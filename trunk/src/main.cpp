@@ -2,6 +2,10 @@
  #include <gtk/gtk.h>
  #include "terminal.h"
 
+/*---[ Constants ]------------------------------------------------------------*/
+
+ static const char *hello = "hello.txt";
+
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
  static void chkParameters(int argc, char *argv[]);
@@ -17,6 +21,11 @@
  static void destroy( GtkWidget *widget, gpointer   data )
  {
     gtk_main_quit();
+ }
+
+ static void init(void)
+ {
+
  }
 
  int main(int argc, char *argv[])
@@ -37,6 +46,7 @@
     t = new Terminal();
 
     t->SetContainer(GTK_CONTAINER(top));
+
 
     gtk_widget_show(top);
 
