@@ -23,6 +23,11 @@
 			<Option objectName="configure"/>
 			<Option target="default"/>
 		</Unit>
+		<Unit filename="src/Makefile">
+			<Option compilerVar=""/>
+			<Option objectName="src/Makefile"/>
+			<Option target="default"/>
+		</Unit>
 		<Unit filename="src/gtk.mk">
 			<Option compilerVar=""/>
 			<Option compile="0"/>

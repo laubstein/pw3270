@@ -45,6 +45,7 @@ $(TARGET): $(OBJECTS)
 	@g++ $(GLFLAGS) -o $@ $(OBJECTS)
 
 run: $(TARGET)
+	@sync
 ifdef DEBUG
 	@$(DEBUG_RUN)
 else
