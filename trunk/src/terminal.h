@@ -20,8 +20,33 @@
 
       void Load(const char *descr);
 
+      /**
+	   * Obtem a largura da fonte.
+	   *
+	   */
+	  int Width(void)
+	  {
+	     return width;
+	  }
+
+      /**
+       * Obtem a altura da fonte.
+       *
+       */
+	  int Height(void)
+	  {
+	     return height;
+	  }
+
+	  GdkFont *Font(void)
+	  {
+	  	return fn;
+	  }
+
    private:
       GdkFont *fn;
+      int	  width;
+      int	  height;
 
    };
 
@@ -43,6 +68,9 @@
     * Objeto representando um terminal.
     *
     */
+   #define TERMINAL_HPAD 2
+   #define TERMINAL_VPAD 2
+
    class Terminal
    {
    public:
@@ -51,12 +79,24 @@
 
       void SetContainer(GtkContainer *ctg);
 
+      /* Callbacks */
+      gboolean expose(GtkWidget *widget, GdkEventExpose *event);
+      void     resize(GtkWidget *widget, GtkAllocation  *allocation);
+
    private:
       GtkWidget 		*widget;
       int 				rows;
       int 				cols;
+      int				left;
       FontElement		*fontlist;
+      FontElement		*font;
       ScreenElement		*screen;
+
+      void SetFont(FontElement *fn)
+      {
+	     font = fn;
+      }
+
    };
 
 
