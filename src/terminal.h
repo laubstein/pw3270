@@ -61,6 +61,11 @@
 
       void expose(GtkWidget *widget, FontElement *font, int x, int y);
 
+      void Set(gchar chr, unsigned short attr)
+      {
+      	this->chr = chr;
+      }
+
    private:
       gchar chr;
 
@@ -79,7 +84,7 @@
       Terminal(int rows = 25, int cols = 80);
       ~Terminal();
 
-      int  Print(int row, int col, const char *fmt, ...);
+      int  Print(int row, int col, unsigned short attr, const char *fmt, ...);
 
       void SetContainer(GtkContainer *ctg);
 

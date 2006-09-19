@@ -1,4 +1,5 @@
 
+ #include <stdarg.h>
 
  #include "log.h"
  #include "terminal.h"
@@ -121,6 +122,58 @@
    return TRUE;
  }
 
+ /**
+  * Imprime na tela.
+  *
+  * Formata e apresenta a string informada dentro da tela.
+  *
+  * @param	row		Linha da tela
+  * @param	col		Coluna da tela
+  * @param	attr	Atributo para a string
+  * @param	fmt		String de formatacao.
+  * @param	...		Argumentos.
+  */
+ int Terminal::Print(int row, int col, unsigned short attr, const char *fmt, ...)
+ {
+ 	char		string[4096];
+    va_list 	arg_ptr;
+    char    	*ptr;
+
+    va_start(arg_ptr, fmt);
+    vsnprintf(string, 4095, fmt, arg_ptr);
+    va_end(arg_ptr);
+
+    for(ptr=string;*ptr && row < rows;ptr++)
+    {
+	   switch(*ptr)
+	   {
+	   // Testa por caractere de controle
+	   case '\n':
+	   case '\r':
+	      col = 0;
+	      row++;
+	      break;
+
+       // Nao e controle, coloca no buffer
+	   default:
+
+	      screen[(row*cols)+col].Set(*ptr,attr);
+
+          if(col++ > cols)
+          {
+	         col = 0;
+	         row++;
+          }
+	   }
+
+    }
+
+    // FIXME (perry#2#): Invalidar somente a area alterada.
+    gdk_window_invalidate_rect(widget->window,&widget->allocation,0);
+
+    return 0;
+ }
+
  void Terminal::resize(GtkWidget *widget, GtkAllocation *allocation)
  {
  	int			width = (allocation->width-(TERMINAL_HPAD<<1)) / cols;
@@ -205,7 +258,7 @@
  {
    gdk_draw_text(	widget->window,
                     font->Font(),
-                    widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
+                    widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
                     x,
                     y,
                     &chr,
@@ -242,7 +295,7 @@
     /* Obtem a geometria da fonte */
     gdk_text_extents(fn,"A",1,&lbearing,&rbearing,&width,&ascent,&descent);
     this->width  = width;
-    this->height = ascent+descent;
+    this->height = (ascent+descent)+2;
 
  	DBGPrintf("Loading \"%s\" (width=%d,ascent=%d,descent=%d)",descr,width,ascent,descent);
 
