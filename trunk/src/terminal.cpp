@@ -168,8 +168,11 @@
 
     }
 
-    // FIXME (perry#2#): Invalidar somente a area alterada.
-    gdk_window_invalidate_rect(widget->window,&widget->allocation,0);
+    if(widget->window)
+    {
+       // FIXME (perry#2#): Invalidar somente a area alterada.
+       gdk_window_invalidate_rect(widget->window,&widget->allocation,0);
+    }
 
     return 0;
  }
