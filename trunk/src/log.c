@@ -1,23 +1,3 @@
-/*
-Este arquivo é parte do programa Instalador
-
-Copyright (C) 2003 Banco do Brasil S/A
-
-Instalador é um software livre; você pode redistribui-lo e/ou
-modifica-lo dentro dos termos da Licença Pública Geral Menor GNU como
-publicada pela Fundação do Software Livre (FSF); na versão 2 da
-Licença, ou (à sua opção) qualquer versão.
-
-Este programa é distribuido na esperança que possa ser util,
-mas SEM NENHUMA GARANTIA; sem uma garantia implicita de ADEQUAÇÂO
-a qualquer MERCADO ou APLICAÇÃO EM PARTICULAR.
-Veja a Licença Pública Geral GNU para maiores detalhes.
-
-Você deve ter recebido uma cópia da Licença Pública Geral Menor GNU
-junto com este programa, se não, escreva para a Fundação do Software
-Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-*/
 
  #define _USE_BSD
  #include <string.h>
@@ -36,11 +16,16 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
  #include <unistd.h>
 
- #include <log.h>
+ #include "log.h"
 
 /*---[ Statics e globais ]----------------------------------------------------------------------------------*/
 
- static char   			logfile[0x0100]		= "/tmp/install.log";
+#ifdef DEBUG
+ static char   			logfile[0x0100]		= "g3270.log";
+#else
+ static char   			logfile[0x0100]		= "/var/log/g3270.log";
+#endif
+
  static pthread_mutex_t	lock				= PTHREAD_MUTEX_INITIALIZER;
 
 /*---[ Prototipos ]-----------------------------------------------------------------------------------------*/
@@ -54,7 +39,7 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   *
   * "locka" semaforo para serializacao de acesso
   */
- int install_lock(void)
+ int g3270_lock(void)
  {
     return pthread_mutex_lock(&lock);
  }
@@ -64,7 +49,7 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   *
   * Libera semaforo para serializacao de acesso
   */
- int install_unlock(void)
+ int g3270_unlock(void)
  {
     return pthread_mutex_unlock(&lock);
  }
@@ -73,7 +58,7 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   * Abre um arquivo de log
   * @return Handle para escrita no arquivo
   */
- FILE *install_openLog(void)
+ FILE *g3270_openLog(void)
  {
     FILE *ret = NULL;
 
@@ -87,9 +72,9 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
  /**
   * Fechar arquivo de log
-  * @param	arq	Handle do arquivo de log retornado por install_openLog() ou install_logPrefix()
+  * @param	arq	Handle do arquivo de log retornado por g3270_openLog() ou g3270_logPrefix()
   */
- void install_closeLog(FILE *arq)
+ void g3270_closeLog(FILE *arq)
  {
     if(arq)
        fclose(arq);
@@ -104,9 +89,9 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   * @param	module	Identificador do modulo para gravacao no arquivo
   * @return handle para escrita no arquivo
   */
- FILE *install_logPrefix(const char *module)
+ FILE *g3270_logPrefix(const char *module)
  {
-    FILE *out = install_openLog();
+    FILE *out = g3270_openLog();
 	writetime(out,module);
 	return out;
  }
@@ -128,7 +113,7 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   * @param	fmt		String de formatacao para a mensagem no mesmo formato da funcao printf()
   * @param	...		Argumentos de acordo com a string de formatacao
   */
- int install_log(const char *module, const char *fmt, ...)
+ int g3270_log(const char *module, const char *fmt, ...)
  {
     char    string[0x0100];
     va_list arg_ptr;
@@ -138,9 +123,9 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     vsnprintf(string, 0xFF, fmt, arg_ptr);
     va_end(arg_ptr);
 
-	install_lock();
+	g3270_lock();
 
-    out = install_logPrefix(module);
+    out = g3270_logPrefix(module);
 
     fprintf(out,"%s\n",string);
 #ifdef DEBUG
@@ -150,8 +135,8 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 	DBGMessage(string);
 
-    install_closeLog(out);
-	install_unlock();
+    g3270_closeLog(out);
+	g3270_unlock();
 
     return 0;
  }
@@ -166,7 +151,7 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   * @param	fmt		String de formatacao para a mensagem no mesmo formato da funcao printf()
   * @param	...		Argumentos de acordo com a string de formatacao
   */
- int install_logRC(const char *module, int rc, const char *fmt, ...)
+ int g3270_logRC(const char *module, int rc, const char *fmt, ...)
  {
     FILE    *out;
     char    string[0x0100];
@@ -178,13 +163,13 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     if(!rc)
        return 0;
 
-	install_lock();
+	g3270_lock();
 
     va_start(arg_ptr, fmt);
     vsprintf(string, fmt, arg_ptr);
     va_end(arg_ptr);
 
-    out = install_logPrefix(module);
+    out = g3270_logPrefix(module);
 
 	if(rc > 0)
 	{
@@ -199,9 +184,9 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
        fprintf(out,"%s: (rc=%d)\n",string,rc);
 	}
 
-    install_closeLog(out);
+    g3270_closeLog(out);
 
-	install_unlock();
+	g3270_unlock();
 
 #ifdef DEBUG
 	if(rc > 0)
@@ -226,7 +211,7 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   *
   * @param	filename	path completo para o novo arquivo de log
   */
- int install_logName(const char *filename)
+ int g3270_logName(const char *filename)
  {
 	FILE *in;
 	FILE *out;
@@ -238,12 +223,12 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 	if(!out)
 	{
-       install_logRC(MODULE,-1,"Nao foi possivel ativar %s",filename);
+       g3270_logRC(MODULE,-1,"Nao foi possivel ativar %s",filename);
 	   return -1;
 	}
 
     WriteLog("Mudando arquivo de log para %s",filename);
-	install_lock();
+	g3270_lock();
 	in = fopen(logfile,"r");
 	if(in)
 	{
@@ -278,7 +263,7 @@ Livre(FSF) Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
        link(logfile,filename);
        strncpy(logfile,filename,0xFF);
 	}
-    install_unlock();
+    g3270_unlock();
 	return rc;
  }
 
