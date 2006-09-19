@@ -59,6 +59,8 @@
    public:
       ScreenElement();
 
+      void expose(GtkWidget *widget, FontElement *font, int x, int y);
+
    private:
       gchar chr;
 
@@ -77,6 +79,8 @@
       Terminal(int rows = 25, int cols = 80);
       ~Terminal();
 
+      int  Print(int row, int col, const char *fmt, ...);
+
       void SetContainer(GtkContainer *ctg);
 
       /* Callbacks */
@@ -88,6 +92,7 @@
       int 				rows;
       int 				cols;
       int				left;
+      int				top;
       FontElement		*fontlist;
       FontElement		*font;
       ScreenElement		*screen;

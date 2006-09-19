@@ -6,13 +6,25 @@
 /*---[ Font list ]------------------------------------------------------------*/
 
  static const char *FontDescr[] =
-	{ 	"-xos4-terminus-medium-*-normal-*-12-*-*-*-*-*-*-*",
+	{
+
+		"-xos4-terminus-medium-*-normal-*-12-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-medium-*-normal-*-14-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-medium-*-normal-*-16-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-medium-*-normal-*-20-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-medium-*-normal-*-24-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-medium-*-normal-*-28-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-32-*-*-*-*-*-*-*"  };
+	 	"-xos4-terminus-medium-*-normal-*-32-*-*-*-*-*-*-*",
+
+		"-xos4-terminus-bold-*-*-*-12-*-*-*-*-*-*-*",
+	 	"-xos4-terminus-bold-*-*-*-14-*-*-*-*-*-*-*",
+	 	"-xos4-terminus-bold-*-*-*-16-*-*-*-*-*-*-*",
+	 	"-xos4-terminus-bold-*-*-*-20-*-*-*-*-*-*-*",
+	 	"-xos4-terminus-bold-*-*-*-24-*-*-*-*-*-*-*",
+	 	"-xos4-terminus-bold-*-*-*-28-*-*-*-*-*-*-*",
+	 	"-xos4-terminus-bold-*-*-*-32-*-*-*-*-*-*-*"
+
+	};
 
  #define FONT_COUNT (sizeof(FontDescr)/sizeof(const char *))
 
@@ -45,6 +57,8 @@
  {
  	this->rows = rows;
  	this->cols = cols;
+
+ 	top		   = TERMINAL_VPAD;
  	left       = TERMINAL_HPAD;
 
     widget     = gtk_drawing_area_new();
@@ -86,21 +100,23 @@
 
  gboolean Terminal::expose(GtkWidget *widget, GdkEventExpose *event)
  {
-/*
-   gdk_draw_arc(widget->window,
-                widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
-                TRUE,
-                0, 0, widget->allocation.width, widget->allocation.height,
-                0, 64 * 360);
-*/
+   // FIXME (perry#2#): Pintar somente a parte do texto que for realmente necessaria.
 
-   gdk_draw_text(	widget->window,
-                    font->Font(),
-                    widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
-                    left,
-                    TERMINAL_VPAD+font->Height(),
-                    "xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.xxxxxxxxx.",
-                    80);
+   int x;
+   int y = top + font->Height();
+
+   for(int lin = 0; lin < rows; lin++)
+   {
+   	  x  = left;
+      y += font->Height();
+
+      for(int col = 0; col < cols;col++)
+      {
+	     ScreenElement *s = screen+((lin*cols)+col);
+         s->expose(widget, font, x, y);
+	     x += font->Width();
+      }
+   }
 
    return TRUE;
  }
@@ -162,7 +178,7 @@
   */
  ScreenElement::ScreenElement()
  {
- 	chr = 0;
+ 	chr = ' ';
  }
 
  /**
@@ -174,8 +190,26 @@
   */
  FontElement::FontElement()
  {
- 	fn = 0;
+ 	fn    = 0;
  	width = 0;
+ }
+
+ /**
+  * Pinta o elemento.
+  *
+  * Pinta o elemento de tela na posicao especificada, respeitando os atributos
+  * correspondentes.
+  *
+  */
+ void ScreenElement::expose(GtkWidget *widget, FontElement *font, int x, int y)
+ {
+   gdk_draw_text(	widget->window,
+                    font->Font(),
+                    widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
+                    x,
+                    y,
+                    &chr,
+                    1);
  }
 
  /**
@@ -198,6 +232,12 @@
  	if(fn)
  	   gdk_font_unref(fn);
     fn = gdk_font_load(descr);
+
+    if(!fn)
+    {
+ 	   DBGPrintf("Can't load \"%s\"",descr);
+ 	   return;
+    }
 
     /* Obtem a geometria da fonte */
     gdk_text_extents(fn,"A",1,&lbearing,&rbearing,&width,&ascent,&descent);
