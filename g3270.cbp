@@ -40,6 +40,11 @@
 			<Option link="0"/>
 			<Option target="default"/>
 		</Unit>
+		<Unit filename="src/lib/Makefile">
+			<Option compilerVar=""/>
+			<Option objectName="src/lib/Makefile"/>
+			<Option target="default"/>
+		</Unit>
 		<Unit filename="src/lib/X11/keysym.h">
 			<Option compilerVar=""/>
 			<Option compile="0"/>
