@@ -5,12 +5,9 @@
 
 /*---[ Constants ]------------------------------------------------------------*/
 
- static const char *hello = "hello.txt";
-
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
  static void chkParameters(int argc, char *argv[]);
-
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -22,32 +19,6 @@
  static void destroy( GtkWidget *widget, gpointer   data )
  {
     gtk_main_quit();
- }
-
- static void initialize(Terminal *t)
- {
-    FILE *arq;
-
-    if(hello)
-    {
-    	arq = fopen(hello,"r");
-    	if(arq)
-    	{
-			char buffer[90];
-			int ln = 0;
-
-			while(fgets(buffer,90,arq))
-			{
-				char *ptr;
-				for(ptr=buffer;*ptr && *ptr >= ' ';ptr++);
-				*ptr = 0;
-				t->Print(ln,0,0,"%s",buffer);
-				ln++;
-			}
-
-    		fclose(arq);
-    	}
-    }
  }
 
  int main(int argc, char *argv[])
@@ -68,8 +39,6 @@
     t = new Terminal();
 
     t->SetContainer(GTK_CONTAINER(top));
-
-    initialize(t);
 
     gtk_widget_show(top);
 

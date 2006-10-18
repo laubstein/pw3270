@@ -52,6 +52,10 @@ else
 	@./$(TARGET)
 endif
 
+lib3270.so: lib/*.c lib/*.h lib/Makefile
+	@make -C lib lib3270.so
+	@mv lib/lib3270.so $@
+
 gtk.mk: ../configure
 	@cd .. ; ./configure
 
