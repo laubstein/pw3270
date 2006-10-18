@@ -191,7 +191,7 @@ sigchld_handler(int ignored)
 }
 
 int
-3270_main(int argc, char *argv[])
+run_emulator(int argc, char *argv[])
 {
 	const char	*cl_hostname = CN;
 

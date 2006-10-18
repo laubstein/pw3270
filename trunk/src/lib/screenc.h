@@ -49,5 +49,4 @@ extern void Trace_action(Widget w, XEvent *event, String *params,
 extern void Show_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 
-extern int 3270_main(int argc, char *argv[]);
-
+extern int run_emulator(int argc, char *argv[]);
