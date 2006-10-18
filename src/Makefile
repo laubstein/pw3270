@@ -62,3 +62,4 @@ gtk.mk: ../configure
 clean:
 	@rm -f $(TARGET)
 	@rm -f $(OBJECTS)
+	@make -C lib clean
