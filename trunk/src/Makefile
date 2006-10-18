@@ -63,3 +63,4 @@ clean:
 	@rm -f $(TARGET)
 	@rm -f $(OBJECTS)
 	@make -C lib clean
+	@rm -f lib3270.so
