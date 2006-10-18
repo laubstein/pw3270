@@ -148,7 +148,7 @@ usage(char *msg)
 /* Callback for connection state changes. */
 static void
 main_connect(Boolean ignored)
-{       
+{
 	if (CONNECTED || appres.disconnect_clear) {
 #if defined(C3270_80_132) /*[*/
 		if (appres.altscreen != CN)
@@ -157,17 +157,17 @@ main_connect(Boolean ignored)
 #endif /*]*/
 			ctlr_erase(True);
 	}
-} 
+}
 
 /* Callback for application exit. */
 static void
 main_exiting(Boolean ignored)
-{       
+{
 	if (escaped)
 		stop_pager();
 	else
 		screen_suspend();
-} 
+}
 
 /* Make sure error messages are seen. */
 static void
@@ -191,7 +191,7 @@ sigchld_handler(int ignored)
 }
 
 int
-main(int argc, char *argv[])
+3270_main(int argc, char *argv[])
 {
 	const char	*cl_hostname = CN;
 
