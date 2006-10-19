@@ -49,6 +49,7 @@
 #include "telnetc.h"
 #include "togglesc.h"
 #include "utilc.h"
+#include "lib3270.h"
 
 #if defined(HAVE_LIBREADLINE) /*[*/
 #include <readline/readline.h>
@@ -191,15 +192,13 @@ sigchld_handler(int ignored)
 }
 
 int
-run_emulator(int argc, char *argv[])
+run_emulator(const char	*cl_hostname)
 {
-	const char	*cl_hostname = CN;
-
 	add_resource("keymap.base",
 	    xs_buffer("%s%s%s", base_keymap1, base_keymap2, base_keymap3));
 	add_resource("keymap.base.3270", NewString(base_3270_keymap));
 
-	argc = parse_command_line(argc, (const char **)argv, &cl_hostname);
+//	argc = parse_command_line(argc, (const char **)argv, &cl_hostname);
 
 	if (charset_init(appres.charset) != CS_OKAY) {
 		xs_warning("Cannot find charset \"%s\"", appres.charset);
