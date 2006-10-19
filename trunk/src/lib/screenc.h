@@ -49,4 +49,3 @@ extern void Trace_action(Widget w, XEvent *event, String *params,
 extern void Show_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 
-extern int run_emulator(int argc, char *argv[]);

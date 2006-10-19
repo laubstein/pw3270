@@ -1,20 +1,42 @@
 
-include gtk.mk
-
 TARGET		= g3270
 OBJECTS     = main.o log.o terminal.o
 
-ifdef DEBUG
+ifeq ($(DEBUG),1)
    DFLAGS=-DDEBUG=1 -g -O0
 else
    DFLAGS=-DNDEBUG=1
 endif
 
-GCFLAGS     = -c `pkg-config --cflags $(GTK)` \
-              -DBUILD=\"`date +%G%m%d%H%M`\" -Wall -Werror \
-              -DTARGET=\"$(TARGET)\" $(DFLAGS)
+#---[ Set GTK Versions ]-------------------------------------------------------#
 
-GLFLAGS     = `pkg-config --libs $(GTK)`
+ifndef GTKLIB
+   GTKLIB=gtk+-2.0
+endif
+
+ifndef GTK_VRS
+   GTK_VRS=`pkg-config --modversion $(GTKLIB)`
+endif
+
+ifndef GTK
+   GTK=`pkg-config --modversion $(GTKLIB) | cut -b 1`
+endif
+
+ifeq ($(GTKLIB),gtk+)
+   GTK_MODULES=$(GTKLIB) gthread-2.0
+else
+   GTK_MODULES=$(GTKLIB)
+endif
+
+
+#---[ Build flags ]------------------------------------------------------------#
+
+GCFLAGS     = -c `pkg-config --cflags $(GTK_MODULES)` \
+              -DBUILD=\"`date +%G%m%d%H%M`\" -Wall -Werror \
+              -DTARGET=\"$(TARGET)\" $(DFLAGS) \
+              -DGTK=$(GTK) -DGTKVERSION=\"$(GTK_VRS)\"
+
+GLFLAGS     = `pkg-config --libs $(GTK_MODULES)` -L. -l3270
 
 #---[ Leak check ]-------------------------------------------------------------#
 
@@ -41,15 +63,18 @@ endif
 
 #---[ Targets ]----------------------------------------------------------------#
 
-$(TARGET): $(OBJECTS)
+version:
+	@echo gtk=$(GTK) $(GTK_VRS)
+
+$(TARGET): $(OBJECTS) lib3270.so
 	@g++ $(GLFLAGS) -o $@ $(OBJECTS)
 
 run: $(TARGET)
 	@sync
 ifdef DEBUG
-	@$(DEBUG_RUN)
+	@LD_LIBRARY_PATH=. $(DEBUG_RUN)
 else
-	@./$(TARGET)
+	@LD_LIBRARY_PATH=. ./$(TARGET)
 endif
 
 lib3270.so: lib/*.c lib/*.h lib/Makefile
