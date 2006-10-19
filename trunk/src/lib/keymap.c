@@ -30,6 +30,7 @@
 #include "statusc.h"
 #include "trace_dsc.h"
 #include "utilc.h"
+#include "lib3270.h"
 
 #undef COLS
 extern int cCOLS;
@@ -66,8 +67,7 @@ struct keymap {
 
 #define IS_INACTIVE(k)	((k)->hints[0] & KM_INACTIVE)
 
-KEYBOARD_INFO *keyboard_info_3270	= 0;
-
+const KEYBOARD_INFO *keyboard_info_3270	= 0;
 
 static struct keymap *master_keymap = NULL;
 static struct keymap **nextk = &master_keymap;
@@ -812,3 +812,10 @@ keymap_dump(void)
 		}
 	}
 }
+
+int set_3270_keyboard(const KEYBOARD_INFO *kbd)
+{
+	keyboard_info_3270 = kbd;
+	return 0;
+}
+

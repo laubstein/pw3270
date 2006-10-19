@@ -13,47 +13,7 @@
 
 /* c3270 version of screenc.h */
 
-
-#pragma pack(1)
-
-#define SCREEN_MAGIC 0x4871
-
-typedef struct _screen_callback
-{
-	unsigned short sz;
-	unsigned short magic;
-
-    void (*screen_init)(void);
-    void (*screen_disp)(Boolean erasing unused);
-    void (*screen_suspend)(void);
-    void (*screen_resume)(void);
-
-    void (*cursor_move)(int baddr);
-    void (*toggle_monocase)(struct toggle *t unused, enum toggle_type tt unused);
-
-    void (*status_ctlr_done)(void);
-    void (*status_insert_mode)(Boolean on);
-    void (*status_minus)(void);
-    void (*status_oerr)(int error_type);
-    void (*status_reset)(void);
-    void (*status_reverse_mode)(Boolean on);
-    void (*status_syswait)(void);
-    void (*status_twait)(void);
-    void (*status_typeahead)(Boolean on);
-    void (*status_compose)(Boolean on, unsigned char c, enum keytype keytype);
-    void (*status_lu)(const char *lu);
-
-    void (*ring_bell)(void);
-    void (*screen_flip)(void);
-    void (*screen_width)(int width);
-
-    void (*Redraw_action)(Widget w, XEvent *event, String *params, Cardinal *num_params);
-
-} SCREEN_CALLBACK;
-
-#pragma pack()
-
-extern SCREEN_CALLBACK *screen_callbacks_3270;
+#include "lib3270.h"
 
 #define blink_start()
 #define display_heightMM()	100
@@ -67,18 +27,11 @@ extern SCREEN_CALLBACK *screen_callbacks_3270;
 #define screen_scroll()
 
 extern void cursor_move(int baddr);
-extern void cursor_move(int baddr);
-extern void ring_bell(void);
 extern void ring_bell(void);
 extern void screen_132(void);
-extern void screen_132(void);
-extern void screen_80(void);
 extern void screen_80(void);
 extern void screen_disp(Boolean erasing);
-extern void screen_disp(Boolean erasing);
 extern void screen_init(void);
-extern void screen_init(void);
-extern void screen_flip(void);
 extern void screen_flip(void);
 extern void screen_resume(void);
 extern void screen_suspend(void);
