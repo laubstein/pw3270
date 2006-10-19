@@ -36,12 +36,19 @@
 #include "utilc.h"
 #include "widec.h"
 #include "xioc.h"
+#include "lib3270.h"
 
 /*---[ Publics ]--------------------------------------------------------------*/
 
-SCREEN_CALLBACK *screen_callbacks_3270	= 0;
-Boolean 		 escaped 				= True;
+const SCREEN_CALLBACK *screen_callbacks_3270	= 0;
+Boolean 		 	   escaped 					= True;
 
+/* Set callback structure */
+int set_3270_screen(const SCREEN_CALLBACK *scr)
+{
+	screen_callbacks_3270 = scr;
+	return 0;
+}
 
 /* Initialize the screen. */
 void screen_init(void)

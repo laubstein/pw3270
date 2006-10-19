@@ -13,6 +13,8 @@
 
 /* c3270 version of keymapc.h */
 
+#include "lib3270.h"
+
 #define KM_CTRL		0x0001
 #define KM_META		0x0002
 
@@ -21,24 +23,5 @@ extern char *lookup_key(int k);
 extern void keymap_dump(void);
 extern const char *decode_key(int k, int hint, char *buf);
 
-#pragma pack(1)
-
-typedef struct _keytable
-{
-	const char *name;
-    int code;
-} KEYTABLE;
-
-typedef struct _keyboard_info
-{
-	unsigned short sz;
-	unsigned short magic;
-
-	void (*beep)(void);
-
-	const KEYTABLE	*keys;
-} KEYBOARD_INFO;
-
-#pragma pack()
 
 
