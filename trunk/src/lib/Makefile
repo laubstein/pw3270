@@ -40,7 +40,7 @@ INSTALL_DATA = ${INSTALL} -m 644
 XCPPFLAGS = -I. -DLIBX3270DIR=\"$(LIBX3270DIR)\"  -D_POSIX_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE
 CFLAGS = -g -O2 $(XCPPFLAGS) $(CDEBUGFLAGS)
 LDFLAGS =
-LIBS = -lnsl -lncurses -lutil
+LIBS = -lnsl -lutil
 
 version.o: $(VOBJS) version.txt mkversion.sh
 	@chmod +x mkversion.sh version.txt

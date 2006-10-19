@@ -35,10 +35,10 @@
 extern int cCOLS;
 
 #undef COLOR_BLACK
-#undef COLOR_RED    
+#undef COLOR_RED
 #undef COLOR_GREEN
 #undef COLOR_YELLOW
-#undef COLOR_BLUE   
+#undef COLOR_BLUE
 #undef COLOR_WHITE
 #if defined(HAVE_NCURSES_H) /*[*/
 #include <ncurses.h>
@@ -65,6 +65,9 @@ struct keymap {
 };
 
 #define IS_INACTIVE(k)	((k)->hints[0] & KM_INACTIVE)
+
+KEYBOARD_INFO *keyboard_info_3270	= 0;
+
 
 static struct keymap *master_keymap = NULL;
 static struct keymap **nextk = &master_keymap;
@@ -418,7 +421,7 @@ longer_match(struct keymap *k, int nc)
 
 /*
  * Helper function that returns a keymap action, sets the status line, and
- * traces the result.  
+ * traces the result.
  *
  * If s is NULL, then this is a failed initial lookup.
  * If s is 'ignore', then this is a lookup in progress (k non-NULL) or a
@@ -560,118 +563,31 @@ lookup_key(int code)
 	}
 
 	/* Complain. */
-	beep();
+    if(keyboard_info_3270 && keyboard_info_3270->beep)
+	   keyboard_info_3270->beep();
+
 	trace_event(" keymap lookup failure after partial match\n");
 	return status_ret(ignore, NULL);
 }
-
-static struct {
-	const char *name;
-	int code;
-} ncurses_key[] = {
-	{ "BREAK",	KEY_BREAK },
-	{ "DOWN",	KEY_DOWN },
-	{ "UP",		KEY_UP },
-	{ "LEFT",	KEY_LEFT },
-	{ "RIGHT",	KEY_RIGHT },
-	{ "HOME",	KEY_HOME },
-	{ "BACKSPACE",	KEY_BACKSPACE },
-	{ "F0",		KEY_F0 },
-	{ "DL",		KEY_DL },
-	{ "IL",		KEY_IL },
-	{ "DC",		KEY_DC },
-	{ "IC",		KEY_IC },
-	{ "EIC",	KEY_EIC },
-	{ "CLEAR",	KEY_CLEAR },
-	{ "EOS",	KEY_EOS },
-	{ "EOL",	KEY_EOL },
-	{ "SF",		KEY_SF },
-	{ "SR",		KEY_SR },
-	{ "NPAGE",	KEY_NPAGE },
-	{ "PPAGE",	KEY_PPAGE },
-	{ "STAB",	KEY_STAB },
-	{ "CTAB",	KEY_CTAB },
-	{ "CATAB",	KEY_CATAB },
-	{ "ENTER",	KEY_ENTER },
-	{ "SRESET",	KEY_SRESET },
-	{ "RESET",	KEY_RESET },
-	{ "PRINT",	KEY_PRINT },
-	{ "LL",		KEY_LL },
-	{ "A1",		KEY_A1 },
-	{ "A3",		KEY_A3 },
-	{ "B2",		KEY_B2 },
-	{ "C1",		KEY_C1 },
-	{ "C3",		KEY_C3 },
-	{ "BTAB",	KEY_BTAB },
-	{ "BEG",	KEY_BEG },
-	{ "CANCEL",	KEY_CANCEL },
-	{ "CLOSE",	KEY_CLOSE },
-	{ "COMMAND",	KEY_COMMAND },
-	{ "COPY",	KEY_COPY },
-	{ "CREATE",	KEY_CREATE },
-	{ "END",	KEY_END },
-	{ "EXIT",	KEY_EXIT },
-	{ "FIND",	KEY_FIND },
-	{ "HELP",	KEY_HELP },
-	{ "MARK",	KEY_MARK },
-	{ "MESSAGE",	KEY_MESSAGE },
-	{ "MOVE",	KEY_MOVE },
-	{ "NEXT",	KEY_NEXT },
-	{ "OPEN",	KEY_OPEN },
-	{ "OPTIONS",	KEY_OPTIONS },
-	{ "PREVIOUS",	KEY_PREVIOUS },
-	{ "REDO",	KEY_REDO },
-	{ "REFERENCE",	KEY_REFERENCE },
-	{ "REFRESH",	KEY_REFRESH },
-	{ "REPLACE",	KEY_REPLACE },
-	{ "RESTART",	KEY_RESTART },
-	{ "RESUME",	KEY_RESUME },
-	{ "SAVE",	KEY_SAVE },
-	{ "SBEG",	KEY_SBEG },
-	{ "SCANCEL",	KEY_SCANCEL },
-	{ "SCOMMAND",	KEY_SCOMMAND },
-	{ "SCOPY",	KEY_SCOPY },
-	{ "SCREATE",	KEY_SCREATE },
-	{ "SDC",	KEY_SDC },
-	{ "SDL",	KEY_SDL },
-	{ "SELECT",	KEY_SELECT },
-	{ "SEND",	KEY_SEND },
-	{ "SEOL",	KEY_SEOL },
-	{ "SEXIT",	KEY_SEXIT },
-	{ "SFIND",	KEY_SFIND },
-	{ "SHELP",	KEY_SHELP },
-	{ "SHOME",	KEY_SHOME },
-	{ "SIC",	KEY_SIC },
-	{ "SLEFT",	KEY_SLEFT },
-	{ "SMESSAGE",	KEY_SMESSAGE },
-	{ "SMOVE",	KEY_SMOVE },
-	{ "SNEXT",	KEY_SNEXT },
-	{ "SOPTIONS",	KEY_SOPTIONS },
-	{ "SPREVIOUS",	KEY_SPREVIOUS },
-	{ "SPRINT",	KEY_SPRINT },
-	{ "SREDO",	KEY_SREDO },
-	{ "SREPLACE",	KEY_SREPLACE },
-	{ "SRIGHT",	KEY_SRIGHT },
-	{ "SRSUME",	KEY_SRSUME },
-	{ "SSAVE",	KEY_SSAVE },
-	{ "SSUSPEND",	KEY_SSUSPEND },
-	{ "SUNDO",	KEY_SUNDO },
-	{ "SUSPEND",	KEY_SUSPEND },
-	{ "UNDO",	KEY_UNDO },
-	{ CN, 0 }
-};
 
 /* Look up a curses symbolic key. */
 static int
 lookup_ccode(const char *s)
 {
 	int i;
+	const KEYTABLE *key;
+
 	unsigned long f;
 	char *ptr;
 
-	for (i = 0; ncurses_key[i].name != CN; i++) {
-		if (!strcmp(s, ncurses_key[i].name))
-			return ncurses_key[i].code;
+	if(!(keyboard_info_3270 || keyboard_info_3270->keys))
+	   return -1;
+
+    key = keyboard_info_3270->keys;
+
+	for (i = 0; key[i].name != CN; i++) {
+		if (!strcmp(s, key[i].name))
+			return key[i].code;
 	}
 	if (s[0] == 'F' &&
 	    (f = strtoul(s + 1, &ptr, 10)) < 64 &&
@@ -686,11 +602,17 @@ lookup_ccode(const char *s)
 static const char *
 lookup_cname(int ccode)
 {
-	int i;
+	const KEYTABLE *key;
+	int 	  i;
 
-	for (i = 0; ncurses_key[i].name != CN; i++) {
-		if (ccode == ncurses_key[i].code)
-			return ncurses_key[i].name;
+	if(!(keyboard_info_3270 || keyboard_info_3270->keys))
+	   return CN;
+
+    key = keyboard_info_3270->keys;
+
+	for (i = 0; key[i].name != CN; i++) {
+		if (ccode == key[i].code)
+			return key[i].name;
 	}
 	if (ccode >= KEY_F0 && ccode < KEY_F0 + 64) {
 		static char buf[10];
