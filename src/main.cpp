@@ -2,6 +2,9 @@
  #include <stdio.h>
  #include <gtk/gtk.h>
  #include "terminal.h"
+
+ #include "lib/globals.h"
+ #include "lib/appres.h"
  #include "lib/lib3270.h"
 
 /*---[ Constants ]------------------------------------------------------------*/
