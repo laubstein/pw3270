@@ -194,6 +194,9 @@ sigchld_handler(int ignored)
 int
 run_emulator(const char	*cl_hostname)
 {
+    if(!(screen_callbacks_3270 && keyboard_info_3270))
+       return EINVAL;
+
 	add_resource("keymap.base",
 	    xs_buffer("%s%s%s", base_keymap1, base_keymap2, base_keymap3));
 	add_resource("keymap.base.3270", NewString(base_3270_keymap));

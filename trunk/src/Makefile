@@ -53,13 +53,13 @@ endif
 
 #---[ Rules ]------------------------------------------------------------------#
 
-%.o: %.cpp *.h Makefile *.mk
+%.o: %.cpp *.h Makefile
 	@echo $< ...
-	@g++ $(GCFLAGS) -o $@ -c $<
+	g++ $(GCFLAGS) -o $@ -c $<
 
 %.o: %.c *.h Makefile *.mk
 	@echo $< ...
-	@gcc $(GCFLAGS) -o $@ -c $<
+	gcc $(GCFLAGS) -o $@ -c $<
 
 #---[ Targets ]----------------------------------------------------------------#
 
