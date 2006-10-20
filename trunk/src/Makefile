@@ -1,6 +1,6 @@
 
 TARGET		= g3270
-OBJECTS     = main.o log.o terminal.o
+OBJECTS     = main.o log.o terminal.o screen_callbacks.o
 
 ifeq ($(DEBUG),1)
    DFLAGS=-DDEBUG=1 -g -O0
@@ -62,9 +62,6 @@ endif
 	gcc $(GCFLAGS) -o $@ -c $<
 
 #---[ Targets ]----------------------------------------------------------------#
-
-version:
-	@echo gtk=$(GTK) $(GTK_VRS)
 
 $(TARGET): $(OBJECTS) lib3270.so
 	@g++ $(GLFLAGS) -o $@ $(OBJECTS)

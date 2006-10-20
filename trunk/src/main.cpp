@@ -3,9 +3,7 @@
  #include <gtk/gtk.h>
  #include "terminal.h"
 
- #include "lib/globals.h"
- #include "lib/appres.h"
- #include "lib/lib3270.h"
+ #include "g3270.h"
 
 /*---[ Constants ]------------------------------------------------------------*/
 
@@ -37,6 +35,8 @@
     printf(TARGET " (Build " BUILD " for gtk " GTKVERSION ") Starting\n");
     fflush(stdout);
 
+    set_3270_screen(&g3270_screen_callbacks);
+    set_3270_keyboard(&g3270_keyboard_info);
 
     run_emulator("3270.df.bb:8023");
 
