@@ -23,6 +23,12 @@
 			<Option objectName="src/Makefile"/>
 			<Option target="default"/>
 		</Unit>
+		<Unit filename="src/g3270.h">
+			<Option compilerVar=""/>
+			<Option compile="0"/>
+			<Option link="0"/>
+			<Option target="default"/>
+		</Unit>
 		<Unit filename="src/lib/3270ds.h">
 			<Option compilerVar=""/>
 			<Option compile="0"/>
@@ -490,11 +496,21 @@
 			<Option compilerVar="CPP"/>
 			<Option target="default"/>
 		</Unit>
+		<Unit filename="src/screen_callbacks.cpp">
+			<Option compilerVar="CPP"/>
+			<Option target="default"/>
+		</Unit>
 		<Unit filename="src/terminal.cpp">
 			<Option compilerVar="CPP"/>
 			<Option target="default"/>
 		</Unit>
 		<Unit filename="src/terminal.h">
+			<Option compilerVar=""/>
+			<Option compile="0"/>
+			<Option link="0"/>
+			<Option target="default"/>
+		</Unit>
+		<Unit filename="src/trace.h">
 			<Option compilerVar=""/>
 			<Option compile="0"/>
 			<Option link="0"/>
