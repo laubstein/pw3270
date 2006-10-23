@@ -83,8 +83,8 @@ int set_3270_screen(const SCREEN_CALLBACK *scr);
 int set_3270_keyboard(const KEYBOARD_INFO *kbd);
 int run_emulator(const char	*cl_hostname);
 
-extern int parse_3270_command_line(int argc, const char **argv, const char **cl_hostname);
-
+extern int  parse_3270_command_line(int argc, const char **argv, const char **cl_hostname);
+extern void register_3270_schange(int tx, void (*func)(Boolean));
 
 extern const SCREEN_CALLBACK *screen_callbacks_3270;
 extern const KEYBOARD_INFO   *keyboard_info_3270;

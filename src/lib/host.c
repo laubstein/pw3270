@@ -943,7 +943,7 @@ static struct st_callback *st_last[N_ST];
 
 /* Register a function interested in a state change. */
 void
-register_schange(int tx, void (*func)(Boolean))
+register_3270_schange(int tx, void (*func)(Boolean))
 {
 	struct st_callback *st;
 
@@ -957,6 +957,12 @@ printf("%s(%d) %d\n",__FILE__,__LINE__, tx);fflush(stdout);
 	else
 		st_callbacks[tx] = st;
 	st_last[tx] = st;
+}
+
+// FIXME (perry#1#): UGLY!!! But changing all the call will take some time.
+void register_schange(int tx, void (*func)(Boolean))
+{
+	register_3270_schange(tx,func);
 }
 
 /* Signal a state change. */
