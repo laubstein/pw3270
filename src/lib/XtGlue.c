@@ -39,6 +39,7 @@ void (*Warning_redirect)(const char *) = NULL;
 void
 Error(const char *s)
 {
+    // TODO (perry#3#): Needs a callback here
 	fprintf(stderr, "Error: %s\n", s);
 	exit(1);
 }
@@ -46,6 +47,7 @@ Error(const char *s)
 void
 Warning(const char *s)
 {
+    // TODO (perry#3#): Needs a callback here
 #if defined(C3270) /*[*/
 	extern Boolean any_error_output;
 #endif /*]*/
@@ -417,13 +419,13 @@ RemoveTimeOut(unsigned long timer)
 	}
 }
 
-/* Input events. */ 
-typedef struct input {  
+/* Input events. */
+typedef struct input {
         struct input *next;
-        int source; 
+        int source;
         int condition;
         void (*proc)(void);
-} input_t;          
+} input_t;
 static input_t *inputs = (input_t *)NULL;
 static Boolean inputs_changed = False;
 
@@ -439,6 +441,9 @@ AddInput(int source, void (*fn)(void))
 	ip->next = inputs;
 	inputs = ip;
 	inputs_changed = True;
+
+    printf("%s(%d) %p\n",__FILE__,__LINE__,ip->proc);fflush(stdout);
+
 	return (unsigned long)ip;
 }
 
@@ -498,7 +503,7 @@ RemoveInput(unsigned long id)
  * select().
  */
 int
-select_setup(int *nfds, fd_set *readfds, fd_set *writefds, 
+select_setup(int *nfds, fd_set *readfds, fd_set *writefds,
     fd_set *exceptfds, struct timeval **timeout, struct timeval *timebuf)
 {
 	input_t *ip;
@@ -567,14 +572,18 @@ process_events(Boolean block)
 
 	processed_any = False;
     retry:
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 	/* If we've processed any input, then don't block again. */
 	if (processed_any)
 		block = False;
+
 	any_events = False;
 	FD_ZERO(&rfds);
 	FD_ZERO(&wfds);
 	FD_ZERO(&xfds);
 	for (ip = inputs; ip != (input_t *)NULL; ip = ip->next) {
+
 		if ((unsigned long)ip->condition & InputReadMask) {
 			FD_SET(ip->source, &rfds);
 			any_events = True;
@@ -588,6 +597,7 @@ process_events(Boolean block)
 			any_events = True;
 		}
 	}
+
 	if (block) {
 		if (timeouts != TN) {
 			(void) gettimeofday(&now, (void *)NULL);
@@ -612,24 +622,40 @@ process_events(Boolean block)
 	if (!any_events)
 		return processed_any;
 	ns = select(FD_SETSIZE, &rfds, &wfds, &xfds, tp);
+
+
 	if (ns < 0) {
 		if (errno != EINTR)
 			Warning("process_events: select() failed");
 		return processed_any;
 	}
+
 	inputs_changed = False;
 	for (ip = inputs; ip != (input_t *)NULL; ip = ip_next) {
+
+        printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 		ip_next = ip->next;
+
 		if (((unsigned long)ip->condition & InputReadMask) &&
 		    FD_ISSET(ip->source, &rfds)) {
+
+            printf("%s(%d) %p\n",__FILE__,__LINE__,ip->proc);fflush(stdout);
 			(*ip->proc)();
+            printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 			processed_any = True;
 			if (inputs_changed)
 				goto retry;
 		}
+        printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 		if (((unsigned long)ip->condition & InputWriteMask) &&
 		    FD_ISSET(ip->source, &wfds)) {
+
+            printf("%s(%d) %p\n",__FILE__,__LINE__,ip->proc);fflush(stdout);
 			(*ip->proc)();
+            printf("%s(%d) %p\n",__FILE__,__LINE__,ip->proc);fflush(stdout);
+
 			processed_any = True;
 			if (inputs_changed)
 				goto retry;
@@ -642,6 +668,9 @@ process_events(Boolean block)
 				goto retry;
 		}
 	}
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 
 	/* See what's expired. */
 	if (timeouts != TN) {
@@ -659,6 +688,10 @@ process_events(Boolean block)
 				break;
 		}
 	}
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
+
 	if (inputs_changed)
 		goto retry;
 

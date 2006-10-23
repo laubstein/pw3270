@@ -150,6 +150,8 @@ usage(char *msg)
 static void
 main_connect(Boolean ignored)
 {
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 	if (CONNECTED || appres.disconnect_clear) {
 #if defined(C3270_80_132) /*[*/
 		if (appres.altscreen != CN)
@@ -158,6 +160,8 @@ main_connect(Boolean ignored)
 #endif /*]*/
 			ctlr_erase(True);
 	}
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 }
 
 /* Callback for application exit. */
@@ -198,7 +202,7 @@ run_emulator(const char	*cl_hostname)
        return EINVAL;
 
 	add_resource("keymap.base",
-	    xs_buffer("%s%s%s", base_keymap1, base_keymap2, base_keymap3));
+	xs_buffer("%s%s%s", base_keymap1, base_keymap2, base_keymap3));
 	add_resource("keymap.base.3270", NewString(base_3270_keymap));
 
 //	argc = parse_command_line(argc, (const char **)argv, &cl_hostname);
@@ -234,12 +238,15 @@ run_emulator(const char	*cl_hostname)
 	hostfile_init();
 	hostfile_init();
 	ansi_init();
-
 	sms_init();
 
-	register_schange(ST_CONNECT, main_connect);
-        register_schange(ST_3270_MODE, main_connect);
-        register_schange(ST_EXITING, main_exiting);
+
+	// TODO (perry#1#): The right way is left the main aplication to register their own callbacks.
+    register_schange(ST_CONNECT, main_connect);
+	register_schange(ST_3270_MODE, main_connect);
+    register_schange(ST_EXITING, main_exiting);
+
+
 #if defined(X3270_FT) /*[*/
 	ft_init();
 #endif /*]*/
@@ -253,6 +260,8 @@ run_emulator(const char	*cl_hostname)
 	/* Make sure we can collect child exit status. */
 	(void) signal(SIGCHLD, sigchld_handler);
 
+	printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 	/* Handle initial toggle settings. */
 #if defined(X3270_TRACE) /*[*/
 	if (!appres.debug_tracing) {
@@ -260,19 +269,25 @@ run_emulator(const char	*cl_hostname)
 		appres.toggle[EVENT_TRACE].value = False;
 	}
 #endif /*]*/
+
 	initialize_toggles();
 
 	/* Connect to the host. */
 	screen_suspend();
+
 	if (cl_hostname != CN) {
 		appres.once = True;
+
 		if (host_connect(cl_hostname) < 0)
-			exit(1);
+			return(1);
+
 		/* Wait for negotiations to complete or fail. */
 		while (!IN_ANSI && !IN_3270) {
+
 			(void) process_events(True);
+
 			if (!PCONNECTED)
-				exit(1);
+				return(1);
 		}
 		pause_for_errors();
 	} else {

@@ -9,7 +9,7 @@
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
- static void chkParameters(int argc, char *argv[]);
+ static void chkParameters(int argc, const char **argv);
 
 /*---[ Implement ]------------------------------------------------------------*/
 /*
@@ -23,8 +23,9 @@
     gtk_main_quit();
  }
 */
- int main(int argc, char *argv[])
+ int main(int argc, const char **argv)
  {
+ 	const char *cl_hostname;
 /*
     GtkWidget *top;
     Terminal  *t;
@@ -38,7 +39,14 @@
     set_3270_screen(&g3270_screen_callbacks);
     set_3270_keyboard(&g3270_keyboard_info);
 
-    run_emulator("3270.df.bb:8023");
+    parse_3270_command_line(argc, argv, &cl_hostname);
+
+    if(!cl_hostname)
+       cl_hostname = "3270.df.bb:8023";
+
+    printf("Server: %s\n",cl_hostname);
+
+    run_emulator(cl_hostname);
 
 /*
     gtk_init(&argc, &argv);
@@ -61,7 +69,7 @@
     return 0;
  }
 
- static void chkParameters(int argc, char *argv[])
+ static void chkParameters(int argc, const char **argv)
  {
 	// TODO (perry#3#): Testar parametros da linha de comando.
 

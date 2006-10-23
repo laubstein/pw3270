@@ -725,7 +725,10 @@ void
 host_connected(void)
 {
 	cstate = CONNECTED_INITIAL;
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 	st_changed(ST_CONNECT, True);
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 #if defined(X3270_DISPLAY) /*[*/
 	if (appres.reconnect && error_popup_visible())
@@ -812,7 +815,7 @@ save_recent(const char *hn)
 
 	/*
 	 * Read the last-connection file, to capture the any changes made by
-	 * other instances of x3270.  
+	 * other instances of x3270.
 	 */
 	if (appres.connectfile_name != CN &&
 	    strcasecmp(appres.connectfile_name, "none")) {
@@ -943,6 +946,8 @@ void
 register_schange(int tx, void (*func)(Boolean))
 {
 	struct st_callback *st;
+
+printf("%s(%d) %d\n",__FILE__,__LINE__, tx);fflush(stdout);
 
 	st = (struct st_callback *)Malloc(sizeof(*st));
 	st->func = func;
