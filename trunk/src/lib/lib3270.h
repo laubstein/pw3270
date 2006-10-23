@@ -55,6 +55,8 @@ typedef struct _screen_callback
     void (*screen_flip)(void);
     void (*screen_width)(int width);
 
+    void (*error_popup)(const char *msg);
+
     void (*Redraw_action)(Widget w, XEvent *event, String *params, Cardinal *num_params);
 
 } SCREEN_CALLBACK;
@@ -80,6 +82,8 @@ typedef struct _keyboard_info
 int set_3270_screen(const SCREEN_CALLBACK *scr);
 int set_3270_keyboard(const KEYBOARD_INFO *kbd);
 int run_emulator(const char	*cl_hostname);
+
+extern int parse_3270_command_line(int argc, const char **argv, const char **cl_hostname);
 
 
 extern const SCREEN_CALLBACK *screen_callbacks_3270;

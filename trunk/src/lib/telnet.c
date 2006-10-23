@@ -205,13 +205,13 @@ static const char *nnn(int c);
 #define TNS_SB_IAC	7	/* got an IAC after an IAC SB */
 
 /* telnet predefined messages */
-static unsigned char	do_opt[]	= { 
+static unsigned char	do_opt[]	= {
 	IAC, DO, '_' };
-static unsigned char	dont_opt[]	= { 
+static unsigned char	dont_opt[]	= {
 	IAC, DONT, '_' };
-static unsigned char	will_opt[]	= { 
+static unsigned char	will_opt[]	= {
 	IAC, WILL, '_' };
-static unsigned char	wont_opt[]	= { 
+static unsigned char	wont_opt[]	= {
 	IAC, WONT, '_' };
 #if defined(X3270_TN3270E) /*[*/
 static unsigned char	functions_req[] = {
@@ -585,7 +585,7 @@ setup_lus(void)
 
 	/*
 	 * Count the commas in the LU name.  That plus one is the
-	 * number of LUs to try. 
+	 * number of LUs to try.
 	 */
 	lu = luname;
 	while ((comma = strchr(lu, ',')) != CN) {
@@ -771,6 +771,8 @@ net_input(void)
 	if (sock < 0)
 		return;
 
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 #if defined(X3270_ANSI) /*[*/
 	ansi_data = 0;
 #endif /*]*/
@@ -781,7 +783,13 @@ net_input(void)
 	else
 #else /*][*/
 #endif /*]*/
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 	nr = read(sock, (char *) netrbuf, BUFSZ);
+
+    printf("%s(%d) %d\n",__FILE__,__LINE__,nr);fflush(stdout);
+
 	if (nr < 0) {
 #if defined(HAVE_LIBSSL) /*[*/
 		if (ssl_con != NULL) {
@@ -828,19 +836,28 @@ net_input(void)
 	}
 
 	/* Process the data. */
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 	if (HALF_CONNECTED) {
 		if (non_blocking(False) < 0) {
 			host_disconnect(True);
 			return;
 		}
+        printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 		host_connected();
+
+        printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 		net_connected();
+
+        printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 	}
 
 #if defined(X3270_TRACE) /*[*/
 	trace_netdata('<', netrbuf, nr);
 #endif /*]*/
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 	ns_brcvd += nr;
 	for (cp = netrbuf; cp < (netrbuf + nr); cp++) {
@@ -848,6 +865,9 @@ net_input(void)
 		if (local_process) {
 			/* More to do here, probably. */
 			if (IN_NEITHER) {	/* now can assume ANSI mode */
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 				host_in3270(CONNECTED_ANSI);
 				hisopts[TELOPT_ECHO] = 1;
 				check_linemode(False);
@@ -858,7 +878,13 @@ net_input(void)
 			ansi_process((unsigned int) *cp);
 		} else {
 #endif /*]*/
+
+    printf("%s(%d) %s\n",__FILE__,__LINE__,cp);fflush(stdout);
+
 			if (telnet_fsm(*cp)) {
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 				(void) ctlr_dbcs_postprocess();
 				host_disconnect(True);
 				return;
@@ -867,6 +893,8 @@ net_input(void)
 		}
 #endif /*]*/
 	}
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
@@ -877,6 +905,8 @@ net_input(void)
 		ansi_data = 0;
 	}
 #endif /*]*/
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 #if defined(X3270_TRACE) /*[*/
 	/* See if it's time to roll over the trace file. */
@@ -950,9 +980,14 @@ telnet_fsm(unsigned char c)
 	int	sl;
 #endif /*]*/
 
+    printf("%s(%d) %d\n",__FILE__,__LINE__,telnet_state);fflush(stdout);
+
 	switch (telnet_state) {
 	    case TNS_DATA:	/* normal data processing */
 		if (c == IAC) {	/* got a telnet command */
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 			telnet_state = TNS_IAC;
 #if defined(X3270_ANSI) /*[*/
 			if (ansi_data) {
@@ -997,6 +1032,9 @@ telnet_fsm(unsigned char c)
 		}
 		break;
 	    case TNS_IAC:	/* process a telnet command */
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 		if (c != EOR && c != IAC) {
 			trace_dsn("RCVD %s ", cmd(c));
 		}
@@ -1072,6 +1110,9 @@ telnet_fsm(unsigned char c)
 		}
 		break;
 	    case TNS_WILL:	/* telnet WILL DO OPTION command */
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 		trace_dsn("%s\n", opt(c));
 		switch (c) {
 		    case TELOPT_SGA:
@@ -1129,6 +1170,9 @@ telnet_fsm(unsigned char c)
 		telnet_state = TNS_DATA;
 		break;
 	    case TNS_DO:	/* telnet PLEASE DO OPTION command */
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 		trace_dsn("%s\n", opt(c));
 		switch (c) {
 		    case TELOPT_BINARY:
@@ -1191,6 +1235,9 @@ telnet_fsm(unsigned char c)
 		telnet_state = TNS_DATA;
 		break;
 	    case TNS_DONT:	/* telnet PLEASE DON'T DO OPTION command */
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 		trace_dsn("%s\n", opt(c));
 		if (myopts[c]) {
 			myopts[c] = 0;
@@ -1203,14 +1250,23 @@ telnet_fsm(unsigned char c)
 		telnet_state = TNS_DATA;
 		break;
 	    case TNS_SB:	/* telnet sub-option string command */
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 		if (c == IAC)
 			telnet_state = TNS_SB_IAC;
 		else
 			*sbptr++ = c;
 		break;
 	    case TNS_SB_IAC:	/* telnet sub-option string command */
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 		*sbptr++ = c;
 		if (c == SE) {
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 			telnet_state = TNS_DATA;
 			if (sbbuf[0] == TELOPT_TTYPE &&
 			    sbbuf[1] == TELQUAL_SEND) {
@@ -1257,6 +1313,9 @@ telnet_fsm(unsigned char c)
 #if defined(X3270_TN3270E) /*[*/
 			else if (myopts[TELOPT_TN3270E] &&
 				   sbbuf[0] == TELOPT_TN3270E) {
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 				if (tn3270e_negotiate())
 					return -1;
 			}
@@ -1265,11 +1324,17 @@ telnet_fsm(unsigned char c)
 			else if (need_tls_follows &&
 				   myopts[TELOPT_STARTTLS] &&
 				   sbbuf[0] == TELOPT_STARTTLS) {
+
+	    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 				continue_tls(sbbuf, sbptr - sbbuf);
 			}
 #endif /*]*/
 
 		} else {
+
+    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 			telnet_state = TNS_SB;
 		}
 		break;
@@ -1285,6 +1350,8 @@ tn3270e_request(void)
 	int tt_len, tb_len;
 	char *tt_out;
 	char *t;
+
+printf("%s(%d) %p\n",__FILE__,__LINE__,termtype);fflush(stdout);
 
 	tt_len = strlen(termtype);
 	if (try_lu != CN && *try_lu)
@@ -1352,22 +1419,32 @@ tn3270e_negotiate(void)
 	int sblen;
 	unsigned long e_rcvd;
 
+printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 	/* Find out how long the subnegotiation buffer is. */
 	for (sblen = 0; ; sblen++) {
 		if (sbbuf[sblen] == SE)
 			break;
 	}
 
+printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+
 	trace_dsn("TN3270E ");
+
+printf("%s(%d) %d\n",__FILE__,__LINE__,sbbuf[1]);fflush(stdout);
 
 	switch (sbbuf[1]) {
 
 	case TN3270E_OP_SEND:
 
+printf("%s(%d) %d\n",__FILE__,__LINE__,sbbuf[2]);fflush(stdout);
+
 		if (sbbuf[2] == TN3270E_OP_DEVICE_TYPE) {
 
 			/* Host wants us to send our device type. */
 			trace_dsn("SEND DEVICE-TYPE SE\n");
+
+printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 			tn3270e_request();
 		} else {
@@ -2515,7 +2592,7 @@ tn3270e_ack(void)
 	rsp_len = 0;
 	rsp_buf[rsp_len++] = TN3270E_DT_RESPONSE;	    /* data_type */
 	rsp_buf[rsp_len++] = 0;				    /* request_flag */
-	rsp_buf[rsp_len++] = TN3270E_RSF_POSITIVE_RESPONSE; /* response_flag */	
+	rsp_buf[rsp_len++] = TN3270E_RSF_POSITIVE_RESPONSE; /* response_flag */
 	rsp_buf[rsp_len++] = h_in->seq_number[0];	    /* seq_number[0] */
 	if (h_in->seq_number[0] == IAC)
 		rsp_buf[rsp_len++] = IAC;

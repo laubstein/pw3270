@@ -294,6 +294,7 @@ read_keymap(const char *name)
 	}
 	Free(name_3270);
 	Free(name_nvt);
+
 }
 
 /*
@@ -392,6 +393,7 @@ read_one_keymap(const char *name, const char *fn, const char *r0, int flags)
 	Free(r_copy);
 	if (f != NULL)
 		fclose(f);
+
 }
 
 /* Multi-key keymap support. */
@@ -657,6 +659,7 @@ keymap_init(void)
 		register_schange(ST_CONNECT, keymap_3270_mode);
 		initted = True;
 	}
+
 }
 
 /* Erase the current keymap. */

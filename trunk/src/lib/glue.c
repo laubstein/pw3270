@@ -51,6 +51,7 @@
 #include "togglesc.h"
 #include "trace_dsc.h"
 #include "utilc.h"
+#include "lib3270.h"
 
 extern void usage(char *);
 
@@ -120,7 +121,7 @@ struct toggle_name toggle_names[N_TOGGLES] = {
 
 
 int
-parse_command_line(int argc, const char **argv, const char **cl_hostname)
+parse_3270_command_line(int argc, const char **argv, const char **cl_hostname)
 {
 	int cl, i;
 	int ovc, ovr;
@@ -147,10 +148,10 @@ parse_command_line(int argc, const char **argv, const char **cl_hostname)
 		(void) strcat(strcat(command_string, " "), argv[i]);
 	}
 
-#if defined(LOCAL_PROCESS) /*[*/ 
+#if defined(LOCAL_PROCESS) /*[*/
         /* Pick out the -e option. */
         parse_local_process(&argc, argv, cl_hostname);
-#endif /*]*/    
+#endif /*]*/
 
 	/* Parse command-line options. */
 	parse_options(&argc, argv);
@@ -1030,29 +1031,21 @@ popup_an_error(const char *fmt, ...)
 	(void) vsprintf(vmsgbuf, fmt, args);
 	va_end(args);
 
-	/*
-	 * Multi-line messages are fine for X pop-ups, but they're no fun for
-	 * text applications.
-	 */
-	s = vmsgbuf;
-	while ((s = strchr(s, '\n')) != NULL) {
-		*s++ = ' ';
-	}
-	while ((sl = strlen(vmsgbuf)) > 0 && vmsgbuf[sl-1] == ' ') {
-		vmsgbuf[--sl] = '\0';
-	}
-
 	if (sms_redirect()) {
 		sms_error(vmsgbuf);
 		return;
 	} else {
-#if defined(C3270) /*[*/
+
+#if defined(C3270)
 		screen_suspend();
 		any_error_output = True;
-#endif /*]*/
-		(void) fprintf(stderr, "%s\n", vmsgbuf);
+#endif
+        if(screen_callbacks_3270 && screen_callbacks_3270->error_popup)
+           screen_callbacks_3270->error_popup(vmsgbuf);
 		macro_output = True;
 	}
+
+
 }
 
 /* Pop up an error dialog, based on an error number. */
