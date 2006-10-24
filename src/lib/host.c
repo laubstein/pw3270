@@ -726,9 +726,7 @@ host_connected(void)
 {
 	cstate = CONNECTED_INITIAL;
 
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 	st_changed(ST_CONNECT, True);
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 #if defined(X3270_DISPLAY) /*[*/
 	if (appres.reconnect && error_popup_visible())
@@ -946,8 +944,6 @@ void
 register_3270_schange(int tx, void (*func)(Boolean))
 {
 	struct st_callback *st;
-
-printf("%s(%d) %d\n",__FILE__,__LINE__, tx);fflush(stdout);
 
 	st = (struct st_callback *)Malloc(sizeof(*st));
 	st->func = func;

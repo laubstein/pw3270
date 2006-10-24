@@ -53,8 +53,22 @@ int set_3270_screen(const SCREEN_CALLBACK *scr)
 /* Initialize the screen. */
 void screen_init(void)
 {
+    int want_ov_rows = ov_rows;
+    int want_ov_cols = ov_cols;
+
 	if(screen_callbacks_3270 && screen_callbacks_3270->screen_init)
        screen_callbacks_3270->screen_init();
+
+	/* Set up the controller. */
+	ctlr_init(-1);
+	ctlr_reinit(-1);
+
+	/* Finish screen initialization. */
+
+
+	/* initialization ok */
+	screen_suspend();
+
 }
 
 /* Display what's in the buffer. */
