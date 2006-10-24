@@ -81,7 +81,9 @@ typedef struct _keyboard_info
 
 int set_3270_screen(const SCREEN_CALLBACK *scr);
 int set_3270_keyboard(const KEYBOARD_INFO *kbd);
-int run_emulator(const char	*cl_hostname);
+
+int Run_3270(const char	*cl_hostname);
+int Initialize_3270(void);
 
 extern int  parse_3270_command_line(int argc, const char **argv, const char **cl_hostname);
 extern void register_3270_schange(int tx, void (*func)(Boolean));
@@ -92,6 +94,19 @@ extern const KEYBOARD_INFO   *keyboard_info_3270;
 #ifdef __cplusplus
  }
 #endif
+
+/* state changes */
+#define ST_RESOLVING	 1
+#define ST_HALF_CONNECT	 2
+#define ST_CONNECT	     3
+#define ST_3270_MODE	 4
+#define ST_LINE_MODE	 5
+#define ST_REMODEL	     6
+#define ST_PRINTER	     7
+#define ST_EXITING	     8
+#define ST_CHARSET    	 9
+#define N_ST		    10
+
 
 
 #endif // LIB3270_INCLUDED

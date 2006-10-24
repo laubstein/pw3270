@@ -9,7 +9,14 @@
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
+extern "C" {
+
  static void chkParameters(int argc, const char **argv);
+ static void stsConnect(Boolean ignored);
+ static void stsHalfConnect(Boolean ignored);
+ static void stsExiting(Boolean ignored);
+
+}
 
 /*---[ Implement ]------------------------------------------------------------*/
 /*
@@ -23,6 +30,27 @@
     gtk_main_quit();
  }
 */
+
+ static void stsConnect(Boolean status)
+ {
+ 	DBGPrintf("Connect: %s",status ? "Yes" : "No");
+ }
+
+ static void stsHalfConnect(Boolean ignored)
+ {
+ 	DBGMessage("HalfConnect");
+ }
+
+ static void stsExiting(Boolean ignored)
+ {
+ 	DBGMessage("Exiting");
+ }
+
+ static void stsResolving(Boolean ignored)
+ {
+ 	DBGMessage("Resolving");
+ }
+
  int main(int argc, const char **argv)
  {
  	const char *cl_hostname;
@@ -50,7 +78,20 @@
 
     printf("Server: %s\n",cl_hostname);
 
-    run_emulator(cl_hostname);
+    Initialize_3270();
+
+printf("*****************************************************************\n");
+
+    CHKPoint();
+    register_3270_schange(ST_CONNECT,		stsConnect);
+    register_3270_schange(ST_EXITING,		stsExiting);
+    register_3270_schange(ST_HALF_CONNECT,	stsHalfConnect);
+    register_3270_schange(ST_RESOLVING,		stsResolving);
+    CHKPoint();
+
+printf("*****************************************************************\n");
+
+    Run_3270(cl_hostname);
 
 /*
     top = gtk_window_new(GTK_WINDOW_TOPLEVEL);
