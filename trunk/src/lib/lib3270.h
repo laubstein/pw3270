@@ -35,6 +35,7 @@ typedef struct _screen_callback
     void (*screen_disp)(Boolean erasing);
     void (*screen_suspend)(void);
     void (*screen_resume)(void);
+    void (*screen_type)(const char *model_name, int maxROWS, int maxCOLS);
 
     void (*cursor_move)(int baddr);
     void (*toggle_monocase)(struct toggle *t, enum toggle_type tt);

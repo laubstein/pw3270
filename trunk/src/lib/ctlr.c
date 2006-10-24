@@ -181,6 +181,8 @@ set_rows_cols(int mn, int ovc, int ovr)
 {
 	int defmod;
 
+	printf("mn: %d ovc: %d ovr: %d\n",mn,ovc,ovr);fflush(stdout);
+
 	switch (mn) {
 	case 2:
 		maxCOLS = 80;
@@ -255,6 +257,11 @@ set_rows_cols(int mn, int ovc, int ovr)
 	    appres.m3279 ? '9' : '8',
 	    model_num,
 	    appres.extended ? "-E" : "");
+
+	/* Tell the world the screen geometry/type */
+	if(screen_callbacks_3270 && screen_callbacks_3270->screen_type)
+       screen_callbacks_3270->screen_type(model_name,maxROWS,maxCOLS);
+
 
 	/* Make sure that the current rows/cols are still 24x80. */
 	COLS = 80;
