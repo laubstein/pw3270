@@ -177,6 +177,9 @@ main_exiting(Boolean ignored)
 static void
 pause_for_errors(void)
 {
+// FIXME (perry#1#): This function is really necessary?
+
+/*
 	char s[10];
 
 	if (any_error_output) {
@@ -185,6 +188,7 @@ pause_for_errors(void)
 		(void) fgets(s, sizeof(s), stdin);
 		any_error_output = False;
 	}
+*/
 }
 
 /* Empty SIGCHLD handler, ensuring that we can collect child exit status. */
@@ -194,10 +198,7 @@ sigchld_handler(int ignored)
 	(void) signal(SIGCHLD, sigchld_handler);
 }
 
-
-
-int
-run_emulator(const char	*cl_hostname)
+int Initialize_3270(void)
 {
     if(!(screen_callbacks_3270 && keyboard_info_3270))
        return EINVAL;
@@ -241,9 +242,9 @@ run_emulator(const char	*cl_hostname)
 
 
 	// TODO (perry#1#): The right way is left the main aplication to register their own callbacks.
-    register_schange(ST_CONNECT, main_connect);
-	register_schange(ST_3270_MODE, main_connect);
-    register_schange(ST_EXITING, main_exiting);
+//    register_3270_schange(ST_CONNECT, main_connect);
+//	register_3270_schange(ST_3270_MODE, main_connect);
+//    register_3270_schange(ST_EXITING, main_exiting);
 
 
 #if defined(X3270_FT) /*[*/
@@ -269,7 +270,20 @@ run_emulator(const char	*cl_hostname)
 	}
 #endif /*]*/
 
+printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
+
 	initialize_toggles();
+
+printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
+
+}
+
+int Run_3270(const char	*cl_hostname)
+{
+    if(!(screen_callbacks_3270 && keyboard_info_3270))
+       return EINVAL;
+
+printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
 
 	/* Connect to the host. */
 	screen_suspend();
@@ -277,8 +291,15 @@ run_emulator(const char	*cl_hostname)
 	if (cl_hostname != CN) {
 		appres.once = True;
 
+		printf("Connecting to \"%s\"\n",cl_hostname);
+
 		if (host_connect(cl_hostname) < 0)
+		{
+			printf("Can't connect");
 			return(1);
+		}
+
+printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
 
 		/* Wait for negotiations to complete or fail. */
 		while (!IN_ANSI && !IN_3270) {
@@ -288,18 +309,27 @@ run_emulator(const char	*cl_hostname)
 			if (!PCONNECTED)
 				return(1);
 		}
+
+printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
 		pause_for_errors();
+printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
+
 	} else {
 		if (appres.secure) {
 			Error("Must specify hostname with secure option");
 		}
 		appres.once = False;
+
+printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
+
 		interact();
 	}
 	screen_resume();
 	screen_disp(False);
 
 	/* Process events forever. */
+printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
+
 	while (1) {
 		(void) process_events(True);
 		if (appres.cbreak_mode && escape_pending) {
