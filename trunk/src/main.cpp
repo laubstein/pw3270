@@ -80,16 +80,12 @@ extern "C" {
 
     Initialize_3270();
 
-printf("*****************************************************************\n");
-
     CHKPoint();
     register_3270_schange(ST_CONNECT,		stsConnect);
     register_3270_schange(ST_EXITING,		stsExiting);
     register_3270_schange(ST_HALF_CONNECT,	stsHalfConnect);
     register_3270_schange(ST_RESOLVING,		stsResolving);
     CHKPoint();
-
-printf("*****************************************************************\n");
 
     Run_3270(cl_hostname);
 
