@@ -154,8 +154,6 @@ ctlr_init(unsigned cmask unused)
 void
 ctlr_reinit(unsigned cmask)
 {
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
-
 	if (cmask & MODEL_CHANGE) {
 		/* Allocate buffers */
 		if (ea_buf)
@@ -429,15 +427,9 @@ next_unprotected(int baddr0)
 void
 ctlr_erase(Boolean alt)
 {
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
-
 	kybd_inhibit(False);
 
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
-
 	ctlr_clear(True);
-
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 	/* Let a script go. */
 	sms_host_output();
@@ -445,10 +437,7 @@ ctlr_erase(Boolean alt)
 	if (alt == screen_alt)
 		return;
 
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 	screen_disp(True);
-
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 	if (alt) {
 		/* Going from 24x80 to maximum. */
@@ -466,8 +455,6 @@ ctlr_erase(Boolean alt)
 			COLS = 80;
 		}
 	}
-
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 	screen_alt = alt;
 }
@@ -2225,14 +2212,10 @@ ctlr_any_data(void)
 {
 	register int i;
 
-    printf("%s(%d) %p\n",__FILE__,__LINE__,ea_buf);fflush(stdout);
-
 	for (i = 0; i < ROWS*COLS; i++) {
 		if (!IsBlank(ea_buf[i].cc))
 			return True;
 	}
-
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 	return False;
 }
@@ -2245,7 +2228,6 @@ void
 ctlr_clear(Boolean can_snap)
 {
 	/* Snap any data that is about to be lost into the trace file. */
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 	if (ctlr_any_data()) {
 #if defined(X3270_TRACE) /*[*/
@@ -2253,24 +2235,17 @@ ctlr_clear(Boolean can_snap)
 			trace_screen();
 #endif /*]*/
 
-        printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
-
 		scroll_save(maxROWS, ever_3270 ? False : True);
 	}
 #if defined(X3270_TRACE) /*[*/
 	trace_skipping = False;
 #endif /*]*/
 
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
-
 	/* Clear the screen. */
 	(void) memset((char *)ea_buf, 0, ROWS*COLS*sizeof(struct ea));
 
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
-
 	ALL_CHANGED;
 
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 	cursor_move(0);
 
 	buffer_addr = 0;
@@ -2280,8 +2255,6 @@ ctlr_clear(Boolean can_snap)
 	default_gr = 0;
 	default_ic = 0;
 	sscp_start = 0;
-
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 }
 

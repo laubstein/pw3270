@@ -442,8 +442,6 @@ AddInput(int source, void (*fn)(void))
 	inputs = ip;
 	inputs_changed = True;
 
-    printf("%s(%d) %p\n",__FILE__,__LINE__,ip->proc);fflush(stdout);
-
 	return (unsigned long)ip;
 }
 
@@ -572,7 +570,6 @@ process_events(Boolean block)
 
 	processed_any = False;
     retry:
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 	/* If we've processed any input, then don't block again. */
 	if (processed_any)
@@ -633,28 +630,22 @@ process_events(Boolean block)
 	inputs_changed = False;
 	for (ip = inputs; ip != (input_t *)NULL; ip = ip_next) {
 
-        printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 		ip_next = ip->next;
 
 		if (((unsigned long)ip->condition & InputReadMask) &&
 		    FD_ISSET(ip->source, &rfds)) {
 
-            printf("%s(%d) %p\n",__FILE__,__LINE__,ip->proc);fflush(stdout);
 			(*ip->proc)();
-            printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 			processed_any = True;
 			if (inputs_changed)
 				goto retry;
 		}
-        printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 		if (((unsigned long)ip->condition & InputWriteMask) &&
 		    FD_ISSET(ip->source, &wfds)) {
 
-            printf("%s(%d) %p\n",__FILE__,__LINE__,ip->proc);fflush(stdout);
 			(*ip->proc)();
-            printf("%s(%d) %p\n",__FILE__,__LINE__,ip->proc);fflush(stdout);
 
 			processed_any = True;
 			if (inputs_changed)
@@ -668,9 +659,6 @@ process_events(Boolean block)
 				goto retry;
 		}
 	}
-
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
-
 
 	/* See what's expired. */
 	if (timeouts != TN) {
@@ -688,9 +676,6 @@ process_events(Boolean block)
 				break;
 		}
 	}
-
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
-
 
 	if (inputs_changed)
 		goto retry;

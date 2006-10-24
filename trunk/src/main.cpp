@@ -39,6 +39,10 @@
     set_3270_screen(&g3270_screen_callbacks);
     set_3270_keyboard(&g3270_keyboard_info);
 
+/*
+    gtk_init(&argc, &argv);
+*/
+
     parse_3270_command_line(argc, argv, &cl_hostname);
 
     if(!cl_hostname)
@@ -49,8 +53,6 @@
     run_emulator(cl_hostname);
 
 /*
-    gtk_init(&argc, &argv);
-
     top = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	g_signal_connect(G_OBJECT(top), "delete_event", G_CALLBACK(delete_event), NULL);
     g_signal_connect (G_OBJECT(top), "destroy", G_CALLBACK (destroy), NULL);

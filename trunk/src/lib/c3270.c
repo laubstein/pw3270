@@ -150,7 +150,7 @@ usage(char *msg)
 static void
 main_connect(Boolean ignored)
 {
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
+    printf("%s(%d) main_connect\n",__FILE__,__LINE__);fflush(stdout);
 
 	if (CONNECTED || appres.disconnect_clear) {
 #if defined(C3270_80_132) /*[*/
@@ -160,7 +160,6 @@ main_connect(Boolean ignored)
 #endif /*]*/
 			ctlr_erase(True);
 	}
-    printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
 
 }
 
@@ -195,6 +194,8 @@ sigchld_handler(int ignored)
 	(void) signal(SIGCHLD, sigchld_handler);
 }
 
+
+
 int
 run_emulator(const char	*cl_hostname)
 {
@@ -204,8 +205,6 @@ run_emulator(const char	*cl_hostname)
 	add_resource("keymap.base",
 	xs_buffer("%s%s%s", base_keymap1, base_keymap2, base_keymap3));
 	add_resource("keymap.base.3270", NewString(base_3270_keymap));
-
-//	argc = parse_command_line(argc, (const char **)argv, &cl_hostname);
 
 	if (charset_init(appres.charset) != CS_OKAY) {
 		xs_warning("Cannot find charset \"%s\"", appres.charset);

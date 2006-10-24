@@ -62,7 +62,7 @@ static struct {
         const char *name[MAX_MODS_PER];
         unsigned int mask;
 	Boolean is_meta;
-} skeymask[MAP_SIZE] = { 
+} skeymask[MAP_SIZE] = {
 	{ { "Shift" }, ShiftMask, False },
 	{ { (char *)NULL } /* Lock */, LockMask, False },
 	{ { "Ctrl" }, ControlMask, False },
