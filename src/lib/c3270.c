@@ -240,13 +240,6 @@ int Initialize_3270(void)
 	ansi_init();
 	sms_init();
 
-
-	// TODO (perry#1#): The right way is left the main aplication to register their own callbacks.
-//    register_3270_schange(ST_CONNECT, main_connect);
-//	register_3270_schange(ST_3270_MODE, main_connect);
-//    register_3270_schange(ST_EXITING, main_exiting);
-
-
 #if defined(X3270_FT) /*[*/
 	ft_init();
 #endif /*]*/
@@ -270,20 +263,13 @@ int Initialize_3270(void)
 	}
 #endif /*]*/
 
-printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
-
 	initialize_toggles();
-
-printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
-
 }
 
 int Run_3270(const char	*cl_hostname)
 {
     if(!(screen_callbacks_3270 && keyboard_info_3270))
        return EINVAL;
-
-printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
 
 	/* Connect to the host. */
 	screen_suspend();
@@ -299,8 +285,6 @@ printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
 			return(1);
 		}
 
-printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
-
 		/* Wait for negotiations to complete or fail. */
 		while (!IN_ANSI && !IN_3270) {
 
@@ -310,17 +294,11 @@ printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
 				return(1);
 		}
 
-printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
-		pause_for_errors();
-printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
-
 	} else {
 		if (appres.secure) {
 			Error("Must specify hostname with secure option");
 		}
 		appres.once = False;
-
-printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
 
 		interact();
 	}
@@ -328,7 +306,6 @@ printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
 	screen_disp(False);
 
 	/* Process events forever. */
-printf("%s(%d)\n", __FILE__, __LINE__); fflush(stdout);
 
 	while (1) {
 		(void) process_events(True);
