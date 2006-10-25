@@ -382,7 +382,7 @@ parse_options(int *argcp, const char **argv)
 	appres.compose_map = "latin1";
 #endif /*]*/
 
-	appres.model = "4";
+	appres.model = "2";
 	appres.hostsfile = CN;
 	appres.port = "telnet";
 	appres.charset = "bracket";

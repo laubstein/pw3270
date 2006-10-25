@@ -57,7 +57,7 @@ endif
 	@echo $< ...
 	g++ $(GCFLAGS) -o $@ -c $<
 
-%.o: %.c *.h Makefile *.mk
+%.o: %.c *.h Makefile
 	@echo $< ...
 	gcc $(GCFLAGS) -o $@ -c $<
 

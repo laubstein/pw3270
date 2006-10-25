@@ -16,7 +16,7 @@
 
  #ifdef TRACE
 
-    #define DBGFILE stdout
+    #define DBGFILE stderr
 
     #define CHKPoint()        	   fprintf(DBGFILE,"%s(%d):\t%s\t\t(" __DATE__ " " __TIME__")\n",__FILE__,__LINE__,__FUNCTION__);fflush(DBGFILE);
 

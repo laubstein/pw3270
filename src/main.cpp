@@ -1,9 +1,9 @@
 
  #include <stdio.h>
  #include <gtk/gtk.h>
- #include "terminal.h"
 
  #include "g3270.h"
+ #include "log.h"
 
 /*---[ Constants ]------------------------------------------------------------*/
 
@@ -33,22 +33,22 @@ extern "C" {
 
  static void stsConnect(Boolean status)
  {
- 	DBGPrintf("Connect: %s",status ? "Yes" : "No");
+    g3270_log("lib3270", "%s", status ? "Connected" : "Disconnected");
  }
 
  static void stsHalfConnect(Boolean ignored)
  {
- 	DBGMessage("HalfConnect");
+ 	DBGPrintf("HalfConnect: %s", ignored ? "Yes" : "No");
  }
 
  static void stsExiting(Boolean ignored)
  {
- 	DBGMessage("Exiting");
+ 	DBGPrintf("Exiting: %s", ignored ? "Yes" : "No");
  }
 
  static void stsResolving(Boolean ignored)
  {
- 	DBGMessage("Resolving");
+ 	DBGPrintf("Resolving: %s", ignored ? "Yes" : "No");
  }
 
  int main(int argc, const char **argv)
@@ -76,7 +76,7 @@ extern "C" {
     if(!cl_hostname)
        cl_hostname = "3270.df.bb:8023";
 
-    printf("Server: %s\n",cl_hostname);
+    printf("Host: %s\n",cl_hostname);
 
     Initialize_3270();
 
