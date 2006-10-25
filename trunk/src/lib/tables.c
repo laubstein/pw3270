@@ -26,7 +26,8 @@
  *			Character Generator ("3270" font)
  */
 
-#include "globals.h"
+/* #include "globals.h" */
+#include "lib3270.h"
 #include "tablesc.h"
 
 unsigned char asc2cg[256] = {
@@ -486,3 +487,10 @@ unsigned char ft2asc0[256] = { FT2ASC };
 unsigned char asc2ft[256] = { ASC2FT };
 unsigned char asc2ft0[256] = { ASC2FT };
 #endif /*]*/
+
+
+unsigned char GetASCIICharacter(const struct ea *display)
+{
+	return ebc2asc[display->cc];
+}
+

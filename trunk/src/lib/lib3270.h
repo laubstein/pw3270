@@ -32,7 +32,7 @@ typedef struct _screen_callback
 	unsigned short magic;
 
     void (*screen_init)(void);
-    void (*screen_disp)(Boolean erasing);
+    void (*screen_disp)(Boolean erasing, const struct ea *display);
     void (*screen_suspend)(void);
     void (*screen_resume)(void);
     void (*screen_type)(const char *model_name, int maxROWS, int maxCOLS);
@@ -79,6 +79,8 @@ typedef struct _keyboard_info
 } KEYBOARD_INFO;
 
 #pragma pack()
+
+/*---[ Prototipes ]-----------------------------------------------------------*/
 
 int set_3270_screen(const SCREEN_CALLBACK *scr);
 int set_3270_keyboard(const KEYBOARD_INFO *kbd);

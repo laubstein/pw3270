@@ -76,7 +76,7 @@ extern "C" {
     if(!cl_hostname)
        cl_hostname = "3270.df.bb:8023";
 
-    printf("Host: %s\n",cl_hostname);
+    g3270_log(TARGET, "Host: \"%s\"",cl_hostname);
 
     Initialize_3270();
 

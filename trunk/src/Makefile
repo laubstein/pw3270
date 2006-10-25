@@ -28,15 +28,17 @@ else
    GTK_MODULES=$(GTKLIB)
 endif
 
+PKG_MODULES=$(GTK_MODULES)
+
 
 #---[ Build flags ]------------------------------------------------------------#
 
-GCFLAGS     = -c `pkg-config --cflags $(GTK_MODULES)` \
+GCFLAGS     = -c `pkg-config --cflags $(PKG_MODULES)` \
               -DBUILD=\"`date +%G%m%d%H%M`\" -Wall -Werror \
               -DTARGET=\"$(TARGET)\" $(DFLAGS) \
               -DGTK=$(GTK) -DGTKVERSION=\"$(GTK_VRS)\"
 
-GLFLAGS     = `pkg-config --libs $(GTK_MODULES)` -L. -l3270
+GLFLAGS     = `pkg-config --libs $(PKG_MODULES)` -L. -l3270
 
 #---[ Leak check ]-------------------------------------------------------------#
 
@@ -64,7 +66,7 @@ endif
 #---[ Targets ]----------------------------------------------------------------#
 
 $(TARGET): $(OBJECTS) lib3270.so
-	@g++ $(GLFLAGS) -o $@ $(OBJECTS)
+	g++ $(GLFLAGS) -o $@ $(OBJECTS)
 
 run: $(TARGET)
 	@sync
