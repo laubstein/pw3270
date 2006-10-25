@@ -129,8 +129,8 @@
 
     fprintf(out,"%s\n",string);
 #ifdef DEBUG
-	fprintf(stderr,"%s\n",string);
-	fflush(stderr);
+	printf("%s\n",string);
+	flush(stdout);
 #endif
 
 	DBGMessage(string);
