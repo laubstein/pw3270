@@ -13,10 +13,12 @@
  #include <sys/file.h>
  #include <pthread.h>
  #include <errno.h>
+ #include <stdlib.h>
 
  #include <unistd.h>
 
  #include "log.h"
+ #include "trace.h"
 
 /*---[ Statics e globais ]----------------------------------------------------------------------------------*/
 
@@ -60,14 +62,42 @@
   */
  FILE *g3270_openLog(void)
  {
-    FILE *ret = NULL;
+ 	const char *ptr;
+    FILE       *ret = NULL;
 
     ret = fopen(logfile,"a");
+    if(ret)
+       return ret;
 
-	if(!ret)
-       return stderr;
+ 	ptr = getenv("USER");
+	if(ptr)
+	{
+		snprintf(logfile,0xFF,"/home/%s/" TARGET, ptr);
+        ret = fopen(logfile,"a");
+        if(ret)
+		   return ret;
+	}
 
-    return ret;
+    ret = fopen(TARGET ".log","a");
+    if(ret)
+       return ret;
+
+ 	ptr = getenv("TMPDIR");
+	if(ptr)
+	{
+		snprintf(logfile,0xFF,"/home/%s/" TARGET, ptr);
+        ret = fopen(logfile,"a");
+        if(ret)
+		   return ret;
+	}
+
+    strncpy(logfile,"/tmp/" TARGET, 0xFF);
+
+    ret = fopen(logfile,"a");
+    if(ret)
+       return ret;
+
+    return fopen("/dev/null","a");
  }
 
  /**
@@ -127,12 +157,10 @@
 
     out = g3270_logPrefix(module);
 
-    fprintf(out,"%s\n",string);
-#ifdef DEBUG
-	printf("%s\n",string);
-	flush(stdout);
-#endif
+    if(!out)
+       return -1;
 
+    fprintf(out,"%s\n",string);
 	DBGMessage(string);
 
     g3270_closeLog(out);
@@ -174,10 +202,7 @@
 	if(rc > 0)
 	{
        fprintf(out,"%s: %s (rc=%d)\n",string,strerror(rc),rc);
-#ifndef DEBUG
-       fprintf(stderr,"%s: %s (rc=%d)\n",string,strerror(rc),rc);
-	   fflush(stderr);
-#endif
+       DBGPrintf("%s: %s (rc=%d)\n",string,strerror(rc),rc);
 	}
 	else
 	{
@@ -202,135 +227,3 @@
     return rc;
  }
 
- /**
-  * Muda o arquivo de log.
-  *
-  * Muda o arquivo de log em uso, copiando inclusive o conteudo anterior.
-  * Esta funcao e utilizada para efetuar a transferencia do arquivo de log
-  * da ramdisk para o disco real logo apos a formatacao do HD.
-  *
-  * @param	filename	path completo para o novo arquivo de log
-  */
- int g3270_logName(const char *filename)
- {
-	FILE *in;
-	FILE *out;
-	int  rc = 0;
-	char buffer[0x0100];
-
-    strncpy(buffer,filename,0xFF);
-	out = fopen(buffer,"a");
-
-	if(!out)
-	{
-       g3270_logRC(MODULE,-1,"Nao foi possivel ativar %s",filename);
-	   return -1;
-	}
-
-    WriteLog("Mudando arquivo de log para %s",filename);
-	g3270_lock();
-	in = fopen(logfile,"r");
-	if(in)
-	{
-       while(!feof(in) && !rc)
-       {
-          int   sz;
-		  char *ptr;
-
-		  sz = fread(ptr=buffer,1,0xFF,in);
-
-          while(sz > 0 && !rc)
-          {
-             int szWrite = fwrite(ptr,1,sz,out);
-
-             if(szWrite < 1)
-             {
-			    fprintf(out,"** Erro ao copiar arquivo de entrada\n");
-				fflush(out);
-				rc = -1;
-             }
-             ptr += szWrite;
-             sz  -= szWrite;
-          }
-       }
-	   fclose(in);
-    }
-    fclose(out);
-
-	if(!rc)
-	{
-	   remove(logfile);
-       link(logfile,filename);
-       strncpy(logfile,filename,0xFF);
-	}
-    g3270_unlock();
-	return rc;
- }
-
- /**
-  * Copia arquivo
-  *
-  * Efetua a copia de um arquivo entre dois diretorios. O parametro root
-  * e fornecido em separado para facilitar o uso da macro IMAGE_ROOT
-  *
-  * @param	src		Path completo para o arquivo fonte
-  * @param	root	Diretorio para o arquivo destino
-  * @param	dst		Nome do arquivo destino
-  *
-  * @see	IMAGE_ROOT
-  */
- int CopyFile(const char *src, const char *root, const char *dst)
- {
-    char buffer[1024];
-	FILE *in;
-	FILE *out;
-	int  rc = 0;
-
-	if(root)
-	   snprintf(buffer,1023,"%s/%s",root,dst);
-	else
-	   strncpy(buffer,dst,1023);
-
-	WriteLog("Copiando arquivo %s para %s",src,dst);
-
-	in = fopen(src,"r");
-	if(!in)
-	{
-	   Error("Nao foi possivel abrir %s para leitura",src);
-	   return -1;
-	}
-
-	out = fopen(buffer,"w");
-	if(!out)
-	{
-	   Error("Nao foi possivel criar %s",buffer);
-	   fclose(in);
-	   return -1;
-	}
-
-    while(!feof(in) && !rc)
-    {
-       int   sz;
-	   char *ptr;
-
-	   sz = fread(ptr=buffer,1,1023,in);
-
-       while(sz > 0 && !rc)
-       {
-          int szWrite = fwrite(ptr,1,sz,out);
-
-          if(szWrite < 1)
-          {
-		     Error("Erro na leitura do arquivo %s",src);
-			 rc = -1;
-          }
-          ptr += szWrite;
-          sz  -= szWrite;
-       }
-    }
-
-	fclose(out);
-	fclose(in);
-
-    return rc;
- }
