@@ -13,6 +13,7 @@
 
  #include <stdio.h>
 
+ #define Log(...)               g3270_log(MODULE, __VA_ARGS__)
  #define WriteLog(...)          g3270_log(MODULE, __VA_ARGS__)
  #define WriteError(e,...)      g3270_logRC(MODULE, e, __VA_ARGS__)
  #define Error(...)             g3270_logRC(MODULE, -1, __VA_ARGS__)
