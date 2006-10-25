@@ -75,7 +75,7 @@ void screen_init(void)
 void screen_disp(Boolean erasing)
 {
 	if(screen_callbacks_3270 && screen_callbacks_3270->screen_disp)
-       screen_callbacks_3270->screen_disp(erasing);
+       screen_callbacks_3270->screen_disp(erasing,ea_buf);
 }
 
 void screen_suspend(void)
