@@ -2,9 +2,6 @@
  #include <stdio.h>
  #include <gtk/gtk.h>
 
- #include "lib/globals.h"
- #include "lib/appres.h"
- #include "lib/lib3270.h"
  #include "g3270.h"
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
@@ -58,6 +55,24 @@ static struct GSourceFuncs Source_3270;
  {
  	DBGPrintf("Resolving: %s", ignored ? "Yes" : "No");
  }
+
+/*---[ 3270 Event processing ]------------------------------------------------*/
+ static gboolean prepare_3270(gpointer  source_data, GTimeVal *current_time, gint *timeout, gpointer  user_data)
+ {
+ }
+
+ static gboolean check_3270(gpointer  source_data, GTimeVal *current_time, gpointer  user_data)
+ {
+ }
+
+ static gboolean dispatch_3270(gpointer  source_data, GTimeVal *current_time, gpointer  user_data)
+ {
+ }
+
+ static GDestroyNotify destroy_3270
+ {
+ }
+
 
  int main(int argc, const char **argv)
  {
