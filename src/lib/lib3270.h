@@ -88,6 +88,9 @@ int set_3270_keyboard(const KEYBOARD_INFO *kbd);
 int Run_3270(const char	*cl_hostname);
 int Initialize_3270(void);
 
+unsigned char 		GetASCIICharacter(const struct ea *display);
+const unsigned char *GetASCIIString(unsigned char *str);
+
 extern int  parse_3270_command_line(int argc, const char **argv, const char **cl_hostname);
 extern void register_3270_schange(int tx, void (*func)(Boolean));
 

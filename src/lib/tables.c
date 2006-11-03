@@ -26,7 +26,8 @@
  *			Character Generator ("3270" font)
  */
 
-/* #include "globals.h" */
+#include "globals.h"
+#include "appres.h"
 #include "lib3270.h"
 #include "tablesc.h"
 
@@ -494,3 +495,19 @@ unsigned char GetASCIICharacter(const struct ea *display)
 	return ebc2asc[display->cc];
 }
 
+const unsigned char *GetASCIIString(unsigned char *str)
+{
+   const unsigned char *ret = str;
+
+   printf("%s\n",ret);
+
+   while(*str)
+   {
+   	  *str = ebc2asc[*str];
+      str++;
+   }
+
+   printf("%s\n",ret);
+
+   return ret;
+}
