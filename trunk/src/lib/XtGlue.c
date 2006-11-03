@@ -447,6 +447,9 @@ AddInput(int source, void (*fn)(void))
 	inputs = ip;
 	inputs_changed = True;
 
+    if(keyboard_info_3270 && keyboard_info_3270->InputAdded)
+       keyboard_info_3270->InputAdded(ip);
+
 	return (unsigned long)ip;
 }
 
@@ -462,6 +465,10 @@ AddExcept(int source, void (*fn)(void))
 	ip->next = inputs;
 	inputs = ip;
 	inputs_changed = True;
+
+    if(keyboard_info_3270 && keyboard_info_3270->InputAdded)
+       keyboard_info_3270->InputAdded(ip);
+
 	return (unsigned long)ip;
 }
 
@@ -493,6 +500,10 @@ RemoveInput(unsigned long id)
 	}
 	if (ip == (input_t *)NULL)
 		return;
+
+    if(keyboard_info_3270 && keyboard_info_3270->InputRemoved)
+       keyboard_info_3270->InputRemoved(ip);
+
 	if (prev != (input_t *)NULL)
 		prev->next = ip->next;
 	else

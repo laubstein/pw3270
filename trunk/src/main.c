@@ -4,6 +4,7 @@
  #include <glib.h>
 
  #include "g3270.h"
+ #include "lib/hostc.h"
 
 /*---[ Structs ]--------------------------------------------------------------*/
 
