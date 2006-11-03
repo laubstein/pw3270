@@ -28,6 +28,13 @@
 #include <sys/select.h>
 #endif /*]*/
 
+#include "appres.h"
+#include "lib3270.h"
+
+
+// TODO (perry#9#): Replace the old input_t in the source and remove this define
+#define input_t INPUT_3270
+
 #define InputReadMask	0x1
 #define InputExceptMask	0x2
 #define InputWriteMask	0x4
@@ -419,15 +426,13 @@ RemoveTimeOut(unsigned long timer)
 	}
 }
 
-/* Input events. */
-typedef struct input {
-        struct input *next;
-        int source;
-        int condition;
-        void (*proc)(void);
-} input_t;
 static input_t *inputs = (input_t *)NULL;
 static Boolean inputs_changed = False;
+
+const INPUT_3270 * Query3270InputList(void)
+{
+	return inputs;
+}
 
 unsigned long
 AddInput(int source, void (*fn)(void))
