@@ -1,8 +1,4 @@
 
- #include <stdio.h>
- #include <gtk/gtk.h>
- #include <glib.h>
-
  #include "g3270.h"
  #include "lib/hostc.h"
 
@@ -16,13 +12,15 @@
  } SRCDATA;
 
 
+/*---[ Globals ]--------------------------------------------------------------*/
+
+ GSource *fd3270 = 0;
+
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
- /*
  static void stsConnect(Boolean ignored);
  static void stsHalfConnect(Boolean ignored);
  static void stsExiting(Boolean ignored);
- */
 
 #if GTK == 2
 
@@ -165,7 +163,6 @@
  {
  	const char *cl_hostname;
     GtkWidget *top;
-    GSource   *src;
 
     printf(TARGET " (Build " BUILD " for gtk " GTKVERSION ") Starting\n");
     fflush(stdout);
@@ -181,8 +178,6 @@
     if(!cl_hostname)
        cl_hostname = "3270.df.bb:8023";
 
-    g3270_log(TARGET, "Host: \"%s\"",cl_hostname);
-
     Initialize_3270();
 
     CHKPoint();
@@ -192,13 +187,12 @@
     register_3270_schange(ST_RESOLVING,		stsResolving);
     CHKPoint();
 
-//    Run_3270(cl_hostname);
-
     /* Add 3270 as a new gtk event source */
+
 #if GTK == 2
 
-    src = g_source_new(&Source_3270,sizeof(SRCDATA));
-    g_source_attach(src,NULL);
+    fd3270 = g_source_new(&Source_3270,sizeof(SRCDATA));
+    g_source_attach(fd3270,NULL);
 
 #else
 
@@ -211,6 +205,16 @@
     top = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	g_signal_connect(G_OBJECT(top), "delete_event", G_CALLBACK(delete_event), NULL);
     g_signal_connect (G_OBJECT(top), "destroy", G_CALLBACK (destroy), NULL);
+
+    /* Start 3270 function */
+//    Run_3270(cl_hostname);
+
+    if(cl_hostname)
+    {
+       g3270_log(TARGET, "Connecting to \"%s\"",cl_hostname);
+       host_connect(cl_hostname);
+    }
+
 
     gtk_widget_show(top);
 
