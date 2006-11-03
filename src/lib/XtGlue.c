@@ -35,10 +35,6 @@
 // TODO (perry#9#): Replace the old input_t in the source and remove this define
 #define input_t INPUT_3270
 
-#define InputReadMask	0x1
-#define InputExceptMask	0x2
-#define InputWriteMask	0x4
-
 #define MILLION		1000000L
 
 void (*Warning_redirect)(const char *) = NULL;

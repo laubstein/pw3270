@@ -69,12 +69,16 @@ typedef struct _keytable
 } KEYTABLE;
 
 /* Input events. */
+#define InputReadMask	0x1
+#define InputExceptMask	0x2
+#define InputWriteMask	0x4
+
 typedef struct input_3270
 {
 	struct input_3270 *next;
-    int source;
-    int condition;
-    void (*proc)(void);
+    int source;			/**< The file descriptor to poll */
+    int condition;		/**< Bit field to indicate the type of handle (InputReadMask, InputExceptMask or InputWriteMask) */
+    void (*proc)(void); /**< The function who process the file handle */
 } INPUT_3270;
 
 typedef struct _keyboard_info

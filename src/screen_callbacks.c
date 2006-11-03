@@ -278,6 +278,16 @@ static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num
 
 static void InputAdded(const INPUT_3270 *ip)
 {
+   // http://developer.gnome.org/doc/API/glib/glib-the-main-event-loop.html#G-MAIN-ADD-POLL
+
+/*
+struct GPollFD
+{
+  gint		fd;
+  gushort 	events;
+  gushort 	revents;
+};
+*/
 	DBGPrintf("Input Source %p added",ip);
 }
 
