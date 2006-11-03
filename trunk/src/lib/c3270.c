@@ -146,24 +146,25 @@ usage(char *msg)
 		programname);
 }
 
-/* Callback for connection state changes. */
+/* Callback for connection state changes.
 static void
 main_connect(Boolean ignored)
 {
     printf("%s(%d) main_connect\n",__FILE__,__LINE__);fflush(stdout);
 
 	if (CONNECTED || appres.disconnect_clear) {
-#if defined(C3270_80_132) /*[*/
+#if defined(C3270_80_132)
 		if (appres.altscreen != CN)
 			ctlr_erase(False);
 		else
-#endif /*]*/
+#endif
 			ctlr_erase(True);
 	}
 
 }
+*/
 
-/* Callback for application exit. */
+/* Callback for application exit.
 static void
 main_exiting(Boolean ignored)
 {
@@ -172,6 +173,7 @@ main_exiting(Boolean ignored)
 	else
 		screen_suspend();
 }
+*/
 
 /* Make sure error messages are seen. */
 static void

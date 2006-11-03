@@ -23,9 +23,9 @@ ifndef GTK
 endif
 
 ifeq ($(GTKLIB),gtk+)
-   GTK_MODULES=$(GTKLIB) gthread-2.0
-else
    GTK_MODULES=$(GTKLIB)
+else
+   GTK_MODULES=$(GTKLIB) gthread-2.0 glib-2.0
 endif
 
 PKG_MODULES=$(GTK_MODULES)

@@ -71,7 +71,7 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
 
 /*---[ Keyboard tables ]------------------------------------------------------*/
 
- static const KEYTABLE =
+ static const KEYTABLE keys[] =
  {
 //	{ "BREAK",	KEY_BREAK },
 	{ "DOWN",		GDK_Down 		},
@@ -170,10 +170,9 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
  {
 	sizeof(KEYBOARD_INFO),
 	KEYBOARD_MAGIC,
-
 	ring_bell,
+	keys
 
-	keytable;
  };
 
 /*---[ Implement screen callbacks ]-------------------------------------------*/

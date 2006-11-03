@@ -78,6 +78,15 @@ typedef struct _keyboard_info
 	const KEYTABLE	*keys;
 } KEYBOARD_INFO;
 
+/* Input events. */
+typedef struct input_3270
+{
+	struct input_3270 *next;
+    int source;
+    int condition;
+    void (*proc)(void);
+} INPUT_3270;
+
 #pragma pack()
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
@@ -90,6 +99,8 @@ int Initialize_3270(void);
 
 unsigned char 		GetASCIICharacter(const struct ea *display);
 const unsigned char *GetASCIIString(unsigned char *str);
+
+extern const INPUT_3270 * Query3270InputList(void);
 
 extern int  parse_3270_command_line(int argc, const char **argv, const char **cl_hostname);
 extern void register_3270_schange(int tx, void (*func)(Boolean));

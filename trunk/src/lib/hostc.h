@@ -37,7 +37,7 @@ extern void Reconnect_action(Widget w, XEvent *event, String *params,
 
 /* Host connect/disconnect and state change. */
 extern void hostfile_init(void);
-extern int host_connect(const char *n);
+extern int  host_connect(const char *n);
 extern void host_connected(void);
 extern void host_disconnect(Boolean disable);
 extern void host_in3270(enum cstate);
