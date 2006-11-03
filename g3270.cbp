@@ -492,12 +492,12 @@
 			<Option link="0"/>
 			<Option target="default"/>
 		</Unit>
-		<Unit filename="src/main.cpp">
-			<Option compilerVar="CPP"/>
+		<Unit filename="src/main.c">
+			<Option compilerVar="CC"/>
 			<Option target="default"/>
 		</Unit>
-		<Unit filename="src/screen_callbacks.cpp">
-			<Option compilerVar="CPP"/>
+		<Unit filename="src/screen_callbacks.c">
+			<Option compilerVar="CC"/>
 			<Option target="default"/>
 		</Unit>
 		<Unit filename="src/terminal.cpp">
