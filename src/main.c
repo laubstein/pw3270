@@ -2,21 +2,29 @@
  #include <stdio.h>
  #include <gtk/gtk.h>
 
+ #include "lib/globals.h"
+ #include "lib/appres.h"
+ #include "lib/lib3270.h"
  #include "g3270.h"
- #include "log.h"
-
-/*---[ Constants ]------------------------------------------------------------*/
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
-
-extern "C" {
 
  static void chkParameters(int argc, const char **argv);
  static void stsConnect(Boolean ignored);
  static void stsHalfConnect(Boolean ignored);
  static void stsExiting(Boolean ignored);
 
-}
+
+ static gboolean prepare_3270(gpointer  source_data, GTimeVal *current_time, gint *timeout, gpointer  user_data);
+ static gboolean check_3270(gpointer  source_data, GTimeVal *current_time, gpointer  user_data);
+ static gboolean dispatch_3270(gpointer  source_data, GTimeVal *current_time, gpointer  user_data);
+ static GDestroyNotify destroy_3270;
+
+/*---[ Constants ]------------------------------------------------------------*/
+
+/* 3270 Event Sources */
+static struct GSourceFuncs Source_3270;
+
 
 /*---[ Implement ]------------------------------------------------------------*/
 /*
