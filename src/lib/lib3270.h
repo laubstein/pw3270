@@ -68,16 +68,6 @@ typedef struct _keytable
     int code;
 } KEYTABLE;
 
-typedef struct _keyboard_info
-{
-	unsigned short sz;
-	unsigned short magic;
-
-	void (*beep)(void);
-
-	const KEYTABLE	*keys;
-} KEYBOARD_INFO;
-
 /* Input events. */
 typedef struct input_3270
 {
@@ -86,6 +76,19 @@ typedef struct input_3270
     int condition;
     void (*proc)(void);
 } INPUT_3270;
+
+typedef struct _keyboard_info
+{
+	unsigned short sz;
+	unsigned short magic;
+
+	void (*beep)(void);
+
+	void (*InputAdded)(const INPUT_3270 *ip);
+	void (*InputRemoved)(const INPUT_3270 *ip);
+
+	const KEYTABLE	*keys;
+} KEYBOARD_INFO;
 
 #pragma pack()
 

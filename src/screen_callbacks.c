@@ -31,6 +31,9 @@ static void screen_width(int width);
 static void error_popup(const char *msg);
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
 
+static void InputAdded(const INPUT_3270 *ip);
+static void InputRemoved(const INPUT_3270 *ip);
+
 /*---[ 3270 Screen callback table ]-------------------------------------------*/
 
 const SCREEN_CALLBACK g3270_screen_callbacks =
@@ -170,7 +173,11 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
  {
 	sizeof(KEYBOARD_INFO),
 	KEYBOARD_MAGIC,
+
 	ring_bell,
+	InputAdded,
+	InputRemoved,
+
 	keys
 
  };
@@ -267,5 +274,15 @@ static void error_popup(const char *msg)
 
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
+}
+
+static void InputAdded(const INPUT_3270 *ip)
+{
+	DBGPrintf("Input Source %p added",ip);
+}
+
+static void InputRemoved(const INPUT_3270 *ip)
+{
+	DBGPrintf("Input Source %p removed",ip);
 }
 
