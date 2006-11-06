@@ -31,9 +31,6 @@ static void screen_width(int width);
 static void error_popup(const char *msg);
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
 
-static void InputAdded(const INPUT_3270 *ip);
-static void InputRemoved(const INPUT_3270 *ip);
-
 /*---[ 3270 Screen callback table ]-------------------------------------------*/
 
 const SCREEN_CALLBACK g3270_screen_callbacks =
@@ -175,8 +172,8 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
 	KEYBOARD_MAGIC,
 
 	ring_bell,
-	InputAdded,
-	InputRemoved,
+	gsource_addfile,
+	gsource_removefile,
 
 	keys
 
@@ -186,113 +183,117 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
 
 static void screen_init(void)
 {
+	CHKPoint();
 }
 
 static void screen_disp(Boolean erasing, const struct ea *display)
 {
+	CHKPoint();
 }
 
 static void screen_suspend(void)
 {
+	CHKPoint();
 }
 
 static void screen_resume(void)
 {
+	CHKPoint();
 }
 
 static void screen_type(const char *model_name, int maxROWS, int maxCOLS)
 {
+	CHKPoint();
 }
 
 static void cursor_move(int baddr)
 {
+	CHKPoint();
 }
 
 static void toggle_monocase(struct toggle *t, enum toggle_type tt)
 {
+	CHKPoint();
 }
 
 static void status_ctlr_done(void)
 {
+	CHKPoint();
 }
 
 static void status_insert_mode(Boolean on)
 {
+	CHKPoint();
 }
 
 static void status_minus(void)
 {
+	CHKPoint();
 }
 
 static void status_oerr(int error_type)
 {
+	CHKPoint();
 }
 
 static void status_reset(void)
 {
+	CHKPoint();
 }
 
 static void status_reverse_mode(Boolean on)
 {
+	CHKPoint();
 }
 
 static void status_syswait(void)
 {
+	CHKPoint();
 }
 
 static void status_twait(void)
 {
+	CHKPoint();
 }
 
 static void status_typeahead(Boolean on)
 {
+	CHKPoint();
 }
 
 static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
 {
+	CHKPoint();
 }
 
 static void status_lu(const char *lu)
 {
+	DBGPrintf("LU: %s",lu);
 }
 
 static void ring_bell(void)
 {
+	CHKPoint();
 }
 
 static void screen_flip(void)
 {
+	CHKPoint();
 }
 
 static void screen_width(int width)
 {
+	CHKPoint();
 }
 
 static void error_popup(const char *msg)
 {
+	DBGMessage(msg);
 }
 
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
+	CHKPoint();
 }
 
-static void InputAdded(const INPUT_3270 *ip)
-{
-   // http://developer.gnome.org/doc/API/glib/glib-the-main-event-loop.html#G-MAIN-ADD-POLL
-
-/*
-struct GPollFD
-{
-  gint		fd;
-  gushort 	events;
-  gushort 	revents;
-};
-*/
-	DBGPrintf("Input Source %p added",ip);
-}
-
-static void InputRemoved(const INPUT_3270 *ip)
-{
-	DBGPrintf("Input Source %p removed",ip);
-}
 
