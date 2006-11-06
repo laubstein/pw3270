@@ -26,5 +26,8 @@
  void gsource_removefile(const INPUT_3270 *ip);
  void SetWindowTitle(const char *msg);
 
+/*---[ Terminal window ]------------------------------------------------------*/
+
+ GtkWidget *g3270_new(const char *hostname);
 
 
