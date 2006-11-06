@@ -331,6 +331,7 @@ int Run_3270(const char	*cl_hostname)
 			--children;
 		screen_disp(False);
 	}
+
 }
 
 /*

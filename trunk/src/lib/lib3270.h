@@ -81,6 +81,13 @@ typedef struct input_3270
     void (*proc)(void); /**< The function who process the file handle */
 } INPUT_3270;
 
+typedef struct timeout_3270 {
+	struct timeout_3270 *next;
+	struct timeval tv;
+	void (*proc)(void);
+	Boolean in_play;
+} TIMEOUT_3270;
+
 typedef struct _keyboard_info
 {
 	unsigned short sz;
@@ -107,13 +114,19 @@ int Initialize_3270(void);
 unsigned char 		GetASCIICharacter(const struct ea *display);
 const unsigned char *GetASCIIString(unsigned char *str);
 
+const struct timeval *Get3270Timeout(struct timeval *tp);
+
+
 extern const INPUT_3270 * Query3270SourceList(void);
 
-extern int  parse_3270_command_line(int argc, const char **argv, const char **cl_hostname);
-extern void register_3270_schange(int tx, void (*func)(Boolean));
+extern int   parse_3270_command_line(int argc, const char **argv, const char **cl_hostname);
+extern void  register_3270_schange(int tx, void (*func)(Boolean));
 
 extern const SCREEN_CALLBACK *screen_callbacks_3270;
 extern const KEYBOARD_INFO   *keyboard_info_3270;
+
+extern void  display_3270(Boolean erasing);
+
 
 #ifdef __cplusplus
  }

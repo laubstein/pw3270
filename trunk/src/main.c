@@ -87,12 +87,14 @@
        host_connect(cl_hostname);
     }
 
-    Run_3270(cl_hostname);
+
+//    Run_3270(cl_hostname);
+
+    DBGMessage("Starting gtk main loop");
 
     gtk_widget_show(top);
 
     gtk_main();
-
 
     return 0;
  }

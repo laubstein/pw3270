@@ -74,6 +74,12 @@ void screen_init(void)
 /* Display what's in the buffer. */
 void screen_disp(Boolean erasing)
 {
+    // TODO (perry#3#): Replace all calls with the new function name
+	display_3270(erasing);
+}
+
+void display_3270(Boolean erasing)
+{
 	if(screen_callbacks_3270 && screen_callbacks_3270->screen_disp)
        screen_callbacks_3270->screen_disp(erasing,ea_buf);
 }
