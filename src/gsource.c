@@ -19,10 +19,22 @@
 
 /*---[ Structs ]--------------------------------------------------------------*/
 
+#pragma pack(1)
+
  typedef struct _srcdata
  {
     GSource sr;
  } SRCDATA;
+
+ typedef struct _pooldata
+ {
+ 	GPollFD				gfd;		// MUST BE THE FIRST ONE!!!
+
+ 	const INPUT_3270	*ip;
+
+ } POOLDATA;
+
+ #pragma pack()
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -72,11 +84,11 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
- static GSource *fd3270	= 0;
- static GMutex  *mutex	= 0;
- static int		szPoll	= 0;
- static GPollFD *gpool	= 0;
- struct pollfd  *fds	= 0;
+ static GSource		*fd3270	= 0;
+ static GMutex		*mutex	= 0;
+ static int			szPoll	= 0;
+ static POOLDATA	*gpool	= 0;
+ struct pollfd		*fds	= 0;
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -103,7 +115,7 @@
  void gsource_addfile(const INPUT_3270 *ip)
  {
     // http://developer.gnome.org/doc/API/glib/glib-the-main-event-loop.html#G-MAIN-ADD-POLL
-    GPollFD 	*fd = 0;
+    POOLDATA 	*fd = 0;
     int			sz;
     int			f;
 
@@ -113,7 +125,7 @@
     {
     	szPoll = SRC_SIZE;
 
-    	sz     = szPoll * sizeof(GPollFD);
+    	sz     = szPoll * sizeof(POOLDATA);
     	gpool  = g_malloc(sz);
 
     	if(gpool)
@@ -129,7 +141,7 @@
 
     for(f = 0; f < szPoll && !fd; f++)
     {
-    	if(!gpool[f].fd)
+    	if(!gpool[f].ip)
     	   fd = gpool+f;
     }
 
@@ -137,9 +149,9 @@
     {
     	DBGPrintf("No more space in the poll table, adding more %d entries",SRC_SIZE);
 
-    	sz     = (szPoll+SRC_SIZE) * sizeof(GPollFD);
+    	sz     = (szPoll+SRC_SIZE) * sizeof(POOLDATA);
 
-    	gpool  = g_realloc(poll,sz);
+    	gpool  = g_realloc(gpool,sz);
     	if(!gpool)
     	{
 			Log("Error resizing GpoolFD structures to %d bytes",sz);
@@ -148,7 +160,7 @@
 
     	for(f=0;f < SRC_SIZE;f++)
     	{
-    		memset(gpool+(szPoll+f),0,sizeof(GPollFD));
+    		memset(gpool+(szPoll+f),0,sizeof(POOLDATA));
     	}
 
 		fd = gpool+szPoll;
@@ -158,24 +170,25 @@
     }
 
 #ifdef DEBUG	// Sanity check
-    if(fd->fd)
+    if(fd->ip)
     {
     	DBGMessage("ERROR!!! The new poll structure has data!!!");
     }
 #endif
 
-    fd->fd = ip->source;
+    fd->ip     = ip;
+    fd->gfd.fd = ip->source;
 
     if(ip->condition & InputReadMask)
-      fd->events |= (G_IO_IN|G_IO_PRI);
+      fd->gfd.events |= (G_IO_IN|G_IO_PRI);
 
     if(ip->condition & InputExceptMask)
-	  fd->events |= (G_IO_HUP|G_IO_NVAL|G_IO_ERR);
+	  fd->gfd.events |= (G_IO_HUP|G_IO_NVAL|G_IO_ERR);
 
     if(ip->condition & InputWriteMask)
-	  fd->events |= G_IO_OUT;
+	  fd->gfd.events |= G_IO_OUT;
 
-    g_source_add_poll(fd3270,fd);
+    g_source_add_poll(fd3270,&fd->gfd);
 
     sz = szPoll * sizeof(struct pollfd);
 
@@ -188,26 +201,30 @@
 
     UNLOCK
 
-	DBGPrintf("Input Source %p added (GPool=%p)",ip,fd);
+	DBGPrintf("Input Source %p added (GPool=%p, fd=%d, masc=%02x)",ip,fd,ip->source,ip->condition);
  }
 
  void gsource_removefile(const INPUT_3270 *ip)
  {
-    GPollFD 	*fd = 0;
+    POOLDATA 	*fd = 0;
     int			f;
 
     LOCK
 
     for(f = 0; f < szPoll && !fd; f++)
     {
-    	if(gpool[f].fd == ip->source)
+    	if(gpool[f].ip == ip)
     	   fd = gpool+f;
     }
 
     if(fd)
     {
-    	g_source_remove_poll(fd3270,fd);
-    	memset(fd,0,sizeof(GPollFD));
+    	g_source_remove_poll(fd3270,&fd->gfd);
+    	memset(fd,0,sizeof(POOLDATA));
+    }
+    else
+    {
+    	Log("Unexpected call to gsource_removefile(%p) (fd=%d, masc=%02x)",ip,ip->source,ip->condition);
     }
 
     UNLOCK
@@ -255,18 +272,18 @@
 
     for(f = 0; f < szPoll; f++)
     {
-    	if(gpool[f].fd)
+    	if(gpool[f].gfd.fd)
     	{
-    		fds[qtd].fd = gpool[f].fd;
+    		fds[qtd].fd = gpool[f].gfd.fd;
     		fds[qtd].events = 0;
 
-    		if(gpool[f].events & (G_IO_IN|G_IO_PRI))
+    		if(gpool[f].gfd.events & (G_IO_IN|G_IO_PRI))
     		   fds[qtd].events |= (POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI);
 
-    		if(gpool[f].events & (G_IO_HUP|G_IO_NVAL|G_IO_ERR))
+    		if(gpool[f].gfd.events & (G_IO_HUP|G_IO_NVAL|G_IO_ERR))
 			   fds[qtd].events |= (POLLOUT|POLLWRBAND);
 
-    		if(gpool[f].events & (G_IO_OUT))
+    		if(gpool[f].gfd.events & (G_IO_OUT))
                fds[qtd].events |= (POLLERR|POLLHUP|POLLNVAL);
 
     		qtd++;
