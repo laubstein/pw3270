@@ -113,6 +113,7 @@ int Initialize_3270(void);
 
 unsigned char 		GetASCIICharacter(const struct ea *display);
 const unsigned char *GetASCIIString(unsigned char *str);
+const struct ea 	*Get3270DeviceBuffer(int *rows, int *cols);
 
 const struct timeval *Check3270Timeouts(struct timeval *tp);
 

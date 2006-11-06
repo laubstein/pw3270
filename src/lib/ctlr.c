@@ -35,6 +35,8 @@
 #include "screen.h"
 #include "resources.h"
 
+#include "lib3270.h"
+
 #include "ctlrc.h"
 #include "ftc.h"
 #include "ft_cutc.h"
@@ -69,6 +71,7 @@ Boolean         is_altbuffer = False;
 struct ea      *ea_buf;		/* 3270 device buffer */
 				/* ea_buf[-1] is the dummy default field
 				   attribute */
+
 Boolean         formatted = False;	/* set in screen_disp */
 Boolean         screen_changed = False;
 int             first_changed = -1;
@@ -171,6 +174,15 @@ ctlr_reinit(unsigned cmask)
 		cursor_addr = 0;
 		buffer_addr = 0;
 	}
+}
+
+const struct ea *Get3270DeviceBuffer(int *rows, int *cols)
+{
+	if(rows)
+	   *rows = maxROWS;
+	if(cols)
+	   *cols = maxCOLS;
+	return ea_buf;
 }
 
 /*
