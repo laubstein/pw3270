@@ -31,6 +31,7 @@
  	GPollFD				gfd;		// MUST BE THE FIRST ONE!!!
 
  	const INPUT_3270	*ip;
+ 	int					events;
 
  } POOLDATA;
 
@@ -178,21 +179,33 @@
     }
 #endif
 
-    inputs_changed	= TRUE;
+    memset(fd,0,sizeof(POOLDATA));
     fd->ip     		= ip;
     fd->gfd.fd		= ip->source;
 
     if(ip->condition & InputReadMask)
+    {
       fd->gfd.events |= (G_IO_IN|G_IO_PRI);
+      fd->events      = (POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI);
+    }
 
     if(ip->condition & InputExceptMask)
+    {
 	  fd->gfd.events |= (G_IO_HUP|G_IO_NVAL|G_IO_ERR);
+	  fd->events      = (POLLERR|POLLHUP|POLLNVAL);
+    }
 
     if(ip->condition & InputWriteMask)
+    {
 	  fd->gfd.events |= G_IO_OUT;
+	  fd->events      = (POLLOUT|POLLWRBAND);
+    }
+
+    inputs_changed	= TRUE;
 
     g_source_add_poll(fd3270,&fd->gfd);
 
+    /* reset the poll() vector to the right size */
     sz = szPoll * sizeof(struct pollfd);
 
     if(fds)
@@ -257,7 +270,26 @@
 	 * returned which were >= 0.
 	 *
 	 */
-  	timeout = 0;
+/*
+	struct timeval 	tv;
+	long			ln;
+
+    if(Get3270Timeout(&tv))
+    {
+       ln  = (tv.tv_sec * 1000000L);
+       ln += tv.tv_usec;
+
+       DBGTrace(ln);
+
+	   *timeout = (gint) ln;
+    }
+    else
+    {
+  	   *timeout = -1;
+    }
+
+    *timeout = 0;
+*/
   	return 0;
   }
 
@@ -280,24 +312,16 @@
     {
     	if(gpool[f].gfd.fd)
     	{
-    		fds[qtd].fd = gpool[f].gfd.fd;
-    		fds[qtd].events = 0;
-
-    		if(gpool[f].gfd.events & (G_IO_IN|G_IO_PRI))
-    		   fds[qtd].events |= (POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI);
-
-    		if(gpool[f].gfd.events & (G_IO_HUP|G_IO_NVAL|G_IO_ERR))
-			   fds[qtd].events |= (POLLOUT|POLLWRBAND);
-
-    		if(gpool[f].gfd.events & (G_IO_OUT))
-               fds[qtd].events |= (POLLERR|POLLHUP|POLLNVAL);
-
+    		fds[qtd].fd     = gpool[f].gfd.fd;
+    		fds[qtd].events = gpool[f].events;
     		qtd++;
     	}
     }
 
     if(poll(fds,qtd,0) > 0)
        rc = TRUE;
+
+//    DBGPrintf("Pending events: %s",rc ? "Yes" : "No");
 
     UNLOCK
   	return rc;
@@ -315,48 +339,32 @@
      * parameters are needed for this type of event source.
      *
      */
-    const INPUT_3270 *ip;
-    const INPUT_3270 *next;
-    struct pollfd    pfd;
-    gboolean		 rc		= FALSE;
+    struct pollfd		fds;
+    gboolean			rc		= FALSE;
+	int					f;
+	const INPUT_3270	*ip;
 
     // FIXME (perry#1#): Do it right (using the callback function).
 
-    /*
-     * Check all 3270 handles looking for events to process
-     */
-
-    ip = Query3270SourceList();
-
-    while(ip)
+//    CHKPoint();
+    for(f = 0; f < szPoll; f++)
     {
-    	next = ip->next;
-    	memset(&pfd,0,sizeof(pfd));
+    	if(gpool[f].gfd.fd)
+    	{
+    		ip		   = gpool[f].ip;
+    		fds.fd     = gpool[f].gfd.fd;
+    		fds.events = gpool[f].events;
 
-    	pfd.fd = ip->source;
-
-        if(ip->condition & InputReadMask)
-		   pfd.events |= (POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI);
-
-        if(ip->condition & InputExceptMask)
-           pfd.events |= (POLLERR|POLLHUP|POLLNVAL);
-
-        if(ip->condition & InputWriteMask)
-		   pfd.events |= (POLLOUT|POLLWRBAND);
-
-        if(poll(&pfd,1,0) > 0)
-        {
-		   DBGPrintf("Source %p has event (fd=%d, masc=%02x)",ip,ip->source,ip->condition);
-
-           (*ip->proc)();
-           rc   = TRUE;
-
-		   if(inputs_changed)
-              next = Query3270SourceList(); // UGLY: The best way is to reset the search only if the list has changed
+            if(poll(&fds,1,0) > 0)
+            {
+		       DBGPrintf("Source %p has event (fd=%d, masc=%02x)",ip,ip->source,ip->condition);
+               (*ip->proc)();
+               rc   = TRUE;
+            }
         }
-
-        ip = next;
     }
+
+    DBGTracex(rc);
 
   	return rc;
   }

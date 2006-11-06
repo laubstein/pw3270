@@ -33,7 +33,8 @@
 
 
 // TODO (perry#9#): Replace the old input_t in the source and remove this define
-#define input_t INPUT_3270
+#define input_t		INPUT_3270
+#define timeout_t	TIMEOUT_3270
 
 #define MILLION		1000000L
 
@@ -349,12 +350,6 @@ KeysymToString(KeySym k)
 }
 
 /* Timeouts. */
-typedef struct timeout {
-	struct timeout *next;
-	struct timeval tv;
-	void (*proc)(void);
-	Boolean in_play;
-} timeout_t;
 #define TN	(timeout_t *)NULL
 static timeout_t *timeouts = TN;
 
@@ -397,6 +392,8 @@ AddTimeOut(unsigned long interval, void (*proc)(void))
 		prev->next = t_new;
 	}
 
+	printf("*** TIMEOUT %p anexado\n",t_new);
+
 	return (unsigned long)t_new;
 }
 
@@ -406,6 +403,8 @@ RemoveTimeOut(unsigned long timer)
 	timeout_t *st = (timeout_t *)timer;
 	timeout_t *t;
 	timeout_t *prev = TN;
+
+	printf("*** TIMEOUT %p removido\n",st);
 
 	if (st->in_play)
 		return;
@@ -510,6 +509,7 @@ RemoveInput(unsigned long id)
 		inputs = ip->next;
 	Free(ip);
 	inputs_changed = True;
+
 }
 
 /*
@@ -572,6 +572,27 @@ select_setup(int *nfds, fd_set *readfds, fd_set *writefds,
 	return r;
 }
 
+const struct timeval *Get3270Timeout(struct timeval *tp)
+{
+	struct timeval now;
+
+	memset(tp,0,sizeof(struct timeval));
+
+	if (timeouts == TN)
+	   return 0;
+
+	(void) gettimeofday(&now, (void *)NULL);
+	tp->tv_sec  = timeouts->tv.tv_sec  - now.tv_sec;
+	tp->tv_usec = timeouts->tv.tv_usec - now.tv_usec;
+
+	if (tp->tv_usec < 0L) {
+		tp->tv_sec--;
+		tp->tv_usec += MILLION;
+	}
+
+    return tp;
+}
+
 /* Event dispatcher. */
 Boolean
 process_events(Boolean block)
@@ -580,7 +601,7 @@ process_events(Boolean block)
 	fd_set rfds, wfds, xfds;
 	int ns;
 	struct timeval now, twait, *tp;
-	struct timeout *t;
+	timeout_t *t;
 	Boolean any_events;
 	Boolean processed_any = False;
 
@@ -613,6 +634,11 @@ process_events(Boolean block)
 
 	if (block) {
 		if (timeouts != TN) {
+
+			Get3270Timeout(&now);
+
+			printf("Meu: %ld %ld\n",(unsigned long) now.tv_sec, (unsigned long) now.tv_usec);
+
 			(void) gettimeofday(&now, (void *)NULL);
 			twait.tv_sec = timeouts->tv.tv_sec - now.tv_sec;
 			twait.tv_usec = timeouts->tv.tv_usec - now.tv_usec;
@@ -624,6 +650,10 @@ process_events(Boolean block)
 				twait.tv_sec = twait.tv_usec = 0L;
 			tp = &twait;
 			any_events = True;
+
+			printf("Dele: %ld %ld\n",(unsigned long) twait.tv_sec, (unsigned long) twait.tv_usec);
+			fflush(stdout);
+
 		} else {
 			tp = (struct timeval *)NULL;
 		}
@@ -683,11 +713,16 @@ process_events(Boolean block)
 			if (t->tv.tv_sec < now.tv_sec ||
 			    (t->tv.tv_sec == now.tv_sec &&
 			     t->tv.tv_usec < now.tv_usec)) {
+
+				printf("******************* Timeout!!!!\n");
+				fflush(stdout);
+
 				timeouts = t->next;
 				t->in_play = True;
 				(*t->proc)();
 				processed_any = True;
 				Free(t);
+
 			} else
 				break;
 		}
