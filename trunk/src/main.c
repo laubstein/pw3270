@@ -80,7 +80,6 @@
     g_signal_connect (G_OBJECT(top), "destroy", G_CALLBACK (destroy), NULL);
 
     /* Start 3270 function */
-//    Run_3270(cl_hostname);
 
     if(cl_hostname)
     {
@@ -88,6 +87,7 @@
        host_connect(cl_hostname);
     }
 
+    Run_3270(cl_hostname);
 
     gtk_widget_show(top);
 
