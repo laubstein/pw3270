@@ -29,6 +29,10 @@
 			<Option link="0"/>
 			<Option target="default"/>
 		</Unit>
+		<Unit filename="src/gsource.c">
+			<Option compilerVar="CC"/>
+			<Option target="default"/>
+		</Unit>
 		<Unit filename="src/lib/3270ds.h">
 			<Option compilerVar=""/>
 			<Option compile="0"/>

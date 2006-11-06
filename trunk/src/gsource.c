@@ -315,7 +315,7 @@
     if(poll(fds,qtd,0) > 0)
        rc = TRUE;
 
-    DBGPrintf("Pending events: %s",rc ? "Yes" : "No");
+//    DBGPrintf("Pending events: %s",rc ? "Yes" : "No");
 
     UNLOCK
   	return rc;
