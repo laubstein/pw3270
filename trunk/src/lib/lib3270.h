@@ -114,7 +114,7 @@ int Initialize_3270(void);
 unsigned char 		GetASCIICharacter(const struct ea *display);
 const unsigned char *GetASCIIString(unsigned char *str);
 
-const struct timeval *Get3270Timeout(struct timeval *tp);
+const struct timeval *Check3270Timeouts(struct timeval *tp);
 
 
 extern const INPUT_3270 * Query3270SourceList(void);

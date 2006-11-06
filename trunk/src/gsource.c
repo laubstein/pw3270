@@ -270,26 +270,20 @@
 	 * returned which were >= 0.
 	 *
 	 */
-/*
 	struct timeval 	tv;
 	long			ln;
 
-    if(Get3270Timeout(&tv))
+    if(Check3270Timeouts(&tv))
     {
+       // NOTE (perry#7#): Is there any better way?
        ln  = (tv.tv_sec * 1000000L);
        ln += tv.tv_usec;
 
-       DBGTrace(ln);
+       if(ln > 0)
+          *timeout = (ln/1000);
 
-	   *timeout = (gint) ln;
-    }
-    else
-    {
-  	   *timeout = -1;
     }
 
-    *timeout = 0;
-*/
   	return 0;
   }
 
@@ -321,7 +315,7 @@
     if(poll(fds,qtd,0) > 0)
        rc = TRUE;
 
-//    DBGPrintf("Pending events: %s",rc ? "Yes" : "No");
+    DBGPrintf("Pending events: %s",rc ? "Yes" : "No");
 
     UNLOCK
   	return rc;
