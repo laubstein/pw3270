@@ -1,20 +1,14 @@
 
  #include "g3270.h"
- #include "lib/hostc.h"
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
- static void stsConnect(Boolean ignored);
- static void stsHalfConnect(Boolean ignored);
- static void stsExiting(Boolean ignored);
-
 /*---[ Globals ]--------------------------------------------------------------*/
 
- const char	*cl_hostname	= 0;
  GtkWidget	*top_window		= 0;
+ GtkWidget  *terminal		= 0;
 
-
-/*---[ 3270 Event Status ]----------------------------------------------------*/
+/*---[ Main program ]---------------------------------------------------------*/
 
  void SetWindowTitle(const char *msg)
  {
@@ -37,31 +31,8 @@
        gtk_window_set_title(GTK_WINDOW(top_window),title);
 
     }
-}
-
- static void stsConnect(Boolean status)
- {
-    g3270_log("lib3270", "%s", status ? "Connected" : "Disconnected");
-    if(!status)
-       SetWindowTitle(0);
  }
 
- static void stsHalfConnect(Boolean ignored)
- {
- 	DBGPrintf("HalfConnect: %s", ignored ? "Yes" : "No");
- }
-
- static void stsExiting(Boolean ignored)
- {
- 	DBGPrintf("Exiting: %s", ignored ? "Yes" : "No");
- }
-
- static void stsResolving(Boolean ignored)
- {
- 	DBGPrintf("Resolving: %s", ignored ? "Yes" : "No");
- }
-
-/*---[ Main program ]---------------------------------------------------------*/
 
  static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer data )
  {
@@ -75,7 +46,6 @@
 
  int main(int argc, char **argv)
  {
-
     printf(TARGET " (Build " BUILD " for gtk " GTKVERSION ") Starting\n");
     fflush(stdout);
 
@@ -89,33 +59,19 @@
     /* Create gtk's stuff  */
 
     top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	g_signal_connect(G_OBJECT(top_window), "delete_event", G_CALLBACK(delete_event), NULL);
+	g_signal_connect(G_OBJECT(top_window),  "delete_event", G_CALLBACK(delete_event), NULL);
     g_signal_connect (G_OBJECT(top_window), "destroy", G_CALLBACK (destroy), NULL);
 
-    gsource_init();
-    SetWindowTitle(0);
-
     /* Parse 3270 command line */
-
     parse_3270_command_line(argc, (const char **) argv, &cl_hostname);
 
     if(!cl_hostname)
        cl_hostname = "3270.df.bb:8023";
 
-    Initialize_3270();
+    SetWindowTitle(0);
 
-    register_3270_schange(ST_CONNECT,		stsConnect);
-    register_3270_schange(ST_EXITING,		stsExiting);
-    register_3270_schange(ST_HALF_CONNECT,	stsHalfConnect);
-    register_3270_schange(ST_RESOLVING,		stsResolving);
-
-    /* Start 3270 function */
-
-    if(cl_hostname)
-    {
-       g3270_log(TARGET, "Connecting to \"%s\"",cl_hostname);
-       host_connect(cl_hostname);
-    }
+    // Create terminal window
+	terminal = g3270_new(cl_hostname);
 
 
 //    Run_3270(cl_hostname);

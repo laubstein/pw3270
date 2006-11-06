@@ -508,10 +508,6 @@
 			<Option compilerVar="CC"/>
 			<Option target="default"/>
 		</Unit>
-		<Unit filename="src/terminal.cpp">
-			<Option compilerVar="CPP"/>
-			<Option target="default"/>
-		</Unit>
 		<Unit filename="src/terminal.h">
 			<Option compilerVar=""/>
 			<Option compile="0"/>
