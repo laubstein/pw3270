@@ -88,8 +88,8 @@ typedef struct _keyboard_info
 
 	void (*beep)(void);
 
-	void (*InputAdded)(const INPUT_3270 *ip);
-	void (*InputRemoved)(const INPUT_3270 *ip);
+	void (*SourceAdded)(const INPUT_3270 *ip);
+	void (*SourceRemoved)(const INPUT_3270 *ip);
 
 	const KEYTABLE	*keys;
 } KEYBOARD_INFO;
@@ -107,7 +107,7 @@ int Initialize_3270(void);
 unsigned char 		GetASCIICharacter(const struct ea *display);
 const unsigned char *GetASCIIString(unsigned char *str);
 
-extern const INPUT_3270 * Query3270InputList(void);
+extern const INPUT_3270 * Query3270SourceList(void);
 
 extern int  parse_3270_command_line(int argc, const char **argv, const char **cl_hostname);
 extern void register_3270_schange(int tx, void (*func)(Boolean));

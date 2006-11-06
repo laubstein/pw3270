@@ -7,7 +7,7 @@
 
  #include "lib/hostc.h"
 
- #define SRC_SIZE 2
+ #define SRC_SIZE 3
 
 // #ifdef DEBUG
 //    #define LOCK DBGMessage("Lock"); 	g_mutex_lock(mutex);
@@ -84,11 +84,13 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
- static GSource		*fd3270	= 0;
- static GMutex		*mutex	= 0;
- static int			szPoll	= 0;
- static POOLDATA	*gpool	= 0;
- struct pollfd		*fds	= 0;
+ static GSource		*fd3270			= 0;
+ static GMutex		*mutex			= 0;
+ static int			szPoll			= 0;
+ static POOLDATA	*gpool			= 0;
+ struct pollfd		*fds			= 0;
+ static Boolean 	inputs_changed	= FALSE;
+
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -176,8 +178,9 @@
     }
 #endif
 
-    fd->ip     = ip;
-    fd->gfd.fd = ip->source;
+    inputs_changed	= TRUE;
+    fd->ip     		= ip;
+    fd->gfd.fd		= ip->source;
 
     if(ip->condition & InputReadMask)
       fd->gfd.events |= (G_IO_IN|G_IO_PRI);
@@ -201,7 +204,7 @@
 
     UNLOCK
 
-	DBGPrintf("Input Source %p added (GPool=%p, fd=%d, masc=%02x)",ip,fd,ip->source,ip->condition);
+	DBGPrintf("Source %p added (GPool=%p, fd=%d, masc=%02x)",ip,fd,ip->source,ip->condition);
  }
 
  void gsource_removefile(const INPUT_3270 *ip)
@@ -219,7 +222,8 @@
 
     if(fd)
     {
-    	g_source_remove_poll(fd3270,&fd->gfd);
+		inputs_changed	= TRUE;
+		g_source_remove_poll(fd3270,&fd->gfd);
     	memset(fd,0,sizeof(POOLDATA));
     }
     else
@@ -228,7 +232,9 @@
     }
 
     UNLOCK
-	DBGPrintf("Input Source %p removed (GPool=%p)",ip,fd);
+
+	DBGPrintf("Source %p removed (GPool=%p, fd=%d, masc=%02x)",ip,fd,ip->source,ip->condition);
+
  }
 
 
@@ -320,7 +326,7 @@
      * Check all 3270 handles looking for events to process
      */
 
-    ip = Query3270InputList();
+    ip = Query3270SourceList();
 
     while(ip)
     {
@@ -340,9 +346,13 @@
 
         if(poll(&pfd,1,0) > 0)
         {
+		   DBGPrintf("Source %p has event (fd=%d, masc=%02x)",ip,ip->source,ip->condition);
+
            (*ip->proc)();
            rc   = TRUE;
-           next = Query3270InputList(); // UGLY: The best way is to reset the search only if the list has changed
+
+		   if(inputs_changed)
+              next = Query3270SourceList(); // UGLY: The best way is to reset the search only if the list has changed
         }
 
         ip = next;

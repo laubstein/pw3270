@@ -425,7 +425,7 @@ RemoveTimeOut(unsigned long timer)
 static input_t *inputs = (input_t *)NULL;
 static Boolean inputs_changed = False;
 
-const INPUT_3270 * Query3270InputList(void)
+const INPUT_3270 * Query3270SourceList(void)
 {
 	return inputs;
 }
@@ -443,8 +443,8 @@ AddInput(int source, void (*fn)(void))
 	inputs = ip;
 	inputs_changed = True;
 
-    if(keyboard_info_3270 && keyboard_info_3270->InputAdded)
-       keyboard_info_3270->InputAdded(ip);
+    if(keyboard_info_3270 && keyboard_info_3270->SourceAdded)
+       keyboard_info_3270->SourceAdded(ip);
 
 	return (unsigned long)ip;
 }
@@ -462,8 +462,8 @@ AddExcept(int source, void (*fn)(void))
 	inputs = ip;
 	inputs_changed = True;
 
-    if(keyboard_info_3270 && keyboard_info_3270->InputAdded)
-       keyboard_info_3270->InputAdded(ip);
+    if(keyboard_info_3270 && keyboard_info_3270->SourceAdded)
+       keyboard_info_3270->SourceAdded(ip);
 
 	return (unsigned long)ip;
 }
@@ -480,6 +480,10 @@ AddOutput(int source, void (*fn)(void))
 	ip->next = inputs;
 	inputs = ip;
 	inputs_changed = True;
+
+    if(keyboard_info_3270 && keyboard_info_3270->SourceAdded)
+       keyboard_info_3270->SourceAdded(ip);
+
 	return (unsigned long)ip;
 }
 
@@ -497,8 +501,8 @@ RemoveInput(unsigned long id)
 	if (ip == (input_t *)NULL)
 		return;
 
-    if(keyboard_info_3270 && keyboard_info_3270->InputRemoved)
-       keyboard_info_3270->InputRemoved(ip);
+    if(keyboard_info_3270 && keyboard_info_3270->SourceRemoved)
+       keyboard_info_3270->SourceRemoved(ip);
 
 	if (prev != (input_t *)NULL)
 		prev->next = ip->next;
