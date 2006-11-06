@@ -203,7 +203,7 @@ static void screen_resume(void)
 
 static void screen_type(const char *model_name, int maxROWS, int maxCOLS)
 {
-	CHKPoint();
+	DBGPrintf("Screen type: %s (%dx%d)",model_name,maxROWS,maxCOLS);
 }
 
 static void cursor_move(int baddr)
@@ -269,6 +269,7 @@ static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
 static void status_lu(const char *lu)
 {
 	DBGPrintf("LU: %s",lu);
+	SetWindowTitle(lu);
 }
 
 static void ring_bell(void)
