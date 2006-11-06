@@ -392,7 +392,7 @@ AddTimeOut(unsigned long interval, void (*proc)(void))
 		prev->next = t_new;
 	}
 
-	printf("*** TIMEOUT %p anexado\n",t_new);
+	printf("*** TIMEOUT %p anexado (%ld ms)\n",t_new, interval);
 
 	return (unsigned long)t_new;
 }
@@ -572,9 +572,10 @@ select_setup(int *nfds, fd_set *readfds, fd_set *writefds,
 	return r;
 }
 
-const struct timeval *Get3270Timeout(struct timeval *tp)
+const struct timeval *Check3270Timeouts(struct timeval *tp)
 {
-	struct timeval now;
+	struct timeval	now;
+	timeout_t 		*t;
 
 	memset(tp,0,sizeof(struct timeval));
 
@@ -582,6 +583,27 @@ const struct timeval *Get3270Timeout(struct timeval *tp)
 	   return 0;
 
 	(void) gettimeofday(&now, (void *)NULL);
+
+    /* Check for expired timeouts */
+	while ((t = timeouts) != TN)
+	{
+	   if(t->tv.tv_sec < now.tv_sec ||
+			    (t->tv.tv_sec == now.tv_sec &&
+			     t->tv.tv_usec < now.tv_usec))
+	   {
+	      timeouts = t->next;
+		  t->in_play = True;
+		  (*t->proc)();
+		  Free(t);
+
+	   } else
+	      break;
+	}
+
+	if (timeouts == TN)
+	   return 0;
+
+    /* Get the time for the next timeout */
 	tp->tv_sec  = timeouts->tv.tv_sec  - now.tv_sec;
 	tp->tv_usec = timeouts->tv.tv_usec - now.tv_usec;
 
@@ -635,10 +657,6 @@ process_events(Boolean block)
 	if (block) {
 		if (timeouts != TN) {
 
-			Get3270Timeout(&now);
-
-			printf("Meu: %ld %ld\n",(unsigned long) now.tv_sec, (unsigned long) now.tv_usec);
-
 			(void) gettimeofday(&now, (void *)NULL);
 			twait.tv_sec = timeouts->tv.tv_sec - now.tv_sec;
 			twait.tv_usec = timeouts->tv.tv_usec - now.tv_usec;
@@ -650,9 +668,6 @@ process_events(Boolean block)
 				twait.tv_sec = twait.tv_usec = 0L;
 			tp = &twait;
 			any_events = True;
-
-			printf("Dele: %ld %ld\n",(unsigned long) twait.tv_sec, (unsigned long) twait.tv_usec);
-			fflush(stdout);
 
 		} else {
 			tp = (struct timeval *)NULL;
