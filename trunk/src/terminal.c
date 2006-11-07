@@ -1,7 +1,10 @@
 
  #include "g3270.h"
+ #include <gdk/gdkkeysyms.h>
+
  #include "lib/hostc.h"
  #include "lib/kybdc.h"
+ #include "lib/actionsc.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -165,35 +168,79 @@
      *  } GdkEventKey;
      *
      */
+
+#ifdef DEBUG
+     #define DECLARE_ACTION(key, action, cause, parm1, parm2) { key, #key, action, cause, parm1, parm2 }
+#else
+     #define DECLARE_ACTION(key, action, cause, parm1, parm2) { key, action, cause, parm1, parm2 }
+#endif
+
+    static const struct _actions
+    {
+       guint		 	keyval;
+#ifdef DEBUG
+       const char		*trace;
+#endif
+	   XtActionProc 	action;
+	   enum iaction 	cause;
+	   const char 		*parm1;
+	   const char 		*parm2;
+    } actions[] =
+    {
+		DECLARE_ACTION( GDK_Home,	Home_action, 	IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Left,	Left_action,	IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Up,		Up_action,		IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Right,	Right_action, 	IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Down,	Down_action,	IA_DEFAULT, CN, CN )
+    };
+
 	char			ks[6];
     String			params[2];
     Cardinal 		one			= 1;
-//    const struct ea	*ea			= QueryDeviceChar(-1);
+    int				f;
 
+    for(f=0; f < (sizeof(actions)/sizeof(struct _actions));f++)
+    {
+    	if(actions[f].keyval == event->keyval)
+    	{
+#ifdef DEBUG
+		   DBGPrintf("Action: %s",actions[f].trace);
+#endif
+           action_internal(	actions[f].action,
+							actions[f].cause,
+							actions[f].parm1,
+							actions[f].parm2 );
+           return TRUE;
+    	}
+    }
+
+//    const struct ea	*ea			= QueryDeviceChar(-1);
 //	DBGPrintf("Key: %s %c (%d)", event->string, Ebc2ASC(ea->cc), event->keyval);
 
+    // /opt/gnome/include/gtk-2.0/gdk/gdkkeysyms.h
 
     /* Check for regular key */
 
     if(event->keyval < 0xFF && event->string[0] >= ' ')
     {
-    	// Standard char, use it.
-    	params[0] = event->string;
-    	params[1] = 0;
-        Key_action(NULL, NULL, params, &one);
-        return TRUE;
-    }
-    else if(event->keyval < 0xFFFF)
+ 	   // Standard char, use it.
+	   params[0] = event->string;
+	   params[1] = 0;
+       Key_action(NULL, NULL, params, &one);
+ 	   return TRUE;
+	}
+
+    if(event->keyval < 0xFFFF)
     {
-        snprintf(ks,5,"0x%x",event->keyval);
+	   snprintf(ks,5,"0x%x",event->keyval);
+	   params[0] = ks;
+	   params[1] = 0;
+       Key_action(NULL, NULL, params, &one);
+ 	   return TRUE;
+	}
 
-    	params[0] = ks;
-    	params[1] = 0;
-        Key_action(NULL, NULL, params, &one);
-        return TRUE;
-    }
+    return FALSE;
 
- 	return FALSE;
  }
 
  static gboolean button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
