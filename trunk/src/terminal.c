@@ -79,6 +79,8 @@
 
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
+    // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
+
  	const struct ea *trm;
  	int				rows;
  	int				cols;
@@ -88,26 +90,37 @@
  	int				vPos;
  	char			chr;
 
+ 	int				left	= (event->area.x - font->Width);
+ 	int				right	= left + event->area.width + (font->Width << 1);
+
+ 	int				top		= (event->area.y - font->Height);
+ 	int				bottom	= top + event->area.height + (font->Height << 1);
+
+//    DBGPrintf("H %d<->%d V %d<->%d",left,right,top,bottom);
+
  	trm = Get3270DeviceBuffer(&rows, &cols);
 
-    // FIXME (perry#2#): Draw only the needed area
-    DBGPrintf("Redraw %dx%d (%p)",rows,cols,trm);
     if(!trm)
        return FALSE;
 
+    // TODO (perry#2#): Find a better way (Is it necessary to run all over the buffer?)
     vPos = top_margin;
     for(row = 0; row < rows; row++)
     {
     	hPos = left_margin;
     	for(col = 0; col < cols; col++)
     	{
-    		chr = GetASCIICharacter(trm);
-			gdk_draw_text(	widget->window,
-							font->fn,
-							widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-							hPos,vPos,
-							&chr,
-							1);
+    		if(  hPos >= left && hPos <= right && vPos >= top && vPos <= bottom)
+    		{
+    			/* It's inside the drawing area, redraw */
+    		    chr = GetASCIICharacter(trm);
+			    gdk_draw_text(	widget->window,
+								font->fn,
+								widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+								hPos,vPos,
+								&chr,
+								1);
+    		}
 
 			hPos += font->Width;
 	        trm++;
@@ -139,6 +152,35 @@
      *
      */
 	DBGTrace(event->keyval);
+
+/*
+
+        if (!(k & ~0xff)) {
+                char ks[6];
+                String params[2];
+                Cardinal one;
+
+                if (k >= ' ') {
+                        ks[0] = k;
+                        ks[1] = '\0';
+                } else {
+                        (void) sprintf(ks, "0x%x", k);
+                }
+                params[0] = ks;
+                params[1] = CN;
+                one = 1;
+                Key_action(NULL, NULL, params, &one);
+                return;
+        }
+
+
+void
+Key_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+
+Key_action(NULL, NULL, params, &one);
+
+*/
+
 
  	return 0;
  }
