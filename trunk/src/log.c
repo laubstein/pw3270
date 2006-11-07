@@ -133,7 +133,7 @@
 
     time(&ltime);
     strftime(wrk, 39, "%d/%m/%Y %H:%M:%S", localtime(&ltime));
-    fprintf(out,"%s %-8s ",wrk,module);
+    fprintf(out,"%s ",wrk);
  }
 
  /**
