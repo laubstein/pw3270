@@ -187,12 +187,25 @@
 	   const char 		*parm2;
     } actions[] =
     {
-		DECLARE_ACTION( GDK_Home,	Home_action, 	IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_Left,	Left_action,	IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_Up,		Up_action,		IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_Right,	Right_action, 	IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_Down,	Down_action,	IA_DEFAULT, CN, CN )
+		DECLARE_ACTION( GDK_Home,		Home_action, 		IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Left,		Left_action,		IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Up,			Up_action,			IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Right,		Right_action, 		IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Down,		Down_action,		IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_Clear,  	Clear_action, 		IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_3270_Reset,	Reset_action,		IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_Tab,	    Tab_action,			IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_Delete,		Delete_action,		IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_BackSpace,	BackSpace_action,	IA_DEFAULT, CN, CN ),
+
+        DECLARE_ACTION( GDK_Return,		Enter_action,		IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_KP_Enter,	Enter_action,		IA_DEFAULT, CN, CN ),
+
+        DECLARE_ACTION( GDK_Linefeed,	Newline_action,		IA_DEFAULT, CN, CN )
+
     };
+
+//        DECLARE_ACTION(        Redraw_action,	IA_DEFAULT, CN, CN ),
 
 	char			ks[6];
     String			params[2];
@@ -213,6 +226,8 @@
            return TRUE;
     	}
     }
+
+    DBGTracex(event->keyval);
 
 //    const struct ea	*ea			= QueryDeviceChar(-1);
 //	DBGPrintf("Key: %s %c (%d)", event->string, Ebc2ASC(ea->cc), event->keyval);
