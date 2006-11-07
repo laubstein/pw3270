@@ -117,7 +117,7 @@
        return rc;
 
     // TODO (perry#2#): Find a better way (Is it necessary to run all over the buffer?)
-    vPos = top_margin;
+    vPos = top_margin+font->Height;
     for(row = 0; row < rows; row++)
     {
     	hPos = left_margin;
@@ -201,6 +201,8 @@
         DECLARE_ACTION( GDK_Return,		Enter_action,		IA_DEFAULT, CN, CN ),
         DECLARE_ACTION( GDK_KP_Enter,	Enter_action,		IA_DEFAULT, CN, CN ),
 
+//        DECLARE_ACTION( GDK_Escape,		Escape_action,		IA_DEFAULT, CN, CN ),
+
         DECLARE_ACTION( GDK_Linefeed,	Newline_action,		IA_DEFAULT, CN, CN )
 
     };
@@ -234,9 +236,18 @@
 
     // /opt/gnome/include/gtk-2.0/gdk/gdkkeysyms.h
 
+    /* Check for Function keys */
+    if(event->keyval >= GDK_F1 && event->keyval <=  GDK_F12)
+    {
+    	snprintf(ks,5,"%d",(event->keyval - GDK_F1)+1);
+    	DBGPrintf("Function-%s",ks);
+		action_internal(PF_action, IA_DEFAULT, ks, CN);
+    	return TRUE;
+    }
+
     /* Check for regular key */
 
-    if(event->keyval < 0xFF && event->string[0] >= ' ')
+    if(event->keyval < 0x00FF && event->string[0] >= ' ')
     {
  	   // Standard char, use it.
 	   params[0] = event->string;
@@ -245,6 +256,7 @@
  	   return TRUE;
 	}
 
+/*
     if(event->keyval < 0xFFFF)
     {
 	   snprintf(ks,5,"0x%x",event->keyval);
@@ -253,6 +265,7 @@
        Key_action(NULL, NULL, params, &one);
  	   return TRUE;
 	}
+*/
 
     return FALSE;
 
