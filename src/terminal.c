@@ -7,6 +7,11 @@
  #define TERMINAL_HPAD 2
  #define TERMINAL_VPAD 2
 
+
+/*---[ Prototipes ]-----------------------------------------------------------*/
+
+ static void InvalidateCursor(void);
+
 /*---[ Structures ]-----------------------------------------------------------*/
 
  typedef struct _fontelement
@@ -90,6 +95,8 @@
  	int				vPos;
  	char			chr;
 
+    gboolean		rc		= FALSE;
+
  	int				left	= (event->area.x - font->Width);
  	int				right	= left + event->area.width + (font->Width << 1);
 
@@ -101,7 +108,7 @@
  	trm = Get3270DeviceBuffer(&rows, &cols);
 
     if(!trm)
-       return FALSE;
+       return rc;
 
     // TODO (perry#2#): Find a better way (Is it necessary to run all over the buffer?)
     vPos = top_margin;
@@ -114,6 +121,7 @@
     		{
     			/* It's inside the drawing area, redraw */
     		    chr = GetASCIICharacter(trm);
+    		    rc  = TRUE;
 			    gdk_draw_text(	widget->window,
 								font->fn,
 								widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
@@ -128,7 +136,7 @@
     	vPos += font->Height;
     }
 
-    return TRUE;
+    return rc;
  }
 
  static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
@@ -193,22 +201,27 @@ Key_action(NULL, NULL, params, &one);
     return 0;
  }
 
- static void SetFont(GtkWidget *widget, FONTELEMENT *fn)
- {
- 	font = fn;
-    DBGPrintf("Reconfiguring for font %p with width %d",fn,fn->Width);
- }
-
- static void SetMargins(GtkWidget *widget, FONTELEMENT *fn, int width, int height)
+ static void SetFont(GtkWidget *widget, FONTELEMENT *fn, int width, int height)
  {
  	int rows = 0;
  	int cols = 0;
 
     Get3270DeviceBuffer(&rows, &cols);
 
-    SetFont(widget,fn);
-    left_margin = (width - (font->Width*cols)) >> 1;
-    top_margin  = (height - (font->Height*rows)) >> 1;
+ 	font = fn;
+
+ 	if(width)
+       left_margin = (width - (font->Width*cols)) >> 1;
+	else
+	   left_margin = 0;
+
+	if(height)
+       top_margin = (height - (font->Height*rows)) >> 1;
+	else
+	   top_margin = 0;
+
+	gtk_widget_queue_draw(widget);
+
  }
 
  static void resize(GtkWidget *widget, GtkAllocation *allocation, void *t)
@@ -231,7 +244,7 @@ Key_action(NULL, NULL, params, &one);
     	if(fontlist[f].Width == width)
     	{
 		   DBGPrintf("Font %d has %d pixels width",f,width);
-		   SetMargins(widget,fontlist+f,allocation->width,allocation->height);
+		   SetFont(widget,fontlist+f,allocation->width,allocation->height);
 		   return;
     	}
     }
@@ -244,7 +257,7 @@ Key_action(NULL, NULL, params, &one);
     }
 
     /* Reconfigure drawing box */
-    SetMargins(widget,fn,allocation->width,allocation->height);
+    SetFont(widget,fn,allocation->width,allocation->height);
 
  }
 
@@ -309,7 +322,7 @@ Key_action(NULL, NULL, params, &one);
     gtk_widget_add_events(ret,GDK_KEY_RELEASE_MASK|GDK_BUTTON_PRESS_MASK);
 
     // FIXME (perry#3#): Make it better! Get the smaller font, not the first one.
-	SetFont(ret,fontlist);
+	SetFont(ret,fontlist,0,0);
 
     Get3270DeviceBuffer(&rows, &cols);
     DBGPrintf("Screen size: %dx%d",rows,cols);
@@ -332,14 +345,17 @@ Key_action(NULL, NULL, params, &one);
     return ret;
  }
 
+ static void InvalidateCursor(void)
+ {
+    // TODO (perry#1#): Invalidate only the cursor position.
+	gtk_widget_queue_draw(terminal);
+ }
+
  void SetCursorPosition(int row, int col)
  {
-    // FIXME (perry#2#): Redraw only the old and new cursor position.
-
+    InvalidateCursor();
     cursor_row = row;
     cursor_col = col;
-
-    // UGLY!!! Redraw all the terminal!!!
-	gtk_widget_queue_draw(terminal);
+    InvalidateCursor();
  }
 

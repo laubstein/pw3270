@@ -279,6 +279,7 @@ static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
 static void status_lu(const char *lu)
 {
 	DBGPrintf("LU: %s",lu);
+    g3270_log("lib3270", "Using LU \"%s\"",lu);
 	SetWindowTitle(lu);
 }
 
