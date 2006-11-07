@@ -98,8 +98,18 @@ void screen_resume(void)
 
 void cursor_move(int baddr)
 {
+    cursor_addr = baddr;
 	if(screen_callbacks_3270 && screen_callbacks_3270->cursor_move)
        screen_callbacks_3270->cursor_move(baddr);
+}
+
+const struct ea * QueryDeviceChar(int baddr)
+{
+	if(baddr < 0)
+	   baddr = cursor_addr;
+
+    // FIXME (perry#1#): Check size
+	return ea_buf+baddr;
 }
 
 void toggle_monocase(struct toggle *t, enum toggle_type tt)

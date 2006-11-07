@@ -490,24 +490,8 @@ unsigned char asc2ft0[256] = { ASC2FT };
 #endif /*]*/
 
 
-unsigned char GetASCIICharacter(const struct ea *display)
+unsigned char Ebc2ASC(unsigned char cc)
 {
-	return ebc2asc[display->cc];
+	return ebc2asc[cc];
 }
 
-const unsigned char *GetASCIIString(unsigned char *str)
-{
-   const unsigned char *ret = str;
-
-   printf("%s\n",ret);
-
-   while(*str)
-   {
-   	  *str = ebc2asc[*str];
-      str++;
-   }
-
-   printf("%s\n",ret);
-
-   return ret;
-}

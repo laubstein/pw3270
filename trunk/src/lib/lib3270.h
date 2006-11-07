@@ -36,6 +36,7 @@ typedef struct _screen_callback
     void (*screen_suspend)(void);
     void (*screen_resume)(void);
     void (*screen_type)(const char *model_name, int maxROWS, int maxCOLS);
+    void (*screen_changed)(int first, int last);
 
     void (*cursor_move)(int baddr);
     void (*toggle_monocase)(struct toggle *t, enum toggle_type tt);
@@ -111,9 +112,10 @@ int set_3270_keyboard(const KEYBOARD_INFO *kbd);
 int Run_3270(const char	*cl_hostname);
 int Initialize_3270(void);
 
-unsigned char 		GetASCIICharacter(const struct ea *display);
-const unsigned char *GetASCIIString(unsigned char *str);
-const struct ea 	*Get3270DeviceBuffer(int *rows, int *cols);
+unsigned char 		 Ebc2ASC(unsigned char cc);
+
+const struct ea 	 *Get3270DeviceBuffer(int *rows, int *cols);
+const struct ea      *QueryDeviceChar(int baddr);
 
 const struct timeval *Check3270Timeouts(struct timeval *tp);
 

@@ -13,6 +13,7 @@ static void screen_type(const char *model_name, int maxROWS, int maxCOLS);
 
 static void cursor_move(int baddr);
 static void toggle_monocase(struct toggle *t, enum toggle_type tt);
+static void screen_changed(int first, int last);
 
 static void status_ctlr_done(void);
 static void status_insert_mode(Boolean on);
@@ -44,6 +45,7 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
 
 	screen_resume,
 	screen_type,
+    screen_changed,
 
 	cursor_move,
 	toggle_monocase,
@@ -219,6 +221,8 @@ static void cursor_move(int baddr)
 
  	DBGPrintf("Cursor moved to %dx%d",row,col);
 
+	gtk_widget_queue_draw(terminal);
+
 }
 
 static void toggle_monocase(struct toggle *t, enum toggle_type tt)
@@ -305,7 +309,12 @@ static void error_popup(const char *msg)
 
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
+	CHKPoint();
 	gtk_widget_queue_draw(terminal);
 }
 
+static void screen_changed(int first, int last)
+{
+//	DBGPrintf("Screen changed: %d<->%d",first,last);
+}
 
