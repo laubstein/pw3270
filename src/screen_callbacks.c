@@ -219,10 +219,7 @@ static void cursor_move(int baddr)
  	row = baddr/cols;
  	col = baddr - (row*cols);
 
- 	DBGPrintf("Cursor moved to %dx%d",row,col);
-
-	gtk_widget_queue_draw(terminal);
-
+    SetCursorPosition(row,col);
 }
 
 static void toggle_monocase(struct toggle *t, enum toggle_type tt)

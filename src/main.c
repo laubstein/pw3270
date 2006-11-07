@@ -75,13 +75,9 @@
     gtk_container_add(GTK_CONTAINER(top_window),terminal);
 
 
-//    Run_3270(cl_hostname);
-
     DBGMessage("Starting gtk main loop");
 
     gtk_widget_show_all(top_window);
-
-//	gtk_window_set_focus(GTK_WINDOW(top_window),terminal);
     gtk_main();
 
     return 0;

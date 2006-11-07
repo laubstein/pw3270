@@ -10,7 +10,7 @@
 
  #define TERMINAL_HPAD 2
  #define TERMINAL_VPAD 2
-
+ #define LINE_SPACING  2
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -39,6 +39,7 @@
 	 	"-xos4-terminus-medium-*-normal-*-28-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-medium-*-normal-*-32-*-*-*-*-*-*-*",
 
+/*
 		"-xos4-terminus-bold-*-*-*-12-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-14-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-16-*-*-*-*-*-*-*",
@@ -46,6 +47,7 @@
 	 	"-xos4-terminus-bold-*-*-*-24-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-28-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-32-*-*-*-*-*-*-*"
+*/
 
   };
 
@@ -61,6 +63,7 @@
  static int 		left_margin		= 0;
  static int			cursor_row		= 0;
  static int			cursor_col		= 0;
+ static int			cursor_height	= 3;
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -136,7 +139,7 @@
 
 
     		    rc  = TRUE;
-			    gdk_draw_text(	widget->window,font->fn,gc,hPos,vPos,chr,1);
+			    gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,chr,1);
     		}
 
 			hPos += font->Width;
@@ -144,6 +147,28 @@
     	}
     	vPos += font->Height;
     }
+
+    /* Draw cursor */
+    col = left_margin + (cursor_col * font->Width);
+    row = top_margin  + (cursor_row * font->Height) + font->Height;
+
+	gdk_draw_rectangle(	widget->window,
+                        widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+                        1,
+                        col,
+                        (row - cursor_height) + LINE_SPACING,
+                        font->Width,
+                        cursor_height );
+
+/*
+	gdk_draw_line(	widget->window,
+                    widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+					col, 0, col, row );
+
+	gdk_draw_line(	widget->window,
+                    widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+					0, row, col, row );
+*/
 
     return rc;
  }
@@ -289,12 +314,12 @@
  	font = fn;
 
  	if(width)
-       left_margin = (width - (font->Width*cols)) >> 1;
+       left_margin = (((width - (TERMINAL_HPAD<<1)) - (font->Width*cols)) >> 1) + TERMINAL_HPAD;
 	else
 	   left_margin = 0;
 
 	if(height)
-       top_margin = (height - (font->Height*rows)) >> 1;
+       top_margin = (((height - (TERMINAL_VPAD<<1)) - (font->Height*rows)) >> 1) + TERMINAL_VPAD;
 	else
 	   top_margin = 0;
 
@@ -383,7 +408,9 @@
     	{
     	   gdk_text_extents(fontlist[f].fn,"A",1,&lbearing,&rbearing,&width,&ascent,&descent);
     	   fontlist[f].Width  = width;
-           fontlist[f].Height = (ascent+descent)+2;
+           fontlist[f].Height = (ascent+descent)+LINE_SPACING;
+           DBGTrace(lbearing);
+           DBGTrace(rbearing);
     	}
     	else
     	{
@@ -435,5 +462,7 @@
     cursor_row = row;
     cursor_col = col;
     InvalidateCursor();
+ 	DBGPrintf("Cursor moved to %dx%d",row,col);
+
  }
 
