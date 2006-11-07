@@ -1,6 +1,7 @@
 
  #include "g3270.h"
  #include "lib/hostc.h"
+ #include "lib/kybdc.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -93,7 +94,9 @@
  	int				col;
  	int				hPos;
  	int				vPos;
- 	char			chr;
+ 	char			chr[2];
+
+    GdkGC 			*gc;
 
     gboolean		rc		= FALSE;
 
@@ -120,14 +123,17 @@
     		if(  hPos >= left && hPos <= right && vPos >= top && vPos <= bottom)
     		{
     			/* It's inside the drawing area, redraw */
-    		    chr = GetASCIICharacter(trm);
+    			gc     = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+
+    			chr[0] = Ebc2ASC(trm->cc);
+    			chr[1] = 0;
+
+    			/* Detect the right color */
+
+
+
     		    rc  = TRUE;
-			    gdk_draw_text(	widget->window,
-								font->fn,
-								widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-								hPos,vPos,
-								&chr,
-								1);
+			    gdk_draw_text(	widget->window,font->fn,gc,hPos,vPos,chr,1);
     		}
 
 			hPos += font->Width;
@@ -159,38 +165,35 @@
      *  } GdkEventKey;
      *
      */
-	DBGTrace(event->keyval);
+	char			ks[6];
+    String			params[2];
+    Cardinal 		one			= 1;
+//    const struct ea	*ea			= QueryDeviceChar(-1);
 
-/*
-
-        if (!(k & ~0xff)) {
-                char ks[6];
-                String params[2];
-                Cardinal one;
-
-                if (k >= ' ') {
-                        ks[0] = k;
-                        ks[1] = '\0';
-                } else {
-                        (void) sprintf(ks, "0x%x", k);
-                }
-                params[0] = ks;
-                params[1] = CN;
-                one = 1;
-                Key_action(NULL, NULL, params, &one);
-                return;
-        }
+//	DBGPrintf("Key: %s %c (%d)", event->string, Ebc2ASC(ea->cc), event->keyval);
 
 
-void
-Key_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+    /* Check for regular key */
 
-Key_action(NULL, NULL, params, &one);
+    if(event->keyval < 0xFF && event->string[0] >= ' ')
+    {
+    	// Standard char, use it.
+    	params[0] = event->string;
+    	params[1] = 0;
+        Key_action(NULL, NULL, params, &one);
+        return TRUE;
+    }
+    else if(event->keyval < 0xFFFF)
+    {
+        snprintf(ks,5,"0x%x",event->keyval);
 
-*/
+    	params[0] = ks;
+    	params[1] = 0;
+        Key_action(NULL, NULL, params, &one);
+        return TRUE;
+    }
 
-
- 	return 0;
+ 	return FALSE;
  }
 
  static gboolean button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)

@@ -96,6 +96,8 @@ static void	ctlr_connect(Boolean ignored);
 static int	sscp_start;
 static void ticking_stop(void);
 static void ctlr_add_ic(int baddr, unsigned char ic);
+static void region_changed(int f, int l);
+
 
 /*
  * code_table is used to translate buffer addresses and attributes to the 3270
@@ -117,11 +119,8 @@ static unsigned char	code_table[64] = {
 #define ALL_CHANGED	{ \
 	screen_changed = True; \
 	if (IN_ANSI) { first_changed = 0; last_changed = ROWS*COLS; } }
-#define REGION_CHANGED(f, l)	{ \
-	screen_changed = True; \
-	if (IN_ANSI) { \
-	    if (first_changed == -1 || f < first_changed) first_changed = f; \
-	    if (last_changed == -1 || l > last_changed) last_changed = l; } }
+
+#define REGION_CHANGED(f, l) region_changed(f,l)
 #define ONE_CHANGED(n)	REGION_CHANGED(n, n+1)
 
 #define DECODE_BADDR(c1, c2) \
@@ -2727,4 +2726,18 @@ toggle_showTiming(struct toggle *t unused, enum toggle_type tt unused)
 void
 toggle_nop(struct toggle *t unused, enum toggle_type tt unused)
 {
+}
+
+static void region_changed(int f, int l)
+{
+	screen_changed = True;
+	if (IN_ANSI)
+	{
+	    if (first_changed == -1 || f < first_changed) first_changed = f;
+	    if (last_changed == -1 || l > last_changed) last_changed = l;
+	}
+
+    if(screen_callbacks_3270 && screen_callbacks_3270->screen_changed)
+       screen_callbacks_3270->screen_changed(f,l);
+
 }
