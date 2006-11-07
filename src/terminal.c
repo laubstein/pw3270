@@ -50,6 +50,8 @@
  static FONTELEMENT *font			= 0;
  static int			top_margin		= 0;
  static int 		left_margin		= 0;
+ static int			cursor_row		= 0;
+ static int			cursor_col		= 0;
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -90,6 +92,8 @@
 
     // FIXME (perry#2#): Draw only the needed area
     DBGPrintf("Redraw %dx%d (%p)",rows,cols,trm);
+    if(!trm)
+       return FALSE;
 
     vPos = top_margin;
     for(row = 0; row < rows; row++)
@@ -112,6 +116,39 @@
     }
 
     return TRUE;
+ }
+
+ static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+ {
+    /*
+     * http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventKey
+     *
+     * typedef struct {
+     *    GdkEventType type;
+     *    GdkWindow *window;
+     *    gint8 send_event;
+     *    guint32 time;
+     *    guint state;
+     *    guint keyval;
+     *    gint length;
+     *    gchar *string;
+     *    guint16 hardware_keycode;
+     *    guint8 group;
+     *    guint is_modifier : 1;
+     *  } GdkEventKey;
+     *
+     */
+	DBGTrace(event->keyval);
+
+ 	return 0;
+ }
+
+ static gboolean button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+ {
+    // http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-button-press-event
+    CHKPoint();
+
+    return 0;
  }
 
  static void SetFont(GtkWidget *widget, FONTELEMENT *fn)
@@ -223,6 +260,11 @@
 
     /* Create drawing area */
     ret = gtk_drawing_area_new();
+    GTK_WIDGET_SET_FLAGS(ret, GTK_CAN_DEFAULT);
+    GTK_WIDGET_SET_FLAGS(ret, GTK_CAN_FOCUS);
+
+    // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Events.html#GdkEventMask
+    gtk_widget_add_events(ret,GDK_KEY_RELEASE_MASK|GDK_BUTTON_PRESS_MASK);
 
     // FIXME (perry#3#): Make it better! Get the smaller font, not the first one.
 	SetFont(ret,fontlist);
@@ -231,8 +273,10 @@
     DBGPrintf("Screen size: %dx%d",rows,cols);
     gtk_widget_set_size_request(ret, (font->Width*cols)+(TERMINAL_HPAD<<1), (font->Height*rows)+(TERMINAL_VPAD<<1));
 
-    g_signal_connect(G_OBJECT(ret), "expose_event",  G_CALLBACK(expose), 0);
-    g_signal_connect(G_OBJECT(ret), "size-allocate", G_CALLBACK(resize), 0);
+    g_signal_connect(G_OBJECT(ret), "expose_event",  		G_CALLBACK(expose),		  0);
+    g_signal_connect(G_OBJECT(ret), "size-allocate",		G_CALLBACK(resize),	   	  0);
+    g_signal_connect(G_OBJECT(ret), "key-release-event",	G_CALLBACK(key_release),  0);
+    g_signal_connect(G_OBJECT(ret), "button-press-event",	G_CALLBACK(button_press), 0);
 
     /* Finish */
 
@@ -244,5 +288,16 @@
     }
 
     return ret;
+ }
+
+ void SetCursorPosition(int row, int col)
+ {
+    // FIXME (perry#2#): Redraw only the old and new cursor position.
+
+    cursor_row = row;
+    cursor_col = col;
+
+    // UGLY!!! Redraw all the terminal!!!
+	gtk_widget_queue_draw(terminal);
  }
 

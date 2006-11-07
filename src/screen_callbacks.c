@@ -188,7 +188,7 @@ static void screen_init(void)
 
 static void screen_disp(Boolean erasing, const struct ea *display)
 {
-	CHKPoint();
+	gtk_widget_queue_draw(terminal);
 }
 
 static void screen_suspend(void)
@@ -198,7 +198,7 @@ static void screen_suspend(void)
 
 static void screen_resume(void)
 {
-	CHKPoint();
+	gtk_widget_queue_draw(terminal);
 }
 
 static void screen_type(const char *model_name, int maxROWS, int maxCOLS)
@@ -208,7 +208,17 @@ static void screen_type(const char *model_name, int maxROWS, int maxCOLS)
 
 static void cursor_move(int baddr)
 {
-	CHKPoint();
+	int row;
+	int col;
+ 	int	cols;
+
+ 	Get3270DeviceBuffer(0, &cols);
+
+ 	row = baddr/cols;
+ 	col = baddr - (row*cols);
+
+ 	DBGPrintf("Cursor moved to %dx%d",row,col);
+
 }
 
 static void toggle_monocase(struct toggle *t, enum toggle_type tt)
@@ -238,7 +248,7 @@ static void status_oerr(int error_type)
 
 static void status_reset(void)
 {
-	CHKPoint();
+	gtk_widget_queue_draw(terminal);
 }
 
 static void status_reverse_mode(Boolean on)
@@ -294,7 +304,7 @@ static void error_popup(const char *msg)
 
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
-	CHKPoint();
+	gtk_widget_queue_draw(terminal);
 }
 
 

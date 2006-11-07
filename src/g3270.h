@@ -17,7 +17,7 @@
 
  extern const char				*cl_hostname;
  extern GtkWidget				*top_window;
-
+ extern GtkWidget  				*terminal;
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -25,6 +25,7 @@
  void gsource_addfile(const INPUT_3270 *ip);
  void gsource_removefile(const INPUT_3270 *ip);
  void SetWindowTitle(const char *msg);
+ void SetCursorPosition(int row, int col);
 
 /*---[ Terminal window ]------------------------------------------------------*/
 
