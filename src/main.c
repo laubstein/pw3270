@@ -72,13 +72,15 @@
 
     // Create terminal window
 	terminal = g3270_new(cl_hostname);
+    gtk_container_add(GTK_CONTAINER(top_window),terminal);
+
 
 
 //    Run_3270(cl_hostname);
 
     DBGMessage("Starting gtk main loop");
 
-    gtk_widget_show(top_window);
+    gtk_widget_show_all(top_window);
 
     gtk_main();
 
