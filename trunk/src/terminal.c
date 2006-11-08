@@ -167,6 +167,7 @@
 			     gdk_gc_set_foreground(gc,field_cmap+(DEFCOLOR_MAP(trm->fa)));
 			  }
 
+
 		   }
 		   else if(trm->gr || trm->fg || trm->bg)
 		   {
