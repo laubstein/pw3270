@@ -234,7 +234,8 @@ static void status_ctlr_done(void)
 
 static void status_insert_mode(Boolean on)
 {
-	CHKPoint();
+	DBGPrintf("Insert: %s", on ? "Yes" : "No");
+	SetCursorType(on ? CURSOR_TYPE_INSERT : CURSOR_TYPE_OVER);
 }
 
 static void status_minus(void)
@@ -296,7 +297,9 @@ static void screen_flip(void)
 
 static void screen_width(int width)
 {
-	CHKPoint();
+    // FIXME (perry#1#): Recalculate font size!
+	DBGTrace(width);
+	gtk_widget_queue_draw(terminal);
 }
 
 static void error_popup(const char *msg)
@@ -306,7 +309,6 @@ static void error_popup(const char *msg)
 
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
-	CHKPoint();
 	gtk_widget_queue_draw(terminal);
 }
 
