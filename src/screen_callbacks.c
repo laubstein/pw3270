@@ -274,7 +274,7 @@ static void status_typeahead(Boolean on)
 
 static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
 {
-	CHKPoint();
+	DBGPrintf("Compose: %s", on ? "Yes" : "No");
 }
 
 static void status_lu(const char *lu)
