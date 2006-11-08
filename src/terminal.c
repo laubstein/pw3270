@@ -1,16 +1,21 @@
 
  #include "g3270.h"
  #include <gdk/gdkkeysyms.h>
+ #include <string.h>
 
  #include "lib/hostc.h"
  #include "lib/kybdc.h"
  #include "lib/actionsc.h"
+ #include "lib/3270ds.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
  #define TERMINAL_HPAD 2
  #define TERMINAL_VPAD 2
  #define LINE_SPACING  2
+ #define FIELD_COLORS  4
+
+ #define DEFCOLOR_MAP(f) ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -27,7 +32,28 @@
 
 /*---[ Constants ]------------------------------------------------------------*/
 
+  static const int widget_states[] = { GTK_STATE_NORMAL, GTK_STATE_ACTIVE, GTK_STATE_PRELIGHT, GTK_STATE_SELECTED, GTK_STATE_INSENSITIVE };
+
+
+/*---[ Terminal config ]------------------------------------------------------*/
   // TODO (perry#2#): Read from file(s).
+
+  // /usr/X11R6/lib/X11/rgb.txt
+  static const char *TerminalColors = "black,blue1,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
+  static const char *FieldColors    = "green1,red,blue,white";
+
+
+/*
+        static int field_colors[4] = {
+            COLOR_GREEN,         default
+            COLOR_RED,           intensified
+            COLOR_BLUE,          protected
+            COLOR_WHITE          protected, intensified
+#       define DEFCOLOR_MAP(f) \
+                ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
+*/
+
+
   static const char *FontDescr[] =
   {
 
@@ -57,13 +83,16 @@
 
  const char			*cl_hostname	= 0;
 
- static FONTELEMENT *fontlist		= 0;
- static FONTELEMENT *font			= 0;
- static int			top_margin		= 0;
- static int 		left_margin		= 0;
- static int			cursor_row		= 0;
- static int			cursor_col		= 0;
- static int			cursor_height	= 3;
+ static FONTELEMENT *fontlist				= 0;
+ static FONTELEMENT *font					= 0;
+ static int			top_margin				= 0;
+ static int 		left_margin				= 0;
+ static int			cursor_row				= 0;
+ static int			cursor_col				= 0;
+ static int			cursor_height			= 3;
+ static GdkColor	*terminal_cmap			= 0;
+ static int			terminal_color_count	= 0;
+ static GdkColor	field_cmap[FIELD_COLORS];
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -102,17 +131,9 @@
  	int				vPos;
  	char			chr[2];
 
-    GdkGC 			*gc;
+    GdkGC 			*gc     	= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
 
-    gboolean		rc		= FALSE;
-
- 	int				left	= (event->area.x - font->Width);
- 	int				right	= left + event->area.width + (font->Width << 1);
-
- 	int				top		= (event->area.y - font->Height);
- 	int				bottom	= top + event->area.height + (font->Height << 1);
-
-//    DBGPrintf("H %d<->%d V %d<->%d",left,right,top,bottom);
+    gboolean		rc			= FALSE;
 
  	trm = Get3270DeviceBuffer(&rows, &cols);
 
@@ -126,24 +147,48 @@
     	hPos = left_margin;
     	for(col = 0; col < cols; col++)
     	{
-    		if(  hPos >= left && hPos <= right && vPos >= top && vPos <= bottom)
-    		{
-    			/* It's inside the drawing area, redraw */
-    			gc     = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+		   chr[0] = Ebc2ASC(trm->cc);
 
-    			chr[0] = Ebc2ASC(trm->cc);
-    			chr[1] = 0;
+		   chr[1] = 0;
 
-    			/* Detect the right color */
+		   rc  = TRUE;
 
+		   if(trm->fa)
+		   {
+		      chr[0] = ' ';
 
+			  if(trm->fg || trm->bg)
+			  {
+			     gdk_gc_set_foreground(gc,terminal_cmap + (trm->fg % terminal_color_count));
+		         gdk_gc_set_background(gc,terminal_cmap + (trm->bg % terminal_color_count));
+			  }
+			  else
+			  {
+			     gdk_gc_set_foreground(gc,field_cmap+(DEFCOLOR_MAP(trm->fa)));
+			  }
 
-    		    rc  = TRUE;
-			    gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,chr,1);
-    		}
+		   }
+		   else if(trm->gr || trm->fg || trm->bg)
+		   {
 
-			hPos += font->Width;
-	        trm++;
+// TODO (perry#1#): Set GC attributes based on terminal flags (and blink?)
+//              if(trm->gr & GR_BLINK)
+//              if(trm->gr & GR_REVERSE)
+//              if(trm->gr & GR_UNDERLINE)
+//              if(trm->gr & GR_INTENSIFY)
+
+			  if(trm->fg || trm->bg)
+			  {
+		         gdk_gc_set_foreground(gc,terminal_cmap + (trm->fg % terminal_color_count));
+		         gdk_gc_set_background(gc,terminal_cmap + (trm->fg % terminal_color_count));
+			  }
+
+		   }
+
+		   gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,chr,1);
+
+		   hPos += font->Width;
+	       trm++;
     	}
     	vPos += font->Height;
     }
@@ -175,25 +220,6 @@
 
  static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
-    /*
-     * http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventKey
-     *
-     * typedef struct {
-     *    GdkEventType type;
-     *    GdkWindow *window;
-     *    gint8 send_event;
-     *    guint32 time;
-     *    guint state;
-     *    guint keyval;
-     *    gint length;
-     *    gchar *string;
-     *    guint16 hardware_keycode;
-     *    guint8 group;
-     *    guint is_modifier : 1;
-     *  } GdkEventKey;
-     *
-     */
-
 #ifdef DEBUG
      #define DECLARE_ACTION(key, action, cause, parm1, parm2) { key, #key, action, cause, parm1, parm2 }
 #else
@@ -212,6 +238,9 @@
 	   const char 		*parm2;
     } actions[] =
     {
+		// /opt/gnome/include/gtk-2.0/gdk/gdkkeysyms.h
+		// http://www.koders.com/c/fidA3A9523D24A70BAFCE05733E73D558365D103DB3.aspx
+
 		DECLARE_ACTION( GDK_Home,		Home_action, 		IA_DEFAULT, CN, CN ),
 		DECLARE_ACTION( GDK_Left,		Left_action,		IA_DEFAULT, CN, CN ),
 		DECLARE_ACTION( GDK_Up,			Up_action,			IA_DEFAULT, CN, CN ),
@@ -254,13 +283,6 @@
     	}
     }
 
-    DBGTracex(event->keyval);
-
-//    const struct ea	*ea			= QueryDeviceChar(-1);
-//	DBGPrintf("Key: %s %c (%d)", event->string, Ebc2ASC(ea->cc), event->keyval);
-
-    // /opt/gnome/include/gtk-2.0/gdk/gdkkeysyms.h
-
     /* Check for Function keys */
     if(event->keyval >= GDK_F1 && event->keyval <=  GDK_F12)
     {
@@ -281,17 +303,10 @@
  	   return TRUE;
 	}
 
-/*
-    if(event->keyval < 0xFFFF)
-    {
-	   snprintf(ks,5,"0x%x",event->keyval);
-	   params[0] = ks;
-	   params[1] = 0;
-       Key_action(NULL, NULL, params, &one);
- 	   return TRUE;
-	}
-*/
 
+
+	/* Unknown key, ignore-it */
+    DBGTracex(event->keyval);
     return FALSE;
 
  }
@@ -366,6 +381,7 @@
 
  GtkWidget *g3270_new(const char *hostname)
  {
+
  	int		  sz;
  	int		  f;
     gint 	  lbearing	= 0;
@@ -375,6 +391,11 @@
     gint 	  descent	= 0;
     int		  rows		= 0;
     int		  cols		= 0;
+
+ 	char      *ptr;
+ 	char      *tok;
+ 	char      buffer[4096];
+
  	GtkWidget *ret;
 
  	if(!hostname)
@@ -409,8 +430,6 @@
     	   gdk_text_extents(fontlist[f].fn,"A",1,&lbearing,&rbearing,&width,&ascent,&descent);
     	   fontlist[f].Width  = width;
            fontlist[f].Height = (ascent+descent)+LINE_SPACING;
-           DBGTrace(lbearing);
-           DBGTrace(rbearing);
     	}
     	else
     	{
@@ -437,6 +456,65 @@
     g_signal_connect(G_OBJECT(ret), "size-allocate",		G_CALLBACK(resize),	   	  0);
     g_signal_connect(G_OBJECT(ret), "key-release-event",	G_CALLBACK(key_release),  0);
     g_signal_connect(G_OBJECT(ret), "button-press-event",	G_CALLBACK(button_press), 0);
+
+    // Set terminal colors
+    DBGTracex(gtk_widget_get_default_colormap());
+
+    strncpy(buffer,TerminalColors,4095);
+    for(ptr=strtok_r(buffer,",",&tok);ptr;ptr = strtok_r(0,",",&tok))
+       terminal_color_count++;
+
+    sz   		  = sizeof(GdkColor) * terminal_color_count;
+    terminal_cmap =  g_malloc(sz);
+
+    if(!terminal_cmap)
+    {
+    	Log("Memory allocation error when creating %d colors",terminal_color_count);
+    	return 0;
+    }
+
+    f = 0;
+    strncpy(buffer,TerminalColors,4095);
+    for(ptr=strtok_r(buffer,",",&tok);ptr;ptr = strtok_r(0,",",&tok))
+    {
+    	gdk_color_parse(ptr,terminal_cmap+f);
+
+    	if(!gdk_colormap_alloc_color(	gtk_widget_get_default_colormap(),
+										terminal_cmap+f,
+										FALSE,
+										TRUE ))
+		{
+			Log("Can't allocate terminal color \"%s\"",ptr);
+		}
+        f++;
+    }
+
+    for(f=0;f < (sizeof(widget_states)/sizeof(int));f++)
+    {
+	   // http://ometer.com/gtk-colors.html
+       gtk_widget_modify_bg(ret,widget_states[f],terminal_cmap);
+       gtk_widget_modify_fg(ret,widget_states[f],terminal_cmap+4);
+    }
+
+    /* Set field colors */
+    memset(&field_cmap,0,sizeof(GdkColor)*FIELD_COLORS);
+
+    f = 0;
+    strncpy(buffer,FieldColors,4095);
+    for(ptr=strtok_r(buffer,",",&tok);ptr && f < FIELD_COLORS;ptr = strtok_r(0,",",&tok))
+    {
+    	gdk_color_parse(ptr,field_cmap+f);
+
+    	if(!gdk_colormap_alloc_color(	gtk_widget_get_default_colormap(),
+										field_cmap+f,
+										FALSE,
+										TRUE ))
+		{
+			Log("Can't allocate field color \"%s\"",ptr);
+		}
+
+        f++;
+    }
 
     /* Finish */
 
