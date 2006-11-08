@@ -10,10 +10,8 @@
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
- #define TERMINAL_HPAD 2
- #define TERMINAL_VPAD 2
- #define LINE_SPACING  2
- #define FIELD_COLORS  4
+ #define MIN_LINE_SPACING	2
+ #define FIELD_COLORS	4
 
  #define DEFCOLOR_MAP(f) ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
 
@@ -92,6 +90,7 @@
  static int			cursor_height			= 3;
  static GdkColor	*terminal_cmap			= 0;
  static int			terminal_color_count	= 0;
+ static int			line_spacing			= MIN_LINE_SPACING;
  static GdkColor	field_cmap[FIELD_COLORS];
 
 /*---[ Implement ]------------------------------------------------------------*/
@@ -127,6 +126,8 @@
  	int				cols;
  	int				row;
  	int				col;
+ 	int				cRow;
+ 	int				cCol;
  	int				hPos;
  	int				vPos;
  	char			chr[2];
@@ -208,6 +209,12 @@
 
 		   }
 
+		   if(col == cursor_col)
+		      cCol = hPos;
+
+		   if(row == cursor_row)
+		      cRow = vPos;
+
 		   switch(mode)
 		   {
 		   case 0:	// Nothing special
@@ -224,22 +231,20 @@
 
 		   }
 
-
 		   hPos += font->Width;
 	       trm++;
     	}
-    	vPos += font->Height;
+    	vPos += (font->Height + line_spacing);
     }
 
     /* Draw cursor */
-    col = left_margin + (cursor_col * font->Width);
-    row = top_margin  + (cursor_row * font->Height) + font->Height;
+
+    gdk_gc_set_foreground(gc,field_cmap+3);
 
 	gdk_draw_rectangle(	widget->window,
                         widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
                         1,
-                        col,
-                        (row - cursor_height) + LINE_SPACING,
+                        cCol, cRow,
                         font->Width,
                         cursor_height );
 
@@ -366,15 +371,20 @@
 
  	font = fn;
 
- 	if(width)
-       left_margin = (((width - (TERMINAL_HPAD<<1)) - (font->Width*cols)) >> 1) + TERMINAL_HPAD;
-	else
+    /* Calculate new left margin */
+
+	left_margin = (width - (font->Width*cols)) >> 1;
+ 	if(left_margin < 0)
 	   left_margin = 0;
 
-	if(height)
-       top_margin = (((height - (TERMINAL_VPAD<<1)) - (font->Height*rows)) >> 1) + TERMINAL_VPAD;
-	else
-	   top_margin = 0;
+	/* Calculate new line-spacing */
+	line_spacing = (height - (font->Height*rows)) / rows;
+	if(line_spacing < MIN_LINE_SPACING)
+	   line_spacing = MIN_LINE_SPACING;
+
+    top_margin = (height - ((font->Height+line_spacing)*rows)) >> 1;
+    if(top_margin < 0)
+       top_margin = 0;
 
 	gtk_widget_queue_draw(widget);
 
@@ -390,7 +400,7 @@
 
     Get3270DeviceBuffer(&rows, &cols);
 
- 	width = (allocation->width-(TERMINAL_HPAD<<1)) / cols;
+ 	width = allocation->width / cols;
 
 	DBGPrintf("Resize %d,%d em %d,%d (%d)", allocation->width, allocation->height,allocation->x,allocation->y,width);
 
@@ -467,7 +477,7 @@
     	{
     	   gdk_text_extents(fontlist[f].fn,"A",1,&lbearing,&rbearing,&width,&ascent,&descent);
     	   fontlist[f].Width  = width;
-           fontlist[f].Height = (ascent+descent)+LINE_SPACING;
+           fontlist[f].Height = (ascent+descent)+line_spacing;
     	}
     	else
     	{
@@ -488,7 +498,7 @@
 
     Get3270DeviceBuffer(&rows, &cols);
     DBGPrintf("Screen size: %dx%d",rows,cols);
-    gtk_widget_set_size_request(ret, (font->Width*cols)+(TERMINAL_HPAD<<1), (font->Height*rows)+(TERMINAL_VPAD<<1));
+    gtk_widget_set_size_request(ret, font->Width*(cols+1), (font->Height+MIN_LINE_SPACING)*(rows+1));
 
     g_signal_connect(G_OBJECT(ret), "expose_event",  		G_CALLBACK(expose),		  0);
     g_signal_connect(G_OBJECT(ret), "size-allocate",		G_CALLBACK(resize),	   	  0);
@@ -578,7 +588,7 @@
     cursor_row = row;
     cursor_col = col;
     InvalidateCursor();
- 	DBGPrintf("Cursor moved to %dx%d",row,col);
+// 	DBGPrintf("Cursor moved to %dx%d",row,col);
 
  }
 
