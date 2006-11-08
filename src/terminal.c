@@ -11,9 +11,22 @@
 /*---[ Defines ]--------------------------------------------------------------*/
 
  #define MIN_LINE_SPACING	2
- #define FIELD_COLORS	4
+ #define FIELD_COLORS		4
+ #define CURSOR_COLORS		(CURSOR_TYPE_CROSSHAIR * 2)
 
  #define DEFCOLOR_MAP(f) ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
+
+ #ifdef DEBUG
+     #define DECLARE_KEYPROC(key, state, action) { key, state, #key " (" #state ")", action, #action }
+ #else
+     #define DECLARE_KEYPROC(key, state, action) { key, state, action }
+ #endif
+
+ #ifdef DEBUG
+     #define DECLARE_ACTION(key, state, action, cause, parm1, parm2) { key, state, #key " (" #state ")", action, #action, cause, parm1, parm2 }
+ #else
+     #define DECLARE_ACTION(key, state, action, cause, parm1, parm2) { key, state, action, cause, parm1, parm2 }
+ #endif
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -39,18 +52,7 @@
   // /usr/X11R6/lib/X11/rgb.txt
   static const char *TerminalColors = "black,blue1,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
   static const char *FieldColors    = "green1,red,blue,white";
-
-
-/*
-        static int field_colors[4] = {
-            COLOR_GREEN,         default
-            COLOR_RED,           intensified
-            COLOR_BLUE,          protected
-            COLOR_WHITE          protected, intensified
-#       define DEFCOLOR_MAP(f) \
-                ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
-*/
-
+  static const char *CursorColors	= "white,white,DarkSlateGray,DarkSlateGray";
 
   static const char *FontDescr[] =
   {
@@ -79,19 +81,32 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
- const char			*cl_hostname	= 0;
+ const char			*cl_hostname							= 0;
 
- static FONTELEMENT *fontlist				= 0;
- static FONTELEMENT *font					= 0;
- static int			top_margin				= 0;
- static int 		left_margin				= 0;
- static int			cursor_row				= 0;
- static int			cursor_col				= 0;
- static int			cursor_height			= 3;
- static GdkColor	*terminal_cmap			= 0;
- static int			terminal_color_count	= 0;
- static int			line_spacing			= MIN_LINE_SPACING;
+ static FONTELEMENT *fontlist								= 0;
+ static FONTELEMENT *font									= 0;
+ static int			top_margin								= 0;
+ static int 		left_margin								= 0;
+ static GdkColor	*terminal_cmap							= 0;
+ static int			terminal_color_count					= 0;
+ static int			line_spacing							= MIN_LINE_SPACING;
  static GdkColor	field_cmap[FIELD_COLORS];
+
+ static int			cursor_row								= 0;
+ static int			cursor_col								= 0;
+ static int			cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
+ static int			cursor_type								= CURSOR_TYPE_OVER;
+ static gboolean	cross_hair								= TRUE;
+ static GdkColor	cursor_cmap[CURSOR_COLORS];
+
+
+/*---[ Gui-Actions ]----------------------------------------------------------*/
+
+ static void toogle_crosshair(void)
+ {
+ 	cross_hair = !cross_hair;
+    InvalidateCursor();
+ }
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -136,14 +151,36 @@
 
     gboolean		rc			= FALSE;
     int				mode		= 0;
+    int				ps;
 
  	trm = Get3270DeviceBuffer(&rows, &cols);
 
     if(!trm)
        return rc;
 
+	/* Adjust cursor color */
+	ps = (cursor_row * rows) + cols;
+
+    /* Calculate coordinates */
+    vPos = (top_margin + font->Height);
+    cRow = (cursor_row * (font->Height + line_spacing)) + vPos;
+    cCol = (cursor_col * font->Width) + left_margin;
+
+    if(cross_hair && (cursor_type != CURSOR_TYPE_NONE))
+    {
+	   /* Draw cross-hair cursor */
+       gdk_gc_set_foreground(gc,cursor_cmap+CURSOR_TYPE_CROSSHAIR+cursor_type);
+
+   	   gdk_draw_line(	widget->window,
+						widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+						cCol, event->area.y, cCol, event->area.y + event->area.height );
+
+	   gdk_draw_line(	widget->window,
+						widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+						event->area.x, cRow, event->area.x + event->area.width, cRow );
+    }
+
     // TODO (perry#2#): Find a better way (Is it necessary to run all over the buffer?)
-    vPos = top_margin+font->Height;
     for(row = 0; row < rows; row++)
     {
     	hPos = left_margin;
@@ -164,22 +201,6 @@
 			  else
 			     mode = 0;
 
-/*
-			  DBGPrintf("Flag %04x at %d,%d %s %s %s %s %s %s %s %s %s",
-								trm->fa,row,col,
-								trm->fa & FA_PROTECT ? "FA_PROTECT" : "",
-								trm->fa & FA_NUMERIC ? "FA_NUMERIC" : "",
-								trm->fa & FA_INTENSITY ? "FA_INTENSITY" : "",
-								trm->fa & FA_INT_NORM_NSEL ? "FA_INT_NORM_NSEL" : "",
-								trm->fa & FA_INT_NORM_SEL ? "FA_INT_NORM_SEL" : "",
-								trm->fa & FA_INT_HIGH_SEL ? "FA_INT_HIGH_SEL" : "",
-								trm->fa & FA_INT_ZERO_NSEL ? "" : "",
-								trm->fa & FA_RESERVED ? "FA_RESERVED" : "",
-								trm->fa & FA_MODIFY ? "FA_MODIFY" : "" );
-*/
-
-
-
 			  if(trm->fg || trm->bg)
 			  {
 			     gdk_gc_set_foreground(gc,terminal_cmap + (trm->fg % terminal_color_count));
@@ -189,7 +210,6 @@
 			  {
 			     gdk_gc_set_foreground(gc,field_cmap+(DEFCOLOR_MAP(trm->fa)));
 			  }
-
 
 		   }
 		   else if(trm->gr || trm->fg || trm->bg)
@@ -208,12 +228,6 @@
 			  }
 
 		   }
-
-		   if(col == cursor_col)
-		      cCol = hPos;
-
-		   if(row == cursor_row)
-		      cRow = vPos;
 
 		   switch(mode)
 		   {
@@ -237,45 +251,60 @@
     	vPos += (font->Height + line_spacing);
     }
 
-    /* Draw cursor */
+    if(cursor_type != CURSOR_TYPE_NONE)
+    {
+       /* Draw cursor */
 
-    gdk_gc_set_foreground(gc,field_cmap+3);
+       gdk_gc_set_foreground(gc,cursor_cmap+cursor_type);
 
-	gdk_draw_rectangle(	widget->window,
-                        widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-                        1,
-                        cCol, cRow,
-                        font->Width,
-                        cursor_height );
-
-/*
-	gdk_draw_line(	widget->window,
-                    widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-					col, 0, col, row );
-
-	gdk_draw_line(	widget->window,
-                    widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-					0, row, col, row );
-*/
+	   gdk_draw_rectangle(	widget->window,
+							widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+							1,
+							cCol, (cRow + 3) - cursor_height[cursor_type],
+							font->Width,
+							cursor_height[cursor_type] );
+    }
 
     return rc;
  }
 
  static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+
+     static const struct _keyproc
+     {
+       guint		 	keyval;
+       guint			state;
+
 #ifdef DEBUG
-     #define DECLARE_ACTION(key, action, cause, parm1, parm2) { key, #key, action, cause, parm1, parm2 }
-#else
-     #define DECLARE_ACTION(key, action, cause, parm1, parm2) { key, action, cause, parm1, parm2 }
+       const char		*trace;
 #endif
+
+	   void (*exec)(void);
+
+#ifdef DEBUG
+       const char		*action_trace;
+#endif
+
+     } keyproc[] =
+     {
+     	DECLARE_KEYPROC( GDK_c, GDK_CONTROL_MASK, toogle_crosshair )
+     };
 
     static const struct _actions
     {
        guint		 	keyval;
+       guint			state;
+
 #ifdef DEBUG
        const char		*trace;
 #endif
+
 	   XtActionProc 	action;
+
+#ifdef DEBUG
+       const char		*action_trace;
+#endif
 	   enum iaction 	cause;
 	   const char 		*parm1;
 	   const char 		*parm2;
@@ -284,27 +313,28 @@
 		// /opt/gnome/include/gtk-2.0/gdk/gdkkeysyms.h
 		// http://www.koders.com/c/fidA3A9523D24A70BAFCE05733E73D558365D103DB3.aspx
 
-		DECLARE_ACTION( GDK_Home,		Home_action, 		IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_Left,		Left_action,		IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_Up,			Up_action,			IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_Right,		Right_action, 		IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_Down,		Down_action,		IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_Clear,  	Clear_action, 		IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_3270_Reset,	Reset_action,		IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_Tab,	    Tab_action,			IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_Delete,		Delete_action,		IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_BackSpace,	BackSpace_action,	IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Home,		0,	Home_action, 			IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Left,		0,	Left_action,			IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Up,			0,	Up_action,				IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Right,		0,	Right_action, 			IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_Down,		0,	Down_action,			IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_Clear,		0, 	Clear_action, 			IA_DEFAULT, CN, CN ),
 
-        DECLARE_ACTION( GDK_Return,		Enter_action,		IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_KP_Enter,	Enter_action,		IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_3270_Reset,	0,	Reset_action,			IA_DEFAULT, CN, CN ),
 
-//        DECLARE_ACTION( GDK_Escape,		Escape_action,		IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_Tab,	    0,	Tab_action,				IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_Delete,		0,	Delete_action,			IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_BackSpace,	0,	BackSpace_action,		IA_DEFAULT, CN, CN ),
 
-        DECLARE_ACTION( GDK_Linefeed,	Newline_action,		IA_DEFAULT, CN, CN )
+        DECLARE_ACTION( GDK_Return,		0,	Enter_action,			IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_KP_Enter,	0,	Enter_action,			IA_DEFAULT, CN, CN ),
+
+        DECLARE_ACTION( GDK_Insert,		0,	ToggleInsert_action,	IA_DEFAULT, CN, CN ),
+
+        DECLARE_ACTION( GDK_Linefeed,	0,	Newline_action,			IA_DEFAULT, CN, CN )
 
     };
 
-//        DECLARE_ACTION(        Redraw_action,	IA_DEFAULT, CN, CN ),
 
 	char			ks[6];
     String			params[2];
@@ -313,10 +343,10 @@
 
     for(f=0; f < (sizeof(actions)/sizeof(struct _actions));f++)
     {
-    	if(actions[f].keyval == event->keyval)
+    	if(actions[f].keyval == event->keyval && (event->state & actions[f].state) == actions[f].state)
     	{
 #ifdef DEBUG
-		   DBGPrintf("Action: %s",actions[f].trace);
+		   DBGPrintf("Key: %s\tAction: %s",actions[f].trace,actions[f].action_trace);
 #endif
            action_internal(	actions[f].action,
 							actions[f].cause,
@@ -335,21 +365,51 @@
     	return TRUE;
     }
 
-    /* Check for regular key */
+    /* Check for keyproc actions */
+    for(f=0; f < (sizeof(keyproc)/sizeof(struct _keyproc));f++)
+    {
+    	if(keyproc[f].keyval == event->keyval && (event->state & keyproc[f].state) == keyproc[f].state)
+    	{
+#ifdef DEBUG
+		   DBGPrintf("Key: %s\tAction: %s",keyproc[f].trace,keyproc[f].action_trace);
+#endif
+		   keyproc[f].exec();
+           return TRUE;
+    	}
+    }
 
-    if(event->keyval < 0x00FF && event->string[0] >= ' ')
+    /* Check for regular key */
+    if(*event->string && !(event->state & GDK_CONTROL_MASK) )
     {
  	   // Standard char, use it.
 	   params[0] = event->string;
 	   params[1] = 0;
+//	   DBGPrintf("Keyval: %04x String: \"%s\" State: %04x",event->keyval,event->string,event->state);
        Key_action(NULL, NULL, params, &one);
  	   return TRUE;
 	}
 
-
-
 	/* Unknown key, ignore-it */
-    DBGTracex(event->keyval);
+    DBGPrintf("Keyval: %d  Keychar: \"%s\" State: %04x %s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+						event->keyval,
+						event->string,
+						event->state,
+						event->state & GDK_SHIFT_MASK	? " GDK_SHIFT_MASK"		: "",
+						event->state & GDK_LOCK_MASK	? " GDK_LOCK_MASK"		: "",
+						event->state & GDK_CONTROL_MASK	? " GDK_CONTROL_MASK"	: "",
+						event->state & GDK_MOD1_MASK	? " GDK_MOD1_MASK"		: "",
+						event->state & GDK_MOD2_MASK	? " GDK_MOD2_MASK"		: "",
+						event->state & GDK_MOD3_MASK	? " GDK_MOD3_MASK"		: "",
+						event->state & GDK_MOD4_MASK	? " GDK_MOD4_MASK"		: "",
+						event->state & GDK_MOD5_MASK	? " GDK_MOD5_MASK"		: "",
+						event->state & GDK_BUTTON1_MASK	? " GDK_BUTTON1_MASK"	: "",
+						event->state & GDK_BUTTON2_MASK	? " GDK_BUTTON2_MASK"	: "",
+						event->state & GDK_BUTTON3_MASK	? " GDK_BUTTON3_MASK"	: "",
+						event->state & GDK_BUTTON4_MASK	? " GDK_BUTTON4_MASK"	: "",
+						event->state & GDK_BUTTON5_MASK	? " GDK_BUTTON5_MASK"	: "",
+						event->state & GDK_RELEASE_MASK	? " GDK_RELEASE_MASK"	: ""
+						);
+
     return FALSE;
 
  }
@@ -564,6 +624,29 @@
         f++;
     }
 
+    /* Set cursor colors */
+// static GdkColor	cursor_cmap[];
+
+    memset(&cursor_cmap,0,sizeof(GdkColor)*CURSOR_COLORS);
+
+    f = 0;
+    strncpy(buffer,CursorColors,4095);
+    for(ptr=strtok_r(buffer,",",&tok);ptr && f < CURSOR_COLORS;ptr = strtok_r(0,",",&tok))
+    {
+    	gdk_color_parse(ptr,cursor_cmap+f);
+
+    	if(!gdk_colormap_alloc_color(	gtk_widget_get_default_colormap(),
+										cursor_cmap+f,
+										FALSE,
+										TRUE ))
+		{
+			Log("Can't allocate cursor color \"%s\"",ptr);
+		}
+
+        f++;
+    }
+
+
     /* Finish */
 
 	// TODO (perry#3#): Start connection in background.
@@ -578,7 +661,6 @@
 
  static void InvalidateCursor(void)
  {
-    // TODO (perry#1#): Invalidate only the cursor position.
 	gtk_widget_queue_draw(terminal);
  }
 
@@ -588,7 +670,11 @@
     cursor_row = row;
     cursor_col = col;
     InvalidateCursor();
-// 	DBGPrintf("Cursor moved to %dx%d",row,col);
+ }
 
+ void SetCursorType(int type)
+ {
+ 	cursor_type = type;
+    InvalidateCursor();
  }
 
