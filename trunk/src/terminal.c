@@ -134,6 +134,7 @@
     GdkGC 			*gc     	= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
 
     gboolean		rc			= FALSE;
+    int				mode		= 0;
 
  	trm = Get3270DeviceBuffer(&rows, &cols);
 
@@ -156,6 +157,27 @@
 		   if(trm->fa)
 		   {
 		      chr[0] = ' ';
+
+              if( (trm->fa & (FA_INTENSITY|FA_INT_NORM_SEL|FA_INT_HIGH_SEL)) == (FA_INTENSITY|FA_INT_NORM_SEL|FA_INT_HIGH_SEL) )
+                 mode = (trm->fa & FA_PROTECT) ? 1 : 2;
+			  else
+			     mode = 0;
+
+/*
+			  DBGPrintf("Flag %04x at %d,%d %s %s %s %s %s %s %s %s %s",
+								trm->fa,row,col,
+								trm->fa & FA_PROTECT ? "FA_PROTECT" : "",
+								trm->fa & FA_NUMERIC ? "FA_NUMERIC" : "",
+								trm->fa & FA_INTENSITY ? "FA_INTENSITY" : "",
+								trm->fa & FA_INT_NORM_NSEL ? "FA_INT_NORM_NSEL" : "",
+								trm->fa & FA_INT_NORM_SEL ? "FA_INT_NORM_SEL" : "",
+								trm->fa & FA_INT_HIGH_SEL ? "FA_INT_HIGH_SEL" : "",
+								trm->fa & FA_INT_ZERO_NSEL ? "" : "",
+								trm->fa & FA_RESERVED ? "FA_RESERVED" : "",
+								trm->fa & FA_MODIFY ? "FA_MODIFY" : "" );
+*/
+
+
 
 			  if(trm->fg || trm->bg)
 			  {
@@ -186,7 +208,22 @@
 
 		   }
 
-		   gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,chr,1);
+		   switch(mode)
+		   {
+		   case 0:	// Nothing special
+		      gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,chr,1);
+		      break;
+
+		   case 1:  // Hidden
+		      gdk_draw_text(widget->window,font->fn,gc,hPos,vPos," ",1);
+		      break;
+
+		   case 2:	// Hidden/Editable
+		      gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,chr[0] == ' ' ? chr : "*", 1);
+		      break;
+
+		   }
+
 
 		   hPos += font->Width;
 	       trm++;
