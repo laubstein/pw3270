@@ -12,11 +12,13 @@
 
  int CopyToClipboard(int fromRow, int fromCol, int toRow, int toCol)
  {
+ 	DBGTracex(Clipboard);
  	if(Clipboard)
  	{
  		DBGMessage("Release old clipboard area");
  		szClipboard = 0;
  		g_free(Clipboard);
+ 		Clipboard = 0;
  	}
  	return AppendToClipboard(fromRow,fromCol,toRow,toCol);
  }
@@ -24,6 +26,10 @@
 
  int AppendToClipboard(int fromRow, int fromCol, int toRow, int toCol)
  {
+#if GTK == 2
+    gchar			*string;
+#endif
+
  	char			*buffer;
  	int				rows;
  	int				cols;
@@ -86,6 +92,43 @@
     	return -1;
     }
 
+#if GTK == 2
+
+    string = g_convert(buffer, -1,"UTF-8", "ISO-8859-1", NULL, NULL, NULL);
+    if(!string)
+    {
+    	Log("Error converting clipboard string to UTF-8");
+    	return -1;
+    }
+
+	sz = strlen(string);
+
+    if(!Clipboard)
+    {
+    	ptr         =
+    	Clipboard   = g_malloc((szClipboard = sz)+5);
+    }
+    else
+    {
+    	DBGPrintf("Resizing clipboard (%d+%d)",szClipboard,sz);
+    	Clipboard    = g_realloc(Clipboard,szClipboard+sz+5);
+    	ptr		     = Clipboard + szClipboard;
+    	szClipboard += sz;
+    }
+
+    if(!Clipboard)
+    {
+    	Log("Memory allocation error when saving clipboard info");
+        g_free(string);
+    	return -1;
+    }
+
+	strcpy(ptr,string);
+
+    g_free(string);
+
+#else
+
 	sz = strlen(buffer);
 
     if(!Clipboard)
@@ -109,6 +152,8 @@
 
 	strcpy(ptr,buffer);
 
+#endif
+
 #ifdef DEBUG
     DBGPrintf("Clipboard contents (%d bytes):",szClipboard);
     fprintf(DBGFILE,"%s\n",Clipboard);
@@ -116,5 +161,15 @@
 #endif
 
     g_free(buffer);
+
+#if GTK == 2
+
+    gtk_clipboard_set_text(	gtk_widget_get_clipboard(terminal,GDK_SELECTION_CLIPBOARD),
+                            Clipboard,-1);
+#else
+
+    #error Clipboard is not implemented
+
+#endif
     return 0;
  }

@@ -21,7 +21,9 @@
  #define	MOUSE_MODE_NORMAL		0x0000
  #define	MOUSE_MODE_SELECTING	0x0001
  #define	MOUSE_MODE_COPY			0x0002
- #define	MOUSE_MODE_APPEND		0x0006
+ #define	MOUSE_MODE_APPEND		0x0004
+
+ #define    MOUSE_MODE_CLIPBOARD	0x0006
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -332,15 +334,22 @@
 
  static int CheckForCopy(void)
  {
-    if( !(MouseMode & MOUSE_MODE_COPY))
+    if( !(MouseMode & MOUSE_MODE_CLIPBOARD))
        return 0;
 
-    DBGMessage("Processing clipboard action from %d,%d to %d,%d");
+	DBGTracex(MouseMode);
+	DBGTracex(MouseMode & MOUSE_MODE_APPEND);
 
     if(MouseMode & MOUSE_MODE_APPEND)
+    {
+       DBGMessage("Append to clipboard");
        AppendToClipboard(fromRow,fromCol,toRow,toCol);
+    }
 	else
+	{
+       DBGMessage("Copy to clipboard");
 	   CopyToClipboard(fromRow,fromCol,toRow,toCol);
+	}
 
     return 1;
  }
@@ -728,7 +737,8 @@
  void RemoveSelectionBox(void)
  {
  	CheckForCopy();
-    fromRow = -1;
+    fromRow   = -1;
+    MouseMode = MOUSE_MODE_NORMAL;
 	gtk_widget_queue_draw(terminal);
  }
 
