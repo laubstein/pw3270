@@ -129,6 +129,7 @@ extern const SCREEN_CALLBACK *screen_callbacks_3270;
 extern const KEYBOARD_INFO   *keyboard_info_3270;
 
 extern void  display_3270(Boolean erasing);
+extern void  move3270Cursor(int baddr);
 
 
 #ifdef __cplusplus

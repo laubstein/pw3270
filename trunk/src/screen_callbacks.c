@@ -230,6 +230,7 @@ static void toggle_monocase(struct toggle *t, enum toggle_type tt)
 static void status_ctlr_done(void)
 {
 	CHKPoint();
+	EnableCursor(TRUE);
 }
 
 static void status_insert_mode(Boolean on)
@@ -250,6 +251,7 @@ static void status_oerr(int error_type)
 
 static void status_reset(void)
 {
+//    EnableCursor(TRUE);
 	gtk_widget_queue_draw(terminal);
 }
 
@@ -261,6 +263,7 @@ static void status_reverse_mode(Boolean on)
 static void status_syswait(void)
 {
 	CHKPoint();
+    EnableCursor(FALSE);
 }
 
 static void status_twait(void)

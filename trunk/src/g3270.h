@@ -41,10 +41,14 @@
 
  void SetCursorPosition(int row, int col);
  void SetCursorType(int type);
+ void ToogleCursor(void);
+ void EnableCursor(gboolean mode);
+
 
  void toogle_crosshair(void);
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+
 
 /*---[ Terminal window ]------------------------------------------------------*/
 

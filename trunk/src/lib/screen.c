@@ -96,6 +96,11 @@ void screen_resume(void)
        screen_callbacks_3270->screen_resume();
 }
 
+void move3270Cursor(int baddr)
+{
+	cursor_move(baddr);
+}
+
 void cursor_move(int baddr)
 {
     cursor_addr = baddr;
