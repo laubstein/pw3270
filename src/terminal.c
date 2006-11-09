@@ -84,7 +84,7 @@
  static int			cursor_col								= 0;
  static int			cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
  static int			cursor_type								= CURSOR_TYPE_OVER;
- static gboolean	cross_hair								= TRUE;
+ static gboolean	cross_hair								= FALSE;
  static GdkColor	cursor_cmap[CURSOR_COLORS];
 
 
@@ -393,7 +393,7 @@
     GTK_WIDGET_SET_FLAGS(ret, GTK_CAN_FOCUS);
 
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Events.html#GdkEventMask
-    gtk_widget_add_events(ret,GDK_KEY_RELEASE_MASK|GDK_BUTTON_PRESS_MASK);
+    gtk_widget_add_events(ret,GDK_KEY_PRESS_MASK|GDK_BUTTON_PRESS_MASK);
 
     // FIXME (perry#3#): Make it better! Get the smaller font, not the first one.
 	SetFont(ret,fontlist,0,0);
@@ -404,8 +404,8 @@
 
     g_signal_connect(G_OBJECT(ret), "expose_event",  		G_CALLBACK(expose),		  	0);
     g_signal_connect(G_OBJECT(ret), "size-allocate",		G_CALLBACK(resize),	   	  	0);
-    g_signal_connect(G_OBJECT(ret), "key-release-event",	G_CALLBACK(KeyboardAction),	0);
-    g_signal_connect(G_OBJECT(ret), "button-press-event",	G_CALLBACK(button_press), 	0);
+    g_signal_connect(G_OBJECT(ret), "key-press-event",		G_CALLBACK(KeyboardAction),	0);
+    g_signal_connect(G_OBJECT(ret), "button-press-event",	G_CALLBACK(button_press),	0);
 
     // Set terminal colors
     DBGTracex(gtk_widget_get_default_colormap());
