@@ -84,6 +84,7 @@
  static int			cursor_col								= 0;
  static int			cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
  static int			cursor_type								= CURSOR_TYPE_OVER;
+ static gboolean    cursor_enabled							= TRUE;
  static gboolean	cross_hair								= FALSE;
  static GdkColor	cursor_cmap[CURSOR_COLORS];
 
@@ -154,7 +155,7 @@
     cRow = (cursor_row * (font->Height + line_spacing)) + vPos;
     cCol = (cursor_col * font->Width) + left_margin;
 
-    if(cross_hair && (cursor_type != CURSOR_TYPE_NONE))
+    if(cross_hair && cursor_enabled)
     {
 	   /* Draw cross-hair cursor */
        gdk_gc_set_foreground(gc,cursor_cmap+CURSOR_TYPE_CROSSHAIR+cursor_type);
@@ -239,7 +240,7 @@
     	vPos += (font->Height + line_spacing);
     }
 
-    if(cursor_type != CURSOR_TYPE_NONE)
+    if(cursor_enabled)
     {
        /* Draw cursor */
 
@@ -259,10 +260,32 @@
  static gboolean button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
     // http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-button-press-event
-    CHKPoint();
+ 	int 	rows;
+ 	int 	cols;
+ 	long	cRow;
+ 	long	cCol;
+
+    Get3270DeviceBuffer(&rows, &cols);
+
+    /* Convert mouse coordinates into cursor coordinates */
+
+    if((event->x < left_margin) || (event->y < top_margin) )
+       return 0;
+
+    cCol = (event->x - left_margin) / font->Width;
+    cRow = (event->y - top_margin)  / (font->Height + line_spacing);
+
+    if( (cRow > rows) || (cCol > cols))
+       return 0;
+
+    DBGPrintf("Button press at %ld,%ld (%ld,%ld)",(unsigned long) event->x, (unsigned long) event->y, cRow, cCol);
+
+    move3270Cursor((cRow * cols) + cCol);
 
     return 0;
  }
+
+
 
  static void SetFont(GtkWidget *widget, FONTELEMENT *fn, int width, int height)
  {
@@ -516,7 +539,12 @@
 
  void SetCursorType(int type)
  {
- 	cursor_type = type;
+    cursor_type = type;
     InvalidateCursor();
  }
 
+ void EnableCursor(gboolean mode)
+ {
+ 	cursor_enabled = mode;
+ 	DBGPrintf("Cursor %s", cursor_enabled ? "enabled" : "disabled");
+ }
