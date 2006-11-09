@@ -37,6 +37,8 @@
  extern char 					*Clipboard;
  extern int						szClipboard;
 
+ extern gboolean				WaitForScreen;
+
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
  int  gsource_init(void);
@@ -52,7 +54,6 @@
 
  int  AppendToClipboard(int fromRow, int fromCol, int toRow, int toCol);
  int  CopyToClipboard(int fromRow, int fromCol, int toRow, int toCol);
-
 
  void toogle_crosshair(void);
 

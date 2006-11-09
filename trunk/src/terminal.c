@@ -5,7 +5,7 @@
 
  #include "lib/hostc.h"
  #include "lib/kybdc.h"
-// #include "lib/actionsc.h"
+ #include "lib/actionsc.h"
  #include "lib/3270ds.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
@@ -81,6 +81,8 @@
 
  const char			*cl_hostname							= 0;
 
+ gboolean			WaitForScreen							= TRUE;
+
  static FONTELEMENT *fontlist								= 0;
  static FONTELEMENT *font									= 0;
  static int			top_margin								= 0;
@@ -97,6 +99,7 @@
  static gboolean    cursor_enabled							= TRUE;
  static gboolean	cross_hair								= FALSE;
  static GdkColor	cursor_cmap[CURSOR_COLORS];
+
 
  static GdkColor	selection_cmap[SELECTION_COLORS];
  static int			fromRow									= -1;
@@ -490,6 +493,26 @@
  	return 0;
  }
 
+#if GTK == 2
+
+ static gboolean scroll_event(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
+ {
+    // FIXME (perry#1#): Read associoation from scroll to function key from configuration file.
+ 	static const char *scroll[] = { "8", "7" };
+ 	DBGTracex(event->direction);
+
+ 	if(event->direction > 1 || WaitForScreen)
+ 	   return 0;
+
+	// It's whell mouse action, execute function codes.
+    WaitForScreen = TRUE;
+    action_internal(PF_action, IA_DEFAULT, scroll[event->direction], CN);
+
+ 	return 0;
+ }
+
+#endif
+
  static void SetFont(GtkWidget *widget, FONTELEMENT *fn, int width, int height)
  {
  	int rows = 0;
@@ -662,6 +685,12 @@
     g_signal_connect(G_OBJECT(ret), "button-release-event",	G_CALLBACK(button_release),	0);
     g_signal_connect(G_OBJECT(ret), "motion-notify-event",	G_CALLBACK(motion_notify),	0);
 
+#if GTK == 2
+
+    g_signal_connect(G_OBJECT(ret), "scroll-event",			G_CALLBACK(scroll_event),	0);
+
+#endif
+
     // Set terminal colors
     DBGTracex(gtk_widget_get_default_colormap());
 
@@ -737,6 +766,7 @@
  void RemoveSelectionBox(void)
  {
  	CheckForCopy();
+
     fromRow   = -1;
     MouseMode = MOUSE_MODE_NORMAL;
 	gtk_widget_queue_draw(terminal);
