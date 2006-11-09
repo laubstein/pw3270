@@ -318,6 +318,7 @@ static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num
 static void screen_changed(int first, int last)
 {
 //	DBGPrintf("Screen changed: %d<->%d",first,last);
+   WaitForScreen = FALSE;
    RemoveSelectionBox();
 }
 
