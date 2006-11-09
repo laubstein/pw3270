@@ -1,6 +1,7 @@
 
 TARGET		= g3270
-OBJECTS     = main.o log.o terminal.o screen_callbacks.o gsource.o actions.o
+OBJECTS     = main.o log.o terminal.o screen_callbacks.o gsource.o actions.o \
+				clipboard.o
 
 ifeq ($(DEBUG),1)
    DFLAGS=-DDEBUG=1 -g -O0

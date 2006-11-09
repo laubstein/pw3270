@@ -21,6 +21,9 @@
 
  #define CURSOR_TYPE_NONE	-1
 
+ #define min(x,y) (x < y ? x : y)
+ #define max(x,y) (x > y ? x : y)
+
 /*---[ Globals ]--------------------------------------------------------------*/
 
  extern const 	SCREEN_CALLBACK g3270_screen_callbacks;
@@ -30,6 +33,9 @@
  extern const char				*cl_hostname;
  extern GtkWidget				*top_window;
  extern GtkWidget  				*terminal;
+
+ extern char 					*Clipboard;
+ extern int						szClipboard;
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -43,6 +49,9 @@
  void SetCursorType(int type);
  void ToogleCursor(void);
  void EnableCursor(gboolean mode);
+
+ int  AppendToClipboard(int fromRow, int fromCol, int toRow, int toCol);
+ int  CopyToClipboard(int fromRow, int fromCol, int toRow, int toCol);
 
 
  void toogle_crosshair(void);
