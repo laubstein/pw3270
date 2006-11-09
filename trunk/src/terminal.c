@@ -17,11 +17,11 @@
 
  #define DEFCOLOR_MAP(f) ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
 
- enum MOUSE_MODES
- {
- 	MOUSE_MODE_NORMAL,
- 	MOUSE_MODE_SELECTING
- };
+ /* Binary flags for mouse state */
+ #define	MOUSE_MODE_NORMAL		0x0000
+ #define	MOUSE_MODE_SELECTING	0x0001
+ #define	MOUSE_MODE_COPY			0x0002
+ #define	MOUSE_MODE_APPEND		0x0006
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -154,6 +154,8 @@
  	int				hPos;
  	int				vPos;
  	char			chr[2];
+ 	int				x[2];
+ 	int				y[2];
 
     GdkGC 			*gc     	= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
 
@@ -170,28 +172,20 @@
     vPos = (top_margin + font->Height);
 
 	/* Draw selection box */
-    if(fromRow > 0)
+    if(fromRow >= 0)
     {
        /* Draw selection box */
+       x[0] = (min(fromCol,toCol) * font->Width) + left_margin;
+       x[1] = (max(fromCol,toCol) * font->Width) + left_margin;
+
+       y[0] = ((min(fromRow,toRow) * (font->Height + line_spacing)) + vPos)-font->Height;
+       y[1] = ((max(fromRow,toRow) * (font->Height + line_spacing)) + vPos)-font->Height;
+
        gdk_gc_set_foreground(gc,selection_cmap);
-	   gdk_draw_rectangle(	widget->window,
-							gc,
-							1,
-							(fromCol * font->Width) + left_margin,
-							(fromRow * (font->Height + line_spacing)) + vPos,
-							(toCol - fromCol) * font->Width,
-							(toRow - fromRow) * (font->Height + line_spacing)
-						);
+	   gdk_draw_rectangle(widget->window,gc,1,x[0],y[0],x[1]-x[0],y[1]-y[0]);
 
        gdk_gc_set_foreground(gc,selection_cmap+1);
-	   gdk_draw_rectangle(	widget->window,
-							gc,
-							0,
-							(fromCol * font->Width) + left_margin,
-							(fromRow * (font->Height + line_spacing)) + vPos,
-							(toCol - fromCol) * font->Width,
-							(toRow - fromRow) * (font->Height + line_spacing)
-						);
+	   gdk_draw_rectangle(widget->window,gc,0,x[0],y[0],x[1]-x[0],y[1]-y[0]);
 
     }
 
@@ -336,17 +330,38 @@
     return TRUE;
  }
 
- static gboolean button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+ static int CheckForCopy(void)
+ {
+    if( !(MouseMode & MOUSE_MODE_COPY))
+       return 0;
+
+    DBGMessage("Processing clipboard action from %d,%d to %d,%d");
+
+    if(MouseMode & MOUSE_MODE_APPEND)
+       AppendToClipboard(fromRow,fromCol,toRow,toCol);
+	else
+	   CopyToClipboard(fromRow,fromCol,toRow,toCol);
+
+    return 1;
+ }
+
+ static gboolean single_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
  	long	cRow;
  	long	cCol;
 
-    DBGPrintf("Button press at %ld,%ld",(unsigned long) event->x, (unsigned long) event->y);
-    MouseMode = MOUSE_MODE_NORMAL;
+    DBGPrintf("Button %d press at %ld,%ld", event->button,(unsigned long) event->x, (unsigned long) event->y);
 
     switch(event->button)
     {
     case 1:
+
+       if(MouseMode != MOUSE_MODE_NORMAL)
+       {
+          MouseMode = MOUSE_MODE_NORMAL;
+          RemoveSelectionBox();
+       }
+
        xFrom = (unsigned long) event->x;
        yFrom = (unsigned long) event->y;
 
@@ -357,11 +372,50 @@
        break;
 
 	case 3:
+	   DBGMessage("Copy!");
+	   MouseMode |= MOUSE_MODE_COPY;
 	   break;
     }
 
  	return 0;
  }
+
+ static gboolean double_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+ {
+    DBGPrintf("Button %d double-click at %ld,%ld", event->button,(unsigned long) event->x, (unsigned long) event->y);
+
+    switch(event->button)
+    {
+    case 1:
+       break;
+
+	case 3:
+	   DBGMessage("Append!");
+	   MouseMode = MOUSE_MODE_APPEND;
+	   break;
+    }
+
+
+ 	return 0;
+ }
+
+ static gboolean button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+ {
+ 	switch(event->type)
+ 	{
+	case GDK_BUTTON_PRESS:
+	   return single_click(widget,event,user_data);
+
+	case GDK_2BUTTON_PRESS:
+	   return double_click(widget,event,user_data);
+
+	default:
+	   return 0;
+
+ 	}
+ 	return 0;
+ }
+
 
  static gboolean button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
@@ -385,13 +439,14 @@
           RemoveSelectionBox();
           move3270Cursor((cRow * cols) + cCol);
        }
+       CheckForCopy();
+       MouseMode = MOUSE_MODE_NORMAL;
        break;
 
 	case 3:
 	   break;
     }
 
-    MouseMode = MOUSE_MODE_NORMAL;
     return 0;
  }
 
@@ -400,13 +455,25 @@
  	long	cRow;
  	long	cCol;
 
- 	DBGPrintf( "Motion notify: %ld,%ld to %ld,%ld", xFrom, yFrom, (unsigned long) event->x, (unsigned long) event->y);
     MouseMode = MOUSE_MODE_SELECTING;
 
-    Mouse2Terminal(xTo = ((long) event->x), yTo = ((long) event->y), &cRow, &cCol);
+    xTo = ((long) event->x);
+    yTo = ((long) event->y);
+
+    Mouse2Terminal(xTo, yTo, &cRow, &cCol);
 
     toRow = cRow;
     toCol = cCol;
+
+    DBGPrintf("Box from %d,%d to %d,%d",min(toRow,fromRow),min(toCol,fromCol),max(toRow,fromRow),max(toCol,fromCol));
+/*
+
+							(fromCol * font->Width) + left_margin,
+							(fromRow * (font->Height + line_spacing)) + vPos,
+							(toCol - fromCol) * font->Width,
+							(toRow - fromRow) * (font->Height + line_spacing)
+*/
+
 
 	gtk_widget_queue_draw(widget);
 
@@ -659,6 +726,7 @@
 
  void RemoveSelectionBox(void)
  {
+ 	CheckForCopy();
     fromRow = -1;
 	gtk_widget_queue_draw(terminal);
  }

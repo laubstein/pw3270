@@ -27,6 +27,10 @@
 			<Option compilerVar="CC"/>
 			<Option target="default"/>
 		</Unit>
+		<Unit filename="src/clipboard.c">
+			<Option compilerVar="CC"/>
+			<Option target="default"/>
+		</Unit>
 		<Unit filename="src/g3270.h">
 			<Option compilerVar=""/>
 			<Option compile="0"/>
