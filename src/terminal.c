@@ -573,6 +573,25 @@
     }
  }
 
+ void selection_handle( GtkWidget        *widget,
+                        GtkSelectionData *selection_data,
+                        guint             info,
+                        guint             time_stamp,
+                        gpointer          data )
+ {
+    char *teste = "Teste de uso do clipboard";
+ 	CHKPoint();
+	gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8, (unsigned char *) teste, strlen(teste));
+ }
+
+ gint selection_clear( GtkWidget         *widget,
+                      GdkEventSelection *event,
+                      gint              *have_selection )
+ {
+ 	CHKPoint();
+    return TRUE;
+ }
+
  GtkWidget *g3270_new(const char *hostname)
  {
 
@@ -687,7 +706,12 @@
     /* Set selection colors */
     LoadColors(selection_cmap,SELECTION_COLORS,SelectionColors);
 
-    /* Finish */
+    /* Configure clipboard stuff */
+    /* http://developer.gnome.org/doc/API/gtk/gtk-selections.html */
+    gtk_signal_connect(GTK_OBJECT(ret), "selection_clear_event", GTK_SIGNAL_FUNC(selection_clear), 0);
+    gtk_selection_add_target(ret,GDK_SELECTION_PRIMARY,GDK_SELECTION_TYPE_STRING,1);
+    gtk_signal_connect(GTK_OBJECT(ret), "selection_get", GTK_SIGNAL_FUNC(selection_handle), 0);
+
 
 	// TODO (perry#3#): Start connection in background.
     if(cl_hostname)
