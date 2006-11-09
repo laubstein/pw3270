@@ -9,6 +9,9 @@
 
 /*---[ Keyboard processing ]--------------------------------------------*/
 
+ // Replace the Alt-Key mas for one with a more "acceptable" name.
+ #define GDK_ALT_MASK GDK_MOD1_MASK
+
  #ifdef DEBUG
      #define DECLARE_KEYPROC(key, state, action) { key, state, #key " (" #state ")", action, #action }
  #else
@@ -59,12 +62,13 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
+ // FIXME (perry#1#): Optimize keyboard processing.
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
 
     static const struct WindowActions keyproc[] =
     {
-     	DECLARE_KEYPROC( GDK_c, GDK_CONTROL_MASK, toogle_crosshair )
+     	DECLARE_KEYPROC( GDK_c, GDK_ALT_MASK, toogle_crosshair )
     };
 
     static const struct TerminalActions actions[] =
@@ -137,20 +141,9 @@
     	}
     }
 
-    /* Check for regular key */
-    if(*event->string && !(event->state & GDK_CONTROL_MASK) )
-    {
- 	   // Standard char, use it.
-	   params[0] = event->string;
-	   params[1] = 0;
-//	   DBGPrintf("Keyval: %04x String: \"%s\" State: %04x",event->keyval,event->string,event->state);
-       Key_action(NULL, NULL, params, &one);
- 	   return TRUE;
-	}
-
-	/* Unknown key, ignore-it */
-    DBGPrintf("Keyval: %d  Keychar: \"%s\" State: %04x %s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+    DBGPrintf("Keyval: %d (%s) Keychar: \"%s\" State: %04x %s%s%s%s%s%s%s%s%s%s%s%s%s%s",
 						event->keyval,
+						gdk_keyval_name(event->keyval),
 						event->string,
 						event->state,
 						event->state & GDK_SHIFT_MASK	? " GDK_SHIFT_MASK"		: "",
@@ -168,6 +161,18 @@
 						event->state & GDK_BUTTON5_MASK	? " GDK_BUTTON5_MASK"	: "",
 						event->state & GDK_RELEASE_MASK	? " GDK_RELEASE_MASK"	: ""
 						);
+
+    /* Check for regular key */
+    if(*event->string && !(event->state & (GDK_ALT_MASK|GDK_CONTROL_MASK)) )
+    {
+ 	   // Standard char, use it.
+	   params[0] = event->string;
+	   params[1] = 0;
+       Key_action(NULL, NULL, params, &one);
+ 	   return TRUE;
+	}
+
+	/* Unknown key, ignore-it */
 
     return FALSE;
 
