@@ -12,9 +12,16 @@
 
  #define MIN_LINE_SPACING	2
  #define FIELD_COLORS		4
+ #define SELECTION_COLORS	2
  #define CURSOR_COLORS		(CURSOR_TYPE_CROSSHAIR * 2)
 
  #define DEFCOLOR_MAP(f) ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
+
+ enum MOUSE_MODES
+ {
+ 	MOUSE_MODE_NORMAL,
+ 	MOUSE_MODE_SELECTING
+ };
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -38,9 +45,10 @@
   // TODO (perry#2#): Read from file(s).
 
   // /usr/X11R6/lib/X11/rgb.txt
-  static const char *TerminalColors = "black,blue1,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
-  static const char *FieldColors    = "green1,red,blue,white";
-  static const char *CursorColors	= "white,white,DarkSlateGray,DarkSlateGray";
+  static const char *TerminalColors  = "black,blue1,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
+  static const char *FieldColors     = "green1,red,blue,white";
+  static const char *CursorColors	 = "white,white,DarkSlateGray,DarkSlateGray";
+  static const char *SelectionColors = "DarkSlateGray,yellow";
 
   static const char *FontDescr[] =
   {
@@ -88,6 +96,17 @@
  static gboolean	cross_hair								= FALSE;
  static GdkColor	cursor_cmap[CURSOR_COLORS];
 
+ static GdkColor	selection_cmap[SELECTION_COLORS];
+ static int			fromRow									= -1;
+ static int			fromCol									= -1;
+ static int			toRow									= -1;
+ static int			toCol									= -1;
+
+ static long		xFrom									= -1;
+ static long		yFrom									= -1;
+ static long		xTo										= -1;
+ static long		yTo										= -1;
+ static int			MouseMode								= MOUSE_MODE_NORMAL;
 
 /*---[ Gui-Actions ]----------------------------------------------------------*/
 
@@ -147,11 +166,39 @@
     if(!trm)
        return rc;
 
+    /* Get top of the screen */
+    vPos = (top_margin + font->Height);
+
+	/* Draw selection box */
+    if(fromRow > 0)
+    {
+       /* Draw selection box */
+       gdk_gc_set_foreground(gc,selection_cmap);
+	   gdk_draw_rectangle(	widget->window,
+							gc,
+							1,
+							(fromCol * font->Width) + left_margin,
+							(fromRow * (font->Height + line_spacing)) + vPos,
+							(toCol - fromCol) * font->Width,
+							(toRow - fromRow) * (font->Height + line_spacing)
+						);
+
+       gdk_gc_set_foreground(gc,selection_cmap+1);
+	   gdk_draw_rectangle(	widget->window,
+							gc,
+							0,
+							(fromCol * font->Width) + left_margin,
+							(fromRow * (font->Height + line_spacing)) + vPos,
+							(toCol - fromCol) * font->Width,
+							(toRow - fromRow) * (font->Height + line_spacing)
+						);
+
+    }
+
 	/* Adjust cursor color */
 	ps = (cursor_row * rows) + cols;
 
     /* Calculate coordinates */
-    vPos = (top_margin + font->Height);
     cRow = (cursor_row * (font->Height + line_spacing)) + vPos;
     cCol = (cursor_col * font->Width) + left_margin;
 
@@ -247,7 +294,7 @@
        gdk_gc_set_foreground(gc,cursor_cmap+cursor_type);
 
 	   gdk_draw_rectangle(	widget->window,
-							widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+							gc,
 							1,
 							cCol, (cRow + 3) - cursor_height[cursor_type],
 							font->Width,
@@ -257,7 +304,66 @@
     return rc;
  }
 
+ static gboolean Mouse2Terminal(long x, long y, long *cRow, long *cCol)
+ {
+ 	int 	rows;
+ 	int 	cols;
+
+    Get3270DeviceBuffer(&rows, &cols);
+
+    /* Convert mouse coordinates into cursor coordinates */
+
+    if((x < left_margin) || (y < top_margin) )
+    {
+	   *cRow = *cCol = 0;
+       return FALSE;
+    }
+
+    *cCol = (x - left_margin) / font->Width;
+    *cRow = (y - top_margin)  / (font->Height + line_spacing);
+
+    if( (*cCol > cols) || (*cRow > rows))
+    {
+       if(*cCol > cols)
+          *cCol = cols;
+
+	   if(*cRow > rows)
+	      *cRow = rows;
+
+	   return FALSE;
+    }
+
+    return TRUE;
+ }
+
  static gboolean button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+ {
+ 	long	cRow;
+ 	long	cCol;
+
+    DBGPrintf("Button press at %ld,%ld",(unsigned long) event->x, (unsigned long) event->y);
+    MouseMode = MOUSE_MODE_NORMAL;
+
+    switch(event->button)
+    {
+    case 1:
+       xFrom = (unsigned long) event->x;
+       yFrom = (unsigned long) event->y;
+
+       Mouse2Terminal((long) event->x, (long) event->y, &cRow, &cCol);
+
+       fromRow = cRow;
+       fromCol = cCol;
+       break;
+
+	case 3:
+	   break;
+    }
+
+ 	return 0;
+ }
+
+ static gboolean button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
     // http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-button-press-event
  	int 	rows;
@@ -267,25 +373,46 @@
 
     Get3270DeviceBuffer(&rows, &cols);
 
-    /* Convert mouse coordinates into cursor coordinates */
+    DBGPrintf("Button %d release at %ld,%ld", event->button,(unsigned long) event->x, (unsigned long) event->y);
+    xFrom = yFrom = -1;
 
-    if((event->x < left_margin) || (event->y < top_margin) )
-       return 0;
 
-    cCol = (event->x - left_margin) / font->Width;
-    cRow = (event->y - top_margin)  / (font->Height + line_spacing);
+    switch(event->button)
+    {
+    case 1:
+       if(MouseMode == MOUSE_MODE_NORMAL && Mouse2Terminal((long) event->x, (long) event->y, &cRow, &cCol))
+       {
+          RemoveSelectionBox();
+          move3270Cursor((cRow * cols) + cCol);
+       }
+       break;
 
-    if( (cRow > rows) || (cCol > cols))
-       return 0;
+	case 3:
+	   break;
+    }
 
-    DBGPrintf("Button press at %ld,%ld (%ld,%ld)",(unsigned long) event->x, (unsigned long) event->y, cRow, cCol);
-
-    move3270Cursor((cRow * cols) + cCol);
-
+    MouseMode = MOUSE_MODE_NORMAL;
     return 0;
  }
 
+ static gboolean motion_notify(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
+ {
+ 	long	cRow;
+ 	long	cCol;
 
+ 	DBGPrintf( "Motion notify: %ld,%ld to %ld,%ld", xFrom, yFrom, (unsigned long) event->x, (unsigned long) event->y);
+    MouseMode = MOUSE_MODE_SELECTING;
+
+    Mouse2Terminal(xTo = ((long) event->x), yTo = ((long) event->y), &cRow, &cCol);
+
+    toRow = cRow;
+    toCol = cCol;
+
+	gtk_widget_queue_draw(widget);
+
+
+ 	return 0;
+ }
 
  static void SetFont(GtkWidget *widget, FONTELEMENT *fn, int width, int height)
  {
@@ -352,6 +479,33 @@
 
  }
 
+ static void LoadColors(GdkColor *clr, int qtd, const char *string)
+ {
+ 	char buffer[4096];
+	char *ptr;
+ 	char *tok;
+ 	int	 f;
+
+    memset(clr,0,sizeof(GdkColor)*qtd);
+
+    f = 0;
+    strncpy(buffer,string,4095);
+    for(ptr=strtok_r(buffer,",",&tok);ptr && f < qtd;ptr = strtok_r(0,",",&tok))
+    {
+    	gdk_color_parse(ptr,clr+f);
+
+    	if(!gdk_colormap_alloc_color(	gtk_widget_get_default_colormap(),
+										clr+f,
+										FALSE,
+										TRUE ))
+		{
+			Log("Can't allocate color \"%s\" from %s",ptr,string);
+		}
+
+        f++;
+    }
+ }
+
  GtkWidget *g3270_new(const char *hostname)
  {
 
@@ -416,7 +570,7 @@
     GTK_WIDGET_SET_FLAGS(ret, GTK_CAN_FOCUS);
 
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Events.html#GdkEventMask
-    gtk_widget_add_events(ret,GDK_KEY_PRESS_MASK|GDK_BUTTON_PRESS_MASK);
+    gtk_widget_add_events(ret,GDK_KEY_PRESS_MASK|GDK_BUTTON_PRESS_MASK|GDK_BUTTON_MOTION_MASK|GDK_BUTTON_RELEASE_MASK);
 
     // FIXME (perry#3#): Make it better! Get the smaller font, not the first one.
 	SetFont(ret,fontlist,0,0);
@@ -429,6 +583,8 @@
     g_signal_connect(G_OBJECT(ret), "size-allocate",		G_CALLBACK(resize),	   	  	0);
     g_signal_connect(G_OBJECT(ret), "key-press-event",		G_CALLBACK(KeyboardAction),	0);
     g_signal_connect(G_OBJECT(ret), "button-press-event",	G_CALLBACK(button_press),	0);
+    g_signal_connect(G_OBJECT(ret), "button-release-event",	G_CALLBACK(button_release),	0);
+    g_signal_connect(G_OBJECT(ret), "motion-notify-event",	G_CALLBACK(motion_notify),	0);
 
     // Set terminal colors
     DBGTracex(gtk_widget_get_default_colormap());
@@ -446,21 +602,7 @@
     	return 0;
     }
 
-    f = 0;
-    strncpy(buffer,TerminalColors,4095);
-    for(ptr=strtok_r(buffer,",",&tok);ptr;ptr = strtok_r(0,",",&tok))
-    {
-    	gdk_color_parse(ptr,terminal_cmap+f);
-
-    	if(!gdk_colormap_alloc_color(	gtk_widget_get_default_colormap(),
-										terminal_cmap+f,
-										FALSE,
-										TRUE ))
-		{
-			Log("Can't allocate terminal color \"%s\"",ptr);
-		}
-        f++;
-    }
+    LoadColors(terminal_cmap, terminal_color_count, TerminalColors);
 
     for(f=0;f < (sizeof(widget_states)/sizeof(int));f++)
     {
@@ -470,47 +612,13 @@
     }
 
     /* Set field colors */
-    memset(&field_cmap,0,sizeof(GdkColor)*FIELD_COLORS);
-
-    f = 0;
-    strncpy(buffer,FieldColors,4095);
-    for(ptr=strtok_r(buffer,",",&tok);ptr && f < FIELD_COLORS;ptr = strtok_r(0,",",&tok))
-    {
-    	gdk_color_parse(ptr,field_cmap+f);
-
-    	if(!gdk_colormap_alloc_color(	gtk_widget_get_default_colormap(),
-										field_cmap+f,
-										FALSE,
-										TRUE ))
-		{
-			Log("Can't allocate field color \"%s\"",ptr);
-		}
-
-        f++;
-    }
+    LoadColors(field_cmap,FIELD_COLORS,FieldColors);
 
     /* Set cursor colors */
-// static GdkColor	cursor_cmap[];
+    LoadColors(cursor_cmap,CURSOR_COLORS,CursorColors);
 
-    memset(&cursor_cmap,0,sizeof(GdkColor)*CURSOR_COLORS);
-
-    f = 0;
-    strncpy(buffer,CursorColors,4095);
-    for(ptr=strtok_r(buffer,",",&tok);ptr && f < CURSOR_COLORS;ptr = strtok_r(0,",",&tok))
-    {
-    	gdk_color_parse(ptr,cursor_cmap+f);
-
-    	if(!gdk_colormap_alloc_color(	gtk_widget_get_default_colormap(),
-										cursor_cmap+f,
-										FALSE,
-										TRUE ))
-		{
-			Log("Can't allocate cursor color \"%s\"",ptr);
-		}
-
-        f++;
-    }
-
+    /* Set selection colors */
+    LoadColors(selection_cmap,SELECTION_COLORS,SelectionColors);
 
     /* Finish */
 
@@ -548,3 +656,10 @@
  	cursor_enabled = mode;
  	DBGPrintf("Cursor %s", cursor_enabled ? "enabled" : "disabled");
  }
+
+ void RemoveSelectionBox(void)
+ {
+    fromRow = -1;
+	gtk_widget_queue_draw(terminal);
+ }
+
