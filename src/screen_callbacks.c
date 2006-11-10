@@ -210,9 +210,10 @@ static void screen_type(const char *model_name, int maxROWS, int maxCOLS)
 
 static void cursor_move(int baddr)
 {
-	int row;
-	int col;
- 	int	cols;
+	int		row;
+	int		col;
+ 	int		cols;
+ 	char	buffer[20];
 
  	Get3270DeviceBuffer(0, &cols);
 
@@ -220,6 +221,10 @@ static void cursor_move(int baddr)
  	col = baddr - (row*cols);
 
     SetCursorPosition(row,col);
+
+    snprintf(buffer,19,"%02d/%03d",row+1,col+1);
+    gtk_label_set_text(GTK_LABEL(CursorPosition),buffer);
+
 }
 
 static void toggle_monocase(struct toggle *t, enum toggle_type tt)
