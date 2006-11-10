@@ -9,36 +9,28 @@
  GtkWidget  *terminal		= 0;
  GtkWidget  *StatusBar		= 0;
  GtkWidget	*CursorPosition	= 0;
+ GtkWidget	*LUName			= 0;
 
 /*---[ Main program ]---------------------------------------------------------*/
-
- void SetWindowTitle(const char *msg)
- {
- 	char title[512];
-
-    if(top_window)
-    {
-	   strncpy(title,TARGET,511);
-	   strncat(title," ",511);
-
-	   if(cl_hostname)
-	   {
-	      strncat(title,cl_hostname,511);
-	      strncat(title," ",511);
-	   }
-
-       if(msg)
-	      strncat(title,msg,511);
-
-       gtk_window_set_title(GTK_WINDOW(top_window),title);
-
-    }
- }
-
 
  static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer data )
  {
     return FALSE;
+ }
+
+ gboolean map_event(GtkWidget *widget, GdkEvent  *event, gpointer   user_data)
+ {
+ 	DBGTracex(widget->window);
+
+    LUName         = gtk_label_new("--------");
+    CursorPosition = gtk_label_new("--/---");
+
+	gtk_box_pack_end(GTK_BOX(StatusBar),CursorPosition,FALSE,FALSE,10);
+	gtk_box_pack_end(GTK_BOX(StatusBar),LUName,FALSE,FALSE,10);
+
+    gtk_widget_show_all(StatusBar);
+
+    return 0;
  }
 
  static void destroy( GtkWidget *widget, gpointer   data )
@@ -51,8 +43,9 @@
  	GtkWidget *vbox;
 
     top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	g_signal_connect(G_OBJECT(top_window),  "delete_event", G_CALLBACK(delete_event), NULL);
-    g_signal_connect (G_OBJECT(top_window), "destroy", G_CALLBACK (destroy), NULL);
+	g_signal_connect(G_OBJECT(top_window),	"delete_event", G_CALLBACK(delete_event),	NULL);
+    g_signal_connect(G_OBJECT(top_window),	"destroy", 		G_CALLBACK(destroy),		NULL);
+    g_signal_connect(G_OBJECT(top_window),	"map-event",	G_CALLBACK(map_event),		NULL);
 
     SetWindowTitle(0);
 
@@ -66,9 +59,6 @@
     // Create status-bar
     StatusBar = gtk_hbox_new(FALSE,1);
 	gtk_box_pack_end(GTK_BOX(vbox),StatusBar,FALSE,FALSE,0);
-
-    CursorPosition = gtk_label_new("--/---");
-	gtk_box_pack_end(GTK_BOX(StatusBar),CursorPosition,FALSE,FALSE,10);
 
  }
 
@@ -98,6 +88,29 @@
     gtk_main();
 
     return 0;
+ }
+
+ void SetWindowTitle(const char *msg)
+ {
+ 	char title[512];
+
+    if(top_window)
+    {
+	   strncpy(title,TARGET,511);
+	   strncat(title," ",511);
+
+	   if(cl_hostname)
+	   {
+	      strncat(title,cl_hostname,511);
+	      strncat(title," ",511);
+	   }
+
+       if(msg)
+	      strncat(title,msg,511);
+
+       gtk_window_set_title(GTK_WINDOW(top_window),title);
+
+    }
  }
 
 
