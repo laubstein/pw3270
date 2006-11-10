@@ -50,7 +50,7 @@
   static const char *TerminalColors  = "black,blue1,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
   static const char *FieldColors     = "green1,red,blue,white";
   static const char *CursorColors	 = "white,white,DarkSlateGray,DarkSlateGray";
-  static const char *SelectionColors = "DarkSlateGray,yellow";
+  static const char *SelectionColors = "#000020,yellow";
 
   static const char *FontDescr[] =
   {
@@ -335,6 +335,23 @@
     return TRUE;
  }
 
+ void CopySelection(void)
+ {
+ 	if(fromRow < 0)
+ 	   return;
+    DBGMessage("Copy to clipboard");
+	CopyToClipboard(fromRow,fromCol,toRow,toCol);
+
+ }
+
+ void AppendSelection(void)
+ {
+ 	if(fromRow < 0)
+ 	   return;
+    DBGMessage("Append to clipboard");
+    AppendToClipboard(fromRow,fromCol,toRow,toCol);
+ }
+
  static int CheckForCopy(void)
  {
     if( !(MouseMode & MOUSE_MODE_CLIPBOARD))
@@ -344,15 +361,9 @@
 	DBGTracex(MouseMode & MOUSE_MODE_APPEND);
 
     if(MouseMode & MOUSE_MODE_APPEND)
-    {
-       DBGMessage("Append to clipboard");
-       AppendToClipboard(fromRow,fromCol,toRow,toCol);
-    }
+       AppendSelection();
 	else
-	{
-       DBGMessage("Copy to clipboard");
-	   CopyToClipboard(fromRow,fromCol,toRow,toCol);
-	}
+	   CopySelection();
 
     return 1;
  }
