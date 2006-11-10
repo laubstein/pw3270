@@ -11,9 +11,6 @@
 /*---[ Defines ]--------------------------------------------------------------*/
 
  #define MIN_LINE_SPACING	2
- #define FIELD_COLORS		4
- #define SELECTION_COLORS	2
- #define CURSOR_COLORS		(CURSOR_TYPE_CROSSHAIR * 2)
 
  #define DEFCOLOR_MAP(f) ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
 
@@ -24,6 +21,8 @@
  #define	MOUSE_MODE_APPEND		0x0004
 
  #define    MOUSE_MODE_CLIPBOARD	0x0006
+
+ #define	STATUS_LINE_SPACE		4
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -48,9 +47,26 @@
 
   // /usr/X11R6/lib/X11/rgb.txt
   static const char *TerminalColors  = "black,blue1,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
+
+  #define FIELD_COLORS		4
   static const char *FieldColors     = "green1,red,blue,white";
+
+  #define CURSOR_COLORS		(CURSOR_TYPE_CROSSHAIR * 2)
   static const char *CursorColors	 = "white,white,DarkSlateGray,DarkSlateGray";
+
+  #define SELECTION_COLORS	2
   static const char *SelectionColors = "#000020,yellow";
+
+  enum _STATUS_COLORS
+  {
+  	    STATUS_COLOR_BACKGROUND,
+  	    STATUS_COLOR_SEPARATOR,
+		STATUS_COLOR_CURSOR_POSITION,
+		STATUS_COLOR_LUNAME,
+
+		STATUS_COLORS	// Must be the last one
+  };
+  static const char *StatusColors	 = "black,ForestGreen,LimeGreen,LimeGreen";
 
   static const char *FontDescr[] =
   {
@@ -100,8 +116,10 @@
  static gboolean	cross_hair								= FALSE;
  static GdkColor	cursor_cmap[CURSOR_COLORS];
 
+ static GdkColor	status_cmap[STATUS_COLORS];
 
  static GdkColor	selection_cmap[SELECTION_COLORS];
+
  static int			fromRow									= -1;
  static int			fromCol									= -1;
  static int			toRow									= -1;
@@ -112,6 +130,7 @@
  static long		xTo										= -1;
  static long		yTo										= -1;
  static int			MouseMode								= MOUSE_MODE_NORMAL;
+
 
 /*---[ Gui-Actions ]----------------------------------------------------------*/
 
@@ -174,7 +193,7 @@
        return rc;
 
     /* Get top of the screen */
-    vPos = (top_margin + font->Height);
+    vPos = (top_margin + font->Height + event->area.x);
 
 	/* Draw selection box */
     if(fromRow >= 0)
@@ -208,7 +227,7 @@
 
    	   gdk_draw_line(	widget->window,
 						widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-						cCol, event->area.y, cCol, event->area.y + event->area.height );
+						cCol, event->area.y, cCol, event->area.y + ( rows * (font->Height + line_spacing) ));
 
 	   gdk_draw_line(	widget->window,
 						widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
@@ -218,7 +237,7 @@
     // TODO (perry#2#): Find a better way (Is it necessary to run all over the buffer?)
     for(row = 0; row < rows; row++)
     {
-    	hPos = left_margin;
+    	hPos = event->area.x+left_margin;
     	for(col = 0; col < cols; col++)
     	{
 		   chr[0] = Ebc2ASC(trm->cc);
@@ -286,6 +305,29 @@
     	vPos += (font->Height + line_spacing);
     }
 
+    /* Draw status line */
+    vPos -= font->Height;
+    vPos++;
+
+    gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_SEPARATOR);
+    gdk_draw_line( widget->window, gc, event->area.x+left_margin, vPos, hPos, vPos);
+
+    vPos += (font->Height+1);
+
+    /* Cursor position */
+    hPos -= (font->Width * strlen(oia_cursor));
+    gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_CURSOR_POSITION);
+    gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,oia_cursor,strlen(oia_cursor));
+
+
+    /* LU Name */
+    hPos -= (font->Width * (strlen(oia_LUName)+1));
+    gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_LUNAME);
+    gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,oia_LUName,strlen(oia_LUName));
+
+
+
+    /* Draw cursor */
     if(cursor_enabled)
     {
        /* Draw cursor */
@@ -341,8 +383,8 @@
  	   return;
     DBGMessage("Copy to clipboard");
 
-	if(!CopyToClipboard(fromRow,fromCol,toRow,toCol) && StatusMessage)
-       gtk_label_set_text(GTK_LABEL(StatusMessage),"Copiado");
+	if(!CopyToClipboard(fromRow,fromCol,toRow,toCol))
+       SetStatusMessage("Copiado");
 
  }
 
@@ -352,10 +394,9 @@
  	   return;
 
     DBGMessage("Append to clipboard");
-    DBGTracex(StatusMessage);
 
-    if(AppendToClipboard(fromRow,fromCol,toRow,toCol) == 0 && StatusMessage)
-       gtk_label_set_text(GTK_LABEL(StatusMessage),"Anexado");
+    if(AppendToClipboard(fromRow,fromCol,toRow,toCol) == 0)
+       SetStatusMessage("Anexado");
 
  }
 
@@ -537,6 +578,7 @@
  	int cols = 0;
 
     Get3270DeviceBuffer(&rows, &cols);
+    rows++;
 
  	font = fn;
 
@@ -551,7 +593,7 @@
 	if(line_spacing < MIN_LINE_SPACING)
 	   line_spacing = MIN_LINE_SPACING;
 
-    top_margin = (height - ((font->Height+line_spacing)*rows)) >> 1;
+    top_margin = (height - (STATUS_LINE_SPACE + ((font->Height+line_spacing)*rows))) >> 1;
     if(top_margin < 0)
        top_margin = 0;
 
@@ -681,6 +723,7 @@
     	}
     }
 
+
     /* Create drawing area */
     ret = gtk_drawing_area_new();
     GTK_WIDGET_SET_FLAGS(ret, GTK_CAN_DEFAULT);
@@ -742,6 +785,9 @@
 
     /* Set selection colors */
     LoadColors(selection_cmap,SELECTION_COLORS,SelectionColors);
+
+    /* Set status bar colors */
+    LoadColors(status_cmap, STATUS_COLORS, StatusColors);
 
     /* Configure clipboard stuff */
     /* http://developer.gnome.org/doc/API/2.0/gtk/gtk-Clipboards.html#GtkClipboard */

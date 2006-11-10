@@ -7,11 +7,6 @@
 
  GtkWidget	*top_window		= 0;
  GtkWidget  *terminal		= 0;
- GtkWidget  *StatusBar		= 0;
- GtkWidget	*CursorPosition	= 0;
- GtkWidget	*LUName			= 0;
- GtkWidget  *StatusMessage  = 0;
- GtkWidget	*InsertStatus	= 0;
 
 /*---[ Main program ]---------------------------------------------------------*/
 
@@ -23,16 +18,6 @@
  gboolean map_event(GtkWidget *widget, GdkEvent  *event, gpointer   user_data)
  {
  	DBGTracex(widget->window);
-
-	gtk_box_pack_start(GTK_BOX(StatusBar),StatusMessage,FALSE,FALSE,5);
-
-	gtk_box_pack_start(GTK_BOX(StatusBar),gtk_label_new(""),TRUE,TRUE,5);
-
-	gtk_box_pack_end(GTK_BOX(StatusBar),CursorPosition,FALSE,FALSE,5);
-	gtk_box_pack_end(GTK_BOX(StatusBar),LUName,FALSE,FALSE,5);
-	gtk_box_pack_end(GTK_BOX(StatusBar),InsertStatus,FALSE,FALSE,5);
-
-    gtk_widget_show_all(StatusBar);
 
     return 0;
  }
@@ -59,15 +44,6 @@
     // Create terminal window
 	terminal = g3270_new(cl_hostname);
 	gtk_box_pack_start(GTK_BOX(vbox),terminal,TRUE,TRUE,0);
-
-    // Create status-bar
-    StatusBar = gtk_hbox_new(FALSE,1);
-	gtk_box_pack_end(GTK_BOX(vbox),StatusBar,FALSE,FALSE,0);
-
-    LUName         = gtk_label_new("--------");
-    CursorPosition = gtk_label_new("--/---");
-    StatusMessage  = gtk_label_new("");
-    InsertStatus   = gtk_label_new("---");
 
  }
 

@@ -24,20 +24,20 @@
  #define min(x,y) (x < y ? x : y)
  #define max(x,y) (x > y ? x : y)
 
+ #define SetStatusMessage(x) /* */
+
 /*---[ Globals ]--------------------------------------------------------------*/
 
  extern const 	SCREEN_CALLBACK g3270_screen_callbacks;
  extern const 	KEYBOARD_INFO   g3270_keyboard_info;
 
 
+ extern char					oia_cursor[];
+ extern char					oia_LUName[];
+
  extern const char				*cl_hostname;
  extern GtkWidget				*top_window;
  extern GtkWidget  				*terminal;
- extern GtkWidget				*CursorPosition;
- extern GtkWidget				*LUName;
- extern GtkWidget  				*StatusMessage;
- extern GtkWidget				*InsertStatus;
- extern GtkWidget				*StatusBar;
 
  extern char 					*Clipboard;
  extern int						szClipboard;
