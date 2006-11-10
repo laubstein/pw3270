@@ -34,7 +34,7 @@ static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num
 
 static void SetStatusCode(int error_type);
 
-/*---[ Error codes ]----------------------------------------------------------*/
+/*---[ Status codes ]---------------------------------------------------------*/
 
  #ifdef DEBUG
      #define DECLARE_STATUS_MESSAGE(code, msg) { code, #code, msg }
@@ -70,6 +70,10 @@ static void SetStatusCode(int error_type);
 
  };
 
+/*---[ Globas ]---------------------------------------------------------------*/
+
+ char oia_cursor[8]  = "";
+ char oia_LUName[12] = "          ";
 
 /*---[ 3270 Screen callback table ]-------------------------------------------*/
 
@@ -252,7 +256,6 @@ static void cursor_move(int baddr)
 	int		row;
 	int		col;
  	int		cols;
- 	char	buffer[20];
 
  	Get3270DeviceBuffer(0, &cols);
 
@@ -260,12 +263,7 @@ static void cursor_move(int baddr)
  	col = baddr - (row*cols);
 
     SetCursorPosition(row,col);
-
-    if(CursorPosition)
-    {
-       snprintf(buffer,19,"%02d/%03d",row+1,col+1);
-       gtk_label_set_text(GTK_LABEL(CursorPosition),buffer);
-    }
+    snprintf(oia_cursor,7,"%02d/%03d",row+1,col+1);
 
 }
 
@@ -283,15 +281,9 @@ static void status_ctlr_done(void)
 static void status_insert_mode(Boolean on)
 {
 	if(on)
-	{
-       gtk_label_set_text(GTK_LABEL(InsertStatus),"INS");
 	   SetCursorType(CURSOR_TYPE_INSERT);
-	}
 	else
-	{
-       gtk_label_set_text(GTK_LABEL(InsertStatus),"OVR");
 	   SetCursorType(CURSOR_TYPE_OVER);
-	}
 }
 
 static void status_minus(void)
@@ -333,9 +325,12 @@ static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
 
 static void status_lu(const char *lu)
 {
+	if(!lu)
+	   lu = "";
+
     g3270_log("lib3270", "Using LU \"%s\"",lu);
-    if(LUName)
-       gtk_label_set_text(GTK_LABEL(LUName),lu ? lu : "--------");
+    snprintf(oia_LUName,11,"%-10s",lu);
+
 }
 
 static void ring_bell(void)
@@ -401,8 +396,7 @@ static void SetStatusCode(int code)
 	   Log("Unexpected status code %d from 3270 library",code);
 	}
 
-    if(StatusMessage)
-       gtk_label_set_text(GTK_LABEL(StatusMessage),msg);
+    SetStatusMessage(msg);
 
 }
 
