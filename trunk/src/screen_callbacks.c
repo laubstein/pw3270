@@ -53,7 +53,7 @@ static void SetStatusCode(int error_type);
  	const char		*msg;
  } status[] =
  {
-	DECLARE_STATUS_MESSAGE( KL_OERR_PROTECTED,	"Protegido"			),
+	DECLARE_STATUS_MESSAGE( KL_OERR_PROTECTED,	"Mova o cursor para uma posição desprotegida e tente novamente"			),
 	DECLARE_STATUS_MESSAGE( KL_OERR_NUMERIC,	"Somente numeros"	),
 	DECLARE_STATUS_MESSAGE( KL_OERR_OVERFLOW,	"Overflow"			),
 	DECLARE_STATUS_MESSAGE( KL_OERR_DBCS,		"DBCS"				),
