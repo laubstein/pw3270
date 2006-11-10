@@ -55,6 +55,9 @@
  int  AppendToClipboard(int fromRow, int fromCol, int toRow, int toCol);
  int  CopyToClipboard(int fromRow, int fromCol, int toRow, int toCol);
 
+ void CopySelection(void);
+ void AppendSelection(void);
+
  void toogle_crosshair(void);
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);

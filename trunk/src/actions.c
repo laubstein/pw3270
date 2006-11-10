@@ -68,7 +68,9 @@
 
     static const struct WindowActions keyproc[] =
     {
-     	DECLARE_KEYPROC( GDK_c, GDK_ALT_MASK, toogle_crosshair )
+     	DECLARE_KEYPROC( GDK_x, GDK_ALT_MASK, 		toogle_crosshair ),
+
+     	DECLARE_KEYPROC( GDK_c, GDK_CONTROL_MASK, 	CopySelection )
     };
 
     static const struct TerminalActions actions[] =
