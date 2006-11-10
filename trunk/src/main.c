@@ -7,6 +7,8 @@
 
  GtkWidget	*top_window		= 0;
  GtkWidget  *terminal		= 0;
+ GtkWidget  *StatusBar		= 0;
+ GtkWidget	*CursorPosition	= 0;
 
 /*---[ Main program ]---------------------------------------------------------*/
 
@@ -44,6 +46,32 @@
     gtk_main_quit();
  }
 
+ static void CreateMainWindow(const char *cl_hostname)
+ {
+ 	GtkWidget *vbox;
+
+    top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	g_signal_connect(G_OBJECT(top_window),  "delete_event", G_CALLBACK(delete_event), NULL);
+    g_signal_connect (G_OBJECT(top_window), "destroy", G_CALLBACK (destroy), NULL);
+
+    SetWindowTitle(0);
+
+    vbox = gtk_vbox_new(FALSE,0);
+    gtk_container_add(GTK_CONTAINER(top_window),vbox);
+
+    // Create terminal window
+	terminal = g3270_new(cl_hostname);
+	gtk_box_pack_start(GTK_BOX(vbox),terminal,TRUE,TRUE,0);
+
+    // Create status-bar
+    StatusBar = gtk_hbox_new(FALSE,1);
+	gtk_box_pack_end(GTK_BOX(vbox),StatusBar,FALSE,FALSE,0);
+
+    CursorPosition = gtk_label_new("--/---");
+	gtk_box_pack_end(GTK_BOX(StatusBar),CursorPosition,FALSE,FALSE,10);
+
+ }
+
  int main(int argc, char **argv)
  {
     printf(TARGET " (Build " BUILD " for gtk " GTKVERSION ") Starting\n");
@@ -56,24 +84,13 @@
     g_thread_init(NULL);
     gtk_init(&argc, &argv);
 
-    /* Create gtk's stuff  */
-
-    top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	g_signal_connect(G_OBJECT(top_window),  "delete_event", G_CALLBACK(delete_event), NULL);
-    g_signal_connect (G_OBJECT(top_window), "destroy", G_CALLBACK (destroy), NULL);
-
     /* Parse 3270 command line */
     parse_3270_command_line(argc, (const char **) argv, &cl_hostname);
 
     if(!cl_hostname)
        cl_hostname = "3270.df.bb:8023";
 
-    SetWindowTitle(0);
-
-    // Create terminal window
-	terminal = g3270_new(cl_hostname);
-    gtk_container_add(GTK_CONTAINER(top_window),terminal);
-
+    CreateMainWindow(cl_hostname);
 
     DBGMessage("Starting gtk main loop");
 

@@ -33,6 +33,7 @@
  extern const char				*cl_hostname;
  extern GtkWidget				*top_window;
  extern GtkWidget  				*terminal;
+ extern GtkWidget				*CursorPosition;
 
  extern char 					*Clipboard;
  extern int						szClipboard;
