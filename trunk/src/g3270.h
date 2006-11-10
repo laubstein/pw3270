@@ -34,6 +34,7 @@
  extern GtkWidget				*top_window;
  extern GtkWidget  				*terminal;
  extern GtkWidget				*CursorPosition;
+ extern GtkWidget				*LUName;
 
  extern char 					*Clipboard;
  extern int						szClipboard;

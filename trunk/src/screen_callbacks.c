@@ -222,8 +222,11 @@ static void cursor_move(int baddr)
 
     SetCursorPosition(row,col);
 
-    snprintf(buffer,19,"%02d/%03d",row+1,col+1);
-    gtk_label_set_text(GTK_LABEL(CursorPosition),buffer);
+    if(CursorPosition)
+    {
+       snprintf(buffer,19,"%02d/%03d",row+1,col+1);
+       gtk_label_set_text(GTK_LABEL(CursorPosition),buffer);
+    }
 
 }
 
@@ -290,7 +293,10 @@ static void status_lu(const char *lu)
 {
 	DBGPrintf("LU: %s",lu);
     g3270_log("lib3270", "Using LU \"%s\"",lu);
-	SetWindowTitle(lu);
+
+    if(LUName)
+       gtk_label_set_text(GTK_LABEL(LUName),lu ? lu : "--------");
+
 }
 
 static void ring_bell(void)
