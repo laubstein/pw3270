@@ -62,13 +62,25 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
+ static void Page_Up(void)
+ {
+    action_internal(PF_action, IA_DEFAULT, "7", CN);
+ }
+
+ static void Page_Down(void)
+ {
+    action_internal(PF_action, IA_DEFAULT, "8", CN);
+ }
+
  // FIXME (perry#1#): Optimize keyboard processing.
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
 
     static const struct WindowActions keyproc[] =
     {
-     	DECLARE_KEYPROC( GDK_x, GDK_ALT_MASK, 		toogle_crosshair ),
+     	DECLARE_KEYPROC( GDK_x,			GDK_ALT_MASK, 	toogle_crosshair	),
+     	DECLARE_KEYPROC( GDK_Page_Up, 	0, 				Page_Up				),
+     	DECLARE_KEYPROC( GDK_Page_Down,	0, 				Page_Down			),
 
      	DECLARE_KEYPROC( GDK_c, GDK_CONTROL_MASK, 	CopySelection )
     };
