@@ -1,6 +1,7 @@
 
 #include <gdk/gdkkeysyms.h>
 #include "g3270.h"
+#include "lib/kybdc.h"
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -18,7 +19,6 @@ static void screen_changed(int first, int last);
 static void status_ctlr_done(void);
 static void status_insert_mode(Boolean on);
 static void status_minus(void);
-static void status_oerr(int error_type);
 static void status_reset(void);
 static void status_reverse_mode(Boolean on);
 static void status_syswait(void);
@@ -31,6 +31,45 @@ static void screen_flip(void);
 static void screen_width(int width);
 static void error_popup(const char *msg);
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
+
+static void SetStatusCode(int error_type);
+
+/*---[ Error codes ]----------------------------------------------------------*/
+
+ #ifdef DEBUG
+     #define DECLARE_STATUS_MESSAGE(code, msg) { code, #code, msg }
+ #else
+     #define DECLARE_STATUS_MESSAGE(code, msg) { code, msg }
+ #endif
+
+ #define KL_OIA_SYSWAIT	0x8000
+
+ static struct _status
+ {
+ 	unsigned short	code;
+#ifdef DEBUG
+    const char		*dbg;
+#endif
+ 	const char		*msg;
+ } status[] =
+ {
+	DECLARE_STATUS_MESSAGE( KL_OERR_PROTECTED,	"Protegido"			),
+	DECLARE_STATUS_MESSAGE( KL_OERR_NUMERIC,	"Somente numeros"	),
+	DECLARE_STATUS_MESSAGE( KL_OERR_OVERFLOW,	"Overflow"			),
+	DECLARE_STATUS_MESSAGE( KL_OERR_DBCS,		"DBCS"				),
+	DECLARE_STATUS_MESSAGE( KL_NOT_CONNECTED,	"Nao conectado"		),
+	DECLARE_STATUS_MESSAGE( KL_AWAITING_FIRST,	"Awaiting first"	),
+	DECLARE_STATUS_MESSAGE( KL_OIA_TWAIT,		"Wait"				),
+	DECLARE_STATUS_MESSAGE( KL_OIA_LOCKED,		"Locked"			),
+	DECLARE_STATUS_MESSAGE( KL_DEFERRED_UNLOCK,	"Deferred Unlock"	),
+	DECLARE_STATUS_MESSAGE( KL_ENTER_INHIBIT,	"Inhibit"			),
+	DECLARE_STATUS_MESSAGE( KL_SCROLLED,		"Scrolled"			),
+	DECLARE_STATUS_MESSAGE( KL_OIA_MINUS,		"Minus"				),
+
+	DECLARE_STATUS_MESSAGE( KL_OIA_SYSWAIT,		"Syswait"			),
+
+ };
+
 
 /*---[ 3270 Screen callback table ]-------------------------------------------*/
 
@@ -53,7 +92,7 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
 	status_ctlr_done,
 	status_insert_mode,
 	status_minus,
-	status_oerr,
+	SetStatusCode,
 	status_reset,
 	status_reverse_mode,
 	status_syswait,
@@ -238,13 +277,21 @@ static void toggle_monocase(struct toggle *t, enum toggle_type tt)
 static void status_ctlr_done(void)
 {
 	CHKPoint();
-	EnableCursor(TRUE);
+	SetStatusCode(-1);
 }
 
 static void status_insert_mode(Boolean on)
 {
-	DBGPrintf("Insert: %s", on ? "Yes" : "No");
-	SetCursorType(on ? CURSOR_TYPE_INSERT : CURSOR_TYPE_OVER);
+	if(on)
+	{
+       gtk_label_set_text(GTK_LABEL(InsertStatus),"INS");
+	   SetCursorType(CURSOR_TYPE_INSERT);
+	}
+	else
+	{
+       gtk_label_set_text(GTK_LABEL(InsertStatus),"OVR");
+	   SetCursorType(CURSOR_TYPE_OVER);
+	}
 }
 
 static void status_minus(void)
@@ -252,36 +299,31 @@ static void status_minus(void)
 	CHKPoint();
 }
 
-static void status_oerr(int error_type)
-{
-	CHKPoint();
-}
-
 static void status_reset(void)
 {
-//    EnableCursor(TRUE);
 	gtk_widget_queue_draw(terminal);
 }
 
 static void status_reverse_mode(Boolean on)
 {
-	CHKPoint();
+	DBGPrintf("Reverse: %s", on ? "Yes" : "False");
 }
 
 static void status_syswait(void)
 {
-	CHKPoint();
     EnableCursor(FALSE);
+    SetStatusCode(KL_OIA_SYSWAIT);
 }
 
 static void status_twait(void)
 {
+	EnableCursor(TRUE);
 	CHKPoint();
 }
 
 static void status_typeahead(Boolean on)
 {
-	CHKPoint();
+	DBGPrintf("Typeahead: %s", on ? "Yes" : "False");
 }
 
 static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
@@ -291,12 +333,9 @@ static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
 
 static void status_lu(const char *lu)
 {
-	DBGPrintf("LU: %s",lu);
     g3270_log("lib3270", "Using LU \"%s\"",lu);
-
     if(LUName)
        gtk_label_set_text(GTK_LABEL(LUName),lu ? lu : "--------");
-
 }
 
 static void ring_bell(void)
@@ -318,7 +357,7 @@ static void screen_width(int width)
 
 static void error_popup(const char *msg)
 {
-	DBGMessage(msg);
+	Log(msg);
 }
 
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
@@ -328,8 +367,42 @@ static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num
 
 static void screen_changed(int first, int last)
 {
-//	DBGPrintf("Screen changed: %d<->%d",first,last);
    WaitForScreen = FALSE;
    RemoveSelectionBox();
+   SetStatusCode(-1);
+}
+
+static void SetStatusCode(int code)
+{
+	int 		f;
+	const char 	*msg = 0;
+	char		buffer[40];
+
+	if(code < 0)
+	{
+		msg = "";
+	}
+	else
+	{
+	   for(f=0;!msg && f<(sizeof(status)/sizeof(struct _status));f++)
+	   {
+		   if(status[f].code == code)
+		   {
+		   	   msg = status[f].msg;
+			   DBGPrintf("Status: %s",status[f].dbg);
+		   }
+	   }
+	}
+
+	if(!msg)
+	{
+	   msg = buffer;
+	   snprintf(buffer,39,"Status %04d",code);
+	   Log("Unexpected status code %d from 3270 library",code);
+	}
+
+    if(StatusMessage)
+       gtk_label_set_text(GTK_LABEL(StatusMessage),msg);
+
 }
 

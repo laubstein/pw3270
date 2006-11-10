@@ -340,7 +340,9 @@
  	if(fromRow < 0)
  	   return;
     DBGMessage("Copy to clipboard");
-	CopyToClipboard(fromRow,fromCol,toRow,toCol);
+
+	if(!CopyToClipboard(fromRow,fromCol,toRow,toCol) && StatusMessage)
+       gtk_label_set_text(GTK_LABEL(StatusMessage),"Copiado");
 
  }
 
@@ -348,8 +350,13 @@
  {
  	if(fromRow < 0)
  	   return;
+
     DBGMessage("Append to clipboard");
-    AppendToClipboard(fromRow,fromCol,toRow,toCol);
+    DBGTracex(StatusMessage);
+
+    if(AppendToClipboard(fromRow,fromCol,toRow,toCol) == 0 && StatusMessage)
+       gtk_label_set_text(GTK_LABEL(StatusMessage),"Anexado");
+
  }
 
  static int CheckForCopy(void)
