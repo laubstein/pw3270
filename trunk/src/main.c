@@ -10,6 +10,8 @@
  GtkWidget  *StatusBar		= 0;
  GtkWidget	*CursorPosition	= 0;
  GtkWidget	*LUName			= 0;
+ GtkWidget  *StatusMessage  = 0;
+ GtkWidget	*InsertStatus	= 0;
 
 /*---[ Main program ]---------------------------------------------------------*/
 
@@ -22,11 +24,13 @@
  {
  	DBGTracex(widget->window);
 
-    LUName         = gtk_label_new("--------");
-    CursorPosition = gtk_label_new("--/---");
+	gtk_box_pack_start(GTK_BOX(StatusBar),StatusMessage,FALSE,FALSE,5);
 
-	gtk_box_pack_end(GTK_BOX(StatusBar),CursorPosition,FALSE,FALSE,10);
-	gtk_box_pack_end(GTK_BOX(StatusBar),LUName,FALSE,FALSE,10);
+	gtk_box_pack_start(GTK_BOX(StatusBar),gtk_label_new(""),TRUE,TRUE,5);
+
+	gtk_box_pack_end(GTK_BOX(StatusBar),CursorPosition,FALSE,FALSE,5);
+	gtk_box_pack_end(GTK_BOX(StatusBar),LUName,FALSE,FALSE,5);
+	gtk_box_pack_end(GTK_BOX(StatusBar),InsertStatus,FALSE,FALSE,5);
 
     gtk_widget_show_all(StatusBar);
 
@@ -59,6 +63,11 @@
     // Create status-bar
     StatusBar = gtk_hbox_new(FALSE,1);
 	gtk_box_pack_end(GTK_BOX(vbox),StatusBar,FALSE,FALSE,0);
+
+    LUName         = gtk_label_new("--------");
+    CursorPosition = gtk_label_new("--/---");
+    StatusMessage  = gtk_label_new("");
+    InsertStatus   = gtk_label_new("---");
 
  }
 

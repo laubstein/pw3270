@@ -35,6 +35,9 @@
  extern GtkWidget  				*terminal;
  extern GtkWidget				*CursorPosition;
  extern GtkWidget				*LUName;
+ extern GtkWidget  				*StatusMessage;
+ extern GtkWidget				*InsertStatus;
+ extern GtkWidget				*StatusBar;
 
  extern char 					*Clipboard;
  extern int						szClipboard;
