@@ -9,12 +9,28 @@
  #include "lib/lib3270.h"
  #include "log.h"
 
- #define KL_OIA_SYSWAIT		0x8000
- #define KL_OIA_CONNECTING	0x8100
-
  #define RedrawTerminalContents() gtk_widget_queue_draw(terminal)
+ #define RedrawStatusLine() gtk_widget_queue_draw(terminal)
 
 /*---[ Defines ]--------------------------------------------------------------*/
+
+ enum status_codes
+ {
+        STATUS_DISCONNECTED,           /* X Not Connected */
+        STATUS_RESOLVING,              /* X Resolving */
+        STATUS_CONNECTING,             /* X Connecting */
+        STATUS_NONSPECIFIC,            /* X */
+        STATUS_INHIBIT,                /* X Inhibit */
+        STATUS_BLANK,                  /* (blank) */
+        STATUS_TWAIT,                  /* X Wait */
+        STATUS_SYSWAIT,                /* X SYSTEM */
+        STATUS_PROTECTED,              /* X Protected */
+        STATUS_NUMERIC,                /* X Numeric */
+        STATUS_OVERFLOW,               /* X Overflow */
+        STATUS_DBCS,                   /* X DBCS */
+        STATUS_SCROLLED,               /* X Scrolled */
+        STATUS_MINUS                   /* X -f */
+ };
 
  enum cursor_types
  {
@@ -38,6 +54,7 @@
 	STATUS_COLOR_TIME,
 	STATUS_COLOR_WARNING,
 	STATUS_COLOR_NORMAL,
+	STATUS_COLOR_TOOGLE,
 
 	STATUS_COLORS	// Must be the last one
  };
@@ -67,6 +84,9 @@
  extern char					oia_cursor[];
  extern char					oia_LUName[];
 
+ #define OIA_TIMER_COUNT	7
+ extern char					oia_Timer[OIA_TIMER_COUNT+1];
+
  extern const char				*cl_hostname;
  extern GtkWidget				*top_window;
  extern GtkWidget  				*terminal;
@@ -84,6 +104,8 @@
  extern GdkColor				*terminal_cmap;
  extern int						terminal_color_count;
 
+ extern int						cursor_type;
+
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
  int  gsource_init(void);
@@ -96,8 +118,9 @@
  void SetCursorType(int type);
  void ToogleCursor(void);
  void EnableCursor(gboolean mode);
- void SetStatusCode(int code);
+ void SetOIAStatus(int code);
  void InvalidateCursor(void);
+ void status_untiming(void);
 
  void DrawTerminal(GdkDrawable *, GdkGC *, const FONTELEMENT *, int, int, int);
 
@@ -113,6 +136,8 @@
  void action_remove_selection(GtkWidget *w, gpointer data);
  void action_disconnect(GtkWidget *w, gpointer data);
  void action_exit(GtkWidget *w, gpointer data);
+
+ #define NotImplemented() Log("Function %s in %s needs implementation",__FUNCTION__,__FILE__)
 
 /*---[ Terminal window ]------------------------------------------------------*/
 

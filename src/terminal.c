@@ -36,7 +36,7 @@
   static const char *FieldColors     = "green1,red,blue,white";
   static const char *CursorColors	 = "white,white,DarkSlateGray,DarkSlateGray";
   static const char *SelectionColors = "#000020,yellow";
-  static const char *StatusColors	 = "black,ForestGreen,LimeGreen,LimeGreen,red,white,yellow,green";
+  static const char *StatusColors	 = "black,ForestGreen,LimeGreen,LimeGreen,red,white,yellow,green,LimeGreen";
 
   static const char *FontDescr[] =
   {
@@ -95,7 +95,8 @@
  static int			cursor_row								= 0;
  static int			cursor_col								= 0;
  static gboolean	cross_hair								= FALSE;
- static int			cursor_type								= CURSOR_TYPE_OVER;
+
+ int				cursor_type								= CURSOR_TYPE_OVER;
 
 /*---[ Terminal colors ]------------------------------------------------------*/
 
@@ -108,24 +109,36 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
- static void stsConnect(Boolean status)
+ static void stsConnect(Boolean connected)
  {
-    g3270_log("lib3270", "%s", status ? "Connected" : "Disconnected");
-    if(!status)
+    g3270_log("lib3270", "%s", connected ? "Connected" : "Disconnected");
+
+    if(connected)
     {
-	   SetStatusCode(KL_NOT_CONNECTED);
-       SetWindowTitle(0);
+	   if (GetKeyboardStatus() & KL_AWAITING_FIRST)
+	      SetOIAStatus(STATUS_NONSPECIFIC);
+       else
+	      SetOIAStatus(STATUS_BLANK);
+	   status_untiming();
     }
     else
     {
-	   SetStatusCode(-1);
+	   SetOIAStatus(STATUS_DISCONNECTED);
+       SetWindowTitle(0);
     }
+ }
+
+ static void stsResolving(Boolean ignored)
+ {
+ 	DBGPrintf("Resolving: %s", ignored ? "Yes" : "No");
+    SetOIAStatus(STATUS_CONNECTING);
+    status_untiming();
  }
 
  static void stsHalfConnect(Boolean ignored)
  {
  	DBGPrintf("HalfConnect: %s", ignored ? "Yes" : "No");
-	SetStatusCode(KL_OIA_CONNECTING);
+    status_untiming();
  }
 
  static void stsExiting(Boolean ignored)
@@ -133,10 +146,6 @@
  	DBGPrintf("Exiting: %s", ignored ? "Yes" : "No");
  }
 
- static void stsResolving(Boolean ignored)
- {
- 	DBGPrintf("Resolving: %s", ignored ? "Yes" : "No");
- }
 
  static gboolean Mouse2Terminal(long x, long y, long *cRow, long *cCol)
  {

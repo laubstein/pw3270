@@ -3,6 +3,12 @@
 #include "g3270.h"
 #include "lib/kybdc.h"
 
+/*---[ Defines ]--------------------------------------------------------------*/
+
+#define TCNT    7
+#define LUCNT   8
+#define CM     (60 * 10)
+
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
 static void screen_init(void);
@@ -26,16 +32,20 @@ static void status_twait(void);
 static void status_typeahead(Boolean on);
 static void status_compose(Boolean on, unsigned char c, enum keytype keytype);
 static void status_lu(const char *lu);
+static void status_oerr(int error_type);
 static void ring_bell(void);
 static void screen_flip(void);
 static void screen_width(int width);
 static void error_popup(const char *msg);
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
+static void status_timing(struct timeval *t0, struct timeval *t1);
 
 /*---[ Globas ]---------------------------------------------------------------*/
 
- char oia_cursor[8]  = "";
- char oia_LUName[12] = "          ";
+ char oia_cursor[8]					= "";
+ char oia_LUName[12]				= "          ";
+ char oia_Timet[TCNT+1]				= "";
+ char oia_Timer[OIA_TIMER_COUNT+1]	= "";
 
 /*---[ 3270 Screen callback table ]-------------------------------------------*/
 
@@ -58,7 +68,7 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
 	status_ctlr_done,
 	status_insert_mode,
 	status_minus,
-	SetStatusCode,
+	status_oerr,
 	status_reset,
 	status_reverse_mode,
 	status_syswait,
@@ -73,7 +83,11 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
 
 	error_popup,
 
-	Redraw_action
+	Redraw_action,
+
+	status_timing,
+	status_untiming
+
 };
 
 /*---[ Keyboard tables ]------------------------------------------------------*/
@@ -234,6 +248,7 @@ static void toggle_monocase(struct toggle *t, enum toggle_type tt)
 	CHKPoint();
 }
 
+/* Done with controller confirmation */
 static void status_ctlr_done(void)
 {
 #ifdef DEBUG
@@ -249,60 +264,60 @@ static void status_insert_mode(Boolean on)
 	   SetCursorType(CURSOR_TYPE_OVER);
 }
 
+/* Lock the keyboard (X -f) */
 static void status_minus(void)
 {
-	CHKPoint();
+	SetOIAStatus(STATUS_MINUS);
 }
 
+/* Unlock the keyboard */
 static void status_reset(void)
 {
-#ifdef DEBUG
-			   Log("Status:\t%s",__FUNCTION__);
-#endif
-	gtk_widget_queue_draw(terminal);
+   if (GetKeyboardStatus() & KL_ENTER_INHIBIT)
+      SetOIAStatus(STATUS_INHIBIT);
+   else if (GetKeyboardStatus() & KL_DEFERRED_UNLOCK)
+      SetOIAStatus(STATUS_NONSPECIFIC);
+   else
+      SetOIAStatus(STATUS_BLANK);
 }
 
+/* Toggle reverse mode */
 static void status_reverse_mode(Boolean on)
 {
-#ifdef DEBUG
-			   Log("Status:\t%s",__FUNCTION__);
-#endif
+	NotImplemented();
 }
 
+/* Lock the keyboard (X SYSTEM) */
 static void status_syswait(void)
 {
-    EnableCursor(FALSE);
-    SetStatusCode(KL_OIA_SYSWAIT);
+	SetOIAStatus(STATUS_SYSWAIT);
 }
 
+/* Lock the keyboard (twait) */
 static void status_twait(void)
 {
-	EnableCursor(TRUE);
-	SetStatusCode(KL_OIA_TWAIT);
+    SetOIAStatus(STATUS_TWAIT);
 }
 
+/* Toggle typeahead */
 static void status_typeahead(Boolean on)
 {
-#ifdef DEBUG
-			   Log("Status:\t%s",__FUNCTION__);
-#endif
+	NotImplemented();
 }
 
+/* Set compose character */
 static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
 {
-#ifdef DEBUG
-			   Log("Status:\t%s",__FUNCTION__);
-#endif
+	NotImplemented();
 }
 
+/* Set LU name */
 static void status_lu(const char *lu)
 {
 	if(!lu)
 	   lu = "";
-
     g3270_log("lib3270", "Using LU \"%s\"",lu);
     snprintf(oia_LUName,11,"%-10s",lu);
-
 }
 
 static void ring_bell(void)
@@ -336,5 +351,58 @@ static void screen_changed(int first, int last)
 {
    WaitForScreen = FALSE;
    action_remove_selection(0,0);
+}
+
+static void status_oerr(int error_type)
+{
+   switch(error_type)
+   {
+   case KL_OERR_PROTECTED:
+      SetOIAStatus(STATUS_PROTECTED);
+      break;
+
+   case KL_OERR_NUMERIC:
+      SetOIAStatus(STATUS_NUMERIC);
+      break;
+
+   case KL_OERR_OVERFLOW:
+      SetOIAStatus(STATUS_OVERFLOW);
+      break;
+
+   case KL_OERR_DBCS:
+      SetOIAStatus(STATUS_DBCS);
+      break;
+
+   }
+
+}
+
+static void status_timing(struct timeval *t0, struct timeval *t1)
+{
+   unsigned long cs;       // centiseconds
+
+   if (t1->tv_sec - t0->tv_sec > (99*60))
+   {
+      strncpy(oia_Timer,":??.?",OIA_TIMER_COUNT);
+   }
+   else
+   {
+      cs = (t1->tv_sec - t0->tv_sec) * 10 +
+           (t1->tv_usec - t0->tv_usec + 50000) / 100000;
+
+      if (cs < CM)
+         snprintf(oia_Timer, OIA_TIMER_COUNT, ":%02ld.%ld", cs / 10, cs % 10);
+      else
+         snprintf(oia_Timer, OIA_TIMER_COUNT, "%02ld:%02ld", cs / CM, (cs % CM) / 10);
+   }
+
+   RedrawStatusLine();
+
+}
+
+void status_untiming(void)
+{
+   *oia_Timer = 0;
+   RedrawStatusLine();
 }
 

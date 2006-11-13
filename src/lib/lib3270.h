@@ -61,6 +61,9 @@ typedef struct _screen_callback
 
     void (*Redraw_action)(Widget w, XEvent *event, String *params, Cardinal *num_params);
 
+	void (*status_timing)(struct timeval *t0, struct timeval *t1);
+	void (*status_untiming)(void);
+
 } SCREEN_CALLBACK;
 
 typedef struct _keytable
