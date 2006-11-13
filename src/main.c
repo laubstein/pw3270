@@ -3,10 +3,37 @@
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
+
+/*---[ Main menu ]------------------------------------------------------------*/
+
+ // TODO (perry#1#): Load it from configuration file.
+ static GtkItemFactoryEntry menu_items[] =
+ {
+ 	{ "/_Arquivo",					NULL,			NULL,	0,	"<Branch>"		},
+ 	{ "/Arquivo/_Imprimir Tela",	"<control>I",	NULL,	0,	NULL			},
+ 	{ "/Arquivo/Sair",          	"<control>X",	NULL,	0,	NULL			},
+
+ 	{ "/_Editar",					NULL,			NULL,	0,	"<Branch>"		},
+ 	{ "/Editar/Copiar",				NULL,			NULL,	0,	NULL			},
+ 	{ "/Editar/Copiar anexando",	NULL,			NULL,	0,	NULL			},
+ 	{ "/Editar/Colar",				NULL,			NULL,	0,	NULL			},
+	{ "/Editar/sep1",     			NULL,         	NULL,	0,	"<Separator>"	},
+	{ "/Editar/Limpar campos",		NULL,			NULL,	0,	NULL			},
+	{ "/Editar/sep2",     			NULL,         	NULL,	0,	"<Separator>"	},
+	{ "/Editar/Selecionar tudo",	NULL,			NULL,	0,	NULL			},
+	{ "/Editar/Desmarcar",			NULL,			NULL,	0,	NULL			},
+
+ 	{ "/_Comunicação",				NULL,			NULL,	0,	"<Branch>"		},
+ 	{ "/Comunicação/Conectar",		NULL,			NULL,	0,	NULL			},
+ 	{ "/Comunicação/Desconectar",	NULL,			NULL,	0,	NULL			},
+
+ };
+
 /*---[ Globals ]--------------------------------------------------------------*/
 
  GtkWidget	*top_window		= 0;
  GtkWidget  *terminal		= 0;
+ GtkWidget  *top_menu		= 0;
 
 /*---[ Main program ]---------------------------------------------------------*/
 
@@ -27,6 +54,37 @@
     gtk_main_quit();
  }
 
+ static GtkWidget *CreateMainMenu(GtkWidget  *window)
+ {
+   // http://www.gtk.org/tutorial1.2/gtk_tut-13.html
+   GtkItemFactory	*item_factory;
+   GtkAccelGroup	*accel_group;
+   gint 			nmenu_items		= sizeof (menu_items) / sizeof (menu_items[0]);
+
+   accel_group = gtk_accel_group_new();
+
+   /* This function initializes the item factory.
+      Param 1: The type of menu - can be GTK_TYPE_MENU_BAR, GTK_TYPE_MENU,
+               or GTK_TYPE_OPTION_MENU.
+      Param 2: The path of the menu.
+      Param 3: A pointer to a gtk_accel_group.  The item factory sets up
+               the accelerator table while generating menus.
+   */
+
+   item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", accel_group);
+
+   /* This function generates the menu items. Pass the item factory,
+      the number of items in the array, the array itself, and any
+      callback data for the the menu items. */
+   gtk_item_factory_create_items(item_factory, nmenu_items, menu_items, NULL);
+
+   /* Attach the new accelerator group to the window. */
+   gtk_window_add_accel_group(GTK_WINDOW (window), accel_group);
+
+   /* Finally, return the actual menu bar created by the item factory. */
+   return gtk_item_factory_get_widget(item_factory, "<main>");
+ }
+
  static void CreateMainWindow(const char *cl_hostname)
  {
  	GtkWidget *vbox;
@@ -42,6 +100,9 @@
     vbox = gtk_vbox_new(FALSE,0);
     gtk_container_add(GTK_CONTAINER(top_window),vbox);
 
+    top_menu = CreateMainMenu(top_window);
+    gtk_box_pack_start(GTK_BOX(vbox), top_menu, FALSE, TRUE, 0);
+
     // Create terminal window
 	terminal = g3270_new(cl_hostname);
 	gtk_box_pack_start(GTK_BOX(vbox),terminal,TRUE,TRUE,0);
@@ -51,6 +112,10 @@
 #else
     gtk_window_set_role(GTK_WINDOW(top_window), TARGET "_topwindow");
 #endif
+
+    gtk_widget_show(top_menu);
+    gtk_widget_show(terminal);
+    gtk_widget_show(vbox);
 
  }
 
@@ -76,7 +141,7 @@
 
     DBGMessage("Starting gtk main loop");
 
-    gtk_widget_show_all(top_window);
+    gtk_widget_show(top_window);
     gtk_main();
 
     return 0;
