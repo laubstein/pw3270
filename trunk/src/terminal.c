@@ -328,6 +328,7 @@
 
  static gboolean button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
+
  	switch(event->type)
  	{
 	case GDK_BUTTON_PRESS:

@@ -106,6 +106,7 @@
 
  extern int						cursor_type;
 
+
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
  int  gsource_init(void);
@@ -135,6 +136,7 @@
  void action_append( GtkWidget *w, gpointer data);
  void action_remove_selection(GtkWidget *w, gpointer data);
  void action_disconnect(GtkWidget *w, gpointer data);
+ void action_connect(GtkWidget *w, gpointer data);
  void action_exit(GtkWidget *w, gpointer data);
 
  #define NotImplemented() Log("Function %s in %s needs implementation",__FUNCTION__,__FILE__)
