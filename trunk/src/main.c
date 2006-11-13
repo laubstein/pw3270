@@ -143,7 +143,7 @@
     parse_3270_command_line(argc, (const char **) argv, &cl_hostname);
 
     if(!cl_hostname)
-       cl_hostname = "3270.df.bb:9023";
+       cl_hostname = "172.17.78.220:8023";
 
     CreateMainWindow(cl_hostname);
 

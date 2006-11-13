@@ -70,13 +70,13 @@
 
 /* Statics */
 static enum	{ NONE, COMPOSE, FIRST } composing = NONE;
-static unsigned char pf_xlate[] = { 
+static unsigned char pf_xlate[] = {
 	AID_PF1,  AID_PF2,  AID_PF3,  AID_PF4,  AID_PF5,  AID_PF6,
 	AID_PF7,  AID_PF8,  AID_PF9,  AID_PF10, AID_PF11, AID_PF12,
 	AID_PF13, AID_PF14, AID_PF15, AID_PF16, AID_PF17, AID_PF18,
 	AID_PF19, AID_PF20, AID_PF21, AID_PF22, AID_PF23, AID_PF24
 };
-static unsigned char pa_xlate[] = { 
+static unsigned char pa_xlate[] = {
 	AID_PA1, AID_PA2, AID_PA3
 };
 #define PF_SZ	(sizeof(pf_xlate)/sizeof(pf_xlate[0]))
@@ -2192,7 +2192,7 @@ lightpen_select(int baddr)
 			}
 			return;
 		}
-	} 
+	}
 #endif /*]*/
 
 	switch (ea_buf[designator].cc) {
@@ -3164,13 +3164,13 @@ emulate_input(char *s, int len, Boolean pasting)
 				key_ACharacter((unsigned char) c, KT_STD, ia);
 				state = BASE;
 				break;
-			    case '0': 
-			    case '1': 
-			    case '2': 
+			    case '0':
+			    case '1':
+			    case '2':
 			    case '3':
-			    case '4': 
-			    case '5': 
-			    case '6': 
+			    case '4':
+			    case '5':
+			    case '6':
 			    case '7':
 				state = OCTAL;
 				literal = 0;
@@ -3423,7 +3423,7 @@ hex_input(char *s)
 	}
 #endif /*]*/
 }
- 
+
 void
 ignore_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -4009,5 +4009,10 @@ TemporaryKeymap_action(Widget w unused, XEvent *event, String *params, Cardinal 
 		cancel_if_idle_command();
 	}
 }
-
 #endif /*]*/
+
+
+unsigned int GetKeyboardStatus(void)
+{
+	return kybdlock;
+}

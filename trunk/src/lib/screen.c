@@ -219,3 +219,15 @@ void screen_80(void)
        screen_callbacks_3270->screen_width(80);
 }
 
+extern void status_timing(struct timeval *t0, struct timeval *t1)
+{
+   if(screen_callbacks_3270 && screen_callbacks_3270->status_timing)
+      screen_callbacks_3270->status_timing(t0,t1);
+}
+
+extern void status_untiming(void)
+{
+   if(screen_callbacks_3270 && screen_callbacks_3270->status_untiming)
+      screen_callbacks_3270->status_untiming();
+}
+
