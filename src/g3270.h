@@ -9,7 +9,8 @@
  #include "lib/lib3270.h"
  #include "log.h"
 
- #define KL_OIA_SYSWAIT	0x8000
+ #define KL_OIA_SYSWAIT		0x8000
+ #define KL_OIA_CONNECTING	0x8100
 
 /*---[ Defines ]--------------------------------------------------------------*/
 

@@ -127,6 +127,9 @@
 	DECLARE_STATUS_MESSAGE( KL_SCROLLED,		STATUS_COLOR_WARNING,	"Scrolled"			),
 	DECLARE_STATUS_MESSAGE( KL_OIA_MINUS,		STATUS_COLOR_WARNING,	"Minus"				),
 	DECLARE_STATUS_MESSAGE( KL_OIA_SYSWAIT,		STATUS_COLOR_TIME,		""					),
+	DECLARE_STATUS_MESSAGE( KL_OIA_CONNECTING,	STATUS_COLOR_TIME,		"Conectando"		),
+
+
 
  };
 
@@ -185,12 +188,20 @@
  {
     g3270_log("lib3270", "%s", status ? "Connected" : "Disconnected");
     if(!status)
+    {
+	   SetStatusCode(KL_NOT_CONNECTED);
        SetWindowTitle(0);
+    }
+    else
+    {
+	   SetStatusCode(-1);
+    }
  }
 
  static void stsHalfConnect(Boolean ignored)
  {
  	DBGPrintf("HalfConnect: %s", ignored ? "Yes" : "No");
+	SetStatusCode(KL_OIA_CONNECTING);
  }
 
  static void stsExiting(Boolean ignored)
@@ -370,7 +381,7 @@
        gdk_draw_text(	widget->window,
 						font->fn,
 						gc,
-						font->Width*5,
+						left_margin+(font->Width*2),
 						vPos,
 						current_status->msg,
 						strlen(current_status->msg));
@@ -381,7 +392,7 @@
 	      gdk_draw_text(	widget->window,
 							font->fn,
 							gc,
-							font->Width*5,
+							left_margin+(font->Width*2),
 							vPos,
 							current_status->dbg,
 							strlen(current_status->dbg));
