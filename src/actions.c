@@ -60,6 +60,8 @@
 	const char 		*parm2;
  };
 
+/*---[ Statics ]--------------------------------------------------------------*/
+
 /*---[ Implement ]------------------------------------------------------------*/
 
  static void Page_Up(void)
@@ -117,6 +119,8 @@
     String			params[2];
     Cardinal 		one			= 1;
     int				f;
+
+    DBGTracex(event->state);
 
     for(f=0; f < (sizeof(actions)/sizeof(struct TerminalActions));f++)
     {
@@ -192,9 +196,15 @@
 
  }
 
+ void action_connect(GtkWidget *w, gpointer data)
+ {
+    host_connect(cl_hostname);
+ }
+
  void action_disconnect(GtkWidget *w, gpointer data)
  {
  	Log("Disconnecting");
+	host_disconnect(False);
  }
 
  void action_exit(GtkWidget *w, gpointer data)

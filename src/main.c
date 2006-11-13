@@ -17,6 +17,7 @@
  {
  	{ "/_Arquivo",					NULL,					NULL,						0,	"<Branch>"		},
  	{ "/Arquivo/_Imprimir Tela",	"<control>I",			NULL,						0,	NULL			},
+ 	{ "/Arquivo/_Imprimir Seleção",	"<control><shift>I",	NULL,						0,	NULL			},
  	{ "/Arquivo/Sair",          	"<control>X",			action_exit,				0,	NULL			},
 
  	{ "/_Editar",					NULL,					NULL,						0,	"<Branch>"		},
@@ -32,7 +33,7 @@
  	{ "/_Opções",					NULL,					NULL,						0,	"<Branch>"		},
  	{ "/Opções/Cross Hair",			"<ALT>x",				action_crosshair,			0,	NULL			},
 
- 	{ "/Comunicação/Conectar",		NULL,					NULL,						0,	NULL			},
+ 	{ "/Comunicação/Conectar",		NULL,					action_connect,				0,	NULL			},
  	{ "/Comunicação/Desconectar",	NULL,					action_disconnect,			0,	NULL			},
 
  };
