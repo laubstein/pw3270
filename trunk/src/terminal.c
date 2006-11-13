@@ -100,8 +100,10 @@
 
  #ifdef DEBUG
      #define DECLARE_STATUS_MESSAGE(code, color, msg) { code, #code, color, msg }
+     #define NO_STATUS_MESSAGE ""
  #else
      #define DECLARE_STATUS_MESSAGE(code, color, msg) { code, color, msg }
+     #define NO_STATUS_MESSAGE 0
  #endif
 
  static struct _status
@@ -120,13 +122,13 @@
 	DECLARE_STATUS_MESSAGE( KL_OERR_DBCS,		STATUS_COLOR_WARNING,	"DBCS"				),
 	DECLARE_STATUS_MESSAGE( KL_NOT_CONNECTED,	STATUS_COLOR_ERROR,		"Nao conectado"		),
 	DECLARE_STATUS_MESSAGE( KL_AWAITING_FIRST,	STATUS_COLOR_WARNING,	"Awaiting first"	),
-	DECLARE_STATUS_MESSAGE( KL_OIA_TWAIT,		STATUS_COLOR_NORMAL,	""					),
+	DECLARE_STATUS_MESSAGE( KL_OIA_TWAIT,		STATUS_COLOR_NORMAL,	NO_STATUS_MESSAGE	),
 	DECLARE_STATUS_MESSAGE( KL_OIA_LOCKED,		STATUS_COLOR_ERROR,		"Locked"			),
 	DECLARE_STATUS_MESSAGE( KL_DEFERRED_UNLOCK,	STATUS_COLOR_WARNING,	"Deferred Unlock"	),
 	DECLARE_STATUS_MESSAGE( KL_ENTER_INHIBIT,	STATUS_COLOR_WARNING,	"Inhibit"			),
 	DECLARE_STATUS_MESSAGE( KL_SCROLLED,		STATUS_COLOR_WARNING,	"Scrolled"			),
 	DECLARE_STATUS_MESSAGE( KL_OIA_MINUS,		STATUS_COLOR_WARNING,	"Minus"				),
-	DECLARE_STATUS_MESSAGE( KL_OIA_SYSWAIT,		STATUS_COLOR_TIME,		""					),
+	DECLARE_STATUS_MESSAGE( KL_OIA_SYSWAIT,		STATUS_COLOR_TIME,		NO_STATUS_MESSAGE	),
 	DECLARE_STATUS_MESSAGE( KL_OIA_CONNECTING,	STATUS_COLOR_TIME,		"Conectando"		),
 
 
@@ -237,6 +239,7 @@
     int				mode		= 0;
     int				ps;
 
+CHKPoint();
  	trm = Get3270DeviceBuffer(&rows, &cols);
 
     if(!trm)
@@ -246,7 +249,7 @@
     vPos = (top_margin + font->Height + event->area.x);
 
 	/* Draw selection box */
-    if(fromRow >= 0)
+    if(fromRow >= 0 && toRow > 0)
     {
        /* Draw selection box */
        x[0] = (min(fromCol,toCol) * font->Width) + left_margin;
@@ -375,7 +378,7 @@
     gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,oia_LUName,strlen(oia_LUName));
 
     /* Terminal Status */
-    if(current_status)
+    if(current_status && current_status->msg)
     {
        gdk_gc_set_foreground(gc,status_cmap+current_status->color);
        gdk_draw_text(	widget->window,
@@ -902,7 +905,9 @@
  {
  	CheckForCopy();
 
+    toRow	  =
     fromRow   = -1;
+
     MouseMode = MOUSE_MODE_NORMAL;
 	gtk_widget_queue_draw(terminal);
  }
