@@ -41,7 +41,6 @@
 
   static const int widget_states[] = { GTK_STATE_NORMAL, GTK_STATE_ACTIVE, GTK_STATE_PRELIGHT, GTK_STATE_SELECTED, GTK_STATE_INSENSITIVE };
 
-
 /*---[ Terminal config ]------------------------------------------------------*/
   // TODO (perry#2#): Read from file(s).
 
@@ -63,10 +62,14 @@
   	    STATUS_COLOR_SEPARATOR,
 		STATUS_COLOR_CURSOR_POSITION,
 		STATUS_COLOR_LUNAME,
+		STATUS_COLOR_ERROR,
+		STATUS_COLOR_TIME,
+		STATUS_COLOR_WARNING,
+		STATUS_COLOR_NORMAL,
 
 		STATUS_COLORS	// Must be the last one
   };
-  static const char *StatusColors	 = "black,ForestGreen,LimeGreen,LimeGreen";
+  static const char *StatusColors	 = "black,ForestGreen,LimeGreen,LimeGreen,red,white,yellow,green";
 
   static const char *FontDescr[] =
   {
@@ -92,6 +95,42 @@
   };
 
   #define FONT_COUNT (sizeof(FontDescr)/sizeof(const char *))
+
+/*---[ Status codes ]---------------------------------------------------------*/
+
+ #ifdef DEBUG
+     #define DECLARE_STATUS_MESSAGE(code, color, msg) { code, #code, color, msg }
+ #else
+     #define DECLARE_STATUS_MESSAGE(code, color, msg) { code, color, msg }
+ #endif
+
+ static struct _status
+ {
+ 	unsigned short	code;
+#ifdef DEBUG
+    const char		*dbg;
+#endif
+	unsigned short	color;
+ 	const char		*msg;
+ } status[] =
+ {
+	DECLARE_STATUS_MESSAGE( KL_OERR_PROTECTED,	STATUS_COLOR_ERROR,		"Protegido"			),
+	DECLARE_STATUS_MESSAGE( KL_OERR_NUMERIC,	STATUS_COLOR_ERROR,		"Somente numeros"	),
+	DECLARE_STATUS_MESSAGE( KL_OERR_OVERFLOW,	STATUS_COLOR_ERROR,		"Overflow"			),
+	DECLARE_STATUS_MESSAGE( KL_OERR_DBCS,		STATUS_COLOR_WARNING,	"DBCS"				),
+	DECLARE_STATUS_MESSAGE( KL_NOT_CONNECTED,	STATUS_COLOR_ERROR,		"Nao conectado"		),
+	DECLARE_STATUS_MESSAGE( KL_AWAITING_FIRST,	STATUS_COLOR_WARNING,	"Awaiting first"	),
+	DECLARE_STATUS_MESSAGE( KL_OIA_TWAIT,		STATUS_COLOR_NORMAL,	""					),
+	DECLARE_STATUS_MESSAGE( KL_OIA_LOCKED,		STATUS_COLOR_ERROR,		"Locked"			),
+	DECLARE_STATUS_MESSAGE( KL_DEFERRED_UNLOCK,	STATUS_COLOR_WARNING,	"Deferred Unlock"	),
+	DECLARE_STATUS_MESSAGE( KL_ENTER_INHIBIT,	STATUS_COLOR_WARNING,	"Inhibit"			),
+	DECLARE_STATUS_MESSAGE( KL_SCROLLED,		STATUS_COLOR_WARNING,	"Scrolled"			),
+	DECLARE_STATUS_MESSAGE( KL_OIA_MINUS,		STATUS_COLOR_WARNING,	"Minus"				),
+	DECLARE_STATUS_MESSAGE( KL_OIA_SYSWAIT,		STATUS_COLOR_TIME,		""					),
+
+ };
+
+ static struct _status *current_status = 0;
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
@@ -319,13 +358,36 @@
     gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_CURSOR_POSITION);
     gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,oia_cursor,strlen(oia_cursor));
 
-
     /* LU Name */
     hPos -= (font->Width * (strlen(oia_LUName)+1));
     gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_LUNAME);
     gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,oia_LUName,strlen(oia_LUName));
 
+    /* Terminal Status */
+    if(current_status)
+    {
+       gdk_gc_set_foreground(gc,status_cmap+current_status->color);
+       gdk_draw_text(	widget->window,
+						font->fn,
+						gc,
+						font->Width*5,
+						vPos,
+						current_status->msg,
+						strlen(current_status->msg));
 
+#ifdef DEBUG
+	   if(!*current_status->msg)
+	   {
+	      gdk_draw_text(	widget->window,
+							font->fn,
+							gc,
+							font->Width*5,
+							vPos,
+							current_status->dbg,
+							strlen(current_status->dbg));
+	   }
+#endif
+    }
 
     /* Draw cursor */
     if(cursor_enabled)
@@ -383,8 +445,7 @@
  	   return;
     DBGMessage("Copy to clipboard");
 
-	if(!CopyToClipboard(fromRow,fromCol,toRow,toCol))
-       SetStatusMessage("Copiado");
+	CopyToClipboard(fromRow,fromCol,toRow,toCol);
 
  }
 
@@ -395,8 +456,7 @@
 
     DBGMessage("Append to clipboard");
 
-    if(AppendToClipboard(fromRow,fromCol,toRow,toCol) == 0)
-       SetStatusMessage("Anexado");
+    AppendToClipboard(fromRow,fromCol,toRow,toCol);
 
  }
 
@@ -834,5 +894,33 @@
     fromRow   = -1;
     MouseMode = MOUSE_MODE_NORMAL;
 	gtk_widget_queue_draw(terminal);
+ }
+
+ void SetStatusCode(int code)
+ {
+    int 			f;
+    struct _status	*sts	= 0;
+
+	if(code < 0)
+	{
+		current_status = 0;
+  	    DBGMessage("Status:\tNONE");
+	}
+	else
+	{
+	   for(f=0;!sts && f<(sizeof(status)/sizeof(struct _status));f++)
+	   {
+		   if(status[f].code == code)
+		   {
+		   	   current_status = sts = (status+f);
+			   DBGPrintf("Status:\t%s",current_status->dbg);
+		   }
+	   }
+	   if(!sts)
+	      Log("Unexpected status code %d from 3270 library",code);
+	}
+
+	gtk_widget_queue_draw(terminal);
+
  }
 

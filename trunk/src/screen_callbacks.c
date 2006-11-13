@@ -32,44 +32,6 @@ static void screen_width(int width);
 static void error_popup(const char *msg);
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
 
-static void SetStatusCode(int error_type);
-
-/*---[ Status codes ]---------------------------------------------------------*/
-
- #ifdef DEBUG
-     #define DECLARE_STATUS_MESSAGE(code, msg) { code, #code, msg }
- #else
-     #define DECLARE_STATUS_MESSAGE(code, msg) { code, msg }
- #endif
-
- #define KL_OIA_SYSWAIT	0x8000
-
- static struct _status
- {
- 	unsigned short	code;
-#ifdef DEBUG
-    const char		*dbg;
-#endif
- 	const char		*msg;
- } status[] =
- {
-	DECLARE_STATUS_MESSAGE( KL_OERR_PROTECTED,	"Mova o cursor para uma posição desprotegida e tente novamente"			),
-	DECLARE_STATUS_MESSAGE( KL_OERR_NUMERIC,	"Somente numeros"	),
-	DECLARE_STATUS_MESSAGE( KL_OERR_OVERFLOW,	"Overflow"			),
-	DECLARE_STATUS_MESSAGE( KL_OERR_DBCS,		"DBCS"				),
-	DECLARE_STATUS_MESSAGE( KL_NOT_CONNECTED,	"Nao conectado"		),
-	DECLARE_STATUS_MESSAGE( KL_AWAITING_FIRST,	"Awaiting first"	),
-	DECLARE_STATUS_MESSAGE( KL_OIA_TWAIT,		"Wait"				),
-	DECLARE_STATUS_MESSAGE( KL_OIA_LOCKED,		"Locked"			),
-	DECLARE_STATUS_MESSAGE( KL_DEFERRED_UNLOCK,	"Deferred Unlock"	),
-	DECLARE_STATUS_MESSAGE( KL_ENTER_INHIBIT,	"Inhibit"			),
-	DECLARE_STATUS_MESSAGE( KL_SCROLLED,		"Scrolled"			),
-	DECLARE_STATUS_MESSAGE( KL_OIA_MINUS,		"Minus"				),
-
-	DECLARE_STATUS_MESSAGE( KL_OIA_SYSWAIT,		"Syswait"			),
-
- };
-
 /*---[ Globas ]---------------------------------------------------------------*/
 
  char oia_cursor[8]  = "";
@@ -275,7 +237,6 @@ static void toggle_monocase(struct toggle *t, enum toggle_type tt)
 static void status_ctlr_done(void)
 {
 	CHKPoint();
-	SetStatusCode(-1);
 }
 
 static void status_insert_mode(Boolean on)
@@ -310,7 +271,7 @@ static void status_syswait(void)
 static void status_twait(void)
 {
 	EnableCursor(TRUE);
-	CHKPoint();
+	SetStatusCode(KL_OIA_TWAIT);
 }
 
 static void status_typeahead(Boolean on)
@@ -364,39 +325,5 @@ static void screen_changed(int first, int last)
 {
    WaitForScreen = FALSE;
    RemoveSelectionBox();
-   SetStatusCode(-1);
-}
-
-static void SetStatusCode(int code)
-{
-	int 		f;
-	const char 	*msg = 0;
-	char		buffer[40];
-
-	if(code < 0)
-	{
-		msg = "";
-	}
-	else
-	{
-	   for(f=0;!msg && f<(sizeof(status)/sizeof(struct _status));f++)
-	   {
-		   if(status[f].code == code)
-		   {
-		   	   msg = status[f].msg;
-			   DBGPrintf("Status: %s",status[f].dbg);
-		   }
-	   }
-	}
-
-	if(!msg)
-	{
-	   msg = buffer;
-	   snprintf(buffer,39,"Status %04d",code);
-	   Log("Unexpected status code %d from 3270 library",code);
-	}
-
-    SetStatusMessage(msg);
-
 }
 
