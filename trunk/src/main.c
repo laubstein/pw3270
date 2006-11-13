@@ -32,6 +32,7 @@
  	GtkWidget *vbox;
 
     top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
 	g_signal_connect(G_OBJECT(top_window),	"delete_event", G_CALLBACK(delete_event),	NULL);
     g_signal_connect(G_OBJECT(top_window),	"destroy", 		G_CALLBACK(destroy),		NULL);
     g_signal_connect(G_OBJECT(top_window),	"map-event",	G_CALLBACK(map_event),		NULL);
@@ -63,12 +64,13 @@
     parse_3270_command_line(argc, (const char **) argv, &cl_hostname);
 
     if(!cl_hostname)
-       cl_hostname = "3270.df.bb:8023";
+       cl_hostname = "3270.df.bb:9023";
 
     CreateMainWindow(cl_hostname);
 
     DBGMessage("Starting gtk main loop");
 
+	gtk_window_set_wmclass(GTK_WINDOW(top_window),TARGET,"toplevel");
     gtk_widget_show_all(top_window);
     gtk_main();
 
