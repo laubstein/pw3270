@@ -335,6 +335,6 @@ static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num
 static void screen_changed(int first, int last)
 {
    WaitForScreen = FALSE;
-   RemoveSelectionBox();
+   action_remove_selection(0,0);
 }
 
