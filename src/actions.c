@@ -78,11 +78,11 @@
 
     static const struct WindowActions keyproc[] =
     {
-     	DECLARE_KEYPROC( GDK_x,			GDK_ALT_MASK, 	toogle_crosshair	),
+//     	DECLARE_KEYPROC( GDK_x,			GDK_ALT_MASK, 	toogle_crosshair	),
      	DECLARE_KEYPROC( GDK_Page_Up, 	0, 				Page_Up				),
      	DECLARE_KEYPROC( GDK_Page_Down,	0, 				Page_Down			),
 
-     	DECLARE_KEYPROC( GDK_c, GDK_CONTROL_MASK, 	CopySelection )
+//     	DECLARE_KEYPROC( GDK_c, GDK_CONTROL_MASK, 	CopySelection )
     };
 
     static const struct TerminalActions actions[] =
@@ -192,3 +192,14 @@
 
  }
 
+ void action_disconnect(GtkWidget *w, gpointer data)
+ {
+ 	Log("Disconnecting");
+ }
+
+ void action_exit(GtkWidget *w, gpointer data)
+ {
+ 	action_disconnect(0,0);
+ 	Log("Exiting");
+ 	gtk_main_quit();
+ }

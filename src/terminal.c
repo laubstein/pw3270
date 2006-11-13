@@ -6,13 +6,11 @@
  #include "lib/hostc.h"
  #include "lib/kybdc.h"
  #include "lib/actionsc.h"
- #include "lib/3270ds.h"
+// #include "lib/3270ds.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
  #define MIN_LINE_SPACING	2
-
- #define DEFCOLOR_MAP(f) ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
 
  /* Binary flags for mouse state */
  #define	MOUSE_MODE_NORMAL		0x0000
@@ -26,17 +24,6 @@
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
- static void InvalidateCursor(void);
-
-/*---[ Structures ]-----------------------------------------------------------*/
-
- typedef struct _fontelement
- {
-	GdkFont *fn;
-	int	  	Width;
-	int	  	Height;
- } FONTELEMENT;
-
 /*---[ Constants ]------------------------------------------------------------*/
 
   static const int widget_states[] = { GTK_STATE_NORMAL, GTK_STATE_ACTIVE, GTK_STATE_PRELIGHT, GTK_STATE_SELECTED, GTK_STATE_INSENSITIVE };
@@ -46,29 +33,9 @@
 
   // /usr/X11R6/lib/X11/rgb.txt
   static const char *TerminalColors  = "black,blue1,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
-
-  #define FIELD_COLORS		4
   static const char *FieldColors     = "green1,red,blue,white";
-
-  #define CURSOR_COLORS		(CURSOR_TYPE_CROSSHAIR * 2)
   static const char *CursorColors	 = "white,white,DarkSlateGray,DarkSlateGray";
-
-  #define SELECTION_COLORS	2
   static const char *SelectionColors = "#000020,yellow";
-
-  enum _STATUS_COLORS
-  {
-  	    STATUS_COLOR_BACKGROUND,
-  	    STATUS_COLOR_SEPARATOR,
-		STATUS_COLOR_CURSOR_POSITION,
-		STATUS_COLOR_LUNAME,
-		STATUS_COLOR_ERROR,
-		STATUS_COLOR_TIME,
-		STATUS_COLOR_WARNING,
-		STATUS_COLOR_NORMAL,
-
-		STATUS_COLORS	// Must be the last one
-  };
   static const char *StatusColors	 = "black,ForestGreen,LimeGreen,LimeGreen,red,white,yellow,green";
 
   static const char *FontDescr[] =
@@ -96,47 +63,6 @@
 
   #define FONT_COUNT (sizeof(FontDescr)/sizeof(const char *))
 
-/*---[ Status codes ]---------------------------------------------------------*/
-
- #ifdef DEBUG
-     #define DECLARE_STATUS_MESSAGE(code, color, msg) { code, #code, color, msg }
-     #define NO_STATUS_MESSAGE ""
- #else
-     #define DECLARE_STATUS_MESSAGE(code, color, msg) { code, color, msg }
-     #define NO_STATUS_MESSAGE 0
- #endif
-
- static struct _status
- {
- 	unsigned short	code;
-#ifdef DEBUG
-    const char		*dbg;
-#endif
-	unsigned short	color;
- 	const char		*msg;
- } status[] =
- {
-	DECLARE_STATUS_MESSAGE( KL_OERR_PROTECTED,	STATUS_COLOR_ERROR,		"Protegido"			),
-	DECLARE_STATUS_MESSAGE( KL_OERR_NUMERIC,	STATUS_COLOR_ERROR,		"Somente numeros"	),
-	DECLARE_STATUS_MESSAGE( KL_OERR_OVERFLOW,	STATUS_COLOR_ERROR,		"Overflow"			),
-	DECLARE_STATUS_MESSAGE( KL_OERR_DBCS,		STATUS_COLOR_WARNING,	"DBCS"				),
-	DECLARE_STATUS_MESSAGE( KL_NOT_CONNECTED,	STATUS_COLOR_ERROR,		"Nao conectado"		),
-	DECLARE_STATUS_MESSAGE( KL_AWAITING_FIRST,	STATUS_COLOR_WARNING,	"Awaiting first"	),
-	DECLARE_STATUS_MESSAGE( KL_OIA_TWAIT,		STATUS_COLOR_NORMAL,	NO_STATUS_MESSAGE	),
-	DECLARE_STATUS_MESSAGE( KL_OIA_LOCKED,		STATUS_COLOR_ERROR,		"Locked"			),
-	DECLARE_STATUS_MESSAGE( KL_DEFERRED_UNLOCK,	STATUS_COLOR_WARNING,	"Deferred Unlock"	),
-	DECLARE_STATUS_MESSAGE( KL_ENTER_INHIBIT,	STATUS_COLOR_WARNING,	"Inhibit"			),
-	DECLARE_STATUS_MESSAGE( KL_SCROLLED,		STATUS_COLOR_WARNING,	"Scrolled"			),
-	DECLARE_STATUS_MESSAGE( KL_OIA_MINUS,		STATUS_COLOR_WARNING,	"Minus"				),
-	DECLARE_STATUS_MESSAGE( KL_OIA_SYSWAIT,		STATUS_COLOR_TIME,		NO_STATUS_MESSAGE	),
-	DECLARE_STATUS_MESSAGE( KL_OIA_CONNECTING,	STATUS_COLOR_TIME,		"Conectando"		),
-
-
-
- };
-
- static struct _status *current_status = 0;
-
 /*---[ Globals ]--------------------------------------------------------------*/
 
  const char			*cl_hostname							= 0;
@@ -147,22 +73,11 @@
  static FONTELEMENT *font									= 0;
  static int			top_margin								= 0;
  static int 		left_margin								= 0;
- static GdkColor	*terminal_cmap							= 0;
- static int			terminal_color_count					= 0;
+
+ GdkColor			*terminal_cmap							= 0;
+ int				terminal_color_count					= 0;
+
  static int			line_spacing							= MIN_LINE_SPACING;
- static GdkColor	field_cmap[FIELD_COLORS];
-
- static int			cursor_row								= 0;
- static int			cursor_col								= 0;
- static int			cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
- static int			cursor_type								= CURSOR_TYPE_OVER;
- static gboolean    cursor_enabled							= TRUE;
- static gboolean	cross_hair								= FALSE;
- static GdkColor	cursor_cmap[CURSOR_COLORS];
-
- static GdkColor	status_cmap[STATUS_COLORS];
-
- static GdkColor	selection_cmap[SELECTION_COLORS];
 
  static int			fromRow									= -1;
  static int			fromCol									= -1;
@@ -175,14 +90,21 @@
  static long		yTo										= -1;
  static int			MouseMode								= MOUSE_MODE_NORMAL;
 
+ static int			cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
+ static gboolean    cursor_enabled							= TRUE;
+ static int			cursor_row								= 0;
+ static int			cursor_col								= 0;
+ static gboolean	cross_hair								= FALSE;
+ static int			cursor_type								= CURSOR_TYPE_OVER;
+
+/*---[ Terminal colors ]------------------------------------------------------*/
+
+ GdkColor	field_cmap[FIELD_COLORS];
+ GdkColor	cursor_cmap[CURSOR_COLORS];
+ GdkColor	status_cmap[STATUS_COLORS];
+ GdkColor	selection_cmap[SELECTION_COLORS];
 
 /*---[ Gui-Actions ]----------------------------------------------------------*/
-
- void toogle_crosshair(void)
- {
- 	cross_hair = !cross_hair;
-    InvalidateCursor();
- }
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -214,211 +136,6 @@
  static void stsResolving(Boolean ignored)
  {
  	DBGPrintf("Resolving: %s", ignored ? "Yes" : "No");
- }
-
- static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
- {
-    // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
-
- 	const struct ea *trm;
- 	int				rows;
- 	int				cols;
- 	int				row;
- 	int				col;
- 	int				cRow;
- 	int				cCol;
- 	int				hPos;
- 	int				vPos;
- 	char			chr[2];
- 	int				x[2];
- 	int				y[2];
-
-    GdkGC 			*gc     	= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
-
-    gboolean		rc			= FALSE;
-    int				mode		= 0;
-    int				ps;
-
-CHKPoint();
- 	trm = Get3270DeviceBuffer(&rows, &cols);
-
-    if(!trm)
-       return rc;
-
-    /* Get top of the screen */
-    vPos = (top_margin + font->Height + event->area.x);
-
-	/* Draw selection box */
-    if(fromRow >= 0 && toRow > 0)
-    {
-       /* Draw selection box */
-       x[0] = (min(fromCol,toCol) * font->Width) + left_margin;
-       x[1] = (max(fromCol,toCol) * font->Width) + left_margin;
-
-       y[0] = ((min(fromRow,toRow) * (font->Height + line_spacing)) + vPos)-font->Height;
-       y[1] = ((max(fromRow,toRow) * (font->Height + line_spacing)) + vPos)-font->Height;
-
-       gdk_gc_set_foreground(gc,selection_cmap);
-	   gdk_draw_rectangle(widget->window,gc,1,x[0],y[0],x[1]-x[0],y[1]-y[0]);
-
-       gdk_gc_set_foreground(gc,selection_cmap+1);
-	   gdk_draw_rectangle(widget->window,gc,0,x[0],y[0],x[1]-x[0],y[1]-y[0]);
-
-    }
-
-	/* Adjust cursor color */
-	ps = (cursor_row * rows) + cols;
-
-    /* Calculate coordinates */
-    cRow = (cursor_row * (font->Height + line_spacing)) + vPos;
-    cCol = (cursor_col * font->Width) + left_margin;
-
-    if(cross_hair && cursor_enabled)
-    {
-	   /* Draw cross-hair cursor */
-       gdk_gc_set_foreground(gc,cursor_cmap+CURSOR_TYPE_CROSSHAIR+cursor_type);
-
-   	   gdk_draw_line(	widget->window,
-						widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-						cCol, top_margin + event->area.y, cCol, top_margin + event->area.y + ( rows * (font->Height + line_spacing) ));
-
-	   gdk_draw_line(	widget->window,
-						widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-						event->area.x, cRow, event->area.x + event->area.width, cRow );
-    }
-
-    // TODO (perry#2#): Find a better way (Is it necessary to run all over the buffer?)
-    for(row = 0; row < rows; row++)
-    {
-    	hPos = event->area.x+left_margin;
-    	for(col = 0; col < cols; col++)
-    	{
-		   chr[0] = Ebc2ASC(trm->cc);
-
-		   chr[1] = 0;
-
-		   rc  = TRUE;
-
-		   if(trm->fa)
-		   {
-		      chr[0] = ' ';
-
-              if( (trm->fa & (FA_INTENSITY|FA_INT_NORM_SEL|FA_INT_HIGH_SEL)) == (FA_INTENSITY|FA_INT_NORM_SEL|FA_INT_HIGH_SEL) )
-                 mode = (trm->fa & FA_PROTECT) ? 1 : 2;
-			  else
-			     mode = 0;
-
-			  if(trm->fg || trm->bg)
-			  {
-			     gdk_gc_set_foreground(gc,terminal_cmap + (trm->fg % terminal_color_count));
-		         gdk_gc_set_background(gc,terminal_cmap + (trm->bg % terminal_color_count));
-			  }
-			  else
-			  {
-			     gdk_gc_set_foreground(gc,field_cmap+(DEFCOLOR_MAP(trm->fa)));
-			  }
-
-		   }
-		   else if(trm->gr || trm->fg || trm->bg)
-		   {
-
-// TODO (perry#1#): Set GC attributes based on terminal flags (and blink?)
-//              if(trm->gr & GR_BLINK)
-//              if(trm->gr & GR_REVERSE)
-//              if(trm->gr & GR_UNDERLINE)
-//              if(trm->gr & GR_INTENSIFY)
-
-			  if(trm->fg || trm->bg)
-			  {
-		         gdk_gc_set_foreground(gc,terminal_cmap + (trm->fg % terminal_color_count));
-		         gdk_gc_set_background(gc,terminal_cmap + (trm->fg % terminal_color_count));
-			  }
-
-		   }
-
-		   switch(mode)
-		   {
-		   case 0:	// Nothing special
-		      gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,chr,1);
-		      break;
-
-		   case 1:  // Hidden
-		      gdk_draw_text(widget->window,font->fn,gc,hPos,vPos," ",1);
-		      break;
-
-		   case 2:	// Hidden/Editable
-		      gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,chr[0] == ' ' ? chr : "*", 1);
-		      break;
-
-		   }
-
-		   hPos += font->Width;
-	       trm++;
-    	}
-    	vPos += (font->Height + line_spacing);
-    }
-
-    /* Draw status line */
-    vPos -= font->Height;
-    vPos++;
-
-    gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_SEPARATOR);
-    gdk_draw_line( widget->window, gc, event->area.x+left_margin, vPos, hPos, vPos);
-
-    vPos += (font->Height+1);
-
-    /* Cursor position */
-    hPos -= (font->Width * strlen(oia_cursor));
-    gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_CURSOR_POSITION);
-    gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,oia_cursor,strlen(oia_cursor));
-
-    /* LU Name */
-    hPos -= (font->Width * (strlen(oia_LUName)+1));
-    gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_LUNAME);
-    gdk_draw_text(widget->window,font->fn,gc,hPos,vPos,oia_LUName,strlen(oia_LUName));
-
-    /* Terminal Status */
-    if(current_status && current_status->msg)
-    {
-       gdk_gc_set_foreground(gc,status_cmap+current_status->color);
-       gdk_draw_text(	widget->window,
-						font->fn,
-						gc,
-						left_margin+(font->Width*2),
-						vPos,
-						current_status->msg,
-						strlen(current_status->msg));
-
-#ifdef DEBUG
-	   if(!*current_status->msg)
-	   {
-	      gdk_draw_text(	widget->window,
-							font->fn,
-							gc,
-							left_margin+(font->Width*2),
-							vPos,
-							current_status->dbg,
-							strlen(current_status->dbg));
-	   }
-#endif
-    }
-
-    /* Draw cursor */
-    if(cursor_enabled)
-    {
-       /* Draw cursor */
-
-       gdk_gc_set_foreground(gc,cursor_cmap+cursor_type);
-
-	   gdk_draw_rectangle(	widget->window,
-							gc,
-							1,
-							cCol, (cRow + 3) - cursor_height[cursor_type],
-							font->Width,
-							cursor_height[cursor_type] );
-    }
-
-    return rc;
  }
 
  static gboolean Mouse2Terminal(long x, long y, long *cRow, long *cCol)
@@ -453,27 +170,6 @@ CHKPoint();
     return TRUE;
  }
 
- void CopySelection(void)
- {
- 	if(fromRow < 0)
- 	   return;
-    DBGMessage("Copy to clipboard");
-
-	CopyToClipboard(fromRow,fromCol,toRow,toCol);
-
- }
-
- void AppendSelection(void)
- {
- 	if(fromRow < 0)
- 	   return;
-
-    DBGMessage("Append to clipboard");
-
-    AppendToClipboard(fromRow,fromCol,toRow,toCol);
-
- }
-
  static int CheckForCopy(void)
  {
     if( !(MouseMode & MOUSE_MODE_CLIPBOARD))
@@ -483,11 +179,88 @@ CHKPoint();
 	DBGTracex(MouseMode & MOUSE_MODE_APPEND);
 
     if(MouseMode & MOUSE_MODE_APPEND)
-       AppendSelection();
+       action_append(0,0);
 	else
-	   CopySelection();
+	   action_copy(0,0);
 
     return 1;
+ }
+
+ static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
+ {
+    // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
+ 	int		cRow;
+ 	int		cCol;
+    int		rows;
+    int		cols;
+    GdkGC	*gc				= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+ 	int		x[2];
+ 	int		y[2];
+ 	int	    vPos = (top_margin + font->Height);
+
+
+ 	if(!Get3270DeviceBuffer(&rows, &cols))
+ 	   return 0;
+
+    cRow = (cursor_row * (font->Height + line_spacing)) + vPos;
+    cCol = (cursor_col * font->Width) + left_margin;
+
+    if(cross_hair && cursor_enabled)
+    {
+       gdk_gc_set_foreground(gc,cursor_cmap+CURSOR_TYPE_CROSSHAIR+cursor_type);
+
+   	   gdk_draw_line(	widget->window,
+						gc,
+						cCol,
+						top_margin,
+						cCol,
+						top_margin + ( rows * (font->Height + line_spacing) ));
+
+	   gdk_draw_line(	widget->window,
+						gc,
+						left_margin, cRow,
+						left_margin + (cols * font->Width), cRow );
+    }
+
+    /* Check for selection box */
+    if(fromRow >= 0 && toRow > 0)
+    {
+       x[0] = (min(fromCol,toCol) * font->Width) + left_margin;
+       x[1] = (max(fromCol,toCol) * font->Width) + left_margin;
+
+       y[0] = ((min(fromRow,toRow) * (font->Height + line_spacing)) + vPos)-font->Height;
+       y[1] = ((max(fromRow,toRow) * (font->Height + line_spacing)) + vPos)-font->Height;
+
+       gdk_gc_set_foreground(gc,selection_cmap);
+	   gdk_draw_rectangle(widget->window,gc,1,x[0],y[0],x[1]-x[0],y[1]-y[0]);
+
+       gdk_gc_set_foreground(gc,selection_cmap+1);
+	   gdk_draw_rectangle(widget->window,gc,0,x[0],y[0],x[1]-x[0],y[1]-y[0]);
+
+    }
+
+    // TODO (perry#2#): Draw to a pixmap and paint here the contents.
+    DrawTerminal(	widget->window,
+					gc,
+					font,
+					left_margin,
+					top_margin,
+					line_spacing);
+
+    /* Draw cursor */
+    if(cursor_enabled)
+    {
+       gdk_gc_set_foreground(gc,cursor_cmap+cursor_type);
+
+	   gdk_draw_rectangle(	widget->window,
+							gc,
+							1,
+							cCol, (cRow + 3) - cursor_height[cursor_type],
+							font->Width,
+							cursor_height[cursor_type] );
+    }
+
+    return 0;
  }
 
  static gboolean single_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
@@ -504,7 +277,7 @@ CHKPoint();
        if(MouseMode != MOUSE_MODE_NORMAL)
        {
           MouseMode = MOUSE_MODE_NORMAL;
-          RemoveSelectionBox();
+          action_remove_selection(0,0);
        }
 
        xFrom = (unsigned long) event->x;
@@ -581,7 +354,7 @@ CHKPoint();
     case 1:
        if(MouseMode == MOUSE_MODE_NORMAL && Mouse2Terminal((long) event->x, (long) event->y, &cRow, &cCol))
        {
-          RemoveSelectionBox();
+          action_remove_selection(0,0);
           move3270Cursor((cRow * cols) + cCol);
        }
        CheckForCopy();
@@ -876,9 +649,27 @@ CHKPoint();
     return ret;
  }
 
- static void InvalidateCursor(void)
+ void InvalidateCursor(void)
  {
 	gtk_widget_queue_draw(terminal);
+ }
+
+ void action_crosshair( GtkWidget *w, gpointer   data )
+ {
+ 	cross_hair = !cross_hair;
+    InvalidateCursor();
+ }
+
+ void EnableCursor(gboolean mode)
+ {
+ 	cursor_enabled = mode;
+ 	DBGPrintf("Cursor %s", cursor_enabled ? "enabled" : "disabled");
+ }
+
+ void SetCursorType(int type)
+ {
+    cursor_type = type;
+    InvalidateCursor();
  }
 
  void SetCursorPosition(int row, int col)
@@ -889,19 +680,28 @@ CHKPoint();
     InvalidateCursor();
  }
 
- void SetCursorType(int type)
+ void action_copy(GtkWidget *w, gpointer data)
  {
-    cursor_type = type;
-    InvalidateCursor();
+ 	if(fromRow < 0)
+ 	   return;
+    DBGMessage("Copy to clipboard");
+
+	CopyToClipboard(fromRow,fromCol,toRow,toCol);
+
  }
 
- void EnableCursor(gboolean mode)
+ void action_append(GtkWidget *w, gpointer data)
  {
- 	cursor_enabled = mode;
- 	DBGPrintf("Cursor %s", cursor_enabled ? "enabled" : "disabled");
+ 	if(fromRow < 0)
+ 	   return;
+
+    DBGMessage("Append to clipboard");
+
+    AppendToClipboard(fromRow,fromCol,toRow,toCol);
+
  }
 
- void RemoveSelectionBox(void)
+ void action_remove_selection(GtkWidget *w, gpointer data)
  {
  	CheckForCopy();
 
@@ -910,35 +710,5 @@ CHKPoint();
 
     MouseMode = MOUSE_MODE_NORMAL;
 	gtk_widget_queue_draw(terminal);
- }
-
- void SetStatusCode(int code)
- {
-    int 			f;
-    struct _status	*sts	= 0;
-
-	if(code < 0)
-	{
-		current_status = 0;
-  	    DBGMessage("Status:\tNONE");
-	}
-	else
-	{
-	   for(f=0;!sts && f<(sizeof(status)/sizeof(struct _status));f++)
-	   {
-		   if(status[f].code == code)
-		   {
-		   	   current_status = sts = (status+f);
-#ifdef DEBUG
-			   Log("Status:\t%s",current_status->dbg);
-#endif
-		   }
-	   }
-	   if(!sts)
-	      Log("Unexpected status code %d from 3270 library",code);
-	}
-
-	gtk_widget_queue_draw(terminal);
-
  }
 
