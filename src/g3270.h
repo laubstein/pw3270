@@ -9,6 +9,8 @@
  #include "lib/lib3270.h"
  #include "log.h"
 
+ #define KL_OIA_SYSWAIT	0x8000
+
 /*---[ Defines ]--------------------------------------------------------------*/
 
  enum cursor_types
@@ -56,6 +58,7 @@
  void SetCursorType(int type);
  void ToogleCursor(void);
  void EnableCursor(gboolean mode);
+ void SetStatusCode(int code);
 
  int  AppendToClipboard(int fromRow, int fromCol, int toRow, int toCol);
  int  CopyToClipboard(int fromRow, int fromCol, int toRow, int toCol);
