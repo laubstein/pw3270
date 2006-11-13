@@ -46,6 +46,12 @@
 	terminal = g3270_new(cl_hostname);
 	gtk_box_pack_start(GTK_BOX(vbox),terminal,TRUE,TRUE,0);
 
+#if GTK == 1
+	gtk_window_set_wmclass(GTK_WINDOW(top_window),"toplevel",TARGET);
+#else
+    gtk_window_set_role(GTK_WINDOW(top_window), TARGET "_topwindow");
+#endif
+
  }
 
  int main(int argc, char **argv)
@@ -70,7 +76,6 @@
 
     DBGMessage("Starting gtk main loop");
 
-	gtk_window_set_wmclass(GTK_WINDOW(top_window),TARGET,"toplevel");
     gtk_widget_show_all(top_window);
     gtk_main();
 

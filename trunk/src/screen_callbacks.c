@@ -236,7 +236,9 @@ static void toggle_monocase(struct toggle *t, enum toggle_type tt)
 
 static void status_ctlr_done(void)
 {
-	CHKPoint();
+#ifdef DEBUG
+			   Log("Status:\t%s",__FUNCTION__);
+#endif
 }
 
 static void status_insert_mode(Boolean on)
@@ -254,12 +256,17 @@ static void status_minus(void)
 
 static void status_reset(void)
 {
+#ifdef DEBUG
+			   Log("Status:\t%s",__FUNCTION__);
+#endif
 	gtk_widget_queue_draw(terminal);
 }
 
 static void status_reverse_mode(Boolean on)
 {
-	DBGPrintf("Reverse: %s", on ? "Yes" : "False");
+#ifdef DEBUG
+			   Log("Status:\t%s",__FUNCTION__);
+#endif
 }
 
 static void status_syswait(void)
@@ -276,12 +283,16 @@ static void status_twait(void)
 
 static void status_typeahead(Boolean on)
 {
-	DBGPrintf("Typeahead: %s", on ? "Yes" : "False");
+#ifdef DEBUG
+			   Log("Status:\t%s",__FUNCTION__);
+#endif
 }
 
 static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
 {
-	DBGPrintf("Compose: %s", on ? "Yes" : "No");
+#ifdef DEBUG
+			   Log("Status:\t%s",__FUNCTION__);
+#endif
 }
 
 static void status_lu(const char *lu)

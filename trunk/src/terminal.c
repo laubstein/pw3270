@@ -277,7 +277,7 @@
 
    	   gdk_draw_line(	widget->window,
 						widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-						cCol, event->area.y, cCol, event->area.y + ( rows * (font->Height + line_spacing) ));
+						cCol, top_margin + event->area.y, cCol, top_margin + event->area.y + ( rows * (font->Height + line_spacing) ));
 
 	   gdk_draw_line(	widget->window,
 						widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
@@ -924,7 +924,9 @@
 		   if(status[f].code == code)
 		   {
 		   	   current_status = sts = (status+f);
-			   DBGPrintf("Status:\t%s",current_status->dbg);
+#ifdef DEBUG
+			   Log("Status:\t%s",current_status->dbg);
+#endif
 		   }
 	   }
 	   if(!sts)
