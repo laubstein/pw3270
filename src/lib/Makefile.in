@@ -59,6 +59,10 @@ fallbacks.c: mkfb X3270.xad
 
 c3270: $(OBJS1)
 	$(CC) -o $@ $(OBJS1) $(LDFLAGS) $(LIBS)
+
+lib3270.so: $(OBJS1)
+	$(CC) -shared $(LIBS) -Wl,-soname,$(@F) -o $@ $^
+
 x3270if: x3270if.o
 	$(CC) -o $@ x3270if.o
 
