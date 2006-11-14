@@ -490,8 +490,4 @@ unsigned char asc2ft0[256] = { ASC2FT };
 #endif /*]*/
 
 
-unsigned char Ebc2ASC(unsigned char cc)
-{
-	return ebc2asc[cc];
-}
 

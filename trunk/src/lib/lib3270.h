@@ -115,8 +115,6 @@ int set_3270_keyboard(const KEYBOARD_INFO *kbd);
 int Run_3270(const char	*cl_hostname);
 int Initialize_3270(void);
 
-unsigned char 		 Ebc2ASC(unsigned char cc);
-
 const struct ea 	 *Get3270DeviceBuffer(int *rows, int *cols);
 const struct ea      *QueryDeviceChar(int baddr);
 
@@ -134,6 +132,8 @@ extern const KEYBOARD_INFO   *keyboard_info_3270;
 extern void  display_3270(Boolean erasing);
 extern void  move3270Cursor(int baddr);
 extern void  RemoveSelectionBox(void);
+
+extern int   Get3270CursorRow(void);
 
 
 #ifdef __cplusplus

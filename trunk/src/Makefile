@@ -77,7 +77,7 @@ else
 	@LD_LIBRARY_PATH=. ./$(TARGET)
 endif
 
-lib/Makefile: lib/Makefile.in
+lib/Makefile:
 	@cd lib ; ./configure
 
 lib3270.so: lib/Makefile lib/*.c lib/*.h
@@ -91,5 +91,4 @@ clean:
 	@rm -f $(TARGET)
 	@rm -f $(OBJECTS)
 	@make -C lib clean
-	@rm -f lib/Makefile
 	@rm -f lib3270.so

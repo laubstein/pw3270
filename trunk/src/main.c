@@ -10,26 +10,26 @@
  // TODO (perry#1#): Load it from configuration file.
  static GtkItemFactoryEntry menu_items[] =
  {
- 	{ "/_Arquivo",					NULL,					NULL,						0,	"<Branch>"		},
- 	{ "/Arquivo/_Imprimir Tela",	"<control>I",			NULL,						0,	NULL			},
- 	{ "/Arquivo/_Imprimir Seleção",	"<control><shift>I",	NULL,						0,	NULL			},
- 	{ "/Arquivo/Sair",          	"<control>X",			action_exit,				0,	NULL			},
+ 	{ "/_Arquivo",					NULL,					NULL,						0,		"<Branch>"		},
+ 	{ "/Arquivo/_Imprimir Tela",	"<control>P",			NULL,						0,		NULL			},
+ 	{ "/Arquivo/_Imprimir Seleção",	"<control><shift>P",	NULL,						0,		NULL			},
+ 	{ "/Arquivo/Sair",          	"<control>X",			action_exit,				0,		NULL			},
 
- 	{ "/_Editar",					NULL,					NULL,						0,	"<Branch>"		},
- 	{ "/Editar/Copiar",				"<control>C",			action_copy,				0,	NULL			},
- 	{ "/Editar/Copiar anexando",	"<control><shift>C",	action_append,				0,	NULL			},
- 	{ "/Editar/Colar",				"<control>V",			action_paste,				0,	NULL			},
-	{ "/Editar/sep1",     			NULL,         			NULL,						0,	"<Separator>"	},
-	{ "/Editar/Limpar campos",		NULL,					action_clear,				0,	NULL			},
-	{ "/Editar/sep2",     			NULL,         			NULL,						0,	"<Separator>"	},
-	{ "/Editar/Selecionar tudo",	"<control>A",			action_select_all,			0,	NULL			},
-	{ "/Editar/Desmarcar",			"<control>D",			action_remove_selection,	0,	NULL			},
+ 	{ "/_Editar",					NULL,					NULL,						0,		"<Branch>"		},
+ 	{ "/Editar/Copiar",				"<control>C",			action_copy,				0,		NULL			},
+ 	{ "/Editar/Copiar anexando",	"<control><shift>C",	action_append,				0,		NULL			},
+ 	{ "/Editar/Colar",				"<control>V",			action_paste,				0,		NULL			},
+	{ "/Editar/sep1",     			NULL,         			NULL,						0,		"<Separator>"	},
+	{ "/Editar/Limpar campos",		NULL,					action_clear,				0,		NULL			},
+	{ "/Editar/sep2",     			NULL,         			NULL,						0,		"<Separator>"	},
+	{ "/Editar/Selecionar tudo",	"<control>A",			action_select_all,			0,		NULL			},
+	{ "/Editar/Desmarcar",			"<control>D",			action_remove_selection,	0,		NULL			},
 
- 	{ "/_Opções",					NULL,					NULL,						0,	"<Branch>"		},
- 	{ "/Opções/Cross Hair",			"<ALT>x",				action_crosshair,			0,	NULL			},
+ 	{ "/_Opções",					NULL,					NULL,						0,		"<Branch>"		},
+ 	{ "/Opções/Cross Hair",			"<ALT>x",				action_crosshair,			0,		NULL			},
 
- 	{ "/Comunicação/Conectar",		NULL,					action_connect,				0,	NULL			},
- 	{ "/Comunicação/Desconectar",	NULL,					action_disconnect,			0,	NULL			},
+ 	{ "/Comunicação/Conectar",		NULL,					action_connect,				0,		NULL			},
+ 	{ "/Comunicação/Desconectar",	NULL,					action_disconnect,			0,		NULL			},
 
  };
 
@@ -125,8 +125,36 @@
 
  int main(int argc, char **argv)
  {
+/*
+#ifdef DEBUG
+	int		f;
+    gchar	str[2];
+    gchar   *string;
+
+    CHKPoint();
+
+    str[1] = 0;
+    for(f=1;f<0xFF;f++)
+    {
+    	*str   = f; // Ebc2ASC(f);
+		string = g_convert(str, 1, "EBCDIC-BR", "UTF-8", NULL, NULL, NULL);
+
+		if(string)
+		   fprintf(stderr,"0x%02x\n",(unsigned char) *string);
+		else
+		   fprintf(stderr,"0x%02x\n",(unsigned char) ' ');
+
+        g_free(string);
+    }
+
+
+    return -1;
+#endif
+*/
+
     printf(TARGET " (Build " BUILD " for gtk " GTKVERSION ") Starting\n");
     fflush(stdout);
+
 
     /* Populate callback tables */
     set_3270_screen(&g3270_screen_callbacks);

@@ -15,11 +15,11 @@
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
-// #if GTK == 2
-//    #define USE_CLIPBOARD
-// #else
+ #if GTK == 2
+    #define USE_CLIPBOARD
+ #else
     #define USE_SELECTION
-// #endif
+ #endif
 
  enum status_codes
  {
@@ -87,6 +87,8 @@
  extern const 	SCREEN_CALLBACK g3270_screen_callbacks;
  extern const 	KEYBOARD_INFO   g3270_keyboard_info;
 
+ extern const 	gchar 			ebcdic2asc[];
+
 
  extern char					oia_cursor[];
  extern char					oia_LUName[];
@@ -148,6 +150,7 @@
  void action_exit(GtkWidget *w, gpointer data);
  void action_clear(GtkWidget *w, gpointer data);
  void action_paste(GtkWidget *w, gpointer data);
+
 
  #define NotImplemented() Log("Function %s in %s needs implementation",__FUNCTION__,__FILE__)
 

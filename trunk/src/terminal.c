@@ -50,22 +50,21 @@
   {
 
 		"-xos4-terminus-medium-*-normal-*-12-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-14-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-16-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-20-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-24-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-28-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-32-*-*-*-*-*-*-*",
 
-/*
-		"-xos4-terminus-bold-*-*-*-12-*-*-*-*-*-*-*",
+//		"-xos4-terminus-bold-*-*-*-12-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-14-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-16-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-20-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-24-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-28-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-32-*-*-*-*-*-*-*"
-*/
+
+	 	"-xos4-terminus-medium-*-normal-*-14-*-*-*-*-*-*-*",
+	 	"-xos4-terminus-medium-*-normal-*-16-*-*-*-*-*-*-*",
+	 	"-xos4-terminus-medium-*-normal-*-20-*-*-*-*-*-*-*",
+	 	"-xos4-terminus-medium-*-normal-*-24-*-*-*-*-*-*-*",
+	 	"-xos4-terminus-medium-*-normal-*-28-*-*-*-*-*-*-*",
+	 	"-xos4-terminus-medium-*-normal-*-32-*-*-*-*-*-*-*",
 
   };
 
@@ -152,6 +151,7 @@
  {
  	DBGPrintf("HalfConnect: %s", ignored ? "Yes" : "No");
     status_untiming();
+    SetOIAStatus(STATUS_CONNECTING);
  }
 
  static void stsExiting(Boolean ignored)
@@ -487,14 +487,14 @@
 
  	width = allocation->width / cols;
 
-	DBGPrintf("Resize %d,%d em %d,%d (%d)", allocation->width, allocation->height,allocation->x,allocation->y,width);
+//	DBGPrintf("Resize %d,%d em %d,%d (%d)", allocation->width, allocation->height,allocation->x,allocation->y,width);
 
     /* Search for a font with exact match */
     for(f = 0; f< FONT_COUNT;f++)
     {
     	if(fontlist[f].Width == width)
     	{
-		   DBGPrintf("Font %d has %d pixels width",f,width);
+//		   DBGPrintf("Font %d has %d pixels width",f,width);
 		   SetFont(widget,fontlist+f,allocation->width,allocation->height);
 		   return;
     	}
