@@ -32,16 +32,16 @@
  	const char		*msg;
  } status[] =
  {
-	DECLARE_STATUS_MESSAGE( STATUS_DISCONNECTED,	STATUS_COLOR_WARNING,	"X Not Connected"	),
-	DECLARE_STATUS_MESSAGE( STATUS_RESOLVING,		STATUS_COLOR_ERROR,		"X Resolving"		),
-	DECLARE_STATUS_MESSAGE( STATUS_CONNECTING,		STATUS_COLOR_ERROR,		"X Connecting"		),
+	DECLARE_STATUS_MESSAGE( STATUS_DISCONNECTED,	STATUS_COLOR_WARNING,	"X Desconectado"	),
+	DECLARE_STATUS_MESSAGE( STATUS_RESOLVING,		STATUS_COLOR_ERROR,		"X Resolvendo"		),
+	DECLARE_STATUS_MESSAGE( STATUS_CONNECTING,		STATUS_COLOR_ERROR,		"X Conectando"		),
 	DECLARE_STATUS_MESSAGE( STATUS_NONSPECIFIC,		STATUS_COLOR_WARNING,	NO_STATUS_MESSAGE	),
 	DECLARE_STATUS_MESSAGE( STATUS_INHIBIT,			STATUS_COLOR_ERROR,		"X Inhibit"			),
 	DECLARE_STATUS_MESSAGE( STATUS_BLANK,			STATUS_COLOR_TIME,		NO_STATUS_MESSAGE	),
 	DECLARE_STATUS_MESSAGE( STATUS_TWAIT,			STATUS_COLOR_TIME,		"X Wait"			),
 	DECLARE_STATUS_MESSAGE( STATUS_SYSWAIT,			STATUS_COLOR_TIME,		"X System"			),
-	DECLARE_STATUS_MESSAGE( STATUS_PROTECTED,		STATUS_COLOR_ERROR,		"X Protected"		),
-	DECLARE_STATUS_MESSAGE( STATUS_NUMERIC,			STATUS_COLOR_ERROR,		"X Numeric"			),
+	DECLARE_STATUS_MESSAGE( STATUS_PROTECTED,		STATUS_COLOR_ERROR,		"X Protegido"		),
+	DECLARE_STATUS_MESSAGE( STATUS_NUMERIC,			STATUS_COLOR_ERROR,		"X Numerico"		),
 	DECLARE_STATUS_MESSAGE( STATUS_OVERFLOW,		STATUS_COLOR_ERROR,		"X Overflow"		),
 	DECLARE_STATUS_MESSAGE( STATUS_DBCS,			STATUS_COLOR_ERROR,		"X DBCS"			),
 	DECLARE_STATUS_MESSAGE( STATUS_SCROLLED,		STATUS_COLOR_ERROR,		"X Scrolled"		),
@@ -95,6 +95,31 @@ const gchar ebcdic2asc[] =
 
 /*---[ Implement ]------------------------------------------------------------*/
 
+ static void SetColorAttribute(GdkGC *gc, const struct ea *trm, GdkColor **fgColor, GdkColor **bgColor)
+ {
+ 	int 		fg	= (trm->fg % terminal_color_count);
+ 	int 		bg	= (trm->bg % terminal_color_count);
+ 	GdkColor	*clr;
+
+    *fgColor = (terminal_cmap + fg);
+ 	*bgColor = (terminal_cmap + bg);
+
+    if(*bgColor && (trm->gr & GR_REVERSE))
+    {
+	   // Reverse colors
+	   clr 		= *fgColor;
+
+	   if(*bgColor)
+	      *fgColor = *bgColor;
+	   else
+	      *fgColor = (terminal_cmap);
+
+	   *bgColor = clr;
+       return;
+    }
+
+ }
+
  void DrawTerminal(GdkDrawable *drawable, GdkGC *gc, const FONTELEMENT *font, int left, int top, int line_spacing)
  {
  	// Draw terminal data
@@ -109,7 +134,8 @@ const gchar ebcdic2asc[] =
 
     gboolean		rc			= FALSE;
     int				mode		= 0;
-//    gchar   		*string;
+    GdkColor		*fg			= 0;
+    GdkColor		*bg			= 0;
 
  	trm = Get3270DeviceBuffer(&rows, &cols);
 
@@ -127,16 +153,6 @@ const gchar ebcdic2asc[] =
 		   chr[0] = ebcdic2asc[trm->cc];
 		   chr[1] = 0;
 
-/*
-           string = g_convert(chr, 1, "ISO-8859-1", "UTF-8", NULL, NULL, NULL);
-		   if(string)
-		      chr[0] = *string;
-			else
-			  chr[0] = ' ';
-
-		   g_free(string);
-*/
-
 		   rc  = TRUE;
 
 		   if(trm->fa)
@@ -150,47 +166,48 @@ const gchar ebcdic2asc[] =
 
 			  if(trm->fg || trm->bg)
 			  {
-			     gdk_gc_set_foreground(gc,terminal_cmap + (trm->fg % terminal_color_count));
-		         gdk_gc_set_background(gc,terminal_cmap + (trm->bg % terminal_color_count));
+		         chr[0] = 0;
+                 SetColorAttribute(gc, trm, &fg, &bg);
 			  }
 			  else
 			  {
-			     gdk_gc_set_foreground(gc,field_cmap+(DEFCOLOR_MAP(trm->fa)));
+			     fg = field_cmap+(DEFCOLOR_MAP(trm->fa));
+			     bg = 0;
 			  }
-
 		   }
 		   else if(trm->gr || trm->fg || trm->bg)
 		   {
-
-// TODO (perry#1#): Set GC attributes based on terminal flags (and blink?)
-//              if(trm->gr & GR_BLINK)
-//              if(trm->gr & GR_REVERSE)
-//              if(trm->gr & GR_UNDERLINE)
-//              if(trm->gr & GR_INTENSIFY)
-
-			  if(trm->fg || trm->bg)
-			  {
-		         gdk_gc_set_foreground(gc,terminal_cmap + (trm->fg % terminal_color_count));
-		         gdk_gc_set_background(gc,terminal_cmap + (trm->bg % terminal_color_count));
-			  }
-
+		      chr[0] = ' ';
+		      SetColorAttribute(gc, trm, &fg, &bg);
 		   }
 
-		   switch(mode)
-		   {
-		   case 0:	// Nothing special
-		      gdk_draw_text(drawable,font->fn,gc,hPos,vPos,chr,1);
-		      break;
+           if(chr[0])
+           {
+		      if(bg)
+		      {
+		         gdk_gc_set_foreground(gc,bg);
+		         gdk_draw_rectangle(drawable,gc,1,hPos,vPos-font->Height,font->Width,font->Height+line_spacing);
+		      }
 
-		   case 1:  // Hidden
-		      gdk_draw_text(drawable,font->fn,gc,hPos,vPos," ",1);
-		      break;
+		      if(fg)
+		         gdk_gc_set_foreground(gc,fg);
 
-		   case 2:	// Hidden/Editable
-		      gdk_draw_text(drawable,font->fn,gc,hPos,vPos,chr[0] == ' ' ? chr : "*", 1);
-		      break;
+		      switch(mode)
+		      {
+		      case 0:	// Nothing special
+		         gdk_draw_text(drawable,font->fn,gc,hPos,vPos,chr,1);
+		         break;
 
-		   }
+		      case 1:  // Hidden
+		         gdk_draw_text(drawable,font->fn,gc,hPos,vPos," ",1);
+		         break;
+
+		      case 2:	// Hidden/Editable
+		         gdk_draw_text(drawable,font->fn,gc,hPos,vPos,chr[0] == ' ' ? chr : "*", 1);
+		         break;
+
+		      }
+           }
 
 		   hPos += font->Width;
 	       trm++;
