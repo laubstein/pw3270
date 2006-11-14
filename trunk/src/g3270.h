@@ -16,9 +16,9 @@
 /*---[ Defines ]--------------------------------------------------------------*/
 
 // #if GTK == 2
-    #define USE_CLIPBOARD
+//    #define USE_CLIPBOARD
 // #else
-//    #define USE_SELECTION
+    #define USE_SELECTION
 // #endif
 
  enum status_codes
