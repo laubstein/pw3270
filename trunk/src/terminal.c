@@ -227,23 +227,6 @@
     cRow = (cursor_row * (font->Height + line_spacing)) + vPos;
     cCol = (cursor_col * font->Width) + left_margin;
 
-    if(cross_hair && cursor_enabled)
-    {
-       gdk_gc_set_foreground(gc,cursor_cmap+CURSOR_TYPE_CROSSHAIR+cursor_type);
-
-   	   gdk_draw_line(	widget->window,
-						gc,
-						cCol,
-						top_margin,
-						cCol,
-						top_margin + ( rows * (font->Height + line_spacing) ));
-
-	   gdk_draw_line(	widget->window,
-						gc,
-						left_margin, cRow,
-						left_margin + (cols * font->Width), cRow );
-    }
-
     /* Check for selection box */
     if(fromRow >= 0 && toRow > 0)
     {
@@ -280,6 +263,23 @@
 							cCol, (cRow + 3) - cursor_height[cursor_type],
 							font->Width,
 							cursor_height[cursor_type] );
+    }
+
+    if(cross_hair && cursor_enabled)
+    {
+       gdk_gc_set_foreground(gc,cursor_cmap+CURSOR_TYPE_CROSSHAIR+cursor_type);
+
+   	   gdk_draw_line(	widget->window,
+						gc,
+						cCol,
+						top_margin,
+						cCol,
+						top_margin + ( rows * (font->Height + line_spacing) ));
+
+	   gdk_draw_line(	widget->window,
+						gc,
+						left_margin, cRow,
+						left_margin + (cols * font->Width), cRow );
     }
 
     return 0;
@@ -687,18 +687,19 @@
  void action_crosshair( GtkWidget *w, gpointer   data )
  {
  	cross_hair = !cross_hair;
+ 	DBGPrintf("Cross_hair: %s Cursor: %s",cross_hair ? "Yes" : "No",cursor_enabled ? "Yes" : "No");
     InvalidateCursor();
  }
 
  void EnableCursor(gboolean mode)
  {
  	cursor_enabled = mode;
- 	DBGPrintf("Cursor %s", cursor_enabled ? "enabled" : "disabled");
+ 	DBGPrintf("Cross_hair: %s Cursor: %s",cross_hair ? "Yes" : "No",cursor_enabled ? "Yes" : "No");
  }
 
  void SetCursorType(int type)
  {
-    cursor_type = type;
+    cursor_type = (type % CURSOR_TYPE_CROSSHAIR);
     InvalidateCursor();
  }
 
