@@ -2,6 +2,7 @@
  #include "g3270.h"
  #include "trace.h"
 
+ #include "lib/kybdc.h"
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
@@ -173,3 +174,36 @@
 #endif
     return 0;
  }
+
+#if GTK == 2
+ static void paste_clipboard(GtkClipboard *clipboard, const gchar *text, gpointer data)
+ {
+    gchar *string;
+
+    string = g_convert(text, -1, "ISO-8859-1", "UTF-8", NULL, NULL, NULL);
+    if(!string)
+    {
+    	Log("Error converting clipboard string to ISO-8859-1");
+    	return;
+    }
+
+    emulate_input(string, strlen(string), True);
+    g_free(string);
+
+ }
+#endif
+
+ void action_paste(GtkWidget *w, gpointer data)
+ {
+#if GTK == 2
+    gtk_clipboard_request_text(	gtk_widget_get_clipboard(terminal,GDK_SELECTION_CLIPBOARD),
+								paste_clipboard,
+								0 );
+#else
+
+    #error Clipboard is not implemented
+
+#endif
+ }
+
+

@@ -213,3 +213,9 @@
  	Log("Exiting");
  	gtk_main_quit();
  }
+
+ void action_clear(GtkWidget *w, gpointer data)
+ {
+    action_internal(EraseInput_action, IA_DEFAULT, CN, CN);
+ }
+

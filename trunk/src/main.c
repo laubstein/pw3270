@@ -7,11 +7,6 @@
 /*---[ Main menu ]------------------------------------------------------------*/
 
 
- void action_select_all( GtkWidget *w, gpointer   data )
- {
- 	CHKPoint();
- }
-
  // TODO (perry#1#): Load it from configuration file.
  static GtkItemFactoryEntry menu_items[] =
  {
@@ -23,9 +18,9 @@
  	{ "/_Editar",					NULL,					NULL,						0,	"<Branch>"		},
  	{ "/Editar/Copiar",				"<control>C",			action_copy,				0,	NULL			},
  	{ "/Editar/Copiar anexando",	"<control><shift>C",	action_append,				0,	NULL			},
- 	{ "/Editar/Colar",				NULL,					NULL,						0,	NULL			},
+ 	{ "/Editar/Colar",				"<control>V",			action_paste,				0,	NULL			},
 	{ "/Editar/sep1",     			NULL,         			NULL,						0,	"<Separator>"	},
-	{ "/Editar/Limpar campos",		NULL,					NULL,						0,	NULL			},
+	{ "/Editar/Limpar campos",		NULL,					action_clear,				0,	NULL			},
 	{ "/Editar/sep2",     			NULL,         			NULL,						0,	"<Separator>"	},
 	{ "/Editar/Selecionar tudo",	"<control>A",			action_select_all,			0,	NULL			},
 	{ "/Editar/Desmarcar",			"<control>D",			action_remove_selection,	0,	NULL			},

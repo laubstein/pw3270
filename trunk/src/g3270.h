@@ -138,6 +138,8 @@
  void action_disconnect(GtkWidget *w, gpointer data);
  void action_connect(GtkWidget *w, gpointer data);
  void action_exit(GtkWidget *w, gpointer data);
+ void action_clear(GtkWidget *w, gpointer data);
+ void action_paste(GtkWidget *w, gpointer data);
 
  #define NotImplemented() Log("Function %s in %s needs implementation",__FUNCTION__,__FILE__)
 

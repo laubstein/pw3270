@@ -6,6 +6,7 @@
  #include "lib/hostc.h"
  #include "lib/kybdc.h"
  #include "lib/actionsc.h"
+ #include "lib/ctlrc.h"
 // #include "lib/3270ds.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
@@ -120,11 +121,16 @@
        else
 	      SetOIAStatus(STATUS_BLANK);
 	   status_untiming();
+       ctlr_erase(True);
+       EnableCursor(TRUE);
     }
     else
     {
 	   SetOIAStatus(STATUS_DISCONNECTED);
        SetWindowTitle(0);
+       EnableCursor(FALSE);
+       ctlr_erase(True);
+       RedrawTerminalContents();
     }
  }
 
@@ -719,6 +725,13 @@
     fromRow   = -1;
 
     MouseMode = MOUSE_MODE_NORMAL;
+	gtk_widget_queue_draw(terminal);
+ }
+
+ void action_select_all( GtkWidget *w, gpointer   data )
+ {
+ 	fromRow = fromCol = 0;
+    Get3270DeviceBuffer(&toRow, &toCol);
 	gtk_widget_queue_draw(terminal);
  }
 
