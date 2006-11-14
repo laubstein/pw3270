@@ -3065,8 +3065,6 @@ emulate_input(char *s, int len, Boolean pasting)
 			    case '\n':
 				if (pasting)
 				{
-					printf("Linechanged: %d\n",lineChanged);
-					fflush(stdout);
 					if(lineChanged < 2)
 						action_internal(Newline_action, ia, CN, CN);
 				}
