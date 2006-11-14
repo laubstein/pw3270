@@ -66,7 +66,7 @@ endif
 
 #---[ Targets ]----------------------------------------------------------------#
 
-$(TARGET): $(OBJECTS) lib3270.so
+$(TARGET): lib3270.so $(OBJECTS)
 	g++ $(GLFLAGS) -o $@ $(OBJECTS)
 
 run: $(TARGET)
@@ -77,7 +77,10 @@ else
 	@LD_LIBRARY_PATH=. ./$(TARGET)
 endif
 
-lib3270.so: lib/*.c lib/*.h lib/Makefile
+lib/Makefile: lib/Makefile.in
+	@cd lib ; ./configure
+
+lib3270.so: lib/Makefile lib/*.c lib/*.h
 	@make -C lib lib3270.so
 	@mv lib/lib3270.so $@
 
@@ -88,4 +91,5 @@ clean:
 	@rm -f $(TARGET)
 	@rm -f $(OBJECTS)
 	@make -C lib clean
+	@rm -f lib/Makefile
 	@rm -f lib3270.so
