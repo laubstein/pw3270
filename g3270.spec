@@ -1,7 +1,7 @@
 Name:           g3270
 License:        GPL
 Group:          System/Libraries
-Version:        3.3
+Version:        3.3.4
 Release:        0.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
 Requires:       gtk+2 openssl
