@@ -121,7 +121,7 @@
 			  if(trm->fg || trm->bg)
 			  {
 		         gdk_gc_set_foreground(gc,terminal_cmap + (trm->fg % terminal_color_count));
-		         gdk_gc_set_background(gc,terminal_cmap + (trm->fg % terminal_color_count));
+		         gdk_gc_set_background(gc,terminal_cmap + (trm->bg % terminal_color_count));
 			  }
 
 		   }
