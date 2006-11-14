@@ -80,11 +80,8 @@
 
     static const struct WindowActions keyproc[] =
     {
-//     	DECLARE_KEYPROC( GDK_x,			GDK_ALT_MASK, 	toogle_crosshair	),
      	DECLARE_KEYPROC( GDK_Page_Up, 	0, 				Page_Up				),
      	DECLARE_KEYPROC( GDK_Page_Down,	0, 				Page_Down			),
-
-//     	DECLARE_KEYPROC( GDK_c, GDK_CONTROL_MASK, 	CopySelection )
     };
 
     static const struct TerminalActions actions[] =
@@ -119,6 +116,7 @@
     String			params[2];
     Cardinal 		one			= 1;
     int				f;
+    gchar 			*string		= 0;
 
     DBGTracex(event->state);
 
@@ -159,10 +157,12 @@
     	}
     }
 
+    string = event->string;
+
     DBGPrintf("Keyval: %d (%s) Keychar: \"%s\" State: %04x %s%s%s%s%s%s%s%s%s%s%s%s%s%s",
 						event->keyval,
 						gdk_keyval_name(event->keyval),
-						event->string,
+						string,
 						event->state,
 						event->state & GDK_SHIFT_MASK	? " GDK_SHIFT_MASK"		: "",
 						event->state & GDK_LOCK_MASK	? " GDK_LOCK_MASK"		: "",
@@ -181,7 +181,7 @@
 						);
 
     /* Check for regular key */
-    if(*event->string && !(event->state & (GDK_ALT_MASK|GDK_CONTROL_MASK)) )
+    if(*string && !(event->state & (GDK_ALT_MASK|GDK_CONTROL_MASK)) )
     {
  	   // Standard char, use it.
 	   params[0] = event->string;
