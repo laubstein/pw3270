@@ -12,7 +12,14 @@
  #define RedrawTerminalContents() gtk_widget_queue_draw(terminal)
  #define RedrawStatusLine() gtk_widget_queue_draw(terminal)
 
+
 /*---[ Defines ]--------------------------------------------------------------*/
+
+// #if GTK == 2
+    #define USE_CLIPBOARD
+// #else
+//    #define USE_SELECTION
+// #endif
 
  enum status_codes
  {
@@ -125,6 +132,7 @@
 
  void DrawTerminal(GdkDrawable *, GdkGC *, const FONTELEMENT *, int, int, int);
 
+ void InitClipboard(GtkWidget *w);
  int  AppendToClipboard(int fromRow, int fromCol, int toRow, int toCol);
  int  CopyToClipboard(int fromRow, int fromCol, int toRow, int toCol);
 

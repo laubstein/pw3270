@@ -662,6 +662,8 @@
        host_connect(cl_hostname);
     }
 
+    InitClipboard(ret);
+
     return ret;
  }
 

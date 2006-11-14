@@ -4,12 +4,20 @@
 
  #include "lib/kybdc.h"
 
+
 /*---[ Globals ]--------------------------------------------------------------*/
 
  char *Clipboard  = 0;
  int  szClipboard = 0;
 
 /*---[ Implement ]------------------------------------------------------------*/
+
+ void InitClipboard(GtkWidget *w)
+ {
+#ifdef USE_SELECTION
+
+#endif
+ }
 
  int CopyToClipboard(int fromRow, int fromCol, int toRow, int toCol)
  {
@@ -27,7 +35,7 @@
 
  int AppendToClipboard(int fromRow, int fromCol, int toRow, int toCol)
  {
-#if GTK == 2
+#ifdef USE_CLIPBOARD
     gchar			*string;
 #endif
 
@@ -93,7 +101,7 @@
     	return -1;
     }
 
-#if GTK == 2
+#ifdef USE_CLIPBOARD
 
     string = g_convert(buffer, -1,"UTF-8", "ISO-8859-1", NULL, NULL, NULL);
     if(!string)
@@ -163,7 +171,7 @@
 
     g_free(buffer);
 
-#if GTK == 2
+#ifdef USE_CLIPBOARD
 
     gtk_clipboard_set_text(	gtk_widget_get_clipboard(terminal,GDK_SELECTION_CLIPBOARD),
                             Clipboard,-1);
@@ -175,7 +183,7 @@
     return 0;
  }
 
-#if GTK == 2
+#ifdef USE_CLIPBOARD
  static void paste_clipboard(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
     gchar *string;
@@ -195,7 +203,7 @@
 
  void action_paste(GtkWidget *w, gpointer data)
  {
-#if GTK == 2
+#ifdef USE_CLIPBOARD
     gtk_clipboard_request_text(	gtk_widget_get_clipboard(terminal,GDK_SELECTION_CLIPBOARD),
 								paste_clipboard,
 								0 );
