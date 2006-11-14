@@ -133,7 +133,7 @@
 
     	for(col=fromCol;col<toCol;col++)
     	{
-            *ptr = Ebc2ASC(trm->cc);
+            *ptr = ebcdic2asc[trm->cc]; // Ebc2ASC(trm->cc);
     		if(*ptr > ' ')
     		   mark = ptr;
     		ptr++;

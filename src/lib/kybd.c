@@ -2941,6 +2941,11 @@ remargin(int lmargin)
 	return True;
 }
 
+int Get3270CursorRow(void)
+{
+	return (cursor_addr/maxCOLS);
+}
+
 /*
  * Pretend that a sequence of keys was entered at the keyboard.
  *
@@ -2964,6 +2969,8 @@ emulate_input(char *s, int len, Boolean pasting)
 	} state = BASE;
 	int literal = 0;
 	int nc = 0;
+	int lin;
+	int lineChanged = 0;
 	enum iaction ia = pasting ? IA_PASTE : IA_STRING;
 	int orig_addr = cursor_addr;
 	int orig_col = BA_TO_COL(cursor_addr);
@@ -3000,7 +3007,19 @@ emulate_input(char *s, int len, Boolean pasting)
 	 * In the switch statements below, "break" generally means "consume
 	 * this character," while "continue" means "rescan this character."
 	 */
+    lin = Get3270CursorRow();
+
 	while (len) {
+
+        if(lin == Get3270CursorRow())
+        {
+        	lineChanged = 0;
+        }
+        else;
+        {
+        	lin = Get3270CursorRow();
+        	lineChanged++;
+        }
 
 		/*
 		 * It isn't possible to unlock the keyboard from a string,
@@ -3045,8 +3064,14 @@ emulate_input(char *s, int len, Boolean pasting)
 				break;
 			    case '\n':
 				if (pasting)
-					action_internal(Newline_action, ia, CN, CN);
-				else {
+				{
+					printf("Linechanged: %d\n",lineChanged);
+					fflush(stdout);
+					if(lineChanged < 2)
+						action_internal(Newline_action, ia, CN, CN);
+				}
+				else
+				{
 					action_internal(Enter_action, ia, CN, CN);
 					if (IN_3270)
 						return len-1;

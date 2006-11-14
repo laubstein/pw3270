@@ -161,7 +161,7 @@
        return -1;
 
     fprintf(out,"%s\n",string);
-	DBGMessage(string);
+	DBGPrintf("%s\n",string);
 
     g3270_closeLog(out);
 	g3270_unlock();
