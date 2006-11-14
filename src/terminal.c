@@ -389,17 +389,20 @@
  	long	cRow;
  	long	cCol;
 
-    MouseMode = MOUSE_MODE_SELECTING;
+ 	if(event->state & GDK_BUTTON1_MASK)
+ 	{
 
-    xTo = ((long) event->x);
-    yTo = ((long) event->y);
+       MouseMode = MOUSE_MODE_SELECTING;
 
-    Mouse2Terminal(xTo, yTo, &cRow, &cCol);
+       xTo = ((long) event->x);
+       yTo = ((long) event->y);
 
-    toRow = cRow;
-    toCol = cCol;
+       Mouse2Terminal(xTo, yTo, &cRow, &cCol);
 
-    DBGPrintf("Box from %d,%d to %d,%d",min(toRow,fromRow),min(toCol,fromCol),max(toRow,fromRow),max(toCol,fromCol));
+       toRow = cRow;
+       toCol = cCol;
+
+       DBGPrintf("Box from %d,%d to %d,%d",min(toRow,fromRow),min(toCol,fromCol),max(toRow,fromRow),max(toCol,fromCol));
 /*
 
 							(fromCol * font->Width) + left_margin,
@@ -409,7 +412,8 @@
 */
 
 
-	gtk_widget_queue_draw(widget);
+   	   gtk_widget_queue_draw(widget);
+ 	}
 
 
  	return 0;
@@ -594,6 +598,7 @@
 
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Events.html#GdkEventMask
     gtk_widget_add_events(ret,GDK_KEY_PRESS_MASK|GDK_BUTTON_PRESS_MASK|GDK_BUTTON_MOTION_MASK|GDK_BUTTON_RELEASE_MASK);
+
 
     // FIXME (perry#3#): Make it better! Get the smaller font, not the first one.
 	SetFont(ret,fontlist,0,0);

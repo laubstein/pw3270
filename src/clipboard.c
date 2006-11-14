@@ -10,11 +10,67 @@
  char *Clipboard  = 0;
  int  szClipboard = 0;
 
+#ifdef USE_SELECTION
+ static GtkWidget	*clipboard_widget = 0;
+#endif
+
 /*---[ Implement ]------------------------------------------------------------*/
+
+#ifdef USE_SELECTION
+
+ // http://www.google.com.br/codesearch?q=+gtk_selection_add_target+show:L9kmB7L0t-M:OvIvT0HzdRY:S4TjZW2WUPM&sa=N&cd=10&ct=rc&cs_p=http://ftp.mozilla.org/pub/mozilla.org/mozilla/releases/mozilla1.7a/src/mozilla-source-1.7a.tar.bz2&cs_f=mozilla/widget/src/gtk/nsClipboard.cpp#a0
+
+ void SelectionGetCB(GtkWidget *widget,GtkSelectionData *selection_data, guint aInfo, guint aTime)
+ {
+ 	char *teste = "TESTE DE COPIA PARA BUFFER";
+
+ 	CHKPoint();
+
+    gtk_selection_data_set(	selection_data,
+							GDK_SELECTION_TYPE_STRING,
+							8,
+							(guchar *) teste,
+							strlen(teste));
+ }
+
+ void SelectionClearCB(GtkWidget *aWidget, GdkEventSelection *aEvent, gpointer aData)
+ {
+ 	CHKPoint();
+ }
+
+ void SelectionReceivedCB(GtkWidget *aWidget, GtkSelectionData *aSelectionData, guint aTime)
+ {
+ 	CHKPoint();
+ }
+
+#endif
 
  void InitClipboard(GtkWidget *w)
  {
 #ifdef USE_SELECTION
+
+   clipboard_widget = gtk_invisible_new();
+
+   // When someone else takes the selection away:
+   gtk_signal_connect(		GTK_OBJECT(clipboard_widget), "selection_clear_event",
+							GTK_SIGNAL_FUNC(SelectionClearCB),
+							0 );
+
+   // Set up the paste handler:
+   gtk_signal_connect(		GTK_OBJECT(clipboard_widget), "selection_received",
+							GTK_SIGNAL_FUNC(SelectionReceivedCB),
+							0 );
+
+   // Add target
+   gtk_selection_add_target(	clipboard_widget,
+								GDK_SELECTION_PRIMARY,
+								GDK_TARGET_STRING,
+								1 );
+
+   // Handle selection requests if we called gtk_selection_add_target:
+   gtk_signal_connect(		GTK_OBJECT(clipboard_widget), "selection_get",
+							GTK_SIGNAL_FUNC(SelectionGetCB),
+							0 );
 
 #endif
  }
@@ -177,7 +233,12 @@
                             Clipboard,-1);
 #else
 
-    #error Clipboard is not implemented
+    DBGMessage("Setting selection owner");
+    if(!gtk_selection_owner_set(clipboard_widget, GDK_SELECTION_PRIMARY, GDK_CURRENT_TIME))
+    {
+    	Log("gtk_selection_owner_set() has failed!");
+    	return -1;
+    }
 
 #endif
     return 0;
@@ -209,7 +270,7 @@
 								0 );
 #else
 
-    #error Clipboard is not implemented
+    NotImplemented();
 
 #endif
  }
