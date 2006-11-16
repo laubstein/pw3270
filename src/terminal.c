@@ -475,36 +475,48 @@
 
  }
 
- static void resize(GtkWidget *widget, GtkAllocation *allocation, void *t)
+ static void size_allocate(GtkWidget *widget, GtkAllocation *allocation, void *t)
  {
  	int			rows;
  	int			cols;
  	int			width;
- 	FONTELEMENT *fn   	= font;
+ 	int			height;
+ 	FONTELEMENT *fn   	= 0;
  	int         f;
 
     Get3270DeviceBuffer(&rows, &cols);
 
- 	width = allocation->width / cols;
+ 	width  = allocation->width / cols;
+ 	height = (allocation->height / (rows+2)) - MIN_LINE_SPACING;
 
-//	DBGPrintf("Resize %d,%d em %d,%d (%d)", allocation->width, allocation->height,allocation->x,allocation->y,width);
+	DBGPrintf("Resize %d,%d em %d,%d (%dx%d)",	allocation->width,
+												allocation->height,
+												allocation->x,
+												allocation->y,
+												width,
+												height
+			);
 
     /* Search for a font with exact match */
-    for(f = 0; f< FONT_COUNT;f++)
+    for(f = 0; f< FONT_COUNT && !fn;f++)
     {
-    	if(fontlist[f].Width == width)
-    	{
-//		   DBGPrintf("Font %d has %d pixels width",f,width);
-		   SetFont(widget,fontlist+f,allocation->width,allocation->height);
-		   return;
-    	}
+    	if( (fontlist[f].Width == width) && fontlist[f].Height <= height )
+		   fn = fontlist+f;
     }
 
-    /* No match, search for the near one */
-    for(f = 0; f < FONT_COUNT;f++)
+    if(!fn)
     {
-    	if(fontlist[f].Width <= width && fontlist[f].Width > fn->Width)
-    	   fn = fontlist+f;
+       /* No match, search for the near one */
+       fn = fontlist;
+       for(f = 0; f < FONT_COUNT;f++)
+       {
+	      if(fontlist[f].Width <= width
+					&& fontlist[f].Width > fn->Width
+					&& fontlist[f].Height <= height )
+		  {
+    	     fn = fontlist+f;
+		  }
+       }
     }
 
     /* Reconfigure drawing box */
@@ -615,7 +627,7 @@
     gtk_widget_set_size_request(ret, font->Width*(cols+1), (font->Height+MIN_LINE_SPACING)*(rows+1));
 
     g_signal_connect(G_OBJECT(ret), "expose_event",  		G_CALLBACK(expose),		  	0);
-    g_signal_connect(G_OBJECT(ret), "size-allocate",		G_CALLBACK(resize),	   	  	0);
+    g_signal_connect(G_OBJECT(ret), "size-allocate",		G_CALLBACK(size_allocate), 	0);
     g_signal_connect(G_OBJECT(ret), "key-press-event",		G_CALLBACK(KeyboardAction),	0);
     g_signal_connect(G_OBJECT(ret), "button-press-event",	G_CALLBACK(button_press),	0);
     g_signal_connect(G_OBJECT(ret), "button-release-event",	G_CALLBACK(button_release),	0);
