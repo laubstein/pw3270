@@ -1,7 +1,7 @@
 
 TARGET		= g3270
 OBJECTS     = main.o log.o terminal.o screen_callbacks.o gsource.o actions.o \
-				clipboard.o draw.o
+				clipboard.o draw.o print.o
 
 ifeq ($(DEBUG),1)
    DFLAGS=-DDEBUG=1 -g -O0
@@ -23,6 +23,14 @@ ifndef GTK
    GTK=`pkg-config --modversion $(GTKLIB) | cut -b 1`
 endif
 
+ifndef TMPPATH
+   TMPPATH=/tmp
+endif
+
+ifndef LOGPATH
+   LOGPATH=/var/log
+endif
+
 ifeq ($(GTKLIB),gtk+)
    GTK_MODULES=$(GTKLIB)
 else
@@ -37,7 +45,8 @@ PKG_MODULES=$(GTK_MODULES)
 GCFLAGS     = -c `pkg-config --cflags $(PKG_MODULES)` \
               -DBUILD=\"`date +%G%m%d%H%M`\" -Wall -Werror \
               -DTARGET=\"$(TARGET)\" $(DFLAGS) \
-              -DGTK=$(GTK) -DGTKVERSION=\"$(GTK_VRS)\"
+              -DGTK=$(GTK) -DGTKVERSION=\"$(GTK_VRS)\" \
+              -DTMPPATH=\"$(TMPPATH)\" -DLOGPATH=\"$(LOGPATH)\"
 
 GLFLAGS     = `pkg-config --libs $(PKG_MODULES)` -L. -l3270
 

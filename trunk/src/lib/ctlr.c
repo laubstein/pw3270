@@ -192,8 +192,6 @@ set_rows_cols(int mn, int ovc, int ovr)
 {
 	int defmod;
 
-	printf("mn: %d ovc: %d ovr: %d\n",mn,ovc,ovr);fflush(stdout);
-
 	switch (mn) {
 	case 2:
 		maxCOLS = 80;

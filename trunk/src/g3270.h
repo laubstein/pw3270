@@ -9,8 +9,8 @@
  #include "lib/lib3270.h"
  #include "log.h"
 
- #define RedrawTerminalContents() gtk_widget_queue_draw(terminal)
- #define RedrawStatusLine() gtk_widget_queue_draw(terminal)
+ #define RedrawTerminalContents() if(terminal) { gtk_widget_queue_draw(terminal); }
+ #define RedrawStatusLine() if(terminal) { gtk_widget_queue_draw(terminal); }
 
 
 /*---[ Defines ]--------------------------------------------------------------*/
@@ -19,6 +19,14 @@
     #define USE_CLIPBOARD
  #else
     #define USE_SELECTION
+ #endif
+
+ #ifndef TMPPATH
+    TMPPATH="/tmp"
+ #endif
+
+ #ifndef LOGPATH
+    LOGPATH="/var/log"
  #endif
 
  enum status_codes
@@ -132,6 +140,8 @@
  void InvalidateCursor(void);
  void status_untiming(void);
 
+ int  PrintTemporaryFile(const char *filename);
+
  void DrawTerminal(GdkDrawable *, GdkGC *, const FONTELEMENT *, int, int, int);
 
  void InitClipboard(GtkWidget *w);
@@ -150,6 +160,10 @@
  void action_exit(GtkWidget *w, gpointer data);
  void action_clear(GtkWidget *w, gpointer data);
  void action_paste(GtkWidget *w, gpointer data);
+
+ void action_print(GtkWidget *w, gpointer data);
+ void action_print_copy(GtkWidget *w, gpointer data);
+ void action_print_selection(GtkWidget *w, gpointer data);
 
 
  #define NotImplemented() Log("Function %s in %s needs implementation",__FUNCTION__,__FILE__)

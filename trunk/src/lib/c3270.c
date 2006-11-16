@@ -255,8 +255,6 @@ int Initialize_3270(void)
 	/* Make sure we can collect child exit status. */
 	(void) signal(SIGCHLD, sigchld_handler);
 
-	printf("%s(%d)\n",__FILE__,__LINE__);fflush(stdout);
-
 	/* Handle initial toggle settings. */
 #if defined(X3270_TRACE) /*[*/
 	if (!appres.debug_tracing) {
