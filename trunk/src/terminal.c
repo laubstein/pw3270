@@ -23,6 +23,10 @@
 
  #define	STATUS_LINE_SPACE		4
 
+ #if GTK == 2
+    #define USE_GTKIMCONTEXT
+ #endif
+
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
 /*---[ Constants ]------------------------------------------------------------*/
@@ -104,6 +108,10 @@
  static gboolean	cross_hair								= FALSE;
 
  int				cursor_type								= CURSOR_TYPE_OVER;
+
+#ifdef USE_GTKIMCONTEXT
+ GtkIMContext		*im;
+#endif
 
 /*---[ Terminal colors ]------------------------------------------------------*/
 
@@ -475,8 +483,9 @@
 
  }
 
- static void size_allocate(GtkWidget *widget, GtkAllocation *allocation, void *t)
+ static void configure_event(GtkWidget *widget, GdkEventConfigure *event, void *t)
  {
+    // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventConfigure
  	int			rows;
  	int			cols;
  	int			width;
@@ -486,13 +495,13 @@
 
     Get3270DeviceBuffer(&rows, &cols);
 
- 	width  = allocation->width / cols;
- 	height = (allocation->height / (rows+2)) - MIN_LINE_SPACING;
+ 	width  = event->width / cols;
+ 	height = (event->height / (rows+2)) - MIN_LINE_SPACING;
 
-	DBGPrintf("Resize %d,%d em %d,%d (%dx%d)",	allocation->width,
-												allocation->height,
-												allocation->x,
-												allocation->y,
+	DBGPrintf("Resize %d,%d em %d,%d (%dx%d)",	event->width,
+												event->height,
+												event->x,
+												event->y,
 												width,
 												height
 			);
@@ -520,9 +529,64 @@
     }
 
     /* Reconfigure drawing box */
-    SetFont(widget,fn,allocation->width,allocation->height);
+    SetFont(widget,fn,event->width,event->height);
 
  }
+
+ static void realize(GtkWidget *widget, void *t)
+ {
+#ifdef USE_GTKIMCONTEXT
+    gtk_im_context_set_client_window(im,widget->window);
+#endif
+ }
+
+ static gboolean focus_in_event(GtkWidget *widget, GdkEventFocus *event, gpointer x)
+ {
+ 	CHKPoint();
+#ifdef USE_GTKIMCONTEXT
+    gtk_im_context_focus_in(im);
+#endif
+ 	return 0;
+ }
+
+ static gboolean focus_out_event(GtkWidget *widget, GdkEventFocus *event, gpointer x)
+ {
+ 	CHKPoint();
+#ifdef USE_GTKIMCONTEXT
+    gtk_im_context_focus_out(im);
+#endif
+ 	return 0;
+ }
+
+ static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+ {
+#ifdef USE_GTKIMCONTEXT
+    if(gtk_im_context_filter_keypress(im,event))
+       return TRUE;
+#endif
+
+ 	CHKPoint();
+ 	return KeyboardAction(widget,event,user_data);
+ }
+
+ static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+ {
+#ifdef USE_GTKIMCONTEXT
+    if(gtk_im_context_filter_keypress(im,event))
+       return TRUE;
+#endif
+
+ 	CHKPoint();
+ 	return 0;
+ }
+
+#ifdef USE_GTKIMCONTEXT
+ static void im_commit(GtkIMContext *imcontext, gchar *arg1, gpointer user_data)
+ {
+ 	DBGPrintf("Commit: %s",arg1);
+	ParseInput(arg1);
+ }
+#endif
 
  static void LoadColors(GdkColor *clr, int qtd, const char *string)
  {
@@ -575,6 +639,10 @@
 
     gsource_init();
 
+#ifdef USE_GTKIMCONTEXT
+    im = gtk_im_context_simple_new();
+#endif
+
     Initialize_3270();
 
     register_3270_schange(ST_CONNECT,		stsConnect);
@@ -616,7 +684,7 @@
     GTK_WIDGET_SET_FLAGS(ret, GTK_CAN_FOCUS);
 
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Events.html#GdkEventMask
-    gtk_widget_add_events(ret,GDK_KEY_PRESS_MASK|GDK_BUTTON_PRESS_MASK|GDK_BUTTON_MOTION_MASK|GDK_BUTTON_RELEASE_MASK);
+    gtk_widget_add_events(ret,GDK_KEY_PRESS_MASK|GDK_KEY_RELEASE_MASK|GDK_BUTTON_PRESS_MASK|GDK_BUTTON_MOTION_MASK|GDK_BUTTON_RELEASE_MASK);
 
 
     // FIXME (perry#3#): Make it better! Get the smaller font, not the first one.
@@ -626,17 +694,23 @@
     DBGPrintf("Screen size: %dx%d",rows,cols);
     gtk_widget_set_size_request(ret, font->Width*(cols+1), (font->Height+MIN_LINE_SPACING)*(rows+1));
 
-    g_signal_connect(G_OBJECT(ret), "expose_event",  		G_CALLBACK(expose),		  	0);
-    g_signal_connect(G_OBJECT(ret), "size-allocate",		G_CALLBACK(size_allocate), 	0);
-    g_signal_connect(G_OBJECT(ret), "key-press-event",		G_CALLBACK(KeyboardAction),	0);
-    g_signal_connect(G_OBJECT(ret), "button-press-event",	G_CALLBACK(button_press),	0);
-    g_signal_connect(G_OBJECT(ret), "button-release-event",	G_CALLBACK(button_release),	0);
-    g_signal_connect(G_OBJECT(ret), "motion-notify-event",	G_CALLBACK(motion_notify),	0);
+    g_signal_connect(G_OBJECT(ret), "expose_event",  		G_CALLBACK(expose),		  		0);
+    g_signal_connect(G_OBJECT(ret), "key-press-event",		G_CALLBACK(key_press_event),	0);
+    g_signal_connect(G_OBJECT(ret), "key-release-event",	G_CALLBACK(key_release_event),	0);
+    g_signal_connect(G_OBJECT(ret), "button-press-event",	G_CALLBACK(button_press),		0);
+    g_signal_connect(G_OBJECT(ret), "button-release-event",	G_CALLBACK(button_release),		0);
+    g_signal_connect(G_OBJECT(ret), "motion-notify-event",	G_CALLBACK(motion_notify),		0);
+    g_signal_connect(G_OBJECT(ret), "configure-event",		G_CALLBACK(configure_event), 	0);
+    g_signal_connect(G_OBJECT(ret), "realize",				G_CALLBACK(realize), 			0);
+    g_signal_connect(G_OBJECT(ret), "focus-in-event",		G_CALLBACK(focus_in_event), 	0);
+    g_signal_connect(G_OBJECT(ret), "focus-out-event",		G_CALLBACK(focus_out_event), 	0);
+
+#ifdef USE_GTKIMCONTEXT
+    g_signal_connect(G_OBJECT(im), "commit",				G_CALLBACK(im_commit), 			0);
+#endif
 
 #if GTK == 2
-
-    g_signal_connect(G_OBJECT(ret), "scroll-event",			G_CALLBACK(scroll_event),	0);
-
+    g_signal_connect(G_OBJECT(ret), "scroll-event",			G_CALLBACK(scroll_event),		0);
 #endif
 
     // Set terminal colors
@@ -693,6 +767,10 @@
 
  void InvalidateCursor(void)
  {
+#ifdef USE_GTKIMCONTEXT
+    gtk_im_context_reset(im);
+#endif
+
 	gtk_widget_queue_draw(terminal);
  }
 
@@ -707,6 +785,7 @@
  {
  	cursor_enabled = mode;
  	DBGPrintf("Cross_hair: %s Cursor: %s",cross_hair ? "Yes" : "No",cursor_enabled ? "Yes" : "No");
+    InvalidateCursor();
  }
 
  void SetCursorType(int type)
@@ -717,10 +796,25 @@
 
  void SetCursorPosition(int row, int col)
  {
+#ifdef USE_GTKIMCONTEXT
+    GdkRectangle area;
+#endif
+
     InvalidateCursor();
     cursor_row = row;
     cursor_col = col;
     InvalidateCursor();
+
+#ifdef USE_GTKIMCONTEXT
+    memset(&area,0,sizeof(area));
+
+    area.width	= font->Width;
+    area.height	= (font->Height + line_spacing);
+    area.x		= (cursor_col * area.width)  + left_margin;
+    area.y		= (cursor_row * area.height) + (top_margin + font->Height);
+
+    gtk_im_context_set_cursor_location(im,&area);
+#endif
  }
 
  void action_copy(GtkWidget *w, gpointer data)

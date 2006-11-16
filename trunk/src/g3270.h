@@ -165,6 +165,8 @@
  void action_print_copy(GtkWidget *w, gpointer data);
  void action_print_selection(GtkWidget *w, gpointer data);
 
+ void ParseInput(const gchar *string);
+
 
  #define NotImplemented() Log("Function %s in %s needs implementation",__FUNCTION__,__FILE__)
 
