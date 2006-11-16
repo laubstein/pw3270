@@ -53,7 +53,7 @@ GLFLAGS     = `pkg-config --libs $(PKG_MODULES)` -L. -l3270
 #---[ Leak check ]-------------------------------------------------------------#
 
 # LeakTracer: http://freshmeat.net/projects/leaktracer/
-DEBUG_RUN = LeakCheck ./$(TARGET) ; leak-analyze ./$(TARGET)
+# DEBUG_RUN = LeakCheck ./$(TARGET) ; leak-analyze ./$(TARGET)
 
 # Valgrind
 # DEBUG_RUN = valgrind --tool=memcheck --leak-check=yes --db-attach=no ./$(TARGET)
@@ -65,18 +65,14 @@ endif
 
 #---[ Rules ]------------------------------------------------------------------#
 
-%.o: %.cpp *.h Makefile
-	@echo $< ...
-	g++ $(GCFLAGS) -o $@ -c $<
-
 %.o: %.c *.h Makefile
 	@echo $< ...
-	gcc $(GCFLAGS) -o $@ -c $<
+	@gcc $(GCFLAGS) -o $@ -c $<
 
 #---[ Targets ]----------------------------------------------------------------#
 
 $(TARGET): lib3270.so $(OBJECTS)
-	g++ $(GLFLAGS) -o $@ $(OBJECTS)
+	@gcc $(GLFLAGS) -o $@ $(OBJECTS)
 
 run: $(TARGET)
 	@sync
