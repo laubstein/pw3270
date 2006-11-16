@@ -1124,8 +1124,6 @@ key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause)
 			trace_event("  dropped (control char)\n");
 			return;
 		}
-		printf("%d\t%c = %02x,%02x %c\n",(int) c,c,asc2ebc[c],ebc2asc[asc2ebc[c]],0x5b);
-		fflush(stdout);
 		(void) key_Character((int) asc2ebc[c], keytype == KT_GE, False);
 	}
 #if defined(X3270_ANSI) /*[*/
