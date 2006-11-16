@@ -79,7 +79,6 @@
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
 
-
     static const struct WindowActions keyproc[] =
     {
      	DECLARE_KEYPROC( GDK_Page_Up, 	0, 				Page_Up				),
@@ -185,7 +184,7 @@
 						);
 
     /* Check for regular key */
-    if(*string && !(event->state & (GDK_ALT_MASK|GDK_CONTROL_MASK)) )
+    if(string && *string && !(event->state & (GDK_ALT_MASK|GDK_CONTROL_MASK)) )
     {
  	   // Standard char, use it.
 	   params[0] = event->string;
