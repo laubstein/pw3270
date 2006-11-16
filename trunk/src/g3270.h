@@ -95,7 +95,7 @@
  extern const 	SCREEN_CALLBACK g3270_screen_callbacks;
  extern const 	KEYBOARD_INFO   g3270_keyboard_info;
 
- extern const 	gchar 			ebcdic2asc[];
+ extern const 	unsigned char	ebcdic2asc[];
 
 
  extern char					oia_cursor[];

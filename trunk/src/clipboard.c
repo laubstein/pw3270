@@ -3,6 +3,7 @@
  #include "trace.h"
 
  #include "lib/kybdc.h"
+ #include "lib/tablesc.h"
 
 
 /*---[ Globals ]--------------------------------------------------------------*/
@@ -133,7 +134,7 @@
 
     	for(col=bCol;col<fCol;col++)
     	{
-            *ptr = ebcdic2asc[trm->cc]; // Ebc2ASC(trm->cc);
+            *ptr = ebc2asc[trm->cc];
     		if(*ptr > ' ')
     		   mark = ptr;
     		ptr++;

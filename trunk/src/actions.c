@@ -6,6 +6,7 @@
  #include "lib/kybdc.h"
  #include "lib/actionsc.h"
  #include "lib/3270ds.h"
+ #include "lib/tablesc.h"
 
 /*---[ Keyboard processing ]--------------------------------------------*/
 
@@ -74,9 +75,10 @@
     action_internal(PF_action, IA_DEFAULT, "8", CN);
  }
 
- // FIXME (perry#1#): Optimize keyboard processing.
+ // FIXME (perry#1#): Replace structures with GTK acelerators loaded from configuration file
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+
 
     static const struct WindowActions keyproc[] =
     {
@@ -244,7 +246,7 @@
           {
     	     for(col = 0; col < cols; col++)
     	     {
-    	     	fprintf(arq,"%c",ebcdic2asc[trm->cc]);
+    	     	fprintf(arq,"%c",ebc2asc[trm->cc]);
     	     	trm++;
     	     }
     	     fprintf(arq,"\n");

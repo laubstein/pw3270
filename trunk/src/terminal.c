@@ -7,7 +7,7 @@
  #include "lib/kybdc.h"
  #include "lib/actionsc.h"
  #include "lib/ctlrc.h"
-// #include "lib/3270ds.h"
+ #include "lib/tablesc.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -793,7 +793,7 @@
 
     	  for(col=bCol;col<fCol;col++)
     	  {
-             *ptr = ebcdic2asc[trm->cc];
+             *ptr = ebc2asc[trm->cc];
     		 if(*ptr > ' ')
     		    mark = ptr;
     		 ptr++;
