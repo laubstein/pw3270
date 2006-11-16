@@ -90,6 +90,8 @@
 		// http://www.koders.com/c/fidA3A9523D24A70BAFCE05733E73D558365D103DB3.aspx
 
 		DECLARE_ACTION( GDK_Home,		0,	Home_action, 			IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_End,		0,	EraseInput_action,		IA_DEFAULT, CN, CN ),
+
 		DECLARE_ACTION( GDK_Left,		0,	Left_action,			IA_DEFAULT, CN, CN ),
 		DECLARE_ACTION( GDK_Up,			0,	Up_action,				IA_DEFAULT, CN, CN ),
 		DECLARE_ACTION( GDK_Right,		0,	Right_action, 			IA_DEFAULT, CN, CN ),
@@ -218,5 +220,47 @@
  {
     action_internal(EraseInput_action, IA_DEFAULT, CN, CN);
  }
+
+ void action_print(GtkWidget *w, gpointer data)
+ {
+    // TODO (perry#9#): Replace with mkstemp
+ 	char 			*filename = tempnam(TMPPATH, TARGET);
+ 	int				rows;
+ 	int				cols;
+ 	int				row;
+ 	int				col;
+ 	const struct ea *trm;
+ 	FILE			*arq;
+
+ 	DBGMessage(filename);
+
+ 	arq = fopen(filename,"w");
+ 	if(arq)
+ 	{
+       trm = Get3270DeviceBuffer(&rows, &cols);
+       if(trm)
+       {
+          for(row = 0; row < rows; row++)
+          {
+    	     for(col = 0; col < cols; col++)
+    	     {
+    	     	fprintf(arq,"%c",ebcdic2asc[trm->cc]);
+    	     	trm++;
+    	     }
+    	     fprintf(arq,"\n");
+          }
+       }
+       fclose(arq);
+       PrintTemporaryFile(filename);
+ 	}
+ 	else
+ 	{
+ 		Error("Unable to open \"%s\" for writing",filename);
+        free(filename);
+ 	}
+
+ }
+
+
 
 

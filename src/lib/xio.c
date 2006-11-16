@@ -47,7 +47,6 @@ x_add_input(int net_sock)
 	ns_exception_id = AddExcept(net_sock, net_exception);
 	excepting = True;
 
-    printf("%s(%d) %p\n",__FILE__,__LINE__,net_input);fflush(stdout);
 	ns_read_id = AddInput(net_sock, net_input);
 
 	reading = True;

@@ -750,3 +750,69 @@
 	gtk_widget_queue_draw(terminal);
  }
 
+ void action_print_selection(GtkWidget *w, gpointer data)
+ {
+ 	int				rows;
+ 	int				cols;
+ 	const struct ea *screen;
+ 	const struct ea *trm;
+ 	char			*ptr;
+ 	char			*mark;
+
+ 	char			buffer[1024];
+
+    int col;
+    int row;
+
+ 	int bCol = min(fromCol,toCol);
+ 	int fCol = max(fromCol,toCol);
+
+ 	int bRow = min(fromRow,toRow);
+ 	int fRow = max(fromRow,toRow);
+
+ 	char 			*filename;
+ 	FILE			*arq;
+
+ 	screen = Get3270DeviceBuffer(&rows, &cols);
+
+ 	if(bCol < 0 || bRow < 0)
+ 	   return;
+
+ 	filename = tempnam(TMPPATH, TARGET);
+ 	DBGMessage(filename);
+
+ 	arq = fopen(filename,"w");
+ 	if(arq)
+ 	{
+	   DBGPrintf("Printing from %d,%d to %d,%d",bRow,bCol,fRow,fCol);
+
+       for(row=bRow;row<fRow;row++)
+       {
+	      trm  = screen + ((row * cols)+fromCol);
+		  mark = ptr = buffer;
+
+    	  for(col=bCol;col<fCol;col++)
+    	  {
+             *ptr = ebcdic2asc[trm->cc];
+    		 if(*ptr > ' ')
+    		    mark = ptr;
+    		 ptr++;
+    		 trm++;
+		   }
+    	   *(mark+1) = 0;
+
+    	   DBGPrintf("%d\t%s",row,buffer);
+
+    	   fprintf(arq,"%s\n",buffer);
+       }
+
+       fclose(arq);
+       PrintTemporaryFile(filename);
+ 	}
+ 	else
+ 	{
+ 		Error("Unable to open \"%s\" for writing",filename);
+        free(filename);
+ 	}
+
+ }

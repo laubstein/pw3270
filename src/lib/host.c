@@ -623,7 +623,6 @@ host_connect(const char *n)
 	x_add_input(net_sock);
 
 	/* Set state and tell the world. */
-printf("%s(%d) %d\n", __FILE__, __LINE__,pending); fflush(stdout);
 
 	if (pending) {
 		cstate = PENDING;

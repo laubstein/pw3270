@@ -11,8 +11,9 @@
  static GtkItemFactoryEntry menu_items[] =
  {
  	{ "/_Arquivo",					NULL,					NULL,						0,		"<Branch>"		},
- 	{ "/Arquivo/_Imprimir Tela",	"<control>P",			NULL,						0,		NULL			},
- 	{ "/Arquivo/_Imprimir Seleção",	"<control><shift>P",	NULL,						0,		NULL			},
+ 	{ "/Arquivo/_Imprimir Tela",	"<control>P",			action_print,				0,		NULL			},
+ 	{ "/Arquivo/Imprimir Seleção",	"<control><shift>P",	action_print_selection,		0,		NULL			},
+ 	{ "/Arquivo/Imprimir Cópia",	NULL,					action_print_copy,			0,		NULL			},
  	{ "/Arquivo/Sair",          	"<control>X",			action_exit,				0,		NULL			},
 
  	{ "/_Editar",					NULL,					NULL,						0,		"<Branch>"		},
@@ -152,7 +153,7 @@
 #endif
 */
 
-    printf(TARGET " (Build " BUILD " for gtk " GTKVERSION ") Starting\n");
+    printf(TARGET " Build " BUILD " for gtk " GTKVERSION "\n");
     fflush(stdout);
 
 

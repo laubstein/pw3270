@@ -11,7 +11,7 @@ BuildRequires:  gtk2-devel openssl-devel
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
-any IBM host that supports 3270-style connections over TELNET. 
+any IBM host that supports 3270-style connections over TELNET.
 
 %package lib
 Provides:	%{name}-lib
@@ -30,7 +30,7 @@ cd src/lib
 cd ../..
 
 %build
-make DATADIR=/%{_datadir}/%{name} -C src
+make DATADIR=/%{_datadir}/%{name} TMPPATH=%{tmppath} -C src
 
 %install
 rm -rf $RPM_BUILD_ROOT

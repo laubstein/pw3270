@@ -111,7 +111,7 @@
  	int fCol = max(fromCol,toCol);
 
  	int bRow = min(fromRow,toRow);
- 	int fRow = min(fromRow,toRow);
+ 	int fRow = max(fromRow,toRow);
 
  	screen = Get3270DeviceBuffer(&rows, &cols);
 
@@ -126,12 +126,12 @@
     }
 
     ptr = buffer;
-    for(row=fromRow;row<toRow;row++)
+    for(row=bRow;row<fRow;row++)
     {
     	trm  = screen + ((row * cols)+fromCol);
     	mark = ptr;
 
-    	for(col=fromCol;col<toCol;col++)
+    	for(col=bCol;col<fCol;col++)
     	{
             *ptr = ebcdic2asc[trm->cc]; // Ebc2ASC(trm->cc);
     		if(*ptr > ' ')
@@ -274,5 +274,34 @@
 
 #endif
  }
+
+ void action_print_copy(GtkWidget *w, gpointer data)
+ {
+ 	char 			*filename;
+ 	FILE			*arq;
+
+    if(!Clipboard)
+       return;
+
+    // TODO (perry#9#): Replace with mkstemp
+ 	filename = tempnam(TMPPATH, TARGET);
+ 	DBGMessage(filename);
+
+ 	arq = fopen(filename,"w");
+ 	if(arq)
+ 	{
+	   fprintf(arq,"%s\n",Clipboard);
+       fclose(arq);
+       PrintTemporaryFile(filename);
+ 	}
+ 	else
+ 	{
+ 		Error("Unable to open \"%s\" for writing",filename);
+        free(filename);
+ 	}
+
+ }
+
+
 
 

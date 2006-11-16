@@ -392,8 +392,6 @@ AddTimeOut(unsigned long interval, void (*proc)(void))
 		prev->next = t_new;
 	}
 
-	printf("*** TIMEOUT %p anexado (%ld ms)\n",t_new, interval);
-
 	return (unsigned long)t_new;
 }
 
@@ -403,8 +401,6 @@ RemoveTimeOut(unsigned long timer)
 	timeout_t *st = (timeout_t *)timer;
 	timeout_t *t;
 	timeout_t *prev = TN;
-
-	printf("*** TIMEOUT %p removido\n",st);
 
 	if (st->in_play)
 		return;
