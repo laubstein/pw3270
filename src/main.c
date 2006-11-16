@@ -40,6 +40,10 @@
  GtkWidget  *terminal		= 0;
  GtkWidget  *top_menu		= 0;
 
+#if defined(DATADIR) && GTK == 2
+ GdkPixbuf	*icon			= 0;
+#endif
+
 /*---[ Main program ]---------------------------------------------------------*/
 
  static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer data )
@@ -111,6 +115,12 @@
     // Create terminal window
 	terminal = g3270_new(cl_hostname);
 	gtk_box_pack_start(GTK_BOX(vbox),terminal,TRUE,TRUE,0);
+
+#if defined(DATADIR) && GTK == 2
+    icon = gdk_pixbuf_new_from_file(DATADIR "/icon.jpg", NULL);
+    if(icon)
+    	gtk_window_set_icon(GTK_WINDOW(top_window),icon);
+#endif
 
 #if GTK == 1
 	gtk_window_set_wmclass(GTK_WINDOW(top_window),"toplevel",TARGET);

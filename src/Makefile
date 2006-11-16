@@ -31,6 +31,10 @@ ifndef LOGPATH
    LOGPATH=/var/log
 endif
 
+ifndef DATADIR
+   DATADIR=.
+endif
+
 ifeq ($(GTKLIB),gtk+)
    GTK_MODULES=$(GTKLIB)
 else
@@ -46,7 +50,8 @@ GCFLAGS     = -c `pkg-config --cflags $(PKG_MODULES)` \
               -DBUILD=\"`date +%G%m%d%H%M`\" -Wall -Werror \
               -DTARGET=\"$(TARGET)\" $(DFLAGS) \
               -DGTK=$(GTK) -DGTKVERSION=\"$(GTK_VRS)\" \
-              -DTMPPATH=\"$(TMPPATH)\" -DLOGPATH=\"$(LOGPATH)\"
+              -DTMPPATH=\"$(TMPPATH)\" -DLOGPATH=\"$(LOGPATH)\" \
+              -DDATADIR=\"$(DATADIR)\"
 
 GLFLAGS     = `pkg-config --libs $(PKG_MODULES)` -L. -l3270
 
