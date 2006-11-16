@@ -116,8 +116,6 @@
 
 
 	char			ks[6];
-    String			params[2];
-    Cardinal 		one			= 1;
     int				f;
     gchar 			*string		= 0;
 
@@ -187,9 +185,7 @@
     if(string && *string && !(event->state & (GDK_ALT_MASK|GDK_CONTROL_MASK)) )
     {
  	   // Standard char, use it.
-	   params[0] = event->string;
-	   params[1] = 0;
-       Key_action(NULL, NULL, params, &one);
+ 	   ParseInput(string);
  	   return TRUE;
 	}
 
@@ -197,6 +193,23 @@
 
     return FALSE;
 
+ }
+
+ void ParseInput(const gchar *string)
+ {
+    gchar *input;
+
+    input = g_convert(string, -1, "ISO-8859-1", "UTF-8", NULL, NULL, NULL);
+    if(!string)
+    {
+    	Log("Error converting string to ISO-8859-1");
+    	return;
+    }
+
+    // NOTE (perry#1#): Is it the best way?
+    emulate_input(input, strlen(input), False);
+
+    g_free(input);
  }
 
  void action_connect(GtkWidget *w, gpointer data)
