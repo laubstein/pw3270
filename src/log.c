@@ -53,17 +53,17 @@
 
  static FILE *CheckFileName(char *dir)
  {
- 	time_t      ltime;
+    time_t      ltime;
     struct stat	fs;
- 	char 		masc[0x0100];
- 	char		fileName[0x0100];
+    char 	masc[0x0100];
+    char	fileName[0x0100];
 
- 	if(!dir)
- 	   return 0;
+    if(!dir)
+       return 0;
 
- 	strncpy(masc,dir,0xFF);
- 	strncat(masc,"/",0xFF);
- 	strncat(masc,logFileName,0xFF);
+    strncpy(masc,dir,0xFF);
+    strncat(masc,"/",0xFF);
+    strncat(masc,logFileName,0xFF);
 
     time(&ltime);
     strftime(fileName, 0xFF, masc, localtime(&ltime));
@@ -96,18 +96,23 @@
 
     if(home)
     {
-	   snprintf(dir, 0xFF,"%s/" TARGET, home);
-	   ret = CheckFileName(dir);
+       snprintf(dir, 0xFF,"%s/" TARGET, home);
+       ret = CheckFileName(dir);
        if(ret)
           return ret;
 
-	   snprintf(dir, 0xFF,"%s/log", home);
-	   ret = CheckFileName(dir);
+       snprintf(dir, 0xFF,"%s/log", home);
+       ret = CheckFileName(dir);
        if(ret)
           return ret;
 
-	   snprintf(dir, 0xFF,"%s/tmp", home);
-	   ret = CheckFileName(dir);
+       snprintf(dir, 0xFF,"%s/." TARGET, home);
+       ret = CheckFileName(dir);
+       if(ret)
+          return ret;
+
+       snprintf(dir, 0xFF,"%s/tmp", home);
+       ret = CheckFileName(dir);
        if(ret)
           return ret;
 
