@@ -22,13 +22,8 @@
 
 /*---[ Statics e globais ]----------------------------------------------------------------------------------*/
 
-#ifdef DEBUG
- static char   			logfile[0x0100]		= "g3270.log";
-#else
- static char   			logfile[0x0100]		= "/var/log/g3270.log";
-#endif
-
- static pthread_mutex_t	lock				= PTHREAD_MUTEX_INITIALIZER;
+ static char   			logFileName[0x0100]		= TARGET "_%u.log";
+ static pthread_mutex_t	lock					= PTHREAD_MUTEX_INITIALIZER;
 
 /*---[ Prototipos ]-----------------------------------------------------------------------------------------*/
 
@@ -56,44 +51,69 @@
     return pthread_mutex_unlock(&lock);
  }
 
+ static FILE *CheckFileName(char *dir)
+ {
+ 	time_t      ltime;
+    struct stat	fs;
+ 	char 		masc[0x0100];
+ 	char		fileName[0x0100];
+
+ 	if(!dir)
+ 	   return 0;
+
+ 	strncpy(masc,dir,0xFF);
+ 	strncat(masc,"/",0xFF);
+ 	strncat(masc,logFileName,0xFF);
+
+    time(&ltime);
+    strftime(fileName, 0xFF, masc, localtime(&ltime));
+
+    memset(&fs,0,sizeof(fs));
+    if(stat(fileName,&fs) != -1 && fs.st_atime > 10000)
+    {
+       if( difftime(ltime,fs.st_atime) > 86400 )
+          remove(fileName);
+    }
+
+    return fopen(fileName,"a");
+ }
+
  /**
   * Abre um arquivo de log
   * @return Handle para escrita no arquivo
   */
  FILE *g3270_openLog(void)
  {
- 	const char *ptr;
-    FILE       *ret = NULL;
+    FILE       	*ret	= NULL;
+    char		*home	= getenv("HOME");
+    char		dir[0x0100];
 
-    ret = fopen(logfile,"a");
+#ifdef LOGPATH
+    ret = CheckFileName(LOGPATH);
     if(ret)
        return ret;
+#endif
 
- 	ptr = getenv("USER");
-	if(ptr)
-	{
-		snprintf(logfile,0xFF,"/home/%s/" TARGET, ptr);
-        ret = fopen(logfile,"a");
-        if(ret)
-		   return ret;
-	}
+    if(home)
+    {
+	   snprintf(dir, 0xFF,"%s/" TARGET, home);
+	   ret = CheckFileName(dir);
+       if(ret)
+          return ret;
 
-    ret = fopen(TARGET ".log","a");
-    if(ret)
-       return ret;
+	   snprintf(dir, 0xFF,"%s/log", home);
+	   ret = CheckFileName(dir);
+       if(ret)
+          return ret;
 
- 	ptr = getenv("TMPDIR");
-	if(ptr)
-	{
-		snprintf(logfile,0xFF,"/home/%s/" TARGET, ptr);
-        ret = fopen(logfile,"a");
-        if(ret)
-		   return ret;
-	}
+	   snprintf(dir, 0xFF,"%s/tmp", home);
+	   ret = CheckFileName(dir);
+       if(ret)
+          return ret;
 
-    strncpy(logfile,"/tmp/" TARGET, 0xFF);
+    }
 
-    ret = fopen(logfile,"a");
+    ret = CheckFileName(getenv("TMPDIR"));
     if(ret)
        return ret;
 
