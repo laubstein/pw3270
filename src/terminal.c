@@ -867,6 +867,8 @@
 
  	char			buffer[1024];
 
+ 	int				fd;
+
     int col;
     int row;
 
@@ -876,7 +878,7 @@
  	int bRow = min(fromRow,toRow);
  	int fRow = max(fromRow,toRow);
 
- 	char 			*filename;
+ 	char 			filename[1024];
  	FILE			*arq;
 
  	screen = Get3270DeviceBuffer(&rows, &cols);
@@ -884,10 +886,13 @@
  	if(bCol < 0 || bRow < 0)
  	   return;
 
- 	filename = tempnam(TMPPATH, TARGET);
- 	DBGMessage(filename);
+    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,TARGET);
+    fd = mkstemp(filename);
 
- 	arq = fopen(filename,"w");
+    DBGMessage(filename);
+
+ 	arq = fdopen(fd,"w");
+
  	if(arq)
  	{
 	   DBGPrintf("Printing from %d,%d to %d,%d",bRow,bCol,fRow,fCol);
@@ -918,7 +923,6 @@
  	else
  	{
  		Error("Unable to open \"%s\" for writing",filename);
-        free(filename);
  	}
 
  }
