@@ -5,6 +5,7 @@
  #include "lib/kybdc.h"
  #include "lib/3270ds.h"
  #include "lib/tablesc.h"
+ #include "lib/hostc.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -196,7 +197,7 @@
      *   M-35       Compose first character
      *   M-34       empty
      *   M-33       Typeahead indication ("T" or blank)
-     *   M-32       empty
+     *   M-32       SSL Status
      *   M-31       Alternate keymap indication ("K" or blank)
      *   M-30       Reverse input mode indication ("R" or blank)
      *   M-29       Insert mode indication (Special symbol/"I" or blank)
@@ -236,6 +237,12 @@
 
     /* Timer */
     DrawStatusRight(15,STATUS_COLOR_TIME,oia_Timer);
+
+    /* SSL Status */
+    if(query_ssl_host())
+    {
+       DrawStatusRight(32,STATUS_COLOR_SSL,"*");
+    }
 
     /* Terminal Status */
     if(current_status && current_status->msg)

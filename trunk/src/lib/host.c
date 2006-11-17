@@ -1034,3 +1034,15 @@ Disconnect_action(Widget w unused, XEvent *event, String *params,
 		return;
 	host_disconnect(False);
 }
+
+const char * query_qualified_host(void)
+{
+	return qualified_host;
+}
+
+Boolean query_ssl_host(void)
+{
+	return ssl_host;
+}
+
+
