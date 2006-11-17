@@ -278,17 +278,19 @@
 
  void action_print_copy(GtkWidget *w, gpointer data)
  {
- 	char 			*filename;
+ 	char 			filename[1024];
  	FILE			*arq;
+ 	int				fd;
 
     if(!Clipboard)
        return;
 
-    // TODO (perry#9#): Replace with mkstemp
- 	filename = tempnam(TMPPATH, TARGET);
- 	DBGMessage(filename);
+    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,TARGET);
+    fd = mkstemp(filename);
 
- 	arq = fopen(filename,"w");
+    DBGMessage(filename);
+
+ 	arq = fdopen(fd,"w");
  	if(arq)
  	{
 	   fprintf(arq,"%s\n",Clipboard);
@@ -298,7 +300,6 @@
  	else
  	{
  		Error("Unable to open \"%s\" for writing",filename);
-        free(filename);
  	}
 
  }

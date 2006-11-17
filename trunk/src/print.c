@@ -31,18 +31,19 @@
 
  int PrintTemporaryFile(const char *filename)
  {
+ 	char *file = strdup(filename);
 #if GTK == 2
     GThread   *thd = 0;
 #else
     pthread_t  thd = 0;
 #endif
 
-    DBGMessage(filename);
+    DBGMessage(file);
 
 #if GTK == 2
-    thd =  g_thread_create( PrintThread, (gpointer) filename, 0, NULL);
+    thd =  g_thread_create( PrintThread, (gpointer) file, 0, NULL);
 #else
-     pthread_create(&thd, NULL, (void * (*)(void *)) PrintThread, filename);
+     pthread_create(&thd, NULL, (void * (*)(void *)) PrintThread, file);
 #endif
 
  	return 0;

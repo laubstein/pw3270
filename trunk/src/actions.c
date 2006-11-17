@@ -238,17 +238,22 @@
  void action_print(GtkWidget *w, gpointer data)
  {
     // TODO (perry#9#): Replace with mkstemp
- 	char 			*filename = tempnam(TMPPATH, TARGET);
+ 	char 			filename[1024];
  	int				rows;
  	int				cols;
  	int				row;
  	int				col;
  	const struct ea *trm;
  	FILE			*arq;
+ 	int				fd;
 
- 	DBGMessage(filename);
+    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,TARGET);
+    fd = mkstemp(filename);
 
- 	arq = fopen(filename,"w");
+    DBGMessage(filename);
+
+ 	arq = fdopen(fd,"w");
+
  	if(arq)
  	{
        trm = Get3270DeviceBuffer(&rows, &cols);
@@ -270,7 +275,6 @@
  	else
  	{
  		Error("Unable to open \"%s\" for writing",filename);
-        free(filename);
  	}
 
  }
