@@ -9,9 +9,9 @@
  #include "lib/lib3270.h"
  #include "log.h"
 
- #define RedrawTerminalContents()	if(terminal) { gtk_widget_queue_draw(terminal); }
- #define RedrawStatusLine() 		if(terminal) { gtk_widget_queue_draw(terminal); }
  #define UpdateWindowTitle()		SetWindowTitle(0)
+
+ #define RedrawStatusLine() 		RedrawTerminalContents()
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -167,6 +167,8 @@
  void action_print_selection(GtkWidget *w, gpointer data);
 
  void ParseInput(const gchar *string);
+
+ void RedrawTerminalContents(void);
 
 
  #define NotImplemented() Log("Function %s in %s needs implementation",__FUNCTION__,__FILE__)

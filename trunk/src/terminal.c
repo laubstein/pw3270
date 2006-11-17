@@ -221,6 +221,9 @@
  	int		x[2];
  	int		y[2];
  	int	    vPos = (top_margin + font->Height);
+ 	gint 			width;
+    gint 			height;
+
 
 
  	if(!Get3270DeviceBuffer(&rows, &cols))
@@ -228,6 +231,13 @@
 
     cRow = (cursor_row * (font->Height + line_spacing)) + vPos;
     cCol = (cursor_col * font->Width) + left_margin;
+
+    /* Get window size */
+    gdk_drawable_get_size(widget->window,&width,&height);
+
+	/* Draw background */
+    gdk_gc_set_foreground(gc,terminal_cmap);
+    gdk_draw_rectangle(widget->window,gc,1,0,0,width,height);
 
     /* Check for selection box */
     if(fromRow >= 0 && toRow > 0)
@@ -745,17 +755,14 @@
        gtk_widget_modify_fg(ret,widget_states[f],terminal_cmap+4);
     }
 
-	// TODO (perry#3#): Start connection in background.
-    if(cl_hostname)
-    {
-       g3270_log(TARGET, "Connecting to \"%s\"",cl_hostname);
-       host_connect(cl_hostname);
-    }
+    action_connect(ret,0);
 
     InitClipboard(ret);
 
     return ret;
  }
+
+
 
  void InvalidateCursor(void)
  {
@@ -763,7 +770,12 @@
     gtk_im_context_reset(im);
 #endif
 
-	gtk_widget_queue_draw(terminal);
+    if(terminal)
+    {
+        gdk_threads_enter();
+		gtk_widget_queue_draw(terminal);
+		gdk_threads_leave();
+    }
  }
 
  void action_crosshair( GtkWidget *w, gpointer   data )
@@ -917,4 +929,14 @@
  		Error("Unable to open \"%s\" for writing",filename);
  	}
 
+ }
+
+ void RedrawTerminalContents(void)
+ {
+    if(terminal)
+    {
+        gdk_threads_enter();
+		gtk_widget_queue_draw(terminal);
+		gdk_threads_leave();
+    }
  }

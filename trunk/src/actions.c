@@ -212,15 +212,47 @@
     g_free(input);
  }
 
+ static int connecting = 0;
+
+ static gpointer ConnectThread(gpointer host)
+ {
+ 	connecting++;
+ 	DBGMessage("Connect thread has started");
+ 	Log("Trying \"%s\"",host);
+    host_connect(host);
+ 	DBGMessage("Connect thread has ended");
+ 	connecting--;
+ 	return 0;
+ }
+
  void action_connect(GtkWidget *w, gpointer data)
  {
+#if GTK == 2
+    GThread   *thd = 0;
+#else
+    pthread_t  thd = 0;
+#endif
+
+ 	if(connecting)
+ 	   return;
+
     // TODO (perry#9#): Show a dialog box to select the hostname/port.
- 	if(cl_hostname)
-       host_connect(cl_hostname);
+    if(!cl_hostname)
+       return;
+
+#if GTK == 2
+    thd =  g_thread_create( ConnectThread, (gpointer) cl_hostname, 0, NULL);
+#else
+     pthread_create(&thd, NULL, (void * (*)(void *)) ConnectThread, cl_hostname);
+#endif
+
  }
 
  void action_disconnect(GtkWidget *w, gpointer data)
  {
+ 	if(connecting)
+ 	   return;
+
  	Log("Disconnecting");
 	host_disconnect(False);
  }
