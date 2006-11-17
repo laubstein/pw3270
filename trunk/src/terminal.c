@@ -265,23 +265,23 @@
 							cCol, (cRow + 3) - cursor_height[cursor_type],
 							font->Width,
 							cursor_height[cursor_type] );
-    }
 
-    if(cross_hair && cursor_enabled)
-    {
-       gdk_gc_set_foreground(gc,cursor_cmap+CURSOR_TYPE_CROSSHAIR+cursor_type);
+       if(cross_hair)
+       {
+          gdk_gc_set_foreground(gc,cursor_cmap+CURSOR_TYPE_CROSSHAIR+cursor_type);
 
-   	   gdk_draw_line(	widget->window,
-						gc,
-						cCol,
-						top_margin,
-						cCol,
-						top_margin + ( rows * (font->Height + line_spacing) ));
+   	      gdk_draw_line(	widget->window,
+							gc,
+							cCol,
+							top_margin,
+							cCol,
+							top_margin + ( rows * (font->Height + line_spacing) ));
 
-	   gdk_draw_line(	widget->window,
-						gc,
-						left_margin, cRow,
-						left_margin + (cols * font->Width), cRow );
+			gdk_draw_line(	widget->window,
+							gc,
+							left_margin, cRow,
+							left_margin + (cols * font->Width), cRow );
+       }
     }
 
     return 0;
@@ -723,14 +723,8 @@
     	return 0;
     }
 
+    /* Load terminal colors */
     LoadColors(terminal_cmap, terminal_color_count, TerminalColors);
-
-    for(f=0;f < (sizeof(widget_states)/sizeof(int));f++)
-    {
-	   // http://ometer.com/gtk-colors.html
-       gtk_widget_modify_bg(ret,widget_states[f],terminal_cmap);
-       gtk_widget_modify_fg(ret,widget_states[f],terminal_cmap+4);
-    }
 
     /* Set field colors */
     LoadColors(field_cmap,FIELD_COLORS,FieldColors);
@@ -744,8 +738,12 @@
     /* Set status bar colors */
     LoadColors(status_cmap, STATUS_COLORS, StatusColors);
 
-    /* Configure clipboard stuff */
-    /* http://developer.gnome.org/doc/API/2.0/gtk/gtk-Clipboards.html#GtkClipboard */
+    for(f=0;f < (sizeof(widget_states)/sizeof(int));f++)
+    {
+	   // http://ometer.com/gtk-colors.html
+       gtk_widget_modify_bg(ret,widget_states[f],terminal_cmap);
+       gtk_widget_modify_fg(ret,widget_states[f],terminal_cmap+4);
+    }
 
 	// TODO (perry#3#): Start connection in background.
     if(cl_hostname)
