@@ -35,14 +35,14 @@ make DATADIR=%{_datadir}/%{name} TMPPATH=%{tmppath} -C src
 %install
 rm -rf $RPM_BUILD_ROOT
 
-mkdir -p $RPM_BUILD_ROOT/%{_libdir}
-mkdir -p $RPM_BUILD_ROOT/%{_bindir}
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{name}
+mkdir -p $RPM_BUILD_ROOT%{_libdir}
+mkdir -p $RPM_BUILD_ROOT%{_bindir}
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}
 
-install -m 755 src/lib3270.so	$RPM_BUILD_ROOT/%{_libdir}
-install -m 755 src/%{name}		$RPM_BUILD_ROOT/%{_bindir}
+install -m 755 src/lib3270.so	$RPM_BUILD_ROOT%{_libdir}
+install -m 755 src/%{name}	$RPM_BUILD_ROOT%{_bindir}
 
-install -m 644 src/*.jpg		$RPM_BUILD_ROOT/%{_datadir}/%{name}
+install -m 644 src/*.jpg	$RPM_BUILD_ROOT%{_datadir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
