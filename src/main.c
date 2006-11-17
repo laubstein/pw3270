@@ -1,5 +1,6 @@
 
  #include "g3270.h"
+ #include "lib/hostc.h"
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -178,7 +179,7 @@
     parse_3270_command_line(argc, (const char **) argv, &cl_hostname);
 
     if(!cl_hostname)
-       cl_hostname = "172.17.78.220:8023";
+       cl_hostname = getenv("HOST3270");
 
     CreateMainWindow(cl_hostname);
 
@@ -193,13 +194,19 @@
  void SetWindowTitle(const char *msg)
  {
  	char title[512];
+ 	const char *ptr = query_qualified_host();
 
     if(top_window)
     {
 	   strncpy(title,TARGET,511);
 	   strncat(title," ",511);
 
-	   if(cl_hostname)
+	   if(ptr)
+	   {
+	      strncat(title,ptr,511);
+	      strncat(title," ",511);
+	   }
+	   else if(cl_hostname)
 	   {
 	      strncat(title,cl_hostname,511);
 	      strncat(title," ",511);

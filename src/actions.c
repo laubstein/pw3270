@@ -214,7 +214,9 @@
 
  void action_connect(GtkWidget *w, gpointer data)
  {
-    host_connect(cl_hostname);
+    // TODO (perry#9#): Show a dialog box to select the hostname/port.
+ 	if(cl_hostname)
+       host_connect(cl_hostname);
  }
 
  void action_disconnect(GtkWidget *w, gpointer data)

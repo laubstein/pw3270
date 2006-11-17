@@ -9,9 +9,9 @@
  #include "lib/lib3270.h"
  #include "log.h"
 
- #define RedrawTerminalContents() if(terminal) { gtk_widget_queue_draw(terminal); }
- #define RedrawStatusLine() if(terminal) { gtk_widget_queue_draw(terminal); }
-
+ #define RedrawTerminalContents()	if(terminal) { gtk_widget_queue_draw(terminal); }
+ #define RedrawStatusLine() 		if(terminal) { gtk_widget_queue_draw(terminal); }
+ #define UpdateWindowTitle()		SetWindowTitle(0)
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -70,6 +70,7 @@
 	STATUS_COLOR_WARNING,
 	STATUS_COLOR_NORMAL,
 	STATUS_COLOR_TOOGLE,
+	STATUS_COLOR_SSL,
 
 	STATUS_COLORS	// Must be the last one
  };

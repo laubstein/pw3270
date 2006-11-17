@@ -318,6 +318,7 @@ static void status_lu(const char *lu)
 	   lu = "";
     g3270_log("lib3270", "Using LU \"%s\"",lu);
     snprintf(oia_LUName,11,"%-10s",lu);
+    UpdateWindowTitle();
 }
 
 static void ring_bell(void)
