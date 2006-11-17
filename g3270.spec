@@ -4,10 +4,11 @@ Group:          System/X11/Terminals
 Version:        3.3.4
 Release:        0.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
-Requires:       gtk2 openssl
 Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-BuildRequires:  gtk2-devel openssl-devel
+
+Requires:       openssl %{name}-lib
+BuildRequires:  openssl-devel
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
@@ -30,7 +31,7 @@ cd src/lib
 cd ../..
 
 %build
-make DATADIR=%{_datadir}/%{name} TMPPATH=%{tmppath} -C src
+make DATADIR=%{_datadir}/%{name} TMPPATH=%{_tmppath} -C src
 strip src/g3270
 strip src/lib3270.so
 
@@ -61,7 +62,7 @@ EOF
 
 mkdir -p %{buildroot}%{_datadir}/applications
 
-if [ "%_vendor}" != "conectiva" ] ; then
+if [ %{_vendor} != conectiva ] ; then
 
 	desktop-file-install	--vendor %{_build_vendor} \
 				--dir %{buildroot}%{_datadir}/applications \
