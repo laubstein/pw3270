@@ -98,6 +98,9 @@
  	int				vPos;
  	unsigned char	chr[2];
 
+ 	gint 			width;
+    gint 			height;
+
     gboolean		rc			= FALSE;
     int				mode		= 0;
     GdkColor		*fg			= 0;
@@ -107,6 +110,12 @@
 
  	if(!font->fn)
  	   return;
+
+    gdk_drawable_get_size(drawable,&width,&height);
+
+	/* Draw background */
+    gdk_gc_set_foreground(gc,terminal_cmap);
+    gdk_draw_rectangle(drawable,gc,1,0,0,width,height);
 
     /* Get top of the screen */
     vPos = (top + font->Height);
