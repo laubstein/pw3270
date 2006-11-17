@@ -1,6 +1,6 @@
 Name:           g3270
 License:        GPL
-Group:          System/Libraries
+Group:          System/X11/Terminals
 Version:        3.3.4
 Release:        0.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
@@ -26,31 +26,69 @@ tn3270 protocol library for %{name}
 %setup -q -n %{name}
 ./configure
 cd src/lib
-./configure --disable-trace
+%configure --disable-trace
 cd ../..
 
 %build
 make DATADIR=%{_datadir}/%{name} TMPPATH=%{tmppath} -C src
+strip src/g3270
+strip src/lib3270.so
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-mkdir -p $RPM_BUILD_ROOT%{_libdir}
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}
+mkdir -p %{buildroot}%{_libdir}
+mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_datadir}/%{name}
+mkdir -p %{buildroot}%{_sysconfdir}/x3270
 
-install -m 755 src/lib3270.so	$RPM_BUILD_ROOT%{_libdir}
-install -m 755 src/%{name}	$RPM_BUILD_ROOT%{_bindir}
+install -m 755 src/lib3270.so		%{buildroot}%{_libdir}
+install -m 755 src/%{name}		%{buildroot}%{_bindir}
+install -m 644 src/*.jpg		%{buildroot}%{_datadir}/%{name}
+install -m 644 src/lib/ibm_hosts	%{buildroot}%{_sysconfdir}/x3270
 
-install -m 644 src/*.jpg	$RPM_BUILD_ROOT%{_datadir}/%{name}
+# Desktop menu entry
+cat > %{name}.desktop << EOF
+[Desktop Entry]
+Encoding=UTF-8
+Name=%{name}
+Comment=IBM 3270 Terminal emulator
+Exec=%{_bindir}/%{name}
+Icon=%{_datadir}/%{name}/icon.jpg
+Terminal=false
+Type=Application
+EOF
+
+mkdir -p %{buildroot}%{_datadir}/applications
+
+if [ "%_vendor}" != "conectiva" ] ; then
+
+	desktop-file-install	--vendor %{_build_vendor} \
+				--dir %{buildroot}%{_datadir}/applications \
+				--add-category Application \
+				--add-category System \
+				%{name}.desktop
+
+else
+
+	install -m 644 %{name}.desktop %{buildroot}%{_datadir}/applications
+
+fi
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files lib
-%{_libdir}
-
 %files
+%defattr(-,root,root)
 %{_bindir}
 %{_datadir}/%{name}
+%{_datadir}/applications
+
+%files lib
+%defattr(-,root,root)
+%{_libdir}
+%{_sysconfdir}/x3270
+
+%changelog
+
 
