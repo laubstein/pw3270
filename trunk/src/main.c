@@ -137,33 +137,6 @@
 
  int main(int argc, char **argv)
  {
-/*
-#ifdef DEBUG
-	int		f;
-    gchar	str[2];
-    gchar   *string;
-
-    CHKPoint();
-
-    str[1] = 0;
-    for(f=1;f<0xFF;f++)
-    {
-    	*str   = f; // Ebc2ASC(f);
-		string = g_convert(str, 1, "EBCDIC-BR", "UTF-8", NULL, NULL, NULL);
-
-		if(string)
-		   fprintf(stderr,"0x%02x\n",(unsigned char) *string);
-		else
-		   fprintf(stderr,"0x%02x\n",(unsigned char) ' ');
-
-        g_free(string);
-    }
-
-
-    return -1;
-#endif
-*/
-
     printf(TARGET " Build " BUILD " for gtk " GTKVERSION "\n");
     fflush(stdout);
 
@@ -195,29 +168,32 @@
 
  void SetWindowTitle(const char *msg)
  {
- 	char title[512];
- 	const char *ptr = query_qualified_host();
+    char title[512];
+    const char *ptr = query_qualified_host();
 
     if(top_window)
     {
-	   strncpy(title,TARGET,511);
-	   strncat(title," ",511);
+       strncpy(title,TARGET,511);
+       strncat(title," ",511);
 
-	   if(ptr)
-	   {
-	      strncat(title,ptr,511);
-	      strncat(title," ",511);
-	   }
-	   else if(cl_hostname)
-	   {
-	      strncat(title,cl_hostname,511);
-	      strncat(title," ",511);
-	   }
+       if(ptr)
+       {
+          strncat(title,ptr,511);
+          strncat(title," ",511);
+       }
+       else if(cl_hostname)
+       {
+          strncat(title,cl_hostname,511);
+          strncat(title," ",511);
+       }
 
        if(msg)
-	      strncat(title,msg,511);
+          strncat(title,msg,511);
 
+       gdk_threads_enter();
        gtk_window_set_title(GTK_WINDOW(top_window),title);
+       gdk_threads_leave();
+
 
     }
  }
