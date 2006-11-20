@@ -970,7 +970,7 @@
     if(terminal)
     {
         gdk_threads_enter();
-		gtk_widget_queue_draw(terminal);
-		gdk_threads_leave();
+        gtk_widget_queue_draw(terminal);
+        gdk_threads_leave();
     }
  }

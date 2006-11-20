@@ -314,11 +314,14 @@ static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
 /* Set LU name */
 static void status_lu(const char *lu)
 {
-	if(!lu)
-	   lu = "";
+    if(!lu)
+       lu = "";
+       
     g3270_log("lib3270", "Using LU \"%s\"",lu);
     snprintf(oia_LUName,11,"%-10s",lu);
     UpdateWindowTitle();
+    RedrawStatusLine();
+
 }
 
 static void ring_bell(void)
