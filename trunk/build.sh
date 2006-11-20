@@ -10,8 +10,14 @@ VENDOR=`rpm --eval="%{u2p:%{_vendor}}"`
 
 mv *~ /tmp
 
+make -C src clean
+
 cd ..
-tar -zcvf `rpm --eval="%{u2p:%{_sourcedir}}"`/$PACKAGE.tar.gz $PACKAGE
+tar -zcf `rpm --eval="%{u2p:%{_sourcedir}}"`/$PACKAGE.tar.gz --exclude=*CVS* $PACKAGE
+
+if [ "$?" != "0" ]; then
+   exit -1
+fi
 
 cd $OLDDIR
 
