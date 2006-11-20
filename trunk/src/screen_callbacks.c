@@ -209,7 +209,7 @@ static void screen_init(void)
 
 static void screen_disp(Boolean erasing, const struct ea *display)
 {
-	gtk_widget_queue_draw(terminal);
+	RedrawTerminalContents();
 }
 
 static void screen_suspend(void)
@@ -219,7 +219,7 @@ static void screen_suspend(void)
 
 static void screen_resume(void)
 {
-	gtk_widget_queue_draw(terminal);
+	RedrawTerminalContents();
 }
 
 static void screen_type(const char *model_name, int maxROWS, int maxCOLS)
@@ -303,12 +303,14 @@ static void status_twait(void)
 static void status_typeahead(Boolean on)
 {
 	NotImplemented();
+        RedrawStatusLine();
 }
 
 /* Set compose character */
 static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
 {
 	NotImplemented();
+        RedrawStatusLine();
 }
 
 /* Set LU name */
@@ -316,7 +318,7 @@ static void status_lu(const char *lu)
 {
     if(!lu)
        lu = "";
-       
+
     g3270_log("lib3270", "Using LU \"%s\"",lu);
     snprintf(oia_LUName,11,"%-10s",lu);
     UpdateWindowTitle();
@@ -337,8 +339,8 @@ static void screen_flip(void)
 static void screen_width(int width)
 {
     // FIXME (perry#1#): Recalculate font size!
-	DBGTrace(width);
-	gtk_widget_queue_draw(terminal);
+   DBGTrace(width);
+   RedrawTerminalContents();
 }
 
 static void error_popup(const char *msg)
@@ -348,13 +350,14 @@ static void error_popup(const char *msg)
 
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
-	gtk_widget_queue_draw(terminal);
+	RedrawTerminalContents();
 }
 
 static void screen_changed(int first, int last)
 {
    WaitForScreen = FALSE;
    action_remove_selection(0,0);
+   RedrawTerminalContents();
 }
 
 static void status_oerr(int error_type)

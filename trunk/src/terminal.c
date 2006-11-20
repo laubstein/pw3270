@@ -465,7 +465,10 @@
 */
 
 
+           gdk_threads_enter();
    	   gtk_widget_queue_draw(widget);
+           gdk_threads_leave();
+
  	}
 
 
@@ -517,7 +520,9 @@
     if(top_margin < 0)
        top_margin = 0;
 
-	gtk_widget_queue_draw(widget);
+    gdk_threads_enter();
+    gtk_widget_queue_draw(widget);
+    gdk_threads_leave();
 
  }
 
@@ -806,9 +811,9 @@
 
     if(terminal)
     {
-        gdk_threads_enter();
-		gtk_widget_queue_draw(terminal);
-		gdk_threads_leave();
+       gdk_threads_enter();
+       gtk_widget_queue_draw(terminal);
+       gdk_threads_leave();
     }
  }
 
@@ -878,20 +883,27 @@
 
  void action_remove_selection(GtkWidget *w, gpointer data)
  {
- 	CheckForCopy();
+    CheckForCopy();
 
     toRow	  =
     fromRow   = -1;
 
     MouseMode = MOUSE_MODE_NORMAL;
-	gtk_widget_queue_draw(terminal);
+
+    gdk_threads_enter();
+    gtk_widget_queue_draw(terminal);
+    gdk_threads_leave();
+
  }
 
  void action_select_all( GtkWidget *w, gpointer   data )
  {
- 	fromRow = fromCol = 0;
+    fromRow = fromCol = 0;
     Get3270DeviceBuffer(&toRow, &toCol);
-	gtk_widget_queue_draw(terminal);
+    gdk_threads_enter();
+    gtk_widget_queue_draw(terminal);
+    gdk_threads_leave();
+
  }
 
  void action_print_selection(GtkWidget *w, gpointer data)
