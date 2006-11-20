@@ -31,7 +31,7 @@ cd src/lib
 cd ../..
 
 %build
-make DATADIR=%{_datadir}/%{name} TMPPATH=%{_tmppath} -C src
+make QUIET_MODE=1 DATADIR=%{_datadir}/%{name} TMPPATH=%{_tmppath} -C src
 strip src/g3270
 strip src/lib3270.so
 
