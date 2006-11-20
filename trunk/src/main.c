@@ -140,6 +140,7 @@
     printf(TARGET " Build " BUILD " for gtk " GTKVERSION "\n");
     fflush(stdout);
 
+    Log(TARGET " Build " BUILD " for gtk " GTKVERSION "\n");
 
     /* Populate callback tables */
     set_3270_screen(&g3270_screen_callbacks);
@@ -155,7 +156,7 @@
        cl_hostname = getenv("HOST3270_0");
 
     DBGMessage(cl_hostname);
-    
+
     CreateMainWindow(cl_hostname);
 
     DBGMessage("Starting gtk main loop");
