@@ -86,6 +86,9 @@
        return;
     }
 
+    if(*bgColor == terminal_cmap)
+       *bgColor = 0;
+
  }
 
  void DrawTerminal(GdkDrawable *drawable, GdkGC *gc, const FONTELEMENT *font, int left, int top, int line_spacing)
