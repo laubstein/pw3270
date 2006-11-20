@@ -181,6 +181,8 @@
     if(!cl_hostname)
        cl_hostname = getenv("HOST3270_0");
 
+    DBGMessage(cl_hostname);
+    
     CreateMainWindow(cl_hostname);
 
     DBGMessage("Starting gtk main loop");
