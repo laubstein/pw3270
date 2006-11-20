@@ -173,7 +173,11 @@
  void RedrawTerminalContents(void);
 
 
+#ifdef QUIET_MODE
  #define NotImplemented() Log("Function %s in %s needs implementation",__FUNCTION__,__FILE__)
+#else
+ #define NotImplemented() /* */
+#endif
 
 /*---[ Terminal window ]------------------------------------------------------*/
 

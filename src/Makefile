@@ -41,6 +41,10 @@ else
    GTK_MODULES=$(GTKLIB) gthread-2.0 glib-2.0
 endif
 
+ifdef QUIET_MODE
+   QFLAGS=-DQUIET_MODE=$(QUIET_MODE)
+endif
+
 PKG_MODULES=$(GTK_MODULES)
 
 
@@ -48,7 +52,7 @@ PKG_MODULES=$(GTK_MODULES)
 
 GCFLAGS     = -c `pkg-config --cflags $(PKG_MODULES)` \
               -DBUILD=\"`date +%G%m%d%H%M`\" -Wall -Werror \
-              -DTARGET=\"$(TARGET)\" $(DFLAGS) \
+              -DTARGET=\"$(TARGET)\" $(DFLAGS) $(QFLAGS) \
               -DGTK=$(GTK) -DGTKVERSION=\"$(GTK_VRS)\" \
               -DTMPPATH=\"$(TMPPATH)\" -DLOGPATH=\"$(LOGPATH)\" \
               -DDATADIR=\"$(DATADIR)\"
