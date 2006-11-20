@@ -49,13 +49,12 @@
 
 		"-xos4-terminus-medium-*-normal-*-12-*-*-*-*-*-*-*",
 
-//		"-xos4-terminus-bold-*-*-*-12-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-14-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-16-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-20-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-24-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-bold-*-*-*-28-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-bold-*-*-*-32-*-*-*-*-*-*-*"
+	 	"-xos4-terminus-bold-*-*-*-32-*-*-*-*-*-*-*",
 
 	 	"-xos4-terminus-medium-*-normal-*-14-*-*-*-*-*-*-*",
 	 	"-xos4-terminus-medium-*-normal-*-16-*-*-*-*-*-*-*",
@@ -149,7 +148,7 @@
     }
     else
     {
-	   SetOIAStatus(STATUS_DISCONNECTED);
+       SetOIAStatus(STATUS_DISCONNECTED);
        SetWindowTitle(0);
        EnableCursor(FALSE);
        ctlr_erase(True);
@@ -158,7 +157,7 @@
        if(reconnect)
        {
           snprintf(key,39,"HOST3270_%d",++reconnect_retry);
-          DBGMessage(key);
+          DBGPrintf("Host Key: %s",key);
 		  host = getenv(key);
 		  if(host)
 		  {

@@ -277,9 +277,7 @@
 		   if(status[f].code == code)
 		   {
 		   	   current_status = sts = (status+f);
-#ifdef DEBUG
-			   Log("Status:\t%s",current_status->dbg);
-#endif
+			   DBGPrintf("Status:\t%s",current_status->dbg);
 		   }
 	   }
 	   if(!sts)
