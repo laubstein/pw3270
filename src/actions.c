@@ -219,6 +219,7 @@
  	connecting++;
  	DBGMessage("Connect thread has started");
  	Log("Trying \"%s\"",host);
+ 	reconnect = TRUE;
     host_connect(host);
  	DBGMessage("Connect thread has ended");
  	connecting--;
@@ -246,6 +247,8 @@
      pthread_create(&thd, NULL, (void * (*)(void *)) ConnectThread, cl_hostname);
 #endif
 
+     UpdateWindowTitle();
+
  }
 
  void action_disconnect(GtkWidget *w, gpointer data)
@@ -254,6 +257,7 @@
  	   return;
 
  	Log("Disconnecting");
+ 	reconnect = FALSE;
 	host_disconnect(False);
  }
 

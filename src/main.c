@@ -179,7 +179,7 @@
     parse_3270_command_line(argc, (const char **) argv, &cl_hostname);
 
     if(!cl_hostname)
-       cl_hostname = getenv("HOST3270");
+       cl_hostname = getenv("HOST3270_0");
 
     CreateMainWindow(cl_hostname);
 

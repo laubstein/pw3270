@@ -338,9 +338,7 @@
 	int					f;
 	const INPUT_3270	*ip;
 
-    // FIXME (perry#1#): Do it right (using the callback function).
-
-//    CHKPoint();
+    // FIXME (perry#8#): Do it right (using the callback function).
     for(f = 0; f < szPoll; f++)
     {
     	if(gpool[f].gfd.fd)
@@ -351,14 +349,11 @@
 
             if(poll(&fds,1,0) > 0)
             {
-		       DBGPrintf("Source %p has event (fd=%d, masc=%02x)",ip,ip->source,ip->condition);
                (*ip->proc)();
                rc   = TRUE;
             }
         }
     }
-
-    DBGTracex(rc);
 
   	return rc;
   }

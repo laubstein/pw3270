@@ -286,7 +286,7 @@
 	      Log("Unexpected status code %d from 3270 library",code);
 	}
 
-    RedrawTerminalContents();
+    RedrawStatusLine();
 
  }
 
