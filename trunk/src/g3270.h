@@ -124,6 +124,8 @@
 
  extern int						cursor_type;
 
+ extern gboolean				reconnect;
+
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 

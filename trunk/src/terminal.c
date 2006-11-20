@@ -8,6 +8,7 @@
  #include "lib/actionsc.h"
  #include "lib/ctlrc.h"
  #include "lib/tablesc.h"
+ #include "lib/utilc.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -101,6 +102,8 @@
  static gboolean	cross_hair								= FALSE;
 
  int				cursor_type								= CURSOR_TYPE_OVER;
+ gboolean			reconnect								= TRUE;
+ int				reconnect_retry							= 0;
 
 #ifdef USE_GTKIMCONTEXT
  GtkIMContext		*im;
@@ -117,17 +120,29 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
+ static void Reconnect(void)
+ {
+ 	action_connect(0,0);
+ }
+
  static void stsConnect(Boolean connected)
  {
+ 	char key[40];
+ 	char *host;
+
     g3270_log("lib3270", "%s", connected ? "Connected" : "Disconnected");
+
+    gdk_threads_enter();
+
+    status_untiming();
 
     if(connected)
     {
+	   reconnect_retry = 0;
 	   if (GetKeyboardStatus() & KL_AWAITING_FIRST)
 	      SetOIAStatus(STATUS_NONSPECIFIC);
        else
 	      SetOIAStatus(STATUS_BLANK);
-	   status_untiming();
        ctlr_erase(True);
        EnableCursor(TRUE);
        SetWindowTitle(0);
@@ -139,7 +154,26 @@
        EnableCursor(FALSE);
        ctlr_erase(True);
        RedrawTerminalContents();
+
+       if(reconnect)
+       {
+          snprintf(key,39,"HOST3270_%d",++reconnect_retry);
+          DBGMessage(key);
+		  host = getenv(key);
+		  if(host)
+		  {
+		  	 cl_hostname = host;
+             AddTimeOut(1000,Reconnect);
+		  }
+		  else
+		  {
+		  	 Log("No more hosts to try, stopping");
+		  }
+       }
     }
+
+    gdk_threads_leave();
+
  }
 
  static void stsResolving(Boolean ignored)
@@ -224,10 +258,11 @@
  	gint 			width;
     gint 			height;
 
-
-
  	if(!Get3270DeviceBuffer(&rows, &cols))
+ 	{
+	   DBGMessage("Redraw without buffer");
  	   return 0;
+ 	}
 
     cRow = (cursor_row * (font->Height + line_spacing)) + vPos;
     cCol = (cursor_col * font->Width) + left_margin;
