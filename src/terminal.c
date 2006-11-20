@@ -121,7 +121,8 @@
 
  static void Reconnect(void)
  {
- 	action_connect(0,0);
+    SetOIAStatus(STATUS_RECONNECTING);
+    action_connect(0,0);
  }
 
  static void stsConnect(Boolean connected)
@@ -246,22 +247,25 @@
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
- 	int		cRow;
- 	int		cCol;
+    int		cRow;
+    int		cCol;
     int		rows;
     int		cols;
-    GdkGC	*gc				= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
- 	int		x[2];
- 	int		y[2];
- 	int	    vPos = (top_margin + font->Height);
- 	gint 			width;
-    gint 			height;
+    GdkGC	*gc		= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+    int		x[2];
+    int		y[2];
+    int		vPos = (top_margin + font->Height);
+    gint 	width;
+    gint 	height;
 
- 	if(!Get3270DeviceBuffer(&rows, &cols))
+    Get3270DeviceBuffer(&rows, &cols);
+
+/*
  	{
 	   DBGMessage("Redraw without buffer");
  	   return 0;
  	}
+*/
 
     cRow = (cursor_row * (font->Height + line_spacing)) + vPos;
     cCol = (cursor_col * font->Width) + left_margin;
@@ -269,7 +273,7 @@
     /* Get window size */
     gdk_drawable_get_size(widget->window,&width,&height);
 
-	/* Draw background */
+    /* Draw background */
     gdk_gc_set_foreground(gc,terminal_cmap);
     gdk_draw_rectangle(widget->window,gc,1,0,0,width,height);
 
@@ -283,10 +287,10 @@
        y[1] = ((max(fromRow,toRow) * (font->Height + line_spacing)) + vPos)-font->Height;
 
        gdk_gc_set_foreground(gc,selection_cmap);
-	   gdk_draw_rectangle(widget->window,gc,1,x[0],y[0],x[1]-x[0],y[1]-y[0]);
+       gdk_draw_rectangle(widget->window,gc,1,x[0],y[0],x[1]-x[0],y[1]-y[0]);
 
        gdk_gc_set_foreground(gc,selection_cmap+1);
-	   gdk_draw_rectangle(widget->window,gc,0,x[0],y[0],x[1]-x[0],y[1]-y[0]);
+       gdk_draw_rectangle(widget->window,gc,0,x[0],y[0],x[1]-x[0],y[1]-y[0]);
 
     }
 
@@ -526,9 +530,8 @@
 
  }
 
- static void configure_event(GtkWidget *widget, GdkEventConfigure *event, void *t)
+ static void configure_terminal(GtkWidget *widget, int hWidth, int hHeight)
  {
-    // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventConfigure
  	int			rows;
  	int			cols;
  	int			width;
@@ -538,22 +541,15 @@
 
     Get3270DeviceBuffer(&rows, &cols);
 
- 	width  = event->width / cols;
- 	height = (event->height / (rows+2)) - MIN_LINE_SPACING;
+ 	width  = hWidth / cols;
+ 	height = (hHeight / (rows+2)) - MIN_LINE_SPACING;
 
-	DBGPrintf("Resize %d,%d em %d,%d (%dx%d)",	event->width,
-												event->height,
-												event->x,
-												event->y,
-												width,
-												height
-			);
 
     /* Search for a font with exact match */
-    for(f = 0; f< FONT_COUNT && !fn;f++)
+    for(f = 0; f < FONT_COUNT && !fn;f++)
     {
-    	if( (fontlist[f].Width == width) && fontlist[f].Height <= height )
-		   fn = fontlist+f;
+       if( fontlist[f].fn && (fontlist[f].Width == width) && fontlist[f].Height <= height )
+          fn = fontlist+f;
     }
 
     if(!fn)
@@ -562,19 +558,26 @@
        fn = fontlist;
        for(f = 0; f < FONT_COUNT;f++)
        {
-	      if(fontlist[f].Width <= width
-					&& fontlist[f].Width > fn->Width
-					&& fontlist[f].Height <= height )
-		  {
-    	     fn = fontlist+f;
-		  }
+          if( fontlist[f].fn  && fontlist[f].Width <= width
+                              && fontlist[f].Width > fn->Width
+                              && fontlist[f].Height <= height )
+              {
+                 fn = fontlist+f;
+              }
        }
     }
 
     /* Reconfigure drawing box */
-    SetFont(widget,fn,event->width,event->height);
+    SetFont(widget,fn,hWidth,hHeight);
 
  }
+
+ static void configure_event(GtkWidget *widget, GdkEventConfigure *event, void *t)
+ {
+    // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventConfigure
+    configure_terminal(widget,event->width,event->height);
+ }
+
 
  static void realize(GtkWidget *widget, void *t)
  {

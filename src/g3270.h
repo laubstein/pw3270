@@ -44,7 +44,9 @@
         STATUS_OVERFLOW,               /* X Overflow */
         STATUS_DBCS,                   /* X DBCS */
         STATUS_SCROLLED,               /* X Scrolled */
-        STATUS_MINUS                   /* X -f */
+        STATUS_MINUS,                  /* X -f */
+	
+	STATUS_RECONNECTING
  };
 
  enum cursor_types

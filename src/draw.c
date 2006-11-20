@@ -34,19 +34,21 @@
  } status[] =
  {
 	DECLARE_STATUS_MESSAGE( STATUS_DISCONNECTED,	STATUS_COLOR_WARNING,	"X Desconectado"	),
-	DECLARE_STATUS_MESSAGE( STATUS_RESOLVING,		STATUS_COLOR_ERROR,		"X Resolvendo"		),
-	DECLARE_STATUS_MESSAGE( STATUS_CONNECTING,		STATUS_COLOR_ERROR,		"X Conectando"		),
-	DECLARE_STATUS_MESSAGE( STATUS_NONSPECIFIC,		STATUS_COLOR_WARNING,	NO_STATUS_MESSAGE	),
-	DECLARE_STATUS_MESSAGE( STATUS_INHIBIT,			STATUS_COLOR_ERROR,		"X Inhibit"			),
-	DECLARE_STATUS_MESSAGE( STATUS_BLANK,			STATUS_COLOR_TIME,		NO_STATUS_MESSAGE	),
-	DECLARE_STATUS_MESSAGE( STATUS_TWAIT,			STATUS_COLOR_TIME,		"X Wait"			),
-	DECLARE_STATUS_MESSAGE( STATUS_SYSWAIT,			STATUS_COLOR_TIME,		"X System"			),
-	DECLARE_STATUS_MESSAGE( STATUS_PROTECTED,		STATUS_COLOR_ERROR,		"X Protegido"		),
-	DECLARE_STATUS_MESSAGE( STATUS_NUMERIC,			STATUS_COLOR_ERROR,		"X Numerico"		),
-	DECLARE_STATUS_MESSAGE( STATUS_OVERFLOW,		STATUS_COLOR_ERROR,		"X Overflow"		),
-	DECLARE_STATUS_MESSAGE( STATUS_DBCS,			STATUS_COLOR_ERROR,		"X DBCS"			),
-	DECLARE_STATUS_MESSAGE( STATUS_SCROLLED,		STATUS_COLOR_ERROR,		"X Scrolled"		),
-	DECLARE_STATUS_MESSAGE( STATUS_MINUS,			STATUS_COLOR_ERROR,		"X -f"				),
+	DECLARE_STATUS_MESSAGE( STATUS_RESOLVING,	STATUS_COLOR_ERROR,	"X Resolvendo"		),
+	DECLARE_STATUS_MESSAGE( STATUS_CONNECTING,	STATUS_COLOR_ERROR,	"X Conectando"		),
+	DECLARE_STATUS_MESSAGE( STATUS_NONSPECIFIC,	STATUS_COLOR_WARNING,	NO_STATUS_MESSAGE	),
+	DECLARE_STATUS_MESSAGE( STATUS_INHIBIT,		STATUS_COLOR_ERROR,	"X Inhibit"			),
+	DECLARE_STATUS_MESSAGE( STATUS_BLANK,		STATUS_COLOR_TIME,	NO_STATUS_MESSAGE	),
+	DECLARE_STATUS_MESSAGE( STATUS_TWAIT,		STATUS_COLOR_TIME,	"X Wait"			),
+	DECLARE_STATUS_MESSAGE( STATUS_SYSWAIT,		STATUS_COLOR_TIME,	"X System"			),
+	DECLARE_STATUS_MESSAGE( STATUS_PROTECTED,	STATUS_COLOR_ERROR,	"X Protegido"		),
+	DECLARE_STATUS_MESSAGE( STATUS_NUMERIC,		STATUS_COLOR_ERROR,	"X Numerico"		),
+	DECLARE_STATUS_MESSAGE( STATUS_OVERFLOW,	STATUS_COLOR_ERROR,	"X Overflow"		),
+	DECLARE_STATUS_MESSAGE( STATUS_DBCS,		STATUS_COLOR_ERROR,	"X DBCS"			),
+	DECLARE_STATUS_MESSAGE( STATUS_SCROLLED,	STATUS_COLOR_ERROR,	"X Scrolled"		),
+	DECLARE_STATUS_MESSAGE( STATUS_MINUS,		STATUS_COLOR_ERROR,	"X -f"				),
+	DECLARE_STATUS_MESSAGE( STATUS_RECONNECTING,	STATUS_COLOR_WARNING,	"X Reconnecting"				),
+
  };
 
  static struct _status *current_status = 0;
@@ -103,82 +105,87 @@
     GdkColor		*fg			= 0;
     GdkColor		*bg			= 0;
 
- 	trm = Get3270DeviceBuffer(&rows, &cols);
+    if(!font->fn)
+    {
+       Log("Invalid FONT definition");
+       return;
+    }
 
- 	if(!font->fn)
- 	   return;
+    trm = Get3270DeviceBuffer(&rows, &cols);
 
     /* Get top of the screen */
     vPos = (top + font->Height);
 
-    for(row = 0; row < rows; row++)
+    if(trm)
     {
-    	hPos = left;
-    	for(col = 0; col < cols; col++)
-    	{
-           chr[0] = ebc2asc[trm->cc];
-		   chr[1] = 0;
+       for(row = 0; row < rows; row++)
+       {
+          hPos = left;
+          for(col = 0; col < cols; col++)
+          {
+             chr[0] = ebc2asc[trm->cc];
+             chr[1] = 0;
 
-		   rc  = TRUE;
+             rc  = TRUE;
 
-		   if(trm->fa)
-		   {
-		      chr[0] = ' ';
+             if(trm->fa)
+             {
+                chr[0] = ' ';
 
-              if( (trm->fa & (FA_INTENSITY|FA_INT_NORM_SEL|FA_INT_HIGH_SEL)) == (FA_INTENSITY|FA_INT_NORM_SEL|FA_INT_HIGH_SEL) )
-                 mode = (trm->fa & FA_PROTECT) ? 1 : 2;
-			  else
-			     mode = 0;
+                if( (trm->fa & (FA_INTENSITY|FA_INT_NORM_SEL|FA_INT_HIGH_SEL)) == (FA_INTENSITY|FA_INT_NORM_SEL|FA_INT_HIGH_SEL) )
+                   mode = (trm->fa & FA_PROTECT) ? 1 : 2;
+                else
+                   mode = 0;
 
-			  if(trm->fg || trm->bg)
-			  {
-		         chr[0] = 0;
-                 SetColorAttribute(gc, trm, &fg, &bg);
-			  }
-			  else
-			  {
-			     fg = field_cmap+(DEFCOLOR_MAP(trm->fa));
-			     bg = 0;
-			  }
-		   }
-		   else if(trm->gr || trm->fg || trm->bg)
-		   {
-		      chr[0] = ' ';
-		      SetColorAttribute(gc, trm, &fg, &bg);
-		   }
+                if(trm->fg || trm->bg)
+                {
+                   chr[0] = 0;
+                   SetColorAttribute(gc, trm, &fg, &bg);
+                }
+                else
+                {
+                   fg = field_cmap+(DEFCOLOR_MAP(trm->fa));
+                   bg = 0;
+                }
+             }
+             else if(trm->gr || trm->fg || trm->bg)
+             {
+                chr[0] = ' ';
+                SetColorAttribute(gc, trm, &fg, &bg);
+             }
 
-           if(chr[0])
-           {
-		      if(bg)
-		      {
-		         gdk_gc_set_foreground(gc,bg);
-		         gdk_draw_rectangle(drawable,gc,1,hPos,vPos-font->Height,font->Width,font->Height+line_spacing);
-		      }
+             if(chr[0])
+             {
+                if(bg)
+                {
+                   gdk_gc_set_foreground(gc,bg);
+                   gdk_draw_rectangle(drawable,gc,1,hPos,vPos-font->Height,font->Width,font->Height+line_spacing);
+                }
 
-		      if(fg)
-		         gdk_gc_set_foreground(gc,fg);
+                if(fg)
+                   gdk_gc_set_foreground(gc,fg);
 
-		      switch(mode)
-		      {
-		      case 0:	// Nothing special
-		         gdk_draw_text(drawable,font->fn,gc,hPos,vPos,(gchar *) chr,1);
-		         break;
+                switch(mode)
+                {
+                case 0:	// Nothing special
+                   gdk_draw_text(drawable,font->fn,gc,hPos,vPos,(gchar *) chr,1);
+                   break;
 
-		      case 1:  // Hidden
-		         gdk_draw_text(drawable,font->fn,gc,hPos,vPos," ",1);
-		         break;
+                case 1:  // Hidden
+                   gdk_draw_text(drawable,font->fn,gc,hPos,vPos," ",1);
+                   break;
 
-		      case 2:	// Hidden/Editable
-//		         gdk_draw_text(drawable,font->fn,gc,hPos,vPos,(gchar *) (chr[0] == ' ' ? chr : "*"), 1);
-		         break;
+                case 2:	// Hidden/Editable
+                   break;
 
-		      }
+                }
+             }
+
+             hPos += font->Width;
+             trm++;
            }
-
-		   hPos += font->Width;
-	       trm++;
-    	}
-    	vPos += (font->Height + line_spacing);
+          vPos += (font->Height + line_spacing);
+       }
     }
 
     /*
