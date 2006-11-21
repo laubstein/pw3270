@@ -45,22 +45,15 @@
 
    accel_group = gtk_accel_group_new();
 
-   /* This function initializes the item factory.
-      Param 1: The type of menu - can be GTK_TYPE_MENU_BAR, GTK_TYPE_MENU,
-               or GTK_TYPE_OPTION_MENU.
-      Param 2: The path of the menu.
-      Param 3: A pointer to a gtk_accel_group.  The item factory sets up
-               the accelerator table while generating menus.
-   */
+   // http://developer.gnome.org/doc/API/2.0/gtk/GtkItemFactory.html
    item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", accel_group);
 
    /* Load menu from configuration file */
+#ifdef DATADIR
    LoadMenu(DATADIR "/menu.conf",item_factory);
-
-   /* This function generates the menu items. Pass the item factory,
-      the number of items in the array, the array itself, and any
-      callback data for the the menu items. */
-//   gtk_item_factory_create_items(item_factory, nmenu_items, menu_items, NULL);
+#else
+   LoadMenu("./menu.conf",item_factory);
+#endif
 
    /* Attach the new accelerator group to the window. */
    gtk_window_add_accel_group(GTK_WINDOW (window), accel_group);
