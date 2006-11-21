@@ -8,33 +8,6 @@
 /*---[ Main menu ]------------------------------------------------------------*/
 
 
- // TODO (perry#1#): Load it from configuration file.
- static GtkItemFactoryEntry menu_items[] =
- {
- 	{ "/_Arquivo",					NULL,					NULL,						0,		"<Branch>"		},
- 	{ "/Arquivo/_Imprimir Tela",	"<control>P",			action_print,				0,		NULL			},
- 	{ "/Arquivo/Imprimir Seleção",	"<control><shift>P",	action_print_selection,		0,		NULL			},
- 	{ "/Arquivo/Imprimir Cópia",	NULL,					action_print_copy,			0,		NULL			},
- 	{ "/Arquivo/Sair",          	"<control>X",			action_exit,				0,		NULL			},
-
- 	{ "/_Editar",					NULL,					NULL,						0,		"<Branch>"		},
- 	{ "/Editar/Copiar",				"<control>C",			action_copy,				0,		NULL			},
- 	{ "/Editar/Copiar anexando",	"<control><shift>C",	action_append,				0,		NULL			},
- 	{ "/Editar/Colar",				"<control>V",			action_paste,				0,		NULL			},
-	{ "/Editar/sep1",     			NULL,         			NULL,						0,		"<Separator>"	},
-	{ "/Editar/Limpar campos",		NULL,					action_clear,				0,		NULL			},
-	{ "/Editar/sep2",     			NULL,         			NULL,						0,		"<Separator>"	},
-	{ "/Editar/Selecionar tudo",	"<control>A",			action_select_all,			0,		NULL			},
-	{ "/Editar/Desmarcar",			"<control>D",			action_remove_selection,	0,		NULL			},
-
- 	{ "/_Opções",					NULL,					NULL,						0,		"<Branch>"		},
- 	{ "/Opções/Cross Hair",			"<ALT>x",				action_crosshair,			0,		NULL			},
-
- 	{ "/Comunicação/Conectar",		NULL,					action_connect,				0,		NULL			},
- 	{ "/Comunicação/Desconectar",	NULL,					action_disconnect,			0,		NULL			},
-
- };
-
 /*---[ Globals ]--------------------------------------------------------------*/
 
  GtkWidget	*top_window		= 0;
@@ -69,7 +42,6 @@
    // http://www.gtk.org/tutorial1.2/gtk_tut-13.html
    GtkItemFactory	*item_factory;
    GtkAccelGroup	*accel_group;
-   gint 			nmenu_items		= sizeof (menu_items) / sizeof (menu_items[0]);
 
    accel_group = gtk_accel_group_new();
 
@@ -80,13 +52,15 @@
       Param 3: A pointer to a gtk_accel_group.  The item factory sets up
                the accelerator table while generating menus.
    */
-
    item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", accel_group);
+
+   /* Load menu from configuration file */
+   LoadMenu(DATADIR "/menu.conf",item_factory);
 
    /* This function generates the menu items. Pass the item factory,
       the number of items in the array, the array itself, and any
       callback data for the the menu items. */
-   gtk_item_factory_create_items(item_factory, nmenu_items, menu_items, NULL);
+//   gtk_item_factory_create_items(item_factory, nmenu_items, menu_items, NULL);
 
    /* Attach the new accelerator group to the window. */
    gtk_window_add_accel_group(GTK_WINDOW (window), accel_group);

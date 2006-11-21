@@ -45,7 +45,7 @@
         STATUS_DBCS,                   /* X DBCS */
         STATUS_SCROLLED,               /* X Scrolled */
         STATUS_MINUS,                  /* X -f */
-	
+
 	STATUS_RECONNECTING
  };
 
@@ -173,6 +173,8 @@
  void ParseInput(const gchar *string);
 
  void RedrawTerminalContents(void);
+
+ int LoadMenu(const char *filename, GtkItemFactory *factory);
 
 
 #ifdef QUIET_MODE
