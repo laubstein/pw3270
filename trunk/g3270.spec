@@ -46,6 +46,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/x3270
 install -m 755 src/lib3270.so		%{buildroot}%{_libdir}
 install -m 755 src/%{name}		%{buildroot}%{_bindir}
 install -m 644 src/*.jpg		%{buildroot}%{_datadir}/%{name}
+install -m 644 src/*.conf		%{buildroot}%{_datadir}/%{name}
 install -m 644 src/lib/ibm_hosts	%{buildroot}%{_sysconfdir}/x3270
 
 # Desktop menu entry
