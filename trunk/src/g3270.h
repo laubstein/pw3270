@@ -165,6 +165,10 @@
  void action_exit(GtkWidget *w, gpointer data);
  void action_clear(GtkWidget *w, gpointer data);
  void action_paste(GtkWidget *w, gpointer data);
+ void action_BackTab(GtkWidget *w, gpointer data);
+
+ void action_F7(GtkWidget *w, gpointer data);
+ void action_F8(GtkWidget *w, gpointer data);
 
  void action_print(GtkWidget *w, gpointer data);
  void action_print_copy(GtkWidget *w, gpointer data);
