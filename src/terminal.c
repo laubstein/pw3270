@@ -24,9 +24,6 @@
 
  #define	STATUS_LINE_SPACE		4
 
- #if GTK == 2
-    #define USE_GTKIMCONTEXT
- #endif
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -105,6 +102,7 @@
  int				reconnect_retry							= 0;
 
 #ifdef USE_GTKIMCONTEXT
+ // http://developer.gnome.org/doc/API/2.0/gtk/GtkIMContext.html
  GtkIMContext		*im;
 #endif
 
@@ -606,13 +604,20 @@
 
  static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+ 	if(KeyboardAction(widget,event,user_data))
+ 	{
+#ifdef USE_GTKIMCONTEXT
+       gtk_im_context_reset(im);
+#endif
+ 	   return TRUE;
+ 	}
+
 #ifdef USE_GTKIMCONTEXT
     if(gtk_im_context_filter_keypress(im,event))
        return TRUE;
 #endif
 
- 	CHKPoint();
- 	return KeyboardAction(widget,event,user_data);
+    return FALSE;
  }
 
  static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)

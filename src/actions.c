@@ -78,6 +78,8 @@
      	DECLARE_KEYPROC( GDK_3270_PrintScreen,	0,		action_print	),
 
      	DECLARE_KEYPROC( GDK_ISO_Left_Tab,		0,		action_BackTab	),
+     	DECLARE_KEYPROC( GDK_KP_Subtract,		0,		action_BackTab	),
+
 
     };
 
@@ -103,6 +105,8 @@
         DECLARE_ACTION( GDK_3270_Reset,	0,	Reset_action,			IA_DEFAULT, CN, CN ),
 
         DECLARE_ACTION( GDK_Tab,	    0,	Tab_action,				IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_KP_Add,	    0,	Tab_action,				IA_DEFAULT, CN, CN ),
+
         DECLARE_ACTION( GDK_Delete,		0,	Delete_action,			IA_DEFAULT, CN, CN ),
         DECLARE_ACTION( GDK_BackSpace,	0,	Erase_action,			IA_DEFAULT, CN, CN ),
 
@@ -118,7 +122,10 @@
 
 	char			ks[6];
     int				f;
+
+#ifndef USE_GTKIMCONTEXT
     gchar 			*string		= 0;
+#endif
 
     DBGTracex(event->state);
 
@@ -159,6 +166,7 @@
     	}
     }
 
+#ifndef USE_GTKIMCONTEXT
     string = event->string;
 
     DBGPrintf("Keyval: %d (%s) Keychar: \"%s\" State: %04x %s%s%s%s%s%s%s%s%s%s%s%s%s%s",
@@ -189,8 +197,7 @@
  	   ParseInput(string);
  	   return TRUE;
 	}
-
-	/* Unknown key, ignore-it */
+#endif
 
     return FALSE;
 
