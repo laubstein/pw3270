@@ -37,7 +37,7 @@
   // /usr/X11R6/lib/X11/rgb.txt
   static const char *TerminalColors  = "black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
   static const char *FieldColors     = "green,red,#00FFFF,white";
-  static const char *CursorColors	 = "white,white,DarkSlateGray,DarkSlateGray";
+  static const char *CursorColors	 = "white,white,LimeGreen,LimeGreen";
   static const char *SelectionColors = "#000020,yellow";
   static const char *StatusColors	 = "black,#7890F0,LimeGreen,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen";
 
