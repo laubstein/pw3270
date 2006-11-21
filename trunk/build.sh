@@ -13,7 +13,7 @@ mv *~ /tmp
 make -C src clean
 
 cd ..
-tar -zcf `rpm --eval="%{u2p:%{_sourcedir}}"`/$PACKAGE.tar.gz --exclude=*CVS* $PACKAGE
+tar -zcvf `rpm --eval="%{u2p:%{_sourcedir}}"`/$PACKAGE.tar.gz --exclude=*.svn* $PACKAGE
 
 if [ "$?" != "0" ]; then
    exit -1
@@ -25,6 +25,9 @@ rm -f $RPMDIR/$RPMARCH/$PACKAGE*.rpm
 rm -f $RPMDIR/noarch/$PACKAGE*.rpm
 
 rpmbuild -ba $PACKAGE.spec
+if [ "$?" != "0" ]; then
+   exit -1
+fi
 
 echo "Enviando arquivo source para o servidor..."
 scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/$PACKAGE*.src.rpm $USER@os2team.df.intrabb.bb.com.br:/home/html/src/$VENDOR
