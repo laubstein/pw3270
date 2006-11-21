@@ -8,7 +8,7 @@
  #include "lib/3270ds.h"
  #include "lib/tablesc.h"
 
-/*--[ Keyboard processing ]--------------------------------------------*/
+/*---[ Keyboard processing ]--------------------------------------------*/
 
  // Replace the Alt-Key mas for one with a more "acceptable" name.
  #define GDK_ALT_MASK GDK_MOD1_MASK
