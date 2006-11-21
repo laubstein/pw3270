@@ -97,8 +97,13 @@
 		DECLARE_ACTION( GDK_Up,			0,	Up_action,				IA_DEFAULT, CN, CN ),
 		DECLARE_ACTION( GDK_Right,		0,	Right_action, 			IA_DEFAULT, CN, CN ),
 		DECLARE_ACTION( GDK_Down,		0,	Down_action,			IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_Clear,		0, 	Clear_action, 			IA_DEFAULT, CN, CN ),
 
+		DECLARE_ACTION( GDK_KP_Left,	0,	Left_action,			IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_KP_Up,		0,	Up_action,				IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_KP_Right,	0,	Right_action, 			IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_KP_Down,	0,	Down_action,			IA_DEFAULT, CN, CN ),
+
+        DECLARE_ACTION( GDK_Clear,		0, 	Clear_action, 			IA_DEFAULT, CN, CN ),
         DECLARE_ACTION( GDK_3270_Reset,	0,	Reset_action,			IA_DEFAULT, CN, CN ),
 
         DECLARE_ACTION( GDK_Tab,	    0,	Tab_action,				IA_DEFAULT, CN, CN ),
