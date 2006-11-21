@@ -34,7 +34,7 @@
    const char		*trace;
 #endif
 
-   void (*exec)(void);
+   void (*exec)(GtkWidget *, gpointer);
 
 #ifdef DEBUG
    const char		*action_trace;
@@ -65,24 +65,20 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
- static void Page_Up(void)
- {
-    action_internal(PF_action, IA_DEFAULT, "7", CN);
- }
-
- static void Page_Down(void)
- {
-    action_internal(PF_action, IA_DEFAULT, "8", CN);
- }
-
  // FIXME (perry#1#): Replace structures with GTK acelerators loaded from configuration file
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
 
     static const struct WindowActions keyproc[] =
     {
-     	DECLARE_KEYPROC( GDK_Page_Up, 	0, 				Page_Up				),
-     	DECLARE_KEYPROC( GDK_Page_Down,	0, 				Page_Down			),
+     	DECLARE_KEYPROC( GDK_Page_Up, 			0,		action_F7		),
+     	DECLARE_KEYPROC( GDK_Page_Down,			0,		action_F8		),
+
+     	DECLARE_KEYPROC( GDK_Print,				0,		action_print	),
+     	DECLARE_KEYPROC( GDK_3270_PrintScreen,	0,		action_print	),
+
+     	DECLARE_KEYPROC( GDK_ISO_Left_Tab,		0,		action_BackTab	),
+
     };
 
     static const struct TerminalActions actions[] =
@@ -91,7 +87,7 @@
 		// http://www.koders.com/c/fidA3A9523D24A70BAFCE05733E73D558365D103DB3.aspx
 
 		DECLARE_ACTION( GDK_Home,		0,	Home_action, 			IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_End,		0,	EraseInput_action,		IA_DEFAULT, CN, CN ),
+		DECLARE_ACTION( GDK_End,		0,	EraseEOF_action,		IA_DEFAULT, CN, CN ),
 
 		DECLARE_ACTION( GDK_Left,		0,	Left_action,			IA_DEFAULT, CN, CN ),
 		DECLARE_ACTION( GDK_Up,			0,	Up_action,				IA_DEFAULT, CN, CN ),
@@ -108,7 +104,7 @@
 
         DECLARE_ACTION( GDK_Tab,	    0,	Tab_action,				IA_DEFAULT, CN, CN ),
         DECLARE_ACTION( GDK_Delete,		0,	Delete_action,			IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_BackSpace,	0,	BackSpace_action,		IA_DEFAULT, CN, CN ),
+        DECLARE_ACTION( GDK_BackSpace,	0,	Erase_action,			IA_DEFAULT, CN, CN ),
 
         DECLARE_ACTION( GDK_Return,		0,	Enter_action,			IA_DEFAULT, CN, CN ),
         DECLARE_ACTION( GDK_KP_Enter,	0,	Enter_action,			IA_DEFAULT, CN, CN ),
@@ -158,7 +154,7 @@
 #ifdef DEBUG
 		   DBGPrintf("Key: %s\tAction: %s",keyproc[f].trace,keyproc[f].action_trace);
 #endif
-		   keyproc[f].exec();
+		   keyproc[f].exec(0,0);
            return TRUE;
     	}
     }
@@ -282,7 +278,6 @@
 
  void action_print(GtkWidget *w, gpointer data)
  {
-    // TODO (perry#9#): Replace with mkstemp
  	char 			filename[1024];
  	int				rows;
  	int				cols;
@@ -323,6 +318,22 @@
  	}
 
  }
+
+ void action_F7(GtkWidget *w, gpointer data)
+ {
+    action_internal(PF_action, IA_DEFAULT, "7", CN);
+ }
+
+ void action_F8(GtkWidget *w, gpointer data)
+ {
+    action_internal(PF_action, IA_DEFAULT, "8", CN);
+ }
+
+ void action_BackTab(GtkWidget *w, gpointer data)
+ {
+    action_internal(BackTab_action, IA_DEFAULT, CN, CN);
+ }
+
 
 
 

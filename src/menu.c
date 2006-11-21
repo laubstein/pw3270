@@ -26,6 +26,8 @@
 	{ "remove_selection",	action_remove_selection	},
 	{ "crosshair",			action_crosshair		},
 	{ "connect",			action_connect			},
+	{ "F8",					action_F7				},
+	{ "F7",					action_F8				},
 	{ "disconnect",			action_disconnect		}
 
  };
