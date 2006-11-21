@@ -21,6 +21,10 @@
     #define USE_SELECTION
  #endif
 
+ #if GTK == 2
+    #define USE_GTKIMCONTEXT
+ #endif
+
  #ifndef TMPPATH
     TMPPATH="/tmp"
  #endif
