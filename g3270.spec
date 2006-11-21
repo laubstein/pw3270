@@ -4,7 +4,7 @@ Group:          System/X11/Terminals
 Version:        3.3.4
 Release:        1.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
-Source:         %{name}-%{version}.tar.gz
+Source:         %{name}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 Requires:       openssl %{name}-lib
