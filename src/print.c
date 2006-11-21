@@ -7,7 +7,7 @@
 
 /*---[ Constants ]------------------------------------------------------------*/
 
- static const char *exec = "kprinter -t " TARGET " %s";
+ static const char *exec = "kprinter --nodialog -t " TARGET " %s";
 
 /*---[ Lock/Unlock ]----------------------------------------------------------*/
 
