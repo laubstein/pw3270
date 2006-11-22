@@ -68,6 +68,13 @@
 
     top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
+#if GTK == 1
+	gtk_window_set_wmclass(GTK_WINDOW(top_window),"toplevel",TARGET);
+	#error Is it working?
+#else
+    gtk_window_set_role(GTK_WINDOW(top_window), TARGET "0" );
+#endif
+
 	g_signal_connect(G_OBJECT(top_window),	"delete_event", G_CALLBACK(delete_event),	NULL);
     g_signal_connect(G_OBJECT(top_window),	"destroy", 		G_CALLBACK(destroy),		NULL);
     g_signal_connect(G_OBJECT(top_window),	"map-event",	G_CALLBACK(map_event),		NULL);
@@ -90,15 +97,7 @@
     	gtk_window_set_icon(GTK_WINDOW(top_window),icon);
 #endif
 
-#if GTK == 1
-	gtk_window_set_wmclass(GTK_WINDOW(top_window),"toplevel",TARGET);
-#else
-    gtk_window_set_role(GTK_WINDOW(top_window), TARGET "_topwindow");
-#endif
-
-    gtk_widget_show(top_menu);
-    gtk_widget_show(terminal);
-    gtk_widget_show(vbox);
+	gtk_window_set_position(GTK_WINDOW(top_window),GTK_WIN_POS_CENTER);
 
  }
 
@@ -128,7 +127,7 @@
 
     DBGMessage("Starting gtk main loop");
 
-    gtk_widget_show(top_window);
+    gtk_widget_show_all(top_window);
     gtk_main();
 
     return 0;

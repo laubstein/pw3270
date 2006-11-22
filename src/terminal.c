@@ -743,6 +743,7 @@
 
     Get3270DeviceBuffer(&rows, &cols);
     DBGPrintf("Screen size: %dx%d",rows,cols);
+
     gtk_widget_set_size_request(ret, font->Width*(cols+1), (font->Height+MIN_LINE_SPACING)*(rows+1));
 
     g_signal_connect(G_OBJECT(ret), "expose_event",  		G_CALLBACK(expose),		  		0);
