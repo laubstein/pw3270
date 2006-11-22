@@ -65,10 +65,8 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
- // FIXME (perry#1#): Replace structures with GTK acelerators loaded from configuration file
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
-
     static const struct WindowActions keyproc[] =
     {
      	DECLARE_KEYPROC( GDK_Page_Up, 			0,		action_F7		),
@@ -80,6 +78,21 @@
      	DECLARE_KEYPROC( GDK_ISO_Left_Tab,		0,		action_BackTab	),
      	DECLARE_KEYPROC( GDK_KP_Subtract,		0,		action_BackTab	),
 
+     	DECLARE_KEYPROC( GDK_KP_Add,			0,		action_Tab		),
+     	DECLARE_KEYPROC( GDK_Tab,				0,		action_Tab		),
+
+     	DECLARE_KEYPROC( GDK_Home,				0,		action_Home		),
+     	DECLARE_KEYPROC( GDK_End,				0,		action_EraseEOF	),
+
+     	DECLARE_KEYPROC( GDK_Left,				0,		action_Left		),
+     	DECLARE_KEYPROC( GDK_Up,				0,		action_Up		),
+     	DECLARE_KEYPROC( GDK_Right,				0,		action_Right	),
+     	DECLARE_KEYPROC( GDK_Down,				0,		action_Down		),
+
+     	DECLARE_KEYPROC( GDK_KP_Left,			0,		action_Left		),
+     	DECLARE_KEYPROC( GDK_KP_Up,				0,		action_Up		),
+     	DECLARE_KEYPROC( GDK_KP_Right,			0,		action_Right	),
+     	DECLARE_KEYPROC( GDK_KP_Down,			0,		action_Down		),
 
     };
 
@@ -88,24 +101,8 @@
 		// /opt/gnome/include/gtk-2.0/gdk/gdkkeysyms.h
 		// http://www.koders.com/c/fidA3A9523D24A70BAFCE05733E73D558365D103DB3.aspx
 
-		DECLARE_ACTION( GDK_Home,		0,	Home_action, 			IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_End,		0,	EraseEOF_action,		IA_DEFAULT, CN, CN ),
-
-		DECLARE_ACTION( GDK_Left,		0,	Left_action,			IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_Up,			0,	Up_action,				IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_Right,		0,	Right_action, 			IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_Down,		0,	Down_action,			IA_DEFAULT, CN, CN ),
-
-		DECLARE_ACTION( GDK_KP_Left,	0,	Left_action,			IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_KP_Up,		0,	Up_action,				IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_KP_Right,	0,	Right_action, 			IA_DEFAULT, CN, CN ),
-		DECLARE_ACTION( GDK_KP_Down,	0,	Down_action,			IA_DEFAULT, CN, CN ),
-
         DECLARE_ACTION( GDK_Clear,		0, 	Clear_action, 			IA_DEFAULT, CN, CN ),
         DECLARE_ACTION( GDK_3270_Reset,	0,	Reset_action,			IA_DEFAULT, CN, CN ),
-
-        DECLARE_ACTION( GDK_Tab,	    0,	Tab_action,				IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_KP_Add,	    0,	Tab_action,				IA_DEFAULT, CN, CN ),
 
         DECLARE_ACTION( GDK_Delete,		0,	Delete_action,			IA_DEFAULT, CN, CN ),
         DECLARE_ACTION( GDK_BackSpace,	0,	Erase_action,			IA_DEFAULT, CN, CN ),
@@ -153,13 +150,13 @@
     	return TRUE;
     }
 
-    /* Check for keyproc actions */
+    /* Check for special keyproc actions */
     for(f=0; f < (sizeof(keyproc)/sizeof(struct WindowActions));f++)
     {
     	if(keyproc[f].keyval == event->keyval && (event->state & keyproc[f].state) == keyproc[f].state)
     	{
 #ifdef DEBUG
-		   DBGPrintf("Key: %s\tAction: %s",keyproc[f].trace,keyproc[f].action_trace);
+		   DBGPrintf("Special Key: %s\tAction: %s",keyproc[f].trace,keyproc[f].action_trace);
 #endif
 		   keyproc[f].exec(0,0);
            return TRUE;
@@ -341,7 +338,53 @@
     action_internal(BackTab_action, IA_DEFAULT, CN, CN);
  }
 
+ void action_Tab(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Tab_action, IA_DEFAULT, CN, CN);
+ }
 
+ void action_Home(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Home_action, IA_DEFAULT, CN, CN);
+ }
 
+ void action_EraseEOF(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(EraseEOF_action, IA_DEFAULT, CN, CN);
+ }
 
+ void action_Left(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Left_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Up(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Up_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Right(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Right_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Down(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Down_action, IA_DEFAULT, CN, CN);
+ }
+
+/*
+ void action_(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(_action, IA_DEFAULT, CN, CN);
+ }
+*/
 

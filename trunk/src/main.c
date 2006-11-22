@@ -37,6 +37,62 @@
     gtk_main_quit();
  }
 
+/*
+
+ Why it's not working for some keys?
+
+ static void LoadAcelerators(GtkWidget  *window)
+ {
+   // http://developer.gnome.org/doc/API/2.0/gtk/gtk-Keyboard-Accelerators.html
+
+   static const struct _accelerator
+   {
+      const char *key;
+      void (*action)(GtkWidget *w, gpointer data);
+   } accelerator[] =
+   {
+		{ "Page_Up",			action_F7 		},
+		{ "Page_Down",			action_F8 		},
+
+     	{ "Print",				action_print	},
+     	{ "3270_PrintScreen",	action_print	},
+
+		{ "Tab",				action_Tab 		},
+     	{ "ISO_Left_Tab",		action_BackTab	}
+
+   };
+
+   int				 f;
+
+   GtkAccelGroup	*accel_group;
+   GdkModifierType 	 mods;
+   guint 			 key;
+
+   // http://developer.gnome.org/doc/API/2.0/gobject/gobject-Closures.html
+   GClosure			*closure;
+
+   accel_group = gtk_accel_group_new();
+
+   for(f=0;f< (sizeof(accelerator)/sizeof(struct _accelerator)); f++)
+   {
+	  DBGMessage(accelerator[f].key);
+      gtk_accelerator_parse(accelerator[f].key, &key, &mods);
+      if(key)
+      {
+         closure = g_cclosure_new_object_swap(G_CALLBACK(accelerator[f].action), G_OBJECT(window));
+         gtk_accel_group_connect(accel_group,key,mods,GTK_ACCEL_LOCKED,closure);
+      }
+      else
+      {
+	     Log("Error parsing accelerator \"%s\"",accelerator[f].key);
+      }
+   }
+
+   gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+
+ }
+*/
+
  static GtkWidget *CreateMainMenu(GtkWidget  *window)
  {
    // http://www.gtk.org/tutorial1.2/gtk_tut-13.html
@@ -56,7 +112,10 @@
 #endif
 
    /* Attach the new accelerator group to the window. */
-   gtk_window_add_accel_group(GTK_WINDOW (window), accel_group);
+   gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+
+   /* Attach keyboard actions to the window */
+//   LoadAcelerators(window);
 
    /* Finally, return the actual menu bar created by the item factory. */
    return gtk_item_factory_get_widget(item_factory, "<main>");
@@ -103,6 +162,7 @@
 
  int main(int argc, char **argv)
  {
+
     printf(TARGET " Build " BUILD " for gtk " GTKVERSION "\n");
     fflush(stdout);
 

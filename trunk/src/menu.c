@@ -117,7 +117,6 @@
     	if(*buffer == '/')
     	{
     		current++;
-    		DBGPrintf("%d = %s",current,buffer);
     		memset(itens+current,0,sizeof(GtkItemFactoryEntry));
 
     		(itens+current)->path = g_strdup((char *) buffer);

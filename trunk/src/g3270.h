@@ -174,9 +174,18 @@
  void action_F7(GtkWidget *w, gpointer data);
  void action_F8(GtkWidget *w, gpointer data);
 
+ void action_Tab(GtkWidget *w, gpointer data);
+
  void action_print(GtkWidget *w, gpointer data);
  void action_print_copy(GtkWidget *w, gpointer data);
  void action_print_selection(GtkWidget *w, gpointer data);
+
+ void action_Down(GtkWidget *w, gpointer data);
+ void action_Right(GtkWidget *w, gpointer data);
+ void action_Up(GtkWidget *w, gpointer data);
+ void action_Left(GtkWidget *w, gpointer data);
+ void action_EraseEOF(GtkWidget *w, gpointer data);
+ void action_Home(GtkWidget *w, gpointer data);
 
  void ParseInput(const gchar *string);
 
