@@ -7,6 +7,7 @@
  #include "lib/actionsc.h"
  #include "lib/3270ds.h"
  #include "lib/tablesc.h"
+ #include "lib/screenc.h"
 
 /*---[ Keyboard processing ]--------------------------------------------*/
 
@@ -84,7 +85,9 @@
 
         DECLARE_KEYPROC( GDK_Insert,			0,		action_Insert	),
 
-        DECLARE_KEYPROC( GDK_Linefeed,			0,		action_Newline	)
+        DECLARE_KEYPROC( GDK_Control_L,			0,		action_Redraw	)
+
+
 
     };
 
@@ -163,7 +166,7 @@
     input = g_convert(string, -1, "ISO-8859-1", "UTF-8", NULL, NULL, NULL);
     if(!string)
     {
-    	Log("Error converting string to ISO-8859-1");
+    	Log("Error converting string \"%s\" to ISO-8859-1",string);
     	return;
     }
 
@@ -378,6 +381,12 @@
     action_internal(Newline_action, IA_DEFAULT, CN, CN);
  }
 
+ void action_Redraw(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Redraw_action, IA_DEFAULT, CN, CN);
+ }
+
 /*
  void action_(GtkWidget *w, gpointer data)
  {
@@ -385,4 +394,5 @@
     action_internal(_action, IA_DEFAULT, CN, CN);
  }
 */
+
 

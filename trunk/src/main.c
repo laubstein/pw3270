@@ -138,7 +138,7 @@
     g_signal_connect(G_OBJECT(top_window),	"destroy", 		G_CALLBACK(destroy),		NULL);
     g_signal_connect(G_OBJECT(top_window),	"map-event",	G_CALLBACK(map_event),		NULL);
 
-    SetWindowTitle(0);
+    UpdateWindowTitle();
 
     vbox = gtk_vbox_new(FALSE,0);
     gtk_container_add(GTK_CONTAINER(top_window),vbox);
@@ -173,6 +173,7 @@
     set_3270_keyboard(&g3270_keyboard_info);
 
     g_thread_init(NULL);
+    gdk_threads_init();
     gtk_init(&argc, &argv);
 
     /* Parse 3270 command line */
@@ -193,7 +194,7 @@
     return 0;
  }
 
- void SetWindowTitle(const char *msg)
+ void UpdateWindowTitle(void)
  {
     char title[512];
     const char *ptr = query_qualified_host();
@@ -214,13 +215,9 @@
           strncat(title," ",511);
        }
 
-       if(msg)
-          strncat(title,msg,511);
-
-       gdk_threads_enter();
+       LockThreads();
        gtk_window_set_title(GTK_WINDOW(top_window),title);
-       gdk_threads_leave();
-
+       UnlockThreads();
 
     }
  }
