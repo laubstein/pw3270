@@ -130,7 +130,7 @@
 
     g3270_log("lib3270", "%s", connected ? "Connected" : "Disconnected");
 
-    gdk_threads_enter();
+    LockThreads();
 
     status_untiming();
 
@@ -143,15 +143,12 @@
 	      SetOIAStatus(STATUS_BLANK);
        ctlr_erase(True);
        EnableCursor(TRUE);
-       SetWindowTitle(0);
     }
     else
     {
        SetOIAStatus(STATUS_DISCONNECTED);
-       SetWindowTitle(0);
        EnableCursor(FALSE);
        ctlr_erase(True);
-       RedrawTerminalContents();
 
        if(reconnect)
        {
@@ -170,7 +167,10 @@
        }
     }
 
-    gdk_threads_leave();
+    UnlockThreads();
+
+    UpdateWindowTitle();
+    RedrawTerminalContents();
 
  }
 
@@ -257,13 +257,6 @@
     gint 	height;
 
     Get3270DeviceBuffer(&rows, &cols);
-
-/*
- 	{
-	   DBGMessage("Redraw without buffer");
- 	   return 0;
- 	}
-*/
 
     cRow = (cursor_row * (font->Height + line_spacing)) + vPos;
     cCol = (cursor_col * font->Width) + left_margin;
@@ -467,9 +460,9 @@
 */
 
 
-           gdk_threads_enter();
+       LockThreads();
    	   gtk_widget_queue_draw(widget);
-           gdk_threads_leave();
+       UnlockThreads();
 
  	}
 
@@ -521,10 +514,6 @@
     top_margin = (height - (STATUS_LINE_SPACE + ((font->Height+line_spacing)*rows))) >> 1;
     if(top_margin < 0)
        top_margin = 0;
-
-    gdk_threads_enter();
-    gtk_widget_queue_draw(widget);
-    gdk_threads_leave();
 
  }
 
@@ -810,20 +799,18 @@
     return ret;
  }
 
-
-
  void InvalidateCursor(void)
  {
+//    LockThreads();
+
 #ifdef USE_GTKIMCONTEXT
     gtk_im_context_reset(im);
 #endif
 
     if(terminal)
-    {
-       gdk_threads_enter();
        gtk_widget_queue_draw(terminal);
-       gdk_threads_leave();
-    }
+
+//    UnlockThreads();
  }
 
  void action_crosshair( GtkWidget *w, gpointer   data )
@@ -899,9 +886,9 @@
 
     MouseMode = MOUSE_MODE_NORMAL;
 
-    gdk_threads_enter();
+    LockThreads();
     gtk_widget_queue_draw(terminal);
-    gdk_threads_leave();
+    UnlockThreads();
 
  }
 
@@ -909,9 +896,9 @@
  {
     fromRow = fromCol = 0;
     Get3270DeviceBuffer(&toRow, &toCol);
-    gdk_threads_enter();
+    LockThreads();
     gtk_widget_queue_draw(terminal);
-    gdk_threads_leave();
+    UnlockThreads();
 
  }
 
@@ -988,10 +975,12 @@
 
  void RedrawTerminalContents(void)
  {
+/*
     if(terminal)
     {
-        gdk_threads_enter();
+        LockThreads();
         gtk_widget_queue_draw(terminal);
-        gdk_threads_leave();
+        UnlockThreads();
     }
+*/
  }

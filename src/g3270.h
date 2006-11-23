@@ -9,9 +9,15 @@
  #include "lib/lib3270.h"
  #include "log.h"
 
- #define UpdateWindowTitle()		SetWindowTitle(0)
-
  #define RedrawStatusLine() 		RedrawTerminalContents()
+
+#ifdef DEBUG
+ #define LockThreads()				DBGMessage("Lock!"); gdk_threads_enter()
+ #define UnlockThreads()			DBGMessage("Unlock!"); gdk_threads_leave()
+#else
+ #define LockThreads()				gdk_threads_enter()
+ #define UnlockThreads()			gdk_threads_leave()
+#endif
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -139,7 +145,7 @@
  void gsource_addfile(const INPUT_3270 *ip);
  void gsource_removefile(const INPUT_3270 *ip);
 
- void SetWindowTitle(const char *msg);
+ void UpdateWindowTitle(void);
 
  void SetCursorPosition(int row, int col);
  void SetCursorType(int type);
@@ -194,6 +200,8 @@
  void action_Enter(GtkWidget *w, gpointer data);
  void action_Insert(GtkWidget *w, gpointer data);
  void action_Newline(GtkWidget *w, gpointer data);
+
+ void action_Redraw(GtkWidget *w, gpointer data);
 
  void ParseInput(const gchar *string);
 
