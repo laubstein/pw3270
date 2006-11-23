@@ -460,12 +460,9 @@
 */
 
 
-       LockThreads();
    	   gtk_widget_queue_draw(widget);
-       UnlockThreads();
 
  	}
-
 
  	return 0;
  }
@@ -886,9 +883,7 @@
 
     MouseMode = MOUSE_MODE_NORMAL;
 
-    LockThreads();
     gtk_widget_queue_draw(terminal);
-    UnlockThreads();
 
  }
 
@@ -896,9 +891,8 @@
  {
     fromRow = fromCol = 0;
     Get3270DeviceBuffer(&toRow, &toCol);
-    LockThreads();
+
     gtk_widget_queue_draw(terminal);
-    UnlockThreads();
 
  }
 
