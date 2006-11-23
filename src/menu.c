@@ -122,7 +122,7 @@
     		(itens+current)->path = g_strdup((char *) buffer);
 
     	}
-    	else if(current >= 0 && *ln)
+    	else if(current >= 0 && *ln && *ln != '#')
     	{
 		   ptr = (unsigned char *) strchr((char *) ln,'=');
 		   if(ptr)

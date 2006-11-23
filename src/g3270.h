@@ -187,6 +187,14 @@
  void action_EraseEOF(GtkWidget *w, gpointer data);
  void action_Home(GtkWidget *w, gpointer data);
 
+ void action_Clear(GtkWidget *w, gpointer data);
+ void action_Reset(GtkWidget *w, gpointer data);
+ void action_Delete(GtkWidget *w, gpointer data);
+ void action_Erase(GtkWidget *w, gpointer data);
+ void action_Enter(GtkWidget *w, gpointer data);
+ void action_Insert(GtkWidget *w, gpointer data);
+ void action_Newline(GtkWidget *w, gpointer data);
+
  void ParseInput(const gchar *string);
 
  void RedrawTerminalContents(void);
