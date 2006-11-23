@@ -969,6 +969,10 @@
 
  void RedrawTerminalContents(void)
  {
-    // NOTE (perry#1#): Is it thread safe?
-    gtk_widget_queue_draw(terminal);
+    if(terminal)
+    {
+       LockThreads();
+       gtk_widget_queue_draw(terminal);
+       UnlockThreads();
+    }
  }

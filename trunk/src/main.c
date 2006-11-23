@@ -13,6 +13,7 @@
  GtkWidget	*top_window		= 0;
  GtkWidget  *terminal		= 0;
  GtkWidget  *top_menu		= 0;
+ GThread    *MainThread     = 0;
 
 #if defined(DATADIR) && GTK == 2
  GdkPixbuf	*icon			= 0;
@@ -176,6 +177,10 @@
     gdk_threads_init();
     gtk_init(&argc, &argv);
 
+    MainThread = g_thread_self();
+
+    DBGPrintf("Main thread: %p",MainThread);
+
     /* Parse 3270 command line */
     parse_3270_command_line(argc, (const char **) argv, &cl_hostname);
 
@@ -220,6 +225,26 @@
        UnlockThreads();
 
     }
+ }
+
+ void gdk_lock(void)
+ {
+ 	// Calls from mainthread are builto from the internal gtk_main_loop and
+ 	// they're already locked.
+ 	if(g_thread_self() == MainThread)
+ 	   return;
+
+    gdk_threads_enter();
+ }
+
+ void gdk_unlock(void)
+ {
+ 	// Calls from mainthread are builto from the internal gtk_main_loop and
+ 	// they're already locked.
+ 	if(g_thread_self() == MainThread)
+ 	   return;
+
+    gdk_threads_leave();
  }
 
 

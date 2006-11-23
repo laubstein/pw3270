@@ -12,11 +12,12 @@
  #define RedrawStatusLine() 		RedrawTerminalContents()
 
 #ifdef DEBUG
- #define LockThreads()				DBGMessage("Lock!"); gdk_threads_enter()
- #define UnlockThreads()			DBGMessage("Unlock!"); gdk_threads_leave()
+ #define LockThreads()				DBGPrintf("Lock %p",g_thread_self()); gdk_lock()
+
+ #define UnlockThreads()			DBGPrintf("Unlock %p",g_thread_self()); gdk_unlock()
 #else
- #define LockThreads()				gdk_threads_enter()
- #define UnlockThreads()			gdk_threads_leave()
+ #define LockThreads()				gdk_lock()
+ #define UnlockThreads()			gdk_unlock()
 #endif
 
 /*---[ Defines ]--------------------------------------------------------------*/
@@ -207,7 +208,10 @@
 
  void RedrawTerminalContents(void);
 
- int LoadMenu(const char *filename, GtkItemFactory *factory);
+ int  LoadMenu(const char *filename, GtkItemFactory *factory);
+
+ void gdk_lock(void);
+ void gdk_unlock(void);
 
 
 #ifdef QUIET_MODE
