@@ -7,6 +7,11 @@ RPMDIR=`rpm --eval="%{u2p:%{_rpmdir}}"`
 RPMARCH=`rpm --eval="%{u2p:%{_target_cpu}}"`
 VENDOR=`rpm --eval="%{u2p:%{_vendor}}"`
 
+RELEASE=`grep Release g3270.spec | sed 's/ //g' |cut -d: -f2 |cut -d. -f1`
+
+#if [ -f svn ] ; then
+#   echo Atualizando SVN
+#fi
 
 mv *~ /tmp
 
@@ -34,6 +39,5 @@ scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/$PACKAGE*.src.rpm $USER@os2team.df.intra
 
 echo "Enviando arquivo binario o servidor..."
 scp $RPMDIR/$RPMARCH/$PACKAGE*.rpm $RPMDIR/noarch/$PACKAGE*.rpm $USER@os2team.df.intrabb.bb.com.br:/home/html/$VENDOR
-
 
 
