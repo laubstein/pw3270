@@ -42,27 +42,6 @@
 
  };
 
- struct TerminalActions
- {
-    guint		 	keyval;
-    guint			state;
-
-#ifdef DEBUG
-    const char		*trace;
-#endif
-
-	XtActionProc 	action;
-
-#ifdef DEBUG
-    const char		*action_trace;
-#endif
-	enum iaction 	cause;
-	const char 		*parm1;
-	const char 		*parm2;
- };
-
-/*---[ Statics ]--------------------------------------------------------------*/
-
 /*---[ Implement ]------------------------------------------------------------*/
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
@@ -94,28 +73,20 @@
      	DECLARE_KEYPROC( GDK_KP_Right,			0,		action_Right	),
      	DECLARE_KEYPROC( GDK_KP_Down,			0,		action_Down		),
 
-    };
+        DECLARE_KEYPROC( GDK_Clear,				0,		action_Clear	),
+        DECLARE_KEYPROC( GDK_3270_Reset,		0,		action_Reset	),
 
-    static const struct TerminalActions actions[] =
-    {
-		// /opt/gnome/include/gtk-2.0/gdk/gdkkeysyms.h
-		// http://www.koders.com/c/fidA3A9523D24A70BAFCE05733E73D558365D103DB3.aspx
+        DECLARE_KEYPROC( GDK_Delete,			0,		action_Delete	),
+        DECLARE_KEYPROC( GDK_BackSpace,			0,		action_Erase	),
 
-        DECLARE_ACTION( GDK_Clear,		0, 	Clear_action, 			IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_3270_Reset,	0,	Reset_action,			IA_DEFAULT, CN, CN ),
+        DECLARE_KEYPROC( GDK_Return,			0,		action_Enter	),
+        DECLARE_KEYPROC( GDK_KP_Enter,			0,		action_Enter	),
 
-        DECLARE_ACTION( GDK_Delete,		0,	Delete_action,			IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_BackSpace,	0,	Erase_action,			IA_DEFAULT, CN, CN ),
+        DECLARE_KEYPROC( GDK_Insert,			0,		action_Insert	),
 
-        DECLARE_ACTION( GDK_Return,		0,	Enter_action,			IA_DEFAULT, CN, CN ),
-        DECLARE_ACTION( GDK_KP_Enter,	0,	Enter_action,			IA_DEFAULT, CN, CN ),
-
-        DECLARE_ACTION( GDK_Insert,		0,	ToggleInsert_action,	IA_DEFAULT, CN, CN ),
-
-        DECLARE_ACTION( GDK_Linefeed,	0,	Newline_action,			IA_DEFAULT, CN, CN )
+        DECLARE_KEYPROC( GDK_Linefeed,			0,		action_Newline	)
 
     };
-
 
 	char			ks[6];
     int				f;
@@ -125,21 +96,6 @@
 #endif
 
     DBGTracex(event->state);
-
-    for(f=0; f < (sizeof(actions)/sizeof(struct TerminalActions));f++)
-    {
-    	if(actions[f].keyval == event->keyval && (event->state & actions[f].state) == actions[f].state)
-    	{
-#ifdef DEBUG
-		   DBGPrintf("Key: %s\tAction: %s",actions[f].trace,actions[f].action_trace);
-#endif
-           action_internal(	actions[f].action,
-							actions[f].cause,
-							actions[f].parm1,
-							actions[f].parm2 );
-           return TRUE;
-    	}
-    }
 
     /* Check for Function keys */
     if(event->keyval >= GDK_F1 && event->keyval <=  GDK_F12)
@@ -156,7 +112,7 @@
     	if(keyproc[f].keyval == event->keyval && (event->state & keyproc[f].state) == keyproc[f].state)
     	{
 #ifdef DEBUG
-		   DBGPrintf("Special Key: %s\tAction: %s",keyproc[f].trace,keyproc[f].action_trace);
+		   DBGPrintf("Key: %s\tAction: %s",keyproc[f].trace,keyproc[f].action_trace);
 #endif
 		   keyproc[f].exec(0,0);
            return TRUE;
@@ -253,7 +209,7 @@
 #if GTK == 2
     thd =  g_thread_create( ConnectThread, (gpointer) cl_hostname, 0, NULL);
 #else
-    pthread_create(&thd, NULL, (void * (*)(void *)) ConnectThread, cl_hostname);
+	pthread_create(&thd, NULL, (void * (*)(void *)) ConnectThread, cl_hostname);
 #endif
 
  }
@@ -378,6 +334,48 @@
  {
  	CHKPoint();
     action_internal(Down_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Clear(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Clear_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Reset(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Reset_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Delete(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Delete_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Erase(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Erase_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Enter(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Enter_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Insert(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(ToggleInsert_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Newline(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(Newline_action, IA_DEFAULT, CN, CN);
  }
 
 /*
