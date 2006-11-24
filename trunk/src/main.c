@@ -2,8 +2,19 @@
  #include "g3270.h"
  #include "lib/hostc.h"
 
-/*---[ Prototipes ]-----------------------------------------------------------*/
+/*---[ Structures ]-----------------------------------------------------------*/
 
+ #pragma pack(1)
+
+ struct user_config
+ {
+ 	unsigned short	sz;
+    gint 			width;
+    gint			height;
+
+ };
+
+ #pragma pack()
 
 /*---[ Main menu ]------------------------------------------------------------*/
 
@@ -21,8 +32,39 @@
 
 /*---[ Main program ]---------------------------------------------------------*/
 
+ void action_exit(GtkWidget *w, gpointer data)
+ {
+ 	char filename[4096];
+ 	char *home	= getenv("HOME");
+ 	FILE *arq;
+
+ 	struct user_config config;
+
+ 	action_disconnect(0,0);
+ 	Log("Exiting");
+
+ 	// Save window size and position
+ 	memset(&config,0,sizeof(config));
+ 	config.sz = sizeof(config);
+
+    gtk_window_get_size(GTK_WINDOW(top_window),&config.width,&config.height);
+
+    DBGPrintf("Tamanho da janela: %dx%d",config.width, config.height);
+
+    snprintf(filename,4095,"%s/.%s.saved",home ? home : ".", TARGET);
+    arq = fopen(filename,"w");
+    if(arq)
+    {
+	   fwrite (&config, sizeof(config), 1, arq);
+	   fclose(arq);
+    }
+
+ 	gtk_main_quit();
+ }
+
  static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer data )
  {
+ 	action_exit(widget,0);
     return FALSE;
  }
 
@@ -124,7 +166,12 @@
 
  static void CreateMainWindow(const char *cl_hostname)
  {
- 	GtkWidget *vbox;
+ 	GtkWidget	*vbox;
+ 	char 		filename[4096];
+ 	char 		*home	= getenv("HOME");
+ 	FILE 		*arq;
+
+ 	struct user_config config;
 
     top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -157,6 +204,19 @@
     	gtk_window_set_icon(GTK_WINDOW(top_window),icon);
 #endif
 
+    // Set size and position
+    snprintf(filename,4095,"%s/.%s.saved",home ? home : ".", TARGET);
+    arq = fopen(filename,"r");
+    if(arq)
+    {
+    	if(fread(&config,sizeof(config),1,arq) == 1 && (config.sz == sizeof(config)))
+    	{
+		   DBGPrintf("Tamanho da janela: %dx%d",config.width, config.height);
+           gtk_window_resize(GTK_WINDOW(top_window),config.width, config.height);
+    	}
+    	fclose(arq);
+    }
+
 	gtk_window_set_position(GTK_WINDOW(top_window),GTK_WIN_POS_CENTER);
 
  }
@@ -171,6 +231,8 @@
 
     /* Populate callback tables */
     set_3270_screen(&g3270_screen_callbacks);
+
+	// FIXME (perry#9#): Looks like this is not necessary since the library doesn't process keyboard.
     set_3270_keyboard(&g3270_keyboard_info);
 
     g_thread_init(NULL);
@@ -178,7 +240,6 @@
     gtk_init(&argc, &argv);
 
     MainThread = g_thread_self();
-
     DBGPrintf("Main thread: %p",MainThread);
 
     /* Parse 3270 command line */

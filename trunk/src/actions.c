@@ -227,13 +227,6 @@
 	host_disconnect(False);
  }
 
- void action_exit(GtkWidget *w, gpointer data)
- {
- 	action_disconnect(0,0);
- 	Log("Exiting");
- 	gtk_main_quit();
- }
-
  void action_clear(GtkWidget *w, gpointer data)
  {
     action_internal(EraseInput_action, IA_DEFAULT, CN, CN);
@@ -386,6 +379,7 @@
  	CHKPoint();
     action_internal(Redraw_action, IA_DEFAULT, CN, CN);
  }
+
 
 /*
  void action_(GtkWidget *w, gpointer data)
