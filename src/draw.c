@@ -109,7 +109,7 @@
     gboolean		rc			= FALSE;
     int				mode		= 0;
     GdkColor		*fg			= terminal_cmap+1;
-    GdkColor		*bg			= terminal_cmap;
+    GdkColor		*bg			= 0;
 
     if(!font->fn)
     {
