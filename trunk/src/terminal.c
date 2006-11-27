@@ -1,7 +1,7 @@
 
  #include "g3270.h"
-// #include <gdk/gdkkeysyms.h>
  #include <string.h>
+ #include <errno.h>
 
  #include "lib/hostc.h"
  #include "lib/kybdc.h"
@@ -32,14 +32,15 @@
   static const int widget_states[] = { GTK_STATE_NORMAL, GTK_STATE_ACTIVE, GTK_STATE_PRELIGHT, GTK_STATE_SELECTED, GTK_STATE_INSENSITIVE };
 
 /*---[ Terminal config ]------------------------------------------------------*/
-  // TODO (perry#2#): Read from file(s).
 
   // /usr/X11R6/lib/X11/rgb.txt
+  /*
   static const char *TerminalColors  = "black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
   static const char *FieldColors     = "green,red,#00FFFF,white";
   static const char *CursorColors	 = "white,white,LimeGreen,LimeGreen";
   static const char *SelectionColors = "#000020,yellow";
   static const char *StatusColors	 = "black,#7890F0,LimeGreen,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen";
+  */
 
   static const char *FontDescr[] =
   {
@@ -138,7 +139,7 @@
     {
 	   reconnect_retry = 0;
 	   if (GetKeyboardStatus() & KL_AWAITING_FIRST)
-	      SetOIAStatus(STATUS_NONSPECIFIC);
+	      SetOIAStatus(STATUS_TWAIT);
        else
 	      SetOIAStatus(STATUS_BLANK);
        ctlr_erase(True);
@@ -177,7 +178,7 @@
  static void stsResolving(Boolean ignored)
  {
  	DBGPrintf("Resolving: %s", ignored ? "Yes" : "No");
-    SetOIAStatus(STATUS_CONNECTING);
+    SetOIAStatus(STATUS_RESOLVING);
     status_untiming();
  }
 
@@ -192,7 +193,6 @@
  {
  	DBGPrintf("Exiting: %s", ignored ? "Yes" : "No");
  }
-
 
  static gboolean Mouse2Terminal(long x, long y, long *cRow, long *cCol)
  {
@@ -625,17 +625,65 @@
  }
 #endif
 
- static void LoadColors(GdkColor *clr, int qtd, const char *string)
+ static int GetColorDescription(const char *id, char *buffer)
+ {
+    static const struct _colors
+    {
+    	const char *name;
+    	const char *def;
+    } colors[] =
+    {
+		{ "Terminal",	"black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white" },
+		{ "Fields",		"green,red,#00FFFF,white" },
+		{ "Cursor",		"white,white,LimeGreen,LimeGreen" },
+		{ "Selection",	"#000020,yellow" },
+		{ "Status",		"black,#7890F0,LimeGreen,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen" }
+    };
+    char	key[40];
+    char	*ptr;
+    int 	f;
+
+	/* Check for environment variable */
+	snprintf(key,39,"%s3270",id);
+	ptr = getenv(key);
+	if(ptr)
+	{
+   		strncpy(buffer,ptr,4095);
+		return 0;
+	}
+
+    // TODO (perry#1#): Search configuration file for the definition.
+
+    /* Search for the default colors */
+    for(f=0;f< (sizeof(colors)/sizeof(struct _colors));f++)
+    {
+    	if(!strcmp(id,colors[f].name))
+    	{
+    		strncpy(buffer,colors[f].def,4095);
+    		return 0;
+    	}
+    }
+
+ 	return -1;
+ }
+
+ static int LoadColors(GdkColor *clr, int qtd, const char *id)
  {
  	char buffer[4096];
 	char *ptr;
  	char *tok;
  	int	 f;
+ 	int	 rc = 0;
 
     memset(clr,0,sizeof(GdkColor)*qtd);
 
     f = 0;
-    strncpy(buffer,string,4095);
+    if(GetColorDescription(id,buffer))
+    {
+    	Log("Cant'find color definition for \"%s\"",id);
+    	return ENOENT;
+    }
+
     for(ptr=strtok_r(buffer,",",&tok);ptr && f < qtd;ptr = strtok_r(0,",",&tok))
     {
     	gdk_color_parse(ptr,clr+f);
@@ -645,11 +693,13 @@
 										FALSE,
 										TRUE ))
 		{
-			Log("Can't allocate color \"%s\" from %s",ptr,string);
+			Log("Can't allocate color \"%s\" from %s",ptr,id);
+			rc = EINVAL;
 		}
 
         f++;
     }
+    return rc;
  }
 
  GtkWidget *g3270_new(const char *hostname)
@@ -751,10 +801,8 @@
     g_signal_connect(G_OBJECT(ret), "scroll-event",			G_CALLBACK(scroll_event),		0);
 #endif
 
-    // Set terminal colors
-    DBGTracex(gtk_widget_get_default_colormap());
-
-    strncpy(buffer,TerminalColors,4095);
+    /* Load terminal colors */
+    GetColorDescription("Terminal",buffer);
     for(ptr=strtok_r(buffer,",",&tok);ptr;ptr = strtok_r(0,",",&tok))
        terminal_color_count++;
 
@@ -767,20 +815,13 @@
     	return 0;
     }
 
-    /* Load terminal colors */
-    LoadColors(terminal_cmap, terminal_color_count, TerminalColors);
+    LoadColors(terminal_cmap, terminal_color_count, "Terminal");
 
-    /* Set field colors */
-    LoadColors(field_cmap,FIELD_COLORS,FieldColors);
-
-    /* Set cursor colors */
-    LoadColors(cursor_cmap,CURSOR_COLORS,CursorColors);
-
-    /* Set selection colors */
-    LoadColors(selection_cmap,SELECTION_COLORS,SelectionColors);
-
-    /* Set status bar colors */
-    LoadColors(status_cmap, STATUS_COLORS, StatusColors);
+    /* Load colors */
+    LoadColors(field_cmap,FIELD_COLORS,"Fields");
+    LoadColors(cursor_cmap,CURSOR_COLORS,"Cursor");
+    LoadColors(selection_cmap,SELECTION_COLORS,"Selection");
+    LoadColors(status_cmap, STATUS_COLORS, "Status");
 
     for(f=0;f < (sizeof(widget_states)/sizeof(int));f++)
     {
