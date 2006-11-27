@@ -105,8 +105,8 @@
 
     gboolean		rc			= FALSE;
     int				mode		= 0;
-    GdkColor		*fg			= 0;
-    GdkColor		*bg			= 0;
+    GdkColor		*fg			= terminal_cmap+1;
+    GdkColor		*bg			= terminal_cmap;
 
     if(!font->fn)
     {
