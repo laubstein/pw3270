@@ -2673,14 +2673,14 @@ keep_ticking(void)
 	tick_id = AddTimeOut(msec, keep_ticking);
 	status_timing(&t_start, &t1);
 
-	fprintf(stderr,"%s(%d):\t%s (%d %d)\n",__FILE__,__LINE__,__FUNCTION__,ticking,mticking);fflush(stderr);
+//	fprintf(stderr,"%s(%d):\t%s (%d %d)\n",__FILE__,__LINE__,__FUNCTION__,ticking,mticking);fflush(stderr);
 
 }
 
 void
 ticking_start(Boolean anyway)
 {
-	fprintf(stderr,"%s(%d):\t%s (%d %d)\n",__FILE__,__LINE__,__FUNCTION__,ticking,mticking);fflush(stderr);
+//	fprintf(stderr,"%s(%d):\t%s (%d %d)\n",__FILE__,__LINE__,__FUNCTION__,ticking,mticking);fflush(stderr);
 
 	(void) gettimeofday(&t_start, (struct timezone *) 0);
 	mticking = True;
@@ -2699,7 +2699,7 @@ ticking_start(Boolean anyway)
 
 void stop_3270_timer(void)
 {
-	fprintf(stderr,"%s(%d):\t%s\n",__FILE__,__LINE__,__FUNCTION__);fflush(stderr);
+//	fprintf(stderr,"%s(%d):\t%s\n",__FILE__,__LINE__,__FUNCTION__);fflush(stderr);
 	ticking_stop();
 	status_untiming();
 }
@@ -2709,7 +2709,7 @@ ticking_stop(void)
 {
 	struct timeval t1;
 
-	fprintf(stderr,"%s(%d):\t%s (%d %d)\n",__FILE__,__LINE__,__FUNCTION__,ticking,mticking);fflush(stderr);
+//	fprintf(stderr,"%s(%d):\t%s (%d %d)\n",__FILE__,__LINE__,__FUNCTION__,ticking,mticking);fflush(stderr);
 
 	(void) gettimeofday(&t1, (struct timezone *) 0);
 	if (mticking) {

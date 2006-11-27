@@ -181,14 +181,12 @@
  {
  	DBGPrintf("Resolving: %s", ignored ? "Yes" : "No");
     SetOIAStatus(STATUS_RESOLVING);
-    stop_3270_timer();
  }
 
  static void stsHalfConnect(Boolean ignored)
  {
  	DBGPrintf("HalfConnect: %s", ignored ? "Yes" : "No");
     SetOIAStatus(STATUS_CONNECTING);
-    stop_3270_timer();
  }
 
  static void stsExiting(Boolean ignored)
