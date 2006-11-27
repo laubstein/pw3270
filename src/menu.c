@@ -2,50 +2,6 @@
  #include "g3270.h"
  #include <dlfcn.h>
 
-/*---[ Macros ]---------------------------------------------------------------*/
-
-
-/*---[ Static ]---------------------------------------------------------------*/
-
- static const struct _callbacks
- {
-    const char				*name;
-    GtkItemFactoryCallback	callback;
- }
- callbacks[] =
- {
-	{ "print",				action_print			},
-	{ "print_selection",	action_print_selection	},
-	{ "print_copy",			action_print_copy		},
-	{ "exit",				action_exit				},
-	{ "copy",				action_copy				},
-	{ "append",				action_append			},
-	{ "paste",				action_paste			},
-	{ "clear",				action_clear			},
-	{ "select_all",			action_select_all		},
-	{ "remove_selection",	action_remove_selection	},
-	{ "crosshair",			action_crosshair		},
-	{ "connect",			action_connect			},
-	{ "F8",					action_F7				},
-	{ "F7",					action_F8				},
-	{ "disconnect",			action_disconnect		},
-	{ "backtab",			action_BackTab			},
-	{ "tab",				action_Tab				},
-	{ "home",				action_Home				},
-	{ "eraseeof",			action_EraseEOF			},
-	{ "left",				action_Left				},
-	{ "up",					action_Up				},
-	{ "right",				action_Right			},
-	{ "down",				action_Down				},
-	{ "reset",				action_Reset			},
-	{ "delete",				action_Delete			},
-	{ "erase",				action_Erase			},
-	{ "enter",				action_Enter			},
-	{ "insert",				action_Insert			},
-	{ "redraw",				action_Redraw			}
- };
-
-
 /*---[ Implement ]------------------------------------------------------------*/
 
  static void Accelerator(GtkItemFactoryEntry *itn, const char *accelerator)
@@ -57,11 +13,11 @@
  {
     int f;
 
-    for(f=0;f< (sizeof(callbacks)/sizeof(struct _callbacks));f++)
+    for(f=0;f< action_callback_counter;f++)
     {
-    	if(!strcmp(callbacks[f].name,name))
+    	if(!strcmp(action_callbacks[f].name,name))
     	{
-    		itn->callback = callbacks[f].callback;
+    		itn->callback = action_callbacks[f].callback;
     		return;
     	}
     }
