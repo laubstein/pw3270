@@ -105,6 +105,12 @@
 	int	  	Height;
  } FONTELEMENT;
 
+ struct action_callback
+ {
+    const char				*name;
+    GtkItemFactoryCallback	callback;
+ };
+
 /*---[ Globals ]--------------------------------------------------------------*/
 
  extern const 	SCREEN_CALLBACK g3270_screen_callbacks;
@@ -112,6 +118,8 @@
 
  extern const 	unsigned char	ebcdic2asc[];
 
+ extern const struct action_callback action_callbacks[];
+ extern const int	 action_callback_counter;
 
  extern char					oia_cursor[];
  extern char					oia_LUName[];

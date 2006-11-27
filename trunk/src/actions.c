@@ -9,6 +9,43 @@
  #include "lib/tablesc.h"
  #include "lib/screenc.h"
 
+/*---[ Callback table ]-------------------------------------------------------*/
+
+ const struct action_callback action_callbacks[] =
+ {
+	{ "print",				action_print			},
+	{ "print_selection",	action_print_selection	},
+	{ "print_copy",			action_print_copy		},
+	{ "exit",				action_exit				},
+	{ "copy",				action_copy				},
+	{ "append",				action_append			},
+	{ "paste",				action_paste			},
+	{ "clear",				action_clear			},
+	{ "select_all",			action_select_all		},
+	{ "remove_selection",	action_remove_selection	},
+	{ "crosshair",			action_crosshair		},
+	{ "connect",			action_connect			},
+	{ "F8",					action_F7				},
+	{ "F7",					action_F8				},
+	{ "disconnect",			action_disconnect		},
+	{ "backtab",			action_BackTab			},
+	{ "tab",				action_Tab				},
+	{ "home",				action_Home				},
+	{ "eraseeof",			action_EraseEOF			},
+	{ "left",				action_Left				},
+	{ "up",					action_Up				},
+	{ "right",				action_Right			},
+	{ "down",				action_Down				},
+	{ "reset",				action_Reset			},
+	{ "delete",				action_Delete			},
+	{ "erase",				action_Erase			},
+	{ "enter",				action_Enter			},
+	{ "insert",				action_Insert			},
+	{ "redraw",				action_Redraw			}
+ };
+
+ const int action_callback_counter = (sizeof(action_callbacks)/sizeof(struct action_callback));
+
 /*---[ Keyboard processing ]--------------------------------------------*/
 
  // Replace the Alt-Key mas for one with a more "acceptable" name.
@@ -28,17 +65,17 @@
 
  struct WindowActions
  {
-   guint		 	keyval;
-   guint			state;
+   guint		 			keyval;
+   guint					state;
 
 #ifdef DEBUG
-   const char		*trace;
+   const char				*trace;
 #endif
 
-   void (*exec)(GtkWidget *, gpointer);
+   GtkItemFactoryCallback	exec;
 
 #ifdef DEBUG
-   const char		*action_trace;
+   const char				*action_trace;
 #endif
 
  };
