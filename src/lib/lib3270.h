@@ -135,6 +135,8 @@ extern void  RemoveSelectionBox(void);
 
 extern int   Get3270CursorRow(void);
 
+extern void  stop_3270_timer(void);
+
 
 #ifdef __cplusplus
  }

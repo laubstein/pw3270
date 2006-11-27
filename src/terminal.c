@@ -124,16 +124,19 @@
     action_connect(0,0);
  }
 
+ static void sts3270Mode(Boolean connected)
+ {
+ 	DBGPrintf("3270Mode: %s", connected ? "Connected" : "Not connected");
+	stop_3270_timer();
+    RedrawStatusLine();
+ }
+
  static void stsConnect(Boolean connected)
  {
  	char key[40];
  	char *host;
 
     g3270_log("lib3270", "%s", connected ? "Connected" : "Disconnected");
-
-    LockThreads();
-
-    status_untiming();
 
     if(connected)
     {
@@ -168,8 +171,7 @@
        }
     }
 
-    UnlockThreads();
-
+    stop_3270_timer();
     UpdateWindowTitle();
     RedrawTerminalContents();
 
@@ -179,14 +181,14 @@
  {
  	DBGPrintf("Resolving: %s", ignored ? "Yes" : "No");
     SetOIAStatus(STATUS_RESOLVING);
-    status_untiming();
+    stop_3270_timer();
  }
 
  static void stsHalfConnect(Boolean ignored)
  {
  	DBGPrintf("HalfConnect: %s", ignored ? "Yes" : "No");
-    status_untiming();
     SetOIAStatus(STATUS_CONNECTING);
+    stop_3270_timer();
  }
 
  static void stsExiting(Boolean ignored)
@@ -736,6 +738,7 @@
     register_3270_schange(ST_EXITING,		stsExiting);
     register_3270_schange(ST_HALF_CONNECT,	stsHalfConnect);
     register_3270_schange(ST_RESOLVING,		stsResolving);
+	register_3270_schange(ST_3270_MODE, 	sts3270Mode);
 
     /* Load font table */
     sz   	 = sizeof(FONTELEMENT) * FONT_COUNT;
@@ -839,7 +842,7 @@
 
  void InvalidateCursor(void)
  {
-//    LockThreads();
+    LockThreads();
 
 #ifdef USE_GTKIMCONTEXT
     gtk_im_context_reset(im);
@@ -848,7 +851,7 @@
     if(terminal)
        gtk_widget_queue_draw(terminal);
 
-//    UnlockThreads();
+    UnlockThreads();
  }
 
  void action_crosshair( GtkWidget *w, gpointer   data )

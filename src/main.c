@@ -142,17 +142,23 @@
    GtkItemFactory	*item_factory;
    GtkAccelGroup	*accel_group;
 
+#ifdef DATADIR
+   const char		*filename = DATADIR "/menu.conf";
+#else
+   const char		*filename = DATADIR "./menu.conf";
+#endif
+
    accel_group = gtk_accel_group_new();
 
    // http://developer.gnome.org/doc/API/2.0/gtk/GtkItemFactory.html
    item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", accel_group);
 
    /* Load menu from configuration file */
-#ifdef DATADIR
-   LoadMenu(DATADIR "/menu.conf",item_factory);
-#else
-   LoadMenu("./menu.conf",item_factory);
-#endif
+   if(LoadMenu(filename,item_factory) < 1)
+   {
+      Log("Can't load \"%s\"",filename);
+      return 0;
+   }
 
    /* Attach the new accelerator group to the window. */
    gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
@@ -192,7 +198,8 @@
     gtk_container_add(GTK_CONTAINER(top_window),vbox);
 
     top_menu = CreateMainMenu(top_window);
-    gtk_box_pack_start(GTK_BOX(vbox), top_menu, FALSE, TRUE, 0);
+    if(top_menu)
+       gtk_box_pack_start(GTK_BOX(vbox), top_menu, FALSE, TRUE, 0);
 
     // Create terminal window
 	terminal = g3270_new(cl_hostname);

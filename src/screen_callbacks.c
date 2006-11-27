@@ -384,9 +384,21 @@ static void status_oerr(int error_type)
 
 }
 
+#ifdef DEBUG
+   static int dbgTimerEnabled = 0;
+#endif
+
 static void status_timing(struct timeval *t0, struct timeval *t1)
 {
    unsigned long cs;       // centiseconds
+
+#ifdef DEBUG
+   if(!dbgTimerEnabled)
+   {
+      dbgTimerEnabled = 1;
+      DBGMessage("Timer ON!");
+   }
+#endif
 
    if (t1->tv_sec - t0->tv_sec > (99*60))
    {
@@ -409,6 +421,14 @@ static void status_timing(struct timeval *t0, struct timeval *t1)
 
 void status_untiming(void)
 {
+#ifdef DEBUG
+   if(dbgTimerEnabled)
+   {
+      dbgTimerEnabled = 0;
+      DBGMessage("Timer Off!");
+   }
+#endif
+
    *oia_Timer = 0;
    RedrawStatusLine();
 }
