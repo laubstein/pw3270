@@ -28,9 +28,23 @@
 	{ "connect",			action_connect			},
 	{ "F8",					action_F7				},
 	{ "F7",					action_F8				},
-	{ "disconnect",			action_disconnect		}
-
+	{ "disconnect",			action_disconnect		},
+	{ "backtab",			action_BackTab			},
+	{ "tab",				action_Tab				},
+	{ "home",				action_Home				},
+	{ "eraseeof",			action_EraseEOF			},
+	{ "left",				action_Left				},
+	{ "up",					action_Up				},
+	{ "right",				action_Right			},
+	{ "down",				action_Down				},
+	{ "reset",				action_Reset			},
+	{ "delete",				action_Delete			},
+	{ "erase",				action_Erase			},
+	{ "enter",				action_Enter			},
+	{ "insert",				action_Insert			},
+	{ "redraw",				action_Redraw			}
  };
+
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -48,7 +62,6 @@
     	if(!strcmp(callbacks[f].name,name))
     	{
     		itn->callback = callbacks[f].callback;
-    		DBGPrintf("%s=%p",itn->path,itn->callback);
     		return;
     	}
     }
