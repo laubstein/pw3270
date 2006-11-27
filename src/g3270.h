@@ -55,6 +55,7 @@
         STATUS_DBCS,                   /* X DBCS */
         STATUS_SCROLLED,               /* X Scrolled */
         STATUS_MINUS,                  /* X -f */
+        STATUS_AWAITING_FIRST,	       /* X Wait */
 
 	STATUS_RECONNECTING
  };
@@ -83,6 +84,7 @@
 	STATUS_COLOR_NORMAL,
 	STATUS_COLOR_TOOGLE,
 	STATUS_COLOR_SSL,
+	STATUS_COLOR_CONNECTED,
 
 	STATUS_COLORS	// Must be the last one
  };
