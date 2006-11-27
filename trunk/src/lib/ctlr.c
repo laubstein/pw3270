@@ -2672,11 +2672,16 @@ keep_ticking(void)
 	} while (msec <= 0);
 	tick_id = AddTimeOut(msec, keep_ticking);
 	status_timing(&t_start, &t1);
+
+	fprintf(stderr,"%s(%d):\t%s (%d %d)\n",__FILE__,__LINE__,__FUNCTION__,ticking,mticking);fflush(stderr);
+
 }
 
 void
 ticking_start(Boolean anyway)
 {
+	fprintf(stderr,"%s(%d):\t%s (%d %d)\n",__FILE__,__LINE__,__FUNCTION__,ticking,mticking);fflush(stderr);
+
 	(void) gettimeofday(&t_start, (struct timezone *) 0);
 	mticking = True;
 
@@ -2686,8 +2691,17 @@ ticking_start(Boolean anyway)
 	if (ticking)
 		RemoveTimeOut(tick_id);
 	ticking = True;
+
 	tick_id = AddTimeOut(1000, keep_ticking);
 	t_want = t_start;
+
+}
+
+void stop_3270_timer(void)
+{
+	fprintf(stderr,"%s(%d):\t%s\n",__FILE__,__LINE__,__FUNCTION__);fflush(stderr);
+	ticking_stop();
+	status_untiming();
 }
 
 static void
@@ -2695,19 +2709,24 @@ ticking_stop(void)
 {
 	struct timeval t1;
 
+	fprintf(stderr,"%s(%d):\t%s (%d %d)\n",__FILE__,__LINE__,__FUNCTION__,ticking,mticking);fflush(stderr);
+
 	(void) gettimeofday(&t1, (struct timezone *) 0);
 	if (mticking) {
 		sms_accumulate_time(&t_start, &t1);
 		mticking = False;
-	} else {
-		return;
 	}
 
 	if (!ticking)
 		return;
+
 	RemoveTimeOut(tick_id);
 	ticking = False;
+
 	status_timing(&t_start, &t1);
+
+    if(screen_callbacks_3270 && screen_callbacks_3270->status_untiming)
+      screen_callbacks_3270->status_untiming();
 }
 
 void

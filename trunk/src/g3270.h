@@ -12,11 +12,11 @@
  #define RedrawStatusLine() 		RedrawTerminalContents()
 
 // #ifdef DEBUG
-//  #define LockThreads()				DBGPrintf("Lock %p",g_thread_self()); gdk_lock()
-//  #define UnlockThreads()			DBGPrintf("Unlock %p",g_thread_self()); gdk_unlock()
+//   #define LockThreads()				DBGPrintf("Lock %p",g_thread_self()); gdk_lock()
+//   #define UnlockThreads()			DBGPrintf("Unlock %p",g_thread_self()); gdk_unlock()
 // #else
- #define LockThreads()				gdk_lock()
- #define UnlockThreads()			gdk_unlock()
+   #define LockThreads()				gdk_lock()
+   #define UnlockThreads()			gdk_unlock()
 // #endif
 
 /*---[ Defines ]--------------------------------------------------------------*/
