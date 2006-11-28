@@ -86,45 +86,53 @@
  {
     static const struct WindowActions keyproc[] =
     {
-     	DECLARE_KEYPROC( GDK_Page_Up, 			0,		action_F7		),
-     	DECLARE_KEYPROC( GDK_Page_Down,			0,		action_F8		),
+     	DECLARE_KEYPROC( GDK_KP_Left,			GDK_SHIFT_MASK,		action_SelectLeft	),
+     	DECLARE_KEYPROC( GDK_KP_Up,				GDK_SHIFT_MASK,		action_SelectUp		),
+     	DECLARE_KEYPROC( GDK_KP_Right,			GDK_SHIFT_MASK,		action_SelectRight	),
+     	DECLARE_KEYPROC( GDK_KP_Down,			GDK_SHIFT_MASK,		action_SelectDown	),
 
-     	DECLARE_KEYPROC( GDK_Print,				0,		action_print	),
-     	DECLARE_KEYPROC( GDK_3270_PrintScreen,	0,		action_print	),
+     	DECLARE_KEYPROC( GDK_Left,				GDK_SHIFT_MASK,		action_SelectLeft	),
+     	DECLARE_KEYPROC( GDK_Up,				GDK_SHIFT_MASK,		action_SelectUp		),
+     	DECLARE_KEYPROC( GDK_Right,				GDK_SHIFT_MASK,		action_SelectRight	),
+     	DECLARE_KEYPROC( GDK_Down,				GDK_SHIFT_MASK,		action_SelectDown	),
 
-     	DECLARE_KEYPROC( GDK_ISO_Left_Tab,		0,		action_BackTab	),
-     	DECLARE_KEYPROC( GDK_KP_Subtract,		0,		action_BackTab	),
+     	DECLARE_KEYPROC( GDK_Page_Up, 			0,					action_F7			),
+     	DECLARE_KEYPROC( GDK_Page_Down,			0,					action_F8			),
 
-     	DECLARE_KEYPROC( GDK_KP_Add,			0,		action_Tab		),
-     	DECLARE_KEYPROC( GDK_Tab,				0,		action_Tab		),
+     	DECLARE_KEYPROC( GDK_Print,				0,					action_print		),
+     	DECLARE_KEYPROC( GDK_3270_PrintScreen,	0,					action_print		),
 
-     	DECLARE_KEYPROC( GDK_Home,				0,		action_Home		),
-     	DECLARE_KEYPROC( GDK_End,				0,		action_EraseEOF	),
+     	DECLARE_KEYPROC( GDK_ISO_Left_Tab,		0,					action_BackTab		),
+     	DECLARE_KEYPROC( GDK_KP_Subtract,		0,					action_BackTab		),
 
-     	DECLARE_KEYPROC( GDK_Left,				0,		action_Left		),
-     	DECLARE_KEYPROC( GDK_Up,				0,		action_Up		),
-     	DECLARE_KEYPROC( GDK_Right,				0,		action_Right	),
-     	DECLARE_KEYPROC( GDK_Down,				0,		action_Down		),
+     	DECLARE_KEYPROC( GDK_KP_Add,			0,					action_Tab			),
+     	DECLARE_KEYPROC( GDK_Tab,				0,					action_Tab			),
 
-     	DECLARE_KEYPROC( GDK_KP_Left,			0,		action_Left		),
-     	DECLARE_KEYPROC( GDK_KP_Up,				0,		action_Up		),
-     	DECLARE_KEYPROC( GDK_KP_Right,			0,		action_Right	),
-     	DECLARE_KEYPROC( GDK_KP_Down,			0,		action_Down		),
+     	DECLARE_KEYPROC( GDK_Home,				0,					action_Home			),
+     	DECLARE_KEYPROC( GDK_End,				0,					action_EraseEOF		),
 
-        DECLARE_KEYPROC( GDK_Clear,				0,		action_Clear	),
-        DECLARE_KEYPROC( GDK_3270_Reset,		0,		action_Reset	),
+     	DECLARE_KEYPROC( GDK_Left,				0,					action_Left			),
+     	DECLARE_KEYPROC( GDK_Up,				0,					action_Up			),
+     	DECLARE_KEYPROC( GDK_Right,				0,					action_Right		),
+     	DECLARE_KEYPROC( GDK_Down,				0,					action_Down			),
 
-        DECLARE_KEYPROC( GDK_Delete,			0,		action_Delete	),
-        DECLARE_KEYPROC( GDK_BackSpace,			0,		action_Erase	),
+     	DECLARE_KEYPROC( GDK_KP_Left,			0,					action_Left			),
+     	DECLARE_KEYPROC( GDK_KP_Up,				0,					action_Up			),
+     	DECLARE_KEYPROC( GDK_KP_Right,			0,					action_Right		),
+     	DECLARE_KEYPROC( GDK_KP_Down,			0,					action_Down			),
 
-        DECLARE_KEYPROC( GDK_Return,			0,		action_Enter	),
-        DECLARE_KEYPROC( GDK_KP_Enter,			0,		action_Enter	),
+        DECLARE_KEYPROC( GDK_Clear,				0,					action_Clear		),
+        DECLARE_KEYPROC( GDK_3270_Reset,		0,					action_Reset		),
 
-        DECLARE_KEYPROC( GDK_Insert,			0,		action_Insert	),
+        DECLARE_KEYPROC( GDK_Delete,			0,					action_Delete		),
+        DECLARE_KEYPROC( GDK_BackSpace,			0,					action_Erase		),
 
-        DECLARE_KEYPROC( GDK_Control_L,			0,		action_Redraw	)
+        DECLARE_KEYPROC( GDK_Return,			0,					action_Enter		),
+        DECLARE_KEYPROC( GDK_KP_Enter,			0,					action_Enter		),
 
+        DECLARE_KEYPROC( GDK_Insert,			0,					action_Insert		),
 
+        DECLARE_KEYPROC( GDK_Control_L,			0,					action_Redraw		)
 
     };
 
