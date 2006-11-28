@@ -95,6 +95,11 @@
  gboolean			reconnect								= TRUE;
  int				reconnect_retry							= 0;
 
+ static int 		selection_row 							= -1;
+ static int 		selection_col 							= -1;
+
+
+
 #ifdef USE_GTKIMCONTEXT
  // http://developer.gnome.org/doc/API/2.0/gtk/GtkIMContext.html
  GtkIMContext		*im;
@@ -444,16 +449,7 @@
        toCol = cCol;
 
        DBGPrintf("Box from %d,%d to %d,%d",min(toRow,fromRow),min(toCol,fromCol),max(toRow,fromRow),max(toCol,fromCol));
-/*
-
-							(fromCol * font->Width) + left_margin,
-							(fromRow * (font->Height + line_spacing)) + vPos,
-							(toCol - fromCol) * font->Width,
-							(toRow - fromRow) * (font->Height + line_spacing)
-*/
-
-
-   	   gtk_widget_queue_draw(widget);
+       gtk_widget_queue_draw(terminal);
 
  	}
 
@@ -605,8 +601,6 @@
     if(gtk_im_context_filter_keypress(im,event))
        return TRUE;
 #endif
-
- 	CHKPoint();
  	return 0;
  }
 
@@ -913,10 +907,12 @@
  {
     CheckForCopy();
 
-    toCol     =
-    fromCol   =
-    toRow	  =
-    fromRow   = -1;
+    toCol         =
+    fromCol       =
+    toRow	      =
+    selection_row =
+    selection_col =
+    fromRow       = -1;
 
     MouseMode = MOUSE_MODE_NORMAL;
 
@@ -1016,22 +1012,47 @@
 
  static void BeginSelection(void)
  {
-    if(fromRow < 0)
-       fromRow = cursor_row;
+    if(selection_row < 0)
+       selection_row = fromRow = cursor_row;
 
-	if(fromCol < 0)
-	   fromCol = cursor_col;
+	if(selection_col < 0)
+	   selection_col = fromCol = cursor_col;
 
     if(toRow < 0)
-       toRow = cursor_row;
+       toRow = cursor_row+1;
 
 	if(toCol < 0)
 	   toCol = cursor_col;
 
  }
 
- static void DrawSelection(void)
+ static void SetSelectionBox(int sRow, int sCol)
  {
+ 	/* Set selection box from the marked position and the current cursor position */
+
+    if(sRow > cursor_row)
+    {
+    	fromRow = cursor_row;
+    	toRow   = sRow;
+    }
+    else
+    {
+    	toRow   = cursor_row;
+    	fromRow = sRow;
+    }
+
+    if(sCol > cursor_col)
+    {
+    	fromCol = cursor_col;
+    	toCol   = sCol;
+    }
+    else
+    {
+    	toCol   = cursor_col;
+    	fromCol = sCol;
+    }
+
+    DBGPrintf("Box from %d,%d to %d,%d",min(toRow,fromRow),min(toCol,fromCol),max(toRow,fromRow),max(toCol,fromCol));
     gtk_widget_queue_draw(terminal);
  }
 
@@ -1039,55 +1060,95 @@
  {
     BeginSelection();
 
-    if(fromRow > 0)
-       fromRow--;
+    if(selection_row > 0)
+       selection_row--;
 
-    DrawSelection();
-
+	SetSelectionBox(selection_row,selection_col);
  }
 
  void action_SelectDown(GtkWidget *w, gpointer data)
  {
-    int rows;
-    int cols;
+ 	int rows, cols;
 
     BeginSelection();
 
-    if(!Get3270DeviceBuffer(&rows, &cols))
-       return;
+    if(Get3270DeviceBuffer(&rows, &cols) && selection_row < rows)
+       selection_row++;
 
-    if(fromRow < rows)
-       fromRow++;
-
-    DrawSelection();
+	SetSelectionBox(selection_row,selection_col);
  }
 
  void action_SelectLeft(GtkWidget *w, gpointer data)
  {
- 	if(cursor_col < 1)
- 	   return;
-
     BeginSelection();
 
-    if(fromCol > 0)
-       fromCol--;
+    if(selection_col > 0)
+       selection_col--;
 
-    DrawSelection();
+	SetSelectionBox(selection_row,selection_col);
  }
 
  void action_SelectRight(GtkWidget *w, gpointer data)
  {
-    int rows;
-    int cols;
+ 	int rows, cols;
 
     BeginSelection();
 
-    if(!Get3270DeviceBuffer(&rows, &cols))
-       return;
+    if(Get3270DeviceBuffer(&rows, &cols) && selection_col < cols)
+       selection_col++;
 
-    if(fromCol < cols)
-       fromCol++;
+	SetSelectionBox(selection_row,selection_col);
+ }
 
-    DrawSelection();
+ void action_SelectionUp(GtkWidget *w, gpointer data)
+ {
+ 	if(fromRow > 0)
+ 	{
+ 		fromRow--;
+ 		toRow--;
+ 		cursor_row	  = fromRow;
+ 		selection_row = toRow;
+        gtk_widget_queue_draw(terminal);
+ 	}
+ }
+
+ void action_SelectionDown(GtkWidget *w, gpointer data)
+ {
+ 	int rows, cols;
+
+    if(Get3270DeviceBuffer(&rows, &cols) && toRow < rows)
+    {
+    	fromRow++;
+    	toRow++;
+ 		cursor_row	  = fromRow;
+ 		selection_row = toRow;
+        gtk_widget_queue_draw(terminal);
+    }
+ }
+
+ void action_SelectionLeft(GtkWidget *w, gpointer data)
+ {
+ 	if(fromCol > 0)
+ 	{
+ 		fromCol--;
+ 		toCol--;
+ 		cursor_col    = fromCol;
+ 		selection_col = toCol;
+        gtk_widget_queue_draw(terminal);
+ 	}
+ }
+
+ void action_SelectionRight(GtkWidget *w, gpointer data)
+ {
+ 	int rows, cols;
+
+    if(Get3270DeviceBuffer(&rows, &cols) && toCol < cols)
+    {
+    	fromCol++;
+    	toCol++;
+ 		cursor_col    = fromCol;
+ 		selection_col = toCol;
+        gtk_widget_queue_draw(terminal);
+    }
  }
 

@@ -41,7 +41,17 @@
 	{ "erase",				action_Erase			},
 	{ "enter",				action_Enter			},
 	{ "insert",				action_Insert			},
-	{ "redraw",				action_Redraw			}
+	{ "redraw",				action_Redraw			},
+	{ "selectleft",			action_SelectLeft		},
+	{ "selectup",			action_SelectUp			},
+	{ "selectright",		action_SelectRight		},
+	{ "selectdown",			action_SelectDown		},
+	{ "selectionleft",		action_SelectionLeft	},
+	{ "selectionup",		action_SelectionUp		},
+	{ "selectionright",		action_SelectionRight	},
+	{ "selectiondown",		action_SelectionDown	}
+
+
  };
 
  const int action_callback_counter = (sizeof(action_callbacks)/sizeof(struct action_callback));
@@ -96,6 +106,16 @@
      	DECLARE_KEYPROC( GDK_Right,				GDK_SHIFT_MASK,		action_SelectRight	),
      	DECLARE_KEYPROC( GDK_Down,				GDK_SHIFT_MASK,		action_SelectDown	),
 
+     	DECLARE_KEYPROC( GDK_Left,				GDK_CONTROL_MASK,	action_SelectionLeft	),
+     	DECLARE_KEYPROC( GDK_Up,				GDK_CONTROL_MASK,	action_SelectionUp		),
+     	DECLARE_KEYPROC( GDK_Right,				GDK_CONTROL_MASK,	action_SelectionRight	),
+     	DECLARE_KEYPROC( GDK_Down,				GDK_CONTROL_MASK,	action_SelectionDown	),
+
+     	DECLARE_KEYPROC( GDK_KP_Left,			GDK_CONTROL_MASK,	action_SelectionLeft	),
+     	DECLARE_KEYPROC( GDK_KP_Up,				GDK_CONTROL_MASK,	action_SelectionUp		),
+     	DECLARE_KEYPROC( GDK_KP_Right,			GDK_CONTROL_MASK,	action_SelectionRight	),
+     	DECLARE_KEYPROC( GDK_KP_Down,			GDK_CONTROL_MASK,	action_SelectionDown	),
+
      	DECLARE_KEYPROC( GDK_Page_Up, 			0,					action_F7			),
      	DECLARE_KEYPROC( GDK_Page_Down,			0,					action_F8			),
 
@@ -142,8 +162,6 @@
 #ifndef USE_GTKIMCONTEXT
     gchar 			*string		= 0;
 #endif
-
-    DBGTracex(event->state);
 
     /* Check for Function keys */
     if(event->keyval >= GDK_F1 && event->keyval <=  GDK_F12)
