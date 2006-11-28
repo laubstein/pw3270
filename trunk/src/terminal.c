@@ -34,13 +34,6 @@
 /*---[ Terminal config ]------------------------------------------------------*/
 
   // /usr/X11R6/lib/X11/rgb.txt
-  /*
-  static const char *TerminalColors  = "black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
-  static const char *FieldColors     = "green,red,#00FFFF,white";
-  static const char *CursorColors	 = "white,white,LimeGreen,LimeGreen";
-  static const char *SelectionColors = "#000020,yellow";
-  static const char *StatusColors	 = "black,#7890F0,LimeGreen,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen";
-  */
 
   static const char *FontDescr[] =
   {
@@ -920,6 +913,8 @@
  {
     CheckForCopy();
 
+    toCol     =
+    fromCol   =
     toRow	  =
     fromRow   = -1;
 
@@ -1018,3 +1013,81 @@
        UnlockThreads();
     }
  }
+
+ static void BeginSelection(void)
+ {
+    if(fromRow < 0)
+       fromRow = cursor_row;
+
+	if(fromCol < 0)
+	   fromCol = cursor_col;
+
+    if(toRow < 0)
+       toRow = cursor_row;
+
+	if(toCol < 0)
+	   toCol = cursor_col;
+
+ }
+
+ static void DrawSelection(void)
+ {
+    gtk_widget_queue_draw(terminal);
+ }
+
+ void action_SelectUp(GtkWidget *w, gpointer data)
+ {
+    BeginSelection();
+
+    if(fromRow > 0)
+       fromRow--;
+
+    DrawSelection();
+
+ }
+
+ void action_SelectDown(GtkWidget *w, gpointer data)
+ {
+    int rows;
+    int cols;
+
+    BeginSelection();
+
+    if(!Get3270DeviceBuffer(&rows, &cols))
+       return;
+
+    if(fromRow < rows)
+       fromRow++;
+
+    DrawSelection();
+ }
+
+ void action_SelectLeft(GtkWidget *w, gpointer data)
+ {
+ 	if(cursor_col < 1)
+ 	   return;
+
+    BeginSelection();
+
+    if(fromCol > 0)
+       fromCol--;
+
+    DrawSelection();
+ }
+
+ void action_SelectRight(GtkWidget *w, gpointer data)
+ {
+    int rows;
+    int cols;
+
+    BeginSelection();
+
+    if(!Get3270DeviceBuffer(&rows, &cols))
+       return;
+
+    if(fromCol < cols)
+       fromCol++;
+
+    DrawSelection();
+ }
+

@@ -211,6 +211,11 @@
  void action_Insert(GtkWidget *w, gpointer data);
  void action_Newline(GtkWidget *w, gpointer data);
 
+ void action_SelectUp(GtkWidget *w, gpointer data);
+ void action_SelectDown(GtkWidget *w, gpointer data);
+ void action_SelectLeft(GtkWidget *w, gpointer data);
+ void action_SelectRight(GtkWidget *w, gpointer data);
+
  void action_Redraw(GtkWidget *w, gpointer data);
 
  void ParseInput(const gchar *string);
