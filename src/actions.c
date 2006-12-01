@@ -164,6 +164,8 @@
 #endif
 
     /* Check for Function keys */
+
+    // FIXME (perry#2#): It's probably not necessary since the function keys are beeing treated in the main window.
     if(event->keyval >= GDK_F1 && event->keyval <=  GDK_F12)
     {
     	snprintf(ks,5,"%d",(event->keyval - GDK_F1)+1);
