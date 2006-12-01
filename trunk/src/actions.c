@@ -227,7 +227,7 @@
     gchar *input;
 
     input = g_convert(string, -1, "ISO-8859-1", "UTF-8", NULL, NULL, NULL);
-    if(!string)
+    if(!input)
     {
     	Log("Error converting string \"%s\" to ISO-8859-1",string);
     	return;

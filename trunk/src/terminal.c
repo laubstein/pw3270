@@ -607,7 +607,7 @@
 #ifdef USE_GTKIMCONTEXT
  static void im_commit(GtkIMContext *imcontext, gchar *arg1, gpointer user_data)
  {
- 	DBGPrintf("Commit: %s",arg1);
+ 	DBGPrintf("Commit: %s (%02x)", arg1,(unsigned int) *arg1);
 	ParseInput(arg1);
  }
 #endif
