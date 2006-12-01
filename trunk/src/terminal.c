@@ -2,6 +2,7 @@
  #include "g3270.h"
  #include <string.h>
  #include <errno.h>
+ #include <gdk/gdkkeysyms.h>
 
  #include "lib/hostc.h"
  #include "lib/kybdc.h"
@@ -101,6 +102,7 @@
 
 
 #ifdef USE_GTKIMCONTEXT
+ /* Input context for dead key support */
  // http://developer.gnome.org/doc/API/2.0/gtk/GtkIMContext.html
  GtkIMContext		*im;
 #endif
@@ -577,8 +579,46 @@
  	return 0;
  }
 
+ static void UpdateControlKeys(guint keyval, gboolean press)
+ {
+ 	static const struct _ctrltable
+ 	{
+ 		guint keyval;
+		unsigned long flag;
+ 	} ctrltable[] =
+ 	{
+ 		{ GDK_Shift_L,		KEY_STATUS_SHIFT_L	},
+ 		{ GDK_Shift_R,		KEY_STATUS_SHIFT_R	},
+ 		{ GDK_Alt_L,		KEY_STATUS_ALT_L	},
+ 		{ GDK_Alt_R,		KEY_STATUS_ALT_R	},
+ 		{ GDK_Control_L,	KEY_STATUS_CTRL_L	},
+ 		{ GDK_Control_R,	KEY_STATUS_CTRL_R	},
+ 	};
+
+ 	int f;
+
+ 	for(f=0;f<(sizeof(ctrltable)/sizeof(struct _ctrltable));f++)
+ 	{
+ 		if(ctrltable[f].keyval == keyval)
+ 		{
+ 			if(press)
+ 			   oia_KeyboardState |= ctrltable[f].flag;
+			else
+ 			   oia_KeyboardState &= ~ctrltable[f].flag;
+
+ 			DBGPrintf("Key %s is %s (flag is %04x)",gdk_keyval_name(keyval), press ? "On" : "Off", oia_KeyboardState);
+
+            RedrawStatusLine();
+ 			return;
+ 		}
+ 	}
+
+ }
+
  static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+ 	UpdateControlKeys(event->keyval,1);
+
  	if(KeyboardAction(widget,event,user_data))
  	{
 #ifdef USE_GTKIMCONTEXT
@@ -597,6 +637,8 @@
 
  static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+ 	UpdateControlKeys(event->keyval,0);
+
 #ifdef USE_GTKIMCONTEXT
     if(gtk_im_context_filter_keypress(im,event))
        return TRUE;
@@ -624,7 +666,7 @@
 		{ "Fields",		"green,red,#00FFFF,white" },
 		{ "Cursor",		"white,white,LimeGreen,LimeGreen" },
 		{ "Selection",	"#000020,yellow" },
-		{ "Status",		"black,#7890F0,LimeGreen,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen,LimeGreen" }
+		{ "Status",		"black,#7890F0,LimeGreen,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen,LimeGreen,LimeGreen" }
     };
     char	key[40];
     char	*ptr;

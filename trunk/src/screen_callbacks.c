@@ -309,8 +309,10 @@ static void status_typeahead(Boolean on)
 /* Set compose character */
 static void status_compose(Boolean on, unsigned char c, enum keytype keytype)
 {
+	DBGPrintf("Compose: %s Char: %02x \"%c\"",on ? "Yes" : "No", c, c);
 	NotImplemented();
-        RedrawStatusLine();
+
+    RedrawStatusLine();
 }
 
 /* Set LU name */

@@ -115,6 +115,7 @@
      	DECLARE_KEYPROC( GDK_KP_Up,				GDK_CONTROL_MASK,	action_SelectionUp		),
      	DECLARE_KEYPROC( GDK_KP_Right,			GDK_CONTROL_MASK,	action_SelectionRight	),
      	DECLARE_KEYPROC( GDK_KP_Down,			GDK_CONTROL_MASK,	action_SelectionDown	),
+        DECLARE_KEYPROC( GDK_l,					GDK_CONTROL_MASK,	action_Redraw			),
 
      	DECLARE_KEYPROC( GDK_Page_Up, 			0,					action_F7			),
      	DECLARE_KEYPROC( GDK_Page_Down,			0,					action_F8			),
@@ -152,7 +153,6 @@
 
         DECLARE_KEYPROC( GDK_Insert,			0,					action_Insert		),
 
-        DECLARE_KEYPROC( GDK_Control_L,			0,					action_Redraw		)
 
     };
 
