@@ -60,7 +60,7 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
- guint KeyboardState = 0;
+ unsigned short oia_KeyboardState = 0;
 
 /*---[ Statics ]--------------------------------------------------------------*/
 
@@ -250,6 +250,10 @@
 
     /* Timer */
     DrawStatusRight(15,STATUS_COLOR_TIME,oia_Timer);
+
+    /* Keyboard status */
+    DrawStatusRight(40,STATUS_COLOR_KEYBOARD,oia_KeyboardState & KEY_STATUS_ALT ? "A" : " ");
+    DrawStatusRight(39,STATUS_COLOR_KEYBOARD,oia_KeyboardState & KEY_STATUS_SHIFT ? "^" : " ");
 
     /* SSL Status */
     if(query_ssl_host())
