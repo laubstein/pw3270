@@ -1,6 +1,9 @@
 
  #include "g3270.h"
+ #include <gdk/gdkkeysyms.h>
  #include "lib/hostc.h"
+ #include "lib/actionsc.h"
+ #include "lib/kybdc.h"
 
 /*---[ Structures ]-----------------------------------------------------------*/
 
@@ -170,6 +173,34 @@
    return gtk_item_factory_get_widget(item_factory, "<main>");
  }
 
+ static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+ {
+ 	// http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-key-press-event
+ 	char ks[6];
+
+    if(IS_FUNCTION_KEY(event))
+    {
+    	snprintf(ks,5,"%d",(event->keyval - GDK_F1)+1);
+    	DBGPrintf("Function-%s",ks);
+		action_internal(PF_action, IA_DEFAULT, ks, CN);
+    	return TRUE;
+    }
+
+    return FALSE;
+ }
+
+ static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+ {
+
+    if(IS_FUNCTION_KEY(event))
+    {
+    	DBGPrintf("Function-release-%d (%08x)",(event->keyval - GDK_F1)+1, event->state);
+    	return TRUE;
+    }
+
+ 	return 0;
+ }
+
  static void CreateMainWindow(const char *cl_hostname)
  {
  	GtkWidget	*vbox;
@@ -188,9 +219,11 @@
     gtk_window_set_role(GTK_WINDOW(top_window), TARGET "0" );
 #endif
 
-	g_signal_connect(G_OBJECT(top_window),	"delete_event", G_CALLBACK(delete_event),	NULL);
-    g_signal_connect(G_OBJECT(top_window),	"destroy", 		G_CALLBACK(destroy),		NULL);
-    g_signal_connect(G_OBJECT(top_window),	"map-event",	G_CALLBACK(map_event),		NULL);
+	g_signal_connect(G_OBJECT(top_window),	"delete_event", 		G_CALLBACK(delete_event),			NULL);
+    g_signal_connect(G_OBJECT(top_window),	"destroy", 				G_CALLBACK(destroy),				NULL);
+    g_signal_connect(G_OBJECT(top_window),	"map-event",			G_CALLBACK(map_event),				NULL);
+    g_signal_connect(G_OBJECT(top_window),	"key-press-event",		G_CALLBACK(key_press_event),	0);
+    g_signal_connect(G_OBJECT(top_window), 	"key-release-event",	G_CALLBACK(key_release_event),	0);
 
     UpdateWindowTitle();
 

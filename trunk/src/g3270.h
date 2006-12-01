@@ -11,13 +11,13 @@
 
  #define RedrawStatusLine() 		RedrawTerminalContents()
 
- #ifdef DEBUG
-   #define LockThreads()			DBGPrintf("Lock %p",g_thread_self()); gdk_lock()
-   #define UnlockThreads()			DBGPrintf("Unlock %p",g_thread_self()); gdk_unlock()
- #else
+// #ifdef DEBUG
+//   #define LockThreads()			DBGPrintf("Lock %p",g_thread_self()); gdk_lock()
+//   #define UnlockThreads()			DBGPrintf("Unlock %p",g_thread_self()); gdk_unlock()
+// #else
    #define LockThreads()			gdk_lock()
    #define UnlockThreads()			gdk_unlock()
- #endif
+// #endif
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -95,6 +95,8 @@
  #define max(x,y) (x > y ? x : y)
 
  #define SetStatusMessage(x) /* */
+
+ #define IS_FUNCTION_KEY(event)   (event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(event->state & (GDK_MOD1_MASK|GDK_SHIFT_MASK|GDK_CONTROL_MASK)))
 
 /*---[ Structures ]-----------------------------------------------------------*/
 
