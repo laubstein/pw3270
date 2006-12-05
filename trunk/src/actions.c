@@ -117,6 +117,9 @@
      	DECLARE_KEYPROC( GDK_KP_Down,			GDK_CONTROL_MASK,	action_SelectionDown	),
         DECLARE_KEYPROC( GDK_l,					GDK_CONTROL_MASK,	action_Redraw			),
 
+     	DECLARE_KEYPROC( GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab			),
+//     	DECLARE_KEYPROC( GDK_KP_Subtract,		0,					action_BackTab		),
+
      	DECLARE_KEYPROC( GDK_Page_Up, 			0,					action_F7			),
      	DECLARE_KEYPROC( GDK_Page_Down,			0,					action_F8			),
 
@@ -124,9 +127,7 @@
      	DECLARE_KEYPROC( GDK_3270_PrintScreen,	0,					action_print		),
 
      	DECLARE_KEYPROC( GDK_ISO_Left_Tab,		0,					action_BackTab		),
-     	DECLARE_KEYPROC( GDK_KP_Subtract,		0,					action_BackTab		),
 
-     	DECLARE_KEYPROC( GDK_KP_Add,			0,					action_Tab			),
      	DECLARE_KEYPROC( GDK_Tab,				0,					action_Tab			),
 
      	DECLARE_KEYPROC( GDK_Home,				0,					action_Home			),
@@ -162,6 +163,29 @@
 #ifndef USE_GTKIMCONTEXT
     gchar 			*string		= 0;
 #endif
+
+
+    DBGPrintf("Keyval: %d (%s) Keychar: \"%s\" State: %04x %s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+						event->keyval,
+						gdk_keyval_name(event->keyval),
+						event->string,
+						event->state,
+						event->state & GDK_SHIFT_MASK	? " GDK_SHIFT_MASK"		: "",
+						event->state & GDK_LOCK_MASK	? " GDK_LOCK_MASK"		: "",
+						event->state & GDK_CONTROL_MASK	? " GDK_CONTROL_MASK"	: "",
+						event->state & GDK_MOD1_MASK	? " GDK_MOD1_MASK"		: "",
+						event->state & GDK_MOD2_MASK	? " GDK_MOD2_MASK"		: "",
+						event->state & GDK_MOD3_MASK	? " GDK_MOD3_MASK"		: "",
+						event->state & GDK_MOD4_MASK	? " GDK_MOD4_MASK"		: "",
+						event->state & GDK_MOD5_MASK	? " GDK_MOD5_MASK"		: "",
+						event->state & GDK_BUTTON1_MASK	? " GDK_BUTTON1_MASK"	: "",
+						event->state & GDK_BUTTON2_MASK	? " GDK_BUTTON2_MASK"	: "",
+						event->state & GDK_BUTTON3_MASK	? " GDK_BUTTON3_MASK"	: "",
+						event->state & GDK_BUTTON4_MASK	? " GDK_BUTTON4_MASK"	: "",
+						event->state & GDK_BUTTON5_MASK	? " GDK_BUTTON5_MASK"	: "",
+						event->state & GDK_RELEASE_MASK	? " GDK_RELEASE_MASK"	: ""
+						);
+
 
     /* Check for Function keys */
 
