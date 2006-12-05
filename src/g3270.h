@@ -127,6 +127,9 @@
  extern char					oia_cursor[];
  extern char					oia_LUName[];
 
+ #ifndef GDK_NUMLOCK_MASK
+    #define GDK_NUMLOCK_MASK GDK_MOD2_MASK
+ #endif
 
  #define KEY_STATUS_SHIFT_L		0x0001
  #define KEY_STATUS_SHIFT_R		0x0002
