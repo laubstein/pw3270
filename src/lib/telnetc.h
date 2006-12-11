@@ -55,3 +55,5 @@ extern Boolean net_snap_options(void);
 extern void space3270out(int n);
 extern const char *tn3270e_current_opts(void);
 extern void trace_netdata(char direction, unsigned const char *buf, int len);
+extern Boolean query_secure_connection(void);
+
