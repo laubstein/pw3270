@@ -1040,9 +1040,5 @@ const char * query_qualified_host(void)
 	return qualified_host;
 }
 
-Boolean query_ssl_host(void)
-{
-	return ssl_host;
-}
 
 

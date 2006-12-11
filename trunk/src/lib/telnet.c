@@ -3230,3 +3230,8 @@ net_getsockname(void *buf, int *len)
 		return -1;
 	return getsockname(sock, buf, (socklen_t *)(void *)len);
 }
+
+Boolean query_secure_connection(void)
+{
+	return secure_connection;
+}

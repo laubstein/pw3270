@@ -42,5 +42,4 @@ extern void 		host_connected(void);
 extern void 		host_disconnect(Boolean disable);
 extern void 		host_in3270(enum cstate);
 extern void 		st_changed(int tx, Boolean mode);
-extern Boolean 		query_ssl_host(void);
 extern const char * query_qualified_host(void);

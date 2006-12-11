@@ -6,6 +6,7 @@
  #include "lib/3270ds.h"
  #include "lib/tablesc.h"
  #include "lib/hostc.h"
+ #include "lib/telnetc.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -20,8 +21,6 @@
      #define DECLARE_STATUS_MESSAGE(code, color, msg) { code, color, msg }
      #define NO_STATUS_MESSAGE 0
  #endif
-
-
 
  static struct _status
  {
@@ -256,7 +255,7 @@
     DrawStatusRight(39,STATUS_COLOR_KEYBOARD,oia_KeyboardState & KEY_STATUS_SHIFT ? "^" : " ");
 
     /* SSL Status */
-    if(query_ssl_host())
+    if(query_secure_connection())
     {
        DrawStatusRight(32,STATUS_COLOR_SSL,"*");
     }
