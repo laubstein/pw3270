@@ -257,7 +257,7 @@
     /* SSL Status */
     if(query_secure_connection())
     {
-       DrawStatusRight(32,STATUS_COLOR_SSL,"*");
+       DrawStatusRight(32,STATUS_COLOR_SSL,"s");
     }
 
     /* Terminal Status */
