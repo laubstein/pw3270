@@ -36,6 +36,8 @@
 
   // /usr/X11R6/lib/X11/rgb.txt
 
+/*
+
   static const char *FontDescr[] =
   {
 
@@ -59,13 +61,25 @@
 
   #define FONT_COUNT (sizeof(FontDescr)/sizeof(const char *))
 
+  */
+
 /*---[ Globals ]--------------------------------------------------------------*/
+
+#ifdef DATADIR
+  static const char *fontfile = DATADIR "/fonts.conf";
+#else
+  static const char *fontfile = "./fonts.conf";
+#endif
 
  const char			*cl_hostname							= 0;
 
  gboolean			WaitForScreen							= TRUE;
 
  static FONTELEMENT *fontlist								= 0;
+ static int			fontCount								= 0;
+
+ #define FONT_COUNT fontCount
+
  static FONTELEMENT *font									= 0;
  static int			top_margin								= 0;
  static int 		left_margin								= 0;
@@ -744,9 +758,13 @@
     int		  rows		= 0;
     int		  cols		= 0;
 
+    int		  qtd;
+
  	char      *ptr;
  	char      *tok;
  	char      buffer[4096];
+
+ 	FILE	  *arq;
 
  	GtkWidget *ret;
 
@@ -768,6 +786,71 @@
 	register_3270_schange(ST_3270_MODE, 	sts3270Mode);
 
     /* Load font table */
+    qtd = 0;
+
+    arq = fopen(fontfile,"r");
+
+    if(!arq)
+    {
+    	Error("Unable to open \"%s\" for reading",fontfile);
+    	return 0;
+    }
+
+    while(fgets((char *) buffer,1023,arq))
+    {
+	   for(ptr = buffer;*ptr && *ptr != '\n';ptr++);
+	   *ptr = 0;
+
+       for(ptr = buffer;*ptr && isspace(*ptr);ptr++);
+
+       if(*ptr && *ptr != '#')
+       {
+          DBGMessage(buffer);
+          if(!fontlist || (fontCount >= qtd) )
+          {
+		     qtd += 10;
+		     if(fontlist)
+		        fontlist = realloc(fontlist,sizeof(FONTELEMENT) * qtd);
+			 else
+			    fontlist = malloc(sizeof(FONTELEMENT) * qtd);
+
+			 if(!fontlist)
+			 {
+			 	Error("Can't allocate memory for font list");
+			 	return 0;
+			 }
+          }
+
+ 		  fontlist[fontCount].fn = gdk_font_load(buffer);
+		  if(fontlist[fontCount].fn)
+		  {
+		     gdk_text_extents(fontlist[fontCount].fn,"A",1,&lbearing,&rbearing,&width,&ascent,&descent);
+		 	 fontlist[fontCount].Width  = width;
+		  	 fontlist[fontCount].Height = (ascent+descent)+line_spacing;
+             fontCount++;
+		  }
+	 	  else
+		  {
+			 Log("Error loading font %s",buffer);
+		  }
+       }
+    }
+
+    DBGTrace(fontCount);
+
+    if(fontCount)
+    {
+	   fontlist = realloc(fontlist,sizeof(FONTELEMENT) * fontCount);
+    }
+    else
+    {
+    	Error("Can't read fonts!");
+    	return 0;
+    }
+
+    fclose(arq);
+
+/*
     sz   	 = sizeof(FONTELEMENT) * FONT_COUNT;
     fontlist = g_malloc(sz);
     if(!fontlist)
@@ -793,6 +876,7 @@
     		Log("Error loading font %s",FontDescr[f]);
     	}
     }
+*/
 
 
     /* Create drawing area */
