@@ -292,10 +292,12 @@
 
     CreateMainWindow(cl_hostname);
 
-    DBGMessage("Starting gtk main loop");
-
-    gtk_widget_show_all(top_window);
-    gtk_main();
+	if(terminal)
+	{
+       DBGMessage("Starting gtk main loop");
+       gtk_widget_show_all(top_window);
+       gtk_main();
+	}
 
     return 0;
  }

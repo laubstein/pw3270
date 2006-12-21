@@ -14,9 +14,12 @@
  #include <pthread.h>
  #include <errno.h>
  #include <stdlib.h>
+ #include <gtk/gtk.h>
+
 
  #include <unistd.h>
 
+ #include "g3270.h"
  #include "log.h"
  #include "trace.h"
 
@@ -248,6 +251,77 @@
        DBGPrintf("%s: (rc=%d)\n",string,rc);
 	}
 #endif
+
+    return rc;
+ }
+
+
+ /**
+  * Grava mensagem de erro e avisa o usuario.
+  *
+  * Grava uma mensagem de erro no arquivo de log.
+  *
+  * @param	module	Identificador do modulo para gravacao no arquivo
+  * @param	rc		Codigo de erro ou -1 para usar o valor de errno
+  * @param	fmt		String de formatacao para a mensagem no mesmo formato da funcao printf()
+  * @param	...		Argumentos de acordo com a string de formatacao
+  */
+ int g3270_popup(const char *module, int rc, const char *fmt, ...)
+ {
+    FILE      *out;
+    char      string[0x0100];
+    va_list   arg_ptr;
+    GtkWidget *widget;
+
+	if(rc == -1)
+	   rc = errno;
+
+    if(!rc)
+       return 0;
+
+	g3270_lock();
+
+    va_start(arg_ptr, fmt);
+    vsprintf(string, fmt, arg_ptr);
+    va_end(arg_ptr);
+
+    out = g3270_logPrefix(module);
+
+	if(rc > 0)
+	{
+       fprintf(out,"%s: %s (rc=%d)\n",string,strerror(rc),rc);
+       DBGPrintf("%s: %s (rc=%d)\n",string,strerror(rc),rc);
+	}
+	else
+	{
+       fprintf(out,"%s: (rc=%d)\n",string,rc);
+	}
+
+    g3270_closeLog(out);
+
+	g3270_unlock();
+
+#ifdef DEBUG
+	if(rc > 0)
+	{
+       DBGPrintf("%s: %s (rc=%d)\n",string,strerror(rc),rc);
+	}
+	else
+	{
+       DBGPrintf("%s: (rc=%d)\n",string,rc);
+	}
+#endif
+
+    widget = gtk_message_dialog_new_with_markup(
+						GTK_WINDOW(top_window),
+						GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
+                        rc ? GTK_MESSAGE_ERROR : GTK_MESSAGE_WARNING,
+                        rc ? GTK_BUTTONS_CLOSE : GTK_BUTTONS_OK,
+                        string );
+
+    gtk_dialog_run(GTK_DIALOG(widget));
+
+    gtk_widget_destroy (widget);
 
     return rc;
  }
