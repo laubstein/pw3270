@@ -32,37 +32,6 @@
 
   static const int widget_states[] = { GTK_STATE_NORMAL, GTK_STATE_ACTIVE, GTK_STATE_PRELIGHT, GTK_STATE_SELECTED, GTK_STATE_INSENSITIVE };
 
-/*---[ Terminal config ]------------------------------------------------------*/
-
-  // /usr/X11R6/lib/X11/rgb.txt
-
-/*
-
-  static const char *FontDescr[] =
-  {
-
-		"-xos4-terminus-medium-*-normal-*-12-*-*-*-*-*-*-*",
-
-	 	"-xos4-terminus-bold-*-*-*-14-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-bold-*-*-*-16-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-bold-*-*-*-20-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-bold-*-*-*-24-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-bold-*-*-*-28-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-bold-*-*-*-32-*-*-*-*-*-*-*",
-
-	 	"-xos4-terminus-medium-*-normal-*-14-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-16-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-20-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-24-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-28-*-*-*-*-*-*-*",
-	 	"-xos4-terminus-medium-*-normal-*-32-*-*-*-*-*-*-*",
-
-  };
-
-  #define FONT_COUNT (sizeof(FontDescr)/sizeof(const char *))
-
-  */
-
 /*---[ Globals ]--------------------------------------------------------------*/
 
 #ifdef DATADIR
@@ -792,7 +761,7 @@
 
     if(!arq)
     {
-    	Error("Unable to open \"%s\" for reading",fontfile);
+    	ErrorPopup("Unable to open \"%s\" for reading",fontfile);
     	return 0;
     }
 
@@ -816,7 +785,7 @@
 
 			 if(!fontlist)
 			 {
-			 	Error("Can't allocate memory for font list");
+			 	ErrorPopup("Can't allocate memory for font list");
 			 	return 0;
 			 }
           }
@@ -844,40 +813,11 @@
     }
     else
     {
-    	Error("Can't read fonts!");
+    	ErrorPopup("Can't find fonts!");
     	return 0;
     }
 
     fclose(arq);
-
-/*
-    sz   	 = sizeof(FONTELEMENT) * FONT_COUNT;
-    fontlist = g_malloc(sz);
-    if(!fontlist)
-    {
-    	Log("Memory allocation error when creating font table");
-    	return 0;
-    }
-
-    memset(fontlist,0,sz);
-
-    for(f=0;f<FONT_COUNT;f++)
-    {
-    	fontlist[f].fn = gdk_font_load(FontDescr[f]);
-
-    	if(fontlist[f].fn)
-    	{
-    	   gdk_text_extents(fontlist[f].fn,"A",1,&lbearing,&rbearing,&width,&ascent,&descent);
-    	   fontlist[f].Width  = width;
-           fontlist[f].Height = (ascent+descent)+line_spacing;
-    	}
-    	else
-    	{
-    		Log("Error loading font %s",FontDescr[f]);
-    	}
-    }
-*/
-
 
     /* Create drawing area */
     ret = gtk_drawing_area_new();
@@ -925,7 +865,7 @@
 
     if(!terminal_cmap)
     {
-    	Log("Memory allocation error when creating %d colors",terminal_color_count);
+    	ErrorPopup("Memory allocation error when creating %d colors",terminal_color_count);
     	return 0;
     }
 
