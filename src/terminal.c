@@ -562,45 +562,47 @@
  	return 0;
  }
 
- static void UpdateControlKeys(guint keyval, gboolean press)
+ static void UpdateControlKeys(GdkEventKey *event)
  {
- 	static const struct _ctrltable
- 	{
- 		guint keyval;
-		unsigned long flag;
- 	} ctrltable[] =
- 	{
- 		{ GDK_Shift_L,		KEY_STATUS_SHIFT_L	},
- 		{ GDK_Shift_R,		KEY_STATUS_SHIFT_R	},
- 		{ GDK_Alt_L,		KEY_STATUS_ALT_L	},
- 		{ GDK_Alt_R,		KEY_STATUS_ALT_R	},
- 		{ GDK_Control_L,	KEY_STATUS_CTRL_L	},
- 		{ GDK_Control_R,	KEY_STATUS_CTRL_R	},
- 	};
+   static const struct _ctrltable
+   {
+           guint keyval;
+           guint flag;
+   } ctrltable[] =
+   {
+           { GDK_Shift_L,          GDK_SHIFT_MASK      },
+           { GDK_Shift_R,          GDK_SHIFT_MASK      },
+           { GDK_Alt_L,            GDK_ALT_MASK        },
+           { GDK_Alt_R,            GDK_ALT_MASK        },
+           { GDK_Control_L,        GDK_CONTROL_MASK    },
+           { GDK_Control_R,        GDK_CONTROL_MASK    },
+    };
 
- 	int f;
+	int   f;
+    guint state = event->state & (GDK_SHIFT_MASK|GDK_ALT_MASK|GDK_CONTROL_MASK);
 
- 	for(f=0;f<(sizeof(ctrltable)/sizeof(struct _ctrltable));f++)
- 	{
- 		if(ctrltable[f].keyval == keyval)
- 		{
- 			if(press)
- 			   oia_KeyboardState |= ctrltable[f].flag;
-			else
- 			   oia_KeyboardState &= ~ctrltable[f].flag;
+    for(f=0;f<(sizeof(ctrltable)/sizeof(struct _ctrltable));f++)
+    {
+    	if(event->keyval == ctrltable[f].keyval)
+    	{
+           if(event->type == GDK_KEY_PRESS)
+              state |= ctrltable[f].flag;
+		   else
+              state &= ~ctrltable[f].flag;
+    	}
+    }
 
- 			DBGPrintf("Key %s is %s (flag is %04x)",gdk_keyval_name(keyval), press ? "On" : "Off", oia_KeyboardState);
-
-            RedrawStatusLine();
- 			return;
- 		}
- 	}
-
+    if(state != oia_KeyboardState)
+    {
+    	oia_KeyboardState = state;
+    	DBGTracex(oia_KeyboardState);
+    	RedrawStatusLine();
+    }
  }
 
  static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
- 	UpdateControlKeys(event->keyval,1);
+ 	UpdateControlKeys(event);
 
  	if(KeyboardAction(widget,event,user_data))
  	{
@@ -620,7 +622,7 @@
 
  static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
- 	UpdateControlKeys(event->keyval,0);
+ 	UpdateControlKeys(event);
 
 #ifdef USE_GTKIMCONTEXT
     if(gtk_im_context_filter_keypress(im,event))

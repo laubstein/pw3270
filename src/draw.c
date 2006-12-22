@@ -59,7 +59,7 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
- unsigned short oia_KeyboardState = 0;
+ guint oia_KeyboardState = 0;
 
 /*---[ Statics ]--------------------------------------------------------------*/
 
@@ -251,8 +251,9 @@
     DrawStatusRight(15,STATUS_COLOR_TIME,oia_Timer);
 
     /* Keyboard status */
-    DrawStatusRight(40,STATUS_COLOR_KEYBOARD,oia_KeyboardState & KEY_STATUS_ALT ? "A" : " ");
-    DrawStatusRight(39,STATUS_COLOR_KEYBOARD,oia_KeyboardState & KEY_STATUS_SHIFT ? "^" : " ");
+
+    DrawStatusRight(40,STATUS_COLOR_KEYBOARD,(oia_KeyboardState & GDK_ALT_MASK) ? "A" : " ");
+    DrawStatusRight(39,STATUS_COLOR_KEYBOARD,(oia_KeyboardState & GDK_SHIFT_MASK) ? "^" : " ");
 
     /* SSL Status */
     if(query_secure_connection())
