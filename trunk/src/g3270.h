@@ -131,20 +131,11 @@
     #define GDK_NUMLOCK_MASK GDK_MOD2_MASK
  #endif
 
- #define KEY_STATUS_SHIFT_L		0x0001
- #define KEY_STATUS_SHIFT_R		0x0002
- #define KEY_STATUS_SHIFT		(KEY_STATUS_SHIFT_L|KEY_STATUS_SHIFT_R)
+ #ifndef GDK_ALT_MASK
+     #define GDK_ALT_MASK GDK_MOD1_MASK
+ #endif
 
- #define KEY_STATUS_ALT_L		0x0004
- #define KEY_STATUS_ALT_R		0x0008
- #define KEY_STATUS_ALT			(KEY_STATUS_ALT_L|KEY_STATUS_ALT_R)
-
- #define KEY_STATUS_CTRL_L		0x0010
- #define KEY_STATUS_CTRL_R		0x0020
- #define KEY_STATUS_CTRL		(KEY_STATUS_CTRL_L|KEY_STATUS_CTRL_R)
-
- extern unsigned short			oia_KeyboardState;
-
+ extern guint					oia_KeyboardState;
 
  #define OIA_TIMER_COUNT	7
  extern char					oia_Timer[OIA_TIMER_COUNT+1];

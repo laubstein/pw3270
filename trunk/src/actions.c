@@ -58,9 +58,6 @@
 
 /*---[ Keyboard processing ]--------------------------------------------*/
 
- // Replace the Alt-Key mas for one with a more "acceptable" name.
- #define GDK_ALT_MASK GDK_MOD1_MASK
-
  #ifdef DEBUG
      #define DECLARE_KEYPROC(key, state, action) { key, state, #key " (" #state ")", action, #action }
  #else
