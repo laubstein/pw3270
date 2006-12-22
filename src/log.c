@@ -312,7 +312,7 @@
 	}
 #endif
 
-    widget = gtk_message_dialog_new_with_markup(
+    widget = gtk_message_dialog_new(
 						GTK_WINDOW(top_window),
 						GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
                         rc ? GTK_MESSAGE_ERROR : GTK_MESSAGE_WARNING,
