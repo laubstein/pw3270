@@ -97,7 +97,7 @@
 
  #define SetStatusMessage(x) /* */
 
- #define IS_FUNCTION_KEY(event)   (event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(event->state & (GDK_MOD1_MASK|GDK_SHIFT_MASK|GDK_CONTROL_MASK)))
+ #define IS_FUNCTION_KEY(event)   (event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(event->state & (GDK_MOD1_MASK|GDK_CONTROL_MASK)))
 
 /*---[ Structures ]-----------------------------------------------------------*/
 

@@ -173,6 +173,18 @@
    return gtk_item_factory_get_widget(item_factory, "<main>");
  }
 
+ static int GetFunctionKey(GdkEventKey *event)
+ {
+ 	int rc = (event->keyval - GDK_F1)+1;
+
+ 	if(event->state & GDK_SHIFT_MASK)
+ 	   rc += 12;
+
+	DBGPrintf("F%d %s",rc,event->type == GDK_KEY_PRESS ? "Pressed" : "Released");
+
+	return rc;
+ }
+
  static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
  	// http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-key-press-event
@@ -180,8 +192,7 @@
 
     if(IS_FUNCTION_KEY(event))
     {
-    	snprintf(ks,5,"%d",(event->keyval - GDK_F1)+1);
-    	DBGPrintf("Function-%s",ks);
+    	snprintf(ks,5,"%d",GetFunctionKey(event));
 		action_internal(PF_action, IA_DEFAULT, ks, CN);
     	return TRUE;
     }
@@ -194,7 +205,7 @@
 
     if(IS_FUNCTION_KEY(event))
     {
-    	DBGPrintf("Function-release-%d (%08x)",(event->keyval - GDK_F1)+1, event->state);
+    	GetFunctionKey(event);
     	return TRUE;
     }
 
