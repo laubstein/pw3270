@@ -157,7 +157,7 @@
 
     };
 
-	char			ks[6];
+//	char			ks[6];
     int				f;
 
 #ifndef USE_GTKIMCONTEXT
@@ -190,6 +190,7 @@
     /* Check for Function keys */
 
     // FIXME (perry#2#): It's probably not necessary since the function keys are beeing treated in the main window.
+/*
     if(event->keyval >= GDK_F1 && event->keyval <=  GDK_F12)
     {
     	snprintf(ks,5,"%d",(event->keyval - GDK_F1)+1);
@@ -197,6 +198,7 @@
 		action_internal(PF_action, IA_DEFAULT, ks, CN);
     	return TRUE;
     }
+*/
 
     /* Check for special keyproc actions */
     for(f=0; f < (sizeof(keyproc)/sizeof(struct WindowActions));f++)
