@@ -9,10 +9,6 @@ VENDOR=`rpm --eval="%{u2p:%{_vendor}}"`
 
 RELEASE=`grep Release g3270.spec | sed 's/ //g' |cut -d: -f2 |cut -d. -f1`
 
-#if [ -f svn ] ; then
-#   echo Atualizando SVN
-#fi
-
 mv *~ /tmp
 
 make -C src clean
@@ -35,7 +31,7 @@ if [ "$?" != "0" ]; then
 fi
 
 echo "Enviando arquivo source para o servidor..."
-scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/$PACKAGE*.src.rpm $USER@os2team.df.intrabb.bb.com.br:/home/html/src/$VENDOR
+scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/$PACKAGE*.src.rpm $USER@suportelinux.df.bb.com.br:/dados/src/$VENDOR
 
 echo "Enviando arquivo binario o servidor..."
 scp $RPMDIR/$RPMARCH/$PACKAGE*.rpm $RPMDIR/noarch/$PACKAGE*.rpm $USER@os2team.df.intrabb.bb.com.br:/home/html/$VENDOR
