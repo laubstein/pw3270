@@ -234,6 +234,11 @@
  void action_SelectionLeft(GtkWidget *w, gpointer data);
  void action_SelectionRight(GtkWidget *w, gpointer data);
 
+ void action_PreviousWord(GtkWidget *w, gpointer data);
+ void action_NextWord(GtkWidget *w, gpointer data);
+ void action_DeleteWord(GtkWidget *w, gpointer data);
+ void action_DeleteField(GtkWidget *w, gpointer data);
+
  void action_Redraw(GtkWidget *w, gpointer data);
 
  void ParseInput(const gchar *string);

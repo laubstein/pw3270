@@ -49,8 +49,11 @@
 	{ "selectionleft",		action_SelectionLeft	},
 	{ "selectionup",		action_SelectionUp		},
 	{ "selectionright",		action_SelectionRight	},
-	{ "selectiondown",		action_SelectionDown	}
-
+	{ "selectiondown",		action_SelectionDown	},
+	{ "previousword",		action_PreviousWord		},
+	{ "nextword",			action_NextWord			},
+	{ "deleteword",			action_DeleteWord		},
+	{ "deletefield",		action_DeleteField		}
 
  };
 
@@ -112,10 +115,15 @@
      	DECLARE_KEYPROC( GDK_KP_Up,				GDK_CONTROL_MASK,	action_SelectionUp		),
      	DECLARE_KEYPROC( GDK_KP_Right,			GDK_CONTROL_MASK,	action_SelectionRight	),
      	DECLARE_KEYPROC( GDK_KP_Down,			GDK_CONTROL_MASK,	action_SelectionDown	),
+
         DECLARE_KEYPROC( GDK_l,					GDK_CONTROL_MASK,	action_Redraw			),
 
+        DECLARE_KEYPROC( GDK_w,					GDK_CONTROL_MASK,	action_DeleteWord		),
+        DECLARE_KEYPROC( GDK_u,					GDK_CONTROL_MASK,	action_DeleteField		),
+
+        DECLARE_KEYPROC( GDK_r,					GDK_CONTROL_MASK,	action_Reset			),
+
      	DECLARE_KEYPROC( GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab			),
-//     	DECLARE_KEYPROC( GDK_KP_Subtract,		0,					action_BackTab		),
 
      	DECLARE_KEYPROC( GDK_Page_Up, 			0,					action_F7			),
      	DECLARE_KEYPROC( GDK_Page_Down,			0,					action_F8			),
@@ -141,6 +149,7 @@
      	DECLARE_KEYPROC( GDK_KP_Down,			0,					action_Down			),
 
         DECLARE_KEYPROC( GDK_Clear,				0,					action_Clear		),
+
         DECLARE_KEYPROC( GDK_3270_Reset,		0,					action_Reset		),
 
         DECLARE_KEYPROC( GDK_Delete,			0,					action_Delete		),
@@ -148,6 +157,8 @@
 
         DECLARE_KEYPROC( GDK_Return,			0,					action_Enter		),
         DECLARE_KEYPROC( GDK_KP_Enter,			0,					action_Enter		),
+
+        DECLARE_KEYPROC( GDK_Escape,			0,					action_Reset		),
 
         DECLARE_KEYPROC( GDK_Insert,			0,					action_Insert		),
 
@@ -183,19 +194,6 @@
 						event->state & GDK_RELEASE_MASK	? " GDK_RELEASE_MASK"	: ""
 						);
 
-
-    /* Check for Function keys */
-
-    // FIXME (perry#2#): It's probably not necessary since the function keys are beeing treated in the main window.
-/*
-    if(event->keyval >= GDK_F1 && event->keyval <=  GDK_F12)
-    {
-    	snprintf(ks,5,"%d",(event->keyval - GDK_F1)+1);
-    	DBGPrintf("Function-%s",ks);
-		action_internal(PF_action, IA_DEFAULT, ks, CN);
-    	return TRUE;
-    }
-*/
 
     /* Check for special keyproc actions */
     for(f=0; f < (sizeof(keyproc)/sizeof(struct WindowActions));f++)
@@ -468,6 +466,29 @@
     action_internal(Redraw_action, IA_DEFAULT, CN, CN);
  }
 
+ void action_PreviousWord(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(PreviousWord_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_NextWord(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(NextWord_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_DeleteWord(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(DeleteWord_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_DeleteField(GtkWidget *w, gpointer data)
+ {
+ 	CHKPoint();
+    action_internal(DeleteField_action, IA_DEFAULT, CN, CN);
+ }
 
 /*
  void action_(GtkWidget *w, gpointer data)
