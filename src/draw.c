@@ -76,21 +76,33 @@
 
  #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
 
- static GdkPixmap *pixmap[IMAGE_COUNT];
+ static GdkPixbuf *pix[IMAGE_COUNT];
 
- void LoadImages(GdkDrawable *drawable)
+ void LoadImages(GdkDrawable *drawable, GdkGC *gc)
  {
- 	int f;
+ 	int			f;
+ 	GdkPixmap	*temp;
 
  	for(f=0;f<IMAGE_COUNT;f++)
  	{
- 		pixmap[f] = gdk_pixmap_create_from_data(	drawable,
-													(const gchar *) imagedata[f].data,
-                                            		imagedata[f].width,
-                                            		imagedata[f].height,
-													gdk_drawable_get_depth(drawable),
-													status_cmap+imagedata[f].color,
-													terminal_cmap );
+ 		// Load bitmap setting the right colors
+ 		temp = gdk_pixmap_create_from_data(	drawable,
+											(const gchar *) imagedata[f].data,
+                                       		imagedata[f].width,
+                                       		imagedata[f].height,
+											gdk_drawable_get_depth(drawable),
+											status_cmap+imagedata[f].color,
+											terminal_cmap );
+
+		pix[f] = gdk_pixbuf_get_from_drawable(	0,
+												temp,
+												gdk_drawable_get_colormap(drawable),
+												0,0,
+												0,0,
+												imagedata[f].width,
+												imagedata[f].height );
+
+        gdk_pixmap_unref(temp);
  	}
  }
 
@@ -127,7 +139,7 @@
 #ifdef DEBUG
  static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height)
  {
-	gdk_draw_drawable(drawable,gc,pixmap[id],0,0,x,(y-Height)+1,-1,-1);
+    gdk_pixbuf_render_to_drawable(pix[id],drawable,gc,0,0,x,(y-Height)+1,-1,-1,GDK_RGB_DITHER_NORMAL,0,0);
  }
 #endif
 
