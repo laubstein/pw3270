@@ -8,6 +8,11 @@
  #include "lib/hostc.h"
  #include "lib/telnetc.h"
 
+#ifdef DEBUG
+ #define ENABLE_STATUS_IMAGES
+#endif
+
+
 /*---[ Defines ]--------------------------------------------------------------*/
 
  #define DEFCOLOR_MAP(f) ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
@@ -61,6 +66,8 @@
 
 /*---[ Status icons ]---------------------------------------------------------*/
 
+#ifdef ENABLE_STATUS_IMAGES
+
  #include "locked.bm"
 
  static const struct _imagedata
@@ -76,35 +83,17 @@
 
  #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
 
- static GdkPixbuf *pix[IMAGE_COUNT];
-
- void LoadImages(GdkDrawable *drawable, GdkGC *gc)
+ static struct _pix
  {
- 	int			f;
- 	GdkPixmap	*temp;
+ 	GdkPixbuf *base;
+ 	GdkPixbuf *pix;
+ 	int		   Width;
+ 	int		   Height;
+ } pix[IMAGE_COUNT];
 
- 	for(f=0;f<IMAGE_COUNT;f++)
- 	{
- 		// Load bitmap setting the right colors
- 		temp = gdk_pixmap_create_from_data(	drawable,
-											(const gchar *) imagedata[f].data,
-                                       		imagedata[f].width,
-                                       		imagedata[f].height,
-											gdk_drawable_get_depth(drawable),
-											status_cmap+imagedata[f].color,
-											terminal_cmap );
+// static GdkPixbuf *pix[IMAGE_COUNT];
 
-		pix[f] = gdk_pixbuf_get_from_drawable(	0,
-												temp,
-												gdk_drawable_get_colormap(drawable),
-												0,0,
-												0,0,
-												imagedata[f].width,
-												imagedata[f].height );
-
-        gdk_pixmap_unref(temp);
- 	}
- }
+#endif
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -136,11 +125,61 @@
 
  }
 
-#ifdef DEBUG
- static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height)
+#ifdef ENABLE_STATUS_IMAGES
+
+ static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height, int Width)
  {
-    gdk_pixbuf_render_to_drawable(pix[id],drawable,gc,0,0,x,(y-Height)+1,-1,-1,GDK_RGB_DITHER_NORMAL,0,0);
+    double ratio;
+    int    temp;
+
+ 	if( ((Height != pix[id].Height) || (Width != pix[id].Width)) && pix[id].pix )
+ 	{
+ 		gdk_pixbuf_unref(pix[id].pix);
+		pix[id].pix = 0;
+ 	}
+
+ 	if(!pix[id].pix)
+ 	{
+ 		/* Resize by Height */
+        ratio = ((double) gdk_pixbuf_get_width(pix[id].base)) / ((double) gdk_pixbuf_get_height(pix[id].base));
+		temp  = (int) ((double) ratio * ((double) Height));
+
+        DBGPrintf("Ratio: %ld %dx%d <-> %dx%d (%dx%d)",
+									(long) (ratio * 100),
+									gdk_pixbuf_get_width(pix[id].base),gdk_pixbuf_get_height(pix[id].base),
+									temp,Height,
+									Width,Height);
+
+	    pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,temp,Height,GDK_INTERP_HYPER);
+ 	}
+
+/*
+ 	if(!pix[id].pix)
+ 	{
+ 		// Resize by width
+        ratio = ((double) gdk_pixbuf_get_height(pix[id].base)) / ((double) gdk_pixbuf_get_width(pix[id].base));
+		temp  = (int) ((double) ratio * ((double) Width));
+
+        DBGPrintf("Ratio: %ld %dx%d <-> %dx%d (%dx%d)",
+									(long) (ratio * 100),
+									gdk_pixbuf_get_width(pix[id].base),gdk_pixbuf_get_height(pix[id].base),
+									Width,temp,
+									Width,Height);
+
+		pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,Width,temp,GDK_INTERP_HYPER);
+
+ 	}
+
+*/
+
+    if(pix[id].pix)
+    {
+   	   pix[id].Height = Height;
+	   pix[id].Width  = Width;
+	   gdk_pixbuf_render_to_drawable(pix[id].pix,drawable,gc,0,0,x,(y-Height)+2,-1,-1,GDK_RGB_DITHER_NORMAL,0,0);
+    }
  }
+
 #endif
 
  void DrawTerminal(GdkDrawable *drawable, GdkGC *gc, const FONTELEMENT *font, int left, int top, int line_spacing)
@@ -270,6 +309,12 @@
      *   M-7..M     cursor position (rrr/ccc or blank)
      *
      */
+#ifdef ENABLE_STATUS_IMAGES
+   #define DrawIconRight(x,i,color,string) DrawImage(drawable, gc, i,left+(((cols-x) * font->Width)), vPos, font->Height, font->Width);
+#else
+   #define DrawIconRight(x,i,color,string) 	gdk_gc_set_foreground(gc,status_cmap+color); \
+											gdk_draw_text(drawable,font->fn,gc,left+(((cols-x) * font->Width)),vPos,string,strlen(string))
+#endif
 
 #define DrawStatusRight(x,color,string) gdk_gc_set_foreground(gc,status_cmap+color); \
 										gdk_draw_text(drawable,font->fn,gc,left+(((cols-x) * font->Width)),vPos,string,strlen(string))
@@ -309,7 +354,7 @@
 
     if(query_secure_connection())
     {
-       DrawStatusRight(32,STATUS_COLOR_SSL,"s");
+       DrawIconRight(32,0,STATUS_COLOR_SSL,"s");
     }
 
     /* Terminal Status */
@@ -325,11 +370,6 @@
 #endif
 
     }
-
-#ifdef DEBUG
-	DrawImage(drawable, gc, 0, left, vPos, font->Height);
-#endif
-
 
  }
 
@@ -360,4 +400,40 @@
     RedrawStatusLine();
 
  }
+
+ void LoadImages(GdkDrawable *drawable, GdkGC *gc)
+ {
+#ifdef ENABLE_STATUS_IMAGES
+
+ 	int			f;
+ 	GdkPixmap	*temp;
+
+    memset(pix,0,sizeof(struct _pix) * IMAGE_COUNT);
+
+ 	for(f=0;f<IMAGE_COUNT;f++)
+ 	{
+ 		// Load bitmap setting the right colors
+ 		temp = gdk_pixmap_create_from_data(	drawable,
+											(const gchar *) imagedata[f].data,
+                                       		imagedata[f].width,
+                                       		imagedata[f].height,
+											gdk_drawable_get_depth(drawable),
+											status_cmap+imagedata[f].color,
+											terminal_cmap );
+
+		pix[f].base = gdk_pixbuf_get_from_drawable(	0,
+													temp,
+													gdk_drawable_get_colormap(drawable),
+													0,0,
+													0,0,
+													imagedata[f].width,
+													imagedata[f].height );
+
+        gdk_pixmap_unref(temp);
+ 	}
+#endif
+ }
+
+
+
 
