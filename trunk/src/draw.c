@@ -306,6 +306,7 @@
     DrawStatusRight(39,STATUS_COLOR_KEYBOARD,(oia_KeyboardState & GDK_SHIFT_MASK) ? "^" : " ");
 
     /* SSL Status */
+
     if(query_secure_connection())
     {
        DrawStatusRight(32,STATUS_COLOR_SSL,"s");
@@ -326,8 +327,9 @@
     }
 
 #ifdef DEBUG
-	DrawImage(drawable, gc, 0, left+(((cols-32) * font->Width)), vPos, font->Height);
+	DrawImage(drawable, gc, 0, left, vPos, font->Height);
 #endif
+
 
  }
 
