@@ -541,7 +541,7 @@
 #ifdef USE_GTKIMCONTEXT
     gtk_im_context_set_client_window(im,widget->window);
 #endif
-    LoadImages(widget->window);
+    LoadImages(widget->window,widget->style->fg_gc[GTK_WIDGET_STATE(widget)]);
  }
 
  static gboolean focus_in_event(GtkWidget *widget, GdkEventFocus *event, gpointer x)
