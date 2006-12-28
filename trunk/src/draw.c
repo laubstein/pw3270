@@ -55,13 +55,44 @@
 
  static struct _status *current_status = 0;
 
-/*---[ Translation codes ]----------------------------------------------------*/
-
 /*---[ Globals ]--------------------------------------------------------------*/
 
  guint oia_KeyboardState = 0;
 
-/*---[ Statics ]--------------------------------------------------------------*/
+/*---[ Status icons ]---------------------------------------------------------*/
+
+ #include "locked.bm"
+
+ static const struct _imagedata
+ {
+	const unsigned char	*data;
+    gint				width;
+    gint				height;
+    short				color;
+ } imagedata[] =
+ {
+ 	{ locked_bits, locked_width, locked_height, STATUS_COLOR_SSL }
+ };
+
+ #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
+
+ static GdkPixmap *pixmap[IMAGE_COUNT];
+
+ void LoadImages(GdkDrawable *drawable)
+ {
+ 	int f;
+
+ 	for(f=0;f<IMAGE_COUNT;f++)
+ 	{
+ 		pixmap[f] = gdk_pixmap_create_from_data(	drawable,
+													(const gchar *) imagedata[f].data,
+                                            		imagedata[f].width,
+                                            		imagedata[f].height,
+													gdk_drawable_get_depth(drawable),
+													status_cmap+imagedata[f].color,
+													terminal_cmap );
+ 	}
+ }
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -92,6 +123,13 @@
        *bgColor = 0;
 
  }
+
+#ifdef DEBUG
+ static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height)
+ {
+	gdk_draw_drawable(drawable,gc,pixmap[id],0,0,x,(y-Height)+1,-1,-1);
+ }
+#endif
 
  void DrawTerminal(GdkDrawable *drawable, GdkGC *gc, const FONTELEMENT *font, int left, int top, int line_spacing)
  {
@@ -274,6 +312,10 @@
 #endif
 
     }
+
+#ifdef DEBUG
+	DrawImage(drawable, gc, 0, left+(((cols-32) * font->Width)), vPos, font->Height);
+#endif
 
  }
 
