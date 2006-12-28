@@ -536,12 +536,12 @@
     configure_terminal(widget,event->width,event->height);
  }
 
-
  static void realize(GtkWidget *widget, void *t)
  {
 #ifdef USE_GTKIMCONTEXT
     gtk_im_context_set_client_window(im,widget->window);
 #endif
+    LoadImages(widget->window);
  }
 
  static gboolean focus_in_event(GtkWidget *widget, GdkEventFocus *event, gpointer x)
@@ -651,7 +651,7 @@
 		{ "Fields",		"green,red,#00FFFF,white" },
 		{ "Cursor",		"white,white,LimeGreen,LimeGreen" },
 		{ "Selection",	"#000020,yellow" },
-		{ "Status",		"black,#7890F0,LimeGreen,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen,LimeGreen,LimeGreen" }
+		{ "Status",		"black,#7890F0,white,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen,LimeGreen,LimeGreen" }
     };
     char	key[40];
     char	*ptr;
