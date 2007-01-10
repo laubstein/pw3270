@@ -8,11 +8,6 @@
  #include "lib/hostc.h"
  #include "lib/telnetc.h"
 
-#ifdef DEBUG
- #define ENABLE_STATUS_IMAGES
-#endif
-
-
 /*---[ Defines ]--------------------------------------------------------------*/
 
  #define DEFCOLOR_MAP(f) ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
@@ -66,8 +61,6 @@
 
 /*---[ Status icons ]---------------------------------------------------------*/
 
-#ifdef ENABLE_STATUS_IMAGES
-
  #include "locked.bm"
 
  static const struct _imagedata
@@ -90,10 +83,6 @@
  	int		   Width;
  	int		   Height;
  } pix[IMAGE_COUNT];
-
-// static GdkPixbuf *pix[IMAGE_COUNT];
-
-#endif
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -125,8 +114,6 @@
 
  }
 
-#ifdef ENABLE_STATUS_IMAGES
-
  static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height, int Width)
  {
     double ratio;
@@ -153,25 +140,6 @@
 	    pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,temp,Height,GDK_INTERP_HYPER);
  	}
 
-/*
- 	if(!pix[id].pix)
- 	{
- 		// Resize by width
-        ratio = ((double) gdk_pixbuf_get_height(pix[id].base)) / ((double) gdk_pixbuf_get_width(pix[id].base));
-		temp  = (int) ((double) ratio * ((double) Width));
-
-        DBGPrintf("Ratio: %ld %dx%d <-> %dx%d (%dx%d)",
-									(long) (ratio * 100),
-									gdk_pixbuf_get_width(pix[id].base),gdk_pixbuf_get_height(pix[id].base),
-									Width,temp,
-									Width,Height);
-
-		pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,Width,temp,GDK_INTERP_HYPER);
-
- 	}
-
-*/
-
     if(pix[id].pix)
     {
    	   pix[id].Height = Height;
@@ -179,8 +147,6 @@
 	   gdk_pixbuf_render_to_drawable(pix[id].pix,drawable,gc,0,0,x,(y-Height)+2,-1,-1,GDK_RGB_DITHER_NORMAL,0,0);
     }
  }
-
-#endif
 
  void DrawTerminal(GdkDrawable *drawable, GdkGC *gc, const FONTELEMENT *font, int left, int top, int line_spacing)
  {
@@ -309,12 +275,7 @@
      *   M-7..M     cursor position (rrr/ccc or blank)
      *
      */
-#ifdef ENABLE_STATUS_IMAGES
-   #define DrawIconRight(x,i,color,string) DrawImage(drawable, gc, i,left+(((cols-x) * font->Width)), vPos, font->Height, font->Width);
-#else
-   #define DrawIconRight(x,i,color,string) 	gdk_gc_set_foreground(gc,status_cmap+color); \
-											gdk_draw_text(drawable,font->fn,gc,left+(((cols-x) * font->Width)),vPos,string,strlen(string))
-#endif
+#define DrawIconRight(x,i,color,string) DrawImage(drawable, gc, i,left+(((cols-x) * font->Width)), vPos, font->Height, font->Width);
 
 #define DrawStatusRight(x,color,string) gdk_gc_set_foreground(gc,status_cmap+color); \
 										gdk_draw_text(drawable,font->fn,gc,left+(((cols-x) * font->Width)),vPos,string,strlen(string))
@@ -403,8 +364,6 @@
 
  void LoadImages(GdkDrawable *drawable, GdkGC *gc)
  {
-#ifdef ENABLE_STATUS_IMAGES
-
  	int			f;
  	GdkPixmap	*temp;
 
@@ -431,7 +390,6 @@
 
         gdk_pixmap_unref(temp);
  	}
-#endif
  }
 
 
