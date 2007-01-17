@@ -333,6 +333,7 @@ static void status_lu(const char *lu)
 static void ring_bell(void)
 {
 #ifdef DEBUG
+    DBGMessage("Beep!");
 	if(terminal && terminal->window)
 	   gdk_beep();
 #endif
