@@ -1,5 +1,7 @@
 
+#include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
+
 #include "g3270.h"
 #include "lib/kybdc.h"
 
@@ -330,7 +332,10 @@ static void status_lu(const char *lu)
 
 static void ring_bell(void)
 {
-	CHKPoint();
+#ifdef DEBUG
+	if(terminal && terminal->window)
+	   gdk_beep();
+#endif
 }
 
 static void screen_flip(void)
