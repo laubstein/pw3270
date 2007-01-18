@@ -269,6 +269,9 @@
     }
 
     // TODO (perry#2#): Draw to a pixmap and paint here the contents.
+    if(!cursor_enabled)
+       *oia_cursor = 0;
+
     DrawTerminal(	widget->window,
 					gc,
 					font,

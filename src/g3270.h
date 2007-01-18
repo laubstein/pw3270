@@ -181,6 +181,8 @@
  int  PrintTemporaryFile(const char *filename);
 
  void DrawTerminal(GdkDrawable *, GdkGC *, const FONTELEMENT *, int, int, int);
+ int  PaintBuffer(GdkDrawable *, GdkGC *, const FONTELEMENT *, int, int, int);
+ void PaintStatus(int, GdkDrawable *, GdkGC *, const FONTELEMENT *, int, int, int);
 
  void InitClipboard(GtkWidget *w);
  int  AppendToClipboard(int fromRow, int fromCol, int toRow, int toCol);
