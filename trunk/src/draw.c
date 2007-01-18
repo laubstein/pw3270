@@ -152,6 +152,20 @@
 
  void DrawTerminal(GdkDrawable *drawable, GdkGC *gc, const FONTELEMENT *font, int left, int top, int line_spacing)
  {
+    int StatusLine;
+
+    if(!font->fn)
+    {
+       Log("Invalid FONT definition");
+       return;
+    }
+
+    StatusLine = PaintBuffer(drawable, gc, font, left, top, line_spacing);
+    PaintStatus(StatusLine,drawable, gc, font, left, top, line_spacing);
+ }
+
+ int PaintBuffer(GdkDrawable *drawable, GdkGC *gc, const FONTELEMENT *font, int left, int top, int line_spacing)
+ {
  	// Draw terminal data
  	const struct ea *trm;
  	int				rows;
@@ -166,12 +180,6 @@
     int				mode		= 0;
     GdkColor		*fg			= terminal_cmap+1;
     GdkColor		*bg			= 0;
-
-    if(!font->fn)
-    {
-       Log("Invalid FONT definition");
-       return;
-    }
 
     trm = Get3270DeviceBuffer(&rows, &cols);
 
@@ -250,6 +258,19 @@
        }
     }
 
+    vPos -= font->Height;
+    vPos++;
+
+    gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_SEPARATOR);
+    gdk_draw_line( drawable, gc, left, vPos, hPos, vPos);
+
+    vPos += (font->Height+1);
+
+    return vPos;
+ }
+
+ void PaintStatus(int vPos, GdkDrawable *drawable, GdkGC *gc, const FONTELEMENT *font, int left, int top, int line_spacing)
+ {
     /*
      * The status line is laid out thusly (M is maxCOLS):
      *
@@ -277,6 +298,7 @@
      *   M-7..M     cursor position (rrr/ccc or blank)
      *
      */
+
 #define DrawIconRight(x,i,color,string) DrawImage(drawable, gc, i,left+(((cols-x) * font->Width)), vPos, font->Height, font->Width);
 
 #define DrawStatusRight(x,color,string) gdk_gc_set_foreground(gc,status_cmap+color); \
@@ -285,21 +307,20 @@
 #define DrawStatusLeft(x,color,string)  gdk_gc_set_foreground(gc,status_cmap+color); \
 										gdk_draw_text(drawable,font->fn,gc,left+(x * font->Width),vPos,string,strlen(string))
 
-    vPos -= font->Height;
-    vPos++;
+ 	int				rows;
+ 	int				cols;
 
-    gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_SEPARATOR);
-    gdk_draw_line( drawable, gc, left, vPos, hPos, vPos);
-
-    vPos += (font->Height+1);
-
-    /* Cursor position */
-    DrawStatusRight(7,STATUS_COLOR_CURSOR_POSITION,oia_cursor);
-
-    /* Insert mode */
-    if(cursor_type == CURSOR_TYPE_INSERT)
+    Get3270DeviceBuffer(&rows, &cols);
+    if(*oia_cursor) // Is cursor enabled?
     {
-       DrawStatusRight(29,STATUS_COLOR_TOOGLE,"I");
+       /* Cursor position */
+       DrawStatusRight(7,STATUS_COLOR_CURSOR_POSITION,oia_cursor);
+
+       /* Insert mode */
+       if(cursor_type == CURSOR_TYPE_INSERT)
+       {
+          DrawStatusRight(29,STATUS_COLOR_TOOGLE,"I");
+       }
     }
 
     /* LU Name */
