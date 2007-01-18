@@ -654,7 +654,7 @@
 		{ "Fields",		"green,red,#00FFFF,white" },
 		{ "Cursor",		"white,white,LimeGreen,LimeGreen" },
 		{ "Selection",	"#000020,yellow" },
-		{ "Status",		"black,#7890F0,white,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen,LimeGreen,LimeGreen" }
+		{ "Status",		"black,#7890F0,white,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen,LimeGreen,LimeGreen,LimeGreen" }
     };
     char	key[40];
     char	*ptr;
