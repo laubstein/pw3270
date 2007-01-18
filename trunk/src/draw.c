@@ -311,6 +311,19 @@
  	int				cols;
 
     Get3270DeviceBuffer(&rows, &cols);
+
+    /* First box */
+#ifdef DEBUG
+    gdk_gc_set_foreground(gc,status_cmap+STATUS_COLLOR_CONNECT_ICON);
+	gdk_draw_rectangle(	drawable,gc,
+						CONNECTED ? 1 : 0,
+						(left+(2 * font->Width))-1,vPos-(font->Height-1),font->Width,font->Height);
+	gdk_draw_text(drawable,font->fn,gc,left+(2 * font->Width),vPos,"?",1);
+#endif
+
+
+    /* Cursor position & Insert mode */
+
     if(*oia_cursor) // Is cursor enabled?
     {
        /* Cursor position */
