@@ -62,6 +62,7 @@
 /*---[ Status icons ]---------------------------------------------------------*/
 
  #include "locked.bm"
+ #include "unlocked.bm"
 
  static const struct _imagedata
  {
@@ -71,7 +72,8 @@
     short				color;
  } imagedata[] =
  {
- 	{ locked_bits, locked_width, locked_height, STATUS_COLOR_SSL }
+ 	{ locked_bits,   locked_width,   locked_height,   STATUS_COLOR_SSL },
+ 	{ unlocked_bits, unlocked_width, unlocked_height, STATUS_COLOR_SSL }
  };
 
  #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
@@ -312,11 +314,14 @@
     DrawStatusRight(39,STATUS_COLOR_KEYBOARD,(oia_KeyboardState & GDK_SHIFT_MASK) ? "^" : " ");
 
     /* SSL Status */
-
     if(query_secure_connection())
     {
        DrawIconRight(32,0,STATUS_COLOR_SSL,"s");
     }
+	else
+	{
+       DrawIconRight(32,1,STATUS_COLOR_SSL," ");
+	}
 
     /* Terminal Status */
     if(current_status && current_status->msg)
