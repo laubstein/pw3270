@@ -15,16 +15,21 @@
 /*---[ Status codes ]---------------------------------------------------------*/
 
  #ifdef DEBUG
-     #define DECLARE_STATUS_MESSAGE(code, color, msg) { code, #code, color, msg }
+     #define DECLARE_STATUS_MESSAGE(code, cursor, color, msg) { code, 0, cursor, #code, color, msg }
      #define NO_STATUS_MESSAGE ""
  #else
-     #define DECLARE_STATUS_MESSAGE(code, color, msg) { code, color, msg }
+     #define DECLARE_STATUS_MESSAGE(code, cursor, color, msg) { code, 0, cursor, color, msg }
      #define NO_STATUS_MESSAGE 0
  #endif
+
+ #define STATUS_CURSOR_NONE	-1
 
  static struct _status
  {
  	unsigned short	code;
+ 	GdkCursor		*cursor;
+ 	int				cursor_type;
+
 #ifdef DEBUG
     const char		*dbg;
 #endif
@@ -32,24 +37,117 @@
  	const char		*msg;
  } status[] =
  {
-	DECLARE_STATUS_MESSAGE( STATUS_DISCONNECTED,	STATUS_COLOR_WARNING,	"X Desconectado"	),
-	DECLARE_STATUS_MESSAGE( STATUS_RESOLVING,		STATUS_COLOR_ERROR,		"X Resolvendo"		),
-	DECLARE_STATUS_MESSAGE( STATUS_CONNECTING,		STATUS_COLOR_ERROR,		"X Conectando"		),
-	DECLARE_STATUS_MESSAGE( STATUS_NONSPECIFIC,		STATUS_COLOR_WARNING,	NO_STATUS_MESSAGE	),
-	DECLARE_STATUS_MESSAGE( STATUS_INHIBIT,			STATUS_COLOR_ERROR,		"X Inhibit"			),
-	DECLARE_STATUS_MESSAGE( STATUS_BLANK,			STATUS_COLOR_TIME,		NO_STATUS_MESSAGE	),
+	DECLARE_STATUS_MESSAGE(
+			STATUS_DISCONNECTED,
+			GDK_ARROW,
+			STATUS_COLOR_WARNING,
+			"X Desconectado"
+	),
 
-	DECLARE_STATUS_MESSAGE( STATUS_TWAIT,			STATUS_COLOR_TIME,		"X Aguarde"			),
-	DECLARE_STATUS_MESSAGE( STATUS_AWAITING_FIRST,	STATUS_COLOR_CONNECTED,	"X Conectando"		),
+	DECLARE_STATUS_MESSAGE(
+			STATUS_RESOLVING,
+			GDK_WATCH,
+			STATUS_COLOR_ERROR,
+			"X Resolvendo"
+	),
 
-	DECLARE_STATUS_MESSAGE( STATUS_SYSWAIT,			STATUS_COLOR_TIME,		"X System"			),
-	DECLARE_STATUS_MESSAGE( STATUS_PROTECTED,		STATUS_COLOR_ERROR,		"X Protegido"		),
-	DECLARE_STATUS_MESSAGE( STATUS_NUMERIC,			STATUS_COLOR_ERROR,		"X Numerico"		),
-	DECLARE_STATUS_MESSAGE( STATUS_OVERFLOW,		STATUS_COLOR_ERROR,		"X Overflow"		),
-	DECLARE_STATUS_MESSAGE( STATUS_DBCS,			STATUS_COLOR_ERROR,		"X DBCS"			),
-	DECLARE_STATUS_MESSAGE( STATUS_SCROLLED,		STATUS_COLOR_ERROR,		"X Scrolled"		),
-	DECLARE_STATUS_MESSAGE( STATUS_MINUS,			STATUS_COLOR_ERROR,		"X -f"				),
-	DECLARE_STATUS_MESSAGE( STATUS_RECONNECTING,	STATUS_COLOR_WARNING,	"X Reconnecting"				),
+	DECLARE_STATUS_MESSAGE(
+			STATUS_CONNECTING,
+			GDK_WATCH,
+			STATUS_COLOR_ERROR,
+			"X Conectando"
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_NONSPECIFIC,
+			GDK_XTERM,
+			STATUS_COLOR_WARNING,
+			NO_STATUS_MESSAGE
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_INHIBIT,
+			STATUS_CURSOR_NONE,
+			STATUS_COLOR_ERROR,
+			"X Inhibit"
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_BLANK,
+			GDK_XTERM,
+			STATUS_COLOR_TIME,
+			NO_STATUS_MESSAGE
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_TWAIT,
+			GDK_WATCH,
+			STATUS_COLOR_TIME,
+			"X Aguarde"
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_AWAITING_FIRST,
+			STATUS_CURSOR_NONE,
+			STATUS_COLOR_CONNECTED,
+			"X Conectando"
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_SYSWAIT,
+			GDK_WATCH,
+			STATUS_COLOR_TIME,
+			"X System"
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_PROTECTED,
+			STATUS_CURSOR_NONE,
+			STATUS_COLOR_ERROR,
+			"X Protegido"
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_NUMERIC,
+			STATUS_CURSOR_NONE,
+			STATUS_COLOR_ERROR,
+			"X Numerico"
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_OVERFLOW,
+			STATUS_CURSOR_NONE,
+			STATUS_COLOR_ERROR,
+			"X Overflow"
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_DBCS,
+			STATUS_CURSOR_NONE,
+			STATUS_COLOR_ERROR,
+			"X DBCS"
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_SCROLLED,
+			STATUS_CURSOR_NONE,
+			STATUS_COLOR_ERROR,
+			"X Scrolled"
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_MINUS,
+			STATUS_CURSOR_NONE,
+			STATUS_COLOR_ERROR,
+			"X -f"
+	),
+
+	DECLARE_STATUS_MESSAGE(
+			STATUS_RECONNECTING,
+			STATUS_CURSOR_NONE,
+			STATUS_COLOR_WARNING,
+			"X Reconnecting"
+	),
 
  };
 
@@ -393,8 +491,15 @@
 			   DBGPrintf("Status:\t%s",current_status->dbg);
 		   }
 	   }
-	   if(!sts)
+	   if(sts)
+	   {
+	      // Ajusta a janela de acordo com o status corrente
+	      if(terminal && terminal->window && sts->cursor)
+	         gdk_window_set_cursor(terminal->window,sts->cursor);
+	   }
+	   {
 	      Log("Unexpected status code %d from 3270 library",code);
+	   }
 	}
 
     RedrawStatusLine();
@@ -429,6 +534,13 @@
 
         gdk_pixmap_unref(temp);
  	}
+
+    for(f=0;f<(sizeof(status)/sizeof(struct _status));f++)
+	{
+	   if(status[f].cursor_type != STATUS_CURSOR_NONE)
+	      status[f].cursor = gdk_cursor_new(status[f].cursor_type);
+	}
+
  }
 
 
