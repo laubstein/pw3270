@@ -41,21 +41,21 @@
 			STATUS_DISCONNECTED,
 			GDK_ARROW,
 			STATUS_COLOR_WARNING,
-			"X Desconectado"
+			"XDesconectado"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_RESOLVING,
 			GDK_WATCH,
 			STATUS_COLOR_ERROR,
-			"X Resolvendo"
+			"XResolvendo"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_CONNECTING,
 			GDK_WATCH,
 			STATUS_COLOR_ERROR,
-			"X Conectando"
+			"XConectando"
 	),
 
 	DECLARE_STATUS_MESSAGE(
@@ -69,7 +69,7 @@
 			STATUS_INHIBIT,
 			STATUS_CURSOR_NONE,
 			STATUS_COLOR_ERROR,
-			"X Inhibit"
+			"XInhibit"
 	),
 
 	DECLARE_STATUS_MESSAGE(
@@ -83,42 +83,42 @@
 			STATUS_TWAIT,
 			GDK_WATCH,
 			STATUS_COLOR_TIME,
-			"X Aguarde"
+			"XAguarde"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_AWAITING_FIRST,
 			STATUS_CURSOR_NONE,
 			STATUS_COLOR_CONNECTED,
-			"X Conectando"
+			"XConectando"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_SYSWAIT,
 			GDK_WATCH,
 			STATUS_COLOR_TIME,
-			"X System"
+			"XSystem"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_PROTECTED,
 			STATUS_CURSOR_NONE,
 			STATUS_COLOR_ERROR,
-			"X Protegido"
+			"XProtegido"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_NUMERIC,
 			STATUS_CURSOR_NONE,
 			STATUS_COLOR_ERROR,
-			"X Numerico"
+			"XNumerico"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_OVERFLOW,
 			STATUS_CURSOR_NONE,
 			STATUS_COLOR_ERROR,
-			"X Overflow"
+			"XOverflow"
 	),
 
 	DECLARE_STATUS_MESSAGE(
@@ -411,17 +411,13 @@
     Get3270DeviceBuffer(&rows, &cols);
 
     /* First box */
-#ifdef DEBUG
     gdk_gc_set_foreground(gc,status_cmap+STATUS_COLLOR_CONNECT_ICON);
 	gdk_draw_rectangle(	drawable,gc,
 						CONNECTED ? 1 : 0,
 						(left+(2 * font->Width))-1,vPos-(font->Height-1),font->Width,font->Height);
 	gdk_draw_text(drawable,font->fn,gc,left+(2 * font->Width),vPos,"?",1);
-#endif
-
 
     /* Cursor position & Insert mode */
-
     if(*oia_cursor) // Is cursor enabled?
     {
        /* Cursor position */
@@ -441,7 +437,6 @@
     DrawStatusRight(15,STATUS_COLOR_TIME,oia_Timer);
 
     /* Keyboard status */
-
     DrawStatusRight(40,STATUS_COLOR_KEYBOARD,(oia_KeyboardState & GDK_ALT_MASK) ? "A" : " ");
     DrawStatusRight(39,STATUS_COLOR_KEYBOARD,(oia_KeyboardState & GDK_SHIFT_MASK) ? "^" : " ");
 
@@ -458,7 +453,29 @@
     /* Terminal Status */
     if(current_status && current_status->msg)
     {
-       DrawStatusLeft(8,current_status->color,current_status->msg);
+
+	   int col = left+(8*font->Width);
+
+       gdk_gc_set_foreground(gc,status_cmap+current_status->color);
+
+       if(*current_status->msg == 'X')
+       {
+       	  int        f;
+       	  int        xCols = 3;
+       	  const char *ptr  = current_status->msg+1;
+
+       	  for(f=0;f < xCols;f++)
+       	  {
+		     gdk_draw_line(drawable,gc,col+f,vPos-(font->Height-1), col+f+(font->Width-xCols),vPos);
+		     gdk_draw_line(drawable,gc,col+f+(font->Width-xCols),vPos-(font->Height-1),col+f,vPos);
+       	  }
+
+		  gdk_draw_text(drawable,font->fn,gc,col+font->Width+(font->Width >> 1),vPos,ptr,strlen(ptr));
+       }
+       else if(*current_status->msg)
+       {
+		  gdk_draw_text(drawable,font->fn,gc,col,vPos,current_status->msg,strlen(current_status->msg));
+       }
 
 #ifdef DEBUG
 	   if(!*current_status->msg)
