@@ -533,6 +533,7 @@
 		   {
 		   	   current_status = sts = (status+f);
 			   DBGPrintf("Status:\t%s",current_status->dbg);
+			   return;
 		   }
 	   }
 	   if(sts)
@@ -541,6 +542,7 @@
 	      if(terminal && terminal->window && sts->cursor)
 	         gdk_window_set_cursor(terminal->window,sts->cursor);
 	   }
+	   else
 	   {
 	      Log("Unexpected status code %d from 3270 library",code);
 	   }
