@@ -48,6 +48,8 @@ static void status_timing(struct timeval *t0, struct timeval *t1);
  char oia_LUName[12]				= "          ";
  char oia_Timet[TCNT+1]				= "";
  char oia_Timer[OIA_TIMER_COUNT+1]	= "";
+ char oia_undera					= 1;
+
 
 /*---[ 3270 Screen callback table ]-------------------------------------------*/
 
@@ -253,9 +255,8 @@ static void toggle_monocase(struct toggle *t, enum toggle_type tt)
 /* Done with controller confirmation */
 static void status_ctlr_done(void)
 {
-#ifdef DEBUG
-			   Log("Status:\t%s",__FUNCTION__);
-#endif
+	oia_undera = 1;
+	RedrawStatusLine();
 }
 
 static void status_insert_mode(Boolean on)
@@ -298,6 +299,7 @@ static void status_syswait(void)
 /* Lock the keyboard (twait) */
 static void status_twait(void)
 {
+	oia_undera = 0;
     SetOIAStatus(STATUS_TWAIT);
 }
 
@@ -305,7 +307,7 @@ static void status_twait(void)
 static void status_typeahead(Boolean on)
 {
 	NotImplemented();
-        RedrawStatusLine();
+    RedrawStatusLine();
 }
 
 /* Set compose character */
