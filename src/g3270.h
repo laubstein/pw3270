@@ -41,21 +41,21 @@
 
  enum status_codes
  {
-        STATUS_DISCONNECTED,           /* X Not Connected */
-        STATUS_RESOLVING,              /* X Resolving */
-        STATUS_CONNECTING,             /* X Connecting */
-        STATUS_NONSPECIFIC,            /* X */
-        STATUS_INHIBIT,                /* X Inhibit */
-        STATUS_BLANK,                  /* (blank) */
-        STATUS_TWAIT,                  /* X Wait */
-        STATUS_SYSWAIT,                /* X SYSTEM */
-        STATUS_PROTECTED,              /* X Protected */
-        STATUS_NUMERIC,                /* X Numeric */
-        STATUS_OVERFLOW,               /* X Overflow */
-        STATUS_DBCS,                   /* X DBCS */
-        STATUS_SCROLLED,               /* X Scrolled */
-        STATUS_MINUS,                  /* X -f */
-        STATUS_AWAITING_FIRST,	       /* X Wait */
+        STATUS_DISCONNECTED,           /*  0 X Not Connected */
+        STATUS_RESOLVING,              /*  1 X Resolving */
+        STATUS_CONNECTING,             /*  2 X Connecting */
+        STATUS_NONSPECIFIC,            /*  3 X */
+        STATUS_INHIBIT,                /*  4 X Inhibit */
+        STATUS_BLANK,                  /*  5 (blank) */
+        STATUS_TWAIT,                  /*  6 X Wait */
+        STATUS_SYSWAIT,                /*  7 X SYSTEM */
+        STATUS_PROTECTED,              /*  8 X Protected */
+        STATUS_NUMERIC,                /*  9 X Numeric */
+        STATUS_OVERFLOW,               /* 10 X Overflow */
+        STATUS_DBCS,                   /* 11 X DBCS */
+        STATUS_SCROLLED,               /* 12 X Scrolled */
+        STATUS_MINUS,                  /* 13 X -f */
+        STATUS_AWAITING_FIRST,	       /* 14 X Wait */
 
 	STATUS_RECONNECTING
  };
