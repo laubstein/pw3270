@@ -91,6 +91,8 @@
 	STATUS_COLORS	// Must be the last one
  };
 
+ #define STATUS_COLLOR_CNCT STATUS_COLLOR_CONNECT_ICON
+
  #define CURSOR_TYPE_NONE	-1
 
  #define min(x,y) (x < y ? x : y)
@@ -125,6 +127,7 @@
  extern const struct action_callback action_callbacks[];
  extern const int	 action_callback_counter;
 
+ extern char					oia_undera;
  extern char					oia_cursor[];
  extern char					oia_LUName[];
 

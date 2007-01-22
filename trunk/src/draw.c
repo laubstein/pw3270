@@ -412,6 +412,11 @@
 
     Get3270DeviceBuffer(&rows, &cols);
 
+    if (oia_undera)
+    {
+    	DrawStatusLeft(1,STATUS_COLLOR_CNCT,(IN_E ? "B" : "A"));
+    }
+
     /* First box */
     gdk_gc_set_foreground(gc,status_cmap+STATUS_COLLOR_CONNECT_ICON);
 	gdk_draw_rectangle(	drawable,gc,
