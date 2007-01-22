@@ -164,6 +164,7 @@
  #include "shift.bm"
  #include "a.bm"
  #include "b.bm"
+ #include "four.bm"
 
  static const struct _imagedata
  {
@@ -178,6 +179,7 @@
  	{ shift_bits,    shift_width,    shift_height,    STATUS_COLOR_KEYBOARD },
  	{ a_bits,        a_width,        a_height,    	  STATUS_COLLOR_CNCT    },
  	{ b_bits,        b_width,        b_height,    	  STATUS_COLLOR_CNCT    },
+ 	{ four_bits,     four_width,     four_height,  	  STATUS_COLLOR_CNCT    },
  };
 
  #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
@@ -416,12 +418,13 @@
 
     Get3270DeviceBuffer(&rows, &cols);
 
-    if (oia_undera)
+
+    if(oia_undera)
     {
         DrawImage(drawable,
 						gc,
 						(IN_E ? 4 : 3),
-						(left+font->Width)-2,
+						(left+font->Width)+1,
 						vPos,
 						font->Height,
 						font->Width
@@ -429,12 +432,13 @@
 //    	DrawStatusLeft(1,STATUS_COLLOR_CNCT,(IN_E ? "B" : "A"));
     }
 
-    /* First box */
+    DrawImage(drawable,gc,5,left,vPos,font->Height,font->Width);
+
     gdk_gc_set_foreground(gc,status_cmap+STATUS_COLLOR_CONNECT_ICON);
 	gdk_draw_rectangle(	drawable,gc,
 						CONNECTED ? 1 : 0,
-						(left+(2 * font->Width)),vPos-(font->Height-1),font->Width,font->Height);
-	gdk_draw_text(drawable,font->fn,gc,left+(2 * font->Width)+1,vPos,"?",1);
+						(left+(2 * font->Width)+4),vPos-(font->Height-1),font->Width+1,font->Height);
+	gdk_draw_text(drawable,font->fn,gc,left+(2 * font->Width)+5,vPos,"?",1);
 
     /* Cursor position & Insert mode */
     if(*oia_cursor) // Is cursor enabled?
