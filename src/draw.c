@@ -161,6 +161,7 @@
 
  #include "locked.bm"
  #include "unlocked.bm"
+ #include "shift.bm"
 
  static const struct _imagedata
  {
@@ -170,8 +171,9 @@
     short				color;
  } imagedata[] =
  {
- 	{ locked_bits,   locked_width,   locked_height,   STATUS_COLOR_SSL },
- 	{ unlocked_bits, unlocked_width, unlocked_height, STATUS_COLOR_SSL }
+ 	{ locked_bits,   locked_width,   locked_height,   STATUS_COLOR_SSL 		},
+ 	{ unlocked_bits, unlocked_width, unlocked_height, STATUS_COLOR_SSL 		},
+ 	{ shift_bits,    shift_width,    shift_height,    STATUS_COLOR_KEYBOARD }
  };
 
  #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
@@ -438,7 +440,11 @@
 
     /* Keyboard status */
     DrawStatusRight(40,STATUS_COLOR_KEYBOARD,(oia_KeyboardState & GDK_ALT_MASK) ? "A" : " ");
-    DrawStatusRight(39,STATUS_COLOR_KEYBOARD,(oia_KeyboardState & GDK_SHIFT_MASK) ? "^" : " ");
+
+    if(oia_KeyboardState & GDK_SHIFT_MASK)
+    {
+       DrawIconRight(39,2,STATUS_COLOR_SSL,"^");
+    }
 
     /* SSL Status */
     if(query_secure_connection())
