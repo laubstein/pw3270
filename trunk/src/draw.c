@@ -162,6 +162,8 @@
  #include "locked.bm"
  #include "unlocked.bm"
  #include "shift.bm"
+ #include "a.bm"
+ #include "b.bm"
 
  static const struct _imagedata
  {
@@ -173,7 +175,9 @@
  {
  	{ locked_bits,   locked_width,   locked_height,   STATUS_COLOR_SSL 		},
  	{ unlocked_bits, unlocked_width, unlocked_height, STATUS_COLOR_SSL 		},
- 	{ shift_bits,    shift_width,    shift_height,    STATUS_COLOR_KEYBOARD }
+ 	{ shift_bits,    shift_width,    shift_height,    STATUS_COLOR_KEYBOARD },
+ 	{ a_bits,        a_width,        a_height,    	  STATUS_COLLOR_CNCT    },
+ 	{ b_bits,        b_width,        b_height,    	  STATUS_COLLOR_CNCT    },
  };
 
  #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
@@ -414,15 +418,23 @@
 
     if (oia_undera)
     {
-    	DrawStatusLeft(1,STATUS_COLLOR_CNCT,(IN_E ? "B" : "A"));
+        DrawImage(drawable,
+						gc,
+						(IN_E ? 4 : 3),
+						(left+font->Width)-2,
+						vPos,
+						font->Height,
+						font->Width
+				  );
+//    	DrawStatusLeft(1,STATUS_COLLOR_CNCT,(IN_E ? "B" : "A"));
     }
 
     /* First box */
     gdk_gc_set_foreground(gc,status_cmap+STATUS_COLLOR_CONNECT_ICON);
 	gdk_draw_rectangle(	drawable,gc,
 						CONNECTED ? 1 : 0,
-						(left+(2 * font->Width))-1,vPos-(font->Height-1),font->Width,font->Height);
-	gdk_draw_text(drawable,font->fn,gc,left+(2 * font->Width),vPos,"?",1);
+						(left+(2 * font->Width)),vPos-(font->Height-1),font->Width,font->Height);
+	gdk_draw_text(drawable,font->fn,gc,left+(2 * font->Width)+1,vPos,"?",1);
 
     /* Cursor position & Insert mode */
     if(*oia_cursor) // Is cursor enabled?
