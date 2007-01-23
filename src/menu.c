@@ -2,14 +2,21 @@
  #include "g3270.h"
  #include <dlfcn.h>
 
+/*---[ Parameter structure ]--------------------------------------------------*/
+
+ typedef struct _parmdata
+ {
+ 	GtkItemFactoryEntry entry;
+ } PARMDATA;
+
 /*---[ Implement ]------------------------------------------------------------*/
 
- static void Accelerator(GtkItemFactoryEntry *itn, const char *accelerator)
+ static void Accelerator(PARMDATA *data, const char *accelerator)
  {
-    itn->accelerator = g_strdup(accelerator);
+    data->entry.accelerator = g_strdup(accelerator);
  }
 
- static void Action(GtkItemFactoryEntry *itn, const char *name)
+ static void Action(PARMDATA *data, const char *name)
  {
     int f;
 
@@ -17,7 +24,7 @@
     {
     	if(!strcmp(action_callbacks[f].name,name))
     	{
-    		itn->callback = action_callbacks[f].callback;
+    		data->entry.callback = action_callbacks[f].callback;
     		return;
     	}
     }
@@ -25,11 +32,29 @@
     Log("Invalid action code: \"%s\"",name);
  }
 
- static void Type(GtkItemFactoryEntry *itn, const char *type)
+ static void Type(PARMDATA *data, const char *type)
  {
  	char key[1024];
  	snprintf(key,1023,"<%s>",type);
-    itn->item_type = g_strdup(key);
+    data->entry.item_type = g_strdup(key);
+ }
+
+ static void InsertItem(GtkItemFactory *factory, PARMDATA *item, int *qtd)
+ {
+    if(item->entry.path)
+	{
+	   // entry.callback_action e o valor passado no segundo parametro da action.
+	   DBGPrintf("%d %s",item->entry.callback_action,item->entry.path);
+
+       gtk_item_factory_create_item(	factory,
+										(GtkItemFactoryEntry *) &item->entry,
+										0,
+										1 );
+       (*qtd)++;
+
+       g_free(item->entry.path);
+	}
+    memset(item,0,sizeof(PARMDATA));
  }
 
  int LoadMenu(const char *filename, GtkItemFactory *factory)
@@ -37,7 +62,7 @@
  	static const struct _cmd
  	{
  		const char *key;
- 		void (*exec)(GtkItemFactoryEntry *, const char *);
+ 		void (*exec)(PARMDATA *, const char *);
  	} cmd[] =
  	{
  		{ "Accelerator",	Accelerator },
@@ -53,7 +78,7 @@
     unsigned char		*ln;
     int					f;
 
-    GtkItemFactoryEntry	item;
+    PARMDATA			item;
 
     memset(&item,0,sizeof(item));
 
@@ -66,21 +91,10 @@
 
     	if(*buffer == '/')
     	{
-    		if(item.path)
-    		{
-               gtk_item_factory_create_item(	factory,
-												(GtkItemFactoryEntry *) &item,
-												0,
-												1 );
-               qtd++;
-               g_free(item.path);
-    		}
-
-            memset(&item,0,sizeof(item));
-    		item.path = g_strdup((char *) buffer);
-
+           InsertItem(factory, &item, &qtd);
+		   item.entry.path = g_strdup((char *) buffer);
     	}
-    	else if(item.path && *ln && *ln != '#')
+    	else if(item.entry.path && *ln && *ln != '#')
     	{
 		   ptr = (unsigned char *) strchr((char *) ln,'=');
 		   if(ptr)
@@ -95,15 +109,8 @@
     	}
     }
 
-	if(item.path)
-	{
-       gtk_item_factory_create_item(	factory,
-										(GtkItemFactoryEntry *) &item,
-										0,
-										1 );
-	   qtd++;
-       g_free(item.path);
-	}
+	if(item.entry.path)
+       InsertItem(factory, &item, &qtd);
 
     fclose(arq);
 

@@ -43,6 +43,8 @@
 
  	struct user_config config;
 
+    DBGPrintf("Widget: %p Data: %d",w,(int) data);
+
  	action_disconnect(0,0);
  	Log("Exiting");
 
