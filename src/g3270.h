@@ -206,6 +206,7 @@
  void action_paste(GtkWidget *w, gpointer data);
 
  void action_exec_with_selection(GtkWidget *w, gpointer data);
+ void action_exec_with_copy(GtkWidget *w, gpointer data);
 
  void action_BackTab(GtkWidget *w, gpointer data);
 

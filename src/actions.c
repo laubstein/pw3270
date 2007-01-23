@@ -16,6 +16,7 @@
 	{ "print",					action_print				},
 	{ "print_selection",		action_print_selection		},
 	{ "exec_with_selection",	action_exec_with_selection	},
+	{ "exec_with_copy",			action_exec_with_copy		},
 	{ "print_copy",				action_print_copy			},
 	{ "exit",					action_exit					},
 	{ "copy",					action_copy					},
