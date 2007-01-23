@@ -17,6 +17,7 @@
 	{ "print_selection",		action_print_selection		},
 	{ "exec_with_selection",	action_exec_with_selection	},
 	{ "exec_with_copy",			action_exec_with_copy		},
+	{ "exec_with_screen",		action_exec_with_screen		},
 	{ "print_copy",				action_print_copy			},
 	{ "exit",					action_exit					},
 	{ "copy",					action_copy					},
@@ -320,9 +321,10 @@
     action_internal(EraseInput_action, IA_DEFAULT, CN, CN);
  }
 
- void action_print(GtkWidget *w, gpointer data)
+ static gpointer exec_with_screen_thread(gpointer cmd)
  {
  	char 			filename[1024];
+ 	char			buffer[1024];
  	int				rows;
  	int				cols;
  	int				row;
@@ -354,14 +356,36 @@
           }
        }
        fclose(arq);
-       PrintTemporaryFile(filename);
+
+	   snprintf(buffer,1023,cmd,filename);
+	   DBGMessage(buffer);
+       system(buffer);
+       remove(filename);
+
  	}
  	else
  	{
  		Error("Unable to open \"%s\" for writing",filename);
  	}
-
+    return 0;
  }
+
+ void action_exec_with_screen(GtkWidget *w, gpointer data)
+ {
+#if GTK == 2
+    GThread   *thd = 0;
+    thd =  g_thread_create( exec_with_screen_thread, (gpointer) data, 0, NULL);
+#else
+    pthread_t  thd = 0;
+    pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_screen_thread, data);
+#endif
+ }
+
+ void action_print(GtkWidget *w, gpointer data)
+ {
+    action_exec_with_screen(w,data ? data : "kprinter --nodialog -t " TARGET " %s");
+ }
+
 
  void action_F7(GtkWidget *w, gpointer data)
  {
