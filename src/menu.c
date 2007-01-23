@@ -7,6 +7,7 @@
  typedef struct _parmdata
  {
  	GtkItemFactoryEntry entry;
+ 	char parm[1024];
  } PARMDATA;
 
 /*---[ Implement ]------------------------------------------------------------*/
@@ -39,17 +40,55 @@
     data->entry.item_type = g_strdup(key);
  }
 
+ static void Parm(PARMDATA *data, const char *parm)
+ {
+ 	strncpy(data->parm,parm,1023);
+ }
+
+ static void ReleaseString(gpointer string)
+ {
+ 	if(string)
+ 	{
+ 		DBGPrintf("Releasing \"%s\"",(char *) string);
+ 		g_free(string);
+ 	}
+ }
+
  static void InsertItem(GtkItemFactory *factory, PARMDATA *item, int *qtd)
  {
     if(item->entry.path)
 	{
-	   // entry.callback_action e o valor passado no segundo parametro da action.
-	   DBGPrintf("%d %s",item->entry.callback_action,item->entry.path);
+	   if(*item->parm)
+	   {
+	      item->entry.callback_action = (guint) g_strdup((char *) item->parm);
+	   }
+	   else
+	   {
+          item->entry.callback_action = 0;
+	   }
+
+	   DBGPrintf("%p %s",(void *) item->entry.callback_action,item->entry.path);
 
        gtk_item_factory_create_item(	factory,
 										(GtkItemFactoryEntry *) &item->entry,
 										0,
 										1 );
+
+       if(item->entry.callback_action)
+       {
+	      GObject *obj = (GObject *) gtk_item_factory_get_widget_by_action(factory,item->entry.callback_action);
+
+	      if(!obj)
+	      {
+		     Log("Error locating widget for \"%s\"",item->entry.path);
+	      }
+	      else
+	      {
+	      	g_object_set_data_full(obj,"g3270.parameter",(gpointer) item->entry.callback_action,ReleaseString);
+	      }
+
+       }
+
        (*qtd)++;
 
        g_free(item->entry.path);
@@ -67,7 +106,9 @@
  	{
  		{ "Accelerator",	Accelerator },
  		{ "Action",			Action		},
- 		{ "Type",			Type		}
+ 		{ "Type",			Type		},
+ 		{ "Script",			Parm		},
+ 		{ "Command",		Parm		}
  	};
 
  	unsigned char		buffer[1024];
@@ -77,8 +118,9 @@
     unsigned char		*ptr;
     unsigned char		*ln;
     int					f;
-
     PARMDATA			item;
+
+    DBGMessage(filename);
 
     memset(&item,0,sizeof(item));
 
