@@ -276,14 +276,15 @@
 #endif
  }
 
- void action_print_copy(GtkWidget *w, gpointer data)
+ static gpointer exec_with_copy_thread(gpointer cmd)
  {
  	char 			filename[1024];
+ 	char			buffer[1024];
  	FILE			*arq;
  	int				fd;
 
     if(!Clipboard)
-       return;
+       return 0;
 
     snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,TARGET);
     fd = mkstemp(filename);
@@ -295,15 +296,32 @@
  	{
 	   fprintf(arq,"%s\n",Clipboard);
        fclose(arq);
-       PrintTemporaryFile(filename);
+
+	   snprintf(buffer,1023,cmd,filename);
+	   DBGMessage(buffer);
+       system(buffer);
+       remove(filename);
  	}
  	else
  	{
  		Error("Unable to open \"%s\" for writing",filename);
  	}
-
+    return 0;
  }
 
+ void action_exec_with_copy(GtkWidget *w, gpointer data)
+ {
+#if GTK == 2
+    GThread   *thd = 0;
+    thd =  g_thread_create( exec_with_copy_thread, (gpointer) data, 0, NULL);
+#else
+    pthread_t  thd = 0;
+    pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_copy_thread, data);
+#endif
+ }
 
-
+ void action_print_copy(GtkWidget *w, gpointer data)
+ {
+    action_exec_with_copy(w,data ? data : "kprinter --nodialog -t " TARGET " %s");
+ }
 
