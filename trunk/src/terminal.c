@@ -1000,7 +1000,7 @@
 
  }
 
- void action_print_selection(GtkWidget *w, gpointer data)
+ static gpointer exec_with_selection_thread(gpointer cmd)
  {
  	int				rows;
  	int				cols;
@@ -1025,10 +1025,13 @@
  	char 			filename[1024];
  	FILE			*arq;
 
+ 	if(!cmd)
+ 	   return 0;
+
  	screen = Get3270DeviceBuffer(&rows, &cols);
 
  	if(bCol < 0 || bRow < 0)
- 	   return;
+ 	   return 0;
 
     snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,TARGET);
     fd = mkstemp(filename);
@@ -1062,13 +1065,36 @@
        }
 
        fclose(arq);
-       PrintTemporaryFile(filename);
+
+	   snprintf(buffer,1023,cmd,filename);
+	   DBGMessage(buffer);
+       system(buffer);
+
+       remove(filename);
+
  	}
  	else
  	{
  		Error("Unable to open \"%s\" for writing",filename);
  	}
 
+	return 0;
+ }
+
+ void action_exec_with_selection(GtkWidget *w, gpointer data)
+ {
+#if GTK == 2
+    GThread   *thd = 0;
+    thd =  g_thread_create( exec_with_selection_thread, (gpointer) data, 0, NULL);
+#else
+    pthread_t  thd = 0;
+    pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_selection_thread, data);
+#endif
+ }
+
+ void action_print_selection(GtkWidget *w, gpointer data)
+ {
+    action_exec_with_selection(w,data ? data : "kprinter --nodialog -t " TARGET " %s");
  }
 
  void RedrawTerminalContents(void)

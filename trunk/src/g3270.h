@@ -204,6 +204,9 @@
  void action_exit(GtkWidget *w, gpointer data);
  void action_clear(GtkWidget *w, gpointer data);
  void action_paste(GtkWidget *w, gpointer data);
+
+ void action_exec_with_selection(GtkWidget *w, gpointer data);
+
  void action_BackTab(GtkWidget *w, gpointer data);
 
  void action_F7(GtkWidget *w, gpointer data);
