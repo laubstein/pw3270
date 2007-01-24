@@ -251,6 +251,7 @@
  void action_DeleteField(GtkWidget *w, gpointer data);
 
  void action_Redraw(GtkWidget *w, gpointer data);
+ void action_AboutBox(GtkWidget *w, gpointer data);
 
  void ParseInput(const gchar *string);
 
