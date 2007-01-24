@@ -541,12 +541,13 @@
  	CHKPoint();
 
  	gtk_show_about_dialog(	GTK_WINDOW(top_window),
-							"name",    "g3270",
-							"authors", authors,
-							"license", license,
-							"comments",_("3270 Terminal emulator for Gnome/GTK."),
+							"name",    	"g3270",
+							"authors", 	authors,
+							"license", 	license,
+							"logo",		icon,
+							"comments",	_("3270 Terminal emulator for Gnome/GTK."),
 #ifdef VERSION
-							"version", VERSION,
+							"version", 	VERSION,
 #endif
 							NULL
 						);

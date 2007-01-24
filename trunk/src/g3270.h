@@ -119,6 +119,10 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
+#if defined(DATADIR) && GTK == 2
+ extern GdkPixbuf	*icon;
+#endif
+
  extern const 	SCREEN_CALLBACK g3270_screen_callbacks;
  extern const 	KEYBOARD_INFO   g3270_keyboard_info;
 
