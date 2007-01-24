@@ -1,5 +1,6 @@
 
  #include <gdk/gdkkeysyms.h>
+ #include <glib/gi18n.h>
  #include "g3270.h"
 
  #include "lib/hostc.h"
@@ -9,11 +10,13 @@
  #include "lib/tablesc.h"
  #include "lib/screenc.h"
 
+
 /*---[ Callback table ]-------------------------------------------------------*/
 
  const struct action_callback action_callbacks[] =
  {
 	{ "print",					action_print				},
+	{ "about",					action_AboutBox				},
 	{ "print_selection",		action_print_selection		},
 	{ "exec_with_selection",	action_exec_with_selection	},
 	{ "exec_with_copy",			action_exec_with_copy		},
@@ -515,6 +518,56 @@
  	CHKPoint();
     action_internal(DeleteField_action, IA_DEFAULT, CN, CN);
  }
+
+ void action_AboutBox(GtkWidget *w, gpointer data)
+ {
+ 	static const char *authors[] = {	"Paul Mattes <Paul.Mattes@usa.net>",
+										"Perry Werneck <perry.werneck@gmail.com>",
+										NULL};
+
+	static const char license[] = "This program is free software; you can redistribute it and/or\n"
+		"modify it under the terms of the GNU General Public License as\n"
+ 		"published by the Free Software Foundation; either version 2 of the\n"
+		"License, or (at your option) any later version.\n\n"
+		"This program is distributed in the hope that it will be useful,\n"
+		"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+		"GNU General Public License for more details.\n\n"
+		"You should have received a copy of the GNU General Public License\n"
+		"along with this program; if not, write to the Free Software\n"
+		"Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02111-1307\n"
+		"USA";
+
+ 	CHKPoint();
+
+ 	gtk_show_about_dialog(	GTK_WINDOW(top_window),
+							"name",    "g3270",
+							"authors", authors,
+							"license", license,
+							"comments",_("3270 Terminal emulator for Gnome/GTK."),
+#ifdef VERSION
+							"version", VERSION,
+#endif
+							NULL
+						);
+/*
+gtk_show_about_dialog (NULL,
+					"name", "GChemPaint",
+					"authors", authors,
+					"artists", artists,
+					"comments", _("GChemPaint is a 2D chemical structures editor for Gnome"),
+					"copyright", _("(C) 2001-2005 by Jean Bréfort"),
+					"license", license,
+					"logo", pixbuf,
+					"icon-name", "gchempaint",
+					"translator_credits", strcmp (translator_credits, "translator_credits") != 0 ?
+											(const char *)translator_credits : NULL,
+					"version", VERSION,
+					"website", "http://www.nongnu.org/gchempaint",
+					NULL);
+*/
+ }
+
 
 /*
  void action_(GtkWidget *w, gpointer data)

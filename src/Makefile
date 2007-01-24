@@ -45,6 +45,10 @@ ifdef QUIET_MODE
    QFLAGS=-DQUIET_MODE=$(QUIET_MODE)
 endif
 
+ifdef VERSION
+   VFLAGS=-DVERSION=\"$(VERSION)\"
+endif
+
 PKG_MODULES=$(GTK_MODULES)
 
 
@@ -55,7 +59,7 @@ GCFLAGS     = -c `pkg-config --cflags $(PKG_MODULES)` \
               -DTARGET=\"$(TARGET)\" $(DFLAGS) $(QFLAGS) \
               -DGTK=$(GTK) -DGTKVERSION=\"$(GTK_VRS)\" \
               -DTMPPATH=\"$(TMPPATH)\" -DLOGPATH=\"$(LOGPATH)\" \
-              -DDATADIR=\"$(DATADIR)\"
+              -DDATADIR=\"$(DATADIR)\" $(VFLAGS)
 
 GLFLAGS     = `pkg-config --libs $(PKG_MODULES)` -L. -l3270
 
