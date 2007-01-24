@@ -1,6 +1,6 @@
 
  #include <gdk/gdkkeysyms.h>
- #include <glib/gi18n.h>
+
  #include "g3270.h"
 
  #include "lib/hostc.h"
@@ -10,6 +10,11 @@
  #include "lib/tablesc.h"
  #include "lib/screenc.h"
 
+ #ifdef __GTK_ABOUT_DIALOG_H__
+    #include <glib/gi18n.h>
+ #endif
+
+ 
 
 /*---[ Callback table ]-------------------------------------------------------*/
 
@@ -521,6 +526,9 @@
 
  void action_AboutBox(GtkWidget *w, gpointer data)
  {
+
+ #ifdef __GTK_ABOUT_DIALOG_H__
+
  	static const char *authors[] = {	"Paul Mattes <Paul.Mattes@usa.net>",
 										"Perry Werneck <perry.werneck@gmail.com>",
 										NULL};
@@ -567,6 +575,8 @@ gtk_show_about_dialog (NULL,
 					"website", "http://www.nongnu.org/gchempaint",
 					NULL);
 */
+#endif
+
  }
 
 
