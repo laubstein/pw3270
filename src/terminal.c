@@ -349,11 +349,27 @@
 
  static gboolean double_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
+    long cRow;
+    long cCol;
+    int  rows;
+    int  cols;
+    int  baddr;
+
     DBGPrintf("Button %d double-click at %ld,%ld", event->button,(unsigned long) event->x, (unsigned long) event->y);
 
     switch(event->button)
     {
     case 1:
+       Mouse2Terminal((long) event->x, (long) event->y, &cRow, &cCol);
+       if(Get3270DeviceBuffer(&rows, &cols))
+       {
+          baddr = find_field_attribute((cRow * cols) + cCol);
+          if(baddr > 0)
+          {
+             DBGPrintf("Field por position %ldx%ld: %d",cRow,cCol,baddr);
+
+          }
+       }
        break;
 
 	case 3:
