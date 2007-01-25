@@ -6,7 +6,9 @@
  #ifdef GI18N
    #include <glib/gi18n.h>
  #else
-   #define _(String) String
+   #include <libintl.h>
+   #include <locale.h>
+   #define _(String) gettext(String)
  #endif
 
  #include "lib/globals.h"
