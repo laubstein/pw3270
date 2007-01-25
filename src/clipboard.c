@@ -204,11 +204,32 @@
  {
 #if GTK == 2
     GThread   *thd = 0;
-    thd =  g_thread_create( exec_with_copy_thread, (gpointer) data, 0, NULL);
 #else
     pthread_t  thd = 0;
+#endif
+
+	if(!Clipboard)
+	{
+       GtkWidget *widget = gtk_message_dialog_new(
+					    GTK_WINDOW(top_window),
+                        GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
+                        GTK_MESSAGE_WARNING,
+                        GTK_BUTTONS_OK,
+                        _( "Não existe cópia armazenada" ) );
+
+       gtk_dialog_run(GTK_DIALOG(widget));
+       gtk_widget_destroy (widget);
+
+       return;
+
+	}
+
+#if GTK == 2
+    thd =  g_thread_create( exec_with_copy_thread, (gpointer) data, 0, NULL);
+#else
     pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_copy_thread, data);
 #endif
+
  }
 
  void action_print_copy(GtkWidget *w, gpointer data)

@@ -317,7 +317,7 @@
 						GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
                         rc ? GTK_MESSAGE_ERROR : GTK_MESSAGE_WARNING,
                         rc ? GTK_BUTTONS_CLOSE : GTK_BUTTONS_OK,
-                        string );
+                        _( string ) );
 
     gtk_dialog_run(GTK_DIALOG(widget));
 
