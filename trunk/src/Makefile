@@ -1,4 +1,6 @@
 
+include gtk.mk
+
 TARGET		= g3270
 OBJECTS     = main.o log.o terminal.o screen_callbacks.o gsource.o actions.o \
 				clipboard.o draw.o print.o menu.o
@@ -49,6 +51,10 @@ ifdef VERSION
    VFLAGS=-DVERSION=\"$(VERSION)\"
 endif
 
+ifdef GI18N
+   I18N=-DGI18N=\"$(GI18N)\"
+endif
+
 PKG_MODULES=$(GTK_MODULES)
 
 
@@ -59,7 +65,7 @@ GCFLAGS     = -c `pkg-config --cflags $(PKG_MODULES)` \
               -DTARGET=\"$(TARGET)\" $(DFLAGS) $(QFLAGS) \
               -DGTK=$(GTK) -DGTKVERSION=\"$(GTK_VRS)\" \
               -DTMPPATH=\"$(TMPPATH)\" -DLOGPATH=\"$(LOGPATH)\" \
-              -DDATADIR=\"$(DATADIR)\" $(VFLAGS)
+              -DDATADIR=\"$(DATADIR)\" $(VFLAGS) $(I18N)
 
 GLFLAGS     = `pkg-config --libs $(PKG_MODULES)` -L. -l3270
 
@@ -80,7 +86,7 @@ endif
 
 %.o: %.c *.h Makefile *.bm
 	@echo $< ...
-	@gcc $(GCFLAGS) -o $@ -c $<
+	gcc $(GCFLAGS) -o $@ -c $<
 
 #---[ Targets ]----------------------------------------------------------------#
 

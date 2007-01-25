@@ -1031,7 +1031,21 @@
  	screen = Get3270DeviceBuffer(&rows, &cols);
 
  	if(bCol < 0 || bRow < 0)
+ 	{
+       gdk_threads_enter();
+
+       GtkWidget *widget = gtk_message_dialog_new(
+					    GTK_WINDOW(top_window),
+                        GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
+                        GTK_MESSAGE_WARNING,
+                        GTK_BUTTONS_OK,
+                        _( "Selecione algum texto antes" ) );
+
+       gtk_dialog_run(GTK_DIALOG(widget));
+       gtk_widget_destroy (widget);
+       gdk_threads_leave();
  	   return 0;
+ 	}
 
     snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,TARGET);
     fd = mkstemp(filename);

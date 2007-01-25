@@ -10,18 +10,14 @@
  #include "lib/tablesc.h"
  #include "lib/screenc.h"
 
- #ifdef __GTK_ABOUT_DIALOG_H__
-    #include <glib/gi18n.h>
- #endif
-
- 
-
 /*---[ Callback table ]-------------------------------------------------------*/
 
  const struct action_callback action_callbacks[] =
  {
 	{ "print",					action_print				},
+#ifdef __GTK_ABOUT_DIALOG_H__
 	{ "about",					action_AboutBox				},
+#endif
 	{ "print_selection",		action_print_selection		},
 	{ "exec_with_selection",	action_exec_with_selection	},
 	{ "exec_with_copy",			action_exec_with_copy		},
@@ -578,7 +574,6 @@ gtk_show_about_dialog (NULL,
 #endif
 
  }
-
 
 /*
  void action_(GtkWidget *w, gpointer data)

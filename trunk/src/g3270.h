@@ -3,6 +3,11 @@
 
  #include <gtk/gtk.h>
 
+ #ifdef GI18N
+   #include <glib/gi18n.h>
+ #else
+   #define _(String) String
+ #endif
 
  #include "lib/globals.h"
  #include "lib/appres.h"
