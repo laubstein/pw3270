@@ -2739,6 +2739,21 @@ xim_lookup(XKeyEvent *event)
 
 
 /*
+ * Insert an string from keyboard
+ *
+ */
+void Input_String(const unsigned char *str)
+{
+	reset_idle_timer();
+
+	while(*str)
+	{
+		key_ACharacter((unsigned char)((*str) & 0xff), KT_STD, IA_KEY);
+		str++;
+	}
+}
+
+/*
  * Key action.
  */
 void

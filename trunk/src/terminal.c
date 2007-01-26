@@ -84,7 +84,6 @@
  gboolean			mouse_click								= 0;
 
 
-
 #ifdef USE_GTKIMCONTEXT
  /* Input context for dead key support */
  // http://developer.gnome.org/doc/API/2.0/gtk/GtkIMContext.html
