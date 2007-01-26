@@ -177,9 +177,9 @@
  	{ locked_bits,   locked_width,   locked_height,   STATUS_COLOR_SSL 		},
  	{ unlocked_bits, unlocked_width, unlocked_height, STATUS_COLOR_SSL 		},
  	{ shift_bits,    shift_width,    shift_height,    STATUS_COLOR_KEYBOARD },
- 	{ a_bits,        a_width,        a_height,    	  STATUS_COLLOR_CNCT    },
- 	{ b_bits,        b_width,        b_height,    	  STATUS_COLLOR_CNCT    },
- 	{ four_bits,     four_width,     four_height,  	  STATUS_COLLOR_CNCT    },
+ 	{ a_bits,        a_width,        a_height,    	  STATUS_COLOR_CNCT     },
+ 	{ b_bits,        b_width,        b_height,    	  STATUS_COLOR_CNCT     },
+ 	{ four_bits,     four_width,     four_height,  	  STATUS_COLOR_CNCT     },
  };
 
  #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
@@ -429,12 +429,11 @@
 						font->Height,
 						font->Width
 				  );
-//    	DrawStatusLeft(1,STATUS_COLLOR_CNCT,(IN_E ? "B" : "A"));
     }
 
     DrawImage(drawable,gc,5,left,vPos,font->Height,font->Width);
 
-    gdk_gc_set_foreground(gc,status_cmap+STATUS_COLLOR_CONNECT_ICON);
+    gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_CONNECT_ICON);
 	gdk_draw_rectangle(	drawable,gc,
 						CONNECTED ? 1 : 0,
 						(left+(2 * font->Width)+4),vPos-(font->Height-1),font->Width+1,font->Height);
@@ -452,6 +451,9 @@
           DrawStatusRight(29,STATUS_COLOR_TOOGLE,"I");
        }
     }
+
+    /* Typeahead indicator */
+    DrawStatusRight(33,STATUS_COLOR_TYPEAHEAD,oia_Typeahead);
 
     /* LU Name */
     DrawStatusRight(25,STATUS_COLOR_LUNAME,oia_LUName);
