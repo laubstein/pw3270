@@ -347,13 +347,33 @@
  	return 0;
  }
 
+ static void Check4Function(const char *field)
+ {
+ 	const char *ptr;
+ 	char ks[6];
+
+ 	for(ptr = field;*ptr;ptr++)
+ 	{
+ 		if(!isdigit(*ptr))
+ 		   return;
+ 	}
+
+    snprintf(ks,5,"%d",atoi(field));
+    DBGPrintf("Function: %s",ks);
+    action_internal(PF_action, IA_DEFAULT, ks, CN);
+
+ }
+
  static gboolean double_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
-    long cRow;
-    long cCol;
-    int  rows;
-    int  cols;
-    int  baddr;
+    long 			cRow;
+    long 			cCol;
+    int  			rows;
+    int  			cols;
+    int  			baddr;
+    const struct ea *trm;
+    char			buffer[10];
+    int				f;
 
     DBGPrintf("Button %d double-click at %ld,%ld", event->button,(unsigned long) event->x, (unsigned long) event->y);
 
@@ -361,13 +381,25 @@
     {
     case 1:
        Mouse2Terminal((long) event->x, (long) event->y, &cRow, &cCol);
-       if(Get3270DeviceBuffer(&rows, &cols))
+       trm = Get3270DeviceBuffer(&rows, &cols);
+
+       if(trm)
        {
           baddr = find_field_attribute((cRow * cols) + cCol);
           if(baddr > 0)
           {
              DBGPrintf("Field por position %ldx%ld: %d",cRow,cCol,baddr);
+			 baddr++;
+             for(f=0;f<10 && !trm[baddr].fa;f++)
+             	buffer[f] =  ebc2asc[trm[baddr++].cc];
 
+			 DBGTrace(f);
+             if(f < 10)
+             {
+             	buffer[f] = 0;
+             	if(*buffer == 'F')
+             	   Check4Function(buffer+1);
+             }
           }
        }
        break;
