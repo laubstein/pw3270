@@ -137,6 +137,7 @@ extern int   Get3270CursorRow(void);
 
 extern void  stop_3270_timer(void);
 
+extern void  Input_String(const unsigned char *);
 
 #ifdef __cplusplus
  }

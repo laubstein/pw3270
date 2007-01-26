@@ -264,7 +264,13 @@
     }
 
     // NOTE (perry#1#): Is it the best way?
-    emulate_input(input, strlen(input), False);
+    Input_String((const unsigned char *) input);
+    /*
+    if(!emulate_input(input, strlen(input), False))
+    {
+    	DBGMessage("Input failed!!");
+    }
+    */
 
     g_free(input);
  }

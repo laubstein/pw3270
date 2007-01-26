@@ -306,7 +306,7 @@ static void status_twait(void)
 /* Toggle typeahead */
 static void status_typeahead(Boolean on)
 {
-	NotImplemented();
+	DBGPrintf("Typeahead: %s",on ? "Yes" : "No");
     RedrawStatusLine();
 }
 

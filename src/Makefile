@@ -1,9 +1,10 @@
 
 include gtk.mk
 
-TARGET		= g3270
-OBJECTS     = main.o log.o terminal.o screen_callbacks.o gsource.o actions.o \
-				clipboard.o draw.o print.o menu.o
+TARGET		   = g3270
+RUN_PARAMETERS = sr679600001.age6796.bb:8023
+OBJECTS        = main.o log.o terminal.o screen_callbacks.o gsource.o actions.o \
+				 clipboard.o draw.o print.o menu.o
 
 ifeq ($(DEBUG),1)
    DFLAGS=-DDEBUG=1 -g -O0
@@ -96,9 +97,9 @@ $(TARGET): lib3270.so $(OBJECTS)
 run: $(TARGET)
 	@sync
 ifdef DEBUG
-	@LD_LIBRARY_PATH=. $(DEBUG_RUN)
+	@LD_LIBRARY_PATH=. $(DEBUG_RUN) $(RUN_PARAMETERS)
 else
-	@LD_LIBRARY_PATH=. ./$(TARGET)
+	@LD_LIBRARY_PATH=. ./$(TARGET) $(RUN_PARAMETERS)
 endif
 
 lib/Makefile:
