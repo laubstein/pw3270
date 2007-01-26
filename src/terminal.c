@@ -81,6 +81,7 @@
 
  static int 		selection_row 							= -1;
  static int 		selection_col 							= -1;
+ gboolean			mouse_click								= 0;
 
 
 
@@ -380,6 +381,7 @@
     switch(event->button)
     {
     case 1:
+       mouse_click = 0;
        Mouse2Terminal((long) event->x, (long) event->y, &cRow, &cCol);
        trm = Get3270DeviceBuffer(&rows, &cols);
 
@@ -416,6 +418,7 @@
 
  static gboolean button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
+    mouse_click = 1;
 
  	switch(event->type)
  	{
@@ -440,6 +443,9 @@
  	int 	cols;
  	long	cRow;
  	long	cCol;
+
+    if(!mouse_click)
+       return 0;
 
     Get3270DeviceBuffer(&rows, &cols);
 
