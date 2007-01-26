@@ -93,12 +93,13 @@
 	STATUS_COLOR_SSL,
 	STATUS_COLOR_CONNECTED,
 	STATUS_COLOR_KEYBOARD,
-	STATUS_COLLOR_CONNECT_ICON,
+	STATUS_COLOR_CONNECT_ICON,
 
 	STATUS_COLORS	// Must be the last one
  };
 
- #define STATUS_COLLOR_CNCT STATUS_COLLOR_CONNECT_ICON
+ #define STATUS_COLOR_CNCT 		STATUS_COLOR_CONNECT_ICON
+ #define STATUS_COLOR_TYPEAHEAD STATUS_COLOR_TOOGLE
 
  #define CURSOR_TYPE_NONE	-1
 
@@ -139,6 +140,7 @@
  extern const int	 action_callback_counter;
 
  extern char					oia_undera;
+ extern char					oia_Typeahead[2];
  extern char					oia_cursor[];
  extern char					oia_LUName[];
 

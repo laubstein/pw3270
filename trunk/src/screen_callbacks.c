@@ -49,7 +49,7 @@ static void status_timing(struct timeval *t0, struct timeval *t1);
  char oia_Timet[TCNT+1]				= "";
  char oia_Timer[OIA_TIMER_COUNT+1]	= "";
  char oia_undera					= 1;
-
+ char oia_Typeahead[2] 				= " ";
 
 /*---[ 3270 Screen callback table ]-------------------------------------------*/
 
@@ -307,6 +307,7 @@ static void status_twait(void)
 static void status_typeahead(Boolean on)
 {
 	DBGPrintf("Typeahead: %s",on ? "Yes" : "No");
+	*oia_Typeahead = on ? 'T' : ' ';
     RedrawStatusLine();
 }
 
