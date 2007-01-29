@@ -10,57 +10,62 @@
  #include "lib/tablesc.h"
  #include "lib/screenc.h"
 
+/*---[ Internal actions ]-----------------------------------------------------*/
+
+ static void action_toogle(GtkWidget *w, gpointer data);
+
 /*---[ Callback table ]-------------------------------------------------------*/
 
  const struct action_callback action_callbacks[] =
  {
-	{ "print",					action_print				},
+	{ "print",					action_print					},
+	{ "toogle",					action_toogle					},
 #ifdef __GTK_ABOUT_DIALOG_H__
-	{ "about",					action_AboutBox				},
+	{ "about",					action_AboutBox					},
 #endif
-	{ "print_selection",		action_print_selection		},
-	{ "exec_with_selection",	action_exec_with_selection	},
-	{ "exec_with_copy",			action_exec_with_copy		},
-	{ "exec_with_screen",		action_exec_with_screen		},
-	{ "print_copy",				action_print_copy			},
-	{ "exit",					action_exit					},
-	{ "copy",					action_copy					},
-	{ "append",					action_append				},
-	{ "paste",					action_paste				},
-	{ "clear",					action_clear				},
-	{ "select_all",				action_select_all			},
-	{ "remove_selection",		action_remove_selection		},
-	{ "crosshair",				action_crosshair			},
-	{ "connect",				action_connect				},
-	{ "F8",						action_F7					},
-	{ "F7",						action_F8					},
-	{ "disconnect",				action_disconnect			},
-	{ "backtab",				action_BackTab				},
-	{ "tab",					action_Tab					},
-	{ "home",					action_Home					},
-	{ "eraseeof",				action_EraseEOF				},
-	{ "left",					action_Left					},
-	{ "up",						action_Up					},
-	{ "right",					action_Right				},
-	{ "down",					action_Down					},
-	{ "reset",					action_Reset				},
-	{ "delete",					action_Delete				},
-	{ "erase",					action_Erase				},
-	{ "enter",					action_Enter				},
-	{ "insert",					action_Insert				},
-	{ "redraw",					action_Redraw				},
-	{ "selectleft",				action_SelectLeft			},
-	{ "selectup",				action_SelectUp				},
-	{ "selectright",			action_SelectRight			},
-	{ "selectdown",				action_SelectDown			},
-	{ "selectionleft",			action_SelectionLeft		},
-	{ "selectionup",			action_SelectionUp			},
-	{ "selectionright",			action_SelectionRight		},
-	{ "selectiondown",			action_SelectionDown		},
-	{ "previousword",			action_PreviousWord			},
-	{ "nextword",				action_NextWord				},
-	{ "deleteword",				action_DeleteWord			},
-	{ "deletefield",			action_DeleteField			}
+	{ "print_selection",		action_print_selection			},
+	{ "exec_with_selection",	action_exec_with_selection		},
+	{ "exec_with_copy",			action_exec_with_copy			},
+	{ "exec_with_screen",		action_exec_with_screen			},
+	{ "print_copy",				action_print_copy				},
+	{ "exit",					action_exit						},
+	{ "copy",					action_copy						},
+	{ "append",					action_append					},
+	{ "paste",					action_paste					},
+	{ "clear",					action_clear					},
+	{ "select_all",				action_select_all				},
+	{ "remove_selection",		action_remove_selection			},
+	{ "crosshair",				action_crosshair				},
+	{ "connect",				action_connect					},
+	{ "F8",						action_F7						},
+	{ "F7",						action_F8						},
+	{ "disconnect",				action_disconnect				},
+	{ "backtab",				action_BackTab					},
+	{ "tab",					action_Tab						},
+	{ "home",					action_Home						},
+	{ "eraseeof",				action_EraseEOF					},
+	{ "left",					action_Left						},
+	{ "up",						action_Up						},
+	{ "right",					action_Right					},
+	{ "down",					action_Down						},
+	{ "reset",					action_Reset					},
+	{ "delete",					action_Delete					},
+	{ "erase",					action_Erase					},
+	{ "enter",					action_Enter					},
+	{ "insert",					action_Insert					},
+	{ "redraw",					action_Redraw					},
+	{ "selectleft",				action_SelectLeft				},
+	{ "selectup",				action_SelectUp					},
+	{ "selectright",			action_SelectRight				},
+	{ "selectdown",				action_SelectDown				},
+	{ "selectionleft",			action_SelectionLeft			},
+	{ "selectionup",			action_SelectionUp				},
+	{ "selectionright",			action_SelectionRight			},
+	{ "selectiondown",			action_SelectionDown			},
+	{ "previousword",			action_PreviousWord				},
+	{ "nextword",				action_NextWord					},
+	{ "deleteword",				action_DeleteWord				},
+	{ "deletefield",			action_DeleteField				}
 
  };
 
@@ -581,12 +586,11 @@ gtk_show_about_dialog (NULL,
 
  }
 
-/*
- void action_(GtkWidget *w, gpointer data)
+ static void action_toogle(GtkWidget *w, gpointer data)
  {
- 	CHKPoint();
-    action_internal(_action, IA_DEFAULT, CN, CN);
- }
-*/
+ 	if(!data)
+ 	   return;
 
+ 	DBGPrintf("Toogle \"%s\" using widget %p",(char *) data,w);
+ }
 

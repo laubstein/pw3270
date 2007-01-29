@@ -108,7 +108,8 @@
  		{ "Action",			Action		},
  		{ "Type",			Type		},
  		{ "Script",			Parm		},
- 		{ "Command",		Parm		}
+ 		{ "Command",		Parm		},
+ 		{ "Option",			Parm		}
  	};
 
  	unsigned char		buffer[1024];

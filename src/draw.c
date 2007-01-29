@@ -535,22 +535,13 @@
 		   {
 		   	   current_status = sts = (status+f);
 			   DBGPrintf("Status:\t%s",current_status->dbg);
+			   SetMousePointer(sts->cursor);
+               RedrawStatusLine();
 			   return;
 		   }
 	   }
-	   if(sts)
-	   {
-	      // Ajusta a janela de acordo com o status corrente
-	      if(terminal && terminal->window && sts->cursor)
-	         gdk_window_set_cursor(terminal->window,sts->cursor);
-	   }
-	   else
-	   {
-	      Log("Unexpected status code %d from 3270 library",code);
-	   }
+       Log("Unexpected status code %d from 3270 library",code);
 	}
-
-    RedrawStatusLine();
 
  }
 

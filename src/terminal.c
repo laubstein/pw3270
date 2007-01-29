@@ -49,25 +49,24 @@
 
  #define FONT_COUNT fontCount
 
- static FONTELEMENT *font									= 0;
- static int			top_margin								= 0;
- static int 		left_margin								= 0;
+ FONTELEMENT 		*font									= 0;
+ int				top_margin								= 0;
+ int 				left_margin								= 0;
 
  GdkColor			*terminal_cmap							= 0;
  int				terminal_color_count					= 0;
-
- static int			line_spacing							= MIN_LINE_SPACING;
+ int				line_spacing							= MIN_LINE_SPACING;
 
  static int			fromRow									= -1;
  static int			fromCol									= -1;
  static int			toRow									= -1;
  static int			toCol									= -1;
 
- static long		xFrom									= -1;
- static long		yFrom									= -1;
- static long		xTo										= -1;
- static long		yTo										= -1;
- static int			MouseMode								= MOUSE_MODE_NORMAL;
+// static long		xFrom									= -1;
+// static long		yFrom									= -1;
+// static long		xTo										= -1;
+// static long		yTo										= -1;
+// static int			MouseMode								= MOUSE_MODE_NORMAL;
 
  static int			cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
  static gboolean    cursor_enabled							= TRUE;
@@ -79,9 +78,9 @@
  gboolean			reconnect								= TRUE;
  int				reconnect_retry							= 0;
 
- static int 		selection_row 							= -1;
- static int 		selection_col 							= -1;
- gboolean			mouse_click								= 0;
+// static int 		selection_row 							= -1;
+// static int 		selection_col 							= -1;
+// gboolean			mouse_click								= 0;
 
 
 #ifdef USE_GTKIMCONTEXT
@@ -177,14 +176,15 @@
  	DBGPrintf("Exiting: %s", ignored ? "Yes" : "No");
  }
 
- static gboolean Mouse2Terminal(long x, long y, long *cRow, long *cCol)
+/*
+ gboolean Mouse2Terminal(long x, long y, long *cRow, long *cCol)
  {
  	int 	rows;
  	int 	cols;
 
     Get3270DeviceBuffer(&rows, &cols);
 
-    /* Convert mouse coordinates into cursor coordinates */
+    // Convert mouse coordinates into cursor coordinates
 
     if((x < left_margin) || (y < top_margin) )
     {
@@ -208,7 +208,9 @@
 
     return TRUE;
  }
+ */
 
+/*
  static int CheckForCopy(void)
  {
     if( !(MouseMode & MOUSE_MODE_CLIPBOARD))
@@ -224,6 +226,7 @@
 
     return 1;
  }
+ */
 
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
@@ -233,8 +236,8 @@
     int		rows;
     int		cols;
     GdkGC	*gc		= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
-    int		x[2];
-    int		y[2];
+//    int		x[2];
+//    int		y[2];
     int		vPos = (top_margin + font->Height);
     gint 	width;
     gint 	height;
@@ -251,7 +254,9 @@
     gdk_gc_set_foreground(gc,terminal_cmap);
     gdk_draw_rectangle(widget->window,gc,1,0,0,width,height);
 
-    /* Check for selection box */
+    DrawSelectionBox(widget->window,gc);
+
+    /* Check for selection box
     if(fromRow >= 0 && toRow > 0)
     {
        x[0] = (min(fromCol,toCol) * font->Width) + left_margin;
@@ -267,6 +272,7 @@
        gdk_draw_rectangle(widget->window,gc,0,x[0],y[0],x[1]-x[0],y[1]-y[0]);
 
     }
+    */
 
     // TODO (perry#2#): Draw to a pixmap and paint here the contents.
     if(!cursor_enabled)
@@ -312,6 +318,7 @@
     return 0;
  }
 
+/*
  static gboolean single_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
  	long	cRow;
@@ -346,7 +353,9 @@
 
  	return 0;
  }
+*/
 
+/*
  static void Check4Function(const char *field)
  {
  	const char *ptr;
@@ -363,7 +372,9 @@
     action_internal(PF_action, IA_DEFAULT, ks, CN);
 
  }
+*/
 
+/*
  static gboolean double_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
     long 			cRow;
@@ -414,27 +425,9 @@
 
  	return 0;
  }
+*/
 
- static gboolean button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
- {
-    mouse_click = 1;
-
- 	switch(event->type)
- 	{
-	case GDK_BUTTON_PRESS:
-	   return single_click(widget,event,user_data);
-
-	case GDK_2BUTTON_PRESS:
-	   return double_click(widget,event,user_data);
-
-	default:
-	   return 0;
-
- 	}
- 	return 0;
- }
-
-
+/*
  static gboolean button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
     // http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-button-press-event
@@ -470,7 +463,9 @@
 
     return 0;
  }
+*/
 
+/*
  static gboolean motion_notify(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
  {
  	long	cRow;
@@ -496,7 +491,9 @@
 
  	return 0;
  }
+*/
 
+/*
 #if GTK == 2
 
  static gboolean scroll_event(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
@@ -516,6 +513,7 @@
  }
 
 #endif
+*/
 
  static void SetFont(GtkWidget *widget, FONTELEMENT *fn, int width, int height)
  {
@@ -590,6 +588,7 @@
  {
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventConfigure
     configure_terminal(widget,event->width,event->height);
+    ConfigureSelectionBox();
  }
 
  static void realize(GtkWidget *widget, void *t)
@@ -598,6 +597,7 @@
     gtk_im_context_set_client_window(im,widget->window);
 #endif
     LoadImages(widget->window,widget->style->fg_gc[GTK_WIDGET_STATE(widget)]);
+    LoadMousePointers(widget->window,widget->style->fg_gc[GTK_WIDGET_STATE(widget)]);
  }
 
  static gboolean focus_in_event(GtkWidget *widget, GdkEventFocus *event, gpointer x)
@@ -897,9 +897,6 @@
     g_signal_connect(G_OBJECT(ret), "expose_event",  		G_CALLBACK(expose),		  		0);
     g_signal_connect(G_OBJECT(ret), "key-press-event",		G_CALLBACK(key_press_event),	0);
     g_signal_connect(G_OBJECT(ret), "key-release-event",	G_CALLBACK(key_release_event),	0);
-    g_signal_connect(G_OBJECT(ret), "button-press-event",	G_CALLBACK(button_press),		0);
-    g_signal_connect(G_OBJECT(ret), "button-release-event",	G_CALLBACK(button_release),		0);
-    g_signal_connect(G_OBJECT(ret), "motion-notify-event",	G_CALLBACK(motion_notify),		0);
     g_signal_connect(G_OBJECT(ret), "configure-event",		G_CALLBACK(configure_event), 	0);
     g_signal_connect(G_OBJECT(ret), "realize",				G_CALLBACK(realize), 			0);
     g_signal_connect(G_OBJECT(ret), "focus-in-event",		G_CALLBACK(focus_in_event), 	0);
@@ -909,8 +906,13 @@
     g_signal_connect(G_OBJECT(im), "commit",				G_CALLBACK(im_commit), 			0);
 #endif
 
+    // Connect mouse events
+    g_signal_connect(G_OBJECT(ret), "button-press-event",	G_CALLBACK(mouse_button_press),		0);
+    g_signal_connect(G_OBJECT(ret), "button-release-event",	G_CALLBACK(mouse_button_release),	0);
+    g_signal_connect(G_OBJECT(ret), "motion-notify-event",	G_CALLBACK(mouse_motion),			0);
+
 #if GTK == 2
-    g_signal_connect(G_OBJECT(ret), "scroll-event",			G_CALLBACK(scroll_event),		0);
+    g_signal_connect(G_OBJECT(ret), "scroll-event",			G_CALLBACK(mouse_scroll),		0);
 #endif
 
     /* Load terminal colors */
@@ -1024,32 +1026,6 @@
     DBGMessage("Append to clipboard");
 
     AppendToClipboard(fromRow,fromCol,toRow,toCol);
-
- }
-
- void action_remove_selection(GtkWidget *w, gpointer data)
- {
-    CheckForCopy();
-
-    toCol         =
-    fromCol       =
-    toRow	      =
-    selection_row =
-    selection_col =
-    fromRow       = -1;
-
-    MouseMode = MOUSE_MODE_NORMAL;
-
-    gtk_widget_queue_draw(terminal);
-
- }
-
- void action_select_all( GtkWidget *w, gpointer   data )
- {
-    fromRow = fromCol = 0;
-    Get3270DeviceBuffer(&toRow, &toCol);
-
-    gtk_widget_queue_draw(terminal);
 
  }
 
@@ -1171,148 +1147,6 @@
        LockThreads();
        gtk_widget_queue_draw(terminal);
        UnlockThreads();
-    }
- }
-
- static void BeginSelection(void)
- {
-    if(selection_row < 0)
-       selection_row = fromRow = cursor_row;
-
-	if(selection_col < 0)
-	   selection_col = fromCol = cursor_col;
-
-    if(toRow < 0)
-       toRow = cursor_row+1;
-
-	if(toCol < 0)
-	   toCol = cursor_col;
-
- }
-
- static void SetSelectionBox(int sRow, int sCol)
- {
- 	/* Set selection box from the marked position and the current cursor position */
-
-    if(sRow > cursor_row)
-    {
-    	fromRow = cursor_row;
-    	toRow   = sRow;
-    }
-    else
-    {
-    	toRow   = cursor_row;
-    	fromRow = sRow;
-    }
-
-    if(sCol > cursor_col)
-    {
-    	fromCol = cursor_col;
-    	toCol   = sCol;
-    }
-    else
-    {
-    	toCol   = cursor_col;
-    	fromCol = sCol;
-    }
-
-    DBGPrintf("Box from %d,%d to %d,%d",min(toRow,fromRow),min(toCol,fromCol),max(toRow,fromRow),max(toCol,fromCol));
-    gtk_widget_queue_draw(terminal);
- }
-
- void action_SelectUp(GtkWidget *w, gpointer data)
- {
-    BeginSelection();
-
-    if(selection_row > 0)
-       selection_row--;
-
-	SetSelectionBox(selection_row,selection_col);
- }
-
- void action_SelectDown(GtkWidget *w, gpointer data)
- {
- 	int rows, cols;
-
-    BeginSelection();
-
-    if(Get3270DeviceBuffer(&rows, &cols) && selection_row < rows)
-       selection_row++;
-
-	SetSelectionBox(selection_row,selection_col);
- }
-
- void action_SelectLeft(GtkWidget *w, gpointer data)
- {
-    BeginSelection();
-
-    if(selection_col > 0)
-       selection_col--;
-
-	SetSelectionBox(selection_row,selection_col);
- }
-
- void action_SelectRight(GtkWidget *w, gpointer data)
- {
- 	int rows, cols;
-
-    BeginSelection();
-
-    if(Get3270DeviceBuffer(&rows, &cols) && selection_col < cols)
-       selection_col++;
-
-	SetSelectionBox(selection_row,selection_col);
- }
-
- void action_SelectionUp(GtkWidget *w, gpointer data)
- {
- 	if(fromRow > 0)
- 	{
- 		fromRow--;
- 		toRow--;
- 		cursor_row	  = fromRow;
- 		selection_row = toRow;
-        gtk_widget_queue_draw(terminal);
- 	}
- }
-
- void action_SelectionDown(GtkWidget *w, gpointer data)
- {
- 	int rows, cols;
-
-    if(Get3270DeviceBuffer(&rows, &cols) && toRow < rows)
-    {
-    	fromRow++;
-    	toRow++;
- 		cursor_row	  = fromRow;
- 		selection_row = toRow;
-        gtk_widget_queue_draw(terminal);
-    }
- }
-
- void action_SelectionLeft(GtkWidget *w, gpointer data)
- {
- 	if(fromCol > 0)
- 	{
- 		fromCol--;
- 		toCol--;
- 		cursor_col    = fromCol;
- 		selection_col = toCol;
-        gtk_widget_queue_draw(terminal);
- 	}
- }
-
- void action_SelectionRight(GtkWidget *w, gpointer data)
- {
- 	int rows, cols;
-
-    if(Get3270DeviceBuffer(&rows, &cols) && toCol < cols)
-    {
-    	fromCol++;
-    	toCol++;
- 		cursor_col    = fromCol;
- 		selection_col = toCol;
-        gtk_widget_queue_draw(terminal);
     }
  }
 

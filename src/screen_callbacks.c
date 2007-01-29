@@ -42,7 +42,7 @@ static void error_popup(const char *msg);
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
 static void status_timing(struct timeval *t0, struct timeval *t1);
 
-/*---[ Globas ]---------------------------------------------------------------*/
+/*---[ Globals ]--------------------------------------------------------------*/
 
  char oia_cursor[8]					= "";
  char oia_LUName[12]				= "          ";
@@ -367,7 +367,7 @@ static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num
 static void screen_changed(int first, int last)
 {
    WaitForScreen = FALSE;
-   action_remove_selection(0,0);
+//   action_remove_selection(0,0);
    RedrawTerminalContents();
 }
 

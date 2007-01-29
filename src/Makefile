@@ -4,7 +4,7 @@ include gtk.mk
 TARGET		   = g3270
 RUN_PARAMETERS = sr679600001.age6796.bb:8023
 OBJECTS        = main.o log.o terminal.o screen_callbacks.o gsource.o actions.o \
-				 clipboard.o draw.o print.o menu.o
+				 clipboard.o draw.o print.o menu.o mouse.o
 
 ifeq ($(DEBUG),1)
    DFLAGS=-DDEBUG=1 -g -O0

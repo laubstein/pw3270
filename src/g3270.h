@@ -134,6 +134,11 @@
  extern const 	SCREEN_CALLBACK g3270_screen_callbacks;
  extern const 	KEYBOARD_INFO   g3270_keyboard_info;
 
+ extern FONTELEMENT				*font;
+ extern int						top_margin;
+ extern int 					left_margin;
+ extern int						line_spacing;
+
  extern const 	unsigned char	ebcdic2asc[];
 
  extern const struct action_callback action_callbacks[];
@@ -282,6 +287,20 @@
 #else
  #define NotImplemented() /* */
 #endif
+
+/*---[ Mouse ]----------------------------------------------------------------*/
+
+ void	  SetMousePointer(GdkCursor *cursor);
+ void 	  LoadMousePointers(GdkDrawable *drawable, GdkGC *gc);
+ void	  DrawSelectionBox(GdkDrawable *drawable, GdkGC *gc);
+ void	  ConfigureSelectionBox(void);
+
+ gboolean Mouse2Terminal(long x, long y, long *cRow, long *cCol);
+
+ gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data);
+ gboolean mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
+ gboolean mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+ gboolean mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
 /*---[ Terminal window ]------------------------------------------------------*/
 
