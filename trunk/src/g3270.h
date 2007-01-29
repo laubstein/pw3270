@@ -138,6 +138,8 @@
  extern int						top_margin;
  extern int 					left_margin;
  extern int						line_spacing;
+ extern int						cursor_row;
+ extern	int						cursor_col;
 
  extern const 	unsigned char	ebcdic2asc[];
 
