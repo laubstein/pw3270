@@ -328,146 +328,82 @@
  #define GetTerminalSize()	int rows, cols ; \
 							if(!Get3270DeviceBuffer(&rows, &cols)) return;
 
- void action_SelectUp(GtkWidget *w, gpointer data)
- {
- 	GetTerminalSize();
-
-    if(selecting)
-    {
-	   if(pos[1].row > 0)
-	   {
-          pos[1].row--;
-	   	  if(pos[1].row == pos[0].row)
-	   	  {
-		     if(pos[1].row)
-	   	        pos[1].row--;
-			 else
-				pos[1].row = 1;
-	   	  }
-	      ConfigureSelectionBox();
-	   }
-       return;
-    }
-
-    if(cursor_row)
-    {
-       selecting  = 99;
-
-       pos[0].row =
-       pos[1].row = cursor_row+1;
-
-       pos[0].col = cursor_col;
-       pos[1].col = cursor_col+1;
-
-       action_SelectUp(w, data);
-    }
-
- }
 
  void action_SelectRight(GtkWidget *w, gpointer data)
  {
  	GetTerminalSize();
 
-    if(selecting)
-    {
-	   if(pos[1].col < cols)
-	   {
-          pos[1].col++;
-	   	  if(pos[1].col == pos[0].col)
-	   	  {
-		     if(pos[1].col)
-	   	        pos[1].col++;
-			 else
-				pos[1].col = 1;
-	   	  }
-	   	  DBGTrace(pos[1].col);
-	      ConfigureSelectionBox();
-	   }
-       return;
-    }
-
-    if(cursor_col)
+    if(!selecting)
     {
        selecting  = 99;
-
        pos[0].col =
-       pos[1].col = cursor_col+1;
-
+       pos[1].col = cursor_col;
        pos[0].row = cursor_row;
        pos[1].row = cursor_row+1;
-
-       action_SelectRight(w, data);
-    }
- }
-
- void action_SelectLeft(GtkWidget *w, gpointer data)
- {
- 	GetTerminalSize();
-
-    if(selecting)
-    {
-	   if(pos[1].col > 0)
-	   {
-          pos[1].col--;
-	   	  if(pos[1].col == pos[0].col)
-	   	  {
-		     if(pos[1].col)
-	   	        pos[1].col--;
-			 else
-				pos[1].col = 1;
-	   	  }
-	      ConfigureSelectionBox();
-	   }
-       return;
     }
 
-    if(cursor_col)
-    {
-       selecting  = 99;
+	if(pos[1].col < cols)
+	   pos[1].col++;
 
-       pos[0].col =
-       pos[1].col = cursor_col+1;
+    ConfigureSelectionBox();
 
-       pos[0].row = cursor_row;
-       pos[1].row = cursor_row+1;
-
-       action_SelectLeft(w, data);
-    }
  }
 
  void action_SelectDown(GtkWidget *w, gpointer data)
  {
  	GetTerminalSize();
 
-    if(selecting)
-    {
-	   if(pos[1].row < rows)
-	   {
-          pos[1].row++;
-	   	  if(pos[1].row == pos[0].row)
-	   	  {
-		     if(pos[1].row)
-	   	        pos[1].row++;
-			 else
-				pos[1].row = rows;
-	   	  }
-	      ConfigureSelectionBox();
-	   }
-       return;
-    }
-
-    if(cursor_row)
+    if(!selecting)
     {
        selecting  = 99;
-
-       pos[0].row =
-       pos[1].row = cursor_row+1;
-
        pos[0].col = cursor_col;
        pos[1].col = cursor_col+1;
-
-       action_SelectDown(w, data);
+       pos[0].row =
+       pos[1].row = cursor_row;
     }
+
+	if(pos[1].row < rows)
+	   pos[1].row++;
+
+    ConfigureSelectionBox();
+
+ }
+
+ void action_SelectLeft(GtkWidget *w, gpointer data)
+ {
+    if(!selecting)
+    {
+       selecting = 99;
+       pos[0].col =
+       pos[1].col = cursor_col;
+       pos[0].row = cursor_row;
+       pos[1].row = cursor_row+1;
+    }
+
+	if(pos[1].col > 0)
+	   pos[1].col--;
+
+    ConfigureSelectionBox();
+
+ }
+
+ void action_SelectUp(GtkWidget *w, gpointer data)
+ {
+ 	GetTerminalSize();
+
+    if(!selecting)
+    {
+       selecting  = 99;
+       pos[0].col = cursor_col;
+       pos[1].col = cursor_col+1;
+       pos[0].row =
+       pos[1].row = cursor_row;
+    }
+
+	if(pos[1].row > 0)
+	   pos[1].row--;
+
+    ConfigureSelectionBox();
 
  }
 
