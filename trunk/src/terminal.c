@@ -1008,27 +1008,6 @@
 #endif
  }
 
- void action_copy(GtkWidget *w, gpointer data)
- {
- 	if(fromRow < 0)
- 	   return;
-    DBGMessage("Copy to clipboard");
-
-	CopyToClipboard(fromRow,fromCol,toRow,toCol);
-
- }
-
- void action_append(GtkWidget *w, gpointer data)
- {
- 	if(fromRow < 0)
- 	   return;
-
-    DBGMessage("Append to clipboard");
-
-    AppendToClipboard(fromRow,fromCol,toRow,toCol);
-
- }
-
  static gpointer exec_with_selection_thread(gpointer cmd)
  {
  	int				rows;
