@@ -62,6 +62,7 @@
 	{ "selectionup",			action_SelectionUp				},
 	{ "selectionright",			action_SelectionRight			},
 	{ "selectiondown",			action_SelectionDown			},
+	{ "restoreselection",		action_RestoreSelection			},
 	{ "previousword",			action_PreviousWord				},
 	{ "nextword",				action_NextWord					},
 	{ "deleteword",				action_DeleteWord				},
