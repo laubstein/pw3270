@@ -3,6 +3,7 @@
  #include "g3270.h"
  #include "lib/kybdc.h"
  #include "lib/actionsc.h"
+ #include "lib/tablesc.h"
 
 
 /*---[ Defines ]--------------------------------------------------------------*/
@@ -529,5 +530,116 @@
 
     AppendToClipboard(row[0],col[0],row[1],col[1]);
 
+ }
+
+ static gpointer exec_with_selection_thread(gpointer cmd)
+ {
+ 	int				rows;
+ 	int				cols;
+ 	const struct ea *screen;
+ 	const struct ea *trm;
+ 	char			*ptr;
+ 	char			*mark;
+
+ 	char			buffer[1024];
+
+ 	int				fd;
+
+    int col;
+    int row;
+
+ 	int bCol = min(pos[SELECTION_BEGIN].col,pos[SELECTION_END].col);
+ 	int fCol = max(pos[SELECTION_BEGIN].col,pos[SELECTION_END].col);
+
+ 	int bRow = min(pos[SELECTION_BEGIN].row,pos[SELECTION_END].row);
+ 	int fRow = max(pos[SELECTION_BEGIN].row,pos[SELECTION_END].row);
+
+ 	char 			filename[1024];
+ 	FILE			*arq;
+
+ 	if(!cmd)
+ 	   return 0;
+
+ 	screen = Get3270DeviceBuffer(&rows, &cols);
+
+ 	if(bCol < 0 || bRow < 0)
+ 	{
+       gdk_threads_enter();
+
+       GtkWidget *widget = gtk_message_dialog_new(
+					    GTK_WINDOW(top_window),
+                        GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
+                        GTK_MESSAGE_WARNING,
+                        GTK_BUTTONS_OK,
+                        _( "Selecione algum texto antes" ) );
+
+       gtk_dialog_run(GTK_DIALOG(widget));
+       gtk_widget_destroy (widget);
+       gdk_threads_leave();
+ 	   return 0;
+ 	}
+
+    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,TARGET);
+    fd = mkstemp(filename);
+
+    DBGMessage(filename);
+
+ 	arq = fdopen(fd,"w");
+
+ 	if(arq)
+ 	{
+	   DBGPrintf("Printing from %d,%d to %d,%d",bRow,bCol,fRow,fCol);
+
+       for(row=bRow;row<fRow;row++)
+       {
+	      trm  = screen + ((row * cols)+bCol);
+		  mark = ptr = buffer;
+
+    	  for(col=bCol;col<fCol;col++)
+    	  {
+             *ptr = ebc2asc[trm->cc];
+    		 if(*ptr > ' ')
+    		    mark = ptr;
+    		 ptr++;
+    		 trm++;
+		   }
+    	   *(mark+1) = 0;
+
+    	   DBGPrintf("%d\t%s",row,buffer);
+
+    	   fprintf(arq,"%s\n",buffer);
+       }
+
+       fclose(arq);
+
+	   snprintf(buffer,1023,cmd,filename);
+	   DBGMessage(buffer);
+       system(buffer);
+
+       remove(filename);
+
+ 	}
+ 	else
+ 	{
+ 		Error("Unable to open \"%s\" for writing",filename);
+ 	}
+
+	return 0;
+ }
+
+ void action_exec_with_selection(GtkWidget *w, gpointer data)
+ {
+#if GTK == 2
+    GThread   *thd = 0;
+    thd =  g_thread_create( exec_with_selection_thread, (gpointer) data, 0, NULL);
+#else
+    pthread_t  thd = 0;
+    pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_selection_thread, data);
+#endif
+ }
+
+ void action_print_selection(GtkWidget *w, gpointer data)
+ {
+    action_exec_with_selection(w,data ? data : "kprinter --nodialog -t " TARGET " %s");
  }
 
