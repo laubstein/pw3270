@@ -70,8 +70,8 @@
 
  static int			cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
  static gboolean    cursor_enabled							= TRUE;
- static int			cursor_row								= 0;
- static int			cursor_col								= 0;
+ int				cursor_row								= 0;
+ int				cursor_col								= 0;
  static gboolean	cross_hair								= FALSE;
 
  int				cursor_type								= CURSOR_TYPE_OVER;

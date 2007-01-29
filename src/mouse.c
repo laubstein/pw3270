@@ -96,6 +96,10 @@
  	if(!selecting)
  	   return;
 
+	DBGPrintf("Select from %ldx%ld to %ldx%ld",
+						pos[0].row,pos[0].col,
+						pos[1].row,pos[1].col);
+
     for(f=0;f<SELECTION_COUNT;f++)
     {
 	   pos[f].updated 	= 1;
@@ -321,49 +325,158 @@
  	InvalidateSelectionBox();
  }
 
+ #define GetTerminalSize()	int rows, cols ; \
+							if(!Get3270DeviceBuffer(&rows, &cols)) return;
+
  void action_SelectUp(GtkWidget *w, gpointer data)
  {
-	CHKPoint();
+ 	GetTerminalSize();
 
-    if(!selecting)
+    if(selecting)
+    {
+	   if(pos[1].row > 0)
+	   {
+          pos[1].row--;
+	   	  if(pos[1].row == pos[0].row)
+	   	  {
+		     if(pos[1].row)
+	   	        pos[1].row--;
+			 else
+				pos[1].row = 1;
+	   	  }
+	      ConfigureSelectionBox();
+	   }
        return;
+    }
 
- }
+    if(cursor_row)
+    {
+       selecting  = 99;
 
- void action_SelectDown(GtkWidget *w, gpointer data)
- {
-	CHKPoint();
+       pos[0].row =
+       pos[1].row = cursor_row+1;
 
-    if(!selecting)
-       return;
+       pos[0].col = cursor_col;
+       pos[1].col = cursor_col+1;
 
- }
-
- void action_SelectLeft(GtkWidget *w, gpointer data)
- {
-	CHKPoint();
-
-    if(!selecting)
-       return;
+       action_SelectUp(w, data);
+    }
 
  }
 
  void action_SelectRight(GtkWidget *w, gpointer data)
  {
-	CHKPoint();
+ 	GetTerminalSize();
 
-    if(!selecting)
+    if(selecting)
+    {
+	   if(pos[1].col < cols)
+	   {
+          pos[1].col++;
+	   	  if(pos[1].col == pos[0].col)
+	   	  {
+		     if(pos[1].col)
+	   	        pos[1].col++;
+			 else
+				pos[1].col = 1;
+	   	  }
+	   	  DBGTrace(pos[1].col);
+	      ConfigureSelectionBox();
+	   }
        return;
+    }
+
+    if(cursor_col)
+    {
+       selecting  = 99;
+
+       pos[0].col =
+       pos[1].col = cursor_col+1;
+
+       pos[0].row = cursor_row;
+       pos[1].row = cursor_row+1;
+
+       action_SelectRight(w, data);
+    }
+ }
+
+ void action_SelectLeft(GtkWidget *w, gpointer data)
+ {
+ 	GetTerminalSize();
+
+    if(selecting)
+    {
+	   if(pos[1].col > 0)
+	   {
+          pos[1].col--;
+	   	  if(pos[1].col == pos[0].col)
+	   	  {
+		     if(pos[1].col)
+	   	        pos[1].col--;
+			 else
+				pos[1].col = 1;
+	   	  }
+	      ConfigureSelectionBox();
+	   }
+       return;
+    }
+
+    if(cursor_col)
+    {
+       selecting  = 99;
+
+       pos[0].col =
+       pos[1].col = cursor_col+1;
+
+       pos[0].row = cursor_row;
+       pos[1].row = cursor_row+1;
+
+       action_SelectLeft(w, data);
+    }
+ }
+
+ void action_SelectDown(GtkWidget *w, gpointer data)
+ {
+ 	GetTerminalSize();
+
+    if(selecting)
+    {
+	   if(pos[1].row < rows)
+	   {
+          pos[1].row++;
+	   	  if(pos[1].row == pos[0].row)
+	   	  {
+		     if(pos[1].row)
+	   	        pos[1].row++;
+			 else
+				pos[1].row = rows;
+	   	  }
+	      ConfigureSelectionBox();
+	   }
+       return;
+    }
+
+    if(cursor_row)
+    {
+       selecting  = 99;
+
+       pos[0].row =
+       pos[1].row = cursor_row+1;
+
+       pos[0].col = cursor_col;
+       pos[1].col = cursor_col+1;
+
+       action_SelectDown(w, data);
+    }
 
  }
 
- #define CheckSelection()	int rows, cols ; \
-							if(!selecting) return ; \
-							if(!Get3270DeviceBuffer(&rows, &cols)) return;
-
  void action_SelectionUp(GtkWidget *w, gpointer data)
  {
-    CheckSelection();
+    GetTerminalSize();
+
+	if(!selecting)
+	   return;
 
     if(pos[0].row <= 1 || pos[1].row < 1)
        return;
@@ -378,7 +491,10 @@
 
  void action_SelectionDown(GtkWidget *w, gpointer data)
  {
-    CheckSelection();
+    GetTerminalSize();
+
+	if(!selecting)
+	   return;
 
     if(pos[0].row >= rows || pos[1].row >= rows)
        return;
@@ -392,7 +508,10 @@
 
  void action_SelectionLeft(GtkWidget *w, gpointer data)
  {
-    CheckSelection();
+    GetTerminalSize();
+
+	if(!selecting)
+	   return;
 
     if(pos[0].col < 1 || pos[1].col < 1)
        return;
@@ -406,7 +525,10 @@
 
  void action_SelectionRight(GtkWidget *w, gpointer data)
  {
-    CheckSelection();
+    GetTerminalSize();
+
+	if(!selecting)
+	   return;
 
     if(pos[0].col >= cols || pos[1].col >= cols)
        return;
