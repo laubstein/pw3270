@@ -476,3 +476,12 @@
     ConfigureSelectionBox();
  }
 
+ void action_RestoreSelection(GtkWidget *w, gpointer data)
+ {
+ 	if(!selecting)
+ 	{
+ 	   selecting = 98;
+       ConfigureSelectionBox();
+ 	}
+ }
+

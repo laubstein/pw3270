@@ -259,6 +259,7 @@
  void action_SelectDown(GtkWidget *w, gpointer data);
  void action_SelectLeft(GtkWidget *w, gpointer data);
  void action_SelectRight(GtkWidget *w, gpointer data);
+ void action_RestoreSelection(GtkWidget *w, gpointer data);
 
  void action_SelectionUp(GtkWidget *w, gpointer data);
  void action_SelectionDown(GtkWidget *w, gpointer data);
