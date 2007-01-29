@@ -528,6 +528,10 @@
 			<Option link="0"/>
 			<Option target="default"/>
 		</Unit>
+		<Unit filename="src/mouse.c">
+			<Option compilerVar="CC"/>
+			<Option target="default"/>
+		</Unit>
 		<Unit filename="src/print.c">
 			<Option compilerVar="CC"/>
 			<Option target="default"/>

@@ -485,3 +485,49 @@
  	}
  }
 
+ void action_copy(GtkWidget *w, gpointer data)
+ {
+ 	int row[2];
+ 	int col[2];
+
+ 	if(!selecting)
+ 	   return;
+
+    row[0] = min(pos[SELECTION_BEGIN].row,pos[SELECTION_END].row);
+    row[1] = max(pos[SELECTION_BEGIN].row,pos[SELECTION_END].row);
+
+    col[0] = min(pos[SELECTION_BEGIN].col,pos[SELECTION_END].col);
+    col[1] = max(pos[SELECTION_BEGIN].col,pos[SELECTION_END].col);
+
+    DBGPrintf("Copy %dx%d<->%dx%d to clipboard",row[0],col[0],row[1],col[1]);
+
+    if( (row[0] == row[1]) || (col[0] == col[1]) )
+       return;
+
+	CopyToClipboard(row[0],col[0],row[1],col[1]);
+
+ }
+
+ void action_append(GtkWidget *w, gpointer data)
+ {
+ 	int row[2];
+ 	int col[2];
+
+ 	if(!selecting)
+ 	   return;
+
+    row[0] = min(pos[SELECTION_BEGIN].row,pos[SELECTION_END].row);
+    row[1] = max(pos[SELECTION_BEGIN].row,pos[SELECTION_END].row);
+
+    col[0] = min(pos[SELECTION_BEGIN].col,pos[SELECTION_END].col);
+    col[1] = max(pos[SELECTION_BEGIN].col,pos[SELECTION_END].col);
+
+    DBGPrintf("Append %dx%d<->%dx%d to clipboard",row[0],col[0],row[1],col[1]);
+
+    if( (row[0] == row[1]) || (col[0] == col[1]) )
+       return;
+
+    AppendToClipboard(row[0],col[0],row[1],col[1]);
+
+ }
+
