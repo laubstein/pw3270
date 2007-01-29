@@ -32,8 +32,16 @@ fi
 
 echo "Enviando arquivo source para o servidor..."
 scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/$PACKAGE*.src.rpm $USER@suportelinux.df.bb.com.br:/dados/src/$VENDOR
+if [ "$?" != "0" ]; then
+   echo "Erro ao copiar o pacote fonte"
+   exit -1
+fi
+mv -f `rpm --eval="%{u2p:%{_srcrpmdir}}"`/$PACKAGE*.src.rpm /tmp
 
 echo "Enviando arquivo binario o servidor..."
-scp $RPMDIR/$RPMARCH/$PACKAGE*.rpm $RPMDIR/noarch/$PACKAGE*.rpm $USER@os2team.df.intrabb.bb.com.br:/home/html/$VENDOR
-
+scp $RPMDIR/$RPMARCH/$PACKAGE*.rpm $USER@os2team.df.intrabb.bb.com.br:/home/html/$VENDOR
+if [ "$?" = "0" ]; then
+   mv -f $RPMDIR/$RPMARCH/$PACKAGE*.rpm /tmp
+   echo "Binarios movidos para /tmp"
+fi
 
