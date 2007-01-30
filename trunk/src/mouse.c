@@ -10,6 +10,10 @@
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
+ #define SELECTING_RESTORED 0x0D
+ #define SELECTING_CLICK	0x0E
+ #define SELECTING_KEYBOARD 0x0F
+
  typedef struct _position
  {
  	unsigned char	updated;
@@ -347,6 +351,21 @@
        FieldAction(pos[0].row,pos[0].col);
        break;
 
+    case 0xe13: // Selection-click
+	case 0x013:	// Single-left-click
+
+       selecting  = SELECTING_CLICK;
+       pos[0].col = pos[1].col = cursor_col;
+       pos[0].row = pos[1].row = cursor_row;
+       ConfigureSelectionBox();
+
+       pos[1].updated = 1;
+       pos[1].x       = (unsigned long) event->x;
+       pos[1].y       = (unsigned long) event->y;
+
+       InvalidateSelectionBox();
+	   break;
+
     }
 
     DBGTrace(event->button);
@@ -458,7 +477,7 @@
 
     if(!selecting)
     {
-       selecting  = 99;
+       selecting  = SELECTING_KEYBOARD;
        pos[0].col =
        pos[1].col = cursor_col;
        pos[0].row = cursor_row;
@@ -478,7 +497,7 @@
 
     if(!selecting)
     {
-       selecting  = 99;
+       selecting  = SELECTING_KEYBOARD;
        pos[0].col = cursor_col;
        pos[1].col = cursor_col+1;
        pos[0].row =
@@ -496,7 +515,7 @@
  {
     if(!selecting)
     {
-       selecting = 99;
+       selecting = SELECTING_KEYBOARD;
        pos[0].col =
        pos[1].col = cursor_col;
        pos[0].row = cursor_row;
@@ -516,7 +535,7 @@
 
     if(!selecting)
     {
-       selecting  = 99;
+       selecting  = SELECTING_KEYBOARD;
        pos[0].col = cursor_col;
        pos[1].col = cursor_col+1;
        pos[0].row =
@@ -603,7 +622,7 @@
  {
  	if(!selecting)
  	{
- 	   selecting = 98;
+ 	   selecting = SELECTING_RESTORED;
        ConfigureSelectionBox();
  	}
  }
