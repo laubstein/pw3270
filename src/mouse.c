@@ -41,15 +41,26 @@
  static GdkCursor 	*pointer	= 0;
 
  static int			selected_cursor = -1;
- static CURSOR		cursor[]		= {	{	0,	GDK_BOTTOM_RIGHT_CORNER }
-										};
+ static CURSOR		cursor[]		= {	{	0,	GDK_TOP_LEFT_CORNER     },
+										{	0,	GDK_TOP_RIGHT_CORNER    },
+										{	0,	GDK_BOTTOM_LEFT_CORNER  },
+										{	0,	GDK_BOTTOM_RIGHT_CORNER },
+									  };
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
  unsigned short selecting = 0;
+ unsigned short modifier  = 0;
 
 /*---[ Implement ]------------------------------------------------------------*/
 
+/**
+ * Invalida uma caixa de selecao.
+ *
+ * Recalcula as coordenadas de terminal correspondentes as posicoes de mouse
+ * capturadas e redesenha toda a caixa de selecao.
+ *
+ */
  static void InvalidateSelectionBox(void)
  {
  	int rows;
@@ -90,6 +101,15 @@
  	RedrawTerminalContents();
  }
 
+/**
+ * Configura a caixa de selecao.
+ *
+ * Recalcula novas coordenadas de tela de acordo com as coordenadas de terminal.
+ * Chamada a cada "resize" da janela principal e no caso de acoes de teclado ou
+ * campo. Tambem forca o recalculo de todos os indicadores e redesenho da caixa
+ * de selecao.
+ *
+ */
  void ConfigureSelectionBox(void)
  {
  	int f;
@@ -117,6 +137,7 @@
  	   return;
 
 	selected_cursor = cr;
+	DBGTrace(selected_cursor);
 
     if(terminal && terminal->window)
     {
@@ -184,10 +205,12 @@
 
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3:
 	   DBGMessage("Button 2 Click");
+	   modifier = 1;
 	   break;
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 3:
 	   DBGMessage("Button 2 Double-Click");
+	   modifier = 2;
 	   break;
 
 	default:
@@ -205,25 +228,42 @@
  {
     int rows, cols;
 
-    switch(selecting)
+    DBGTracex(((selecting & 0x0F) << 8) | ((modifier & 0x0F) << 4) | event->button);
+
+    switch(((selecting & 0x0F) << 8) | ((modifier & 0x0F) << 4) | event->button)
     {
-	case 1:	// Single click!
+	case 0x101:	// Single click!
 
 	   DBGPrintf("Move cursor position to %ld,%ld",pos[0].row,pos[0].col);
-
 	   if(Get3270DeviceBuffer(&rows, &cols))
           move3270Cursor((pos[0].row * cols) + pos[0].col);
-
-	   selecting = 0;
-
 	   break;
 
-	case 2:	// Selecting box
+	case 0x201:	// Selecting box
 	   DBGMessage("Finish selection");
 	   break;
+
+    case 0x211:	// Copy!
+       DBGMessage("Copy text");
+       action_copy(0,0);
+       break;
+
+	case 0x221:	// Append!
+	   DBGMessage("Append");
+	   action_append(0,0);
+	   break;
+
     }
 
-    SelectCursor(-1);
+    DBGTrace(event->button);
+
+    if(event->button == 1)
+    {
+	   selecting =
+	   modifier  = 0;
+       SelectCursor(-1);
+    }
+
     return 0;
  }
 
@@ -237,7 +277,7 @@
        pos[SELECTION_END].x         = (unsigned long) event->x;
        pos[SELECTION_END].y         = (unsigned long) event->y;
        selecting = 2;
-       SelectCursor(0);
+       SelectCursor( (pos[SELECTION_BEGIN].x > pos[SELECTION_END].x ? 0 : 1) | (pos[SELECTION_BEGIN].y > pos[SELECTION_END].y ? 0 : 2));
        InvalidateSelectionBox();
 	   break;
 
@@ -253,23 +293,11 @@
     // FIXME (perry#1#): Read associoation from scroll to function key from configuration file.
     static const char *scroll[] = { "8", "7" };
 
-    CHKPoint();
-
-    switch(selecting)
-    {
-	case 0:		// No selection in progress, act as page-up/page-down
- 	   if(event->direction < 2 && !WaitForScreen)
- 	   {
-          WaitForScreen = TRUE;
-          action_internal(PF_action, IA_DEFAULT, scroll[event->direction], CN);
- 	   }
- 	   return 0;
-
-    case 1:		// It's clicked
-    case 2:		// It's selection
-       return 0;
-
-    }
+    if(event->direction < 2 && !WaitForScreen)
+ 	{
+       WaitForScreen = TRUE;
+       action_internal(PF_action, IA_DEFAULT, scroll[event->direction], CN);
+	}
 
  	return 0;
  }
