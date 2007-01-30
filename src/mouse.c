@@ -4,7 +4,9 @@
  #include "lib/kybdc.h"
  #include "lib/actionsc.h"
  #include "lib/tablesc.h"
-
+ #include "lib/utilc.h"
+ #include "lib/ctlrc.h"
+ #include "lib/3270ds.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -201,6 +203,7 @@
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1:
 	   DBGMessage("Button 1 Double-Click");
+       selecting = 3;
 	   break;
 
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3:
@@ -224,6 +227,90 @@
  	return 0;
  }
 
+ static unsigned long copy_timer = 0;
+
+ static void RemoveCopyTimer(void)
+ {
+    if(copy_timer)
+	{
+	   RemoveTimeOut(copy_timer);
+	   copy_timer = 0;
+	}
+ }
+
+ static void copy_text(void)
+ {
+    DBGMessage("**** TIMED COPY ****");
+    RemoveCopyTimer();
+    action_copy(0,0);
+ }
+
+ static void FieldAction(int row, int col)
+ {
+    int 			rows;
+    int 			cols;
+    int 			baddr;
+    const struct ea *trm   = Get3270DeviceBuffer(&rows, &cols);
+    int				length;
+    int				maxlength;
+
+	if(!trm)
+	   return;
+
+    baddr     = find_field_attribute((row * cols) + col);
+    maxlength = (rows * cols) - baddr;
+
+    DBGTrace(maxlength);
+
+    for(length=1; !trm[baddr+length].fa && length < maxlength;length++);
+    length--;
+
+    DBGTrace(length);
+
+    /*
+     * If the field begins with "F", is protected and folowed by numeric
+     * digits act as a clickable function key indicator.
+     *
+     */
+    if(ebc2asc[trm[baddr+1].cc] == 'F' && length < 4 && FA_IS_PROTECTED(trm[baddr].fa))
+    {
+    	int  key = 0;
+    	int  f;
+
+    	for(f=1; f<length;f++)
+    	{
+    		unsigned char chr = ebc2asc[trm[baddr+1+f].cc];
+    		DBGPrintf("[%c]",chr);
+    		if(key >= 0 && isdigit(chr))
+    		{
+    			key *= 10;
+    			key += (chr - '0');
+    		}
+    		else
+    		{
+    			key = -1;
+    		}
+    	}
+
+    	if(key > 0 && key < 12)
+    	{
+    		// It's a function key! Activate it!
+    	    char ks[6];
+    	    snprintf(ks,5,"%d",key);
+			DBGPrintf("Function: %s",ks);
+			action_internal(PF_action, IA_DEFAULT, ks, CN);
+    		return;
+    	}
+    }
+
+    if (!FA_IS_PROTECTED(trm[baddr].fa))
+    {
+    	// It's not protected, try to select a word.
+    	DBGMessage("Double-click in a editable field");
+    }
+
+ }
+
  gboolean mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
     int rows, cols;
@@ -233,7 +320,6 @@
     switch(((selecting & 0x0F) << 8) | ((modifier & 0x0F) << 4) | event->button)
     {
 	case 0x101:	// Single click!
-
 	   DBGPrintf("Move cursor position to %ld,%ld",pos[0].row,pos[0].col);
 	   if(Get3270DeviceBuffer(&rows, &cols))
           move3270Cursor((pos[0].row * cols) + pos[0].col);
@@ -243,15 +329,23 @@
 	   DBGMessage("Finish selection");
 	   break;
 
-    case 0x211:	// Copy!
-       DBGMessage("Copy text");
-       action_copy(0,0);
+    case 0x213:	// Timed Copy!
+       copy_timer = AddTimeOut(500, copy_text);
        break;
 
-	case 0x221:	// Append!
+    case 0x211: // Direct Copy
+       copy_text();
+       break;
+
+	case 0x223:	// Append!
 	   DBGMessage("Append");
+       RemoveCopyTimer();
 	   action_append(0,0);
 	   break;
+
+    case 0x301:	// Double-click (left)
+       FieldAction(pos[0].row,pos[0].col);
+       break;
 
     }
 
