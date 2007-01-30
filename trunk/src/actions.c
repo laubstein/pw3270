@@ -9,6 +9,7 @@
  #include "lib/3270ds.h"
  #include "lib/tablesc.h"
  #include "lib/screenc.h"
+ #include "lib/ctlrc.h"
 
 /*---[ Internal actions ]-----------------------------------------------------*/
 
@@ -58,6 +59,7 @@
 	{ "selectup",				action_SelectUp					},
 	{ "selectright",			action_SelectRight				},
 	{ "selectdown",				action_SelectDown				},
+	{ "selectfield",			action_SelectField				},
 	{ "selectionleft",			action_SelectionLeft			},
 	{ "selectionup",			action_SelectionUp				},
 	{ "selectionright",			action_SelectionRight			},

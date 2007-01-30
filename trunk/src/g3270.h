@@ -260,6 +260,7 @@
  void action_SelectLeft(GtkWidget *w, gpointer data);
  void action_SelectRight(GtkWidget *w, gpointer data);
  void action_RestoreSelection(GtkWidget *w, gpointer data);
+ void action_SelectField(GtkWidget *w, gpointer data);
 
  void action_SelectionUp(GtkWidget *w, gpointer data);
  void action_SelectionDown(GtkWidget *w, gpointer data);
@@ -270,6 +271,7 @@
  void action_NextWord(GtkWidget *w, gpointer data);
  void action_DeleteWord(GtkWidget *w, gpointer data);
  void action_DeleteField(GtkWidget *w, gpointer data);
+
 
  void action_Redraw(GtkWidget *w, gpointer data);
  void action_AboutBox(GtkWidget *w, gpointer data);
