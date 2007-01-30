@@ -249,7 +249,7 @@
     action_copy(0,0);
  }
 
- static void FieldAction(int row, int col)
+ static int FieldAction(int button, int row, int col)
  {
     int 			rows;
     int 			cols;
@@ -259,7 +259,7 @@
     int				maxlength;
 
 	if(!trm)
-	   return;
+	   return 0;
 
     baddr     = find_field_attribute((row * cols) + col);
     maxlength = (rows * cols) - baddr;
@@ -303,16 +303,56 @@
     	    snprintf(ks,5,"%d",key);
 			DBGPrintf("Function: %s",ks);
 			action_internal(PF_action, IA_DEFAULT, ks, CN);
-    		return;
+    		return 0;
     	}
     }
 
-    if (!FA_IS_PROTECTED(trm[baddr].fa))
+    DBGTrace(button);
+
+    if(button == 1)
     {
     	// It's not protected, try to select a word.
-    	DBGMessage("Double-click in a editable field");
+    	int 			paddr = (row * cols) + col;
+    	int				c     = col;
+
+    	DBGPrintf("Double-click in a field at %dx%d",row,col);
+
+    	while(c > 0 && paddr > baddr && !isspace(ebc2asc[trm[paddr].cc]))
+    	{
+		   DBGPrintf("%d [%c] %d",c,ebc2asc[trm[paddr].cc],FA_IS_ZERO(trm[paddr].fa));
+    	   paddr--;
+    	   c--;
+    	}
+    	c++;
+    	paddr++;
+
+    	selecting  = SELECTING_CLICK;
+        pos[0].row = row;
+        pos[0].col = c;
+
+    	while(c < cols && !isspace(ebc2asc[trm[paddr].cc]))
+    	{
+		   DBGPrintf("%d [%c] %d",c,ebc2asc[trm[paddr].cc],FA_IS_ZERO(trm[paddr].fa));
+    	   paddr++;
+    	   c++;
+    	}
+
+        pos[1].row = row+1;
+        pos[1].col = c;
+
+        ConfigureSelectionBox();
+
+        return 1;
     }
 
+    if(button == 2)
+    {
+    	// Select the entire field
+        DBGTrace(baddr - (row * cols));
+
+	}
+
+    return 0;
  }
 
  gboolean mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
@@ -348,16 +388,23 @@
 	   break;
 
     case 0x301:	// Double-click (left)
-       FieldAction(pos[0].row,pos[0].col);
-       break;
+       if(FieldAction(1,pos[0].row,pos[0].col))
+          return 0;
+	   break;
+
+    case 0xe23:	// Double-click (right)
+	   break;
 
     case 0xe13: // Selection-click
 	case 0x013:	// Single-left-click
 
-       selecting  = SELECTING_CLICK;
-       pos[0].col = pos[1].col = cursor_col;
-       pos[0].row = pos[1].row = cursor_row;
-       ConfigureSelectionBox();
+       if(selecting != SELECTING_CLICK)
+       {
+          selecting  = SELECTING_CLICK;
+          pos[0].col = pos[1].col = cursor_col;
+          pos[0].row = pos[1].row = cursor_row;
+          ConfigureSelectionBox();
+       }
 
        pos[1].updated = 1;
        pos[1].x       = (unsigned long) event->x;
