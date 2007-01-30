@@ -10,10 +10,6 @@
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
- #define SELECTING_RESTORED 0x0D
- #define SELECTING_CLICK	0x0E
- #define SELECTING_KEYBOARD 0x0F
-
  typedef struct _position
  {
  	unsigned char	updated;
@@ -36,6 +32,12 @@
  	GdkCursor		*cursor;
  	GdkCursorType	type;
  } CURSOR;
+
+ #define SELECTING_RESTORED 0x0D
+ #define SELECTING_CLICK	0x0E
+ #define SELECTING_KEYBOARD 0x0F
+
+ #define SELECTING_ACTION   SELECTING_KEYBOARD
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -829,5 +831,31 @@
  void action_print_selection(GtkWidget *w, gpointer data)
  {
     action_exec_with_selection(w,data ? data : "kprinter --nodialog -t " TARGET " %s");
+ }
+
+ void action_SelectField(GtkWidget *w, gpointer data)
+ {
+    int 			rows;
+    int 			cols;
+    int 			baddr;
+    const struct ea *trm   = Get3270DeviceBuffer(&rows, &cols);
+    int				sz;
+
+	if(!trm)
+	   return;
+
+    baddr = find_field_attribute((cursor_row * cols) + cursor_col);
+
+    selecting  = SELECTING_ACTION;
+
+    pos[1].row = ( pos[0].row = (baddr/cols)) + 1;
+    pos[1].col = ( pos[0].col = (baddr - (pos[0].row * cols))+1) +1;
+
+    for(sz = 1; !trm[baddr+sz].fa && pos[1].col++ < cols; sz++);
+
+    pos[1].col--;
+
+    ConfigureSelectionBox();
+
  }
 
