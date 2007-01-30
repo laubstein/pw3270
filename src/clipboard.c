@@ -147,6 +147,14 @@
  static void paste_clipboard(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
     gchar *string;
+    char  *ptr;
+
+/*
+#ifdef DEBUG
+    char 	buffer[75];
+    int		ps = 0;
+#endif
+*/
 
     string = g_convert(text, -1, "ISO-8859-1", "UTF-8", NULL, NULL, NULL);
     if(!string)
@@ -155,6 +163,36 @@
     	return;
     }
 
+/*
+#ifdef DEBUG
+
+    DBGMessage("Paste buffer:");
+
+    for(ptr = (const char *) string; *ptr; ptr++)
+    {
+    	if(ps > 0x0F)
+    	{
+    		fprintf(stderr,"%s\n",buffer);
+    		ps = 0;
+    	}
+    	sprintf(buffer+(ps*3),"%02x ",(int) *ptr);
+    	ps++;
+    }
+
+	fprintf(stderr,"%s\n",buffer);
+    fflush(stderr);
+
+#endif
+*/
+
+    /* Remove TABS */
+    for(ptr = string;*ptr;ptr++)
+    {
+    	if(*ptr == 0x09)
+    	   *ptr = ' ';
+    }
+
+    /* Paste and release */
     emulate_input(string, strlen(string), True);
     g_free(string);
 
