@@ -648,6 +648,8 @@
     }
  }
 
+ static guint last_keyval = 0;
+
  static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
  	UpdateControlKeys(event);
@@ -665,6 +667,9 @@
        return TRUE;
 #endif
 
+    // Guarda tecla pressionada
+    last_keyval = event->keyval;
+
     return FALSE;
  }
 
@@ -676,6 +681,13 @@
     if(gtk_im_context_filter_keypress(im,event))
        return TRUE;
 #endif
+
+    if(last_keyval == event->keyval && last_keyval == GDK_Control_L)
+    {
+    	DBGMessage("Left control");
+    	action_Reset(0,0);
+    }
+
  	return 0;
  }
 
