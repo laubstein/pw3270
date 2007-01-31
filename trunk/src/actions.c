@@ -563,7 +563,7 @@
 							"authors", 	authors,
 							"license", 	license,
 							"logo",		icon,
-							"comments",	_("3270 Terminal emulator for Gnome/GTK."),
+							"comments",	_("3270 Terminal emulator for Gnome/GTK.\nBuild " BUILD),
 #ifdef VERSION
 							"version", 	VERSION,
 #endif
