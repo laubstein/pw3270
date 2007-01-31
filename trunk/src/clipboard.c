@@ -4,6 +4,7 @@
 
  #include "lib/kybdc.h"
  #include "lib/tablesc.h"
+ #include "lib/3270ds.h"
 
 
 /*---[ Globals ]--------------------------------------------------------------*/
@@ -18,21 +19,7 @@
 
  }
 
- int CopyToClipboard(int fromRow, int fromCol, int toRow, int toCol)
- {
- 	DBGTracex(Clipboard);
- 	if(Clipboard)
- 	{
- 		DBGMessage("Release old clipboard area");
- 		szClipboard = 0;
- 		g_free(Clipboard);
- 		Clipboard = 0;
- 	}
- 	return AppendToClipboard(fromRow,fromCol,toRow,toCol);
- }
-
-
- int AppendToClipboard(int fromRow, int fromCol, int toRow, int toCol)
+ int AddToClipboard(int fromRow, int fromCol, int toRow, int toCol, int clear, int table)
  {
     gchar			*string;
  	char			*buffer;
@@ -44,20 +31,36 @@
  	char			*mark;
  	int				sz;
 
-    int col;
-    int row;
+    int 			col;
+    int 			row;
 
- 	int bCol = min(fromCol,toCol);
- 	int fCol = max(fromCol,toCol);
+    int				len;
 
- 	int bRow = min(fromRow,toRow);
- 	int fRow = max(fromRow,toRow);
+    int				mode = 0;
+
+    unsigned char	chr  = ' ';
+
+ 	int 			bCol = min(fromCol,toCol);
+ 	int 			fCol = max(fromCol,toCol);
+
+ 	int 			bRow = min(fromRow,toRow);
+ 	int 			fRow = max(fromRow,toRow);
+
+ 	if(clear && Clipboard)
+ 	{
+ 		DBGMessage("Release old clipboard area");
+ 		szClipboard = 0;
+ 		g_free(Clipboard);
+ 		Clipboard = 0;
+ 	}
 
  	screen = Get3270DeviceBuffer(&rows, &cols);
 
  	DBGPrintf("Adding area from %d,%d to %d,%d to clipboard",bRow,bCol,fRow,fCol);
 
-    buffer = g_malloc(((rows+1) * cols)+5);
+    len		= (((rows+1) * cols)+5) << 1;
+    DBGTrace(len);
+    buffer 	= g_malloc(len+1);
 
     if(!buffer)
     {
@@ -65,6 +68,7 @@
     	return -1;
     }
 
+    /* Copy selected area to transfer buffer */
     ptr = buffer;
     for(row=bRow;row<fRow;row++)
     {
@@ -73,9 +77,26 @@
 
     	for(col=bCol;col<fCol;col++)
     	{
-            *ptr = ebc2asc[trm->cc];
-    		if(*ptr > ' ')
+		    chr = ' ';
+
+			if(trm->fa)
+            {
+			   if(table)
+			      *(ptr++) = '\t';
+
+			   if( (trm->fa & (FA_INTENSITY|FA_INT_NORM_SEL|FA_INT_HIGH_SEL)) == (FA_INTENSITY|FA_INT_NORM_SEL|FA_INT_HIGH_SEL) )
+                  mode = (trm->fa & FA_PROTECT) ? 1 : 2;
+               else
+                  mode = 0;
+            }
+
+            if(!mode)
+               chr = ebc2asc[trm->cc];
+
+            /* Add processed string to the transfer buffer */
+    		if(chr > ' ')
     		   mark = ptr;
+            *ptr = chr;
     		ptr++;
     		trm++;
     	}
@@ -144,17 +165,19 @@
     return 0;
  }
 
+//#ifdef DEBUG
+//   #define DUMP_PASTE
+//#endif
+
  static void paste_clipboard(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
     gchar *string;
     char  *ptr;
 
-/*
-#ifdef DEBUG
-    char 	buffer[75];
+#ifdef DUMP_PASTE
+    char 	buffer[0x0100];
     int		ps = 0;
 #endif
-*/
 
     string = g_convert(text, -1, "ISO-8859-1", "UTF-8", NULL, NULL, NULL);
     if(!string)
@@ -163,27 +186,33 @@
     	return;
     }
 
-/*
-#ifdef DEBUG
+#ifdef DUMP_PASTE
 
     DBGMessage("Paste buffer:");
+    memset(buffer,' ',78);
+    *(buffer+78) = 0;
 
-    for(ptr = (const char *) string; *ptr; ptr++)
+    for(ptr = (char *) string; *ptr; ptr++)
     {
+    	char temp[5];
     	if(ps > 0x0F)
     	{
     		fprintf(stderr,"%s\n",buffer);
+            memset(buffer,' ',78);
+            *(buffer+78) = 0;
     		ps = 0;
     	}
-    	sprintf(buffer+(ps*3),"%02x ",(int) *ptr);
+    	*(buffer+50+ps) = *ptr >= ' ' ? *ptr : '.';
+    	snprintf(temp,5,"%02x",(int) *ptr);
+    	memcpy(buffer+(ps*3),temp,2);
     	ps++;
     }
 
+    *(buffer+75) = 0;
 	fprintf(stderr,"%s\n",buffer);
     fflush(stderr);
 
-#endif
-*/
+#else
 
     /* Remove TABS */
     for(ptr = string;*ptr;ptr++)
@@ -194,6 +223,9 @@
 
     /* Paste and release */
     emulate_input(string, strlen(string), True);
+
+#endif
+
     g_free(string);
 
  }

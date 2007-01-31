@@ -209,21 +209,22 @@
  void PaintStatus(int, GdkDrawable *, GdkGC *, const FONTELEMENT *, int, int, int);
 
  void InitClipboard(GtkWidget *w);
- int  AppendToClipboard(int fromRow, int fromCol, int toRow, int toCol);
- int  CopyToClipboard(int fromRow, int fromCol, int toRow, int toCol);
+ int  AddToClipboard(int fromRow, int fromCol, int toRow, int toCol, int clear, int table);
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 
  void action_crosshair( GtkWidget *w, gpointer data );
- void action_select_all( GtkWidget *w, gpointer   data);
- void action_copy( GtkWidget *w, gpointer data);
- void action_append( GtkWidget *w, gpointer data);
- void action_remove_selection(GtkWidget *w, gpointer data);
  void action_disconnect(GtkWidget *w, gpointer data);
  void action_connect(GtkWidget *w, gpointer data);
  void action_exit(GtkWidget *w, gpointer data);
  void action_clear(GtkWidget *w, gpointer data);
+
+ void action_select_all( GtkWidget *w, gpointer   data);
+ void action_copy( GtkWidget *w, gpointer data);
+ void action_append( GtkWidget *w, gpointer data);
+ void action_remove_selection(GtkWidget *w, gpointer data);
  void action_paste(GtkWidget *w, gpointer data);
+ void action_copy_as_table(GtkWidget *w, gpointer data);
 
  void action_exec_with_selection(GtkWidget *w, gpointer data);
  void action_exec_with_copy(GtkWidget *w, gpointer data);

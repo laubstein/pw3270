@@ -30,6 +30,12 @@
     	}
     }
 
+    if(data->entry.path)
+    {
+    	g_free(data->entry.path);
+    	data->entry.path = 0;
+    }
+
     Log("Invalid action code: \"%s\"",name);
  }
 
