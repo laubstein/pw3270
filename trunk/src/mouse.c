@@ -33,11 +33,16 @@
  	GdkCursorType	type;
  } CURSOR;
 
- #define SELECTING_RESTORED 0x0D
- #define SELECTING_CLICK	0x0E
- #define SELECTING_KEYBOARD 0x0F
+ #define SELECTING_NONE			0x00
+ #define SELECTING_LEFT			0x01
+ #define SELECTING_MOTION	  	0x02
+ #define SELECTING_DOUBLE_LEFT 	0x03
+ #define SELECTING_RESTORED 	0x0D
+ #define SELECTING_CLICK		0x0E
+ #define SELECTING_KEYBOARD 	0x0F
 
  #define SELECTING_ACTION   SELECTING_KEYBOARD
+ #define SELECTING_SHOW		SELECTING_RESTORED
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -57,7 +62,7 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
- unsigned short selecting = 0;
+ unsigned short selecting = SELECTING_NONE;
  unsigned short modifier  = 0;
 
 /*---[ Implement ]------------------------------------------------------------*/
@@ -186,9 +191,13 @@
 
  gboolean mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
-
+/*
     DBGTracex(event->button);
     DBGTracex(event->type);
+    DBGTracex(event->state);
+	DBGTrace(event->state & GDK_BUTTON1_MASK);
+	DBGTrace(event->state & GDK_BUTTON3_MASK);
+*/
 
     switch( ((event->type & 0x0F) << 4) | (event->button & 0x0F))
  	{
@@ -204,12 +213,15 @@
        pos[SELECTION_BEGIN].y       =
        pos[SELECTION_END].y         = (unsigned long) event->y;
 
-       selecting = 1;
+	   if(!(event->state & GDK_BUTTON3_MASK))
+	      modifier = 0;
+
+       selecting = SELECTING_LEFT;
 	   break;
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1:
 	   DBGMessage("Button 1 Double-Click");
-       selecting = 3;
+       selecting = SELECTING_DOUBLE_LEFT;
 	   break;
 
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3:
@@ -231,24 +243,6 @@
     InvalidateSelectionBox();
 
  	return 0;
- }
-
- static unsigned long copy_timer = 0;
-
- static void RemoveCopyTimer(void)
- {
-    if(copy_timer)
-	{
-	   RemoveTimeOut(copy_timer);
-	   copy_timer = 0;
-	}
- }
-
- static void copy_text(void)
- {
-    DBGMessage("**** TIMED COPY ****");
-    RemoveCopyTimer();
-    action_copy(0,0);
  }
 
  static int FieldAction(int button, int row, int col)
@@ -357,17 +351,39 @@
     return 0;
  }
 
+ static unsigned long QueuedCopy = 0;
+
+ static void RemoveQueuedCopy(void)
+ {
+    modifier = 0; // Disable right-button
+
+    if(QueuedCopy)
+	{
+	   RemoveTimeOut(QueuedCopy);
+	   QueuedCopy = 0;
+	}
+ }
+
+ static void DoQueuedCopy(void)
+ {
+    DBGMessage("**** TIMED COPY ****");
+    RemoveQueuedCopy();
+    action_copy(0,0);
+ }
+
+ #define MouseFlags(button) (((selecting & 0x0F) << 8) | ((modifier & 0x0F) << 4) | button)
+
  gboolean mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
     int rows, cols;
 
-    DBGTracex(((selecting & 0x0F) << 8) | ((modifier & 0x0F) << 4) | event->button);
+    DBGPrintf("Mouse flags: 0x%04x",MouseFlags(event->button));
 
-    switch(((selecting & 0x0F) << 8) | ((modifier & 0x0F) << 4) | event->button)
+    switch(MouseFlags(event->button))
     {
 	case 0x101:	// Single click!
 	   DBGPrintf("Move cursor position to %ld,%ld",pos[0].row,pos[0].col);
-	   selecting = 0;
+	   selecting = SELECTING_NONE;
 	   if(Get3270DeviceBuffer(&rows, &cols))
           move3270Cursor((pos[0].row * cols) + pos[0].col);
        InvalidateSelectionBox();
@@ -377,18 +393,18 @@
 	   DBGMessage("Finish selection");
 	   break;
 
-    case 0x213:	// Timed Copy!
-       copy_timer = AddTimeOut(500, copy_text);
-       break;
-
     case 0x211: // Direct Copy
-       if(copy_timer)
-          copy_text();
+       if(QueuedCopy)
+          DoQueuedCopy();
        break;
 
-	case 0x223:	// Append!
+    case 0x213:	// Left-on, single-click on right (Queue copy)
+       QueuedCopy = AddTimeOut(500, DoQueuedCopy);
+       break;
+
+	case 0x223:	// Left-on, double-click on Right (Append, remove queued copy)
 	   DBGMessage("Append");
-       RemoveCopyTimer();
+       RemoveQueuedCopy();
 	   action_append(0,0);
 	   break;
 
@@ -397,11 +413,28 @@
           return 0;
 	   break;
 
+    case 0x113: // Single-click (right)
+       break;
+
+
+   /*
+    * Right button only
+    */
+    case 0xd13:	// Single-click with selection box visible
+       pos[1].updated = 1;
+       pos[1].x       = (unsigned long) event->x;
+       pos[1].y       = (unsigned long) event->y;
+       InvalidateSelectionBox();
+       break;
+
+    case 0xd23:	// Double-click (right)
     case 0xe23:	// Double-click (right)
+	   action_SelectField(0,0);
+       modifier = 0;
 	   break;
 
-    case 0xe13: // Selection-click
-	case 0x013:	// Single-left-click
+    case 0xe13: // Single-click (right) + SELECTING_CLICK
+	case 0x013:	// Single-click (right)
 
        if(selecting != SELECTING_CLICK)
        {
@@ -420,12 +453,17 @@
 
     }
 
-    DBGTrace(event->button);
-
     if(event->button == 1)
     {
-	   modifier  = 0;
+	   DBGTracex(selecting);
+	   if(selecting == SELECTING_LEFT || selecting == SELECTING_MOTION)
+	      selecting = SELECTING_SHOW;
+
+	   modifier = 0;
        SelectCursor(-1);
+
+       DBGPrintf("New mouse flags: 0x%04x",MouseFlags(event->button));
+
     }
 
     return 0;
@@ -433,14 +471,15 @@
 
  gboolean mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
  {
+
     switch(selecting)
     {
-	case 1:	// Single click
-	case 2: // Selecting
+	case SELECTING_LEFT:	// Left button pressed
+	case SELECTING_MOTION:  // Selecting by mouse-motion
 	   pos[SELECTION_END].updated	= 1;
        pos[SELECTION_END].x         = (unsigned long) event->x;
        pos[SELECTION_END].y         = (unsigned long) event->y;
-       selecting = 2;
+       selecting = SELECTING_MOTION;
        SelectCursor( (pos[SELECTION_BEGIN].x > pos[SELECTION_END].x ? 0 : 1) | (pos[SELECTION_BEGIN].y > pos[SELECTION_END].y ? 0 : 2));
        InvalidateSelectionBox();
 	   break;
@@ -514,7 +553,7 @@
 	pos[1].x       = (cols * font->Width) + left_margin;
 	pos[1].y       = (rows * (font->Height+line_spacing))+top_margin;
 
- 	selecting = 2;
+ 	selecting = SELECTING_ACTION;
  	InvalidateSelectionBox();
  }
 
