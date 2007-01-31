@@ -34,6 +34,7 @@ SOURCE_PACKET=`rpm --eval="%{u2p:%{_srcrpmdir}}"`/$PACKAGE*.src.rpm
 PACKET_VERSION=`rpm -qp --qf '%{VERSION}-%{RELEASE}' $SOURCE_PACKET`
 
 echo Gerando copia do repositorio para a tag $PACKET_VERSION
+svn rm --force -m "Atualizando $PACKET_VERSION" http://$USER@suportelinux.df.bb.com.br/svn/$PACKAGE/tags/$PACKET_VERSION
 svn cp -m "Pacote $PACKET_VERSION" http://$USER@suportelinux.df.bb.com.br/svn/$PACKAGE/trunk http://$USER@suportelinux.df.bb.com.br/svn/$PACKAGE/tags/$PACKET_VERSION
 
 echo "Enviando arquivo source para o servidor..."
