@@ -25,6 +25,9 @@
 	{ "about",					action_AboutBox					},
 #endif
 	{ "print_selection",		action_print_selection			},
+#ifdef DEBUG
+	{ "copy_as_table",			action_copy_as_table			},
+#endif
 	{ "exec_with_selection",	action_exec_with_selection		},
 	{ "exec_with_copy",			action_exec_with_copy			},
 	{ "exec_with_screen",		action_exec_with_screen			},
