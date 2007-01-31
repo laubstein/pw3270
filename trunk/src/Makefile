@@ -1,10 +1,9 @@
 
 include gtk.mk
 
-TARGET		   = g3270
-RUN_PARAMETERS = 172.17.78.220:8023
-OBJECTS        = main.o log.o terminal.o screen_callbacks.o gsource.o actions.o \
-				 clipboard.o draw.o print.o menu.o mouse.o
+TARGET	   = g3270
+OBJECTS    = main.o log.o terminal.o screen_callbacks.o gsource.o actions.o \
+		clipboard.o draw.o print.o menu.o mouse.o
 
 ifeq ($(DEBUG),1)
    DFLAGS=-DDEBUG=1 -g -O0
@@ -93,14 +92,6 @@ endif
 
 $(TARGET): lib3270.so $(OBJECTS)
 	@gcc $(GLFLAGS) -o $@ $(OBJECTS)
-
-run: $(TARGET)
-	@sync
-ifdef DEBUG
-	@LD_LIBRARY_PATH=. $(DEBUG_RUN) $(RUN_PARAMETERS)
-else
-	@LD_LIBRARY_PATH=. ./$(TARGET) $(RUN_PARAMETERS)
-endif
 
 lib/Makefile:
 	@cd lib ; ./configure
