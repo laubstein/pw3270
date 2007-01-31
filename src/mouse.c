@@ -367,8 +367,10 @@
     {
 	case 0x101:	// Single click!
 	   DBGPrintf("Move cursor position to %ld,%ld",pos[0].row,pos[0].col);
+	   selecting = 0;
 	   if(Get3270DeviceBuffer(&rows, &cols))
           move3270Cursor((pos[0].row * cols) + pos[0].col);
+       InvalidateSelectionBox();
 	   break;
 
 	case 0x201:	// Selecting box
@@ -380,7 +382,8 @@
        break;
 
     case 0x211: // Direct Copy
-       copy_text();
+       if(copy_timer)
+          copy_text();
        break;
 
 	case 0x223:	// Append!
@@ -421,7 +424,6 @@
 
     if(event->button == 1)
     {
-	   selecting =
 	   modifier  = 0;
        SelectCursor(-1);
     }
