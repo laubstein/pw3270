@@ -287,6 +287,7 @@
  void gdk_lock(void);
  void gdk_unlock(void);
 
+ gchar *CopyTerminalContents(int bRow, int bCol, int fRow, int fCol, int table);
 
 #ifdef QUIET_MODE
  #define NotImplemented() Log("Function %s in %s needs implementation",__FUNCTION__,__FILE__)
@@ -300,6 +301,7 @@
  void 	  LoadMousePointers(GdkDrawable *drawable, GdkGC *gc);
  void	  DrawSelectionBox(GdkDrawable *drawable, GdkGC *gc);
  void	  ConfigureSelectionBox(void);
+
 
  gboolean Mouse2Terminal(long x, long y, long *cRow, long *cCol);
 

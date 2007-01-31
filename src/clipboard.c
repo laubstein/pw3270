@@ -1,4 +1,5 @@
 
+ #include <errno.h>
  #include "g3270.h"
  #include "trace.h"
 
@@ -19,60 +20,55 @@
 
  }
 
- int AddToClipboard(int fromRow, int fromCol, int toRow, int toCol, int clear, int table)
+ gchar *CopyTerminalContents(int bRow, int bCol, int fRow, int fCol, int table)
  {
-    gchar			*string;
- 	char			*buffer;
- 	int				rows;
- 	int				cols;
- 	const struct ea *screen;
- 	const struct ea *trm;
- 	char			*ptr;
- 	char			*mark;
- 	int				sz;
+ 	int 			cols;
+ 	int 			rows;
 
+ 	int 			len;
     int 			col;
     int 			row;
 
-    int				len;
-
     int				mode = 0;
-
     unsigned char	chr  = ' ';
+    char			*ptr;
+ 	char			*mark;
 
- 	int 			bCol = min(fromCol,toCol);
- 	int 			fCol = max(fromCol,toCol);
+ 	const struct ea *screen;
+ 	const struct ea *trm;
 
- 	int 			bRow = min(fromRow,toRow);
- 	int 			fRow = max(fromRow,toRow);
+ 	gchar			*buffer;
 
- 	if(clear && Clipboard)
+ 	screen = Get3270DeviceBuffer(&rows,&cols);
+
+ 	if(fRow < 0)
+ 	   fRow = rows;
+
+	if(fCol < 0)
+	   fCol = cols;
+
+ 	if( (fCol <= bCol) || (fRow <= bRow) || !screen)
  	{
- 		DBGMessage("Release old clipboard area");
- 		szClipboard = 0;
- 		g_free(Clipboard);
- 		Clipboard = 0;
+ 		errno = EINVAL;
+ 		return 0;
  	}
 
- 	screen = Get3270DeviceBuffer(&rows, &cols);
+ 	len = (cols * rows) << 1;
 
- 	DBGPrintf("Adding area from %d,%d to %d,%d to clipboard",bRow,bCol,fRow,fCol);
+ 	DBGTrace(len);
 
-    len		= (((rows+1) * cols)+5) << 1;
-    DBGTrace(len);
-    buffer 	= g_malloc(len+1);
+ 	buffer = g_malloc(len+1);
 
     if(!buffer)
-    {
-    	Log("Can't allocate memory for temporary clipboard area");
-    	return -1;
-    }
+       return 0;
 
     /* Copy selected area to transfer buffer */
-    ptr = buffer;
+    DBGPrintf("Reading %dx%d <-> %dx%d",bRow,bCol,fRow,fCol);
+
+	ptr = (char *) buffer;
     for(row=bRow;row<fRow;row++)
     {
-    	trm  = screen + ((row * cols)+fromCol);
+    	trm  = screen + ((row * cols)+bCol);
     	mark = ptr;
 
     	for(col=bCol;col<fCol;col++)
@@ -105,18 +101,39 @@
 
     }
 
-    if(ptr == buffer)
-    {
-    	DBGMessage("No clipboard info");
-    	return -1;
-    }
+   *ptr = 0;
 
-    *ptr = 0;
-	sz   = strlen(buffer);
+    return buffer;
+ }
+
+ int AddToClipboard(int fromRow, int fromCol, int toRow, int toCol, int clear, int table)
+ {
+    gchar	*string;
+ 	gchar	*buffer;
+ 	char	*ptr;
+ 	int		sz;
+
+    buffer = CopyTerminalContents(	min(fromRow,toRow), min(fromCol,toCol),
+									max(fromRow,toRow), max(fromCol,toCol),
+									table );
+
+    if(!buffer)
+    	return -1;
+
+ 	if(clear && Clipboard)
+ 	{
+ 		DBGMessage("Release old clipboard area");
+ 		szClipboard = 0;
+ 		g_free(Clipboard);
+ 		Clipboard = 0;
+ 	}
+
+	sz = strlen(buffer);
 
     if(!sz)
     {
-    	DBGMessage("Empty buffer");
+    	g_free(buffer);
+    	DBGMessage("No clipboard info");
     	return -1;
     }
 

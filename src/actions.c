@@ -344,15 +344,14 @@
 
  static gpointer exec_with_screen_thread(gpointer cmd)
  {
- 	char 			filename[1024];
- 	char			buffer[1024];
- 	int				rows;
- 	int				cols;
- 	int				row;
- 	int				col;
- 	const struct ea *trm;
- 	FILE			*arq;
- 	int				fd;
+ 	char	buffer[1024];
+ 	char	filename[1024];
+ 	gchar	*screen = CopyTerminalContents(0,0,-1,-1,0);
+ 	FILE	*arq;
+ 	int		fd;
+
+    if(!screen)
+       return 0;
 
     snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,TARGET);
     fd = mkstemp(filename);
@@ -363,31 +362,27 @@
 
  	if(arq)
  	{
-       trm = Get3270DeviceBuffer(&rows, &cols);
-       if(trm)
+       if(fwrite(screen,strlen(screen),1,arq) != 1)
        {
-          for(row = 0; row < rows; row++)
-          {
-    	     for(col = 0; col < cols; col++)
-    	     {
-    	     	fprintf(arq,"%c",ebc2asc[trm->cc]);
-    	     	trm++;
-    	     }
-    	     fprintf(arq,"\n");
-          }
+	      Error("Error writing screen contents to %s",filename);
+	      fclose(arq);
        }
-       fclose(arq);
-
-	   snprintf(buffer,1023,cmd,filename);
-	   DBGMessage(buffer);
-       system(buffer);
-       remove(filename);
-
+       else
+       {
+          fclose(arq);
+	      snprintf(buffer,1023,cmd,filename);
+	      DBGMessage(buffer);
+          system(buffer);
+          remove(filename);
+       }
  	}
  	else
  	{
  		Error("Unable to open \"%s\" for writing",filename);
  	}
+
+ 	g_free(screen);
+
     return 0;
  }
 
