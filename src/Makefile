@@ -103,6 +103,9 @@ lib3270.so: lib/Makefile lib/*.c lib/*.h
 gtk.mk: ../configure
 	@cd .. ; ./configure
 
+run: $(TARGET)
+	@./run.sh
+
 clean:
 	@rm -f $(TARGET)
 	@rm -f $(OBJECTS)
