@@ -168,58 +168,6 @@
  	DBGPrintf("Exiting: %s", ignored ? "Yes" : "No");
  }
 
-/*
- gboolean Mouse2Terminal(long x, long y, long *cRow, long *cCol)
- {
- 	int 	rows;
- 	int 	cols;
-
-    Get3270DeviceBuffer(&rows, &cols);
-
-    // Convert mouse coordinates into cursor coordinates
-
-    if((x < left_margin) || (y < top_margin) )
-    {
-	   *cRow = *cCol = 0;
-       return FALSE;
-    }
-
-    *cCol = (x - left_margin) / font->Width;
-    *cRow = (y - top_margin)  / (font->Height + line_spacing);
-
-    if( (*cCol > cols) || (*cRow > rows))
-    {
-       if(*cCol > cols)
-          *cCol = cols;
-
-	   if(*cRow > rows)
-	      *cRow = rows;
-
-	   return FALSE;
-    }
-
-    return TRUE;
- }
- */
-
-/*
- static int CheckForCopy(void)
- {
-    if( !(MouseMode & MOUSE_MODE_CLIPBOARD))
-       return 0;
-
-	DBGTracex(MouseMode);
-	DBGTracex(MouseMode & MOUSE_MODE_APPEND);
-
-    if(MouseMode & MOUSE_MODE_APPEND)
-       action_append(0,0);
-	else
-	   action_copy(0,0);
-
-    return 1;
- }
- */
-
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
@@ -228,9 +176,7 @@
     int		rows;
     int		cols;
     GdkGC	*gc		= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
-//    int		x[2];
-//    int		y[2];
-    int		vPos = (top_margin + font->Height);
+    int		vPos	= (top_margin + font->Height);
     gint 	width;
     gint 	height;
 
@@ -247,24 +193,6 @@
     gdk_draw_rectangle(widget->window,gc,1,0,0,width,height);
 
     DrawSelectionBox(widget->window,gc);
-
-    /* Check for selection box
-    if(fromRow >= 0 && toRow > 0)
-    {
-       x[0] = (min(fromCol,toCol) * font->Width) + left_margin;
-       x[1] = (max(fromCol,toCol) * font->Width) + left_margin;
-
-       y[0] = ((min(fromRow,toRow) * (font->Height + line_spacing)) + vPos)-font->Height;
-       y[1] = ((max(fromRow,toRow) * (font->Height + line_spacing)) + vPos)-font->Height;
-
-       gdk_gc_set_foreground(gc,selection_cmap);
-       gdk_draw_rectangle(widget->window,gc,1,x[0],y[0],x[1]-x[0],y[1]-y[0]);
-
-       gdk_gc_set_foreground(gc,selection_cmap+1);
-       gdk_draw_rectangle(widget->window,gc,0,x[0],y[0],x[1]-x[0],y[1]-y[0]);
-
-    }
-    */
 
     // TODO (perry#2#): Draw to a pixmap and paint here the contents.
     if(!cursor_enabled)
@@ -309,203 +237,6 @@
 
     return 0;
  }
-
-/*
- static gboolean single_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
- {
- 	long	cRow;
- 	long	cCol;
-
-    DBGPrintf("Button %d press at %ld,%ld", event->button,(unsigned long) event->x, (unsigned long) event->y);
-
-    switch(event->button)
-    {
-    case 1:
-
-       if(MouseMode != MOUSE_MODE_NORMAL)
-       {
-          MouseMode = MOUSE_MODE_NORMAL;
-          action_remove_selection(0,0);
-       }
-
-       xFrom = (unsigned long) event->x;
-       yFrom = (unsigned long) event->y;
-
-       Mouse2Terminal((long) event->x, (long) event->y, &cRow, &cCol);
-
-       fromRow = cRow;
-       fromCol = cCol;
-       break;
-
-	case 3:
-	   DBGMessage("Copy!");
-	   MouseMode |= MOUSE_MODE_COPY;
-	   break;
-    }
-
- 	return 0;
- }
-*/
-
-/*
- static void Check4Function(const char *field)
- {
- 	const char *ptr;
- 	char ks[6];
-
- 	for(ptr = field;*ptr;ptr++)
- 	{
- 		if(!isdigit(*ptr))
- 		   return;
- 	}
-
-    snprintf(ks,5,"%d",atoi(field));
-    DBGPrintf("Function: %s",ks);
-    action_internal(PF_action, IA_DEFAULT, ks, CN);
-
- }
-*/
-
-/*
- static gboolean double_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
- {
-    long 			cRow;
-    long 			cCol;
-    int  			rows;
-    int  			cols;
-    int  			baddr;
-    const struct ea *trm;
-    char			buffer[10];
-    int				f;
-
-    DBGPrintf("Button %d double-click at %ld,%ld", event->button,(unsigned long) event->x, (unsigned long) event->y);
-
-    switch(event->button)
-    {
-    case 1:
-       mouse_click = 0;
-       Mouse2Terminal((long) event->x, (long) event->y, &cRow, &cCol);
-       trm = Get3270DeviceBuffer(&rows, &cols);
-
-       if(trm)
-       {
-          baddr = find_field_attribute((cRow * cols) + cCol);
-          if(baddr > 0)
-          {
-             DBGPrintf("Field por position %ldx%ld: %d",cRow,cCol,baddr);
-			 baddr++;
-             for(f=0;f<10 && !trm[baddr].fa;f++)
-             	buffer[f] =  ebc2asc[trm[baddr++].cc];
-
-			 DBGTrace(f);
-             if(f < 10)
-             {
-             	buffer[f] = 0;
-             	if(*buffer == 'F')
-             	   Check4Function(buffer+1);
-             }
-          }
-       }
-       break;
-
-	case 3:
-	   DBGMessage("Append!");
-	   MouseMode = MOUSE_MODE_APPEND;
-	   break;
-    }
-
-
- 	return 0;
- }
-*/
-
-/*
- static gboolean button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
- {
-    // http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-button-press-event
- 	int 	rows;
- 	int 	cols;
- 	long	cRow;
- 	long	cCol;
-
-    if(!mouse_click)
-       return 0;
-
-    Get3270DeviceBuffer(&rows, &cols);
-
-    DBGPrintf("Button %d release at %ld,%ld", event->button,(unsigned long) event->x, (unsigned long) event->y);
-    xFrom = yFrom = -1;
-
-
-    switch(event->button)
-    {
-    case 1:
-       if(MouseMode == MOUSE_MODE_NORMAL && Mouse2Terminal((long) event->x, (long) event->y, &cRow, &cCol))
-       {
-          action_remove_selection(0,0);
-          move3270Cursor((cRow * cols) + cCol);
-       }
-       CheckForCopy();
-       MouseMode = MOUSE_MODE_NORMAL;
-       break;
-
-	case 3:
-	   break;
-    }
-
-    return 0;
- }
-*/
-
-/*
- static gboolean motion_notify(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
- {
- 	long	cRow;
- 	long	cCol;
-
- 	if(event->state & GDK_BUTTON1_MASK)
- 	{
-
-       MouseMode = MOUSE_MODE_SELECTING;
-
-       xTo = ((long) event->x);
-       yTo = ((long) event->y);
-
-       Mouse2Terminal(xTo, yTo, &cRow, &cCol);
-
-       toRow = cRow;
-       toCol = cCol;
-
-       DBGPrintf("Box from %d,%d to %d,%d",min(toRow,fromRow),min(toCol,fromCol),max(toRow,fromRow),max(toCol,fromCol));
-       gtk_widget_queue_draw(terminal);
-
- 	}
-
- 	return 0;
- }
-*/
-
-/*
-#if GTK == 2
-
- static gboolean scroll_event(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
- {
-    // FIXME (perry#1#): Read associoation from scroll to function key from configuration file.
- 	static const char *scroll[] = { "8", "7" };
- 	DBGTracex(event->direction);
-
- 	if(event->direction > 1 || WaitForScreen)
- 	   return 0;
-
-	// It's whell mouse action, execute function codes.
-    WaitForScreen = TRUE;
-    action_internal(PF_action, IA_DEFAULT, scroll[event->direction], CN);
-
- 	return 0;
- }
-
-#endif
-*/
 
  static void SetFont(GtkWidget *widget, FONTELEMENT *fn, int width, int height)
  {
@@ -776,16 +507,34 @@
     return rc;
  }
 
- GtkWidget *g3270_new(const char *hostname)
+ static int ReadFont(const char *buffer, int fontCount)
  {
-
- 	int		  sz;
- 	int		  f;
     gint 	  lbearing	= 0;
     gint 	  rbearing	= 0;
     gint 	  width		= 0;
     gint 	  ascent	= 0;
     gint 	  descent	= 0;
+
+    fontlist[fontCount].fn = gdk_font_load(buffer);
+    if(fontlist[fontCount].fn)
+	{
+	   gdk_text_extents(fontlist[fontCount].fn,"A",1,&lbearing,&rbearing,&width,&ascent,&descent);
+	   fontlist[fontCount].Width  = width;
+	   fontlist[fontCount].Height = (ascent+descent)+line_spacing;
+       fontCount++;
+	}
+	else
+	{
+	   Log("Error loading font %s",buffer);
+	}
+	return fontCount;
+ }
+
+ GtkWidget *g3270_new(const char *hostname)
+ {
+
+ 	int		  sz;
+ 	int		  f;
     int		  rows		= 0;
     int		  cols		= 0;
 
@@ -823,7 +572,7 @@
 
     if(!arq)
     {
-    	ErrorPopup("Unable to open \"%s\" for reading",fontfile);
+    	ErrorPopup( _( "Unable to open \"%s\" for reading" ),fontfile);
     	return 0;
     }
 
@@ -847,27 +596,48 @@
 
 			 if(!fontlist)
 			 {
-			 	ErrorPopup("Can't allocate memory for font list");
+			 	ErrorPopup( _( "Can't allocate memory for font list" ) );
 			 	return 0;
 			 }
           }
 
- 		  fontlist[fontCount].fn = gdk_font_load(buffer);
-		  if(fontlist[fontCount].fn)
-		  {
-		     gdk_text_extents(fontlist[fontCount].fn,"A",1,&lbearing,&rbearing,&width,&ascent,&descent);
-		 	 fontlist[fontCount].Width  = width;
-		  	 fontlist[fontCount].Height = (ascent+descent)+line_spacing;
-             fontCount++;
-		  }
-	 	  else
-		  {
-			 Log("Error loading font %s",buffer);
-		  }
+		  fontCount = ReadFont(buffer,fontCount);
        }
     }
 
     DBGTrace(fontCount);
+
+    if(!fontCount)
+    {
+    	static const char *default_fonts[] = {	"-*-fixed-*-*-*-*-13-*-*-*-*-*-*-*",
+												"-*-fixed-*-*-*-*-14-*-*-*-*-*-*-*",
+												"-*-fixed-*-*-*-*-15-*-*-*-*-*-*-*",
+												"-*-fixed-*-*-*-*-16-*-*-*-*-*-*-*",
+												"-*-fixed-*-*-*-*-18-*-*-*-*-*-*-*",
+												"-*-fixed-*-*-*-*-20-*-*-*-*-*-*-*",
+												"-*-terminal-*-*-*-*-*-*-*-*-*-*-*-*",
+											};
+
+    	Log("No Font, trying to use defaults");
+
+    	if(fontlist)
+    	   free(fontlist);
+
+		fontlist = malloc(sizeof(FONTELEMENT) * (sizeof(default_fonts)/sizeof(const char *)));
+
+	    if(fontlist)
+	    {
+	    	int f;
+
+	    	for(f=0;f<(sizeof(default_fonts)/sizeof(const char *));f++)
+	    	{
+		       fontCount = ReadFont(default_fonts[f],fontCount);
+	    	}
+	    }
+
+	    DBGTrace(fontCount);
+
+    }
 
     if(fontCount)
     {
@@ -875,7 +645,7 @@
     }
     else
     {
-    	ErrorPopup("Can't find fonts!");
+    	ErrorPopup( _( "Can't find fonts!" ) );
     	return 0;
     }
 
@@ -929,7 +699,7 @@
 
     if(!terminal_cmap)
     {
-    	ErrorPopup("Memory allocation error when creating %d colors",terminal_color_count);
+    	ErrorPopup( _( "Memory allocation error when creating %d colors" ), terminal_color_count);
     	return 0;
     }
 
