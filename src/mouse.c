@@ -494,7 +494,7 @@
  gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
  {
     // FIXME (perry#1#): Read associoation from scroll to function key from configuration file.
-    static const char *scroll[] = { "8", "7" };
+    static const char *scroll[] = { "7", "8" };
 
     if(event->direction < 2 && !WaitForScreen)
  	{
