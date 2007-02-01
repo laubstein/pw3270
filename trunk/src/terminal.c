@@ -49,17 +49,6 @@
  int				terminal_color_count					= 0;
  int				line_spacing							= MIN_LINE_SPACING;
 
-// static int			fromRow									= -1;
-// static int			fromCol									= -1;
-// static int			toRow									= -1;
-// static int			toCol									= -1;
-
-// static long		xFrom									= -1;
-// static long		yFrom									= -1;
-// static long		xTo										= -1;
-// static long		yTo										= -1;
-// static int			MouseMode								= MOUSE_MODE_NORMAL;
-
  static int			cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
  static gboolean    cursor_enabled							= TRUE;
  int				cursor_row								= 0;
@@ -70,14 +59,7 @@
  gboolean			reconnect								= TRUE;
  int				reconnect_retry							= 0;
 
-// static int 		selection_row 							= -1;
-// static int 		selection_col 							= -1;
-// gboolean			mouse_click								= 0;
-
-
 #ifdef USE_GTKIMCONTEXT
- /* Input context for dead key support */
- // http://developer.gnome.org/doc/API/2.0/gtk/GtkIMContext.html
  GtkIMContext		*im;
 #endif
 
@@ -507,13 +489,30 @@
     return rc;
  }
 
- static int ReadFont(const char *buffer, int fontCount)
+ static int ReadFont(const char *buffer, int fontCount, int *qtd)
  {
     gint 	  lbearing	= 0;
     gint 	  rbearing	= 0;
     gint 	  width		= 0;
     gint 	  ascent	= 0;
     gint 	  descent	= 0;
+
+    if(!fontlist || (fontCount >= *qtd) )
+    {
+       (*qtd) += 10;
+       if(fontlist)
+	      fontlist = realloc(fontlist,sizeof(FONTELEMENT) * (*qtd));
+	   else
+		  fontlist = malloc(sizeof(FONTELEMENT) * (*qtd));
+
+	   if(!fontlist)
+	   {
+	      ErrorPopup( _( "Can't allocate memory for font list" ) );
+	      *qtd = -1;
+	 	  return 0;
+   	   }
+
+	}
 
     fontlist[fontCount].fn = gdk_font_load(buffer);
     if(fontlist[fontCount].fn)
@@ -538,7 +537,7 @@
     int		  rows		= 0;
     int		  cols		= 0;
 
-    int		  qtd;
+    int		  qtd		= 0;
 
  	char      *ptr;
  	char      *tok;
@@ -566,8 +565,6 @@
 	register_3270_schange(ST_3270_MODE, 	sts3270Mode);
 
     /* Load font table */
-    qtd = 0;
-
     arq = fopen(fontfile,"r");
 
     if(!arq)
@@ -585,23 +582,9 @@
 
        if(*ptr && *ptr != '#')
        {
-          DBGMessage(buffer);
-          if(!fontlist || (fontCount >= qtd) )
-          {
-		     qtd += 10;
-		     if(fontlist)
-		        fontlist = realloc(fontlist,sizeof(FONTELEMENT) * qtd);
-			 else
-			    fontlist = malloc(sizeof(FONTELEMENT) * qtd);
-
-			 if(!fontlist)
-			 {
-			 	ErrorPopup( _( "Can't allocate memory for font list" ) );
-			 	return 0;
-			 }
-          }
-
-		  fontCount = ReadFont(buffer,fontCount);
+	      fontCount = ReadFont(buffer,fontCount,&qtd);
+	      if(qtd < 0)
+	         return 0;
        }
     }
 
@@ -609,31 +592,24 @@
 
     if(!fontCount)
     {
-    	static const char *default_fonts[] = {	"-*-fixed-*-*-*-*-13-*-*-*-*-*-*-*",
-												"-*-fixed-*-*-*-*-14-*-*-*-*-*-*-*",
-												"-*-fixed-*-*-*-*-15-*-*-*-*-*-*-*",
-												"-*-fixed-*-*-*-*-16-*-*-*-*-*-*-*",
-												"-*-fixed-*-*-*-*-18-*-*-*-*-*-*-*",
-												"-*-fixed-*-*-*-*-20-*-*-*-*-*-*-*",
-												"-*-terminal-*-*-*-*-*-*-*-*-*-*-*-*",
-											};
+    	int t;
+    	static const char *DefaultFont[] = { "terminus", "fixed", "courier" };
 
-    	Log("No Font, trying to use defaults");
 
-    	if(fontlist)
-    	   free(fontlist);
 
-		fontlist = malloc(sizeof(FONTELEMENT) * (sizeof(default_fonts)/sizeof(const char *)));
+		for(t=0;!fontCount && t < (sizeof(DefaultFont)/sizeof(const char *)); t++)
+		{
+			Log("Loading default font \"%s\"",DefaultFont[t]);
 
-	    if(fontlist)
-	    {
-	    	int f;
-
-	    	for(f=0;f<(sizeof(default_fonts)/sizeof(const char *));f++)
-	    	{
-		       fontCount = ReadFont(default_fonts[f],fontCount);
-	    	}
-	    }
+    	    for(f=6;f<40;f++)
+    	    {
+		       char buffer[80];
+    		   snprintf(buffer,79,"-*-%s-*-*-*-*-%d-*-*-*-*-*-*-*",DefaultFont[t],f);
+			   fontCount = ReadFont(buffer,fontCount,&qtd);
+	           if(qtd < 0)
+	              return 0;
+    	    }
+    	}
 
 	    DBGTrace(fontCount);
 
