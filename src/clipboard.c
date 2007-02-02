@@ -32,7 +32,7 @@
     int				mode = 0;
     unsigned char	chr  = ' ';
     char			*ptr;
- 	char			*mark;
+    char			*mark;
 
  	const struct ea *screen;
  	const struct ea *trm;
@@ -65,13 +65,13 @@
     /* Copy selected area to transfer buffer */
     DBGPrintf("Reading %dx%d <-> %dx%d",bRow,bCol,fRow,fCol);
 
-	ptr = (char *) buffer;
-    for(row=bRow;row<fRow;row++)
+	ptr  = (char *) buffer;
+   	trm  = screen;
+	*ptr = 0;
+    for(row=0;row < rows;row++)
     {
-    	trm  = screen + ((row * cols)+bCol);
     	mark = ptr;
-
-    	for(col=bCol;col<fCol;col++)
+    	for(col=0;col<cols;col++)
     	{
 		    chr = ' ';
 
@@ -89,15 +89,19 @@
             if(!mode)
                chr = ebc2asc[trm->cc];
 
-            /* Add processed string to the transfer buffer */
-    		if(chr > ' ')
-    		   mark = ptr;
-            *ptr = chr;
-    		ptr++;
+            if(row >= bRow && row < fRow && col >= bCol && col < fCol)
+            {
+			   /* It's inside the selection box, copy it */
+               *(ptr++) = chr;
+               if(!isspace(chr))
+                  mark = ptr;
+            }
+
     		trm++;
     	}
-    	ptr = (mark+1);
-    	*(ptr++) = '\n';
+    	ptr = mark;
+        if(row >= bRow && row < fRow)
+   	       *(ptr++) = '\n';
 
     }
 
