@@ -13,6 +13,8 @@ BuildRequires:  openssl-devel
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
 any IBM host that supports 3270-style connections over TELNET.
+$Revision$
+
 
 %package lib
 Provides:	%{name}-lib
@@ -21,6 +23,7 @@ Group:          Development/Libraries
 
 %description lib
 tn3270 protocol library for %{name}
+$Revision$
 
 %prep
 
