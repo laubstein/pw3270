@@ -72,7 +72,7 @@ if [ %{_vendor} != conectiva ] ; then
 
 	desktop-file-install	--vendor %{_build_vendor} \
 				--dir %{buildroot}%{_datadir}/applications \
-				--add-category Emulator \
+				--add-category System \
 				%{name}.desktop
 
 else
