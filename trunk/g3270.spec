@@ -8,7 +8,7 @@ Source:         %{name}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 Requires:       openssl %{name}-lib terminus-font
-BuildRequires:  openssl-devel
+BuildRequires:  openssl-devel sed
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
@@ -47,12 +47,15 @@ mkdir -p %{buildroot}%{_datadir}/%{name}
 mkdir -p %{buildroot}%{_sysconfdir}/x3270
 mkdir -p %{buildroot}/etc/sysconfig
 
-install -m 755 src/lib3270.so		%{buildroot}%{_libdir}
-install -m 755 src/%{name}		%{buildroot}%{_bindir}
-install -m 644 src/*.jpg		%{buildroot}%{_datadir}/%{name}
-install -m 644 src/*.conf		%{buildroot}%{_datadir}/%{name}
+install -m 755 src/lib3270.so	    %{buildroot}%{_libdir}
+install -m 755 src/g3270		    %{buildroot}%{_datadir}/%{name}/%{name}
+install -m 644 src/*.jpg		    %{buildroot}%{_datadir}/%{name}
+install -m 644 src/*.conf		    %{buildroot}%{_datadir}/%{name}
 install -m 644 src/lib/ibm_hosts	%{buildroot}%{_sysconfdir}/x3270
-install -m 644 sysconfig		%{buildroot}/etc/sysconfig/%{name}
+install -m 644 sysconfig		    %{buildroot}/etc/sysconfig/%{name}
+
+sed "s@./src@%{_datadir}/%{name}@g" g3270.sh > %{buildroot}%{_datadir}/%{name}/%{name}.sh
+chmod 755 %{buildroot}%{_datadir}/%{name}/%{name}.sh
 
 # Desktop menu entry
 cat > %{name}.desktop << EOF
@@ -60,7 +63,7 @@ cat > %{name}.desktop << EOF
 Encoding=UTF-8
 Name=%{name}
 Comment=IBM 3270 Terminal emulator
-Exec=%{_bindir}/%{name}
+Exec=%{_datadir}/%{name}/%{name}.sh
 Icon=%{_datadir}/%{name}/icon.jpg
 Terminal=false
 Type=Application
@@ -70,10 +73,10 @@ mkdir -p %{buildroot}%{_datadir}/applications
 
 if [ %{_vendor} != conectiva ] ; then
 
-	desktop-file-install	--vendor %{_build_vendor} \
-				--dir %{buildroot}%{_datadir}/applications \
-				--add-category System \
-				%{name}.desktop
+	desktop-file-install    --vendor %{_build_vendor} \
+                            --dir %{buildroot}%{_datadir}/applications \
+                            --add-category System \
+                            %{name}.desktop
 
 else
 
