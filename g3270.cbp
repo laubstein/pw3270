@@ -18,6 +18,12 @@
 				<Option projectResourceIncludeDirsRelation="0"/>
 			</Target>
 		</Build>
+		<Unit filename="g3270.sh">
+			<Option compilerVar=""/>
+			<Option compile="0"/>
+			<Option link="0"/>
+			<Option target="default"/>
+		</Unit>
 		<Unit filename="g3270.spec">
 			<Option compilerVar=""/>
 			<Option compile="0"/>
