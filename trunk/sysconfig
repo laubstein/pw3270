@@ -42,5 +42,5 @@ Status3270="black,#7890F0,white,LimeGreen,red,white,yellow,green,LimeGreen,LimeG
 #
 # The name of the 3270 host [L]:HOSTNAME:PORT
 #
-Host3270=""
+HOST3270_0=""
 
