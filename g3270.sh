@@ -7,6 +7,7 @@ export Fields3270
 export Cursor3270
 export Selection3270
 export Status3270
+export HOST3270_0
 
 cd ./src
 ./g3270
