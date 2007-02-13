@@ -771,23 +771,6 @@
 
     DBGTrace(selecting);
 
- 	if(!selecting)
- 	{
-       gdk_threads_enter();
-
-       GtkWidget *widget = gtk_message_dialog_new(
-					    GTK_WINDOW(top_window),
-                        GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
-                        GTK_MESSAGE_WARNING,
-                        GTK_BUTTONS_OK,
-                        _( "Selecione algum texto antes" ) );
-
-       gtk_dialog_run(GTK_DIALOG(widget));
-       gtk_widget_destroy (widget);
-       gdk_threads_leave();
- 	   return 0;
- 	}
-
     screen = CopyTerminalContents(	min(pos[SELECTION_BEGIN].row,pos[SELECTION_END].row),
 									min(pos[SELECTION_BEGIN].col,pos[SELECTION_END].col),
 
@@ -842,6 +825,27 @@
     pthread_t  thd = 0;
     pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_selection_thread, data);
 #endif
+
+ 	if(!selecting)
+ 	{
+       GtkWidget *widget = gtk_message_dialog_new(
+					    GTK_WINDOW(top_window),
+                        GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
+                        GTK_MESSAGE_WARNING,
+                        GTK_BUTTONS_OK,
+                        _( "Selecione algum texto antes" ) );
+
+       gtk_dialog_run(GTK_DIALOG(widget));
+       gtk_widget_destroy (widget);
+ 	   return;
+ 	}
+
+#if GTK == 2
+    thd =  g_thread_create( exec_with_selection_thread, (gpointer) data, 0, NULL);
+#else
+    pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_selection_thread, data);
+#endif
+	 
  }
 
  void action_print_selection(GtkWidget *w, gpointer data)
@@ -874,4 +878,3 @@
     ConfigureSelectionBox();
 
  }
-
