@@ -820,10 +820,8 @@
  {
 #if GTK == 2
     GThread   *thd = 0;
-    thd =  g_thread_create( exec_with_selection_thread, (gpointer) data, 0, NULL);
 #else
     pthread_t  thd = 0;
-    pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_selection_thread, data);
 #endif
 
  	if(!selecting)
@@ -841,7 +839,7 @@
  	}
 
 #if GTK == 2
-    thd =  g_thread_create( exec_with_selection_thread, (gpointer) data, 0, NULL);
+    thd = g_thread_create( exec_with_selection_thread, (gpointer) data, 0, NULL);
 #else
     pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_selection_thread, data);
 #endif
