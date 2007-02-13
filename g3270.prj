@@ -185,7 +185,12 @@ module.pixmap.files=\
 
 module.data.name=.
 module.data.type=
-module.data.files=
+module.data.files=\
+	g3270.spec\
+	sysconfig\
+	src/Makefile\
+	src/run.sh\
+	g3270.sh
 
 module.help.name=.
 module.help.type=
