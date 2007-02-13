@@ -175,7 +175,13 @@ module.source.files=\
 module.pixmap.name=.
 module.pixmap.type=
 module.pixmap.files=\
-	src/icon.jpg
+	src/icon.jpg\
+	src/a.bm\
+	src/b.bm\
+	src/four.bm\
+	src/locked.bm\
+	src/shift.bm\
+	src/unlocked.bm
 
 module.data.name=.
 module.data.type=
