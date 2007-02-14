@@ -11,6 +11,10 @@
    #define _(String) gettext(String)
  #endif
 
+ #ifndef SYSCONFIG
+   #define SYSCONFIG "/etc/sysconfig/g3270"
+ #endif   
+
  #include "lib/globals.h"
  #include "lib/appres.h"
  #include "lib/lib3270.h"
@@ -75,6 +79,7 @@
  	CURSOR_TYPE_CROSSHAIR // Must be the last one!
  };
 
+ #define TERMINAL_COLORS	16
  #define FIELD_COLORS		4
  #define CURSOR_COLORS		(CURSOR_TYPE_CROSSHAIR * 2)
  #define SELECTION_COLORS	2
@@ -177,9 +182,7 @@
  extern GdkColor				cursor_cmap[CURSOR_COLORS];
  extern GdkColor				status_cmap[STATUS_COLORS];
  extern GdkColor				selection_cmap[SELECTION_COLORS];
-
- extern GdkColor				*terminal_cmap;
- extern int						terminal_color_count;
+ extern GdkColor				terminal_cmap[TERMINAL_COLORS];
 
  extern int						cursor_type;
 
@@ -313,5 +316,3 @@
 /*---[ Terminal window ]------------------------------------------------------*/
 
  GtkWidget *g3270_new(const char *hostname);
-
-
