@@ -190,7 +190,8 @@ module.data.files=\
 	sysconfig\
 	src/Makefile\
 	src/run.sh\
-	g3270.sh
+	g3270.sh\
+	src/menu.conf
 
 module.help.name=.
 module.help.type=
