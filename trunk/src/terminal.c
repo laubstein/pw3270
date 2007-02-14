@@ -45,8 +45,7 @@
  int				top_margin								= 0;
  int 				left_margin								= 0;
 
- GdkColor			*terminal_cmap							= 0;
- int				terminal_color_count					= 0;
+// int				terminal_color_count					= 0;
  int				line_spacing							= MIN_LINE_SPACING;
 
  static int			cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
@@ -65,6 +64,7 @@
 
 /*---[ Terminal colors ]------------------------------------------------------*/
 
+ GdkColor	terminal_cmap[TERMINAL_COLORS];
  GdkColor	field_cmap[FIELD_COLORS];
  GdkColor	cursor_cmap[CURSOR_COLORS];
  GdkColor	status_cmap[STATUS_COLORS];
@@ -532,7 +532,6 @@
  GtkWidget *g3270_new(const char *hostname)
  {
 
- 	int		  sz;
  	int		  f;
     int		  rows		= 0;
     int		  cols		= 0;
@@ -540,7 +539,6 @@
     int		  qtd		= 0;
 
  	char      *ptr;
- 	char      *tok;
  	char      buffer[4096];
 
  	FILE	  *arq;
@@ -665,23 +663,8 @@
     g_signal_connect(G_OBJECT(ret), "scroll-event",			G_CALLBACK(mouse_scroll),		0);
 #endif
 
-    /* Load terminal colors */
-    GetColorDescription("Terminal",buffer);
-    for(ptr=strtok_r(buffer,",",&tok);ptr;ptr = strtok_r(0,",",&tok))
-       terminal_color_count++;
-
-    sz   		  = sizeof(GdkColor) * terminal_color_count;
-    terminal_cmap =  g_malloc(sz);
-
-    if(!terminal_cmap)
-    {
-    	ErrorPopup( _( "Memory allocation error when creating %d colors" ), terminal_color_count);
-    	return 0;
-    }
-
-    LoadColors(terminal_cmap, terminal_color_count, "Terminal");
-
     /* Load colors */
+    LoadColors(terminal_cmap, TERMINAL_COLORS, "Terminal");
     LoadColors(field_cmap,FIELD_COLORS,"Fields");
     LoadColors(cursor_cmap,CURSOR_COLORS,"Cursor");
     LoadColors(selection_cmap,SELECTION_COLORS,"Selection");
@@ -767,4 +750,3 @@
        UnlockThreads();
     }
  }
-

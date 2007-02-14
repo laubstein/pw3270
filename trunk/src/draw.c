@@ -196,8 +196,8 @@
 
  static void SetColorAttribute(GdkGC *gc, const struct ea *trm, GdkColor **fgColor, GdkColor **bgColor)
  {
- 	int 		fg	= (trm->fg % terminal_color_count);
- 	int 		bg	= (trm->bg % terminal_color_count);
+ 	int 		fg	= (trm->fg % TERMINAL_COLORS);
+ 	int 		bg	= (trm->bg % TERMINAL_COLORS);
  	GdkColor	*clr;
 
     *fgColor = (terminal_cmap + fg);
@@ -581,7 +581,3 @@
 	}
 
  }
-
-
-
-
