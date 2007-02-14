@@ -8,6 +8,8 @@
  #include "lib/3270ds.h"
 
 
+ #define DUMP_COPY 1
+
 /*---[ Globals ]--------------------------------------------------------------*/
 
  char *Clipboard  = 0;
@@ -20,6 +22,42 @@
 
  }
 
+ #if defined(DUMP_COPY)
+
+ static void DumpString(const char *msg, const char *string)
+ {
+	char 		 buffer[1024];
+	const char *ptr;
+    int			 ps = 0;
+	 
+    DBGPrintf("Dump of %s",msg);
+	 
+    memset(buffer,' ',78);
+    *(buffer+78) = 0;
+
+    for(ptr = string; *ptr; ptr++)
+    {
+    	char temp[5];
+    	if(ps > 0x0F)
+    	{
+    		fprintf(stderr,"%s\n",buffer);
+            memset(buffer,' ',78);
+            *(buffer+78) = 0;
+    		ps = 0;
+    	}
+    	*(buffer+50+ps) = *ptr >= ' ' ? *ptr : '.';
+    	snprintf(temp,5,"%02x",(int) *ptr);
+    	memcpy(buffer+(ps*3),temp,2);
+    	ps++;
+    }
+
+    *(buffer+75) = 0;
+	fprintf(stderr,"%s\n",buffer);
+    fflush(stderr);
+ }
+#endif	
+
+ 
  gchar *CopyTerminalContents(int bRow, int bCol, int fRow, int fCol, int table)
  {
  	int 			cols;
@@ -32,7 +70,9 @@
     int				mode = 0;
     unsigned char	chr  = ' ';
     char			*ptr;
-    char			*mark;
+	char 			*dst;
+	char 			*mark;
+	int 			copy = 0;
 
  	const struct ea *screen;
  	const struct ea *trm;
@@ -105,8 +145,52 @@
 
     }
 
-   *ptr = 0;
+    *ptr = 0;
 
+#ifdef DUMP_COPY	
+	DumpString("Pre-processed Buffer",buffer);
+#endif
+	
+	if(table)
+	{
+	   // Remove unnecessary spaces
+	   for(mark=ptr=dst=buffer;*ptr;ptr++)
+       {
+		   switch(*ptr)
+		   {
+		   case '\t':
+			   copy     = 0;
+		       dst      = mark;
+			   *(dst++) = '\t';
+		       mark     = dst;
+			   break;
+			   
+		   case '\n':
+			   copy     = 0;
+		       dst      = mark;
+			   *(dst++) = '\n';
+		       mark     = dst;
+		       break;
+		   
+		   default:
+			  if(!isspace(*ptr))
+			  {
+				 mark = dst+1;
+			     copy = 1;
+			  }
+			  
+			  if(copy)
+				 *(dst++) = *ptr;
+		   }
+       }
+	   *dst = 0;
+	   
+#ifdef DUMP_COPY	
+   	DumpString("Post-processed Buffer",buffer);
+#endif
+	}
+	
+	
     return buffer;
  }
 
@@ -327,4 +411,3 @@
  {
     action_exec_with_copy(w,data ? data : "kprinter --nodialog -t " TARGET " %s");
  }
-
