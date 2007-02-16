@@ -477,7 +477,7 @@
 
     	if(!gdk_colormap_alloc_color(	gtk_widget_get_default_colormap(),
 										clr+f,
-										FALSE,
+										TRUE,
 										TRUE ))
 		{
 			Log("Can't allocate color \"%s\" from %s",ptr,id);
