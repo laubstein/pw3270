@@ -15,7 +15,10 @@
 /*---[ Internal actions ]-----------------------------------------------------*/
 
  static void action_toogle(GtkWidget *w, gpointer data);
+ 
+#ifdef DEBUG 
  static void action_set_colors(GtkWidget *w, gpointer data);
+#endif 
 
 /*---[ Callback table ]-------------------------------------------------------*/
 
@@ -145,6 +148,9 @@
         DECLARE_KEYPROC( GDK_r,					GDK_CONTROL_MASK,	action_Reset			),
 
      	DECLARE_KEYPROC( GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab			),
+
+     	DECLARE_KEYPROC( GDK_Page_Up, 			GDK_SHIFT_MASK,		action_F19			),
+     	DECLARE_KEYPROC( GDK_Page_Down,			GDK_SHIFT_MASK,		action_F20			),
 
      	DECLARE_KEYPROC( GDK_Page_Up, 			0,					action_F7			),
      	DECLARE_KEYPROC( GDK_Page_Down,			0,					action_F8			),
@@ -405,7 +411,6 @@
     action_exec_with_screen(w,data ? data : "kprinter --nodialog -t " TARGET " %s");
  }
 
-
  void action_F7(GtkWidget *w, gpointer data)
  {
     action_internal(PF_action, IA_DEFAULT, "7", CN);
@@ -416,6 +421,17 @@
     action_internal(PF_action, IA_DEFAULT, "8", CN);
  }
 
+ void action_F19(GtkWidget *w, gpointer data)
+ {
+    action_internal(PF_action, IA_DEFAULT, "19", CN);
+ }
+
+ void action_F20(GtkWidget *w, gpointer data)
+ {
+    action_internal(PF_action, IA_DEFAULT, "20", CN);
+ }
+
+ 
  void action_BackTab(GtkWidget *w, gpointer data)
  {
     action_internal(BackTab_action, IA_DEFAULT, CN, CN);
@@ -598,6 +614,7 @@ gtk_show_about_dialog (NULL,
  	DBGPrintf("Toogle \"%s\" using widget %p",(char *) data,w);
  }
 
+#ifdef DEBUG 
  
  static void AddColors(int pos, GtkTable *table, const char *string, GdkColor *list, int count)
  {
@@ -674,3 +691,5 @@ gtk_show_about_dialog (NULL,
      gtk_widget_destroy (widget);
 	 
  }
+
+ #endif
