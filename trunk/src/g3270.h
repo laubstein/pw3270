@@ -237,6 +237,8 @@
 
  void action_F7(GtkWidget *w, gpointer data);
  void action_F8(GtkWidget *w, gpointer data);
+ void action_F19(GtkWidget *w, gpointer data);
+ void action_F20(GtkWidget *w, gpointer data);
 
  void action_Tab(GtkWidget *w, gpointer data);
 
