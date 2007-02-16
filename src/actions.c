@@ -1,4 +1,5 @@
 
+ #include <gdk/gdk.h>
  #include <gdk/gdkkeysyms.h>
 
  #include "g3270.h"
@@ -625,6 +626,14 @@ gtk_show_about_dialog (NULL,
 
 #ifdef DEBUG 
  
+ static void ColorChanged(GtkColorButton *widget, GdkColor *clr)
+ {
+	CHKPoint();
+    gtk_color_button_get_color(widget,clr);
+    gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr,TRUE,TRUE);
+    RedrawTerminalContents();
+ }
+  
  static void AddColors(int pos, GtkTable *table, const char *string, GdkColor *list, int count)
  {
     GtkTable  *colors; 
@@ -642,6 +651,8 @@ gtk_show_about_dialog (NULL,
 	for(f=0;f<count;f++)
     {
 		button = gtk_color_button_new_with_color(list+f);
+        g_signal_connect(G_OBJECT(button),"color-set",G_CALLBACK(ColorChanged),list+f);
+		
 		gtk_widget_set_sensitive(button,sensitive);
         gtk_table_attach_defaults(colors,button,col,col+1,row,row+1);
 		if(col++ > 6)
@@ -652,7 +663,7 @@ gtk_show_about_dialog (NULL,
     }		
 	 
     gtk_table_attach_defaults(table,GTK_WIDGET(colors),1,2,pos,pos+1);
-	 
+    gtk_table_set_row_spacing(table,pos,4);
 
  }
  
@@ -661,22 +672,6 @@ gtk_show_about_dialog (NULL,
 	 GtkWidget *widget;
 	 GtkTable  *table; 
 
-	 /*
-	 if(access(SYSCONFIG,W_OK))
-	 {
-		 // No write on the configuration file
-		 widget = gtk_message_dialog_new(	GTK_WINDOW(top_window),
-											GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
-                        					GTK_MESSAGE_ERROR,
-                        					GTK_BUTTONS_OK,
-                        					_( "Configuração de cores não está disponível" ) );
-
-    	gtk_dialog_run(GTK_DIALOG(widget));
-    	gtk_widget_destroy (widget);
-	    return;
-	 }
-	 */
-	 
      widget = gtk_dialog_new_with_buttons (	_( "Configuração de cores" ),
                                             GTK_WINDOW(top_window),
                                             GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -687,6 +682,8 @@ gtk_show_about_dialog (NULL,
 
      table = GTK_TABLE(gtk_table_new(1,5,0));
 
+	 gtk_table_set_col_spacing(table,0,10);
+	 
      AddColors(0, table, _( "Terminal" ),  		terminal_cmap,	TERMINAL_COLORS );
 	 AddColors(1, table, _( "Fields"),			field_cmap,		FIELD_COLORS);
      AddColors(2, table, _( "Cursor"),			cursor_cmap,	CURSOR_COLORS);
