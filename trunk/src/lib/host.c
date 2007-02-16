@@ -1040,5 +1040,7 @@ const char * query_qualified_host(void)
 	return qualified_host;
 }
 
-
-
+int Get3270CState(void)
+{
+	return cstate;
+}
