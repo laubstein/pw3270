@@ -634,7 +634,7 @@ gtk_show_about_dialog (NULL,
     RedrawTerminalContents();
  }
   
- static void AddColors(int pos, GtkTable *table, const char *string, GdkColor *list, int count)
+ static void AddColors(int pos, GtkTable *table, const char *string, GdkColor *list, GdkColor *bkp, int count)
  {
     GtkTable  *colors; 
 	GtkWidget *button;
@@ -650,6 +650,7 @@ gtk_show_about_dialog (NULL,
 	 
 	for(f=0;f<count;f++)
     {
+		bkp[f] = list[f];
 		button = gtk_color_button_new_with_color(list+f);
         g_signal_connect(G_OBJECT(button),"color-set",G_CALLBACK(ColorChanged),list+f);
 		
@@ -667,8 +668,24 @@ gtk_show_about_dialog (NULL,
 
  }
  
+ static void RestoreColors(GdkColor *clr, GdkColor *bkp, int count)
+ {
+	int f;
+	for(f=0;f<count;f++)
+	{
+		clr[f] = bkp[f];
+        gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr+f,TRUE,TRUE);
+	}
+ }
+ 
  static void action_set_colors(GtkWidget *w, gpointer data)
  {
+     GdkColor  terminal_backup[TERMINAL_COLORS];
+	 GdkColor  field_backup[FIELD_COLORS];
+     GdkColor  cursor_backup[CURSOR_COLORS];
+     GdkColor  selection_backup[SELECTION_COLORS];
+     GdkColor  status_backup[STATUS_COLORS];
+	 
 	 GtkWidget *widget;
 	 GtkTable  *table; 
 
@@ -684,17 +701,36 @@ gtk_show_about_dialog (NULL,
 
 	 gtk_table_set_col_spacing(table,0,10);
 	 
-     AddColors(0, table, _( "Terminal" ),  		terminal_cmap,	TERMINAL_COLORS );
-	 AddColors(1, table, _( "Fields"),			field_cmap,		FIELD_COLORS);
-     AddColors(2, table, _( "Cursor"),			cursor_cmap,	CURSOR_COLORS);
-     AddColors(3, table, _( "Selection Box" ),	selection_cmap,	SELECTION_COLORS);
-     AddColors(4, table, _( "Status Bar" ),		status_cmap,	STATUS_COLORS);
-
+     AddColors(0, table, _( "Terminal" ),  		terminal_cmap,	terminal_backup,	TERMINAL_COLORS );
+	 AddColors(1, table, _( "Fields"),			field_cmap,		field_backup,		FIELD_COLORS);
+     AddColors(2, table, _( "Cursor"),			cursor_cmap,	cursor_backup,		CURSOR_COLORS);
+     AddColors(3, table, _( "Selection Box" ),	selection_cmap,	selection_backup,	SELECTION_COLORS);
+     AddColors(4, table, _( "Status Bar" ),		status_cmap,	status_backup,		STATUS_COLORS);
 
 	 gtk_container_add(GTK_CONTAINER(GTK_DIALOG(widget)->vbox),GTK_WIDGET(table));
 	 gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(widget)->vbox));
-   	 gtk_dialog_run(GTK_DIALOG(widget));
+   	 switch(gtk_dialog_run(GTK_DIALOG(widget)))
+	 {
+	 case GTK_RESPONSE_ACCEPT:
+		 DBGMessage("Cores confirmadas, atualizar arquivo de configuracao");
+	     break;
+	 
+	 case GTK_RESPONSE_REJECT:
+		 DBGMessage("Alteracao cancelada, restaurar todas as cores");
+     	 RestoreColors(terminal_cmap,	terminal_backup,	TERMINAL_COLORS);
+	 	 RestoreColors(field_cmap,		field_backup,		FIELD_COLORS);
+     	 RestoreColors(cursor_cmap,		cursor_backup,		CURSOR_COLORS);
+     	 RestoreColors(selection_cmap,	selection_backup,	SELECTION_COLORS);
+     	 RestoreColors(status_cmap,		status_backup,		STATUS_COLORS);
+		 break;
+	 
+	 default:
+	 	 Log("Invalid response from color selection dialog");
+	 }
+	 
      gtk_widget_destroy (widget);
+	 
+     RedrawTerminalContents();
 	 
  }
 
