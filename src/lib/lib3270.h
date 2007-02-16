@@ -134,10 +134,12 @@ extern void  move3270Cursor(int baddr);
 extern void  RemoveSelectionBox(void);
 
 extern int   Get3270CursorRow(void);
+extern int   Get3270CState(void);
 
 extern void  stop_3270_timer(void);
 
 extern void  Input_String(const unsigned char *);
+
 
 #ifdef __cplusplus
  }

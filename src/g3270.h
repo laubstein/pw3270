@@ -141,7 +141,7 @@
 
  extern FONTELEMENT				*font;
  extern int						top_margin;
- extern int 					left_margin;
+ extern int 						left_margin;
  extern int						line_spacing;
  extern int						cursor_row;
  extern	int						cursor_col;
@@ -151,10 +151,10 @@
  extern const struct action_callback action_callbacks[];
  extern const int	 action_callback_counter;
 
- extern char					oia_undera;
- extern char					oia_Typeahead[2];
- extern char					oia_cursor[];
- extern char					oia_LUName[];
+ extern char						oia_undera;
+ extern char						oia_Typeahead[2];
+ extern char						oia_cursor[];
+ extern char						oia_LUName[];
 
  #ifndef GDK_NUMLOCK_MASK
     #define GDK_NUMLOCK_MASK GDK_MOD2_MASK
@@ -164,29 +164,29 @@
      #define GDK_ALT_MASK GDK_MOD1_MASK
  #endif
 
- extern guint					oia_KeyboardState;
+ extern guint						oia_KeyboardState;
 
  #define OIA_TIMER_COUNT	7
- extern char					oia_Timer[OIA_TIMER_COUNT+1];
+ extern char						oia_Timer[OIA_TIMER_COUNT+1];
 
  extern const char				*cl_hostname;
- extern GtkWidget				*top_window;
+ extern GtkWidget					*top_window;
  extern GtkWidget  				*terminal;
 
- extern char 					*Clipboard;
+ extern char 						*Clipboard;
  extern int						szClipboard;
 
- extern gboolean				WaitForScreen;
+ extern gboolean					WaitForScreen;
 
- extern GdkColor				field_cmap[FIELD_COLORS];
- extern GdkColor				cursor_cmap[CURSOR_COLORS];
- extern GdkColor				status_cmap[STATUS_COLORS];
- extern GdkColor				selection_cmap[SELECTION_COLORS];
- extern GdkColor				terminal_cmap[TERMINAL_COLORS];
+ extern GdkColor					field_cmap[FIELD_COLORS];
+ extern GdkColor					cursor_cmap[CURSOR_COLORS];
+ extern GdkColor					status_cmap[STATUS_COLORS];
+ extern GdkColor					selection_cmap[SELECTION_COLORS];
+ extern GdkColor					terminal_cmap[TERMINAL_COLORS];
 
  extern int						cursor_type;
 
- extern gboolean				reconnect;
+ extern gboolean					reconnect;
 
 
 /*---[ Prototipes ]-----------------------------------------------------------*/

@@ -309,7 +309,6 @@
 
     UpdateWindowTitle();
 
-
     return 0;
  }
 
@@ -321,6 +320,12 @@
     pthread_t  thd = 0;
 #endif
 
+    if(Get3270CState() != NOT_CONNECTED)
+	{
+		DBGMessage("Already connected or connecting");
+		return;
+	}
+	
     if(connecting)
        return;
 
@@ -328,6 +333,8 @@
     if(!cl_hostname)
        return;
 
+    SetOIAStatus(STATUS_RESOLVING);
+	
 #if GTK == 2
     thd =  g_thread_create( ConnectThread, (gpointer) cl_hostname, 0, NULL);
 #else
@@ -505,8 +512,10 @@
 
  void action_Enter(GtkWidget *w, gpointer data)
  {
- 	CHKPoint();
-    action_internal(Enter_action, IA_DEFAULT, CN, CN);
+	if(Get3270CState() == NOT_CONNECTED)
+       action_connect(w,data);
+	else
+       action_internal(Enter_action, IA_DEFAULT, CN, CN);
  }
 
  void action_Insert(GtkWidget *w, gpointer data)
