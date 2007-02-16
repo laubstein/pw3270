@@ -1,0 +1,36 @@
+#!/bin/sh
+
+CONFIG_FILE=src/gtk.mk
+TEMP_FILE=/tmp/$0.g3270.tmp
+
+rm -f $CONFIG_FILE
+
+pkg-config --modversion gtk+-2.0 > /dev/null 2>&1
+if [ "$?" = "0" ]; then
+
+    GTK_VERSION=2
+    echo GTK2=`pkg-config --modversion gtk+-2.0` >> $CONFIG_FILE
+	
+else
+
+   pkg-config --modversion gtk+ > /dev/null 2>&1
+   if [ "$?" = "0" ]; then
+      GTK_VERSION=1
+      echo GTK1=`pkg-config --modversion gtk+` >> $CONFIG_FILE
+   fi
+fi
+
+echo GTK=$GTK_VERSION >> $CONFIG_FILE
+
+pkg-config --cflags-only-I gtk+-2.0 | sed "s@-I@\n@g" > $TEMP_FILE
+while read dir
+do
+   if [ "$dir" != "" ]; then
+      if [ -e "$dir/glib/gi18n.h" ]; then
+         echo GI18N=$dir/glib/gi18n.h >> $CONFIG_FILE
+      fi
+   fi
+done < $TEMP_FILE
+rm -f $TEMP_FILE
+
+cat $CONFIG_FILE
