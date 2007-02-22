@@ -152,8 +152,12 @@
 
     	if(*buffer == '/')
     	{
+		   ptr = buffer;
+		   if(!strncmp((char *) ptr,"/menu",5))
+			   ptr += 5;
+		   
            InsertItem(factory, &item, &qtd);
-		   item.entry.path = g_strdup((char *) buffer);
+		   item.entry.path = g_strdup((char *) ptr);
     	}
     	else if(item.entry.path && *ln && *ln != '#')
     	{
