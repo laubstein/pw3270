@@ -16,7 +16,7 @@
 	 { GTK_STOCK_COPY, 			action_copy			},
 	 { GTK_STOCK_PASTE, 		action_paste		},
 	 { GTK_STOCK_PRINT, 		action_print		},
-	 { GTK_STOCK_CLEAR, 		action_Clear		},
+	 { GTK_STOCK_CLEAR, 		action_clear		},
 	 { GTK_STOCK_CONNECT, 		action_connect		},
 	 { GTK_STOCK_DISCONNECT,	action_disconnect	}
  };
