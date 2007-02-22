@@ -416,7 +416,7 @@
 
  void action_print(GtkWidget *w, gpointer data)
  {
-    action_exec_with_screen(w,data ? data : "kprinter --nodialog -t " TARGET " %s");
+    action_exec_with_screen(w,data ? data : PRINT_COMMAND);
  }
 
  void action_F7(GtkWidget *w, gpointer data)
