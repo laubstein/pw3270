@@ -605,22 +605,6 @@
 #endif
 							NULL
 						);
-/*
-gtk_show_about_dialog (NULL,
-					"name", "GChemPaint",
-					"authors", authors,
-					"artists", artists,
-					"comments", _("GChemPaint is a 2D chemical structures editor for Gnome"),
-					"copyright", _("(C) 2001-2005 by Jean Bréfort"),
-					"license", license,
-					"logo", pixbuf,
-					"icon-name", "gchempaint",
-					"translator_credits", strcmp (translator_credits, "translator_credits") != 0 ?
-											(const char *)translator_credits : NULL,
-					"version", VERSION,
-					"website", "http://www.nongnu.org/gchempaint",
-					NULL);
-*/
 #endif
 
  }

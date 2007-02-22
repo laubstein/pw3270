@@ -85,37 +85,6 @@
     gtk_main_quit();
  }
 
- static GtkWidget *CreateMainMenu(GtkWidget  *window)
- {
-   // http://www.gtk.org/tutorial1.2/gtk_tut-13.html
-   GtkItemFactory	*item_factory;
-   GtkAccelGroup	*accel_group;
-
-#ifdef DATADIR
-   const char		*filename = DATADIR "/menu.conf";
-#else
-   const char		*filename = DATADIR "./menu.conf";
-#endif
-
-   accel_group = gtk_accel_group_new();
-
-   // http://developer.gnome.org/doc/API/2.0/gtk/GtkItemFactory.html
-   item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", accel_group);
-
-   /* Load menu from configuration file */
-   if(LoadMenu(filename,item_factory) < 1)
-   {
-      Log("Can't load \"%s\"",filename);
-      return 0;
-   }
-
-   /* Attach the new accelerator group to the window. */
-   gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
-
-   /* Finally, return the actual menu bar created by the item factory. */
-   return gtk_item_factory_get_widget(item_factory, "<main>");
- }
-
  static int GetFunctionKey(GdkEventKey *event)
  {
  	int rc = (event->keyval - GDK_F1)+1;
@@ -158,6 +127,7 @@
  static void CreateMainWindow(const char *cl_hostname)
  {
  	GtkWidget	*vbox;
+	GtkWidget   *toolbar;
  	char 		filename[4096];
  	char 		*home	= getenv("HOME");
  	FILE 		*arq;
@@ -184,10 +154,16 @@
     vbox = gtk_vbox_new(FALSE,0);
     gtk_container_add(GTK_CONTAINER(top_window),vbox);
 
-    top_menu = CreateMainMenu(top_window);
+	// Load menu bar
+    top_menu = LoadMenu(top_window);
     if(top_menu)
        gtk_box_pack_start(GTK_BOX(vbox), top_menu, FALSE, TRUE, 0);
 
+	// Load toolbar
+	toolbar = LoadToolbar(top_window);
+    if(toolbar)
+       gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, TRUE, 0);
+	
     // Create terminal window
 	terminal = g3270_new(cl_hostname);
 	gtk_box_pack_start(GTK_BOX(vbox),terminal,TRUE,TRUE,0);
@@ -303,6 +279,3 @@
 
     gdk_threads_leave();
  }
-
-
-
