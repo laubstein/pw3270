@@ -187,6 +187,8 @@
     	fclose(arq);
     }
 
+	gtk_widget_grab_focus(terminal);
+	gtk_widget_grab_default(terminal);
 	gtk_window_set_position(GTK_WINDOW(top_window),GTK_WIN_POS_CENTER);
 
  }
