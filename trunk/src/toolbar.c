@@ -32,6 +32,7 @@
 	 GtkToolItem *item;
 	 
 	 toolbar = gtk_toolbar_new();
+     GTK_WIDGET_UNSET_FLAGS(toolbar,GTK_CAN_FOCUS);
 	 
 	 for(f=0;f<(sizeof(action)/sizeof(struct _action));f++)
 	 {
@@ -42,6 +43,7 @@
 	 }
 	 
 #endif
+
 	 
 	 return toolbar;
  }
