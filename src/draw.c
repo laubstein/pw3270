@@ -491,7 +491,7 @@
        {
        	  int        f;
        	  int        xCols = 3;
-       	  const char *ptr  = current_status->msg+1;
+       	  const char *ptr  = _( current_status->msg+1 );
 
        	  for(f=0;f < xCols;f++)
        	  {
