@@ -21,6 +21,9 @@
  #include "log.h"
 
  #define RedrawStatusLine() 		RedrawTerminalContents()
+ 
+// #define PRINT_COMMAND "kprinter --nodialog -t " TARGET " %s"
+ #define PRINT_COMMAND "lpr %s"
 
 // #ifdef DEBUG
 //   #define LockThreads()			DBGPrintf("Lock %p",g_thread_self()); gdk_lock()
