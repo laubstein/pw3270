@@ -170,7 +170,8 @@ module.source.files=\
 	src/main.c\
 	src/menu.c\
 	src/actions.c\
-	src/print.c
+	src/print.c\
+	src/toolbar.c
 
 module.pixmap.name=.
 module.pixmap.type=
