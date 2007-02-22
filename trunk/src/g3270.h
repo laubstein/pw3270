@@ -291,8 +291,9 @@
 
  void RedrawTerminalContents(void);
 
- int  LoadMenu(const char *filename, GtkItemFactory *factory);
- void LoadImages(GdkDrawable *drawable, GdkGC *gc);
+ GtkWidget	*LoadMenu(GtkWidget *window);
+ GtkWidget	*LoadToolbar(GtkWidget *window);
+ void 		LoadImages(GdkDrawable *drawable, GdkGC *gc);
 
  void gdk_lock(void);
  void gdk_unlock(void);

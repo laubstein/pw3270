@@ -102,9 +102,15 @@
     memset(item,0,sizeof(PARMDATA));
  }
 
- int LoadMenu(const char *filename, GtkItemFactory *factory)
+ GtkWidget *LoadMenu(GtkWidget *window)
  {
- 	static const struct _cmd
+#ifdef DATADIR
+    static const char		*filename = DATADIR "/menu.conf";
+#else
+    static const char		*filename = "./menu.conf";
+#endif	 
+
+	 static const struct _cmd
  	{
  		const char *key;
  		void (*exec)(PARMDATA *, const char *);
@@ -126,6 +132,12 @@
     unsigned char		*ln;
     int					f;
     PARMDATA			item;
+	
+    // http://www.gtk.org/tutorial1.2/gtk_tut-13.html
+    GtkAccelGroup		*accel_group	= gtk_accel_group_new();
+
+    // http://developer.gnome.org/doc/API/2.0/gtk/GtkItemFactory.html
+    GtkItemFactory		*factory		= gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", accel_group);
 
     DBGMessage(filename);
 
@@ -163,5 +175,15 @@
 
     fclose(arq);
 
-    return qtd;
+	if(qtd)
+	{
+       /* Attach the new accelerator group to the window. */
+       gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+
+	   /* Finally, return the actual menu bar created by the item factory. */
+       return gtk_item_factory_get_widget(factory, "<main>");
+	}
+	
+	return 0;
+ 
  }
