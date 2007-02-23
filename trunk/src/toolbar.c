@@ -16,21 +16,47 @@
 	  int	pos;
 	  int  type;
 	  char	*item;
+	  char	*parm;
 	  void (*action)(GtkWidget *w, gpointer data);
  } PARAMETER;
 
 /*---[ Implement ]------------------------------------------------------------*/
 
- static void ProcessDefinition(PARAMETER *prm, void (*proc)(PARAMETER *p, void *data), void *data)
+ static void ReleaseString(gpointer string)
  {
+ 	if(string)
+ 	{
+ 		DBGPrintf("Releasing \"%s\"",(char *) string);
+ 		g_free(string);
+ 	}
+ }
+
+ static void SetObjectParameter(GObject *obj, const char *name, const char *string)
+ {
+	 DBGPrintf("Allocating \"%s\"",string);
+     g_object_set_data_full(obj,name,g_strdup((char *) string),ReleaseString);	 
+ }
+
+ static void ProcessDefinition(PARAMETER *prm, GObject * (*proc)(PARAMETER *p, void *data), void *data)
+ {
+	 GObject *obj;
+	 
 	 if(!prm->item)
 		 return;
 
 	 DBGPrintf("%s=%p",prm->item,prm->action);
 
-	 proc(prm,data);
+	 obj = proc(prm,data);
+
+	 if(prm->parm)
+	 {
+		if(obj)
+		   SetObjectParameter(G_OBJECT(obj),"g3270.parameter",prm->parm);
+	 	free(prm->parm);
+	 }
 
 	 free(prm->item);
+	 
 	 memset(prm,0,sizeof(PARAMETER));
  }
 
@@ -49,6 +75,13 @@
     prm->action = 0;
 
     Log("Invalid action code: \"%s\"",name);
+ }
+
+ static void Parm(PARAMETER *prm, const char *parm)
+ {
+	 if(prm->parm)
+		 free(prm->parm);
+	 prm->parm = strdup(parm);
  }
 
  static void Type(PARAMETER *prm, const char *name)
@@ -77,7 +110,7 @@
 
  }
 
- int LoadUIDefinition(FILE *in, const char *id, void (*proc)(PARAMETER *p, void *data), void *data)
+ int LoadUIDefinition(FILE *in, const char *id, GObject * (*proc)(PARAMETER *p, void *data), void *data)
  {
 	 static const struct _cmd
  	 {
@@ -86,7 +119,11 @@
  	 } cmd[] =
   	 {
  		{ "action",			Action		},
-		{ "type",			Type		}
+		{ "type",			Type		},
+ 		{ "script",			Parm		},
+ 		{ "command",		Parm		},
+ 		{ "option",			Parm		}
+		
  	 };
 
 	 char			buffer[1024];
@@ -145,7 +182,8 @@
  }
 
 #ifdef __GTK_TOOL_ITEM_H__
- static void AddToolbar(PARAMETER *p, GtkWidget *toolbar)
+ 
+ static GObject *AddToolbar(PARAMETER *p, GtkWidget *toolbar)
  {
 	 GtkToolItem *item = 0;
 
@@ -163,7 +201,9 @@
 	 }
 
      if(item)
-       gtk_toolbar_insert(GTK_TOOLBAR(toolbar),GTK_TOOL_ITEM(item),-1);
+		gtk_toolbar_insert(GTK_TOOLBAR(toolbar),GTK_TOOL_ITEM(item),-1);
+	 
+	 return G_OBJECT(item);
  }
 #endif
 
@@ -184,7 +224,7 @@
 #ifdef __GTK_TOOL_ITEM_H__
     toolbar = gtk_toolbar_new();
     GTK_WIDGET_UNSET_FLAGS(toolbar,GTK_CAN_FOCUS);
-	LoadUIDefinition(in,"toolbar", (void (*)(PARAMETER *, void *)) AddToolbar, toolbar);
+	LoadUIDefinition(in,"toolbar", (GObject * (*)(PARAMETER *, void *)) AddToolbar, toolbar);
 #endif
 
 	fclose(in);
