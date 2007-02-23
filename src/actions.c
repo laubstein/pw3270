@@ -27,7 +27,7 @@
  {
 	{ "print",					action_print					},
 	{ "toogle",					action_toogle					},
-#ifdef __GTK_ABOUT_DIALOG_H__
+#ifdef __GTK_COLOR_BUTTON_H__
 	{ "about",					action_AboutBox					},
 #endif
 	{ "print_selection",		action_print_selection			},
