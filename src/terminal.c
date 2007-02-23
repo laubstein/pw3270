@@ -100,7 +100,7 @@
 	   if (GetKeyboardStatus() & KL_AWAITING_FIRST)
 	      SetOIAStatus(STATUS_AWAITING_FIRST);
        else
-	      SetOIAStatus(STATUS_BLANK);
+	      SetOIAStatus(STATUS_CONNECTED);
        ctlr_erase(True);
        EnableCursor(TRUE);
     }

@@ -70,8 +70,9 @@
         STATUS_SCROLLED,               /* 12 X Scrolled */
         STATUS_MINUS,                  /* 13 X -f */
         STATUS_AWAITING_FIRST,	       /* 14 X Wait */
+	    STATUS_CONNECTED,			   /* 15 Connected */
 
-	STATUS_RECONNECTING
+		STATUS_RECONNECTING
  };
 
  enum cursor_types
