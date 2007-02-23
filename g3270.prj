@@ -192,7 +192,8 @@ module.data.files=\
 	src/Makefile\
 	src/run.sh\
 	g3270.sh\
-	src/menu.conf
+	src/menu.conf\
+	src/toolbar.conf
 
 module.help.name=.
 module.help.type=
