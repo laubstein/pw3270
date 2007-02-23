@@ -18,7 +18,7 @@
 	  char	*item;
 	  void (*action)(GtkWidget *w, gpointer data);
  } PARAMETER;
- 
+
 /*---[ Implement ]------------------------------------------------------------*/
 
  static void ProcessDefinition(PARAMETER *prm, void (*proc)(PARAMETER *p, void *data), void *data)
@@ -27,13 +27,13 @@
 		 return;
 
 	 DBGPrintf("%s=%p",prm->item,prm->action);
-	 
+
 	 proc(prm,data);
-	 
+
 	 free(prm->item);
 	 memset(prm,0,sizeof(PARAMETER));
  }
- 
+
  static void Action(PARAMETER *prm, const char *name)
  {
     int f;
@@ -47,7 +47,7 @@
     	}
     }
     prm->action = 0;
-	
+
     Log("Invalid action code: \"%s\"",name);
  }
 
@@ -63,7 +63,7 @@
 		 {	"separator",	ITEM_TYPE_SEPARATOR	}
 	 };
 	 int f;
-	 
+
 	 for(f = 0; f < (sizeof(type)/sizeof(struct _type));f++)
 	 {
 		 if(!strcmp(name,type[f].key))
@@ -72,12 +72,12 @@
 			 return;
 		 }
 	 }
-	 
+
 	 Log("Invalid type code: \"%s\"",name);
-	 
+
  }
- 
- static int LoadUIDefinition(FILE *in, const char *id, void (*proc)(PARAMETER *p, void *data), void *data)
+
+ int LoadUIDefinition(FILE *in, const char *id, void (*proc)(PARAMETER *p, void *data), void *data)
  {
 	 static const struct _cmd
  	 {
@@ -88,7 +88,7 @@
  		{ "action",			Action		},
 		{ "type",			Type		}
  	 };
-	 
+
 	 char			buffer[1024];
      char 			*ptr;
      char 			*ln;
@@ -97,22 +97,22 @@
 	 int 			szId	= strlen(id);
 	 PARAMETER		parm;
 	 int 			f;
-	 
+
 	 memset(&parm,0,sizeof(PARAMETER));
-	 
+
 	 rewind(in);
-	 
+
      while(fgets(buffer,1023,in))
      {
    	    for(ln=buffer;*ln && *ln <= ' ';ln++);
 
     	for(ptr=ln;*ptr && *ptr >= ' ';ptr++);
     	*ptr = 0;
-		
+
 		if(*buffer == '/')
 		{
 			ProcessDefinition(&parm,proc,data);
-			
+
 			enabled = !strncmp(id,buffer+1,szId);
 			if(enabled)
 			{
@@ -138,17 +138,16 @@
 		   }
 		}
 	}
-	 
+
 	ProcessDefinition(&parm,proc,data);
-	
+
 	return 0;
  }
- 
-#ifdef __GTK_TOOLBAR_H__ 
+
+#ifdef __GTK_TOOL_ITEM_H__
  static void AddToolbar(PARAMETER *p, GtkWidget *toolbar)
  {
-	 GtkToolItem *item;
-
+	 GtkToolItem *item = 0;
 
 	 switch(p->type)
 	 {
@@ -157,37 +156,38 @@
 	     if(p->action)
  	        g_signal_connect(G_OBJECT(item), "clicked", G_CALLBACK(p->action), 0);
 	     break;
-	 
+
 	 case ITEM_TYPE_SEPARATOR:
 		 item = gtk_separator_tool_item_new();
 		 break;
- 	 }
-	 
-     gtk_toolbar_insert(GTK_TOOLBAR(toolbar),GTK_TOOL_ITEM(item),-1);
+	 }
+
+     if(item)
+       gtk_toolbar_insert(GTK_TOOLBAR(toolbar),GTK_TOOL_ITEM(item),-1);
  }
-#endif 
- 
+#endif
+
  GtkWidget	*LoadToolbar(GtkWidget *window)
  {
 #ifdef DATADIR
     static const char	*filename = DATADIR "/toolbar.conf";
 #else
     static const char	*filename = "./toolbar.conf";
-#endif	 
-	 
+#endif
+
 	GtkWidget	*toolbar = 0;
 	FILE 		*in		 = fopen(filename,"r");
-	 
+
 	if(!in)
 		return 0;
 
-#ifdef __GTK_TOOLBAR_H__	
+#ifdef __GTK_TOOL_ITEM_H__
     toolbar = gtk_toolbar_new();
     GTK_WIDGET_UNSET_FLAGS(toolbar,GTK_CAN_FOCUS);
 	LoadUIDefinition(in,"toolbar", (void (*)(PARAMETER *, void *)) AddToolbar, toolbar);
-#endif	
-	
+#endif
+
 	fclose(in);
-	 
+
     return toolbar;
  }
