@@ -17,7 +17,7 @@
 
  static void action_toogle(GtkWidget *w, gpointer data);
  
-#ifdef DEBUG 
+#ifdef __GTK_COLOR_BUTTON_H__ 
  static void action_set_colors(GtkWidget *w, gpointer data);
 #endif 
 

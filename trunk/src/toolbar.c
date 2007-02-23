@@ -144,6 +144,7 @@
 	return 0;
  }
  
+#ifdef __GTK_TOOLBAR_H__ 
  static void AddToolbar(PARAMETER *p, GtkWidget *toolbar)
  {
 	 GtkToolItem *item;
@@ -164,6 +165,7 @@
 	 
      gtk_toolbar_insert(GTK_TOOLBAR(toolbar),GTK_TOOL_ITEM(item),-1);
  }
+#endif 
  
  GtkWidget	*LoadToolbar(GtkWidget *window)
  {
@@ -179,10 +181,11 @@
 	if(!in)
 		return 0;
 
+#ifdef __GTK_TOOLBAR_H__	
     toolbar = gtk_toolbar_new();
     GTK_WIDGET_UNSET_FLAGS(toolbar,GTK_CAN_FOCUS);
-	
 	LoadUIDefinition(in,"toolbar", (void (*)(PARAMETER *, void *)) AddToolbar, toolbar);
+#endif	
 	
 	fclose(in);
 	 
