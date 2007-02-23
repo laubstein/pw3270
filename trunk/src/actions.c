@@ -33,6 +33,8 @@
 	{ "print_selection",		action_print_selection			},
 #ifdef DEBUG
 	{ "copy_as_table",			action_copy_as_table			},
+#endif
+#ifdef __GTK_COLOR_BUTTON_H__	
 	{ "set_colors",				action_set_colors				},
 #endif
 	{ "exec_with_selection",	action_exec_with_selection		},
@@ -617,7 +619,7 @@
  	DBGPrintf("Toogle \"%s\" using widget %p",(char *) data,w);
  }
 
-#ifdef DEBUG 
+#ifdef __GTK_COLOR_BUTTON_H__ 
  
  static void ColorChanged(GtkColorButton *widget, GdkColor *clr)
  {
@@ -727,4 +729,4 @@
 	 
  }
 
- #endif
+ #endif // __GTK_COLOR_BUTTON_H__
