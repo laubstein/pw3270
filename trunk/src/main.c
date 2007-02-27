@@ -37,9 +37,9 @@
 
  void action_exit(GtkWidget *w, gpointer data)
  {
- 	char filename[4096];
- 	char *home	= getenv("HOME");
- 	FILE *arq;
+ 	char	filename[4096];
+ 	char	*home	= getenv("HOME");
+ 	FILE	*arq;
 
  	struct user_config config;
 
