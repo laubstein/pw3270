@@ -284,6 +284,9 @@
  void action_DeleteWord(GtkWidget *w, gpointer data);
  void action_DeleteField(GtkWidget *w, gpointer data);
 
+#ifdef __GTK_COLOR_BUTTON_H__ 
+ void action_set_colors(GtkWidget *w, gpointer data);
+#endif 
 
  void action_Redraw(GtkWidget *w, gpointer data);
  void action_AboutBox(GtkWidget *w, gpointer data);
@@ -325,3 +328,4 @@
 /*---[ Terminal window ]------------------------------------------------------*/
 
  GtkWidget *g3270_new(const char *hostname);
+ void LoadTerminalColors(void);

@@ -14,15 +14,7 @@
 /*---[ Defines ]--------------------------------------------------------------*/
 
  #define MIN_LINE_SPACING	2
-
- #define	STATUS_LINE_SPACE		4
-
-
-/*---[ Prototipes ]-----------------------------------------------------------*/
-
-/*---[ Constants ]------------------------------------------------------------*/
-
-  static const int widget_states[] = { GTK_STATE_NORMAL, GTK_STATE_ACTIVE, GTK_STATE_PRELIGHT, GTK_STATE_SELECTED, GTK_STATE_INSENSITIVE };
+ #define STATUS_LINE_SPACE	4
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
@@ -61,16 +53,6 @@
 #ifdef USE_GTKIMCONTEXT
  GtkIMContext		*im;
 #endif
-
-/*---[ Terminal colors ]------------------------------------------------------*/
-
- GdkColor	terminal_cmap[TERMINAL_COLORS];
- GdkColor	field_cmap[FIELD_COLORS];
- GdkColor	cursor_cmap[CURSOR_COLORS];
- GdkColor	status_cmap[STATUS_COLORS];
- GdkColor	selection_cmap[SELECTION_COLORS];
-
-/*---[ Gui-Actions ]----------------------------------------------------------*/
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -412,83 +394,6 @@
  }
 #endif
 
- static int GetColorDescription(const char *id, char *buffer)
- {
-    static const struct _colors
-    {
-    	const char *name;
-    	const char *def;
-    } colors[] =
-    {
-		{ "Terminal",	"black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white" },
-		{ "Fields",		"green,red,#00FFFF,white" },
-		{ "Cursor",		"white,white,LimeGreen,LimeGreen" },
-		{ "Selection",	"#000020,yellow" },
-		{ "Status",		"black,#7890F0,white,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen,LimeGreen,LimeGreen,LimeGreen" }
-    };
-    char	key[40];
-    char	*ptr;
-    int 	f;
-
-	/* Check for environment variable */
-	snprintf(key,39,"%s3270",id);
-	ptr = getenv(key);
-	if(ptr)
-	{
-   		strncpy(buffer,ptr,4095);
-		return 0;
-	}
-
-    // TODO (perry#1#): Search configuration file for the definition.
-
-    /* Search for the default colors */
-    for(f=0;f< (sizeof(colors)/sizeof(struct _colors));f++)
-    {
-    	if(!strcmp(id,colors[f].name))
-    	{
-    		strncpy(buffer,colors[f].def,4095);
-    		return 0;
-    	}
-    }
-
- 	return -1;
- }
-
- static int LoadColors(GdkColor *clr, int qtd, const char *id)
- {
- 	char buffer[4096];
-	char *ptr;
- 	char *tok;
- 	int	 f;
- 	int	 rc = 0;
-
-    memset(clr,0,sizeof(GdkColor)*qtd);
-
-    f = 0;
-    if(GetColorDescription(id,buffer))
-    {
-    	Log("Cant'find color definition for \"%s\"",id);
-    	return ENOENT;
-    }
-
-    for(ptr=strtok_r(buffer,",",&tok);ptr && f < qtd;ptr = strtok_r(0,",",&tok))
-    {
-    	gdk_color_parse(ptr,clr+f);
-
-    	if(!gdk_colormap_alloc_color(	gtk_widget_get_default_colormap(),
-										clr+f,
-										TRUE,
-										TRUE ))
-		{
-			Log("Can't allocate color \"%s\" from %s",ptr,id);
-			rc = EINVAL;
-		}
-
-        f++;
-    }
-    return rc;
- }
-
  static int ReadFont(const char *buffer, int fontCount, int *qtd)
  {
     gint 	  lbearing	= 0;
@@ -531,6 +436,7 @@
 
  GtkWidget *g3270_new(const char *hostname)
  {
+    static const int widget_states[] = { GTK_STATE_NORMAL, GTK_STATE_ACTIVE, GTK_STATE_PRELIGHT, GTK_STATE_SELECTED, GTK_STATE_INSENSITIVE };
 
  	int		  f;
     int		  rows		= 0;
@@ -593,8 +499,6 @@
     	int t;
     	static const char *DefaultFont[] = { "terminus", "fixed", "courier" };
 
-
-
 		for(t=0;!fontCount && t < (sizeof(DefaultFont)/sizeof(const char *)); t++)
 		{
 			Log("Loading default font \"%s\"",DefaultFont[t]);
@@ -633,7 +537,6 @@
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Events.html#GdkEventMask
     gtk_widget_add_events(ret,GDK_KEY_PRESS_MASK|GDK_KEY_RELEASE_MASK|GDK_BUTTON_PRESS_MASK|GDK_BUTTON_MOTION_MASK|GDK_BUTTON_RELEASE_MASK);
 
-
     // FIXME (perry#3#): Make it better! Get the smaller font, not the first one.
 	SetFont(ret,fontlist,0,0);
 
@@ -664,19 +567,16 @@
 #endif
 
     /* Load colors */
-    LoadColors(terminal_cmap, TERMINAL_COLORS, "Terminal");
-    LoadColors(field_cmap,FIELD_COLORS,"Fields");
-    LoadColors(cursor_cmap,CURSOR_COLORS,"Cursor");
-    LoadColors(selection_cmap,SELECTION_COLORS,"Selection");
-    LoadColors(status_cmap, STATUS_COLORS, "Status");
+	LoadTerminalColors();
 
+    /* Set default terminal colors */
     for(f=0;f < (sizeof(widget_states)/sizeof(int));f++)
     {
 	   // http://ometer.com/gtk-colors.html
        gtk_widget_modify_bg(ret,widget_states[f],terminal_cmap);
        gtk_widget_modify_fg(ret,widget_states[f],terminal_cmap+4);
     }
-
+	
     action_connect(ret,0);
 
     InitClipboard(ret);
