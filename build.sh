@@ -46,9 +46,8 @@ fi
 mv -f `rpm --eval="%{u2p:%{_srcrpmdir}}"`/$PACKAGE*.src.rpm /tmp
 
 echo "Enviando arquivo binario o servidor..."
-scp $RPMDIR/$RPMARCH/$PACKAGE*.rpm $USER@os2team.df.intrabb.bb.com.br:/home/html/$VENDOR
+scp $RPMDIR/$RPMARCH/$PACKAGE*.rpm $USER@os2team.df.intrabb.bb.com.br:/home/matriz/pacotes/$VENDOR/bb
 if [ "$?" = "0" ]; then
    mv -f $RPMDIR/$RPMARCH/$PACKAGE*.rpm /tmp
    echo "Binarios movidos para /tmp"
 fi
-

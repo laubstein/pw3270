@@ -194,7 +194,8 @@ module.data.files=\
 	src/run.sh\
 	g3270.sh\
 	src/menu.conf\
-	src/toolbar.conf
+	src/toolbar.conf\
+	build.sh
 
 module.help.name=.
 module.help.type=
