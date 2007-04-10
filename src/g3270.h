@@ -25,14 +25,6 @@
 // #define PRINT_COMMAND "kprinter --nodialog -t " TARGET " %s"
  #define PRINT_COMMAND "lpr %s"
 
-// #ifdef DEBUG
-//   #define LockThreads()			DBGPrintf("Lock %p",g_thread_self()); gdk_lock()
-//   #define UnlockThreads()			DBGPrintf("Unlock %p",g_thread_self()); gdk_unlock()
-// #else
-   #define LockThreads()			gdk_lock()
-   #define UnlockThreads()			gdk_unlock()
-// #endif
-
 /*---[ Defines ]--------------------------------------------------------------*/
 
  #if GTK == 2
@@ -53,64 +45,12 @@
     LOGPATH="/var/log"
  #endif
 
- enum status_codes
- {
-        STATUS_DISCONNECTED,           /*  0 X Not Connected */
-        STATUS_RESOLVING,              /*  1 X Resolving */
-        STATUS_CONNECTING,             /*  2 X Connecting */
-        STATUS_NONSPECIFIC,            /*  3 X */
-        STATUS_INHIBIT,                /*  4 X Inhibit */
-        STATUS_BLANK,                  /*  5 (blank) */
-        STATUS_TWAIT,                  /*  6 X Wait */
-        STATUS_SYSWAIT,                /*  7 X SYSTEM */
-        STATUS_PROTECTED,              /*  8 X Protected */
-        STATUS_NUMERIC,                /*  9 X Numeric */
-        STATUS_OVERFLOW,               /* 10 X Overflow */
-        STATUS_DBCS,                   /* 11 X DBCS */
-        STATUS_SCROLLED,               /* 12 X Scrolled */
-        STATUS_MINUS,                  /* 13 X -f */
-        STATUS_AWAITING_FIRST,	       /* 14 X Wait */
-	    STATUS_CONNECTED,			   /* 15 Connected */
-
-		STATUS_RECONNECTING
- };
-
- enum cursor_types
- {
- 	CURSOR_TYPE_OVER,
- 	CURSOR_TYPE_INSERT,
-
- 	CURSOR_TYPE_CROSSHAIR // Must be the last one!
- };
-
+ #include "extension.h"
+ 
  #define TERMINAL_COLORS	16
  #define FIELD_COLORS		4
  #define CURSOR_COLORS		(CURSOR_TYPE_CROSSHAIR * 2)
  #define SELECTION_COLORS	2
-
- enum _STATUS_COLORS
- {
-    STATUS_COLOR_BACKGROUND,
-    STATUS_COLOR_SEPARATOR,
-	STATUS_COLOR_CURSOR_POSITION,
-	STATUS_COLOR_LUNAME,
-	STATUS_COLOR_ERROR,
-	STATUS_COLOR_TIME,
-	STATUS_COLOR_WARNING,
-	STATUS_COLOR_NORMAL,
-	STATUS_COLOR_TOOGLE,
-	STATUS_COLOR_SSL,
-	STATUS_COLOR_CONNECTED,
-	STATUS_COLOR_KEYBOARD,
-	STATUS_COLOR_CONNECT_ICON,
-
-	STATUS_COLORS	// Must be the last one
- };
-
- #define STATUS_COLOR_CNCT 		STATUS_COLOR_CONNECT_ICON
- #define STATUS_COLOR_TYPEAHEAD STATUS_COLOR_TOOGLE
-
- #define CURSOR_TYPE_NONE	-1
 
  #define min(x,y) (x < y ? x : y)
  #define max(x,y) (x > y ? x : y)
@@ -159,14 +99,6 @@
  extern char						oia_Typeahead[2];
  extern char						oia_cursor[];
  extern char						oia_LUName[];
-
- #ifndef GDK_NUMLOCK_MASK
-    #define GDK_NUMLOCK_MASK GDK_MOD2_MASK
- #endif
-
- #ifndef GDK_ALT_MASK
-     #define GDK_ALT_MASK GDK_MOD1_MASK
- #endif
 
  extern guint						oia_KeyboardState;
 
@@ -298,9 +230,6 @@
  GtkWidget	*LoadMenu(GtkWidget *window);
  GtkWidget	*LoadToolbar(GtkWidget *window);
  void 		LoadImages(GdkDrawable *drawable, GdkGC *gc);
-
- void gdk_lock(void);
- void gdk_unlock(void);
 
  gchar *CopyTerminalContents(int bRow, int bCol, int fRow, int fCol, int table);
 
