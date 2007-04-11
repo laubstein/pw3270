@@ -102,13 +102,15 @@ exec_prefix=%{_exec_prefix}
 libdir=%{_libdir}
 includedir=%{_includedir}/%{name}
 target=x11
+extension_prefix=%{_datadir}/%{name}/plugin
+startup_script=%{_datadir}/%{name}/%{name}.sh
 
 Name: %{name}
 Description: GTK-3270 Terminal Emulator
 Version: %{version}-%{release}
 Requires: gtk+-2.0
-Libs: -L\${libdir}
-Cflags: -I\${includedir}/ -DG3270=\"%{version}-%{release}\"
+Libs: -L\${libdir} -l3270
+Cflags: -I\${includedir}/ -DG3270=\"%{version}-%{release}\" -DPLUGINPATH=\"%{_datadir}/%{name}/plugin\"
 EOF
 
 install -m 644 %{name}.pc %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
