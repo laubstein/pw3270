@@ -172,7 +172,8 @@ module.source.files=\
 	src/actions.c\
 	src/print.c\
 	src/toolbar.c\
-	src/colors.c
+	src/colors.c\
+	src/extension.c
 
 module.pixmap.name=.
 module.pixmap.type=
