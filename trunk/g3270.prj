@@ -121,7 +121,8 @@ module.include.files=\
 	src/log.h\
 	src/trace.h\
 	src/terminal.h\
-	src/g3270.h
+	src/g3270.h\
+	src/extension.h
 
 module.source.name=.
 module.source.type=

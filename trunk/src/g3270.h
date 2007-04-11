@@ -272,3 +272,4 @@
  int		LoadExtensions(const char *dir);
  void		UnloadExtensions(void);
  void 		CallExtension(EXTENSION *ext, const char *function, GtkWidget *widget);
+ void      SetExtensionsChar(const char *function, const char *parameter);

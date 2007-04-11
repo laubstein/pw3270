@@ -96,97 +96,15 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
 
 /*---[ Keyboard tables ]------------------------------------------------------*/
 
+ /* I "think" this isn't necessary anymore */
+
  static const KEYTABLE keys[] =
  {
-//	{ "BREAK",	KEY_BREAK },
 	{ "DOWN",		GDK_Down 		},
 	{ "UP",			GDK_Up 			},
 	{ "LEFT",		GDK_Left		},
 	{ "RIGHT",		GDK_Right 		},
-//	{ "HOME",	KEY_HOME },
 	{ "BACKSPACE",	GDK_BackSpace	},
-//	{ "F0",		KEY_F0 },
-//	{ "DL",		KEY_DL },
-//	{ "IL",		KEY_IL },
-//	{ "DC",		KEY_DC },
-//	{ "IC",		KEY_IC },
-//	{ "EIC",	KEY_EIC },
-//	{ "CLEAR",	KEY_CLEAR },
-//	{ "EOS",	KEY_EOS },
-//	{ "EOL",	KEY_EOL },
-//	{ "SF",		KEY_SF },
-//	{ "SR",		KEY_SR },
-//	{ "NPAGE",	KEY_NPAGE },
-//	{ "PPAGE",	KEY_PPAGE },
-//	{ "STAB",	KEY_STAB },
-//	{ "CTAB",	KEY_CTAB },
-//	{ "CATAB",	KEY_CATAB },
-//	{ "ENTER",	KEY_ENTER },
-//	{ "SRESET",	KEY_SRESET },
-//	{ "RESET",	KEY_RESET },
-//	{ "PRINT",	KEY_PRINT },
-//	{ "LL",		KEY_LL },
-//	{ "A1",		KEY_A1 },
-//	{ "A3",		KEY_A3 },
-//	{ "B2",		KEY_B2 },
-//	{ "C1",		KEY_C1 },
-//	{ "C3",		KEY_C3 },
-//	{ "BTAB",	KEY_BTAB },
-//	{ "BEG",	KEY_BEG },
-//	{ "CANCEL",	KEY_CANCEL },
-//	{ "CLOSE",	KEY_CLOSE },
-//	{ "COMMAND",	KEY_COMMAND },
-//	{ "COPY",	KEY_COPY },
-//	{ "CREATE",	KEY_CREATE },
-//	{ "END",	KEY_END },
-//	{ "EXIT",	KEY_EXIT },
-//	{ "FIND",	KEY_FIND },
-//	{ "HELP",	KEY_HELP },
-//	{ "MARK",	KEY_MARK },
-//	{ "MESSAGE",	KEY_MESSAGE },
-//	{ "MOVE",	KEY_MOVE },
-//	{ "NEXT",	KEY_NEXT },
-//	{ "OPEN",	KEY_OPEN },
-//	{ "OPTIONS",	KEY_OPTIONS },
-//	{ "PREVIOUS",	KEY_PREVIOUS },
-//	{ "REDO",	KEY_REDO },
-//	{ "REFERENCE",	KEY_REFERENCE },
-//	{ "REFRESH",	KEY_REFRESH },
-//	{ "REPLACE",	KEY_REPLACE },
-//	{ "RESTART",	KEY_RESTART },
-//	{ "RESUME",	KEY_RESUME },
-//	{ "SAVE",	KEY_SAVE },
-//	{ "SBEG",	KEY_SBEG },
-//	{ "SCANCEL",	KEY_SCANCEL },
-//	{ "SCOMMAND",	KEY_SCOMMAND },
-//	{ "SCOPY",	KEY_SCOPY },
-//	{ "SCREATE",	KEY_SCREATE },
-//	{ "SDC",	KEY_SDC },
-//	{ "SDL",	KEY_SDL },
-//	{ "SELECT",	KEY_SELECT },
-//	{ "SEND",	KEY_SEND },
-//	{ "SEOL",	KEY_SEOL },
-//	{ "SEXIT",	KEY_SEXIT },
-//	{ "SFIND",	KEY_SFIND },
-//	{ "SHELP",	KEY_SHELP },
-//	{ "SHOME",	KEY_SHOME },
-//	{ "SIC",	KEY_SIC },
-//	{ "SLEFT",	KEY_SLEFT },
-//	{ "SMESSAGE",	KEY_SMESSAGE },
-//	{ "SMOVE",	KEY_SMOVE },
-//	{ "SNEXT",	KEY_SNEXT },
-//	{ "SOPTIONS",	KEY_SOPTIONS },
-//	{ "SPREVIOUS",	KEY_SPREVIOUS },
-//	{ "SPRINT",	KEY_SPRINT },
-//	{ "SREDO",	KEY_SREDO },
-//	{ "SREPLACE",	KEY_SREPLACE },
-//	{ "SRIGHT",	KEY_SRIGHT },
-//	{ "SRSUME",	KEY_SRSUME },
-//	{ "SSAVE",	KEY_SSAVE },
-//	{ "SSUSPEND",	KEY_SSUSPEND },
-//	{ "SUNDO",	KEY_SUNDO },
-//	{ "SUSPEND",	KEY_SUSPEND },
-//	{ "UNDO",	KEY_UNDO },
 	{ CN, 0 }
 
  };
@@ -331,6 +249,10 @@ static void status_lu(const char *lu)
     UpdateWindowTitle();
     RedrawStatusLine();
 
+#ifdef EXTENSIONS
+	SetExtensionsChar("g3270LUChanged",lu);
+#endif	
+	
 }
 
 static void ring_bell(void)
@@ -443,4 +365,3 @@ void status_untiming(void)
    *oia_Timer = 0;
    RedrawStatusLine();
 }
-

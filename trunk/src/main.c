@@ -229,6 +229,7 @@
 		
 #ifdef EXTENSIONS
 	   LoadExtensions(EXTENSIONS);
+	   SetExtensionsChar("g3270ServerChanged",cl_hostname);
 #endif	
 		
        DBGMessage("Starting gtk main loop");
