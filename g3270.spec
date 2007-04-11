@@ -39,7 +39,7 @@ cd src/lib
 cd ../..
 
 %build
-make QUIET_MODE=1 DATADIR=%{_datadir}/%{name} VERSION=%{version}-%{release} TMPPATH=%{_tmppath} -C src
+make QUIET_MODE=1 DATADIR=%{_datadir}/%{name} EXTENSIONS=%{_datadir}/%{name}/plugin VERSION=%{version}-%{release} TMPPATH=%{_tmppath} -C src
 strip src/g3270
 strip src/lib3270.so
 
@@ -49,6 +49,7 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_datadir}/%{name}
+mkdir -p %{buildroot}%{_datadir}/%{name}/plugin
 mkdir -p %{buildroot}%{_includedir}/%{name}
 mkdir -p %{buildroot}%{_sysconfdir}/x3270
 mkdir -p %{buildroot}/etc/sysconfig

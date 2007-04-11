@@ -74,6 +74,13 @@
     GtkItemFactoryCallback	callback;
  };
 
+ typedef struct _extension
+ {
+	 struct _extension	*up;
+	 struct _extension	*down;
+	 void					*handle;
+ } EXTENSION;
+ 
 /*---[ Globals ]--------------------------------------------------------------*/
 
 #if defined(DATADIR) && GTK == 2
@@ -241,20 +248,27 @@
 
 /*---[ Mouse ]----------------------------------------------------------------*/
 
- void	  SetMousePointer(GdkCursor *cursor);
- void 	  LoadMousePointers(GdkDrawable *drawable, GdkGC *gc);
- void	  DrawSelectionBox(GdkDrawable *drawable, GdkGC *gc);
- void	  ConfigureSelectionBox(void);
+ void		SetMousePointer(GdkCursor *cursor);
+ void		LoadMousePointers(GdkDrawable *drawable, GdkGC *gc);
+ void		DrawSelectionBox(GdkDrawable *drawable, GdkGC *gc);
+ void		ConfigureSelectionBox(void);
 
+ gboolean	Mouse2Terminal(long x, long y, long *cRow, long *cCol);
 
- gboolean Mouse2Terminal(long x, long y, long *cRow, long *cCol);
-
- gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data);
- gboolean mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
- gboolean mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
- gboolean mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+ gboolean	mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data);
+ gboolean	mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
+ gboolean	mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+ gboolean	mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
 /*---[ Terminal window ]------------------------------------------------------*/
 
- GtkWidget *g3270_new(const char *hostname);
- void LoadTerminalColors(void);
+ GtkWidget	*g3270_new(const char *hostname);
+ void		LoadTerminalColors(void);
+
+/*---[ Extensions/Plugins ]---------------------------------------------------*/
+
+ EXTENSION	*OpenExtension(const char *path);
+ int		CloseExtension(EXTENSION *ext);
+ int		LoadExtensions(const char *dir);
+ void		UnloadExtensions(void);
+ void 		CallExtension(EXTENSION *ext, const char *function, GtkWidget *widget);
