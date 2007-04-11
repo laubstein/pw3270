@@ -3,7 +3,7 @@ include gtk.mk
 
 TARGET	   = g3270
 OBJECTS    = main.o log.o terminal.o screen_callbacks.o gsource.o actions.o \
-		clipboard.o draw.o print.o menu.o mouse.o toolbar.o colors.o
+		clipboard.o draw.o print.o menu.o mouse.o toolbar.o colors.o extension.o
 
 ifeq ($(DEBUG),1)
    DFLAGS=-DDEBUG=1 -g -O0
@@ -37,6 +37,10 @@ ifndef DATADIR
    DATADIR=.
 endif
 
+ifndef EXTENSIONS
+   EXTENSIONS=/usr/share/g3270/extensions
+endif
+
 ifeq ($(GTKLIB),gtk+)
    GTK_MODULES=$(GTKLIB)
 else
@@ -65,7 +69,8 @@ GCFLAGS     = -c `pkg-config --cflags $(PKG_MODULES)` \
               -DTARGET=\"$(TARGET)\" $(DFLAGS) $(QFLAGS) \
               -DGTK=$(GTK) -DGTKVERSION=\"$(GTK_VRS)\" \
               -DTMPPATH=\"$(TMPPATH)\" -DLOGPATH=\"$(LOGPATH)\" \
-              -DDATADIR=\"$(DATADIR)\" $(VFLAGS) $(I18N)
+              -DDATADIR=\"$(DATADIR)\" $(VFLAGS) $(I18N) \
+			  -DEXTENSIONS=\"$(EXTENSIONS)\"
 
 GLFLAGS     = `pkg-config --libs $(PKG_MODULES)` -L. -l3270
 

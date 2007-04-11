@@ -223,12 +223,22 @@
     DBGMessage(cl_hostname);
 
     CreateMainWindow(cl_hostname);
-
+	
 	if(terminal)
 	{
+		
+#ifdef EXTENSIONS
+	   LoadExtensions(EXTENSIONS);
+#endif	
+		
        DBGMessage("Starting gtk main loop");
        gtk_widget_show_all(top_window);
        gtk_main();
+		
+#ifdef EXTENSIONS
+	   UnloadExtensions();
+#endif	
+		
 	}
 
     return 0;
