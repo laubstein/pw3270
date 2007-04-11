@@ -3235,3 +3235,8 @@ Boolean query_secure_connection(void)
 {
 	return secure_connection;
 }
+
+int Get3270Socket(void)
+{
+	return sock;
+}
