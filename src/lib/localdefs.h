@@ -20,6 +20,10 @@
  *		and timers.
  */
 
+#ifndef LOCALDEFS_H_INCLUDED
+
+ #define LOCALDEFS_H_INCLUDED
+
 /* Identify ourselves. */
 #define C3270	1
 
@@ -62,3 +66,5 @@ extern void *Realloc(void *, size_t);
 extern char *NewString(const char *);
 extern void Error(const char *);
 extern void Warning(const char *);
+
+#endif // LOCALDEFS_H_INCLUDED
