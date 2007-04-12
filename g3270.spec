@@ -63,7 +63,7 @@ install -m 644 src/lib/ibm_hosts	%{buildroot}%{_sysconfdir}/x3270
 install -m 644 sysconfig		    %{buildroot}/etc/sysconfig/%{name}
 
 install -m 644 src/lib/*.h			%{buildroot}%{_includedir}/%{name}
-install -m 644 src/lib/*.h			%{buildroot}%{_includedir}/%{name}
+install -m 644 src/extension.h		%{buildroot}%{_includedir}/%{name}
 
 sed "s@./src@%{_datadir}/%{name}@g" g3270.sh > %{buildroot}%{_datadir}/%{name}/%{name}.sh
 chmod 755 %{buildroot}%{_datadir}/%{name}/%{name}.sh
