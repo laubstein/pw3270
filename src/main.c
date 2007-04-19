@@ -154,6 +154,11 @@
     vbox = gtk_vbox_new(FALSE,0);
     gtk_container_add(GTK_CONTAINER(top_window),vbox);
 
+	// Load extensions
+#ifdef EXTENSIONS
+	LoadExtensions(EXTENSIONS);
+#endif	
+
 	// Load menu bar
     top_menu = LoadMenu(top_window);
     if(top_menu)
@@ -226,9 +231,7 @@
 	
 	if(terminal)
 	{
-		
 #ifdef EXTENSIONS
-	   LoadExtensions(EXTENSIONS);
 	   SetExtensionsChar("g3270ServerChanged",cl_hostname);
 #endif	
 		
@@ -242,6 +245,7 @@
 		
 	}
 
+	CHKPoint();
     return 0;
  }
 

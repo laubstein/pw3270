@@ -90,6 +90,8 @@
  #define Exec(...)              g3270_logExec(MODULE, __VA_ARGS__)
  #define NOT_IMPLEMENTED( ... ) g3270_log(MODULE, "*** NOT IMPLEMENTED CALL ***: " __FILE__ " " __VA_ARGS__)
 
+ #define DEBUG 1
+	 
  #if defined( DEBUG )
 
     #define DBGFILE stderr
