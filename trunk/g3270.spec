@@ -39,7 +39,7 @@ cd src/lib
 cd ../..
 
 %build
-make QUIET_MODE=1 DATADIR=%{_datadir}/%{name} EXTENSIONS=%{_datadir}/%{name}/plugin VERSION=%{version}-%{release} TMPPATH=%{_tmppath} -C src
+make QUIET_MODE=1 DATADIR=%{_datadir}/%{name} EXTENSIONS=%{_datadir}/%{name}/plugins VERSION=%{version}-%{release} TMPPATH=%{_tmppath} -C src
 strip src/g3270
 strip src/lib3270.so
 
@@ -49,7 +49,7 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_datadir}/%{name}
-mkdir -p %{buildroot}%{_datadir}/%{name}/plugin
+mkdir -p %{buildroot}%{_datadir}/%{name}/plugins
 mkdir -p %{buildroot}%{_includedir}/%{name}
 mkdir -p %{buildroot}%{_sysconfdir}/x3270
 mkdir -p %{buildroot}/etc/sysconfig
@@ -102,7 +102,7 @@ exec_prefix=%{_exec_prefix}
 libdir=%{_libdir}
 includedir=%{_includedir}/%{name}
 target=x11
-extension_prefix=%{_datadir}/%{name}/plugin
+extension_prefix=%{_datadir}/%{name}/plugins
 extension_data=%{_datadir}/%{name}
 startup_script=%{_datadir}/%{name}/%{name}.sh
 
@@ -111,7 +111,7 @@ Description: GTK-3270 Terminal Emulator
 Version: %{version}-%{release}
 Requires: gtk+-2.0
 Libs: -L\${libdir} -l3270
-Cflags: -I\${includedir}/ -DG3270=\"%{version}-%{release}\" -DPLUGINPATH=\"%{_datadir}/%{name}/plugin\" -DPLUGINDATA=\"%{_datadir}/%{name}\"
+Cflags: -I\${includedir}/ -DG3270=\"%{version}-%{release}\" -DPLUGINPATH=\"%{_datadir}/%{name}/plugins\" -DPLUGINDATA=\"%{_datadir}/%{name}\"
 EOF
 
 install -m 644 %{name}.pc %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
