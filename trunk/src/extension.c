@@ -6,6 +6,7 @@
 #include <dlfcn.h>
 
 #include "g3270.h"
+#include "trace.h"
 
 /*---[ Publics ]--------------------------------------------------------------*/
 
@@ -40,6 +41,8 @@
  {
 	 while(first)
 	    CloseExtension(first);
+	 
+	 CHKPoint();
  }
  
  EXTENSION *OpenExtension(const char *path)
@@ -85,6 +88,8 @@
 		 ext->down->up = ext->up;
 	 else
 		 last = ext->down;
+
+	 DBGPrintf("Removendo %p (first: %p last: %p)",ext,first,last);
 	 
 	 if(ext->handle)
 	 {
@@ -92,7 +97,11 @@
 		 dlclose(ext->handle);
 	 }
 	 
+	 CHKPoint();
+	 
 	 free(ext);
+
+	 CHKPoint();
 	 
 	 return 0;
  }
@@ -125,4 +134,24 @@
 		   call(top_window,parameter);
        ext = ext->down;		
     }		
+ }
+ 
+ GtkItemFactoryCallback QueryActionCallback(const char *name)
+ {
+	GtkItemFactoryCallback	call;
+    char 					function[512];
+	 
+	snprintf(function,511,"g3270_action_%s",name);
+	 
+    EXTENSION	*ext = first;
+
+    while(ext)
+    {
+       call = dlsym(ext->handle,function);
+	   if(call)
+		   return call;
+       ext = ext->down;		
+    }		
+	 
+	return 0;
  }

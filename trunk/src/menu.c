@@ -21,6 +21,7 @@
  {
     int f;
 
+	/* Locate internal actions */
     for(f=0;f< action_callback_counter;f++)
     {
     	if(!strcmp(action_callbacks[f].name,name))
@@ -29,7 +30,13 @@
     		return;
     	}
     }
-
+	
+	/* Locate extension actions */
+    data->entry.callback = QueryActionCallback(name);
+	if(data->entry.callback)
+		return;
+	
+	/* Invalid action code, release data and log-it */
     if(data->entry.path)
     {
     	g_free(data->entry.path);

@@ -38,7 +38,7 @@ ifndef DATADIR
 endif
 
 ifndef EXTENSIONS
-   EXTENSIONS=/usr/share/g3270/extensions
+   EXTENSIONS=/usr/share/g3270/plugins
 endif
 
 ifeq ($(GTKLIB),gtk+)
