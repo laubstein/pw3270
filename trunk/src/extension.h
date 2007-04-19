@@ -90,17 +90,22 @@
  #define Exec(...)              g3270_logExec(MODULE, __VA_ARGS__)
  #define NOT_IMPLEMENTED( ... ) g3270_log(MODULE, "*** NOT IMPLEMENTED CALL ***: " __FILE__ " " __VA_ARGS__)
 
- #define DEBUG 1
-	 
  #if defined( DEBUG )
 
     #define DBGFILE stderr
 
     #define CHKPoint()        	   fprintf(DBGFILE,"%s(%d):\t%s\t\t(" __DATE__ " " __TIME__")\n",__FILE__,__LINE__,__FUNCTION__);fflush(DBGFILE);
+
+    #define DBGMessage(x)     	   fprintf(DBGFILE,"%s(%d):\t%s\n",__FILE__,__LINE__,x);fflush(DBGFILE);
+    #define DBGTrace(x)       	   fprintf(DBGFILE,"%s(%d):\t%s = %ld\n",__FILE__,__LINE__,#x, (unsigned long) x);fflush(DBGFILE);
+    #define DBGTracex(x)      	   fprintf(DBGFILE,"%s(%d):\t%s = %08lx\n",__FILE__,__LINE__,#x, (unsigned long) x);fflush(DBGFILE);
     #define DBGPrintf(x, ...) 	   fprintf(DBGFILE,"%s(%d):\t" x "\n",__FILE__,__LINE__, __VA_ARGS__);fflush(DBGFILE);
 
  #else
 
+    #define DBGMessage(x) /* x */
+    #define DBGTrace(x) /* x */
+    #define DBGTracex(x) /* x */
     #define CHKPoint()  /* */
     #define DBGPrintf(x, ...) /* */
 
