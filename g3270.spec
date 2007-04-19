@@ -111,7 +111,7 @@ Description: GTK-3270 Terminal Emulator
 Version: %{version}-%{release}
 Requires: gtk+-2.0
 Libs: -L\${libdir} -l3270
-Cflags: -I\${includedir}/ -DG3270=\"%{version}-%{release}\" -DPLUGINPATH=\"%{_datadir}/%{name}/plugin\" -DPLUGINDATA=\"%{_datadir}/%{name}/plugin\"
+Cflags: -I\${includedir}/ -DG3270=\"%{version}-%{release}\" -DPLUGINPATH=\"%{_datadir}/%{name}/plugin\" -DPLUGINDATA=\"%{_datadir}/%{name}\"
 EOF
 
 install -m 644 %{name}.pc %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
