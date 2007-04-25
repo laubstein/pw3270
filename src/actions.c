@@ -16,6 +16,7 @@
 /*---[ Internal actions ]-----------------------------------------------------*/
 
  static void action_toogle(GtkWidget *w, gpointer data);
+ static void action_dump(GtkWidget *w, gpointer data);
  
 /*---[ Callback table ]-------------------------------------------------------*/
 
@@ -154,7 +155,12 @@
      	DECLARE_KEYPROC( GDK_Page_Up, 			0,					action_F7			),
      	DECLARE_KEYPROC( GDK_Page_Down,			0,					action_F8			),
 
+#ifdef DEBUG
+     	DECLARE_KEYPROC( GDK_Print,				GDK_CONTROL_MASK,	action_dump			),
+#endif	
+
      	DECLARE_KEYPROC( GDK_Print,				0,					action_print		),
+		
      	DECLARE_KEYPROC( GDK_3270_PrintScreen,	0,					action_print		),
 
      	DECLARE_KEYPROC( GDK_ISO_Left_Tab,		0,					action_BackTab		),
@@ -614,3 +620,70 @@
 
  	DBGPrintf("Toogle \"%s\" using widget %p",(char *) data,w);
  }
+
+#ifdef DEBUG 
+ static void action_dump(GtkWidget *w, gpointer data)
+ {
+	time_t				ltime;
+	char				wrk[40];
+	FILE				*out = fopen("/tmp/g3270.screen","a");
+ 	const struct ea	*trm;
+	const struct ea	*chr;
+ 	int					rows;
+ 	int					cols;
+ 	int					row;
+ 	int					col;
+	 
+	if(!out)
+		return;
+	 
+	time(&ltime);
+	strftime(wrk, 39, "%d/%m/%Y %H:%M:%S", localtime(&ltime));
+    fprintf(out,"%s Writing screen dump\n",wrk);
+
+    trm = Get3270DeviceBuffer(&rows, &cols);
+	
+	chr = trm;
+	for(row = 0; row < rows; row++)
+	{
+		fprintf(out,"%02d ",row);
+		for(col = 0; col < cols;col++)
+		{
+			fprintf(out,"%c",ebc2asc[chr->cc]);
+			chr++;
+		}
+		fprintf(out,"\n");
+	}
+	fprintf(out,"\n");
+
+	chr = trm;
+	for(row = 0; row < rows; row++)
+	{
+		fprintf(out,"%02d ",row);
+		for(col = 0; col < cols;col++)
+		{
+			fprintf(out,"%02x %c ",chr->fa,ebc2asc[chr->cc]);
+			chr++;
+		}
+		fprintf(out,"\n");
+	}
+	fprintf(out,"\n");
+	
+	chr = trm;
+	for(row = 0; row < rows; row++)
+	{
+		fprintf(out,"%02d ",row);
+		for(col = 0; col < cols;col++)
+		{
+			fprintf(out,"%02x:%02x ",chr->fa,chr->cc);
+			chr++;
+		}
+		fprintf(out,"\n");
+	}
+	fprintf(out,"\n");
+	
+	
+	fclose(out);
+ }
+ 
+#endif

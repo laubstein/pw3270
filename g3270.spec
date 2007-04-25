@@ -2,13 +2,13 @@ Name:           g3270
 License:        GPL
 Group:          System/X11/Terminals
 Version:        3.3.4
-Release:        12.%_vendor
+Release:        13.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
 Source:         %{name}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
-Requires:       openssl %{name}-lib terminus-font
-BuildRequires:  openssl-devel sed pkgconfig
+Requires:       openssl %{name}-lib gtk2
+BuildRequires:  openssl-devel sed pkgconfig gtk2-devel
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
@@ -56,7 +56,7 @@ mkdir -p %{buildroot}/etc/sysconfig
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
 
 install -m 755 src/lib3270.so	    %{buildroot}%{_libdir}
-install -m 755 src/g3270		    %{buildroot}%{_datadir}/%{name}/%{name}
+install -m 755 src/g3270		    %{buildroot}%{_datadir}/%{name}
 install -m 644 src/*.jpg		    %{buildroot}%{_datadir}/%{name}
 install -m 644 src/*.conf		    %{buildroot}%{_datadir}/%{name}
 install -m 644 src/lib/ibm_hosts	%{buildroot}%{_sysconfdir}/x3270
@@ -122,9 +122,14 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %{_bindir}
-%{_datadir}/%{name}
 %{_datadir}/applications
-/etc/sysconfig/%{name}
+
+%{_datadir}/%{name}/%{name}
+%{_datadir}/%{name}/*.jpg
+%{_datadir}/%{name}/*.sh
+
+%config(noreplace) %{_datadir}/%{name}/*.conf
+%config(noreplace) /etc/sysconfig/%{name}
 
 %files lib
 %defattr(-,root,root)
