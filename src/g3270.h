@@ -271,6 +271,6 @@
  int					CloseExtension(EXTENSION *ext);
  int					LoadExtensions(const char *dir);
  void					UnloadExtensions(void);
- void 					CallExtension(EXTENSION *ext, const char *function, GtkWidget *widget);
+ int 					CallExtension(EXTENSION *ext, const char *function, GtkWidget *widget);
  void      			SetExtensionsChar(const char *function, const char *parameter);
  GtkItemFactoryCallback	QueryActionCallback(const char *name);
