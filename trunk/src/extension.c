@@ -50,7 +50,7 @@
 	 EXTENSION *rc;
 	 void *handle;
 
-     handle = dlopen(path, RTLD_NOW);
+     handle = dlopen(path, RTLD_LAZY);
 	 if(!handle)
 		 return 0;
 
@@ -94,7 +94,9 @@
 	 if(ext->handle)
 	 {
          CallExtension(ext,"g3270CloseExtension",0);
+		 CHKPoint();
 		 dlclose(ext->handle);
+		 CHKPoint();
 	 }
 	 
 	 CHKPoint();
@@ -106,9 +108,9 @@
 	 return 0;
  }
  
- void CallExtension(EXTENSION *ext, const char *function, GtkWidget *widget)
+ int CallExtension(EXTENSION *ext, const char *function, GtkWidget *widget)
  {
-	 void (*call)(GtkWidget *) = 0;
+	 int (*call)(GtkWidget *) = 0;
 	 
 	 if(!widget)
 		 widget = top_window;
@@ -117,9 +119,9 @@
 	 {
 	    call = dlsym(ext->handle,function);
 	    if(call)
-		   call(widget);
+		   return call(widget);
 	 }
-	 
+	 return 0;
  }
  
  void SetExtensionsChar(const char *function, const char *parameter)

@@ -112,8 +112,9 @@
  #endif
  
  #ifndef BUILD
-    #define BUILD 20070411
+    #define BUILD 20070425
  #endif
+
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -132,8 +133,8 @@
 
 /*---[ Extension entry points ]-----------------------------------------------*/
 
- void g3270OpenExtension(GtkWidget *TopWindow);
- void g3270CloseExtension(GtkWidget *TopWindow);
+ int  g3270OpenExtension(GtkWidget *TopWindow);
+ int  g3270CloseExtension(GtkWidget *TopWindow);
  void g3270LUChanged(GtkWidget *widget, const char *lu);
  void g3270ServerChanged(GtkWidget *widget, const char *server);
 
