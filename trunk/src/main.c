@@ -245,9 +245,7 @@
 		
 	}
 
-//	CHKPoint();
-	exit(-1);
-//    return 0;
+    return 0;
  }
 
  void UpdateWindowTitle(void)
