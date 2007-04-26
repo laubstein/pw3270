@@ -16,7 +16,10 @@
 /*---[ Internal actions ]-----------------------------------------------------*/
 
  static void action_toogle(GtkWidget *w, gpointer data);
+
+#ifdef DEBUG
  static void action_dump(GtkWidget *w, gpointer data);
+#endif 
  
 /*---[ Callback table ]-------------------------------------------------------*/
 
