@@ -133,10 +133,10 @@
 
 /*---[ Extension entry points ]-----------------------------------------------*/
 
- int  g3270OpenExtension(GtkWidget *TopWindow);
- int  g3270CloseExtension(GtkWidget *TopWindow);
- void g3270LUChanged(GtkWidget *widget, const char *lu);
- void g3270ServerChanged(GtkWidget *widget, const char *server);
+ int  		g3270OpenExtension(GtkWidget *TopWindow);
+ int  		g3270CloseExtension(GtkWidget *TopWindow);
+ void 		g3270LUChanged(GtkWidget *widget, const char *lu);
+ void 		g3270ServerChanged(GtkWidget *widget, const char *server);
 
 #ifdef __cplusplus
  }

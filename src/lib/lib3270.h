@@ -134,6 +134,7 @@ extern void  move3270Cursor(int baddr);
 extern void  RemoveSelectionBox(void);
 
 extern int   Get3270CursorRow(void);
+extern int   Get3270CursorCol(void);
 extern int   Get3270CState(void);
 extern int   Get3270Socket(void);
 
