@@ -37,8 +37,12 @@ ifndef DATADIR
    DATADIR=.
 endif
 
+ifndef PLUGINDATA
+   PLUGINDATA=/usr/share/g3270
+endif   
+
 ifndef EXTENSIONS
-   EXTENSIONS=/usr/share/g3270/plugins
+   EXTENSIONS=$(PLUGINDATA)/plugins
 endif
 
 ifeq ($(GTKLIB),gtk+)
@@ -70,7 +74,9 @@ GCFLAGS     = -c `pkg-config --cflags $(PKG_MODULES)` \
               -DGTK=$(GTK) -DGTKVERSION=\"$(GTK_VRS)\" \
               -DTMPPATH=\"$(TMPPATH)\" -DLOGPATH=\"$(LOGPATH)\" \
               -DDATADIR=\"$(DATADIR)\" $(VFLAGS) $(I18N) \
-			  -DEXTENSIONS=\"$(EXTENSIONS)\"
+			  -DEXTENSIONS=\"$(EXTENSIONS)\" \
+			  -DPLUGINDATA=\"$(PLUGINDATA)\" \
+			  -I/opt/orexx
 
 GLFLAGS     = `pkg-config --libs $(PKG_MODULES)` -L. -l3270
 
