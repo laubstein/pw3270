@@ -7,7 +7,7 @@ Summary:        IBM 3270 Terminal emulator for gtk.
 Source:         %{name}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
-Requires:       openssl %{name}-lib gtk2
+Requires:       openssl %{name}-lib
 BuildRequires:  openssl-devel sed pkgconfig
 
 %description
