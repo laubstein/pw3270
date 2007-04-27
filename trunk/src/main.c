@@ -4,6 +4,7 @@
  #include "lib/hostc.h"
  #include "lib/actionsc.h"
  #include "lib/kybdc.h"
+ #include "lib/togglesc.h"
 
 /*---[ Structures ]-----------------------------------------------------------*/
 
@@ -226,21 +227,22 @@
        cl_hostname = getenv("HOST3270_0");
 
     DBGMessage(cl_hostname);
-
     CreateMainWindow(cl_hostname);
 	
 	if(terminal)
 	{
+		do_toggle(MARGINED_PASTE);
+		
 #ifdef EXTENSIONS
-	   SetExtensionsChar("g3270ServerChanged",cl_hostname);
+		SetExtensionsChar("g3270ServerChanged",cl_hostname);
 #endif	
 		
-       DBGMessage("Starting gtk main loop");
-       gtk_widget_show_all(top_window);
-       gtk_main();
+		DBGMessage("Starting gtk main loop");
+		gtk_widget_show_all(top_window);
+		gtk_main();
 		
 #ifdef EXTENSIONS
-	   UnloadExtensions();
+		UnloadExtensions();
 #endif	
 		
 	}

@@ -50,7 +50,10 @@ do_toggle_reason(int ix, enum toggle_type reason)
 	 * menu label(s).
 	 */
 	toggle_toggle(t);
-	t->upcall(t, reason);
+
+	if(t->upcall)
+		t->upcall(t, reason);
+	
 #if defined(X3270_MENUS) /*[*/
 	menubar_retoggle(t);
 #endif /*]*/

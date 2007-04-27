@@ -36,6 +36,8 @@
 #include <X11/keysym.h>
 
 #include <fcntl.h>
+#include <errno.h>
+
 #include "3270ds.h"
 #include "appres.h"
 #include "ctlr.h"
@@ -2025,53 +2027,6 @@ Newline_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 }
 
 
-/*
- * Cursor to the field in next line, column in (*params)
- */
-void
-CursorDown_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-	register int	baddr, faddr;
-	register unsigned char	fa;
-	unsigned int k;
-
-    action_debug(CursorDown_action, event, params, num_params);
-	if (check_usage(CursorDown_action, *num_params, 1, 1) < 0)
-		return;
-	
-	k = atoi(params[0]);
-	
-    if (k < 1 || k > COLS) 
-	{
-		popup_an_error("%s: Invalid argument '%s'",action_name(CursorDown_action), params[0]);
-        cancel_if_idle_command();
-        return;
-    }
-	
-	action_debug(CursorDown_action, event, params, num_params);
-	reset_idle_timer();
-	if (kybdlock) {
-		enq_ta(CursorDown_action, params[0], CN);
-		return;
-	}
-	
-#if defined(X3270_ANSI) /*[*/
-	if (IN_ANSI) {
-		net_sendc('\n');
-		return;
-	}
-#endif /*]*/
-	
-	baddr = (cursor_addr + COLS) % (COLS * ROWS);	/* down */
-	baddr = ((baddr / COLS) * COLS)+k;				/* Requested col */
-	faddr = find_field_attribute(baddr);
-	fa = ea_buf[faddr].fa;
-	if (faddr != baddr && !FA_IS_PROTECTED(fa))
-		cursor_move(baddr);
-	else
-		cursor_move(next_unprotected(baddr));
-}
-
 
 /*
  * DUP key
@@ -3014,6 +2969,24 @@ int Get3270CursorCol(void)
 	return cursor_addr - (Get3270CursorRow()*COLS);
 }
 
+int SelectFieldByPosition(int lin, int col)
+{
+	register int    baddr, faddr;
+    register unsigned char  fa;	
+	
+	baddr = (lin * COLS) + col;
+	faddr = find_field_attribute(baddr);
+    fa = ea_buf[faddr].fa;
+    if(!FA_IS_PROTECTED(fa))
+	{
+		cursor_move(baddr);
+		return 0;
+	}
+	
+	return EINVAL;
+}
+
+
 /*
  * Pretend that a sequence of keys was entered at the keyboard.
  *
@@ -3054,8 +3027,6 @@ emulate_input(char *s, int len, Boolean pasting)
 	char c;
 	char *ws;
 #endif /*]*/
-
-	char cl[10];
 	
 	/*
 	 * Convert from a multi-byte string to a Unicode string.
@@ -3079,7 +3050,6 @@ emulate_input(char *s, int len, Boolean pasting)
 	 * this character," while "continue" means "rescan this character."
 	 */
     lin = Get3270CursorRow();
-	snprintf(cl,9,"%d",Get3270CursorCol());
 	
 	while (len) {
 
@@ -3138,9 +3108,8 @@ emulate_input(char *s, int len, Boolean pasting)
 				if (pasting)
 				{
 					if(lineChanged < 2)
-						action_internal(CursorDown_action,ia,cl,CN);
-//						action_internal(Newline_action, ia, CN, CN);
-					
+						action_internal(Newline_action, ia, CN, CN);
+				
 				}
 				else
 				{
