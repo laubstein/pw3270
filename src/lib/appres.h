@@ -55,9 +55,9 @@ struct toggle {
 
 #define MARGINED_PASTE	11
 #define RECTANGLE_SELECT 12
+#define CROSSHAIR	13
 
 #if defined(X3270_DISPLAY) /*[*/
-#define CROSSHAIR	13
 #define VISIBLE_CONTROL	14
 #endif /*]*/
 

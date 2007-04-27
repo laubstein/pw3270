@@ -10,6 +10,7 @@
  #include "lib/ctlrc.h"
  #include "lib/tablesc.h"
  #include "lib/utilc.h"
+ #include "lib/togglesc.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -44,7 +45,6 @@
  static gboolean    cursor_enabled							= TRUE;
  int				cursor_row								= 0;
  int				cursor_col								= 0;
- static gboolean	cross_hair								= FALSE;
 
  int				cursor_type								= CURSOR_TYPE_OVER;
  gboolean			reconnect								= TRUE;
@@ -181,7 +181,7 @@
 							font->Width,
 							cursor_height[cursor_type] );
 
-       if(cross_hair)
+       if(toggled(CROSSHAIR))
        {
           gdk_gc_set_foreground(gc,cursor_cmap+CURSOR_TYPE_CROSSHAIR+cursor_type);
 
@@ -600,15 +600,14 @@
 
  void action_crosshair( GtkWidget *w, gpointer   data )
  {
- 	cross_hair = !cross_hair;
- 	DBGPrintf("Cross_hair: %s Cursor: %s",cross_hair ? "Yes" : "No",cursor_enabled ? "Yes" : "No");
+	do_toggle(CROSSHAIR);
+ 	DBGPrintf("Cross_hair: %s Cursor: %s",toggled(CROSSHAIR) ? "Yes" : "No",cursor_enabled ? "Yes" : "No");
     InvalidateCursor();
  }
 
  void EnableCursor(gboolean mode)
  {
  	cursor_enabled = mode;
- 	DBGPrintf("Cross_hair: %s Cursor: %s",cross_hair ? "Yes" : "No",cursor_enabled ? "Yes" : "No");
     InvalidateCursor();
  }
 
