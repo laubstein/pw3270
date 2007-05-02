@@ -22,7 +22,10 @@
 	char			buffer[4096];
 
 	if(!hDir)
-	   return errno;
+	{
+		WriteLog("Can't search extensions in \"%s\": %s",dir,strerror(errno));
+		return errno;
+	}
 
     for(fl = readdir(hDir);fl; fl = readdir(hDir))
 	{
@@ -47,12 +50,16 @@
  
  EXTENSION *OpenExtension(const char *path)
  {
-	 EXTENSION *rc;
-	 void *handle;
+	 EXTENSION		*rc;
+	 void			*handle;
+	 int			i;
 
      handle = dlopen(path, RTLD_LAZY);
 	 if(!handle)
+	 {
+		 WriteLog("Error loading \"%s\": %s",path,dlerror());
 		 return 0;
+	 }
 
 	 rc = malloc(sizeof(EXTENSION));
 	 
@@ -72,7 +79,11 @@
 		 last   = rc;
 	 }
 
-     CallExtension(rc,"g3270OpenExtension",0);
+     i = CallExtension(rc,"g3270OpenExtension",0);
+	 if(i)
+		 WriteLog("Opening \"%s\": rc=%d",path,i);
+	 else
+		 WriteLog("Extension \"%s\" loaded.",path);
 	 
 	 return rc;
  }
