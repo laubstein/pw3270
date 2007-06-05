@@ -129,7 +129,7 @@
 
  extern int						cursor_type;
 
- extern gboolean					reconnect;
+ extern int						reconnect_retry;
 
 
 /*---[ Prototipes ]-----------------------------------------------------------*/

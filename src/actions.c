@@ -310,7 +310,7 @@
     connecting++;
     DBGMessage("Connect thread has started");
     Log("Trying \"%s\"",host);
-    reconnect = TRUE;
+    reconnect_retry = 0;
     host_connect(host);
     DBGMessage("Connect thread has ended");
     connecting--;
@@ -357,7 +357,7 @@
  	   return;
 
  	Log("Disconnecting");
- 	reconnect = FALSE;
+ 	reconnect_retry = -1;
 	host_disconnect(False);
  }
 

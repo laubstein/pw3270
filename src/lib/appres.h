@@ -65,7 +65,10 @@ struct toggle {
 #define AID_WAIT	15
 #endif /*]*/
 
-#define N_TOGGLES	16
+/* Reconnect when disconnected */
+#define RECONNECT	17
+
+#define N_TOGGLES	17
 
 #define toggled(ix)		(appres.toggle[ix].value)
 #define toggle_toggle(t) \

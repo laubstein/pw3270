@@ -4,8 +4,14 @@
 
  #include <gtk/gtk.h>
  #include <sys/time.h> 
- #include <g3270/localdefs.h>
- #include <g3270/lib3270.h>
+ 
+ #ifdef G3270_CORE
+	 #include <lib/localdefs.h>
+	 #include <lib/lib3270.h>
+ #else
+	 #include <g3270/localdefs.h>
+	 #include <g3270/lib3270.h>
+ #endif
 
  #define G3270_EXTENSION_H_INCLUDED
 
