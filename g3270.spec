@@ -2,13 +2,13 @@ Name:           g3270
 License:        GPL
 Group:          System/X11/Terminals
 Version:        3.3.4
-Release:        13.%_vendor
+Release:        14.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
 Source:         %{name}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 Requires:       openssl %{name}-lib
-BuildRequires:  openssl-devel sed pkgconfig
+BuildRequires:  openssl-devel sed pkgconfig ncurses-devel gtk2-devel
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
