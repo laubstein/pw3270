@@ -41,13 +41,12 @@
 // int				terminal_color_count					= 0;
  int				line_spacing							= MIN_LINE_SPACING;
 
- static int			cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
- static gboolean    cursor_enabled							= TRUE;
+ static int		cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
+ static gboolean   cursor_enabled							= TRUE;
  int				cursor_row								= 0;
  int				cursor_col								= 0;
 
  int				cursor_type								= CURSOR_TYPE_OVER;
- gboolean			reconnect								= TRUE;
  int				reconnect_retry							= 0;
 
 #ifdef USE_GTKIMCONTEXT
@@ -78,7 +77,8 @@
 
     if(connected)
     {
-	   reconnect_retry = 0;
+       reconnect_retry = toggled(RECONNECT) ? 0 : -1;
+		
 	   if (GetKeyboardStatus() & KL_AWAITING_FIRST)
 	      SetOIAStatus(STATUS_AWAITING_FIRST);
        else
@@ -92,7 +92,7 @@
        EnableCursor(FALSE);
        ctlr_erase(True);
 
-       if(reconnect)
+       if(reconnect_retry >= 0)
        {
           snprintf(key,39,"HOST3270_%d",++reconnect_retry);
           DBGPrintf("Host Key: %s",key);
@@ -101,10 +101,6 @@
 		  {
 		  	 cl_hostname = host;
              AddTimeOut(1000,Reconnect);
-		  }
-		  else
-		  {
-		  	 Log("No more hosts to try, stopping");
 		  }
        }
     }

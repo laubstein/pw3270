@@ -68,7 +68,7 @@ PKG_MODULES=$(GTK_MODULES)
 
 #---[ Build flags ]------------------------------------------------------------#
 
-GCFLAGS     = -c `pkg-config --cflags $(PKG_MODULES)` \
+GCFLAGS     = -c `pkg-config --cflags $(PKG_MODULES)` -I. \
               -DBUILD=\"`date +%G%m%d%H%M`\" -Wall -Werror \
               -DTARGET=\"$(TARGET)\" $(DFLAGS) $(QFLAGS) \
               -DGTK=$(GTK) -DGTKVERSION=\"$(GTK_VRS)\" \
@@ -76,7 +76,9 @@ GCFLAGS     = -c `pkg-config --cflags $(PKG_MODULES)` \
               -DDATADIR=\"$(DATADIR)\" $(VFLAGS) $(I18N) \
 			  -DEXTENSIONS=\"$(EXTENSIONS)\" \
 			  -DPLUGINDATA=\"$(PLUGINDATA)\" \
-			  -I/opt/orexx
+			  -DG3270_CORE
+
+# -I/opt/orexx
 
 GLFLAGS     = `pkg-config --libs $(PKG_MODULES)` -L. -l3270
 
