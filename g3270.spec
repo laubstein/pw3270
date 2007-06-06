@@ -8,7 +8,7 @@ Source:         %{name}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 Requires:       openssl %{name}-lib
-BuildRequires:  openssl-devel sed pkgconfig ncurses-devel gtk2-devel
+BuildRequires:  openssl-devel sed pkgconfig ncurses-devel
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
