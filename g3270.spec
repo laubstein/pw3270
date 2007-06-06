@@ -140,4 +140,4 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/%{name}
 %{_libdir}/pkgconfig
 
-%changelog
+
