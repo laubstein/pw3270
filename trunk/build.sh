@@ -22,12 +22,6 @@ fi
 
 cd $OLDDIR
 
-if [ ! -d /usr/include/g3270 ]; then
-   mkdir /usr/include/g3270
-   ln -s $PWD/src/lib/*.h /usr/include/g3270
-
-fi
-
 rm -f $RPMDIR/$RPMARCH/$PACKAGE*.rpm
 rm -f $RPMDIR/noarch/$PACKAGE*.rpm
 
