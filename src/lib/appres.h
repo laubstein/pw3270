@@ -30,45 +30,29 @@ struct toggle {
 	const char *label[2];	/* labels */
 	void (*upcall)(struct toggle *, enum toggle_type); /* change value */
 };
-#define MONOCASE	0
-#define ALT_CURSOR	1
-#define CURSOR_BLINK	2
-#define SHOW_TIMING	3
-#define CURSOR_POS	4
 
-#if defined(X3270_TRACE) /*[*/
-#define DS_TRACE	5
-#endif /*]*/
+enum TOOGLES_3270
+{
+	MONOCASE,
+	ALT_CURSOR,
+	CURSOR_BLINK,
+	SHOW_TIMING,
+	CURSOR_POS,
+	DS_TRACE,
+	SCROLL_BAR,
+	LINE_WRAP,
+	BLANK_FILL,
+	SCREEN_TRACE,
+	EVENT_TRACE,
+	MARGINED_PASTE,
+	RECTANGLE_SELECT,
+	CROSSHAIR,
+	VISIBLE_CONTROL,
+	AID_WAIT,
+	RECONNECT,
 
-#define SCROLL_BAR	6
-
-#if defined(X3270_ANSI) /*[*/
-#define LINE_WRAP	7
-#endif /*]*/
-
-#define BLANK_FILL	8
-
-#if defined(X3270_TRACE) /*[*/
-#define SCREEN_TRACE	9
-#define EVENT_TRACE	10
-#endif /*]*/
-
-#define MARGINED_PASTE	11
-#define RECTANGLE_SELECT 12
-#define CROSSHAIR	13
-
-#if defined(X3270_DISPLAY) /*[*/
-#define VISIBLE_CONTROL	14
-#endif /*]*/
-
-#if defined(X3270_SCRIPT) || defined(TCL3270) /*[*/
-#define AID_WAIT	15
-#endif /*]*/
-
-/* Reconnect when disconnected */
-#define RECONNECT	17
-
-#define N_TOGGLES	17
+	N_TOGGLES
+};
 
 #define toggled(ix)		(appres.toggle[ix].value)
 #define toggle_toggle(t) \
