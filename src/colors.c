@@ -143,6 +143,7 @@
 	 GtkCellRenderer *renderer;
 	 GtkTreeStore  *store;
 	 GtkTreeIter iter;
+	 GtkWidget	*frame;
 	 int f;
 	 
      widget = gtk_dialog_new_with_buttons (	_( "Configuração de cores" ),
@@ -158,6 +159,7 @@
 	 
 	 // Colors tree
 	 view = gtk_tree_view_new();
+	 gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view),FALSE);
 	 renderer = gtk_cell_renderer_text_new();
 	 gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view),-1,"Name",renderer,"text", 0,NULL);
 			
@@ -175,14 +177,18 @@
 	 for(f=0;f<(sizeof(GColors)/sizeof(char *));f++)
 		 InsertInTree(store,&iter,GColors[f]);
 
-
 	 gtk_tree_view_set_model(GTK_TREE_VIEW(view), GTK_TREE_MODEL(store));
 
      g_object_unref(store);
 	 // Boxes
-	 hbox  = gtk_hbox_new(FALSE,2);
-	 gtk_box_pack_start(GTK_BOX(hbox),view,TRUE,TRUE,2);
-	 gtk_box_pack_end(GTK_BOX(hbox),color,TRUE,TRUE,2);
+	 hbox  = gtk_hpaned_new();
+	 
+	 frame = gtk_scrolled_window_new(NULL,NULL);
+	 gtk_container_add(GTK_CONTAINER(frame),view);
+	 gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(frame),GTK_SHADOW_ETCHED_IN);
+	 gtk_paned_add1(GTK_PANED(hbox),frame);
+	 
+	 gtk_paned_add2(GTK_PANED(hbox),color);
 
 	 gtk_container_add(GTK_CONTAINER(GTK_DIALOG(widget)->vbox),hbox);
 	 gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(widget)->vbox));
