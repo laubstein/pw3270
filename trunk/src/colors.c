@@ -120,12 +120,24 @@
 	 gtk_tree_store_set(store, &iter, 0, str, -1);
  }
  
+ static void color_changed(GtkColorSelection *colorselection, COLORDATA *last)
+ {
+	 if(last->current)
+	 {
+		 gtk_color_selection_get_current_color(colorselection,last->current);
+		 gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),last->current,TRUE,TRUE);
+		 RedrawTerminalContents();
+	 }
+ }
+ 
  static void row_activated(GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, GtkWidget *color)
  {
 	 gchar 			*str  = gtk_tree_path_to_string(path);
 	 gchar 			*ptr  = strchr((char *) str, ':');
 	 COLORDATA		*last = g_object_get_data(G_OBJECT(color),"info");
 	 unsigned int idx;
+	 
+	 printf("%s(%d): %s\n",__FILE__,__LINE__,str);
 	 
 	 if(ptr)
 	 {
@@ -137,6 +149,7 @@
 		 case 0:	// Field colors
 			 if(idx < FIELD_COLORS)
 			 {
+				 last->current = field_cmap+idx;
 				 gtk_color_selection_set_previous_color(GTK_COLOR_SELECTION(color),last->field_cmap+idx);
 				 gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(color),field_cmap+idx);
 			 }
@@ -145,8 +158,18 @@
 		 case 1:	// Graphics colors
 			 if(idx < TERMINAL_COLORS)
 			 {
+				 last->current = terminal_cmap+idx;
 				 gtk_color_selection_set_previous_color(GTK_COLOR_SELECTION(color),last->terminal_cmap+idx);
 				 gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(color),terminal_cmap+idx);
+			 }
+			 break;
+			 
+		 case 2:	// OIA
+			 if(idx < TERMINAL_COLORS)
+			 {
+				 last->current = status_cmap+idx;
+				 gtk_color_selection_set_previous_color(GTK_COLOR_SELECTION(color),last->status_cmap+idx);
+				 gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(color),status_cmap+idx);
 			 }
 			 break;
 		 }
@@ -163,7 +186,8 @@
 								_( "Intensified, Protected" )
 						    };
 							
-	 char *GColors[]	  = {	_( "Blue" ),
+	 char *GColors[]	  = {	_( "Background" ),
+								_( "Blue" ),
 								_( "Red"  ),
 								_( "Pink" ),
 								_( "Green" ),
@@ -179,6 +203,22 @@
 								_( "Mustard" ),
 								_( "Gray" ),
 							    _( "Brown" ) 
+							 };
+							 
+							 
+    char *SColors[]       = {	_( "Background" ),
+								_( "STATUS_COLOR_SEPARATOR" ),
+								_( "STATUS_COLOR_CURSOR_POSITION" ),
+								_( "STATUS_COLOR_LUNAME" ),
+								_( "STATUS_COLOR_ERROR" ),
+								_( "STATUS_COLOR_TIME" ),
+								_( "STATUS_COLOR_WARNING" ),
+								_( "STATUS_COLOR_NORMAL" ),
+								_( "STATUS_COLOR_TOOGLE" ),
+								_( "STATUS_COLOR_SSL" ),
+								_( "STATUS_COLOR_CONNECTED" ),
+								_( "STATUS_COLOR_KEYBOARD" ),
+								_( "STATUS_COLOR_CONNECT_ICON" )
 							 };
 							 
 	 COLORDATA			last;
@@ -209,7 +249,7 @@
 	 // Color selection dialog
 	 color = gtk_color_selection_new();
 	 gtk_color_selection_set_has_opacity_control(GTK_COLOR_SELECTION(color),FALSE);
-	 
+
 	 g_object_set_data(G_OBJECT(color),"info",&last);
 	 
 	 // Colors tree
@@ -234,9 +274,15 @@
 	 for(f=0;f<(sizeof(GColors)/sizeof(char *));f++)
 		 InsertInTree(store,&iter,GColors[f]);
 
+ 	 gtk_tree_store_append(store,&iter,NULL);
+	 gtk_tree_store_set(store, &iter, 0, _( "OIA" ), -1);
+	 for(f=0;f<(sizeof(SColors)/sizeof(char *));f++)
+		 InsertInTree(store,&iter,SColors[f]);
+
 	 gtk_tree_view_set_model(GTK_TREE_VIEW(view), GTK_TREE_MODEL(store));
 
 	 g_signal_connect(G_OBJECT(view), "row-activated", G_CALLBACK(row_activated), (gpointer) color);
+	 g_signal_connect(G_OBJECT(color), "color-changed", G_CALLBACK(color_changed), (gpointer) &last);
 	 
      g_object_unref(store);
 	 // Boxes
