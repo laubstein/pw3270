@@ -263,7 +263,8 @@
 /*---[ Terminal window ]------------------------------------------------------*/
 
  GtkWidget	*g3270_new(const char *hostname);
- void		LoadTerminalColors(void);
+ void		LoadTerminalColors(FILE *cfg);
+ void		SaveTerminalColors(FILE *cfg);
 
 /*---[ Extensions/Plugins ]---------------------------------------------------*/
 

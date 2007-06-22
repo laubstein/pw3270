@@ -62,6 +62,7 @@
     if(arq)
     {
 	   fwrite (&config, sizeof(config), 1, arq);
+	   SaveTerminalColors(arq);
 	   fclose(arq);
     }
 
@@ -170,6 +171,21 @@
     if(toolbar)
        gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, TRUE, 0);
 	
+    // Load basic configuration
+    snprintf(filename,4095,"%s/.%s.saved",home ? home : ".", TARGET);
+    arq = fopen(filename,"r");
+    if(arq)
+    {
+    	if(fread(&config,sizeof(config),1,arq) == 1 && (config.sz == sizeof(config)))
+    	{
+		   DBGPrintf("Tamanho da janela: %dx%d",config.width, config.height);
+           gtk_window_resize(GTK_WINDOW(top_window),config.width, config.height);
+    	}
+    }
+	
+    /* Load colors */
+	LoadTerminalColors(arq);
+
     // Create terminal window
 	terminal = g3270_new(cl_hostname);
 	gtk_box_pack_start(GTK_BOX(vbox),terminal,TRUE,TRUE,0);
@@ -180,18 +196,9 @@
     	gtk_window_set_icon(GTK_WINDOW(top_window),icon);
 #endif
 
-    // Set size and position
-    snprintf(filename,4095,"%s/.%s.saved",home ? home : ".", TARGET);
-    arq = fopen(filename,"r");
-    if(arq)
-    {
-    	if(fread(&config,sizeof(config),1,arq) == 1 && (config.sz == sizeof(config)))
-    	{
-		   DBGPrintf("Tamanho da janela: %dx%d",config.width, config.height);
-           gtk_window_resize(GTK_WINDOW(top_window),config.width, config.height);
-    	}
-    	fclose(arq);
-    }
+	
+	if(arq)
+		fclose(arq);
 
 	gtk_widget_grab_focus(terminal);
 	gtk_widget_grab_default(terminal);
