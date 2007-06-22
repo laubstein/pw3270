@@ -102,12 +102,57 @@
 
  #ifdef DEBUG
  
+ typedef struct _colordata
+ {
+	 GdkColor *current;
+	 GdkColor terminal_cmap[TERMINAL_COLORS];
+	 GdkColor field_cmap[FIELD_COLORS];
+	 GdkColor cursor_cmap[CURSOR_COLORS];
+	 GdkColor status_cmap[STATUS_COLORS];
+	 GdkColor selection_cmap[SELECTION_COLORS];
+ } COLORDATA;
+ 
  static void InsertInTree(GtkTreeStore *store, GtkTreeIter *parent, const char *str)
  {
 	 GtkTreeIter iter;										   
 	 memset(&iter,0,sizeof(iter));
 	 gtk_tree_store_append(store,&iter,parent);
 	 gtk_tree_store_set(store, &iter, 0, str, -1);
+ }
+ 
+ static void row_activated(GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, GtkWidget *color)
+ {
+	 gchar 			*str  = gtk_tree_path_to_string(path);
+	 gchar 			*ptr  = strchr((char *) str, ':');
+	 COLORDATA		*last = g_object_get_data(G_OBJECT(color),"info");
+	 unsigned int idx;
+	 
+	 if(ptr)
+	 {
+		 *(ptr++) = 0;
+		 idx = atoi(ptr);
+		 
+		 switch(atoi((char *) str))
+		 {
+		 case 0:	// Field colors
+			 if(idx < FIELD_COLORS)
+			 {
+				 gtk_color_selection_set_previous_color(GTK_COLOR_SELECTION(color),last->field_cmap+idx);
+				 gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(color),field_cmap+idx);
+			 }
+			 break;
+		 
+		 case 1:	// Graphics colors
+			 if(idx < TERMINAL_COLORS)
+			 {
+				 gtk_color_selection_set_previous_color(GTK_COLOR_SELECTION(color),last->terminal_cmap+idx);
+				 gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(color),terminal_cmap+idx);
+			 }
+			 break;
+		 }
+	 }
+	 
+	 g_free(str);
  }
  
  void action_set_colors(GtkWidget *w, gpointer data)
@@ -135,17 +180,25 @@
 								_( "Gray" ),
 							    _( "Brown" ) 
 							 };
+							 
+	 COLORDATA			last;
 		 
-	 GtkWidget *widget;
-	 GtkWidget *hbox;
-	 GtkWidget *color;
-	 GtkWidget *view;
-	 GtkCellRenderer *renderer;
-	 GtkTreeStore  *store;
-	 GtkTreeIter iter;
-	 GtkWidget	*frame;
-	 int f;
+	 GtkWidget			*widget;
+	 GtkWidget			*hbox;
+	 GtkWidget			*color;
+	 GtkWidget			*view;
+	 GtkCellRenderer	*renderer;
+	 GtkTreeStore  		*store;
+	 GtkTreeIter 		iter;
+	 GtkWidget			*frame;
+	 int 				f;
 	 
+	 memset(&last,0,sizeof(last));
+	 memcpy(last.terminal_cmap,terminal_cmap,sizeof(GdkColor)*TERMINAL_COLORS);
+	 memcpy(last.field_cmap,field_cmap,sizeof(GdkColor)*FIELD_COLORS);
+	 memcpy(last.cursor_cmap,cursor_cmap,sizeof(GdkColor)*CURSOR_COLORS);
+	 memcpy(last.selection_cmap,selection_cmap,sizeof(GdkColor)*SELECTION_COLORS);
+							 
      widget = gtk_dialog_new_with_buttons (	_( "Configuração de cores" ),
                                             GTK_WINDOW(top_window),
                                             GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -157,9 +210,13 @@
 	 color = gtk_color_selection_new();
 	 gtk_color_selection_set_has_opacity_control(GTK_COLOR_SELECTION(color),FALSE);
 	 
+	 g_object_set_data(G_OBJECT(color),"info",&last);
+	 
 	 // Colors tree
 	 view = gtk_tree_view_new();
 	 gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view),FALSE);
+	 gtk_tree_view_set_enable_tree_lines(GTK_TREE_VIEW(view),TRUE);
+	 
 	 renderer = gtk_cell_renderer_text_new();
 	 gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view),-1,"Name",renderer,"text", 0,NULL);
 			
@@ -179,6 +236,8 @@
 
 	 gtk_tree_view_set_model(GTK_TREE_VIEW(view), GTK_TREE_MODEL(store));
 
+	 g_signal_connect(G_OBJECT(view), "row-activated", G_CALLBACK(row_activated), (gpointer) color);
+	 
      g_object_unref(store);
 	 // Boxes
 	 hbox  = gtk_hpaned_new();
@@ -199,6 +258,7 @@
 		 break;
 	 
 	 case GTK_RESPONSE_REJECT:
+		 // Restore color using the values saved in "last"
 		 break;
 		 
 	 default:
