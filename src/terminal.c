@@ -562,9 +562,6 @@
     g_signal_connect(G_OBJECT(ret), "scroll-event",			G_CALLBACK(mouse_scroll),		0);
 #endif
 
-    /* Load colors */
-	LoadTerminalColors();
-
     /* Set default terminal colors */
     for(f=0;f < (sizeof(widget_states)/sizeof(int));f++)
     {

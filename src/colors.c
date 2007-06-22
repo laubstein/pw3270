@@ -89,7 +89,56 @@
     return rc;
  }
 
- void LoadTerminalColors()
+ void SaveTerminalColors(FILE *arq)
+ {
+	#pragma pack(1)
+	 
+	typedef struct _clrconfig
+	{
+		guint16 red;
+		guint16 green;
+		guint16 blue;
+	} CLRCONFIG;
+	
+    static const struct _clrinfo
+	{
+		unsigned short sz;
+		GdkColor *itn;
+	} clrinfo[] =
+	{
+		{ TERMINAL_COLORS, terminal_cmap },
+		{ FIELD_COLORS, field_cmap },
+		{ CURSOR_COLORS, cursor_cmap },
+		{ SELECTION_COLORS, selection_cmap },
+		{ STATUS_COLORS, status_cmap }
+	};
+	
+	int f,p;
+	unsigned char tag;
+	CLRCONFIG		rec;
+	
+	#pragma pack()
+	
+	for(f=0;f<(sizeof(clrinfo)/sizeof(struct _clrinfo));f++)
+	{
+		tag = 'c';
+		fwrite(&tag,sizeof(tag),1,arq);
+		tag = f;
+		fwrite(&tag,sizeof(tag),1,arq);
+		
+		fwrite(&clrinfo[f].sz,sizeof(clrinfo[f].sz),1,arq);
+		
+		for(p=0;p<clrinfo[f].sz;p++)
+		{
+			rec.red   = (clrinfo[f].itn +p)->red;
+			rec.green = (clrinfo[f].itn +p)->green;
+			rec.blue  = (clrinfo[f].itn +p)->blue;
+			fwrite(&rec,sizeof(rec),1,arq);
+		}
+	}
+ }
+
+ void LoadTerminalColors(FILE *cfg)
  { 
 	 
     LoadColors(terminal_cmap, TERMINAL_COLORS, "Terminal");
