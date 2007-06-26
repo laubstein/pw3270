@@ -2,6 +2,60 @@
  #include <errno.h>
  #include "g3270.h"
 
+/*---[ Structs ]--------------------------------------------------------------*/
+
+	#pragma pack(1)
+	 
+	typedef struct _clrconfig
+	{
+		guint16 red;
+		guint16 green;
+		guint16 blue;
+	} CLRCONFIG;
+	
+    static const struct _clrinfo
+	{
+		unsigned short sz;
+		GdkColor 		 *itn;
+		const char		 *name;
+		const char		 *def;
+	} clrinfo[] =
+	{
+		{
+			TERMINAL_COLORS, 
+			terminal_cmap,
+			"Terminal",	
+			"black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white"
+		},
+		{
+			FIELD_COLORS, 
+			field_cmap,
+			"Fields",		
+			"green,red,#00FFFF,white"
+		},
+		{
+			CURSOR_COLORS, 
+			cursor_cmap,
+			"Cursor",		
+			"white,white,LimeGreen,LimeGreen"
+		},
+		{
+			SELECTION_COLORS, 
+			selection_cmap,
+			"Selection",	
+			"#000020,yellow"
+		},
+		{
+			STATUS_COLORS, 
+			status_cmap,
+			"Status",
+			"black,#7890F0,white,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen,LimeGreen,LimeGreen,LimeGreen"
+		}
+	};
+	
+	#pragma pack()
+	
+
 /*---[ Terminal colors ]------------------------------------------------------*/
 
  GdkColor	terminal_cmap[TERMINAL_COLORS];
@@ -12,48 +66,7 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
- static int GetColorDescription(const char *id, char *buffer)
- {
-    static const struct _colors
-    {
-    	const char *name;
-    	const char *def;
-    } colors[] =
-    {
-		{ "Terminal",	"black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white" },
-		{ "Fields",		"green,red,#00FFFF,white" },
-		{ "Cursor",		"white,white,LimeGreen,LimeGreen" },
-		{ "Selection",	"#000020,yellow" },
-		{ "Status",		"black,#7890F0,white,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen,LimeGreen,LimeGreen,LimeGreen" }
-    };
-    char	key[40];
-    char	*ptr;
-    int 	f;
-
-	/* Check for environment variable */
-	snprintf(key,39,"%s3270",id);
-	ptr = getenv(key);
-	if(ptr)
-	{
-   		strncpy(buffer,ptr,4095);
-		return 0;
-	}
-
-    // TODO (perry#1#): Search configuration file for the definition.
-
-    /* Search for the default colors */
-    for(f=0;f< (sizeof(colors)/sizeof(struct _colors));f++)
-    {
-    	if(!strcmp(id,colors[f].name))
-    	{
-    		strncpy(buffer,colors[f].def,4095);
-    		return 0;
-    	}
-    }
-
- 	return -1;
- }
-
+/*	
  static int LoadColors(GdkColor *clr, int qtd, const char *id)
  {
  	char buffer[4096];
@@ -88,36 +101,55 @@
     }
     return rc;
  }
+*/
+
+ void LoadTerminalColors(FILE *cfg)
+ { 
+	char 	 *ptr;
+	char 	 buffer[4096];
+	GdkColor *clr;
+	int 	 f;
+	int		 p;
+	char	 *tok;
+	 
+	for(f=0;f<(sizeof(clrinfo)/sizeof(struct _clrinfo));f++)
+	{
+		// Check for entry in configuration file
+		
+		// Not configured, load defaults
+		snprintf(buffer,4095,"%s3270",clrinfo[f].name);
+		ptr = getenv(buffer);
+		if(ptr)
+			strncpy(buffer,ptr,4095);
+		else
+			strncpy(buffer,clrinfo[f].def,4095);
+		
+		clr = clrinfo[f].itn;
+		
+		ptr=strtok_r(buffer,",",&tok);
+		for(p=0;p<clrinfo[f].sz;p++)
+		{
+			if(ptr)
+			{
+				gdk_color_parse(ptr,clr);
+				ptr = strtok_r(0,",",&tok);
+			}
+			else
+			{
+				gdk_color_parse("green",clr);
+			}
+			gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr,TRUE,TRUE);
+			clr++;
+		}
+	}
+ }
+
 
  void SaveTerminalColors(FILE *arq)
  {
-	#pragma pack(1)
-	 
-	typedef struct _clrconfig
-	{
-		guint16 red;
-		guint16 green;
-		guint16 blue;
-	} CLRCONFIG;
-	
-    static const struct _clrinfo
-	{
-		unsigned short sz;
-		GdkColor *itn;
-	} clrinfo[] =
-	{
-		{ TERMINAL_COLORS, terminal_cmap },
-		{ FIELD_COLORS, field_cmap },
-		{ CURSOR_COLORS, cursor_cmap },
-		{ SELECTION_COLORS, selection_cmap },
-		{ STATUS_COLORS, status_cmap }
-	};
-	
 	int f,p;
 	unsigned char tag;
 	CLRCONFIG		rec;
-	
-	#pragma pack()
 	
 	for(f=0;f<(sizeof(clrinfo)/sizeof(struct _clrinfo));f++)
 	{
@@ -136,17 +168,6 @@
 			fwrite(&rec,sizeof(rec),1,arq);
 		}
 	}
- }
-
- void LoadTerminalColors(FILE *cfg)
- { 
-	 
-    LoadColors(terminal_cmap, TERMINAL_COLORS, "Terminal");
-    LoadColors(field_cmap,FIELD_COLORS,"Fields");
-    LoadColors(cursor_cmap,CURSOR_COLORS,"Cursor");
-    LoadColors(selection_cmap,SELECTION_COLORS,"Selection");
-    LoadColors(status_cmap, STATUS_COLORS, "Status");
-	 
  }
 
  #ifdef DEBUG
