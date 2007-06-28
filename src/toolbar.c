@@ -218,6 +218,8 @@
 	GtkWidget	*toolbar = 0;
 	FILE 		*in		 = fopen(filename,"r");
 
+	DBGPrintf("%s: %p",filename,in);
+	 
 	if(!in)
 		return 0;
 

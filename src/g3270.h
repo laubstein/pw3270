@@ -170,6 +170,7 @@
  void action_append( GtkWidget *w, gpointer data);
  void action_remove_selection(GtkWidget *w, gpointer data);
  void action_paste(GtkWidget *w, gpointer data);
+ void action_paste_next(GtkWidget *w, gpointer data);
  void action_copy_as_table(GtkWidget *w, gpointer data);
 
  void action_exec_with_selection(GtkWidget *w, gpointer data);

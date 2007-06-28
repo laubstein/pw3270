@@ -335,11 +335,28 @@
 
  }
 
+  
+ static gchar *paste_buffer = 0; /**< String with contains the remaining part of the pasted buffer */
+ 
+
  void action_paste(GtkWidget *w, gpointer data)
  {
+	if(paste_buffer)
+	{
+		g_free(paste_buffer);
+		paste_buffer = 0;
+	}
+	
     gtk_clipboard_request_text(	gtk_widget_get_clipboard(terminal,GDK_SELECTION_CLIPBOARD),
 								paste_clipboard,
 								0 );
+ }
+
+ void action_paste_next(GtkWidget *w, gpointer data)
+ {
+	 if(!paste_buffer)
+		 return;
+	 
  }
 
  static gpointer exec_with_copy_thread(gpointer cmd)
