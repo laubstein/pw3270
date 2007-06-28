@@ -45,6 +45,7 @@
 	{ "copy",					action_copy						},
 	{ "append",					action_append					},
 	{ "paste",					action_paste					},
+	{ "paste_next",				action_paste_next				},
 	{ "clear",					action_clear					},
 	{ "select_all",				action_select_all				},
 	{ "remove_selection",		action_remove_selection			},
