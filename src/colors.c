@@ -111,35 +111,79 @@
 	int 	 f;
 	int		 p;
 	char	 *tok;
+	unsigned char tag;
+//    unsigned short sz;
+//	CLRCONFIG rec;
 	 
 	for(f=0;f<(sizeof(clrinfo)/sizeof(struct _clrinfo));f++)
 	{
 		// Check for entry in configuration file
+		tag = 0;
 		
-		// Not configured, load defaults
-		snprintf(buffer,4095,"%s3270",clrinfo[f].name);
-		ptr = getenv(buffer);
-		if(ptr)
-			strncpy(buffer,ptr,4095);
-		else
-			strncpy(buffer,clrinfo[f].def,4095);
-		
-		clr = clrinfo[f].itn;
-		
-		ptr=strtok_r(buffer,",",&tok);
-		for(p=0;p<clrinfo[f].sz;p++)
+/*		
+		if(fread(&tag,1,1,cfg) == 1 && tag == 'c')
 		{
-			if(ptr)
+			CHKPoint();
+			if(fread(&tag,1,1,cfg) != 1 || tag != f)
 			{
-				gdk_color_parse(ptr,clr);
-				ptr = strtok_r(0,",",&tok);
+				CHKPoint();
+				tag = 0;
+			}
+			else if(fread(&sz,sizeof(sz),1,cfg) != 1 || clrinfo[tag].sz != sz)
+			{
+				tag = 0;
 			}
 			else
 			{
-				gdk_color_parse("green",clr);
+				DBGMessage("Loading colors from configuration file");
+				clr = clrinfo[f].itn;
+			    for(p=0;p<clrinfo[f].sz;p++)
+				{
+				   if(fread(&rec,sizeof(rec),1,cfg) == 1)
+				   {
+					   (clrinfo[f].itn +p)->red = rec.red;
+					   (clrinfo[f].itn +p)->green = rec.green;
+					   (clrinfo[f].itn +p)->blue = rec.blue;
+					   gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr,TRUE,TRUE);
+					   clr++;
+				   }
+				   else
+				   {
+					   tag = 0;
+				   }
+				}
 			}
-			gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr,TRUE,TRUE);
-			clr++;
+		}
+*/
+		DBGTrace(tag);
+		
+		if(!tag)
+		{
+			// Not configured, load defaults
+			snprintf(buffer,4095,"%s3270",clrinfo[f].name);
+			ptr = getenv(buffer);
+			if(ptr)
+				strncpy(buffer,ptr,4095);
+			else
+				strncpy(buffer,clrinfo[f].def,4095);
+			
+			clr = clrinfo[f].itn;
+			
+			ptr=strtok_r(buffer,",",&tok);
+			for(p=0;p<clrinfo[f].sz;p++)
+			{
+				if(ptr)
+				{
+					gdk_color_parse(ptr,clr);
+					ptr = strtok_r(0,",",&tok);
+				}
+				else
+				{
+					gdk_color_parse("green",clr);
+				}
+				gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr,TRUE,TRUE);
+				clr++;
+			}
 		}
 	}
  }
