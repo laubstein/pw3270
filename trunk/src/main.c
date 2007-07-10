@@ -49,16 +49,45 @@
 #ifdef __G_KEY_FILE_H__
 	int		pos[2];
 	char	*ptr;
-#endif
-
+	char	*conf;
+#else
  	struct user_config config;
-
-    DBGPrintf("Widget: %p Data: %d",w,(int) data);
+#endif
 
  	action_disconnect(0,0);
  	Log("Exiting");
 
  	// Save window size and position
+#ifdef __G_KEY_FILE_H__
+
+	DBGTracex(main_configuration);
+
+	if(main_configuration)
+	{
+    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
+
+   		gtk_window_get_size(GTK_WINDOW(top_window),&pos[0],&pos[1]);
+		g_key_file_set_integer_list(main_configuration,"Terminal","size",pos,2);
+
+		conf = ptr = g_key_file_to_data(main_configuration,NULL,NULL);
+		if(ptr)
+		{
+			while(*ptr && isspace(*ptr))
+				ptr++;
+	    	arq = fopen(filename,"w");
+	    	if(arq)
+			{
+	    		fprintf(arq,ptr);
+	    		fclose(arq);
+			}
+			g_free(conf);
+		}
+		g_key_file_free(main_configuration);
+		main_configuration = 0;
+	}
+
+#else
+
  	memset(&config,0,sizeof(config));
  	config.sz = sizeof(config);
 
@@ -74,31 +103,6 @@
 	   SaveTerminalColors(arq);
 	   fclose(arq);
     }
-
-#ifdef __G_KEY_FILE_H__
-
-	if(main_configuration)
-	{
-    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
-
-   		gtk_window_get_size(GTK_WINDOW(top_window),&pos[0],&pos[1]);
-		g_key_file_set_integer_list(main_configuration,"Terminal","size",pos,2);
-
-		ptr = g_key_file_to_data(main_configuration,NULL,NULL);
-		if(ptr)
-		{
-
-	    	arq = fopen(filename,"w");
-	    	if(arq)
-			{
-	    		fprintf(arq,"%s",ptr);
-	    		fclose(arq);
-			}
-		}
-
-		g_key_file_free(main_configuration);
-		main_configuration = 0;
-	}
 
 #endif
 
@@ -169,8 +173,12 @@
  	char 		filename[4096];
  	char 		*home	= getenv("HOME");
  	FILE 		*arq;
-
+#ifdef __G_KEY_FILE_H__
+	gint		*pos;
+	gsize		sz;
+#else
  	struct user_config config;
+#endif
 
     top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -207,7 +215,22 @@
     if(toolbar)
        gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, TRUE, 0);
 
-    // Load basic configuration
+    // Load key file
+#ifdef __G_KEY_FILE_H__
+	main_configuration = g_key_file_new();
+	if(main_configuration)
+	{
+    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
+    	g_key_file_load_from_file(main_configuration,filename,G_KEY_FILE_KEEP_TRANSLATIONS,NULL);
+
+    	if(g_key_file_has_key(main_configuration,"Terminal","size",NULL))
+    	{
+			pos = g_key_file_get_integer_list(main_configuration,"Terminal","size",&sz,NULL);
+			if(pos && sz == 2)
+           		gtk_window_resize(GTK_WINDOW(top_window),pos[0],pos[1]);
+    	}
+	}
+#else
     snprintf(filename,4095,"%s/.%s.saved",home ? home : ".", TARGET);
     arq = fopen(filename,"r");
     if(arq)
@@ -218,15 +241,6 @@
            gtk_window_resize(GTK_WINDOW(top_window),config.width, config.height);
     	}
     }
-
-    // Load key file
-#ifdef __G_KEY_FILE_H__
-	main_configuration = g_key_file_new();
-	if(main_configuration)
-	{
-    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
-    	g_key_file_load_from_file(main_configuration,filename,G_KEY_FILE_KEEP_COMMENTS|G_KEY_FILE_KEEP_TRANSLATIONS,NULL);
-	}
 #endif
 
     /* Load colors */
