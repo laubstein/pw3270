@@ -5,14 +5,14 @@
 /*---[ Structs ]--------------------------------------------------------------*/
 
 	#pragma pack(1)
-	 
+
 	typedef struct _clrconfig
 	{
 		guint16 red;
 		guint16 green;
 		guint16 blue;
 	} CLRCONFIG;
-	
+
     static const struct _clrinfo
 	{
 		unsigned short sz;
@@ -22,39 +22,39 @@
 	} clrinfo[] =
 	{
 		{
-			TERMINAL_COLORS, 
+			TERMINAL_COLORS,
 			terminal_cmap,
-			"Terminal",	
+			"Terminal",
 			"black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white"
 		},
 		{
-			FIELD_COLORS, 
+			FIELD_COLORS,
 			field_cmap,
-			"Fields",		
+			"Fields",
 			"green,red,#00FFFF,white"
 		},
 		{
-			CURSOR_COLORS, 
+			CURSOR_COLORS,
 			cursor_cmap,
-			"Cursor",		
+			"Cursor",
 			"white,white,LimeGreen,LimeGreen"
 		},
 		{
-			SELECTION_COLORS, 
+			SELECTION_COLORS,
 			selection_cmap,
-			"Selection",	
+			"Selection",
 			"#000020,yellow"
 		},
 		{
-			STATUS_COLORS, 
+			STATUS_COLORS,
 			status_cmap,
 			"Status",
 			"black,#7890F0,white,LimeGreen,red,white,yellow,green,LimeGreen,LimeGreen,LimeGreen,LimeGreen,LimeGreen"
 		}
 	};
-	
+
 	#pragma pack()
-	
+
 
 /*---[ Terminal colors ]------------------------------------------------------*/
 
@@ -66,7 +66,7 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
-/*	
+/*
  static int LoadColors(GdkColor *clr, int qtd, const char *id)
  {
  	char buffer[4096];
@@ -104,7 +104,7 @@
 */
 
  void LoadTerminalColors(FILE *cfg)
- { 
+ {
 	char 	 *ptr;
 	char 	 buffer[4096];
 	GdkColor *clr;
@@ -114,13 +114,13 @@
 	unsigned char tag;
 //    unsigned short sz;
 //	CLRCONFIG rec;
-	 
+
 	for(f=0;f<(sizeof(clrinfo)/sizeof(struct _clrinfo));f++)
 	{
 		// Check for entry in configuration file
 		tag = 0;
-		
-/*		
+
+/*
 		if(fread(&tag,1,1,cfg) == 1 && tag == 'c')
 		{
 			CHKPoint();
@@ -156,7 +156,7 @@
 		}
 */
 		DBGTrace(tag);
-		
+
 		if(!tag)
 		{
 			// Not configured, load defaults
@@ -166,9 +166,9 @@
 				strncpy(buffer,ptr,4095);
 			else
 				strncpy(buffer,clrinfo[f].def,4095);
-			
+
 			clr = clrinfo[f].itn;
-			
+
 			ptr=strtok_r(buffer,",",&tok);
 			for(p=0;p<clrinfo[f].sz;p++)
 			{
@@ -191,19 +191,21 @@
 
  void SaveTerminalColors(FILE *arq)
  {
+#ifndef __G_KEY_FILE_H__
+
 	int f,p;
 	unsigned char tag;
 	CLRCONFIG		rec;
-	
+
 	for(f=0;f<(sizeof(clrinfo)/sizeof(struct _clrinfo));f++)
 	{
 		tag = 'c';
 		fwrite(&tag,sizeof(tag),1,arq);
 		tag = f;
 		fwrite(&tag,sizeof(tag),1,arq);
-		
+
 		fwrite(&clrinfo[f].sz,sizeof(clrinfo[f].sz),1,arq);
-		
+
 		for(p=0;p<clrinfo[f].sz;p++)
 		{
 			rec.red   = (clrinfo[f].itn +p)->red;
@@ -212,10 +214,12 @@
 			fwrite(&rec,sizeof(rec),1,arq);
 		}
 	}
+
+#endif
  }
 
  #ifdef DEBUG
- 
+
  #define NUM_COLOR_TABLES 5
 
  typedef struct _colorlist
@@ -226,28 +230,28 @@
 		 GdkColor *saved;
 		 GdkColor *tbl;
  } COLORLIST;
- 
+
  typedef struct _colordata
  {
 	 GdkColor	*current;
 	 COLORLIST	*clr;
-	 
+
 	 GdkColor	terminal_cmap[TERMINAL_COLORS];
 	 GdkColor	field_cmap[FIELD_COLORS];
 	 GdkColor	cursor_cmap[CURSOR_COLORS];
 	 GdkColor	status_cmap[STATUS_COLORS];
 	 GdkColor	selection_cmap[SELECTION_COLORS];
-	 
+
  } COLORDATA;
- 
+
  static void InsertInTree(GtkTreeStore *store, GtkTreeIter *parent, const char *str)
  {
-	 GtkTreeIter iter;										   
+	 GtkTreeIter iter;
 	 memset(&iter,0,sizeof(iter));
 	 gtk_tree_store_append(store,&iter,parent);
 	 gtk_tree_store_set(store, &iter, 0, str, -1);
  }
- 
+
  static void color_changed(GtkColorSelection *colorselection, COLORDATA *last)
  {
 	 if(last->current)
@@ -257,7 +261,7 @@
 		 RedrawTerminalContents();
 	 }
  }
- 
+
  static void row_activated(GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, GtkWidget *color)
  {
 	 gchar 			*str  = gtk_tree_path_to_string(path);
@@ -266,17 +270,17 @@
 	 COLORLIST		*clr;
 	 unsigned int idx;
 	 unsigned int el;
-	 
+
 	 printf("%s(%d): %s\n",__FILE__,__LINE__,str);
-	 
+
 	 if(ptr)
 	 {
 		 *(ptr++) = 0;
 		 idx = atoi(ptr);
 		 el  = atoi(str);
-		 
+
 		 DBGPrintf("el=%d idx=%d",el,idx);
-		 
+
 		 if(el < NUM_COLOR_TABLES)
 		 {
 			 clr = last->clr+el;
@@ -288,20 +292,20 @@
 			 }
 		 }
 	 }
-	 
+
 	 g_free(str);
  }
- 
+
  void action_set_colors(GtkWidget *w, gpointer data)
  {
-	 char *FieldColors[FIELD_COLORS] = 
+	 char *FieldColors[FIELD_COLORS] =
 		 {	_( "Normal, Unprotected" ),
 			_( "Intensified, Unprotected" ),
 			_( "Normal, Protected" ),
 			_( "Intensified, Protected" )
 		 };
-							
-	 char *GColors[TERMINAL_COLORS] = 
+
+	 char *GColors[TERMINAL_COLORS] =
 		 {	_( "Background" ),
 			_( "Blue" ),
 			_( "Red"  ),
@@ -320,9 +324,9 @@
 			_( "Gray" )
 
 		 };
-							 
-							 
-    char *SColors[STATUS_COLORS] = 
+
+
+    char *SColors[STATUS_COLORS] =
 		 {	_( "Background" ),
 			_( "STATUS_COLOR_SEPARATOR" ),
 			_( "STATUS_COLOR_CURSOR_POSITION" ),
@@ -337,15 +341,15 @@
 			_( "STATUS_COLOR_KEYBOARD" ),
 			_( "STATUS_COLOR_CONNECT_ICON" )
 		  };
-							 
-	 char *cursors[CURSOR_COLORS] = 
+
+	 char *cursors[CURSOR_COLORS] =
 		  {  _( "Normal" ),
 			 _( "Insert" ),
 			 _( "Cross Hair/Normal" ),
 			 _( "Cross Hair/Insert" )
 		  };
-							 
-							 
+
+
 	 char *selec[SELECTION_COLORS] =
 		  {  _( "Contents" ),
 			 _( "Border" )
@@ -356,11 +360,11 @@
 	 {
 		 { _( "Base colors" ),	 	FieldColors, 	FIELD_COLORS,		last.field_cmap,		field_cmap		},
 		 { _( "Graphics colors"),	GColors,		TERMINAL_COLORS,	last.terminal_cmap,		terminal_cmap	},
-		 { _( "OIA" ),				SColors,		STATUS_COLORS,		last.status_cmap,		status_cmap		}, 
+		 { _( "OIA" ),				SColors,		STATUS_COLORS,		last.status_cmap,		status_cmap		},
 		 { _( "Cursors" ),			cursors,		CURSOR_COLORS,		last.cursor_cmap,		cursor_cmap		},
 		 { _( "Selection box" ),	selec,			SELECTION_COLORS,	last.selection_cmap,	selection_cmap 	}
 	 };
-	 
+
 	 GtkWidget			*widget;
 	 GtkWidget			*hbox;
 	 GtkWidget			*color;
@@ -371,36 +375,41 @@
 	 GtkWidget			*frame;
 	 int 				f;
 	 int				p;
-	 
+#ifdef __G_KEY_FILE_H__
+	 int c;
+	 char buffer[4096];
+	 unsigned char red, green, blue;
+#endif
+
 	 memset(&last,0,sizeof(last));
 	 last.clr = clr;
 	 for(f=0;f<NUM_COLOR_TABLES;f++)
 		 memcpy(clr[f].saved,clr[f].tbl,sizeof(GdkColor)*clr[f].max);
-		
+
      widget = gtk_dialog_new_with_buttons (	_( "Configuração de cores" ),
                                             GTK_WINDOW(top_window),
                                             GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
                                             GTK_STOCK_OK,     GTK_RESPONSE_ACCEPT,
                                             GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
                                             NULL);
-	 
+
 	 // Color selection dialog
 	 color = gtk_color_selection_new();
 	 gtk_color_selection_set_has_opacity_control(GTK_COLOR_SELECTION(color),FALSE);
 
 	 g_object_set_data(G_OBJECT(color),"info",&last);
-	 
+
 	 // Colors tree
 	 view = gtk_tree_view_new();
 	 gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view),FALSE);
 	 gtk_tree_view_set_enable_tree_lines(GTK_TREE_VIEW(view),TRUE);
-	 
+
 	 renderer = gtk_cell_renderer_text_new();
 	 gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view),-1,"Name",renderer,"text", 0,NULL);
-			
+
 	 store = gtk_tree_store_new(1, G_TYPE_STRING);
 	 memset(&iter,0,sizeof(iter));
-	 
+
 	 // Add colors
  	 for(f=0;f<NUM_COLOR_TABLES;f++)
 	 {
@@ -419,46 +428,64 @@
 
 	 g_signal_connect(G_OBJECT(view),  "row-activated", G_CALLBACK(row_activated), (gpointer) color);
 	 g_signal_connect(G_OBJECT(color), "color-changed", G_CALLBACK(color_changed), (gpointer) &last);
-	 
+
      g_object_unref(store);
 	 // Boxes
 	 hbox  = gtk_hpaned_new();
-	 
+
 	 frame = gtk_scrolled_window_new(NULL,NULL);
 	 gtk_container_add(GTK_CONTAINER(frame),view);
 	 gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(frame),GTK_SHADOW_ETCHED_IN);
 	 gtk_paned_add1(GTK_PANED(hbox),frame);
-	 
+
 	 gtk_paned_add2(GTK_PANED(hbox),color);
 
 	 gtk_container_add(GTK_CONTAINER(GTK_DIALOG(widget)->vbox),hbox);
 	 gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(widget)->vbox));
-	 
-	 switch(gtk_dialog_run(GTK_DIALOG(widget)))	 
+
+	 switch(gtk_dialog_run(GTK_DIALOG(widget)))
 	 {
 	 case GTK_RESPONSE_ACCEPT:
-		 break;
-	 
+	 	// Save selected colors
+#ifdef __G_KEY_FILE_H__
+		if(main_configuration)
+		{
+			for(c=0;c<(sizeof(clrinfo)/sizeof(struct _clrinfo));c++)
+			{
+				*buffer = 0;
+				for(f=0;f<clrinfo[c].sz;f++)
+				{
+					red = (unsigned char) (clrinfo[c].itn+f)->red;
+					green = (unsigned char) (clrinfo[c].itn+f)->green;
+					blue = (unsigned char) (clrinfo[c].itn+f)->blue;
+					sprintf(buffer+strlen(buffer),"#%02x%02x%02x;",red,green,blue);
+				}
+				g_key_file_set_string(main_configuration,"colors",clrinfo[c].name,buffer);
+			}
+		}
+#endif
+		break;
+
 	 case GTK_RESPONSE_REJECT:
-		 // Restore color using the values saved in "last"
-	 	 for(f=0;f<NUM_COLOR_TABLES;f++)
-		 {
-			 memcpy(clr[f].tbl,clr[f].saved,sizeof(GdkColor)*clr[f].max);
-			 for(p=0;p<clr[f].max;p++)
-				 gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr[f].tbl+p,TRUE,TRUE);
-		 }
-		 RedrawTerminalContents();
-		 break;
-		 
+		// Restore color using the values saved in "last"
+		for(f=0;f<NUM_COLOR_TABLES;f++)
+		{
+		 memcpy(clr[f].tbl,clr[f].saved,sizeof(GdkColor)*clr[f].max);
+		 for(p=0;p<clr[f].max;p++)
+			 gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr[f].tbl+p,TRUE,TRUE);
+		}
+		RedrawTerminalContents();
+		break;
+
 	 default:
-		 Log("Unexpected response from color selection dialog");
+		Log("Unexpected response from color selection dialog");
 	 }
-	 
+
      gtk_widget_destroy (widget);
-	 
-	 
+
+
      RedrawTerminalContents();
-	 
+
  }
- 
+
 #endif
