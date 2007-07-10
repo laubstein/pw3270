@@ -325,7 +325,6 @@
 #ifdef __G_KEY_FILE_H__
 	 int c;
 	 char buffer[4096];
-	 unsigned char red, green, blue;
 #endif
 
 	 memset(&last,0,sizeof(last));
@@ -404,10 +403,12 @@
 					*buffer = 0;
 					for(f=0;f<clr[c].max;f++)
 					{
-						red = (unsigned char) (clr[c].tbl+f)->red;
-						green = (unsigned char) (clr[c].tbl+f)->green;
-						blue = (unsigned char) (clr[c].tbl+f)->blue;
-						sprintf(buffer+strlen(buffer),"#%02x%02x%02x;",red,green,blue);
+						sprintf(buffer+strlen(buffer),"#%04x%04x%04x;",
+															(clr[c].tbl+f)->red,
+															(clr[c].tbl+f)->green,
+															(clr[c].tbl+f)->blue
+												);
+
 					}
 					g_key_file_set_string(main_configuration,"Colors",clrinfo[clr[c].conf].name,buffer);
 				}
