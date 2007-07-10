@@ -172,7 +172,7 @@
 	GtkWidget   *toolbar;
  	char 		filename[4096];
  	char 		*home	= getenv("HOME");
- 	FILE 		*arq;
+ 	FILE 		*arq	= 0;
 #ifdef __G_KEY_FILE_H__
 	gint		*pos;
 	gsize		sz;
@@ -255,7 +255,6 @@
     if(icon)
     	gtk_window_set_icon(GTK_WINDOW(top_window),icon);
 #endif
-
 
 	if(arq)
 		fclose(arq);

@@ -105,86 +105,66 @@
 
  void LoadTerminalColors(FILE *cfg)
  {
-	char 	 *ptr;
-	char 	 buffer[4096];
-	GdkColor *clr;
-	int 	 f;
-	int		 p;
-	char	 *tok;
-	unsigned char tag;
-//    unsigned short sz;
-//	CLRCONFIG rec;
+	int			c,p;
+	char		buffer[4096];
+	char		*ptr;
+	char		*tok;
+	GdkColor	*clr;
 
-	for(f=0;f<(sizeof(clrinfo)/sizeof(struct _clrinfo));f++)
+	for(c=0;c<(sizeof(clrinfo)/sizeof(struct _clrinfo));c++)
 	{
 		// Check for entry in configuration file
-		tag = 0;
+		*buffer = 0;
 
-/*
-		if(fread(&tag,1,1,cfg) == 1 && tag == 'c')
-		{
-			CHKPoint();
-			if(fread(&tag,1,1,cfg) != 1 || tag != f)
-			{
-				CHKPoint();
-				tag = 0;
-			}
-			else if(fread(&sz,sizeof(sz),1,cfg) != 1 || clrinfo[tag].sz != sz)
-			{
-				tag = 0;
-			}
-			else
-			{
-				DBGMessage("Loading colors from configuration file");
-				clr = clrinfo[f].itn;
-			    for(p=0;p<clrinfo[f].sz;p++)
+#ifdef __G_KEY_FILE_H__
+    	if(main_configuration)
+    	{
+    		ptr = g_key_file_get_string(main_configuration,"Colors",clrinfo[c].name,NULL);
+
+    		if(ptr)
+    		{
+    			strncpy(buffer,ptr,4095);
+				g_free(ptr);
+
+    			for(ptr=buffer;*ptr;ptr++)
 				{
-				   if(fread(&rec,sizeof(rec),1,cfg) == 1)
-				   {
-					   (clrinfo[f].itn +p)->red = rec.red;
-					   (clrinfo[f].itn +p)->green = rec.green;
-					   (clrinfo[f].itn +p)->blue = rec.blue;
-					   gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr,TRUE,TRUE);
-					   clr++;
-				   }
-				   else
-				   {
-					   tag = 0;
-				   }
+					if(*ptr == ';')
+						*ptr = ',';
 				}
-			}
-		}
-*/
-		DBGTrace(tag);
+    		}
+    	}
+#endif
 
-		if(!tag)
+		if(!*buffer)
 		{
-			// Not configured, load defaults
-			snprintf(buffer,4095,"%s3270",clrinfo[f].name);
+			// No predefined color, try the default ones
+			snprintf(buffer,4095,"%s3270",clrinfo[c].name);
 			ptr = getenv(buffer);
 			if(ptr)
 				strncpy(buffer,ptr,4095);
 			else
-				strncpy(buffer,clrinfo[f].def,4095);
-
-			clr = clrinfo[f].itn;
-
-			ptr=strtok_r(buffer,",",&tok);
-			for(p=0;p<clrinfo[f].sz;p++)
-			{
-				if(ptr)
-				{
-					gdk_color_parse(ptr,clr);
-					ptr = strtok_r(0,",",&tok);
-				}
-				else
-				{
-					gdk_color_parse("green",clr);
-				}
-				gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr,TRUE,TRUE);
-				clr++;
-			}
+				strncpy(buffer,clrinfo[c].def,4095);
 		}
+
+		// Load colors in buffer
+		clr = clrinfo[c].itn;
+
+		ptr=strtok_r(buffer,",",&tok);
+		for(p=0;p<clrinfo[c].sz;p++)
+		{
+			if(ptr)
+			{
+				gdk_color_parse(ptr,clr);
+				ptr = strtok_r(0,",",&tok);
+			}
+			else
+			{
+				gdk_color_parse("green",clr);
+			}
+			gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr,TRUE,TRUE);
+			clr++;
+		}
+
 	}
  }
 
@@ -217,8 +197,6 @@
 
 #endif
  }
-
- #ifdef DEBUG
 
  #define NUM_COLOR_TABLES 5
 
@@ -295,6 +273,8 @@
 
 	 g_free(str);
  }
+
+#ifdef __GTK_COLOR_SELECTION_H__
 
  void action_set_colors(GtkWidget *w, gpointer data)
  {
@@ -460,7 +440,7 @@
 					blue = (unsigned char) (clrinfo[c].itn+f)->blue;
 					sprintf(buffer+strlen(buffer),"#%02x%02x%02x;",red,green,blue);
 				}
-				g_key_file_set_string(main_configuration,"colors",clrinfo[c].name,buffer);
+				g_key_file_set_string(main_configuration,"Colors",clrinfo[c].name,buffer);
 			}
 		}
 #endif
