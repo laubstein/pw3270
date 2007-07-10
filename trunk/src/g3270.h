@@ -13,7 +13,7 @@
 
  #ifndef SYSCONFIG
    #define SYSCONFIG "/etc/sysconfig/g3270"
- #endif   
+ #endif
 
  #include "lib/globals.h"
  #include "lib/appres.h"
@@ -21,7 +21,7 @@
  #include "log.h"
 
  #define RedrawStatusLine() 		RedrawTerminalContents()
- 
+
 // #define PRINT_COMMAND "kprinter --nodialog -t " TARGET " %s"
  #define PRINT_COMMAND "lpr %s"
 
@@ -46,7 +46,7 @@
  #endif
 
  #include "extension.h"
- 
+
  #define TERMINAL_COLORS	16
  #define FIELD_COLORS		4
  #define CURSOR_COLORS		(CURSOR_TYPE_CROSSHAIR * 2)
@@ -80,7 +80,7 @@
 	 struct _extension	*down;
 	 void					*handle;
  } EXTENSION;
- 
+
 /*---[ Globals ]--------------------------------------------------------------*/
 
 #if defined(DATADIR) && GTK == 2
@@ -131,6 +131,9 @@
 
  extern int						reconnect_retry;
 
+#ifdef __G_KEY_FILE_H__
+ extern GKeyFile					*main_configuration;
+#endif
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -224,9 +227,9 @@
  void action_DeleteWord(GtkWidget *w, gpointer data);
  void action_DeleteField(GtkWidget *w, gpointer data);
 
-#ifdef __GTK_COLOR_BUTTON_H__ 
+#ifdef __GTK_COLOR_BUTTON_H__
  void action_set_colors(GtkWidget *w, gpointer data);
-#endif 
+#endif
 
  void action_Redraw(GtkWidget *w, gpointer data);
  void action_AboutBox(GtkWidget *w, gpointer data);

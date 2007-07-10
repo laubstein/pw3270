@@ -34,6 +34,10 @@
  GdkPixbuf	*icon			= 0;
 #endif
 
+#ifdef __G_KEY_FILE_H__
+ GKeyFile	*main_configuration	= 0;
+#endif
+
 /*---[ Main program ]---------------------------------------------------------*/
 
  void action_exit(GtkWidget *w, gpointer data)
@@ -41,6 +45,11 @@
  	char	filename[4096];
  	char	*home	= getenv("HOME");
  	FILE	*arq;
+
+#ifdef __G_KEY_FILE_H__
+	int		pos[2];
+	char	*ptr;
+#endif
 
  	struct user_config config;
 
@@ -65,6 +74,33 @@
 	   SaveTerminalColors(arq);
 	   fclose(arq);
     }
+
+#ifdef __G_KEY_FILE_H__
+
+	if(main_configuration)
+	{
+    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
+
+   		gtk_window_get_size(GTK_WINDOW(top_window),&pos[0],&pos[1]);
+		g_key_file_set_integer_list(main_configuration,"Terminal","size",pos,2);
+
+		ptr = g_key_file_to_data(main_configuration,NULL,NULL);
+		if(ptr)
+		{
+
+	    	arq = fopen(filename,"w");
+	    	if(arq)
+			{
+	    		fprintf(arq,"%s",ptr);
+	    		fclose(arq);
+			}
+		}
+
+		g_key_file_free(main_configuration);
+		main_configuration = 0;
+	}
+
+#endif
 
  	gtk_main_quit();
  }
@@ -159,7 +195,7 @@
 	// Load extensions
 #ifdef EXTENSIONS
 	LoadExtensions(EXTENSIONS);
-#endif	
+#endif
 
 	// Load menu bar
     top_menu = LoadMenu(top_window);
@@ -170,7 +206,7 @@
 	toolbar = LoadToolbar(top_window);
     if(toolbar)
        gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, TRUE, 0);
-	
+
     // Load basic configuration
     snprintf(filename,4095,"%s/.%s.saved",home ? home : ".", TARGET);
     arq = fopen(filename,"r");
@@ -182,7 +218,17 @@
            gtk_window_resize(GTK_WINDOW(top_window),config.width, config.height);
     	}
     }
-	
+
+    // Load key file
+#ifdef __G_KEY_FILE_H__
+	main_configuration = g_key_file_new();
+	if(main_configuration)
+	{
+    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
+    	g_key_file_load_from_file(main_configuration,filename,G_KEY_FILE_KEEP_COMMENTS|G_KEY_FILE_KEEP_TRANSLATIONS,NULL);
+	}
+#endif
+
     /* Load colors */
 	LoadTerminalColors(arq);
 
@@ -196,7 +242,7 @@
     	gtk_window_set_icon(GTK_WINDOW(top_window),icon);
 #endif
 
-	
+
 	if(arq)
 		fclose(arq);
 
@@ -235,23 +281,23 @@
 
     DBGMessage(cl_hostname);
     CreateMainWindow(cl_hostname);
-	
+
 	if(terminal)
 	{
 		do_toggle(MARGINED_PASTE);
-		
+
 #ifdef EXTENSIONS
 		SetExtensionsChar("g3270ServerChanged",cl_hostname);
-#endif	
-		
+#endif
+
 		DBGMessage("Starting gtk main loop");
 		gtk_widget_show_all(top_window);
 		gtk_main();
-		
+
 #ifdef EXTENSIONS
 		UnloadExtensions();
-#endif	
-		
+#endif
+
 	}
 
     return 0;
@@ -304,3 +350,4 @@
 
     gdk_threads_leave();
  }
+
