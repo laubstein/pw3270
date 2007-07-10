@@ -66,43 +66,6 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
-/*
- static int LoadColors(GdkColor *clr, int qtd, const char *id)
- {
- 	char buffer[4096];
-	char *ptr;
- 	char *tok;
- 	int	 f;
- 	int	 rc = 0;
-
-    memset(clr,0,sizeof(GdkColor)*qtd);
-
-    f = 0;
-    if(GetColorDescription(id,buffer))
-    {
-    	Log("Cant'find color definition for \"%s\"",id);
-    	return ENOENT;
-    }
-
-    for(ptr=strtok_r(buffer,",",&tok);ptr && f < qtd;ptr = strtok_r(0,",",&tok))
-    {
-    	gdk_color_parse(ptr,clr+f);
-
-    	if(!gdk_colormap_alloc_color(	gtk_widget_get_default_colormap(),
-										clr+f,
-										TRUE,
-										TRUE ))
-		{
-			Log("Can't allocate color \"%s\" from %s",ptr,id);
-			rc = EINVAL;
-		}
-
-        f++;
-    }
-    return rc;
- }
-*/
-
  void LoadTerminalColors(FILE *cfg)
  {
 	int			c,p;
@@ -202,17 +165,21 @@
 
  typedef struct _colorlist
  {
-		 char *name;
-		 char **title;
-		 int max;
-		 GdkColor *saved;
-		 GdkColor *tbl;
+		 char 				*name;
+		 int				conf;
+		 char 				**title;
+		 int 				max;
+		 GdkColor 			*saved;
+		 GdkColor 			*tbl;
  } COLORLIST;
 
  typedef struct _colordata
  {
 	 GdkColor	*current;
 	 COLORLIST	*clr;
+
+	 int		selected;
+	 char		changed[sizeof(clrinfo)/sizeof(struct _clrinfo)];
 
 	 GdkColor	terminal_cmap[TERMINAL_COLORS];
 	 GdkColor	field_cmap[FIELD_COLORS];
@@ -234,6 +201,7 @@
  {
 	 if(last->current)
 	 {
+	 	 last->changed[last->selected] = 1;
 		 gtk_color_selection_get_current_color(colorselection,last->current);
 		 gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),last->current,TRUE,TRUE);
 		 RedrawTerminalContents();
@@ -249,8 +217,6 @@
 	 unsigned int idx;
 	 unsigned int el;
 
-	 printf("%s(%d): %s\n",__FILE__,__LINE__,str);
-
 	 if(ptr)
 	 {
 		 *(ptr++) = 0;
@@ -265,6 +231,7 @@
 			 if(idx < clr->max)
 			 {
 				 last->current = clr->tbl+idx;
+				 last->selected = el;
 				 gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(color),last->current);
 				 gtk_color_selection_set_previous_color(GTK_COLOR_SELECTION(color),clr->saved + idx);
 			 }
@@ -338,11 +305,11 @@
 	 COLORDATA			last;
 	 COLORLIST			clr[NUM_COLOR_TABLES] =
 	 {
-		 { _( "Base colors" ),	 	FieldColors, 	FIELD_COLORS,		last.field_cmap,		field_cmap		},
-		 { _( "Graphics colors"),	GColors,		TERMINAL_COLORS,	last.terminal_cmap,		terminal_cmap	},
-		 { _( "OIA" ),				SColors,		STATUS_COLORS,		last.status_cmap,		status_cmap		},
-		 { _( "Cursors" ),			cursors,		CURSOR_COLORS,		last.cursor_cmap,		cursor_cmap		},
-		 { _( "Selection box" ),	selec,			SELECTION_COLORS,	last.selection_cmap,	selection_cmap 	}
+		 { _( "Base colors" ),	 	1,	FieldColors, 	FIELD_COLORS,		last.field_cmap,		field_cmap		},
+		 { _( "Graphics colors"),	0,	GColors,		TERMINAL_COLORS,	last.terminal_cmap,		terminal_cmap	},
+		 { _( "OIA" ),				4,	SColors,		STATUS_COLORS,		last.status_cmap,		status_cmap		},
+		 { _( "Cursors" ),			2,	cursors,		CURSOR_COLORS,		last.cursor_cmap,		cursor_cmap		},
+		 { _( "Selection box" ),	3,	selec,			SELECTION_COLORS,	last.selection_cmap,	selection_cmap 	}
 	 };
 
 	 GtkWidget			*widget;
@@ -432,15 +399,18 @@
 		{
 			for(c=0;c<(sizeof(clrinfo)/sizeof(struct _clrinfo));c++)
 			{
-				*buffer = 0;
-				for(f=0;f<clrinfo[c].sz;f++)
+				if(last.changed[c])
 				{
-					red = (unsigned char) (clrinfo[c].itn+f)->red;
-					green = (unsigned char) (clrinfo[c].itn+f)->green;
-					blue = (unsigned char) (clrinfo[c].itn+f)->blue;
-					sprintf(buffer+strlen(buffer),"#%02x%02x%02x;",red,green,blue);
+					*buffer = 0;
+					for(f=0;f<clr[c].max;f++)
+					{
+						red = (unsigned char) (clr[c].tbl+f)->red;
+						green = (unsigned char) (clr[c].tbl+f)->green;
+						blue = (unsigned char) (clr[c].tbl+f)->blue;
+						sprintf(buffer+strlen(buffer),"#%02x%02x%02x;",red,green,blue);
+					}
+					g_key_file_set_string(main_configuration,"Colors",clrinfo[clr[c].conf].name,buffer);
 				}
-				g_key_file_set_string(main_configuration,"Colors",clrinfo[c].name,buffer);
 			}
 		}
 #endif
