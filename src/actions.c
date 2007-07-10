@@ -19,22 +19,22 @@
 
 #ifdef DEBUG
  static void action_dump(GtkWidget *w, gpointer data);
-#endif 
- 
+#endif
+
 /*---[ Callback table ]-------------------------------------------------------*/
 
  const struct action_callback action_callbacks[] =
  {
 	{ "print",					action_print					},
 	{ "toogle",					action_toogle					},
-#ifdef __GTK_COLOR_BUTTON_H__
+#ifdef __GTK_ABOUT_DIALOG_H__
 	{ "about",					action_AboutBox					},
 #endif
 	{ "print_selection",		action_print_selection			},
 #ifdef DEBUG
 	{ "copy_as_table",			action_copy_as_table			},
 #endif
-#ifdef __GTK_COLOR_BUTTON_H__	
+#ifdef __GTK_COLOR_SELECTION_H__
 	{ "set_colors",				action_set_colors				},
 #endif
 	{ "exec_with_selection",	action_exec_with_selection		},
@@ -161,10 +161,10 @@
 
 #ifdef DEBUG
      	DECLARE_KEYPROC( GDK_Print,				GDK_CONTROL_MASK,	action_dump			),
-#endif	
+#endif
 
      	DECLARE_KEYPROC( GDK_Print,				0,					action_print		),
-		
+
      	DECLARE_KEYPROC( GDK_3270_PrintScreen,	0,					action_print		),
 
      	DECLARE_KEYPROC( GDK_ISO_Left_Tab,		0,					action_BackTab		),
@@ -334,7 +334,7 @@
 		DBGMessage("Already connected or connecting");
 		return;
 	}
-	
+
     if(connecting)
        return;
 
@@ -343,7 +343,7 @@
        return;
 
     SetOIAStatus(STATUS_RESOLVING);
-	
+
 #if GTK == 2
     thd =  g_thread_create( ConnectThread, (gpointer) cl_hostname, 0, NULL);
 #else
@@ -456,7 +456,7 @@
  {
     action_internal(PF_action, IA_DEFAULT, "24", CN);
  }
- 
+
  void action_BackTab(GtkWidget *w, gpointer data)
  {
     action_internal(BackTab_action, IA_DEFAULT, CN, CN);
@@ -625,7 +625,7 @@
  	DBGPrintf("Toogle \"%s\" using widget %p",(char *) data,w);
  }
 
-#ifdef DEBUG 
+#ifdef DEBUG
  static void action_dump(GtkWidget *w, gpointer data)
  {
 	time_t				ltime;
@@ -637,16 +637,16 @@
  	int					cols;
  	int					row;
  	int					col;
-	 
+
 	if(!out)
 		return;
-	 
+
 	time(&ltime);
 	strftime(wrk, 39, "%d/%m/%Y %H:%M:%S", localtime(&ltime));
     fprintf(out,"%s Writing screen dump\n",wrk);
 
     trm = Get3270DeviceBuffer(&rows, &cols);
-	
+
 	chr = trm;
 	for(row = 0; row < rows; row++)
 	{
@@ -672,7 +672,7 @@
 		fprintf(out,"\n");
 	}
 	fprintf(out,"\n");
-	
+
 	chr = trm;
 	for(row = 0; row < rows; row++)
 	{
@@ -685,9 +685,9 @@
 		fprintf(out,"\n");
 	}
 	fprintf(out,"\n");
-	
-	
+
+
 	fclose(out);
  }
- 
+
 #endif
