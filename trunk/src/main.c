@@ -20,8 +20,27 @@
 
  #pragma pack()
 
-/*---[ Main menu ]------------------------------------------------------------*/
+/*---[ Constants ]------------------------------------------------------------*/
 
+ static const char *toggle_name[] =
+ 	{	"MONOCASE",
+		"ALT_CURSOR",
+		"CURSOR_BLINK",
+		"SHOW_TIMING",
+		"CURSOR_POS",
+		"DS_TRACE",
+		"SCROLL_BAR",
+		"LINE_WRAP",
+		"BLANK_FILL",
+		"SCREEN_TRACE",
+		"EVENT_TRACE",
+		"MarginedPaste",
+		"RECTANGLE_SELECT",
+		"CrossHairCursor",
+		"VISIBLE_CONTROL",
+		"AID_WAIT",
+		"Reconnect"
+ 	};
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
@@ -176,6 +195,7 @@
 #ifdef __G_KEY_FILE_H__
 	gint		*pos;
 	gsize		sz;
+	int			f;
 #else
  	struct user_config config;
 #endif
@@ -220,6 +240,7 @@
 	main_configuration = g_key_file_new();
 	if(main_configuration)
 	{
+		// Load configuration
     	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
     	g_key_file_load_from_file(main_configuration,filename,G_KEY_FILE_KEEP_TRANSLATIONS,NULL);
 
@@ -228,6 +249,15 @@
 			pos = g_key_file_get_integer_list(main_configuration,"Terminal","size",&sz,NULL);
 			if(pos && sz == 2)
            		gtk_window_resize(GTK_WINDOW(top_window),pos[0],pos[1]);
+    	}
+
+    	// Load toggles
+    	for(f=0;f<(sizeof(toggle_name)/sizeof(const char *));f++)
+    	{
+    		if(g_key_file_has_key(main_configuration,"Toggles",toggle_name[f],NULL))
+    		{
+				set_toggle(f,g_key_file_get_boolean(main_configuration,"Toggles",toggle_name[f],NULL),TT_INITIAL);
+    		}
     	}
 	}
 #else

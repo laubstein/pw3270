@@ -31,7 +31,7 @@ struct toggle {
 	void (*upcall)(struct toggle *, enum toggle_type); /* change value */
 };
 
-enum TOOGLES_3270
+enum TOGGLES_3270
 {
 	MONOCASE,
 	ALT_CURSOR,

@@ -53,7 +53,7 @@ do_toggle_reason(int ix, enum toggle_type reason)
 
 	if(t->upcall)
 		t->upcall(t, reason);
-	
+
 #if defined(X3270_MENUS) /*[*/
 	menubar_retoggle(t);
 #endif /*]*/
@@ -64,6 +64,13 @@ do_toggle(int ix)
 {
 	do_toggle_reason(ix, TT_INTERACTIVE);
 }
+
+void set_toggle(int ix, Boolean state, enum toggle_type reason)
+{
+	if(ix < N_TOGGLES && appres.toggle[ix].value != state)
+		do_toggle_reason(ix, reason);
+}
+
 
 /*
  * Called from system initialization code to handle initial toggle settings.
