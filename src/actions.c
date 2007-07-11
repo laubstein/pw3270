@@ -17,6 +17,7 @@
 /*---[ Internal actions ]-----------------------------------------------------*/
 
  static void action_toggle(GtkWidget *w, gpointer data);
+ static void PrintScreen(GtkWidget *w, gpointer data);
 
 #ifdef DEBUG
  static void action_dump(GtkWidget *w, gpointer data);
@@ -164,9 +165,9 @@
      	DECLARE_KEYPROC( GDK_Print,				GDK_CONTROL_MASK,	action_dump			),
 #endif
 
-     	DECLARE_KEYPROC( GDK_Print,				0,					action_print		),
+     	DECLARE_KEYPROC( GDK_Print,				0,					PrintScreen			),
 
-     	DECLARE_KEYPROC( GDK_3270_PrintScreen,	0,					action_print		),
+     	DECLARE_KEYPROC( GDK_3270_PrintScreen,	0,					PrintScreen			),
 
      	DECLARE_KEYPROC( GDK_ISO_Left_Tab,		0,					action_BackTab		),
 
@@ -423,9 +424,19 @@
 #endif
  }
 
+ static void PrintScreen(GtkWidget *w, gpointer data)
+ {
+ 	// First of all try a ^P in the main window
+ 	if(gtk_accel_groups_activate(G_OBJECT(top_window), GDK_p, GDK_CONTROL_MASK))
+ 		return;
+
+ 	// If it fails exec the default action
+ 	action_print(w,data);
+ }
+
  void action_print(GtkWidget *w, gpointer data)
  {
-    action_exec_with_screen(w,data ? data : PRINT_COMMAND);
+ 	action_exec_with_screen(w,data ? data : PRINT_COMMAND);
  }
 
  void action_F7(GtkWidget *w, gpointer data)
