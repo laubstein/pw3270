@@ -22,7 +22,7 @@
 
 /*---[ Constants ]------------------------------------------------------------*/
 
- static const char *toggle_name[] =
+ const char *toggle_name[N_TOGGLES] =
  	{	"MONOCASE",
 		"ALT_CURSOR",
 		"CURSOR_BLINK",

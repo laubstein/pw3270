@@ -129,6 +129,8 @@
 
  extern int						cursor_type;
 
+ extern const char 				*toggle_name[N_TOGGLES];
+
  extern int						reconnect_retry;
 
 #ifdef __G_KEY_FILE_H__
