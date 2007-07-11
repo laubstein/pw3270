@@ -20,6 +20,11 @@
  #include "lib/lib3270.h"
  #include "log.h"
 
+ #if defined( __GTK_COLOR_SELECTION_H__ ) && defined( __G_KEY_FILE_H__ )
+ 	#define ENABLE_COLOR_SELECTION 1
+ #endif	
+
+
  #define RedrawStatusLine() 		RedrawTerminalContents()
 
 // #define PRINT_COMMAND "kprinter --nodialog -t " TARGET " %s"
@@ -229,7 +234,7 @@
  void action_DeleteWord(GtkWidget *w, gpointer data);
  void action_DeleteField(GtkWidget *w, gpointer data);
 
-#ifdef __GTK_COLOR_BUTTON_H__
+#ifdef ENABLE_COLOR_SELECTION
  void action_set_colors(GtkWidget *w, gpointer data);
 #endif
 
