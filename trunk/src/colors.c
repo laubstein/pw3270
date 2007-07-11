@@ -189,6 +189,8 @@
 
  } COLORDATA;
 
+#ifdef ENABLE_COLOR_SELECTION
+ 
  static void InsertInTree(GtkTreeStore *store, GtkTreeIter *parent, const char *str)
  {
 	 GtkTreeIter iter;
@@ -240,8 +242,6 @@
 
 	 g_free(str);
  }
-
-#ifdef __GTK_COLOR_SELECTION_H__
 
  void action_set_colors(GtkWidget *w, gpointer data)
  {

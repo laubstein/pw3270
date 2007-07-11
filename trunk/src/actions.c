@@ -35,7 +35,7 @@
 #ifdef DEBUG
 	{ "copy_as_table",			action_copy_as_table			},
 #endif
-#ifdef __GTK_COLOR_SELECTION_H__
+#ifdef ENABLE_COLOR_SELECTION
 	{ "set_colors",				action_set_colors				},
 #endif
 	{ "exec_with_selection",	action_exec_with_selection		},
