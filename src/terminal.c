@@ -78,7 +78,7 @@
     if(connected)
     {
        reconnect_retry = toggled(RECONNECT) ? 0 : -1;
-		
+
 	   if (GetKeyboardStatus() & KL_AWAITING_FIRST)
 	      SetOIAStatus(STATUS_AWAITING_FIRST);
        else
@@ -569,7 +569,7 @@
        gtk_widget_modify_bg(ret,widget_states[f],terminal_cmap);
        gtk_widget_modify_fg(ret,widget_states[f],terminal_cmap+4);
     }
-	
+
     action_connect(ret,0);
 
     InitClipboard(ret);
@@ -589,13 +589,6 @@
        gtk_widget_queue_draw(terminal);
 
     UnlockThreads();
- }
-
- void action_crosshair( GtkWidget *w, gpointer   data )
- {
-	do_toggle(CROSSHAIR);
- 	DBGPrintf("Cross_hair: %s Cursor: %s",toggled(CROSSHAIR) ? "Yes" : "No",cursor_enabled ? "Yes" : "No");
-    InvalidateCursor();
  }
 
  void EnableCursor(gboolean mode)

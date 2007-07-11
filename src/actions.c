@@ -10,12 +10,13 @@
  #include "lib/3270ds.h"
  #include "lib/tablesc.h"
  #include "lib/screenc.h"
+ #include "lib/togglesc.h"
  #include "lib/ctlrc.h"
  #include "unistd.h"
 
 /*---[ Internal actions ]-----------------------------------------------------*/
 
- static void action_toogle(GtkWidget *w, gpointer data);
+ static void action_toggle(GtkWidget *w, gpointer data);
 
 #ifdef DEBUG
  static void action_dump(GtkWidget *w, gpointer data);
@@ -26,7 +27,7 @@
  const struct action_callback action_callbacks[] =
  {
 	{ "print",					action_print					},
-	{ "toogle",					action_toogle					},
+	{ "toggle",					action_toggle					},
 #ifdef __GTK_ABOUT_DIALOG_H__
 	{ "about",					action_AboutBox					},
 #endif
@@ -617,12 +618,30 @@
 
  }
 
- static void action_toogle(GtkWidget *w, gpointer data)
+ void action_crosshair( GtkWidget *w, gpointer data)
  {
+ 	action_toggle(w,(gpointer) toggle_name[CROSSHAIR]);
+ }
+
+ static void action_toggle(GtkWidget *w, gpointer data)
+ {
+ 	int f;
+
  	if(!data)
  	   return;
 
  	DBGPrintf("Toogle \"%s\" using widget %p",(char *) data,w);
+
+ 	for(f=0;f<N_TOGGLES;f++)
+ 	{
+ 		if(!strcmp((char *) data,toggle_name[f]))
+ 		{
+ 			DBGPrintf("Toogle=\"%s\" ID=%d",(char *) data,f);
+ 			do_toggle(f);
+    		InvalidateCursor();
+ 			return;
+ 		}
+ 	}
  }
 
 #ifdef DEBUG
