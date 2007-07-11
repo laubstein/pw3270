@@ -252,6 +252,8 @@
     	}
 
     	// Load toggles
+		set_toggle(MARGINED_PASTE,1,TT_INITIAL); // Margined paste is default
+
     	for(f=0;f<(sizeof(toggle_name)/sizeof(const char *));f++)
     	{
     		if(g_key_file_has_key(main_configuration,"Toggles",toggle_name[f],NULL))
@@ -327,8 +329,6 @@
 
 	if(terminal)
 	{
-		do_toggle(MARGINED_PASTE);
-
 #ifdef EXTENSIONS
 		SetExtensionsChar("g3270ServerChanged",cl_hostname);
 #endif
