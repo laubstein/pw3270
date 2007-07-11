@@ -30,12 +30,12 @@
     		return;
     	}
     }
-	
+
 	/* Locate extension actions */
     data->entry.callback = QueryActionCallback(name);
 	if(data->entry.callback)
 		return;
-	
+
 	/* Invalid action code, release data and log-it */
     if(data->entry.path)
     {
@@ -99,8 +99,8 @@
 	      {
 	      	g_object_set_data_full(obj,"g3270.parameter",(gpointer) item->entry.callback_action,ReleaseString);
 	      }
-
        }
+
 
        (*qtd)++;
 
@@ -115,7 +115,7 @@
     static const char		*filename = DATADIR "/menu.conf";
 #else
     static const char		*filename = "./menu.conf";
-#endif	 
+#endif
 
 	 static const struct _cmd
  	{
@@ -139,7 +139,7 @@
     unsigned char		*ln;
     int					f;
     PARMDATA			item;
-	
+
     // http://www.gtk.org/tutorial1.2/gtk_tut-13.html
     GtkAccelGroup		*accel_group	= gtk_accel_group_new();
 
@@ -162,7 +162,7 @@
 		   ptr = buffer;
 		   if(!strncmp((char *) ptr,"/menu",5))
 			   ptr += 5;
-		   
+
            InsertItem(factory, &item, &qtd);
 		   item.entry.path = g_strdup((char *) ptr);
     	}
@@ -194,7 +194,7 @@
 	   /* Finally, return the actual menu bar created by the item factory. */
        return gtk_item_factory_get_widget(factory, "<main>");
 	}
-	
+
 	return 0;
- 
+
  }
