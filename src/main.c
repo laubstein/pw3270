@@ -235,7 +235,10 @@
     if(toolbar)
        gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, TRUE, 0);
 
-    // Load key file
+	// Set default toogle values
+	set_toggle(MARGINED_PASTE,1,TT_INITIAL); // Margined paste is default
+
+	// Load key file
 #ifdef __G_KEY_FILE_H__
 	main_configuration = g_key_file_new();
 	if(main_configuration)
@@ -252,8 +255,6 @@
     	}
 
     	// Load toggles
-		set_toggle(MARGINED_PASTE,1,TT_INITIAL); // Margined paste is default
-
     	for(f=0;f<(sizeof(toggle_name)/sizeof(const char *));f++)
     	{
     		if(g_key_file_has_key(main_configuration,"Toggles",toggle_name[f],NULL))
