@@ -660,7 +660,7 @@
 
 #ifdef __G_KEY_FILE_H__
  	if(main_configuration)
- 		g_key_file_set_boolean(main_configuration,"Toggles",toggle_name[toggle],get_toggle(toggle) ? TRUE : FALSE);
+ 		g_key_file_set_boolean(main_configuration,"Toggles",toggle_name[toggle],toggled(toggle) ? TRUE : FALSE);
 #endif
 
 	InvalidateCursor();
