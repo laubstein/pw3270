@@ -15,6 +15,9 @@
  char *Clipboard  = 0;
  int  szClipboard = 0;
 
+ static int	paste_pos    = 0;
+ static gchar *paste_buffer = 0; /**< String with contains the remaining part of the pasted buffer */
+
 /*---[ Implement ]------------------------------------------------------------*/
 
  void InitClipboard(GtkWidget *w)
@@ -29,9 +32,9 @@
 	char 		 buffer[1024];
 	const char *ptr;
     int			 ps = 0;
-	 
+
     DBGPrintf("Dump of %s",msg);
-	 
+
     memset(buffer,' ',78);
     *(buffer+78) = 0;
 
@@ -55,9 +58,9 @@
 	fprintf(stderr,"%s\n",buffer);
     fflush(stderr);
  }
-#endif	
+#endif
 
- 
+
  gchar *CopyTerminalContents(int bRow, int bCol, int fRow, int fCol, int table)
  {
  	int 			cols;
@@ -147,10 +150,10 @@
 
     *ptr = 0;
 
-#ifdef DUMP_COPY	
+#ifdef DUMP_COPY
 	DumpString("Pre-processed Buffer",buffer);
 #endif
-	
+
 	if(table)
 	{
 	   // Remove unnecessary spaces
@@ -164,33 +167,33 @@
 			   *(dst++) = '\t';
 		       mark     = dst;
 			   break;
-			   
+
 		   case '\n':
 			   copy     = 0;
 		       dst      = mark;
 			   *(dst++) = '\n';
 		       mark     = dst;
 		       break;
-		   
+
 		   default:
 			  if(!isspace(*ptr))
 			  {
 				 mark = dst+1;
 			     copy = 1;
 			  }
-			  
+
 			  if(copy)
 				 *(dst++) = *ptr;
 		   }
        }
 	   *dst = 0;
-	   
-#ifdef DUMP_COPY	
+
+#ifdef DUMP_COPY
    	DumpString("Post-processed Buffer",buffer);
 #endif
 	}
-	
-	
+
+
     return buffer;
  }
 
@@ -274,6 +277,16 @@
 //   #define DUMP_PASTE
 //#endif
 
+ static void ClearPasteBuffer(void)
+ {
+	if(paste_buffer)
+	{
+		g_free(paste_buffer);
+		paste_buffer = 0;
+		paste_pos = 0;
+	}
+ }
+
  static void paste_clipboard(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
     gchar *string;
@@ -284,8 +297,10 @@
     int		ps = 0;
 #endif
 
-    string = g_convert(text, -1, "ISO-8859-1", "UTF-8", NULL, NULL, NULL);
-    if(!string)
+	ClearPasteBuffer();
+
+    paste_buffer = g_convert(text, -1, "ISO-8859-1", "UTF-8", NULL, NULL, NULL);
+    if(!paste_buffer)
     {
     	Log("Error converting clipboard string to ISO-8859-1");
     	return;
@@ -297,7 +312,7 @@
     memset(buffer,' ',78);
     *(buffer+78) = 0;
 
-    for(ptr = (char *) string; *ptr; ptr++)
+    for(ptr = (char *) paste_buffer; *ptr; ptr++)
     {
     	char temp[5];
     	if(ps > 0x0F)
@@ -326,27 +341,15 @@
     	   *ptr = ' ';
     }
 
-    /* Paste and release */
-    emulate_input(string, strlen(string), True);
-
+    paste_pos = 0;
+	action_paste_next(0,0);
 #endif
-
-    g_free(string);
 
  }
 
-  
- static gchar *paste_buffer = 0; /**< String with contains the remaining part of the pasted buffer */
- 
 
  void action_paste(GtkWidget *w, gpointer data)
  {
-	if(paste_buffer)
-	{
-		g_free(paste_buffer);
-		paste_buffer = 0;
-	}
-	
     gtk_clipboard_request_text(	gtk_widget_get_clipboard(terminal,GDK_SELECTION_CLIPBOARD),
 								paste_clipboard,
 								0 );
@@ -354,9 +357,36 @@
 
  void action_paste_next(GtkWidget *w, gpointer data)
  {
-	 if(!paste_buffer)
-		 return;
-	 
+ 	int 	sz;
+ 	int 	remaining;
+ 	char 	*ptr;
+
+	if(!paste_buffer)
+		return;
+
+	DBGTrace(paste_pos);
+
+	ptr = paste_buffer+paste_pos;
+
+	sz = strlen(paste_buffer);
+	if(!sz)
+	{
+		ClearPasteBuffer();
+		return;
+	}
+
+    remaining = emulate_input(paste_buffer+paste_pos, sz, True);
+    if(remaining < 1)
+    {
+		ClearPasteBuffer();
+		return;
+    }
+
+	DBGPrintf("Paste buffer size: %d, remaining chars: %d New position: %d",sz,remaining,paste_pos+(sz-remaining));
+
+	paste_pos += ((sz-remaining)-1);
+	DBGTrace(paste_pos);
+
  }
 
  static gpointer exec_with_copy_thread(gpointer cmd)
