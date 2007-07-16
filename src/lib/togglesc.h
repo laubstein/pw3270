@@ -26,6 +26,5 @@
 extern void do_toggle(int);
 extern void initialize_toggles(void);
 extern void set_toggle(int ix, Boolean state, enum toggle_type reason);
-extern Boolean get_toggle(int ix);
 extern void shutdown_toggles(void);
 extern void Toggle_action(Widget, XEvent *, String *, Cardinal *);

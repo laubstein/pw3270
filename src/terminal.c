@@ -25,12 +25,12 @@
   static const char *fontfile = "./fonts.conf";
 #endif
 
- const char			*cl_hostname							= 0;
+ const char		*cl_hostname							= 0;
 
  gboolean			WaitForScreen							= TRUE;
 
  static FONTELEMENT *fontlist								= 0;
- static int			fontCount								= 0;
+ static int			fontCount							= 0;
 
  #define FONT_COUNT fontCount
 
@@ -38,7 +38,6 @@
  int				top_margin								= 0;
  int 				left_margin								= 0;
 
-// int				terminal_color_count					= 0;
  int				line_spacing							= MIN_LINE_SPACING;
 
  static int		cursor_height[CURSOR_TYPE_CROSSHAIR]	= { 3, 6 };
@@ -92,17 +91,22 @@
        EnableCursor(FALSE);
        ctlr_erase(True);
 
-       if(reconnect_retry >= 0)
-       {
-          snprintf(key,39,"HOST3270_%d",++reconnect_retry);
-          DBGPrintf("Host Key: %s",key);
+	   DBGTrace(reconnect_retry);
+
+	   if(reconnect_retry >= 0)
+	   {
+		  snprintf(key,39,"HOST3270_%d",reconnect_retry++);
 		  host = getenv(key);
 		  if(host)
 		  {
-		  	 cl_hostname = host;
-             AddTimeOut(1000,Reconnect);
+			 	cl_hostname = host;
+			 	AddTimeOut(1000,Reconnect);
 		  }
-       }
+		  else
+		  {
+				Log("No more hosts to try, stopping");
+		  }
+	   }
     }
 
     stop_3270_timer();
