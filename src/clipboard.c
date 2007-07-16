@@ -368,14 +368,14 @@
 
 	ptr = paste_buffer+paste_pos;
 
-	sz = strlen(paste_buffer);
+	sz = strlen(ptr);
 	if(!sz)
 	{
 		ClearPasteBuffer();
 		return;
 	}
 
-    remaining = emulate_input(paste_buffer+paste_pos, sz, True);
+    remaining = emulate_input(ptr, sz, True);
     if(remaining < 1)
     {
 		ClearPasteBuffer();
