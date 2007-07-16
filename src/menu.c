@@ -7,7 +7,8 @@
  typedef struct _parmdata
  {
  	GtkItemFactoryEntry entry;
- 	char parm[1024];
+ 	unsigned char		toggle;
+ 	char 				parm[1024];
  } PARMDATA;
 
 /*---[ Implement ]------------------------------------------------------------*/
@@ -49,8 +50,21 @@
  static void Type(PARMDATA *data, const char *type)
  {
  	char key[1024];
- 	snprintf(key,1023,"<%s>",type);
+
+ 	if(strcmp(type,"Toggle"))
+ 	{
+ 		snprintf(key,1023,"<%s>",type);
+ 	}
+ 	else
+ 	{
+ 		data->toggle = 1;
+ 		strcpy(key,"<ToggleItem>");
+ 	}
+
     data->entry.item_type = g_strdup(key);
+
+    DBGPrintf("Type: %s item_type: %s",type,key);
+
  }
 
  static void Parm(PARMDATA *data, const char *parm)
@@ -80,7 +94,10 @@
           item->entry.callback_action = 0;
 	   }
 
-	   DBGPrintf("%p %s",(void *) item->entry.callback_action,item->entry.path);
+	   if(!item->entry.callback && item->toggle)
+			Action(item,"toggle");
+
+	   DBGPrintf("%p %s %p %s",(void *) item->entry.callback_action,item->entry.path,item->entry.callback,item->toggle ? "Toggle" : "");
 
        gtk_item_factory_create_item(	factory,
 										(GtkItemFactoryEntry *) &item->entry,
@@ -99,8 +116,23 @@
 	      {
 	      	g_object_set_data_full(obj,"g3270.parameter",(gpointer) item->entry.callback_action,ReleaseString);
 	      }
-       }
 
+#ifdef __G_KEY_FILE_H__
+		  if(item->toggle)
+		  {
+		  	 // Load toggle configuration
+		     int toggle = ToggleByName(item->parm);
+			 if(toggle >= 0 && main_configuration)
+			 {
+				if(g_key_file_has_key(main_configuration,"Toggles",item->parm,NULL))
+				{
+					gboolean flag = g_key_file_get_boolean(main_configuration,"Toggles",item->parm,NULL);
+				  	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(obj),flag);
+				}
+			 }
+		  }
+#endif
+       }
 
        (*qtd)++;
 

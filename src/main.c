@@ -195,12 +195,55 @@
 #ifdef __G_KEY_FILE_H__
 	gint		*pos;
 	gsize		sz;
-	int			f;
+//	int			f;
 #else
  	struct user_config config;
 #endif
 
     top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+	// Set default toogle values
+	set_toggle(MARGINED_PASTE,1,TT_INITIAL); // Margined paste is default
+
+	// Load configuration
+#ifdef __G_KEY_FILE_H__
+	main_configuration = g_key_file_new();
+	if(main_configuration)
+	{
+		// Load configuration
+    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
+    	g_key_file_load_from_file(main_configuration,filename,G_KEY_FILE_KEEP_TRANSLATIONS,NULL);
+
+    	if(g_key_file_has_key(main_configuration,"Terminal","size",NULL))
+    	{
+			pos = g_key_file_get_integer_list(main_configuration,"Terminal","size",&sz,NULL);
+			if(pos && sz == 2)
+           		gtk_window_resize(GTK_WINDOW(top_window),pos[0],pos[1]);
+    	}
+
+    	// Load toggles
+/*
+    	for(f=0;f<(sizeof(toggle_name)/sizeof(const char *));f++)
+    	{
+    		if(g_key_file_has_key(main_configuration,"Toggles",toggle_name[f],NULL))
+    		{
+				set_toggle(f,g_key_file_get_boolean(main_configuration,"Toggles",toggle_name[f],NULL),TT_INITIAL);
+    		}
+    	}
+*/
+	}
+#else
+    snprintf(filename,4095,"%s/.%s.saved",home ? home : ".", TARGET);
+    arq = fopen(filename,"r");
+    if(arq)
+    {
+    	if(fread(&config,sizeof(config),1,arq) == 1 && (config.sz == sizeof(config)))
+    	{
+		   DBGPrintf("Tamanho da janela: %dx%d",config.width, config.height);
+           gtk_window_resize(GTK_WINDOW(top_window),config.width, config.height);
+    	}
+    }
+#endif
 
 #if GTK == 1
 	gtk_window_set_wmclass(GTK_WINDOW(top_window),"toplevel",TARGET);
@@ -234,47 +277,6 @@
 	toolbar = LoadToolbar(top_window);
     if(toolbar)
        gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, TRUE, 0);
-
-	// Set default toogle values
-	set_toggle(MARGINED_PASTE,1,TT_INITIAL); // Margined paste is default
-
-	// Load key file
-#ifdef __G_KEY_FILE_H__
-	main_configuration = g_key_file_new();
-	if(main_configuration)
-	{
-		// Load configuration
-    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
-    	g_key_file_load_from_file(main_configuration,filename,G_KEY_FILE_KEEP_TRANSLATIONS,NULL);
-
-    	if(g_key_file_has_key(main_configuration,"Terminal","size",NULL))
-    	{
-			pos = g_key_file_get_integer_list(main_configuration,"Terminal","size",&sz,NULL);
-			if(pos && sz == 2)
-           		gtk_window_resize(GTK_WINDOW(top_window),pos[0],pos[1]);
-    	}
-
-    	// Load toggles
-    	for(f=0;f<(sizeof(toggle_name)/sizeof(const char *));f++)
-    	{
-    		if(g_key_file_has_key(main_configuration,"Toggles",toggle_name[f],NULL))
-    		{
-				set_toggle(f,g_key_file_get_boolean(main_configuration,"Toggles",toggle_name[f],NULL),TT_INITIAL);
-    		}
-    	}
-	}
-#else
-    snprintf(filename,4095,"%s/.%s.saved",home ? home : ".", TARGET);
-    arq = fopen(filename,"r");
-    if(arq)
-    {
-    	if(fread(&config,sizeof(config),1,arq) == 1 && (config.sz == sizeof(config)))
-    	{
-		   DBGPrintf("Tamanho da janela: %dx%d",config.width, config.height);
-           gtk_window_resize(GTK_WINDOW(top_window),config.width, config.height);
-    	}
-    }
-#endif
 
     /* Load colors */
 	LoadTerminalColors(arq);
