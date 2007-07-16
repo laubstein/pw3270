@@ -22,7 +22,7 @@
 
  #if defined( __GTK_COLOR_SELECTION_H__ ) && defined( __G_KEY_FILE_H__ )
  	#define ENABLE_COLOR_SELECTION 1
- #endif	
+ #endif
 
 
  #define RedrawStatusLine() 		RedrawTerminalContents()
@@ -159,6 +159,8 @@
  void status_untiming(void);
 
  int  PrintTemporaryFile(const char *filename);
+ int  ToggleByName(const char *name);
+
 
  void DrawTerminal(GdkDrawable *, GdkGC *, const FONTELEMENT *, int, int, int);
  int  PaintBuffer(GdkDrawable *, GdkGC *, const FONTELEMENT *, int, int, int);

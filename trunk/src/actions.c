@@ -634,25 +634,31 @@
  	action_toggle(w,(gpointer) toggle_name[CROSSHAIR]);
  }
 
- static void action_toggle(GtkWidget *w, gpointer data)
+ int ToggleByName(const char *name)
  {
  	int f;
 
- 	if(!data)
+ 	if(name)
+ 	{
+		for(f=0;f<N_TOGGLES;f++)
+		{
+			if(!strcmp(name,toggle_name[f]))
+				return f;
+		}
+ 	}
+
+    return -1;
+ }
+
+ static void action_toggle(GtkWidget *w, gpointer data)
+ {
+ 	int toggle = ToggleByName((const char *) data);
+ 	if(toggle < 0)
  	   return;
 
- 	DBGPrintf("Toogle \"%s\" using widget %p",(char *) data,w);
+	do_toggle(toggle);
+	InvalidateCursor();
 
- 	for(f=0;f<N_TOGGLES;f++)
- 	{
- 		if(!strcmp((char *) data,toggle_name[f]))
- 		{
- 			DBGPrintf("Toogle=\"%s\" ID=%d",(char *) data,f);
- 			do_toggle(f);
-    		InvalidateCursor();
- 			return;
- 		}
- 	}
  }
 
 #ifdef DEBUG
