@@ -71,6 +71,19 @@ void set_toggle(int ix, Boolean state, enum toggle_type reason)
 		do_toggle_reason(ix, reason);
 }
 
+Boolean get_toggle(int ix)
+{
+	struct toggle *t;
+
+	if(ix < N_TOGGLES)
+	{
+		t = &appres.toggle[ix];
+		return t->value;
+	}
+
+	return 0;
+}
+
 
 /*
  * Called from system initialization code to handle initial toggle settings.

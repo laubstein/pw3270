@@ -657,6 +657,12 @@
  	   return;
 
 	do_toggle(toggle);
+
+#ifdef __G_KEY_FILE_H__
+ 	if(main_configuration)
+ 		g_key_file_set_boolean(main_configuration,"Toggles",toggle_name[toggle],get_toggle(toggle) ? TRUE : FALSE);
+#endif
+
 	InvalidateCursor();
 
  }
