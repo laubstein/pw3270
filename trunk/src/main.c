@@ -25,7 +25,7 @@
  const char *toggle_name[N_TOGGLES] =
  	{	"MONOCASE",
 		"ALT_CURSOR",
-		"CURSOR_BLINK",
+		"CursorBlink",
 		"SHOW_TIMING",
 		"ShowCursorPosition",
 		"DS_TRACE",
