@@ -70,11 +70,11 @@ void set_toggle(int ix, Boolean state, enum toggle_type reason)
 	if(ix < N_TOGGLES)
 	{
 		if( (appres.toggle[ix].value && !state) || (!appres.toggle[ix].value && state) )
+		{
 			do_toggle_reason(ix, reason);
+		}
 	}
 }
-
-
 
 /*
  * Called from system initialization code to handle initial toggle settings.

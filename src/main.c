@@ -203,8 +203,12 @@
     top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 	// Set default toogle values
+	CHKPoint();
 	set_toggle(MARGINED_PASTE,1,TT_INITIAL);
 	set_toggle(CURSOR_POS,1,TT_INITIAL);
+
+	DBGPrintf("toggle CURSOR_POS: %s",(int) toggled(CURSOR_POS) ? "Enabled" : "Disabled");
+
 
 	// Load configuration
 #ifdef __G_KEY_FILE_H__
@@ -222,16 +226,6 @@
            		gtk_window_resize(GTK_WINDOW(top_window),pos[0],pos[1]);
     	}
 
-    	// Load toggles
-/*
-    	for(f=0;f<(sizeof(toggle_name)/sizeof(const char *));f++)
-    	{
-    		if(g_key_file_has_key(main_configuration,"Toggles",toggle_name[f],NULL))
-    		{
-				set_toggle(f,g_key_file_get_boolean(main_configuration,"Toggles",toggle_name[f],NULL),TT_INITIAL);
-    		}
-    	}
-*/
 	}
 #else
     snprintf(filename,4095,"%s/.%s.saved",home ? home : ".", TARGET);
