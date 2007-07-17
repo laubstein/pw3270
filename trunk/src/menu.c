@@ -1,6 +1,7 @@
 
  #include "g3270.h"
  #include <dlfcn.h>
+ #include "lib/togglesc.h"
 
 /*---[ Parameter structure ]--------------------------------------------------*/
 
@@ -127,9 +128,20 @@
 				if(g_key_file_has_key(main_configuration,"Toggles",item->parm,NULL))
 				{
 					gboolean flag = g_key_file_get_boolean(main_configuration,"Toggles",item->parm,NULL);
+
+					DBGPrintf("%s: %d",item->parm,flag);
+
 				  	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(obj),flag);
+					set_toggle(toggle,flag,TT_INITIAL);
+				}
+				else if(toggled(toggle))
+				{
+					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(obj),TRUE);
+					set_toggle(toggle,1,TT_INITIAL);
+			 		g_key_file_set_boolean(main_configuration,"Toggles",item->parm,TRUE);
 				}
 			 }
+
 		  }
 #endif
        }
