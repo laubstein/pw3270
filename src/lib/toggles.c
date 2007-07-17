@@ -67,8 +67,11 @@ do_toggle(int ix)
 
 void set_toggle(int ix, Boolean state, enum toggle_type reason)
 {
-	if(ix < N_TOGGLES && appres.toggle[ix].value != state)
-		do_toggle_reason(ix, reason);
+	if(ix < N_TOGGLES)
+	{
+		if( (appres.toggle[ix].value && !state) || (!appres.toggle[ix].value && state) )
+			do_toggle_reason(ix, reason);
+	}
 }
 
 

@@ -451,7 +451,11 @@
     if(*oia_cursor) // Is cursor enabled?
     {
        /* Cursor position */
-       DrawStatusRight(7,STATUS_COLOR_CURSOR_POSITION,oia_cursor);
+       DBGTracex(toggled(CURSOR_POS));
+       if(toggled(CURSOR_POS))
+       {
+       		DrawStatusRight(7,STATUS_COLOR_CURSOR_POSITION,oia_cursor);
+       }
 
        /* Insert mode */
        if(cursor_type == CURSOR_TYPE_INSERT)

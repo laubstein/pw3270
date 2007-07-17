@@ -27,7 +27,7 @@
 		"ALT_CURSOR",
 		"CURSOR_BLINK",
 		"SHOW_TIMING",
-		"CURSOR_POS",
+		"ShowCursorPosition",
 		"DS_TRACE",
 		"SCROLL_BAR",
 		"LINE_WRAP",
@@ -203,7 +203,8 @@
     top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 	// Set default toogle values
-	set_toggle(MARGINED_PASTE,1,TT_INITIAL); // Margined paste is default
+	set_toggle(MARGINED_PASTE,1,TT_INITIAL);
+	set_toggle(CURSOR_POS,1,TT_INITIAL);
 
 	// Load configuration
 #ifdef __G_KEY_FILE_H__
