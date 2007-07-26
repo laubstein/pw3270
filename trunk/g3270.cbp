@@ -231,6 +231,7 @@
 		<Unit filename="src/toolbar.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/toolbar.conf" />
 		<Unit filename="src/trace.h" />
 		<Extensions>
 			<code_completion />
