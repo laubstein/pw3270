@@ -174,6 +174,8 @@
  #include "b.bm"
  #include "four.bm"
 
+ static int Loaded = 0;
+
  static const struct _imagedata
  {
 	const unsigned char	*data;
@@ -562,7 +564,11 @@
  	int			f;
  	GdkPixmap	*temp;
 
-    memset(pix,0,sizeof(struct _pix) * IMAGE_COUNT);
+	if(!Loaded)
+	{
+    	memset(pix,0,sizeof(struct _pix) * IMAGE_COUNT);
+    	Loaded = 0;
+	}
 
  	for(f=0;f<IMAGE_COUNT;f++)
  	{
@@ -574,6 +580,9 @@
 											gdk_drawable_get_depth(drawable),
 											status_cmap+imagedata[f].color,
 											terminal_cmap );
+
+		if(pix[f].base)
+			gdk_pixbuf_unref(pix[f].base);
 
 		pix[f].base = gdk_pixbuf_get_from_drawable(	0,
 													temp,

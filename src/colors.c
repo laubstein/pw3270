@@ -190,7 +190,7 @@
  } COLORDATA;
 
 #ifdef ENABLE_COLOR_SELECTION
- 
+
  static void InsertInTree(GtkTreeStore *store, GtkTreeIter *parent, const char *str)
  {
 	 GtkTreeIter iter;
@@ -206,6 +206,7 @@
 	 	 last->changed[last->selected] = 1;
 		 gtk_color_selection_get_current_color(colorselection,last->current);
 		 gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),last->current,TRUE,TRUE);
+		 LoadImages(terminal->window,terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)]);
 		 RedrawTerminalContents();
 	 }
  }
@@ -275,18 +276,18 @@
 
     char *SColors[STATUS_COLORS] =
 		 {	_( "Background" ),
-			_( "STATUS_COLOR_SEPARATOR" ),
-			_( "STATUS_COLOR_CURSOR_POSITION" ),
-			_( "Lu Name" ),
+			_( "Separator" ),
+			_( "Cursor position" ),
+			_( "LU Name" ),
 			_( "Error message" ),
 			_( "Clock" ),
 			_( "Warning Message" ),
 			_( "Message" ),
-			_( "Toogle" ),
-			_( "Secure connection indicator" ),
+			_( "Toggle" ),
+			_( "SSL mark" ),
 			_( "Connection mark" ),
-			_( "STATUS_COLOR_KEYBOARD" ),
-			_( "STATUS_COLOR_CONNECT_ICON" )
+			_( "Key mark" ),
+			_( "Connection mark" )
 		  };
 
 	 char *cursors[CURSOR_COLORS] =
@@ -425,6 +426,7 @@
 		 for(p=0;p<clr[f].max;p++)
 			 gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),clr[f].tbl+p,TRUE,TRUE);
 		}
+		LoadImages(terminal->window,terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)]);
 		RedrawTerminalContents();
 		break;
 
