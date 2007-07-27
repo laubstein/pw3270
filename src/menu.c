@@ -133,6 +133,7 @@
 
 				  	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(obj),flag);
 					set_toggle(toggle,flag,TT_INITIAL);
+			 		g_key_file_set_boolean(main_configuration,"Toggles",item->parm,flag);
 				}
 				else if(toggled(toggle))
 				{
@@ -151,14 +152,12 @@
 
 			DBGPrintf("toggle %s: %s",item->parm,(int) toggled(toggle) ? "Enabled" : "Disabled");
 
-			if(toggle >= 0 && toggled(toggle))
+			if(toggled(toggle))
 			{
 				gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(obj),TRUE);
 				set_toggle(toggle,1,TT_INITIAL);
 			}
-
 		  }
-
 #endif
        }
 
