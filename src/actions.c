@@ -18,6 +18,7 @@
 
  static void action_toggle(GtkWidget *w, gpointer data);
  static void PrintScreen(GtkWidget *w, gpointer data);
+ static void action_FullScreen(GtkWidget *w, gpointer data);
 
 #ifdef DEBUG
  static void action_dump(GtkWidget *w, gpointer data);
@@ -83,6 +84,7 @@
 	{ "previousword",			action_PreviousWord				},
 	{ "nextword",				action_NextWord					},
 	{ "deleteword",				action_DeleteWord				},
+	{ "FullScreen",				action_FullScreen				},
 	{ "deletefield",			action_DeleteField				}
 
  };
@@ -192,6 +194,9 @@
 
         DECLARE_KEYPROC( GDK_Delete,			0,					action_Delete		),
         DECLARE_KEYPROC( GDK_BackSpace,			0,					action_Erase		),
+
+        DECLARE_KEYPROC( GDK_Return,			GDK_CONTROL_MASK,	action_FullScreen	),
+        DECLARE_KEYPROC( GDK_Return,			GDK_ALT_MASK,		action_FullScreen	),
 
         DECLARE_KEYPROC( GDK_Return,			0,					action_Enter		),
         DECLARE_KEYPROC( GDK_KP_Enter,			0,					action_Enter		),
@@ -733,3 +738,15 @@
  }
 
 #endif
+
+ static void action_FullScreen(GtkWidget *w, gpointer data)
+ {
+	if(!top_window->window)
+		return;
+
+	if(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_FULLSCREEN)
+		gtk_window_unfullscreen(GTK_WINDOW(top_window));
+	else
+		gtk_window_fullscreen(GTK_WINDOW(top_window));
+ }
+
