@@ -196,6 +196,7 @@
         DECLARE_KEYPROC( GDK_BackSpace,			0,					action_Erase		),
 
         DECLARE_KEYPROC( GDK_Return,			GDK_CONTROL_MASK,	action_FullScreen	),
+        DECLARE_KEYPROC( GDK_KP_Enter,			GDK_CONTROL_MASK,	action_FullScreen	),
 
         DECLARE_KEYPROC( GDK_Return,			0,					action_Enter		),
         DECLARE_KEYPROC( GDK_KP_Enter,			0,					action_Enter		),
