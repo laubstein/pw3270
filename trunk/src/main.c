@@ -76,54 +76,58 @@
  	action_disconnect(0,0);
  	Log("Exiting");
 
- 	// Save window size and position
+	if(!top_window->window && (gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_FULLSCREEN))
+	{
+		// Window isn't in fullscreen mode, save size
+
 #ifdef __G_KEY_FILE_H__
 
-	DBGTracex(main_configuration);
+		DBGTracex(main_configuration);
 
-	if(main_configuration)
-	{
-    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
-
-   		gtk_window_get_size(GTK_WINDOW(top_window),&pos[0],&pos[1]);
-		g_key_file_set_integer_list(main_configuration,"Terminal","size",pos,2);
-
-		conf = ptr = g_key_file_to_data(main_configuration,NULL,NULL);
-		if(ptr)
+		if(main_configuration)
 		{
-			while(*ptr && isspace(*ptr))
-				ptr++;
-	    	arq = fopen(filename,"w");
-	    	if(arq)
+			snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
+
+			gtk_window_get_size(GTK_WINDOW(top_window),&pos[0],&pos[1]);
+			g_key_file_set_integer_list(main_configuration,"Terminal","size",pos,2);
+
+			conf = ptr = g_key_file_to_data(main_configuration,NULL,NULL);
+			if(ptr)
 			{
-	    		fprintf(arq,ptr);
-	    		fclose(arq);
+				while(*ptr && isspace(*ptr))
+					ptr++;
+				arq = fopen(filename,"w");
+				if(arq)
+				{
+					fprintf(arq,ptr);
+					fclose(arq);
+				}
+				g_free(conf);
 			}
-			g_free(conf);
+			g_key_file_free(main_configuration);
+			main_configuration = 0;
 		}
-		g_key_file_free(main_configuration);
-		main_configuration = 0;
-	}
 
 #else
 
- 	memset(&config,0,sizeof(config));
- 	config.sz = sizeof(config);
+		memset(&config,0,sizeof(config));
+		config.sz = sizeof(config);
 
-    gtk_window_get_size(GTK_WINDOW(top_window),&config.width,&config.height);
+		gtk_window_get_size(GTK_WINDOW(top_window),&config.width,&config.height);
 
-    DBGPrintf("Tamanho da janela: %dx%d",config.width, config.height);
+		DBGPrintf("Tamanho da janela: %dx%d",config.width, config.height);
 
-    snprintf(filename,4095,"%s/.%s.saved",home ? home : ".", TARGET);
-    arq = fopen(filename,"w");
-    if(arq)
-    {
-	   fwrite (&config, sizeof(config), 1, arq);
-	   SaveTerminalColors(arq);
-	   fclose(arq);
-    }
+		snprintf(filename,4095,"%s/.%s.saved",home ? home : ".", TARGET);
+		arq = fopen(filename,"w");
+		if(arq)
+		{
+		   fwrite (&config, sizeof(config), 1, arq);
+		   SaveTerminalColors(arq);
+		   fclose(arq);
+		}
 
 #endif
+	}
 
  	gtk_main_quit();
  }
@@ -183,6 +187,11 @@
     }
 
  	return 0;
+ }
+
+ static gboolean window_state_event(GtkWidget *widget, GdkEventWindowState *event)
+ {
+ 	return FALSE;
  }
 
  static void CreateMainWindow(const char *cl_hostname)
@@ -250,8 +259,9 @@
 	g_signal_connect(G_OBJECT(top_window),	"delete_event", 		G_CALLBACK(delete_event),			NULL);
     g_signal_connect(G_OBJECT(top_window),	"destroy", 				G_CALLBACK(destroy),				NULL);
     g_signal_connect(G_OBJECT(top_window),	"map-event",			G_CALLBACK(map_event),				NULL);
-    g_signal_connect(G_OBJECT(top_window),	"key-press-event",		G_CALLBACK(key_press_event),	0);
-    g_signal_connect(G_OBJECT(top_window), 	"key-release-event",	G_CALLBACK(key_release_event),	0);
+    g_signal_connect(G_OBJECT(top_window),	"key-press-event",		G_CALLBACK(key_press_event),		0);
+    g_signal_connect(G_OBJECT(top_window), 	"key-release-event",	G_CALLBACK(key_release_event),		0);
+    g_signal_connect(G_OBJECT(top_window), 	"window-state-event",	G_CALLBACK(window_state_event),		0);
 
     UpdateWindowTitle();
 
