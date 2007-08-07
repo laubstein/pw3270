@@ -248,13 +248,13 @@
  		/* Resize by Height */
         ratio = ((double) gdk_pixbuf_get_width(pix[id].base)) / ((double) gdk_pixbuf_get_height(pix[id].base));
 		temp  = (int) ((double) ratio * ((double) Height));
-
+/*
         DBGPrintf("Ratio: %ld %dx%d <-> %dx%d (%dx%d)",
 									(long) (ratio * 100),
 									gdk_pixbuf_get_width(pix[id].base),gdk_pixbuf_get_height(pix[id].base),
 									temp,Height,
 									Width,Height);
-
+*/
 	    pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,temp,Height,GDK_INTERP_HYPER);
  	}
 
@@ -428,6 +428,10 @@
 
     Get3270DeviceBuffer(&rows, &cols);
 
+	gdk_gc_set_foreground(gc,status_cmap+STATUS_COLOR_BACKGROUND);
+    gdk_draw_rectangle(drawable,gc,1,left,vPos-font->Height,(font->Width*cols)+1,font->Height+line_spacing);
+
+	gdk_gc_set_background(gc,status_cmap+STATUS_COLOR_BACKGROUND);
 
     if(oia_undera)
     {
@@ -453,7 +457,6 @@
     if(*oia_cursor) // Is cursor enabled?
     {
        /* Cursor position */
-       DBGTracex(toggled(CURSOR_POS));
        if(toggled(CURSOR_POS))
        {
        		DrawStatusRight(7,STATUS_COLOR_CURSOR_POSITION,oia_cursor);
@@ -579,7 +582,7 @@
                                        		imagedata[f].height,
 											gdk_drawable_get_depth(drawable),
 											status_cmap+imagedata[f].color,
-											terminal_cmap );
+											status_cmap+STATUS_COLOR_BACKGROUND );
 
 		if(pix[f].base)
 			gdk_pixbuf_unref(pix[f].base);

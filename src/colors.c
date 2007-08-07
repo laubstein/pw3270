@@ -287,7 +287,7 @@
 			_( "SSL mark" ),
 			_( "Connection mark" ),
 			_( "Key mark" ),
-			_( "Connection mark" )
+			_( "Connection icons" )
 		  };
 
 	 char *cursors[CURSOR_COLORS] =
@@ -411,6 +411,7 @@
 												);
 
 					}
+					DBGPrintf("%s=%s",clrinfo[clr[c].conf].name,buffer);
 					g_key_file_set_string(main_configuration,"Colors",clrinfo[clr[c].conf].name,buffer);
 				}
 			}
