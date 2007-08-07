@@ -76,40 +76,46 @@
  	action_disconnect(0,0);
  	Log("Exiting");
 
-	if(!top_window->window && (gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_FULLSCREEN))
-	{
-		// Window isn't in fullscreen mode, save size
-
 #ifdef __G_KEY_FILE_H__
 
-		DBGTracex(main_configuration);
+	DBGTracex(main_configuration);
 
-		if(main_configuration)
+	if(main_configuration)
+	{
+		snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
+
+		if(top_window->window)
 		{
-			snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
-
-			gtk_window_get_size(GTK_WINDOW(top_window),&pos[0],&pos[1]);
-			g_key_file_set_integer_list(main_configuration,"Terminal","size",pos,2);
-
-			conf = ptr = g_key_file_to_data(main_configuration,NULL,NULL);
-			if(ptr)
-			{
-				while(*ptr && isspace(*ptr))
-					ptr++;
-				arq = fopen(filename,"w");
-				if(arq)
-				{
-					fprintf(arq,ptr);
-					fclose(arq);
-				}
-				g_free(conf);
-			}
-			g_key_file_free(main_configuration);
-			main_configuration = 0;
+		 	if( !(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_FULLSCREEN) )
+		 	{
+				// Window isn't in fullscreen mode, save size
+				DBGMessage("*** Saving window size");
+				gtk_window_get_size(GTK_WINDOW(top_window),&pos[0],&pos[1]);
+				g_key_file_set_integer_list(main_configuration,"Terminal","size",pos,2);
+		 	}
+			g_key_file_set_boolean(main_configuration,"Terminal","FullScreen",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_FULLSCREEN));
 		}
 
-#else
+		conf = ptr = g_key_file_to_data(main_configuration,NULL,NULL);
+		if(ptr)
+		{
+			while(*ptr && isspace(*ptr))
+				ptr++;
+			arq = fopen(filename,"w");
+			if(arq)
+			{
+				fprintf(arq,ptr);
+				fclose(arq);
+			}
+			g_free(conf);
+		}
+		g_key_file_free(main_configuration);
+		main_configuration = 0;
+	}
 
+#else
+	if(top_window->window && !(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_FULLSCREEN))
+	{
 		memset(&config,0,sizeof(config));
 		config.sz = sizeof(config);
 
@@ -125,9 +131,8 @@
 		   SaveTerminalColors(arq);
 		   fclose(arq);
 		}
-
-#endif
 	}
+#endif
 
  	gtk_main_quit();
  }
