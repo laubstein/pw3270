@@ -7,44 +7,43 @@
 
 /*---[ Constants ]------------------------------------------------------------*/
 
- static const char *exec = PRINT_COMMAND;
-
 /*---[ Lock/Unlock ]----------------------------------------------------------*/
 
 /*---[ Implement ]------------------------------------------------------------*/
 
+#if defined(DEBUG) && defined(__GTK_PRINT_OPERATION_H__)
 
- static gpointer PrintThread(gpointer filename)
+ void action_print(GtkWidget *w, gpointer data)
  {
- 	char buffer[4096];
-
-    DBGMessage( (char *) filename);
- 	snprintf(buffer,4095,exec,(char *) filename);
-
- 	DBGMessage(buffer);
-    system(buffer);
-
-    remove(filename);
-    free(filename);
-    return 0;
+ 	action_exec_with_screen(w,data ? data : PRINT_COMMAND);
  }
 
- int PrintTemporaryFile(const char *filename)
+ void action_print_copy(GtkWidget *w, gpointer data)
  {
- 	char *file = strdup(filename);
-#if GTK == 2
-    GThread   *thd = 0;
-#else
-    pthread_t  thd = 0;
-#endif
-
-    DBGMessage(file);
-
-#if GTK == 2
-    thd =  g_thread_create( PrintThread, (gpointer) file, 0, NULL);
-#else
-     pthread_create(&thd, NULL, (void * (*)(void *)) PrintThread, file);
-#endif
-
- 	return 0;
+    action_exec_with_copy(w,data ? data : PRINT_COMMAND);
  }
+
+ void action_print_selection(GtkWidget *w, gpointer data)
+ {
+    action_exec_with_selection(w,data ? data : PRINT_COMMAND);
+ }
+
+#else
+
+ void action_print(GtkWidget *w, gpointer data)
+ {
+ 	action_exec_with_screen(w,data ? data : PRINT_COMMAND);
+ }
+
+ void action_print_copy(GtkWidget *w, gpointer data)
+ {
+    action_exec_with_copy(w,data ? data : PRINT_COMMAND);
+ }
+
+ void action_print_selection(GtkWidget *w, gpointer data)
+ {
+    action_exec_with_selection(w,data ? data : PRINT_COMMAND);
+ }
+
+
+#endif

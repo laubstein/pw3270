@@ -454,7 +454,3 @@
 
  }
 
- void action_print_copy(GtkWidget *w, gpointer data)
- {
-    action_exec_with_copy(w,data ? data : PRINT_COMMAND);
- }

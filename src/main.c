@@ -86,14 +86,17 @@
 
 		if(top_window->window)
 		{
-		 	if( !(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_FULLSCREEN) )
+		 	if( !(gdk_window_get_state(top_window->window) & (GDK_WINDOW_STATE_FULLSCREEN|GDK_WINDOW_STATE_MAXIMIZED|GDK_WINDOW_STATE_ICONIFIED)) )
 		 	{
 				// Window isn't in fullscreen mode, save size
 				DBGMessage("*** Saving window size");
 				gtk_window_get_size(GTK_WINDOW(top_window),&pos[0],&pos[1]);
-				g_key_file_set_integer_list(main_configuration,"Terminal","size",pos,2);
+				g_key_file_set_integer_list(main_configuration,"MainWindow","size",pos,2);
 		 	}
-			g_key_file_set_boolean(main_configuration,"Terminal","FullScreen",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_FULLSCREEN));
+			g_key_file_set_boolean(main_configuration,"MainWindow","FullScreen",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_FULLSCREEN));
+			g_key_file_set_boolean(main_configuration,"MainWindow","Maximized",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_MAXIMIZED));
+			g_key_file_set_boolean(main_configuration,"MainWindow","Minimized",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_ICONIFIED));
+
 		}
 
 		conf = ptr = g_key_file_to_data(main_configuration,NULL,NULL);
@@ -233,9 +236,9 @@
     	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
     	g_key_file_load_from_file(main_configuration,filename,G_KEY_FILE_KEEP_TRANSLATIONS,NULL);
 
-    	if(g_key_file_has_key(main_configuration,"Terminal","size",NULL))
+    	if(g_key_file_has_key(main_configuration,"MainWindow","size",NULL))
     	{
-			pos = g_key_file_get_integer_list(main_configuration,"Terminal","size",&sz,NULL);
+			pos = g_key_file_get_integer_list(main_configuration,"MainWindow","size",&sz,NULL);
 			if(pos && sz == 2)
            		gtk_window_resize(GTK_WINDOW(top_window),pos[0],pos[1]);
     	}

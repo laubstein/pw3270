@@ -843,12 +843,7 @@
 #else
     pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_selection_thread, data);
 #endif
-	 
- }
 
- void action_print_selection(GtkWidget *w, gpointer data)
- {
-    action_exec_with_selection(w,data ? data : PRINT_COMMAND);
  }
 
  void action_SelectField(GtkWidget *w, gpointer data)

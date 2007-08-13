@@ -439,11 +439,6 @@
  	action_print(w,data);
  }
 
- void action_print(GtkWidget *w, gpointer data)
- {
- 	action_exec_with_screen(w,data ? data : PRINT_COMMAND);
- }
-
  void action_F7(GtkWidget *w, gpointer data)
  {
     action_internal(PF_action, IA_DEFAULT, "7", CN);
