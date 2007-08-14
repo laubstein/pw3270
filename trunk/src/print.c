@@ -41,20 +41,23 @@
 	if(!cfg->text)
 		gtk_print_operation_cancel(prt);
 
-	// Get the current font for the printing operation
-	strncpy(buffer,"Courier New 10",4095);
-	if(main_configuration)
+	if(!cfg->FontDescr)
 	{
-		ptr = g_key_file_get_string(main_configuration,"Fonts","Printer",NULL);
-		if(ptr)
+		// Get the current font for the printing operation
+		DBGMessage("Font isn't set, reading from configuration");
+		strncpy(buffer,"Courier New 10",4095);
+		if(main_configuration)
 		{
-			strncpy(buffer,ptr,4095);
-			g_free(ptr);
+			ptr = g_key_file_get_string(main_configuration,"Fonts","Printer",NULL);
+			if(ptr)
+			{
+				strncpy(buffer,ptr,4095);
+				g_free(ptr);
+			}
 		}
+		cfg->FontDescr = pango_font_description_from_string(buffer);
+		DBGPrintf("%s = %p",buffer,cfg->FontDescr);
 	}
-
-	cfg->FontDescr = pango_font_description_from_string(buffer);
-	DBGPrintf("%s = %p",buffer,cfg->FontDescr);
 
 	cfg->FontContext	= gtk_print_context_create_pango_context(context);
 	cfg->FontMap		= gtk_print_context_get_pango_fontmap(context);
@@ -175,28 +178,84 @@
 
  }
 
+ static void print_done(GtkPrintOperation *prt, GtkPrintOperationResult result, PRINTINFO *cfg)
+ {
+ 	gchar *ptr;
+
+ 	DBGMessage("Print operation done");
+
+	if(main_configuration && result == GTK_PRINT_OPERATION_RESULT_APPLY)
+	{
+		DBGMessage("Saving print settings");
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
+    	if(cfg->settings && main_configuration)
+			gtk_print_settings_to_key_file(cfg->settings,main_configuration,"PrintSettings");
+#endif
+
+		if(cfg->FontDescr)
+		{
+			ptr = pango_font_description_to_string(cfg->FontDescr);
+			if(ptr)
+			{
+				g_key_file_set_string(main_configuration,"Fonts","Printer",ptr);
+				g_free(ptr);
+			}
+		}
+
+	}
+
+ }
+
+ static void load_font(GtkWidget *widget, PRINTINFO *cfg)
+ {
+ 	gchar *ptr;
+
+	if(main_configuration)
+	{
+		ptr = g_key_file_get_string(main_configuration,"Fonts","Printer",NULL);
+		if(ptr)
+		{
+			gtk_font_selection_set_font_name(GTK_FONT_SELECTION(widget),ptr);
+			g_free(ptr);
+		}
+	}
+ }
+
+ static GObject * create_custom_widget(GtkPrintOperation *prt, PRINTINFO *cfg)
+ {
+ 	GtkWidget *font_dialog =  gtk_font_selection_new();
+
+    g_signal_connect(font_dialog, "realize", G_CALLBACK(load_font), cfg);
+
+ 	return G_OBJECT(font_dialog);
+ }
+
+ static void custom_widget_apply(GtkPrintOperation *prt, GtkWidget *font_dialog, PRINTINFO *cfg)
+ {
+ 	gchar *font;
+
+ 	if(main_configuration)
+ 	{
+ 		font = gtk_font_selection_get_font_name(GTK_FONT_SELECTION(font_dialog));
+ 		if(font)
+ 		{
+			cfg->FontDescr = pango_font_description_from_string(font);
+			DBGPrintf("%s = %p",font,cfg->FontDescr);
+			g_key_file_set_string(main_configuration,"Fonts","Printer",font);
+ 			g_free(font);
+ 		}
+ 	}
+ }
+
  #define DESTROY(x) if(x) { g_object_unref(x); x = 0; }
 
  static void ReleaseInfo(PRINTINFO *cfg)
  {
- 	char *ptr;
-
  	CHKPoint();
 	DESTROY(cfg->setup);
 
  	CHKPoint();
 	DESTROY(cfg->settings);
-
-	if(main_configuration && cfg->FontDescr)
-	{
-		ptr = pango_font_description_to_string(cfg->FontDescr);
-		if(ptr)
-		{
-			g_key_file_set_string(main_configuration,"Fonts","Printer",ptr);
-			g_free(ptr);
-		}
-	}
-
 
 // FIXME (perry#1#): Why it segfaults at this point?
 // 	CHKPoint();
@@ -222,56 +281,70 @@
 	DBGMessage("Print Job released");
  }
 
- static PRINTINFO * AllocInfo(GtkPrintOperation *prt)
+ static GtkPrintOperation * NewPrintOperation(const char *name, gchar *text)
  {
- 	PRINTINFO 	*cfg;
+ 	GtkPrintOperation	*prt;
+ 	PRINTINFO 			*cfg;
+
+	gdk_lock();
+	prt = gtk_print_operation_new();
+	gdk_unlock();
 
 	if(!prt)
 		return 0;
 
+	gdk_lock();
+
+	gtk_print_operation_set_job_name(prt,name);
+
  	cfg = g_malloc(sizeof(PRINTINFO));
  	memset(cfg,0,sizeof(PRINTINFO));
 
+	cfg->text = text;
+
  	g_object_set_data_full(G_OBJECT(prt),"JobInfo",(gpointer) cfg,(void (*)(gpointer)) ReleaseInfo);
 
-	g_signal_connect(prt, "begin-print",    G_CALLBACK(begin_print), cfg);
-    g_signal_connect(prt, "draw-page",      G_CALLBACK(draw_page),   cfg);
+	g_signal_connect(prt, "begin-print",    		G_CALLBACK(begin_print), 			cfg);
+    g_signal_connect(prt, "draw-page",      		G_CALLBACK(draw_page),   			cfg);
+    g_signal_connect(prt, "done",      				G_CALLBACK(print_done),	 			cfg);
+    g_signal_connect(prt, "create-custom-widget",   G_CALLBACK(create_custom_widget),	cfg);
+    g_signal_connect(prt, "custom-widget-apply",   	G_CALLBACK(custom_widget_apply),	cfg);
 
 	gtk_print_operation_set_allow_async(prt,0);
 	gtk_print_operation_set_show_progress(prt,1);
 
 #if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
 	if(main_configuration)
+	{
 		cfg->settings = gtk_print_settings_new_from_key_file(main_configuration,"PrintSettings",NULL);
+	}
 #endif
 
 	if(!cfg->settings)
 		cfg->settings = gtk_print_settings_new();
 
 	DBGTracex(cfg->settings);
+	gtk_print_operation_set_print_settings(prt,cfg->settings);
 
- 	return cfg;
+	gtk_print_operation_set_custom_tab_label(prt,_("Font"));
+
+
+	gdk_unlock();
+
+ 	return prt;
  }
 
  void action_print(GtkWidget *w, gpointer data)
  {
- 	GtkPrintOperation 	*prt = gtk_print_operation_new();
- 	PRINTINFO			*cfg = AllocInfo(prt);;
+ 	GtkPrintOperation 	*prt =  NewPrintOperation("3270 Screen",CopyTerminalContents(0,0,-1,-1,0));
 
- 	if(!cfg)
+ 	if(!prt)
  		return;
 
-	// Set screen to print
-	gtk_print_operation_set_job_name(prt,"3270 Screen");
-	cfg->text = CopyTerminalContents(0,0,-1,-1,0);
-
 	// Run Print dialog
+	gdk_lock();
 	gtk_print_operation_run(prt,GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG,GTK_WINDOW(top_window),NULL);
-
-#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
-    if(cfg->settings && main_configuration)
-		gtk_print_settings_to_key_file(cfg->settings,main_configuration,"PrintSettings");
-#endif
+	gdk_unlock();
 
     DESTROY(prt);
  }
