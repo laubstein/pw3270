@@ -187,9 +187,18 @@
 	if(main_configuration && result == GTK_PRINT_OPERATION_RESULT_APPLY)
 	{
 		DBGMessage("Saving print settings");
+
 #if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
-    	if(cfg->settings && main_configuration)
-			gtk_print_settings_to_key_file(cfg->settings,main_configuration,"PrintSettings");
+
+    	if(main_configuration)
+    	{
+    		if(cfg->settings)
+				gtk_print_settings_to_key_file(cfg->settings,main_configuration,"PrintSettings");
+
+			if(cfg->setup)
+				gtk_page_setup_to_key_file(cfg->setup,NULL,NULL);
+
+    	}
 #endif
 
 		if(cfg->FontDescr)
@@ -317,17 +326,22 @@
 	if(main_configuration)
 	{
 		cfg->settings = gtk_print_settings_new_from_key_file(main_configuration,"PrintSettings",NULL);
+		cfg->setup = gtk_page_setup_new_from_key_file(main_configuration,NULL,NULL);
 	}
 #endif
 
 	if(!cfg->settings)
 		cfg->settings = gtk_print_settings_new();
 
+	if(!cfg->setup)
+		cfg->setup = gtk_page_setup_new();
+
+	gtk_print_operation_set_default_page_setup(prt,cfg->setup);
+
 	DBGTracex(cfg->settings);
 	gtk_print_operation_set_print_settings(prt,cfg->settings);
 
 	gtk_print_operation_set_custom_tab_label(prt,_("Font"));
-
 
 	gdk_unlock();
 
