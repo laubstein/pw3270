@@ -166,9 +166,6 @@
  int  PaintBuffer(GdkDrawable *, GdkGC *, const FONTELEMENT *, int, int, int);
  void PaintStatus(int, GdkDrawable *, GdkGC *, const FONTELEMENT *, int, int, int);
 
- void InitClipboard(GtkWidget *w);
- int  AddToClipboard(int fromRow, int fromCol, int toRow, int toCol, int clear, int table);
-
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 
  void action_crosshair( GtkWidget *w, gpointer data );
@@ -266,6 +263,8 @@
  void		DrawSelectionBox(GdkDrawable *drawable, GdkGC *gc);
  void		ConfigureSelectionBox(void);
 
+ gchar 		* CopySelectedText(void);
+
  gboolean	Mouse2Terminal(long x, long y, long *cRow, long *cCol);
 
  gboolean	mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data);
@@ -273,11 +272,17 @@
  gboolean	mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
  gboolean	mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
+/*---[ Clipboard ]------------------------------------------------------------*/
+
+ void 			InitClipboard(GtkWidget *w);
+ int  			AddToClipboard(int fromRow, int fromCol, int toRow, int toCol, int clear, int table);
+ const gchar 	* GetClipboard(void);
+
 /*---[ Terminal window ]------------------------------------------------------*/
 
- GtkWidget	*g3270_new(const char *hostname);
- void		LoadTerminalColors(FILE *cfg);
- void		SaveTerminalColors(FILE *cfg);
+ GtkWidget				*g3270_new(const char *hostname);
+ void					LoadTerminalColors(FILE *cfg);
+ void					SaveTerminalColors(FILE *cfg);
 
 /*---[ Extensions/Plugins ]---------------------------------------------------*/
 

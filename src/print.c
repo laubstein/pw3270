@@ -21,7 +21,7 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
-#if defined(DEBUG) && defined(__GTK_PRINT_OPERATION_H__) && defined(__G_KEY_FILE_H__)
+#if defined(__GTK_PRINT_OPERATION_H__) && defined(__G_KEY_FILE_H__)
 
  static void begin_print(GtkPrintOperation *prt, GtkPrintContext *context, PRINTINFO *cfg)
  {
@@ -304,7 +304,7 @@
 	DBGMessage("Print Job released");
  }
 
- static GtkPrintOperation * NewPrintOperation(const char *name, gchar *text)
+ GtkPrintOperation * NewPrintOperation(const char *name, gchar *text)
  {
 #if !(GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12)
 	gchar **list;
@@ -380,12 +380,12 @@
  	return prt;
  }
 
- void action_print(GtkWidget *w, gpointer data)
+ static int PrintBuffer(const char *name, gchar *text)
  {
- 	GtkPrintOperation 	*prt =  NewPrintOperation("3270 Screen",CopyTerminalContents(0,0,-1,-1,0));
+ 	GtkPrintOperation *prt =  NewPrintOperation(name,text);
 
  	if(!prt)
- 		return;
+ 		return -1;
 
 	// Run Print dialog
 	gdk_lock();
@@ -393,16 +393,58 @@
 	gdk_unlock();
 
     DESTROY(prt);
+
+    return 0;
+ }
+
+ void action_print(GtkWidget *w, gpointer data)
+ {
+ 	PrintBuffer("3270 Screen",CopyTerminalContents(0,0,-1,-1,0));
  }
 
  void action_print_copy(GtkWidget *w, gpointer data)
  {
-    action_exec_with_copy(w,data ? data : PRINT_COMMAND);
+ 	const gchar *text = GetClipboard();
+
+ 	if(text)
+ 	{
+ 		PrintBuffer("3270 Clipboard",g_strdup(text));
+ 		return;
+ 	}
+
+	GtkWidget *widget = gtk_message_dialog_new(
+					    GTK_WINDOW(top_window),
+                        GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
+                        GTK_MESSAGE_WARNING,
+                        GTK_BUTTONS_OK,
+                        _( "Clipboard is empty" ) );
+
+	gtk_dialog_run(GTK_DIALOG(widget));
+	gtk_widget_destroy (widget);
+
+
  }
 
  void action_print_selection(GtkWidget *w, gpointer data)
  {
-    action_exec_with_selection(w,data ? data : PRINT_COMMAND);
+ 	gchar *text = CopySelectedText();
+
+ 	if(text)
+ 	{
+ 		PrintBuffer("3270 Selected",text);
+ 		return;
+ 	}
+
+	GtkWidget *widget = gtk_message_dialog_new(
+					    GTK_WINDOW(top_window),
+                        GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
+                        GTK_MESSAGE_WARNING,
+                        GTK_BUTTONS_OK,
+                        _( "Selecione algum texto antes" ) );
+
+	gtk_dialog_run(GTK_DIALOG(widget));
+	gtk_widget_destroy (widget);
+
  }
 
 #else

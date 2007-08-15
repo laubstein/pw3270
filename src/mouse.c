@@ -757,6 +757,21 @@
  	do_copy(0,0);
  }
 
+ gchar * CopySelectedText(void)
+ {
+ 	if(!selecting)
+ 		return NULL;
+
+    return CopyTerminalContents(	min(pos[SELECTION_BEGIN].row,pos[SELECTION_END].row),
+									min(pos[SELECTION_BEGIN].col,pos[SELECTION_END].col),
+
+									max(pos[SELECTION_BEGIN].row,pos[SELECTION_END].row),
+									max(pos[SELECTION_BEGIN].col,pos[SELECTION_END].col),
+
+									0
+								);
+ }
+
  static gpointer exec_with_selection_thread(gpointer cmd)
  {
  	gchar	*screen;
@@ -771,14 +786,7 @@
 
     DBGTrace(selecting);
 
-    screen = CopyTerminalContents(	min(pos[SELECTION_BEGIN].row,pos[SELECTION_END].row),
-									min(pos[SELECTION_BEGIN].col,pos[SELECTION_END].col),
-
-									max(pos[SELECTION_BEGIN].row,pos[SELECTION_END].row),
-									max(pos[SELECTION_BEGIN].col,pos[SELECTION_END].col),
-
-									0
-								);
+    screen = CopySelectedText();
 
     if(!screen)
        return 0;
