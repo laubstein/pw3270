@@ -389,6 +389,11 @@
 
  }
 
+ const gchar * GetClipboard(void)
+ {
+ 	return Clipboard;
+ }
+
  static gpointer exec_with_copy_thread(gpointer cmd)
  {
  	char 			filename[1024];
