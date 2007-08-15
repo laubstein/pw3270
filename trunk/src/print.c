@@ -178,28 +178,42 @@
 
  }
 
+#if !(GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12)
+ static void SavePrintSetting(const gchar *key, const gchar *value, GKeyFile *cfg)
+ {
+ 	 g_key_file_set_string(cfg, "Print Settings", key, value);
+ }
+#endif
+
  static void print_done(GtkPrintOperation *prt, GtkPrintOperationResult result, PRINTINFO *cfg)
  {
- 	gchar *ptr;
+ 	gchar 				*ptr;
+	GtkPrintSettings	*settings = gtk_print_operation_get_print_settings(prt);
 
  	DBGMessage("Print operation done");
 
 	if(main_configuration && result == GTK_PRINT_OPERATION_RESULT_APPLY)
 	{
-		DBGMessage("Saving print settings");
-
-#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
-
     	if(main_configuration)
     	{
-    		if(cfg->settings)
-				gtk_print_settings_to_key_file(cfg->settings,main_configuration,"PrintSettings");
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
+
+			DBGPrintf("Saving print settings in old format (settings: %p)",settings);
+
+    		if(settings)
+				gtk_print_settings_to_key_file(settings,main_configuration,"PrintSettings");
 
 			if(cfg->setup)
 				gtk_page_setup_to_key_file(cfg->setup,NULL,NULL);
+#else
 
-    	}
+			DBGPrintf("Saving print settings in new format (settings: %p)",settings);
+
+			if(settings)
+				gtk_print_settings_foreach(settings,(GtkPrintSettingsFunc) SavePrintSetting,main_configuration);
+
 #endif
+    	}
 
 		if(cfg->FontDescr)
 		{
@@ -292,6 +306,10 @@
 
  static GtkPrintOperation * NewPrintOperation(const char *name, gchar *text)
  {
+#if !(GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12)
+	gchar **list;
+	int f;
+#endif
  	GtkPrintOperation	*prt;
  	PRINTINFO 			*cfg;
 
@@ -322,13 +340,27 @@
 	gtk_print_operation_set_allow_async(prt,0);
 	gtk_print_operation_set_show_progress(prt,1);
 
-#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
 	if(main_configuration)
 	{
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
 		cfg->settings = gtk_print_settings_new_from_key_file(main_configuration,"PrintSettings",NULL);
 		cfg->setup = gtk_page_setup_new_from_key_file(main_configuration,NULL,NULL);
-	}
+#else
+		cfg->settings = gtk_print_settings_new();
+		if(cfg->settings)
+		{
+			list = g_key_file_get_keys(main_configuration,"Print Settings",NULL,NULL);
+			if(list)
+			{
+				for(f=0;list[f];f++)
+				{
+					gtk_print_settings_set(cfg->settings,list[f],g_key_file_get_string(main_configuration,"Print Settings",list[f],NULL));
+				}
+				g_strfreev(list);
+			}
+		}
 #endif
+	}
 
 	if(!cfg->settings)
 		cfg->settings = gtk_print_settings_new();
