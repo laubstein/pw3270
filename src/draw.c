@@ -15,52 +15,49 @@
 /*---[ Status codes ]---------------------------------------------------------*/
 
  #ifdef DEBUG
-     #define DECLARE_STATUS_MESSAGE(code, cursor, color, msg) { code, 0, cursor, #code, color, msg }
+     #define DECLARE_STATUS_MESSAGE(code, color, msg) { code, #code, color, msg }
      #define NO_STATUS_MESSAGE ""
  #else
-     #define DECLARE_STATUS_MESSAGE(code, cursor, color, msg) { code, 0, cursor, color, msg }
+     #define DECLARE_STATUS_MESSAGE(code, color, msg) { code, color, msg }
      #define NO_STATUS_MESSAGE 0
  #endif
 
  #define STATUS_CURSOR_NONE	-1
 
+ static int		cursors[]	= { GDK_XTERM, GDK_X_CURSOR, GDK_WATCH };
+ static GdkCursor 	*cursor[] 	= { 0, 0, 0 };
+
  static struct _status
  {
  	unsigned short	code;
- 	GdkCursor		*cursor;
- 	int				cursor_type;
 
 #ifdef DEBUG
-    const char		*dbg;
+    const char			*dbg;
 #endif
 	unsigned short	color;
- 	const char		*msg;
+ 	const char			*msg;
  } status[] =
  {
 	DECLARE_STATUS_MESSAGE(
 			STATUS_DISCONNECTED,
-			GDK_X_CURSOR,
 			STATUS_COLOR_WARNING,
 			"XDesconectado"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_RESOLVING,
-			GDK_WATCH,
 			STATUS_COLOR_ERROR,
 			"XResolvendo"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_CONNECTING,
-			GDK_WATCH,
 			STATUS_COLOR_ERROR,
 			"XConectando"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_CONNECTED,
-			GDK_XTERM,
 			STATUS_COLOR_CONNECTED,
 			NO_STATUS_MESSAGE
 	),
@@ -68,91 +65,78 @@
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_NONSPECIFIC,
-			GDK_XTERM,
 			STATUS_COLOR_WARNING,
 			NO_STATUS_MESSAGE
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_INHIBIT,
-			STATUS_CURSOR_NONE,
 			STATUS_COLOR_ERROR,
 			"XInhibit"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_BLANK,
-			GDK_XTERM,
 			STATUS_COLOR_TIME,
 			NO_STATUS_MESSAGE
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_TWAIT,
-			GDK_WATCH,
 			STATUS_COLOR_TIME,
 			"XAguarde"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_AWAITING_FIRST,
-			STATUS_CURSOR_NONE,
 			STATUS_COLOR_CONNECTED,
 			"XConectando"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_SYSWAIT,
-			GDK_WATCH,
 			STATUS_COLOR_TIME,
 			"XSystem"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_PROTECTED,
-			GDK_X_CURSOR,
 			STATUS_COLOR_ERROR,
 			"XProtegido"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_NUMERIC,
-			GDK_X_CURSOR,
 			STATUS_COLOR_ERROR,
 			"XNumerico"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_OVERFLOW,
-			GDK_X_CURSOR,
 			STATUS_COLOR_ERROR,
 			"XOverflow"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_DBCS,
-			STATUS_CURSOR_NONE,
 			STATUS_COLOR_ERROR,
 			"X DBCS"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_SCROLLED,
-			STATUS_CURSOR_NONE,
 			STATUS_COLOR_ERROR,
 			"X Scrolled"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_MINUS,
-			STATUS_CURSOR_NONE,
 			STATUS_COLOR_ERROR,
 			"X -f"
 	),
 
 	DECLARE_STATUS_MESSAGE(
 			STATUS_RECONNECTING,
-			GDK_WATCH,
 			STATUS_COLOR_WARNING,
 			"X Reconnecting"
 	),
@@ -539,6 +523,9 @@
     int 			f;
     struct _status	*sts	= 0;
 
+	if(code == STATUS_BLANK)
+		SetTerminalCursorByID(0);
+
 	if(code < 0)
 	{
 		current_status = 0;
@@ -552,7 +539,6 @@
 		   {
 		   	   current_status = sts = (status+f);
 			   DBGPrintf("Status:\t%s",current_status->dbg);
-			   SetMousePointer(sts->cursor);
                RedrawStatusLine();
 			   return;
 		   }
@@ -598,10 +584,18 @@
         gdk_pixmap_unref(temp);
  	}
 
-    for(f=0;f<(sizeof(status)/sizeof(struct _status));f++)
-	{
-	   if(status[f].cursor_type != STATUS_CURSOR_NONE)
-	      status[f].cursor = gdk_cursor_new(status[f].cursor_type);
-	}
+	for(f=0;f<(sizeof(cursor)/sizeof(GdkCursor *));f++)
+		cursor[f] = gdk_cursor_new(cursors[f]);
+
+ }
+
+ void SetTerminalCursorByID(int id)
+ {
+ 	if(id >= (sizeof(cursor)/sizeof(GdkCursor *)) || id < 0)
+ 		id = 0;
+
+ 	gdk_lock();
+ 	SetMousePointer(cursor[id]);
+ 	gdk_unlock();
 
  }
