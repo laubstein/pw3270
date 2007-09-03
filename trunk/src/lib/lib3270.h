@@ -39,6 +39,8 @@ typedef struct _screen_callback
     void (*screen_changed)(int first, int last);
 
     void (*cursor_move)(int baddr);
+    void (*cursor_mode)(int mode);
+
     void (*toggle_monocase)(struct toggle *t, enum toggle_type tt);
 
     void (*status_ctlr_done)(void);

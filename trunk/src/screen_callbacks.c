@@ -21,6 +21,8 @@ static void screen_resume(void);
 static void screen_type(const char *model_name, int maxROWS, int maxCOLS);
 
 static void cursor_move(int baddr);
+static void cursor_mode(int mode);
+
 static void toggle_monocase(struct toggle *t, enum toggle_type tt);
 static void screen_changed(int first, int last);
 
@@ -67,6 +69,8 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
     screen_changed,
 
 	cursor_move,
+    cursor_mode,
+
 	toggle_monocase,
 
 	status_ctlr_done,
@@ -251,8 +255,8 @@ static void status_lu(const char *lu)
 
 #ifdef EXTENSIONS
 	SetExtensionsChar("g3270LUChanged",lu);
-#endif	
-	
+#endif
+
 }
 
 static void ring_bell(void)
@@ -364,4 +368,10 @@ void status_untiming(void)
 
    *oia_Timer = 0;
    RedrawStatusLine();
+}
+
+static void cursor_mode(int mode)
+{
+	DBGPrintf("********** CURSOR: %d",mode);
+	SetTerminalCursorByID(mode);
 }

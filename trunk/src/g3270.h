@@ -283,6 +283,7 @@
  GtkWidget				*g3270_new(const char *hostname);
  void					LoadTerminalColors(FILE *cfg);
  void					SaveTerminalColors(FILE *cfg);
+ void					SetTerminalCursorByID(int id);
 
 /*---[ Extensions/Plugins ]---------------------------------------------------*/
 

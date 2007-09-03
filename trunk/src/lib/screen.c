@@ -231,3 +231,8 @@ extern void status_untiming(void)
       screen_callbacks_3270->status_untiming();
 }
 
+extern void screen_set_cursor(int mode)
+{
+   if(screen_callbacks_3270 && screen_callbacks_3270->cursor_mode)
+      screen_callbacks_3270->cursor_mode(mode);
+}
