@@ -59,6 +59,8 @@ typedef struct _screen_callback
     void (*screen_flip)(void);
     void (*screen_width)(int width);
 
+	const char * (*lookup_cname)(int ccode);
+
     void (*error_popup)(const char *msg);
 
     void (*Redraw_action)(Widget w, XEvent *event, String *params, Cardinal *num_params);

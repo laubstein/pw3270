@@ -43,6 +43,7 @@ static void screen_width(int width);
 static void error_popup(const char *msg);
 static void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
 static void status_timing(struct timeval *t0, struct timeval *t1);
+static	const char *lookup_cname(int ccode);
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
@@ -88,6 +89,8 @@ const SCREEN_CALLBACK g3270_screen_callbacks =
 	ring_bell,
 	screen_flip,
 	screen_width,
+
+	lookup_cname,
 
 	error_popup,
 
@@ -374,4 +377,17 @@ static void cursor_mode(int mode)
 {
 	DBGPrintf("********** CURSOR: %d",mode);
 	SetTerminalCursorByID(mode);
+}
+
+const char *lookup_cname(int ccode)
+{
+	int i;
+
+	for(i = 0; i < (sizeof(keys) / sizeof(KEYTABLE));i++)
+	{
+		if(ccode == keys[i].code)
+			return keys[i].name;
+	}
+
+	return CN;
 }
