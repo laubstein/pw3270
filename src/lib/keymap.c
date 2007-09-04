@@ -571,11 +571,10 @@ lookup_key(int code)
 	trace_event(" keymap lookup failure after partial match\n");
 	return status_ret(ignore, NULL);
 }
-
-/* Look up a curses symbolic key. */
-static int
-lookup_ccode(const char *s)
+/* Look up a symbolic key. */
+static int lookup_ccode(const char *s)
 {
+	// FIXME (perry#1#): Change to callback.
 	int i;
 	const KEYTABLE *key;
 
@@ -600,10 +599,10 @@ lookup_ccode(const char *s)
 	return -1;
 }
 
-/* Look up a curses key code. */
-static const char *
-lookup_cname(int ccode)
+/* Look up a key code. */
+static const char *lookup_cname(int ccode)
 {
+/*
 	const KEYTABLE *key;
 	int 	  i;
 
@@ -622,6 +621,10 @@ lookup_cname(int ccode)
 		(void) sprintf(buf, "F%d", ccode - KEY_F0);
 		return buf;
 	}
+*/
+   if(screen_callbacks_3270 && screen_callbacks_3270->lookup_cname)
+      return screen_callbacks_3270->lookup_cname(ccode);
+
 	return CN;
 }
 
