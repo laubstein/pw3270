@@ -17,6 +17,7 @@
 		<VirtualTargets>
 			<Add alias="All" targets="default;" />
 		</VirtualTargets>
+		<Unit filename="build.sh" />
 		<Unit filename="g3270.sh" />
 		<Unit filename="g3270.spec" />
 		<Unit filename="src/Makefile">
@@ -235,6 +236,7 @@
 		<Unit filename="src/trace.h" />
 		<Extensions>
 			<code_completion />
+			<debugger />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
