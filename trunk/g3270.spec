@@ -68,6 +68,8 @@ install -m 644 src/extension.h		%{buildroot}%{_includedir}/%{name}
 sed "s@./src@%{_datadir}/%{name}@g" g3270.sh > %{buildroot}%{_datadir}/%{name}/%{name}.sh
 chmod 755 %{buildroot}%{_datadir}/%{name}/%{name}.sh
 
+ln -s %{_datadir}/%{name}/%{name}.sh %{buildroot}%{_bindir}/%name
+
 # Desktop menu entry
 cat > %{name}.desktop << EOF
 [Desktop Entry]
