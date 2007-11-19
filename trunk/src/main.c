@@ -242,7 +242,7 @@
 #ifdef __G_KEY_FILE_H__
 	gint		*pos;
 	gsize		sz;
-//	int			f;
+	int			f;
 #else
  	struct user_config config;
 #endif
@@ -272,6 +272,14 @@
 			if(pos && sz == 2)
            		gtk_window_resize(GTK_WINDOW(top_window),pos[0],pos[1]);
     	}
+
+		// Load window states
+		for(f=0;f<(sizeof(WindowState)/sizeof(struct _WindowState));f++)
+		{
+			if(g_key_file_get_boolean(main_configuration,"MainWindow",WindowState[f].name,NULL))
+				WindowState[f].activate(GTK_WINDOW(top_window));
+		}
+
 
 	}
 #else
