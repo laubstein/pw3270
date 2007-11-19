@@ -48,8 +48,8 @@ if [ "$1" != "--debug" ]; then
    echo Gerando copia do repositorio para a tag $PACKET_VERSION
 
    if [ "$VENDOR" = "suse" ]; then
-   	svn rm --force -m "Atualizando $PACKET_VERSION" http://$USER@suportelinux.df.bb.com.br/svn/$PACKAGE/tags/$PACKET_VERSION
-   	svn cp -m "Pacote $PACKET_VERSION" http://$USER@suportelinux.df.bb.com.br/svn/$PACKAGE/trunk http://$USER@suportelinux.df.bb.com.br/svn/$PACKAGE/tags/$PACKET_VERSION
+   	svn rm --force -m "Empacotamento $PACKET_VERSION" http://$USER@suportelinux.df.bb.com.br/svn/$PACKAGE/tags/$PACKET_VERSION
+   	svn cp -m "Empacotamento $PACKET_VERSION" http://$USER@suportelinux.df.bb.com.br/svn/$PACKAGE/trunk http://$USER@suportelinux.df.bb.com.br/svn/$PACKAGE/tags/$PACKET_VERSION
    fi
 
    echo "Enviando arquivo source para o servidor..."
@@ -60,7 +60,7 @@ if [ "$1" != "--debug" ]; then
    fi
 
    echo "Enviando arquivo binario o servidor..."
-   scp $RPMDIR/$RPMARCH/$PACKAGE*.rpm $USER@os2team.df.intrabb.bb.com.br:/home/matriz/pacotes/$VENDOR/bb
+   scp $RPMDIR/$RPMARCH/$PACKAGE*.rpm $USER@os2team.df.intrabb.bb.com.br:/home/matriz/pacotes/$VENDOR/bb/$RPMARCH
    if [ "$?" != "0" ]; then
       echo "Erro ao copiar o pacote binario"
    fi
