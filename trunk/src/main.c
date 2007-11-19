@@ -20,6 +20,21 @@
 
  #pragma pack()
 
+#ifdef __G_KEY_FILE_H__
+	static const struct _WindowState
+	{
+		const char *name;
+		GdkWindowState flag;
+		void (*activate)(GtkWindow *);
+	} WindowState[] =
+	{
+		{ "FullScreen",	GDK_WINDOW_STATE_FULLSCREEN,	gtk_window_fullscreen	},
+		{ "Maximized",	GDK_WINDOW_STATE_MAXIMIZED,		gtk_window_maximize		},
+		{ "Iconified",	GDK_WINDOW_STATE_ICONIFIED,		gtk_window_iconify		},
+		{ "Sticky",		GDK_WINDOW_STATE_STICKY,		gtk_window_stick		}
+	};
+#endif
+
 /*---[ Constants ]------------------------------------------------------------*/
 
  const char *toggle_name[N_TOGGLES] =
@@ -72,18 +87,6 @@
 	int		f;
 
 	GdkWindowState CurrentState;
-
-	static const struct _WindowState
-	{
-		const char *name;
-		GdkWindowState flag;
-	} WindowState[] =
-	{
-		{ "FullScreen",	GDK_WINDOW_STATE_FULLSCREEN	},
-		{ "Maximized",	GDK_WINDOW_STATE_MAXIMIZED	},
-		{ "Iconified",	GDK_WINDOW_STATE_ICONIFIED	},
-		{ "Sticky",		GDK_WINDOW_STATE_STICKY		}
-	};
 
 #else
  	struct user_config config;
