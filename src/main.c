@@ -69,6 +69,22 @@
 	int		pos[2];
 	char	*ptr;
 	char	*conf;
+	int		f;
+
+	GdkWindowState CurrentState;
+
+	static const struct _WindowState
+	{
+		const char *name;
+		GdkWindowState flag;
+	} WindowState[] =
+	{
+		{ "FullScreen",	GDK_WINDOW_STATE_FULLSCREEN	},
+		{ "Maximized",	GDK_WINDOW_STATE_MAXIMIZED	},
+		{ "Iconified",	GDK_WINDOW_STATE_ICONIFIED	},
+		{ "Sticky",		GDK_WINDOW_STATE_STICKY		}
+	};
+
 #else
  	struct user_config config;
 #endif
@@ -86,16 +102,27 @@
 
 		if(top_window->window)
 		{
-		 	if( !(gdk_window_get_state(top_window->window) & (GDK_WINDOW_STATE_FULLSCREEN|GDK_WINDOW_STATE_MAXIMIZED|GDK_WINDOW_STATE_ICONIFIED)) )
+			CurrentState = gdk_window_get_state(top_window->window);
+
+		 	if( !(CurrentState & (GDK_WINDOW_STATE_FULLSCREEN|GDK_WINDOW_STATE_MAXIMIZED|GDK_WINDOW_STATE_ICONIFIED)) )
 		 	{
 				// Window isn't in fullscreen mode, save size
 				DBGMessage("*** Saving window size");
 				gtk_window_get_size(GTK_WINDOW(top_window),&pos[0],&pos[1]);
 				g_key_file_set_integer_list(main_configuration,"MainWindow","size",pos,2);
 		 	}
+
+			for(f=0;f<(sizeof(WindowState)/sizeof(struct _WindowState));f++)
+			{
+				g_key_file_set_boolean(main_configuration,"MainWindow",WindowState[f].name, CurrentState & WindowState[f].flag);
+			}
+
+/*
 			g_key_file_set_boolean(main_configuration,"MainWindow","FullScreen",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_FULLSCREEN));
 			g_key_file_set_boolean(main_configuration,"MainWindow","Maximized",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_MAXIMIZED));
 			g_key_file_set_boolean(main_configuration,"MainWindow","Minimized",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_ICONIFIED));
+			g_key_file_set_boolean(main_configuration,"MainWindow","Sticky",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_STICKY));
+*/
 
 		}
 
