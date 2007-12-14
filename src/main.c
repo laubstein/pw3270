@@ -28,7 +28,7 @@
 		void (*activate)(GtkWindow *);
 	} WindowState[] =
 	{
-		{ "FullScreen",	GDK_WINDOW_STATE_FULLSCREEN,	gtk_window_fullscreen	},
+//		{ "FullScreen",	GDK_WINDOW_STATE_FULLSCREEN,	gtk_window_fullscreen	},
 		{ "Maximized",	GDK_WINDOW_STATE_MAXIMIZED,		gtk_window_maximize		},
 		{ "Iconified",	GDK_WINDOW_STATE_ICONIFIED,		gtk_window_iconify		},
 		{ "Sticky",		GDK_WINDOW_STATE_STICKY,		gtk_window_stick		}
@@ -54,7 +54,8 @@
 		"CrossHairCursor",
 		"VISIBLE_CONTROL",
 		"AID_WAIT",
-		"Reconnect"
+		"Reconnect",
+		"FullScreen"
  	};
 
 /*---[ Globals ]--------------------------------------------------------------*/
@@ -328,6 +329,13 @@
 	toolbar = LoadToolbar(top_window);
     if(toolbar)
        gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, TRUE, 0);
+
+	// Preset toggles
+	if(toggled(FULLSCREEN))
+		gtk_window_fullscreen(GTK_WINDOW(top_window));
+	else
+		gtk_window_unfullscreen(GTK_WINDOW(top_window));
+
 
     /* Load colors */
 	LoadTerminalColors(arq);
