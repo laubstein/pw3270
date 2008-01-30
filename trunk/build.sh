@@ -31,7 +31,7 @@ if [ "$?" != "0" ]; then
    exit -1
 fi
 
-tar -zcvf `rpm --eval="%{u2p:%{_sourcedir}}"`/$PACKAGE.tar.gz --directory=/tmp --exclude=*.svn* $PACKAGE
+tar -zcvf `rpm --eval="%{u2p:%{_sourcedir}}"`/$PACKAGE.tar.gz --directory=/tmp --exclude=*.svn* --exclude=*.cbp --exclude=*.layout* --exclude=build.sh $PACKAGE
 if [ "$?" != "0" ]; then
    exit -1
 fi
