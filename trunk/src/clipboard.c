@@ -1,6 +1,7 @@
 
  #include <errno.h>
  #include "g3270.h"
+ #include "config.h"
  #include "trace.h"
 
  #include "lib/kybdc.h"
@@ -404,7 +405,7 @@
     if(!Clipboard)
        return 0;
 
-    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,TARGET);
+    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,PROJECT_NAME);
     fd = mkstemp(filename);
 
     DBGMessage(filename);

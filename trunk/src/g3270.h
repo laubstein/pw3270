@@ -43,11 +43,11 @@
  #endif
 
  #ifndef TMPPATH
-    TMPPATH="/tmp"
+    #define TMPPATH "/tmp"
  #endif
 
  #ifndef LOGPATH
-    LOGPATH="/var/log"
+    #define LOGPATH "/var/log"
  #endif
 
  #include "extension.h"

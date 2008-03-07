@@ -1,6 +1,7 @@
 
 
  #include "g3270.h"
+ #include "config.h"
  #include "lib/kybdc.h"
  #include "lib/actionsc.h"
  #include "lib/tablesc.h"
@@ -791,7 +792,7 @@
     if(!screen)
        return 0;
 
-    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,TARGET);
+    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,PROJECT_NAME);
     fd = mkstemp(filename);
 
     DBGMessage(filename);

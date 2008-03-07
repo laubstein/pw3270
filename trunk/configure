@@ -1,36 +1,110 @@
 #!/bin/sh
 
-CONFIG_FILE=src/gtk.mk
-TEMP_FILE=/tmp/$0.g3270.tmp
+#!/bin/bash
 
-rm -f $CONFIG_FILE
+MyDir=$PWD
 
-pkg-config --modversion gtk+-2.0 > /dev/null 2>&1
-if [ "$?" = "0" ]; then
+#--[ Set default values ]-------------------------------------------------------
 
-    GTK_VERSION=2
-    echo GTK2=`pkg-config --modversion gtk+-2.0` >> $CONFIG_FILE
-	
-else
+name=g3270
+version=3.3.4
+sysconfdir=/etc
+datadir=/usr/share
+localstatedir=/var
+tempdir=/tmp
+libdir=/usr/lib
+bindir=/usr/bin
+gtkmodules="gtk+-2.0 gdk-2.0 glib-2.0 gthread-2.0"
+libgnome="libgnome-2.0"
 
-   pkg-config --modversion gtk+ > /dev/null 2>&1
-   if [ "$?" = "0" ]; then
-      GTK_VERSION=1
-      echo GTK1=`pkg-config --modversion gtk+` >> $CONFIG_FILE
-   fi
+#--[ Check for GTK version ]----------------------------------------------------
+
+PKGCONFIG=`which pkg-config`
+if [ $PKGCONFIG == "" ]; then
+	echo "* Can't find pkg-config"
+	exit 2
 fi
 
-echo GTK=$GTK_VERSION >> $CONFIG_FILE
+$PKGCONFIG --modversion $gtkmodules > /dev/null 2>&1
+if [ "$?" != "0" ]; then
+	echo "* Can't find required gtkmodules: $gtkmodules"
+	exit 2
+fi
 
-pkg-config --cflags-only-I gtk+-2.0 | sed "s@-I@\n@g" > $TEMP_FILE
-while read dir
+#--[ Read configuration options ]-----------------------------------------------
+
+until [ -z "$1" ]
 do
-   if [ "$dir" != "" ]; then
-      if [ -e "$dir/glib/gi18n.h" ]; then
-         echo GI18N=$dir/glib/gi18n.h >> $CONFIG_FILE
-      fi
+   if [ ${1:0:2} = '--' ]; then
+      tmp=${1:2}
+      parameter=${tmp%%=*}
+      value=${tmp##*=}
+      eval "$parameter=$value" > /dev/null 2>&1
    fi
-done < $TEMP_FILE
-rm -f $TEMP_FILE
+   shift
+done
 
-cat $CONFIG_FILE
+#--[ Basic configuration ]------------------------------------------------------
+
+PKGMODULES=$gtkmodules
+$PKGCONFIG --modversion $libgnome > /dev/null 2>&1
+if [ "$?" == "0" ]; then
+	EnableGnome=1
+	PKGMODULES="$PKGMODULES $libgnome"
+else
+	EnableGnome=0
+fi
+
+#--[ Configuration for Makefile ]-----------------------------------------------
+
+cd $MyDir
+
+
+CONFIG_FILE=Makefile
+rm -f $CONFIG_FILE
+
+echo PROJECT_NAME=$name >> $CONFIG_FILE
+echo OS=linux >> $CONFIG_FILE
+echo BUILD=\`date +%G%m%d%H%M\` >> $CONFIG_FILE
+echo OBJEXT=o >> $CONFIG_FILE
+echo CC=gcc >> $CONFIG_FILE
+echo LD=gcc >> $CONFIG_FILE
+echo LIBDIR=$libdir >> $CONFIG_FILE
+echo BINDIR=$bindir >> $CONFIG_FILE
+echo DATADIR=$datadir >> $CONFIG_FILE
+echo INSTALL=install >> $CONFIG_FILE
+
+if [ -n "$debug" ]; then
+	echo ifndef DEBUG >> $CONFIG_FILE
+	echo    DEBUG=$debug >> $CONFIG_FILE
+	echo endif >> $CONFIG_FILE
+fi
+
+echo CFLAGS=	-c -DEAPI -Wall -fPIC  \`$PKGCONFIG --cflags $PKGMODULES\` \
+		-DGTK=2 -DBUILD=\\\"\$\(BUILD\)\\\" >> $CONFIG_FILE
+
+echo LFLAGS=\`$PKGCONFIG --libs $PKGMODULES\` >> $CONFIG_FILE
+
+cat src/Makefile.linux >> $CONFIG_FILE
+
+#--[ Configuration for C/C++ Code ]---------------------------------------------
+
+CONFIG_FILE=src/config.h
+rm -f $CONFIG_FILE
+
+echo "#ifndef CONFIG_H_INCLUDED" >> $CONFIG_FILE
+echo "	#define CONFIG_H_INCLUDED 1" >> $CONFIG_FILE
+echo "	#define PROJECT_NAME \"$name\"" >> $CONFIG_FILE
+echo "	#define PROJECT_VERSION \"$version\"" >> $CONFIG_FILE
+echo "	#define DATADIR \"$datadir/$name\"" >> $CONFIG_FILE
+echo "	#define ENABLE_THREADS \"$threads\""  >> $CONFIG_FILE
+echo "	#define LOCALEDIR \"$datadir/locale\""  >> $CONFIG_FILE
+if [ "$EnableGnome" != "0" ]; then
+	echo "	#define GNOME \"`$PKGCONFIG --modversion $libgnome`\""  >> $CONFIG_FILE
+fi
+echo "#endif" >> $CONFIG_FILE
+
+#--[ Finalize ]-----------------------------------------------------------------
+
+echo $name version $version Configured
+
