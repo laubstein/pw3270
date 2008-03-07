@@ -247,11 +247,11 @@
     top_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 	// Set default toogle values
-	CHKPoint();
+//	CHKPoint();
 	set_toggle(MARGINED_PASTE,1,TT_INITIAL);
 	set_toggle(CURSOR_POS,1,TT_INITIAL);
 
-	DBGPrintf("toggle CURSOR_POS: %s",(int) toggled(CURSOR_POS) ? "Enabled" : "Disabled");
+//	DBGPrintf("toggle CURSOR_POS: %s",(int) toggled(CURSOR_POS) ? "Enabled" : "Disabled");
 
 
 	// Load configuration
@@ -341,6 +341,7 @@
 	gtk_box_pack_start(GTK_BOX(vbox),terminal,TRUE,TRUE,0);
 
 #if defined(DATADIR) && GTK == 2
+	DBGPrintf("Program icon: %s",DATADIR "/icon.jpg");
     icon = gdk_pixbuf_new_from_file(DATADIR "/icon.jpg", NULL);
     if(icon)
     	gtk_window_set_icon(GTK_WINDOW(top_window),icon);
@@ -386,6 +387,7 @@ static void session_die(GnomeClient* client, gpointer client_data)
 {
 	Log("Exiting by gnome's request");
 	action_exit(0,0);
+	Log("Session Die");
 }
 #endif
 
@@ -413,9 +415,14 @@ static void session_die(GnomeClient* client, gpointer client_data)
     DBGPrintf("Main thread: %p",MainThread);
 
 #ifdef USE_GNOME
+
+	gnome_init(PROJECT_NAME, PROJECT_VERSION, argc, argv);
+
 	client = gnome_master_client();
+	DBGPrintf("Gnome: %p",client);
 	gtk_signal_connect(GTK_OBJECT (client), "save_yourself", GTK_SIGNAL_FUNC(save_session), argv[0]);
 	gtk_signal_connect(GTK_OBJECT (client), "die", GTK_SIGNAL_FUNC(session_die), NULL);
+	DBGMessage("Gnome session setup finished");
 #endif
 
     /* Parse 3270 command line */
