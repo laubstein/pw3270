@@ -369,9 +369,11 @@
     Log(PROJECT_NAME " Build " BUILD );
 
     /* Populate callback tables */
-    set_3270_screen(&g3270_screen_callbacks);
+    CHKPoint();
+	set_3270_screen(&g3270_screen_callbacks);
 
 	// FIXME (perry#9#): Looks like this is not necessary since the library doesn't process keyboard.
+    CHKPoint();
     set_3270_keyboard(&g3270_keyboard_info);
 
     g_thread_init(NULL);
@@ -398,6 +400,7 @@
 
 		DBGMessage("Starting gtk main loop");
 		gtk_widget_show_all(top_window);
+		CHKPoint();
 		gtk_main();
 
 #ifdef EXTENSIONS

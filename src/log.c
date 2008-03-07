@@ -42,6 +42,7 @@
   */
  int g3270_lock(void)
  {
+ 	CHKPoint();
     return pthread_mutex_lock(&lock);
  }
 
@@ -52,6 +53,7 @@
   */
  int g3270_unlock(void)
  {
+ 	CHKPoint();
     return pthread_mutex_unlock(&lock);
  }
 
@@ -193,6 +195,7 @@
 	DBGPrintf("%s\n",string);
 
     g3270_closeLog(out);
+    CHKPoint();
 	g3270_unlock();
 
     return 0;
