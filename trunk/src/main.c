@@ -1,7 +1,7 @@
 
  #include "g3270.h"
- #include "config.h"
  #include <gdk/gdkkeysyms.h>
+
  #include "lib/hostc.h"
  #include "lib/actionsc.h"
  #include "lib/kybdc.h"
@@ -29,7 +29,6 @@
 		void (*activate)(GtkWindow *);
 	} WindowState[] =
 	{
-//		{ "FullScreen",	GDK_WINDOW_STATE_FULLSCREEN,	gtk_window_fullscreen	},
 		{ "Maximized",	GDK_WINDOW_STATE_MAXIMIZED,		gtk_window_maximize		},
 		{ "Iconified",	GDK_WINDOW_STATE_ICONIFIED,		gtk_window_iconify		},
 		{ "Sticky",		GDK_WINDOW_STATE_STICKY,		gtk_window_stick		}
@@ -72,6 +71,10 @@
 
 #ifdef __G_KEY_FILE_H__
  GKeyFile	*main_configuration	= 0;
+#endif
+
+#ifdef USE_GNOME
+ GnomeClient *client = 0;
 #endif
 
 /*---[ Main program ]---------------------------------------------------------*/
@@ -121,14 +124,6 @@
 			{
 				g_key_file_set_boolean(main_configuration,"MainWindow",WindowState[f].name, CurrentState & WindowState[f].flag);
 			}
-
-/*
-			g_key_file_set_boolean(main_configuration,"MainWindow","FullScreen",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_FULLSCREEN));
-			g_key_file_set_boolean(main_configuration,"MainWindow","Maximized",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_MAXIMIZED));
-			g_key_file_set_boolean(main_configuration,"MainWindow","Minimized",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_ICONIFIED));
-			g_key_file_set_boolean(main_configuration,"MainWindow","Sticky",(gdk_window_get_state(top_window->window) & GDK_WINDOW_STATE_STICKY));
-*/
-
 		}
 
 		conf = ptr = g_key_file_to_data(main_configuration,NULL,NULL);
@@ -360,6 +355,40 @@
 
  }
 
+#ifdef USE_GNOME
+static gint save_session (GnomeClient *client, gint phase, GnomeSaveStyle save_style,
+              gint is_shutdown, GnomeInteractStyle interact_style,
+              gint is_fast, gpointer client_data)
+{
+  gchar** argv;
+  guint argc;
+
+  Log("Saving session for %s",(char *) client_data);
+
+  /* allocate 0-filled, so it will be NULL-terminated */
+  argv = g_malloc0(sizeof(gchar*)*4);
+  argc = 0;
+
+  argv[argc++] = client_data;
+
+  if(cl_hostname)
+  {
+  	argv[argc++] = ((gchar *) cl_hostname);
+  }
+
+  gnome_client_set_clone_command(client, argc, argv);
+  gnome_client_set_restart_command(client, argc, argv);
+
+  return TRUE;
+}
+
+static void session_die(GnomeClient* client, gpointer client_data)
+{
+	Log("Exiting by gnome's request");
+	action_exit(0,0);
+}
+#endif
+
  int main(int argc, char **argv)
  {
 
@@ -382,6 +411,12 @@
 
     MainThread = g_thread_self();
     DBGPrintf("Main thread: %p",MainThread);
+
+#ifdef USE_GNOME
+	client = gnome_master_client();
+	gtk_signal_connect(GTK_OBJECT (client), "save_yourself", GTK_SIGNAL_FUNC(save_session), argv[0]);
+	gtk_signal_connect(GTK_OBJECT (client), "die", GTK_SIGNAL_FUNC(session_die), NULL);
+#endif
 
     /* Parse 3270 command line */
     parse_3270_command_line(argc, (const char **) argv, &cl_hostname);

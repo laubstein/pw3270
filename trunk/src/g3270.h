@@ -1,14 +1,12 @@
 
+ #include "config.h"
  #include <stdio.h>
-
  #include <gtk/gtk.h>
 
- #ifdef GI18N
-   #include <glib/gi18n.h>
+ #if defined(USE_GNOME)
+	#include <gnome.h>
  #else
-   #include <libintl.h>
-   #include <locale.h>
-   #define _(String) gettext(String)
+	#include <glib/gi18n.h>
  #endif
 
  #ifndef SYSCONFIG
