@@ -3,8 +3,8 @@
 #ifndef G3270_EXTENSION_H_INCLUDED
 
  #include <gtk/gtk.h>
- #include <sys/time.h> 
- 
+ #include <sys/time.h>
+
  #ifdef G3270_CORE
 	 #include <lib/localdefs.h>
 	 #include <lib/lib3270.h>
@@ -44,7 +44,7 @@
 
  	CURSOR_TYPE_CROSSHAIR // Must be the last one!
  };
- 
+
  #define CURSOR_TYPE_NONE	-1
 
  enum _STATUS_COLORS
@@ -76,9 +76,9 @@
  #ifndef GDK_ALT_MASK
      #define GDK_ALT_MASK GDK_MOD1_MASK
  #endif
- 
+
  #define LockThreads()		gdk_lock()
- #define UnlockThreads()	gdk_unlock()
+ #define UnlockThreads()	CHKPoint(); gdk_unlock()
 
 #ifdef __cplusplus
  extern "C" {
@@ -116,7 +116,7 @@
     #define DBGPrintf(x, ...) /* */
 
  #endif
- 
+
  #ifndef BUILD
     #define BUILD 20070425
  #endif
@@ -148,5 +148,5 @@
  }
 #endif
 
- 
+
 #endif

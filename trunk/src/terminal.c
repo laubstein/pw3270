@@ -583,6 +583,7 @@
 
  void InvalidateCursor(void)
  {
+	CHKPoint();
     LockThreads();
 
 #ifdef USE_GTKIMCONTEXT
@@ -592,6 +593,7 @@
     if(terminal)
        gtk_widget_queue_draw(terminal);
 
+	CHKPoint();
     UnlockThreads();
  }
 

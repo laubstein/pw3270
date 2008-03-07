@@ -9,7 +9,8 @@ RELEASE_OBJECTS=$(foreach SRC, $(basename $(SOURCES)), obj/Release/src/$(SRC).$(
 obj/Debug/src/%.$(OBJEXT): src/%.c Makefile src/*.h src/*.mak
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DDEBUG=1 -DG3270_CORE -DG_ERRORCHECK_MUTEXES $(CFLAGS) -I./src -ggdb -o $@ -c $<
+# -DG_ERRORCHECK_MUTEXES 
+	@$(CC) -DDEBUG=1 -DG3270_CORE $(CFLAGS) -I./src -ggdb -o $@ -c $<
 
 obj/Release/src/%.$(OBJEXT): src/%.c Makefile src/*.h src/*.mak
 	@echo $< ...

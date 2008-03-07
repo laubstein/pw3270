@@ -205,7 +205,7 @@
     // http://developer.gnome.org/doc/API/2.0/gtk/GtkItemFactory.html
     GtkItemFactory		*factory		= gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", accel_group);
 
-    DBGMessage(filename);
+    DBGPrintf("Open: %s %p",filename,arq);
 
     memset(&item,0,sizeof(item));
 

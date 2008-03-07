@@ -2,7 +2,7 @@ Name:           g3270
 License:        GPL
 Group:          System/X11/Terminals
 Version:        3.3.4
-Release:        20.%_vendor
+Release:        21.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
 Source:         %{name}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -39,9 +39,9 @@ cd src/lib
 cd ../..
 
 %build
-make QUIET_MODE=1 DATADIR=%{_datadir}/%{name} EXTENSIONS=%{_datadir}/%{name}/plugins VERSION=%{version}-%{release} TMPPATH=%{_tmppath} -C src
-strip src/g3270
-strip src/lib3270.so
+make Release
+strip bin/Release/g3270
+strip bin/lib3270.so
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -55,10 +55,10 @@ mkdir -p %{buildroot}%{_sysconfdir}/x3270
 mkdir -p %{buildroot}/etc/sysconfig
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
 
-install -m 755 src/lib3270.so	    %{buildroot}%{_libdir}
-install -m 755 src/g3270		    %{buildroot}%{_datadir}/%{name}
+install -m 755 bin/lib3270.so	   	%{buildroot}%{_libdir}
+install -m 755 bin/Release/g3270    %{buildroot}%{_datadir}/%{name}
 install -m 644 src/*.jpg		    %{buildroot}%{_datadir}/%{name}
-install -m 644 src/*.conf		    %{buildroot}%{_datadir}/%{name}
+install -m 644 *.conf		    	%{buildroot}%{_datadir}/%{name}
 install -m 644 src/lib/ibm_hosts	%{buildroot}%{_sysconfdir}/x3270
 install -m 644 sysconfig		    %{buildroot}/etc/sysconfig/%{name}
 
