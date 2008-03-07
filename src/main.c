@@ -1,5 +1,6 @@
 
  #include "g3270.h"
+ #include "config.h"
  #include <gdk/gdkkeysyms.h>
  #include "lib/hostc.h"
  #include "lib/actionsc.h"
@@ -102,7 +103,7 @@
 
 	if(main_configuration)
 	{
-		snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
+		snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", PROJECT_NAME);
 
 		if(top_window->window)
 		{
@@ -264,7 +265,7 @@
 	if(main_configuration)
 	{
 		// Load configuration
-    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", TARGET);
+    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", PROJECT_NAME);
     	g_key_file_load_from_file(main_configuration,filename,G_KEY_FILE_KEEP_TRANSLATIONS,NULL);
 
     	if(g_key_file_has_key(main_configuration,"MainWindow","size",NULL))
@@ -297,10 +298,10 @@
 #endif
 
 #if GTK == 1
-	gtk_window_set_wmclass(GTK_WINDOW(top_window),"toplevel",TARGET);
+	gtk_window_set_wmclass(GTK_WINDOW(top_window),"toplevel",PROJECT_NAME);
 	#error Is it working?
 #else
-    gtk_window_set_role(GTK_WINDOW(top_window), TARGET "0" );
+    gtk_window_set_role(GTK_WINDOW(top_window), PROJECT_NAME "0" );
 #endif
 
 	g_signal_connect(G_OBJECT(top_window),	"delete_event", 		G_CALLBACK(delete_event),			NULL);
@@ -362,10 +363,10 @@
  int main(int argc, char **argv)
  {
 
-    printf(TARGET " Build " BUILD " for gtk " GTKVERSION "\n");
+    printf(PROJECT_NAME " Build " BUILD "\n");
     fflush(stdout);
 
-    Log(TARGET " Build " BUILD " for gtk " GTKVERSION "\n");
+    Log(PROJECT_NAME " Build " BUILD );
 
     /* Populate callback tables */
     set_3270_screen(&g3270_screen_callbacks);
@@ -415,7 +416,7 @@
 
     if(top_window)
     {
-       strncpy(title,TARGET,511);
+       strncpy(title,PROJECT_NAME,511);
        strncat(title," ",511);
 
        if(ptr)

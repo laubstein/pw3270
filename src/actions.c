@@ -3,6 +3,7 @@
  #include <gdk/gdkkeysyms.h>
 
  #include "g3270.h"
+ #include "config.h"
 
  #include "lib/hostc.h"
  #include "lib/kybdc.h"
@@ -380,7 +381,7 @@
     if(!screen)
        return 0;
 
-    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,TARGET);
+    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,PROJECT_NAME);
     fd = mkstemp(filename);
 
     DBGMessage(filename);
@@ -613,7 +614,7 @@
 							"name",    	"g3270",
 							"authors", 	authors,
 							"license", 	license,
-							"logo",		icon,
+//							"logo",		icon,
 							"comments",	_("3270 Terminal emulator for Gnome/GTK.\nBuild " BUILD),
 #ifdef VERSION
 							"version", 	VERSION,
