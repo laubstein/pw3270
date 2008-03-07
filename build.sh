@@ -69,3 +69,5 @@ fi
 
 mv -f `rpm --eval="%{u2p:%{_srcrpmdir}}"`/$PACKAGE*.src.rpm /tmp
 mv -f $RPMDIR/$RPMARCH/$PACKAGE*.rpm /tmp
+
+make Release
