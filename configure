@@ -15,7 +15,7 @@ tempdir=/tmp
 libdir=/usr/lib
 bindir=/usr/bin
 gtkmodules="gtk+-2.0 gdk-2.0 glib-2.0 gthread-2.0"
-libgnome="libgnome-2.0"
+libgnome="libgnomeui-2.0"
 
 #--[ Check for GTK version ]----------------------------------------------------
 
@@ -100,7 +100,7 @@ echo "	#define DATADIR \"$datadir/$name\"" >> $CONFIG_FILE
 echo "	#define ENABLE_THREADS \"$threads\""  >> $CONFIG_FILE
 echo "	#define LOCALEDIR \"$datadir/locale\""  >> $CONFIG_FILE
 if [ "$EnableGnome" != "0" ]; then
-	echo "	#define GNOME \"`$PKGCONFIG --modversion $libgnome`\""  >> $CONFIG_FILE
+	echo "	#define USE_GNOME \"`$PKGCONFIG --modversion $libgnome`\""  >> $CONFIG_FILE
 fi
 echo "#endif" >> $CONFIG_FILE
 
