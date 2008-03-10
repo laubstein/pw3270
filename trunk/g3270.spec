@@ -55,12 +55,12 @@ mkdir -p %{buildroot}%{_sysconfdir}/x3270
 mkdir -p %{buildroot}/etc/sysconfig
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
 
-install -m 755 bin/lib3270.so	   	%{buildroot}%{_libdir}
-install -m 755 bin/Release/g3270    %{buildroot}%{_datadir}/%{name}
-install -m 644 src/*.jpg		    %{buildroot}%{_datadir}/%{name}
+install -m 755 bin/Release/lib3270.so	   	%{buildroot}%{_libdir}
+install -m 755 bin/Release/g3270	%{buildroot}%{_datadir}/%{name}
+install -m 644 *.jpg				%{buildroot}%{_datadir}/%{name}
 install -m 644 *.conf		    	%{buildroot}%{_datadir}/%{name}
 install -m 644 src/lib/ibm_hosts	%{buildroot}%{_sysconfdir}/x3270
-install -m 644 sysconfig		    %{buildroot}/etc/sysconfig/%{name}
+install -m 644 sysconfig			%{buildroot}/etc/sysconfig/%{name}
 
 install -m 644 src/lib/*.h			%{buildroot}%{_includedir}/%{name}
 install -m 644 src/extension.h		%{buildroot}%{_includedir}/%{name}
