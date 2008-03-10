@@ -41,7 +41,7 @@ cd ../..
 %build
 make Release
 strip bin/Release/g3270
-strip bin/lib3270.so
+strip bin/Release/lib3270.so
 
 %install
 rm -rf $RPM_BUILD_ROOT
