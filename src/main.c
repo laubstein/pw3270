@@ -79,7 +79,7 @@
 
 /*---[ Main program ]---------------------------------------------------------*/
 
- void action_exit(GtkWidget *w, gpointer data)
+ void action_save(GtkWidget *w, gpointer data)
  {
  	char	filename[4096];
  	char	*home	= getenv("HOME");
@@ -163,7 +163,11 @@
 		}
 	}
 #endif
+ }
 
+ void action_exit(GtkWidget *w, gpointer data)
+ {
+ 	action_save(w,data);
  	gtk_main_quit();
  }
 
@@ -361,33 +365,35 @@ static gint save_session (GnomeClient *client, gint phase, GnomeSaveStyle save_s
               gint is_shutdown, GnomeInteractStyle interact_style,
               gint is_fast, gpointer client_data)
 {
-  gchar** argv;
-  guint argc;
+	gchar** argv;
+	guint argc;
 
-  Log("Saving session for %s",(char *) client_data);
+	Log("Saving session for %s",(char *) client_data);
 
-  /* allocate 0-filled, so it will be NULL-terminated */
-  argv = g_malloc0(sizeof(gchar*)*4);
-  argc = 0;
+	action_save(0,0);
 
-  argv[argc++] = client_data;
+	/* allocate 0-filled, so it will be NULL-terminated */
+	argv = g_malloc0(sizeof(gchar*)*4);
+	argc = 0;
 
-  if(cl_hostname)
-  {
-  	argv[argc++] = ((gchar *) cl_hostname);
-  }
+	argv[argc++] = client_data;
 
-  gnome_client_set_clone_command(client, argc, argv);
-  gnome_client_set_restart_command(client, argc, argv);
+	if(cl_hostname)
+	{
+		argv[argc++] = ((gchar *) cl_hostname);
+	}
 
-  return TRUE;
+	gnome_client_set_clone_command(client, argc, argv);
+	gnome_client_set_restart_command(client, argc, argv);
+
+	return TRUE;
 }
 
-static void session_die(GnomeClient* client, gpointer client_data)
+static gint session_die(GnomeClient* client, gpointer client_data)
 {
 	Log("Exiting by gnome's request");
-	action_exit(0,0);
-	Log("Session Die");
+	gtk_exit(0);
+	return FALSE;
 }
 #endif
 
@@ -407,13 +413,6 @@ static void session_die(GnomeClient* client, gpointer client_data)
     CHKPoint();
     set_3270_keyboard(&g3270_keyboard_info);
 
-    g_thread_init(NULL);
-    gdk_threads_init();
-    gtk_init(&argc, &argv);
-
-    MainThread = g_thread_self();
-    DBGPrintf("Main thread: %p",MainThread);
-
 #ifdef USE_GNOME
 
 	gnome_init(PROJECT_NAME, PROJECT_VERSION, argc, argv);
@@ -423,7 +422,19 @@ static void session_die(GnomeClient* client, gpointer client_data)
 	gtk_signal_connect(GTK_OBJECT (client), "save_yourself", GTK_SIGNAL_FUNC(save_session), argv[0]);
 	gtk_signal_connect(GTK_OBJECT (client), "die", GTK_SIGNAL_FUNC(session_die), NULL);
 	DBGMessage("Gnome session setup finished");
+
+#else
+
+	g_thread_init(NULL);
+	gdk_threads_init();
+	gtk_init(&argc, &argv);
+
+
 #endif
+
+
+    MainThread = g_thread_self();
+    DBGPrintf("Main thread: %p",MainThread);
 
     /* Parse 3270 command line */
     parse_3270_command_line(argc, (const char **) argv, &cl_hostname);
