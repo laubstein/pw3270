@@ -34,17 +34,17 @@
  static void SetObjectParameter(GObject *obj, const char *name, const char *string)
  {
 	 DBGPrintf("Allocating \"%s\"",string);
-     g_object_set_data_full(obj,name,g_strdup((char *) string),ReleaseString);	 
+     g_object_set_data_full(obj,name,g_strdup((char *) string),ReleaseString);
  }
 
  static void ProcessDefinition(PARAMETER *prm, GObject * (*proc)(PARAMETER *p, void *data), void *data)
  {
 	 GObject *obj;
-	 
+
 	 if(!prm->item)
 		 return;
 
-	 DBGPrintf("%s=%p",prm->item,prm->action);
+//	 DBGPrintf("%s=%p",prm->item,prm->action);
 
 	 obj = proc(prm,data);
 
@@ -56,7 +56,7 @@
 	 }
 
 	 free(prm->item);
-	 
+
 	 memset(prm,0,sizeof(PARAMETER));
  }
 
@@ -123,7 +123,7 @@
  		{ "script",			Parm		},
  		{ "command",		Parm		},
  		{ "option",			Parm		}
-		
+
  	 };
 
 	 char			buffer[1024];
@@ -162,13 +162,13 @@
 		   ptr = strchr(ln,'=');
 		   if(ptr)
 		   {
-		      DBGMessage(ln);
+//		      DBGMessage(ln);
 		      *ptr++ = 0;
 		      for(f=0;f< (sizeof(cmd)/sizeof(struct _cmd));f++)
 		      {
 			     if(!strcmp(cmd[f].key,ln))
 				 {
-		            DBGPrintf("%s set to %s in (%s)",ln,ptr,parm.item);
+//		            DBGPrintf("%s set to %s in (%s)",ln,ptr,parm.item);
 			        cmd[f].exec(&parm,ptr);
 				 }
 		      }
@@ -182,7 +182,7 @@
  }
 
 #ifdef __GTK_TOOL_ITEM_H__
- 
+
  static GObject *AddToolbar(PARAMETER *p, GtkWidget *toolbar)
  {
 	 GtkToolItem *item = 0;
@@ -202,7 +202,7 @@
 
      if(item)
 		gtk_toolbar_insert(GTK_TOOLBAR(toolbar),GTK_TOOL_ITEM(item),-1);
-	 
+
 	 return G_OBJECT(item);
  }
 #endif
@@ -219,7 +219,7 @@
 	FILE 		*in		 = fopen(filename,"r");
 
 	DBGPrintf("%s: %p",filename,in);
-	 
+
 	if(!in)
 		return 0;
 

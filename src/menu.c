@@ -64,7 +64,7 @@
 
     data->entry.item_type = g_strdup(key);
 
-    DBGPrintf("Type: %s item_type: %s",type,key);
+//    DBGPrintf("Type: %s item_type: %s",type,key);
 
  }
 
@@ -77,7 +77,7 @@
  {
  	if(string)
  	{
- 		DBGPrintf("Releasing \"%s\"",(char *) string);
+// 		DBGPrintf("Releasing \"%s\"",(char *) string);
  		g_free(string);
  	}
  }
@@ -98,7 +98,7 @@
 	   if(!item->entry.callback && item->toggle)
 			Action(item,"toggle");
 
-	   DBGPrintf("%p %s %p %s",(void *) item->entry.callback_action,item->entry.path,item->entry.callback,item->toggle ? "Toggle" : "");
+//	   DBGPrintf("%p %s %p %s",(void *) item->entry.callback_action,item->entry.path,item->entry.callback,item->toggle ? "Toggle" : "");
 
        gtk_item_factory_create_item(	factory,
 										(GtkItemFactoryEntry *) &item->entry,
