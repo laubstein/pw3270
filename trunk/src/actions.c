@@ -29,6 +29,7 @@
  const struct action_callback action_callbacks[] =
  {
 	{ "print",					action_print					},
+	{ "save",					action_save						},
 	{ "toggle",					action_toggle					},
 #ifdef __GTK_ABOUT_DIALOG_H__
 	{ "about",					action_AboutBox					},
