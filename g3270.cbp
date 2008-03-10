@@ -47,6 +47,9 @@
 		<Unit filename="src/colors.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/config.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/config.h" />
 		<Unit filename="src/draw.c">
 			<Option compilerVar="CC" />
@@ -232,6 +235,7 @@
 		<Unit filename="src/screen_callbacks.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/sources.mak" />
 		<Unit filename="src/terminal.c">
 			<Option compilerVar="CC" />
 		</Unit>

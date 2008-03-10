@@ -167,6 +167,7 @@
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 
  void action_save(GtkWidget *w, gpointer data);
+ void action_restore(GtkWidget *w, gpointer data);
 
  void action_crosshair( GtkWidget *w, gpointer data );
  void action_disconnect(GtkWidget *w, gpointer data);
