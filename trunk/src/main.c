@@ -399,6 +399,10 @@ static gint session_die(GnomeClient* client, gpointer client_data)
 
  int main(int argc, char **argv)
  {
+#ifdef USE_GNOME
+	GnomeProgram *program;
+	GOptionContext *context;
+#endif
 
     printf(PROJECT_NAME " Build " BUILD "\n");
     fflush(stdout);
@@ -415,13 +419,24 @@ static gint session_die(GnomeClient* client, gpointer client_data)
 
 #ifdef USE_GNOME
 
-	gnome_init(PROJECT_NAME, PROJECT_VERSION, argc, argv);
+	context = g_option_context_new (_("- 3270 Emulator for Gnome"));
 
+	program = gnome_program_init (	PROJECT_NAME,
+									PROJECT_VERSION,
+									LIBGNOMEUI_MODULE, argc, argv,
+									GNOME_PARAM_GOPTION_CONTEXT, context,
+									GNOME_PARAM_HUMAN_READABLE_NAME,
+									_("3270 Emulator"),
+									NULL
+								);
+
+	CHKPoint();
 	client = gnome_master_client();
 	DBGPrintf("Gnome: %p",client);
-	gtk_signal_connect(GTK_OBJECT (client), "save_yourself", GTK_SIGNAL_FUNC(save_session), argv[0]);
-	gtk_signal_connect(GTK_OBJECT (client), "die", GTK_SIGNAL_FUNC(session_die), NULL);
+	gtk_signal_connect(GTK_OBJECT(client), "save_yourself", GTK_SIGNAL_FUNC(save_session), argv[0]);
+	gtk_signal_connect(GTK_OBJECT(client), "die", GTK_SIGNAL_FUNC(session_die), NULL);
 	DBGMessage("Gnome session setup finished");
+	CHKPoint();
 
 #else
 
@@ -442,7 +457,7 @@ static gint session_die(GnomeClient* client, gpointer client_data)
     if(!cl_hostname)
        cl_hostname = getenv("HOST3270_0");
 
-    DBGMessage(cl_hostname);
+//    DBGMessage(cl_hostname);
     CreateMainWindow(cl_hostname);
 
 	if(terminal)
