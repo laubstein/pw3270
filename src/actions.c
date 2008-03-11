@@ -370,6 +370,7 @@
  	gchar	*screen = CopyTerminalContents(0,0,-1,-1,0);
  	FILE	*arq;
  	int		fd;
+ 	int		rc;
 
     if(!screen)
        return 0;
@@ -393,7 +394,10 @@
           fclose(arq);
 	      snprintf(buffer,1023,cmd,filename);
 	      DBGMessage(buffer);
-          system(buffer);
+          rc = system(buffer);
+          if(rc)
+				Log("System(\"%s\")= %d",buffer,rc);
+
           remove(filename);
        }
  	}

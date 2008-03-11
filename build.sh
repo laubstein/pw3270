@@ -11,7 +11,7 @@ RELEASE=`grep Release g3270.spec | sed 's/ //g' |cut -d: -f2 |cut -d. -f1`
 
 mv *~ /tmp
 
-make -C src clean
+make clean
 
 cd $OLDDIR
 

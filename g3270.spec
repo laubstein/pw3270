@@ -8,7 +8,7 @@ Source:         %{name}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 Requires:       openssl %{name}-lib
-BuildRequires:  openssl-devel sed pkgconfig ncurses-devel
+BuildRequires:  autoconf openssl-devel sed pkgconfig ncurses-devel
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
@@ -33,12 +33,11 @@ devel for tn3270 protocol library for %{name}
 %prep
 
 %setup -q -n %{name}
-./configure
-cd src/lib
+autoconf
 %configure --disable-trace
-cd ../..
 
 %build
+make clean
 make Release
 strip bin/Release/g3270
 strip bin/Release/lib3270.so
