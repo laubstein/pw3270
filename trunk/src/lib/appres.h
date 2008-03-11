@@ -20,6 +20,11 @@
  *		tcl3270.
  */
 
+
+#ifndef APPRES_H_INCLUDE
+
+#define APPRES_H_INCLUDE
+
 /* Toggles */
 
 enum toggle_type { TT_INITIAL, TT_INTERACTIVE, TT_ACTION, TT_FINAL };
@@ -215,3 +220,5 @@ typedef struct {
 } AppRes, *AppResptr;
 
 extern AppRes appres;
+
+#endif // APPRES_H_INCLUDE
