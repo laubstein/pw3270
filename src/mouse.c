@@ -490,8 +490,6 @@
     return 0;
  }
 
- #if GTK == 2
-
  gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
  {
     // FIXME (perry#1#): Read associoation from scroll to function key from configuration file.
@@ -505,8 +503,6 @@
 
  	return 0;
  }
-
-#endif
 
  void LoadMousePointers(GdkDrawable *drawable, GdkGC *gc)
  {
@@ -792,7 +788,7 @@
     if(!screen)
        return 0;
 
-    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,PROJECT_NAME);
+    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,PACKAGE_NAME);
     fd = mkstemp(filename);
 
     DBGMessage(filename);
@@ -827,11 +823,7 @@
 
  void action_exec_with_selection(GtkWidget *w, gpointer data)
  {
-#if GTK == 2
     GThread   *thd = 0;
-#else
-    pthread_t  thd = 0;
-#endif
 
  	if(!selecting)
  	{
@@ -847,11 +839,7 @@
  	   return;
  	}
 
-#if GTK == 2
     thd = g_thread_create( exec_with_selection_thread, (gpointer) data, 0, NULL);
-#else
-    pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_selection_thread, data);
-#endif
 
  }
 

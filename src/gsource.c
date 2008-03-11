@@ -39,8 +39,6 @@
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
-#if GTK == 2
-
   // http://developer.gnome.org/doc/API/2.0/glib/glib-The-Main-Event-Loop.html#GSourceFuncs
   static gboolean prepare_3270(GSource *source, gint *timeout);
   static gboolean check_3270(GSource *source);
@@ -50,37 +48,17 @@
   static gboolean closure_3270(gpointer data);
 //  static void     DummyMarshal_3270(void); /* Really is of type GClosureMarshal */
 
-#else
-
- static gboolean prepare_3270(gpointer  source_data, GTimeVal *current_time, gint *timeout, gpointer  user_data);
- static gboolean check_3270(gpointer  source_data, GTimeVal *current_time, gpointer  user_data);
- static gboolean dispatch_3270(gpointer  source_data, GTimeVal *current_time, gpointer  user_data);
- static void     destroy_3270(gpointer data);
-
-#endif
-
 /*---[ Constants ]------------------------------------------------------------*/
 
  /* 3270 Event Sources */
  static GSourceFuncs Source_3270 =
  {
-#if GTK == 2
-
 	prepare_3270,
 	check_3270,
 	dispatch_3270,
 	finalize_3270,
 	closure_3270,
 	NULL
-
-#else
-
-	prepare_3270,
-	check_3270,
-	dispatch_3270,
-	destroy_3270
-
-#endif
  };
 
 /*---[ Globals ]--------------------------------------------------------------*/
@@ -101,16 +79,8 @@
 
     mutex = g_mutex_new();
 
-#if GTK == 2
-
     fd3270 = g_source_new(&Source_3270,sizeof(SRCDATA));
     g_source_attach(fd3270,NULL);
-
-#else
-
-	#error And what about GTK version 1?
-
-#endif
 
  	return 0;
  }
@@ -250,9 +220,6 @@
 
  }
 
-
-#if GTK == 2
-
   // http://developer.gnome.org/doc/API/2.0/glib/glib-The-Main-Event-Loop.html#GSourceFuncs
 
   static gboolean prepare_3270(GSource *source, gint *timeout)
@@ -374,28 +341,4 @@
     UNLOCK
   	return 0;
   }
-
-#else
-
- static gboolean prepare_3270(gpointer  source_data, GTimeVal *current_time, gint *timeout, gpointer  user_data)
- {
-  	CHKPoint();
- }
-
- static gboolean check_3270(gpointer  source_data, GTimeVal *current_time, gpointer  user_data)
- {
-  	CHKPoint();
- }
-
- static gboolean dispatch_3270(gpointer  source_data, GTimeVal *current_time, gpointer  user_data)
- {
-  	CHKPoint();
- }
-
- static void destroy_3270(gpointer data)
- {
-  	CHKPoint();
- }
-
-#endif
 

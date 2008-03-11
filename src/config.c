@@ -75,7 +75,7 @@
 
 	if(main_configuration)
 	{
-		snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", PROJECT_NAME);
+		snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", PACKAGE_NAME);
 
 		if(top_window->window)
 		{
@@ -154,7 +154,7 @@
 	if(main_configuration)
 	{
 		// Load configuration
-    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", PROJECT_NAME);
+    	snprintf(filename,4095,"%s/.%s.conf",home ? home : ".", PACKAGE_NAME);
     	g_key_file_load_from_file(main_configuration,filename,G_KEY_FILE_KEEP_TRANSLATIONS,NULL);
 
     	if(g_key_file_has_key(main_configuration,"MainWindow","size",NULL))

@@ -327,11 +327,7 @@
 
  void action_connect(GtkWidget *w, gpointer data)
  {
-#if GTK == 2
     GThread   *thd = 0;
-#else
-    pthread_t  thd = 0;
-#endif
 
     if(Get3270CState() != NOT_CONNECTED)
 	{
@@ -348,11 +344,7 @@
 
     SetOIAStatus(STATUS_RESOLVING);
 
-#if GTK == 2
     thd =  g_thread_create( ConnectThread, (gpointer) cl_hostname, 0, NULL);
-#else
-	pthread_create(&thd, NULL, (void * (*)(void *)) ConnectThread, cl_hostname);
-#endif
 
  }
 
@@ -382,7 +374,7 @@
     if(!screen)
        return 0;
 
-    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,PROJECT_NAME);
+    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,PACKAGE_NAME);
     fd = mkstemp(filename);
 
     DBGMessage(filename);
@@ -417,13 +409,8 @@
 
  void action_exec_with_screen(GtkWidget *w, gpointer data)
  {
-#if GTK == 2
     GThread   *thd = 0;
     thd =  g_thread_create( exec_with_screen_thread, (gpointer) data, 0, NULL);
-#else
-    pthread_t  thd = 0;
-    pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_screen_thread, data);
-#endif
  }
 
  static void PrintScreen(GtkWidget *w, gpointer data)

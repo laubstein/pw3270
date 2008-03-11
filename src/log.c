@@ -26,7 +26,7 @@
 
 /*---[ Statics e globais ]----------------------------------------------------------------------------------*/
 
- static char   			logFileName[0x0100]		= PROJECT_NAME "_%u.log";
+ static char   			logFileName[0x0100]		= PACKAGE_NAME "_%u.log";
  static pthread_mutex_t	lock					= PTHREAD_MUTEX_INITIALIZER;
 
 /*---[ Prototipos ]-----------------------------------------------------------------------------------------*/
@@ -102,7 +102,7 @@
 
     if(home)
     {
-       snprintf(dir, 0xFF,"%s/" PROJECT_NAME, home);
+       snprintf(dir, 0xFF,"%s/" PACKAGE_NAME, home);
        ret = CheckFileName(dir);
        if(ret)
           return ret;
@@ -112,7 +112,7 @@
        if(ret)
           return ret;
 
-       snprintf(dir, 0xFF,"%s/." PROJECT_NAME, home);
+       snprintf(dir, 0xFF,"%s/." PACKAGE_NAME, home);
        ret = CheckFileName(dir);
        if(ret)
           return ret;

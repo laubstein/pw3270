@@ -13,10 +13,7 @@
  GtkWidget  *terminal		= 0;
  GtkWidget  *top_menu		= 0;
  GThread    *MainThread     = 0;
-
-#if defined(DATADIR) && GTK == 2
  GdkPixbuf	*icon			= 0;
-#endif
 
 #ifdef USE_GNOME
  GnomeClient *client = 0;
@@ -110,7 +107,7 @@
 	gtk_window_set_wmclass(GTK_WINDOW(top_window),"toplevel",PROJECT_NAME);
 	#error Is it working?
 #else
-    gtk_window_set_role(GTK_WINDOW(top_window), PROJECT_NAME "0" );
+    gtk_window_set_role(GTK_WINDOW(top_window), PACKAGE_NAME "0" );
 #endif
 
 	g_signal_connect(G_OBJECT(top_window),	"delete_event", 		G_CALLBACK(delete_event),			NULL);
@@ -154,12 +151,10 @@
 	terminal = g3270_new(cl_hostname);
 	gtk_box_pack_start(GTK_BOX(vbox),terminal,TRUE,TRUE,0);
 
-#if defined(DATADIR) && GTK == 2
 	DBGPrintf("Program icon: %s",DATADIR "/icon.jpg");
     icon = gdk_pixbuf_new_from_file(DATADIR "/icon.jpg", NULL);
     if(icon)
     	gtk_window_set_icon(GTK_WINDOW(top_window),icon);
-#endif
 
 	if(arq)
 		fclose(arq);
@@ -214,10 +209,10 @@ static gint session_die(GnomeClient* client, gpointer client_data)
 	GOptionContext *context;
 #endif
 
-    printf(PROJECT_NAME " Build " BUILD "\n");
+    printf(PACKAGE_NAME " Build " BUILD "\n");
     fflush(stdout);
 
-    Log(PROJECT_NAME " Build " BUILD );
+    Log(PACKAGE_NAME " Build " BUILD );
 
     /* Populate callback tables */
     CHKPoint();
@@ -231,8 +226,8 @@ static gint session_die(GnomeClient* client, gpointer client_data)
 
 	context = g_option_context_new (_("- 3270 Emulator for Gnome"));
 
-	program = gnome_program_init (	PROJECT_NAME,
-									PROJECT_VERSION,
+	program = gnome_program_init (	PACKAGE_NAME,
+									PACKAGE_VERSION,
 									LIBGNOMEUI_MODULE, argc, argv,
 									GNOME_PARAM_GOPTION_CONTEXT, 		context,
 									GNOME_PARAM_HUMAN_READABLE_NAME,	_("3270 Emulator"),
@@ -296,7 +291,7 @@ static gint session_die(GnomeClient* client, gpointer client_data)
 
     if(top_window)
     {
-       strncpy(title,PROJECT_NAME,511);
+       strncpy(title,PACKAGE_NAME,511);
        strncat(title," ",511);
 
        if(ptr)
