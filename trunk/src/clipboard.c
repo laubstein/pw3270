@@ -402,6 +402,7 @@
  	char			buffer[1024];
  	FILE			*arq;
  	int				fd;
+ 	int				rc;
 
     if(!Clipboard)
        return 0;
@@ -419,7 +420,9 @@
 
 	   snprintf(buffer,1023,cmd,filename);
 	   DBGMessage(buffer);
-       system(buffer);
+       rc = system(buffer);
+       if(!rc)
+			Log("System(\"%s\"): %d",buffer,rc);
        remove(filename);
  	}
  	else

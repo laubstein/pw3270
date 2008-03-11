@@ -12,10 +12,18 @@
 PKGMODULES=gtk+-2.0 gdk-2.0 glib-2.0 gthread-2.0 libgnomeui-2.0
 include src/sources.mak
 
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
 CC = @CC@
 LD = @CC@
-CFLAGS = @CFLAGS@ `@PKGCONFIG@ --cflags $(PKGMODULES)` -DBUILD=\"`date +%G%m%d%H%M`\" -Isrc -Wall
+
+CFLAGS = @CFLAGS@ `@PKGCONFIG@ --cflags $(PKGMODULES)` -DBUILD=\"`date +%G%m%d%H%M`\" \
+		-DDATADIR=\"@datarootdir@/g3270\" \
+		-DLOCALEDIR=\"@localedir@\" -Isrc -Wall
+
 LFLAGS = `@PKGCONFIG@ --libs $(PKGMODULES)` -l3270
+DATADIR = @DATADIR@
 
 DEBUG_OBJECTS=$(foreach SRC, $(basename $(SOURCES)), obj/Debug/src/$(SRC).o)
 RELEASE_OBJECTS=$(foreach SRC, $(basename $(SOURCES)), obj/Release/src/$(SRC).o)
@@ -68,6 +76,7 @@ bin/Release/lib3270.so: src/lib/Makefile src/lib/*.c src/lib/*.h
 	@mv src/lib/lib3270.so $@
 
 clean:
+	@make -C src/lib clean
 	@rm -f  $(DEBUG_OBJECTS)
 	@rm -f	$(RELEASE_OBJECTS)
 	@rm -f	@PACKAGE_TARNAME@.tar.gz

@@ -777,6 +777,7 @@
  	char 	filename[1024];
  	char	buffer[1024];
  	FILE	*arq;
+ 	int		rc;
 
  	if(!cmd)
  	   return 0;
@@ -807,7 +808,9 @@
           fclose(arq);
 	      snprintf(buffer,1023,cmd,filename);
 	      DBGMessage(buffer);
-          system(buffer);
+          rc = system(buffer);
+          if(rc)
+			Log("System(\"%s\"): %d",buffer,rc);
           remove(filename);
        }
  	}

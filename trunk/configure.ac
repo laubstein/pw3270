@@ -23,6 +23,8 @@ dnl Checks for programs.
 AC_PROG_CC
 AC_CHECK_PROG(PKGCONFIG, pkg-config, `which pkg-config`)
 
+dnl Generating library
+AC_CONFIG_SUBDIRS(src/lib)
 
 dnl Generate the Makefile.
 AC_OUTPUT(Makefile $pr3mf)
