@@ -1,0 +1,11 @@
+#ifndef CONFIG_H_INCLUDED
+	#define CONFIG_H_INCLUDED 1
+
+        #undef PACKAGE_NAME
+        #undef PACKAGE_VERSION
+
+	#define DATADIR "/usr/share/g3270"
+	#define LOCALEDIR "/usr/share/locale"
+	#define USE_GNOME
+
+#endif /* CONFIG_H_INCLUDED */
