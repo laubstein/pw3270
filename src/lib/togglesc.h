@@ -23,6 +23,8 @@
  *		Global declarations for toggles.c.
  */
 
+#include "appres.h"
+
 extern void do_toggle(int);
 extern void initialize_toggles(void);
 extern void set_toggle(int ix, Boolean state, enum toggle_type reason);
