@@ -561,10 +561,7 @@
     g_signal_connect(G_OBJECT(ret), "button-press-event",	G_CALLBACK(mouse_button_press),		0);
     g_signal_connect(G_OBJECT(ret), "button-release-event",	G_CALLBACK(mouse_button_release),	0);
     g_signal_connect(G_OBJECT(ret), "motion-notify-event",	G_CALLBACK(mouse_motion),			0);
-
-#if GTK == 2
     g_signal_connect(G_OBJECT(ret), "scroll-event",			G_CALLBACK(mouse_scroll),		0);
-#endif
 
     /* Set default terminal colors */
     for(f=0;f < (sizeof(widget_states)/sizeof(int));f++)

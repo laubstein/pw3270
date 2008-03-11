@@ -30,11 +30,7 @@
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
- #if GTK == 2
-    #define USE_CLIPBOARD
- #else
-    #define USE_SELECTION
- #endif
+ #define USE_CLIPBOARD
 
  #ifdef __GTK_IM_CONTEXT_H__
     #define USE_GTKIMCONTEXT
@@ -86,10 +82,7 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
-#if defined(DATADIR) && GTK == 2
  extern GdkPixbuf	*icon;
-#endif
-
  extern const 	SCREEN_CALLBACK g3270_screen_callbacks;
  extern const 	KEYBOARD_INFO   g3270_keyboard_info;
 

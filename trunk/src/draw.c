@@ -272,7 +272,7 @@
  	int				cols;
  	int				row;
  	int				col;
- 	int				hPos;
+ 	int				hPos	= left;
  	int				vPos;
  	unsigned char	chr[2];
 

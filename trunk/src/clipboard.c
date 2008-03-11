@@ -290,7 +290,7 @@
 
  static void paste_clipboard(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
-    gchar *string;
+//    gchar *string;
     char  *ptr;
 
 #ifdef DUMP_PASTE
@@ -336,7 +336,7 @@
 #else
 
     /* Remove TABS */
-    for(ptr = string;*ptr;ptr++)
+    for(ptr = paste_buffer;*ptr;ptr++)
     {
     	if(*ptr == 0x09)
     	   *ptr = ' ';
@@ -344,6 +344,7 @@
 
     paste_pos = 0;
 	action_paste_next(0,0);
+
 #endif
 
  }
@@ -405,7 +406,7 @@
     if(!Clipboard)
        return 0;
 
-    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,PROJECT_NAME);
+    snprintf(filename,1023,"%s/%s.XXXXXX",TMPPATH,PACKAGE_NAME);
     fd = mkstemp(filename);
 
     DBGMessage(filename);
@@ -430,11 +431,7 @@
 
  void action_exec_with_copy(GtkWidget *w, gpointer data)
  {
-#if GTK == 2
     GThread   *thd = 0;
-#else
-    pthread_t  thd = 0;
-#endif
 
 	if(!Clipboard)
 	{
@@ -452,11 +449,7 @@
 
 	}
 
-#if GTK == 2
     thd =  g_thread_create( exec_with_copy_thread, (gpointer) data, 0, NULL);
-#else
-    pthread_create(&thd, NULL, (void * (*)(void *)) exec_with_copy_thread, data);
-#endif
 
  }
 
