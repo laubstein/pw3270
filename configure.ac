@@ -12,19 +12,46 @@ dnl
 dnl http://www.gnu.org/software/autoconf/manual/autoconf-2.57/html_node/autoconf_toc.html
 dnl
 
-
-dnl Process this file with autoconf to produce a configure script.
+AC_PREREQ(2.60)
 AC_INIT(g3270,3.3.4)
-
-AC_PREREQ(2.50)
 AC_CONFIG_HEADER(src/config.h)
 
-dnl Checks for programs.
+# Checks for programs.
 AC_PROG_CC
-AC_CHECK_PROG(PKGCONFIG, rexx, `which pkg-config`)
+AC_PROG_MAKE_SET
 
-dnl Generating library
-AC_CONFIG_SUBDIRS(src/lib)
+dnl pkg-config
+AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+if test "x$PKG_CONFIG" = "xno"; then
+        AC_MSG_ERROR([You need to install pkg-config])
+fi
 
-dnl Generate the Makefile.
-AC_OUTPUT(Makefile $pr3mf)
+PKG_CHECK_MODULES(GTK, gtk+-2.0 gdk-2.0 glib-2.0 gthread-2.0 libgnomeui-2.0)
+AC_SUBST(GTK_CFLAGS)
+AC_SUBST(GTK_LIBS)
+
+# Checks for libraries.
+
+# Checks for header files.
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS([stdlib.h string.h sys/file.h sys/time.h unistd.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_HEADER_TIME
+
+# Checks for library functions.
+AC_FUNC_CLOSEDIR_VOID
+AC_REPLACE_FNMATCH
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_FUNC_STAT
+AC_FUNC_STRFTIME
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS([memset strchr strdup strerror])
+
+AC_CONFIG_FILES([Makefile])
+AC_CONFIG_SUBDIRS([src/lib])
+AC_OUTPUT
