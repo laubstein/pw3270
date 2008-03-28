@@ -48,32 +48,24 @@ AC_ARG_WITH(readline, [  --without-readline      Don't use the readline library]
 
 dnl Check for --without-pr3287
 AC_ARG_WITH(pr3287,[  --without-pr3287        don't build pr3287])
-if test -d pr3287 -a "$with_pr3287" != "no"  
-then	PR="" 
+if test -d pr3287 -a "$with_pr3287" != "no"
+then	PR=""
 	pr3mf=pr3287/Makefile
 else	PR="#"
 	pr3mf=""
-fi 
+fi
 AC_SUBST(PR)
 
 dnl Check for libraries.
 dnl Note that the order here is important.  The last libraries should appear
 dnl first, so that objects in them can be used by subsequent libraries.
 AC_CHECK_LIB(util, forkpty)
-AC_CHECK_LIB(ncurses, newterm, , [AC_CHECK_LIB(curses, newterm, , [AC_MSG_ERROR(Can't find libncurses or new-enough libcurses)])])
+
 if test "$with_readline" != no; then
 AC_CHECK_LIB(readline, rl_initialize)
 fi
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(socket, socket)
-
-dnl If we're on AIX and have ncurses, cancel BROKEN_NEWTERM.
-if test -n "$BROKEN_NEWTERM"
-then	if test $ac_cv_lib_ncurses_newterm = yes
-	then	:
-	else	AC_DEFINE(BROKEN_NEWTERM,1)
-	fi
-fi
 
 dnl Checks for header files.
 dnl AC_HEADER_STDC
@@ -85,12 +77,6 @@ AC_CHECK_HEADERS(pty.h)
 AC_CHECK_HEADERS(libutil.h)
 AC_CHECK_HEADERS(util.h)
 AC_CHECK_HEADERS(getopt.h)
-AC_CHECK_HEADERS(ncurses.h, , [AC_CHECK_HEADERS(curses.h, , [AC_MSG_ERROR(Can't find ncurses.h or curses.h)])])
-
-dnl Check for libncurses/ncurses.h inconsistency
-if test $ac_cv_lib_ncurses_newterm != $ac_cv_header_ncurses_h
-then	AC_MSG_ERROR(Found libncurses but not ncurses.h or vice-versa)
-fi
 
 dnl Check for SSL header file.
 AC_ARG_WITH(ssl,[  --with-ssl=DIR          specify OpenSSL install directory])
