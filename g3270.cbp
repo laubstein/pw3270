@@ -64,6 +64,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/lib/3270ds.h" />
+		<Unit filename="src/lib/Makefile.in" />
 		<Unit filename="src/lib/X11/keysym.h" />
 		<Unit filename="src/lib/XtGlue.c">
 			<Option compilerVar="CC" />
@@ -95,6 +96,7 @@
 		</Unit>
 		<Unit filename="src/lib/childc.h" />
 		<Unit filename="src/lib/conf.h" />
+		<Unit filename="src/lib/configure.in" />
 		<Unit filename="src/lib/ctlr.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -9,12 +9,12 @@
 # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.  See the file LICENSE for more details.
 
-# Makefile for c3270 (console-based 3270 emulator)
+# Makefile for lib3270
 
 RM = rm -f
 CC = @CC@
 
-all:: c3270 x3270if
+all:: lib3270.so
 
 SRCS = actions.c ansi.c apl.c c3270.c charset.c child.c ctlr.c \
 	ft.c ft_cut.c ft_dft.c glue.c help.c host.c idle.c keymap.c kybd.c \
@@ -57,9 +57,6 @@ fallbacks.c: mkfb X3270.xad
 	$(RM) $@
 	./mkfb -c X3270.xad $@
 
-c3270: $(OBJS1)
-	$(CC) -o $@ $(OBJS1) $(LDFLAGS) $(LIBS)
-
 lib3270.so: $(OBJS1)
 	$(CC) -shared $(LIBS) -Wl,-soname,$(@F) -o $@ $^
 
@@ -79,11 +76,6 @@ x3270if: x3270if.o
 @CNV@$(IDP)_ibm-1385_P100-1997.cnv: ibm-1385_P100-1997.ucm
 @CNV@	makeconv -d . -p $(IDP) ibm-1385_P100-1997.ucm
 
-install:: c3270 x3270if
-	[ -d $(DESTDIR)$(BINDIR) ] || \
-		mkdir -p $(DESTDIR)$(BINDIR)
-	$(INSTALL_PROGRAM) c3270 $(DESTDIR)$(BINDIR)/c3270
-	$(INSTALL_PROGRAM) x3270if $(DESTDIR)$(BINDIR)/x3270if
 install::
 	[ -d $(DESTDIR)$(LIBX3270DIR) ] || \
 		mkdir -p $(DESTDIR)$(LIBX3270DIR)
