@@ -37,6 +37,7 @@
 			<Add option="`pkg-config gtk+-2.0 --libs`" />
 		</Linker>
 		<Unit filename="Makefile.in" />
+		<Unit filename="aclocal.m4" />
 		<Unit filename="configure.ac" />
 		<Unit filename="g3270.spec" />
 		<Unit filename="src/actions.c">
