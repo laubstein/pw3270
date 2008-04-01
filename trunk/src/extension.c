@@ -1,3 +1,28 @@
+/*
+* Copyright 2008, Banco do Brasil S.A.
+*
+* This file is part of g3270
+*
+* This program file is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation; version 3 of the License.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program in a file named COPYING; if not, write to the
+* Free Software Foundation, Inc.,
+* 51 Franklin Street, Fifth Floor,
+* Boston, MA 02110-1301 USA
+*
+* Authors:
+*
+* Perry Werneck<perry.werneck@gmail.com>
+*
+*/
 
 #include <sys/types.h>
 #include <dirent.h>
@@ -37,17 +62,17 @@
 	}
 
 	closedir(hDir);
-    return 0;	
+    return 0;
  }
 
  void UnloadExtensions(void)
  {
 	 while(first)
 	    CloseExtension(first);
-	 
+
 	 CHKPoint();
  }
- 
+
  EXTENSION *OpenExtension(const char *path)
  {
 	 EXTENSION		*rc;
@@ -62,13 +87,13 @@
 	 }
 
 	 rc = malloc(sizeof(EXTENSION));
-	 
+
 	 if(!rc)
 		 return rc;
-   	 
+
      memset(rc,0,sizeof(EXTENSION));
 	 rc->handle = handle;
-	 
+
 	 if(!first)
 	 {
 		 first = last = rc;
@@ -84,7 +109,7 @@
 		 WriteLog("Opening \"%s\": rc=%d",path,i);
 	 else
 		 WriteLog("Extension \"%s\" loaded.",path);
-	 
+
 	 return rc;
  }
 
@@ -94,14 +119,14 @@
 		 ext->up->down = ext->down;
 	 else
 		 first = ext->down;
-	 
+
 	 if(ext->down)
 		 ext->down->up = ext->up;
 	 else
 		 last = ext->down;
 
 	 DBGPrintf("Removendo %p (first: %p last: %p)",ext,first,last);
-	 
+
 	 if(ext->handle)
 	 {
          CallExtension(ext,"g3270CloseExtension",0);
@@ -109,23 +134,23 @@
 		 dlclose(ext->handle);
 		 CHKPoint();
 	 }
-	 
+
 	 CHKPoint();
-	 
+
 	 free(ext);
 
 	 CHKPoint();
-	 
+
 	 return 0;
  }
- 
+
  int CallExtension(EXTENSION *ext, const char *function, GtkWidget *widget)
  {
 	 int (*call)(GtkWidget *) = 0;
-	 
+
 	 if(!widget)
 		 widget = top_window;
-	 
+
 	 if(ext->handle)
 	 {
 	    call = dlsym(ext->handle,function);
@@ -134,7 +159,7 @@
 	 }
 	 return 0;
  }
- 
+
  void SetExtensionsChar(const char *function, const char *parameter)
  {
     void 		(*call)(GtkWidget *, const char *) = 0;
@@ -145,17 +170,17 @@
        call = dlsym(ext->handle,function);
 	   if(call)
 		   call(top_window,parameter);
-       ext = ext->down;		
-    }		
+       ext = ext->down;
+    }
  }
- 
+
  GtkItemFactoryCallback QueryActionCallback(const char *name)
  {
 	GtkItemFactoryCallback	call;
     char 					function[512];
-	 
+
 	snprintf(function,511,"g3270_action_%s",name);
-	 
+
     EXTENSION	*ext = first;
 
     while(ext)
@@ -163,8 +188,8 @@
        call = dlsym(ext->handle,function);
 	   if(call)
 		   return call;
-       ext = ext->down;		
-    }		
-	 
+       ext = ext->down;
+    }
+
 	return 0;
  }
