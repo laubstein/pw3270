@@ -40,6 +40,7 @@
 		<Unit filename="aclocal.m4" />
 		<Unit filename="configure.ac" />
 		<Unit filename="g3270.spec" />
+		<Unit filename="license.txt" />
 		<Unit filename="src/actions.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -52,7 +53,6 @@
 		<Unit filename="src/config.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/config.h" />
 		<Unit filename="src/draw.c">
 			<Option compilerVar="CC" />
 		</Unit>

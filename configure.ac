@@ -1,15 +1,24 @@
-dnl Copyright 2008 By Perry Werneck
-dnl  Permission to use, copy, modify, and distribute this software and its
-dnl  documentation for any purpose and without fee is hereby granted,
-dnl  provided that the above copyright notice appear in all copies and that
-dnl  both that copyright notice and this permission notice appear in
-dnl  supporting documentation.
+dnl Copyright 2008, Banco do Brasil S.A.
 dnl
-dnl MusicCenter is distributed in the hope that it will be useful, but WITHOUT ANY
-dnl WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-dnl FOR A PARTICULAR PURPOSE.  See the file LICENSE for more details.
+dnl This file is part of g3270
+dnl This program file is free software; you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by the
+dnl Free Software Foundation; version 3 of the License.
 dnl
-dnl http://www.gnu.org/software/autoconf/manual/autoconf-2.57/html_node/autoconf_toc.html
+dnl This program is distributed in the hope that it will be useful, but WITHOUT
+dnl ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+dnl FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+dnl for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with this program in a file named COPYING; if not, write to the
+dnl Free Software Foundation, Inc.,
+dnl 51 Franklin Street, Fifth Floor,
+dnl Boston, MA 02110-1301 USA
+dnl
+dnl Authors:
+dnl
+dnl Perry Werneck<perry.werneck@gmail.com>
 dnl
 
 AC_PREREQ(2.60)
