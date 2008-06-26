@@ -69,17 +69,22 @@ Error(const char *s)
 void
 Warning(const char *s)
 {
-#if defined(C3270) /*[*/
+/*
+#if defined(C3270)
+// TODO (perry#2#): Solve this! How to inform the main program of any error message?
 	extern Boolean any_error_output;
-#endif /*]*/
+#endif
+*/
 
 	if (Warning_redirect != NULL)
 		(*Warning_redirect)(s);
 	else
 		fprintf(stderr, "Warning: %s\n", s);
-#if defined(C3270) /*[*/
+/*
+#if defined(C3270)
 	any_error_output = True;
-#endif /*]*/
+#endif
+*/
 }
 
 void *

@@ -18,8 +18,8 @@
  */
 
 /* glue.c */
-extern int parse_command_line(int argc, const char **argv,
-    const char **cl_hostname);
+extern int parse_command_line(int argc, const char **argv, const char **cl_hostname);
+extern int parse_program_parameters(int argc, const char **argv);
 extern void parse_xrm(const char *arg, const char *where);
 /* extern Boolean process_events(Boolean block); */
 

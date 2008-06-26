@@ -83,7 +83,7 @@ static unsigned long	c3270_AddTimeOut(unsigned long interval_ms, void (*proc)(vo
 static void 			c3270_RemoveTimeOut(unsigned long timer);
 
 static void interact(void);
-static void stop_pager(void);
+// static void stop_pager(void);
 static Boolean process_events(Boolean block);
 
 #if defined(HAVE_LIBREADLINE) /*[*/
@@ -92,7 +92,7 @@ static char *completion_entry(const char *, int);
 #endif /*]*/
 
 /* Pager state. */
-static FILE *pager = NULL;
+// static FILE *pager = NULL;
 
 #if !defined(_WIN32) /*[*/
 /* Base keymap. */
@@ -241,43 +241,6 @@ static const struct lib3270_callbacks callbacks =
 
 };
 
-#if defined(_WIN32) /*[*/
-char *instdir = NULL;
-char myappdata[MAX_PATH];
-#endif /*]*/
-
-void
-usage(char *msg)
-{
-	if (msg != CN)
-		Warning(msg);
-	xs_error("Usage: %s [options] [ps:][LUname@]hostname[:port]",
-		programname);
-}
-
-#if defined(_WIN32) /*[*/
-/*
- * Figure out the install directory and our data directory.
- */
-static void
-save_dirs(char *argv0)
-{
-    	char *bsl;
-
-	/* Extract the installation directory from argv[0]. */
-	bsl = strrchr(argv0, '\\');
-	if (bsl != NULL) {
-	    	instdir = NewString(argv0);
-		instdir[(bsl - argv0) + 1] = '\0';
-	} else
-	    	instdir = "";
-
-	/* Figure out the application data directory. */
-	if (get_dirs(NULL, myappdata) < 0)
-	    	x3270_exit(1);
-}
-#endif /*]*/
-
 /* Callback for connection state changes. */
 static void
 main_connect(Boolean ignored)
@@ -296,10 +259,10 @@ main_connect(Boolean ignored)
 static void
 main_exiting(Boolean ignored)
 {
-	if (escaped)
-		stop_pager();
-	else
+	if (!escaped)
 		screen_suspend();
+//	else
+//		stop_pager();
 }
 
 /* Make sure error messages are seen. */
@@ -332,10 +295,8 @@ main(int argc, char *argv[])
 {
 	const char	*cl_hostname = CN;
 
-#if defined(_WIN32) /*[*/
-	(void) get_version_info();
-	(void) save_dirs(argv[0]);
-#endif /*]*/
+	if(parse_program_parameters(argc, (const char **)argv))
+		return -1;
 
 	printf("%s\n\n"
 		"Copyright 1989-2008 by Paul Mattes, GTRC and others.\n"
@@ -508,7 +469,7 @@ static void
 interact(void)
 {
 	/* In case we got here because a command output, stop the pager. */
-	stop_pager();
+//	stop_pager();
 
 	trace_event("Interacting.\n");
 	if (appres.secure) {
@@ -618,7 +579,7 @@ interact(void)
 		}
 
 		/* Close the pager. */
-		stop_pager();
+//		stop_pager();
 
 #if defined(HAVE_LIBREADLINE) /*[*/
 		/* Give back readline's buffer. */
@@ -638,10 +599,11 @@ interact(void)
 }
 
 /* A command is about to produce output.  Start the pager. */
+/*
 FILE *
 start_pager(void)
 {
-#if !defined(_WIN32) /*[*/
+#if !defined(_WIN32)
 	static char *lesspath = LESSPATH;
 	static char *lesscmd = LESSPATH " -EX";
 	static char *morepath = MOREPATH;
@@ -671,12 +633,13 @@ start_pager(void)
 	if (pager == NULL)
 		pager = stdout;
 	return pager;
-#else /*][*/
+#else
 	return stdout;
-#endif /*]*/
+#endif
 }
-
+*/
 /* Stop the pager. */
+/*
 static void
 stop_pager(void)
 {
@@ -686,6 +649,7 @@ stop_pager(void)
 		pager = NULL;
 	}
 }
+*/
 
 #if defined(HAVE_LIBREADLINE) /*[*/
 
@@ -825,6 +789,7 @@ completion_entry(const char *text, int state)
 /* c3270-specific actions. */
 
 /* Return a time difference in English */
+/*
 static char *
 hms(time_t ts)
 {
@@ -865,11 +830,11 @@ static void
 status_dump(void)
 {
 	const char *emode, *ftype, *ts;
-#if defined(X3270_TN3270E) /*[*/
+#if defined(X3270_TN3270E)
 	const char *eopts;
-#endif /*]*/
+#endif
 	const char *ptype;
-	extern int linemode; /* XXX */
+	extern int linemode;
 	extern time_t ns_time;
 	extern int ns_bsent, ns_rsent, ns_brcvd, ns_rrcvd;
 
@@ -886,35 +851,35 @@ status_dump(void)
 		action_output("%s %s", get_message("luName"), connected_lu);
 	action_output("%s %s (%s)", get_message("characterSet"),
 	    get_charset_name(),
-#if defined(X3270_DBCS) /*[*/
+#if defined(X3270_DBCS)
 	    dbcs? "DBCS": "SBCS"
-#else /*][*/
+#else
 	    "SBCS"
-#endif /*]*/
+#endif
 	    );
 	action_output("%s %ld/%ld (CGCSGID X'%08lX')",
 		get_message("hostCodePage"),
 		cgcsgid & 0xffff,
 		(cgcsgid >> 16) & 0xffff,
 		cgcsgid);
-#if !defined(_WIN32) /*[*/
+#if !defined(_WIN32)
 	action_output("%s %s", get_message("localeCodeset"), locale_codeset);
 	action_output("%s DBCS %s, UTF-8 (wide curses) %s",
 		get_message("buildOpts"),
-#if defined(X3270_DBCS) /*[*/
+#if defined(X3270_DBCS)
 		get_message("buildEnabled"),
-#else /*][*/
+#else
 		get_message("buildDisabled"),
-#endif /*]*/
-#if defined(CURSES_WIDE) /*[*/
+#endif
+#if defined(CURSES_WIDE)
 		get_message("buildEnabled")
-#else /*][*/
+#else
 		get_message("buildDisabled")
-#endif /*]*/
+#endif
 		);
-#else /*][*/
+#else
 	action_output("%s %d", get_message("windowsCodePage"), windows_cp);
-#endif /*]*/
+#endif
 	if (appres.key_map) {
 		action_output("%s %s", get_message("keyboardMap"),
 		    appres.key_map);
@@ -922,22 +887,22 @@ status_dump(void)
 	if (CONNECTED) {
 		action_output("%s %s",
 		    get_message("connectedTo"),
-#if defined(LOCAL_PROCESS) /*[*/
+#if defined(LOCAL_PROCESS)
 		    (local_process && !strlen(current_host))? "(shell)":
-#endif /*]*/
+#endif
 			current_host);
-#if defined(LOCAL_PROCESS) /*[*/
+#if defined(LOCAL_PROCESS)
 		if (!local_process) {
-#endif /*]*/
+#endif
 			action_output("  %s %d", get_message("port"),
 			    current_port);
-#if defined(LOCAL_PROCESS) /*[*/
+#if defined(LOCAL_PROCESS)
 		}
-#endif /*]*/
-#if defined(HAVE_LIBSSL) /*[*/
+#endif
+#if defined(HAVE_LIBSSL)
 		if (secure_connection)
 			action_output("  %s", get_message("secure"));
-#endif /*]*/
+#endif
 		ptype = net_proxy_type();
 		if (ptype) {
 		    	action_output("  %s %s  %s %s  %s %s",
@@ -965,7 +930,7 @@ status_dump(void)
 		} else
 			action_output("  %s", ts);
 
-#if defined(X3270_TN3270E) /*[*/
+#if defined(X3270_TN3270E)
 		eopts = tn3270e_current_opts();
 		if (eopts != CN) {
 			action_output("  %s %s", get_message("tn3270eOpts"),
@@ -973,7 +938,7 @@ status_dump(void)
 		} else if (IN_E) {
 			action_output("  %s", get_message("tn3270eNoOpts"));
 		}
-#endif /*]*/
+#endif
 
 		if (IN_3270)
 			action_output("%s %d %s, %d %s\n%s %d %s, %d %s",
@@ -996,7 +961,7 @@ status_dump(void)
 			    ns_brcvd, (ns_brcvd == 1) ?
 				get_message("byte") : get_message("bytes"));
 
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 		if (IN_ANSI) {
 			struct ctl_char *c = net_linemode_chars();
 			int i;
@@ -1018,7 +983,7 @@ status_dump(void)
 				action_output("%s", buf);
 			}
 		}
-#endif /*]*/
+#endif
 	} else if (HALF_CONNECTED) {
 		action_output("%s %s", get_message("connectionPending"),
 		    current_host);
@@ -1047,11 +1012,11 @@ copyright_dump(void)
 	action_output("  notice.");
 	action_output(" ");
 	action_output(
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 	"wc3270"
-#else /*][*/
+#else
 	"c3270"
-#endif /*]*/
+#endif
 	" is distributed in the hope that it will be useful, but WITHOUT ANY");
 	action_output("WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS");
 	action_output("FOR A PARTICULAR PURPOSE.  See the file LICENSE for more details.");
@@ -1081,8 +1046,7 @@ Show_action(Widget w unused, XEvent *event unused, String *params,
 		popup_an_error("Unknown 'Show' keyword");
 }
 
-#if defined(X3270_TRACE) /*[*/
-/* Trace([data|keyboard][on[filename]|off]) */
+#if defined(X3270_TRACE)
 void
 Trace_action(Widget w unused, XEvent *event unused, String *params,
     Cardinal *num_params)
@@ -1148,17 +1112,8 @@ Trace_action(Widget w unused, XEvent *event unused, String *params,
 		do_toggle(tg);
 	}
 }
-#endif /*]*/
-
-/* Break to the command prompt. */
-void
-Escape_action(Widget w unused, XEvent *event unused, String *params unused,
-    Cardinal *num_params unused)
-{
-	action_debug(Escape_action, event, params, num_params);
-	if (!appres.secure)
-		screen_suspend();
-}
+#endif
+*/
 
 #if !defined(_WIN32) /*[*/
 

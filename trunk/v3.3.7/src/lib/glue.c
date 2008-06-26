@@ -56,6 +56,7 @@
 
 #if defined(_WIN32) /*[*/
 #include "winversc.h"
+#include "windirsc.h"
 #endif /*]*/
 
 extern void usage(char *);
@@ -71,7 +72,7 @@ extern void usage(char *);
 
 #if defined(C3270) /*[*/
 extern void merge_profile(void); /* XXX */
-extern Boolean any_error_output;
+// extern Boolean any_error_output;
 #endif /*]*/
 
 /* Statics */
@@ -134,9 +135,50 @@ struct toggle_name toggle_names[N_TOGGLES] = {
 #endif /*]*/
 };
 
-
-int
-parse_command_line(int argc, const char **argv, const char **cl_hostname)
+#if defined(_WIN32) /*[*/
+/*
+ * Figure out the install directory and our data directory.
+ */
+
+char *instdir = NULL;
+char myappdata[MAX_PATH];
+
+static int save_dirs(const char *argv0)
+{
+	char *bsl;
+
+	/* Extract the installation directory from argv[0]. */
+	bsl = strrchr(argv0, '\\');
+	if (bsl != NULL) {
+	instdir = NewString(argv0);
+	instdir[(bsl - argv0) + 1] = '\0';
+	} else
+	instdir = "";
+
+	/* Figure out the application data directory. */
+	if (get_dirs(NULL, myappdata) < 0)
+		return -1;
+
+	return 0;
+}
+#endif /*]*/
+
+int parse_program_parameters(int argc, const char **argv)
+{
+	int rc = 0;
+
+#if defined(_WIN32) /*[*/
+	(void) get_version_info();
+
+	rc = save_dirs(argv[0]);
+	if(rc)
+		return rc;
+#endif /*]*/
+
+	return rc;
+}
+
+int parse_command_line(int argc, const char **argv, const char **cl_hostname)
 {
 	int cl, i;
 	int ovc, ovr;
@@ -170,10 +212,10 @@ parse_command_line(int argc, const char **argv, const char **cl_hostname)
 		(void) strcat(strcat(command_string, " "), argv[i]);
 	}
 
-#if defined(LOCAL_PROCESS) /*[*/ 
+#if defined(LOCAL_PROCESS) /*[*/
         /* Pick out the -e option. */
         parse_local_process(&argc, argv, cl_hostname);
-#endif /*]*/    
+#endif /*]*/
 
 	/* Parse command-line options. */
 	parse_options(&argc, argv);
@@ -1184,7 +1226,7 @@ popup_an_error(const char *fmt, ...)
 	} else {
 #if defined(C3270) || defined(WC3270) /*[*/
 		screen_suspend();
-		any_error_output = True;
+//		any_error_output = True;
 #endif /*]*/
 		(void) fprintf(stderr, "%s\n", vmsgbuf);
 		macro_output = True;
@@ -1226,14 +1268,22 @@ action_output(const char *fmt, ...)
 
 #if defined(C3270) || defined(WC3270) /*[*/
 		screen_suspend();
-		aout = start_pager();
-		any_error_output = True;
+//		aout = start_pager(); // TODO (perry#1#): Implement a callback to browse the text string.
+//		any_error_output = True;
 #else /*][*/
 		aout = stdout;
 #endif /*]*/
 		(void) fprintf(aout, "%s\n", vmsgbuf);
 		macro_output = True;
 	}
+}
+
+void usage(char *msg)
+{
+	if (msg != CN)
+		Warning(msg);
+
+	xs_error("Usage: %s [options] [ps:][LUname@]hostname[:port]",programname);
 }
 
 #if defined(_WIN32) /*[*/
