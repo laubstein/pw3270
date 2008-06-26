@@ -34,7 +34,7 @@ rpq_timestamp=`date +%Y%m%d%H%M%S`
 cat <<EOF >version.c
 char *build = "${2-x3270} v$version $builddate $user";
 char *app_defaults_version = "$adversion";
-static char sccsid[] = "@(#)${2-x3270} v$version $sccsdate $user";
+char *sccsid = "@(#)${2-x3270} v$version $sccsdate $user";
 
 const char *build_rpq_timestamp = "$rpq_timestamp";
 const char *build_rpq_version = "$version";
