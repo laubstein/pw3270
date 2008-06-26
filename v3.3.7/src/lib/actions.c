@@ -62,7 +62,7 @@ static struct {
         const char *name[MAX_MODS_PER];
         unsigned int mask;
 	Boolean is_meta;
-} skeymask[MAP_SIZE] = { 
+} skeymask[MAP_SIZE] = {
 	{ { "Shift" }, ShiftMask, False },
 	{ { (char *)NULL } /* Lock */, LockMask, False },
 	{ { "Ctrl" }, ControlMask, False },
@@ -844,3 +844,23 @@ action_internal(XtActionProc action, enum iaction cause, const char *parm1,
 		break;
 	}
 }
+
+/* Break to the command prompt. */
+void Escape_action(Widget w unused, XEvent *event unused, String *params unused, Cardinal *num_params unused)
+{
+	action_debug(Escape_action, event, params, num_params);
+	if (!appres.secure)
+		screen_suspend();
+}
+
+
+void Show_action(Widget w unused, XEvent *event unused, String *params, Cardinal *num_params)
+{
+	// TODO (perry#1#): How to implement the same action as did in c3270?
+}
+
+void Trace_action(Widget w unused, XEvent *event unused, String *params, Cardinal *num_params)
+{
+	// TODO (perry#1#): How to implement the same action as did in c3270?
+}
+

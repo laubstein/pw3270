@@ -55,6 +55,10 @@ Release:
 src/lib/fallbacks.c:  src/lib/X3270.xad
 	@make -C src/lib fallbacks.c
 
+src/version.c:	src/lib/*.c src/lib/mkversion.sh $(GLOBAL_DEPENDS)
+	@src/lib/mkversion.sh
+
 clean:
 	@rm -fr obj
 	@rm -f	src/lib/fallbacks.c
+	@rm -f	src/lib/version.o
