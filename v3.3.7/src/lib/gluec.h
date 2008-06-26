@@ -21,7 +21,7 @@
 extern int parse_command_line(int argc, const char **argv,
     const char **cl_hostname);
 extern void parse_xrm(const char *arg, const char *where);
-extern Boolean process_events(Boolean block);
+/* extern Boolean process_events(Boolean block); */
 
 /* XtGlue.c */
 extern void (*Warning_redirect)(const char *);
