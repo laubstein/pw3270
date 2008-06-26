@@ -74,9 +74,6 @@
 		<Unit filename="src/lib/ctlr.h" />
 		<Unit filename="src/lib/ctlrc.h" />
 		<Unit filename="src/lib/dialogc.h" />
-		<Unit filename="src/lib/fallbacks.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/lib/ft.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -132,6 +129,7 @@
 		<Unit filename="src/lib/mkshort.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/lib/mkversion.sh" />
 		<Unit filename="src/lib/objects.h" />
 		<Unit filename="src/lib/popupsc.h" />
 		<Unit filename="src/lib/print.c">

@@ -36,15 +36,11 @@ LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 # Rules
 GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h
 
+# Debug Rules
 obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
-
-obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
-	@echo $< ...
-	@mkdir -p `dirname $@`
-	@$(CC) -DNDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
 
 obj/Debug/lib3270.$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).$(OBJEXT))
 	@echo $@ ...
@@ -55,6 +51,18 @@ obj/Debug/version.o: src/version.c
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
+
+# Release rules
+obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
+
+obj/Release/version.o: src/version.c
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
+
 
 # Targets
 Debug:
