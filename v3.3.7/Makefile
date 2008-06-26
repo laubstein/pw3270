@@ -41,11 +41,15 @@ obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
 
-obj/Debug/lib3270.$(DLLEXT): obj/Debug/version.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).$(OBJEXT))
+obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) -DNDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
+
+obj/Debug/lib3270.$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).$(OBJEXT))
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) $(DLLFLAGS) -o $@ $^ -lws2_32
-
 
 obj/Debug/version.o: src/version.c
 	@echo $< ...
@@ -60,7 +64,7 @@ Release:
 src/lib/fallbacks.c:  src/lib/X3270.xad
 	@make -C src/lib fallbacks.c
 
-src/version.c:	src/lib/*.c src/mkversion.sh $(GLOBAL_DEPENDS)
+src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@src/mkversion.sh
 
 clean:
