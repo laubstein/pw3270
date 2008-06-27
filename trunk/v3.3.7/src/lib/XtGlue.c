@@ -51,7 +51,7 @@
 
 void (*Warning_redirect)(const char *) = NULL;
 
-static const struct lib3270_callbacks *callbacks = NULL;
+static const struct lib3270_io_callbacks *callbacks = NULL;
 
 /*---[ Implement ]------------------------------------------------------------------------------------------*/
 
@@ -429,12 +429,12 @@ void RemoveInput(unsigned long id)
 		callbacks->RemoveInput(id);
 }
 
-int Register3270Callbacks(const struct lib3270_callbacks *cbk)
+int Register3270Callbacks(const struct lib3270_io_callbacks *cbk)
 {
 	if(!cbk)
 		return EINVAL;
 
-	if(cbk->sz != sizeof(struct lib3270_callbacks))
+	if(cbk->sz != sizeof(struct lib3270_io_callbacks))
 		return EINVAL;
 
 	callbacks = cbk;

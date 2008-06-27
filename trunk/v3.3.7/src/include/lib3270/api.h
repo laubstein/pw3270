@@ -28,7 +28,7 @@
 
 		#define LIB3270_H_INCLUDED "2.0"
 
-		struct lib3270_callbacks
+		struct lib3270_io_callbacks
 		{
 			unsigned short sz;
 
@@ -47,7 +47,7 @@
 
 		};
 
-		int Register3270Callbacks(const struct lib3270_callbacks *cbk);
+		int Register3270Callbacks(const struct lib3270_io_callbacks *cbk);
 
 
 #endif // LIB3270_H_INCLUDED
