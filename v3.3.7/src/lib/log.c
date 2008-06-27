@@ -24,6 +24,7 @@
 *
 */
 
+#include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <errno.h>
@@ -45,7 +46,9 @@
  static FILE *prefix(const char *module)
  {
     FILE *out = fopen("g3270.log","a");
-	writetime(out,module);
+    char *ptr = strchr(module,'/');
+
+	writetime(out,ptr ? ptr+1 : module);
 	return out;
  }
 

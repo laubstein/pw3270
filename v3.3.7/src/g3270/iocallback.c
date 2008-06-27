@@ -179,7 +179,6 @@ static gboolean IO_prepare(GSource *source, gint *timeout)
 	 * returned which were >= 0.
 	 *
 	 */
-
 	return 0;
 }
 

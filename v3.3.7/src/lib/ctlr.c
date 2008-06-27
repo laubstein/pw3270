@@ -70,7 +70,7 @@ struct ea      *ea_buf;		/* 3270 device buffer */
 				/* ea_buf[-1] is the dummy default field
 				   attribute */
 Boolean         formatted = False;	/* set in screen_disp */
-Boolean         screen_changed = False;
+Boolean         screen_need_refresh = False;
 int             first_changed = -1;
 int             last_changed = -1;
 unsigned char   reply_mode = SF_SRM_FIELD;
@@ -113,13 +113,15 @@ static unsigned char	code_table[64] = {
 #define IsBlank(c)	((c == EBC_null) || (c == EBC_space))
 
 #define ALL_CHANGED	{ \
-	screen_changed = True; \
+	screen_changed(0,ROWS*COLS); \
 	if (IN_ANSI) { first_changed = 0; last_changed = ROWS*COLS; } }
+
 #define REGION_CHANGED(f, l)	{ \
-	screen_changed = True; \
+	screen_changed(f,l); \
 	if (IN_ANSI) { \
 	    if (first_changed == -1 || f < first_changed) first_changed = f; \
 	    if (last_changed == -1 || l > last_changed) last_changed = l; } }
+
 #define ONE_CHANGED(n)	REGION_CHANGED(n, n+1)
 
 #define DECODE_BADDR(c1, c2) \
@@ -188,12 +190,12 @@ set_rows_cols(int mn, int ovc, int ovr)
 	switch (mn) {
 	case 2:
 		maxCOLS = 80;
-		maxROWS = 24; 
+		maxROWS = 24;
 		model_num = 2;
 		break;
 	case 3:
 		maxCOLS = 80;
-		maxROWS = 32; 
+		maxROWS = 32;
 		model_num = 3;
 		break;
 	case 4:
@@ -205,7 +207,7 @@ set_rows_cols(int mn, int ovc, int ovr)
 		}
 #endif /*]*/
 		maxCOLS = 80;
-		maxROWS = 43; 
+		maxROWS = 43;
 		model_num = 4;
 		break;
 	case 5:
@@ -217,7 +219,7 @@ set_rows_cols(int mn, int ovc, int ovr)
 		}
 #endif /*]*/
 		maxCOLS = 132;
-		maxROWS = 27; 
+		maxROWS = 27;
 		model_num = 5;
 		break;
 	default:
@@ -338,8 +340,8 @@ find_field_attribute(int baddr)
 	if (!formatted)
 		return -1;
 
-	sbaddr = baddr;    
-	do {   
+	sbaddr = baddr;
+	do {
 		if (ea_buf[baddr].fa)
 			return baddr;
 		DEC_BA(baddr);
@@ -2373,7 +2375,7 @@ ctlr_add(int baddr, unsigned char c, unsigned char cs)
 	}
 }
 
-/* 
+/*
  * Set a field attribute in the 3270 buffer.
  */
 void
@@ -2389,7 +2391,7 @@ ctlr_add_fa(int baddr, unsigned char fa, unsigned char cs)
 	ea_buf[baddr].fa = FA_PRINTABLE | (fa & FA_MASK);
 }
 
-/* 
+/*
  * Change the character set for a field in the 3270 buffer.
  */
 void
@@ -2562,7 +2564,7 @@ ctlr_scroll(void)
 
 	/* Synchronize pending changes prior to this. */
 	obscured = screen_obscured();
-	if (!obscured && screen_changed)
+	if (!obscured && screen_has_changes)
 		screen_disp(False);
 
 	/* Move ea_buf. */

@@ -69,8 +69,16 @@
 		{
 			unsigned short sz;
 
-			void (*set_display_charset)(char *dcs);
-			void (*screen_title)(char *text);
+			void (*init)(int rows, int cols);
+			void (*charset)(char *dcs);
+			void (*title)(char *text);
+			void (*changed)(int bstart, int bend);
+			void (*ring_bell)(void);
+			void (*redraw)(void);
+			void (*refresh)(void);
+			void (*suspend)(void);
+			void (*resume)(void);
+
 
 		};
 

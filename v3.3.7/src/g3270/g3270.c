@@ -342,6 +342,7 @@ main(int argc, char *argv[])
 		appres.once = False;
 //		interact();
 	}
+
 	screen_resume();
 	screen_disp(False);
 	peer_script_init();
