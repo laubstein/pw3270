@@ -93,7 +93,7 @@ bin/Debug/c3270.$(BINEXT): bin/Debug/lib3270.$(DLLEXT) $(foreach SRC, $(basename
 bin/Debug/g3270.$(BINEXT): bin/Debug/lib3270.$(DLLEXT) $(foreach SRC, $(basename $(G3270_SRCS)), obj/Debug/src/g3270/$(SRC).$(OBJEXT))
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) -o $@ $^ -lws2_32
+	@$(CC) -o $@ $^ `pkg-config --libs $(GTK_MODULES)` -lws2_32
 
 
 bin/Debug/lib3270.$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).$(OBJEXT))

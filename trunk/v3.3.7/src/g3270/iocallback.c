@@ -24,6 +24,12 @@
  *		http://library.gnome.org/devel/glib/unstable/glib-The-Main-Event-Loop.html
  */
 
+#if defined(_WIN32) /*[*/
+#include <windows.h>
+#include "winversc.h"
+#include "windirsc.h"
+#endif /*]*/
+
 #include <glib.h>
 #include "g3270.h"
 
@@ -141,7 +147,7 @@ static unsigned long g3270_AddTimeOut(unsigned long interval, void (*proc)(void)
 	t->remove = 0;
 	t->fn = proc;
 
-	g_timeout_add_full(G_PRIORITY_DEFAULT, (guint) interval, (GSourceFunc) do_timer, 0, g_free);
+	g_timeout_add_full(G_PRIORITY_DEFAULT, (guint) interval, (GSourceFunc) do_timer, t, g_free);
 
 	return (unsigned long) t;
 }
@@ -179,7 +185,10 @@ static gboolean IO_check(GSource *source)
 	 * function was called, so the source should be checked again here.
 	 *
 	 */
+	if(WaitForSingleObject((HANDLE) ((IO_Source *) source)->source,0) == WAIT_OBJECT_0)
+		return TRUE;
 
+	return FALSE;
 }
 
 static gboolean IO_dispatch(GSource *source, GSourceFunc callback, gpointer user_data)
@@ -193,7 +202,8 @@ static gboolean IO_dispatch(GSource *source, GSourceFunc callback, gpointer user
 	 * should call the callback function with user_data and whatever additional
 	 * parameters are needed for this type of event source.
 	 */
-
+	((IO_Source *) source)->fn();
+	return TRUE;
 }
 
 static void IO_finalize(GSource *source)
