@@ -69,7 +69,6 @@
 #endif /*]*/
 
 #include <glib.h>
-#include <gtk/gtk.h>
 
 #include "g3270.h"
 
@@ -265,6 +264,9 @@ main(int argc, char *argv[])
 		fprintf(stderr,"Can't register into lib3270 callback table\n");
 		return -1;
 	}
+
+	if(CreateTopWindow())
+		return -1;
 
 	add_resource("keymap.base",
 #if defined(_WIN32) /*[*/

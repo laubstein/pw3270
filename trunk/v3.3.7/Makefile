@@ -29,7 +29,7 @@ GTK_MODULES = glib-2.0 gtk+-2.0 gthread-2.0
 
 # Sources
 C3270_SRCS =	c3270.c iocallback.c
-G3270_SRCS =	g3270.c iocallback.c
+G3270_SRCS =	g3270.c iocallback.c topwindow.c
 LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 				ft.c ft_cut.c ft_dft.c glue.c help.c host.c icmd.c idle.c kybd.c \
 				macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
