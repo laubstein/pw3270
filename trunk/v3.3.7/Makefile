@@ -116,3 +116,5 @@ clean:
 	@rm -fr bin
 	@rm -f	src/lib/fallbacks.c
 	@rm -f	src/lib/version.o
+	@rm -f	src/lib/mkfb.exe
+	@rm -f	src/version.c
