@@ -34,7 +34,7 @@ LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 				ft.c ft_cut.c ft_dft.c glue.c help.c host.c icmd.c idle.c kybd.c \
 				macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
 				sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
-				xio.c keymap.c w3misc.c winvers.c windirs.c resolver.c
+				xio.c keymap.c w3misc.c winvers.c windirs.c resolver.c log.c
 
 
 # Main Targets
