@@ -34,6 +34,26 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="Makefile" />
+		<Unit filename="src/c3270/c3270.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/c3270/c3270.h" />
+		<Unit filename="src/c3270/iocallback.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/c3270/screen.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/g3270/g3270.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/g3270/g3270.h" />
+		<Unit filename="src/g3270/iocallback.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/g3270/screen.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/include/globals.h" />
 		<Unit filename="src/include/lib3270/api.h" />
 		<Unit filename="src/lib/3270ds.h" />
@@ -55,9 +75,6 @@
 		<Unit filename="src/lib/aplc.h" />
 		<Unit filename="src/lib/appres.h" />
 		<Unit filename="src/lib/arpa_telnet.h" />
-		<Unit filename="src/lib/c3270.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/lib/catf.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -129,7 +146,6 @@
 		<Unit filename="src/lib/mkshort.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/lib/mkversion.sh" />
 		<Unit filename="src/lib/objects.h" />
 		<Unit filename="src/lib/popupsc.h" />
 		<Unit filename="src/lib/print.c">
