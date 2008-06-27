@@ -28,6 +28,21 @@
 
 		#define LIB3270_H_INCLUDED "2.0"
 
+		/* Debug & log */
+		#ifdef DEBUG
+			#define Trace( fmt, ... )		WriteLog("TRACE", "%s(%d):\t" fmt "\n", __FILE__, __LINE__, __VA_ARGS__ )
+		#else
+			#define Trace( fmt, ... )	/* __VA_ARGS__ */
+			#warning "So compilar como debug"
+		#endif
+
+		int WriteLog(const char *module, const char *fmt, ...);
+		int WriteRCLog(const char *module, int rc, const char *fmt, ...);
+
+
+		#define Log(fmt, ...)		WriteLog("MSG",fmt,__VA_ARGS__)
+
+		/* I/O processing */
 		struct lib3270_io_callbacks
 		{
 			unsigned short sz;
@@ -49,6 +64,7 @@
 
 		int Register3270Callbacks(const struct lib3270_io_callbacks *cbk);
 
+		/* Screen processing */
 		struct lib3270_screen_callbacks
 		{
 			unsigned short sz;

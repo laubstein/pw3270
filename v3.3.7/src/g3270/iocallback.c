@@ -109,13 +109,14 @@ static unsigned long g3270_AddInput(int source, void (*fn)(void))
 	g_source_attach((GSource *) src,NULL);
 	g_source_add_poll((GSource *) src,&src->poll);
 
-	fprintf(stderr,"Added source %08x\n",source);fflush(stderr);
+	Trace("Input %08x added in %p",source,src);
 
 	return (unsigned long) src;
 }
 
 static void g3270_RemoveInput(unsigned long id)
 {
+	Trace("Input %p Removed",(void *) id);
 	g_source_destroy((GSource *) id);
 }
 
@@ -152,11 +153,14 @@ static unsigned long g3270_AddTimeOut(unsigned long interval, void (*proc)(void)
 
 	g_timeout_add_full(G_PRIORITY_DEFAULT, (guint) interval, (GSourceFunc) do_timer, t, g_free);
 
+	Trace("Timer with %ld ms created with id %p",t);
+
 	return (unsigned long) t;
 }
 
 static void g3270_RemoveTimeOut(unsigned long timer)
 {
+	Trace("Removing timer %p",((TIMER *) timer));
 	((TIMER *) timer)->remove++;
 }
 

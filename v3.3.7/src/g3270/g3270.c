@@ -327,6 +327,8 @@ main(int argc, char *argv[])
 		if (host_connect(cl_hostname) < 0)
 			x3270_exit(1);
 		/* Wait for negotiations to complete or fail. */
+		Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);
+
 		while (!IN_ANSI && !IN_3270) {
 			g_main_context_iteration(NULL,TRUE);
 			if (!PCONNECTED)
@@ -345,7 +347,9 @@ main(int argc, char *argv[])
 	peer_script_init();
 
 	/* Process events forever. */
+	Trace("Entering %s main loop","GTK");
 	gtk_main();
+	Trace("%s main loop has finished","GTK");
 
 /*
 	while (1) {
