@@ -102,8 +102,10 @@ dresolve_host_and_port(const char *host, char *portname, unsigned short *pport,
 	hints.ai_protocol = IPPROTO_TCP;
 	rc = getaddrinfo(host, portname, &hints, &res);
 	if (rc != 0) {
-		snprintf(errmsg, em_len, "%s/%s: %s", host, portname,
-				gai_strerror(rc));
+
+		// FIXME (perry#1#): Correct this: What's wrong with gai_strerror?
+		// snprintf(errmsg, em_len, "%s/%s: %s", host, portname, gai_strerror(rc));
+		snprintf(errmsg, em_len, "%s/%s: %d", host, portname, rc);
 		return -2;
 	}
 	switch (res->ai_family) {
