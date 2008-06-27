@@ -19,56 +19,16 @@
  */
 
 /*
- *	c3270.h
- *		c3270 external functions
+ *	g3270.h
+ *		g3270 external functions
  */
 
-#include "globals.h"
-#if !defined(_WIN32) /*[*/
-#include <sys/wait.h>
-#include <signal.h>
-#endif /*]*/
-#include <errno.h>
-#include "appres.h"
-#include "3270ds.h"
-#include "resources.h"
+#ifndef G3270_H_INCLUDED
 
-#include "actionsc.h"
-#include "ansic.h"
-#include "charsetc.h"
-#include "ctlrc.h"
-#include "ftc.h"
-#include "gluec.h"
-#include "hostc.h"
-#include "idlec.h"
-#include "keymapc.h"
-#include "kybdc.h"
-#include "macrosc.h"
-#include "popupsc.h"
-#include "printerc.h"
-#include "screenc.h"
-#include "telnetc.h"
-#include "togglesc.h"
-#include "trace_dsc.h"
-#include "utf8c.h"
-#include "utilc.h"
-#include "xioc.h"
+	#define G3270_H_INCLUDED
 
-#if defined(HAVE_LIBREADLINE) /*[*/
-#include <readline/readline.h>
-#if defined(HAVE_READLINE_HISTORY_H) /*[*/
-#include <readline/history.h>
-#endif /*]*/
-#endif /*]*/
+	#include <lib3270/api.h>
 
-#if defined(_WIN32) /*[*/
-#include <windows.h>
-#include "winversc.h"
-#include "windirsc.h"
-#endif /*]*/
+	extern const struct lib3270_io_callbacks g3270_io_callbacks;
 
-#include <lib3270/api.h>
-
-extern const struct lib3270_io_callbacks c3270_callbacks;
-
-Boolean process_events(Boolean block);
+#endif // G3270_H_INCLUDED
