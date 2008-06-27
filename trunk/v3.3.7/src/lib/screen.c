@@ -37,13 +37,13 @@
 #include "w3miscc.h"
 #include "widec.h"
 #include "xioc.h"
+#include "screen.h"
 #include <lib3270/api.h>
 
 #include <windows.h>
 #include <wincon.h>
 #include "winversc.h"
 
-extern int screen_changed;
 extern char *profile_name;
 
 static struct lib3270_screen_callbacks *callbacks = NULL;
@@ -128,6 +128,7 @@ static int defattr = 0;
 static unsigned long input_id;
 
 Boolean escaped = True;
+Boolean screen_has_changes = FALSE;
 
 enum ts { TS_AUTO, TS_ON, TS_OFF };
 enum ts ab_mode = TS_AUTO;
@@ -313,8 +314,8 @@ set_display_charset(char *dcs)
 	int want_cp = 0;
 
 
-	if(callbacks && callbacks->set_display_charset)
-		callbacks->set_display_charset(dcs);
+	if(callbacks && callbacks->charset)
+		callbacks->charset(dcs);
 
 	windows_cp = GetConsoleCP();
 
@@ -722,6 +723,9 @@ refresh(void)
 {
 	COORD coord;
 
+	if(callbacks && callbacks->refresh)
+		callbacks->refresh();
+
 	/*
 	 * Draw the differences between 'onscreen' and 'toscreen' into
 	 * sbuf.
@@ -786,6 +790,9 @@ screen_init(void)
 	int want_ov_rows = ov_rows;
 	int want_ov_cols = ov_cols;
 	Boolean oversize = False;
+
+	if(callbacks && callbacks->init)
+		callbacks->init(ov_rows,ov_cols);
 
 	/* Disallow altscreen/defscreen. */
 	if ((appres.altscreen != CN) || (appres.defscreen != CN)) {
@@ -1179,7 +1186,7 @@ screen_disp(Boolean erasing unused)
 	if (escaped)
 		return;
 
-	if (!screen_changed) {
+	if (!screen_has_changes) {
 
 		/* Draw the status line. */
 		if (status_row) {
@@ -1304,7 +1311,7 @@ screen_disp(Boolean erasing unused)
 		move(cursor_addr / cCOLS, cursor_addr % cCOLS);
 	refresh();
 
-	screen_changed = FALSE;
+	screen_has_changes = FALSE;
 }
 
 static const char *
@@ -1647,6 +1654,9 @@ screen_suspend(void)
 {
 	static Boolean need_to_scroll = False;
 
+	if(callbacks && callbacks->suspend)
+		callbacks->suspend();
+
 	if (!escaped) {
 		escaped = True;
 		endwin();
@@ -1663,6 +1673,9 @@ void
 screen_resume(void)
 {
 	escaped = False;
+
+	if(callbacks && callbacks->resume)
+		callbacks->resume();
 
 	screen_disp(False);
 	refresh();
@@ -1888,20 +1901,23 @@ draw_oia(void)
 	    "%03d/%03d", cursor_addr/cCOLS + 1, cursor_addr%cCOLS + 1);
 }
 
-void
-Redraw_action(Widget w unused, XEvent *event unused, String *params unused,
-    Cardinal *num_params unused)
+void Redraw_action(Widget w unused, XEvent *event unused, String *params unused, Cardinal *num_params unused)
 {
-	if (!escaped) {
+	if (!escaped)
+	{
 		endwin();
 		refresh();
 	}
+
+	if(callbacks && callbacks->redraw)
+		callbacks->redraw();
+
 }
 
-void
-ring_bell(void)
+void ring_bell(void)
 {
-	/*Beep(750, 300);*/
+	if(callbacks && callbacks->ring_bell)
+		callbacks->ring_bell();
 }
 
 void
@@ -2177,8 +2193,8 @@ Paste_action(Widget w unused, XEvent *event, String *params,
 void
 screen_title(char *text)
 {
-	if(callbacks && callbacks->screen_title)
-		callbacks->screen_title(text);
+	if(callbacks && callbacks->title)
+		callbacks->title(text);
 
 	if(text)
 		(void) SetConsoleTitle(text);
@@ -2214,4 +2230,11 @@ relabel(Boolean ignored unused)
 	} else {
 	    	screen_title(0);
 	}
+}
+
+void screen_changed(int bstart, int bend)
+{
+	screen_has_changes = TRUE;
+	if(callbacks && callbacks->changed)
+		callbacks->changed(bstart,bend);
 }

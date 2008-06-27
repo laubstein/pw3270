@@ -16,3 +16,7 @@
 
 #define SELECTED(baddr)	False
 extern int *char_width, *char_height;
+extern Boolean screen_has_changes;
+
+void screen_changed(int bstart, int bend);
+
