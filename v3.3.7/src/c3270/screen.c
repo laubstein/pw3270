@@ -37,7 +37,6 @@
 #include "w3miscc.h"
 #include "widec.h"
 #include "xioc.h"
-#include <lib3270/api.h>
 
 #include <windows.h>
 #include <wincon.h>
@@ -45,8 +44,6 @@
 
 extern int screen_changed;
 extern char *profile_name;
-
-static struct lib3270_screen_callbacks *callbacks = NULL;
 
 #define MAX_COLORS	16
 static int cmap_fg[MAX_COLORS] = {
@@ -311,10 +308,6 @@ set_display_charset(char *dcs)
 	char *s;
 	char *cs;
 	int want_cp = 0;
-
-
-	if(callbacks && callbacks->set_display_charset)
-		callbacks->set_display_charset(dcs);
 
 	windows_cp = GetConsoleCP();
 
@@ -1768,7 +1761,7 @@ status_typeahead(Boolean on)
 	status_ta = on;
 }
 
-void
+void    
 status_compose(Boolean on, unsigned char c, enum keytype keytype)
 {
         oia_compose = on;
@@ -1802,7 +1795,7 @@ status_connect(Boolean connected)
 		oia_boxsolid = False;
 		status_msg = "X Disconnected";
 		status_secure = False;
-	}
+	}       
 }
 
 static void
@@ -2159,41 +2152,34 @@ Paste_action(Widget w unused, XEvent *event, String *params,
 	    	return;
 
     	if (!IsClipboardFormatAvailable(CF_TEXT))
-		return;
+		return; 
 	if (!OpenClipboard(NULL))
 		return;
 	hglb = GetClipboardData(CF_TEXT);
 	if (hglb != NULL) {
 		lptstr = GlobalLock(hglb);
-		if (lptstr != NULL) {
+		if (lptstr != NULL) { 
 			emulate_input(lptstr, strlen(lptstr), True);
-			GlobalUnlock(hglb);
+			GlobalUnlock(hglb); 
 		}
 	}
-	CloseClipboard();
+	CloseClipboard(); 
 }
 
 /* Set the window title. */
 void
 screen_title(char *text)
 {
-	if(callbacks && callbacks->screen_title)
-		callbacks->screen_title(text);
-
-	if(text)
-		(void) SetConsoleTitle(text);
-	else
-		(void) SetConsoleTitle("wc3270");
+	(void) SetConsoleTitle(text);
 }
 
 void
 Title_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
-	action_debug(Title_action, event, params, num_params);
-
+    	action_debug(Title_action, event, params, num_params);
 	if (check_usage(Title_action, *num_params, 1, 1) < 0)
-		return;
+	    	return;
 
 	screen_title(params[0]);
 }
@@ -2201,17 +2187,24 @@ Title_action(Widget w unused, XEvent *event, String *params,
 static void
 relabel(Boolean ignored unused)
 {
+	char *title;
+
 	if (appres.title != CN)
 	    	return;
 
 	if (PCONNECTED) {
+	    	char *hostname;
 
 		if (profile_name != CN)
-			screen_title(profile_name);
+		    	hostname = profile_name;
 		else
-			screen_title(reconnect_host);
+		    	hostname = reconnect_host;
 
+		title = Malloc(10 + (PCONNECTED ? strlen(hostname) : 0));
+	    	(void) sprintf(title, "%s - wc3270", hostname);
+		screen_title(title);
+		Free(title);
 	} else {
-	    	screen_title(0);
+	    	screen_title("wc3270");
 	}
 }

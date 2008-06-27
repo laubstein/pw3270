@@ -49,5 +49,14 @@
 
 		int Register3270Callbacks(const struct lib3270_io_callbacks *cbk);
 
+		struct lib3270_screen_callbacks
+		{
+			unsigned short sz;
+
+			void (*set_display_charset)(char *dcs);
+			void (*screen_title)(char *text);
+
+		};
+
 
 #endif // LIB3270_H_INCLUDED
