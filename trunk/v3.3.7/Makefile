@@ -12,6 +12,7 @@ MKFB = mkfb
 CC = mingw32-gcc
 NATIVECC = gcc
 WINDRES = mingw32-windres
+PKG_CONFIG_PATH=/home/perry/mingw/lib/pkgconfig
 else
 MKFB = mkfb.exe
 CC = gcc
@@ -23,15 +24,23 @@ XCPPFLAGS = -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500
 CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall -Werror $(XCPPFLAGS) -Isrc/include $(SSLCPP)
 DLLFLAGS = $(EXTRA_FLAGS) -mno-cygwin -shared -Wl,--export-all-symbols -Wl,--enable-auto-import
 
+#
+GTK_MODULES = glib-2.0 gtk+-2.0
 
 # Sources
 C3270_SRCS =	c3270.c iocallback.c
+G3270_SRCS =	g3270.c iocallback.c
 LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 				ft.c ft_cut.c ft_dft.c glue.c help.c host.c icmd.c idle.c kybd.c \
 				macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
 				sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
 				xio.c keymap.c w3misc.c winvers.c windirs.c resolver.c
 
+
+# Main Targets
+Debug: bin/Debug/g3270.$(BINEXT)
+
+Release:
 
 
 # Rules
@@ -47,6 +56,11 @@ obj/Debug/src/c3270/%.o: src/c3270/%.c src/c3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
+
+obj/Debug/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) -DDEBUG=1 $(CFLAGS) `pkg-config --cflags $(GTK_MODULES)` -Isrc/lib -ggdb -o $@ -c $<
 
 obj/Debug/version.o: src/version.c
 	@echo $< ...
@@ -70,16 +84,17 @@ obj/Release/src/lib/w3n46.o: src/lib/resolver.c
 	$(CC) $(CFLAGS) -Isrc/lib -DW3N46 -c -o $@ $^
 
 
-# Main Targets
-Debug: bin/Debug/c3270.$(BINEXT)
-
-Release:
-
 # Debug Targets
 bin/Debug/c3270.$(BINEXT): bin/Debug/lib3270.$(DLLEXT) $(foreach SRC, $(basename $(C3270_SRCS)), obj/Debug/src/c3270/$(SRC).$(OBJEXT))
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) -o $@ $^ -lws2_32
+
+bin/Debug/g3270.$(BINEXT): bin/Debug/lib3270.$(DLLEXT) $(foreach SRC, $(basename $(G3270_SRCS)), obj/Debug/src/g3270/$(SRC).$(OBJEXT))
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) -o $@ $^ -lws2_32
+
 
 bin/Debug/lib3270.$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).$(OBJEXT))
 	@echo $@ ...

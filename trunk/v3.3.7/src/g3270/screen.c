@@ -1635,31 +1635,13 @@ kybd_input2(INPUT_RECORD *ir)
 	trace_event(" dropped (no default)\n");
 }
 
-void
-screen_suspend(void)
+void screen_suspend(void)
 {
-	static Boolean need_to_scroll = False;
-
-	if (!escaped) {
-		escaped = True;
-		endwin();
-
-		if (need_to_scroll)
-			printf("\n");
-		else
-			need_to_scroll = True;
-		RemoveInput(input_id);
-	}
 }
 
-void
-screen_resume(void)
+void screen_resume(void)
 {
-	escaped = False;
 
-	screen_disp(False);
-	refresh();
-	input_id = AddInput((int)chandle, kybd_input);
 }
 
 void
@@ -1761,7 +1743,7 @@ status_typeahead(Boolean on)
 	status_ta = on;
 }
 
-void    
+void
 status_compose(Boolean on, unsigned char c, enum keytype keytype)
 {
         oia_compose = on;
@@ -1795,7 +1777,7 @@ status_connect(Boolean connected)
 		oia_boxsolid = False;
 		status_msg = "X Disconnected";
 		status_secure = False;
-	}       
+	}
 }
 
 static void
@@ -2152,18 +2134,18 @@ Paste_action(Widget w unused, XEvent *event, String *params,
 	    	return;
 
     	if (!IsClipboardFormatAvailable(CF_TEXT))
-		return; 
+		return;
 	if (!OpenClipboard(NULL))
 		return;
 	hglb = GetClipboardData(CF_TEXT);
 	if (hglb != NULL) {
 		lptstr = GlobalLock(hglb);
-		if (lptstr != NULL) { 
+		if (lptstr != NULL) {
 			emulate_input(lptstr, strlen(lptstr), True);
-			GlobalUnlock(hglb); 
+			GlobalUnlock(hglb);
 		}
 	}
-	CloseClipboard(); 
+	CloseClipboard();
 }
 
 /* Set the window title. */
