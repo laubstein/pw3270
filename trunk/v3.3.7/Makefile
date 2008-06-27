@@ -25,7 +25,7 @@ CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall -Werror $(XCPPFLAGS) -Isrc/include 
 DLLFLAGS = $(EXTRA_FLAGS) -mno-cygwin -shared -Wl,--export-all-symbols -Wl,--enable-auto-import
 
 #
-GTK_MODULES = glib-2.0 gtk+-2.0
+GTK_MODULES = glib-2.0 gtk+-2.0 gthread-2.0
 
 # Sources
 C3270_SRCS =	c3270.c iocallback.c
@@ -38,7 +38,7 @@ LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 
 
 # Main Targets
-Debug: bin/Debug/g3270.$(BINEXT)
+Debug: bin/Debug/g3270.$(BINEXT) bin/Debug/c3270.$(BINEXT) bin/Debug/w3n46.dll
 
 Release:
 
