@@ -30,6 +30,7 @@
 #include "windirsc.h"
 #endif /*]*/
 
+#include <stdio.h>
 #include <glib.h>
 #include "g3270.h"
 
@@ -66,7 +67,7 @@ typedef struct _timer
 	void (*fn)(void);
 } TIMER;
 
-const struct lib3270_io_callbacks g3270_callbacks =
+const struct lib3270_io_callbacks g3270_io_callbacks =
 {
 	sizeof(struct lib3270_io_callbacks),
 
@@ -107,6 +108,8 @@ static unsigned long g3270_AddInput(int source, void (*fn)(void))
 
 	g_source_attach((GSource *) src,NULL);
 	g_source_add_poll((GSource *) src,&src->poll);
+
+	fprintf(stderr,"Added source %08x\n",source);fflush(stderr);
 
 	return (unsigned long) src;
 }
