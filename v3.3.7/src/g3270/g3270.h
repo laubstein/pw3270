@@ -27,8 +27,16 @@
 
 	#define G3270_H_INCLUDED
 
+	#include <gtk/gtk.h>
 	#include <lib3270/api.h>
 
+	extern GtkWidget *topwindow;
+
 	extern const struct lib3270_io_callbacks g3270_io_callbacks;
+
+
+	int CreateTopWindow(void);
+	int CreateTerminalWindow(GtkWidget *box);
+
 
 #endif // G3270_H_INCLUDED
