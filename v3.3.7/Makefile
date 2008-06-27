@@ -25,7 +25,7 @@ DLLFLAGS = $(EXTRA_FLAGS) -mno-cygwin -shared -Wl,--export-all-symbols -Wl,--ena
 
 
 # Sources
-C3270_SRCS =	c3270.c
+C3270_SRCS =	c3270.c iocallback.c
 LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 				ft.c ft_cut.c ft_dft.c glue.c help.c host.c icmd.c idle.c kybd.c \
 				macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
@@ -43,6 +43,11 @@ obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
 
+obj/Debug/src/c3270/%.o: src/c3270/%.c src/c3270/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
+
 obj/Debug/version.o: src/version.c
 	@echo $< ...
 	@mkdir -p `dirname $@`
@@ -52,12 +57,12 @@ obj/Debug/version.o: src/version.c
 obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
+	@$(CC) $(CFLAGS) -Isrc/lib -o $@ -c $<
 
 obj/Release/version.o: src/version.c
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
+	@$(CC) $(CFLAGS) -Isrc/lib -o $@ -c $<
 
 obj/Release/src/lib/w3n46.o: src/lib/resolver.c
 	@echo $@ ...
@@ -71,7 +76,7 @@ Debug: bin/Debug/c3270.$(BINEXT)
 Release:
 
 # Debug Targets
-bin/Debug/c3270.$(BINEXT): bin/Debug/lib3270.$(DLLEXT) $(foreach SRC, $(basename $(C3270_SRCS)), obj/Debug/src/lib/$(SRC).$(OBJEXT))
+bin/Debug/c3270.$(BINEXT): bin/Debug/lib3270.$(DLLEXT) $(foreach SRC, $(basename $(C3270_SRCS)), obj/Debug/src/c3270/$(SRC).$(OBJEXT))
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) -o $@ $^ -lws2_32
