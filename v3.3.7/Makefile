@@ -3,6 +3,7 @@
 CROSS=1
 OBJEXT=o
 DLLEXT=dll
+BINEXT=exe
 
 # Set command paths and mkfb (which has to run locally) based on whether
 # compiling natively on Cygwin, or cross-compiling on Linux.
@@ -42,11 +43,6 @@ obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
 
-obj/Debug/lib3270.$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).$(OBJEXT))
-	@echo $@ ...
-	@mkdir -p `dirname $@`
-	@$(CC) $(DLLFLAGS) -o $@ $^ -lws2_32
-
 obj/Debug/version.o: src/version.c
 	@echo $< ...
 	@mkdir -p `dirname $@`
@@ -63,12 +59,32 @@ obj/Release/version.o: src/version.c
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
 
+obj/Release/src/lib/w3n46.o: src/lib/resolver.c
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	$(CC) $(CFLAGS) -Isrc/lib -DW3N46 -c -o $@ $^
 
-# Targets
-Debug:
+
+# Main Targets
+Debug: bin/Debug/c3270.$(BINEXT)
 
 Release:
 
+# Debug Targets
+bin/Debug/c3270.$(BINEXT): bin/Debug/lib3270.$(DLLEXT) $(foreach SRC, $(basename $(C3270_SRCS)), obj/Debug/src/lib/$(SRC).$(OBJEXT))
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) -o $@ $^ -lws2_32
+
+bin/Debug/lib3270.$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).$(OBJEXT))
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DLLFLAGS) -o $@ $^ -lws2_32
+
+bin/Debug/w3n46.dll: obj/Release/src/lib/w3n46.o
+	@$(CC) $(DLLFLAGS) -o $@ $^ -lws2_32
+
+# Other targets
 src/lib/fallbacks.c:  src/lib/X3270.xad
 	@make -C src/lib fallbacks.c
 
@@ -77,5 +93,6 @@ src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 
 clean:
 	@rm -fr obj
+	@rm -fr bin
 	@rm -f	src/lib/fallbacks.c
 	@rm -f	src/lib/version.o
