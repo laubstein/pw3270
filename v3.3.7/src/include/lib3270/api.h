@@ -71,7 +71,7 @@
 
 			void (*init)(void);
 			void (*setsize)(int rows, int cols);
-			void (*addch)(int row, int col, int c, int attr);
+			void (*addch)(int row, int col, int c, unsigned short attr);
 			void (*charset)(char *dcs);
 			void (*title)(char *text);
 			void (*changed)(int bstart, int bend);

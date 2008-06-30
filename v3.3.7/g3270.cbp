@@ -44,6 +44,9 @@
 		<Unit filename="src/c3270/screen.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/g3270/actions.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/g3270/g3270.c">
 			<Option compilerVar="CC" />
 		</Unit>

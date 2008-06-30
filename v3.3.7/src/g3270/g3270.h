@@ -43,6 +43,7 @@
 	int			CreateTopWindow(void);
 	GtkWidget 	*CreateTerminalWindow(void);
 	int 		DrawScreen(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
+	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 
 
 #endif // G3270_H_INCLUDED

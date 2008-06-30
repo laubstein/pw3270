@@ -360,6 +360,8 @@ main(int argc, char *argv[])
 	/* Process events forever. */
 	Trace("Entering %s main loop","GTK");
 	gtk_widget_show_all(topwindow);
+	gtk_widget_grab_focus(terminal);
+	gtk_widget_grab_default(terminal);
 	gtk_main();
 	Trace("%s main loop has finished","GTK");
 
