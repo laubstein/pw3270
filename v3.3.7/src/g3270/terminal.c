@@ -32,71 +32,61 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
- GtkWidget			*terminal			= NULL;
- GdkPixmap			*pixmap				= NULL;
- GdkColor			color[QTD_COLORS];
+ GtkWidget				*terminal			= NULL;
+ GdkPixmap				*pixmap				= NULL;
+ GdkColor				color[QTD_COLORS];
+ PangoFontDescription	*font				= NULL;
+
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
+
+ static GdkPixmap * GetPixmap(GtkWidget *widget)
+ {
+	GdkPixmap	*pix;
+	gint		width;
+    gint		height;
+
+	gdk_drawable_get_size(widget->window,&width,&height);
+	pix = gdk_pixmap_new(widget->window,width,height,-1);
+
+	// Get the best font size
+//	Trace("x1 %p",widget);
+//	gtk_widget_modify_font(widget,font);
+//	Trace("x2 %p",widget);
+
+
+	DrawScreen(widget, color, pix);
+
+	return pix;
+ }
 
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
-	GdkGC *gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+    if(!pixmap)
+		pixmap = GetPixmap(widget); // No pixmap, get a new one
 
-    if(pixmap)
-    {
-    	// Draw pixmap
-		gdk_draw_drawable(widget->window,gc,GDK_DRAWABLE(pixmap),
+	gdk_draw_drawable(widget->window,	widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+										GDK_DRAWABLE(pixmap),
 										event->area.x,event->area.y,
 										event->area.x,event->area.y,
 										event->area.width,event->area.height);
-    }
-    else
-    {
-    	// No pixmap, draw background in event->area
-		gdk_gc_set_foreground(gc,color);
-		gdk_draw_rectangle(widget->window,gc,1,event->area.x,event->area.y,event->area.width,event->area.height);
-    }
-
 
 	return 0;
  }
 
-
- static void SetPixmap(GtkWidget *widget, int width, int height)
+ static void configure(GtkWidget *widget, GdkEventConfigure *event, void *t)
  {
+//    Trace("Configuring %p with %dx%d (Window: %p)",widget,event->width,event->height,widget->window);
+
+    if(!widget->window)
+		return;
+
 	if(pixmap)
 	{
 		gdk_pixmap_unref(pixmap);
 		pixmap = NULL;
 	}
-
-	pixmap = gdk_pixmap_new(widget->window,width,height,-1);
-
-	// TODO (perry#1#): Calc the best font size.
-
-	// Redraw entire screen in the newly created pixmap
-	DrawScreen(widget, color, pixmap);
-
-
-
- }
-
- static void configure(GtkWidget *widget, GdkEventConfigure *event, void *t)
- {
-    Trace("Configuring %p with %dx%d (Window: %p)",widget,event->width,event->height,widget->window);
-
-    if(!widget->window)
-		return;
-
-	SetPixmap(widget,event->width,event->height);
-
- }
-
- static void realize(GtkWidget *widget, void *t)
- {
- 	Trace("%p realized (Window: %p)",widget,widget->window);
-
  }
 
  static void destroy( GtkWidget *widget, gpointer data)
@@ -136,6 +126,9 @@
 	terminal = gtk_drawing_area_new();
 	g_signal_connect(G_OBJECT(terminal), "destroy", G_CALLBACK(destroy), NULL);
 
+	font = pango_font_description_from_string("Courier 10");
+	gtk_widget_modify_font(terminal,font);
+
     GTK_WIDGET_SET_FLAGS(terminal, GTK_CAN_DEFAULT);
     GTK_WIDGET_SET_FLAGS(terminal, GTK_CAN_FOCUS);
 
@@ -144,7 +137,6 @@
 
     g_signal_connect(G_OBJECT(terminal), "expose_event",  		G_CALLBACK(expose),		0);
     g_signal_connect(G_OBJECT(terminal), "configure-event",		G_CALLBACK(configure), 	0);
-    g_signal_connect(G_OBJECT(terminal), "realize",				G_CALLBACK(realize),	0);
 
 	return terminal;
  }
