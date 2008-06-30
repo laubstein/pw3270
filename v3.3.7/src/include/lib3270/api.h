@@ -30,7 +30,7 @@
 
 		/* Debug & log */
 		#ifdef DEBUG
-			#define Trace( fmt, ... )		WriteLog("TRACE", "%s(%d):\t" fmt "\n", __FILE__, __LINE__, __VA_ARGS__ )
+			#define Trace( fmt, ... )		WriteLog("TRACE", "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ )
 		#else
 			#define Trace( fmt, ... )	/* __VA_ARGS__ */
 			#warning "So compilar como debug"
@@ -62,14 +62,15 @@
 
 		};
 
-		int Register3270Callbacks(const struct lib3270_io_callbacks *cbk);
+		int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk);
 
 		/* Screen processing */
 		struct lib3270_screen_callbacks
 		{
 			unsigned short sz;
 
-			void (*init)(int rows, int cols);
+			void (*setsize)(int rows, int cols);
+			void (*addch)(int row, int col, int c, int attr);
 			void (*charset)(char *dcs);
 			void (*title)(char *text);
 			void (*changed)(int bstart, int bend);
@@ -82,5 +83,6 @@
 
 		};
 
+		int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
 
 #endif // LIB3270_H_INCLUDED

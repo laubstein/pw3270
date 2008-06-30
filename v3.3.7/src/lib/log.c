@@ -35,20 +35,19 @@
 
  static void writetime(FILE *out, const char *module)
  {
-    time_t      ltime;
-    char        wrk[40];
+    time_t		ltime;
+    char		wrk[40];
 
     time(&ltime);
     strftime(wrk, 39, "%d/%m/%Y %H:%M:%S", localtime(&ltime));
-    fprintf(out,"%s ",wrk);
+    fprintf(out,"%s %s\t",wrk,module);
  }
 
  static FILE *prefix(const char *module)
  {
     FILE *out = fopen("g3270.log","a");
-    char *ptr = strchr(module,'/');
 
-	writetime(out,ptr ? ptr+1 : module);
+	writetime(out,module);
 	return out;
  }
 
