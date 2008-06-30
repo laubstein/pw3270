@@ -30,10 +30,12 @@
 	#include <gtk/gtk.h>
 	#include <lib3270/api.h>
 
-	extern GtkWidget *topwindow;
+	#define QTD_COLORS 16
+
+	extern GtkWidget	*topwindow;
 
 	extern const struct lib3270_io_callbacks g3270_io_callbacks;
-
+	extern const struct lib3270_screen_callbacks g3270_screen_callbacks;
 
 	int CreateTopWindow(void);
 	int CreateTerminalWindow(GtkWidget *box);

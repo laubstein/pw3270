@@ -38,6 +38,7 @@
 #include "widec.h"
 #include "xioc.h"
 #include "screen.h"
+#include "errno.h"
 #include <lib3270/api.h>
 
 #include <windows.h>
@@ -46,7 +47,7 @@
 
 extern char *profile_name;
 
-static struct lib3270_screen_callbacks *callbacks = NULL;
+static const struct lib3270_screen_callbacks *callbacks = NULL;
 
 #define MAX_COLORS	16
 static int cmap_fg[MAX_COLORS] = {
@@ -376,6 +377,9 @@ static void
 addch(int c)
 {
 	CHAR_INFO *ch = &toscreen[(cur_row * console_cols) + cur_col];
+
+	if(callbacks && callbacks->addch)
+		callbacks->addch(cur_row, cur_col, c, cur_attr);
 
 	/* Save the desired character. */
 	if (ch->Char.UnicodeChar != c || ch->Attributes != cur_attr) {
@@ -791,9 +795,6 @@ screen_init(void)
 	int want_ov_cols = ov_cols;
 	Boolean oversize = False;
 
-	if(callbacks && callbacks->init)
-		callbacks->init(ov_rows,ov_cols);
-
 	/* Disallow altscreen/defscreen. */
 	if ((appres.altscreen != CN) || (appres.defscreen != CN)) {
 		(void) fprintf(stderr, "altscreen/defscreen not supported\n");
@@ -849,6 +850,9 @@ screen_init(void)
 			want_ov_cols = console_cols;
 		set_rows_cols(model_num, want_ov_cols, want_ov_rows);
 	}
+
+	if(callbacks && callbacks->setsize)
+		callbacks->setsize(maxCOLS,maxROWS);
 
 	/* Figure out where the status line goes, if it fits. */
 	/* Start out in altscreen mode. */
@@ -2238,3 +2242,17 @@ void screen_changed(int bstart, int bend)
 	if(callbacks && callbacks->changed)
 		callbacks->changed(bstart,bend);
 }
+
+int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk)
+{
+	if(!cbk)
+		return EINVAL;
+
+	if(cbk->sz != sizeof(struct lib3270_screen_callbacks))
+		return -EINVAL;
+
+	callbacks = cbk;
+	return 0;
+}
+
+

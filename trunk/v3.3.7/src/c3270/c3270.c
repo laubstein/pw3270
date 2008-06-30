@@ -230,7 +230,7 @@ main(int argc, char *argv[])
 		"Type 'help' for help information.\n\n",
 		build);
 
-	if(Register3270Callbacks(&c3270_callbacks))
+	if(Register3270IOCallbacks(&c3270_callbacks))
 	{
 		fprintf(stderr,"Can't register into lib3270 callback table\n");
 		return -1;

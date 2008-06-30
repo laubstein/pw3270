@@ -241,6 +241,7 @@ main(int argc, char *argv[])
 {
 	const char	*cl_hostname = CN;
 
+	/* Init GTK stuff */
 	g_thread_init(0);
 	gtk_init (&argc, &argv);
 
@@ -250,6 +251,22 @@ main(int argc, char *argv[])
 	g_set_application_name("g3270");
 #endif
 
+	if(Register3270IOCallbacks(&g3270_io_callbacks))
+	{
+		fprintf(stderr,"Can't register into lib3270 I/O callback table\n");
+		return -1;
+	}
+
+	if(Register3270ScreenCallbacks(&g3270_screen_callbacks))
+	{
+		fprintf(stderr,"Can't register into lib3270 screen callback table\n");
+		return -1;
+	}
+
+	if(CreateTopWindow())
+		return -1;
+
+	/* Init 3270 stuff */
 	if(parse_program_parameters(argc, (const char **)argv))
 		return -1;
 
@@ -258,15 +275,6 @@ main(int argc, char *argv[])
 		"Type 'show copyright' for full copyright information.\n"
 		"Type 'help' for help information.\n\n",
 		build);
-
-	if(Register3270Callbacks(&g3270_io_callbacks))
-	{
-		fprintf(stderr,"Can't register into lib3270 callback table\n");
-		return -1;
-	}
-
-	if(CreateTopWindow())
-		return -1;
 
 	add_resource("keymap.base",
 #if defined(_WIN32) /*[*/
@@ -351,6 +359,7 @@ main(int argc, char *argv[])
 
 	/* Process events forever. */
 	Trace("Entering %s main loop","GTK");
+	gtk_widget_show_all(topwindow);
 	gtk_main();
 	Trace("%s main loop has finished","GTK");
 
