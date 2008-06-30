@@ -33,12 +33,16 @@
 	#define QTD_COLORS 16
 
 	extern GtkWidget	*topwindow;
+	extern GdkPixmap	*pixmap;
+	extern GtkWidget	*terminal;
+	extern GdkColor	color[QTD_COLORS];
 
 	extern const struct lib3270_io_callbacks g3270_io_callbacks;
 	extern const struct lib3270_screen_callbacks g3270_screen_callbacks;
 
-	int CreateTopWindow(void);
-	int CreateTerminalWindow(GtkWidget *box);
+	int			CreateTopWindow(void);
+	GtkWidget 	*CreateTerminalWindow(void);
+	int 		DrawScreen(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
 
 
 #endif // G3270_H_INCLUDED
