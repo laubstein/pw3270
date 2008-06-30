@@ -35,14 +35,15 @@
  typedef struct _element
  {
  	gchar	ch[MAX_CHR_LENGTH];
- 	int		attr;
+ 	short	fg;
+ 	short	bg;
  } ELEMENT;
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
  static void title(char *text);
  static void setsize(int rows, int cols);
- static void addch(int row, int col, int c, int attr);
+ static void addch(int row, int col, int c, unsigned short attr);
  static void set_charset(char *dcs);
  static void redraw(void);
 
@@ -70,6 +71,8 @@
  static int 		terminal_cols	= 0;
  static ELEMENT	*screen			= NULL;
  static char		*charset		= NULL;
+ static int		left_margin		= 0;
+ static int		top_margin		= 0;
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
@@ -81,7 +84,7 @@
 
  }
 
- static void addch(int row, int col, int c, int attr)
+ static void addch(int row, int col, int c, unsigned short attr)
  {
 	gchar	in[2] = { (char) c, 0 };
 	gsize	sz;
@@ -121,9 +124,33 @@
 		memset(el->ch,0,MAX_CHR_LENGTH);
 	}
 
-	el->attr = attr;
+	// TODO (perry#1#): Get the correct colors
+	el->bg = (attr & 0xF0) >> 4;
+	el->fg = (attr & 0x0F);
 
-	// TODO (perry#1#): Update pixmap, queue screen redraw.
+	// Update pixmap, queue screen redraw.
+	if(terminal && pixmap)
+	{
+		gint x, y, width,height;
+		PangoLayout *layout = gtk_widget_create_pango_layout(terminal," ");
+
+		pango_layout_set_text(layout,el->ch,-1);
+		pango_layout_get_pixel_size(layout,&width,&height);
+
+		x = left_margin + (col * width);
+		y = top_margin + (row * height);
+
+		gdk_draw_layout_with_colors(	pixmap,
+										terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)],
+										x,y,
+										layout,
+										color+el->fg,
+										color+el->bg );
+
+		g_object_unref(layout);
+
+		gtk_widget_queue_draw_area(terminal,x,y,width,height);
+	}
 
  }
 
@@ -165,8 +192,6 @@
 	int 		height;
 	int			x;
 	int			y;
-	int			left_margin = 0;
-	int			top_margin = 0;
 	int			row;
 	int			col;
 
@@ -175,29 +200,26 @@
 
 	gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
 
-	/* Get width/height (assuming it's a fixed width font) */
-	layout = gtk_widget_create_pango_layout(widget," ");
-	pango_layout_get_pixel_size(layout,&width,&height);
-
-	/* Fill pixmap with background color */
+	// Fill pixmap with background color
 	gdk_drawable_get_size(draw,&width,&height);
 	gdk_gc_set_foreground(gc,clr);
 	gdk_draw_rectangle(draw,gc,1,0,0,width,height);
 
-	/* Draw screen contens */
+	// Draw screen contens
+	layout = gtk_widget_create_pango_layout(widget," ");
+	pango_layout_get_pixel_size(layout,&width,&height);
 	y = top_margin;
 	for(row = 0; row < terminal_rows;row++)
 	{
 		x = left_margin;
 		for(col = 0; col < terminal_cols;col++)
 		{
-			/* Set character attributes in the layout */
+			// Set character attributes in the layout
 			if(el->ch)
 			{
-				gdk_gc_set_foreground(gc,clr+3);
 				pango_layout_set_text(layout,el->ch,-1);
 				pango_layout_get_pixel_size(layout,&width,&height);
-				gdk_draw_layout(draw,gc,x,y,layout);
+				gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+el->fg,clr+el->bg);
 			}
 
 			el++;

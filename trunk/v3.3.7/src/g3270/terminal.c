@@ -37,6 +37,8 @@
  GdkColor				color[QTD_COLORS];
  PangoFontDescription	*font				= NULL;
 
+ static guint 			last_keyval = 0;
+ static GtkIMContext	*im;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -98,6 +100,54 @@
 	}
  }
 
+ static void realize(GtkWidget *widget, void *t)
+ {
+    gtk_im_context_set_client_window(im,widget->window);
+ }
+
+ static gboolean focus_in(GtkWidget *widget, GdkEventFocus *event, gpointer x)
+ {
+	gtk_im_context_focus_in(im);
+	return 0;
+ }
+
+ static gboolean focus_out(GtkWidget *widget, GdkEventFocus *event, gpointer x)
+ {
+	gtk_im_context_focus_out(im);
+	return 0;
+ }
+
+ static void im_commit(GtkIMContext *imcontext, gchar *arg1, gpointer user_data)
+ {
+	Trace("Commit: %s (%02x)", arg1,(unsigned int) *arg1);
+ }
+
+ static gboolean key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+ {
+	if(gtk_im_context_filter_keypress(im,event))
+		return TRUE;
+
+	// Guarda tecla pressionada
+	last_keyval = event->keyval;
+
+	return FALSE;
+ }
+
+ static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+ {
+
+	if(gtk_im_context_filter_keypress(im,event))
+		return TRUE;
+
+	if(KeyboardAction(widget,event,user_data))
+	{
+		gtk_im_context_reset(im);
+		return TRUE;
+	}
+
+	return 0;
+ }
+
  int LoadColors(void)
  {
  	static const char *DefaultColors = "black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
@@ -123,6 +173,8 @@
  {
  	LoadColors();
 
+	im = gtk_im_context_simple_new();
+
 	terminal = gtk_drawing_area_new();
 	g_signal_connect(G_OBJECT(terminal), "destroy", G_CALLBACK(destroy), NULL);
 
@@ -135,8 +187,14 @@
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Events.html#GdkEventMask
     gtk_widget_add_events(terminal,GDK_KEY_PRESS_MASK|GDK_KEY_RELEASE_MASK|GDK_BUTTON_PRESS_MASK|GDK_BUTTON_MOTION_MASK|GDK_BUTTON_RELEASE_MASK);
 
-    g_signal_connect(G_OBJECT(terminal), "expose_event",  		G_CALLBACK(expose),		0);
-    g_signal_connect(G_OBJECT(terminal), "configure-event",		G_CALLBACK(configure), 	0);
+    g_signal_connect(G_OBJECT(terminal),	"expose_event",  		G_CALLBACK(expose),			0);
+    g_signal_connect(G_OBJECT(terminal),	"configure-event",		G_CALLBACK(configure),		0);
+    g_signal_connect(G_OBJECT(terminal),	"key-press-event",		G_CALLBACK(key_press),		0);
+    g_signal_connect(G_OBJECT(terminal),	"key-release-event",	G_CALLBACK(key_release),	0);
+    g_signal_connect(G_OBJECT(terminal),	"realize",				G_CALLBACK(realize),		0);
+    g_signal_connect(G_OBJECT(terminal),	"focus-in-event",		G_CALLBACK(focus_in),		0);
+    g_signal_connect(G_OBJECT(terminal),	"focus-out-event",		G_CALLBACK(focus_out),		0);
+    g_signal_connect(G_OBJECT(im),			"commit",				G_CALLBACK(im_commit),		0);
 
 	return terminal;
  }
