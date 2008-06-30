@@ -795,6 +795,9 @@ screen_init(void)
 	int want_ov_cols = ov_cols;
 	Boolean oversize = False;
 
+	if(callbacks && callbacks->init)
+		callbacks->init();
+
 	/* Disallow altscreen/defscreen. */
 	if ((appres.altscreen != CN) || (appres.defscreen != CN)) {
 		(void) fprintf(stderr, "altscreen/defscreen not supported\n");
@@ -852,7 +855,7 @@ screen_init(void)
 	}
 
 	if(callbacks && callbacks->setsize)
-		callbacks->setsize(maxCOLS,maxROWS);
+		callbacks->setsize(maxROWS,maxCOLS);
 
 	/* Figure out where the status line goes, if it fits. */
 	/* Start out in altscreen mode. */

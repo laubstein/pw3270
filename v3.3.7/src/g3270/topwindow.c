@@ -66,8 +66,11 @@
     vbox = gtk_vbox_new(FALSE,0);
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);
 
-	if(CreateTerminalWindow(vbox))
+	if(!CreateTerminalWindow())
 		return -1;
+
+	gtk_box_pack_start(GTK_BOX(vbox), terminal, TRUE, TRUE, 0);
+	gtk_widget_show(terminal);
 
 #ifdef PACKAGE_NAME
 	gtk_window_set_role(GTK_WINDOW(topwindow), PACKAGE_NAME "_TOP" );

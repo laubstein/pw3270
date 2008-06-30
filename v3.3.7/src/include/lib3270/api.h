@@ -69,6 +69,7 @@
 		{
 			unsigned short sz;
 
+			void (*init)(void);
 			void (*setsize)(int rows, int cols);
 			void (*addch)(int row, int col, int c, int attr);
 			void (*charset)(char *dcs);

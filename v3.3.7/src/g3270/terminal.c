@@ -32,11 +32,9 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
- GtkWidget			*terminal	= NULL;
- GdkPixmap			*pixmap		= NULL;
-
- static GdkColor	color[QTD_COLORS];
-
+ GtkWidget			*terminal			= NULL;
+ GdkPixmap			*pixmap				= NULL;
+ GdkColor			color[QTD_COLORS];
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -64,28 +62,34 @@
 	return 0;
  }
 
- static void configure(GtkWidget *widget, GdkEventConfigure *event, void *t)
+
+ static void SetPixmap(GtkWidget *widget, int width, int height)
  {
-	GdkGC *gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
-
-    Trace("Configuring %p with %dx%d (Window: %p)",widget,event->width,event->height,widget->window);
-
-    if(!widget->window)
-		return;
-
 	if(pixmap)
 	{
 		gdk_pixmap_unref(pixmap);
 		pixmap = NULL;
 	}
 
-	pixmap = gdk_pixmap_new(widget->window,event->width,event->height,-1);
+	pixmap = gdk_pixmap_new(widget->window,width,height,-1);
 
-	gdk_gc_set_foreground(gc,color);
-	gdk_draw_rectangle(pixmap,gc,1,0,0,event->width,event->height);
+	// TODO (perry#1#): Calc the best font size.
 
-	// TODO (perry#1#): Redraw screen contents in the newly created pixmap.
+	// Redraw entire screen in the newly created pixmap
+	DrawScreen(widget, color, pixmap);
 
+
+
+ }
+
+ static void configure(GtkWidget *widget, GdkEventConfigure *event, void *t)
+ {
+    Trace("Configuring %p with %dx%d (Window: %p)",widget,event->width,event->height,widget->window);
+
+    if(!widget->window)
+		return;
+
+	SetPixmap(widget,event->width,event->height);
 
  }
 
@@ -113,7 +117,6 @@
  	char	*ptr = strtok(buffer,",");
 
 	// FIXME (perry#5#): Load colors from configuration file.
-
  	for(f=0;ptr && f < QTD_COLORS;f++)
  	{
 		gdk_color_parse(ptr,color+f);
@@ -126,7 +129,7 @@
  	return 0;
  }
 
- int CreateTerminalWindow(GtkWidget *box)
+ GtkWidget *CreateTerminalWindow(void)
  {
  	LoadColors();
 
@@ -143,8 +146,6 @@
     g_signal_connect(G_OBJECT(terminal), "configure-event",		G_CALLBACK(configure), 	0);
     g_signal_connect(G_OBJECT(terminal), "realize",				G_CALLBACK(realize),	0);
 
-	gtk_box_pack_start(GTK_BOX(box), terminal, TRUE, TRUE, 0);
-	gtk_widget_show(terminal);
-	return 0;
+	return terminal;
  }
 

@@ -40,6 +40,8 @@
  static void title(char *text);
  static void setsize(int rows, int cols);
  static void addch(int row, int col, int c, int attr);
+ static void set_charset(char *dcs);
+ static void redraw(void);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -47,16 +49,17 @@
  {
 	sizeof(struct lib3270_screen_callbacks),
 
-	setsize,	// void (*setsize)(int rows, int cols);
-	addch,		// void (*addch)(int row, int col, int c, int attr);
-	NULL,		// void (*charset)(char *dcs);
-	title,		// void (*title)(char *text);
-	NULL,		// void (*changed)(int bstart, int bend);
-	NULL,		// void (*ring_bell)(void);
-	NULL,		// void (*redraw)(void);
-	NULL,		// void (*refresh)(void);
-	NULL,		// void (*suspend)(void);
-	NULL,		// void (*resume)(void);
+	NULL,			// void (*init)(void);
+	setsize,		// void (*setsize)(int rows, int cols);
+	addch,			// void (*addch)(int row, int col, int c, int attr);
+	set_charset,	// void (*charset)(char *dcs);
+	title,			// void (*title)(char *text);
+	NULL,			// void (*changed)(int bstart, int bend);
+	NULL,			// void (*ring_bell)(void);
+	redraw,			// void (*redraw)(void);
+	NULL,			// void (*refresh)(void);
+	NULL,			// void (*suspend)(void);
+	NULL,			// void (*resume)(void);
 
  };
 
@@ -89,7 +92,7 @@
 		terminal_cols = cols;
 	}
 
- 	Trace("Terminal set to %dx%d, screen set to %p",rows,cols,screen);
+ 	Trace("Terminal set to %d rows with %d cols, screen set to %p",rows,cols,screen);
 
  }
 
@@ -108,3 +111,80 @@
 	// TODO (perry#1#): Update pixmap, queue screen redraw.
 
  }
+
+ static void redraw(void)
+ {
+ 	DrawScreen(terminal,color,pixmap);
+ }
+
+ /**
+  * Draw entire buffer.
+  *
+  * @param	widget	Widget to be used as reference.
+  * @param	clr		List of colors to be used when drawing.
+  * @param	draw	The image destination.
+  *
+  */
+ int DrawScreen(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw)
+ {
+	GdkGC		*gc;
+	PangoLayout *layout;
+	ELEMENT		*el			= screen;
+	int 		width;
+	int 		height;
+	int			x;
+	int			y;
+	int			left_margin = 0;
+	int			top_margin = 0;
+	int			row;
+	int			col;
+
+	if(!el)
+		return -1;
+
+	gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+
+	/* Get width/height (assuming it's a fixed size font) */
+	layout = gtk_widget_create_pango_layout(widget," ");
+	pango_layout_get_pixel_size(layout,&width,&height);
+
+	/* Fill pixmap with background color */
+	gdk_drawable_get_size(draw,&width,&height);
+	gdk_gc_set_foreground(gc,clr);
+	gdk_draw_rectangle(draw,gc,1,0,0,width,height);
+
+	/* Draw screen contens */
+	y = top_margin;
+	for(row = 0; row < terminal_rows;row++)
+	{
+		x = left_margin;
+		for(col = 0; col < terminal_cols;col++)
+		{
+			/* Set character attributes in the layout */
+			if(el->ch)
+			{
+				char ch[2];
+				ch[0] =  el->ch;
+				ch[1] = 0;
+				gdk_gc_set_foreground(gc,clr+3);
+				pango_layout_set_text(layout,ch,1);
+				pango_layout_get_pixel_size(layout,&width,&height);
+				gdk_draw_layout(draw,gc,x,y,layout);
+			}
+
+			el++;
+			x += width;
+		}
+		y += height;
+	}
+
+	g_object_unref(layout);
+
+	return 0;
+ }
+
+ static void set_charset(char *dcs)
+ {
+ 	Trace("Screen charset: %s",dcs);
+ }
+
