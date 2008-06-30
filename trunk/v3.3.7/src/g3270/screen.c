@@ -26,13 +26,16 @@
 
 #include "g3270.h"
 #include <malloc.h>
+#include <string.h>
 
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
 
+ #define MAX_CHR_LENGTH 3
+
  typedef struct _element
  {
- 	int ch;
- 	int attr;
+ 	gchar	ch[MAX_CHR_LENGTH];
+ 	int		attr;
  } ELEMENT;
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
@@ -66,6 +69,7 @@
  static int 		terminal_rows	= 0;
  static int 		terminal_cols	= 0;
  static ELEMENT	*screen			= NULL;
+ static char		*charset		= NULL;
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
@@ -77,27 +81,11 @@
 
  }
 
- static void setsize(int rows, int cols)
- {
- 	if(screen)
- 	{
-		g_free(screen);
-		screen = NULL;
- 	}
-
-	if(rows && cols)
-	{
-		screen = g_malloc(sizeof(ELEMENT) *(rows*cols));
-		terminal_rows = rows;
-		terminal_cols = cols;
-	}
-
- 	Trace("Terminal set to %d rows with %d cols, screen set to %p",rows,cols,screen);
-
- }
-
  static void addch(int row, int col, int c, int attr)
  {
+	gchar	in[2] = { (char) c, 0 };
+	gsize	sz;
+	gchar	*ch;
  	ELEMENT *el;
 
  	if(!screen)
@@ -105,10 +93,53 @@
 
  	el = screen + (row*terminal_cols)+col;
 
-	el->ch = c;
+	if(c)
+	{
+		if(charset)
+		{
+			ch = g_convert(in, -1, "UTF-8", charset, NULL, &sz, NULL);
+
+			if(sz < MAX_CHR_LENGTH)
+			{
+				memcpy(el->ch,ch,sz);
+			}
+			else
+			{
+				Log("Invalid size when converting \"%s\" to \"%s\"",in,ch);
+				memset(el->ch,0,MAX_CHR_LENGTH);
+			}
+		}
+		else
+		{
+			memcpy(el->ch,in,2);
+		}
+
+		g_free(ch);
+	}
+	else
+	{
+		memset(el->ch,0,MAX_CHR_LENGTH);
+	}
+
 	el->attr = attr;
 
 	// TODO (perry#1#): Update pixmap, queue screen redraw.
+
+ }
+
+ static void setsize(int rows, int cols)
+ {
+	g_free(screen);
+	screen = NULL;
+
+	if(rows && cols)
+	{
+		screen = g_new0(ELEMENT,(rows*cols));
+		terminal_rows = rows;
+		terminal_cols = cols;
+	}
+
+ 	Trace("Terminal set to %d rows with %d cols, screen set to %p",rows,cols,screen);
 
  }
 
@@ -144,7 +175,7 @@
 
 	gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
 
-	/* Get width/height (assuming it's a fixed size font) */
+	/* Get width/height (assuming it's a fixed width font) */
 	layout = gtk_widget_create_pango_layout(widget," ");
 	pango_layout_get_pixel_size(layout,&width,&height);
 
@@ -163,11 +194,8 @@
 			/* Set character attributes in the layout */
 			if(el->ch)
 			{
-				char ch[2];
-				ch[0] =  el->ch;
-				ch[1] = 0;
 				gdk_gc_set_foreground(gc,clr+3);
-				pango_layout_set_text(layout,ch,1);
+				pango_layout_set_text(layout,el->ch,-1);
 				pango_layout_get_pixel_size(layout,&width,&height);
 				gdk_draw_layout(draw,gc,x,y,layout);
 			}
@@ -186,5 +214,7 @@
  static void set_charset(char *dcs)
  {
  	Trace("Screen charset: %s",dcs);
+	g_free(charset);
+	charset = g_strdup(dcs);
  }
 
