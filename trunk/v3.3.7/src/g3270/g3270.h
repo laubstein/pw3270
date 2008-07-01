@@ -32,10 +32,16 @@
 
 	#define QTD_COLORS 16
 
-	extern GtkWidget	*topwindow;
-	extern GdkPixmap	*pixmap;
-	extern GtkWidget	*terminal;
-	extern GdkColor	color[QTD_COLORS];
+	extern GtkWidget				*topwindow;
+	extern GdkPixmap				*pixmap;
+	extern GtkWidget				*terminal;
+	extern GdkColor				color[QTD_COLORS];
+	extern PangoFontDescription	*font;
+
+	extern int 					terminal_rows;
+	extern int				 		terminal_cols;
+	extern int						left_margin;
+	extern int						top_margin;
 
 	extern const struct lib3270_io_callbacks g3270_io_callbacks;
 	extern const struct lib3270_screen_callbacks g3270_screen_callbacks;

@@ -1761,6 +1761,9 @@ status_reset(void)
 		status_msg = "X";
 	else
 		status_msg = "";
+
+	if(callbacks && callbacks->reset)
+		callbacks->reset(kybdlock, status_msg);
 }
 
 void

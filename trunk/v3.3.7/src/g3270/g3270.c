@@ -34,7 +34,7 @@
 #include "3270ds.h"
 #include "resources.h"
 
-#include "actionsc.h"
+#include <lib3270/actionsc.h>
 #include "ansic.h"
 #include "charsetc.h"
 #include "ctlrc.h"
@@ -43,7 +43,7 @@
 #include "hostc.h"
 #include "idlec.h"
 #include "keymapc.h"
-#include "kybdc.h"
+#include <lib3270/kybdc.h>
 #include "macrosc.h"
 #include "popupsc.h"
 #include "printerc.h"
@@ -236,6 +236,47 @@ sigchld_handler(int ignored)
 }
 #endif /*]*/
 
+static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
+{
+	switch(log_level)
+	{
+	case G_LOG_FLAG_RECURSION:	// internal flag
+		WriteLog("gtk-internal", "%s", message);
+		break;
+
+	case G_LOG_FLAG_FATAL:		// internal flag
+		WriteLog("gtk-fatal", "%s", message);
+		break;
+
+	case G_LOG_LEVEL_ERROR:	// log level for errors, see g_error(). This level is also used for messages produced by g_assert().
+		WriteLog("gtk-error", "%s", message);
+		break;
+
+	case G_LOG_LEVEL_CRITICAL:	// log level for critical messages, see g_critical(). This level is also used for messages produced by g_return_if_fail() and g_return_val_if_fail().
+		WriteLog("gtk-critical", "%s", message);
+		break;
+
+	case G_LOG_LEVEL_WARNING:	// log level for warnings, see g_warning()
+		WriteLog("gtk-warning", "%s", message);
+		break;
+
+	case G_LOG_LEVEL_MESSAGE:	// log level for messages, see g_message()
+		WriteLog("gtk-message", "%s", message);
+		break;
+
+	case G_LOG_LEVEL_INFO:		// log level for informational messages
+		WriteLog("gtk-info", "%s", message);
+		break;
+
+	case G_LOG_LEVEL_DEBUG:	// log level for debug messages, see g_debug()
+		WriteLog("gtk-debug", "%s", message);
+		break;
+
+	default:
+		WriteLog("gtk", "%s", message);
+	}
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -250,6 +291,8 @@ main(int argc, char *argv[])
 #else
 	g_set_application_name("g3270");
 #endif
+
+	g_log_set_handler(NULL,G_LOG_LEVEL_MASK,log_callback,NULL);
 
 	if(Register3270IOCallbacks(&g3270_io_callbacks))
 	{

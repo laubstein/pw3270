@@ -17,6 +17,10 @@
  *		Global declarations for kybd.c.
  */
 
+#ifndef KYBDC_H_INCLUDED
+
+#define KYBDC_H_INCLUDED
+
 /* keyboard lock states */
 extern unsigned int kybdlock;
 #define KL_OERR_MASK		0x000f
@@ -144,3 +148,5 @@ extern int kybd_prime(void);
 extern void kybd_scroll_lock(Boolean lock);
 extern Boolean run_ta(void);
 extern int state_from_keymap(char keymap[32]);
+
+#endif /* KYBDC_H_INCLUDED */

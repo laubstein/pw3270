@@ -33,7 +33,7 @@
 #include "3270ds.h"
 #include "resources.h"
 
-#include "actionsc.h"
+#include <lib3270/actionsc.h>
 #include "ansic.h"
 #include "charsetc.h"
 #include "ctlrc.h"
@@ -42,7 +42,7 @@
 #include "hostc.h"
 #include "idlec.h"
 #include "keymapc.h"
-#include "kybdc.h"
+#include <lib3270/kybdc.h>
 #include "macrosc.h"
 #include "popupsc.h"
 #include "printerc.h"

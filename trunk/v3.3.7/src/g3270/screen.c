@@ -64,15 +64,18 @@
 	NULL,			// void (*refresh)(void);
 	NULL,			// void (*suspend)(void);
 	NULL,			// void (*resume)(void);
+	NULL,			// void (*reset)(int lock, const char *msg);
+
 
  };
 
- static int 		terminal_rows	= 0;
- static int 		terminal_cols	= 0;
+ int 				terminal_rows	= 0;
+ int 				terminal_cols	= 0;
+ int				left_margin		= 0;
+ int				top_margin		= 0;
+
  static ELEMENT	*screen			= NULL;
  static char		*charset		= NULL;
- static int		left_margin		= 0;
- static int		top_margin		= 0;
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
@@ -198,6 +201,7 @@
 	if(!el)
 		return -1;
 
+
 	gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
 
 	// Fill pixmap with background color
@@ -208,6 +212,7 @@
 	// Draw screen contens
 	layout = gtk_widget_create_pango_layout(widget," ");
 	pango_layout_get_pixel_size(layout,&width,&height);
+
 	y = top_margin;
 	for(row = 0; row < terminal_rows;row++)
 	{
