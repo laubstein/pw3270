@@ -80,7 +80,7 @@
 			void (*refresh)(void);
 			void (*suspend)(void);
 			void (*resume)(void);
-
+			void (*reset)(int lock, const char *msg);
 
 		};
 

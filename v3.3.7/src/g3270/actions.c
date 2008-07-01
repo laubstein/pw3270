@@ -24,10 +24,14 @@
 *
 */
 
-
  #include <gdk/gdk.h>
  #include <gdk/gdkkeysyms.h>
+
+ #include <globals.h>
+
  #include "g3270.h"
+ #include <lib3270/kybdc.h>
+ #include <lib3270/actionsc.h>
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
@@ -65,13 +69,34 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
-
-
-
-
+ void action_Enter(GtkWidget *w, gpointer data)
+ {
+ 	// TODO (perry#9#): Test if disconnected, if yes connect it to the last server
+ 	Trace("kybdlock: %d",(int) kybdlock);
+	action_internal(Enter_action, IA_DEFAULT, CN, CN);
+ }
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+ 	static const struct WindowActions keyproc[] =
+ 	{
+		DECLARE_KEYPROC( GDK_Return,		0,	action_Enter            ),
+        DECLARE_KEYPROC( GDK_KP_Enter,		0,	action_Enter            )
+
+ 	};
+
+ 	int f;
+
+    /* Check for special keyproc actions */
+	for(f=0; f < (sizeof(keyproc)/sizeof(struct WindowActions));f++)
+	{
+		if(keyproc[f].keyval == event->keyval && (event->state & keyproc[f].state) == keyproc[f].state)
+		{
+			Trace("Key: %s\tAction: %s",keyproc[f].trace,keyproc[f].action_trace);
+			keyproc[f].callback(widget,user_data);
+			return TRUE;
+		}
+	}
 
 
 

@@ -30,15 +30,31 @@
 #include <malloc.h>
 
 
+// TODO (perry#7#): Find a better way to get font sizes!!!
+#define MAX_FONT_SIZES	54
+
+/*---[ Structs ]------------------------------------------------------------------------------------------------*/
+
+ typedef struct _fontsize
+ {
+ 	int 	size;
+ 	int 	width;
+	int 	height;
+ } FONTSIZE;
+
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
  GtkWidget				*terminal			= NULL;
  GdkPixmap				*pixmap				= NULL;
  GdkColor				color[QTD_COLORS];
- PangoFontDescription	*font				= NULL;
 
  static guint 			last_keyval = 0;
  static GtkIMContext	*im;
+
+ static PangoFontDescription	*font					= NULL;
+ static FONTSIZE				fsize[MAX_FONT_SIZES];
+
+/*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -50,12 +66,6 @@
 
 	gdk_drawable_get_size(widget->window,&width,&height);
 	pix = gdk_pixmap_new(widget->window,width,height,-1);
-
-	// Get the best font size
-//	Trace("x1 %p",widget);
-//	gtk_widget_modify_font(widget,font);
-//	Trace("x2 %p",widget);
-
 
 	DrawScreen(widget, color, pix);
 
@@ -77,13 +87,96 @@
 	return 0;
  }
 
+ /**
+  * Cache font size.
+  *
+  * Get the font metrics for the selected size, cache it for speed up terminal resizing.
+  *
+  * @param sel		The font size.
+  *
+  */
+ static void SetFontSize(int sel)
+ {
+	PangoLayout *layout;
+
+ 	if(fsize[sel].size)
+ 	{
+		pango_font_description_set_size(font,fsize[sel].size);
+		gtk_widget_modify_font(terminal,font);
+		return;
+ 	}
+
+	// TODO (perry#9#): Fint a better and faster way to get the character size.
+	fsize[sel].size = (sel+1) * PANGO_SCALE;
+	pango_font_description_set_size(font,fsize[sel].size);
+
+	gtk_widget_modify_font(terminal,font);
+	layout = gtk_widget_create_pango_layout(terminal,"A");
+
+	pango_layout_get_pixel_size(layout,&fsize[sel].width,&fsize[sel].height);
+
+	g_object_unref(layout);
+
+ }
+
+ static int lWidth = -1;
+ static int lHeight = -1;
+ static int lFont = -1;
+
  static void configure(GtkWidget *widget, GdkEventConfigure *event, void *t)
  {
-//    Trace("Configuring %p with %dx%d (Window: %p)",widget,event->width,event->height,widget->window);
+ 	int f;
 
     if(!widget->window)
 		return;
 
+	if(lWidth == event->width && lHeight == event->height && lFont > 0)
+		return;
+
+	lWidth = event->width;
+	lHeight = event->height;
+
+    Trace("Configuring %p with %dx%d (Window: %p Realized: %d)",widget,event->width,event->height,widget->window,(int) GTK_WIDGET_REALIZED(widget));
+
+	if(lFont == -1)
+	{
+		/* Font all font sizes */
+		lFont = -2;
+		Trace("Loading font sizes from 0 to %d",MAX_FONT_SIZES);
+		for(f=0;f<MAX_FONT_SIZES;f++)
+		{
+			SetFontSize(f);
+			Trace("Font %d fits on %dx%d",f,terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
+		}
+		gtk_widget_set_size_request(widget,fsize->width,fsize->height);
+	}
+
+	/* Get the best font for the current window size */
+	for(f=0;f<MAX_FONT_SIZES && (fsize[f].height*terminal_rows) < event->height && (fsize[f].width*terminal_cols) < event->width;f++);
+
+	if(f >= MAX_FONT_SIZES)
+		f = (MAX_FONT_SIZES-1);
+	else if(f > 0)
+		f--;
+
+	if(f != lFont)
+	{
+		Trace("Font size changes from %d to %d (%dx%d)",lFont,f,terminal_cols*fsize[f].width,terminal_rows*fsize[f].height);
+		lFont = f;
+		pango_font_description_set_size(font,fsize[f].size);
+		gtk_widget_modify_font(terminal,font);
+	}
+
+	/* Center image */
+	left_margin = (event->width >> 1) - ((terminal_cols * fsize[f].width) >> 1);
+	if(left_margin < 0)
+		left_margin = 0;
+
+	top_margin = (event->height >> 1) - ((terminal_rows * fsize[f].height) >> 1);
+	if(top_margin < 0)
+		top_margin = 0;
+
+	/* Reset pixmap */
 	if(pixmap)
 	{
 		gdk_pixmap_unref(pixmap);
@@ -102,6 +195,9 @@
 
  static void realize(GtkWidget *widget, void *t)
  {
+    Trace("Realizing %p",widget);
+
+	// Configure im context
     gtk_im_context_set_client_window(im,widget->window);
  }
 
@@ -171,6 +267,9 @@
 
  GtkWidget *CreateTerminalWindow(void)
  {
+
+	memset(fsize,0,MAX_FONT_SIZES * sizeof(FONTSIZE));
+
  	LoadColors();
 
 	im = gtk_im_context_simple_new();
@@ -178,9 +277,8 @@
 	terminal = gtk_drawing_area_new();
 	g_signal_connect(G_OBJECT(terminal), "destroy", G_CALLBACK(destroy), NULL);
 
-	font = pango_font_description_from_string("Courier 10");
-	gtk_widget_modify_font(terminal,font);
 
+	// Configure terminal widget
     GTK_WIDGET_SET_FLAGS(terminal, GTK_CAN_DEFAULT);
     GTK_WIDGET_SET_FLAGS(terminal, GTK_CAN_FOCUS);
 
@@ -195,6 +293,11 @@
     g_signal_connect(G_OBJECT(terminal),	"focus-in-event",		G_CALLBACK(focus_in),		0);
     g_signal_connect(G_OBJECT(terminal),	"focus-out-event",		G_CALLBACK(focus_out),		0);
     g_signal_connect(G_OBJECT(im),			"commit",				G_CALLBACK(im_commit),		0);
+
+	font = pango_font_description_from_string("Courier");
+
+
+
 
 	return terminal;
  }

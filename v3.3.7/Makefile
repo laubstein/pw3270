@@ -29,7 +29,7 @@ GTK_MODULES = glib-2.0 gtk+-2.0 gthread-2.0
 
 # Sources
 C3270_SRCS =	c3270.c iocallback.c
-G3270_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c
+G3270_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c
 LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 				ft.c ft_cut.c ft_dft.c glue.c help.c host.c icmd.c idle.c kybd.c \
 				macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
@@ -50,7 +50,7 @@ GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h
 obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
+	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
 
 obj/Debug/src/c3270/%.o: src/c3270/%.c src/c3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
@@ -71,7 +71,7 @@ obj/Debug/version.o: src/version.c
 obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(CFLAGS) -Isrc/lib -o $@ -c $<
+	@$(CC) $(CFLAGS) -Isrc/lib -Isrc/include/lib3270 -o $@ -c $<
 
 obj/Release/version.o: src/version.c
 	@echo $< ...
