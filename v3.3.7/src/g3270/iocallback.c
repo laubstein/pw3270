@@ -138,10 +138,9 @@ static unsigned long g3270_AddExcept(int source, void (*fn)(void))
 
 static gboolean do_timer(TIMER *t)
 {
-	if(t->remove)
-		return FALSE;
-	t->fn();
-	return TRUE;
+	if(!t->remove)
+		t->fn();
+	return FALSE;
 }
 
 static unsigned long g3270_AddTimeOut(unsigned long interval, void (*proc)(void))
@@ -153,13 +152,14 @@ static unsigned long g3270_AddTimeOut(unsigned long interval, void (*proc)(void)
 
 	g_timeout_add_full(G_PRIORITY_DEFAULT, (guint) interval, (GSourceFunc) do_timer, t, g_free);
 
-	Trace("Timer with %ld ms created with id %p",t);
+	Trace("Timeout with %ld ms created with id %p",interval,t);
 
 	return (unsigned long) t;
 }
 
 static void g3270_RemoveTimeOut(unsigned long timer)
 {
+	// FIXME (perry#2#): It this really necessary? The timeout is removed as soon as it ticks.
 	Trace("Removing timer %p",((TIMER *) timer));
 	((TIMER *) timer)->remove++;
 }

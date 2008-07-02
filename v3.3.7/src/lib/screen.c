@@ -1193,39 +1193,43 @@ screen_disp(Boolean erasing unused)
 	if (escaped)
 		return;
 
-	if (!screen_has_changes) {
+	if (!screen_has_changes)
+	{
+		/* No changes on the main screen update isn't necessary */
 
 		/* Draw the status line. */
-		if (status_row) {
+		if (status_row)
 			draw_oia();
-		}
 
 		/* Move the cursor. */
 		if (flipped)
-			move(cursor_addr / cCOLS,
-				cCOLS-1 - (cursor_addr % cCOLS));
+			move(cursor_addr / cCOLS,cCOLS-1 - (cursor_addr % cCOLS));
 		else
 			move(cursor_addr / cCOLS, cursor_addr % cCOLS);
 
 		if (status_row)
-		    	refresh();
-		else {
+		{
+			refresh();
+		}
+		else
+		{
 			COORD coord;
 
 			coord.X = cur_col;
 			coord.Y = cur_row;
-			if (SetConsoleCursorPosition(sbuf, coord) == 0) {
+			if (SetConsoleCursorPosition(sbuf, coord) == 0)
+			{
 				fprintf(stderr,
-					"\nscreen_disp: "
-					"SetConsoleCursorPosition(x=%d,y=%d) "
-					"failed: %s\n",
-					coord.X, coord.Y,
-					win32_strerror(GetLastError()));
+				"\nscreen_disp: "
+				"SetConsoleCursorPosition(x=%d,y=%d) "
+				"failed: %s\n",
+				coord.X, coord.Y,
+				win32_strerror(GetLastError()));
 				x3270_exit(1);
 			}
 		}
 
-	    	return;
+		return;
 	}
 
 	fa = get_field_attribute(0);
@@ -1722,6 +1726,9 @@ void
 status_ctlr_done(void)
 {
 	oia_undera = True;
+
+	if(callbacks && callbacks->oia_flag)
+		callbacks->oia_flag(OIA_FLAG_UNDERA,oia_undera);
 }
 
 void
@@ -1734,33 +1741,65 @@ void
 status_minus(void)
 {
 	status_msg = "X -f";
+
+	if(callbacks && callbacks->status)
+		callbacks->status(STATUS_CODE_MINUS);
+
 }
 
 void
 status_oerr(int error_type)
 {
-	switch (error_type) {
+	STATUS_CODE sts = STATUS_CODE_USER;
+
+	switch (error_type)
+	{
 	case KL_OERR_PROTECTED:
+		sts = STATUS_CODE_PROTECTED;
 		status_msg = "X Protected";
 		break;
 	case KL_OERR_NUMERIC:
+		sts = STATUS_CODE_NUMERIC;
 		status_msg = "X Numeric";
 		break;
 	case KL_OERR_OVERFLOW:
+		sts = STATUS_CODE_OVERFLOW;
 		status_msg = "X Overflow";
 		break;
+
+	default:
+		return;
 	}
+
+	if(callbacks && callbacks->status)
+		callbacks->status(sts);
+
 }
 
 void
 status_reset(void)
 {
 	if (kybdlock & KL_ENTER_INHIBIT)
+	{
 		status_msg = "X Inhibit";
+		if(callbacks && callbacks->status)
+			callbacks->status(STATUS_CODE_INHIBIT);
+	}
 	else if (kybdlock & KL_DEFERRED_UNLOCK)
+	{
 		status_msg = "X";
+		if(callbacks && callbacks->status)
+			callbacks->status(STATUS_CODE_X);
+	}
 	else
+	{
 		status_msg = "";
+		if(callbacks && callbacks->status)
+			callbacks->status(STATUS_CODE_BLANK);
+	}
+
+	if(screen_has_changes)
+		screen_disp(0);
 
 	if(callbacks && callbacks->reset)
 		callbacks->reset(kybdlock, status_msg);
@@ -1776,6 +1815,9 @@ void
 status_syswait(void)
 {
 	status_msg = "X SYSTEM";
+
+	if(callbacks && callbacks->status)
+		callbacks->status(STATUS_CODE_SYSWAIT);
 }
 
 void
@@ -1783,20 +1825,28 @@ status_twait(void)
 {
 	oia_undera = False;
 	status_msg = "X Wait";
+
+	if(callbacks && callbacks->status)
+		callbacks->status(STATUS_CODE_TWAIT);
 }
 
 void
 status_typeahead(Boolean on)
 {
 	status_ta = on;
+	if(callbacks && callbacks->typeahead)
+		callbacks->typeahead(on);
 }
 
 void
 status_compose(Boolean on, unsigned char c, enum keytype keytype)
 {
-        oia_compose = on;
-        oia_compose_char = c;
-        oia_compose_keytype = keytype;
+	oia_compose = on;
+	oia_compose_char = c;
+	oia_compose_keytype = keytype;
+
+	if(callbacks && callbacks->compose)
+		callbacks->compose(on,c,keytype);
 }
 
 void
@@ -1812,20 +1862,48 @@ status_lu(const char *lu)
 static void
 status_connect(Boolean connected)
 {
+	STATUS_CODE id = STATUS_CODE_USER;
+
 	if (connected) {
 		oia_boxsolid = IN_3270 && !IN_SSCP;
+
+		if(callbacks && callbacks->oia_flag)
+			callbacks->oia_flag(OIA_FLAG_BOXSOLID,oia_boxsolid);
+
 		if (kybdlock & KL_AWAITING_FIRST)
+		{
 			status_msg = "X";
+			id = STATUS_CODE_AWAITING_FIRST;
+		}
 		else
+		{
 			status_msg = "";
+			id = STATUS_CODE_CONNECTED;
+		}
 #if defined(HAVE_LIBSSL) /*[*/
 		status_secure = secure_connection;
+		if(callbacks && callbacks->oia_flag)
+			callbacks->oia_flag(OIA_FLAG_SECURE,secure_connection);
 #endif /*]*/
+
 	} else {
 		oia_boxsolid = False;
+
+		if(callbacks && callbacks->oia_flag)
+			callbacks->oia_flag(OIA_FLAG_BOXSOLID,oia_boxsolid);
+
 		status_msg = "X Disconnected";
+
 		status_secure = False;
+		if(callbacks && callbacks->oia_flag)
+			callbacks->oia_flag(OIA_FLAG_SECURE,False);
+
+		id = STATUS_CODE_DISCONNECTED;
 	}
+
+	if(callbacks && callbacks->status)
+		callbacks->status(id);
+
 }
 
 static void
@@ -1834,12 +1912,21 @@ status_3270_mode(Boolean ignored unused)
 	oia_boxsolid = IN_3270 && !IN_SSCP;
 	if (oia_boxsolid)
 		oia_undera = True;
+
+	if(callbacks && callbacks->oia_flag)
+	{
+		callbacks->oia_flag(OIA_FLAG_BOXSOLID,oia_boxsolid);
+		callbacks->oia_flag(OIA_FLAG_UNDERA,oia_undera);
+	}
+
 }
 
 static void
 status_printer(Boolean on)
 {
 	oia_printer = on;
+	if(callbacks && callbacks->printer)
+		callbacks->printer(on);
 }
 
 static void
@@ -1918,6 +2005,8 @@ void Redraw_action(Widget w unused, XEvent *event unused, String *params unused,
 		endwin();
 		refresh();
 	}
+
+	screen_disp(0);
 
 	if(callbacks && callbacks->redraw)
 		callbacks->redraw();
@@ -2247,6 +2336,7 @@ void screen_changed(int bstart, int bend)
 	screen_has_changes = TRUE;
 	if(callbacks && callbacks->changed)
 		callbacks->changed(bstart,bend);
+
 }
 
 int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk)

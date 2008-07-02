@@ -65,6 +65,32 @@
 		int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk);
 
 		/* Screen processing */
+		typedef enum _STATUS_CODE
+		{
+			STATUS_CODE_BLANK,
+			STATUS_CODE_SYSWAIT,
+			STATUS_CODE_TWAIT,
+			STATUS_CODE_CONNECTED,
+			STATUS_CODE_DISCONNECTED,
+			STATUS_CODE_AWAITING_FIRST,
+			STATUS_CODE_MINUS,
+			STATUS_CODE_PROTECTED,
+			STATUS_CODE_NUMERIC,
+			STATUS_CODE_OVERFLOW,
+			STATUS_CODE_INHIBIT,
+
+
+			STATUS_CODE_X,
+			STATUS_CODE_USER
+		} STATUS_CODE;
+
+		typedef enum _OIA_FLAG
+		{
+			OIA_FLAG_BOXSOLID,
+			OIA_FLAG_UNDERA,
+			OIA_FLAG_SECURE,
+		} OIA_FLAG;
+
 		struct lib3270_screen_callbacks
 		{
 			unsigned short sz;
@@ -81,6 +107,11 @@
 			void (*suspend)(void);
 			void (*resume)(void);
 			void (*reset)(int lock, const char *msg);
+			void (*status)(STATUS_CODE id);
+			void (*typeahead)(int on);
+			void (*printer)(int on);
+			void (*compose)(int on, unsigned char c, int keytype);
+			void (*oia_flag)(OIA_FLAG id, int on);
 
 		};
 
