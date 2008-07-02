@@ -375,18 +375,6 @@ KeysymToString(KeySym k)
 
 /* Timeouts. */
 
-typedef struct timeout {
-	struct timeout *next;
-#if defined(_WIN32) /*[*/
-	unsigned long long ts;
-#else /*][*/
-	struct timeval tv;
-#endif /*]*/
-	void (*proc)(void);
-	Boolean in_play;
-} timeout_t;
-#define TN	(timeout_t *)NULL
-
 unsigned long AddTimeOut(unsigned long interval_ms, void (*proc)(void))
 {
 	if(callbacks && callbacks->AddTimeOut)

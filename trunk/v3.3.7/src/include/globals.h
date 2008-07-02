@@ -64,15 +64,15 @@
 /*
  * Prerequisite #includes.
  */
-#include <stdio.h>			/* Unix standard I/O library */
-#include <stdlib.h>			/* Other Unix library functions */
-#include <unistd.h>			/* Unix system calls */
-#include <ctype.h>			/* Character classes */
-#include <string.h>			/* String manipulations */
+#include <stdio.h>				/* Unix standard I/O library */
+#include <stdlib.h>				/* Other Unix library functions */
+#include <unistd.h>				/* Unix system calls */
+#include <ctype.h>				/* Character classes */
+#include <string.h>				/* String manipulations */
 #include <sys/types.h>			/* Basic system data types */
 #include <sys/time.h>			/* System time-related data types */
-#include <time.h>			/* C library time functions */
-#include "localdefs.h"			/* {s,tcl,c}3270-specific defines */
+#include <time.h>				/* C library time functions */
+#include <lib3270/localdefs.h>	/* {s,tcl,c}3270-specific defines */
 
 /*
  * Cancel out contradictory parts.

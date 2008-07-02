@@ -27,6 +27,7 @@
 #include "g3270.h"
 #include <malloc.h>
 #include <string.h>
+#include <lib3270/localdefs.h>
 
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
 
@@ -46,6 +47,8 @@
  static void addch(int row, int col, int c, unsigned short attr);
  static void set_charset(char *dcs);
  static void redraw(void);
+ static void reset(int lock, const char *msg);
+ static void status(STATUS_CODE id);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -64,7 +67,12 @@
 	NULL,			// void (*refresh)(void);
 	NULL,			// void (*suspend)(void);
 	NULL,			// void (*resume)(void);
-	NULL,			// void (*reset)(int lock, const char *msg);
+	reset,			// void (*reset)(int lock, const char *msg);
+	status,			// void (*status)(STATUS_CODE id);
+	NULL,			// void (*typeahead)(int on);
+	NULL,			// void (*printer)(int on);
+	NULL,			// void (*compose)(int on, unsigned char c, int keytype);
+	NULL,			// void (*oia_flag)(OIA_FLAG id, int on);
 
 
  };
@@ -92,12 +100,13 @@
 	gchar	in[2] = { (char) c, 0 };
 	gsize	sz;
 	gchar	*ch;
+	ELEMENT temp;
  	ELEMENT *el;
 
  	if(!screen)
 		return;
 
- 	el = screen + (row*terminal_cols)+col;
+	memset(&temp,0,sizeof(temp));
 
 	if(c)
 	{
@@ -107,29 +116,38 @@
 
 			if(sz < MAX_CHR_LENGTH)
 			{
-				memcpy(el->ch,ch,sz);
+				memcpy(temp.ch,ch,sz);
 			}
 			else
 			{
 				Log("Invalid size when converting \"%s\" to \"%s\"",in,ch);
-				memset(el->ch,0,MAX_CHR_LENGTH);
+				memset(temp.ch,0,MAX_CHR_LENGTH);
 			}
+			g_free(ch);
+
 		}
 		else
 		{
-			memcpy(el->ch,in,2);
+			memcpy(temp.ch,in,2);
 		}
 
-		g_free(ch);
 	}
 	else
 	{
-		memset(el->ch,0,MAX_CHR_LENGTH);
+		memset(temp.ch,0,MAX_CHR_LENGTH);
 	}
 
 	// TODO (perry#1#): Get the correct colors
-	el->bg = (attr & 0xF0) >> 4;
-	el->fg = (attr & 0x0F);
+	temp.bg = (attr & 0xF0) >> 4;
+	temp.fg = (attr & 0x0F);
+
+	// Get element entry in the buffer, update ONLY if changed
+ 	el = screen + (row*terminal_cols)+col;
+
+	if(!memcmp(el,&temp,sizeof(ELEMENT)))
+		return;
+
+	memcpy(el,&temp,sizeof(ELEMENT));
 
 	// Update pixmap, queue screen redraw.
 	if(terminal && pixmap)
@@ -245,3 +263,38 @@
 	charset = g_strdup(dcs);
  }
 
+ static void reset(int lock, const char *msg)
+ {
+ 	Trace("Reset Lock: %d Msg: \"%s\"",lock,msg);
+ }
+
+ static void status(STATUS_CODE id)
+ {
+#ifdef DEBUG
+	static const char *status_code[STATUS_CODE_USER] =
+		{
+			"STATUS_CODE_BLANK",
+			"STATUS_CODE_SYSWAIT",
+			"STATUS_CODE_TWAIT",
+			"STATUS_CODE_CONNECTED",
+			"STATUS_CODE_DISCONNECTED",
+			"STATUS_CODE_AWAITING_FIRST",
+			"STATUS_CODE_MINUS",
+			"STATUS_CODE_PROTECTED",
+			"STATUS_CODE_NUMERIC",
+			"STATUS_CODE_OVERFLOW",
+			"STATUS_CODE_INHIBIT",
+			"STATUS_CODE_X",
+		};
+
+#endif
+
+	if(id >= STATUS_CODE_USER)
+	{
+		Log("Unexpected status code %d",(int) id);
+		return;
+	}
+
+	Trace("Status changed to \"%s\"",status_code[id]);
+
+ }
