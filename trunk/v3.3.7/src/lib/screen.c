@@ -126,7 +126,7 @@ static struct {
 };
 
 static int defattr = 0;
-static unsigned long input_id;
+// static unsigned long input_id;
 
 Boolean escaped = True;
 Boolean screen_has_changes = FALSE;
@@ -157,8 +157,8 @@ static int onscreen_valid = FALSE; /* is onscreen valid? */
 static int status_row = 0;	/* Row to display the status line on */
 static int status_skip = 0;	/* Row to blank above the status line */
 
-static void kybd_input(void);
-static void kybd_input2(INPUT_RECORD *ir);
+// static void kybd_input(void);
+// static void kybd_input2(INPUT_RECORD *ir);
 static void draw_oia(void);
 static void status_connect(Boolean ignored);
 static void status_3270_mode(Boolean ignored);
@@ -175,7 +175,7 @@ static void check_aplmap(int codepage);
 static void init_user_colors(void);
 static void init_user_attribute_colors(void);
 
-static HANDLE chandle;	/* console input handle */
+// static HANDLE chandle;	/* console input handle */
 static HANDLE cohandle;	/* console screen buffer handle */
 
 static HANDLE *sbuf;	/* dynamically-allocated screen buffer */
@@ -220,14 +220,14 @@ cc_handler(DWORD type)
 /*
  * Get a handle for the console.
  */
-static HANDLE
-initscr(void)
+static int initscr(void)
 {
 	CONSOLE_SCREEN_BUFFER_INFO info;
 	size_t buffer_size;
 	CONSOLE_CURSOR_INFO cursor_info;
 
 	/* Get a handle to the console. */
+	/*
 	chandle = CreateFile("CONIN$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ,
 		NULL, OPEN_EXISTING, 0, NULL);
 	if (chandle == NULL) {
@@ -240,20 +240,21 @@ initscr(void)
 			win32_strerror(GetLastError()));
 		return NULL;
 	}
+	*/
 
 	cohandle = CreateFile("CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE,
 		NULL, OPEN_EXISTING, 0, NULL);
 	if (cohandle == NULL) {
 		fprintf(stderr, "CreateFile(CONOUT$) failed: %s\n",
 			win32_strerror(GetLastError()));
-		return NULL;
+		return 0;
 	}
 
 	/* Get its dimensions. */
 	if (GetConsoleScreenBufferInfo(cohandle, &info) == 0) {
 		fprintf(stderr, "GetConsoleScreenBufferInfo failed: %s\n",
 			win32_strerror(GetLastError()));
-		return NULL;
+		return 0;
 	}
 	console_rows = info.srWindow.Bottom - info.srWindow.Top + 1;
 	console_cols = info.srWindow.Right - info.srWindow.Left + 1;
@@ -262,7 +263,7 @@ initscr(void)
 	if (GetConsoleCursorInfo(cohandle, &cursor_info) == 0) {
 		fprintf(stderr, "GetConsoleCursorInfo failed: %s\n",
 			win32_strerror(GetLastError()));
-		return NULL;
+		return 0;
 	}
 
 	/* Create the screen buffer. */
@@ -276,21 +277,21 @@ initscr(void)
 		fprintf(stderr,
 			"CreateConsoleScreenBuffer failed: %s\n",
 			win32_strerror(GetLastError()));
-		return NULL;
+		return 0;
 	}
 
 	/* Set its cursor state. */
 	if (SetConsoleCursorInfo(sbuf, &cursor_info) == 0) {
 		fprintf(stderr, "SetConsoleScreenBufferInfo failed: %s\n",
 			win32_strerror(GetLastError()));
-		return NULL;
+		return 0;
 	}
 
 	/* Define a console handler. */
 	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)cc_handler, TRUE)) {
 		fprintf(stderr, "SetConsoleCtrlHandler failed: %s\n",
 				win32_strerror(GetLastError()));
-		return NULL;
+		return 0;
 	}
 
 	/* Allocate and initialize the onscreen and toscreen buffers. */
@@ -302,7 +303,7 @@ initscr(void)
 	(void) memset(toscreen, '\0', buffer_size);
 
 	/* More will no doubt follow. */
-	return chandle;
+	return 1;
 }
 
 /* Try to set the console output character set. */
@@ -763,6 +764,7 @@ refresh(void)
 static void
 endwin(void)
 {
+	/*
 	if (SetConsoleMode(chandle, ENABLE_ECHO_INPUT |
 				    ENABLE_LINE_INPUT |
 				    ENABLE_PROCESSED_INPUT) == 0) {
@@ -770,6 +772,8 @@ endwin(void)
 			win32_strerror(GetLastError()));
 		x3270_exit(1);
 	}
+	*/
+
 	if (SetConsoleMode(cohandle, ENABLE_PROCESSED_OUTPUT |
 				     ENABLE_WRAP_AT_EOL_OUTPUT) == 0) {
 		fprintf(stderr, "\nSetConsoleMode(CONOUT$) failed: %s\n",
@@ -804,7 +808,7 @@ screen_init(void)
 		x3270_exit(1);
 	}
 	/* Initialize the console. */
-	if (initscr() == NULL) {
+	if (!initscr()) {
 		(void) fprintf(stderr, "Can't initialize terminal.\n");
 		x3270_exit(1);
 	}
@@ -920,7 +924,7 @@ screen_init2(void)
 	escaped = False;
 
 	/* Subscribe to input events. */
-	input_id = AddInput((int)chandle, kybd_input);
+//	input_id = AddInput((int)chandle, kybd_input);
 }
 
 /* Calculate where the status line goes now. */
@@ -1325,6 +1329,7 @@ screen_disp(Boolean erasing unused)
 	screen_has_changes = FALSE;
 }
 
+/*
 static const char *
 decode_state(int state, Boolean limited, const char *skip)
 {
@@ -1401,8 +1406,11 @@ decode_state(int state, Boolean limited, const char *skip)
 
 	return buf;
 }
+*/
 
 /* Keyboard input. */
+	/*
+
 static void
 kybd_input(void)
 {
@@ -1410,7 +1418,7 @@ kybd_input(void)
 	DWORD nr;
 	const char *s;
 
-	/* Get the next input event. */
+	// Get the next input event.
 	if (ReadConsoleInput(chandle, &ir, 1, &nr) == 0) {
 		fprintf(stderr, "ReadConsoleInput failed: %s\n",
 			win32_strerror(GetLastError()));
@@ -1421,11 +1429,11 @@ kybd_input(void)
 
 	switch (ir.EventType) {
 	case FOCUS_EVENT:
-		/*trace_event("Focus\n");*/
+		//trace_event("Focus\n");
 		return;
 	case KEY_EVENT:
 		if (!ir.Event.KeyEvent.bKeyDown) {
-			/*trace_event("KeyUp\n");*/
+			// trace_event("KeyUp\n");
 			return;
 		}
 		s = lookup_cname(ir.Event.KeyEvent.wVirtualKeyCode << 16,
@@ -1461,7 +1469,9 @@ kybd_input(void)
 
 	kybd_input2(&ir);
 }
+*/
 
+/*
 static void
 trace_as_keymap(KEY_EVENT_RECORD *e)
 {
@@ -1469,7 +1479,7 @@ trace_as_keymap(KEY_EVENT_RECORD *e)
 	char buf[256];
 
 	buf[0] = '\0';
-	t = lookup_cname(e->wVirtualKeyCode << 16, /*True*/False);
+	t = lookup_cname(e->wVirtualKeyCode << 16, False);
 	s = decode_state(e->dwControlKeyState, True, t);
 	if (strcmp(s, "none")) {
 	    	strcat(buf, s);
@@ -1496,11 +1506,13 @@ trace_as_keymap(KEY_EVENT_RECORD *e)
 		strcat(buf, "???");
 	}
 	trace_event(" %s ->", buf);
-	/* Todo:
-	 *  get rid of redundant state (lctrl when lctrl is pressed)
-	 */
+	// Todo:
+	//  get rid of redundant state (lctrl when lctrl is pressed)
+	//
 }
+*/
 
+/*
 static void
 kybd_input2(INPUT_RECORD *ir)
 {
@@ -1509,15 +1521,15 @@ kybd_input2(INPUT_RECORD *ir)
 	unsigned long xk;
 	char *action;
 
-	/*
-	 * Translate the INPUT_RECORD into an integer we can match keymaps
-	 * against.
-	 *
-	 * If VK and ASCII are the same, use VK.
-	 * If VK is 0x6x, use VK.  These are aliases like ADD and NUMPAD0.
-	 * Otherwise, if there's ASCII, use it.
-	 * Otherwise, use VK.
-	 */
+	//
+	// Translate the INPUT_RECORD into an integer we can match keymaps
+	// against.
+	//
+	// If VK and ASCII are the same, use VK.
+	// If VK is 0x6x, use VK.  These are aliases like ADD and NUMPAD0.
+	// Otherwise, if there's ASCII, use it.
+	// Otherwise, use VK.
+	//
 	if (ir->Event.KeyEvent.wVirtualKeyCode ==
 		    ir->Event.KeyEvent.uChar.AsciiChar)
 		xk = (ir->Event.KeyEvent.wVirtualKeyCode << 16) & 0xffff0000;
@@ -1542,7 +1554,7 @@ kybd_input2(INPUT_RECORD *ir)
 
 	k = ir->Event.KeyEvent.wVirtualKeyCode;
 
-	/* These first cases apply to both 3270 and NVT modes. */
+	// These first cases apply to both 3270 and NVT modes.
 	switch (k) {
 	case VK_ESCAPE:
 		action_internal(Escape_action, IA_DEFAULT, CN, CN);
@@ -1602,9 +1614,9 @@ kybd_input2(INPUT_RECORD *ir)
 		break;
 	}
 
-	/* Then look for 3270-only cases. */
+	// Then look for 3270-only cases.
 	if (IN_3270) switch(k) {
-	/* These cases apply only to 3270 mode. */
+	// These cases apply only to 3270 mode.
 	case VK_TAB:
 		action_internal(Tab_action, IA_DEFAULT, CN, CN);
 		return;
@@ -1621,7 +1633,7 @@ kybd_input2(INPUT_RECORD *ir)
 		break;
 	}
 
-	/* Do some NVT-only translations. */
+	// Do some NVT-only translations.
 	if (IN_ANSI) switch(k) {
 	case VK_DELETE:
 		k = 0x7f;
@@ -1631,14 +1643,14 @@ kybd_input2(INPUT_RECORD *ir)
 		break;
 	}
 
-	/* Catch PF keys. */
+	// Catch PF keys.
 	if (k >= VK_F1 && k <= VK_F24) {
 		(void) sprintf(buf, "%d", k - VK_F1 + 1);
 		action_internal(PF_action, IA_DEFAULT, buf, CN);
 		return;
 	}
 
-	/* Then any other 8-bit ASCII character. */
+	// Then any other 8-bit ASCII character.
 	k = ir->Event.KeyEvent.uChar.AsciiChar & 0xff;
 	if (k && !(k & ~0xff)) {
 		char ks[6];
@@ -1659,6 +1671,7 @@ kybd_input2(INPUT_RECORD *ir)
 	}
 	trace_event(" dropped (no default)\n");
 }
+*/
 
 void
 screen_suspend(void)
@@ -1676,7 +1689,7 @@ screen_suspend(void)
 			printf("\n");
 		else
 			need_to_scroll = True;
-		RemoveInput(input_id);
+//		RemoveInput(input_id);
 	}
 }
 
@@ -1690,7 +1703,7 @@ screen_resume(void)
 
 	screen_disp(False);
 	refresh();
-	input_id = AddInput((int)chandle, kybd_input);
+//	input_id = AddInput((int)chandle, kybd_input);
 }
 
 void
@@ -2351,4 +2364,43 @@ int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk)
 	return 0;
 }
 
+void Error(const char *s)
+{
+	WriteLog("Error","%s",s);
+
+	if(callbacks && callbacks->Error)
+		callbacks->Error(s);
+
+#if defined(WC3270) /*[*/
+	x3270_exit(1);
+#else /*][*/
+	exit(1);
+#endif /*]*/
+}
+
+void Warning(const char *s)
+{
+	WriteLog("Warning","%s",s);
+
+	if(callbacks && callbacks->Warning)
+		callbacks->Warning(s);
+}
+
+void mcursor_locked()
+{
+	if(callbacks && callbacks->cursor)
+		callbacks->cursor(CURSOR_MODE_LOCKED);
+}
+
+extern void mcursor_normal()
+{
+	if(callbacks && callbacks->cursor)
+		callbacks->cursor(CURSOR_MODE_NORMAL);
+}
+
+extern void mcursor_waiting()
+{
+	if(callbacks && callbacks->cursor)
+		callbacks->cursor(CURSOR_MODE_WAITING);
+}
 

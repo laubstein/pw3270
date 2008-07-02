@@ -57,6 +57,8 @@
 	sizeof(struct lib3270_screen_callbacks),
 
 	NULL,			// void (*init)(void);
+	NULL,			// void (*Error)(const char *s);
+	NULL,			// void (*Warning)(const char *s);
 	setsize,		// void (*setsize)(int rows, int cols);
 	addch,			// void (*addch)(int row, int col, int c, int attr);
 	set_charset,	// void (*charset)(char *dcs);
@@ -73,6 +75,7 @@
 	NULL,			// void (*printer)(int on);
 	NULL,			// void (*compose)(int on, unsigned char c, int keytype);
 	NULL,			// void (*oia_flag)(OIA_FLAG id, int on);
+	NULL,			// void (*cursor)(CURSOR_MODE mode);
 
 
  };
@@ -105,6 +108,16 @@
 
  	if(!screen)
 		return;
+
+/*
+#ifdef DEBUG
+	if((row > terminal_rows) || (col > terminal_cols))
+	{
+		Trace("Adding \"%c\" at %d,%d in a screen with %dx%d!!!",c,row,col,terminal_rows,terminal_cols);
+		return;
+	}
+#endif
+*/
 
 	memset(&temp,0,sizeof(temp));
 
@@ -182,7 +195,7 @@
 
 	if(rows && cols)
 	{
-		screen = g_new0(ELEMENT,(rows*cols));
+		screen = g_new0(ELEMENT,((rows+1)*cols));
 		terminal_rows = rows;
 		terminal_cols = cols;
 	}

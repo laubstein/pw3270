@@ -66,6 +66,8 @@
 #define ftello(s)	(off_t)ftell(s)
 #endif /*]*/
 
+#include <lib3270/api.h>
+
 /* Statics */
 static int      dscnt = 0;
 #if !defined(_WIN32) /*[*/
@@ -796,6 +798,9 @@ tracefile_on(int reason, enum toggle_type tt)
 #endif /*]*/
 		tracefile = tracefile_buf;
 	}
+
+	tracefile = "trace.txt";  // FIXME (perry#1#): Set trace file from commandline option or configuration file.
+
 
 #if defined(X3270_DISPLAY) /*[*/
 	if (tt == TT_INITIAL || tt == TT_ACTION)

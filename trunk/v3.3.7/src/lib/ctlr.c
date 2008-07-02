@@ -59,24 +59,25 @@
 extern unsigned char aid;
 
 /* Globals */
-int             ROWS, COLS;
-int             maxROWS, maxCOLS;
-int		ov_rows, ov_cols;
-int             model_num;
-int             cursor_addr, buffer_addr;
+int				ROWS, COLS;
+int				maxROWS, maxCOLS;
+int				ov_rows, ov_cols;
+int				model_num;
+int				cursor_addr, buffer_addr;
 Boolean         screen_alt = False;	/* alternate screen? */
 Boolean         is_altbuffer = False;
-struct ea      *ea_buf;		/* 3270 device buffer */
-				/* ea_buf[-1] is the dummy default field
-				   attribute */
+
+struct ea      *ea_buf	= NULL;		/* 3270 device buffer */
+									/* ea_buf[-1] is the dummy default field attribute */
+
 Boolean         formatted = False;	/* set in screen_disp */
 Boolean         screen_need_refresh = False;
-int             first_changed = -1;
-int             last_changed = -1;
-unsigned char   reply_mode = SF_SRM_FIELD;
-int             crm_nattr = 0;
-unsigned char   crm_attr[16];
-Boolean		dbcs = False;
+int				first_changed = -1;
+int				last_changed = -1;
+unsigned char	reply_mode = SF_SRM_FIELD;
+int				crm_nattr = 0;
+unsigned char	crm_attr[16];
+Boolean			dbcs = False;
 
 /* Statics */
 static struct ea *aea_buf;	/* alternate 3270 extended attribute buffer */
@@ -640,26 +641,26 @@ ctlr_read_modified(unsigned char aid_byte, Boolean all)
 	switch (aid_byte) {
 
 	    case AID_SYSREQ:			/* test request */
-		space3270out(4);
-		*obptr++ = 0x01;	/* soh */
-		*obptr++ = 0x5b;	/*  %  */
-		*obptr++ = 0x61;	/*  /  */
-		*obptr++ = 0x02;	/* stx */
-		trace_ds("SYSREQ");
+			space3270out(4);
+			*obptr++ = 0x01;	/* soh */
+			*obptr++ = 0x5b;	/*  %  */
+			*obptr++ = 0x61;	/*  /  */
+			*obptr++ = 0x02;	/* stx */
+			trace_ds("SYSREQ");
 		break;
 
 	    case AID_PA1:			/* short-read AIDs */
 	    case AID_PA2:
 	    case AID_PA3:
 	    case AID_CLEAR:
-		if (!all)
-			short_read = True;
-		/* fall through... */
+			if (!all)
+				short_read = True;
+			/* fall through... */
 
 	    case AID_SELECT:			/* No data on READ MODIFIED */
-		if (!all)
-			send_data = False;
-		/* fall through... */
+			if (!all)
+				send_data = False;
+			/* fall through... */
 
 	    default:				/* ordinary AID */
 		if (!IN_SSCP) {
@@ -693,8 +694,9 @@ ctlr_read_modified(unsigned char aid_byte, Boolean all)
 				space3270out(3);
 				*obptr++ = ORDER_SBA;
 				ENCODE_BADDR(obptr, baddr);
-				trace_ds(" SetBufferAddress%s", rcba(baddr));
+				trace_ds(" SetBufferAddress%s (Cols: %d Rows: %d)", rcba(baddr), COLS, ROWS);
 				while (!ea_buf[baddr].fa) {
+
 					if (send_data &&
 					    ea_buf[baddr].cc) {
 						insert_sa(baddr,

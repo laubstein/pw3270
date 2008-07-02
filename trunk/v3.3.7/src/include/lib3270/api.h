@@ -65,6 +65,15 @@
 		int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk);
 
 		/* Screen processing */
+		typedef enum _CURSOR_MODE
+		{
+			CURSOR_MODE_NORMAL,
+			CURSOR_MODE_WAITING,
+			CURSOR_MODE_LOCKED,
+
+			CURSOR_MODE_USER
+		} CURSOR_MODE;
+
 		typedef enum _STATUS_CODE
 		{
 			STATUS_CODE_BLANK,
@@ -96,6 +105,8 @@
 			unsigned short sz;
 
 			void (*init)(void);
+			void (*Error)(const char *s);
+			void (*Warning)(const char *s);
 			void (*setsize)(int rows, int cols);
 			void (*addch)(int row, int col, int c, unsigned short attr);
 			void (*charset)(char *dcs);
@@ -112,6 +123,7 @@
 			void (*printer)(int on);
 			void (*compose)(int on, unsigned char c, int keytype);
 			void (*oia_flag)(OIA_FLAG id, int on);
+			void (*cursor)(CURSOR_MODE mode);
 
 		};
 

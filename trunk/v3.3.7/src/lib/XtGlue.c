@@ -49,43 +49,9 @@
 
 /*---[ Globals ]--------------------------------------------------------------------------------------------*/
 
-void (*Warning_redirect)(const char *) = NULL;
-
 static const struct lib3270_io_callbacks *callbacks = NULL;
 
 /*---[ Implement ]------------------------------------------------------------------------------------------*/
-
-void
-Error(const char *s)
-{
-	fprintf(stderr, "Error: %s\n", s);
-#if defined(WC3270) /*[*/
-	x3270_exit(1);
-#else /*][*/
-	exit(1);
-#endif /*]*/
-}
-
-void
-Warning(const char *s)
-{
-/*
-#if defined(C3270)
-// TODO (perry#2#): Solve this! How to inform the main program of any error message?
-	extern Boolean any_error_output;
-#endif
-*/
-
-	if (Warning_redirect != NULL)
-		(*Warning_redirect)(s);
-	else
-		fprintf(stderr, "Warning: %s\n", s);
-/*
-#if defined(C3270)
-	any_error_output = True;
-#endif
-*/
-}
 
 void *
 Malloc(size_t len)
@@ -101,12 +67,14 @@ Malloc(size_t len)
 void *
 Calloc(size_t nelem, size_t elsize)
 {
-	char *r;
+	int		sz = nelem * elsize;
+	char	*r = malloc(sz);
 
-	r = malloc(nelem * elsize);
-	if (r == (char *)NULL)
+	if(!r)
 		Error("Out of memory");
-	return memset(r, '\0', nelem * elsize);
+
+	memset(r, 0, sz);
+	return r;
 }
 
 void *
