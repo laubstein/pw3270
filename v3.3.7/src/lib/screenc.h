@@ -18,9 +18,6 @@
 #define display_height()	1
 #define display_widthMM()	100
 #define display_width()		1
-#define mcursor_locked()
-#define mcursor_normal()
-#define mcursor_waiting()
 #define screen_obscured()	False
 #define screen_scroll()
 
@@ -36,6 +33,9 @@ extern void screen_suspend(void);
 extern FILE *start_pager(void);
 extern void toggle_monocase(struct toggle *t, enum toggle_type tt);
 extern Boolean screen_new_display_charsets(char *cslist, char *csname);
+extern void mcursor_locked();
+extern void mcursor_normal();
+extern void mcursor_waiting();
 
 extern Boolean escaped;
 

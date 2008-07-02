@@ -68,18 +68,20 @@
 #if defined(X3270_DBCS) /*[*/
 #include "widec.h"
 #endif /*]*/
+#include <lib3270/api.h>
+
 
 /*#define KYBDLOCK_TRACE	1*/
 
 /* Statics */
 static enum	{ NONE, COMPOSE, FIRST } composing = NONE;
-static unsigned char pf_xlate[] = { 
+static unsigned char pf_xlate[] = {
 	AID_PF1,  AID_PF2,  AID_PF3,  AID_PF4,  AID_PF5,  AID_PF6,
 	AID_PF7,  AID_PF8,  AID_PF9,  AID_PF10, AID_PF11, AID_PF12,
 	AID_PF13, AID_PF14, AID_PF15, AID_PF16, AID_PF17, AID_PF18,
 	AID_PF19, AID_PF20, AID_PF21, AID_PF22, AID_PF23, AID_PF24
 };
-static unsigned char pa_xlate[] = { 
+static unsigned char pa_xlate[] = {
 	AID_PA1, AID_PA2, AID_PA3
 };
 #define PF_SZ	(sizeof(pf_xlate)/sizeof(pf_xlate[0]))
@@ -397,6 +399,8 @@ key_AID(unsigned char aid_code)
 	if (IN_ANSI) {
 		register unsigned i;
 
+		Trace("aid_code: %02x IN_ANSI: %d",aid_code,IN_ANSI);
+
 		if (aid_code == AID_ENTER) {
 			net_sendc('\r');
 			return;
@@ -417,6 +421,9 @@ key_AID(unsigned char aid_code)
 #if defined(X3270_PLUGIN) /*[*/
 	plugin_aid(aid_code);
 #endif /*]*/
+
+	Trace("IN_SSCP: %d cursor_addr: %d",IN_SSCP,cursor_addr);
+
 	if (IN_SSCP) {
 		if (kybdlock & KL_OIA_MINUS)
 			return;
@@ -2325,7 +2332,7 @@ lightpen_select(int baddr)
 			}
 			return;
 		}
-	} 
+	}
 #endif /*]*/
 
 	switch (ea_buf[designator].cc) {
@@ -3346,13 +3353,13 @@ emulate_input(char *s, int len, Boolean pasting)
 						&skipped);
 				state = BASE;
 				break;
-			    case '0': 
-			    case '1': 
-			    case '2': 
+			    case '0':
+			    case '1':
+			    case '2':
 			    case '3':
-			    case '4': 
-			    case '5': 
-			    case '6': 
+			    case '4':
+			    case '5':
+			    case '6':
 			    case '7':
 				state = OCTAL;
 				literal = 0;
@@ -3611,7 +3618,7 @@ hex_input(char *s)
 	}
 #endif /*]*/
 }
- 
+
 void
 ignore_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {

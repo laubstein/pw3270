@@ -373,6 +373,9 @@ main(int argc, char *argv[])
 	}
 #endif /*]*/
 	initialize_toggles();
+
+	do_toggle(DS_TRACE);
+
 	/* Connect to the host. */
 	screen_suspend();
 	if (cl_hostname != CN) {
