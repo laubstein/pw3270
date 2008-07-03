@@ -48,7 +48,6 @@
  static int  addch(int row, int col, int c, unsigned short attr);
  static void set_charset(char *dcs);
  static void redraw(void);
- static void reset(int lock, const char *msg);
  static void status(STATUS_CODE id);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
@@ -70,14 +69,12 @@
 	MoveCursor,		// void (*move_cursor)(int row, int col);
 	NULL,			// void (*suspend)(void);
 	NULL,			// void (*resume)(void);
-	reset,			// void (*reset)(int lock, const char *msg);
+	NULL,			// void (*reset)(int lock, const char *msg);
 	status,			// void (*status)(STATUS_CODE id);
-	NULL,			// void (*typeahead)(int on);
-	NULL,			// void (*printer)(int on);
 	NULL,			// void (*compose)(int on, unsigned char c, int keytype);
-	NULL,			// void (*oia_flag)(OIA_FLAG id, int on);
 	NULL,			// void (*cursor)(CURSOR_MODE mode);
-
+	NULL,			// void (*lu)(const char *lu);
+	NULL,			// void (*set)(OIA_FLAG id, int on);
 
  };
 
@@ -293,10 +290,7 @@
 	charset = g_strdup(dcs);
  }
 
- static void reset(int lock, const char *msg)
- {
- 	Trace("Reset Lock: %d Msg: \"%s\"",lock,msg);
- }
+ static STATUS_CODE last_id = (STATUS_CODE) -1;
 
  static void status(STATUS_CODE id)
  {
@@ -319,11 +313,17 @@
 
 #endif
 
+	/* Check if status has changed to avoid unnecessary redraws */
+	if(id == last_id)
+		return;
+
 	if(id >= STATUS_CODE_USER)
 	{
 		Log("Unexpected status code %d",(int) id);
 		return;
 	}
+
+	last_id = id;
 
 	Trace("Status changed to \"%s\"",status_code[id]);
 

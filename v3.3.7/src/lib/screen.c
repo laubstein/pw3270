@@ -1377,8 +1377,8 @@ status_ctlr_done(void)
 {
 	oia_undera = True;
 
-	if(callbacks && callbacks->oia_flag)
-		callbacks->oia_flag(OIA_FLAG_UNDERA,oia_undera);
+	if(callbacks && callbacks->set)
+		callbacks->set(OIA_FLAG_UNDERA,oia_undera);
 }
 
 void
@@ -1484,8 +1484,8 @@ void
 status_typeahead(Boolean on)
 {
 	status_ta = on;
-	if(callbacks && callbacks->typeahead)
-		callbacks->typeahead(on);
+	if(callbacks && callbacks->set)
+		callbacks->set(OIA_FLAG_TYPEAHEAD,on);
 }
 
 void
@@ -1502,6 +1502,9 @@ status_compose(Boolean on, unsigned char c, enum keytype keytype)
 void
 status_lu(const char *lu)
 {
+	if(callbacks && callbacks->lu)
+		callbacks->lu(lu);
+
 	if (lu != NULL) {
 		(void) strncpy(oia_lu, lu, LUCNT);
 		oia_lu[LUCNT] = '\0';
@@ -1517,8 +1520,8 @@ status_connect(Boolean connected)
 	if (connected) {
 		oia_boxsolid = IN_3270 && !IN_SSCP;
 
-		if(callbacks && callbacks->oia_flag)
-			callbacks->oia_flag(OIA_FLAG_BOXSOLID,oia_boxsolid);
+		if(callbacks && callbacks->set)
+			callbacks->set(OIA_FLAG_BOXSOLID,oia_boxsolid);
 
 		if (kybdlock & KL_AWAITING_FIRST)
 		{
@@ -1539,14 +1542,14 @@ status_connect(Boolean connected)
 	} else {
 		oia_boxsolid = False;
 
-		if(callbacks && callbacks->oia_flag)
-			callbacks->oia_flag(OIA_FLAG_BOXSOLID,oia_boxsolid);
+		if(callbacks && callbacks->set)
+			callbacks->set(OIA_FLAG_BOXSOLID,oia_boxsolid);
 
 		status_msg = "X Disconnected";
 
 		status_secure = False;
-		if(callbacks && callbacks->oia_flag)
-			callbacks->oia_flag(OIA_FLAG_SECURE,False);
+		if(callbacks && callbacks->set)
+			callbacks->set(OIA_FLAG_SECURE,False);
 
 		id = STATUS_CODE_DISCONNECTED;
 	}
@@ -1563,10 +1566,10 @@ status_3270_mode(Boolean ignored unused)
 	if (oia_boxsolid)
 		oia_undera = True;
 
-	if(callbacks && callbacks->oia_flag)
+	if(callbacks && callbacks->set)
 	{
-		callbacks->oia_flag(OIA_FLAG_BOXSOLID,oia_boxsolid);
-		callbacks->oia_flag(OIA_FLAG_UNDERA,oia_undera);
+		callbacks->set(OIA_FLAG_BOXSOLID,oia_boxsolid);
+		callbacks->set(OIA_FLAG_UNDERA,oia_undera);
 	}
 
 }
@@ -1575,8 +1578,8 @@ static void
 status_printer(Boolean on)
 {
 	oia_printer = on;
-	if(callbacks && callbacks->printer)
-		callbacks->printer(on);
+	if(callbacks && callbacks->set)
+		callbacks->set(OIA_FLAG_PRINTER,on);
 }
 
 static void
