@@ -27,6 +27,7 @@
 #include "g3270.h"
 #include <malloc.h>
 #include <string.h>
+#include <errno.h>
 #include <lib3270/localdefs.h>
 
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
@@ -44,7 +45,7 @@
 
  static void title(char *text);
  static void setsize(int rows, int cols);
- static void addch(int row, int col, int c, unsigned short attr);
+ static int  addch(int row, int col, int c, unsigned short attr);
  static void set_charset(char *dcs);
  static void redraw(void);
  static void reset(int lock, const char *msg);
@@ -66,7 +67,7 @@
 	NULL,			// void (*changed)(int bstart, int bend);
 	NULL,			// void (*ring_bell)(void);
 	redraw,			// void (*redraw)(void);
-	NULL,			// void (*refresh)(void);
+	MoveCursor,		// void (*move_cursor)(int row, int col);
 	NULL,			// void (*suspend)(void);
 	NULL,			// void (*resume)(void);
 	reset,			// void (*reset)(int lock, const char *msg);
@@ -85,7 +86,11 @@
  int				left_margin		= 0;
  int				top_margin		= 0;
 
+ int				fWidth			= 0;
+ int				fHeight			= 0;
+
  static ELEMENT	*screen			= NULL;
+ static int		szScreen		= 0;
  static char		*charset		= NULL;
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
@@ -98,26 +103,39 @@
 
  }
 
- static void addch(int row, int col, int c, unsigned short attr)
+ void ParseInput(const gchar *string)
+ {
+    gchar *input = g_convert(string, -1, charset ? charset : "ISO-8859-1", "UTF-8", NULL, NULL, NULL);
+
+    if(!input)
+    {
+        Log("Error converting string \"%s\" to %s",string,charset);
+        return;
+    }
+
+    Trace("Converted input string: \"%s\"",input);
+
+    // NOTE (perry#1#): Is it the best way?
+    Input_String((const unsigned char *) input);
+
+    g_free(input);
+ }
+
+
+ static int addch(int row, int col, int c, unsigned short attr)
  {
 	gchar	in[2] = { (char) c, 0 };
 	gsize	sz;
 	gchar	*ch;
 	ELEMENT temp;
  	ELEMENT *el;
+ 	int		pos = (row*terminal_cols)+col;
 
  	if(!screen)
-		return;
+		return EINVAL;
 
-/*
-#ifdef DEBUG
-	if((row > terminal_rows) || (col > terminal_cols))
-	{
-		Trace("Adding \"%c\" at %d,%d in a screen with %dx%d!!!",c,row,col,terminal_rows,terminal_cols);
-		return;
-	}
-#endif
-*/
+	if(pos > szScreen)
+		return EFAULT;
 
 	memset(&temp,0,sizeof(temp));
 
@@ -155,10 +173,10 @@
 	temp.fg = (attr & 0x0F);
 
 	// Get element entry in the buffer, update ONLY if changed
- 	el = screen + (row*terminal_cols)+col;
+ 	el = screen + pos;
 
 	if(!memcmp(el,&temp,sizeof(ELEMENT)))
-		return;
+		return 0;
 
 	memcpy(el,&temp,sizeof(ELEMENT));
 
@@ -166,9 +184,7 @@
 	if(terminal && pixmap)
 	{
 		gint x, y, width,height;
-		PangoLayout *layout = gtk_widget_create_pango_layout(terminal," ");
-
-		pango_layout_set_text(layout,el->ch,-1);
+		PangoLayout *layout = gtk_widget_create_pango_layout(terminal,el->ch);
 		pango_layout_get_pixel_size(layout,&width,&height);
 
 		x = left_margin + (col * width);
@@ -186,6 +202,7 @@
 		gtk_widget_queue_draw_area(terminal,x,y,width,height);
 	}
 
+	return 0;
  }
 
  static void setsize(int rows, int cols)
@@ -195,7 +212,8 @@
 
 	if(rows && cols)
 	{
-		screen = g_new0(ELEMENT,((rows+1)*cols));
+		szScreen = rows*cols;
+		screen = g_new0(ELEMENT,szScreen);
 		terminal_rows = rows;
 		terminal_cols = cols;
 	}
@@ -222,16 +240,15 @@
 	GdkGC		*gc;
 	PangoLayout *layout;
 	ELEMENT		*el			= screen;
-	int 		width;
-	int 		height;
 	int			x;
 	int			y;
 	int			row;
 	int			col;
+	int			width;
+	int			height;
 
 	if(!el)
 		return -1;
-
 
 	gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
 
@@ -242,7 +259,7 @@
 
 	// Draw screen contens
 	layout = gtk_widget_create_pango_layout(widget," ");
-	pango_layout_get_pixel_size(layout,&width,&height);
+	pango_layout_get_pixel_size(layout,&fWidth,&fHeight);
 
 	y = top_margin;
 	for(row = 0; row < terminal_rows;row++)
@@ -259,9 +276,9 @@
 			}
 
 			el++;
-			x += width;
+			x += fWidth;
 		}
-		y += height;
+		y += fHeight;
 	}
 
 	g_object_unref(layout);

@@ -108,13 +108,13 @@
 			void (*Error)(const char *s);
 			void (*Warning)(const char *s);
 			void (*setsize)(int rows, int cols);
-			void (*addch)(int row, int col, int c, unsigned short attr);
+			int  (*addch)(int row, int col, int c, unsigned short attr);
 			void (*charset)(char *dcs);
 			void (*title)(char *text);
 			void (*changed)(int bstart, int bend);
 			void (*ring_bell)(void);
 			void (*redraw)(void);
-			void (*refresh)(void);
+			void (*move_cursor)(int row, int col);
 			void (*suspend)(void);
 			void (*resume)(void);
 			void (*reset)(int lock, const char *msg);
@@ -128,5 +128,9 @@
 		};
 
 		int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
+
+		/* Misc API calls */
+		void Input_String(const unsigned char *str);
+
 
 #endif // LIB3270_H_INCLUDED

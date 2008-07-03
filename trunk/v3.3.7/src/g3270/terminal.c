@@ -33,6 +33,10 @@
 // TODO (perry#7#): Find a better way to get font sizes!!!
 #define MAX_FONT_SIZES	54
 
+#define CURSOR_MODE_ENABLED	0x80
+#define CURSOR_MODE_CROSS 	0x02
+#define CURSOR_MODE_BASE	0x04
+
 /*---[ Structs ]------------------------------------------------------------------------------------------------*/
 
  typedef struct _fontsize
@@ -46,7 +50,14 @@
 
  GtkWidget				*terminal			= NULL;
  GdkPixmap				*pixmap				= NULL;
- GdkColor				color[QTD_COLORS];
+ GdkColor				color[TERMINAL_COLOR_COUNT];
+
+ static gint			cCol				= -1;
+ static gint			cRow				= -1;
+ static gint			cMode				= 0xFF;
+ static GdkRectangle	cursor;
+ static gint			sWidth				= 0;
+ static gint			sHeight				= 0;
 
  static guint 			last_keyval = 0;
  static GtkIMContext	*im;
@@ -61,11 +72,11 @@
  static GdkPixmap * GetPixmap(GtkWidget *widget)
  {
 	GdkPixmap	*pix;
-	gint		width;
-    gint		height;
 
-	gdk_drawable_get_size(widget->window,&width,&height);
-	pix = gdk_pixmap_new(widget->window,width,height,-1);
+	cCol = -1;
+
+	gdk_drawable_get_size(widget->window,&sWidth,&sHeight);
+	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
 
 	DrawScreen(widget, color, pix);
 
@@ -75,14 +86,35 @@
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
+	GdkGC *gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+
     if(!pixmap)
 		pixmap = GetPixmap(widget); // No pixmap, get a new one
 
-	gdk_draw_drawable(widget->window,	widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+	gdk_draw_drawable(widget->window,	gc,
 										GDK_DRAWABLE(pixmap),
 										event->area.x,event->area.y,
 										event->area.x,event->area.y,
 										event->area.width,event->area.height);
+
+//	if(cMode & CURSOR_MODE_ENABLED)
+//	{
+		// Draw cursor
+		gdk_gc_set_foreground(gc,color+3);
+
+		if(cMode & CURSOR_MODE_CROSS)
+		{
+			// Draw cross-hair cursor
+//			gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CROSS_HAIR);
+			gdk_draw_line(widget->window,gc,cursor.x,0,cursor.x,sHeight);
+		}
+
+		if(cMode & CURSOR_MODE_BASE)
+		{
+			// Draw standard cursor
+
+		}
+//	}
 
 	return 0;
  }
@@ -215,7 +247,7 @@
 
  static void im_commit(GtkIMContext *imcontext, gchar *arg1, gpointer user_data)
  {
-	Trace("Commit: %s (%02x)", arg1,(unsigned int) *arg1);
+	ParseInput(arg1);
  }
 
  static gboolean key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
@@ -246,18 +278,27 @@
 
  int LoadColors(void)
  {
- 	static const char *DefaultColors = "black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white";
+ 	static const char *DefaultColors = "black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white,white,white";
 
  	int 	f;
+
+	// FIXME (perry#9#): Load colors from configuration file.
  	char	*buffer = strdup(DefaultColors);
+
  	char	*ptr = strtok(buffer,",");
 
-	// FIXME (perry#5#): Load colors from configuration file.
- 	for(f=0;ptr && f < QTD_COLORS;f++)
+ 	for(f=0;ptr && f < TERMINAL_COLOR_COUNT;f++)
  	{
-		gdk_color_parse(ptr,color+f);
+ 		if(ptr)
+ 		{
+			gdk_color_parse(ptr,color+f);
+			ptr = strtok(NULL,",");
+ 		}
+		else
+		{
+			gdk_color_parse("White",color+f);
+		}
 		gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+f,TRUE,TRUE);
- 		ptr = strtok(NULL,",");
  	}
 
  	free(buffer);
@@ -300,5 +341,42 @@
 
 
 	return terminal;
+ }
+
+ static void InvalidateCursor(void)
+ {
+ 	if(cCol > 0)
+ 	{
+		gtk_widget_queue_draw_area(terminal,cursor.x,cursor.y,cursor.width,cursor.height);
+		if(cMode & CURSOR_MODE_CROSS)
+		{
+			gtk_widget_queue_draw_area(terminal,0,cursor.y,sWidth,cursor.height);
+			gtk_widget_queue_draw_area(terminal,cursor.x,0,cursor.width,sHeight);
+		}
+ 	}
+ }
+
+ void MoveCursor(int row, int col)
+ {
+
+	InvalidateCursor();
+
+	memset(&cursor,0,sizeof(cursor));
+
+	if(col < 0)
+	{
+		// Disable cursor
+		cCol = cRow = -1;
+		return;
+	}
+
+	// Set cursor position
+	cursor.x 		= left_margin + (col * fWidth);
+	cursor.y 		= top_margin + (row * fHeight);
+	cursor.width 	= fWidth;
+	cursor.height 	= fHeight;
+
+	// Mark to redraw
+	InvalidateCursor();
  }
 

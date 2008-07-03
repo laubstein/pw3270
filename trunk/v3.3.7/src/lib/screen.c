@@ -226,22 +226,6 @@ static int initscr(void)
 	size_t buffer_size;
 	CONSOLE_CURSOR_INFO cursor_info;
 
-	/* Get a handle to the console. */
-	/*
-	chandle = CreateFile("CONIN$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ,
-		NULL, OPEN_EXISTING, 0, NULL);
-	if (chandle == NULL) {
-		fprintf(stderr, "CreateFile(CONIN$) failed: %s\n",
-			win32_strerror(GetLastError()));
-		return NULL;
-	}
-	if (SetConsoleMode(chandle, ENABLE_PROCESSED_INPUT) == 0) {
-		fprintf(stderr, "SetConsoleMode failed: %s\n",
-			win32_strerror(GetLastError()));
-		return NULL;
-	}
-	*/
-
 	cohandle = CreateFile("CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE,
 		NULL, OPEN_EXISTING, 0, NULL);
 	if (cohandle == NULL) {
@@ -727,9 +711,6 @@ static void
 refresh(void)
 {
 	COORD coord;
-
-	if(callbacks && callbacks->refresh)
-		callbacks->refresh();
 
 	/*
 	 * Draw the differences between 'onscreen' and 'toscreen' into
@@ -1329,350 +1310,6 @@ screen_disp(Boolean erasing unused)
 	screen_has_changes = FALSE;
 }
 
-/*
-static const char *
-decode_state(int state, Boolean limited, const char *skip)
-{
-	static char buf[128];
-	char *s = buf;
-	char *space = "";
-
-	*s = '\0';
-	if (skip == CN)
-	    	skip = "";
-	if (state & LEFT_CTRL_PRESSED) {
-		state &= ~LEFT_CTRL_PRESSED;
-	    	if (strcasecmp(skip, "LeftCtrl")) {
-			s += sprintf(s, "%sLeftCtrl", space);
-			space = " ";
-		}
-	}
-	if (state & RIGHT_CTRL_PRESSED) {
-		state &= ~RIGHT_CTRL_PRESSED;
-	    	if (strcasecmp(skip, "RightCtrl")) {
-			s += sprintf(s, "%sRightCtrl", space);
-			space = " ";
-		}
-	}
-	if (state & LEFT_ALT_PRESSED) {
-		state &= ~LEFT_ALT_PRESSED;
-	    	if (strcasecmp(skip, "LeftAlt")) {
-			s += sprintf(s, "%sLeftAlt", space);
-			space = " ";
-		}
-	}
-	if (state & RIGHT_ALT_PRESSED) {
-		state &= ~RIGHT_ALT_PRESSED;
-	    	if (strcasecmp(skip, "RightAlt")) {
-			s += sprintf(s, "%sRightAlt", space);
-			space = " ";
-		}
-	}
-	if (state & SHIFT_PRESSED) {
-		state &= ~SHIFT_PRESSED;
-	    	if (strcasecmp(skip, "Shift")) {
-			s += sprintf(s, "%sShift", space);
-			space = " ";
-		}
-	}
-	if (state & NUMLOCK_ON) {
-		state &= ~NUMLOCK_ON;
-	    	if (!limited) {
-			s += sprintf(s, "%sNumLock", space);
-			space = " ";
-		}
-	}
-	if (state & SCROLLLOCK_ON) {
-		state &= ~SCROLLLOCK_ON;
-		if (!limited) {
-			s += sprintf(s, "%sScrollLock", space);
-			space = " ";
-		}
-	}
-	if (state & ENHANCED_KEY) {
-		state &= ~ENHANCED_KEY;
-		if (!limited) {
-			s += sprintf(s, "%sEnhanced", space);
-			space = " ";
-		}
-	}
-	if (state & !limited) {
-		s += sprintf(s, "%s?0x%x", space, state);
-	}
-
-	if (!buf[0]) {
-	    	return "none";
-	}
-
-	return buf;
-}
-*/
-
-/* Keyboard input. */
-	/*
-
-static void
-kybd_input(void)
-{
-	INPUT_RECORD ir;
-	DWORD nr;
-	const char *s;
-
-	// Get the next input event.
-	if (ReadConsoleInput(chandle, &ir, 1, &nr) == 0) {
-		fprintf(stderr, "ReadConsoleInput failed: %s\n",
-			win32_strerror(GetLastError()));
-		x3270_exit(1);
-	}
-	if (nr == 0)
-		return;
-
-	switch (ir.EventType) {
-	case FOCUS_EVENT:
-		//trace_event("Focus\n");
-		return;
-	case KEY_EVENT:
-		if (!ir.Event.KeyEvent.bKeyDown) {
-			// trace_event("KeyUp\n");
-			return;
-		}
-		s = lookup_cname(ir.Event.KeyEvent.wVirtualKeyCode << 16,
-			False);
-		if (s == NULL)
-			s = "?";
-		trace_event("Key%s vkey 0x%x (%s) scan 0x%x char 0x%x state 0x%x (%s)\n",
-			ir.Event.KeyEvent.bKeyDown? "Down": "Up",
-			ir.Event.KeyEvent.wVirtualKeyCode, s,
-			ir.Event.KeyEvent.wVirtualScanCode,
-			ir.Event.KeyEvent.uChar.AsciiChar & 0xff,
-			(int)ir.Event.KeyEvent.dwControlKeyState,
-			decode_state(ir.Event.KeyEvent.dwControlKeyState,
-			    False, CN));
-		break;
-	case MENU_EVENT:
-		trace_event("Menu\n");
-		return;
-	case MOUSE_EVENT:
-		trace_event("Mouse\n");
-		return;
-	case WINDOW_BUFFER_SIZE_EVENT:
-		trace_event("WindowBufferSize\n");
-		return;
-	default:
-		trace_event("Unknown input event %d\n", ir.EventType);
-		return;
-	}
-
-	if (!ir.Event.KeyEvent.bKeyDown) {
-		return;
-	}
-
-	kybd_input2(&ir);
-}
-*/
-
-/*
-static void
-trace_as_keymap(KEY_EVENT_RECORD *e)
-{
-    	const char *s, *t;
-	char buf[256];
-
-	buf[0] = '\0';
-	t = lookup_cname(e->wVirtualKeyCode << 16, False);
-	s = decode_state(e->dwControlKeyState, True, t);
-	if (strcmp(s, "none")) {
-	    	strcat(buf, s);
-		strcat(buf, " ");
-	}
-	strcat(buf, "<Key>");
-	if (t != CN)
-		strcat(buf, t);
-	else if (e->uChar.AsciiChar) {
-	    	if (e->uChar.AsciiChar == ':')
-		    	strcat(buf, "colon");
-		else if (e->uChar.AsciiChar == ' ')
-		    	strcat(buf, "space");
-		else if (e->uChar.AsciiChar > ' ' && e->uChar.AsciiChar < '~')
-		    	sprintf(strchr(buf, '\0'), "%c",
-				e->uChar.AsciiChar);
-		else if (e->uChar.AsciiChar >= 0x1 &&
-			 e->uChar.AsciiChar <= 0x1a)
-		    	sprintf(strchr(buf, '\0'), "%c",
-				e->uChar.AsciiChar - 1 + 'a');
-		else
-		    	sprintf(strchr(buf, '\0'), "0x%x", e->uChar.AsciiChar);
-	} else {
-		strcat(buf, "???");
-	}
-	trace_event(" %s ->", buf);
-	// Todo:
-	//  get rid of redundant state (lctrl when lctrl is pressed)
-	//
-}
-*/
-
-/*
-static void
-kybd_input2(INPUT_RECORD *ir)
-{
-	int k;
-	char buf[16];
-	unsigned long xk;
-	char *action;
-
-	//
-	// Translate the INPUT_RECORD into an integer we can match keymaps
-	// against.
-	//
-	// If VK and ASCII are the same, use VK.
-	// If VK is 0x6x, use VK.  These are aliases like ADD and NUMPAD0.
-	// Otherwise, if there's ASCII, use it.
-	// Otherwise, use VK.
-	//
-	if (ir->Event.KeyEvent.wVirtualKeyCode ==
-		    ir->Event.KeyEvent.uChar.AsciiChar)
-		xk = (ir->Event.KeyEvent.wVirtualKeyCode << 16) & 0xffff0000;
-	else if ((ir->Event.KeyEvent.wVirtualKeyCode & 0xf0) == 0x60)
-		xk = (ir->Event.KeyEvent.wVirtualKeyCode << 16) & 0xffff0000;
-	else if (ir->Event.KeyEvent.uChar.AsciiChar > 0)
-		xk = ir->Event.KeyEvent.uChar.AsciiChar & 0xffff;
-	else
-		xk = (ir->Event.KeyEvent.wVirtualKeyCode << 16) & 0xffff0000;
-
-	if (xk) {
-	    	trace_as_keymap(&ir->Event.KeyEvent);
-		action = lookup_key(xk, ir->Event.KeyEvent.dwControlKeyState);
-		if (action != CN) {
-			if (strcmp(action, "[ignore]"))
-				push_keymap_action(action);
-			return;
-		}
-	}
-
-	ia_cause = IA_DEFAULT;
-
-	k = ir->Event.KeyEvent.wVirtualKeyCode;
-
-	// These first cases apply to both 3270 and NVT modes.
-	switch (k) {
-	case VK_ESCAPE:
-		action_internal(Escape_action, IA_DEFAULT, CN, CN);
-		return;
-	case VK_UP:
-		action_internal(Up_action, IA_DEFAULT, CN, CN);
-		return;
-	case VK_DOWN:
-		action_internal(Down_action, IA_DEFAULT, CN, CN);
-		return;
-	case VK_LEFT:
-		action_internal(Left_action, IA_DEFAULT, CN, CN);
-		return;
-	case VK_RIGHT:
-		action_internal(Right_action, IA_DEFAULT, CN, CN);
-		return;
-	case VK_HOME:
-		action_internal(Home_action, IA_DEFAULT, CN, CN);
-		return;
-	case VK_ADD:
-		k = '+';
-		break;
-	case VK_SUBTRACT:
-		k = '+';
-		break;
-	case VK_NUMPAD0:
-		k = '0';
-		break;
-	case VK_NUMPAD1:
-		k = '1';
-		break;
-	case VK_NUMPAD2:
-		k = '2';
-		break;
-	case VK_NUMPAD3:
-		k = '3';
-		break;
-	case VK_NUMPAD4:
-		k = '4';
-		break;
-	case VK_NUMPAD5:
-		k = '5';
-		break;
-	case VK_NUMPAD6:
-		k = '6';
-		break;
-	case VK_NUMPAD7:
-		k = '7';
-		break;
-	case VK_NUMPAD8:
-		k = '8';
-		break;
-	case VK_NUMPAD9:
-		k = '9';
-		break;
-	default:
-		break;
-	}
-
-	// Then look for 3270-only cases.
-	if (IN_3270) switch(k) {
-	// These cases apply only to 3270 mode.
-	case VK_TAB:
-		action_internal(Tab_action, IA_DEFAULT, CN, CN);
-		return;
-	case VK_DELETE:
-		action_internal(Delete_action, IA_DEFAULT, CN, CN);
-		return;
-	case VK_BACK:
-		action_internal(BackSpace_action, IA_DEFAULT, CN, CN);
-		return;
-	case VK_RETURN:
-		action_internal(Enter_action, IA_DEFAULT, CN, CN);
-		return;
-	default:
-		break;
-	}
-
-	// Do some NVT-only translations.
-	if (IN_ANSI) switch(k) {
-	case VK_DELETE:
-		k = 0x7f;
-		break;
-	case VK_BACK:
-		k = '\b';
-		break;
-	}
-
-	// Catch PF keys.
-	if (k >= VK_F1 && k <= VK_F24) {
-		(void) sprintf(buf, "%d", k - VK_F1 + 1);
-		action_internal(PF_action, IA_DEFAULT, buf, CN);
-		return;
-	}
-
-	// Then any other 8-bit ASCII character.
-	k = ir->Event.KeyEvent.uChar.AsciiChar & 0xff;
-	if (k && !(k & ~0xff)) {
-		char ks[6];
-		String params[2];
-		Cardinal one;
-
-		if (k >= ' ') {
-			ks[0] = k;
-			ks[1] = '\0';
-		} else {
-			(void) sprintf(ks, "0x%x", k);
-		}
-		params[0] = ks;
-		params[1] = CN;
-		one = 1;
-		Key_action(NULL, NULL, params, &one);
-		return;
-	}
-	trace_event(" dropped (no default)\n");
-}
-*/
-
 void
 screen_suspend(void)
 {
@@ -1689,7 +1326,6 @@ screen_suspend(void)
 			printf("\n");
 		else
 			need_to_scroll = True;
-//		RemoveInput(input_id);
 	}
 }
 
@@ -1703,13 +1339,14 @@ screen_resume(void)
 
 	screen_disp(False);
 	refresh();
-//	input_id = AddInput((int)chandle, kybd_input);
 }
 
-void
-cursor_move(int baddr)
+void cursor_move(int baddr)
 {
 	cursor_addr = baddr;
+
+	if(callbacks && callbacks->move_cursor)
+		callbacks->move_cursor(baddr/cCOLS, baddr%cCOLS);
 }
 
 void
@@ -2347,8 +1984,16 @@ relabel(Boolean ignored unused)
 void screen_changed(int bstart, int bend)
 {
 	screen_has_changes = TRUE;
-	if(callbacks && callbacks->changed)
+
+	if(!callbacks)
+		return;
+
+	/* If the application can manage screen changes, let it do it */
+	if(callbacks->changed)
+	{
 		callbacks->changed(bstart,bend);
+		return;
+	}
 
 }
 

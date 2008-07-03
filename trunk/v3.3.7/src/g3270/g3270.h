@@ -30,18 +30,42 @@
 	#include <gtk/gtk.h>
 	#include <lib3270/api.h>
 
-	#define QTD_COLORS 16
+	enum TERMINAL_COLOR
+	{
+		TERMINAL_COLOR_00,
+		TERMINAL_COLOR_01,
+		TERMINAL_COLOR_02,
+		TERMINAL_COLOR_03,
+		TERMINAL_COLOR_04,
+		TERMINAL_COLOR_05,
+		TERMINAL_COLOR_06,
+		TERMINAL_COLOR_07,
+		TERMINAL_COLOR_08,
+		TERMINAL_COLOR_09,
+		TERMINAL_COLOR_10,
+		TERMINAL_COLOR_11,
+		TERMINAL_COLOR_12,
+		TERMINAL_COLOR_13,
+		TERMINAL_COLOR_14,
+		TERMINAL_COLOR_15,
+		TERMINAL_COLOR_CURSOR,
+		TERMINAL_COLOR_CROSS_HAIR,
+
+		TERMINAL_COLOR_COUNT
+	};
 
 	extern GtkWidget				*topwindow;
 	extern GdkPixmap				*pixmap;
 	extern GtkWidget				*terminal;
-	extern GdkColor				color[QTD_COLORS];
+	extern GdkColor				color[TERMINAL_COLOR_COUNT];
 	extern PangoFontDescription	*font;
 
 	extern int 					terminal_rows;
 	extern int				 		terminal_cols;
 	extern int						left_margin;
 	extern int						top_margin;
+	extern int 					fWidth;
+	extern int 					fHeight;
 
 	extern const struct lib3270_io_callbacks g3270_io_callbacks;
 	extern const struct lib3270_screen_callbacks g3270_screen_callbacks;
@@ -50,6 +74,8 @@
 	GtkWidget 	*CreateTerminalWindow(void);
 	int 		DrawScreen(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
 	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+	void 		ParseInput(const gchar *string);
+	void 		MoveCursor(int row, int col);
 
 
 #endif // G3270_H_INCLUDED

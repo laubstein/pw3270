@@ -2877,6 +2877,21 @@ xim_lookup(XKeyEvent *event)
 }
 #endif /*]*/
 
+/*
+ * Key action by string
+ */
+void Input_String(const unsigned char *str)
+{
+	reset_idle_timer();
+
+	// FIXME (perry#3#): It works but, is it right?
+	while(*str)
+	{
+		key_ACharacter((unsigned char)((*str) & 0xff), KT_STD, IA_KEY, NULL);
+		str++;
+	}
+	screen_disp(0);
+}
 
 /*
  * Key action.
