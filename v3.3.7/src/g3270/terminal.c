@@ -33,7 +33,8 @@
 // TODO (perry#7#): Find a better way to get font sizes!!!
 #define MAX_FONT_SIZES	54
 
-#define CURSOR_MODE_ENABLED	0x80
+#define CURSOR_MODE_SHOW	0x80
+#define CURSOR_MODE_ENABLED	0x40
 #define CURSOR_MODE_CROSS 	0x02
 #define CURSOR_MODE_BASE	0x04
 
@@ -52,8 +53,8 @@
  GdkPixmap				*pixmap				= NULL;
  GdkColor				color[TERMINAL_COLOR_COUNT];
 
- static gint			cCol				= -1;
- static gint			cRow				= -1;
+ static gint			cCol				= 0;
+ static gint			cRow				= 0;
  static gint			cMode				= 0xFF;
  static GdkRectangle	cursor;
  static gint			sWidth				= 0;
@@ -67,19 +68,16 @@
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
+ static void InvalidateCursor(void);
+
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
  static GdkPixmap * GetPixmap(GtkWidget *widget)
  {
 	GdkPixmap	*pix;
-
-	cCol = -1;
-
 	gdk_drawable_get_size(widget->window,&sWidth,&sHeight);
 	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
-
 	DrawScreen(widget, color, pix);
-
 	return pix;
  }
 
@@ -89,7 +87,10 @@
 	GdkGC *gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
 
     if(!pixmap)
+    {
 		pixmap = GetPixmap(widget); // No pixmap, get a new one
+		MoveCursor(cRow,cCol);		// Rebuild cursor position
+    }
 
 	gdk_draw_drawable(widget->window,	gc,
 										GDK_DRAWABLE(pixmap),
@@ -100,19 +101,20 @@
 //	if(cMode & CURSOR_MODE_ENABLED)
 //	{
 		// Draw cursor
-		gdk_gc_set_foreground(gc,color+3);
 
 		if(cMode & CURSOR_MODE_CROSS)
 		{
 			// Draw cross-hair cursor
-//			gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CROSS_HAIR);
+			gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CROSS_HAIR);
 			gdk_draw_line(widget->window,gc,cursor.x,0,cursor.x,sHeight);
+			gdk_draw_line(widget->window,gc,0,cursor.y,sWidth,cursor.y);
 		}
 
-		if(cMode & CURSOR_MODE_BASE)
+		if( (cMode & (CURSOR_MODE_BASE|CURSOR_MODE_SHOW)) == (CURSOR_MODE_BASE|CURSOR_MODE_SHOW) )
 		{
 			// Draw standard cursor
-
+			gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CURSOR);
+			gdk_draw_rectangle(widget->window,gc,TRUE,cursor.x,cursor.y-cursor.height,cursor.width,cursor.height);
 		}
 //	}
 
@@ -278,7 +280,7 @@
 
  int LoadColors(void)
  {
- 	static const char *DefaultColors = "black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white,white,white";
+ 	static const char *DefaultColors = "black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white,green,green";
 
  	int 	f;
 
@@ -296,7 +298,7 @@
  		}
 		else
 		{
-			gdk_color_parse("White",color+f);
+			gdk_color_parse("green",color+f);
 		}
 		gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+f,TRUE,TRUE);
  	}
@@ -304,6 +306,16 @@
  	free(buffer);
 
  	return 0;
+ }
+
+ static gboolean blink_cursor(gpointer ptr)
+ {
+ 	if(cMode & CURSOR_MODE_ENABLED)
+ 	{
+		cMode ^= CURSOR_MODE_SHOW;
+		InvalidateCursor();
+ 	}
+	return TRUE;
  }
 
  GtkWidget *CreateTerminalWindow(void)
@@ -338,6 +350,7 @@
 	font = pango_font_description_from_string("Courier");
 
 
+	g_timeout_add((guint) 750, (GSourceFunc) blink_cursor, 0);
 
 
 	return terminal;
@@ -345,34 +358,28 @@
 
  static void InvalidateCursor(void)
  {
- 	if(cCol > 0)
- 	{
-		gtk_widget_queue_draw_area(terminal,cursor.x,cursor.y,cursor.width,cursor.height);
-		if(cMode & CURSOR_MODE_CROSS)
-		{
-			gtk_widget_queue_draw_area(terminal,0,cursor.y,sWidth,cursor.height);
-			gtk_widget_queue_draw_area(terminal,cursor.x,0,cursor.width,sHeight);
-		}
- 	}
+	gtk_widget_queue_draw_area(terminal,cursor.x,cursor.y-cursor.height,cursor.width,cursor.height);
+	if(cMode & CURSOR_MODE_CROSS)
+	{
+		gtk_widget_queue_draw_area(terminal,0,cursor.y,sWidth,cursor.height);
+		gtk_widget_queue_draw_area(terminal,cursor.x,0,cursor.width,sHeight);
+	}
  }
 
  void MoveCursor(int row, int col)
  {
 
+	Trace("Moving cursor to %d,%d",row,col);
+
 	InvalidateCursor();
 
 	memset(&cursor,0,sizeof(cursor));
 
-	if(col < 0)
-	{
-		// Disable cursor
-		cCol = cRow = -1;
-		return;
-	}
-
 	// Set cursor position
+	cCol			= col;
+	cRow			= row;
 	cursor.x 		= left_margin + (col * fWidth);
-	cursor.y 		= top_margin + (row * fHeight);
+	cursor.y 		= top_margin + ((row+1) * fHeight);
 	cursor.width 	= fWidth;
 	cursor.height 	= fHeight;
 
