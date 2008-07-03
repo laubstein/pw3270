@@ -98,6 +98,10 @@
 			OIA_FLAG_BOXSOLID,
 			OIA_FLAG_UNDERA,
 			OIA_FLAG_SECURE,
+			OIA_FLAG_TYPEAHEAD,
+			OIA_FLAG_PRINTER,
+
+			OIA_FLAG_USER
 		} OIA_FLAG;
 
 		struct lib3270_screen_callbacks
@@ -119,11 +123,10 @@
 			void (*resume)(void);
 			void (*reset)(int lock, const char *msg);
 			void (*status)(STATUS_CODE id);
-			void (*typeahead)(int on);
-			void (*printer)(int on);
 			void (*compose)(int on, unsigned char c, int keytype);
-			void (*oia_flag)(OIA_FLAG id, int on);
 			void (*cursor)(CURSOR_MODE mode);
+			void (*lu)(const char *lu);
+			void (*set)(OIA_FLAG id, int on);
 
 		};
 
