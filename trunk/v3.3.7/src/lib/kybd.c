@@ -2890,7 +2890,7 @@ void Input_String(const unsigned char *str)
 		key_ACharacter((unsigned char)((*str) & 0xff), KT_STD, IA_KEY, NULL);
 		str++;
 	}
-	screen_disp(0);
+	screen_disp();
 }
 
 /*

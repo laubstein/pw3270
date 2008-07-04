@@ -449,7 +449,7 @@ ctlr_erase(Boolean alt)
 
 	if (alt) {
 		/* Going from 24x80 to maximum. */
-		screen_disp(False);
+		screen_disp();
 		ROWS = maxROWS;
 		COLS = maxCOLS;
 	} else {
@@ -457,7 +457,7 @@ ctlr_erase(Boolean alt)
 		if (maxROWS > 24 || maxCOLS > 80) {
 			if (visible_control) {
 				ctlr_blanks();
-				screen_disp(False);
+				screen_disp();
 			}
 			ROWS = 24;
 			COLS = 80;
@@ -2567,7 +2567,7 @@ ctlr_scroll(void)
 	/* Synchronize pending changes prior to this. */
 	obscured = screen_obscured();
 	if (!obscured && screen_has_changes)
-		screen_disp(False);
+		screen_disp();
 
 	/* Move ea_buf. */
 	(void) memmove(&ea_buf[0], &ea_buf[COLS],
@@ -2667,7 +2667,7 @@ ctlr_shrink(void)
 			    visible_control? EBC_space : EBC_null;
 	}
 	ALL_CHANGED;
-	screen_disp(False);
+	screen_disp();
 }
 
 #if defined(X3270_DBCS) /*[*/

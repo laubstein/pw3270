@@ -112,10 +112,10 @@
 		LIB3270_ACTION( GDK_KP_Add,			GDK_NUMLOCK_MASK,	Tab_action),
 
 		LIB3270_ACTION( GDK_r,				GDK_CONTROL_MASK,	Reset_action),
+		LIB3270_ACTION( GDK_Escape,			0,					Reset_action),
+
 		LIB3270_ACTION( GDK_Delete,			0,					Delete_action),
 		LIB3270_ACTION( GDK_BackSpace,		0,					Erase_action),
-
-		LIB3270_ACTION( GDK_Escape,			0,					Reset_action),
 
 		PF_ACTION( GDK_Page_Up,				0,					"7"),
 		PF_ACTION( GDK_Page_Down,			0,					"8"),

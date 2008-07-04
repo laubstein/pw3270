@@ -958,7 +958,7 @@ execute_command(enum iaction cause, char *s, char **np)
 		(*actions[any].proc)((Widget)NULL, (XEvent *)NULL,
 			count? params: (String *)NULL, &count);
 		free_params();
-		screen_disp(False);
+		screen_disp();
 	} else {
 		popup_an_error("Unknown action: %s", aname);
 		free_params();
@@ -1600,7 +1600,7 @@ dump_range(int first, int len, Boolean in_ascii, struct ea *buf,
 	 * execute 'Wait(output)', they will need to wait for output from the
 	 * host.  output_wait_needed is cleared by sms_host_output,
 	 * which is called from the write logic in ctlr.c.
-	 */     
+	 */
 	if (sms != SN && buf == ea_buf)
 		sms->output_wait_needed = True;
 
@@ -1795,7 +1795,7 @@ EbcdicField_action(Widget w unused, XEvent *event unused,
 static unsigned char
 calc_cs(unsigned char cs)
 {
-	switch (cs & CS_MASK) { 
+	switch (cs & CS_MASK) {
 	case CS_APL:
 	    return 0xf1;
 	case CS_LINEDRAW:
@@ -1839,7 +1839,7 @@ do_read_buffer(String *params, Cardinal num_params, struct ea *buf, int fd)
 					action_name(ReadBuffer_action));
 			return;
 		}
-					                                        
+
 	}
 	if (fd >= 0) {
 		char *s;
@@ -2517,7 +2517,7 @@ expand_expect(char *s)
 				    strchr(hexes, tolower(c)) - hexes;
 				nd++;
 			} else {
-				if (nd) 
+				if (nd)
 					*t++ = n;
 				else
 					*t++ = 'x';

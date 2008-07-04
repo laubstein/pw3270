@@ -63,6 +63,7 @@
 	extern GdkPixmap				*pixmap;
 	extern GtkWidget				*terminal;
 	extern GdkColor				color[TERMINAL_COLOR_COUNT];
+	extern GdkCursor        		*wCursor[CURSOR_MODE_USER];
 	extern PangoFontDescription	*font;
 	extern gint					cMode;
 
