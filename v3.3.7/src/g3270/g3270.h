@@ -50,6 +50,7 @@
 		TERMINAL_COLOR_15,
 		TERMINAL_COLOR_CURSOR,
 		TERMINAL_COLOR_CROSS_HAIR,
+		TERMINAL_COLOR_OIA,
 
 		TERMINAL_COLOR_COUNT
 	};
@@ -79,7 +80,10 @@
 
 	int			CreateTopWindow(void);
 	GtkWidget 	*CreateTerminalWindow(void);
+
 	int 		DrawScreen(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
+	void 		DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
+
 	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 	void 		ParseInput(const gchar *string);
 	void 		MoveCursor(int row, int col);

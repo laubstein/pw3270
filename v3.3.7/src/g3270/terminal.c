@@ -77,6 +77,7 @@
 	gdk_drawable_get_size(widget->window,&sWidth,&sHeight);
 	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
 	DrawScreen(widget, color, pix);
+	DrawOIA(widget,color,pix);
 	RedrawCursor();
 	return pix;
  }
@@ -87,10 +88,7 @@
 	GdkGC *gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
 
     if(!pixmap)
-    {
 		pixmap = GetPixmap(widget); // No pixmap, get a new one
-		MoveCursor(cRow,cCol);		// Rebuild cursor position
-    }
 
 	gdk_draw_drawable(widget->window,	gc,
 										GDK_DRAWABLE(pixmap),
@@ -186,7 +184,7 @@
 	}
 
 	/* Get the best font for the current window size */
-	for(f=0;f<MAX_FONT_SIZES && (fsize[f].height*terminal_rows) < event->height && (fsize[f].width*terminal_cols) < event->width;f++);
+	for(f=0;f<MAX_FONT_SIZES && (fsize[f].height*(terminal_rows+1)) < event->height && (fsize[f].width*terminal_cols) < event->width;f++);
 
 	if(f >= MAX_FONT_SIZES)
 		f = (MAX_FONT_SIZES-1);
@@ -206,7 +204,7 @@
 	if(left_margin < 0)
 		left_margin = 0;
 
-	top_margin = (event->height >> 1) - ((terminal_rows * fsize[f].height) >> 1);
+	top_margin = (event->height >> 1) - (((terminal_rows+1) * fsize[f].height) >> 1);
 	if(top_margin < 0)
 		top_margin = 0;
 
@@ -281,7 +279,7 @@
 
  int LoadColors(void)
  {
- 	static const char *DefaultColors = "black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white,green,green";
+ 	static const char *DefaultColors = "black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white,green,green,green";
 
  	int 	f;
 
