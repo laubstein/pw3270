@@ -29,23 +29,14 @@
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
  GtkWidget *topwindow = NULL;
+ GdkCursor *wCursor[CURSOR_MODE_USER];
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
- void action_exit(GtkWidget *w, gpointer data)
- {
- 	gtk_main_quit();
- }
-
  static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer data )
  {
- 	action_exit(widget,0);
+ 	gtk_main_quit();
     return FALSE;
- }
-
- gboolean map_event(GtkWidget *widget, GdkEvent  *event, gpointer   user_data)
- {
-    return 0;
  }
 
  static void destroy( GtkWidget *widget, gpointer   data )
@@ -55,13 +46,17 @@
 
  int CreateTopWindow(void)
  {
+ 	static int cr[CURSOR_MODE_USER] = { GDK_ARROW, GDK_WATCH, GDK_X_CURSOR };
  	GtkWidget	*vbox;
+ 	int			f;
 
 	topwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
+	for(f=0;f<CURSOR_MODE_USER;f++)
+		wCursor[f] = gdk_cursor_new(cr[f]);
+
 	g_signal_connect(G_OBJECT(topwindow),	"delete_event", 		G_CALLBACK(delete_event),			NULL);
 	g_signal_connect(G_OBJECT(topwindow),	"destroy", 				G_CALLBACK(destroy),				NULL);
-	g_signal_connect(G_OBJECT(topwindow),	"map-event",			G_CALLBACK(map_event),				NULL);
 
     vbox = gtk_vbox_new(FALSE,0);
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);

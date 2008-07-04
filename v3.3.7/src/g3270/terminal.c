@@ -233,6 +233,7 @@
 
 	// Configure im context
     gtk_im_context_set_client_window(im,widget->window);
+    gdk_window_set_cursor(widget->window,wCursor[0]);
  }
 
  static gboolean focus_in(GtkWidget *widget, GdkEventFocus *event, gpointer x)

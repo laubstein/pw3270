@@ -52,6 +52,7 @@
  static void erase(void);
  static void suspend(void);
  static void resume(void);
+ static void set_cursor(CURSOR_MODE mode);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -75,7 +76,7 @@
 	NULL,			// void (*reset)(int lock, const char *msg);
 	status,			// void (*status)(STATUS_CODE id);
 	NULL,			// void (*compose)(int on, unsigned char c, int keytype);
-	NULL,			// void (*cursor)(CURSOR_MODE mode);
+	set_cursor,		// void (*cursor)(CURSOR_MODE mode);
 	NULL,			// void (*lu)(const char *lu);
 	NULL,			// void (*set)(OIA_FLAG id, int on);
 	erase,			// void (*erase)(void);
@@ -197,9 +198,9 @@
 
 	memcpy(el,&temp,sizeof(ELEMENT));
 
-	// If necessary and enabled update pixmap, queue screen redraw.
 	if(draw && terminal && pixmap)
 	{
+		// Update pixmap, queue screen redraw.
 		gint x, y;
 		PangoLayout *layout = gtk_widget_create_pango_layout(terminal,el->ch);
 
@@ -380,3 +381,9 @@
 
  }
 
+ static void set_cursor(CURSOR_MODE mode)
+ {
+ 	if(terminal && terminal->window && mode < CURSOR_MODE_USER)
+		gdk_window_set_cursor(terminal->window,wCursor[mode]);
+
+ }

@@ -200,7 +200,6 @@ Boolean escape_pending = False;
 Boolean stop_pending = False;
 Boolean dont_return = False;
 
-
 /* Callback for connection state changes. */
 static void
 main_connect(Boolean ignored)
@@ -396,7 +395,7 @@ main(int argc, char *argv[])
 	}
 
 	screen_resume();
-	screen_disp(False);
+	screen_disp();
 	peer_script_init();
 
 	/* Process events forever. */

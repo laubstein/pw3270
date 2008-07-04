@@ -1177,11 +1177,11 @@ void screen_erase(void)
 	}
 
 	/* No callback, just redraw */
-	screen_disp(True);
+	screen_disp();
 }
 
 /* Display what's in the buffer. */
-void screen_disp(Boolean erasing unused)
+void screen_disp(void)
 {
 	int row, col;
 	int a;
@@ -1354,7 +1354,7 @@ void screen_resume(void)
 
 	escaped = False;
 
-	screen_disp(False);
+	screen_disp();
 	refresh();
 
 	if(callbacks && callbacks->resume)
@@ -1373,10 +1373,9 @@ void cursor_move(int baddr)
 		callbacks->move_cursor(baddr/cCOLS, baddr%cCOLS);
 }
 
-void
-toggle_monocase(struct toggle *t unused, enum toggle_type tt unused)
+void toggle_monocase(struct toggle *t unused, enum toggle_type tt unused)
 {
-	screen_disp(False);
+	screen_disp();
 }
 
 /* Status line stuff. */
@@ -1473,7 +1472,7 @@ status_reset(void)
 	}
 
 	if(screen_has_changes)
-		screen_disp(0);
+		screen_disp();
 
 	if(callbacks && callbacks->reset)
 		callbacks->reset(kybdlock, status_msg);
@@ -1683,7 +1682,7 @@ void Redraw_action(Widget w unused, XEvent *event unused, String *params unused,
 		refresh();
 	}
 
-	screen_disp(0);
+	screen_disp();
 
 	if(callbacks && callbacks->redraw)
 		callbacks->redraw();
@@ -1700,7 +1699,7 @@ void
 screen_flip(void)
 {
 	flipped = !flipped;
-	screen_disp(False);
+	screen_disp();
 }
 
 void
