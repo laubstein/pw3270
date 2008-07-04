@@ -314,6 +314,10 @@ main(int argc, char *argv[])
 	if(CreateTopWindow())
 		return -1;
 
+//#ifdef DEBUG
+//	gdk_window_set_debug_updates(TRUE);
+//#endif
+
 	/* Init 3270 stuff */
 	if(parse_program_parameters(argc, (const char **)argv))
 		return -1;
