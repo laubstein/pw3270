@@ -1161,9 +1161,27 @@ calc_attrs(int baddr, int fa_addr, int fa)
 	return a;
 }
 
+/* Erase screen */
+void screen_erase(void)
+{
+	/* This may be called when it isn't time. */
+	if (escaped)
+		return;
+
+	/* If the application supplies a callback use it! */
+	if(callbacks && callbacks->erase)
+	{
+		callbacks->erase();
+		screen_has_changes = FALSE;
+		return;
+	}
+
+	/* No callback, just redraw */
+	screen_disp(True);
+}
+
 /* Display what's in the buffer. */
-void
-screen_disp(Boolean erasing unused)
+void screen_disp(Boolean erasing unused)
 {
 	int row, col;
 	int a;
@@ -1343,6 +1361,9 @@ screen_resume(void)
 
 void cursor_move(int baddr)
 {
+	if(cursor_addr == baddr) // Prevent unnecessary calls
+		return;
+
 	cursor_addr = baddr;
 
 	if(callbacks && callbacks->move_cursor)
@@ -2009,6 +2030,7 @@ int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk)
 		return -EINVAL;
 
 	callbacks = cbk;
+
 	return 0;
 }
 

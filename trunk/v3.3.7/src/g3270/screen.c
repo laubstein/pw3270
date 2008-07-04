@@ -49,6 +49,7 @@
  static void set_charset(char *dcs);
  static void redraw(void);
  static void status(STATUS_CODE id);
+ static void erase(void);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -75,6 +76,7 @@
 	NULL,			// void (*cursor)(CURSOR_MODE mode);
 	NULL,			// void (*lu)(const char *lu);
 	NULL,			// void (*set)(OIA_FLAG id, int on);
+	erase,			// void (*erase)(void);
 
  };
 
@@ -225,6 +227,32 @@
  }
 
  /**
+  * Erase screen.
+  *
+  */
+ static void erase(void)
+ {
+	GdkGC		*gc;
+	int			width;
+	int			height;
+
+	Trace("Erasing screen! (pixmap: %p screen: %p)",pixmap,screen);
+
+	if(screen)
+		memset(screen,0,szScreen);
+
+	if(terminal && pixmap)
+	{
+		gc = terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)];
+		gdk_drawable_get_size(pixmap,&width,&height);
+		gdk_gc_set_foreground(gc,color);
+		gdk_draw_rectangle(pixmap,gc,1,0,0,width,height);
+	}
+ }
+
+ static void erase(void);
+
+ /**
   * Draw entire buffer.
   *
   * @param	widget	Widget to be used as reference.
@@ -265,7 +293,7 @@
 		for(col = 0; col < terminal_cols;col++)
 		{
 			// Set character attributes in the layout
-			if(el->ch)
+			if(el->ch && *el->ch != ' ' && *el->ch)
 			{
 				pango_layout_set_text(layout,el->ch,-1);
 				pango_layout_get_pixel_size(layout,&width,&height);
@@ -328,3 +356,4 @@
 	Trace("Status changed to \"%s\"",status_code[id]);
 
  }
+
