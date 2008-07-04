@@ -445,7 +445,7 @@ ctlr_erase(Boolean alt)
 	if (alt == screen_alt)
 		return;
 
-	screen_disp(True);
+	screen_erase();
 
 	if (alt) {
 		/* Going from 24x80 to maximum. */

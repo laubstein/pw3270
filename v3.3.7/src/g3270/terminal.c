@@ -33,11 +33,6 @@
 // TODO (perry#7#): Find a better way to get font sizes!!!
 #define MAX_FONT_SIZES	54
 
-#define CURSOR_MODE_SHOW	0x80
-#define CURSOR_MODE_ENABLED	0x40
-#define CURSOR_MODE_CROSS 	0x02
-#define CURSOR_MODE_BASE	0x04
-
 /*---[ Structs ]------------------------------------------------------------------------------------------------*/
 
  typedef struct _fontsize
@@ -52,10 +47,10 @@
  GtkWidget				*terminal			= NULL;
  GdkPixmap				*pixmap				= NULL;
  GdkColor				color[TERMINAL_COLOR_COUNT];
+ gint					cMode				= 0xFF;
 
  static gint			cCol				= 0;
  static gint			cRow				= 0;
- static gint			cMode				= 0xFF;
  static GdkRectangle	cursor;
  static gint			sWidth				= 0;
  static gint			sHeight				= 0;
@@ -66,9 +61,8 @@
  static PangoFontDescription	*font					= NULL;
  static FONTSIZE				fsize[MAX_FONT_SIZES];
 
-/*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
- static void InvalidateCursor(void);
+/*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -98,8 +92,8 @@
 										event->area.x,event->area.y,
 										event->area.width,event->area.height);
 
-//	if(cMode & CURSOR_MODE_ENABLED)
-//	{
+	if(cMode & CURSOR_MODE_ENABLED)
+	{
 		// Draw cursor
 
 		if(cMode & CURSOR_MODE_CROSS)
@@ -116,7 +110,7 @@
 			gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CURSOR);
 			gdk_draw_rectangle(widget->window,gc,TRUE,cursor.x,cursor.y-cursor.height,cursor.width,cursor.height);
 		}
-//	}
+	}
 
 	return 0;
  }
@@ -356,7 +350,7 @@
 	return terminal;
  }
 
- static void InvalidateCursor(void)
+ void InvalidateCursor(void)
  {
 	gtk_widget_queue_draw_area(terminal,cursor.x,cursor.y-cursor.height,cursor.width,cursor.height);
 	if(cMode & CURSOR_MODE_CROSS)
@@ -368,6 +362,8 @@
 
  void MoveCursor(int row, int col)
  {
+	if(row == cRow && col == cCol)
+		return;
 
 	Trace("Moving cursor to %d,%d",row,col);
 
@@ -381,7 +377,7 @@
 	cursor.x 		= left_margin + (col * fWidth);
 	cursor.y 		= top_margin + ((row+1) * fHeight);
 	cursor.width 	= fWidth;
-	cursor.height 	= fHeight;
+	cursor.height 	= (fHeight >> 2)+1;
 
 	// Mark to redraw
 	InvalidateCursor();

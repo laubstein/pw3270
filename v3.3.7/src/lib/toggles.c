@@ -24,6 +24,7 @@
  *		This module handles toggles.
  */
 
+#include <errno.h>
 #include "globals.h"
 #include "appres.h"
 
@@ -36,7 +37,24 @@
 #include "trace_dsc.h"
 #include "togglesc.h"
 
+#if defined(LIB3270)
+	#include <lib3270/api.h>
+#endif
+
 
+
+#if defined(LIB3270)
+/* Register a callback to monitor toggle changes */
+int register_tchange(int ix, void (*callback)(int value, int reason))
+{
+	if(ix < 0 || ix >= N_TOGGLES)
+		return EINVAL;
+
+	appres.toggle[ix].callback = callback;
+
+	return 0;
+}
+#endif
 /*
  * Generic toggle stuff
  */
@@ -54,6 +72,12 @@ do_toggle_reason(int ix, enum toggle_type reason)
 #if defined(X3270_MENUS) /*[*/
 	menubar_retoggle(t);
 #endif /*]*/
+
+#if defined(LIB3270)
+	if(t->callback)
+		t->callback(t->value, (int) reason);
+#endif
+
 }
 
 void
@@ -68,6 +92,13 @@ do_toggle(int ix)
 void
 initialize_toggles(void)
 {
+	int f;
+
+#if defined(LIB3270)
+	for(f=0;f<N_TOGGLES;f++)
+		appres.toggle[MONOCASE].callback = 0;
+#endif
+
 #if defined(X3270_DISPLAY) || defined(C3270) /*[*/
 	appres.toggle[MONOCASE].upcall =         toggle_monocase;
 #endif /*]*/

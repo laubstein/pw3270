@@ -127,6 +127,7 @@
 			void (*cursor)(CURSOR_MODE mode);
 			void (*lu)(const char *lu);
 			void (*set)(OIA_FLAG id, int on);
+			void (*erase)(void);
 
 		};
 

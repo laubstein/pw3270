@@ -282,6 +282,8 @@ main(int argc, char *argv[])
 {
 	const char	*cl_hostname = CN;
 
+	printf("%s\n\nCopyright 1989-2008 by Paul Mattes, GTRC and others.\n",build);
+
 	/* Init GTK stuff */
 	g_thread_init(0);
 	gtk_init (&argc, &argv);
@@ -306,18 +308,15 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
+	/* Handle initial settings. */
+	initialize_toggles();
+
 	if(CreateTopWindow())
 		return -1;
 
 	/* Init 3270 stuff */
 	if(parse_program_parameters(argc, (const char **)argv))
 		return -1;
-
-	printf("%s\n\n"
-		"Copyright 1989-2008 by Paul Mattes, GTRC and others.\n"
-		"Type 'show copyright' for full copyright information.\n"
-		"Type 'help' for help information.\n\n",
-		build);
 
 	add_resource("keymap.base",
 #if defined(_WIN32) /*[*/
@@ -365,14 +364,9 @@ main(int argc, char *argv[])
 	(void) signal(SIGCHLD, sigchld_handler);
 #endif /*]*/
 
-	/* Handle initial toggle settings. */
-#if defined(X3270_TRACE) /*[*/
-	if (!appres.debug_tracing) {
-		appres.toggle[DS_TRACE].value = False;
-		appres.toggle[EVENT_TRACE].value = False;
-	}
-#endif /*]*/
-	initialize_toggles();
+	gtk_widget_show_all(topwindow);
+	gtk_widget_grab_focus(terminal);
+	gtk_widget_grab_default(terminal);
 
 	/* Connect to the host. */
 	screen_suspend();
@@ -403,42 +397,8 @@ main(int argc, char *argv[])
 
 	/* Process events forever. */
 	Trace("Entering %s main loop","GTK");
-	gtk_widget_show_all(topwindow);
-	gtk_widget_grab_focus(terminal);
-	gtk_widget_grab_default(terminal);
 	gtk_main();
 	Trace("%s main loop has finished","GTK");
-
-/*
-	while (1) {
-		if (!escaped)
-			(void) process_events(True);
-		if (appres.cbreak_mode && escape_pending) {
-			escape_pending = False;
-			screen_suspend();
-		}
-		if (!CONNECTED) {
-			screen_suspend();
-			(void) printf("Disconnected.\n");
-			if (appres.once)
-				x3270_exit(0);
-			interact();
-			screen_resume();
-		} else if (escaped) {
-			interact();
-			trace_event("Done interacting.\n");
-			screen_resume();
-		}
-
-#if !defined(_WIN32)
-		if (children && waitpid(0, (int *)0, WNOHANG) > 0)
-			--children;
-#else
-		printer_check();
-#endif
-		screen_disp(False);
-	}
-	*/
 
 	return 0;
 }

@@ -54,11 +54,17 @@
 		TERMINAL_COLOR_COUNT
 	};
 
+	#define CURSOR_MODE_SHOW	0x80
+	#define CURSOR_MODE_ENABLED	0x40
+	#define CURSOR_MODE_CROSS 	0x02
+	#define CURSOR_MODE_BASE	0x04
+
 	extern GtkWidget				*topwindow;
 	extern GdkPixmap				*pixmap;
 	extern GtkWidget				*terminal;
 	extern GdkColor				color[TERMINAL_COLOR_COUNT];
 	extern PangoFontDescription	*font;
+	extern gint					cMode;
 
 	extern int 					terminal_rows;
 	extern int				 		terminal_cols;
@@ -76,6 +82,8 @@
 	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 	void 		ParseInput(const gchar *string);
 	void 		MoveCursor(int row, int col);
+	void 		InvalidateCursor(void);
+
 
 
 #endif // G3270_H_INCLUDED
