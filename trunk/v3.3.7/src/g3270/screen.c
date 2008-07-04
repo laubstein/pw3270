@@ -90,6 +90,7 @@
 
  int				fWidth			= 0;
  int				fHeight			= 0;
+ int				oiaRow			= -1;
 
  static ELEMENT	*screen			= NULL;
  static int		szScreen		= 0;
@@ -270,11 +271,23 @@
 		gdk_drawable_get_size(pixmap,&width,&height);
 		gdk_gc_set_foreground(gc,color);
 		gdk_draw_rectangle(pixmap,gc,1,0,0,width,height);
+		if(oiaRow > 0)
+			DrawOIA(terminal,color,pixmap);
 		gtk_widget_queue_draw(terminal);
 	}
  }
 
- static void erase(void);
+ void DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw)
+ {
+	GdkGC *gc	= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+	int   row	= oiaRow;
+
+	// Draw OIA
+	gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_OIA);
+	gdk_draw_line(draw,gc,left_margin,row,left_margin+(fWidth*terminal_cols),row);
+	row++;
+
+ }
 
  /**
   * Draw entire buffer.
@@ -320,7 +333,7 @@
 			if(el->ch && *el->ch != ' ' && *el->ch)
 			{
 				pango_layout_set_text(layout,el->ch,-1);
-				pango_layout_get_pixel_size(layout,&width,&height);
+//				pango_layout_get_pixel_size(layout,&width,&height);
 				gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+el->fg,clr+el->bg);
 			}
 
@@ -332,8 +345,12 @@
 
 	g_object_unref(layout);
 
+	oiaRow = y;
+
 	return 0;
+
  }
+
 
  static void set_charset(char *dcs)
  {
