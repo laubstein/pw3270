@@ -50,6 +50,8 @@
  static void redraw(void);
  static void status(STATUS_CODE id);
  static void erase(void);
+ static void suspend(void);
+ static void resume(void);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -68,8 +70,8 @@
 	NULL,			// void (*ring_bell)(void);
 	redraw,			// void (*redraw)(void);
 	MoveCursor,		// void (*move_cursor)(int row, int col);
-	NULL,			// void (*suspend)(void);
-	NULL,			// void (*resume)(void);
+	suspend,		// void (*suspend)(void);
+	resume,			// void (*resume)(void);
 	NULL,			// void (*reset)(int lock, const char *msg);
 	status,			// void (*status)(STATUS_CODE id);
 	NULL,			// void (*compose)(int on, unsigned char c, int keytype);
@@ -91,8 +93,24 @@
  static ELEMENT	*screen			= NULL;
  static int		szScreen		= 0;
  static char		*charset		= NULL;
+ static gboolean	draw			= FALSE;
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
+
+ static void suspend(void)
+ {
+ 	draw = FALSE;
+ }
+
+ static void resume(void)
+ {
+ 	draw = TRUE;
+ 	if(terminal && pixmap)
+ 	{
+		DrawScreen(terminal, color, pixmap);
+		gtk_widget_queue_draw(terminal);
+ 	}
+ }
 
  static void title(char *text)
  {
@@ -179,15 +197,14 @@
 
 	memcpy(el,&temp,sizeof(ELEMENT));
 
-	// Update pixmap, queue screen redraw.
-	if(terminal && pixmap)
+	// If necessary and enabled update pixmap, queue screen redraw.
+	if(draw && terminal && pixmap)
 	{
-		gint x, y, width,height;
+		gint x, y;
 		PangoLayout *layout = gtk_widget_create_pango_layout(terminal,el->ch);
-		pango_layout_get_pixel_size(layout,&width,&height);
 
-		x = left_margin + (col * width);
-		y = top_margin + (row * height);
+		x = left_margin + (col * fWidth);
+		y = top_margin + (row * fHeight);
 
 		gdk_draw_layout_with_colors(	pixmap,
 										terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)],
@@ -198,7 +215,7 @@
 
 		g_object_unref(layout);
 
-		gtk_widget_queue_draw_area(terminal,x,y,width,height);
+		gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
 	}
 
 	return 0;
@@ -235,11 +252,16 @@
 	GdkGC		*gc;
 	int			width;
 	int			height;
+	int			f;
 
 	Trace("Erasing screen! (pixmap: %p screen: %p)",pixmap,screen);
 
 	if(screen)
+	{
 		memset(screen,0,szScreen);
+		for(f=0;f<szScreen;f++)
+			screen[f].ch[0] = ' ';
+	}
 
 	if(terminal && pixmap)
 	{
@@ -247,6 +269,7 @@
 		gdk_drawable_get_size(pixmap,&width,&height);
 		gdk_gc_set_foreground(gc,color);
 		gdk_draw_rectangle(pixmap,gc,1,0,0,width,height);
+		gtk_widget_queue_draw(terminal);
 	}
  }
 

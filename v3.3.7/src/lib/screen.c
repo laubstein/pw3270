@@ -1328,10 +1328,11 @@ void screen_disp(Boolean erasing unused)
 	screen_has_changes = FALSE;
 }
 
-void
-screen_suspend(void)
+void screen_suspend(void)
 {
 	static Boolean need_to_scroll = False;
+
+	WriteLog("x","Screen suspended! %p",callbacks);
 
 	if(callbacks && callbacks->suspend)
 		callbacks->suspend();
@@ -1347,16 +1348,18 @@ screen_suspend(void)
 	}
 }
 
-void
-screen_resume(void)
+void screen_resume(void)
 {
+	WriteLog("x", "Screen Resumed! %p",callbacks);
+
 	escaped = False;
+
+	screen_disp(False);
+	refresh();
 
 	if(callbacks && callbacks->resume)
 		callbacks->resume();
 
-	screen_disp(False);
-	refresh();
 }
 
 void cursor_move(int baddr)

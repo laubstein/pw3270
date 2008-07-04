@@ -25,6 +25,7 @@
 */
 
 #include "g3270.h"
+#include <lib3270/toggle.h>
 #include <gdk/gdk.h>
 #include <string.h>
 #include <malloc.h>
@@ -47,13 +48,15 @@
  GtkWidget				*terminal			= NULL;
  GdkPixmap				*pixmap				= NULL;
  GdkColor				color[TERMINAL_COLOR_COUNT];
- gint					cMode				= 0xFF;
+ gint					cMode				= CURSOR_MODE_ENABLED|CURSOR_MODE_BASE|CURSOR_MODE_SHOW;
+
 
  static gint			cCol				= 0;
  static gint			cRow				= 0;
  static GdkRectangle	cursor;
  static gint			sWidth				= 0;
  static gint			sHeight				= 0;
+ static int			blink_enabled		= 0;
 
  static guint 			last_keyval = 0;
  static GtkIMContext	*im;
@@ -64,6 +67,8 @@
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
+ static void RedrawCursor(void);
+
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
  static GdkPixmap * GetPixmap(GtkWidget *widget)
@@ -72,6 +77,7 @@
 	gdk_drawable_get_size(widget->window,&sWidth,&sHeight);
 	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
 	DrawScreen(widget, color, pix);
+	RedrawCursor();
 	return pix;
  }
 
@@ -116,7 +122,7 @@
  }
 
  /**
-  * Cache font size.
+  * Cache font sizes.
   *
   * Get the font metrics for the selected size, cache it for speed up terminal resizing.
   *
@@ -302,8 +308,20 @@
  	return 0;
  }
 
+ static void set_crosshair(int value, int reason)
+ {
+ 	if(value)
+		cMode |= CURSOR_MODE_CROSS;
+	else
+		cMode &= ~CURSOR_MODE_CROSS;
+	InvalidateCursor();
+ }
+
  static gboolean blink_cursor(gpointer ptr)
  {
+ 	if(!blink_enabled)
+		return FALSE;
+
  	if(cMode & CURSOR_MODE_ENABLED)
  	{
 		cMode ^= CURSOR_MODE_SHOW;
@@ -312,9 +330,22 @@
 	return TRUE;
  }
 
+
+ static void set_blink(int value, int reason)
+ {
+ 	if(value == blink_enabled)
+		return;
+
+	blink_enabled = value;
+
+	if(value)
+		g_timeout_add((guint) 750, (GSourceFunc) blink_cursor, 0);
+
+	InvalidateCursor();
+ }
+
  GtkWidget *CreateTerminalWindow(void)
  {
-
 	memset(fsize,0,MAX_FONT_SIZES * sizeof(FONTSIZE));
 
  	LoadColors();
@@ -344,8 +375,8 @@
 	font = pango_font_description_from_string("Courier");
 
 
-	g_timeout_add((guint) 750, (GSourceFunc) blink_cursor, 0);
-
+	register_tchange(CROSSHAIR,set_crosshair);
+	register_tchange(CURSOR_BLINK,set_blink);
 
 	return terminal;
  }
@@ -369,13 +400,19 @@
 
 	InvalidateCursor();
 
+	cCol			= col;
+	cRow			= row;
+
+	RedrawCursor();
+ }
+
+ static void RedrawCursor(void)
+ {
 	memset(&cursor,0,sizeof(cursor));
 
 	// Set cursor position
-	cCol			= col;
-	cRow			= row;
-	cursor.x 		= left_margin + (col * fWidth);
-	cursor.y 		= top_margin + ((row+1) * fHeight);
+	cursor.x 		= left_margin + (cCol * fWidth);
+	cursor.y 		= top_margin + ((cRow+1) * fHeight);
 	cursor.width 	= fWidth;
 	cursor.height 	= (fHeight >> 2)+1;
 
