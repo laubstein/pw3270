@@ -54,6 +54,7 @@
 #include "trace_dsc.h"
 #include "utilc.h"
 #include "widec.h"
+#include "screenc.h"
 
 /* Externals: kybd.c */
 extern unsigned char aid;
@@ -438,14 +439,13 @@ ctlr_erase(Boolean alt)
 	kybd_inhibit(False);
 
 	ctlr_clear(True);
+	screen_erase();
 
 	/* Let a script go. */
 	sms_host_output();
 
 	if (alt == screen_alt)
 		return;
-
-	screen_erase();
 
 	if (alt) {
 		/* Going from 24x80 to maximum. */

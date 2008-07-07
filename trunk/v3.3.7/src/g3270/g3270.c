@@ -201,9 +201,10 @@ Boolean stop_pending = False;
 Boolean dont_return = False;
 
 /* Callback for connection state changes. */
-static void
-main_connect(Boolean ignored)
+static void main_connect(Boolean status)
 {
+	Trace("%s: status: %d Connected: %d",__FUNCTION__,status,(int) CONNECTED);
+
 	if (CONNECTED || appres.disconnect_clear) {
 #if defined(C3270_80_132) /*[*/
 		if (appres.altscreen != CN)
@@ -213,27 +214,6 @@ main_connect(Boolean ignored)
 			ctlr_erase(True);
 	}
 }
-
-/* Callback for application exit. */
-static void
-main_exiting(Boolean ignored)
-{
-	if (!escaped)
-		screen_suspend();
-//	else
-//		stop_pager();
-}
-
-#if !defined(_WIN32) /*[*/
-/* Empty SIGCHLD handler, ensuring that we can collect child exit status. */
-static void
-sigchld_handler(int ignored)
-{
-#if !defined(_AIX) /*[*/
-	(void) signal(SIGCHLD, sigchld_handler);
-#endif /*]*/
-}
-#endif /*]*/
 
 static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
 {
@@ -350,21 +330,13 @@ main(int argc, char *argv[])
 	sms_init();
 
 	register_schange(ST_CONNECT, main_connect);
-	register_schange(ST_3270_MODE, main_connect);
-	register_schange(ST_EXITING, main_exiting);
+//	register_schange(ST_3270_MODE, main_connect);
+//	register_schange(ST_EXITING, main_exiting);
 #if defined(X3270_FT) /*[*/
 	ft_init();
 #endif /*]*/
 #if defined(X3270_PRINTER) /*[*/
 	printer_init();
-#endif /*]*/
-
-#if !defined(_WIN32) /*[*/
-	/* Make sure we don't fall over any SIGPIPEs. */
-	(void) signal(SIGPIPE, SIG_IGN);
-
-	/* Make sure we can collect child exit status. */
-	(void) signal(SIGCHLD, sigchld_handler);
 #endif /*]*/
 
 	gtk_widget_show_all(topwindow);
@@ -406,62 +378,3 @@ main(int argc, char *argv[])
 	return 0;
 }
 
-#if !defined(_WIN32) /*[*/
-/*
- * SIGTSTP handler for use while a command is running.  Sets a flag so that
- * c3270 will stop before the next prompt is printed.
- */
-static void
-running_sigtstp_handler(int ignored unused)
-{
-	signal(SIGTSTP, SIG_IGN);
-	stop_pending = True;
-}
-
-/*
- * SIGTSTP haandler for use while the prompt is being displayed.
- * Acts immediately by setting SIGTSTP to the default and sending it to
- * ourselves, but also sets a flag so that the user gets one free empty line
- * of input before resuming the connection.
- */
-static void
-prompt_sigtstp_handler(int ignored unused)
-{
-	if (CONNECTED)
-		dont_return = True;
-	signal(SIGTSTP, SIG_DFL);
-	kill(getpid(), SIGTSTP);
-}
-#endif /*]*/
-
-
-
-#if !defined(_WIN32) /*[*/
-
-/* Support for c3270 profiles. */
-
-#define PROFILE_ENV	"C3270PRO"
-#define NO_PROFILE_ENV	"NOC3270PRO"
-#define DEFAULT_PROFILE	"~/.c3270pro"
-
-/* Read in the .c3270pro file. */
-void
-merge_profile(void)
-{
-	const char *fname;
-	char *profile_name;
-
-	/* Check for the no-profile environment variable. */
-	if (getenv(NO_PROFILE_ENV) != CN)
-		return;
-
-	/* Read the file. */
-	fname = getenv(PROFILE_ENV);
-	if (fname == CN || *fname == '\0')
-		fname = DEFAULT_PROFILE;
-	profile_name = do_subst(fname, True, True);
-	(void) read_resource_file(profile_name, False);
-	Free(profile_name);
-}
-
-#endif /*]*/
