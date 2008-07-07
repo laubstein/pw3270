@@ -29,6 +29,7 @@
 #include <string.h>
 #include <errno.h>
 #include <lib3270/localdefs.h>
+#include <lib3270/toggle.h>
 
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
 
@@ -40,6 +41,22 @@
  	short	fg;
  	short	bg;
  } ELEMENT;
+
+#ifdef DEBUG
+ 	#define STATUS_CODE_DESCRIPTION(x,c,y) { #x, c, y }
+#else
+ 	#define STATUS_CODE_DESCRIPTION(x,c,y) { c, y }
+#endif
+
+ struct status_code
+ {
+#ifdef DEBUG
+	const char *dbg;
+#endif
+	int 		clr;
+	const char *str;
+ };
+
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
@@ -53,6 +70,9 @@
  static void suspend(void);
  static void resume(void);
  static void set_cursor(CURSOR_MODE mode);
+ static void set_oia(OIA_FLAG id, int on);
+ static void set_compose(int on, unsigned char c, int keytype);
+ static void set_lu(const char *lu);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -75,29 +95,42 @@
 	resume,			// void (*resume)(void);
 	NULL,			// void (*reset)(int lock, const char *msg);
 	status,			// void (*status)(STATUS_CODE id);
-	NULL,			// void (*compose)(int on, unsigned char c, int keytype);
+	set_compose,	// void (*compose)(int on, unsigned char c, int keytype);
 	set_cursor,		// void (*cursor)(CURSOR_MODE mode);
-	NULL,			// void (*lu)(const char *lu);
-	NULL,			// void (*set)(OIA_FLAG id, int on);
+	set_lu,			// void (*lu)(const char *lu);
+	set_oia,		// void (*set)(OIA_FLAG id, int on);
 	erase,			// void (*erase)(void);
 
  };
 
- int 				terminal_rows	= 0;
- int 				terminal_cols	= 0;
- int				left_margin		= 0;
- int				top_margin		= 0;
+ int 								terminal_rows	= 0;
+ int 								terminal_cols	= 0;
+ int								left_margin		= 0;
+ int								top_margin		= 0;
 
- int				fWidth			= 0;
- int				fHeight			= 0;
- int				oiaRow			= -1;
+ int								fWidth			= 0;
+ int								fHeight			= 0;
+ int								oiaRow			= -1;
 
- static ELEMENT	*screen			= NULL;
- static int		szScreen		= 0;
- static char		*charset		= NULL;
- static gboolean	draw			= FALSE;
+ static ELEMENT					*screen			= NULL;
+ static int						szScreen		= 0;
+ static char						*charset		= NULL;
+ static gboolean					draw			= FALSE;
+ static const struct status_code	*sts_data		= NULL;
+ static unsigned char			compose			= 0;
+ static gchar						*luname			= 0;
+
+ static gboolean	oia_flag[OIA_FLAG_USER];
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
+
+ static void set_compose(int on, unsigned char c, int keytype)
+ {
+ 	if(on)
+ 		compose = c;
+	else
+		compose = 0;
+ }
 
  static void suspend(void)
  {
@@ -140,7 +173,6 @@
     g_free(input);
  }
 
-
  static int addch(int row, int col, int c, unsigned short attr)
  {
 	gchar	in[2] = { (char) c, 0 };
@@ -150,7 +182,7 @@
  	ELEMENT *el;
  	int		pos = (row*terminal_cols)+col;
 
- 	if(!screen)
+ 	if(!screen || col >= terminal_cols || row >= terminal_rows)
 		return EINVAL;
 
 	if(pos > szScreen)
@@ -277,16 +309,128 @@
 	}
  }
 
- void DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw)
+ static void set_lu(const char *lu)
  {
-	GdkGC *gc	= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
-	int   row	= oiaRow;
+ 	if(luname)
+ 	{
+		g_free(luname);
+		luname = NULL;
+ 	}
 
-	gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_OIA);
-	gdk_draw_line(draw,gc,left_margin,row,left_margin+(fWidth*terminal_cols),row);
-	row++;
+ 	if(lu)
+		luname = g_convert(lu, -1, "UTF-8", charset ? charset : "ISO-8859-1", NULL, NULL, NULL);
+
+	if(terminal && pixmap && oiaRow > 0)
+	{
+		DrawOIA(terminal,color,pixmap);
+		gtk_widget_queue_draw(terminal);
+	}
 
  }
+
+ void DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw)
+ {
+	GdkGC 		*gc		= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+	PangoLayout *layout;
+	int   		row		= oiaRow;
+	int			width	= (fWidth*terminal_cols);
+	GdkColor	*bg		= clr+TERMINAL_COLOR_OIA_BACKGROUND;
+	GdkColor	*fg		= clr+TERMINAL_COLOR_OIA;
+	int			col		= left_margin;
+	char		str[11];
+
+	gdk_gc_set_foreground(gc,bg);
+	gdk_draw_rectangle(draw,gc,1,left_margin,row,width,fHeight+1);
+
+	gdk_gc_set_foreground(gc,fg);
+	gdk_draw_line(draw,gc,left_margin,row,left_margin+width,row);
+	row++;
+
+	layout = gtk_widget_create_pango_layout(widget,"4");
+	gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
+	col += fWidth;
+
+	if(oia_flag[OIA_FLAG_UNDERA])
+	{
+		pango_layout_set_text(layout,(IN_E) ? "B" : "A",-1);
+		gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
+	}
+
+	col += fWidth;
+
+	str[1] = 0;
+	if(IN_ANSI)
+		*str = 'N';
+	else if(oia_flag[OIA_FLAG_BOXSOLID])
+		*str = ' ';
+	else if(IN_SSCP)
+		*str = 'S';
+	else
+		*str = '?';
+
+	pango_layout_set_text(layout,str,-1);
+	gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
+
+	col += (fWidth<<1);
+
+	if(sts_data && sts_data->str)
+	{
+		pango_layout_set_text(layout,sts_data->str,-1);
+		gdk_draw_layout_with_colors(draw,gc,col,row,layout,clr+sts_data->clr,bg);
+	}
+
+	memset(str,' ',10);
+
+	col = left_margin+(fWidth*(terminal_cols-36));
+
+	if(compose)
+	{
+		str[0] = 'C';
+		str[1] = compose;
+	}
+
+	// NOTE (perry#9#): I think it would be better if we use some svg images instead of text.
+	str[3] = oia_flag[OIA_FLAG_TYPEAHEAD]	? 'T' : ' ';
+	str[4] = oia_flag[OIA_FLAG_REVERSE] 	? 'R' : ' ';
+	str[5] = oia_flag[OIA_FLAG_INSERT]		? 'I' : ' ';
+	str[6] = oia_flag[OIA_FLAG_PRINTER]		? 'P' : ' ';
+	str[7] = 0;
+
+	pango_layout_set_text(layout,str,-1);
+	gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
+
+
+	if(luname)
+	{
+		pango_layout_set_text(layout,luname,-1);
+		gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-25)),row,layout,clr+TERMINAL_COLOR_OIA_LU,bg);
+	}
+
+	if(Toggled(CURSOR_POS))
+	{
+		sprintf(str,"%03d/%03d",cRow,cCol);
+		pango_layout_set_text(layout,str,-1);
+		gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-7)),row,layout,clr+TERMINAL_COLOR_OIA_CURSOR,bg);
+	}
+
+	g_object_unref(layout);
+
+ }
+
+ static void set_oia(OIA_FLAG id, int on)
+ {
+ 	if(id > OIA_FLAG_USER)
+		return;
+
+ 	oia_flag[id] = on;
+
+ 	if(terminal && pixmap)
+ 	{
+		DrawOIA(terminal,color,pixmap);
+		gtk_widget_queue_draw(terminal); // FIXME (perry#2#): Redraw only the oia.
+ 	}
+ }
+
 
  /**
   * Draw entire buffer.
@@ -362,27 +506,24 @@
 
  static void status(STATUS_CODE id)
  {
-#ifdef DEBUG
-	static const char *status_code[STATUS_CODE_USER] =
-		{
-			"STATUS_CODE_BLANK",
-			"STATUS_CODE_SYSWAIT",
-			"STATUS_CODE_TWAIT",
-			"STATUS_CODE_CONNECTED",
-			"STATUS_CODE_DISCONNECTED",
-			"STATUS_CODE_AWAITING_FIRST",
-			"STATUS_CODE_MINUS",
-			"STATUS_CODE_PROTECTED",
-			"STATUS_CODE_NUMERIC",
-			"STATUS_CODE_OVERFLOW",
-			"STATUS_CODE_INHIBIT",
-			"STATUS_CODE_X",
-		};
-
-#endif
+ 	static const struct status_code tbl[] =
+ 	{
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_BLANK,				TERMINAL_COLOR_OIA_STATUS_OK, 		"" ),
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_SYSWAIT,			TERMINAL_COLOR_OIA_STATUS_OK, 		"X System" ),
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_TWAIT,				TERMINAL_COLOR_OIA_STATUS_OK, 		"X Wait" ),
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_CONNECTED,			TERMINAL_COLOR_OIA_STATUS_OK, 		"" ),
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_DISCONNECTED,		TERMINAL_COLOR_OIA_STATUS_INVALID, 	"X Disconnected" ),
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_AWAITING_FIRST,	TERMINAL_COLOR_OIA_STATUS_OK,		"X" ),
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_MINUS,				TERMINAL_COLOR_OIA_STATUS_OK,		"X -f" ),
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_PROTECTED,			TERMINAL_COLOR_OIA_STATUS_INVALID,	"X Protected" ),
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_NUMERIC,			TERMINAL_COLOR_OIA_STATUS_INVALID,	"X Numeric" ),
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_OVERFLOW,			TERMINAL_COLOR_OIA_STATUS_INVALID,	"X Overflow" ),
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_INHIBIT,			TERMINAL_COLOR_OIA_STATUS_INVALID,	"X Inhibit" ),
+		STATUS_CODE_DESCRIPTION( STATUS_CODE_X,					TERMINAL_COLOR_OIA_STATUS_INVALID,	"X" ),
+	};
 
 	/* Check if status has changed to avoid unnecessary redraws */
-	if(id == last_id)
+	if(id == last_id && !sts_data)
 		return;
 
 	if(id >= STATUS_CODE_USER)
@@ -393,7 +534,12 @@
 
 	last_id = id;
 
-	Trace("Status changed to \"%s\"",status_code[id]);
+	sts_data = tbl+id;
+
+	Trace("Status changed to %s (%s)",sts_data->str,sts_data->dbg);
+
+	DrawOIA(terminal,color,pixmap);
+	gtk_widget_queue_draw(terminal);
 
  }
 

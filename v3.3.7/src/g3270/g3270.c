@@ -40,7 +40,6 @@
 #include "ctlrc.h"
 #include "ftc.h"
 #include "gluec.h"
-#include "hostc.h"
 #include "idlec.h"
 #include "keymapc.h"
 #include <lib3270/kybdc.h>
@@ -71,6 +70,7 @@
 #include <glib.h>
 
 #include "g3270.h"
+#include "hostc.h"
 
 #if !defined(_WIN32) /*[*/
 /* Base keymap. */

@@ -49,10 +49,9 @@
  GdkPixmap				*pixmap				= NULL;
  GdkColor				color[TERMINAL_COLOR_COUNT];
  gint					cMode				= CURSOR_MODE_ENABLED|CURSOR_MODE_BASE|CURSOR_MODE_SHOW;
+ gint					cCol				= 0;
+ gint					cRow				= 0;
 
-
- static gint			cCol				= 0;
- static gint			cRow				= 0;
  static GdkRectangle	cursor;
  static gint			sWidth				= 0;
  static gint			sHeight				= 0;
@@ -231,10 +230,12 @@
 	gdk_gc_set_foreground(gc,color);
 	gdk_draw_rectangle(pix,gc,1,0,0,event->width,event->height);
 
+	oiaRow = terminal_rows*fsize[lFont].height;
+
 	gdk_draw_drawable(pix,gc,pixmap,
 								left,top,
 								left_margin,top_margin,
-								(terminal_cols * fsize[lFont].width),(terminal_rows+1)*fsize[lFont].height);
+								(terminal_cols * fsize[lFont].width),oiaRow+1+fsize[lFont].height);
 
 	/* Set the new pixmap */
 	gdk_pixmap_unref(pixmap);
@@ -306,7 +307,28 @@
 
  int LoadColors(void)
  {
- 	static const char *DefaultColors = "black,#00FFFF,red,pink,green1,turquoise,yellow,white,black,DeepSkyBlue,orange,DeepSkyBlue,PaleGreen,PaleTurquoise,grey,white,green,green,green";
+ 	static const char *DefaultColors =	"black,"
+											"#00FFFF,"
+											"red,"
+											"pink,"
+											"green1,"
+											"turquoise,"
+											"yellow,"
+											"white,"
+											"black,"
+											"DeepSkyBlue,"
+											"orange,"
+											"DeepSkyBlue,"
+											"PaleGreen,"
+											"PaleTurquoise,"
+											"grey,"
+											"white,"
+											"green," 		// TERMINAL_COLOR_CURSOR
+											"green," 		// TERMINAL_COLOR_CROSS_HAIR
+											"green," 		// TERMINAL_COLOR_OIA
+											"black,"	 	// TERMINAL_COLOR_OIA_BACKGROUND
+											"white,"		// TERMINAL_COLOR_OIA_STATUS_OK
+											"red";			// TERMINAL_COLOR_OIA_STATUS_INVALID
 
  	int 	f;
 
@@ -430,6 +452,32 @@
 	cRow			= row;
 
 	RedrawCursor();
+
+	if(Toggled(CURSOR_POS) && terminal && pixmap)
+	{
+		GdkGC 		*gc		= terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)];
+		PangoLayout *layout;
+		int			x		= left_margin+(fWidth*(terminal_cols-7));
+		char		buffer[10];
+
+		gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
+		gdk_draw_rectangle(pixmap,gc,1,x,oiaRow+1,fWidth*7,fHeight);
+
+ 		layout = gtk_widget_create_pango_layout(terminal,"4");
+
+		sprintf(buffer,"%03d/%03d",cRow,cCol);
+		pango_layout_set_text(layout,buffer,-1);
+
+		gdk_draw_layout_with_colors(pixmap,gc,
+							x,oiaRow+1,
+							layout,
+							color+TERMINAL_COLOR_OIA_CURSOR,color+TERMINAL_COLOR_OIA_BACKGROUND);
+
+		g_object_unref(layout);
+		gtk_widget_queue_draw_area(terminal,x,oiaRow+1,fWidth*7,fHeight);
+
+	}
+
  }
 
  static void RedrawCursor(void)

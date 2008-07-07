@@ -398,4 +398,7 @@ int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk)
 
 }
 
-
+enum cstate QueryCSate(void)
+{
+	return cstate;
+}

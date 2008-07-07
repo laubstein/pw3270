@@ -51,9 +51,15 @@
 		TERMINAL_COLOR_CURSOR,
 		TERMINAL_COLOR_CROSS_HAIR,
 		TERMINAL_COLOR_OIA,
+		TERMINAL_COLOR_OIA_BACKGROUND,
+		TERMINAL_COLOR_OIA_STATUS_OK,
+		TERMINAL_COLOR_OIA_STATUS_INVALID,
 
 		TERMINAL_COLOR_COUNT
 	};
+
+	#define TERMINAL_COLOR_OIA_CURSOR TERMINAL_COLOR_OIA_STATUS_OK
+	#define TERMINAL_COLOR_OIA_LU TERMINAL_COLOR_OIA_STATUS_OK
 
 	#define CURSOR_MODE_SHOW	0x80
 	#define CURSOR_MODE_ENABLED	0x40
@@ -74,6 +80,9 @@
 	extern int						top_margin;
 	extern int 					fWidth;
 	extern int 					fHeight;
+	extern int						oiaRow;
+	extern gint					cCol;
+	extern gint					cRow;
 
 	extern const struct lib3270_io_callbacks g3270_io_callbacks;
 	extern const struct lib3270_screen_callbacks g3270_screen_callbacks;

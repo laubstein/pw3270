@@ -54,6 +54,13 @@ int register_tchange(int ix, void (*callback)(int value, int reason))
 
 	return 0;
 }
+
+int Toggled(int ix)
+{
+	if(ix < 0 || ix >= N_TOGGLES)
+		return 0;
+	return (int) appres.toggle[ix].value;
+}
 #endif
 /*
  * Generic toggle stuff
@@ -199,3 +206,4 @@ Toggle_action(Widget w unused, XEvent *event, String *params,
 		    "'clear')", action_name(Toggle_action), params[1]);
 	}
 }
+
