@@ -282,7 +282,6 @@
 	GdkGC *gc	= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
 	int   row	= oiaRow;
 
-	// Draw OIA
 	gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_OIA);
 	gdk_draw_line(draw,gc,left_margin,row,left_margin+(fWidth*terminal_cols),row);
 	row++;

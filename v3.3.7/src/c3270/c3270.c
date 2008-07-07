@@ -329,7 +329,7 @@ main(int argc, char *argv[])
 		interact();
 	}
 	screen_resume();
-	screen_disp(False);
+	screen_disp();
 	peer_script_init();
 
 	/* Process events forever. */
@@ -359,7 +359,7 @@ main(int argc, char *argv[])
 #else /*][*/
 		printer_check();
 #endif /*]*/
-		screen_disp(False);
+		screen_disp();
 	}
 }
 

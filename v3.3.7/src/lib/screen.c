@@ -1164,10 +1164,6 @@ calc_attrs(int baddr, int fa_addr, int fa)
 /* Erase screen */
 void screen_erase(void)
 {
-	/* This may be called when it isn't time. */
-	if (escaped)
-		return;
-
 	/* If the application supplies a callback use it! */
 	if(callbacks && callbacks->erase)
 	{
@@ -1191,10 +1187,6 @@ void screen_disp(void)
 	enum dbcs_state d;
 #endif /*]*/
 	int fa_addr;
-
-	/* This may be called when it isn't time. */
-	if (escaped)
-		return;
 
 	if (!screen_has_changes)
 	{
@@ -1330,30 +1322,12 @@ void screen_disp(void)
 
 void screen_suspend(void)
 {
-	static Boolean need_to_scroll = False;
-
-	WriteLog("x","Screen suspended! %p",callbacks);
-
 	if(callbacks && callbacks->suspend)
 		callbacks->suspend();
-
-	if (!escaped) {
-		escaped = True;
-		endwin();
-
-		if (need_to_scroll)
-			printf("\n");
-		else
-			need_to_scroll = True;
-	}
 }
 
 void screen_resume(void)
 {
-	WriteLog("x", "Screen Resumed! %p",callbacks);
-
-	escaped = False;
-
 	screen_disp();
 	refresh();
 

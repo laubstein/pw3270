@@ -157,7 +157,11 @@
 
  static void configure(GtkWidget *widget, GdkEventConfigure *event, void *t)
  {
- 	int f;
+ 	int 		f;
+	int 		left	= left_margin;
+	int 		top		= top_margin;;
+	GdkPixmap	*pix;
+	GdkGC		*gc;
 
     if(!widget->window)
 		return;
@@ -197,6 +201,14 @@
 		lFont = f;
 		pango_font_description_set_size(font,fsize[f].size);
 		gtk_widget_modify_font(terminal,font);
+
+		if(pixmap)
+		{
+			/* Font size, invalidate entire image */
+			gdk_pixmap_unref(pixmap);
+			pixmap = NULL;
+		}
+
 	}
 
 	/* Center image */
@@ -208,12 +220,27 @@
 	if(top_margin < 0)
 		top_margin = 0;
 
-	/* Reset pixmap */
-	if(pixmap)
-	{
-		gdk_pixmap_unref(pixmap);
-		pixmap = NULL;
-	}
+	/* No pixmap, will create a new one in the next expose */
+	if(!pixmap)
+		return;
+
+	/* Font size hasn't changed, rebuild pixmap using the saved image */
+	pix = gdk_pixmap_new(widget->window,event->width,event->height,-1);
+	gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+
+	gdk_gc_set_foreground(gc,color);
+	gdk_draw_rectangle(pix,gc,1,0,0,event->width,event->height);
+
+	gdk_draw_drawable(pix,gc,pixmap,
+								left,top,
+								left_margin,top_margin,
+								(terminal_cols * fsize[lFont].width),(terminal_rows+1)*fsize[lFont].height);
+
+	/* Set the new pixmap */
+	gdk_pixmap_unref(pixmap);
+	pixmap = pix;
+	RedrawCursor();
+
  }
 
  static void destroy( GtkWidget *widget, gpointer data)
