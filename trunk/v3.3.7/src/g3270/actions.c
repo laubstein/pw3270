@@ -101,6 +101,7 @@
  	{
 		LIB3270_ACTION( GDK_Return,			0,					Enter_action),
 		LIB3270_ACTION( GDK_KP_Enter,		0,					Enter_action),
+		LIB3270_ACTION( GDK_Insert,			0,					ToggleInsert_action),
 
 		LIB3270_ACTION( GDK_Left,			0,					Left_action),
 		LIB3270_ACTION( GDK_Up,				0,					Up_action),

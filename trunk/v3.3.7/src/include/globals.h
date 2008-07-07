@@ -199,30 +199,21 @@ extern char		myappdata[];
 
 /* Data types and complex global variables */
 
-/*   connection state */
-enum cstate {
-	NOT_CONNECTED,		/* no socket, unknown mode */
-	RESOLVING,		/* resolving hostname */
-	PENDING,		/* connection pending */
-	CONNECTED_INITIAL,	/* connected, no mode yet */
-	CONNECTED_ANSI,		/* connected in NVT ANSI mode */
-	CONNECTED_3270,		/* connected in old-style 3270 mode */
-	CONNECTED_INITIAL_E,	/* connected in TN3270E mode, unnegotiated */
-	CONNECTED_NVT,		/* connected in TN3270E mode, NVT mode */
-	CONNECTED_SSCP,		/* connected in TN3270E mode, SSCP-LU mode */
-	CONNECTED_TN3270E	/* connected in TN3270E mode, 3270 mode */
-};
-extern enum cstate cstate;
+#ifdef LIB3270
 
-#define PCONNECTED	((int)cstate >= (int)RESOLVING)
-#define HALF_CONNECTED	(cstate == RESOLVING || cstate == PENDING)
-#define CONNECTED	((int)cstate >= (int)CONNECTED_INITIAL)
-#define IN_NEITHER	(cstate == CONNECTED_INITIAL)
-#define IN_ANSI		(cstate == CONNECTED_ANSI || cstate == CONNECTED_NVT)
-#define IN_3270		(cstate == CONNECTED_3270 || cstate == CONNECTED_TN3270E || cstate == CONNECTED_SSCP)
-#define IN_SSCP		(cstate == CONNECTED_SSCP)
-#define IN_TN3270E	(cstate == CONNECTED_TN3270E)
-#define IN_E		(cstate >= CONNECTED_INITIAL_E)
+	extern enum cstate cstate;
+
+	#define PCONNECTED	((int)cstate >= (int)RESOLVING)
+	#define HALF_CONNECTED	(cstate == RESOLVING || cstate == PENDING)
+	#define CONNECTED	((int)cstate >= (int)CONNECTED_INITIAL)
+	#define IN_NEITHER	(cstate == CONNECTED_INITIAL)
+	#define IN_ANSI		(cstate == CONNECTED_ANSI || cstate == CONNECTED_NVT)
+	#define IN_3270		(cstate == CONNECTED_3270 || cstate == CONNECTED_TN3270E || cstate == CONNECTED_SSCP)
+	#define IN_SSCP		(cstate == CONNECTED_SSCP)
+	#define IN_TN3270E	(cstate == CONNECTED_TN3270E)
+	#define IN_E		(cstate >= CONNECTED_INITIAL_E)
+
+#endif
 
 /*   keyboard modifer bitmap */
 #define ShiftKeyDown	0x01

@@ -1382,6 +1382,8 @@ void
 status_insert_mode(Boolean on)
 {
 	status_im = on;
+	if(callbacks && callbacks->set)
+		callbacks->set(OIA_FLAG_INSERT,on);
 }
 
 void
@@ -1456,6 +1458,8 @@ void
 status_reverse_mode(Boolean on)
 {
 	status_rm = on;
+	if(callbacks && callbacks->set)
+		callbacks->set(OIA_FLAG_REVERSE,on);
 }
 
 void

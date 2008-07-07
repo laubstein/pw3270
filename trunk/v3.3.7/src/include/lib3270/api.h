@@ -42,6 +42,36 @@
 
 		#define Log(fmt, ...)		WriteLog("MSG",fmt,__VA_ARGS__)
 
+		/** connection state */
+		enum cstate
+		{
+			NOT_CONNECTED,			/**< no socket, unknown mode */
+			RESOLVING,				/**< resolving hostname */
+			PENDING,				/**< connection pending */
+			CONNECTED_INITIAL,		/**< connected, no mode yet */
+			CONNECTED_ANSI,			/**< connected in NVT ANSI mode */
+			CONNECTED_3270,			/**< connected in old-style 3270 mode */
+			CONNECTED_INITIAL_E,	/**< connected in TN3270E mode, unnegotiated */
+			CONNECTED_NVT,			/**< connected in TN3270E mode, NVT mode */
+			CONNECTED_SSCP,			/**< connected in TN3270E mode, SSCP-LU mode */
+			CONNECTED_TN3270E		/**< connected in TN3270E mode, 3270 mode */
+		};
+
+		enum cstate QueryCSate(void);
+
+		#ifndef LIB3270
+			#define PCONNECTED	((int) QueryCSate() >= (int)RESOLVING)
+			#define HALF_CONNECTED	(QueryCSate() == RESOLVING || QueryCSate() == PENDING)
+			#define CONNECTED	((int) QueryCSate() >= (int)CONNECTED_INITIAL)
+			#define IN_NEITHER	(QueryCSate() == CONNECTED_INITIAL)
+			#define IN_ANSI		(QueryCSate() == CONNECTED_ANSI || QueryCSate() == CONNECTED_NVT)
+			#define IN_3270		(QueryCSate() == CONNECTED_3270 || QueryCSate() == CONNECTED_TN3270E || QueryCSate() == CONNECTED_SSCP)
+			#define IN_SSCP		(QueryCSate() == CONNECTED_SSCP)
+			#define IN_TN3270E	(QueryCSate() == CONNECTED_TN3270E)
+			#define IN_E		(QueryCSate() >= CONNECTED_INITIAL_E)
+		#endif
+
+
 		/* I/O processing */
 		struct lib3270_io_callbacks
 		{
@@ -100,6 +130,8 @@
 			OIA_FLAG_SECURE,
 			OIA_FLAG_TYPEAHEAD,
 			OIA_FLAG_PRINTER,
+			OIA_FLAG_REVERSE,
+			OIA_FLAG_INSERT,
 
 			OIA_FLAG_USER
 		} OIA_FLAG;
@@ -134,7 +166,8 @@
 		int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
 
 		/* Misc API calls */
-		void Input_String(const unsigned char *str);
+		void	Input_String(const unsigned char *str);
+		int		Toggled(int ix);
 
 
 #endif // LIB3270_H_INCLUDED
