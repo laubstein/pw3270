@@ -21,7 +21,7 @@ WINDRES = windres
 endif
 
 XCPPFLAGS = -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500
-CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall -Werror $(XCPPFLAGS) -Isrc/include $(SSLCPP)
+CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall -Werror $(XCPPFLAGS) -Isrc/include
 DLLFLAGS = $(EXTRA_FLAGS) -mno-cygwin -shared -Wl,--export-all-symbols -Wl,--enable-auto-import
 
 # PKGConfig Stuff
@@ -30,7 +30,9 @@ SSL_MODULES = libcrypto libssl openssl
 
 # Sources
 C3270_SRCS =	c3270.c iocallback.c
-G3270_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c
+
+G3270_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c
+
 LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 				ft.c ft_cut.c ft_dft.c glue.c help.c host.c icmd.c idle.c kybd.c \
 				macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \

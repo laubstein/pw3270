@@ -23,7 +23,10 @@
  *		Global declarations for toggles.c.
  */
 
-extern void do_toggle(int);
+#if ! defined(LIB3270)
+	extern void do_toggle(int);
+#endif
+
 extern void initialize_toggles(void);
 extern void shutdown_toggles(void);
 extern void Toggle_action(Widget, XEvent *, String *, Cardinal *);

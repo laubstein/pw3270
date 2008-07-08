@@ -32,6 +32,7 @@
  #include "g3270.h"
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
+ #include <lib3270/toggle.h>
 
  #ifndef GDK_NUMLOCK_MASK
 	#define GDK_NUMLOCK_MASK GDK_MOD2_MASK
@@ -57,9 +58,13 @@
  #ifdef DEBUG
 	#define LIB3270_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_lib3270, (gpointer) action }
 	#define PF_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_pf, (gpointer) action }
+	#define G3270_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action, 0 }
+	#define TOGGLE_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_Toggle, (gpointer) action }
  #else
 	#define LIB3270_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action_lib3270, (gpointer) action }
 	#define PF_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action_pf, (gpointer) action }
+	#define G3270_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action, 0 }
+	#define TOGGLE_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action_Toggle, (gpointer) action }
  #endif
 
  struct WindowActions
@@ -95,6 +100,22 @@
 	action_internal(PF_action, IA_DEFAULT, id, CN);
  }
 
+ void action_PageUP(GtkWidget *w, gpointer user_data)
+ {
+	WaitingForChanges = TRUE;
+
+	// TODO (perry#1#): Read FN association from configuration file.
+	action_internal(PF_action, IA_DEFAULT, "7", CN);
+ }
+
+ void action_PageDown(GtkWidget *w, gpointer user_data)
+ {
+	WaitingForChanges = TRUE;
+
+	// TODO (perry#1#): Read FN association from configuration file.
+	action_internal(PF_action, IA_DEFAULT, "8", CN);
+ }
+
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
  	static const struct WindowActions keyproc[] =
@@ -118,12 +139,11 @@
 		LIB3270_ACTION( GDK_Delete,			0,					Delete_action),
 		LIB3270_ACTION( GDK_BackSpace,		0,					Erase_action),
 
-		PF_ACTION( GDK_Page_Up,				0,					"7"),
-		PF_ACTION( GDK_Page_Down,			0,					"8"),
+		G3270_ACTION( 	GDK_Page_Up,		0,					action_PageUP),
+		G3270_ACTION( 	GDK_Page_Down,		0,					action_PageDown),
 
-		PF_ACTION( GDK_Page_Up,				GDK_SHIFT_MASK,		"23"),
-		PF_ACTION( GDK_Page_Down,			GDK_SHIFT_MASK,		"24"),
-
+		PF_ACTION(		GDK_Page_Up,		GDK_SHIFT_MASK,		"23"),
+		PF_ACTION(		GDK_Page_Down,		GDK_SHIFT_MASK,		"24"),
 
  	};
 
@@ -148,7 +168,6 @@
 			return TRUE;
 		}
 	}
-
 
 
 	return FALSE;

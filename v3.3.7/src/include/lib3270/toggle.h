@@ -43,10 +43,13 @@
 		CROSSHAIR,
 		VISIBLE_CONTROL,
 		AID_WAIT,
+		FULL_SCREEN,
 
 		N_TOGGLES
 	};
 
 	int register_tchange(int ix, void (*callback)(int value, int reason));
+	void do_toggle(int ix);
+
 
 #endif /* TOGGLE3270_H_INCLUDED */
