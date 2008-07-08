@@ -47,6 +47,7 @@
 #include <netdb.h>
 #endif /*]*/
 #include <stdarg.h>
+
 #if defined(HAVE_LIBSSL) /*[*/
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -227,13 +228,13 @@ static const char *nnn(int c);
 #define TNS_SB_IAC	7	/* got an IAC after an IAC SB */
 
 /* telnet predefined messages */
-static unsigned char	do_opt[]	= { 
+static unsigned char	do_opt[]	= {
 	IAC, DO, '_' };
-static unsigned char	dont_opt[]	= { 
+static unsigned char	dont_opt[]	= {
 	IAC, DONT, '_' };
-static unsigned char	will_opt[]	= { 
+static unsigned char	will_opt[]	= {
 	IAC, WILL, '_' };
-static unsigned char	wont_opt[]	= { 
+static unsigned char	wont_opt[]	= {
 	IAC, WONT, '_' };
 #if defined(X3270_TN3270E) /*[*/
 static unsigned char	functions_req[] = {
@@ -335,20 +336,20 @@ sockstart(void)
 	static int initted = 0;
 	WORD wVersionRequested;
 	WSADATA wsaData;
- 
+
 	if (initted)
 		return;
 
 	initted = 1;
 
 	wVersionRequested = MAKEWORD(2, 2);
- 
+
 	if (WSAStartup(wVersionRequested, &wsaData) != 0) {
 		fprintf(stderr, "WSAStartup failed: %s\n",
 			win32_strerror(GetLastError()));
 		x3270_exit(1);
 	}
- 
+
 	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
 		fprintf(stderr, "Bad winsock version: %d.%d\n",
 			LOBYTE(wsaData.wVersion), HIBYTE(wsaData.wVersion));
@@ -688,7 +689,7 @@ setup_lus(void)
 
 	/*
 	 * Count the commas in the LU name.  That plus one is the
-	 * number of LUs to try. 
+	 * number of LUs to try.
 	 */
 	lu = luname;
 	while ((comma = strchr(lu, ',')) != CN) {
@@ -2686,7 +2687,7 @@ tn3270e_ack(void)
 	rsp_len = 0;
 	rsp_buf[rsp_len++] = TN3270E_DT_RESPONSE;	    /* data_type */
 	rsp_buf[rsp_len++] = 0;				    /* request_flag */
-	rsp_buf[rsp_len++] = TN3270E_RSF_POSITIVE_RESPONSE; /* response_flag */	
+	rsp_buf[rsp_len++] = TN3270E_RSF_POSITIVE_RESPONSE; /* response_flag */
 	rsp_buf[rsp_len++] = h_in->seq_number[0];	    /* seq_number[0] */
 	if (h_in->seq_number[0] == IAC)
 		rsp_buf[rsp_len++] = IAC;

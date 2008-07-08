@@ -1536,8 +1536,8 @@ status_connect(Boolean connected)
 		}
 #if defined(HAVE_LIBSSL) /*[*/
 		status_secure = secure_connection;
-		if(callbacks && callbacks->oia_flag)
-			callbacks->oia_flag(OIA_FLAG_SECURE,secure_connection);
+		if(callbacks && callbacks->set)
+			callbacks->set(OIA_FLAG_SECURE,secure_connection);
 #endif /*]*/
 
 	} else {

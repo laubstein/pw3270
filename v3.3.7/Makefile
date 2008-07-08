@@ -24,8 +24,9 @@ XCPPFLAGS = -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500
 CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall -Werror $(XCPPFLAGS) -Isrc/include $(SSLCPP)
 DLLFLAGS = $(EXTRA_FLAGS) -mno-cygwin -shared -Wl,--export-all-symbols -Wl,--enable-auto-import
 
-#
+# PKGConfig Stuff
 GTK_MODULES = glib-2.0 gtk+-2.0 gthread-2.0
+SSL_MODULES = libcrypto libssl openssl
 
 # Sources
 C3270_SRCS =	c3270.c iocallback.c
@@ -50,7 +51,7 @@ GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h
 obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DDEBUG=1 -DLIB3270=1 $(CFLAGS) -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
+	@$(CC) -DDEBUG=1 -DLIB3270=1 -DHAVE_LIBSSL=1 $(CFLAGS) `pkg-config --cflags $(SSL_MODULES)` -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
 
 obj/Debug/src/c3270/%.o: src/c3270/%.c src/c3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
@@ -71,7 +72,7 @@ obj/Debug/version.o: src/version.c
 obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DLIB3270=1 $(CFLAGS) -Isrc/lib -Isrc/include/lib3270 -o $@ -c $<
+	@$(CC) -DLIB3270=1 -DHAVE_LIBSSL=1 $(CFLAGS) `pkg-config --cflags $(SSL_MODULES)` -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
 
 obj/Release/version.o: src/version.c
 	@echo $< ...
@@ -99,7 +100,7 @@ bin/Debug/g3270.$(BINEXT): bin/Debug/lib3270.$(DLLEXT) $(foreach SRC, $(basename
 bin/Debug/lib3270.$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).$(OBJEXT))
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(DLLFLAGS) -o $@ $^ -lws2_32
+	@$(CC) $(DLLFLAGS) -o $@ $^ `pkg-config --libs $(SSL_MODULES)` -lws2_32
 
 bin/Debug/w3n46.dll: obj/Release/src/lib/w3n46.o
 	@$(CC) $(DLLFLAGS) -o $@ $^ -lws2_32
