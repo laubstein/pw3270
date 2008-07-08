@@ -138,7 +138,6 @@
 
  int								fWidth			= 0;
  int								fHeight			= 0;
- int								oiaRow			= -1;
 
  static ELEMENT					*screen			= NULL;
  static int						szScreen		= 0;
@@ -267,19 +266,22 @@
 	if(draw && terminal && pixmap)
 	{
 		// Update pixmap, queue screen redraw.
-		gint x, y;
+		gint 	x, y;
+	 	GdkGC	*gc		= gdk_gc_new(pixmap);
+
 		PangoLayout *layout = gtk_widget_create_pango_layout(terminal,el->ch);
 
 		x = left_margin + (col * fWidth);
 		y = top_margin + (row * fHeight);
 
 		gdk_draw_layout_with_colors(	pixmap,
-										terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)],
+										gc,
 										x,y,
 										layout,
 										color+el->fg,
 										color+el->bg );
 
+		gdk_gc_destroy(gc);
 		g_object_unref(layout);
 
 		gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
@@ -332,13 +334,13 @@
 
 	if(terminal && pixmap)
 	{
-		gc = terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)];
+		gc = gdk_gc_new(pixmap);
 		gdk_drawable_get_size(pixmap,&width,&height);
 		gdk_gc_set_foreground(gc,color);
 		gdk_draw_rectangle(pixmap,gc,1,0,0,width,height);
-		if(oiaRow > 0)
-			DrawOIA(terminal,color,pixmap);
+		DrawOIA(terminal,color,pixmap);
 		gtk_widget_queue_draw(terminal);
+		gdk_gc_destroy(gc);
 	}
  }
 
@@ -353,7 +355,7 @@
  	if(lu)
 		luname = g_convert(lu, -1, "UTF-8", charset ? charset : "ISO-8859-1", NULL, NULL, NULL);
 
-	if(terminal && pixmap && oiaRow > 0)
+	if(terminal && pixmap)
 	{
 		DrawOIA(terminal,color,pixmap);
 		gtk_widget_queue_draw(terminal);
@@ -363,9 +365,9 @@
 
  void DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw)
  {
-	GdkGC 		*gc		= widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+	GdkGC 		*gc		= gdk_gc_new(draw);
 	PangoLayout *layout;
-	int   		row		= oiaRow;
+	int   		row		= OIAROW;
 	int			width	= (fWidth*terminal_cols);
 	GdkColor	*bg		= clr+TERMINAL_COLOR_OIA_BACKGROUND;
 	GdkColor	*fg		= clr+TERMINAL_COLOR_OIA;
@@ -406,11 +408,24 @@
 
 	col += (fWidth<<1);
 
+#ifdef DEBUG
+	if(sts_data)
+	{
+		pango_layout_set_text(layout,sts_data->str && *sts_data->str ? sts_data->str : sts_data->dbg,-1);
+		gdk_draw_layout_with_colors(draw,gc,col,row,layout,clr+sts_data->clr,bg);
+	}
+	else
+	{
+		pango_layout_set_text(layout,"STATUS_CODE_NONE",-1);
+		gdk_draw_layout_with_colors(draw,gc,col,row,layout,clr+TERMINAL_COLOR_OIA_STATUS_INVALID,bg);
+	}
+#else
 	if(sts_data && sts_data->str)
 	{
 		pango_layout_set_text(layout,sts_data->str,-1);
 		gdk_draw_layout_with_colors(draw,gc,col,row,layout,clr+sts_data->clr,bg);
 	}
+#endif
 
 	memset(str,' ',10);
 
@@ -453,6 +468,7 @@
 	}
 
 	g_object_unref(layout);
+	gdk_gc_destroy(gc);
 
  }
 
@@ -494,7 +510,7 @@
 	if(!el)
 		return -1;
 
-	gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+	gc = gdk_gc_new(draw);
 
 	// Fill pixmap with background color
 	gdk_drawable_get_size(draw,&width,&height);
@@ -526,8 +542,7 @@
 	}
 
 	g_object_unref(layout);
-
-	oiaRow = y;
+	gdk_gc_destroy(gc);
 
 	return 0;
 
@@ -575,7 +590,7 @@
 
 	sts_data = tbl+id;
 
-	Trace("Status changed to %s (%s)",sts_data->str,sts_data->dbg);
+	Trace("Status changed to %s (%s)",sts_data->dbg,sts_data->str);
 
 	DrawOIA(terminal,color,pixmap);
 	gtk_widget_queue_draw(terminal);

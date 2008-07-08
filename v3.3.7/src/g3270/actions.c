@@ -172,3 +172,66 @@
 
 	return FALSE;
  }
+
+static const char *ui_mainwindow_ui_desc =
+"<ui>"
+"	<menubar name='MainwindowMenubar'>"
+"		<menu action='FileMenu'>"
+"			<menuitem action='Quit'/>"
+"		</menu>"
+"		<menu action='EditMenu'>"
+"			<menuitem action='Copy'/>"
+"			<menuitem action='Paste'/>"
+"		</menu>"
+"		<menu action='NetworkMenu'>"
+"			<menuitem action='Connect' />"
+"			<menuitem action='Disconnect' />"
+"		</menu>"
+"		<menu action='HelpMenu'>"
+"			<menuitem action='About' />"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+/*
+	The name of the action.
+	The stock id for the action, or the name of an icon from the icon theme.
+	The label for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain(). If label is NULL, the label of the stock item with id stock_id is used.
+	The accelerator for the action, in the format understood by gtk_accelerator_parse().
+	The tooltip for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
+	The function to call when the action is activated.
+
+	http://library.gnome.org/devel/gtk/stable/gtk-Stock-Items.html
+
+ */
+ static GtkActionEntry internal_action_entries[] =
+ {
+ 	{	"FileMenu",			NULL,					"_File",		NULL,			NULL,	NULL			},
+ 	{	"NetworkMenu",		NULL,					"_Network",		NULL,			NULL,	NULL			},
+ 	{	"HelpMenu",			NULL,					"Help",			NULL,			NULL,	NULL			},
+ 	{	"EditMenu",			NULL,					"_Edit",		NULL,			NULL,	NULL			},
+
+ 	{	"About",			GTK_STOCK_ABOUT,		"About",		NULL,			NULL,	NULL			},
+ 	{	"Connect",			GTK_STOCK_CONNECT,		"_Connect",		NULL,			NULL,	NULL			},
+ 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	"_Disconnect",	NULL,			NULL,	NULL			},
+ 	{	"Quit",				GTK_STOCK_QUIT,			"Quit",			"<control>X",	NULL,	gtk_main_quit	},
+ 	{	"Copy",				GTK_STOCK_COPY,			"Copy",			"<control>C",	NULL,	NULL			},
+ 	{	"Paste",			GTK_STOCK_PASTE,		"Paste",		"<control>V",	NULL,	NULL			},
+ };
+
+ GtkUIManager * LoadApplicationUI(GtkWidget *widget)
+ {
+	GtkUIManager 	*ui_manager = gtk_ui_manager_new();
+	GtkActionGroup	*actions;
+	GError			*error = NULL;
+
+	actions = gtk_action_group_new("InternalActions");
+	gtk_action_group_add_actions(actions, internal_action_entries, G_N_ELEMENTS (internal_action_entries), topwindow);
+	gtk_ui_manager_insert_action_group(ui_manager,actions, 0);
+
+	if(!gtk_ui_manager_add_ui_from_string(ui_manager, ui_mainwindow_ui_desc, -1, &error))
+		g_error("building menus failed: %s", error->message);
+
+	return ui_manager;
+ }
+

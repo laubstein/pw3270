@@ -46,7 +46,7 @@
 
  GtkWidget				*terminal			= NULL;
  GdkPixmap				*pixmap				= NULL;
- GdkColor				color[TERMINAL_COLOR_COUNT];
+ GdkColor				color[TERMINAL_COLOR_COUNT+1];
  gint					cMode				= CURSOR_MODE_ENABLED|CURSOR_MODE_BASE|CURSOR_MODE_SHOW;
  gint					cCol				= 0;
  gint					cRow				= 0;
@@ -83,7 +83,7 @@
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
-	GdkGC *gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+	GdkGC *gc = gdk_gc_new(widget->window);
 
     if(!pixmap)
 		pixmap = GetPixmap(widget); // No pixmap, get a new one
@@ -114,6 +114,7 @@
 		}
 	}
 
+	gdk_gc_destroy(gc);
 	return 0;
  }
 
@@ -224,23 +225,22 @@
 
 	/* Font size hasn't changed, rebuild pixmap using the saved image */
 	pix = gdk_pixmap_new(widget->window,event->width,event->height,-1);
-	gc = widget->style->fg_gc[GTK_WIDGET_STATE(widget)];
+	gc = gdk_gc_new(pix);
 
 	gdk_gc_set_foreground(gc,color);
 	gdk_draw_rectangle(pix,gc,1,0,0,event->width,event->height);
 
-	oiaRow = terminal_rows*fsize[lFont].height;
-
 	gdk_draw_drawable(pix,gc,pixmap,
 								left,top,
 								left_margin,top_margin,
-								(terminal_cols * fsize[lFont].width),oiaRow+1+fsize[lFont].height);
+								(terminal_cols * fsize[lFont].width),OIAROW+1+fsize[lFont].height);
+
+	gdk_gc_destroy(gc);
 
 	/* Set the new pixmap */
 	gdk_pixmap_unref(pixmap);
 	pixmap = pix;
 	RedrawCursor();
-
  }
 
  static void destroy( GtkWidget *widget, gpointer data)
@@ -461,13 +461,13 @@
 
 	if(Toggled(CURSOR_POS) && terminal && pixmap)
 	{
-		GdkGC 		*gc		= terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)];
+		GdkGC 		*gc		= gdk_gc_new(terminal->window);
 		PangoLayout *layout;
 		int			x		= left_margin+(fWidth*(terminal_cols-7));
 		char		buffer[10];
 
 		gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
-		gdk_draw_rectangle(pixmap,gc,1,x,oiaRow+1,fWidth*7,fHeight);
+		gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fWidth*7,fHeight);
 
  		layout = gtk_widget_create_pango_layout(terminal,"4");
 
@@ -475,12 +475,13 @@
 		pango_layout_set_text(layout,buffer,-1);
 
 		gdk_draw_layout_with_colors(pixmap,gc,
-							x,oiaRow+1,
+							x,OIAROW+1,
 							layout,
 							color+TERMINAL_COLOR_OIA_CURSOR,color+TERMINAL_COLOR_OIA_BACKGROUND);
 
 		g_object_unref(layout);
-		gtk_widget_queue_draw_area(terminal,x,oiaRow+1,fWidth*7,fHeight);
+		gdk_gc_destroy(gc);
+		gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fWidth*7,fHeight);
 
 	}
 

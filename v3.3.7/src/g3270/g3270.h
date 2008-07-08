@@ -67,10 +67,12 @@
 	#define CURSOR_MODE_CROSS 	0x02
 	#define CURSOR_MODE_BASE	0x04
 
+	#define OIAROW				(top_margin+(fHeight*terminal_rows))
+
 	extern GtkWidget				*topwindow;
 	extern GdkPixmap				*pixmap;
 	extern GtkWidget				*terminal;
-	extern GdkColor				color[TERMINAL_COLOR_COUNT];
+	extern GdkColor				color[TERMINAL_COLOR_COUNT+1];
 	extern GdkCursor        		*wCursor[CURSOR_MODE_USER];
 	extern PangoFontDescription	*font;
 	extern gint					cMode;
@@ -81,7 +83,6 @@
 	extern int						top_margin;
 	extern int 					fWidth;
 	extern int 					fHeight;
-	extern int						oiaRow;
 	extern gint					cCol;
 	extern gint					cRow;
 	extern gboolean 				WaitingForChanges;
@@ -106,7 +107,8 @@
 	gboolean 	mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 	gboolean 	mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
-	void 		action_PageDown(GtkWidget *w, gpointer user_data);
-	void 		action_PageUP(GtkWidget *w, gpointer user_data);
+	void 			action_PageDown(GtkWidget *w, gpointer user_data);
+	void 			action_PageUP(GtkWidget *w, gpointer user_data);
+	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
 
 #endif // G3270_H_INCLUDED
