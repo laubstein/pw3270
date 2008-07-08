@@ -58,8 +58,10 @@
  int CreateTopWindow(void)
  {
  	static int cr[CURSOR_MODE_USER] = { GDK_ARROW, GDK_WATCH, GDK_X_CURSOR };
- 	GtkWidget	*vbox;
- 	int			f;
+
+ 	GtkWidget		*vbox;
+ 	int				f;
+	GtkUIManager	*ui_manager;
 
 	topwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -72,6 +74,13 @@
     vbox = gtk_vbox_new(FALSE,0);
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);
 
+	/* Create UI elements */
+	ui_manager = LoadApplicationUI(topwindow);
+	gtk_box_pack_start(GTK_BOX(vbox),gtk_ui_manager_get_widget(ui_manager, "/MainwindowMenubar"),FALSE,FALSE,0);
+
+	g_object_unref(ui_manager);
+
+	/* Create terminal window */
 	if(!CreateTerminalWindow())
 		return -1;
 
