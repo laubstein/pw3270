@@ -818,7 +818,7 @@ save_recent(const char *hn)
 
 	/*
 	 * Read the last-connection file, to capture the any changes made by
-	 * other instances of x3270.  
+	 * other instances of x3270.
 	 */
 	if (appres.connectfile_name != CN &&
 	    strcasecmp(appres.connectfile_name, "none")) {
