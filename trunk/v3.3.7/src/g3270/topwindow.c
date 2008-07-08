@@ -25,6 +25,7 @@
 */
 
  #include "g3270.h"
+ #include <lib3270/toggle.h>
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
@@ -42,6 +43,16 @@
  static void destroy( GtkWidget *widget, gpointer   data )
  {
     gtk_main_quit();
+ }
+
+ static void set_fullscreen(int value, int reason)
+ {
+ 	Trace("Fullscren mode toggled (value: %d",value);
+ 	if(value)
+		gtk_window_fullscreen(GTK_WINDOW(topwindow));
+	else
+		gtk_window_unfullscreen(GTK_WINDOW(topwindow));
+
  }
 
  int CreateTopWindow(void)
@@ -73,6 +84,7 @@
 	gtk_window_set_role(GTK_WINDOW(topwindow), "G3270_TOP" );
 #endif
 
+	register_tchange(FULL_SCREEN,set_fullscreen);
 	return 0;
  }
 

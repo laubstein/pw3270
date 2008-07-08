@@ -30,7 +30,6 @@
 #include <string.h>
 #include <malloc.h>
 
-
 // TODO (perry#7#): Find a better way to get font sizes!!!
 #define MAX_FONT_SIZES	54
 
@@ -260,6 +259,7 @@
 	// Configure im context
     gtk_im_context_set_client_window(im,widget->window);
     gdk_window_set_cursor(widget->window,wCursor[0]);
+    LoadImages(widget->window, widget->style->fg_gc[GTK_WIDGET_STATE(widget)]);
  }
 
  static gboolean focus_in(GtkWidget *widget, GdkEventFocus *event, gpointer x)
@@ -411,14 +411,20 @@
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Events.html#GdkEventMask
     gtk_widget_add_events(terminal,GDK_KEY_PRESS_MASK|GDK_KEY_RELEASE_MASK|GDK_BUTTON_PRESS_MASK|GDK_BUTTON_MOTION_MASK|GDK_BUTTON_RELEASE_MASK);
 
-    g_signal_connect(G_OBJECT(terminal),	"expose_event",  		G_CALLBACK(expose),			0);
-    g_signal_connect(G_OBJECT(terminal),	"configure-event",		G_CALLBACK(configure),		0);
-    g_signal_connect(G_OBJECT(terminal),	"key-press-event",		G_CALLBACK(key_press),		0);
-    g_signal_connect(G_OBJECT(terminal),	"key-release-event",	G_CALLBACK(key_release),	0);
-    g_signal_connect(G_OBJECT(terminal),	"realize",				G_CALLBACK(realize),		0);
-    g_signal_connect(G_OBJECT(terminal),	"focus-in-event",		G_CALLBACK(focus_in),		0);
-    g_signal_connect(G_OBJECT(terminal),	"focus-out-event",		G_CALLBACK(focus_out),		0);
-    g_signal_connect(G_OBJECT(im),			"commit",				G_CALLBACK(im_commit),		0);
+    g_signal_connect(G_OBJECT(terminal),	"expose_event",  		G_CALLBACK(expose),					0);
+    g_signal_connect(G_OBJECT(terminal),	"configure-event",		G_CALLBACK(configure),				0);
+    g_signal_connect(G_OBJECT(terminal),	"key-press-event",		G_CALLBACK(key_press),				0);
+    g_signal_connect(G_OBJECT(terminal),	"key-release-event",	G_CALLBACK(key_release),			0);
+    g_signal_connect(G_OBJECT(terminal),	"realize",				G_CALLBACK(realize),				0);
+    g_signal_connect(G_OBJECT(terminal),	"focus-in-event",		G_CALLBACK(focus_in),				0);
+    g_signal_connect(G_OBJECT(terminal),	"focus-out-event",		G_CALLBACK(focus_out),				0);
+    g_signal_connect(G_OBJECT(im),			"commit",				G_CALLBACK(im_commit),				0);
+
+    // Connect mouse events
+    g_signal_connect(G_OBJECT(terminal), "button-press-event",		G_CALLBACK(mouse_button_press),		0);
+    g_signal_connect(G_OBJECT(terminal), "button-release-event",	G_CALLBACK(mouse_button_release),	0);
+    g_signal_connect(G_OBJECT(terminal), "motion-notify-event",		G_CALLBACK(mouse_motion),			0);
+    g_signal_connect(G_OBJECT(terminal), "scroll-event",			G_CALLBACK(mouse_scroll),			0);
 
 	font = pango_font_description_from_string("Courier");
 

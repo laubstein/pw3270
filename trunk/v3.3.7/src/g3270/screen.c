@@ -31,6 +31,9 @@
 #include <lib3270/localdefs.h>
 #include <lib3270/toggle.h>
 
+#include "locked.bm"
+#include "unlocked.bm"
+
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
 
  #define MAX_CHR_LENGTH 3
@@ -73,6 +76,8 @@
  static void set_oia(OIA_FLAG id, int on);
  static void set_compose(int on, unsigned char c, int keytype);
  static void set_lu(const char *lu);
+ static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height, int Width);
+ static void changed(int bstart, int bend);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -87,7 +92,7 @@
 	addch,			// void (*addch)(int row, int col, int c, int attr);
 	set_charset,	// void (*charset)(char *dcs);
 	title,			// void (*title)(char *text);
-	NULL,			// void (*changed)(int bstart, int bend);
+	changed,		// void (*changed)(int bstart, int bend);
 	NULL,			// void (*ring_bell)(void);
 	redraw,			// void (*redraw)(void);
 	MoveCursor,		// void (*move_cursor)(int row, int col);
@@ -102,6 +107,29 @@
 	erase,			// void (*erase)(void);
 
  };
+
+ static const struct _imagedata
+ {
+	const unsigned char	*data;
+    gint					width;
+    gint					height;
+    short					color;
+ } imagedata[] =
+ {
+ 	{ locked_bits,   locked_width,   locked_height,   TERMINAL_COLOR_SSL 		},
+ 	{ unlocked_bits, unlocked_width, unlocked_height, TERMINAL_COLOR_SSL 		},
+ };
+
+ #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
+
+ static struct _pix
+ {
+ 	GdkPixbuf *base;
+ 	GdkPixbuf *pix;
+ 	int		   Width;
+ 	int		   Height;
+ } pix[IMAGE_COUNT];
+
 
  int 								terminal_rows	= 0;
  int 								terminal_cols	= 0;
@@ -123,6 +151,11 @@
  static gboolean	oia_flag[OIA_FLAG_USER];
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
+
+ static void changed(int bstart, int bend)
+ {
+ 	WaitingForChanges = FALSE;
+ }
 
  static void set_compose(int on, unsigned char c, int keytype)
  {
@@ -399,7 +432,13 @@
 	pango_layout_set_text(layout,str,-1);
 	gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
 
+	// Draw SSL indicator
+	DrawImage(draw,gc,oia_flag[OIA_FLAG_SECURE] ? 0 : 1 ,left_margin+(fWidth*(terminal_cols-43)),row+1,fHeight-2,fWidth);
 
+//	pango_layout_set_text(layout,"*",-1);
+//	gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-43)),row,layout,clr+TERMINAL_COLOR_OIA_LU,bg);
+
+	// Draw LU Name
 	if(luname)
 	{
 		pango_layout_set_text(layout,luname,-1);
@@ -548,4 +587,71 @@
  	if(terminal && terminal->window && mode < CURSOR_MODE_USER)
 		gdk_window_set_cursor(terminal->window,wCursor[mode]);
 
+ }
+
+ static int Loaded = 0;
+
+ void LoadImages(GdkDrawable *drawable, GdkGC *gc)
+ {
+ 	int			f;
+ 	GdkPixmap	*temp;
+
+	if(!Loaded)
+	{
+    	memset(pix,0,sizeof(struct _pix) * IMAGE_COUNT);
+    	Loaded = 1;
+	}
+
+ 	for(f=0;f<IMAGE_COUNT;f++)
+ 	{
+ 		// Load bitmap setting the right colors
+ 		temp = gdk_pixmap_create_from_data(	drawable,
+											(const gchar *) imagedata[f].data,
+                                       		imagedata[f].width,
+                                       		imagedata[f].height,
+											gdk_drawable_get_depth(drawable),
+											color+imagedata[f].color,
+											color+TERMINAL_COLOR_OIA_BACKGROUND );
+
+		if(pix[f].base)
+			gdk_pixbuf_unref(pix[f].base);
+
+		pix[f].base = gdk_pixbuf_get_from_drawable(	0,
+													temp,
+													gdk_drawable_get_colormap(drawable),
+													0,0,
+													0,0,
+													imagedata[f].width,
+													imagedata[f].height );
+
+        gdk_pixmap_unref(temp);
+ 	}
+
+ }
+
+ static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height, int Width)
+ {
+    double ratio;
+    int    temp;
+
+ 	if( ((Height != pix[id].Height) || (Width != pix[id].Width)) && pix[id].pix )
+ 	{
+ 		gdk_pixbuf_unref(pix[id].pix);
+		pix[id].pix = 0;
+ 	}
+
+ 	if(!pix[id].pix)
+ 	{
+ 		/* Resize by Height */
+        ratio = ((double) gdk_pixbuf_get_width(pix[id].base)) / ((double) gdk_pixbuf_get_height(pix[id].base));
+		temp  = (int) ((double) ratio * ((double) Height));
+	    pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,temp,Height,GDK_INTERP_HYPER);
+ 	}
+
+    if(pix[id].pix)
+    {
+   	   pix[id].Height = Height;
+	   pix[id].Width  = Width;
+	   gdk_pixbuf_render_to_drawable(pix[id].pix,drawable,gc,0,0,x,y,-1,-1,GDK_RGB_DITHER_NORMAL,0,0);
+    }
  }

@@ -44,13 +44,17 @@
 
 
 #if defined(LIB3270)
+static void no_callback(int value, int reason)
+{
+}
+
 /* Register a callback to monitor toggle changes */
 int register_tchange(int ix, void (*callback)(int value, int reason))
 {
 	if(ix < 0 || ix >= N_TOGGLES)
 		return EINVAL;
 
-	appres.toggle[ix].callback = callback;
+	appres.toggle[ix].callback = callback ? callback : no_callback;
 
 	return 0;
 }
@@ -75,21 +79,26 @@ do_toggle_reason(int ix, enum toggle_type reason)
 	 * menu label(s).
 	 */
 	toggle_toggle(t);
+
 	t->upcall(t, reason);
+
 #if defined(X3270_MENUS) /*[*/
 	menubar_retoggle(t);
 #endif /*]*/
 
 #if defined(LIB3270)
-	if(t->callback)
-		t->callback(t->value, (int) reason);
+	t->callback(t->value, (int) reason);
 #endif
-
 }
 
-void
-do_toggle(int ix)
+void do_toggle(int ix)
 {
+	if(ix < 0 || ix >= N_TOGGLES)
+	{
+		WriteLog("LIB3270","Unexpected toggle id %d",ix);
+		return;
+	}
+
 	do_toggle_reason(ix, TT_INTERACTIVE);
 }
 
@@ -103,7 +112,10 @@ initialize_toggles(void)
 
 #if defined(LIB3270)
 	for(f=0;f<N_TOGGLES;f++)
-		appres.toggle[MONOCASE].callback = 0;
+	{
+		appres.toggle[f].callback = no_callback;
+		appres.toggle[f].upcall = toggle_nop;
+	}
 #endif
 
 #if defined(X3270_DISPLAY) || defined(C3270) /*[*/
@@ -114,8 +126,6 @@ initialize_toggles(void)
 	appres.toggle[CURSOR_BLINK].upcall =     toggle_cursorBlink;
 	appres.toggle[SHOW_TIMING].upcall =      toggle_showTiming;
 	appres.toggle[CURSOR_POS].upcall =       toggle_cursorPos;
-	appres.toggle[MARGINED_PASTE].upcall =   toggle_nop;
-	appres.toggle[RECTANGLE_SELECT].upcall = toggle_nop;
 	appres.toggle[SCROLL_BAR].upcall =       toggle_scrollBar;
 	appres.toggle[CROSSHAIR].upcall =        toggle_crosshair;
 	appres.toggle[VISIBLE_CONTROL].upcall =  toggle_visible_control;
@@ -127,10 +137,6 @@ initialize_toggles(void)
 #endif /*]*/
 #if defined(X3270_ANSI) /*[*/
 	appres.toggle[LINE_WRAP].upcall =        toggle_lineWrap;
-#endif /*]*/
-	appres.toggle[BLANK_FILL].upcall =       toggle_nop;
-#if defined(X3270_SCRIPT) || defined(TCL3270) /*[*/
-	appres.toggle[AID_WAIT].upcall =         toggle_nop;
 #endif /*]*/
 
 #if defined(X3270_TRACE) /*[*/

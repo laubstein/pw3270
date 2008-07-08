@@ -58,8 +58,9 @@
 		TERMINAL_COLOR_COUNT
 	};
 
-	#define TERMINAL_COLOR_OIA_CURSOR TERMINAL_COLOR_OIA_STATUS_OK
-	#define TERMINAL_COLOR_OIA_LU TERMINAL_COLOR_OIA_STATUS_OK
+	#define TERMINAL_COLOR_OIA_CURSOR 	TERMINAL_COLOR_OIA_STATUS_OK
+	#define TERMINAL_COLOR_OIA_LU 		TERMINAL_COLOR_OIA_STATUS_OK
+	#define TERMINAL_COLOR_SSL 			TERMINAL_COLOR_OIA_STATUS_OK
 
 	#define CURSOR_MODE_SHOW	0x80
 	#define CURSOR_MODE_ENABLED	0x40
@@ -83,6 +84,7 @@
 	extern int						oiaRow;
 	extern gint					cCol;
 	extern gint					cRow;
+	extern gboolean 				WaitingForChanges;
 
 	extern const struct lib3270_io_callbacks g3270_io_callbacks;
 	extern const struct lib3270_screen_callbacks g3270_screen_callbacks;
@@ -97,7 +99,14 @@
 	void 		ParseInput(const gchar *string);
 	void 		MoveCursor(int row, int col);
 	void 		InvalidateCursor(void);
+	void 		LoadImages(GdkDrawable *drawable, GdkGC *gc);
 
+	gboolean 	mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data);
+	gboolean 	mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
+	gboolean 	mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+	gboolean 	mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
+	void 		action_PageDown(GtkWidget *w, gpointer user_data);
+	void 		action_PageUP(GtkWidget *w, gpointer user_data);
 
 #endif // G3270_H_INCLUDED

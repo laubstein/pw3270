@@ -347,6 +347,9 @@ main(int argc, char *argv[])
 	screen_suspend();
 	if (cl_hostname != CN) {
 		appres.once = True;
+
+		Trace("Connecting to %s...",cl_hostname);
+
 		if (host_connect(cl_hostname) < 0)
 			x3270_exit(1);
 		/* Wait for negotiations to complete or fail. */
