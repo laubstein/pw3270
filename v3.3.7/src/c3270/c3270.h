@@ -39,7 +39,7 @@
 #include "ctlrc.h"
 #include "ftc.h"
 #include "gluec.h"
-#include "hostc.h"
+#include <lib3270/hostc.h>
 #include "idlec.h"
 #include "keymapc.h"
 #include <lib3270/kybdc.h>

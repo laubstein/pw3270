@@ -76,9 +76,24 @@
 
 	/* Create UI elements */
 	ui_manager = LoadApplicationUI(topwindow);
-	gtk_box_pack_start(GTK_BOX(vbox),gtk_ui_manager_get_widget(ui_manager, "/MainwindowMenubar"),FALSE,FALSE,0);
+	if(ui_manager)
+	{
+		static const char *itn[] = { "/MainMenubar", "/MainToolbar" };
+		int f;
+		gtk_window_add_accel_group(GTK_WINDOW(topwindow),gtk_ui_manager_get_accel_group(ui_manager));
 
-	g_object_unref(ui_manager);
+		for(f=0;f < G_N_ELEMENTS(itn);f++)
+		{
+				GtkWidget *widget = gtk_ui_manager_get_widget(ui_manager, itn[f]);
+				if(widget)
+				{
+					GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_DEFAULT|GTK_CAN_FOCUS);
+					gtk_box_pack_start(GTK_BOX(vbox),widget,FALSE,FALSE,0);
+				}
+		}
+
+		g_object_unref(ui_manager);
+	}
 
 	/* Create terminal window */
 	if(!CreateTerminalWindow())
@@ -94,6 +109,14 @@
 #endif
 
 	register_tchange(FULL_SCREEN,set_fullscreen);
+
+	/* Set window size & position */
+	// TODO (perry#3#): Read saved values.
+
+	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
+	gtk_window_set_position(GTK_WINDOW(topwindow),GTK_WIN_POS_CENTER);
+
+
 	return 0;
  }
 

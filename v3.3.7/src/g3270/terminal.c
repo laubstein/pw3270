@@ -66,6 +66,7 @@
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
  static void RedrawCursor(void);
+ static void set_showcursor(int value, int reason);
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -94,7 +95,7 @@
 										event->area.x,event->area.y,
 										event->area.width,event->area.height);
 
-	if(cMode & CURSOR_MODE_ENABLED)
+	if((cMode & CURSOR_MODE_ENABLED) && GTK_WIDGET_HAS_FOCUS(widget))
 	{
 		// Draw cursor
 
@@ -102,7 +103,7 @@
 		{
 			// Draw cross-hair cursor
 			gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CROSS_HAIR);
-			gdk_draw_line(widget->window,gc,cursor.x,0,cursor.x,sHeight);
+			gdk_draw_line(widget->window,gc,cursor.x,0,cursor.x,OIAROW);
 			gdk_draw_line(widget->window,gc,0,cursor.y,sWidth,cursor.y);
 		}
 
@@ -183,7 +184,7 @@
 			SetFontSize(f);
 			Trace("Font %d fits on %dx%d",f,terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
 		}
-		gtk_widget_set_size_request(widget,fsize->width,fsize->height);
+//		gtk_widget_set_size_request(widget,fsize->width,fsize->height);
 	}
 
 	/* Get the best font for the current window size */
@@ -265,12 +266,14 @@
  static gboolean focus_in(GtkWidget *widget, GdkEventFocus *event, gpointer x)
  {
 	gtk_im_context_focus_in(im);
+	InvalidateCursor();
 	return 0;
  }
 
  static gboolean focus_out(GtkWidget *widget, GdkEventFocus *event, gpointer x)
  {
 	gtk_im_context_focus_out(im);
+	InvalidateCursor();
 	return 0;
  }
 
@@ -362,7 +365,7 @@
 		cMode |= CURSOR_MODE_CROSS;
 	else
 		cMode &= ~CURSOR_MODE_CROSS;
-	InvalidateCursor();
+	gtk_widget_queue_draw(terminal);
  }
 
  static gboolean blink_cursor(gpointer ptr)
@@ -388,8 +391,11 @@
 
 	if(value)
 		g_timeout_add((guint) 750, (GSourceFunc) blink_cursor, 0);
+	else
+		cMode |= CURSOR_MODE_SHOW;
 
-	InvalidateCursor();
+
+	gtk_widget_queue_draw(terminal);
  }
 
  GtkWidget *CreateTerminalWindow(void)
@@ -405,8 +411,7 @@
 
 
 	// Configure terminal widget
-    GTK_WIDGET_SET_FLAGS(terminal, GTK_CAN_DEFAULT);
-    GTK_WIDGET_SET_FLAGS(terminal, GTK_CAN_FOCUS);
+    GTK_WIDGET_SET_FLAGS(terminal, GTK_CAN_DEFAULT|GTK_CAN_FOCUS);
 
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Events.html#GdkEventMask
     gtk_widget_add_events(terminal,GDK_KEY_PRESS_MASK|GDK_KEY_RELEASE_MASK|GDK_BUTTON_PRESS_MASK|GDK_BUTTON_MOTION_MASK|GDK_BUTTON_RELEASE_MASK);
@@ -428,8 +433,8 @@
 
 	font = pango_font_description_from_string("Courier");
 
-
 	register_tchange(CROSSHAIR,set_crosshair);
+	register_tchange(CURSOR_POS,set_showcursor);
 	register_tchange(CURSOR_BLINK,set_blink);
 
 	return terminal;
@@ -443,6 +448,57 @@
 		gtk_widget_queue_draw_area(terminal,0,cursor.y,sWidth,cursor.height);
 		gtk_widget_queue_draw_area(terminal,cursor.x,0,cursor.width,sHeight);
 	}
+ }
+
+ static void DrawCursorPosition(void)
+ {
+	GdkGC 		*gc		= gdk_gc_new(terminal->window);
+	PangoLayout *layout;
+	int			x		= left_margin+(fWidth*(terminal_cols-7));
+	char		buffer[10];
+
+	gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
+	gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fWidth*7,fHeight);
+
+	layout = gtk_widget_create_pango_layout(terminal,"4");
+
+	sprintf(buffer,"%03d/%03d",cRow,cCol);
+	pango_layout_set_text(layout,buffer,-1);
+
+	gdk_draw_layout_with_colors(pixmap,gc,
+						x,OIAROW+1,
+						layout,
+						color+TERMINAL_COLOR_OIA_CURSOR,color+TERMINAL_COLOR_OIA_BACKGROUND);
+
+	g_object_unref(layout);
+	gdk_gc_destroy(gc);
+	gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fWidth*7,fHeight);
+
+ }
+
+ static void set_showcursor(int value, int reason)
+ {
+ 	if(!(terminal && pixmap))
+		return;
+
+	if(value)
+	{
+		DrawCursorPosition();
+	}
+	else
+	{
+		GdkGC *gc	= gdk_gc_new(terminal->window);
+		int   x		= left_margin+(fWidth*(terminal_cols-7));
+
+		gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
+		gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fWidth*7,fHeight);
+
+		gdk_gc_destroy(gc);
+		gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fWidth*7,fHeight);
+
+	}
+
+	gtk_widget_queue_draw(terminal);
  }
 
  void MoveCursor(int row, int col)
@@ -460,30 +516,7 @@
 	RedrawCursor();
 
 	if(Toggled(CURSOR_POS) && terminal && pixmap)
-	{
-		GdkGC 		*gc		= gdk_gc_new(terminal->window);
-		PangoLayout *layout;
-		int			x		= left_margin+(fWidth*(terminal_cols-7));
-		char		buffer[10];
-
-		gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
-		gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fWidth*7,fHeight);
-
- 		layout = gtk_widget_create_pango_layout(terminal,"4");
-
-		sprintf(buffer,"%03d/%03d",cRow,cCol);
-		pango_layout_set_text(layout,buffer,-1);
-
-		gdk_draw_layout_with_colors(pixmap,gc,
-							x,OIAROW+1,
-							layout,
-							color+TERMINAL_COLOR_OIA_CURSOR,color+TERMINAL_COLOR_OIA_BACKGROUND);
-
-		g_object_unref(layout);
-		gdk_gc_destroy(gc);
-		gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fWidth*7,fHeight);
-
-	}
+		DrawCursorPosition();
 
  }
 
