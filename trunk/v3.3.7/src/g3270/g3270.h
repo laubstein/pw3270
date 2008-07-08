@@ -28,6 +28,9 @@
 	#define G3270_H_INCLUDED
 
 	#include <gtk/gtk.h>
+	#include <glib.h>
+	#include <glib/gi18n.h>
+
 	#include <lib3270/api.h>
 
 	enum TERMINAL_COLOR

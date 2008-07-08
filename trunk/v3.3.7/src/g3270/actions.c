@@ -33,6 +33,7 @@
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
  #include <lib3270/toggle.h>
+ #include <lib3270/hostc.h>
 
  #ifndef GDK_NUMLOCK_MASK
 	#define GDK_NUMLOCK_MASK GDK_MOD2_MASK
@@ -173,9 +174,56 @@
 	return FALSE;
  }
 
+ static void Action_CrossHair(GtkWidget *w, gpointer user_data)
+ {
+ 	do_toggle(CROSSHAIR);
+ }
+
+ static void Action_BlinkCursor(GtkWidget *w, gpointer user_data)
+ {
+ 	do_toggle(CURSOR_BLINK);
+ }
+
+ static void Action_FullScreen(GtkWidget *w, gpointer user_data)
+ {
+ 	do_toggle(FULL_SCREEN);
+ }
+
+ static void Action_ShowCursorPos(GtkWidget *w, gpointer user_data)
+ {
+ 	do_toggle(CURSOR_POS);
+ }
+
+ static void Action_AutoReconnect(GtkWidget *w, gpointer user_data)
+ {
+ 	do_toggle(RECONNECT);
+ }
+
+ static void Action_Connect(GtkWidget *w, gpointer user_data)
+ {
+ 	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
+
+ 	if(PCONNECTED)
+ 		return;
+
+
+	// TODO (perry#1#): Ask for server.
+
+ }
+
+ static void Action_Disconnect(GtkWidget *w, gpointer user_data)
+ {
+ 	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
+
+ 	if(!PCONNECTED)
+ 		return;
+
+	host_disconnect(FALSE);
+ }
+
 static const char *ui_mainwindow_ui_desc =
 "<ui>"
-"	<menubar name='MainwindowMenubar'>"
+"	<menubar name='MainMenubar'>"
 "		<menu action='FileMenu'>"
 "			<menuitem action='Quit'/>"
 "		</menu>"
@@ -187,10 +235,28 @@ static const char *ui_mainwindow_ui_desc =
 "			<menuitem action='Connect' />"
 "			<menuitem action='Disconnect' />"
 "		</menu>"
+"		<menu action='OptionsMenu'>"
+"			<menuitem action='CursorBlink' />"
+"			<menuitem action='CursorPos'  />"
+"			<menuitem action='FullScreen'  />"
+"			<menuitem action='MarginedPaste'  />"
+"			<menuitem action='CrossHair'  />"
+"			<menuitem action='RectSelect'  />"
+"			<menuitem action='Reconnect'  />"
+"		</menu>"
 "		<menu action='HelpMenu'>"
 "			<menuitem action='About' />"
 "		</menu>"
 "	</menubar>"
+"	<toolbar action='MainToolbar'>"
+"		<toolitem name='Copy' action='Copy' />"
+"		<toolitem name='Paste' action='Paste' />"
+"		<separator/>"
+"		<toolitem name='Connect' action='Connect' />"
+"		<toolitem name='Disconnect' action='Disconnect' />"
+"		<separator/>"
+"		<toolitem name='Quit' action='Quit' />"
+"	</toolbar>"
 "</ui>";
 
 /*
@@ -204,19 +270,44 @@ static const char *ui_mainwindow_ui_desc =
 	http://library.gnome.org/devel/gtk/stable/gtk-Stock-Items.html
 
  */
- static GtkActionEntry internal_action_entries[] =
+ static const GtkActionEntry internal_action_entries[] =
  {
- 	{	"FileMenu",			NULL,					"_File",		NULL,			NULL,	NULL			},
- 	{	"NetworkMenu",		NULL,					"_Network",		NULL,			NULL,	NULL			},
- 	{	"HelpMenu",			NULL,					"Help",			NULL,			NULL,	NULL			},
- 	{	"EditMenu",			NULL,					"_Edit",		NULL,			NULL,	NULL			},
+ 	{	"FileMenu",			NULL,					N_( "_File" ),			NULL,			NULL,	NULL							},
+ 	{	"NetworkMenu",		NULL,					N_( "_Network" ),		NULL,			NULL,	NULL							},
+ 	{	"HelpMenu",			NULL,					N_( "Help" ),			NULL,			NULL,	NULL							},
+ 	{	"EditMenu",			NULL,					N_( "_Edit" ),			NULL,			NULL,	NULL							},
+ 	{	"OptionsMenu",		NULL,					N_( "_Options" ),		NULL,			NULL,	NULL							},
 
- 	{	"About",			GTK_STOCK_ABOUT,		"About",		NULL,			NULL,	NULL			},
- 	{	"Connect",			GTK_STOCK_CONNECT,		"_Connect",		NULL,			NULL,	NULL			},
- 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	"_Disconnect",	NULL,			NULL,	NULL			},
- 	{	"Quit",				GTK_STOCK_QUIT,			"Quit",			"<control>X",	NULL,	gtk_main_quit	},
- 	{	"Copy",				GTK_STOCK_COPY,			"Copy",			"<control>C",	NULL,	NULL			},
- 	{	"Paste",			GTK_STOCK_PASTE,		"Paste",		"<control>V",	NULL,	NULL			},
+ 	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	NULL							},
+ 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(Action_Connect)		},
+ 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(Action_Disconnect)	},
+ 	{	"Quit",				GTK_STOCK_QUIT,			N_( "Quit" ),			"<control>X",	NULL,	gtk_main_quit					},
+ 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			"<control>C",	NULL,	NULL							},
+ 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),			"<control>V",	NULL,	NULL							},
+ };
+
+
+/*
+	The name of the action.
+	The stock id for the action, or the name of an icon from the icon theme.
+	The label for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
+	The accelerator for the action, in the format understood by gtk_accelerator_parse().
+	The tooltip for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
+	The function to call when the action is activated.
+	The initial state of the toggle action.
+
+	http://library.gnome.org/devel/gtk/stable/GtkActionGroup.html#GtkToggleActionEntry
+*/
+ static const GtkToggleActionEntry internal_action_toggles[] =
+ {
+ 	{	"CursorBlink",		NULL,	N_( "Blink Cursor" ),			NULL, 			NULL,	G_CALLBACK(Action_BlinkCursor),		FALSE },
+ 	{	"CursorPos",		NULL,	N_( "Show Cursor Position" ),	NULL, 			NULL,	G_CALLBACK(Action_ShowCursorPos), 	TRUE  },
+ 	{	"FullScreen",		NULL,	N_( "Full Screen" ),			"<Alt>Home",	NULL,	G_CALLBACK(Action_FullScreen),		FALSE },
+ 	{	"MarginedPaste",	NULL,	N_( "Margined Paste" ),			NULL, 			NULL,	NULL, 								FALSE },
+ 	{	"CrossHair",		NULL,	N_( "Cross Hair Cursor" ),		"<Alt>X",		NULL,	G_CALLBACK(Action_CrossHair),		FALSE },
+ 	{	"RectSelect",		NULL,	N_( "Rectangle Select" ),		NULL, 			NULL,	NULL, 								FALSE },
+ 	{	"Reconnect",		NULL,	N_( "Auto-Reconnect" ),			NULL, 			NULL,	G_CALLBACK(Action_AutoReconnect), 	FALSE },
+
  };
 
  GtkUIManager * LoadApplicationUI(GtkWidget *widget)
@@ -226,11 +317,14 @@ static const char *ui_mainwindow_ui_desc =
 	GError			*error = NULL;
 
 	actions = gtk_action_group_new("InternalActions");
+
 	gtk_action_group_add_actions(actions, internal_action_entries, G_N_ELEMENTS (internal_action_entries), topwindow);
+	gtk_action_group_add_toggle_actions(actions,internal_action_toggles, G_N_ELEMENTS(internal_action_toggles),0);
+
 	gtk_ui_manager_insert_action_group(ui_manager,actions, 0);
 
 	if(!gtk_ui_manager_add_ui_from_string(ui_manager, ui_mainwindow_ui_desc, -1, &error))
-		g_error("building menus failed: %s", error->message);
+		g_error( _( "Building menus failed: %s" ), error->message);
 
 	return ui_manager;
  }

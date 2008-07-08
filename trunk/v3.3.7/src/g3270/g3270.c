@@ -67,10 +67,11 @@
 #include "windirsc.h"
 #endif /*]*/
 
-#include <glib.h>
-
 #include "g3270.h"
-#include "hostc.h"
+#include <lib3270/hostc.h>
+
+#define GETTEXT_PACKAGE "g3270"
+#define LOCALEDIR "mo"
 
 #if !defined(_WIN32) /*[*/
 /* Base keymap. */
@@ -205,14 +206,23 @@ static void main_connect(Boolean status)
 {
 	Trace("%s: status: %d Connected: %d",__FUNCTION__,status,(int) CONNECTED);
 
-	if (CONNECTED || appres.disconnect_clear) {
-#if defined(C3270_80_132) /*[*/
-		if (appres.altscreen != CN)
-			ctlr_erase(False);
-		else
-#endif /*]*/
-			ctlr_erase(True);
+	if(status)
+	{
+		 cMode |= CURSOR_MODE_ENABLED;
 	}
+	else
+	{
+		cMode &= ~CURSOR_MODE_ENABLED;
+		ctlr_erase(True);
+	}
+
+	if(terminal)
+	{
+		gtk_widget_set_sensitive(terminal,status ? TRUE : FALSE);
+		DrawOIA(terminal,color,pixmap);
+		gtk_widget_queue_draw(terminal);
+	}
+
 }
 
 static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
@@ -256,10 +266,13 @@ static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, cons
 	}
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	const char	*cl_hostname = CN;
+
+	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
+	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+	textdomain(GETTEXT_PACKAGE);
 
 	printf("%s\n\nCopyright 1989-2008 by Paul Mattes, GTRC and others.\n",build);
 
@@ -277,13 +290,13 @@ main(int argc, char *argv[])
 
 	if(Register3270IOCallbacks(&g3270_io_callbacks))
 	{
-		fprintf(stderr,"Can't register into lib3270 I/O callback table\n");
+		g_error( _( "Can't register into lib3270 I/O callback table." ) );
 		return -1;
 	}
 
 	if(Register3270ScreenCallbacks(&g3270_screen_callbacks))
 	{
-		fprintf(stderr,"Can't register into lib3270 screen callback table\n");
+		g_error( _( "Can't register into lib3270 screen callback table." ) );
 		return -1;
 	}
 

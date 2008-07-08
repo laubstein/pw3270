@@ -365,7 +365,7 @@
 
  void DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw)
  {
-	GdkGC 		*gc		= gdk_gc_new(draw);
+	GdkGC 		*gc;
 	PangoLayout *layout;
 	int   		row		= OIAROW;
 	int			width	= (fWidth*terminal_cols);
@@ -373,6 +373,11 @@
 	GdkColor	*fg		= clr+TERMINAL_COLOR_OIA;
 	int			col		= left_margin;
 	char		str[11];
+
+	if(!draw)
+		return;
+
+	gc = gdk_gc_new(draw);
 
 	gdk_gc_set_foreground(gc,bg);
 	gdk_draw_rectangle(draw,gc,1,left_margin,row,width,fHeight+1);
@@ -507,7 +512,7 @@
 	int			width;
 	int			height;
 
-	if(!el)
+	if(!(el && draw && widget))
 		return -1;
 
 	gc = gdk_gc_new(draw);
