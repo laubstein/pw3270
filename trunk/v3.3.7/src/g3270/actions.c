@@ -117,9 +117,9 @@
 	action_internal(PF_action, IA_DEFAULT, "8", CN);
  }
 
- void action_Tab(GtkWidget *w, gpointer user_data)
+ void action_Clear(GtkWidget *w, gpointer user_data)
  {
-
+ 	action_internal(EraseInput_action, IA_DEFAULT, CN, CN);
  }
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
@@ -128,22 +128,35 @@
  	{
 		LIB3270_ACTION( GDK_Return,			0,					Enter_action),
 		LIB3270_ACTION( GDK_KP_Enter,		0,					Enter_action),
-		LIB3270_ACTION( GDK_Insert,			0,					ToggleInsert_action),
 
 		LIB3270_ACTION( GDK_Left,			0,					Left_action),
 		LIB3270_ACTION( GDK_Up,				0,					Up_action),
 		LIB3270_ACTION( GDK_Right,			0,					Right_action),
 		LIB3270_ACTION( GDK_Down,			0,					Down_action),
 
+		LIB3270_ACTION( GDK_KP_Left,		0,					Left_action),
+		LIB3270_ACTION( GDK_KP_Up,			0,					Up_action),
+		LIB3270_ACTION( GDK_KP_Right,		0,					Right_action),
+		LIB3270_ACTION( GDK_KP_Down,		0,					Down_action),
+
 		LIB3270_ACTION( GDK_ISO_Left_Tab,	0,					BackTab_action),
 		LIB3270_ACTION( GDK_Tab,			0,					Tab_action),
 		LIB3270_ACTION( GDK_KP_Add,			GDK_NUMLOCK_MASK,	Tab_action),
 
 		LIB3270_ACTION( GDK_r,				GDK_CONTROL_MASK,	Reset_action),
+		LIB3270_ACTION( GDK_w,				GDK_CONTROL_MASK,	DeleteWord_action),
+		LIB3270_ACTION( GDK_u,				GDK_CONTROL_MASK,	DeleteField_action),
+
+		LIB3270_ACTION( GDK_Escape,			0,					Reset_action),
 		LIB3270_ACTION( GDK_Escape,			0,					Reset_action),
 
+		LIB3270_ACTION( GDK_Insert,			0,					ToggleInsert_action),
 		LIB3270_ACTION( GDK_Delete,			0,					Delete_action),
 		LIB3270_ACTION( GDK_BackSpace,		0,					Erase_action),
+		LIB3270_ACTION( GDK_Home,			0,					Home_action),
+		LIB3270_ACTION( GDK_End,			0,					EraseEOF_action),
+		LIB3270_ACTION( GDK_Clear,			0,					EraseInput_action),
+		LIB3270_ACTION( GDK_3270_Reset,		0,					Reset_action),
 
 		G3270_ACTION( 	GDK_Page_Up,		0,					action_PageUP),
 		G3270_ACTION( 	GDK_Page_Down,		0,					action_PageDown),
@@ -244,6 +257,7 @@ static const char *ui_mainwindow_ui_desc =
 "			<menuitem action='PasteNext'/>"
 "			<separator/>"
 "			<menuitem action='SelectAll'/>"
+"			<menuitem action='Clear'/>"
 "			<separator/>"
 "			<menuitem action='Unselect'/>"
 "			<menuitem action='Reselect'/>"
@@ -269,6 +283,7 @@ static const char *ui_mainwindow_ui_desc =
 "		<toolitem name='SelectAll' action='SelectAll' />"
 "		<toolitem name='Copy' action='Copy' />"
 "		<toolitem name='Paste' action='Paste' />"
+"		<toolitem name='Clear' action='Clear' />"
 "		<separator/>"
 "		<toolitem name='Connect' action='Connect' />"
 "		<toolitem name='Disconnect' action='Disconnect' />"
@@ -290,12 +305,14 @@ static const char *ui_mainwindow_ui_desc =
  */
  static const GtkActionEntry internal_action_entries[] =
  {
+ 	/* Top menus */
  	{	"FileMenu",			NULL,					N_( "_File" ),			NULL,			NULL,	NULL							},
  	{	"NetworkMenu",		NULL,					N_( "_Network" ),		NULL,			NULL,	NULL							},
  	{	"HelpMenu",			NULL,					N_( "Help" ),			NULL,			NULL,	NULL							},
  	{	"EditMenu",			NULL,					N_( "_Edit" ),			NULL,			NULL,	NULL							},
  	{	"OptionsMenu",		NULL,					N_( "_Options" ),		NULL,			NULL,	NULL							},
 
+	/* Misc actions */
  	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	NULL							},
  	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(action_Connect)		},
  	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)	},
@@ -309,6 +326,7 @@ static const char *ui_mainwindow_ui_desc =
  	{	"Unselect",			NULL,					N_( "_Unselect" ),		NULL,			NULL,	G_CALLBACK(ClearSelection)		},
  	{	"Reselect",			NULL,					N_( "_Reselect" ),		NULL,			NULL,	G_CALLBACK(Reselect)			},
  	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),		NULL,			NULL,	G_CALLBACK(action_SelectAll)	},
+ 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),	NULL,			NULL,	G_CALLBACK(action_Clear)		},
  };
 
 

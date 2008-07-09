@@ -1659,6 +1659,7 @@ Delete_action(Widget w unused, XEvent *event, String *params,
 		if (!ea_buf[baddr].fa)
 			cursor_move(baddr);
 	}
+	screen_disp();
 }
 
 
@@ -1692,6 +1693,7 @@ BackSpace_action(Widget w unused, XEvent *event, String *params,
 		DEC_BA(baddr);
 		cursor_move(baddr);
 	}
+	screen_disp();
 }
 
 
@@ -1752,6 +1754,7 @@ do_erase(void)
 		cursor_move(baddr);
 		(void) do_delete();
 	}
+	screen_disp();
 }
 
 void
@@ -2454,6 +2457,7 @@ EraseEOF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 			ea_buf[cursor_addr].cc = EBC_si;
 	}
 	(void) ctlr_dbcs_postprocess();
+	screen_disp();
 }
 
 
@@ -2513,6 +2517,7 @@ EraseInput_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 		ctlr_clear(True);
 		cursor_move(0);
 	}
+	screen_disp();
 }
 
 
