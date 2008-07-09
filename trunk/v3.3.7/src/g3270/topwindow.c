@@ -86,10 +86,7 @@
 		{
 				GtkWidget *widget = gtk_ui_manager_get_widget(ui_manager, itn[f]);
 				if(widget)
-				{
-					GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_DEFAULT|GTK_CAN_FOCUS);
 					gtk_box_pack_start(GTK_BOX(vbox),widget,FALSE,FALSE,0);
-				}
 		}
 
 		g_object_unref(ui_manager);
@@ -100,7 +97,7 @@
 		return -1;
 
 	gtk_box_pack_start(GTK_BOX(vbox), terminal, TRUE, TRUE, 0);
-	gtk_widget_show(terminal);
+
 
 #ifdef PACKAGE_NAME
 	gtk_window_set_role(GTK_WINDOW(topwindow), PACKAGE_NAME "_TOP" );

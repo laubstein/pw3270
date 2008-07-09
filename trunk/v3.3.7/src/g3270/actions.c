@@ -57,10 +57,10 @@
 */
 
  #ifdef DEBUG
-	#define LIB3270_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_lib3270, (gpointer) action }
-	#define PF_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_pf, (gpointer) action }
-	#define G3270_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action, 0 }
-	#define TOGGLE_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_Toggle, (gpointer) action }
+	#define LIB3270_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_lib3270, (gpointer) action, #action }
+	#define PF_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_pf, (gpointer) action, "action_pf(" #action ")" }
+	#define G3270_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action, 0, #action }
+	#define TOGGLE_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_Toggle, (gpointer) action, "action_Toggle(" #action ")" }
  #else
 	#define LIB3270_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action_lib3270, (gpointer) action }
 	#define PF_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action_pf, (gpointer) action }
@@ -115,6 +115,11 @@
 
 	// TODO (perry#1#): Read FN association from configuration file.
 	action_internal(PF_action, IA_DEFAULT, "8", CN);
+ }
+
+ void action_Tab(GtkWidget *w, gpointer user_data)
+ {
+
  }
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
@@ -174,32 +179,37 @@
 	return FALSE;
  }
 
- static void Action_CrossHair(GtkWidget *w, gpointer user_data)
+ static void action_CrossHair(GtkWidget *w, gpointer user_data)
  {
  	do_toggle(CROSSHAIR);
  }
 
- static void Action_BlinkCursor(GtkWidget *w, gpointer user_data)
+ static void action_BlinkCursor(GtkWidget *w, gpointer user_data)
  {
  	do_toggle(CURSOR_BLINK);
  }
 
- static void Action_FullScreen(GtkWidget *w, gpointer user_data)
+ static void action_RectSelect(GtkWidget *w, gpointer user_data)
+ {
+ 	do_toggle(RECTANGLE_SELECT);
+ }
+
+ static void action_FullScreen(GtkWidget *w, gpointer user_data)
  {
  	do_toggle(FULL_SCREEN);
  }
 
- static void Action_ShowCursorPos(GtkWidget *w, gpointer user_data)
+ static void action_ShowCursorPos(GtkWidget *w, gpointer user_data)
  {
  	do_toggle(CURSOR_POS);
  }
 
- static void Action_AutoReconnect(GtkWidget *w, gpointer user_data)
+ static void action_AutoReconnect(GtkWidget *w, gpointer user_data)
  {
  	do_toggle(RECONNECT);
  }
 
- static void Action_Connect(GtkWidget *w, gpointer user_data)
+ static void action_Connect(GtkWidget *w, gpointer user_data)
  {
  	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
 
@@ -211,7 +221,7 @@
 
  }
 
- static void Action_Disconnect(GtkWidget *w, gpointer user_data)
+ static void action_Disconnect(GtkWidget *w, gpointer user_data)
  {
  	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
 
@@ -229,7 +239,14 @@ static const char *ui_mainwindow_ui_desc =
 "		</menu>"
 "		<menu action='EditMenu'>"
 "			<menuitem action='Copy'/>"
+"			<menuitem action='Append'/>"
 "			<menuitem action='Paste'/>"
+"			<menuitem action='PasteNext'/>"
+"			<separator/>"
+"			<menuitem action='SelectAll'/>"
+"			<separator/>"
+"			<menuitem action='Unselect'/>"
+"			<menuitem action='Reselect'/>"
 "		</menu>"
 "		<menu action='NetworkMenu'>"
 "			<menuitem action='Connect' />"
@@ -249,6 +266,7 @@ static const char *ui_mainwindow_ui_desc =
 "		</menu>"
 "	</menubar>"
 "	<toolbar action='MainToolbar'>"
+"		<toolitem name='SelectAll' action='SelectAll' />"
 "		<toolitem name='Copy' action='Copy' />"
 "		<toolitem name='Paste' action='Paste' />"
 "		<separator/>"
@@ -279,11 +297,18 @@ static const char *ui_mainwindow_ui_desc =
  	{	"OptionsMenu",		NULL,					N_( "_Options" ),		NULL,			NULL,	NULL							},
 
  	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	NULL							},
- 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(Action_Connect)		},
- 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(Action_Disconnect)	},
- 	{	"Quit",				GTK_STOCK_QUIT,			N_( "Quit" ),			"<control>X",	NULL,	gtk_main_quit					},
- 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			"<control>C",	NULL,	NULL							},
- 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),			"<control>V",	NULL,	NULL							},
+ 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(action_Connect)		},
+ 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)	},
+ 	{	"Quit",				GTK_STOCK_QUIT,			N_( "Quit" ),			NULL,			NULL,	gtk_main_quit					},
+
+ 	/* Edit actions */
+ 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			NULL,			NULL,	G_CALLBACK(action_Copy)			},
+ 	{	"Append",			NULL,					N_( "Add to copy" ),	NULL,			NULL,	G_CALLBACK(action_Append)		},
+ 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),			NULL,			NULL,	G_CALLBACK(action_Paste)		},
+ 	{	"PasteNext",		NULL,					N_( "Paste _next" ),	NULL,			NULL,	G_CALLBACK(action_PasteNext)	},
+ 	{	"Unselect",			NULL,					N_( "_Unselect" ),		NULL,			NULL,	G_CALLBACK(ClearSelection)		},
+ 	{	"Reselect",			NULL,					N_( "_Reselect" ),		NULL,			NULL,	G_CALLBACK(Reselect)			},
+ 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),		NULL,			NULL,	G_CALLBACK(action_SelectAll)	},
  };
 
 
@@ -300,13 +325,13 @@ static const char *ui_mainwindow_ui_desc =
 */
  static const GtkToggleActionEntry internal_action_toggles[] =
  {
- 	{	"CursorBlink",		NULL,	N_( "Blink Cursor" ),			NULL, 			NULL,	G_CALLBACK(Action_BlinkCursor),		FALSE },
- 	{	"CursorPos",		NULL,	N_( "Show Cursor Position" ),	NULL, 			NULL,	G_CALLBACK(Action_ShowCursorPos), 	TRUE  },
- 	{	"FullScreen",		NULL,	N_( "Full Screen" ),			"<Alt>Home",	NULL,	G_CALLBACK(Action_FullScreen),		FALSE },
+ 	{	"CursorBlink",		NULL,	N_( "Blink Cursor" ),			NULL, 			NULL,	G_CALLBACK(action_BlinkCursor),		FALSE },
+ 	{	"CursorPos",		NULL,	N_( "Show Cursor Position" ),	NULL, 			NULL,	G_CALLBACK(action_ShowCursorPos), 	TRUE  },
+ 	{	"FullScreen",		NULL,	N_( "Full Screen" ),			"<Alt>Home",	NULL,	G_CALLBACK(action_FullScreen),		FALSE },
  	{	"MarginedPaste",	NULL,	N_( "Margined Paste" ),			NULL, 			NULL,	NULL, 								FALSE },
- 	{	"CrossHair",		NULL,	N_( "Cross Hair Cursor" ),		"<Alt>X",		NULL,	G_CALLBACK(Action_CrossHair),		FALSE },
- 	{	"RectSelect",		NULL,	N_( "Rectangle Select" ),		NULL, 			NULL,	NULL, 								FALSE },
- 	{	"Reconnect",		NULL,	N_( "Auto-Reconnect" ),			NULL, 			NULL,	G_CALLBACK(Action_AutoReconnect), 	FALSE },
+ 	{	"CrossHair",		NULL,	N_( "Cross Hair Cursor" ),		"<Alt>X",		NULL,	G_CALLBACK(action_CrossHair),		FALSE },
+ 	{	"RectSelect",		NULL,	N_( "Rectangle Select" ),		NULL, 			NULL,	G_CALLBACK(action_RectSelect),		FALSE },
+ 	{	"Reconnect",		NULL,	N_( "Auto-Reconnect" ),			NULL, 			NULL,	G_CALLBACK(action_AutoReconnect), 	FALSE },
 
  };
 

@@ -3165,6 +3165,9 @@ emulate_input(char *s, int len, Boolean pasting)
 	char *ws;
 #endif /*]*/
 
+	if(len < 0)
+		len = strlen(s);
+
 	/*
 	 * Convert from a multi-byte string to a Unicode string.
 	 */

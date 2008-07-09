@@ -21,7 +21,6 @@
 #define screen_obscured()	False
 #define screen_scroll()
 
-extern void cursor_move(int baddr);
 extern void ring_bell(void);
 extern void screen_132(void);
 extern void screen_80(void);

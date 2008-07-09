@@ -29,7 +29,7 @@
  #include "g3270.h"
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
- #include <lib3270/screenc.h>
+ #include <lib3270/toggle.h>
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -37,15 +37,27 @@
 										row = ( (((unsigned long) event->y) - top_margin)/fHeight );
 
 
+ enum _SELECTING_MODE
+ {
+	SELECTING_NONE,
+	SELECTING_NORMAL,
+	SELECTING_RECTANGLE,
+
+
+	SELECTING_INVALID
+ };
+
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
 /*---[ Constants ]------------------------------------------------------------*/
 
 /*---[ Statics ]--------------------------------------------------------------*/
 
- int startRow 	= -1;
- int startCol 	= -1;
- int mode		= 0;
+ static int startRow 	= 0;
+ static int startCol 	= 0;
+ static int endRow 	= 0;
+ static int endCol		= 0;
+ static int mode		= SELECTING_NONE;
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
@@ -53,22 +65,86 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
- static void ClearSelection(void)
+/*
+gsize               g_strlcat                           (gchar *dest,
+                                                         const gchar *src,
+                                                         gsize dest_size);
+*/
+
+ gchar * GetSelection(void)
  {
- 	if(!mode)
+ 	gchar 	*buffer;
+ 	gsize	max = terminal_rows*terminal_cols*MAX_CHR_LENGTH;
+ 	gsize	sz	= 0;
+ 	int		row,col;
+ 	int		pos	= 0;
+
+ 	if(!(mode && max))
+		return NULL;
+
+	buffer = g_malloc(max);
+	*buffer = 0;
+	for(row = 0; row < terminal_rows;row++)
+	{
+		for(col = 0; col < terminal_cols;col++)
+		{
+			if(screen[pos].selected)
+				sz = g_strlcat(buffer,*screen[pos].ch ? screen[pos].ch : " ",max);
+			pos++;
+		}
+		if(*buffer)
+			sz = g_strlcat(g_strchomp(buffer),"\n",max);
+	}
+
+	return g_realloc(buffer,sz+1);
+ }
+
+ static void SetSelection(gboolean selected)
+ {
+ 	int pos;
+
+	if(!screen)
 		return;
 
-	// Clear selection box, invalidate drawing area.
+	for(pos = 0; pos < (terminal_rows * terminal_cols);pos++)
+		screen[pos].selected = selected;
 
-
-	mode = 0;
+	if(terminal && pixmap)
+	{
+		DrawScreen(terminal,color,pixmap);
+		DrawOIA(terminal,color,pixmap);
+		gtk_widget_queue_draw(terminal);
+	}
  }
 
  gboolean mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
- 	ClearSelection();
- 	DecodePosition(event,startRow,startCol);
- 	Trace("Mouse press at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
+
+	switch( ((event->type & 0x0F) << 4) | (event->button & 0x0F))
+	{
+	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 1:
+		ClearSelection();
+		DecodePosition(event,startRow,startCol);
+		Trace("Button 1 clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
+		break;
+
+	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1:
+		Trace("Button 1 double-clicked at %ld,%ld",(long) event->x, (long) event->y);
+		break;
+
+	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3:
+		Trace("Button 2 clicked at %ld,%ld",(long) event->x, (long) event->y);
+		break;
+
+	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 3:
+		Trace("Button 2 double-clicked at %ld,%ld",(long) event->x, (long) event->y);
+		break;
+
+	default:
+		Trace("Unexpected mouse click %d with button %d",event->type, event->button);
+ 		return 0;
+	}
+
  	return 0;
  }
 
@@ -80,8 +156,8 @@
 
  	switch(mode)
  	{
-	case 0:	// Single click, just move cursor
-		cursor_move((row*terminal_rows)+col);
+	case SELECTING_NONE:	// Single click, just move cursor
+		cursor_move((row*terminal_cols)+col);
 		break;
 
 
@@ -90,8 +166,174 @@
     return 0;
  }
 
+ static void UpdateSelectedRectangle(void)
+ {
+ 	int			x,y,row,col;
+	GdkGC		*gc		= NULL;
+	PangoLayout *layout	= NULL;
+ 	int			pos		= 0;
+ 	int			left;
+ 	int			right;
+ 	int			top;
+ 	int			bottom;
+
+	if(!(mode && screen && terminal))
+		return;
+
+	// Clear selection box, invalidate drawing area.
+	if(pixmap)
+		gc = gdk_gc_new(pixmap);
+
+	if(terminal)
+		layout = gtk_widget_create_pango_layout(terminal," ");
+
+	if(startRow > endRow)
+	{
+		top = endRow;
+		bottom = startRow;
+	}
+	else
+	{
+		top = startRow;
+		bottom = endRow;
+	}
+
+	if(startCol > endCol)
+	{
+		left = endCol;
+		right = endCol;
+	}
+	else
+	{
+		left = startCol;
+		right = endCol;
+	}
+
+	y = top_margin;
+	for(row = 0; row < terminal_rows;row++)
+	{
+		x = left_margin;
+		for(col = 0; col < terminal_cols;col++)
+		{
+			gboolean selected = (col >= left && col <= right && row >= top && row <= bottom);
+
+			if(screen[pos].selected != selected)
+			{
+				// Changed, mark to update
+				screen[pos].selected = selected;
+				DrawElement(pixmap,color,gc,layout,x,y,screen+pos);
+				gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
+			}
+			pos++;
+			x += fWidth;
+		}
+		y += fHeight;
+	}
+
+	if(layout)
+		g_object_unref(layout);
+
+	if(gc)
+		gdk_gc_destroy(gc);
+
+ }
+
+ static void UpdateSelectedText(void)
+ {
+ 	int			start	= (startRow * terminal_cols)+startCol;
+ 	int			end 	= (endRow * terminal_cols)+endCol;
+ 	int			pos		= 0;
+ 	int			x,y,row,col;
+	GdkGC		*gc		= NULL;
+	PangoLayout *layout	= NULL;
+
+	if(!(screen && terminal))
+		return;
+
+ 	if(start > end)
+ 	{
+		int temp = start;
+		start = end;
+		end = temp;
+ 	}
+
+	if(pixmap)
+		gc = gdk_gc_new(pixmap);
+
+	if(terminal)
+		layout = gtk_widget_create_pango_layout(terminal," ");
+
+	y = top_margin;
+	for(row = 0; row < terminal_rows;row++)
+	{
+		x = left_margin;
+		for(col = 0; col < terminal_cols;col++)
+		{
+			gboolean selected = (pos >= start && pos <= end) ? TRUE : FALSE;
+			if(screen[pos].selected != selected)
+			{
+				// Changed, mark to update
+				screen[pos].selected = selected;
+				DrawElement(pixmap,color,gc,layout,x,y,screen+pos);
+				gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
+			}
+			pos++;
+			x += fWidth;
+		}
+		y += fHeight;
+	}
+
+	if(layout)
+		g_object_unref(layout);
+
+	if(gc)
+		gdk_gc_destroy(gc);
+
+
+ }
+
+ void set_rectangle_select(int value, int reason)
+ {
+ 	if(mode != SELECTING_RECTANGLE && mode != SELECTING_NORMAL)
+		return;
+
+	ClearSelection();
+	mode = value ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+
+	if(mode == SELECTING_NORMAL)
+		UpdateSelectedText();
+	else
+		UpdateSelectedRectangle();
+ }
+
+ void Reselect(void)
+ {
+	mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+	if(mode == SELECTING_NORMAL)
+		UpdateSelectedText();
+	else
+		UpdateSelectedRectangle();
+ }
+
  gboolean mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
  {
+ 	switch(mode)
+ 	{
+	case SELECTING_NONE:	// Starting selection
+		mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+		return mouse_motion(widget,event,user_data); // Recursive call to update selection box
+
+	case SELECTING_RECTANGLE:
+		DecodePosition(event,endRow,endCol);
+		UpdateSelectedRectangle();
+		break;
+
+	case SELECTING_NORMAL:
+		DecodePosition(event,endRow,endCol);
+		UpdateSelectedText();
+		break;
+
+ 	}
     return 0;
  }
 
@@ -109,3 +351,14 @@
  	return 0;
  }
 
+ void ClearSelection(void)
+ {
+ 	SetSelection(FALSE);
+	mode = SELECTING_NONE;
+ }
+
+ void action_SelectAll(GtkWidget *w, gpointer user_data)
+ {
+ 	SetSelection(TRUE);
+	mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+ }

@@ -168,6 +168,7 @@
 		/* Misc API calls */
 		void	Input_String(const unsigned char *str);
 		int		Toggled(int ix);
+		void 	cursor_move(int baddr);
 
 
 #endif // LIB3270_H_INCLUDED

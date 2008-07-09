@@ -129,10 +129,10 @@
 
  int								fWidth			= 0;
  int								fHeight			= 0;
+ ELEMENT							*screen			= NULL;
+ char								*charset		= NULL;
 
- static ELEMENT					*screen			= NULL;
  static int						szScreen		= 0;
- static char						*charset		= NULL;
  static gboolean					draw			= FALSE;
  static const struct status_code	*sts_data		= NULL;
  static unsigned char			compose			= 0;
@@ -180,11 +180,11 @@
 
  void ParseInput(const gchar *string)
  {
-    gchar *input = g_convert(string, -1, charset ? charset : "ISO-8859-1", "UTF-8", NULL, NULL, NULL);
+    gchar *input = g_convert(string, -1, CHARSET, "UTF-8", NULL, NULL, NULL);
 
     if(!input)
     {
-        Log("Error converting string \"%s\" to %s",string,charset);
+        Log("Error converting string \"%s\" to %s",string,CHARSET);
         return;
     }
 
@@ -214,23 +214,16 @@
 
 	if(c)
 	{
-		if(charset)
-		{
-			gsize sz;
-			gchar in[2] = { (char) c, 0 };
-			gchar *str = g_convert(in, -1, "UTF-8", charset, NULL, &sz, NULL);
+		gsize sz;
+		gchar in[2] = { (char) c, 0 };
+		gchar *str = g_convert(in, -1, "UTF-8", CHARSET, NULL, &sz, NULL);
 
-			if(sz < MAX_CHR_LENGTH)
-				memcpy(ch,str,sz);
-			else
-				Log("Invalid size when converting \"%s\" to \"%s\"",in,ch);
-			g_free(str);
-
-		}
+		if(sz < MAX_CHR_LENGTH)
+			memcpy(ch,str,sz);
 		else
-		{
-			*ch  = c;
-		}
+			Log("Invalid size when converting \"%s\" to \"%s\"",in,ch);
+		g_free(str);
+
 	}
 
 	// TODO (perry#1#): Get the correct colors
@@ -258,12 +251,7 @@
 		x = left_margin + (col * fWidth);
 		y = top_margin + (row * fHeight);
 
-		gdk_draw_layout_with_colors(	pixmap,
-										gc,
-										x,y,
-										layout,
-										color+el->fg,
-										color+el->bg );
+		DrawElement(pixmap,color,gc,layout,x,y,el);
 
 		gdk_gc_destroy(gc);
 		g_object_unref(layout);
@@ -337,7 +325,7 @@
  	}
 
  	if(lu)
-		luname = g_convert(lu, -1, "UTF-8", charset ? charset : "ISO-8859-1", NULL, NULL, NULL);
+		luname = g_convert(lu, -1, "UTF-8", CHARSET, NULL, NULL, NULL);
 
 	if(terminal && pixmap)
 	{
@@ -502,7 +490,6 @@
 	gc = gdk_gc_new(draw);
 
 	// Fill pixmap with background color
-	gdk_drawable_get_size(draw,&width,&height);
 	gdk_gc_set_foreground(gc,clr);
 	gdk_draw_rectangle(draw,gc,1,0,0,width,height);
 
@@ -519,8 +506,12 @@
 			// Set character attributes in the layout
 			if(el->ch && *el->ch != ' ' && *el->ch)
 			{
-				pango_layout_set_text(layout,el->ch,-1);
-				gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+el->fg,clr+el->bg);
+				DrawElement(draw,clr,gc,layout,x,y,el);
+			}
+			else if(el->selected)
+			{
+				gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_SELECTED_BG);
+				gdk_draw_rectangle(draw,gc,1,x,y,fWidth,fHeight);
 			}
 
 			el++;
@@ -658,3 +649,19 @@
 	   gdk_pixbuf_render_to_drawable(pix[id].pix,drawable,gc,0,0,x,y,-1,-1,GDK_RGB_DITHER_NORMAL,0,0);
     }
  }
+
+ void DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el)
+ {
+ 	if(!(gc && draw && layout && el))
+		return;
+
+	pango_layout_set_text(layout,el->ch,-1);
+
+	if(el->selected)
+		gdk_draw_layout_with_colors(draw,gc,x,y,layout,color+TERMINAL_COLOR_SELECTED_FG,clr+TERMINAL_COLOR_SELECTED_BG);
+	else
+		gdk_draw_layout_with_colors(draw,gc,x,y,layout,color+el->fg,clr+el->bg);
+
+ }
+
+
