@@ -33,6 +33,14 @@
 
 	#include <lib3270/api.h>
 
+	#define MAX_CHR_LENGTH 3
+	typedef struct _element
+	{
+		gchar	ch[MAX_CHR_LENGTH];
+		short	fg;
+		short	bg;
+	} ELEMENT;
+
 	enum TERMINAL_COLOR
 	{
 		TERMINAL_COLOR_00,

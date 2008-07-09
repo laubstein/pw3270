@@ -29,8 +29,13 @@
  #include "g3270.h"
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
+ #include <lib3270/screenc.h>
 
 /*---[ Defines ]--------------------------------------------------------------*/
+
+ #define DecodePosition(event,row,col)	col = ( (((unsigned long) event->x) - left_margin)/fWidth ); \
+										row = ( (((unsigned long) event->y) - top_margin)/fHeight );
+
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
@@ -38,19 +43,50 @@
 
 /*---[ Statics ]--------------------------------------------------------------*/
 
+ int startRow 	= -1;
+ int startCol 	= -1;
+ int mode		= 0;
+
 /*---[ Globals ]--------------------------------------------------------------*/
 
  gboolean WaitingForChanges = TRUE;
 
 /*---[ Implement ]------------------------------------------------------------*/
 
+ static void ClearSelection(void)
+ {
+ 	if(!mode)
+		return;
+
+	// Clear selection box, invalidate drawing area.
+
+
+	mode = 0;
+ }
+
  gboolean mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
+ 	ClearSelection();
+ 	DecodePosition(event,startRow,startCol);
+ 	Trace("Mouse press at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
  	return 0;
  }
 
  gboolean mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
+	int row,col;
+
+	DecodePosition(event,row,col);
+
+ 	switch(mode)
+ 	{
+	case 0:	// Single click, just move cursor
+		cursor_move((row*terminal_rows)+col);
+		break;
+
+
+ 	}
+
     return 0;
  }
 
