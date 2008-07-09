@@ -36,15 +36,6 @@
 
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
 
- #define MAX_CHR_LENGTH 3
-
- typedef struct _element
- {
- 	gchar	ch[MAX_CHR_LENGTH];
- 	short	fg;
- 	short	bg;
- } ELEMENT;
-
 #ifdef DEBUG
  	#define STATUS_CODE_DESCRIPTION(x,c,y) { #x, c, y }
 #else
@@ -207,10 +198,9 @@
 
  static int addch(int row, int col, int c, unsigned short attr)
  {
-	gchar	in[2] = { (char) c, 0 };
-	gsize	sz;
-	gchar	*ch;
-	ELEMENT temp;
+ 	gchar	ch[MAX_CHR_LENGTH];
+ 	short	fg;
+ 	short	bg;
  	ELEMENT *el;
  	int		pos = (row*terminal_cols)+col;
 
@@ -220,48 +210,42 @@
 	if(pos > szScreen)
 		return EFAULT;
 
-	memset(&temp,0,sizeof(temp));
+	memset(ch,0,MAX_CHR_LENGTH);
 
 	if(c)
 	{
 		if(charset)
 		{
-			ch = g_convert(in, -1, "UTF-8", charset, NULL, &sz, NULL);
+			gsize sz;
+			gchar in[2] = { (char) c, 0 };
+			gchar *str = g_convert(in, -1, "UTF-8", charset, NULL, &sz, NULL);
 
 			if(sz < MAX_CHR_LENGTH)
-			{
-				memcpy(temp.ch,ch,sz);
-			}
+				memcpy(ch,str,sz);
 			else
-			{
 				Log("Invalid size when converting \"%s\" to \"%s\"",in,ch);
-				memset(temp.ch,0,MAX_CHR_LENGTH);
-			}
-			g_free(ch);
+			g_free(str);
 
 		}
 		else
 		{
-			memcpy(temp.ch,in,2);
+			*ch  = c;
 		}
-
-	}
-	else
-	{
-		memset(temp.ch,0,MAX_CHR_LENGTH);
 	}
 
 	// TODO (perry#1#): Get the correct colors
-	temp.bg = (attr & 0xF0) >> 4;
-	temp.fg = (attr & 0x0F);
+	bg = (attr & 0xF0) >> 4;
+	fg = (attr & 0x0F);
 
 	// Get element entry in the buffer, update ONLY if changed
  	el = screen + pos;
 
-	if(!memcmp(el,&temp,sizeof(ELEMENT)))
+	if( !(bg != el->bg || fg != el->fg || memcmp(el->ch,ch,MAX_CHR_LENGTH)))
 		return 0;
 
-	memcpy(el,&temp,sizeof(ELEMENT));
+	el->bg = bg;
+	el->fg = fg;
+	memcpy(el->ch,ch,MAX_CHR_LENGTH);
 
 	if(draw && terminal && pixmap)
 	{
@@ -358,7 +342,7 @@
 	if(terminal && pixmap)
 	{
 		DrawOIA(terminal,color,pixmap);
-		gtk_widget_queue_draw(terminal);
+		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);
 	}
 
  }
@@ -487,7 +471,7 @@
  	if(terminal && pixmap)
  	{
 		DrawOIA(terminal,color,pixmap);
-		gtk_widget_queue_draw(terminal); // FIXME (perry#2#): Redraw only the oia.
+		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);
  	}
  }
 
@@ -536,7 +520,6 @@
 			if(el->ch && *el->ch != ' ' && *el->ch)
 			{
 				pango_layout_set_text(layout,el->ch,-1);
-//				pango_layout_get_pixel_size(layout,&width,&height);
 				gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+el->fg,clr+el->bg);
 			}
 
@@ -598,7 +581,7 @@
 	Trace("Status changed to %s (%s)",sts_data->dbg,sts_data->str);
 
 	DrawOIA(terminal,color,pixmap);
-	gtk_widget_queue_draw(terminal);
+	gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);
 
  }
 

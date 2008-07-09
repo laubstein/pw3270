@@ -112,7 +112,6 @@
 
 	/* Set window size & position */
 	// TODO (perry#3#): Read saved values.
-
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
 	gtk_window_set_position(GTK_WINDOW(topwindow),GTK_WIN_POS_CENTER);
 
