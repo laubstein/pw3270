@@ -490,6 +490,7 @@
 	gc = gdk_gc_new(draw);
 
 	// Fill pixmap with background color
+	gdk_drawable_get_size(draw,&width,&height);
 	gdk_gc_set_foreground(gc,clr);
 	gdk_draw_rectangle(draw,gc,1,0,0,width,height);
 

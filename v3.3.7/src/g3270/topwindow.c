@@ -55,6 +55,17 @@
 
  }
 
+ static void  set_widget_flags(GtkWidget *widget, gpointer data)
+ {
+ 	Trace("Setting flag to %p (Container: %d",widget,GTK_IS_CONTAINER(widget));
+	GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_FOCUS);
+	GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_DEFAULT);
+
+	if(GTK_IS_CONTAINER(widget))
+		gtk_container_foreach(GTK_CONTAINER(widget),set_widget_flags,0);
+
+ }
+
  int CreateTopWindow(void)
  {
  	static int cr[CURSOR_MODE_USER] = { GDK_ARROW, GDK_WATCH, GDK_X_CURSOR };
@@ -72,7 +83,6 @@
 	g_signal_connect(G_OBJECT(topwindow),	"destroy", 				G_CALLBACK(destroy),				NULL);
 
     vbox = gtk_vbox_new(FALSE,0);
-    gtk_container_add(GTK_CONTAINER(topwindow),vbox);
 
 	/* Create UI elements */
 	ui_manager = LoadApplicationUI(topwindow);
@@ -92,12 +102,14 @@
 		g_object_unref(ui_manager);
 	}
 
+	set_widget_flags(vbox,0);
+    gtk_container_add(GTK_CONTAINER(topwindow),vbox);
+
 	/* Create terminal window */
 	if(!CreateTerminalWindow())
 		return -1;
 
 	gtk_box_pack_start(GTK_BOX(vbox), terminal, TRUE, TRUE, 0);
-
 
 #ifdef PACKAGE_NAME
 	gtk_window_set_role(GTK_WINDOW(topwindow), PACKAGE_NAME "_TOP" );
