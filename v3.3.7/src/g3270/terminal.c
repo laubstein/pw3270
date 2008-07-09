@@ -274,6 +274,7 @@
  {
 	gtk_im_context_focus_out(im);
 	InvalidateCursor();
+	Trace("Terminal %p lost focus",widget);
 	return 0;
  }
 
@@ -331,7 +332,10 @@
 											"green," 		// TERMINAL_COLOR_OIA
 											"black,"	 	// TERMINAL_COLOR_OIA_BACKGROUND
 											"white,"		// TERMINAL_COLOR_OIA_STATUS_OK
-											"red";			// TERMINAL_COLOR_OIA_STATUS_INVALID
+											"red,"			// TERMINAL_COLOR_OIA_STATUS_INVALID
+											"black,"		// TERMINAL_COLOR_SELECTED_FG,
+											"white";		// TERMINAL_COLOR_SELECTED_BG
+
 
  	int 	f;
 
@@ -436,6 +440,7 @@
 	register_tchange(CROSSHAIR,set_crosshair);
 	register_tchange(CURSOR_POS,set_showcursor);
 	register_tchange(CURSOR_BLINK,set_blink);
+	register_tchange(RECTANGLE_SELECT,set_rectangle_select);
 
 	return terminal;
  }

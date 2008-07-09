@@ -45,6 +45,8 @@
 #include "trace_dsc.h"
 #include "utilc.h"
 
+#include <lib3270/api.h>
+
 /* Externals: ctlr.c */
 extern Boolean  screen_alt;
 extern unsigned char reply_mode;

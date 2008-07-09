@@ -36,10 +36,12 @@
 	#define MAX_CHR_LENGTH 3
 	typedef struct _element
 	{
-		gchar	ch[MAX_CHR_LENGTH];
-		short	fg;
-		short	bg;
+		gchar		ch[MAX_CHR_LENGTH];
+		short		fg;
+		short		bg;
+		gboolean	selected;
 	} ELEMENT;
+	extern ELEMENT *screen;
 
 	enum TERMINAL_COLOR
 	{
@@ -65,6 +67,8 @@
 		TERMINAL_COLOR_OIA_BACKGROUND,
 		TERMINAL_COLOR_OIA_STATUS_OK,
 		TERMINAL_COLOR_OIA_STATUS_INVALID,
+		TERMINAL_COLOR_SELECTED_FG,
+		TERMINAL_COLOR_SELECTED_BG,
 
 		TERMINAL_COLOR_COUNT
 	};
@@ -79,6 +83,7 @@
 	#define CURSOR_MODE_BASE	0x04
 
 	#define OIAROW				(top_margin+(fHeight*terminal_rows))
+	#define CHARSET 			charset ? charset : "ISO-8859-1"
 
 	extern GtkWidget				*topwindow;
 	extern GdkPixmap				*pixmap;
@@ -97,6 +102,7 @@
 	extern gint					cCol;
 	extern gint					cRow;
 	extern gboolean 				WaitingForChanges;
+	extern char					*charset;
 
 	extern const struct lib3270_io_callbacks g3270_io_callbacks;
 	extern const struct lib3270_screen_callbacks g3270_screen_callbacks;
@@ -112,14 +118,27 @@
 	void 		MoveCursor(int row, int col);
 	void 		InvalidateCursor(void);
 	void 		LoadImages(GdkDrawable *drawable, GdkGC *gc);
+	void		ClearSelection(void);
+	void 		Reselect(void);
+	void 		set_rectangle_select(int value, int reason);
+
+	gchar 		*GetSelection(void);
 
 	gboolean 	mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data);
 	gboolean 	mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
 	gboolean 	mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 	gboolean 	mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
-	void 			action_PageDown(GtkWidget *w, gpointer user_data);
-	void 			action_PageUP(GtkWidget *w, gpointer user_data);
+	void 		action_PageDown(GtkWidget *w, gpointer user_data);
+	void 		action_PageUP(GtkWidget *w, gpointer user_data);
+	void 		action_Paste(GtkWidget *w, gpointer user_data);
+	void 		action_PasteNext(GtkWidget *w, gpointer user_data);
+	void 		action_Append(GtkWidget *w, gpointer user_data);
+	void 		action_Copy(GtkWidget *w, gpointer user_data);
+	void 		action_SelectAll(GtkWidget *w, gpointer user_data);
+
+
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
+	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el);
 
 #endif // G3270_H_INCLUDED
