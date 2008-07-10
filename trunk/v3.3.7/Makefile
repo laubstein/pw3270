@@ -123,9 +123,9 @@ sources.lst: Makefile
 
 $(PACKAGE).pot: sources.lst $(foreach SRC, $(G3270_SRCS), src/g3270/$(SRC))
 	@xgettext	--files-from=sources.lst --directory=src/g3270 \
-					--default-domain=$(PACKAGE) --language=C \
-					--keyword=_ --keyword=N_ --sort-output \
-					--output=$@
+				--default-domain=$(PACKAGE) --language=C \
+				--keyword=_ --keyword=N_ --sort-output \
+				--output=$@
 
 clean:
 	@rm -fr obj

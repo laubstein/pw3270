@@ -87,6 +87,8 @@
 
 	extern GtkWidget				*topwindow;
 	extern GdkPixmap				*pixmap;
+	extern GtkWidget				*SelectionPopup;
+	extern GtkWidget				*DefaultPopup;
 	extern GtkWidget				*terminal;
 	extern GdkColor				color[TERMINAL_COLOR_COUNT+1];
 	extern GdkCursor        		*wCursor[CURSOR_MODE_USER];
@@ -121,6 +123,7 @@
 	void		ClearSelection(void);
 	void 		Reselect(void);
 	void 		set_rectangle_select(int value, int reason);
+	void 		SetStatusCode(STATUS_CODE id);
 
 	gchar 		*GetSelection(void);
 

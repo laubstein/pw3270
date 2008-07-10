@@ -61,7 +61,9 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
- gboolean WaitingForChanges = TRUE;
+ gboolean	WaitingForChanges 	= TRUE;
+ GtkWidget	*SelectionPopup		= 0;
+ GtkWidget	*DefaultPopup		= 0;
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -119,6 +121,8 @@ gsize               g_strlcat                           (gchar *dest,
 
  gboolean mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
+	// http://library.gnome.org/devel/gdk/stable/gdk-Event-Structures.html#GdkEventButton
+	GtkWidget *w;
 
 	switch( ((event->type & 0x0F) << 4) | (event->button & 0x0F))
 	{
@@ -133,7 +137,13 @@ gsize               g_strlcat                           (gchar *dest,
 		break;
 
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3:
-		Trace("Button 2 clicked at %ld,%ld",(long) event->x, (long) event->y);
+		w = (mode == SELECTING_NONE) ? DefaultPopup : SelectionPopup;
+		Trace("Button 2 clicked at %ld,%ld Menu: %p",(long) event->x, (long) event->y, w);
+		if(w)
+		{
+			gtk_menu_set_screen(GTK_MENU(w), gtk_widget_get_screen(widget));
+			gtk_menu_popup(GTK_MENU(w), NULL, NULL, NULL, NULL, event->button,event->time);
+		}
 		break;
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 3:
@@ -154,10 +164,13 @@ gsize               g_strlcat                           (gchar *dest,
 
 	DecodePosition(event,row,col);
 
+	Trace("Button %d release",event->button);
+
  	switch(mode)
  	{
 	case SELECTING_NONE:	// Single click, just move cursor
-		cursor_move((row*terminal_cols)+col);
+		if(event->button == 1)
+			cursor_move((row*terminal_cols)+col);
 		break;
 
 

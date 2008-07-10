@@ -57,7 +57,6 @@
 
  static void  set_widget_flags(GtkWidget *widget, gpointer data)
  {
- 	Trace("Setting flag to %p (Container: %d",widget,GTK_IS_CONTAINER(widget));
 	GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_FOCUS);
 	GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_DEFAULT);
 
@@ -88,21 +87,43 @@
 	ui_manager = LoadApplicationUI(topwindow);
 	if(ui_manager)
 	{
-		static const char *itn[] = { "/MainMenubar", "/MainToolbar" };
+		static const char *toolbar[] = { "/MainMenubar", "/MainToolbar" };
+
+		static const struct _popup
+		{
+			const char 	*name;
+			GtkWidget		**widget;
+		} popup[] =
+		{
+			{ "/DefaultPopup",		&DefaultPopup	},
+			{ "/SelectionPopup",	&SelectionPopup	}
+		};
+
 		int f;
+
 		gtk_window_add_accel_group(GTK_WINDOW(topwindow),gtk_ui_manager_get_accel_group(ui_manager));
 
-		for(f=0;f < G_N_ELEMENTS(itn);f++)
+		for(f=0;f < G_N_ELEMENTS(toolbar);f++)
 		{
-				GtkWidget *widget = gtk_ui_manager_get_widget(ui_manager, itn[f]);
-				if(widget)
-					gtk_box_pack_start(GTK_BOX(vbox),widget,FALSE,FALSE,0);
+			GtkWidget *widget = gtk_ui_manager_get_widget(ui_manager, toolbar[f]);
+			if(widget)
+				gtk_box_pack_start(GTK_BOX(vbox),widget,FALSE,FALSE,0);
+		}
+
+		set_widget_flags(vbox,0);
+
+		for(f=0;f < G_N_ELEMENTS(popup);f++)
+		{
+			*popup[f].widget =  gtk_ui_manager_get_widget(ui_manager, popup[f].name);
+			if(*popup[f].widget)
+			{
+				g_object_ref(*popup[f].widget);
+			}
 		}
 
 		g_object_unref(ui_manager);
 	}
 
-	set_widget_flags(vbox,0);
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);
 
 	/* Create terminal window */
@@ -123,7 +144,6 @@
 	// TODO (perry#3#): Read saved values.
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
 	gtk_window_set_position(GTK_WINDOW(topwindow),GTK_WIN_POS_CENTER);
-
 
 	return 0;
  }

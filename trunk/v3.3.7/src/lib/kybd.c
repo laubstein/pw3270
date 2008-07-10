@@ -3542,6 +3542,7 @@ emulate_input(char *s, int len, Boolean pasting)
 		break;
 	}
 
+	screen_disp();
 	return len;
 }
 
