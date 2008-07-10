@@ -67,12 +67,6 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
-/*
-gsize               g_strlcat                           (gchar *dest,
-                                                         const gchar *src,
-                                                         gsize dest_size);
-*/
-
  gchar * GetSelection(void)
  {
  	gchar 	*buffer;

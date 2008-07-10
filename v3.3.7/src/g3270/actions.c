@@ -27,6 +27,7 @@
  #include <gdk/gdk.h>
  #include <gdk/gdkkeysyms.h>
 
+ #include "config.h"
  #include <globals.h>
 
  #include "g3270.h"
@@ -295,11 +296,25 @@ static const char *ui_mainwindow_ui_desc =
 "		<menuitem action='Append'/>"
 "		<menuitem action='Unselect'/>"
 "		<menuitem action='SelectAll'/>"
+
+"		<separator/>"
+"		<menuitem action='Connect' />"
+"		<menuitem action='Disconnect' />"
+"		<separator/>"
+"		<menuitem action='Quit'/>"
+
 "	</popup>"
 "	<popup action='DefaultPopup'>"
 "		<menuitem action='Paste'/>"
 "		<menuitem action='PasteNext'/>"
 "		<menuitem action='SelectAll'/>"
+
+"		<separator/>"
+"		<menuitem action='Connect' />"
+"		<menuitem action='Disconnect' />"
+"		<separator/>"
+"		<menuitem action='Quit'/>"
+
 "	</popup>"
 "</ui>";
 
@@ -371,6 +386,7 @@ static const char *ui_mainwindow_ui_desc =
 	GError			*error = NULL;
 
 	actions = gtk_action_group_new("InternalActions");
+	gtk_action_group_set_translation_domain(actions, GETTEXT_PACKAGE);
 
 	gtk_action_group_add_actions(actions, internal_action_entries, G_N_ELEMENTS (internal_action_entries), topwindow);
 	gtk_action_group_add_toggle_actions(actions,internal_action_toggles, G_N_ELEMENTS(internal_action_toggles),0);
