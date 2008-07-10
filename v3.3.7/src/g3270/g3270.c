@@ -24,11 +24,14 @@
  *		Main proceudre.
  */
 
+#include "config.h"
 #include "globals.h"
+
 #if !defined(_WIN32) /*[*/
 #include <sys/wait.h>
 #include <signal.h>
 #endif /*]*/
+
 #include <errno.h>
 #include "appres.h"
 #include "3270ds.h"
@@ -54,12 +57,14 @@
 #include "utilc.h"
 #include "xioc.h"
 
-#if defined(HAVE_LIBREADLINE) /*[*/
+/*
+#if defined(HAVE_LIBREADLINE)
 #include <readline/readline.h>
-#if defined(HAVE_READLINE_HISTORY_H) /*[*/
+#if defined(HAVE_READLINE_HISTORY_H)
 #include <readline/history.h>
-#endif /*]*/
-#endif /*]*/
+#endif
+#endif
+*/
 
 #if defined(_WIN32) /*[*/
 #include <windows.h>
@@ -69,9 +74,6 @@
 
 #include "g3270.h"
 #include <lib3270/hostc.h>
-
-#define GETTEXT_PACKAGE "g3270"
-#define LOCALEDIR "mo"
 
 #if !defined(_WIN32) /*[*/
 /* Base keymap. */
