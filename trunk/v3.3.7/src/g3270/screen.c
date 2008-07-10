@@ -48,7 +48,7 @@
 	const char *dbg;
 #endif
 	int			clr;
-	const char	*str;
+	const char	*string;
  };
 
 
@@ -136,6 +136,7 @@
  static const struct status_code	*sts_data		= NULL;
  static unsigned char			compose			= 0;
  static gchar						*luname			= 0;
+ static const gchar				*status_msg		= NULL;
 
  static gboolean	oia_flag[OIA_FLAG_USER];
 
@@ -336,6 +337,35 @@
 
  void DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw)
  {
+    /*
+     * The status line is laid out thusly (M is maxCOLS):
+     *
+     *   0          "4" in a square
+     *   1          "A" underlined
+     *   2          solid box if connected, "?" in a box if not
+     *   3..7       empty
+     *   8...       message area
+     *   M-43       SSL Status
+     *   M-41       Meta indication ("M" or blank)
+     *   M-40       Alt indication ("A" or blank)
+     *   M-39       Shift indication (Special symbol/"^" or blank)
+     *   M-38..M-37 empty
+     *   M-36       Compose indication ("C" or blank)
+     *   M-35       Compose first character
+     *   M-34       empty
+     *   M-33       Typeahead indication ("T" or blank)
+     *   M-31       Alternate keymap indication ("K" or blank)
+     *   M-30       Reverse input mode indication ("R" or blank)
+     *   M-29       Insert mode indication (Special symbol/"I" or blank)
+     *   M-28       Printer indication ("P" or blank)
+     *   M-27       Script indication ("S" or blank)
+     *   M-26		empty
+     *   M-25..M-14	LU Name
+
+     *   M-15..M-9  command timing (Clock symbol and m:ss, or blank)
+     *   M-7..M     cursor position (rrr/ccc or blank)
+     *
+     */
 	GdkGC 		*gc;
 	PangoLayout *layout;
 	int   		row		= OIAROW;
@@ -357,10 +387,12 @@
 	gdk_draw_line(draw,gc,left_margin,row,left_margin+width,row);
 	row++;
 
+	//  0          "4" in a square
 	layout = gtk_widget_create_pango_layout(widget,"4");
 	gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
 	col += fWidth;
 
+	//  1          "A" underlined
 	if(oia_flag[OIA_FLAG_UNDERA])
 	{
 		pango_layout_set_text(layout,(IN_E) ? "B" : "A",-1);
@@ -369,6 +401,7 @@
 
 	col += fWidth;
 
+	// 2          solid box if connected, "?" in a box if not
 	str[1] = 0;
 	if(IN_ANSI)
 		*str = 'N';
@@ -382,12 +415,14 @@
 	pango_layout_set_text(layout,str,-1);
 	gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
 
+
+	// 8...       message area
 	col += (fWidth<<2);
 
 #ifdef DEBUG
 	if(sts_data)
 	{
-		pango_layout_set_text(layout,sts_data->str && *sts_data->str ? sts_data->str : sts_data->dbg,-1);
+		pango_layout_set_text(layout,status_msg && *status_msg ? status_msg : sts_data->dbg,-1);
 		gdk_draw_layout_with_colors(draw,gc,col,row,layout,clr+sts_data->clr,bg);
 	}
 	else
@@ -396,15 +431,16 @@
 		gdk_draw_layout_with_colors(draw,gc,col,row,layout,clr+TERMINAL_COLOR_OIA_STATUS_INVALID,bg);
 	}
 #else
-	if(sts_data && sts_data->str)
+	if(sts_data && status_msg)
 	{
-		pango_layout_set_text(layout,sts_data->str,-1);
+		pango_layout_set_text(layout,status_msg,-1);
 		gdk_draw_layout_with_colors(draw,gc,col,row,layout,clr+sts_data->clr,bg);
 	}
 #endif
 
 	memset(str,' ',10);
 
+    // M-36       Compose indication ("C" or blank)
 	col = left_margin+(fWidth*(terminal_cols-36));
 
 	if(compose)
@@ -413,29 +449,40 @@
 		str[1] = compose;
 	}
 
-	// NOTE (perry#9#): I think it would be better if we use some svg images instead of text.
+	// NOTE (perry#9#): I think it would be better if we use images (SVG?) instead of text.
+
+    //   M-33       Typeahead indication ("T" or blank)
 	str[3] = oia_flag[OIA_FLAG_TYPEAHEAD]	? 'T' : ' ';
-	str[4] = oia_flag[OIA_FLAG_REVERSE] 	? 'R' : ' ';
-	str[5] = oia_flag[OIA_FLAG_INSERT]		? 'I' : ' ';
-	str[6] = oia_flag[OIA_FLAG_PRINTER]		? 'P' : ' ';
-	str[7] = 0;
+
+    //   M-32       SSL Status - USING IMAGE IN M-43 - see DrawImage() below
+
+    //   M-31       Alternate keymap indication ("K" or blank)
+
+    //   M-30       Reverse input mode indication ("R" or blank)
+	str[6] = oia_flag[OIA_FLAG_REVERSE] 	? 'R' : ' ';
+
+    //   M-29       Insert mode indication (Special symbol/"I" or blank)
+	str[7] = oia_flag[OIA_FLAG_INSERT]		? 'I' : ' ';
+
+    //   M-28       Printer indication ("P" or blank)
+	str[8] = oia_flag[OIA_FLAG_PRINTER]		? 'P' : ' ';
+
+	str[9] = 0;
 
 	pango_layout_set_text(layout,str,-1);
 	gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
 
-	// Draw SSL indicator
+	// Draw SSL indicator (M-43)
 	DrawImage(draw,gc,oia_flag[OIA_FLAG_SECURE] ? 0 : 1 ,left_margin+(fWidth*(terminal_cols-43)),row+1,fHeight-2,fWidth);
 
-//	pango_layout_set_text(layout,"*",-1);
-//	gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-43)),row,layout,clr+TERMINAL_COLOR_OIA_LU,bg);
-
-	// Draw LU Name
+	// M-25 LU Name
 	if(luname)
 	{
 		pango_layout_set_text(layout,luname,-1);
 		gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-25)),row,layout,clr+TERMINAL_COLOR_OIA_LU,bg);
 	}
 
+	//  M-7..M     cursor position (rrr/ccc or blank)
 	if(Toggled(CURSOR_POS))
 	{
 		sprintf(str,"%03d/%03d",cRow,cCol);
@@ -541,18 +588,53 @@
  {
  	static const struct status_code tbl[] =
  	{
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_BLANK,				TERMINAL_COLOR_OIA_STATUS_OK, 		"" ),
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_SYSWAIT,			TERMINAL_COLOR_OIA_STATUS_OK, 		"X System" ),
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_TWAIT,				TERMINAL_COLOR_OIA_STATUS_OK, 		"X Wait" ),
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_CONNECTED,			TERMINAL_COLOR_OIA_STATUS_OK, 		"" ),
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_DISCONNECTED,		TERMINAL_COLOR_OIA_STATUS_INVALID, 	"X Disconnected" ),
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_AWAITING_FIRST,	TERMINAL_COLOR_OIA_STATUS_OK,		"X" ),
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_MINUS,				TERMINAL_COLOR_OIA_STATUS_OK,		"X -f" ),
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_PROTECTED,			TERMINAL_COLOR_OIA_STATUS_INVALID,	"X Protected" ),
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_NUMERIC,			TERMINAL_COLOR_OIA_STATUS_INVALID,	"X Numeric" ),
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_OVERFLOW,			TERMINAL_COLOR_OIA_STATUS_INVALID,	"X Overflow" ),
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_INHIBIT,			TERMINAL_COLOR_OIA_STATUS_INVALID,	"X Inhibit" ),
-		STATUS_CODE_DESCRIPTION( STATUS_CODE_X,					TERMINAL_COLOR_OIA_STATUS_INVALID,	"X" ),
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_BLANK,
+									TERMINAL_COLOR_OIA_STATUS_OK,
+									N_( "a" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_SYSWAIT,
+									TERMINAL_COLOR_OIA_STATUS_OK,
+									N_( "bX System" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_TWAIT,
+									TERMINAL_COLOR_OIA_STATUS_OK,
+									N_( "cX Wait" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_CONNECTED,
+									TERMINAL_COLOR_OIA_STATUS_OK,
+									N_( "d" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_DISCONNECTED,
+									TERMINAL_COLOR_OIA_STATUS_INVALID,
+									N_( "eX Disconnected" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_AWAITING_FIRST,
+									TERMINAL_COLOR_OIA_STATUS_OK,
+									N_( "fX" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_MINUS,
+									TERMINAL_COLOR_OIA_STATUS_OK,
+									N_( "gX -f" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_PROTECTED,
+									TERMINAL_COLOR_OIA_STATUS_INVALID,
+									N_( "hX Protected" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_NUMERIC,
+									TERMINAL_COLOR_OIA_STATUS_INVALID,
+									N_( "iX Numeric" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_OVERFLOW,
+									TERMINAL_COLOR_OIA_STATUS_INVALID,
+									N_( "jX Overflow" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_INHIBIT,
+									TERMINAL_COLOR_OIA_STATUS_INVALID,
+									N_( "kX Inhibit" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_X,
+									TERMINAL_COLOR_OIA_STATUS_INVALID,
+									N_( "lX" ) ),
 	};
 
 	/* Check if status has changed to avoid unnecessary redraws */
@@ -565,11 +647,11 @@
 		return;
 	}
 
-	last_id = id;
+	last_id 	= id;
+	sts_data 	= tbl+id;
+	status_msg	= gettext(sts_data->string)+1;
 
-	sts_data = tbl+id;
-
-	Trace("Status changed to %s (%s)",sts_data->dbg,sts_data->str);
+	Trace("Status changed to %s (%s)",sts_data->dbg,sts_data->string+1);
 
 	// FIXME (perry#2#): Find why the library is keeping the cursor as "locked" in some cases. When corrected this "workaround" can be removed.
 	if(id == STATUS_CODE_BLANK)

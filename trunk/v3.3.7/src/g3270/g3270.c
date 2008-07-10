@@ -287,7 +287,7 @@ static int g3270_init(int *argc, char ***argv)
 	g_log_set_handler(NULL,G_LOG_LEVEL_MASK,log_callback,NULL);
 
 	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
-	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
 	textdomain(GETTEXT_PACKAGE);
 
 	if(Register3270IOCallbacks(&g3270_io_callbacks))
