@@ -1,4 +1,6 @@
 
+PACKAGE=g3270
+
 # Flags
 CROSS=1
 OBJEXT=o
@@ -115,6 +117,16 @@ src/lib/fallbacks.c:  src/lib/X3270.xad
 src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@src/mkversion.sh
 
+sources.lst: Makefile
+	@rm -f $@
+	@for i in $(G3270_SRCS); do echo $$i >> $@; done
+
+$(PACKAGE).pot: sources.lst $(foreach SRC, $(G3270_SRCS), src/g3270/$(SRC))
+	@xgettext	--files-from=sources.lst --directory=src/g3270 \
+					--default-domain=$(PACKAGE) --language=C \
+					--keyword=_ --keyword=N_ --sort-output \
+					--output=$@
+
 clean:
 	@rm -fr obj
 	@rm -fr bin
@@ -122,3 +134,14 @@ clean:
 	@rm -f	src/lib/version.o
 	@rm -f	src/lib/mkfb.exe
 	@rm -f	src/version.c
+	@rm -f	sources.lst
+	@rm -f	g3270.tar.gz
+	@rm -f $(PACKAGE).pot
+	@rm -fr autom4te.cache
+	@rm -f config.status
+	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.log" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "leak.out" -exec mv -f {} $(TMPDIR) \;
+	@rm -f svn-commit.tmp

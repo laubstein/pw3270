@@ -50,6 +50,7 @@
 		<Unit filename="src/g3270/clipboard.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/g3270/config.h" />
 		<Unit filename="src/g3270/g3270.c">
 			<Option compilerVar="CC" />
 		</Unit>
