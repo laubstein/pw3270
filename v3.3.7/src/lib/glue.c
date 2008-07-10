@@ -1194,67 +1194,45 @@ Boolean flipped = False;
 
 Boolean error_popup_visible = False;
 
-static char vmsgbuf[4096];
-
 /* Pop up an error dialog. */
 void
 popup_an_error(const char *fmt, ...)
 {
-	va_list args;
-	char *s;
-	int sl;
+	char 	vmsgbuf[4096];
+	va_list	args;
 
 	va_start(args, fmt);
 	(void) vsprintf(vmsgbuf, fmt, args);
 	va_end(args);
 
-	/*
-	 * Multi-line messages are fine for X pop-ups, but they're no fun for
-	 * text applications.
-	 */
-	s = vmsgbuf;
-	while ((s = strchr(s, '\n')) != NULL) {
-		*s++ = ' ';
-	}
-	while ((sl = strlen(vmsgbuf)) > 0 && vmsgbuf[sl-1] == ' ') {
-		vmsgbuf[--sl] = '\0';
-	}
+	WriteLog("3270","Error Popup:\n%s\n",vmsgbuf);
 
-	if (sms_redirect()) {
-		sms_error(vmsgbuf);
-		return;
-	} else {
-#if defined(C3270) || defined(WC3270) /*[*/
-		screen_suspend();
-//		any_error_output = True;
-#endif /*]*/
-		(void) fprintf(stderr, "%s\n", vmsgbuf);
-		macro_output = True;
-	}
+	// TODO (perry#1#): Find a way (callback?) to pass the message to the application.
+
 }
 
 /* Pop up an error dialog, based on an error number. */
 void
 popup_an_errno(int errn, const char *fmt, ...)
 {
-	va_list args;
-	char *s;
+	char 	vmsgbuf[4096];
+	va_list	args;
 
 	va_start(args, fmt);
 	(void) vsprintf(vmsgbuf, fmt, args);
 	va_end(args);
-	s = NewString(vmsgbuf);
 
-	if (errn > 0)
-		popup_an_error("%s:\n%s", s, strerror(errn));
-	else
-		popup_an_error(s);
-	Free(s);
+	WriteLog("3270", "Error Popup:\n%s\nrc=%d (%s)",vmsgbuf,errn,strerror(errn));
+
+	// TODO (perry#1#): Find a way (callback?) to pass the message to the application.
+
 }
 
 void
 action_output(const char *fmt, ...)
 {
+// TODO (perry#1#): Implement a callback to browse the text string.
+/*
 	va_list args;
 
 	va_start(args, fmt);
@@ -1266,16 +1244,17 @@ action_output(const char *fmt, ...)
 	} else {
 		FILE *aout;
 
-#if defined(C3270) || defined(WC3270) /*[*/
+#if defined(C3270) || defined(WC3270)
 		screen_suspend();
-//		aout = start_pager(); // TODO (perry#1#): Implement a callback to browse the text string.
+//		aout = start_pager();
 //		any_error_output = True;
-#else /*][*/
+#else
 		aout = stdout;
-#endif /*]*/
+#endif
 		(void) fprintf(aout, "%s\n", vmsgbuf);
 		macro_output = True;
 	}
+*/
 }
 
 void usage(char *msg)

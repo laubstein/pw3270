@@ -107,7 +107,7 @@
 
     out = prefix(module);
 
-	fprintf(out,"%s: (rc=%d)\n",string,rc);
+	fprintf(out,"%s: %s (rc=%d)\n",string,strerror(rc),rc);
 
     fclose(out);
 

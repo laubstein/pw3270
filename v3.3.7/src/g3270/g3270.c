@@ -26,6 +26,8 @@
 
 #include "config.h"
 #include "globals.h"
+#include <glib.h>
+#include <glib/gstdio.h>
 
 #if !defined(_WIN32) /*[*/
 #include <sys/wait.h>
@@ -214,6 +216,7 @@ static void main_connect(Boolean status)
 	}
 	else
 	{
+		SetStatusCode(STATUS_CODE_DISCONNECTED);
 		cMode &= ~CURSOR_MODE_ENABLED;
 		ctlr_erase(True);
 	}
@@ -268,27 +271,24 @@ static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, cons
 	}
 }
 
-int main(int argc, char *argv[])
+static int g3270_init(int *argc, char ***argv)
 {
-	const char	*cl_hostname = CN;
+#if defined(_WIN32) /*[*/
+	gchar *ptr = g_strdup(*argv[0]);
+	g_chdir(g_path_get_dirname(ptr));
+	g_free(ptr);
+	Trace("Current dir: %s",g_get_current_dir());
+#endif
+
+	/* Init GTK stuff */
+	g_thread_init(0);
+	gtk_init (argc, argv);
+
+	g_log_set_handler(NULL,G_LOG_LEVEL_MASK,log_callback,NULL);
 
 	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 	textdomain(GETTEXT_PACKAGE);
-
-	printf("%s\n\nCopyright 1989-2008 by Paul Mattes, GTRC and others.\n",build);
-
-	/* Init GTK stuff */
-	g_thread_init(0);
-	gtk_init (&argc, &argv);
-
-#ifdef PACKAGE_NAME
-	g_set_application_name(PACKAGE_NAME);
-#else
-	g_set_application_name("g3270");
-#endif
-
-	g_log_set_handler(NULL,G_LOG_LEVEL_MASK,log_callback,NULL);
 
 	if(Register3270IOCallbacks(&g3270_io_callbacks))
 	{
@@ -301,6 +301,18 @@ int main(int argc, char *argv[])
 		g_error( _( "Can't register into lib3270 screen callback table." ) );
 		return -1;
 	}
+
+	return 0;
+}
+
+int main(int argc, char *argv[])
+{
+	const char	*cl_hostname = CN;
+
+	printf("%s\n\nCopyright 1989-2008 by Paul Mattes, GTRC and others.\n",build);
+
+	if(g3270_init(&argc,&argv))
+		return -1;
 
 	/* Handle initial settings. */
 	initialize_toggles();

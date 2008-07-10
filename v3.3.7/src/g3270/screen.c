@@ -47,8 +47,8 @@
 #ifdef DEBUG
 	const char *dbg;
 #endif
-	int 		clr;
-	const char *str;
+	int			clr;
+	const char	*str;
  };
 
 
@@ -59,7 +59,6 @@
  static int  addch(int row, int col, int c, unsigned short attr);
  static void set_charset(char *dcs);
  static void redraw(void);
- static void status(STATUS_CODE id);
  static void erase(void);
  static void suspend(void);
  static void resume(void);
@@ -90,7 +89,7 @@
 	suspend,		// void (*suspend)(void);
 	resume,			// void (*resume)(void);
 	NULL,			// void (*reset)(int lock, const char *msg);
-	status,			// void (*status)(STATUS_CODE id);
+	SetStatusCode,	// void (*status)(STATUS_CODE id);
 	set_compose,	// void (*compose)(int on, unsigned char c, int keytype);
 	set_cursor,		// void (*cursor)(CURSOR_MODE mode);
 	set_lu,			// void (*lu)(const char *lu);
@@ -383,7 +382,7 @@
 	pango_layout_set_text(layout,str,-1);
 	gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
 
-	col += (fWidth<<1);
+	col += (fWidth<<2);
 
 #ifdef DEBUG
 	if(sts_data)
@@ -538,7 +537,7 @@
 
  static STATUS_CODE last_id = (STATUS_CODE) -1;
 
- static void status(STATUS_CODE id)
+ void SetStatusCode(STATUS_CODE id)
  {
  	static const struct status_code tbl[] =
  	{
@@ -571,6 +570,10 @@
 	sts_data = tbl+id;
 
 	Trace("Status changed to %s (%s)",sts_data->dbg,sts_data->str);
+
+	// FIXME (perry#2#): Find why the library is keeping the cursor as "locked" in some cases. When corrected this "workaround" can be removed.
+	if(id == STATUS_CODE_BLANK)
+		set_cursor(CURSOR_MODE_NORMAL);
 
 	DrawOIA(terminal,color,pixmap);
 	gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);

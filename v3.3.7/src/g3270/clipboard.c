@@ -90,6 +90,8 @@
 		contents = NULL;
  	}
 
+	Trace("Paste buffer:\n%s",str);
+
 	remaining = emulate_input(str,-1,True);
     if(remaining < 1)
 		return;

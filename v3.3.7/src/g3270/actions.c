@@ -290,6 +290,17 @@ static const char *ui_mainwindow_ui_desc =
 "		<separator/>"
 "		<toolitem name='Quit' action='Quit' />"
 "	</toolbar>"
+"	<popup action='SelectionPopup'>"
+"		<menuitem action='Copy'/>"
+"		<menuitem action='Append'/>"
+"		<menuitem action='Unselect'/>"
+"		<menuitem action='SelectAll'/>"
+"	</popup>"
+"	<popup action='DefaultPopup'>"
+"		<menuitem action='Paste'/>"
+"		<menuitem action='PasteNext'/>"
+"		<menuitem action='SelectAll'/>"
+"	</popup>"
 "</ui>";
 
 /*
@@ -355,7 +366,7 @@ static const char *ui_mainwindow_ui_desc =
 
  GtkUIManager * LoadApplicationUI(GtkWidget *widget)
  {
-	GtkUIManager 	*ui_manager = gtk_ui_manager_new();
+	GtkUIManager 	*ui_manager = gtk_ui_manager_new(); // http://library.gnome.org/devel/gtk/stable/GtkUIManager.html
 	GtkActionGroup	*actions;
 	GError			*error = NULL;
 
