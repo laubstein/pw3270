@@ -33,6 +33,7 @@
 
 #include "locked.bm"
 #include "unlocked.bm"
+#include "shift.bm"
 
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
 
@@ -106,8 +107,9 @@
     short					color;
  } imagedata[] =
  {
- 	{ locked_bits,   locked_width,   locked_height,   TERMINAL_COLOR_SSL 		},
- 	{ unlocked_bits, unlocked_width, unlocked_height, TERMINAL_COLOR_SSL 		},
+ 	{ locked_bits,		locked_width,	locked_height,   	TERMINAL_COLOR_SSL 		},
+ 	{ unlocked_bits,	unlocked_width,	unlocked_height, 	TERMINAL_COLOR_SSL 		},
+ 	{ shift_bits,		shift_width, 	shift_height,		TERMINAL_COLOR_OIA 		},
  };
 
  #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
@@ -137,8 +139,9 @@
  static unsigned char			compose			= 0;
  static gchar						*luname			= 0;
  static const gchar				*status_msg		= NULL;
+ static guint						kbrd_state		= 0;
 
- static gboolean	oia_flag[OIA_FLAG_USER];
+ static gboolean					oia_flag[OIA_FLAG_USER];
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
@@ -449,6 +452,10 @@
 		str[1] = compose;
 	}
 
+	//	M-39       Shift indication (Special symbol/"^" or blank)
+	if(kbrd_state & GDK_SHIFT_MASK)
+		DrawImage(draw,gc,2,left_margin+(fWidth*(terminal_cols-39)),row+1,fHeight-2,fWidth);
+
 	// NOTE (perry#9#): I think it would be better if we use images (SVG?) instead of text.
 
     //   M-33       Typeahead indication ("T" or blank)
@@ -747,6 +754,22 @@
 		gdk_draw_layout_with_colors(draw,gc,x,y,layout,color+TERMINAL_COLOR_SELECTED_FG,clr+TERMINAL_COLOR_SELECTED_BG);
 	else
 		gdk_draw_layout_with_colors(draw,gc,x,y,layout,color+el->fg,clr+el->bg);
+
+ }
+
+ void UpdateKeyboardState(guint state)
+ {
+ 	if(state == kbrd_state)
+		return;
+
+ 	kbrd_state = state;
+
+ 	// TODO (perry#1#): Draw only the state flags.
+ 	if(terminal && pixmap)
+ 	{
+		DrawOIA(terminal,color,pixmap);
+		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);
+ 	}
 
  }
 

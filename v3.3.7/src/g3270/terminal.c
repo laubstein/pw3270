@@ -285,6 +285,8 @@
 
  static gboolean key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+	UpdateKeyboardState(event->state & GDK_SHIFT_MASK);
+
 	if(gtk_im_context_filter_keypress(im,event))
 		return TRUE;
 
@@ -296,6 +298,7 @@
 
  static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+	UpdateKeyboardState(event->state & GDK_SHIFT_MASK);
 
 	if(gtk_im_context_filter_keypress(im,event))
 		return TRUE;

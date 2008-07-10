@@ -75,7 +75,7 @@
 
 	#define TERMINAL_COLOR_OIA_CURSOR 	TERMINAL_COLOR_OIA_STATUS_OK
 	#define TERMINAL_COLOR_OIA_LU 		TERMINAL_COLOR_OIA_STATUS_OK
-	#define TERMINAL_COLOR_SSL 			TERMINAL_COLOR_OIA_STATUS_OK
+	#define TERMINAL_COLOR_SSL 			TERMINAL_COLOR_OIA
 
 	#define CURSOR_MODE_SHOW	0x80
 	#define CURSOR_MODE_ENABLED	0x40
@@ -143,5 +143,6 @@
 
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
 	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el);
+	void			UpdateKeyboardState(guint state);
 
 #endif // G3270_H_INCLUDED
