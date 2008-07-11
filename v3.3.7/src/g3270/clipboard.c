@@ -33,9 +33,14 @@
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
- gchar *contents = NULL;
+ static gchar *contents = NULL;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
+
+ gchar * GetClipboard(void)
+ {
+	return g_strdup(contents ? contents : "");
+ }
 
  static void setClipboardcontents(void)
  {

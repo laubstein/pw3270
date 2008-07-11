@@ -773,4 +773,28 @@
 
  }
 
+ gchar * GetScreenContents(gboolean all)
+ {
+ 	gchar 	*buffer;
+ 	gsize	max = terminal_rows*terminal_cols*MAX_CHR_LENGTH;
+ 	int		row,col;
+ 	int		pos	= 0;
+
+	buffer = g_malloc(max);
+	*buffer = 0;
+	for(row = 0; row < terminal_rows;row++)
+	{
+		for(col = 0; col < terminal_cols;col++)
+		{
+			if(all || screen[pos].selected)
+				g_strlcat(buffer,*screen[pos].ch ? screen[pos].ch : " ",max);
+			pos++;
+		}
+		if(*buffer)
+			g_strlcat(buffer,"\n",max);
+
+	}
+
+	return g_realloc(buffer,strlen(buffer)+1);
+ }
 
