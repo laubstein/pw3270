@@ -371,6 +371,10 @@ int main(int argc, char *argv[])
 	gtk_widget_grab_focus(terminal);
 	gtk_widget_grab_default(terminal);
 
+	/* Update screen */
+	while(gtk_events_pending())
+		gtk_main_iteration();
+
 	/* Connect to the host. */
 	screen_suspend();
 	if (cl_hostname != CN) {
@@ -378,7 +382,7 @@ int main(int argc, char *argv[])
 
 		Trace("Connecting to %s...",cl_hostname);
 
-		if (host_connect(cl_hostname) < 0)
+		if(host_connect(cl_hostname) < 0)
 			x3270_exit(1);
 		/* Wait for negotiations to complete or fail. */
 		Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);

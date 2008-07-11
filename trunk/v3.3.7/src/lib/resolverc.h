@@ -17,6 +17,6 @@
  *		Hostname resolution.
  */
 
-extern int
-resolve_host_and_port(const char *host, char *portname, unsigned short *pport,
-	struct sockaddr *sa, socklen_t *sa_len, char *errmsg, int em_size);
+extern int resolve_host_and_port(const char *host, char *portname, unsigned short *pport,struct sockaddr *sa, socklen_t *sa_len, char *errmsg, int em_size);
+
+
