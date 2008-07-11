@@ -125,7 +125,9 @@
 	void 		set_rectangle_select(int value, int reason);
 	void 		SetStatusCode(STATUS_CODE id);
 
-	gchar 		*GetSelection(void);
+	#define		GetSelection() GetScreenContents(0)
+	gchar 		*GetClipboard(void);
+	gchar 		*GetScreenContents(gboolean all);
 
 	gboolean 	mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data);
 	gboolean 	mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
@@ -144,5 +146,8 @@
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
 	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el);
 	void			UpdateKeyboardState(guint state);
+	int				PrintText(const char *name, gchar *text);
+
+
 
 #endif // G3270_H_INCLUDED

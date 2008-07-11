@@ -66,6 +66,9 @@ static int net_sock = -1;
 
 #if defined(X3270_DISPLAY) /*[*/
 static void save_recent(const char *);
+#endif
+
+#if defined(X3270_DISPLAY) || defined(G3270)
 static void try_reconnect(void);
 #endif /*]*/
 
@@ -644,7 +647,7 @@ host_connect(const char *n)
 	return 0;
 }
 
-#if defined(X3270_DISPLAY) /*[*/
+#if defined(X3270_DISPLAY) || defined(G3270) /*[*/
 /*
  * Reconnect to the last host.
  */
@@ -664,7 +667,7 @@ host_reconnect(void)
 static void
 try_reconnect(void)
 {
-	WriteLog("3270","Starting auto-reconnect host: %s",reconnect_host ? reconnect_host : "-");
+	WriteLog("3270","Starting auto-reconnect (Host: %s)",reconnect_host ? reconnect_host : "-");
 	auto_reconnect_inprogress = False;
 	host_reconnect();
 }
@@ -677,6 +680,16 @@ host_disconnect(Boolean failed)
 		x_remove_input();
 		net_disconnect();
 		net_sock = -1;
+#if defined(G3270)
+		Trace("Disconnected (Failed: %d Reconnect: %d in_progress: %d)",failed,toggled(RECONNECT),auto_reconnect_inprogress);
+		if (toggled(RECONNECT) && !auto_reconnect_inprogress)
+		{
+			/* Schedule an automatic reconnection. */
+			auto_reconnect_inprogress = True;
+			(void) AddTimeOut(failed? RECONNECT_ERR_MS: RECONNECT_MS, try_reconnect);
+		}
+#endif
+
 #if defined(X3270_DISPLAY) /*[*/
 		if (appres.once) {
 			if (error_popup_visible()) {
@@ -997,7 +1010,7 @@ Connect_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 		sms_connect_wait();
 }
 
-#if defined(X3270_MENUS) /*[*/
+#if defined(X3270_MENUS) || defined(G3270) /*[*/
 void
 Reconnect_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {

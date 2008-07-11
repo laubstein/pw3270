@@ -230,8 +230,8 @@
  	if(PCONNECTED)
  		return;
 
-
-	// TODO (perry#1#): Ask for server.
+	// TODO (perry#5#): If there's no previous server ask for one.
+	action_internal(Reconnect_action, IA_DEFAULT, CN, CN);
 
  }
 
@@ -245,10 +245,62 @@
 	host_disconnect(FALSE);
  }
 
+ static void action_PrintScreen(GtkWidget *w, gpointer user_data)
+ {
+	PrintText("g3270", GetScreenContents(TRUE));
+ }
+
+ static void action_PrintSelected(GtkWidget *w, gpointer user_data)
+ {
+	PrintText("g3270", GetSelection());
+ }
+
+ static void action_PrintClipboard(GtkWidget *w, gpointer user_data)
+ {
+	PrintText("g3270", GetClipboard());
+ }
+
+ static void action_About(GtkWidget *w, gpointer user_data)
+ {
+ 	static const char *authors[] = {	"Paul Mattes <Paul.Mattes@usa.net>",
+										"GTRC",
+										"Perry Werneck <perry.werneck@gmail.com>",
+										"and others",
+										NULL};
+
+	static const char license[] =
+	N_( "This program is free software; you can redistribute it and/or\n"
+		"modify it under the terms of the GNU General Public License as\n"
+ 		"published by the Free Software Foundation; either version 2 of the\n"
+		"License, or (at your option) any later version.\n\n"
+		"This program is distributed in the hope that it will be useful,\n"
+		"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+		"GNU General Public License for more details.\n\n"
+		"You should have received a copy of the GNU General Public License\n"
+		"along with this program; if not, write to the Free Software\n"
+		"Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02111-1307\n"
+		"USA" );
+
+ 	gtk_show_about_dialog(	GTK_WINDOW(topwindow),
+							"program-name",    	"g3270",
+							"authors", 			authors,
+							"license", 			gettext( license ),
+//							"logo",				icon,
+							"comments",			_( "3270 Terminal emulator for GTK."),
+//							"version", 			VERSION,
+							NULL
+						);
+ }
+
 static const char *ui_mainwindow_ui_desc =
 "<ui>"
 "	<menubar name='MainMenubar'>"
 "		<menu action='FileMenu'>"
+"			<menuitem action='PrintScreen'/>"
+"			<menuitem action='PrintSelected'/>"
+"			<menuitem action='PrintClipboard'/>"
+"			<separator/>"
 "			<menuitem action='Quit'/>"
 "		</menu>"
 "		<menu action='EditMenu'>"
@@ -289,6 +341,7 @@ static const char *ui_mainwindow_ui_desc =
 "		<toolitem name='Connect' action='Connect' />"
 "		<toolitem name='Disconnect' action='Disconnect' />"
 "		<separator/>"
+"		<toolitem name='PrintScreen' action='PrintScreen' />"
 "		<toolitem name='Quit' action='Quit' />"
 "	</toolbar>"
 "	<popup action='SelectionPopup'>"
@@ -296,10 +349,11 @@ static const char *ui_mainwindow_ui_desc =
 "		<menuitem action='Append'/>"
 "		<menuitem action='Unselect'/>"
 "		<menuitem action='SelectAll'/>"
-
 "		<separator/>"
-"		<menuitem action='Connect' />"
-"		<menuitem action='Disconnect' />"
+"		<menuitem action='PrintScreen'/>"
+"		<menuitem action='PrintSelected'/>"
+"		<menuitem action='PrintClipboard'/>"
+
 "		<separator/>"
 "		<menuitem action='Quit'/>"
 
@@ -308,10 +362,9 @@ static const char *ui_mainwindow_ui_desc =
 "		<menuitem action='Paste'/>"
 "		<menuitem action='PasteNext'/>"
 "		<menuitem action='SelectAll'/>"
+"		<menuitem action='PrintScreen'/>"
+"		<menuitem action='PrintClipboard'/>"
 
-"		<separator/>"
-"		<menuitem action='Connect' />"
-"		<menuitem action='Disconnect' />"
 "		<separator/>"
 "		<menuitem action='Quit'/>"
 
@@ -333,26 +386,32 @@ static const char *ui_mainwindow_ui_desc =
  {
  	/* Top menus */
  	{	"FileMenu",			NULL,					N_( "_File" ),			NULL,			NULL,	NULL							},
- 	{	"NetworkMenu",		NULL,					N_( "_Network" ),		NULL,			NULL,	NULL							},
- 	{	"HelpMenu",			NULL,					N_( "Help" ),			NULL,			NULL,	NULL							},
- 	{	"EditMenu",			NULL,					N_( "_Edit" ),			NULL,			NULL,	NULL							},
- 	{	"OptionsMenu",		NULL,					N_( "_Options" ),		NULL,			NULL,	NULL							},
+ 	{	"NetworkMenu",		NULL,					N_( "_Network" ),		NULL,			NULL,	NULL								},
+ 	{	"HelpMenu",			NULL,					N_( "Help" ),			NULL,			NULL,	NULL								},
+ 	{	"EditMenu",			NULL,					N_( "_Edit" ),			NULL,			NULL,	NULL								},
+ 	{	"OptionsMenu",		NULL,					N_( "_Options" ),		NULL,			NULL,	NULL								},
 
 	/* Misc actions */
- 	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	NULL							},
- 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(action_Connect)		},
- 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)	},
- 	{	"Quit",				GTK_STOCK_QUIT,			N_( "Quit" ),			NULL,			NULL,	gtk_main_quit					},
+ 	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	G_CALLBACK(action_About)			},
+ 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(action_Connect)			},
+ 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)		},
+ 	{	"Quit",				GTK_STOCK_QUIT,			N_( "Quit" ),			NULL,			NULL,	gtk_main_quit						},
 
  	/* Edit actions */
- 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			NULL,			NULL,	G_CALLBACK(action_Copy)			},
- 	{	"Append",			NULL,					N_( "Add to copy" ),	NULL,			NULL,	G_CALLBACK(action_Append)		},
- 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),			NULL,			NULL,	G_CALLBACK(action_Paste)		},
- 	{	"PasteNext",		NULL,					N_( "Paste _next" ),	NULL,			NULL,	G_CALLBACK(action_PasteNext)	},
- 	{	"Unselect",			NULL,					N_( "_Unselect" ),		NULL,			NULL,	G_CALLBACK(ClearSelection)		},
- 	{	"Reselect",			NULL,					N_( "_Reselect" ),		NULL,			NULL,	G_CALLBACK(Reselect)			},
- 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),		NULL,			NULL,	G_CALLBACK(action_SelectAll)	},
- 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),	NULL,			NULL,	G_CALLBACK(action_Clear)		},
+ 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			NULL,			NULL,	G_CALLBACK(action_Copy)				},
+ 	{	"Append",			NULL,					N_( "Add to copy" ),	NULL,			NULL,	G_CALLBACK(action_Append)			},
+ 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),			NULL,			NULL,	G_CALLBACK(action_Paste)			},
+ 	{	"PasteNext",		NULL,					N_( "Paste _next" ),	NULL,			NULL,	G_CALLBACK(action_PasteNext)		},
+ 	{	"Unselect",			NULL,					N_( "_Unselect" ),		NULL,			NULL,	G_CALLBACK(ClearSelection)			},
+ 	{	"Reselect",			NULL,					N_( "_Reselect" ),		NULL,			NULL,	G_CALLBACK(Reselect)				},
+ 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),		NULL,			NULL,	G_CALLBACK(action_SelectAll)		},
+ 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),	NULL,			NULL,	G_CALLBACK(action_Clear)			},
+
+ 	/* Printer actions */
+	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),			NULL,			NULL,	G_CALLBACK(action_PrintScreen)		},
+	{	"PrintSelected",	NULL,					N_( "Print selected" ),	NULL,			NULL,	G_CALLBACK(action_PrintSelected)	},
+	{	"PrintClipboard",	NULL,					N_( "Print copy" ),		NULL,			NULL,	G_CALLBACK(action_PrintClipboard)	},
+
  };
 
 

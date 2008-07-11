@@ -67,34 +67,6 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
- gchar * GetSelection(void)
- {
- 	gchar 	*buffer;
- 	gsize	max = terminal_rows*terminal_cols*MAX_CHR_LENGTH;
- 	gsize	sz	= 0;
- 	int		row,col;
- 	int		pos	= 0;
-
- 	if(!(mode && max))
-		return NULL;
-
-	buffer = g_malloc(max);
-	*buffer = 0;
-	for(row = 0; row < terminal_rows;row++)
-	{
-		for(col = 0; col < terminal_cols;col++)
-		{
-			if(screen[pos].selected)
-				sz = g_strlcat(buffer,*screen[pos].ch ? screen[pos].ch : " ",max);
-			pos++;
-		}
-		if(*buffer)
-			sz = g_strlcat(g_strchomp(buffer),"\n",max);
-	}
-
-	return g_realloc(buffer,sz+1);
- }
-
  static void SetSelection(gboolean selected)
  {
  	int pos;

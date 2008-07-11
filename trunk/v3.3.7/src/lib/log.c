@@ -60,19 +60,17 @@
   */
  int WriteLog(const char *module, const char *fmt, ...)
  {
-    char    string[0x0100];
     va_list arg_ptr;
     FILE    *out;
-
-    va_start(arg_ptr, fmt);
-    vsnprintf(string, 0xFF, fmt, arg_ptr);
-    va_end(arg_ptr);
 
     out = prefix(module);
     if(!out)
        return -1;
 
-    fprintf(out,"%s\n",string);
+    va_start(arg_ptr, fmt);
+    vfprintf(out, fmt, arg_ptr);
+    va_end(arg_ptr);
+    fprintf(out,"\n");
 
     fclose(out);
 
@@ -92,7 +90,6 @@
  int WriteRCLog(const char *module, int rc, const char *fmt, ...)
  {
     FILE    *out;
-    char    string[0x0100];
     va_list arg_ptr;
 
 	if(rc == -1)
@@ -101,13 +98,13 @@
     if(!rc)
        return 0;
 
-    va_start(arg_ptr, fmt);
-    vsprintf(string, fmt, arg_ptr);
-    va_end(arg_ptr);
-
     out = prefix(module);
 
-	fprintf(out,"%s: %s (rc=%d)\n",string,strerror(rc),rc);
+    va_start(arg_ptr, fmt);
+    vfprintf(out, fmt, arg_ptr);
+    va_end(arg_ptr);
+
+	fprintf(out,": %s (rc=%d)\n",strerror(rc),rc);
 
     fclose(out);
 
