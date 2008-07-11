@@ -23,7 +23,7 @@ WINDRES = windres
 endif
 
 XCPPFLAGS = -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500
-CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall -Werror $(XCPPFLAGS) -Isrc/include
+CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall -Werror $(XCPPFLAGS) -DG3270 -Isrc/include
 DLLFLAGS = $(EXTRA_FLAGS) -mno-cygwin -shared -Wl,--export-all-symbols -Wl,--enable-auto-import
 
 # PKGConfig Stuff
@@ -127,6 +127,9 @@ $(PACKAGE).pot: sources.lst $(foreach SRC, $(G3270_SRCS), src/g3270/$(SRC))
 				--keyword=_ --keyword=N_ --sort-output \
 				--output=$@
 
+$(PACKAGE).po: $(PACKAGE).pot
+	@msginit --no-translator -o $(PACKAGE).po -i $(PACKAGE).pot
+
 clean:
 	@rm -fr obj
 	@rm -fr bin
@@ -137,6 +140,7 @@ clean:
 	@rm -f	sources.lst
 	@rm -f	g3270.tar.gz
 	@rm -f $(PACKAGE).pot
+	@rm -f $(PACKAGE).po
 	@rm -fr autom4te.cache
 	@rm -f config.status
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;

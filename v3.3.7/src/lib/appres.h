@@ -109,7 +109,9 @@ typedef struct {
 	Boolean allow_resize;
 	Boolean no_other;
 	Boolean do_confirms;
+#if !defined(G3270)
 	Boolean reconnect;
+#endif
 	Boolean visual_select;
 	Boolean suppress_host;
 	Boolean suppress_font_menu;
