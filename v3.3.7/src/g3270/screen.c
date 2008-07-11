@@ -593,7 +593,7 @@
 
  void SetStatusCode(STATUS_CODE id)
  {
- 	static const struct status_code tbl[] =
+ 	static const struct status_code tbl[STATUS_CODE_USER] =
  	{
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_BLANK,
 									TERMINAL_COLOR_OIA_STATUS_OK,
@@ -642,6 +642,16 @@
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_X,
 									TERMINAL_COLOR_OIA_STATUS_INVALID,
 									N_( "lX" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_RESOLVING,
+									TERMINAL_COLOR_OIA_STATUS_WARNING,
+									N_( "mX Resolving" ) ),
+
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_CONNECTING,
+									TERMINAL_COLOR_OIA_STATUS_WARNING,
+									N_( "nX Connecting" ) ),
+
+
 	};
 
 	/* Check if status has changed to avoid unnecessary redraws */

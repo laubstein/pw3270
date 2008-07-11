@@ -1425,6 +1425,30 @@ status_oerr(int error_type)
 
 }
 
+void status_resolving(Boolean on)
+{
+	if(callbacks)
+	{
+		if(callbacks->cursor)
+			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
+
+		if(callbacks->status)
+			callbacks->status(on ? STATUS_CODE_RESOLVING : STATUS_CODE_BLANK);
+	}
+}
+
+void status_connecting(Boolean on)
+{
+	if(callbacks)
+	{
+		if(callbacks->cursor)
+			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
+
+		if(callbacks->status)
+			callbacks->status(on ? STATUS_CODE_CONNECTING : STATUS_CODE_BLANK);
+	}
+}
+
 void
 status_reset(void)
 {

@@ -72,6 +72,7 @@
 #include "utilc.h"
 #include "w3miscc.h"
 #include "xioc.h"
+#include "screen.h"
 
 #if !defined(TELOPT_NAWS) /*[*/
 #define TELOPT_NAWS	31
@@ -495,11 +496,14 @@ net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving,
 		haddr.sin.sin_port = passthru_port;
 		ha_len = sizeof(struct sockaddr_in);
 	} else if (proxy_type > 0) {
+			status_resolving(1);
 	    	if (resolve_host_and_port(proxy_host, proxy_portname,
 			    &proxy_port, &haddr.sa, &ha_len, errmsg,
 			    sizeof(errmsg)) < 0) {
 		    	popup_an_error(errmsg);
+				status_resolving(0);
 		    	return -1;
+			status_resolving(0);
 		}
 	} else {
 #if defined(LOCAL_PROCESS) /*[*/
@@ -510,11 +514,14 @@ net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving,
 #if defined(LOCAL_PROCESS) /*[*/
 			local_process = False;
 #endif /*]*/
+			status_resolving(1);
 			if (resolve_host_and_port(host, portname,
 				    &current_port, &haddr.sa, &ha_len,
 				    errmsg, sizeof(errmsg)) < 0) {
 			    	popup_an_error(errmsg);
+					status_resolving(0);
 			    	return -1;
+			status_resolving(0);
 			}
 #if defined(LOCAL_PROCESS) /*[*/
 		}

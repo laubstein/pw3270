@@ -37,6 +37,7 @@ extern void mcursor_locked();
 extern void mcursor_normal();
 extern void mcursor_waiting();
 
+
 extern Boolean escaped;
 
 extern void Escape_action(Widget w, XEvent *event, String *params,

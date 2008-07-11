@@ -20,3 +20,6 @@ extern Boolean screen_has_changes;
 
 void screen_changed(int bstart, int bend);
 
+extern void status_connecting(Boolean on);
+extern void status_resolving(Boolean on);
+

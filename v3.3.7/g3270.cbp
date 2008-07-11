@@ -138,7 +138,6 @@
 		<Unit filename="src/lib/host.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/lib/hostc.h" />
 		<Unit filename="src/lib/icmd.c">
 			<Option compilerVar="CC" />
 		</Unit>
