@@ -95,6 +95,8 @@
 	extern GdkCursor        		*wCursor[CURSOR_MODE_USER];
 	extern PangoFontDescription	*font;
 	extern gint					cMode;
+	extern GdkPixbuf 				*main_icon;
+
 
 	extern int 					terminal_rows;
 	extern int				 		terminal_cols;

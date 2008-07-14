@@ -30,8 +30,10 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
- GtkWidget *topwindow = NULL;
+ GtkWidget *topwindow 	= NULL;
+ GdkPixbuf *main_icon	= NULL;
  GdkCursor *wCursor[CURSOR_MODE_USER];
+
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -74,17 +76,15 @@
  	int				f;
 	GtkUIManager	*ui_manager;
 	gchar			*file;
-	GdkPixbuf		*pix;
+	GdkPixbuf		*main_icon;
 
 	topwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 	file = FindSystemConfigFile(PACKAGE_NAME ".jpg");
-	Trace("Icon: %s",file);
 	if(file)
 	{
-		pix = gdk_pixbuf_new_from_file(file, NULL);
-		Trace("%s: %p",file,pix);
-		gtk_window_set_icon(GTK_WINDOW(topwindow),pix);
+		main_icon = gdk_pixbuf_new_from_file(file, NULL);
+		gtk_window_set_icon(GTK_WINDOW(topwindow),main_icon);
 		g_free(file);
 	}
 

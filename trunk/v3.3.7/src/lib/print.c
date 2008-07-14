@@ -51,6 +51,8 @@
 #include <sys/stat.h>
 #endif /*]*/
 
+#include <lib3270/api.h>
+
 /* Statics */
 
 #if defined(X3270_DISPLAY) /*[*/
@@ -118,7 +120,7 @@ html_color(int color)
 /*
  * Print the ASCIIfied contents of the screen onto a stream.
  * Returns True if anything printed, False otherwise.
- * 
+ *
  * If 'use_html' is True, then HTML is generated, which preserves colors, but
  * little else (for now).
  */

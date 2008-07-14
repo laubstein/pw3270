@@ -50,10 +50,8 @@ void ctlr_wrapping_memmove(int baddr_to, int baddr_from, int count);
 enum pds ctlr_write(unsigned char buf[], int buflen, Boolean erase);
 void ctlr_write_sscp_lu(unsigned char buf[], int buflen);
 struct ea *fa2ea(int baddr);
-int find_field_attribute(int baddr);
-unsigned char get_field_attribute(register int baddr);
-Boolean get_bounded_field_attribute(register int baddr, register int bound,
-    unsigned char *fa_out);
+
+Boolean get_bounded_field_attribute(register int baddr, register int bound, unsigned char *fa_out);
 void mdt_clear(int baddr);
 void mdt_set(int baddr);
 int next_unprotected(int baddr0);
