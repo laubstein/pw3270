@@ -352,11 +352,36 @@ find_field_attribute(int baddr)
 }
 
 /*
+ * Get Field width
+ */
+int find_field_length(int baddr)
+{
+	int saddr;
+	int addr = find_field_attribute(baddr);
+	int width = 0;
+
+	if(addr < 0)
+		return -1;
+
+	saddr = addr;
+	INC_BA(addr);
+	do {
+		if(ea_buf[addr].fa)
+			return width;
+		INC_BA(addr);
+		width++;
+	} while (addr != saddr);
+
+	return -1;
+
+}
+
+/*
  * Find the field attribute for the given buffer address.  Return its address
  * rather than its value.
  */
 unsigned char
-get_field_attribute(register int baddr)
+get_field_attribute(int baddr)
 {
 	return ea_buf[find_field_attribute(baddr)].fa;
 }
