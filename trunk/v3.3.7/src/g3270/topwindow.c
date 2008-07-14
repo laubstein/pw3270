@@ -60,6 +60,9 @@
 
  static void  set_widget_flags(GtkWidget *widget, gpointer data)
  {
+ 	if(!widget)
+		return;
+
 	GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_FOCUS);
 	GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_DEFAULT);
 
@@ -96,6 +99,10 @@
 
     vbox = gtk_vbox_new(FALSE,0);
 
+	/* Create terminal window */
+	if(!CreateTerminalWindow())
+		return -1;
+
 	/* Create UI elements */
 	ui_manager = LoadApplicationUI(topwindow);
 	if(ui_manager)
@@ -123,7 +130,7 @@
 				gtk_box_pack_start(GTK_BOX(vbox),widget,FALSE,FALSE,0);
 		}
 
-		set_widget_flags(vbox,0);
+		set_widget_flags(gtk_ui_manager_get_widget(ui_manager,"/MainToolbar"),0);
 
 		for(f=0;f < G_N_ELEMENTS(popup);f++)
 		{
@@ -138,10 +145,6 @@
 	}
 
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);
-
-	/* Create terminal window */
-	if(!CreateTerminalWindow())
-		return -1;
 
 	gtk_box_pack_start(GTK_BOX(vbox), terminal, TRUE, TRUE, 0);
 

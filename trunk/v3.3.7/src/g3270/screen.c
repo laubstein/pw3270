@@ -495,7 +495,7 @@
 	//  M-7..M     cursor position (rrr/ccc or blank)
 	if(Toggled(CURSOR_POS))
 	{
-		sprintf(str,"%03d/%03d",cRow,cCol);
+		sprintf(str,"%03d/%03d",cRow+1,cCol+1);
 		pango_layout_set_text(layout,str,-1);
 		gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-7)),row,layout,clr+TERMINAL_COLOR_OIA_CURSOR,bg);
 	}

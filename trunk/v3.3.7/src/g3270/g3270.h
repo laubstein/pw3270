@@ -144,7 +144,10 @@
 	void 		action_Append(GtkWidget *w, gpointer user_data);
 	void 		action_Copy(GtkWidget *w, gpointer user_data);
 	void 		action_SelectAll(GtkWidget *w, gpointer user_data);
-
+	void		action_SelectLeft(GtkWidget *w, gpointer user_data);
+	void		action_SelectUp(GtkWidget *w, gpointer user_data);
+	void		action_SelectRight(GtkWidget *w, gpointer user_data);
+	void		action_SelectDown(GtkWidget *w, gpointer user_data);
 
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
 	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el);
