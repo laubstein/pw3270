@@ -49,6 +49,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #else /*][*/
+
 #if defined(W3N46) /*[*/
   /* Compiling DLL for WinXP or later: Expose getaddrinfo()/freeaddrinfo(). */
 #undef _WIN32_WINNT
@@ -63,13 +64,29 @@
 #endif /*]*/
 
 #include <stdio.h>
+#include <lib3270/api.h>
+
 #include "resolverc.h"
 #include "w3miscc.h"
+
+#pragma pack(1)
+struct parms
+{
+	unsigned short	sz;
+	const char			*host;
+	char				*portname;
+	unsigned short	*pport;
+	struct sockaddr	*sa;
+	socklen_t 			*sa_len;
+	char				*errmsg;
+	int					em_len;
+};
+#pragma pack()
 
 #if defined(_WIN32) && !defined(ISDLL) /*[*/
 typedef int rhproc(const char *, char *, unsigned short *, struct sockaddr *,
 	socklen_t *, char *, int);
-#define DLL_RESOLVER_NAME "dresolve_host_and_port"
+#define DLL_RESOLVER_NAME "cresolve_host_and_port"
 #endif /*]*/
 
 /*
@@ -77,19 +94,12 @@ typedef int rhproc(const char *, char *, unsigned short *, struct sockaddr *,
  * Returns 0 for success, -1 for fatal error (name resolution impossible),
  *  -2 for simple error (cannot resolve the name).
  */
-#if !defined(ISDLL) /*[*/
-int
-resolve_host_and_port(const char *host, char *portname, unsigned short *pport,
-	struct sockaddr *sa, socklen_t *sa_len, char *errmsg, int em_len)
-#else /*][*/
-int
-dresolve_host_and_port(const char *host, char *portname, unsigned short *pport,
-	struct sockaddr *sa, socklen_t *sa_len, char *errmsg, int em_len)
-#endif /*]*/
-{
-#if !defined(_WIN32) || defined(ISDLL) /*[*/
 
-    	/* Non-Windows version, or Windows DLL version. */
+#if !defined(WIN32) || defined(ISDLL)
+
+int cresolve_host_and_port(struct parms *p)
+{
+/* Non-Windows version, or Windows DLL version. */
 #if defined(AF_INET6) /*[*/
 	struct addrinfo	 hints, *res;
 	int		 rc;
@@ -100,31 +110,28 @@ dresolve_host_and_port(const char *host, char *portname, unsigned short *pport,
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
-	rc = getaddrinfo(host, portname, &hints, &res);
+	rc = getaddrinfo(p->host, p->portname, &hints, &res);
 	if (rc != 0) {
 
 		// FIXME (perry#1#): Correct this: What's wrong with gai_strerror?
 		// snprintf(errmsg, em_len, "%s/%s: %s", host, portname, gai_strerror(rc));
-		snprintf(errmsg, em_len, "%s/%s: %d", host, portname, rc);
+		snprintf(p->errmsg, p->em_len, "%s/%s: %d", p->host, p->portname, rc);
 		return -2;
 	}
 	switch (res->ai_family) {
 	case AF_INET:
-		*pport =
-		    ntohs(((struct sockaddr_in *)res->ai_addr)->sin_port);
+		*p->pport = ntohs(((struct sockaddr_in *)res->ai_addr)->sin_port);
 		break;
 	case AF_INET6:
-		*pport =
-		    ntohs(((struct sockaddr_in6 *)res->ai_addr)->sin6_port);
+		*p->pport = ntohs(((struct sockaddr_in6 *)res->ai_addr)->sin6_port);
 		break;
 	default:
-		snprintf(errmsg, em_len, "%s: unknown family %d", host,
-			res->ai_family);
+		snprintf(p->errmsg, p->em_len, "%s: unknown family %d", p->host,res->ai_family);
 		freeaddrinfo(res);
 		return -1;
 	}
-	(void) memcpy(sa, res->ai_addr, res->ai_addrlen);
-	*sa_len = res->ai_addrlen;
+	(void) memcpy(p->sa, res->ai_addr, res->ai_addrlen);
+	*p->sa_len = res->ai_addrlen;
 	freeaddrinfo(res);
 
 #else /*][*/
@@ -167,11 +174,23 @@ dresolve_host_and_port(const char *host, char *portname, unsigned short *pport,
 	*sa_len = sizeof(struct sockaddr_in);
 
 #endif /*]*/
-#else /*][*/
+
+	return 0;
+}
+#endif
+
+#if !defined(ISDLL) /*[*/
+int
+resolve_host_and_port(const char *host, char *portname, unsigned short *pport,struct sockaddr *sa, socklen_t *sa_len, char *errmsg, int em_len)
+{
+	struct parms p = { sizeof(struct parms), host, portname, pport, sa, sa_len, errmsg, em_len };
+
+#if defined(_WIN32)
 
 	/* Win32 version: Use the right DLL. */
+
 	static int loaded = FALSE;
-	static FARPROC p = NULL;
+	static FARPROC call = NULL;
 
 	if (!loaded) {
 		OSVERSIONINFO info;
@@ -198,6 +217,9 @@ dresolve_host_and_port(const char *host, char *portname, unsigned short *pport,
 		    	dllname = "w3n4.dll";
 		else
 		    	dllname = "w3n46.dll";
+
+		Trace("Loading %s",dllname);
+
 		handle = LoadLibrary(dllname);
 		if (handle == NULL) {
 			snprintf(errmsg, em_len, "Can't load %s: %s",
@@ -206,8 +228,9 @@ dresolve_host_and_port(const char *host, char *portname, unsigned short *pport,
 		}
 
 		/* Look up the entry point we need. */
-		p = GetProcAddress(handle, DLL_RESOLVER_NAME);
-		if (p == NULL) {
+		call = GetProcAddress(handle, DLL_RESOLVER_NAME);
+		Trace("Entry point for %s is %p",DLL_RESOLVER_NAME,call);
+		if (call == NULL) {
 			snprintf(errmsg, em_len,
 				"Can't resolve " DLL_RESOLVER_NAME
 				" in %s: %s", dllname,
@@ -218,9 +241,16 @@ dresolve_host_and_port(const char *host, char *portname, unsigned short *pport,
 		loaded = TRUE;
 	}
 
-	/* Use the DLL function to resolve the hostname and port. */
-	return ((rhproc *)p)(host, portname, pport, sa, sa_len, errmsg, em_len);
-#endif /*]*/
+#else
 
-	return 0;
+	int	 (*call)(struct parms *p) = &cresolve_host_and_port;
+
+
+#endif
+
+	Trace("Calling resolver at %p", call);
+
+	return CallAndWait((int (*)(void *)) call,&p);
+
 }
+#endif

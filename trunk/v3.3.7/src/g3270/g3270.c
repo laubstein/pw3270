@@ -230,45 +230,9 @@ static void main_connect(Boolean status)
 
 }
 
-static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
+static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer id)
 {
-	switch(log_level)
-	{
-	case G_LOG_FLAG_RECURSION:	// internal flag
-		WriteLog("gtk-internal", "%s", message);
-		break;
-
-	case G_LOG_FLAG_FATAL:		// internal flag
-		WriteLog("gtk-fatal", "%s", message);
-		break;
-
-	case G_LOG_LEVEL_ERROR:	// log level for errors, see g_error(). This level is also used for messages produced by g_assert().
-		WriteLog("gtk-error", "%s", message);
-		break;
-
-	case G_LOG_LEVEL_CRITICAL:	// log level for critical messages, see g_critical(). This level is also used for messages produced by g_return_if_fail() and g_return_val_if_fail().
-		WriteLog("gtk-critical", "%s", message);
-		break;
-
-	case G_LOG_LEVEL_WARNING:	// log level for warnings, see g_warning()
-		WriteLog("gtk-warning", "%s", message);
-		break;
-
-	case G_LOG_LEVEL_MESSAGE:	// log level for messages, see g_message()
-		WriteLog("gtk-message", "%s", message);
-		break;
-
-	case G_LOG_LEVEL_INFO:		// log level for informational messages
-		WriteLog("gtk-info", "%s", message);
-		break;
-
-	case G_LOG_LEVEL_DEBUG:	// log level for debug messages, see g_debug()
-		WriteLog("gtk-debug", "%s", message);
-		break;
-
-	default:
-		WriteLog("gtk", "%s", message);
-	}
+	WriteLog(id, "%s", message);
 }
 
 static int g3270_init(int *argc, char ***argv)
@@ -284,7 +248,7 @@ static int g3270_init(int *argc, char ***argv)
 	g_thread_init(0);
 	gtk_init (argc, argv);
 
-	g_log_set_handler(NULL,G_LOG_LEVEL_MASK,log_callback,NULL);
+	g_log_set_default_handler(log_callback,"GLog");
 
 	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
 	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
@@ -380,25 +344,34 @@ int main(int argc, char *argv[])
 	if (cl_hostname != CN) {
 		appres.once = True;
 
-		Trace("Connecting to %s...",cl_hostname);
-
 		if(host_connect(cl_hostname) < 0)
+		{
+			while(gtk_events_pending())
+				gtk_main_iteration();
+
 			x3270_exit(1);
+		}
+
 		/* Wait for negotiations to complete or fail. */
 		Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);
 
-		while (!IN_ANSI && !IN_3270) {
-			g_main_context_iteration(NULL,TRUE);
-			if (!PCONNECTED)
+		while (!IN_ANSI && !IN_3270)
+		{
+
+			while(gtk_events_pending())
+				gtk_main_iteration();
+
+			if(!PCONNECTED)
+			{
+				Trace("Negotiation with %s failed!",cl_hostname);
 				x3270_exit(1);
+			}
 		}
-//		pause_for_errors();
 	} else {
 		if (appres.secure) {
 			Error("Must specify hostname with secure option");
 		}
 		appres.once = False;
-//		interact();
 	}
 
 	screen_resume();

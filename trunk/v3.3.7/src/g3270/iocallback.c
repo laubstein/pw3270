@@ -34,6 +34,10 @@
 #include <glib.h>
 #include "g3270.h"
 
+#ifdef G_THREADS_ENABLED
+	static int g3270_CallAndWait(int(*callback)(void *), void *parm);
+#endif
+
 static unsigned long	g3270_AddInput(int source, void (*fn)(void));
 static void			g3270_RemoveInput(unsigned long id);
 
@@ -80,8 +84,15 @@ const struct lib3270_io_callbacks g3270_io_callbacks =
 	g3270_AddExcept,
 
 #if !defined(_WIN32) /*[*/
-	g3270_AddOutput
+	g3270_AddOutput,
 #endif /*]*/
+
+#ifdef G_THREADS_ENABLED
+	g3270_CallAndWait
+#else
+	NULL	// int (*CallAndWait)(int(*callback)(void *), void *parm);
+#endif
+
 
 };
 
@@ -222,4 +233,58 @@ static gboolean IO_closure(gpointer data)
 	return 0;
 }
 
+#ifdef G_THREADS_ENABLED
+
+struct bgParameter
+{
+	int			status;
+	int			rc;
+	int(*callback)(void *);
+	void		*parm;
+
+};
+
+gpointer BgCall(struct bgParameter *p)
+{
+	p->rc = p->callback(p->parm);
+	p->status = 2;
+	return 0;
+}
+
+static gboolean BgCallTimer(struct bgParameter *p)
+{
+	if(p->status == 2)
+	{
+		Trace("Stopping %s",__FUNCTION__);
+		p->status = 0;
+		return FALSE;
+	}
+	return TRUE;
+}
+
+static int g3270_CallAndWait(int(*callback)(void *), void *parm)
+{
+	struct bgParameter p = { 3, -1, callback, parm };
+	GThread	*thread;
+
+	Trace("Starting auxiliary thread for callback %p",callback);
+
+    thread =  g_thread_create( (GThreadFunc) BgCall, &p, 0, NULL);
+
+    if(!thread)
+    {
+    	g_error("Can't start background thread");
+    	return -1;
+    }
+
+	g_timeout_add((guint) 100, (GSourceFunc) BgCallTimer, &p);
+
+	while(p.status)
+		gtk_main_iteration();
+
+	Trace("Auxiliary thread for callback %p finished (rc=%d)",callback,p.rc);
+
+    return p.rc;
+}
+#endif
 
