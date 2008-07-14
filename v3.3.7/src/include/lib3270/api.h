@@ -33,7 +33,6 @@
 			#define Trace( fmt, ... )		WriteLog("TRACE", "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ )
 		#else
 			#define Trace( fmt, ... )	/* __VA_ARGS__ */
-			#warning "So compilar como debug"
 		#endif
 
 		int WriteLog(const char *module, const char *fmt, ...);
@@ -88,6 +87,8 @@
 			#if !defined(_WIN32) /*[*/
 				unsigned long (*AddOutput)(int source, void (*fn)(void));
 			#endif /*]*/
+
+			int 			(*CallAndWait)(int(*callback)(void *), void *parm);
 
 
 		};
@@ -162,6 +163,8 @@
 			void (*lu)(const char *lu);
 			void (*set)(OIA_FLAG id, int on);
 			void (*erase)(void);
+			void (*popup_an_error)(const char *msg);
+
 
 		};
 
@@ -171,6 +174,7 @@
 		void	Input_String(const unsigned char *str);
 		int		Toggled(int ix);
 		void 	cursor_move(int baddr);
+		int 	CallAndWait(int(*callback)(void *), void *parm);
 
 
 #endif // LIB3270_H_INCLUDED

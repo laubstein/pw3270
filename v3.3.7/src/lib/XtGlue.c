@@ -34,12 +34,23 @@
 #include <lib3270/api.h>
 
 #if defined(_WIN32) /*[*/
-#include <windows.h>
+
+	#include <windows.h>
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
+
 #else /*][*/
-#if defined(SEPARATE_SELECT_H) /*[*/
-#include <sys/select.h>
+
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <netdb.h>
+
+	#if defined(SEPARATE_SELECT_H) /*[*/
+		#include <sys/select.h>
+	#endif /*]*/
 #endif /*]*/
-#endif /*]*/
+
+#include "resolverc.h"
 
 #define InputReadMask	0x1
 #define InputExceptMask	0x2
@@ -402,3 +413,12 @@ enum cstate QueryCSate(void)
 {
 	return cstate;
 }
+
+int CallAndWait(int(*callback)(void *),void *parm)
+{
+	if(callbacks && callbacks->CallAndWait)
+		return callbacks->CallAndWait(callback,parm);
+	else
+		return callback(parm);
+}
+

@@ -2078,3 +2078,19 @@ extern void mcursor_waiting()
 		callbacks->cursor(CURSOR_MODE_WAITING);
 }
 
+/* Pop up an error dialog. */
+extern void popup_an_error(const char *fmt, ...)
+{
+	char 	vmsgbuf[4096];
+	va_list	args;
+
+	va_start(args, fmt);
+	(void) vsprintf(vmsgbuf, fmt, args);
+	va_end(args);
+
+	if(callbacks && callbacks->popup_an_error)
+		callbacks->popup_an_error(vmsgbuf);
+	else
+		WriteLog("3270","Error Popup: %s",vmsgbuf);
+
+}

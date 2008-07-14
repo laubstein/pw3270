@@ -25,6 +25,7 @@
 */
 
 #include "g3270.h"
+#include "config.h"
 #include <malloc.h>
 #include <string.h>
 #include <errno.h>
@@ -69,6 +70,7 @@
  static void set_lu(const char *lu);
  static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height, int Width);
  static void changed(int bstart, int bend);
+ static void errorpopup(const char *msg);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -96,6 +98,7 @@
 	set_lu,			// void (*lu)(const char *lu);
 	set_oia,		// void (*set)(OIA_FLAG id, int on);
 	erase,			// void (*erase)(void);
+	errorpopup,		// void (*popup_an_error)(const char *msg);
 
  };
 
@@ -177,7 +180,7 @@
  {
  	Trace("Window %p title: \"%s\"",topwindow,text);
  	if(topwindow)
-		gtk_window_set_title(GTK_WINDOW(topwindow),text);
+		gtk_window_set_title(GTK_WINDOW(topwindow),text ? text : PACKAGE_NAME);
 
  }
 
@@ -808,3 +811,17 @@
 	return g_realloc(buffer,strlen(buffer)+1);
  }
 
+ static void errorpopup(const char *msg)
+ {
+ 	GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+												GTK_DIALOG_DESTROY_WITH_PARENT,
+												GTK_MESSAGE_ERROR,
+												GTK_BUTTONS_CLOSE,
+												"%s",msg );
+
+ 	g_critical(msg);
+
+	gtk_dialog_run(GTK_DIALOG (dialog));
+	gtk_widget_destroy(dialog);
+
+ }

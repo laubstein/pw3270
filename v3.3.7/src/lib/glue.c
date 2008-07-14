@@ -1194,22 +1194,6 @@ Boolean flipped = False;
 
 Boolean error_popup_visible = False;
 
-/* Pop up an error dialog. */
-void
-popup_an_error(const char *fmt, ...)
-{
-	char 	vmsgbuf[4096];
-	va_list	args;
-
-	va_start(args, fmt);
-	(void) vsprintf(vmsgbuf, fmt, args);
-	va_end(args);
-
-	WriteLog("3270","Error Popup:\n%s\n",vmsgbuf);
-
-	// TODO (perry#1#): Find a way (callback?) to pass the message to the application.
-
-}
 
 /* Pop up an error dialog, based on an error number. */
 void

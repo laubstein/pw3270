@@ -87,7 +87,7 @@ obj/Release/version.o: src/version.c
 obj/Release/src/lib/w3n46.o: src/lib/resolver.c
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	$(CC) $(CFLAGS) -Isrc/lib -DW3N46 -c -o $@ $^
+	@$(CC) $(CFLAGS) -Isrc/lib -DW3N46 -c -o $@ $^
 
 
 # Debug Targets
