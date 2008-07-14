@@ -170,6 +170,9 @@
 
 		int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
 
+		int find_field_attribute(int baddr);
+		unsigned char get_field_attribute(register int baddr);
+
 		/* Misc API calls */
 		void	Input_String(const unsigned char *str);
 		int		Toggled(int ix);

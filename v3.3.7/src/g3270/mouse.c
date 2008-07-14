@@ -42,6 +42,7 @@
 	SELECTING_NONE,
 	SELECTING_NORMAL,
 	SELECTING_RECTANGLE,
+	SELECTING_FIELD,
 
 
 	SELECTING_INVALID
@@ -66,6 +67,14 @@
  GtkWidget	*DefaultPopup		= 0;
 
 /*---[ Implement ]------------------------------------------------------------*/
+
+ static void SelectField(void)
+ {
+ 	int baddr = find_field_attribute((startRow * terminal_cols) + startCol);
+//		UpdateSelectedText();
+ }
+
+
 
  static void SetSelection(gboolean selected)
  {
@@ -99,7 +108,10 @@
 		break;
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1:
-		Trace("Button 1 double-clicked at %ld,%ld",(long) event->x, (long) event->y);
+		ClearSelection();
+		DecodePosition(event,startRow,startCol);
+		mode = SELECTING_FIELD;
+		Trace("Button 1 double-clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
 		break;
 
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3:
@@ -139,6 +151,11 @@
 			cursor_move((row*terminal_cols)+col);
 		break;
 
+	case SELECTING_FIELD:	// Double click, select field
+		Trace("Selecting field (button: %d)",event->button);
+		mode = SELECTING_NORMAL;
+		SelectField();
+		break;
 
  	}
 
