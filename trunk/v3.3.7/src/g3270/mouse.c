@@ -30,6 +30,7 @@
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
  #include <lib3270/toggle.h>
+ #include "../lib/3270ds.h"
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -50,6 +51,8 @@
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
+ static void UpdateSelectedRegion(int start, int end);
+
 /*---[ Constants ]------------------------------------------------------------*/
 
 /*---[ Statics ]--------------------------------------------------------------*/
@@ -68,13 +71,49 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
+ static int CheckForFunction(int baddr, int length)
+ {
+ 	int ret = 0;
+	if( !(*screen[baddr+1].ch == 'F' && FA_IS_PROTECTED(get_field_attribute(baddr))) )
+		return ret;
+
+	baddr++;
+	while(--length > 0)
+	{
+		baddr++;
+		if(*screen[baddr].ch > '9' || *screen[baddr].ch < '0')
+			return 0;
+
+		ret = (ret*10)+(*screen[baddr].ch - '0');
+		Trace("Field@%d: %c",baddr,*screen[baddr].ch);
+	}
+
+ 	return ret;
+ }
  static void SelectField(void)
  {
  	int baddr = find_field_attribute((startRow * terminal_cols) + startCol);
-//		UpdateSelectedText();
+ 	int length = find_field_length(baddr);
+ 	int function;
+
+	Trace("Field %d with %d bytes",baddr,length);
+
+	if(length < 0 || length > ((terminal_cols * terminal_cols) - baddr))
+		return;
+
+	function = CheckForFunction(baddr,length);
+	if(function > 0)
+	{
+		// Double-click in "F*", request function key
+		char buffer[10];
+		sprintf(buffer,"%d",function);
+		action_internal(PF_action, IA_DEFAULT, buffer, CN);
+		return;
+	}
+
+	UpdateSelectedRegion(baddr+1,baddr+length);
+
  }
-
-
 
  static void SetSelection(gboolean selected)
  {
@@ -108,7 +147,6 @@
 		break;
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1:
-		ClearSelection();
 		DecodePosition(event,startRow,startCol);
 		mode = SELECTING_FIELD;
 		Trace("Button 1 double-clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
@@ -153,7 +191,6 @@
 
 	case SELECTING_FIELD:	// Double click, select field
 		Trace("Selecting field (button: %d)",event->button);
-		mode = SELECTING_NORMAL;
 		SelectField();
 		break;
 
@@ -236,8 +273,11 @@
 
  static void UpdateSelectedText(void)
  {
- 	int			start	= (startRow * terminal_cols)+startCol;
- 	int			end 	= (endRow * terminal_cols)+endCol;
+ 	UpdateSelectedRegion((startRow * terminal_cols)+startCol,(endRow * terminal_cols)+endCol);
+ }
+
+ static void UpdateSelectedRegion(int start, int end)
+ {
  	int			pos		= 0;
  	int			x,y,row,col;
 	GdkGC		*gc		= NULL;
