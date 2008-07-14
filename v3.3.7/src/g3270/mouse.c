@@ -30,7 +30,7 @@
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
  #include <lib3270/toggle.h>
- #include "../lib/3270ds.h"
+ #include <lib3270/3270ds.h>
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
@@ -185,8 +185,8 @@
  	switch(mode)
  	{
 	case SELECTING_NONE:	// Single click, just move cursor
-		if(event->button == 1)
-			cursor_move((row*terminal_cols)+col);
+		ClearSelection();
+		cursor_move((row*terminal_cols)+col);
 		break;
 
 	case SELECTING_FIELD:	// Double click, select field
@@ -389,8 +389,11 @@
 
  void ClearSelection(void)
  {
- 	SetSelection(FALSE);
-	mode = SELECTING_NONE;
+ 	if(mode)
+ 	{
+		SetSelection(FALSE);
+		mode = SELECTING_NONE;
+ 	}
  }
 
  void action_SelectAll(GtkWidget *w, gpointer user_data)
@@ -398,3 +401,68 @@
  	SetSelection(TRUE);
 	mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
  }
+
+ void action_SelectLeft(GtkWidget *w, gpointer user_data)
+ {
+ 	if(mode == SELECTING_NONE)
+ 	{
+ 		mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+ 		startRow = endRow = cRow;
+ 		startCol = endCol = cCol;
+ 	}
+
+ 	action_internal(Left_action, IA_DEFAULT, CN, CN);
+	endRow = cRow;
+	endCol = cCol;
+
+	Reselect();
+ }
+
+ void action_SelectUp(GtkWidget *w, gpointer user_data)
+ {
+ 	if(mode == SELECTING_NONE)
+ 	{
+ 		mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+ 		startRow = endRow = cRow;
+ 		startCol = endCol = cCol;
+ 	}
+
+ 	action_internal(Up_action, IA_DEFAULT, CN, CN);
+	endRow = cRow;
+	endCol = cCol;
+
+	Reselect();
+ }
+
+ void action_SelectRight(GtkWidget *w, gpointer user_data)
+ {
+ 	if(mode == SELECTING_NONE)
+ 	{
+ 		mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+ 		startRow = endRow = cRow;
+ 		startCol = endCol = cCol;
+ 	}
+
+ 	action_internal(Right_action, IA_DEFAULT, CN, CN);
+	endRow = cRow;
+	endCol = cCol;
+
+	Reselect();
+ }
+
+ void action_SelectDown(GtkWidget *w, gpointer user_data)
+ {
+ 	if(mode == SELECTING_NONE)
+ 	{
+ 		mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+ 		startRow = endRow = cRow;
+ 		startCol = endCol = cCol;
+ 	}
+
+ 	action_internal(Down_action, IA_DEFAULT, CN, CN);
+	endRow = cRow;
+	endCol = cCol;
+
+	Reselect();
+ }
+

@@ -120,41 +120,107 @@
 
  void action_Clear(GtkWidget *w, gpointer user_data)
  {
+ 	ClearSelection();
  	action_internal(EraseInput_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Up(GtkWidget *w, gpointer user_data)
+ {
+  	ClearSelection();
+	action_internal(Up_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Down(GtkWidget *w, gpointer user_data)
+ {
+ 	ClearSelection();
+ 	action_internal(Down_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Left(GtkWidget *w, gpointer user_data)
+ {
+ 	ClearSelection();
+ 	action_internal(Left_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Right(GtkWidget *w, gpointer user_data)
+ {
+ 	ClearSelection();
+ 	action_internal(Right_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Tab(GtkWidget *w, gpointer user_data)
+ {
+ 	action_internal(Tab_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_BackTab(GtkWidget *w, gpointer user_data)
+ {
+ 	action_internal(BackTab_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Reset(GtkWidget *w, gpointer user_data)
+ {
+ 	ClearSelection();
+ 	action_internal(Reset_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Enter(GtkWidget *w, gpointer user_data)
+ {
+ 	ClearSelection();
+ 	action_internal(Enter_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Insert(GtkWidget *w, gpointer user_data)
+ {
+ 	action_internal(ToggleInsert_action, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Home(GtkWidget *w, gpointer user_data)
+ {
+ 	action_internal(Home_action, IA_DEFAULT, CN, CN);
  }
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+ 	// TODO (perry#2#): Put all keyboard actions as accelerators.
  	static const struct WindowActions keyproc[] =
  	{
-		LIB3270_ACTION( GDK_Return,			0,					Enter_action),
-		LIB3270_ACTION( GDK_KP_Enter,		0,					Enter_action),
+		G3270_ACTION( GDK_Return,			0,					action_Enter),
+		G3270_ACTION( GDK_KP_Enter,			0,					action_Enter),
 
-		LIB3270_ACTION( GDK_Left,			0,					Left_action),
-		LIB3270_ACTION( GDK_Up,				0,					Up_action),
-		LIB3270_ACTION( GDK_Right,			0,					Right_action),
-		LIB3270_ACTION( GDK_Down,			0,					Down_action),
+        G3270_ACTION( GDK_KP_Left,			GDK_SHIFT_MASK,		action_SelectLeft),
+        G3270_ACTION( GDK_KP_Up,			GDK_SHIFT_MASK,		action_SelectUp),
+        G3270_ACTION( GDK_KP_Right,			GDK_SHIFT_MASK,		action_SelectRight),
+        G3270_ACTION( GDK_KP_Down,			GDK_SHIFT_MASK,		action_SelectDown),
 
-		LIB3270_ACTION( GDK_KP_Left,		0,					Left_action),
-		LIB3270_ACTION( GDK_KP_Up,			0,					Up_action),
-		LIB3270_ACTION( GDK_KP_Right,		0,					Right_action),
-		LIB3270_ACTION( GDK_KP_Down,		0,					Down_action),
+        G3270_ACTION( GDK_Left,				GDK_SHIFT_MASK,		action_SelectLeft),
+        G3270_ACTION( GDK_Up,				GDK_SHIFT_MASK,		action_SelectUp),
+        G3270_ACTION( GDK_Right,			GDK_SHIFT_MASK,		action_SelectRight),
+        G3270_ACTION( GDK_Down,				GDK_SHIFT_MASK,		action_SelectDown),
 
-		LIB3270_ACTION( GDK_ISO_Left_Tab,	0,					BackTab_action),
-		LIB3270_ACTION( GDK_Tab,			0,					Tab_action),
-		LIB3270_ACTION( GDK_KP_Add,			GDK_NUMLOCK_MASK,	Tab_action),
+		G3270_ACTION( GDK_Left,				0,					action_Left),
+		G3270_ACTION( GDK_Up,				0,					action_Up),
+		G3270_ACTION( GDK_Right,			0,					action_Right),
+		G3270_ACTION( GDK_Down,				0,					action_Down),
 
-		LIB3270_ACTION( GDK_r,				GDK_CONTROL_MASK,	Reset_action),
+		G3270_ACTION( GDK_KP_Left,			0,					action_Left),
+		G3270_ACTION( GDK_KP_Up,			0,					action_Up),
+		G3270_ACTION( GDK_KP_Right,			0,					action_Right),
+		G3270_ACTION( GDK_KP_Down,			0,					action_Down),
+
+		G3270_ACTION( GDK_ISO_Left_Tab,		0,					action_BackTab),
+		G3270_ACTION( GDK_Tab,				0,					action_Tab),
+		G3270_ACTION( GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab),
+
+		G3270_ACTION( GDK_r,				GDK_CONTROL_MASK,	action_Reset),
 		LIB3270_ACTION( GDK_w,				GDK_CONTROL_MASK,	DeleteWord_action),
 		LIB3270_ACTION( GDK_u,				GDK_CONTROL_MASK,	DeleteField_action),
 
-		LIB3270_ACTION( GDK_Escape,			0,					Reset_action),
-		LIB3270_ACTION( GDK_Escape,			0,					Reset_action),
+		G3270_ACTION( GDK_Escape,			0,					action_Reset),
+		G3270_ACTION( GDK_Escape,			0,					action_Reset),
 
-		LIB3270_ACTION( GDK_Insert,			0,					ToggleInsert_action),
 		LIB3270_ACTION( GDK_Delete,			0,					Delete_action),
 		LIB3270_ACTION( GDK_BackSpace,		0,					Erase_action),
-		LIB3270_ACTION( GDK_Home,			0,					Home_action),
 		LIB3270_ACTION( GDK_End,			0,					EraseEOF_action),
 		LIB3270_ACTION( GDK_Clear,			0,					EraseInput_action),
 		LIB3270_ACTION( GDK_3270_Reset,		0,					Reset_action),
@@ -177,6 +243,8 @@
         action_internal(PF_action, IA_DEFAULT, buffer, CN);
         return TRUE;
     }
+
+	/* Check for accelerators */
 
     /* Check for special keyproc actions */
 	for(f=0; f < (sizeof(keyproc)/sizeof(struct WindowActions));f++)
@@ -295,86 +363,6 @@
  }
 
 /*
-static const char *ui_mainwindow_ui_desc =
-"<ui>"
-"	<menubar name='MainMenubar'>"
-"		<menu action='FileMenu'>"
-"			<menuitem action='PrintScreen'/>"
-"			<menuitem action='PrintSelected'/>"
-"			<menuitem action='PrintClipboard'/>"
-"			<separator/>"
-"			<menuitem action='Quit'/>"
-"		</menu>"
-"		<menu action='EditMenu'>"
-"			<menuitem action='Copy'/>"
-"			<menuitem action='Append'/>"
-"			<menuitem action='Paste'/>"
-"			<menuitem action='PasteNext'/>"
-"			<separator/>"
-"			<menuitem action='SelectAll'/>"
-"			<menuitem action='Clear'/>"
-"			<separator/>"
-"			<menuitem action='Unselect'/>"
-"			<menuitem action='Reselect'/>"
-"		</menu>"
-"		<menu action='NetworkMenu'>"
-"			<menuitem action='Connect' />"
-"			<menuitem action='Disconnect' />"
-"		</menu>"
-"		<menu action='OptionsMenu'>"
-"			<menuitem action='CursorBlink' />"
-"			<menuitem action='CursorPos'  />"
-"			<menuitem action='FullScreen'  />"
-"			<menuitem action='MarginedPaste'  />"
-"			<menuitem action='CrossHair'  />"
-"			<menuitem action='RectSelect'  />"
-"			<menuitem action='Reconnect'  />"
-"		</menu>"
-"		<menu action='HelpMenu'>"
-"			<menuitem action='About' />"
-"		</menu>"
-"	</menubar>"
-"	<toolbar action='MainToolbar'>"
-"		<toolitem name='SelectAll' action='SelectAll' />"
-"		<toolitem name='Copy' action='Copy' />"
-"		<toolitem name='Paste' action='Paste' />"
-"		<toolitem name='Clear' action='Clear' />"
-"		<separator/>"
-"		<toolitem name='Connect' action='Connect' />"
-"		<toolitem name='Disconnect' action='Disconnect' />"
-"		<separator/>"
-"		<toolitem name='PrintScreen' action='PrintScreen' />"
-"		<toolitem name='Quit' action='Quit' />"
-"	</toolbar>"
-"	<popup action='SelectionPopup'>"
-"		<menuitem action='Copy'/>"
-"		<menuitem action='Append'/>"
-"		<menuitem action='Unselect'/>"
-"		<menuitem action='SelectAll'/>"
-"		<separator/>"
-"		<menuitem action='PrintScreen'/>"
-"		<menuitem action='PrintSelected'/>"
-"		<menuitem action='PrintClipboard'/>"
-
-"		<separator/>"
-"		<menuitem action='Quit'/>"
-
-"	</popup>"
-"	<popup action='DefaultPopup'>"
-"		<menuitem action='Paste'/>"
-"		<menuitem action='PasteNext'/>"
-"		<menuitem action='SelectAll'/>"
-"		<menuitem action='PrintScreen'/>"
-"		<menuitem action='PrintClipboard'/>"
-
-"		<separator/>"
-"		<menuitem action='Quit'/>"
-
-"	</popup>"
-"</ui>";
-*/
-
-/*
 	The name of the action.
 	The stock id for the action, or the name of an icon from the icon theme.
 	The label for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain(). If label is NULL, the label of the stock item with id stock_id is used.
@@ -399,23 +387,40 @@ static const char *ui_mainwindow_ui_desc =
  	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	G_CALLBACK(action_About)			},
  	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(action_Connect)			},
  	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)		},
- 	{	"Quit",				GTK_STOCK_QUIT,			N_( "Quit" ),			NULL,			NULL,	gtk_main_quit						},
+ 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),			"<Alt>Q",		NULL,	gtk_main_quit						},
 
  	/* Edit actions */
  	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			NULL,			NULL,	G_CALLBACK(action_Copy)				},
- 	{	"Append",			NULL,					N_( "Add to copy" ),	NULL,			NULL,	G_CALLBACK(action_Append)			},
+ 	{	"Append",			GTK_STOCK_ADD,			N_( "Add to copy" ),	NULL,			NULL,	G_CALLBACK(action_Append)			},
  	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),			NULL,			NULL,	G_CALLBACK(action_Paste)			},
  	{	"PasteNext",		NULL,					N_( "Paste _next" ),	NULL,			NULL,	G_CALLBACK(action_PasteNext)		},
  	{	"Unselect",			NULL,					N_( "_Unselect" ),		NULL,			NULL,	G_CALLBACK(ClearSelection)			},
  	{	"Reselect",			NULL,					N_( "_Reselect" ),		NULL,			NULL,	G_CALLBACK(Reselect)				},
- 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),		NULL,			NULL,	G_CALLBACK(action_SelectAll)		},
+ 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),		"<Alt>A",		NULL,	G_CALLBACK(action_SelectAll)		},
  	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),	NULL,			NULL,	G_CALLBACK(action_Clear)			},
 
  	/* Printer actions */
-	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),			NULL,			NULL,	G_CALLBACK(action_PrintScreen)		},
+	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),			"Print",		NULL,	G_CALLBACK(action_PrintScreen)		},
 	{	"PrintSelected",	NULL,					N_( "Print selected" ),	NULL,			NULL,	G_CALLBACK(action_PrintSelected)	},
 	{	"PrintClipboard",	NULL,					N_( "Print copy" ),		NULL,			NULL,	G_CALLBACK(action_PrintClipboard)	},
 
+	/* Select actions */
+	{ 	"SelectRight",		NULL,					N_( "Select Right" ),	"<Shift>Right",	NULL,	G_CALLBACK(action_SelectRight)		},
+	{ 	"SelectLeft",		NULL,					N_( "Select Left" ),	"<Shift>Left",	NULL,	G_CALLBACK(action_SelectLeft)		},
+	{ 	"SelectUp",			NULL,					N_( "Select Up" ),		"<Shift>Up",	NULL,	G_CALLBACK(action_SelectUp)			},
+	{ 	"SelectDown",		NULL,					N_( "Select Down" ),	"<Shift>Down",	NULL,	G_CALLBACK(action_SelectDown)		},
+
+	/* Cursor Movement */
+	{ 	"CursorRight",		GTK_STOCK_GO_FORWARD,	N_( "Right" ),			"Right",		NULL,	G_CALLBACK(action_Right)			},
+	{ 	"CursorLeft",		GTK_STOCK_GO_BACK,		N_( "Left" ),			"Left",			NULL,	G_CALLBACK(action_Left)				},
+	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),				"Up",			NULL,	G_CALLBACK(action_Up)				},
+	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),			"Down",			NULL,	G_CALLBACK(action_Down)				},
+	{ 	"NextField",		NULL,					N_( "Next Field" ),		"Tab",			NULL,	G_CALLBACK(action_Tab)				},
+	{ 	"Enter",			NULL,					N_( "Enter" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
+
+	/* Terminal Actions */
+	{ 	"Reset",			NULL,					N_( "Reset" ),			"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
+	{ 	"Home",				NULL,					N_( "Home" ),			"Home",			NULL,	G_CALLBACK(action_Home)				},
  };
 
 
@@ -432,13 +437,14 @@ static const char *ui_mainwindow_ui_desc =
 */
  static const GtkToggleActionEntry internal_action_toggles[] =
  {
- 	{	"CursorBlink",		NULL,	N_( "Blink Cursor" ),			NULL, 			NULL,	G_CALLBACK(action_BlinkCursor),		FALSE },
- 	{	"CursorPos",		NULL,	N_( "Show Cursor Position" ),	NULL, 			NULL,	G_CALLBACK(action_ShowCursorPos), 	TRUE  },
- 	{	"FullScreen",		NULL,	N_( "Full Screen" ),			"<Alt>Home",	NULL,	G_CALLBACK(action_FullScreen),		FALSE },
- 	{	"MarginedPaste",	NULL,	N_( "Margined Paste" ),			NULL, 			NULL,	NULL, 								FALSE },
- 	{	"CrossHair",		NULL,	N_( "Cross Hair Cursor" ),		"<Alt>X",		NULL,	G_CALLBACK(action_CrossHair),		FALSE },
- 	{	"RectSelect",		NULL,	N_( "Rectangle Select" ),		NULL, 			NULL,	G_CALLBACK(action_RectSelect),		FALSE },
- 	{	"Reconnect",		NULL,	N_( "Auto-Reconnect" ),			NULL, 			NULL,	G_CALLBACK(action_AutoReconnect), 	FALSE },
+ 	{	"CursorBlink",		NULL,					N_( "Blink Cursor" ),			NULL, 			NULL,	G_CALLBACK(action_BlinkCursor),		FALSE },
+ 	{	"CursorPos",		NULL,					N_( "Show Cursor Position" ),	NULL, 			NULL,	G_CALLBACK(action_ShowCursorPos), 	TRUE  },
+ 	{	"FullScreen",		GTK_STOCK_FULLSCREEN,	N_( "Full Screen" ),			NULL,			NULL,	G_CALLBACK(action_FullScreen),		FALSE },
+ 	{	"MarginedPaste",	NULL,					N_( "Margined Paste" ),			NULL, 			NULL,	NULL, 								FALSE },
+ 	{	"CrossHair",		NULL,					N_( "Cross Hair Cursor" ),		"<Alt>X",		NULL,	G_CALLBACK(action_CrossHair),		FALSE },
+ 	{	"RectSelect",		NULL,					N_( "Rectangle Select" ),		NULL, 			NULL,	G_CALLBACK(action_RectSelect),		FALSE },
+ 	{	"Reconnect",		NULL,					N_( "Auto-Reconnect" ),			NULL, 			NULL,	G_CALLBACK(action_AutoReconnect), 	FALSE },
+ 	{	"Insert",			NULL,					N_( "Insert" ),					"Insert", 		NULL,	G_CALLBACK(action_Insert),		 	FALSE },
 
  };
 

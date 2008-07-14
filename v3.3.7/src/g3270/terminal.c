@@ -56,7 +56,6 @@
  static gint			sHeight				= 0;
  static int			blink_enabled		= 0;
 
- static guint 			last_keyval = 0;
  static GtkIMContext	*im;
 
  static PangoFontDescription	*font					= NULL;
@@ -155,24 +154,19 @@
  static int lHeight = -1;
  static int lFont = -1;
 
- static void configure(GtkWidget *widget, GdkEventConfigure *event, void *t)
+ static void ResizeTerminal(GtkWidget *widget, gint width, gint height)
  {
- 	int 		f;
+	int 		f;
 	int 		left	= left_margin;
 	int 		top		= top_margin;;
 	GdkPixmap	*pix;
 	GdkGC		*gc;
 
-    if(!widget->window)
+	if(lWidth == width && lHeight == height && lFont > 0)
 		return;
 
-	if(lWidth == event->width && lHeight == event->height && lFont > 0)
-		return;
-
-	lWidth = event->width;
-	lHeight = event->height;
-
-    Trace("Configuring %p with %dx%d (Window: %p Realized: %d)",widget,event->width,event->height,widget->window,(int) GTK_WIDGET_REALIZED(widget));
+	lWidth = width;
+	lHeight = height;
 
 	if(lFont == -1)
 	{
@@ -188,7 +182,7 @@
 	}
 
 	/* Get the best font for the current window size */
-	for(f=0;f<MAX_FONT_SIZES && (fsize[f].height*(terminal_rows+1)) < event->height && (fsize[f].width*terminal_cols) < event->width;f++);
+	for(f=0;f<MAX_FONT_SIZES && (fsize[f].height*(terminal_rows+1)) < height && (fsize[f].width*terminal_cols) < width;f++);
 
 	if(f >= MAX_FONT_SIZES)
 		f = (MAX_FONT_SIZES-1);
@@ -212,11 +206,11 @@
 	}
 
 	/* Center image */
-	left_margin = (event->width >> 1) - ((terminal_cols * fsize[f].width) >> 1);
+	left_margin = (width >> 1) - ((terminal_cols * fsize[f].width) >> 1);
 	if(left_margin < 0)
 		left_margin = 0;
 
-	top_margin = (event->height >> 1) - (((terminal_rows+1) * fsize[f].height) >> 1);
+	top_margin = (height >> 1) - (((terminal_rows+1) * fsize[f].height) >> 1);
 	if(top_margin < 0)
 		top_margin = 0;
 
@@ -225,11 +219,11 @@
 		return;
 
 	/* Font size hasn't changed, rebuild pixmap using the saved image */
-	pix = gdk_pixmap_new(widget->window,event->width,event->height,-1);
+	pix = gdk_pixmap_new(widget->window,width,height,-1);
 	gc = gdk_gc_new(pix);
 
 	gdk_gc_set_foreground(gc,color);
-	gdk_draw_rectangle(pix,gc,1,0,0,event->width,event->height);
+	gdk_draw_rectangle(pix,gc,1,0,0,width,height);
 
 	gdk_draw_drawable(pix,gc,pixmap,
 								left,top,
@@ -244,6 +238,12 @@
 	RedrawCursor();
  }
 
+ static void configure(GtkWidget *widget, GdkEventConfigure *event, void *t)
+ {
+    if(widget->window)
+		ResizeTerminal(widget,event->width,event->height);
+ }
+
  static void destroy( GtkWidget *widget, gpointer data)
  {
 	if(pixmap)
@@ -255,12 +255,19 @@
 
  static void realize(GtkWidget *widget, void *t)
  {
+ 	int width, height;
+
     Trace("Realizing %p",widget);
 
 	// Configure im context
     gtk_im_context_set_client_window(im,widget->window);
     gdk_window_set_cursor(widget->window,wCursor[0]);
     LoadImages(widget->window, widget->style->fg_gc[GTK_WIDGET_STATE(widget)]);
+
+	gdk_drawable_get_size(widget->window,&width,&height);
+
+	ResizeTerminal(widget, width, height);
+
  }
 
  static gboolean focus_in(GtkWidget *widget, GdkEventFocus *event, gpointer x)
@@ -290,9 +297,6 @@
 	if(gtk_im_context_filter_keypress(im,event))
 		return TRUE;
 
-	// Guarda tecla pressionada
-	last_keyval = event->keyval;
-
 	return FALSE;
  }
 
@@ -309,7 +313,7 @@
 		return TRUE;
 	}
 
-	return 0;
+	return FALSE;
  }
 
  int LoadColors(void)
@@ -405,6 +409,14 @@
 	gtk_widget_queue_draw(terminal);
  }
 
+
+ static void size_allocate(GtkWidget *widget, GtkAllocation *allocation, gpointer user_data)
+ {
+ 	Trace("Terminal changes to %dx%d pixels",allocation->width,allocation->height);
+    if(widget->window)
+		ResizeTerminal(widget,allocation->width,allocation->height);
+ }
+
  GtkWidget *CreateTerminalWindow(void)
  {
 	memset(fsize,0,MAX_FONT_SIZES * sizeof(FONTSIZE));
@@ -413,9 +425,11 @@
 
 	im = gtk_im_context_simple_new();
 
-	terminal = gtk_drawing_area_new();
-	g_signal_connect(G_OBJECT(terminal), "destroy", G_CALLBACK(destroy), NULL);
+	terminal = gtk_event_box_new();
+	gtk_widget_set_app_paintable(terminal,TRUE);
+	gtk_widget_set_redraw_on_allocate(terminal,TRUE);
 
+	g_signal_connect(G_OBJECT(terminal), "destroy", G_CALLBACK(destroy), NULL);
 
 	// Configure terminal widget
     GTK_WIDGET_SET_FLAGS(terminal, GTK_CAN_DEFAULT|GTK_CAN_FOCUS);
@@ -425,6 +439,7 @@
 
     g_signal_connect(G_OBJECT(terminal),	"expose_event",  		G_CALLBACK(expose),					0);
     g_signal_connect(G_OBJECT(terminal),	"configure-event",		G_CALLBACK(configure),				0);
+    g_signal_connect(G_OBJECT(terminal),	"size-allocate",		G_CALLBACK(size_allocate),			0);
     g_signal_connect(G_OBJECT(terminal),	"key-press-event",		G_CALLBACK(key_press),				0);
     g_signal_connect(G_OBJECT(terminal),	"key-release-event",	G_CALLBACK(key_release),			0);
     g_signal_connect(G_OBJECT(terminal),	"realize",				G_CALLBACK(realize),				0);
@@ -470,7 +485,7 @@
 
 	layout = gtk_widget_create_pango_layout(terminal,"4");
 
-	sprintf(buffer,"%03d/%03d",cRow,cCol);
+	sprintf(buffer,"%03d/%03d",cRow+1,cCol+1);
 	pango_layout_set_text(layout,buffer,-1);
 
 	gdk_draw_layout_with_colors(pixmap,gc,
@@ -516,6 +531,7 @@
 
 	Trace("Moving cursor to %d,%d",row,col);
 
+	gtk_im_context_reset(im);
 	InvalidateCursor();
 
 	cCol			= col;
@@ -539,6 +555,7 @@
 	cursor.height 	= (fHeight >> 2)+1;
 
 	// Mark to redraw
+	gtk_im_context_set_cursor_location(im,&cursor);
 	InvalidateCursor();
  }
 

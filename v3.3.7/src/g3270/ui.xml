@@ -12,6 +12,7 @@
 			<menuitem action='Append'/>
 			<menuitem action='Paste'/>
 			<menuitem action='PasteNext'/>
+			<menuitem action='SelectRight'/>
 			<separator/>
 			<menuitem action='SelectAll'/>
 			<menuitem action='Clear'/>
@@ -62,6 +63,7 @@
 		<menuitem action='Quit'/>
 
 	</popup>
+
 	<popup action='DefaultPopup'>
 		<menuitem action='Paste'/>
 		<menuitem action='PasteNext'/>
@@ -73,4 +75,8 @@
 		<menuitem action='Quit'/>
 
 	</popup>
+
+	<accelerator action='Insert' />
+	<accelerator action='Home'/>
+
 </ui>
