@@ -293,6 +293,7 @@
 						);
  }
 
+/*
 static const char *ui_mainwindow_ui_desc =
 "<ui>"
 "	<menubar name='MainMenubar'>"
@@ -370,6 +371,7 @@ static const char *ui_mainwindow_ui_desc =
 
 "	</popup>"
 "</ui>";
+*/
 
 /*
 	The name of the action.
@@ -382,6 +384,7 @@ static const char *ui_mainwindow_ui_desc =
 	http://library.gnome.org/devel/gtk/stable/gtk-Stock-Items.html
 
  */
+
  static const GtkActionEntry internal_action_entries[] =
  {
  	/* Top menus */
@@ -443,6 +446,7 @@ static const char *ui_mainwindow_ui_desc =
 	GtkUIManager 	*ui_manager = gtk_ui_manager_new(); // http://library.gnome.org/devel/gtk/stable/GtkUIManager.html
 	GtkActionGroup	*actions;
 	GError			*error = NULL;
+	gchar			*ui;
 
 	actions = gtk_action_group_new("InternalActions");
 	gtk_action_group_set_translation_domain(actions, GETTEXT_PACKAGE);
@@ -452,9 +456,21 @@ static const char *ui_mainwindow_ui_desc =
 
 	gtk_ui_manager_insert_action_group(ui_manager,actions, 0);
 
-	if(!gtk_ui_manager_add_ui_from_string(ui_manager, ui_mainwindow_ui_desc, -1, &error))
-		g_error( _( "Building menus failed: %s" ), error->message);
+	ui = FindSystemConfigFile("ui.xml");
+	if(ui)
+	{
+		Log("Loading interface from %s",ui);
+		if(!gtk_ui_manager_add_ui_from_file(ui_manager,ui,&error))
+		{
+			if(error)
+				g_error( _( "Building menus from %s failed: %s" ),ui,error->message);
+			else
+				g_error( _( "Building menus from %s failed!" ),ui);
+		}
+		g_free(ui);
+	}
 
+	gtk_ui_manager_ensure_update(ui_manager);
 	return ui_manager;
  }
 
