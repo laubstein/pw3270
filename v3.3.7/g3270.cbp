@@ -73,6 +73,7 @@
 		<Unit filename="src/g3270/topwindow.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/g3270/ui.xml" />
 		<Unit filename="src/include/X11/keysym.h" />
 		<Unit filename="src/include/globals.h" />
 		<Unit filename="src/include/lib3270/actionsc.h" />

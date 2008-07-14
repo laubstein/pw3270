@@ -148,6 +148,7 @@
 	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el);
 	void			UpdateKeyboardState(guint state);
 	int				PrintText(const char *name, gchar *text);
+	gchar 			*FindSystemConfigFile(const gchar *name);
 
 
 
