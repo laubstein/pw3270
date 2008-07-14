@@ -40,7 +40,7 @@
 
     time(&ltime);
     strftime(wrk, 39, "%d/%m/%Y %H:%M:%S", localtime(&ltime));
-    fprintf(out,"%s %s\t",wrk,module);
+    fprintf(out,"%s %-8s\t",wrk,module);
  }
 
  static FILE *prefix(const char *module)

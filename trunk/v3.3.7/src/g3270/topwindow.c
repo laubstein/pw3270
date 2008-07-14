@@ -25,6 +25,7 @@
 */
 
  #include "g3270.h"
+ #include "config.h"
  #include <lib3270/toggle.h>
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
@@ -72,8 +73,20 @@
  	GtkWidget		*vbox;
  	int				f;
 	GtkUIManager	*ui_manager;
+	gchar			*file;
+	GdkPixbuf		*pix;
 
 	topwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+	file = FindSystemConfigFile(PACKAGE_NAME ".jpg");
+	Trace("Icon: %s",file);
+	if(file)
+	{
+		pix = gdk_pixbuf_new_from_file(file, NULL);
+		Trace("%s: %p",file,pix);
+		gtk_window_set_icon(GTK_WINDOW(topwindow),pix);
+		g_free(file);
+	}
 
 	for(f=0;f<CURSOR_MODE_USER;f++)
 		wCursor[f] = gdk_cursor_new(cr[f]);
