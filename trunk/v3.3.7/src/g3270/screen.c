@@ -797,17 +797,28 @@
 	*buffer = 0;
 	for(row = 0; row < terminal_rows;row++)
 	{
+		gchar		line[terminal_cols*MAX_CHR_LENGTH];
+		gboolean 	sel = FALSE;
+
+		*line = 0;
 		for(col = 0; col < terminal_cols;col++)
 		{
 			if(all || screen[pos].selected)
-				g_strlcat(buffer,*screen[pos].ch ? screen[pos].ch : " ",max);
+			{
+				sel = TRUE;
+				g_strlcat(line,*screen[pos].ch ? screen[pos].ch : " ",max);
+			}
 			pos++;
 		}
-		if(*buffer)
+		if(sel)
+		{
+			g_strlcat(buffer,g_strchomp(line),max);
 			g_strlcat(buffer,"\n",max);
+		}
 
 	}
 
+	g_strchomp(buffer);
 	return g_realloc(buffer,strlen(buffer)+1);
  }
 

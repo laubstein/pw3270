@@ -1,5 +1,6 @@
 <ui>
 	<menubar name='MainMenubar'>
+
 		<menu action='FileMenu'>
 			<menuitem action='PrintScreen'/>
 			<menuitem action='PrintSelected'/>
@@ -7,23 +8,26 @@
 			<separator/>
 			<menuitem action='Quit'/>
 		</menu>
+
 		<menu action='EditMenu'>
 			<menuitem action='Copy'/>
 			<menuitem action='Append'/>
 			<menuitem action='Paste'/>
 			<menuitem action='PasteNext'/>
-			<menuitem action='SelectRight'/>
 			<separator/>
-			<menuitem action='SelectAll'/>
 			<menuitem action='Clear'/>
 			<separator/>
+			<menuitem action='SelectAll'/>
+			<menuitem action='SelectField'/>
 			<menuitem action='Unselect'/>
 			<menuitem action='Reselect'/>
 		</menu>
+
 		<menu action='NetworkMenu'>
 			<menuitem action='Connect' />
 			<menuitem action='Disconnect' />
 		</menu>
+
 		<menu action='OptionsMenu'>
 			<menuitem action='CursorBlink' />
 			<menuitem action='CursorPos'  />
@@ -33,10 +37,13 @@
 			<menuitem action='RectSelect'  />
 			<menuitem action='Reconnect'  />
 		</menu>
+
 		<menu action='HelpMenu'>
 			<menuitem action='About' />
 		</menu>
+
 	</menubar>
+
 	<toolbar action='MainToolbar'>
 		<toolitem name='SelectAll' action='SelectAll' />
 		<toolitem name='Copy' action='Copy' />
@@ -49,6 +56,7 @@
 		<toolitem name='PrintScreen' action='PrintScreen' />
 		<toolitem name='Quit' action='Quit' />
 	</toolbar>
+
 	<popup action='SelectionPopup'>
 		<menuitem action='Copy'/>
 		<menuitem action='Append'/>
@@ -61,7 +69,6 @@
 
 		<separator/>
 		<menuitem action='Quit'/>
-
 	</popup>
 
 	<popup action='DefaultPopup'>
@@ -73,10 +80,19 @@
 
 		<separator/>
 		<menuitem action='Quit'/>
-
 	</popup>
 
 	<accelerator action='Insert' />
 	<accelerator action='Home'/>
+	<accelerator action='Reset'/>
+	<accelerator action='Return'/>
+	<accelerator action='Escape' />
+	<accelerator action='DeleteWord'/>
+	<accelerator action='DeleteField' />
+	<accelerator action='Delete' />
+	<accelerator action='Erase' />
+	<accelerator action='EraseEOF' />
+	<accelerator action='PageUP' />
+	<accelerator action='PageDown' />
 
 </ui>

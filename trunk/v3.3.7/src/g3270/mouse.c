@@ -38,20 +38,22 @@
 										row = ( (((unsigned long) event->y) - top_margin)/fHeight );
 
 
- enum _SELECTING_MODE
+ enum _SELECT_MODE
  {
-	SELECTING_NONE,
-	SELECTING_NORMAL,
-	SELECTING_RECTANGLE,
-	SELECTING_FIELD,
+	SELECT_MODE_NONE,
+	SELECT_MODE_TEXT,
+	SELECT_MODE_RECTANGLE,
+	SELECT_MODE_FIELD,
+	SELECT_MODE_COPY,
+	SELECT_MODE_APPEND,
 
-
-	SELECTING_INVALID
+	SELECT_INVALID
  };
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
  static void UpdateSelectedRegion(int start, int end);
+ static void SelectField(int row, int col);
 
 /*---[ Constants ]------------------------------------------------------------*/
 
@@ -61,7 +63,7 @@
  static int startCol 	= 0;
  static int endRow 	= 0;
  static int endCol		= 0;
- static int mode		= SELECTING_NONE;
+ static int mode		= SELECT_MODE_NONE;
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
@@ -90,9 +92,38 @@
 
  	return ret;
  }
- static void SelectField(void)
+
+ void action_SelectField(void)
  {
- 	int baddr = find_field_attribute((startRow * terminal_cols) + startCol);
+ 	int 		pos;
+ 	gboolean	redraw	= FALSE;
+
+	if(!screen)
+		return;
+
+	for(pos = 0; pos < (terminal_rows * terminal_cols);pos++)
+	{
+		if(screen[pos].selected)
+		{
+			redraw = TRUE;
+			screen[pos].selected = FALSE;
+		}
+	}
+
+	SelectField(cRow,cCol);
+
+	if(redraw && terminal && pixmap)
+	{
+		DrawScreen(terminal,color,pixmap);
+		DrawOIA(terminal,color,pixmap);
+		gtk_widget_queue_draw(terminal);
+	}
+
+ }
+
+ static void SelectField(int row, int col)
+ {
+ 	int baddr = find_field_attribute((row * terminal_cols) + col);
  	int length = find_field_length(baddr);
  	int function;
 
@@ -111,21 +142,35 @@
 		return;
 	}
 
+	startRow = (baddr+1) / terminal_cols;
+	startCol = (baddr+1) % terminal_cols;
+
 	UpdateSelectedRegion(baddr+1,baddr+length);
+
+	baddr += length;
+	endRow = baddr / terminal_cols;
+	endCol = baddr % terminal_cols;
 
  }
 
  static void SetSelection(gboolean selected)
  {
- 	int pos;
+ 	int 		pos;
+ 	gboolean	redraw	= FALSE;
 
 	if(!screen)
 		return;
 
 	for(pos = 0; pos < (terminal_rows * terminal_cols);pos++)
-		screen[pos].selected = selected;
+	{
+		if(screen[pos].selected != selected)
+		{
+			redraw = TRUE;
+			screen[pos].selected = selected;
+		}
+	}
 
-	if(terminal && pixmap)
+	if(redraw && terminal && pixmap)
 	{
 		DrawScreen(terminal,color,pixmap);
 		DrawOIA(terminal,color,pixmap);
@@ -133,27 +178,34 @@
 	}
  }
 
+ #define BUTTON_FLAG_COMBO	0x80
+
+ static gint button_flags = 0;
+
  gboolean mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
 	// http://library.gnome.org/devel/gdk/stable/gdk-Event-Structures.html#GdkEventButton
 	GtkWidget *w;
 
-	switch( ((event->type & 0x0F) << 4) | (event->button & 0x0F))
+	Trace("Button press: %d",event->button);
+
+	switch( ((event->type & 0x0F) << 4) | (event->button & 0x0F) | button_flags)
 	{
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 1:
-		ClearSelection();
+		button_flags |= BUTTON_FLAG_COMBO;
+		action_ClearSelection();
 		DecodePosition(event,startRow,startCol);
 		Trace("Button 1 clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
 		break;
 
-	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1:
+	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1 | BUTTON_FLAG_COMBO:
 		DecodePosition(event,startRow,startCol);
-		mode = SELECTING_FIELD;
+		mode = SELECT_MODE_FIELD;
 		Trace("Button 1 double-clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
 		break;
 
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3:
-		w = (mode == SELECTING_NONE) ? DefaultPopup : SelectionPopup;
+		w = (mode == SELECT_MODE_NONE) ? DefaultPopup : SelectionPopup;
 		Trace("Button 2 clicked at %ld,%ld Menu: %p",(long) event->x, (long) event->y, w);
 		if(w)
 		{
@@ -166,9 +218,20 @@
 		Trace("Button 2 double-clicked at %ld,%ld",(long) event->x, (long) event->y);
 		break;
 
+	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 3 | BUTTON_FLAG_COMBO:
+		Trace("Button 2 double-clicked in combo mode at %ld,%ld",(long) event->x, (long) event->y);
+		mode = SELECT_MODE_APPEND;
+		break;
+
+	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3 | BUTTON_FLAG_COMBO:
+		Trace("Button 2 clicked in combo mode at %ld,%ld",(long) event->x, (long) event->y);
+		mode = SELECT_MODE_COPY;
+		break;
+
+#ifdef DEBUG
 	default:
-		Trace("Unexpected mouse click %d with button %d",event->type, event->button);
- 		return 0;
+		Trace("Unexpected mouse click %d with button %d flag: %d",event->type, event->button,button_flags);
+#endif
 	}
 
  	return 0;
@@ -182,19 +245,36 @@
 
 	Trace("Button %d release",event->button);
 
- 	switch(mode)
+	switch( ((mode & 0x0F) << 4) | (event->button & 0x0F))
  	{
-	case SELECTING_NONE:	// Single click, just move cursor
-		ClearSelection();
+	case ((SELECT_MODE_NONE & 0x0F) << 4) | 1: // Single click, just move cursor
+		action_ClearSelection();
 		cursor_move((row*terminal_cols)+col);
 		break;
 
-	case SELECTING_FIELD:	// Double click, select field
+	case ((SELECT_MODE_FIELD & 0x0F) << 4) | 1:	// Double click, select field
 		Trace("Selecting field (button: %d)",event->button);
-		SelectField();
+		SelectField(startRow,startCol);
 		break;
 
+	case ((SELECT_MODE_COPY & 0x0F) << 4) | 1:
+		action_Copy();
+		action_ClearSelection();
+		break;
+
+	case ((SELECT_MODE_APPEND & 0x0F) << 4) | 1:
+		action_Append();
+		action_ClearSelection();
+		break;
+
+#ifdef DEBUG
+	default:
+		Trace("Unexpected action %04x",((mode & 0x0F) << 4) | (event->button & 0x0F));
+#endif
  	}
+
+	if(event->button == 1)
+		button_flags &= ~BUTTON_FLAG_COMBO;
 
     return 0;
  }
@@ -330,13 +410,13 @@
 
  void set_rectangle_select(int value, int reason)
  {
- 	if(mode != SELECTING_RECTANGLE && mode != SELECTING_NORMAL)
+ 	if(mode != SELECT_MODE_RECTANGLE && mode != SELECT_MODE_TEXT)
 		return;
 
-	ClearSelection();
-	mode = value ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+	action_ClearSelection();
+	mode = value ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
 
-	if(mode == SELECTING_NORMAL)
+	if(mode == SELECT_MODE_TEXT)
 		UpdateSelectedText();
 	else
 		UpdateSelectedRectangle();
@@ -344,8 +424,8 @@
 
  void Reselect(void)
  {
-	mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
-	if(mode == SELECTING_NORMAL)
+	mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
+	if(mode == SELECT_MODE_TEXT)
 		UpdateSelectedText();
 	else
 		UpdateSelectedRectangle();
@@ -355,16 +435,16 @@
  {
  	switch(mode)
  	{
-	case SELECTING_NONE:	// Starting selection
-		mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+	case SELECT_MODE_NONE:	// Starting selection
+		mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
 		return mouse_motion(widget,event,user_data); // Recursive call to update selection box
 
-	case SELECTING_RECTANGLE:
+	case SELECT_MODE_RECTANGLE:
 		DecodePosition(event,endRow,endCol);
 		UpdateSelectedRectangle();
 		break;
 
-	case SELECTING_NORMAL:
+	case SELECT_MODE_TEXT:
 		DecodePosition(event,endRow,endCol);
 		UpdateSelectedText();
 		break;
@@ -387,26 +467,23 @@
  	return 0;
  }
 
- void ClearSelection(void)
+ void action_ClearSelection(void)
  {
- 	if(mode)
- 	{
-		SetSelection(FALSE);
-		mode = SELECTING_NONE;
- 	}
+	SetSelection(FALSE);
+	mode = SELECT_MODE_NONE;
  }
 
  void action_SelectAll(GtkWidget *w, gpointer user_data)
  {
  	SetSelection(TRUE);
-	mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+	mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
  }
 
  void action_SelectLeft(GtkWidget *w, gpointer user_data)
  {
- 	if(mode == SELECTING_NONE)
+ 	if(mode == SELECT_MODE_NONE)
  	{
- 		mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+ 		mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}
@@ -420,9 +497,9 @@
 
  void action_SelectUp(GtkWidget *w, gpointer user_data)
  {
- 	if(mode == SELECTING_NONE)
+ 	if(mode == SELECT_MODE_NONE)
  	{
- 		mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+ 		mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}
@@ -436,9 +513,9 @@
 
  void action_SelectRight(GtkWidget *w, gpointer user_data)
  {
- 	if(mode == SELECTING_NONE)
+ 	if(mode == SELECT_MODE_NONE)
  	{
- 		mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+ 		mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}
@@ -452,9 +529,9 @@
 
  void action_SelectDown(GtkWidget *w, gpointer user_data)
  {
- 	if(mode == SELECTING_NONE)
+ 	if(mode == SELECT_MODE_NONE)
  	{
- 		mode = Toggled(RECTANGLE_SELECT) ? SELECTING_RECTANGLE : SELECTING_NORMAL;
+ 		mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}

@@ -92,11 +92,6 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
- static void action_lib3270(GtkWidget *w, XtActionProc proc)
- {
- 	action_internal(proc,IA_DEFAULT,CN,CN);
- }
-
  static void action_pf(GtkWidget *w, gpointer id)
  {
 	action_internal(PF_action, IA_DEFAULT, id, CN);
@@ -120,31 +115,31 @@
 
  void action_Clear(GtkWidget *w, gpointer user_data)
  {
- 	ClearSelection();
+ 	action_ClearSelection();
  	action_internal(EraseInput_action, IA_DEFAULT, CN, CN);
  }
 
  void action_Up(GtkWidget *w, gpointer user_data)
  {
-  	ClearSelection();
+  	action_ClearSelection();
 	action_internal(Up_action, IA_DEFAULT, CN, CN);
  }
 
  void action_Down(GtkWidget *w, gpointer user_data)
  {
- 	ClearSelection();
+ 	action_ClearSelection();
  	action_internal(Down_action, IA_DEFAULT, CN, CN);
  }
 
  void action_Left(GtkWidget *w, gpointer user_data)
  {
- 	ClearSelection();
+ 	action_ClearSelection();
  	action_internal(Left_action, IA_DEFAULT, CN, CN);
  }
 
  void action_Right(GtkWidget *w, gpointer user_data)
  {
- 	ClearSelection();
+ 	action_ClearSelection();
  	action_internal(Right_action, IA_DEFAULT, CN, CN);
  }
 
@@ -160,105 +155,49 @@
 
  void action_Reset(GtkWidget *w, gpointer user_data)
  {
- 	ClearSelection();
+ 	action_ClearSelection();
  	action_internal(Reset_action, IA_DEFAULT, CN, CN);
  }
 
  void action_Enter(GtkWidget *w, gpointer user_data)
  {
- 	ClearSelection();
+ 	action_ClearSelection();
  	action_internal(Enter_action, IA_DEFAULT, CN, CN);
  }
 
- void action_Insert(GtkWidget *w, gpointer user_data)
+ void action_Insert(void)
  {
  	action_internal(ToggleInsert_action, IA_DEFAULT, CN, CN);
  }
 
- void action_Home(GtkWidget *w, gpointer user_data)
+ void action_Home(void)
  {
  	action_internal(Home_action, IA_DEFAULT, CN, CN);
  }
 
- gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+ void action_DeleteWord(void)
  {
- 	// TODO (perry#2#): Put all keyboard actions as accelerators.
- 	static const struct WindowActions keyproc[] =
- 	{
-		G3270_ACTION( GDK_Return,			0,					action_Enter),
-		G3270_ACTION( GDK_KP_Enter,			0,					action_Enter),
+ 	action_internal(DeleteWord_action, IA_DEFAULT, CN, CN);
+ }
 
-        G3270_ACTION( GDK_KP_Left,			GDK_SHIFT_MASK,		action_SelectLeft),
-        G3270_ACTION( GDK_KP_Up,			GDK_SHIFT_MASK,		action_SelectUp),
-        G3270_ACTION( GDK_KP_Right,			GDK_SHIFT_MASK,		action_SelectRight),
-        G3270_ACTION( GDK_KP_Down,			GDK_SHIFT_MASK,		action_SelectDown),
+ void action_DeleteField(void)
+ {
+ 	action_internal(DeleteField_action, IA_DEFAULT, CN, CN);
+ }
 
-        G3270_ACTION( GDK_Left,				GDK_SHIFT_MASK,		action_SelectLeft),
-        G3270_ACTION( GDK_Up,				GDK_SHIFT_MASK,		action_SelectUp),
-        G3270_ACTION( GDK_Right,			GDK_SHIFT_MASK,		action_SelectRight),
-        G3270_ACTION( GDK_Down,				GDK_SHIFT_MASK,		action_SelectDown),
+ void action_Delete(void)
+ {
+ 	action_internal(Delete_action, IA_DEFAULT, CN, CN);
+ }
 
-		G3270_ACTION( GDK_Left,				0,					action_Left),
-		G3270_ACTION( GDK_Up,				0,					action_Up),
-		G3270_ACTION( GDK_Right,			0,					action_Right),
-		G3270_ACTION( GDK_Down,				0,					action_Down),
+ void action_BackSpace(void)
+ {
+ 	action_internal(Erase_action, IA_DEFAULT, CN, CN);
+ }
 
-		G3270_ACTION( GDK_KP_Left,			0,					action_Left),
-		G3270_ACTION( GDK_KP_Up,			0,					action_Up),
-		G3270_ACTION( GDK_KP_Right,			0,					action_Right),
-		G3270_ACTION( GDK_KP_Down,			0,					action_Down),
-
-		G3270_ACTION( GDK_ISO_Left_Tab,		0,					action_BackTab),
-		G3270_ACTION( GDK_Tab,				0,					action_Tab),
-		G3270_ACTION( GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab),
-
-		G3270_ACTION( GDK_r,				GDK_CONTROL_MASK,	action_Reset),
-		LIB3270_ACTION( GDK_w,				GDK_CONTROL_MASK,	DeleteWord_action),
-		LIB3270_ACTION( GDK_u,				GDK_CONTROL_MASK,	DeleteField_action),
-
-		G3270_ACTION( GDK_Escape,			0,					action_Reset),
-		G3270_ACTION( GDK_Escape,			0,					action_Reset),
-
-		LIB3270_ACTION( GDK_Delete,			0,					Delete_action),
-		LIB3270_ACTION( GDK_BackSpace,		0,					Erase_action),
-		LIB3270_ACTION( GDK_End,			0,					EraseEOF_action),
-		LIB3270_ACTION( GDK_Clear,			0,					EraseInput_action),
-		LIB3270_ACTION( GDK_3270_Reset,		0,					Reset_action),
-
-		G3270_ACTION( 	GDK_Page_Up,		0,					action_PageUP),
-		G3270_ACTION( 	GDK_Page_Down,		0,					action_PageDown),
-
-		PF_ACTION(		GDK_Page_Up,		GDK_SHIFT_MASK,		"23"),
-		PF_ACTION(		GDK_Page_Down,		GDK_SHIFT_MASK,		"24"),
-
- 	};
-
- 	int		f;
- 	char	buffer[10];
-
-	/* Is function key? */
-	if(IS_FUNCTION_KEY(event))
-    {
-        sprintf(buffer,"%d",(event->keyval - GDK_F1)+1);
-        action_internal(PF_action, IA_DEFAULT, buffer, CN);
-        return TRUE;
-    }
-
-	/* Check for accelerators */
-
-    /* Check for special keyproc actions */
-	for(f=0; f < (sizeof(keyproc)/sizeof(struct WindowActions));f++)
-	{
-		if(keyproc[f].keyval == event->keyval && (event->state & keyproc[f].state) == keyproc[f].state)
-		{
-			Trace("Key: %s\tAction: %s",keyproc[f].trace,keyproc[f].action_trace);
-			keyproc[f].callback(widget,keyproc[f].user_data);
-			return TRUE;
-		}
-	}
-
-
-	return FALSE;
+ void action_EraseEOF(void)
+ {
+ 	action_internal(EraseEOF_action, IA_DEFAULT, CN, CN);
  }
 
  static void action_CrossHair(GtkWidget *w, gpointer user_data)
@@ -373,7 +312,6 @@
 	http://library.gnome.org/devel/gtk/stable/gtk-Stock-Items.html
 
  */
-
  static const GtkActionEntry internal_action_entries[] =
  {
  	/* Top menus */
@@ -387,17 +325,17 @@
  	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	G_CALLBACK(action_About)			},
  	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(action_Connect)			},
  	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)		},
- 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),			"<Alt>Q",		NULL,	gtk_main_quit						},
+ 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),			NULL,			NULL,	gtk_main_quit						},
 
  	/* Edit actions */
  	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			NULL,			NULL,	G_CALLBACK(action_Copy)				},
  	{	"Append",			GTK_STOCK_ADD,			N_( "Add to copy" ),	NULL,			NULL,	G_CALLBACK(action_Append)			},
  	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),			NULL,			NULL,	G_CALLBACK(action_Paste)			},
  	{	"PasteNext",		NULL,					N_( "Paste _next" ),	NULL,			NULL,	G_CALLBACK(action_PasteNext)		},
- 	{	"Unselect",			NULL,					N_( "_Unselect" ),		NULL,			NULL,	G_CALLBACK(ClearSelection)			},
+ 	{	"Unselect",			NULL,					N_( "_Unselect" ),		NULL,			NULL,	G_CALLBACK(action_ClearSelection)	},
  	{	"Reselect",			NULL,					N_( "_Reselect" ),		NULL,			NULL,	G_CALLBACK(Reselect)				},
  	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),		"<Alt>A",		NULL,	G_CALLBACK(action_SelectAll)		},
- 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),	NULL,			NULL,	G_CALLBACK(action_Clear)			},
+ 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),	"Clear",		NULL,	G_CALLBACK(action_Clear)			},
 
  	/* Printer actions */
 	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),			"Print",		NULL,	G_CALLBACK(action_PrintScreen)		},
@@ -409,6 +347,7 @@
 	{ 	"SelectLeft",		NULL,					N_( "Select Left" ),	"<Shift>Left",	NULL,	G_CALLBACK(action_SelectLeft)		},
 	{ 	"SelectUp",			NULL,					N_( "Select Up" ),		"<Shift>Up",	NULL,	G_CALLBACK(action_SelectUp)			},
 	{ 	"SelectDown",		NULL,					N_( "Select Down" ),	"<Shift>Down",	NULL,	G_CALLBACK(action_SelectDown)		},
+	{	"SelectField",		NULL,					N_( "Select Field" ),	"<Ctrl>f",		NULL,	G_CALLBACK(action_SelectField)		},
 
 	/* Cursor Movement */
 	{ 	"CursorRight",		GTK_STOCK_GO_FORWARD,	N_( "Right" ),			"Right",		NULL,	G_CALLBACK(action_Right)			},
@@ -420,7 +359,18 @@
 
 	/* Terminal Actions */
 	{ 	"Reset",			NULL,					N_( "Reset" ),			"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
+	{ 	"Escape",			NULL,					N_( "Escape" ),			"Escape",		NULL,	G_CALLBACK(action_Reset)			},
 	{ 	"Home",				NULL,					N_( "Home" ),			"Home",			NULL,	G_CALLBACK(action_Home)				},
+	{ 	"Return",			NULL,					N_( "Return" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
+	{	"DeleteWord",		NULL,					N_( "Delete Word" ),	"<Ctrl>w",		NULL,	G_CALLBACK(action_DeleteWord)		},
+	{	"DeleteField",		NULL,					N_( "Delete Field" ),	"<Ctrl>u",		NULL,	G_CALLBACK(action_DeleteField)		},
+	{	"Delete",			NULL,					N_( "Delete Char" ),	"Delete",		NULL,	G_CALLBACK(action_Delete)			},
+	{	"Erase",			NULL,					N_( "Backspace" ),		"BackSpace",	NULL,	G_CALLBACK(action_BackSpace)		},
+	{	"EraseEOF",			NULL,					N_( "EraseEOF" ),		"End",			NULL,	G_CALLBACK(action_EraseEOF)			},
+	{	"PageUP",			NULL,					N_( "Page-Up" ),		"Page_Up",		NULL,	G_CALLBACK(action_PageUP) 			},
+	{	"PageDown",			NULL,					N_( "Page-Down" ),		"Page_Down",	NULL,	G_CALLBACK(action_PageDown)			},
+
+
  };
 
 
@@ -469,15 +419,82 @@
 		Log("Loading interface from %s",ui);
 		if(!gtk_ui_manager_add_ui_from_file(ui_manager,ui,&error))
 		{
-			if(error)
-				g_error( _( "Building menus from %s failed: %s" ),ui,error->message);
+			if(error && error->message)
+				g_error( _( "Can't build Application UI: %s" ),error->message);
 			else
-				g_error( _( "Building menus from %s failed!" ),ui);
+				g_error( _( "Can't build Application UI!" ));
 		}
 		g_free(ui);
+	}
+	else
+	{
+		g_error( _( "Can't find UI definition file" ) );
 	}
 
 	gtk_ui_manager_ensure_update(ui_manager);
 	return ui_manager;
+ }
+
+ gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+ {
+ 	// TODO (perry#2#): Put all keyboard actions as accelerators.
+ 	static const struct WindowActions keyproc[] =
+ 	{
+        G3270_ACTION( GDK_KP_Left,			GDK_SHIFT_MASK,		action_SelectLeft),
+        G3270_ACTION( GDK_KP_Up,			GDK_SHIFT_MASK,		action_SelectUp),
+        G3270_ACTION( GDK_KP_Right,			GDK_SHIFT_MASK,		action_SelectRight),
+        G3270_ACTION( GDK_KP_Down,			GDK_SHIFT_MASK,		action_SelectDown),
+
+        G3270_ACTION( GDK_Left,				GDK_SHIFT_MASK,		action_SelectLeft),
+        G3270_ACTION( GDK_Up,				GDK_SHIFT_MASK,		action_SelectUp),
+        G3270_ACTION( GDK_Right,			GDK_SHIFT_MASK,		action_SelectRight),
+        G3270_ACTION( GDK_Down,				GDK_SHIFT_MASK,		action_SelectDown),
+
+		G3270_ACTION( GDK_Left,				0,					action_Left),
+		G3270_ACTION( GDK_Up,				0,					action_Up),
+		G3270_ACTION( GDK_Right,			0,					action_Right),
+		G3270_ACTION( GDK_Down,				0,					action_Down),
+
+		G3270_ACTION( GDK_KP_Left,			0,					action_Left),
+		G3270_ACTION( GDK_KP_Up,			0,					action_Up),
+		G3270_ACTION( GDK_KP_Right,			0,					action_Right),
+		G3270_ACTION( GDK_KP_Down,			0,					action_Down),
+
+		G3270_ACTION( GDK_ISO_Left_Tab,		0,					action_BackTab),
+		G3270_ACTION( GDK_Tab,				0,					action_Tab),
+		G3270_ACTION( GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab),
+
+//		G3270_ACTION( 	GDK_Page_Up,		0,					action_PageUP),
+//		G3270_ACTION( 	GDK_Page_Down,		0,					action_PageDown),
+
+		PF_ACTION(		GDK_Page_Up,		GDK_SHIFT_MASK,		"23"),
+		PF_ACTION(		GDK_Page_Down,		GDK_SHIFT_MASK,		"24"),
+
+ 	};
+
+ 	int		f;
+ 	char	buffer[10];
+
+	/* Is function key? */
+	if(IS_FUNCTION_KEY(event))
+    {
+        sprintf(buffer,"%d",(event->keyval - GDK_F1)+1);
+        action_internal(PF_action, IA_DEFAULT, buffer, CN);
+        return TRUE;
+    }
+
+    /* Check for special keyproc actions */
+	for(f=0; f < (sizeof(keyproc)/sizeof(struct WindowActions));f++)
+	{
+		if(keyproc[f].keyval == event->keyval && (event->state & keyproc[f].state) == keyproc[f].state)
+		{
+			Trace("Key: %s\tAction: %s",keyproc[f].trace,keyproc[f].action_trace);
+			keyproc[f].callback(widget,keyproc[f].user_data);
+			return TRUE;
+		}
+	}
+
+
+	return FALSE;
  }
 

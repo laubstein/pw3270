@@ -51,7 +51,7 @@
 	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,DEFAULT_CLIPBOARD),contents,-1);
  }
 
- void action_Copy(GtkWidget *w, gpointer user_data)
+ void action_Copy(void)
  {
  	if(contents)
 		g_free(contents);
@@ -59,14 +59,14 @@
 	setClipboardcontents();
  }
 
- void action_Append(GtkWidget *w, gpointer user_data)
+ void action_Append(void)
  {
  	gchar *sel;
  	gchar *last = contents;
 
  	if(!contents)
  	{
-		action_Copy(w,user_data);
+		action_Copy();
 		return;
  	}
 

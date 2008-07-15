@@ -123,7 +123,6 @@
 	void 		MoveCursor(int row, int col);
 	void 		InvalidateCursor(void);
 	void 		LoadImages(GdkDrawable *drawable, GdkGC *gc);
-	void		ClearSelection(void);
 	void 		Reselect(void);
 	void 		set_rectangle_select(int value, int reason);
 	void 		SetStatusCode(STATUS_CODE id);
@@ -141,13 +140,17 @@
 	void 		action_PageUP(GtkWidget *w, gpointer user_data);
 	void 		action_Paste(GtkWidget *w, gpointer user_data);
 	void 		action_PasteNext(GtkWidget *w, gpointer user_data);
-	void 		action_Append(GtkWidget *w, gpointer user_data);
-	void 		action_Copy(GtkWidget *w, gpointer user_data);
 	void 		action_SelectAll(GtkWidget *w, gpointer user_data);
 	void		action_SelectLeft(GtkWidget *w, gpointer user_data);
 	void		action_SelectUp(GtkWidget *w, gpointer user_data);
 	void		action_SelectRight(GtkWidget *w, gpointer user_data);
 	void		action_SelectDown(GtkWidget *w, gpointer user_data);
+
+	void 		action_Append(void);
+	void 		action_Copy(void);
+	void 		action_SelectField(void);
+	void		action_ClearSelection(void);
+
 
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
 	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el);
