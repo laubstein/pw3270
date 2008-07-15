@@ -459,7 +459,7 @@ next_unprotected(int baddr0)
  * size.
  */
 void
-ctlr_erase(Boolean alt)
+ctlr_erase(int alt)
 {
 	kybd_inhibit(False);
 

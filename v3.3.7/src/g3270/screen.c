@@ -79,7 +79,7 @@
  {
 	sizeof(struct lib3270_screen_callbacks),
 
-	NULL,			// void (*init)(void);
+	NULL,			// int (*init)(void);
 	error,			// void (*Error)(const char *s);
 	NULL,			// void (*Warning)(const char *s);
 	setsize,		// void (*setsize)(int rows, int cols);
@@ -233,9 +233,12 @@
 
 	}
 
-	// TODO (perry#1#): Get the correct colors
 	bg = (attr & 0xF0) >> 4;
-	fg = (attr & 0x0F);
+
+	if(attr & COLOR_ATTR_FIELD)
+		fg = (attr & 0x03)+TERMINAL_COLOR_FIELD;
+	else
+		fg = (attr & 0x0F);
 
 	// Get element entry in the buffer, update ONLY if changed
  	el = screen + pos;

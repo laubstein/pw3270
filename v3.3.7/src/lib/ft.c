@@ -1449,7 +1449,7 @@ ft_complete(const char *errmsg)
 
 		(void) gettimeofday(&t1, (struct timezone *)NULL);
 		kbytes_sec = (double)ft_length / 1024.0 /
-			((double)(t1.tv_sec - t0.tv_sec) + 
+			((double)(t1.tv_sec - t0.tv_sec) +
 			 (double)(t1.tv_usec - t0.tv_usec) / 1.0e6);
 		buf = Malloc(256);
 		(void) sprintf(buf, get_message("ftComplete"), ft_length,
@@ -1592,7 +1592,7 @@ enum ft_parm_name {
 	N_PARMS
 };
 
-void  
+void
 Transfer_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
@@ -1620,14 +1620,14 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 		return;
 	}
 
-#if defined(C3270) || defined(WC3270) /*[*/
-	/* Check for interactive mode. */
-	if (xnparams == 0 && escaped) {
-	    	if (interactive_transfer(&xparams, &xnparams) < 0) {
-		    	return;
-		}
-	}
-#endif /*]*/
+//#if defined(C3270) || defined(WC3270) /*[*/
+//	/* Check for interactive mode. */
+//	if (xnparams == 0 && escaped) {
+//	    	if (interactive_transfer(&xparams, &xnparams) < 0) {
+//		    	return;
+//		}
+//	}
+//#endif /*]*/
 
 	/* Set everything to the default. */
 	for (i = 0; i < N_PARMS; i++) {

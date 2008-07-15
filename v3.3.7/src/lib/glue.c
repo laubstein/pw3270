@@ -53,11 +53,15 @@
 #include "togglesc.h"
 #include "trace_dsc.h"
 #include "utilc.h"
+#include "idlec.h"
 
 #if defined(_WIN32) /*[*/
 #include "winversc.h"
 #include "windirsc.h"
 #endif /*]*/
+
+#include <lib3270/api.h>
+
 
 extern void usage(char *);
 
@@ -176,6 +180,30 @@ int parse_program_parameters(int argc, const char **argv)
 #endif /*]*/
 
 	return rc;
+}
+
+const char *lib3270_init(int *argc, const char **argv)
+{
+	const char *cl_hostname = CN;
+
+	*argc = parse_command_line(*argc, argv, &cl_hostname);
+
+	if (charset_init(appres.charset) != CS_OKAY) {
+		xs_warning("Cannot find charset \"%s\"", appres.charset);
+		(void) charset_init(CN);
+	}
+
+	action_init();
+	screen_init();
+	kybd_init();
+	idle_init();
+	keymap_init();
+	hostfile_init();
+	hostfile_init();
+	ansi_init();
+	sms_init();
+
+	return cl_hostname;
 }
 
 int parse_command_line(int argc, const char **argv, const char **cl_hostname)

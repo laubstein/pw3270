@@ -36,7 +36,6 @@ Boolean ctlr_any_data(void);
 void ctlr_bcopy(int baddr_from, int baddr_to, int count, int move_ea);
 void ctlr_changed(int bstart, int bend);
 void ctlr_clear(Boolean can_snap);
-void ctlr_erase(Boolean alt);
 void ctlr_erase_all_unprotected(void);
 void ctlr_init(unsigned cmask);
 void ctlr_read_buffer(unsigned char aid_byte);
