@@ -156,7 +156,7 @@
 			void (*move_cursor)(int row, int col);
 			void (*suspend)(void);
 			void (*resume)(void);
-			void (*reset)(int lock, const char *msg);
+			void (*reset)(int lock);
 			void (*status)(STATUS_CODE id);
 			void (*compose)(int on, unsigned char c, int keytype);
 			void (*cursor)(CURSOR_MODE mode);
