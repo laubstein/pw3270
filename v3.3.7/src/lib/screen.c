@@ -154,19 +154,16 @@ static CHAR_INFO *onscreen;	/* what's on the screen now */
 static CHAR_INFO *toscreen;	/* what's supposed to be on the screen */
 static int onscreen_valid = FALSE; /* is onscreen valid? */
 
-static int status_row = 0;	/* Row to display the status line on */
-static int status_skip = 0;	/* Row to blank above the status line */
+// static int status_row = 0;	/* Row to display the status line on */
+// static int status_skip = 0;	/* Row to blank above the status line */
 
-// static void kybd_input(void);
-// static void kybd_input2(INPUT_RECORD *ir);
-static void draw_oia(void);
 static void status_connect(Boolean ignored);
 static void status_3270_mode(Boolean ignored);
 static void status_printer(Boolean on);
 static int get_color_pair(int fg, int bg);
 static int color_from_fa(unsigned char fa);
-static void screen_init2(void);
-static void set_status_row(int screen_rows, int emulator_rows);
+// static void screen_init2(void);
+// static void set_status_row(int screen_rows, int emulator_rows);
 static Boolean ts_value(const char *s, enum ts *tsp);
 static int linedraw_to_acs(unsigned char c);
 static int apl_to_acs(unsigned char c);
@@ -380,38 +377,6 @@ addch(int c)
 	}
 }
 
-static void
-printw(char *fmt, ...)
-{
-	va_list ap;
-	char buf[1024];
-	char *s;
-
-	va_start(ap, fmt);
-	vsprintf(buf, fmt, ap);
-	for (s = buf; *s; s++) {
-		addch(*s);
-	}
-	va_end(ap);
-}
-
-static void
-mvprintw(int row, int col, char *fmt, ...)
-{
-	va_list ap;
-	char buf[1024];
-	char *s;
-
-	va_start(ap, fmt);
-	cur_row = row;
-	cur_col = col;
-	vsprintf(buf, fmt, ap);
-	for (s = buf; *s; s++) {
-		addch(*s);
-	}
-	va_end(ap);
-}
-
 static int
 ix(int row, int col)
 {
@@ -478,31 +443,6 @@ hdraw(int row, int lrow, int col, int lcol)
 	int xrow;
 	int rc;
 
-#if defined(DEBUG_SCREEN_DRAW) /*[*/
-	/*
-	 * Trace what we've been asked to draw.
-	 * Drawn areas are 'h', done areas are 'd'.
-	 */
-	{
-		int trow, tcol;
-
-		trace_event("hdraw row %d-%d col %d-%d attr 0x%x:\n",
-			row, lrow, col, lcol, tos_a(row, col));
-		for (trow = 0; trow < console_rows; trow++) {
-			for (tcol = 0; tcol < console_cols; tcol++) {
-				if (trow >= row && trow <= lrow &&
-				    tcol >= col && tcol <= lcol)
-					trace_event("h");
-				else if (is_done(trow, tcol))
-					trace_event("d");
-				else
-					trace_event(".");
-			}
-			trace_event("\n");
-		}
-	}
-#endif /*]*/
-
 	/* Write it. */
 	bufferSize.X = console_cols;
 	bufferSize.Y = console_rows;
@@ -550,31 +490,6 @@ draw_rect(int pc_start, int pc_end, int pr_start, int pr_end)
     	int a;
 	int ul_row, ul_col, xrow, xcol, lr_row, lr_col;
 
-#if defined(DEBUG_SCREEN_DRAW) /*[*/
-	/*
-	 * Trace what we've been asked to draw.
-	 * Modified areas are 'r', unmodified (excess) areas are 'x'.
-	 */
-	{
-		int trow, tcol;
-
-		trace_event("draw_rect row %d-%d col %d-%d\n",
-			pr_start, pr_end, pc_start, pc_end);
-		for (trow = 0; trow < console_rows; trow++) {
-			for (tcol = 0; tcol < console_cols; tcol++) {
-				if (trow >= pr_start && trow <= pr_end &&
-				    tcol >= pc_start && tcol <= pc_end) {
-					if (changed(trow, tcol))
-						trace_event("r");
-					else
-						trace_event("x");
-				} else
-					trace_event(".");
-			}
-			trace_event("\n");
-		}
-	}
-#endif /*]*/
 
 	for (ul_row = pr_start; ul_row <= pr_end; ul_row++) {
 	    	for (ul_col = pc_start; ul_col <= pc_end; ul_col++) {
@@ -641,26 +556,6 @@ sync_onscreen(void)
 	/* Clear out the 'what we've seen' array. */
     	none_done();
 
-#if defined(DEBUG_SCREEN_DRAW) /*[*/
-	/*
-	 * Trace what's been modified.
-	 * Modified areas are 'm'.
-	 */
-	{
-		int trow, tcol;
-
-		trace_event("sync_onscreen:\n");
-		for (trow = 0; trow < console_rows; trow++) {
-			for (tcol = 0; tcol < console_cols; tcol++) {
-				if (changed(trow, tcol))
-					trace_event("m");
-				else
-					trace_event(".");
-			}
-			trace_event("\n");
-		}
-	}
-#endif /*]*/
 
 	/* Sometimes you have to draw everything. */
 	if (!onscreen_valid) {
@@ -741,37 +636,6 @@ refresh(void)
 	}
 }
 
-/* Go back to the original screen. */
-static void
-endwin(void)
-{
-	/*
-	if (SetConsoleMode(chandle, ENABLE_ECHO_INPUT |
-				    ENABLE_LINE_INPUT |
-				    ENABLE_PROCESSED_INPUT) == 0) {
-		fprintf(stderr, "\nSetConsoleMode(CONIN$) failed: %s\n",
-			win32_strerror(GetLastError()));
-		x3270_exit(1);
-	}
-	*/
-
-	if (SetConsoleMode(cohandle, ENABLE_PROCESSED_OUTPUT |
-				     ENABLE_WRAP_AT_EOL_OUTPUT) == 0) {
-		fprintf(stderr, "\nSetConsoleMode(CONOUT$) failed: %s\n",
-			win32_strerror(GetLastError()));
-		x3270_exit(1);
-	}
-
-	/* Swap in the original buffer. */
-	if (SetConsoleActiveScreenBuffer(cohandle) == 0) {
-		fprintf(stderr, "\nSetConsoleActiveScreenBuffer failed: %s\n",
-			win32_strerror(GetLastError()));
-		x3270_exit(1);
-	}
-
-	screen_swapped = FALSE;
-}
-
 /* Initialize the screen. */
 void
 screen_init(void)
@@ -842,10 +706,6 @@ screen_init(void)
 	if(callbacks && callbacks->setsize)
 		callbacks->setsize(maxROWS,maxCOLS);
 
-	/* Figure out where the status line goes, if it fits. */
-	/* Start out in altscreen mode. */
-	set_status_row(console_rows, maxROWS);
-
 	/* Set up callbacks for state changes. */
 	register_schange(ST_CONNECT, status_connect);
 	register_schange(ST_3270_MODE, status_3270_mode);
@@ -883,44 +743,12 @@ screen_init(void)
 	if (appres.title != CN)
 		screen_title(appres.title);
 	else if (profile_name != CN)
-	    	screen_title(profile_name);
+		screen_title(profile_name);
 	else
-		screen_title("wc3270");
+		screen_title(NULL);
 
 	/* Finish screen initialization. */
-	screen_init2();
 	screen_suspend();
-}
-
-/* Secondary screen initialization. */
-static void
-screen_init2(void)
-{
-	/*
-	 * Finish initializing ncurses.  This should be the first time that it
-	 * will send anything to the terminal.
-	 */
-	/* nothing to do... */
-
-	escaped = False;
-
-	/* Subscribe to input events. */
-//	input_id = AddInput((int)chandle, kybd_input);
-}
-
-/* Calculate where the status line goes now. */
-static void
-set_status_row(int screen_rows, int emulator_rows)
-{
-	if (screen_rows < emulator_rows + 1) {
-		status_row = status_skip = 0;
-	} else if (screen_rows == emulator_rows + 1) {
-		status_skip = 0;
-		status_row = emulator_rows;
-	} else {
-		status_skip = screen_rows - 2;
-		status_row = screen_rows - 1;
-	}
 }
 
 /*
@@ -1190,40 +1018,11 @@ void screen_disp(void)
 
 	if (!screen_has_changes)
 	{
-		/* No changes on the main screen update isn't necessary */
-
-		/* Draw the status line. */
-		if (status_row)
-			draw_oia();
-
 		/* Move the cursor. */
 		if (flipped)
 			move(cursor_addr / cCOLS,cCOLS-1 - (cursor_addr % cCOLS));
 		else
 			move(cursor_addr / cCOLS, cursor_addr % cCOLS);
-
-		if (status_row)
-		{
-			refresh();
-		}
-		else
-		{
-			COORD coord;
-
-			coord.X = cur_col;
-			coord.Y = cur_row;
-			if (SetConsoleCursorPosition(sbuf, coord) == 0)
-			{
-				fprintf(stderr,
-				"\nscreen_disp: "
-				"SetConsoleCursorPosition(x=%d,y=%d) "
-				"failed: %s\n",
-				coord.X, coord.Y,
-				win32_strerror(GetLastError()));
-				x3270_exit(1);
-			}
-		}
-
 		return;
 	}
 
@@ -1308,8 +1107,6 @@ void screen_disp(void)
 			}
 		}
 	}
-	if (status_row)
-		draw_oia();
 	attrset(defattr);
 	if (flipped)
 		move(cursor_addr / cCOLS, cCOLS-1 - (cursor_addr % cCOLS));
@@ -1354,26 +1151,17 @@ void toggle_monocase(struct toggle *t unused, enum toggle_type tt unused)
 
 /* Status line stuff. */
 
-static Boolean status_ta = False;
-static Boolean status_rm = False;
 static Boolean status_im = False;
-static Boolean status_secure = False;
+// static Boolean status_secure = False;
 static Boolean oia_boxsolid = False;
 static Boolean oia_undera = True;
-static Boolean oia_compose = False;
-static Boolean oia_printer = False;
-static unsigned char oia_compose_char = 0;
-static enum keytype oia_compose_keytype = KT_STD;
-#define LUCNT	8
-static char oia_lu[LUCNT+1];
 
-static char *status_msg = "";
+// static char *status_msg = "";
 
 void
 status_ctlr_done(void)
 {
 	oia_undera = True;
-
 	if(callbacks && callbacks->set)
 		callbacks->set(OIA_FLAG_UNDERA,oia_undera);
 }
@@ -1389,11 +1177,8 @@ status_insert_mode(Boolean on)
 void
 status_minus(void)
 {
-	status_msg = "X -f";
-
 	if(callbacks && callbacks->status)
 		callbacks->status(STATUS_CODE_MINUS);
-
 }
 
 void
@@ -1405,15 +1190,12 @@ status_oerr(int error_type)
 	{
 	case KL_OERR_PROTECTED:
 		sts = STATUS_CODE_PROTECTED;
-		status_msg = "X Protected";
 		break;
 	case KL_OERR_NUMERIC:
 		sts = STATUS_CODE_NUMERIC;
-		status_msg = "X Numeric";
 		break;
 	case KL_OERR_OVERFLOW:
 		sts = STATUS_CODE_OVERFLOW;
-		status_msg = "X Overflow";
 		break;
 
 	default:
@@ -1454,19 +1236,16 @@ status_reset(void)
 {
 	if (kybdlock & KL_ENTER_INHIBIT)
 	{
-		status_msg = "X Inhibit";
 		if(callbacks && callbacks->status)
 			callbacks->status(STATUS_CODE_INHIBIT);
 	}
 	else if (kybdlock & KL_DEFERRED_UNLOCK)
 	{
-		status_msg = "X";
 		if(callbacks && callbacks->status)
 			callbacks->status(STATUS_CODE_X);
 	}
 	else
 	{
-		status_msg = "";
 		if(callbacks && callbacks->status)
 			callbacks->status(STATUS_CODE_BLANK);
 	}
@@ -1475,13 +1254,12 @@ status_reset(void)
 		screen_disp();
 
 	if(callbacks && callbacks->reset)
-		callbacks->reset(kybdlock, status_msg);
+		callbacks->reset(kybdlock);
 }
 
 void
 status_reverse_mode(Boolean on)
 {
-	status_rm = on;
 	if(callbacks && callbacks->set)
 		callbacks->set(OIA_FLAG_REVERSE,on);
 }
@@ -1489,8 +1267,6 @@ status_reverse_mode(Boolean on)
 void
 status_syswait(void)
 {
-	status_msg = "X SYSTEM";
-
 	if(callbacks && callbacks->status)
 		callbacks->status(STATUS_CODE_SYSWAIT);
 }
@@ -1499,8 +1275,6 @@ void
 status_twait(void)
 {
 	oia_undera = False;
-	status_msg = "X Wait";
-
 	if(callbacks && callbacks->status)
 		callbacks->status(STATUS_CODE_TWAIT);
 }
@@ -1508,7 +1282,6 @@ status_twait(void)
 void
 status_typeahead(Boolean on)
 {
-	status_ta = on;
 	if(callbacks && callbacks->set)
 		callbacks->set(OIA_FLAG_TYPEAHEAD,on);
 }
@@ -1516,10 +1289,6 @@ status_typeahead(Boolean on)
 void
 status_compose(Boolean on, unsigned char c, enum keytype keytype)
 {
-	oia_compose = on;
-	oia_compose_char = c;
-	oia_compose_keytype = keytype;
-
 	if(callbacks && callbacks->compose)
 		callbacks->compose(on,c,keytype);
 }
@@ -1529,12 +1298,6 @@ status_lu(const char *lu)
 {
 	if(callbacks && callbacks->lu)
 		callbacks->lu(lu);
-
-	if (lu != NULL) {
-		(void) strncpy(oia_lu, lu, LUCNT);
-		oia_lu[LUCNT] = '\0';
-	} else
-		(void) memset(oia_lu, '\0', sizeof(oia_lu));
 }
 
 static void
@@ -1549,17 +1312,11 @@ status_connect(Boolean connected)
 			callbacks->set(OIA_FLAG_BOXSOLID,oia_boxsolid);
 
 		if (kybdlock & KL_AWAITING_FIRST)
-		{
-			status_msg = "X";
 			id = STATUS_CODE_AWAITING_FIRST;
-		}
 		else
-		{
-			status_msg = "";
 			id = STATUS_CODE_CONNECTED;
-		}
+
 #if defined(HAVE_LIBSSL) /*[*/
-		status_secure = secure_connection;
 		if(callbacks && callbacks->set)
 			callbacks->set(OIA_FLAG_SECURE,secure_connection);
 #endif /*]*/
@@ -1570,9 +1327,6 @@ status_connect(Boolean connected)
 		if(callbacks && callbacks->set)
 			callbacks->set(OIA_FLAG_BOXSOLID,oia_boxsolid);
 
-		status_msg = "X Disconnected";
-
-		status_secure = False;
 		if(callbacks && callbacks->set)
 			callbacks->set(OIA_FLAG_SECURE,False);
 
@@ -1602,93 +1356,16 @@ status_3270_mode(Boolean ignored unused)
 static void
 status_printer(Boolean on)
 {
-	oia_printer = on;
 	if(callbacks && callbacks->set)
 		callbacks->set(OIA_FLAG_PRINTER,on);
 }
 
-static void
-draw_oia(void)
-{
-	int rmargin;
-
-	rmargin = maxCOLS - 1;
-
-	/* Make sure the status line region is filled in properly. */
-	if (appres.m3279) {
-		int i;
-
-		attrset(defattr);
-		if (status_skip) {
-			move(status_skip, 0);
-			for (i = 0; i < rmargin; i++) {
-				printw(" ");
-			}
-		}
-		move(status_row, 0);
-		for (i = 0; i < rmargin; i++) {
-			printw(" ");
-		}
-	}
-
-	if (appres.m3279)
-	    	attrset(BACKGROUND_INTENSITY);
-	else
-		attrset(reverse_colors(defattr));
-	mvprintw(status_row, 0, "4");
-	if (oia_undera)
-		printw("%c", IN_E? 'B': 'A');
-	else
-		printw(" ");
-	if (appres.m3279)
-	    	attrset(BACKGROUND_INTENSITY);
-	else
-		attrset(reverse_colors(defattr));
-	if (IN_ANSI)
-		printw("N");
-	else if (oia_boxsolid)
-		printw(" ");
-	else if (IN_SSCP)
-		printw("S");
-	else
-		printw("?");
-
-	attrset(FOREGROUND_INTENSITY);
-	mvprintw(status_row, 8, "%-11s", status_msg);
-	mvprintw(status_row, rmargin-36,
-	    "%c%c %c  %c%c%c",
-	    oia_compose? 'C': ' ',
-	    oia_compose? oia_compose_char: ' ',
-	    status_ta? 'T': ' ',
-	    status_rm? 'R': ' ',
-	    status_im? 'I': ' ',
-	    oia_printer? 'P': ' ');
-	if (status_secure) {
-	    	attrset(get_color_pair(COLOR_GREEN, COLOR_NEUTRAL_BLACK) |
-			FOREGROUND_INTENSITY);
-		printw("S");
-		attrset(FOREGROUND_INTENSITY);
-	} else
-	    	printw(" ");
-
-	mvprintw(status_row, rmargin-25, "%s", oia_lu);
-	mvprintw(status_row, rmargin-7,
-	    "%03d/%03d", cursor_addr/cCOLS + 1, cursor_addr%cCOLS + 1);
-}
-
 void Redraw_action(Widget w unused, XEvent *event unused, String *params unused, Cardinal *num_params unused)
 {
-	if (!escaped)
-	{
-		endwin();
-		refresh();
-	}
-
-	screen_disp();
-
 	if(callbacks && callbacks->redraw)
 		callbacks->redraw();
-
+	else
+		screen_disp();
 }
 
 void ring_bell(void)
@@ -1936,34 +1613,10 @@ check_aplmap(int codepage)
 	Free(r);
 }
 
-/*
- * Windows-specific Paste action, that takes advantage of the existing x3270
- * instrastructure for multi-line paste.
- */
 void
 Paste_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
-    	HGLOBAL hglb;
-	LPTSTR lptstr;
-
-    	action_debug(Paste_action, event, params, num_params);
-	if (check_usage(Paste_action, *num_params, 0, 0) < 0)
-	    	return;
-
-    	if (!IsClipboardFormatAvailable(CF_TEXT))
-		return;
-	if (!OpenClipboard(NULL))
-		return;
-	hglb = GetClipboardData(CF_TEXT);
-	if (hglb != NULL) {
-		lptstr = GlobalLock(hglb);
-		if (lptstr != NULL) {
-			emulate_input(lptstr, strlen(lptstr), True);
-			GlobalUnlock(hglb);
-		}
-	}
-	CloseClipboard();
 }
 
 /* Set the window title. */
@@ -1972,11 +1625,6 @@ screen_title(char *text)
 {
 	if(callbacks && callbacks->title)
 		callbacks->title(text);
-
-	if(text)
-		(void) SetConsoleTitle(text);
-	else
-		(void) SetConsoleTitle("wc3270");
 }
 
 void
@@ -2044,12 +1692,8 @@ void Error(const char *s)
 
 	if(callbacks && callbacks->Error)
 		callbacks->Error(s);
-
-#if defined(WC3270) /*[*/
-	x3270_exit(1);
-#else /*][*/
-	exit(1);
-#endif /*]*/
+	else
+		exit(1);
 }
 
 void Warning(const char *s)

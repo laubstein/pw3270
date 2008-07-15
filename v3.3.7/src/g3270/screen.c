@@ -71,6 +71,7 @@
  static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height, int Width);
  static void changed(int bstart, int bend);
  static void errorpopup(const char *msg);
+ static void error(const char *s);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -79,7 +80,7 @@
 	sizeof(struct lib3270_screen_callbacks),
 
 	NULL,			// void (*init)(void);
-	NULL,			// void (*Error)(const char *s);
+	error,			// void (*Error)(const char *s);
 	NULL,			// void (*Warning)(const char *s);
 	setsize,		// void (*setsize)(int rows, int cols);
 	addch,			// void (*addch)(int row, int col, int c, int attr);
@@ -91,7 +92,7 @@
 	MoveCursor,		// void (*move_cursor)(int row, int col);
 	suspend,		// void (*suspend)(void);
 	resume,			// void (*resume)(void);
-	NULL,			// void (*reset)(int lock, const char *msg);
+	NULL,			// void (*reset)(int lock);
 	SetStatusCode,	// void (*status)(STATUS_CODE id);
 	set_compose,	// void (*compose)(int on, unsigned char c, int keytype);
 	set_cursor,		// void (*cursor)(CURSOR_MODE mode);
@@ -835,4 +836,10 @@
 	gtk_dialog_run(GTK_DIALOG (dialog));
 	gtk_widget_destroy(dialog);
 
+ }
+
+ static void error(const char *s)
+ {
+ 	g_error("%s",s);
+ 	gtk_main_quit();
  }
