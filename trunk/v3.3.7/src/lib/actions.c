@@ -218,9 +218,9 @@ XtActionsRec all_actions[] = {
 #endif /*]*/
 	{ "PA",			PA_action },
 	{ "PF",			PF_action },
-#if defined(WC3270) /*[*/
-	{ "Paste",		Paste_action },
-#endif /*]*/
+// #if defined(WC3270) /*[*/
+//	{ "Paste",		Paste_action },
+// #endif /*]*/
 #if defined(X3270_SCRIPT) /*[*/
 	{ "PauseScript",	PauseScript_action },
 #endif /*]*/

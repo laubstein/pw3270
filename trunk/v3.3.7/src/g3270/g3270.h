@@ -1,27 +1,28 @@
 /*
- * Modifications and original code Copyright 1993, 1994, 1995, 1996,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Paul Mattes.
- * Original X11 Port Copyright 1990 by Jeff Sparkes.
- *   Permission to use, copy, modify, and distribute this software and its
- *   documentation for any purpose and without fee is hereby granted,
- *   provided that the above copyright notice appear in all copies and that
- *   both that copyright notice and this permission notice appear in
- *   supporting documentation.
- *
- * Copyright 1989 by Georgia Tech Research Corporation, Atlanta, GA 30332.
- *   All Rights Reserved.  GTRC hereby grants public use of this software.
- *   Derivative works based on this software must incorporate this copyright
- *   notice.
- *
- * c3270 and wc3270 are distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the file LICENSE for more details.
- */
-
-/*
- *	g3270.h
- *		g3270 external functions
- */
+* Copyright 2008, Banco do Brasil S.A.
+*
+* This file is part of g3270
+*
+* This program file is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation; version 3 of the License.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program in a file named COPYING; if not, write to the
+* Free Software Foundation, Inc.,
+* 51 Franklin Street, Fifth Floor,
+* Boston, MA 02110-1301 USA
+*
+* Authors:
+*
+* Perry Werneck<perry.werneck@gmail.com>
+*
+*/
 
 #ifndef G3270_H_INCLUDED
 
@@ -61,10 +62,12 @@
 		TERMINAL_COLOR_13,
 		TERMINAL_COLOR_14,
 		TERMINAL_COLOR_15,
+
 		TERMINAL_COLOR_FIELD_DEFAULT,
 		TERMINAL_COLOR_FIELD_INTENSIFIED,
 		TERMINAL_COLOR_FIELD_PROTECTED,
 		TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED,
+
 		TERMINAL_COLOR_CURSOR,
 		TERMINAL_COLOR_CROSS_HAIR,
 		TERMINAL_COLOR_OIA,
