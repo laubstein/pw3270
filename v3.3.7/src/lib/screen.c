@@ -54,40 +54,6 @@ extern char *profile_name;
 static const struct lib3270_screen_callbacks *callbacks = NULL;
 
 
-/*
-static int field_colors[4] = {
-	COLOR_GREEN,		// default
-	COLOR_RED,		// intensified
-	COLOR_BLUE,		// protected
-	COLOR_NEUTRAL_WHITE	// protected, intensified
-};
-*/
-/*
-static struct {
-	char *name;
-	int index;
-} host_color[] = {
-	{ "NeutralBlack",	COLOR_NEUTRAL_BLACK },
-	{ "Blue",		COLOR_BLUE },
-	{ "Red",		COLOR_RED },
-	{ "Pink",		COLOR_PINK },
-	{ "Green",		COLOR_GREEN },
-	{ "Turquoise",		COLOR_TURQUOISE },
-	{ "Yellow",		COLOR_YELLOW },
-	{ "NeutralWhite",	COLOR_NEUTRAL_WHITE },
-	{ "Black",		COLOR_BLACK },
-	{ "DeepBlue",		COLOR_DEEP_BLUE },
-	{ "Orange",		COLOR_ORANGE },
-	{ "Purple",		COLOR_PURPLE },
-	{ "PaleGreen",		COLOR_PALE_GREEN },
-	{ "PaleTurquoise",	COLOR_PALE_TURQUOISE },
-	{ "Grey",		COLOR_GREY },
-	{ "Gray",		COLOR_GREY }, // alias
-	{ "White",		COLOR_WHITE },
-	{ CN,			0 }
-};
-*/
-
 static int defattr = 0;
 // static unsigned long input_id;
 
@@ -107,22 +73,23 @@ static Boolean ts_value(const char *s, enum ts *tsp);
 static int linedraw_to_acs(unsigned char c);
 static int apl_to_acs(unsigned char c);
 static void relabel(Boolean ignored);
-static void check_aplmap(int codepage);
-//static void init_user_colors(void);
+// static void check_aplmap(int codepage);
 
 /* Try to set the console output character set. */
 void
 set_display_charset(char *dcs)
 {
+	/*
 	char *copy;
 	char *s;
 	char *cs;
 	int want_cp = 0;
-
+	*/
 
 	if(callbacks && callbacks->charset)
 		callbacks->charset(dcs);
 
+	/*
 	windows_cp = GetConsoleCP();
 
 	copy = strdup(dcs);
@@ -156,6 +123,7 @@ set_display_charset(char *dcs)
 	}
 
 	check_aplmap(windows_cp);
+	*/
 }
 
 /*
@@ -964,7 +932,7 @@ apl_to_acs(unsigned char c)
 	return r;
 }
 
-/* Read the aplMap.<windows-codepage> resource into aplmap[]. */
+/* Read the aplMap.<windows-codepage> resource into aplmap[]. */ /*
 static void
 check_aplmap(int codepage)
 {
@@ -990,12 +958,15 @@ check_aplmap(int codepage)
 	}
 	Free(r);
 }
+*/
 
+/*
 void
 Paste_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
 }
+*/
 
 /* Set the window title. */
 void
