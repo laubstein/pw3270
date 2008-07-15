@@ -24,12 +24,9 @@
 extern void ring_bell(void);
 extern void screen_132(void);
 extern void screen_80(void);
-extern void screen_disp(void);
 extern void screen_erase(void);
 extern void screen_init(void);
 extern void screen_flip(void);
-extern void screen_resume(void);
-extern void screen_suspend(void);
 extern FILE *start_pager(void);
 extern void toggle_monocase(struct toggle *t, enum toggle_type tt);
 extern Boolean screen_new_display_charsets(char *cslist, char *csname);

@@ -139,15 +139,21 @@
 			OIA_FLAG_USER
 		} OIA_FLAG;
 
+		#define COLOR_ATTR_NONE			0x0000
+		#define COLOR_ATTR_FIELD		0x0100
+		#define COLOR_ATTR_BLINK		0x0200
+		#define COLOR_ATTR_UNDERLINE	0x0400
+		#define COLOR_ATTR_INTENSIFY	0x0800
+
 		struct lib3270_screen_callbacks
 		{
 			unsigned short sz;
 
-			void (*init)(void);
+			int (*init)(void);
 			void (*Error)(const char *s);
 			void (*Warning)(const char *s);
 			void (*setsize)(int rows, int cols);
-			int  (*addch)(int row, int col, int c, unsigned short attr);
+			int	(*addch)(int row, int col, int c, unsigned short attr);
 			void (*charset)(char *dcs);
 			void (*title)(char *text);
 			void (*changed)(int bstart, int bend);
@@ -169,6 +175,7 @@
 		};
 
 		int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
+		const char *lib3270_init(int *argc, const char **argv);
 
 		int find_field_attribute(int baddr);
 		int find_field_length(int baddr);
@@ -180,5 +187,9 @@
 		void 	cursor_move(int baddr);
 		int 	CallAndWait(int(*callback)(void *), void *parm);
 
+		void 	ctlr_erase(int alt);
+		void 	screen_resume(void);
+		void 	screen_suspend(void);
+		void	screen_disp(void);
 
 #endif // LIB3270_H_INCLUDED

@@ -6,14 +6,14 @@
  *   both that copyright notice and this permission notice appear in
  *   supporting documentation.
  *
- * c3270 is distributed in the hope that it will be useful, but WITHOUT ANY
+ * lib3270 is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the file LICENSE for more details.
  */
 
 /*
  *	screen.c
- *		A Windows console-based 3270 Terminal Emulator
+ *		A callback based 3270 Terminal Emulator
  *		Screen drawing
  */
 
@@ -45,62 +45,24 @@
 #include <wincon.h>
 #include "winversc.h"
 
+
+#define get_color_pair(fg,bg) (((bg&0x0F) << 4) | (fg&0x0F))
+#define DEFCOLOR_MAP(f) ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
+
 extern char *profile_name;
 
 static const struct lib3270_screen_callbacks *callbacks = NULL;
 
-#define MAX_COLORS	16
-static int cmap_fg[MAX_COLORS] = {
-	0,						/* neutral black */
-	FOREGROUND_INTENSITY | FOREGROUND_BLUE,		/* blue */
-	FOREGROUND_INTENSITY | FOREGROUND_RED,		/* red */
-	FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE,
-							/* pink */
-	FOREGROUND_INTENSITY | FOREGROUND_GREEN,	/* green */
-	FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE,
-							/* turquoise */
-	FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_RED,
-							/* yellow */
-	FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
-	0,						/* black */
-	FOREGROUND_BLUE,				/* deep blue */
-	FOREGROUND_INTENSITY | FOREGROUND_RED,		/* orange */
-	FOREGROUND_RED | FOREGROUND_BLUE,		/* purple */
-	FOREGROUND_GREEN,				/* pale green */
-	FOREGROUND_GREEN | FOREGROUND_BLUE,		/* pale turquoise */
-	FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE, /* gray */
-	FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,							/* white */
 
-							/* neutral white */
-};
-static int cmap_bg[MAX_COLORS] = {
-	0,						/* neutral black */
-	BACKGROUND_INTENSITY | BACKGROUND_BLUE,		/* blue */
-	BACKGROUND_INTENSITY | BACKGROUND_RED,		/* red */
-	BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_BLUE,
-							/* pink */
-	BACKGROUND_INTENSITY | BACKGROUND_GREEN,	/* green */
-	BACKGROUND_INTENSITY | BACKGROUND_GREEN | BACKGROUND_BLUE,
-							/* turquoise */
-	BACKGROUND_INTENSITY | BACKGROUND_GREEN | BACKGROUND_RED,
-							/* yellow */
-	BACKGROUND_INTENSITY | BACKGROUND_GREEN | BACKGROUND_RED | BACKGROUND_BLUE,
-							/* neutral white */
-	0,						/* black */
-	BACKGROUND_BLUE,				/* deep blue */
-	BACKGROUND_INTENSITY | BACKGROUND_RED,		/* orange */
-	BACKGROUND_RED | BACKGROUND_BLUE,		/* purple */
-	BACKGROUND_GREEN,				/* pale green */
-	BACKGROUND_GREEN | BACKGROUND_BLUE,		/* pale turquoise */
-	BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE, /* gray */
-	BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE,							/* white */
-};
+/*
 static int field_colors[4] = {
-	COLOR_GREEN,		/* default */
-	COLOR_RED,		/* intensified */
-	COLOR_BLUE,		/* protected */
-	COLOR_NEUTRAL_WHITE	/* protected, intensified */
+	COLOR_GREEN,		// default
+	COLOR_RED,		// intensified
+	COLOR_BLUE,		// protected
+	COLOR_NEUTRAL_WHITE	// protected, intensified
 };
+*/
+/*
 static struct {
 	char *name;
 	int index;
@@ -120,15 +82,16 @@ static struct {
 	{ "PaleGreen",		COLOR_PALE_GREEN },
 	{ "PaleTurquoise",	COLOR_PALE_TURQUOISE },
 	{ "Grey",		COLOR_GREY },
-	{ "Gray",		COLOR_GREY }, /* alias */
+	{ "Gray",		COLOR_GREY }, // alias
 	{ "White",		COLOR_WHITE },
 	{ CN,			0 }
 };
+*/
 
 static int defattr = 0;
 // static unsigned long input_id;
 
-Boolean escaped = True;
+// Boolean escaped = True;
 Boolean screen_has_changes = FALSE;
 
 enum ts { TS_AUTO, TS_ON, TS_OFF };
@@ -136,154 +99,16 @@ enum ts ab_mode = TS_AUTO;
 
 int windows_cp = 0;
 
-#if defined(MAYBE_SOMETIME) /*[*/
-/*
- * A bit of a cheat.  We know that Windows console attributes are really just
- * colors, with bits 0-3 for foreground and bits 4-7 for background.  That
- * leaves 8 bits we can play with for our own devious purposes, as long as we
- * don't accidentally pass one of those bits to Windows.
- *
- * The attributes we define are:
- *  WCATTR_UNDERLINE: The character is underlined.  Windows does not support
- *    underlining, but we do, by displaying underlined spaces as underscores.
- *    Some people may find this absolutely maddening.
- */
-#endif /*]*/
-
-static CHAR_INFO *onscreen;	/* what's on the screen now */
-static CHAR_INFO *toscreen;	/* what's supposed to be on the screen */
-static int onscreen_valid = FALSE; /* is onscreen valid? */
-
-// static int status_row = 0;	/* Row to display the status line on */
-// static int status_skip = 0;	/* Row to blank above the status line */
-
 static void status_connect(Boolean ignored);
 static void status_3270_mode(Boolean ignored);
 static void status_printer(Boolean on);
-static int get_color_pair(int fg, int bg);
 static int color_from_fa(unsigned char fa);
 static Boolean ts_value(const char *s, enum ts *tsp);
 static int linedraw_to_acs(unsigned char c);
 static int apl_to_acs(unsigned char c);
 static void relabel(Boolean ignored);
 static void check_aplmap(int codepage);
-static void init_user_colors(void);
-static void init_user_attribute_colors(void);
-
-// static HANDLE chandle;	/* console input handle */
-static HANDLE cohandle;	/* console screen buffer handle */
-
-static HANDLE *sbuf;	/* dynamically-allocated screen buffer */
-
-static int console_rows;
-static int console_cols;
-
-// static int screen_swapped = FALSE;
-
-/*
- * Console event handler.
- */
-static BOOL
-cc_handler(DWORD type)
-{
-	if (type == CTRL_C_EVENT) {
-		char *action;
-
-		/* Process it as a Ctrl-C. */
-		trace_event("Control-C received via Console Event Handler\n");
-		action = lookup_key(0x03, LEFT_CTRL_PRESSED);
-		if (action != CN) {
-			if (strcmp(action, "[ignore]"))
-				push_keymap_action(action);
-		} else {
-			String params[2];
-			Cardinal one;
-
-			params[0] = "0x03";
-			params[1] = CN;
-			one = 1;
-			Key_action(NULL, NULL, params, &one);
-		}
-
-		return TRUE;
-	} else {
-		/* Let Windows have its way with it. */
-		return FALSE;
-	}
-}
-
-/*
- * Get a handle for the console.
- */
-static int initscr(void)
-{
-	CONSOLE_SCREEN_BUFFER_INFO info;
-	size_t buffer_size;
-	CONSOLE_CURSOR_INFO cursor_info;
-
-	cohandle = CreateFile("CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE,
-		NULL, OPEN_EXISTING, 0, NULL);
-	if (cohandle == NULL) {
-		fprintf(stderr, "CreateFile(CONOUT$) failed: %s\n",
-			win32_strerror(GetLastError()));
-		return 0;
-	}
-
-	/* Get its dimensions. */
-	if (GetConsoleScreenBufferInfo(cohandle, &info) == 0) {
-		fprintf(stderr, "GetConsoleScreenBufferInfo failed: %s\n",
-			win32_strerror(GetLastError()));
-		return 0;
-	}
-	console_rows = info.srWindow.Bottom - info.srWindow.Top + 1;
-	console_cols = info.srWindow.Right - info.srWindow.Left + 1;
-
-	/* Get its cursor configuration. */
-	if (GetConsoleCursorInfo(cohandle, &cursor_info) == 0) {
-		fprintf(stderr, "GetConsoleCursorInfo failed: %s\n",
-			win32_strerror(GetLastError()));
-		return 0;
-	}
-
-	/* Create the screen buffer. */
-	sbuf = CreateConsoleScreenBuffer(
-		GENERIC_READ | GENERIC_WRITE,
-		FILE_SHARE_WRITE,
-		NULL,
-		CONSOLE_TEXTMODE_BUFFER,
-		NULL);
-	if (sbuf == NULL) {
-		fprintf(stderr,
-			"CreateConsoleScreenBuffer failed: %s\n",
-			win32_strerror(GetLastError()));
-		return 0;
-	}
-
-	/* Set its cursor state. */
-	if (SetConsoleCursorInfo(sbuf, &cursor_info) == 0) {
-		fprintf(stderr, "SetConsoleScreenBufferInfo failed: %s\n",
-			win32_strerror(GetLastError()));
-		return 0;
-	}
-
-	/* Define a console handler. */
-	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)cc_handler, TRUE)) {
-		fprintf(stderr, "SetConsoleCtrlHandler failed: %s\n",
-				win32_strerror(GetLastError()));
-		return 0;
-	}
-
-	/* Allocate and initialize the onscreen and toscreen buffers. */
-	buffer_size = sizeof(CHAR_INFO) * console_rows * console_cols;
-	onscreen = (CHAR_INFO *)Malloc(buffer_size);
-	(void) memset(onscreen, '\0', buffer_size);
-	onscreen_valid = FALSE;
-	toscreen = (CHAR_INFO *)Malloc(buffer_size);
-	(void) memset(toscreen, '\0', buffer_size);
-
-	/* More will no doubt follow. */
-	return 1;
-}
+//static void init_user_colors(void);
 
 /* Try to set the console output character set. */
 void
@@ -356,363 +181,41 @@ attrset(int a)
 static void
 addch(int c)
 {
-	CHAR_INFO *ch = &toscreen[(cur_row * console_cols) + cur_col];
-
 	if(callbacks && callbacks->addch)
 		callbacks->addch(cur_row, cur_col, c, cur_attr);
 
-	/* Save the desired character. */
-	if (ch->Char.UnicodeChar != c || ch->Attributes != cur_attr) {
-	    	ch->Char.UnicodeChar = c;
-		ch->Attributes = cur_attr;
-	}
-
-	/* Increment and wrap. */
-	if (++cur_col >= console_cols) {
+	// Increment and wrap.
+	if (++cur_col >= maxCOLS)
+	{
 		cur_col = 0;
-		if (++cur_row >= console_rows)
+		if (++cur_row >= maxROWS)
 			cur_row = 0;
 	}
-}
-
-/*
-static int
-ix(int row, int col)
-{
-	return (row * console_cols) + col;
-}
-*/
-
-// static char *done_array = NULL;
-
-/*
-static void
-none_done(void)
-{
-    	if (done_array == NULL) {
-	    	done_array = Malloc(console_rows * console_cols);
-	}
-	memset(done_array, '\0', console_rows * console_cols);
-}
-*/
-
-/*
-static int
-is_done(int row, int col)
-{
-    	return done_array[ix(row, col)];
-}
-*/
-
-/*
-static void
-mark_done(int start_row, int end_row, int start_col, int end_col)
-{
-    	int row;
-
-	for (row = start_row; row <= end_row; row++) {
-	    	memset(&done_array[ix(row, start_col)],
-			1, end_col - start_col + 1);
-	}
-}
-*/
-
-/*
-static int
-tos_a(int row, int col)
-{
-    	// return toscreen[ix(row, col)].Attributes;
-	if (toscreen[ix(row, col)].Char.UnicodeChar & ~0xff)
-		return toscreen[ix(row, col)].Attributes | 0x80000000;
-	else
-	    	return toscreen[ix(row, col)].Attributes;
-}
-*/
-
-#if defined(DEBUG_SCREEN_DRAW) /*[*/
-static int
-changed(int row, int col)
-{
-	return !onscreen_valid ||
-		memcmp(&onscreen[ix(row, col)], &toscreen[ix(row, col)],
-		       sizeof(CHAR_INFO));
-}
-#endif /*]*/
-
-/*
- * Draw a rectangle of homogeneous text.
- */
-/*
-static void
-hdraw(int row, int lrow, int col, int lcol)
-{
-	COORD bufferSize;
-	COORD bufferCoord;
-	SMALL_RECT writeRegion;
-	int xrow;
-	int rc;
-
-	// Write it.
-	bufferSize.X = console_cols;
-	bufferSize.Y = console_rows;
-	bufferCoord.X = col;
-	bufferCoord.Y = row;
-	writeRegion.Left = col;
-	writeRegion.Top = row;
-	writeRegion.Right = lcol;
-	writeRegion.Bottom = lrow;
-	if (toscreen[ix(row, col)].Char.UnicodeChar & ~0xff)
-	    	rc = WriteConsoleOutputW(sbuf, toscreen, bufferSize,
-			bufferCoord, &writeRegion);
-	else
-	    	rc = WriteConsoleOutputA(sbuf, toscreen, bufferSize,
-			bufferCoord, &writeRegion);
-	if (rc == 0) {
-
-		fprintf(stderr, "WriteConsoleOutput failed: %s\n",
-			win32_strerror(GetLastError()));
-		x3270_exit(1);
-	}
-
-	// Sync 'onscreen'.
-	for (xrow = row; xrow <= lrow; xrow++) {
-	    	memcpy(&onscreen[ix(xrow, col)],
-		       &toscreen[ix(xrow, col)],
-		       sizeof(CHAR_INFO) * (lcol - col + 1));
-	}
-
-	// Mark the region as done.
-	mark_done(row, lrow, col, lcol);
-}
-*/
-
-/*
- * Draw a rectanglar region from 'toscreen' onto the screen, without regard to
- * what is already there.
- * If the attributes for the entire region are the same, we can draw it in
- * one go; otherwise we will need to break it into little pieces (fairly
- * stupidly) with common attributes.
- * When done, copy the region from 'toscreen' to 'onscreen'.
- */ /*
-static void
-draw_rect(int pc_start, int pc_end, int pr_start, int pr_end)
-{
-    	int a;
-	int ul_row, ul_col, xrow, xcol, lr_row, lr_col;
-
-
-	for (ul_row = pr_start; ul_row <= pr_end; ul_row++) {
-	    	for (ul_col = pc_start; ul_col <= pc_end; ul_col++) {
-		    	int col_found = 0;
-
-		    	if (is_done(ul_row, ul_col))
-			    	continue;
-
-			//
-			// [ul_row,ul_col] is the upper left-hand corner of an
-			// undrawn region.
-			//
-			// Find the the lower right-hand corner of the
-			// rectangle with common attributes.
-			//
-			a = tos_a(ul_row, ul_col);
-			lr_col = pc_end;
-			lr_row = pr_end;
-			for (xrow = ul_row;
-				!col_found && xrow <= pr_end;
-				xrow++) {
-
-				if (is_done(xrow, ul_col) ||
-				    tos_a(xrow, ul_col) != a) {
-					lr_row = xrow - 1;
-					break;
-				}
-				for (xcol = ul_col; xcol <= lr_col; xcol++) {
-				    	if (is_done(xrow, xcol) ||
-					    tos_a(xrow, xcol) != a) {
-						lr_col = xcol - 1;
-						lr_row = xrow;
-						col_found = 1;
-						break;
-					}
-				}
-			}
-			hdraw(ul_row, lr_row, ul_col, lr_col);
-		}
-	}
-}
-*/
-
-/*
- * Compare 'onscreen' (what's on the screen right now) with 'toscreen' (what
- * we want on the screen) and draw what's changed.  Hopefully it will be in
- * a reasonably optimized fashion.
- *
- * Windows lets us draw a rectangular areas with one call, provided that the
- * whole area has the same attributes.  We will take advantage of this where
- * it is relatively easy to figure out, by walking row by row, holding on to
- * and widening a vertical band of modified columns and drawing only when we
- * hit a row that needs no modifications.  This will cause us to miss some
- * easy-seeming cases that require recognizing multiple bands per row.
- */
- /*
-static void
-sync_onscreen(void)
-{
-    	int row;
-	int col;
-	int pending = FALSE;	// is there a draw pending?
-	int pc_start, pc_end;	// first and last columns in pending band
-	int pr_start;		// first row in pending band
-
-	// Clear out the 'what we've seen' array.
-    	none_done();
-
-
-	// Sometimes you have to draw everything.
-	if (!onscreen_valid) {
-	    	draw_rect(0, console_cols - 1, 0, console_rows - 1);
-		onscreen_valid = TRUE;
-		return;
-	}
-
-	for (row = 0; row < console_rows; row++) {
-
-	    	// Check the whole row for a match first.
-	    	if (!memcmp(&onscreen[ix(row, 0)],
-			    &toscreen[ix(row, 0)],
-			    sizeof(CHAR_INFO) * console_cols)) {
-		    if (pending) {
-			    draw_rect(pc_start, pc_end, pr_start, row - 1);
-			    pending = FALSE;
-		    }
-		    continue;
-		}
-
-		for (col = 0; col < console_cols; col++) {
-		    	if (memcmp(&onscreen[ix(row, col)],
-				   &toscreen[ix(row, col)],
-				   sizeof(CHAR_INFO))) {
-				// This column differs.
-				// Start or expand the band, and start pending.
-				//
-			    	if (!pending || col < pc_start)
-				    	pc_start = col;
-				if (!pending || col > pc_end)
-				    	pc_end = col;
-				if (!pending) {
-				    	pr_start = row;
-					pending = TRUE;
-				}
-			}
-		}
-	}
-
-	if (pending)
-	    	draw_rect(pc_start, pc_end, pr_start, console_rows - 1);
-
-}
-	*/
-
-/* Repaint the screen. */
-static void
-refresh(void)
-{
-	/*
-	COORD coord;
-
-	// Draw the differences between 'onscreen' and 'toscreen' into
-	sync_onscreen();
-
-	// Move the cursor.
-	coord.X = cur_col;
-	coord.Y = cur_row;
-	if (SetConsoleCursorPosition(sbuf, coord) == 0) {
-		fprintf(stderr,
-			"\nrefresh: SetConsoleCursorPosition(x=%d,y=%d) "
-			"failed: %s\n",
-			coord.X, coord.Y, win32_strerror(GetLastError()));
-		x3270_exit(1);
-	}
-
-	// Swap in this buffer.
-	if (screen_swapped == FALSE) {
-		if (SetConsoleActiveScreenBuffer(sbuf) == 0) {
-			fprintf(stderr,
-				"\nSetConsoleActiveScreenBuffer failed: %s\n",
-				win32_strerror(GetLastError()));
-			x3270_exit(1);
-		}
-		screen_swapped = TRUE;
-	}
-	*/
 }
 
 /* Initialize the screen. */
 void
 screen_init(void)
 {
-	int want_ov_rows = ov_rows;
-	int want_ov_cols = ov_cols;
-	Boolean oversize = False;
-
-	if(callbacks && callbacks->init)
-		callbacks->init();
 
 	/* Disallow altscreen/defscreen. */
 	if ((appres.altscreen != CN) || (appres.defscreen != CN)) {
 		(void) fprintf(stderr, "altscreen/defscreen not supported\n");
 		x3270_exit(1);
 	}
+
 	/* Initialize the console. */
-	if (!initscr()) {
-		(void) fprintf(stderr, "Can't initialize terminal.\n");
-		x3270_exit(1);
-	}
-
-	/*
-	 * Respect the console size we are given.
-	 */
-	while (console_rows < maxROWS || console_cols < maxCOLS) {
-		char buf[2];
-
-		/*
-		 * First, cancel any oversize.  This will get us to the correct
-		 * model number, if there is any.
-		 */
-		if ((ov_cols && ov_cols > console_cols) ||
-		    (ov_rows && ov_rows > console_rows)) {
-			ov_cols = 0;
-			ov_rows = 0;
-			oversize = True;
-			continue;
-		}
-
-		/* If we're at the smallest screen now, give up. */
-		if (model_num == 2) {
-			(void) fprintf(stderr, "Emulator won't fit on a %dx%d "
-			    "display.\n", console_rows, console_cols);
+	if(callbacks && callbacks->init)
+	{
+		if(callbacks->init()) {
+			(void) fprintf(stderr, "Can't initialize terminal.\n");
 			x3270_exit(1);
 		}
-
-		/* Try a smaller model. */
-		(void) sprintf(buf, "%d", model_num - 1);
-		appres.model = NewString(buf);
-		set_rows_cols(model_num - 1, 0, 0);
 	}
-
-	/*
-	 * Now, if they wanted an oversize, but didn't get it, try applying it
-	 * again.
-	 */
-	if (oversize) {
-		if (want_ov_rows > console_rows - 2)
-			want_ov_rows = console_rows - 2;
-		if (want_ov_rows < maxROWS)
-			want_ov_rows = maxROWS;
-		if (want_ov_cols > console_cols)
-			want_ov_cols = console_cols;
-		set_rows_cols(model_num, want_ov_cols, want_ov_rows);
+	else
+	{
+		// FIXME (perry#1#): Do it in the right way (command-line parameter or configuration file).
+		set_rows_cols(2, 80, 24);
 	}
 
 	if(callbacks && callbacks->setsize)
@@ -744,8 +247,7 @@ screen_init(void)
 	}
 
 	/* Pull in the user's color mappings. */
-	init_user_colors();
-	init_user_attribute_colors();
+//	init_user_colors();
 
 	/* Set up the controller. */
 	ctlr_init(-1);
@@ -785,151 +287,23 @@ ts_value(const char *s, enum ts *tsp)
 	return True;
 }
 
-/* Allocate a color pair. */
-static int
-get_color_pair(int fg, int bg)
-{
-    	int mfg = fg & 0xf;
-    	int mbg = bg & 0xf;
-
-	if (mfg >= MAX_COLORS)
-	    	mfg = 0;
-	if (mbg >= MAX_COLORS)
-	    	mbg = 0;
-
-	return cmap_fg[mfg] | cmap_bg[mbg];
-}
-
-/*
- * Initialize the user-specified attribute color mappings.
- */
-static void
-init_user_attribute_color(int *a, const char *resname)
-{
-	char *r;
-	unsigned long l;
-	char *ptr;
-	int i;
-
-	if ((r = get_resource(resname)) == CN)
-		return;
-	for (i = 0; host_color[i].name != CN; i++) {
-	    	if (!strcasecmp(r, host_color[i].name)) {
-		    	*a = host_color[i].index;
-			return;
-		}
-	}
-	l = strtoul(r, &ptr, 0);
-	if (ptr == r || *ptr != '\0' || l >= MAX_COLORS) {
-		xs_warning("Invalid %s value: %s", resname, r);
-		return;
-	}
-	*a = (int)l;
-}
-
-static void
-init_user_attribute_colors(void)
-{
-	init_user_attribute_color(&field_colors[0],
-		ResHostColorForDefault);
-	init_user_attribute_color(&field_colors[1],
-		ResHostColorForIntensified);
-	init_user_attribute_color(&field_colors[2],
-		ResHostColorForProtected);
-	init_user_attribute_color(&field_colors[3],
-		ResHostColorForProtectedIntensified);
-}
-
-/*
- * Map a field attribute to a 3270 color index.
- * Applies only to m3270 mode -- does not work for mono.
- */
-static int
-color3270_from_fa(unsigned char fa)
-{
-#	define DEFCOLOR_MAP(f) \
-		((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
-
-	return field_colors[DEFCOLOR_MAP(fa)];
-}
 
 /* Map a field attribute to its default colors. */
 static int
 color_from_fa(unsigned char fa)
 {
-	if (appres.m3279) {
-		int fg;
+	if (appres.m3279)
+		return get_color_pair(DEFCOLOR_MAP(fa),0) | COLOR_ATTR_FIELD;
 
-		fg = color3270_from_fa(fa);
-		return get_color_pair(fg, COLOR_NEUTRAL_BLACK);
-	} else
-		return FOREGROUND_GREEN |
-		    (((ab_mode == TS_ON) || FA_IS_HIGH(fa))?
-		     FOREGROUND_INTENSITY: 0);
+	// Green on black
+	return get_color_pair(0,0) | COLOR_ATTR_FIELD | (((ab_mode == TS_ON) || FA_IS_HIGH(fa)) ? COLOR_ATTR_INTENSIFY : 0);
 }
 
-static int
-reverse_colors(int a)
+static int reverse_colors(int a)
 {
-    	int rv = 0;
-
-	/* Move foreground colors to background colors. */
-	if (a & FOREGROUND_RED)
-	    	rv |= BACKGROUND_RED;
-	if (a & FOREGROUND_BLUE)
-	    	rv |= BACKGROUND_BLUE;
-	if (a & FOREGROUND_GREEN)
-	    	rv |= BACKGROUND_GREEN;
-	if (a & FOREGROUND_INTENSITY)
-	    	rv |= BACKGROUND_INTENSITY;
-
-	/* And vice versa. */
-	if (a & BACKGROUND_RED)
-	    	rv |= FOREGROUND_RED;
-	if (a & BACKGROUND_BLUE)
-	    	rv |= FOREGROUND_BLUE;
-	if (a & BACKGROUND_GREEN)
-	    	rv |= FOREGROUND_GREEN;
-	if (a & BACKGROUND_INTENSITY)
-	    	rv |= FOREGROUND_INTENSITY;
-
-	return rv;
-}
-
-/*
- * Set up the user-specified color mappings.
- */
-static void
-init_user_color(const char *name, int ix)
-{
-    	char *r;
-	unsigned long l;
-	char *ptr;
-
-	r = get_fresource("%s%s", ResConsoleColorForHostColor, name);
-	if (r == CN)
-		r = get_fresource("%s%d", ResConsoleColorForHostColor, ix);
-	if (r == CN)
-	    	return;
-
-	l = strtoul(r, &ptr, 0);
-	if (ptr != r && *ptr == '\0' && l <= 15) {
-	    	cmap_fg[ix] = (int)l;
-	    	cmap_bg[ix] = (int)l + 16;
-		return;
-	}
-
-	xs_warning("Invalid %s value '%s'", ResConsoleColorForHostColor, r);
-}
-
-static void
-init_user_colors(void)
-{
-	int i;
-
-	for (i = 0; host_color[i].name != CN; i++) {
-	    	init_user_color(host_color[i].name, host_color[i].index);
-	}
+	int bg = (a & 0xF0) >> 4;
+	int fg = (a & 0x0F);
+	return get_color_pair(bg,fg) | (a&0xFF00);
 }
 
 /*
@@ -955,18 +329,24 @@ calc_attrs(int baddr, int fa_addr, int fa)
 
 		/* The current location or the fa specifies the fg or bg. */
 		if (ea_buf[baddr].fg)
+		{
 			fg = ea_buf[baddr].fg & 0x0f;
+		}
 		else if (ea_buf[fa_addr].fg)
+		{
 			fg = ea_buf[fa_addr].fg & 0x0f;
+		}
 		else
-			fg = color3270_from_fa(fa);
+		{
+			fg = DEFCOLOR_MAP(fa);
+		}
 
 		if (ea_buf[baddr].bg)
 			bg = ea_buf[baddr].bg & 0x0f;
 		else if (ea_buf[fa_addr].bg)
 			bg = ea_buf[fa_addr].bg & 0x0f;
 		else
-			bg = COLOR_NEUTRAL_BLACK;
+			bg = 0;
 
 		a = get_color_pair(fg, bg);
 	}
@@ -980,6 +360,17 @@ calc_attrs(int baddr, int fa_addr, int fa)
 	else
 		gr = 0;
 
+	if(!(gr & GR_REVERSE) && !bg)
+	{
+		if(gr & GR_BLINK)
+			a |= COLOR_ATTR_BLINK;
+
+		if(gr & GR_UNDERLINE)
+			a |= COLOR_ATTR_UNDERLINE;
+	}
+
+
+/*
 	if (appres.highlight_underline &&
 		appres.m3279 &&
 		(gr & (GR_BLINK | GR_UNDERLINE)) &&
@@ -988,12 +379,10 @@ calc_attrs(int baddr, int fa_addr, int fa)
 
 	    	a |= BACKGROUND_INTENSITY;
 	}
+*/
 
-	if (!appres.m3279 &&
-		((gr & GR_INTENSIFY) || (ab_mode == TS_ON) || FA_IS_HIGH(fa))) {
-
-		a |= FOREGROUND_INTENSITY;
-	}
+	if(!appres.m3279 &&	((gr & GR_INTENSIFY) || (ab_mode == TS_ON) || FA_IS_HIGH(fa)))
+		a |= COLOR_ATTR_INTENSIFY;
 
 	if (gr & GR_REVERSE)
 		a = reverse_colors(a);
@@ -1124,7 +513,6 @@ void screen_disp(void)
 		move(cursor_addr / cCOLS, cCOLS-1 - (cursor_addr % cCOLS));
 	else
 		move(cursor_addr / cCOLS, cursor_addr % cCOLS);
-	refresh();
 
 	screen_has_changes = FALSE;
 }
@@ -1138,7 +526,6 @@ void screen_suspend(void)
 void screen_resume(void)
 {
 	screen_disp();
-	refresh();
 
 	if(callbacks && callbacks->resume)
 		callbacks->resume();
@@ -1163,27 +550,22 @@ void toggle_monocase(struct toggle *t unused, enum toggle_type tt unused)
 
 /* Status line stuff. */
 
-static Boolean status_im = False;
-// static Boolean status_secure = False;
-static Boolean oia_boxsolid = False;
-static Boolean oia_undera = True;
-
-// static char *status_msg = "";
+static void set(OIA_FLAG id, Boolean on)
+{
+	if(callbacks && callbacks->set)
+		callbacks->set(id,on);
+}
 
 void
 status_ctlr_done(void)
 {
-	oia_undera = True;
-	if(callbacks && callbacks->set)
-		callbacks->set(OIA_FLAG_UNDERA,oia_undera);
+	set(OIA_FLAG_UNDERA,True);
 }
 
 void
 status_insert_mode(Boolean on)
 {
-	status_im = on;
-	if(callbacks && callbacks->set)
-		callbacks->set(OIA_FLAG_INSERT,on);
+	set(OIA_FLAG_INSERT,on);
 }
 
 void
@@ -1272,8 +654,7 @@ status_reset(void)
 void
 status_reverse_mode(Boolean on)
 {
-	if(callbacks && callbacks->set)
-		callbacks->set(OIA_FLAG_REVERSE,on);
+	set(OIA_FLAG_REVERSE,on);
 }
 
 void
@@ -1286,7 +667,7 @@ status_syswait(void)
 void
 status_twait(void)
 {
-	oia_undera = False;
+	set(OIA_FLAG_UNDERA,False);
 	if(callbacks && callbacks->status)
 		callbacks->status(STATUS_CODE_TWAIT);
 }
@@ -1294,8 +675,7 @@ status_twait(void)
 void
 status_typeahead(Boolean on)
 {
-	if(callbacks && callbacks->set)
-		callbacks->set(OIA_FLAG_TYPEAHEAD,on);
+	set(OIA_FLAG_TYPEAHEAD,on);
 }
 
 void
@@ -1318,10 +698,8 @@ status_connect(Boolean connected)
 	STATUS_CODE id = STATUS_CODE_USER;
 
 	if (connected) {
-		oia_boxsolid = IN_3270 && !IN_SSCP;
 
-		if(callbacks && callbacks->set)
-			callbacks->set(OIA_FLAG_BOXSOLID,oia_boxsolid);
+		set(OIA_FLAG_BOXSOLID,IN_3270 && !IN_SSCP);
 
 		if (kybdlock & KL_AWAITING_FIRST)
 			id = STATUS_CODE_AWAITING_FIRST;
@@ -1329,18 +707,12 @@ status_connect(Boolean connected)
 			id = STATUS_CODE_CONNECTED;
 
 #if defined(HAVE_LIBSSL) /*[*/
-		if(callbacks && callbacks->set)
-			callbacks->set(OIA_FLAG_SECURE,secure_connection);
+		set(OIA_FLAG_SECURE,secure_connection);
 #endif /*]*/
 
 	} else {
-		oia_boxsolid = False;
-
-		if(callbacks && callbacks->set)
-			callbacks->set(OIA_FLAG_BOXSOLID,oia_boxsolid);
-
-		if(callbacks && callbacks->set)
-			callbacks->set(OIA_FLAG_SECURE,False);
+		set(OIA_FLAG_BOXSOLID,False);
+		set(OIA_FLAG_SECURE,False);
 
 		id = STATUS_CODE_DISCONNECTED;
 	}
@@ -1353,23 +725,17 @@ status_connect(Boolean connected)
 static void
 status_3270_mode(Boolean ignored unused)
 {
-	oia_boxsolid = IN_3270 && !IN_SSCP;
-	if (oia_boxsolid)
-		oia_undera = True;
-
-	if(callbacks && callbacks->set)
-	{
-		callbacks->set(OIA_FLAG_BOXSOLID,oia_boxsolid);
-		callbacks->set(OIA_FLAG_UNDERA,oia_undera);
-	}
+	Boolean oia_boxsolid = (IN_3270 && !IN_SSCP);
+	if(oia_boxsolid)
+		set(OIA_FLAG_UNDERA,True);
+	set(OIA_FLAG_BOXSOLID,oia_boxsolid);
 
 }
 
 static void
 status_printer(Boolean on)
 {
-	if(callbacks && callbacks->set)
-		callbacks->set(OIA_FLAG_PRINTER,on);
+	set(OIA_FLAG_PRINTER,on);
 }
 
 void Redraw_action(Widget w unused, XEvent *event unused, String *params unused, Cardinal *num_params unused)

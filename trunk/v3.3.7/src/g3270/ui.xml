@@ -79,6 +79,11 @@
 		<menuitem action='PrintClipboard'/>
 
 		<separator/>
+		<menuitem action='NextField'/>
+		<menuitem action='Return'/>
+
+		<separator/>
+
 		<menuitem action='Quit'/>
 	</popup>
 

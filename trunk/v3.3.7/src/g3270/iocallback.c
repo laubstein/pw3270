@@ -255,10 +255,12 @@ static gboolean BgCallTimer(struct bgParameter *p)
 {
 	if(p->status == 2)
 	{
-		Trace("Stopping %s",__FUNCTION__);
 		p->status = 0;
 		return FALSE;
 	}
+
+	// TODO (perry#9#): Update some indicator in screen to inform the user of the application's "busy" state.
+
 	return TRUE;
 }
 

@@ -44,7 +44,7 @@ LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 
 
 # Main Targets
-Debug: bin/Debug/g3270.$(BINEXT) bin/Debug/c3270.$(BINEXT) bin/Debug/w3n46.dll
+Debug: bin/Debug/g3270.$(BINEXT) bin/Debug/w3n46.dll
 
 Release:
 

@@ -81,7 +81,6 @@
 		<Unit filename="src/include/lib3270/kybdc.h" />
 		<Unit filename="src/include/lib3270/localdefs.h" />
 		<Unit filename="src/include/lib3270/toggle.h" />
-		<Unit filename="src/lib/3270ds.h" />
 		<Unit filename="src/lib/Makefile" />
 		<Unit filename="src/lib/XtGlue.c">
 			<Option compilerVar="CC" />

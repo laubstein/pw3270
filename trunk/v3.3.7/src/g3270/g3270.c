@@ -35,38 +35,13 @@
 #endif /*]*/
 
 #include <errno.h>
-#include "appres.h"
 #include <lib3270/3270ds.h>
-#include "resources.h"
-
-#include <lib3270/actionsc.h>
-#include "ansic.h"
-#include "charsetc.h"
-#include "ctlrc.h"
 #include "ftc.h"
-#include "gluec.h"
-#include "idlec.h"
-#include "keymapc.h"
-#include <lib3270/kybdc.h>
 #include "macrosc.h"
-#include "popupsc.h"
 #include "printerc.h"
-#include "screenc.h"
-#include "telnetc.h"
 #include "togglesc.h"
-#include "trace_dsc.h"
-#include "utf8c.h"
 #include "utilc.h"
 #include "xioc.h"
-
-/*
-#if defined(HAVE_LIBREADLINE)
-#include <readline/readline.h>
-#if defined(HAVE_READLINE_HISTORY_H)
-#include <readline/history.h>
-#endif
-#endif
-*/
 
 #if defined(_WIN32) /*[*/
 #include <windows.h>
@@ -200,11 +175,6 @@ static char *base_3270_keymap =
      "Shift <Key>RIGHT:  NextWord\n";
 #endif /*]*/
 
-Boolean any_error_output = False;
-Boolean escape_pending = False;
-Boolean stop_pending = False;
-Boolean dont_return = False;
-
 /* Callback for connection state changes. */
 static void main_connect(Boolean status)
 {
@@ -212,7 +182,7 @@ static void main_connect(Boolean status)
 
 	if(status)
 	{
-		 cMode |= CURSOR_MODE_ENABLED;
+		cMode |= CURSOR_MODE_ENABLED;
 	}
 	else
 	{
@@ -226,6 +196,7 @@ static void main_connect(Boolean status)
 		gtk_widget_set_sensitive(terminal,status ? TRUE : FALSE);
 		DrawOIA(terminal,color,pixmap);
 		gtk_widget_queue_draw(terminal);
+		gtk_widget_grab_focus(terminal);
 	}
 
 }
@@ -246,7 +217,7 @@ static int g3270_init(int *argc, char ***argv)
 
 	/* Init GTK stuff */
 	g_thread_init(0);
-	gtk_init (argc, argv);
+	gtk_init(argc, argv);
 
 	g_log_set_default_handler(log_callback,"GLog");
 
@@ -273,7 +244,7 @@ int main(int argc, char *argv[])
 {
 	const char	*cl_hostname = CN;
 
-	printf("%s\n\nCopyright 1989-2008 by Paul Mattes, GTRC and others.\n",build);
+//	printf("%s\n\nCopyright 1989-2008 by Paul Mattes, GTRC and others.\n",build);
 
 	if(g3270_init(&argc,&argv))
 		return -1;
@@ -288,10 +259,6 @@ int main(int argc, char *argv[])
 //	gdk_window_set_debug_updates(TRUE);
 //#endif
 
-	/* Init 3270 stuff */
-	if(parse_program_parameters(argc, (const char **)argv))
-		return -1;
-
 	add_resource("keymap.base",
 #if defined(_WIN32) /*[*/
 	    base_keymap
@@ -301,24 +268,8 @@ int main(int argc, char *argv[])
 	    );
 	add_resource("keymap.base.3270", NewString(base_3270_keymap));
 
-	argc = parse_command_line(argc, (const char **)argv, &cl_hostname);
+	cl_hostname = lib3270_init(&argc, (const char **)argv);
 
-	if (charset_init(appres.charset) != CS_OKAY) {
-		xs_warning("Cannot find charset \"%s\"", appres.charset);
-		(void) charset_init(CN);
-	}
-	action_init();
-
-	screen_init();
-
-	kybd_init();
-	idle_init();
-	keymap_init();
-	hostfile_init();
-	hostfile_init();
-	ansi_init();
-
-	sms_init();
 
 	register_schange(ST_CONNECT, main_connect);
 //	register_schange(ST_3270_MODE, main_connect);
@@ -342,7 +293,6 @@ int main(int argc, char *argv[])
 	/* Connect to the host. */
 	screen_suspend();
 	if (cl_hostname != CN) {
-		appres.once = True;
 
 		if(host_connect(cl_hostname) < 0)
 		{
@@ -355,7 +305,7 @@ int main(int argc, char *argv[])
 		/* Wait for negotiations to complete or fail. */
 		Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);
 
-		while (!IN_ANSI && !IN_3270)
+		while(!IN_ANSI && !IN_3270)
 		{
 
 			while(gtk_events_pending())
@@ -367,11 +317,6 @@ int main(int argc, char *argv[])
 				x3270_exit(1);
 			}
 		}
-	} else {
-		if (appres.secure) {
-			Error("Must specify hostname with secure option");
-		}
-		appres.once = False;
 	}
 
 	screen_resume();
@@ -392,6 +337,7 @@ gchar * FindSystemConfigFile(const gchar *name)
  	gchar					*filename;
  	int						f;
 
+	// Search for the file in gtk's system config path
  	for(f=0;list[f];f++)
  	{
 		filename = g_build_filename(list[f],PACKAGE_NAME,name,NULL);
@@ -400,6 +346,7 @@ gchar * FindSystemConfigFile(const gchar *name)
 		g_free(filename);
  	}
 
+	// Check if the file is available in current directory
 	if(g_file_test(name,G_FILE_TEST_IS_REGULAR))
 		return g_strdup(name);
 

@@ -318,30 +318,36 @@
 
  int LoadColors(void)
  {
- 	static const char *DefaultColors =	"black,"
-											"#00FFFF,"
-											"red,"
-											"pink,"
-											"green1,"
-											"turquoise,"
-											"yellow,"
-											"white,"
-											"black,"
-											"DeepSkyBlue,"
-											"orange,"
-											"DeepSkyBlue,"
-											"PaleGreen,"
-											"PaleTurquoise,"
-											"grey,"
-											"white,"
-											"green," 		// TERMINAL_COLOR_CURSOR
-											"green," 		// TERMINAL_COLOR_CROSS_HAIR
-											"green," 		// TERMINAL_COLOR_OIA
-											"black,"	 	// TERMINAL_COLOR_OIA_BACKGROUND
-											"white,"		// TERMINAL_COLOR_OIA_STATUS_OK
-											"red,"			// TERMINAL_COLOR_OIA_STATUS_INVALID
-											"black,"		// TERMINAL_COLOR_SELECTED_FG,
-											"white";		// TERMINAL_COLOR_SELECTED_BG
+ 	static const char *DefaultColors =	"black,"			// TERMINAL_COLOR_00
+											"#00FFFF,"			// TERMINAL_COLOR_01
+											"red,"				// TERMINAL_COLOR_02
+											"pink,"				// TERMINAL_COLOR_03
+											"green1,"			// TERMINAL_COLOR_04
+											"turquoise,"		// TERMINAL_COLOR_05
+											"yellow,"			// TERMINAL_COLOR_06
+											"white,"			// TERMINAL_COLOR_07
+											"black,"			// TERMINAL_COLOR_08
+											"DeepSkyBlue,"		// TERMINAL_COLOR_09
+											"orange,"			// TERMINAL_COLOR_10
+											"DeepSkyBlue,"		// TERMINAL_COLOR_11
+											"PaleGreen,"		// TERMINAL_COLOR_12
+											"PaleTurquoise,"	// TERMINAL_COLOR_13
+											"grey,"				// TERMINAL_COLOR_14
+											"white,"			// TERMINAL_COLOR_15
+
+											"green,"			// TERMINAL_COLOR_FIELD_DEFAULT
+											"red,"				// TERMINAL_COLOR_FIELD_INTENSIFIED
+											"blue,"				// TERMINAL_COLOR_FIELD_PROTECTED
+											"white,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
+
+											"green," 			// TERMINAL_COLOR_CURSOR
+											"green," 			// TERMINAL_COLOR_CROSS_HAIR
+											"green," 			// TERMINAL_COLOR_OIA
+											"black,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
+											"white,"			// TERMINAL_COLOR_OIA_STATUS_OK
+											"red,"				// TERMINAL_COLOR_OIA_STATUS_INVALID
+											"black,"			// TERMINAL_COLOR_SELECTED_FG,
+											"white";			// TERMINAL_COLOR_SELECTED_BG
 
 
  	int 	f;

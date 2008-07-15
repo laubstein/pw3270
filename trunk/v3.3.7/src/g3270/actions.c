@@ -159,10 +159,26 @@
  	action_internal(Reset_action, IA_DEFAULT, CN, CN);
  }
 
+ static void action_Connect(GtkWidget *w, gpointer user_data)
+ {
+ 	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
+
+ 	if(PCONNECTED)
+ 		return;
+
+	// TODO (perry#5#): If there's no previous server ask for one.
+ 	action_ClearSelection();
+	action_internal(Reconnect_action, IA_DEFAULT, CN, CN);
+
+ }
+
  void action_Enter(GtkWidget *w, gpointer user_data)
  {
  	action_ClearSelection();
- 	action_internal(Enter_action, IA_DEFAULT, CN, CN);
+ 	if(PCONNECTED)
+		action_internal(Enter_action, IA_DEFAULT, CN, CN);
+	else
+		action_Connect(w,user_data);
  }
 
  void action_Insert(void)
@@ -230,18 +246,6 @@
  	do_toggle(RECONNECT);
  }
 
- static void action_Connect(GtkWidget *w, gpointer user_data)
- {
- 	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
-
- 	if(PCONNECTED)
- 		return;
-
-	// TODO (perry#5#): If there's no previous server ask for one.
-	action_internal(Reconnect_action, IA_DEFAULT, CN, CN);
-
- }
-
  static void action_Disconnect(GtkWidget *w, gpointer user_data)
  {
  	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
@@ -249,6 +253,7 @@
  	if(!PCONNECTED)
  		return;
 
+ 	action_ClearSelection();
 	host_disconnect(FALSE);
  }
 
@@ -361,7 +366,7 @@
 	{ 	"Reset",			NULL,					N_( "Reset" ),			"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
 	{ 	"Escape",			NULL,					N_( "Escape" ),			"Escape",		NULL,	G_CALLBACK(action_Reset)			},
 	{ 	"Home",				NULL,					N_( "Home" ),			"Home",			NULL,	G_CALLBACK(action_Home)				},
-	{ 	"Return",			NULL,					N_( "Return" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
+	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
 	{	"DeleteWord",		NULL,					N_( "Delete Word" ),	"<Ctrl>w",		NULL,	G_CALLBACK(action_DeleteWord)		},
 	{	"DeleteField",		NULL,					N_( "Delete Field" ),	"<Ctrl>u",		NULL,	G_CALLBACK(action_DeleteField)		},
 	{	"Delete",			NULL,					N_( "Delete Char" ),	"Delete",		NULL,	G_CALLBACK(action_Delete)			},
@@ -389,7 +394,7 @@
  {
  	{	"CursorBlink",		NULL,					N_( "Blink Cursor" ),			NULL, 			NULL,	G_CALLBACK(action_BlinkCursor),		FALSE },
  	{	"CursorPos",		NULL,					N_( "Show Cursor Position" ),	NULL, 			NULL,	G_CALLBACK(action_ShowCursorPos), 	TRUE  },
- 	{	"FullScreen",		GTK_STOCK_FULLSCREEN,	N_( "Full Screen" ),			NULL,			NULL,	G_CALLBACK(action_FullScreen),		FALSE },
+ 	{	"FullScreen",		NULL,					N_( "Full Screen" ),			NULL,			NULL,	G_CALLBACK(action_FullScreen),		FALSE },
  	{	"MarginedPaste",	NULL,					N_( "Margined Paste" ),			NULL, 			NULL,	NULL, 								FALSE },
  	{	"CrossHair",		NULL,					N_( "Cross Hair Cursor" ),		"<Alt>X",		NULL,	G_CALLBACK(action_CrossHair),		FALSE },
  	{	"RectSelect",		NULL,					N_( "Rectangle Select" ),		NULL, 			NULL,	G_CALLBACK(action_RectSelect),		FALSE },
@@ -478,6 +483,7 @@
 	/* Is function key? */
 	if(IS_FUNCTION_KEY(event))
     {
+		action_ClearSelection();
         sprintf(buffer,"%d",(event->keyval - GDK_F1)+1);
         action_internal(PF_action, IA_DEFAULT, buffer, CN);
         return TRUE;
