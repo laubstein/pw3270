@@ -162,8 +162,6 @@ static void status_3270_mode(Boolean ignored);
 static void status_printer(Boolean on);
 static int get_color_pair(int fg, int bg);
 static int color_from_fa(unsigned char fa);
-// static void screen_init2(void);
-// static void set_status_row(int screen_rows, int emulator_rows);
 static Boolean ts_value(const char *s, enum ts *tsp);
 static int linedraw_to_acs(unsigned char c);
 static int apl_to_acs(unsigned char c);
@@ -180,7 +178,7 @@ static HANDLE *sbuf;	/* dynamically-allocated screen buffer */
 static int console_rows;
 static int console_cols;
 
-static int screen_swapped = FALSE;
+// static int screen_swapped = FALSE;
 
 /*
  * Console event handler.
@@ -377,14 +375,17 @@ addch(int c)
 	}
 }
 
+/*
 static int
 ix(int row, int col)
 {
 	return (row * console_cols) + col;
 }
+*/
 
-static char *done_array = NULL;
+// static char *done_array = NULL;
 
+/*
 static void
 none_done(void)
 {
@@ -393,13 +394,17 @@ none_done(void)
 	}
 	memset(done_array, '\0', console_rows * console_cols);
 }
+*/
 
+/*
 static int
 is_done(int row, int col)
 {
     	return done_array[ix(row, col)];
 }
+*/
 
+/*
 static void
 mark_done(int start_row, int end_row, int start_col, int end_col)
 {
@@ -410,16 +415,19 @@ mark_done(int start_row, int end_row, int start_col, int end_col)
 			1, end_col - start_col + 1);
 	}
 }
+*/
 
+/*
 static int
 tos_a(int row, int col)
 {
-    	/*return toscreen[ix(row, col)].Attributes;*/
+    	// return toscreen[ix(row, col)].Attributes;
 	if (toscreen[ix(row, col)].Char.UnicodeChar & ~0xff)
 		return toscreen[ix(row, col)].Attributes | 0x80000000;
 	else
 	    	return toscreen[ix(row, col)].Attributes;
 }
+*/
 
 #if defined(DEBUG_SCREEN_DRAW) /*[*/
 static int
@@ -434,6 +442,7 @@ changed(int row, int col)
 /*
  * Draw a rectangle of homogeneous text.
  */
+/*
 static void
 hdraw(int row, int lrow, int col, int lcol)
 {
@@ -443,7 +452,7 @@ hdraw(int row, int lrow, int col, int lcol)
 	int xrow;
 	int rc;
 
-	/* Write it. */
+	// Write it.
 	bufferSize.X = console_cols;
 	bufferSize.Y = console_rows;
 	bufferCoord.X = col;
@@ -465,16 +474,17 @@ hdraw(int row, int lrow, int col, int lcol)
 		x3270_exit(1);
 	}
 
-	/* Sync 'onscreen'. */
+	// Sync 'onscreen'.
 	for (xrow = row; xrow <= lrow; xrow++) {
 	    	memcpy(&onscreen[ix(xrow, col)],
 		       &toscreen[ix(xrow, col)],
 		       sizeof(CHAR_INFO) * (lcol - col + 1));
 	}
 
-	/* Mark the region as done. */
+	// Mark the region as done.
 	mark_done(row, lrow, col, lcol);
 }
+*/
 
 /*
  * Draw a rectanglar region from 'toscreen' onto the screen, without regard to
@@ -483,7 +493,7 @@ hdraw(int row, int lrow, int col, int lcol)
  * one go; otherwise we will need to break it into little pieces (fairly
  * stupidly) with common attributes.
  * When done, copy the region from 'toscreen' to 'onscreen'.
- */
+ */ /*
 static void
 draw_rect(int pc_start, int pc_end, int pr_start, int pr_end)
 {
@@ -498,13 +508,13 @@ draw_rect(int pc_start, int pc_end, int pr_start, int pr_end)
 		    	if (is_done(ul_row, ul_col))
 			    	continue;
 
-			/*
-			 * [ul_row,ul_col] is the upper left-hand corner of an
-			 * undrawn region.
-			 *
-			 * Find the the lower right-hand corner of the
-			 * rectangle with common attributes.
-			 */
+			//
+			// [ul_row,ul_col] is the upper left-hand corner of an
+			// undrawn region.
+			//
+			// Find the the lower right-hand corner of the
+			// rectangle with common attributes.
+			//
 			a = tos_a(ul_row, ul_col);
 			lr_col = pc_end;
 			lr_row = pr_end;
@@ -531,6 +541,7 @@ draw_rect(int pc_start, int pc_end, int pr_start, int pr_end)
 		}
 	}
 }
+*/
 
 /*
  * Compare 'onscreen' (what's on the screen right now) with 'toscreen' (what
@@ -544,20 +555,21 @@ draw_rect(int pc_start, int pc_end, int pr_start, int pr_end)
  * hit a row that needs no modifications.  This will cause us to miss some
  * easy-seeming cases that require recognizing multiple bands per row.
  */
+ /*
 static void
 sync_onscreen(void)
 {
     	int row;
 	int col;
-	int pending = FALSE;	/* is there a draw pending? */
-	int pc_start, pc_end;	/* first and last columns in pending band */
-	int pr_start;		/* first row in pending band */
+	int pending = FALSE;	// is there a draw pending?
+	int pc_start, pc_end;	// first and last columns in pending band
+	int pr_start;		// first row in pending band
 
-	/* Clear out the 'what we've seen' array. */
+	// Clear out the 'what we've seen' array.
     	none_done();
 
 
-	/* Sometimes you have to draw everything. */
+	// Sometimes you have to draw everything.
 	if (!onscreen_valid) {
 	    	draw_rect(0, console_cols - 1, 0, console_rows - 1);
 		onscreen_valid = TRUE;
@@ -566,7 +578,7 @@ sync_onscreen(void)
 
 	for (row = 0; row < console_rows; row++) {
 
-	    	/* Check the whole row for a match first. */
+	    	// Check the whole row for a match first.
 	    	if (!memcmp(&onscreen[ix(row, 0)],
 			    &toscreen[ix(row, 0)],
 			    sizeof(CHAR_INFO) * console_cols)) {
@@ -581,10 +593,9 @@ sync_onscreen(void)
 		    	if (memcmp(&onscreen[ix(row, col)],
 				   &toscreen[ix(row, col)],
 				   sizeof(CHAR_INFO))) {
-			    	/*
-				 * This column differs.
-				 * Start or expand the band, and start pending.
-				 */
+				// This column differs.
+				// Start or expand the band, and start pending.
+				//
 			    	if (!pending || col < pc_start)
 				    	pc_start = col;
 				if (!pending || col > pc_end)
@@ -599,21 +610,21 @@ sync_onscreen(void)
 
 	if (pending)
 	    	draw_rect(pc_start, pc_end, pr_start, console_rows - 1);
+
 }
+	*/
 
 /* Repaint the screen. */
 static void
 refresh(void)
 {
+	/*
 	COORD coord;
 
-	/*
-	 * Draw the differences between 'onscreen' and 'toscreen' into
-	 * sbuf.
-	 */
+	// Draw the differences between 'onscreen' and 'toscreen' into
 	sync_onscreen();
 
-	/* Move the cursor. */
+	// Move the cursor.
 	coord.X = cur_col;
 	coord.Y = cur_row;
 	if (SetConsoleCursorPosition(sbuf, coord) == 0) {
@@ -624,7 +635,7 @@ refresh(void)
 		x3270_exit(1);
 	}
 
-	/* Swap in this buffer. */
+	// Swap in this buffer.
 	if (screen_swapped == FALSE) {
 		if (SetConsoleActiveScreenBuffer(sbuf) == 0) {
 			fprintf(stderr,
@@ -634,6 +645,7 @@ refresh(void)
 		}
 		screen_swapped = TRUE;
 	}
+	*/
 }
 
 /* Initialize the screen. */
