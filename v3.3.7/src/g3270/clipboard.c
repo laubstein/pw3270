@@ -74,7 +74,7 @@
 	if(!sel)
 		return;
 
-	contents = g_strconcat(last,sel,NULL);
+	contents = g_strconcat(last,"\n",sel,NULL);
 
 	g_free(sel);
 	g_free(last);

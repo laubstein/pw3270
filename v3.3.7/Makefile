@@ -23,16 +23,15 @@ WINDRES = windres
 endif
 
 XCPPFLAGS = -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500
-CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall -Werror $(XCPPFLAGS) -DG3270 -Isrc/include
+CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall -Werror $(XCPPFLAGS) -O -DG3270 -Isrc/include
 DLLFLAGS = $(EXTRA_FLAGS) -mno-cygwin -shared -Wl,--export-all-symbols -Wl,--enable-auto-import
+BINFLAGS = -mwindows
 
 # PKGConfig Stuff
 GTK_MODULES = glib-2.0 gtk+-2.0 gthread-2.0
 SSL_MODULES = libcrypto libssl openssl
 
 # Sources
-C3270_SRCS =	c3270.c iocallback.c
-
 G3270_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
 				clipboard.c print.c
 
@@ -46,8 +45,7 @@ LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 # Main Targets
 Debug: bin/Debug/g3270.$(BINEXT) bin/Debug/w3n46.dll
 
-Release:
-
+Release: bin/Release/g3270.$(BINEXT) bin/Release/w3n46.dll
 
 # Rules
 GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h
@@ -57,11 +55,6 @@ obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 -DLIB3270=1 -DHAVE_LIBSSL=1 $(CFLAGS) `pkg-config --cflags $(SSL_MODULES)` -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
-
-obj/Debug/src/c3270/%.o: src/c3270/%.c src/c3270/*.h $(GLOBAL_DEPENDS)
-	@echo $< ...
-	@mkdir -p `dirname $@`
-	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
 
 obj/Debug/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
@@ -79,6 +72,11 @@ obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) -DLIB3270=1 -DHAVE_LIBSSL=1 $(CFLAGS) `pkg-config --cflags $(SSL_MODULES)` -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
 
+obj/Release/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(CFLAGS) `pkg-config --cflags $(GTK_MODULES)` -Isrc/lib -o $@ -c $<
+
 obj/Release/version.o: src/version.c
 	@echo $< ...
 	@mkdir -p `dirname $@`
@@ -89,6 +87,19 @@ obj/Release/src/lib/w3n46.o: src/lib/resolver.c
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) -Isrc/lib -DW3N46 -c -o $@ $^
 
+# Release Targets
+bin/Release/g3270.$(BINEXT): bin/Release/lib3270.$(DLLEXT) $(foreach SRC, $(basename $(G3270_SRCS)), obj/Release/src/g3270/$(SRC).$(OBJEXT))
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(BINFLAGS) -o $@ $^ `pkg-config --libs $(GTK_MODULES)` -lws2_32
+
+bin/Release/lib3270.$(DLLEXT): obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Release/src/lib/$(SRC).$(OBJEXT))
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DLLFLAGS) -o $@ $^ `pkg-config --libs $(SSL_MODULES)` -lws2_32
+
+bin/Release/w3n46.dll: obj/Release/src/lib/w3n46.o
+	@$(CC) $(DLLFLAGS) -o $@ $^ -lws2_32
 
 # Debug Targets
 bin/Debug/c3270.$(BINEXT): bin/Debug/lib3270.$(DLLEXT) $(foreach SRC, $(basename $(C3270_SRCS)), obj/Debug/src/c3270/$(SRC).$(OBJEXT))
@@ -99,8 +110,7 @@ bin/Debug/c3270.$(BINEXT): bin/Debug/lib3270.$(DLLEXT) $(foreach SRC, $(basename
 bin/Debug/g3270.$(BINEXT): bin/Debug/lib3270.$(DLLEXT) $(foreach SRC, $(basename $(G3270_SRCS)), obj/Debug/src/g3270/$(SRC).$(OBJEXT))
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) -o $@ $^ `pkg-config --libs $(GTK_MODULES)` -lws2_32
-
+	@$(CC) $(BINFLAGS) -o $@ $^ `pkg-config --libs $(GTK_MODULES)` -lws2_32
 
 bin/Debug/lib3270.$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).$(OBJEXT))
 	@echo $@ ...

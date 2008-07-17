@@ -393,9 +393,11 @@
 	gdk_gc_set_foreground(gc,bg);
 	gdk_draw_rectangle(draw,gc,1,left_margin,row,width,fHeight+1);
 
-	gdk_gc_set_foreground(gc,fg);
+	gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_OIA_SEPARATOR);
 	gdk_draw_line(draw,gc,left_margin,row,left_margin+width,row);
 	row++;
+
+	gdk_gc_set_foreground(gc,fg);
 
 	//  0          "4" in a square
 	layout = gtk_widget_create_pango_layout(widget,"4");

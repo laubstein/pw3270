@@ -254,7 +254,7 @@
  		return;
 
  	action_ClearSelection();
-	host_disconnect(FALSE);
+ 	action_internal(Disconnect_action, IA_DEFAULT, CN, CN);
  }
 
  static void action_PrintScreen(GtkWidget *w, gpointer user_data)

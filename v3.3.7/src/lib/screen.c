@@ -280,7 +280,7 @@ static int reverse_colors(int a)
 static int
 calc_attrs(int baddr, int fa_addr, int fa)
 {
-    	int fg, bg, gr, a;
+    	int fg = 0, bg = 0, gr, a;
 
 	/* Compute the color. */
 
