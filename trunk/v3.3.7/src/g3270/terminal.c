@@ -178,7 +178,7 @@
 			SetFontSize(f);
 			Trace("Font %d fits on %dx%d",f,terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
 		}
-//		gtk_widget_set_size_request(widget,fsize->width,fsize->height);
+		gtk_widget_set_usize(widget,(terminal_rows*fsize->height)+4,(terminal_cols*fsize->width)+4);
 	}
 
 	/* Get the best font for the current window size */
@@ -335,14 +335,15 @@
 											"grey,"				// TERMINAL_COLOR_14
 											"white,"			// TERMINAL_COLOR_15
 
-											"green,"			// TERMINAL_COLOR_FIELD_DEFAULT
+											"green1,"			// TERMINAL_COLOR_FIELD_DEFAULT
 											"red,"				// TERMINAL_COLOR_FIELD_INTENSIFIED
-											"blue,"				// TERMINAL_COLOR_FIELD_PROTECTED
+											"DeepSkyBlue,"		// TERMINAL_COLOR_FIELD_PROTECTED
 											"white,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
 
-											"green," 			// TERMINAL_COLOR_CURSOR
-											"green," 			// TERMINAL_COLOR_CROSS_HAIR
-											"green," 			// TERMINAL_COLOR_OIA
+											"LimeGreen," 		// TERMINAL_COLOR_CURSOR
+											"LimeGreen," 		// TERMINAL_COLOR_CROSS_HAIR
+											"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
+											"LimeGreen,"		// TERMINAL_COLOR_OIA
 											"black,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
 											"white,"			// TERMINAL_COLOR_OIA_STATUS_OK
 											"red,"				// TERMINAL_COLOR_OIA_STATUS_INVALID

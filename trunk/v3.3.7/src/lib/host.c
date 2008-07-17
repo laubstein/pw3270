@@ -691,19 +691,7 @@ host_disconnect(Boolean failed)
 #endif
 
 #if defined(X3270_DISPLAY) /*[*/
-		if (appres.once) {
-			if (error_popup_visible()) {
-				/*
-				 * If there is an error pop-up, exit when it
-				 * pops down.
-				 */
-				exiting = True;
-			} else {
-				/* Exit now. */
-				x3270_exit(0);
-				return;
-			}
-		} else if (toggled(RECONNECT) && !auto_reconnect_inprogress) {
+		if(toggled(RECONNECT) && !auto_reconnect_inprogress) {
 			/* Schedule an automatic reconnection. */
 			auto_reconnect_inprogress = True;
 			(void) AddTimeOut(failed? RECONNECT_ERR_MS:
