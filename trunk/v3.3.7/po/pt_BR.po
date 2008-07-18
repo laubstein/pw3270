@@ -1,0 +1,325 @@
+# translation of g3270.
+# Copyright (C) 2008 THE g3270'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the g3270 package.
+# <>, 2008.
+# , fuzzy
+# 
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: g3270 3.3.7p5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-07-18 10:16-0300\n"
+"PO-Revision-Date: 2008-07-18 10:25-0300\n"
+"Last-Translator:  <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=\n"
+"Content-Transfer-Encoding: "
+
+#: actions.c:288
+msgid "3270 Terminal emulator for GTK."
+msgstr "Emulador 3270 para GTK"
+
+#: actions.c:317
+msgid "About"
+msgstr "Sobre"
+
+#: actions.c:324
+msgid "Add to copy"
+msgstr "Copiar anexando"
+
+#: actions.c:388
+msgid "Auto-Reconnect"
+msgstr "Auto-reconectar"
+
+#: actions.c:360
+msgid "Backspace"
+msgstr ""
+
+#: actions.c:382
+msgid "Blink Cursor"
+msgstr "Cursor piscante"
+
+#: actions.c:417
+msgid "Can't build Application UI!"
+msgstr "Não foi possível montar a interface da aplicação"
+
+#: actions.c:415
+#, c-format
+msgid "Can't build Application UI: %s"
+msgstr "Não foi possível montar a interface da aplicação: %s"
+
+#: actions.c:423
+msgid "Can't find UI definition file"
+msgstr "Arquivo com a definição de interface não foi encontrado"
+
+#: g3270.c:232
+msgid "Can't register into lib3270 I/O callback table."
+msgstr "Não consegui registrar chamadas de I/O na biblioteca 3270"
+
+#: g3270.c:238
+msgid "Can't register into lib3270 screen callback table."
+msgstr "Não consegui registrar chamadas de tela na biblioteca 3270"
+
+#: actions.c:330
+msgid "Clear fields"
+msgstr "Limpar campos"
+
+#: actions.c:323
+msgid "Copy"
+msgstr "Copiar"
+
+#: actions.c:386
+msgid "Cross Hair Cursor"
+msgstr ""
+
+#: actions.c:359
+msgid "Delete Char"
+msgstr "Apagar caractere"
+
+#: actions.c:358
+msgid "Delete Field"
+msgstr "Apagar campo"
+
+#: actions.c:357
+msgid "Delete Word"
+msgstr "Apagar palavra"
+
+#: actions.c:348
+msgid "Down"
+msgstr "Descer"
+
+#: actions.c:350
+msgid "Enter"
+msgstr ""
+
+#: actions.c:361
+msgid "EraseEOF"
+msgstr ""
+
+#: actions.c:354
+msgid "Escape"
+msgstr ""
+
+#: print.c:148
+msgid "Font"
+msgstr "Fonte"
+
+#: actions.c:384
+msgid "Full Screen"
+msgstr "Tela-cheia"
+
+#: actions.c:312
+msgid "Help"
+msgstr "Ajuda"
+
+#: actions.c:355
+msgid "Home"
+msgstr ""
+
+#: actions.c:389
+msgid "Insert"
+msgstr "Inserir"
+
+#: actions.c:346
+msgid "Left"
+msgstr "Esquerda"
+
+#: actions.c:385
+msgid "Margined Paste"
+msgstr "Copiar com margem"
+
+#: actions.c:349
+msgid "Next Field"
+msgstr "Próximo campo"
+
+#: actions.c:290
+msgid "No Translators"
+msgstr "perry.werneck@gmail.com (PT-BR)"
+
+#: actions.c:363
+msgid "Page-Down"
+msgstr ""
+
+#: actions.c:362
+msgid "Page-Up"
+msgstr ""
+
+#: actions.c:325
+msgid "Paste"
+msgstr "Colar"
+
+#: actions.c:326
+msgid "Paste _next"
+msgstr "Colar próximo"
+
+#: actions.c:333
+msgid "Print"
+msgstr "Imprimir"
+
+#: actions.c:335
+msgid "Print copy"
+msgstr "Imprimir cópia"
+
+#: actions.c:334
+msgid "Print selected"
+msgstr "Imprimir seleção"
+
+#: actions.c:387
+msgid "Rectangle Select"
+msgstr "Selecionar retângulo"
+
+#: actions.c:353
+msgid "Reset"
+msgstr ""
+
+#: actions.c:356
+msgid "Return"
+msgstr ""
+
+#: actions.c:345
+msgid "Right"
+msgstr ""
+
+#: actions.c:341
+msgid "Select Down"
+msgstr ""
+
+#: actions.c:342
+msgid "Select Field"
+msgstr ""
+
+#: actions.c:339
+msgid "Select Left"
+msgstr ""
+
+#: actions.c:338
+msgid "Select Right"
+msgstr ""
+
+#: actions.c:340
+msgid "Select Up"
+msgstr ""
+
+#: actions.c:329
+msgid "Select all"
+msgstr ""
+
+#: actions.c:383
+msgid "Show Cursor Position"
+msgstr "Mostra posição do cursor"
+
+#: actions.c:271
+msgid ""
+"This program is free software; you can redistribute it and/or modify it "
+"under the terms of the GNU General Public License as published by the Free "
+"Software Foundation; either version 2 of the License, or (at your option) "
+"any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful, but WITHOUT "
+"ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or "
+"FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for "
+"more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License along with "
+"this program; if not, write to the Free Software Foundation, Inc., 51 "
+"Franklin St, Fifth Floor, Boston, MA 02111-1307 USA"
+msgstr ""
+
+#: actions.c:347
+msgid "Up"
+msgstr ""
+
+#: actions.c:318
+msgid "_Connect"
+msgstr "_Conectar"
+
+#: actions.c:319
+msgid "_Disconnect"
+msgstr "_Desconectar"
+
+#: actions.c:313
+msgid "_Edit"
+msgstr "_Editar"
+
+#: actions.c:310
+msgid "_File"
+msgstr "_Arquivo"
+
+#: actions.c:311
+msgid "_Network"
+msgstr "_Rede"
+
+#: actions.c:314
+msgid "_Options"
+msgstr "_Opções"
+
+#: actions.c:320
+msgid "_Quit"
+msgstr "_Sair"
+
+#: actions.c:328
+msgid "_Reselect"
+msgstr "_Reselecionar"
+
+#: actions.c:327
+msgid "_Unselect"
+msgstr "Deselecionar"
+
+#: screen.c:609
+msgid "a"
+msgstr ""
+
+#: screen.c:613
+msgid "bX System"
+msgstr ""
+
+#: screen.c:617
+msgid "cX Wait"
+msgstr ""
+
+#: screen.c:621
+msgid "d"
+msgstr ""
+
+#: screen.c:625
+msgid "eX Disconnected"
+msgstr "eX Desconectado"
+
+#: screen.c:629
+msgid "fX"
+msgstr ""
+
+#: screen.c:633
+msgid "gX -f"
+msgstr ""
+
+#: screen.c:637
+msgid "hX Protected"
+msgstr "hX Protegido"
+
+#: screen.c:641
+msgid "iX Numeric"
+msgstr "iX Numérico"
+
+#: screen.c:645
+msgid "jX Overflow"
+msgstr ""
+
+#: screen.c:649
+msgid "kX Inhibit"
+msgstr ""
+
+#: screen.c:653
+msgid "lX"
+msgstr ""
+
+#: screen.c:657
+msgid "mX Resolving"
+msgstr "mX Resolvendo"
+
+#: screen.c:661
+msgid "nX Connecting"
+msgstr "nX Conectando"
+

@@ -43,19 +43,6 @@
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
 /*---[ Callback tables ]----------------------------------------------------------------------------------------*/
-/*
- #ifdef DEBUG
-     #define DECLARE_KEYPROC(key, state, action) { key, state, #key " (" #state ")", action, #action }
- #else
-     #define DECLARE_KEYPROC(key, state, action) { key, state, action }
- #endif
-
- #ifdef DEBUG
-     #define DECLARE_ACTION(key, state, action, cause, parm1, parm2) { key, state, #key " (" #state ")", action, #action, cause, parm1, parm2 }
- #else
-     #define DECLARE_ACTION(key, state, action, cause, parm1, parm2) { key, state, action, cause, parm1, parm2 }
- #endif
-*/
 
  #ifdef DEBUG
 	#define LIB3270_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_lib3270, (gpointer) action, #action }
@@ -468,9 +455,6 @@
 		G3270_ACTION( GDK_ISO_Left_Tab,		0,					action_BackTab),
 		G3270_ACTION( GDK_Tab,				0,					action_Tab),
 		G3270_ACTION( GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab),
-
-//		G3270_ACTION( 	GDK_Page_Up,		0,					action_PageUP),
-//		G3270_ACTION( 	GDK_Page_Down,		0,					action_PageDown),
 
 		PF_ACTION(		GDK_Page_Up,		GDK_SHIFT_MASK,		"23"),
 		PF_ACTION(		GDK_Page_Down,		GDK_SHIFT_MASK,		"24"),

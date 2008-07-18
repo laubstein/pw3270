@@ -1,5 +1,6 @@
 
 PACKAGE=g3270
+PACKAGE_VERSION=3.3.7p5
 
 # Flags
 CROSS=1
@@ -33,7 +34,7 @@ SSL_MODULES = libcrypto libssl openssl
 
 # Sources
 G3270_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
-				clipboard.c print.c
+				clipboard.c print.c config.c
 
 LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 				ft.c ft_cut.c ft_dft.c glue.c help.c host.c icmd.c idle.c kybd.c \
@@ -134,8 +135,7 @@ sources.lst: Makefile
 $(PACKAGE).pot: sources.lst $(foreach SRC, $(G3270_SRCS), src/g3270/$(SRC))
 	@xgettext	--files-from=sources.lst --directory=src/g3270 \
 				--default-domain=$(PACKAGE) --language=C \
-				--keyword=_ --keyword=N_ --sort-output \
-				--output=$@
+				--keyword=_ --keyword=N_ --sort-output --output=- | sed "s@PACKAGE VERSION@$(PACKAGE) $(PACKAGE_VERSION)@" > $@
 
 $(PACKAGE).po: $(PACKAGE).pot
 	@msginit --no-translator -o $(PACKAGE).po -i $(PACKAGE).pot

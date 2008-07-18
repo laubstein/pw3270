@@ -83,7 +83,6 @@
 		<menuitem action='Return'/>
 
 		<separator/>
-
 		<menuitem action='Quit'/>
 	</popup>
 
