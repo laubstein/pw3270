@@ -135,7 +135,8 @@ sources.lst: Makefile
 $(PACKAGE).pot: sources.lst $(foreach SRC, $(G3270_SRCS), src/g3270/$(SRC))
 	@xgettext	--files-from=sources.lst --directory=src/g3270 \
 				--default-domain=$(PACKAGE) --language=C \
-				--keyword=_ --keyword=N_ --sort-output --output=- | sed "s@PACKAGE VERSION@$(PACKAGE) $(PACKAGE_VERSION)@" > $@
+				--keyword=_ --keyword=N_ --sort-output --output=- \
+	| sed "s@PACKAGE VERSION@$(PACKAGE) $(PACKAGE_VERSION)@;s@CHARSET@UTF-8@" > $@
 
 $(PACKAGE).po: $(PACKAGE).pot
 	@msginit --no-translator -o $(PACKAGE).po -i $(PACKAGE).pot
