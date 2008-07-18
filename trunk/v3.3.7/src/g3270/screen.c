@@ -56,22 +56,22 @@
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
- static void title(char *text);
- static void setsize(int rows, int cols);
- static int  addch(int row, int col, int c, unsigned short attr);
- static void set_charset(char *dcs);
- static void redraw(void);
- static void erase(void);
- static void suspend(void);
- static void resume(void);
- static void set_cursor(CURSOR_MODE mode);
- static void set_oia(OIA_FLAG id, int on);
- static void set_compose(int on, unsigned char c, int keytype);
- static void set_lu(const char *lu);
- static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height, int Width);
- static void changed(int bstart, int bend);
- static void errorpopup(const char *msg);
- static void error(const char *s);
+ static void	title(char *text);
+ static void	setsize(int rows, int cols);
+ static int  	addch(int row, int col, int c, unsigned short attr);
+ static void	set_charset(char *dcs);
+ static void	erase(void);
+ static void	suspend(void);
+ static void	resume(void);
+ static void	set_cursor(CURSOR_MODE mode);
+ static void	set_oia(OIA_FLAG id, int on);
+ static void	set_compose(int on, unsigned char c, int keytype);
+ static void	set_lu(const char *lu);
+ static void	DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height, int Width);
+ static void	changed(int bstart, int bend);
+ static void	errorpopup(const char *msg);
+ static void	error(const char *s);
+ static int	init(void);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -79,7 +79,7 @@
  {
 	sizeof(struct lib3270_screen_callbacks),
 
-	NULL,			// int (*init)(void);
+	init,			// int (*init)(void);
 	error,			// void (*Error)(const char *s);
 	NULL,			// void (*Warning)(const char *s);
 	setsize,		// void (*setsize)(int rows, int cols);
@@ -88,7 +88,7 @@
 	title,			// void (*title)(char *text);
 	changed,		// void (*changed)(int bstart, int bend);
 	NULL,			// void (*ring_bell)(void);
-	redraw,			// void (*redraw)(void);
+	action_Redraw,	// void (*redraw)(void);
 	MoveCursor,		// void (*move_cursor)(int row, int col);
 	suspend,		// void (*suspend)(void);
 	resume,			// void (*resume)(void);
@@ -173,6 +173,7 @@
  	if(terminal && pixmap)
  	{
 		DrawScreen(terminal, color, pixmap);
+		DrawOIA(terminal,color,pixmap);
 		gtk_widget_queue_draw(terminal);
  	}
  }
@@ -289,9 +290,10 @@
 
  }
 
- static void redraw(void)
+ void action_Redraw(void)
  {
  	DrawScreen(terminal,color,pixmap);
+	DrawOIA(terminal,color,pixmap);
  }
 
  /**
@@ -847,4 +849,12 @@
  {
  	g_error("%s",s);
  	gtk_main_quit();
+ }
+
+ static int init(void)
+ {
+	// TODO (perry#1#): Get screen size from configuration file
+	ctlr_set_rows_cols(2, 80, 24);
+
+	return 0;
  }

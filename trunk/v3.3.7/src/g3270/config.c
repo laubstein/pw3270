@@ -44,8 +44,7 @@
  {
 	{ "Maximized",  GDK_WINDOW_STATE_MAXIMIZED,		gtk_window_maximize             },
 	{ "Iconified",  GDK_WINDOW_STATE_ICONIFIED,		gtk_window_iconify              },
-	{ "Sticky",		GDK_WINDOW_STATE_STICKY,		gtk_window_stick                },
-	{ "FullScreen",	GDK_WINDOW_STATE_FULLSCREEN,	gtk_window_fullscreen			}
+	{ "Sticky",		GDK_WINDOW_STATE_STICKY,		gtk_window_stick                }
  };
 
  static GKeyFile	*conf	= NULL;
@@ -160,6 +159,7 @@
 	{
 		// Save top window's size
 		gtk_window_get_size(GTK_WINDOW(topwindow),&pos[0],&pos[1]);
+		Trace("Topwindow size: %dx%d",pos[0],pos[1]);
 		g_key_file_set_integer_list(conf,"TopWindow","size",pos,2);
 	}
 
@@ -170,7 +170,40 @@
 	SaveConfigFile();
  }
 
+ gchar * GetString(const gchar *group, const gchar *key, const gchar *def)
+ {
+ 	gchar *ret = NULL;
+
+ 	if(conf)
+		ret = g_key_file_get_string(conf,group,key,NULL);
+
+	if(!ret)
+		return g_strdup(def);
+
+	return ret;
+ }
+
  void action_Restore(void)
  {
+	Trace("%s conf: %p",__FUNCTION__,conf);
+
+	if(!conf)
+		return;
+
+ 	/* Set window size */
+	if(g_key_file_has_key(conf,"TopWindow","size",NULL))
+	{
+		gsize 	sz		= 2;
+		gint	*vlr	=  g_key_file_get_integer_list(conf,"TopWindow","size",&sz,NULL);
+		if(vlr)
+		{
+			Trace("Window size: %dx%d (sz=%d)",vlr[0],vlr[1],sz);
+			gtk_window_resize(GTK_WINDOW(topwindow),vlr[0],vlr[1]);
+			g_free(vlr);
+		}
+	}
+
+
+
  }
 

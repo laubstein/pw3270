@@ -223,6 +223,12 @@
  	do_toggle(FULL_SCREEN);
  }
 
+ static void action_ToggleMarginedPaste(void)
+ {
+ 	do_toggle(MARGINED_PASTE);
+ }
+
+
  static void action_ShowCursorPos(GtkWidget *w, gpointer user_data)
  {
  	do_toggle(CURSOR_POS);
@@ -263,6 +269,10 @@
  {
  	action_Save();
  	gtk_main_quit();
+ }
+
+ void action_SelectColors(void)
+ {
  }
 
  static void action_About(GtkWidget *w, gpointer user_data)
@@ -324,6 +334,7 @@
  	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(action_Connect)			},
  	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)		},
  	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),			NULL,			NULL,	G_CALLBACK(action_Quit)				},
+ 	{	"SelectColors",		GTK_STOCK_SELECT_COLOR,	N_( "Colors" ),			NULL,			NULL,	G_CALLBACK(action_SelectColors)		},
 
  	/* Edit actions */
  	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			NULL,			NULL,	G_CALLBACK(action_Copy)				},
@@ -367,7 +378,7 @@
 	{	"EraseEOF",			NULL,					N_( "EraseEOF" ),		"End",			NULL,	G_CALLBACK(action_EraseEOF)			},
 	{	"PageUP",			NULL,					N_( "Page-Up" ),		"Page_Up",		NULL,	G_CALLBACK(action_PageUP) 			},
 	{	"PageDown",			NULL,					N_( "Page-Down" ),		"Page_Down",	NULL,	G_CALLBACK(action_PageDown)			},
-
+	{	"Redraw",			NULL,					N_( "Redraw screen" ),	NULL,			NULL,	G_CALLBACK(action_Redraw)			},
 
  };
 
@@ -385,14 +396,14 @@
 */
  static const GtkToggleActionEntry internal_action_toggles[] =
  {
- 	{	"CursorBlink",		NULL,					N_( "Blink Cursor" ),			NULL, 			NULL,	G_CALLBACK(action_BlinkCursor),		FALSE },
- 	{	"CursorPos",		NULL,					N_( "Show Cursor Position" ),	NULL, 			NULL,	G_CALLBACK(action_ShowCursorPos), 	TRUE  },
- 	{	"FullScreen",		NULL,					N_( "Full Screen" ),			NULL,			NULL,	G_CALLBACK(action_FullScreen),		FALSE },
- 	{	"MarginedPaste",	NULL,					N_( "Margined Paste" ),			NULL, 			NULL,	NULL, 								FALSE },
- 	{	"CrossHair",		NULL,					N_( "Cross Hair Cursor" ),		"<Alt>X",		NULL,	G_CALLBACK(action_CrossHair),		FALSE },
- 	{	"RectSelect",		NULL,					N_( "Rectangle Select" ),		NULL, 			NULL,	G_CALLBACK(action_RectSelect),		FALSE },
- 	{	"Reconnect",		NULL,					N_( "Auto-Reconnect" ),			NULL, 			NULL,	G_CALLBACK(action_AutoReconnect), 	FALSE },
- 	{	"Insert",			NULL,					N_( "Insert" ),					"Insert", 		NULL,	G_CALLBACK(action_Insert),		 	FALSE },
+ 	{	"ToggleCursorBlink",	NULL,					N_( "Blink Cursor" ),			NULL, 			NULL,	G_CALLBACK(action_BlinkCursor),				FALSE },
+ 	{	"ToggleCursorPos",		NULL,					N_( "Show Cursor Position" ),	NULL, 			NULL,	G_CALLBACK(action_ShowCursorPos), 			TRUE  },
+ 	{	"ToggleFullScreen",		NULL,					N_( "Full Screen" ),			NULL,			NULL,	G_CALLBACK(action_FullScreen),				FALSE },
+ 	{	"ToggleMarginedPaste",	NULL,					N_( "Margined Paste" ),			NULL, 			NULL,	G_CALLBACK(action_ToggleMarginedPaste), 	FALSE },
+ 	{	"ToggleCrossHair",		NULL,					N_( "Cross Hair Cursor" ),		"<Alt>X",		NULL,	G_CALLBACK(action_CrossHair),				FALSE },
+ 	{	"ToggleRectSelect",		NULL,					N_( "Rectangle Select" ),		NULL, 			NULL,	G_CALLBACK(action_RectSelect),				FALSE },
+ 	{	"ToggleReconnect",		NULL,					N_( "Auto-Reconnect" ),			NULL, 			NULL,	G_CALLBACK(action_AutoReconnect), 			FALSE },
+ 	{	"ToggleInsert",			NULL,					N_( "Insert" ),					"Insert", 		NULL,	G_CALLBACK(action_Insert),		 			FALSE },
 
  };
 

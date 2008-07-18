@@ -68,16 +68,18 @@
 		TERMINAL_COLOR_FIELD_PROTECTED,
 		TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED,
 
+		TERMINAL_COLOR_SELECTED_FG,
+		TERMINAL_COLOR_SELECTED_BG,
+
 		TERMINAL_COLOR_CURSOR,
 		TERMINAL_COLOR_CROSS_HAIR,
 
+		// Oia Colors
 		TERMINAL_COLOR_OIA_SEPARATOR,
 		TERMINAL_COLOR_OIA,
 		TERMINAL_COLOR_OIA_BACKGROUND,
 		TERMINAL_COLOR_OIA_STATUS_OK,
 		TERMINAL_COLOR_OIA_STATUS_INVALID,
-		TERMINAL_COLOR_SELECTED_FG,
-		TERMINAL_COLOR_SELECTED_BG,
 
 		TERMINAL_COLOR_COUNT
 	};
@@ -162,6 +164,7 @@
 	void		action_ClearSelection(void);
 	void 		action_Save(void);
 	void		action_Restore(void);
+	void 		action_Redraw(void);
 
 
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
@@ -172,6 +175,7 @@
 
 	int 			CloseConfigFile(void);
 	int				OpenConfigFile(void);
+	gchar 			*GetString(const gchar *group, const gchar *key, const gchar *def);
 
 
 #endif // G3270_H_INCLUDED

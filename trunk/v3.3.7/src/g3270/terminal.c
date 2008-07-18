@@ -340,22 +340,22 @@
 											"DeepSkyBlue,"		// TERMINAL_COLOR_FIELD_PROTECTED
 											"white,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
 
+											"black,"			// TERMINAL_COLOR_SELECTED_FG,
+											"white,"			// TERMINAL_COLOR_SELECTED_BG
+
 											"LimeGreen," 		// TERMINAL_COLOR_CURSOR
 											"LimeGreen," 		// TERMINAL_COLOR_CROSS_HAIR
 											"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
 											"LimeGreen,"		// TERMINAL_COLOR_OIA
 											"black,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
 											"white,"			// TERMINAL_COLOR_OIA_STATUS_OK
-											"red,"				// TERMINAL_COLOR_OIA_STATUS_INVALID
-											"black,"			// TERMINAL_COLOR_SELECTED_FG,
-											"white";			// TERMINAL_COLOR_SELECTED_BG
+											"red";				// TERMINAL_COLOR_OIA_STATUS_INVALID
 
 
  	int 	f;
 
 	// FIXME (perry#9#): Load colors from configuration file.
- 	char	*buffer = strdup(DefaultColors);
-
+ 	char	*buffer = GetString("Terminal","Colors",DefaultColors);
  	char	*ptr = strtok(buffer,",");
 
  	for(f=0;ptr && f < TERMINAL_COLOR_COUNT;f++)
@@ -367,12 +367,12 @@
  		}
 		else
 		{
-			gdk_color_parse("green",color+f);
+			gdk_color_parse("LimeGreen",color+f);
 		}
 		gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+f,TRUE,TRUE);
  	}
 
- 	free(buffer);
+ 	g_free(buffer);
 
  	return 0;
  }

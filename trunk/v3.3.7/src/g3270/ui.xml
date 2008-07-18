@@ -29,13 +29,14 @@
 		</menu>
 
 		<menu action='OptionsMenu'>
-			<menuitem action='CursorBlink' />
-			<menuitem action='CursorPos'  />
-			<menuitem action='FullScreen'  />
-			<menuitem action='MarginedPaste'  />
-			<menuitem action='CrossHair'  />
-			<menuitem action='RectSelect'  />
-			<menuitem action='Reconnect'  />
+			<menuitem action='SelectColors' />
+			<menuitem action='ToggleCursorBlink' />
+			<menuitem action='ToggleCursorPos'  />
+			<menuitem action='ToggleFullScreen'  />
+			<menuitem action='ToggleMarginedPaste'  />
+			<menuitem action='ToggleCrossHair'  />
+			<menuitem action='ToggleRectSelect'  />
+			<menuitem action='ToggleReconnect'  />
 		</menu>
 
 		<menu action='HelpMenu'>
@@ -86,7 +87,7 @@
 		<menuitem action='Quit'/>
 	</popup>
 
-	<accelerator action='Insert' />
+	<accelerator action='ToggleInsert' />
 	<accelerator action='Home'/>
 	<accelerator action='Reset'/>
 	<accelerator action='Return'/>

@@ -188,6 +188,8 @@
 		int 	CallAndWait(int(*callback)(void *), void *parm);
 
 		void 	ctlr_erase(int alt);
+		void	ctlr_set_rows_cols(int mn, int ovc, int ovr);
+
 		void 	screen_resume(void);
 		void 	screen_suspend(void);
 		void	screen_disp(void);

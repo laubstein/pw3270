@@ -185,7 +185,7 @@ ctlr_reinit(unsigned cmask)
  * Deal with the relationships between model numbers and rows/cols.
  */
 void
-set_rows_cols(int mn, int ovc, int ovr)
+ctlr_set_rows_cols(int mn, int ovc, int ovr)
 {
 	int defmod;
 
@@ -204,7 +204,7 @@ set_rows_cols(int mn, int ovc, int ovr)
 #if defined(RESTRICT_3279) /*[*/
 		if (appres.m3279) {
 			popup_an_error("No 3279 Model 4\nDefaulting to model 3");
-			set_rows_cols("3", ovc, ovr);
+			ctlr_set_rows_cols("3", ovc, ovr);
 			return;
 		}
 #endif /*]*/
@@ -216,7 +216,7 @@ set_rows_cols(int mn, int ovc, int ovr)
 #if defined(RESTRICT_3279) /*[*/
 		if (appres.m3279) {
 			popup_an_error("No 3279 Model 5\nDefaulting to model 3");
-			set_rows_cols(3, ovc, ovr);
+			ctlr_set_rows_cols(3, ovc, ovr);
 			return;
 		}
 #endif /*]*/
@@ -232,7 +232,7 @@ set_rows_cols(int mn, int ovc, int ovr)
 #endif
 		popup_an_error("Unknown model: %d\nDefaulting to %d", mn,
 		    defmod);
-		set_rows_cols(defmod, ovc, ovr);
+		ctlr_set_rows_cols(defmod, ovc, ovr);
 		return;
 	}
 
