@@ -39,13 +39,13 @@
 
  static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer data )
  {
+ 	action_Save();
  	gtk_main_quit();
     return FALSE;
  }
 
  static void destroy( GtkWidget *widget, gpointer   data )
  {
- 	action_Save();
     gtk_main_quit();
  }
 
@@ -157,9 +157,9 @@
 
 	register_tchange(FULL_SCREEN,set_fullscreen);
 
-	/* Set window size & position */
-	// TODO (perry#3#): Read saved values.
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
+
+	action_Restore();
 	gtk_window_set_position(GTK_WINDOW(topwindow),GTK_WIN_POS_CENTER);
 
 	return 0;

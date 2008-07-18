@@ -56,7 +56,7 @@ void mdt_set(int baddr);
 int next_unprotected(int baddr0);
 enum pds process_ds(unsigned char *buf, int buflen);
 void ps_process(void);
-void set_rows_cols(int mn, int ovc, int ovr);
+#define set_rows_cols(mn,ovc,ovr) ctlr_set_rows_cols(mn,ovc,ovr)
 void ticking_start(Boolean anyway);
 void toggle_nop(struct toggle *t, enum toggle_type tt);
 void toggle_showTiming(struct toggle *t, enum toggle_type tt);
