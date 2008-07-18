@@ -221,6 +221,8 @@ static int g3270_init(int *argc, char ***argv)
 
 	g_log_set_default_handler(log_callback,"GLog");
 
+	OpenConfigFile();
+
 	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
 	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
 	textdomain(GETTEXT_PACKAGE);
@@ -328,6 +330,7 @@ int main(int argc, char *argv[])
 	gtk_main();
 	Trace("%s main loop has finished","GTK");
 
+	CloseConfigFile();
 	return 0;
 }
 

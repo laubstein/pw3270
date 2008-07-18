@@ -168,6 +168,8 @@
 	int				PrintText(const char *name, gchar *text);
 	gchar 			*FindSystemConfigFile(const gchar *name);
 
+	int 			CloseConfigFile(void);
+	int				OpenConfigFile(void);
 
 
 #endif // G3270_H_INCLUDED
