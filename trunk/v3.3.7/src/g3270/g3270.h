@@ -160,6 +160,8 @@
 	void 		action_Copy(void);
 	void 		action_SelectField(void);
 	void		action_ClearSelection(void);
+	void 		action_Save(void);
+	void		action_Restore(void);
 
 
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);

@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-18 10:16-0300\n"
-"PO-Revision-Date: 2008-07-18 10:25-0300\n"
+"PO-Revision-Date: 2008-07-18 11:14-0300\n"
 "Last-Translator:  <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -128,7 +128,7 @@ msgstr "Esquerda"
 
 #: actions.c:385
 msgid "Margined Paste"
-msgstr "Copiar com margem"
+msgstr "Colar com margem"
 
 #: actions.c:349
 msgid "Next Field"
@@ -136,7 +136,7 @@ msgstr "Próximo campo"
 
 #: actions.c:290
 msgid "No Translators"
-msgstr "perry.werneck@gmail.com (PT-BR)"
+msgstr ""
 
 #: actions.c:363
 msgid "Page-Down"
@@ -273,11 +273,11 @@ msgstr ""
 
 #: screen.c:613
 msgid "bX System"
-msgstr ""
+msgstr "bX·Sistema"
 
 #: screen.c:617
 msgid "cX Wait"
-msgstr ""
+msgstr "cX·Aguarde"
 
 #: screen.c:621
 msgid "d"
