@@ -28,16 +28,28 @@
  #include "g3270.h"
  #include <ctype.h>
 
-#define CHECK_FILENAME(...)	filename = g_build_filename( __VA_ARGS__, NULL ); \
-							if(g_file_test(filename,G_FILE_TEST_IS_REGULAR)) \
-								return filename; \
-							g_free(filename);
+ #define CHECK_FILENAME(...)	filename = g_build_filename( __VA_ARGS__, NULL ); \
+								if(g_file_test(filename,G_FILE_TEST_IS_REGULAR)) \
+									return filename; \
+								g_free(filename);
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
+ static const struct _WindowState
+ {
+	const char *name;
+	GdkWindowState flag;
+	void (*activate)(GtkWindow *);
+ } WindowState[] =
+ {
+	{ "Maximized",  GDK_WINDOW_STATE_MAXIMIZED,		gtk_window_maximize             },
+	{ "Iconified",  GDK_WINDOW_STATE_ICONIFIED,		gtk_window_iconify              },
+	{ "Sticky",		GDK_WINDOW_STATE_STICKY,		gtk_window_stick                },
+	{ "FullScreen",	GDK_WINDOW_STATE_FULLSCREEN,	gtk_window_fullscreen			}
+ };
+
  static GKeyFile	*conf	= NULL;
  static gboolean	changed	= FALSE;
-
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -85,7 +97,7 @@
 
 	if(filename)
 	{
-		WriteLog("Loading %s",filename);
+		Log("Loading %s",filename);
 		g_key_file_load_from_file(conf,filename,G_KEY_FILE_NONE,NULL);
 	}
 
@@ -131,4 +143,34 @@
 	return 0;
  }
 
+ void action_Save(void)
+ {
+ 	int 			pos[2];
+	GdkWindowState	CurrentState;
+	int				f;
+
+	Trace("%s conf: %p",__FUNCTION__,conf);
+
+	if(!conf)
+		return;
+
+	CurrentState = gdk_window_get_state(topwindow->window);
+
+	if( !(CurrentState & (GDK_WINDOW_STATE_FULLSCREEN|GDK_WINDOW_STATE_MAXIMIZED|GDK_WINDOW_STATE_ICONIFIED)) )
+	{
+		// Save top window's size
+		gtk_window_get_size(GTK_WINDOW(topwindow),&pos[0],&pos[1]);
+		g_key_file_set_integer_list(conf,"TopWindow","size",pos,2);
+	}
+
+	for(f=0;f<(sizeof(WindowState)/sizeof(struct _WindowState));f++)
+		g_key_file_set_boolean(conf,"TopWindow",WindowState[f].name, CurrentState & WindowState[f].flag);
+
+	changed = TRUE;
+	SaveConfigFile();
+ }
+
+ void action_Restore(void)
+ {
+ }
 

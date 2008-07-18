@@ -45,6 +45,7 @@
 
  static void destroy( GtkWidget *widget, gpointer   data )
  {
+ 	action_Save();
     gtk_main_quit();
  }
 

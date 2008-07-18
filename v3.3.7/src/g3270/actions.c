@@ -259,6 +259,12 @@
 	PrintText("g3270", GetClipboard());
  }
 
+ static void action_Quit(void)
+ {
+ 	action_Save();
+ 	gtk_main_quit();
+ }
+
  static void action_About(GtkWidget *w, gpointer user_data)
  {
  	static const char *authors[] = {	"Paul Mattes <Paul.Mattes@usa.net>",
@@ -317,7 +323,7 @@
  	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	G_CALLBACK(action_About)			},
  	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(action_Connect)			},
  	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)		},
- 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),			NULL,			NULL,	gtk_main_quit						},
+ 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),			NULL,			NULL,	G_CALLBACK(action_Quit)				},
 
  	/* Edit actions */
  	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			NULL,			NULL,	G_CALLBACK(action_Copy)				},
