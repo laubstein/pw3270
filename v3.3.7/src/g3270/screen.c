@@ -69,7 +69,6 @@
  static void	set_lu(const char *lu);
  static void	DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height, int Width);
  static void	changed(int bstart, int bend);
- static void	errorpopup(const char *msg);
  static void	error(const char *s);
  static int	init(void);
 
@@ -99,7 +98,7 @@
 	set_lu,			// void (*lu)(const char *lu);
 	set_oia,		// void (*set)(OIA_FLAG id, int on);
 	erase,			// void (*erase)(void);
-	errorpopup,		// void (*popup_an_error)(const char *msg);
+	error,			// void (*popup_an_error)(const char *msg);
 
  };
 
@@ -608,59 +607,59 @@
  	{
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_BLANK,
 									TERMINAL_COLOR_OIA_STATUS_OK,
-									N_( "a" ) ),
+									NULL ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_SYSWAIT,
 									TERMINAL_COLOR_OIA_STATUS_OK,
-									N_( "bX System" ) ),
+									N_( "X System" ) ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_TWAIT,
 									TERMINAL_COLOR_OIA_STATUS_OK,
-									N_( "cX Wait" ) ),
+									N_( "X Wait" ) ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_CONNECTED,
 									TERMINAL_COLOR_OIA_STATUS_OK,
-									N_( "d" ) ),
+									NULL ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_DISCONNECTED,
 									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "eX Disconnected" ) ),
+									N_( "X Disconnected" ) ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_AWAITING_FIRST,
 									TERMINAL_COLOR_OIA_STATUS_OK,
-									N_( "fX" ) ),
+									N_( "X" ) ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_MINUS,
 									TERMINAL_COLOR_OIA_STATUS_OK,
-									N_( "gX -f" ) ),
+									N_( "X -f" ) ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_PROTECTED,
 									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "hX Protected" ) ),
+									N_( "X Protected" ) ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_NUMERIC,
 									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "iX Numeric" ) ),
+									N_( "X Numeric" ) ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_OVERFLOW,
 									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "jX Overflow" ) ),
+									N_( "X Overflow" ) ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_INHIBIT,
 									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "kX Inhibit" ) ),
+									N_( "X Inhibit" ) ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_X,
 									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "lX" ) ),
+									N_( "X" ) ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_RESOLVING,
 									TERMINAL_COLOR_OIA_STATUS_WARNING,
-									N_( "mX Resolving" ) ),
+									N_( "X Resolving" ) ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_CONNECTING,
 									TERMINAL_COLOR_OIA_STATUS_WARNING,
-									N_( "nX Connecting" ) ),
+									N_( "X Connecting" ) ),
 
 
 	};
@@ -677,9 +676,13 @@
 
 	last_id 	= id;
 	sts_data 	= tbl+id;
-	status_msg	= gettext(sts_data->string)+1;
 
-	Trace("Status changed to %s (%s)",sts_data->dbg,sts_data->string+1);
+	if(sts_data->string)
+		status_msg = gettext(sts_data->string);
+	else
+		status_msg = "";
+
+	Trace("Status changed to %s (%s)",sts_data->dbg,sts_data->string);
 
 	// FIXME (perry#2#): Find why the library is keeping the cursor as "locked" in some cases. When corrected this "workaround" can be removed.
 	if(id == STATUS_CODE_BLANK)
@@ -830,25 +833,19 @@
 	return g_realloc(buffer,strlen(buffer)+1);
  }
 
- static void errorpopup(const char *msg)
+ static void error(const char *msg)
  {
  	GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
 												GTK_DIALOG_DESTROY_WITH_PARENT,
 												GTK_MESSAGE_ERROR,
 												GTK_BUTTONS_CLOSE,
-												"%s",msg );
+												"%s",gettext(msg) );
 
  	g_critical(msg);
 
 	gtk_dialog_run(GTK_DIALOG (dialog));
 	gtk_widget_destroy(dialog);
 
- }
-
- static void error(const char *s)
- {
- 	g_error("%s",s);
- 	gtk_main_quit();
  }
 
  static int init(void)

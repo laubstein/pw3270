@@ -207,3 +207,32 @@
 
  }
 
+gchar * FindSystemConfigFile(const gchar *name)
+{
+	const gchar * const	*list =  g_get_system_config_dirs();
+ 	gchar					*filename;
+ 	int						f;
+
+	// Search for the file in gtk's system config path
+ 	for(f=0;list[f];f++)
+ 	{
+		filename = g_build_filename(list[f],PACKAGE_NAME,name,NULL);
+		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+			return filename;
+		g_free(filename);
+ 	}
+
+	// Check if the file is available in current directory
+	if(g_file_test(name,G_FILE_TEST_IS_REGULAR))
+		return g_strdup(name);
+
+#ifdef DEBUG
+	filename = g_build_filename("..","..","src",PACKAGE_NAME,name,NULL);
+	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+		return filename;
+	g_free(filename);
+#endif
+
+	return 0;
+}
+

@@ -1,7 +1,7 @@
-# translation of g3270.
-# Copyright (C) 2008 THE g3270'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the g3270 package.
-# <>, 2008.
+# Portuguese/Brazil translation of g3270.
+# Copyright (C) 2008 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Perry Werneck <perry.werneck@gmail.com>, 2008.
 # , fuzzy
 # 
 # 
@@ -9,96 +9,100 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-18 10:16-0300\n"
-"PO-Revision-Date: 2008-07-18 11:14-0300\n"
-"Last-Translator:  <>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2008-07-21 07:51-0300\n"
+"PO-Revision-Date: 2008-07-21 08:58-0300\n"
+"Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
+"Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: "
+"Content-Transfer-Encoding: 8bit"
 
-#: actions.c:288
+#: actions.c:304
 msgid "3270 Terminal emulator for GTK."
 msgstr "Emulador 3270 para GTK"
 
-#: actions.c:317
+#: actions.c:333
 msgid "About"
 msgstr "Sobre"
 
-#: actions.c:324
+#: actions.c:341
 msgid "Add to copy"
 msgstr "Copiar anexando"
 
-#: actions.c:388
+#: actions.c:405
 msgid "Auto-Reconnect"
 msgstr "Auto-reconectar"
 
-#: actions.c:360
+#: actions.c:377
 msgid "Backspace"
 msgstr ""
 
-#: actions.c:382
+#: actions.c:399
 msgid "Blink Cursor"
 msgstr "Cursor piscante"
 
-#: actions.c:417
+#: actions.c:434
 msgid "Can't build Application UI!"
-msgstr "Não foi possível montar a interface da aplicação"
+msgstr "Não foi possível montar a UI da aplicação"
 
-#: actions.c:415
+#: actions.c:432
 #, c-format
 msgid "Can't build Application UI: %s"
-msgstr "Não foi possível montar a interface da aplicação: %s"
+msgstr "Não·foi·possível·montar·a·UI·da·aplicação: %s"
 
-#: actions.c:423
+#: actions.c:440
 msgid "Can't find UI definition file"
-msgstr "Arquivo com a definição de interface não foi encontrado"
+msgstr "Não encontrei arquivo de definição da UI"
 
 #: g3270.c:232
 msgid "Can't register into lib3270 I/O callback table."
-msgstr "Não consegui registrar chamadas de I/O na biblioteca 3270"
+msgstr "Não foi possível registrar tabela de I/O 3270"
 
 #: g3270.c:238
 msgid "Can't register into lib3270 screen callback table."
-msgstr "Não consegui registrar chamadas de tela na biblioteca 3270"
+msgstr "Não foi possível registrar chamadas de tela 3270."
 
-#: actions.c:330
+#: actions.c:347
 msgid "Clear fields"
 msgstr "Limpar campos"
 
-#: actions.c:323
+#: actions.c:337
+msgid "Colors"
+msgstr "Cores"
+
+#: actions.c:340
 msgid "Copy"
 msgstr "Copiar"
 
-#: actions.c:386
+#: actions.c:403
 msgid "Cross Hair Cursor"
 msgstr ""
 
-#: actions.c:359
+#: actions.c:376
 msgid "Delete Char"
-msgstr "Apagar caractere"
+msgstr ""
 
-#: actions.c:358
+#: actions.c:375
 msgid "Delete Field"
-msgstr "Apagar campo"
+msgstr ""
 
-#: actions.c:357
+#: actions.c:374
 msgid "Delete Word"
-msgstr "Apagar palavra"
+msgstr ""
 
-#: actions.c:348
+#: actions.c:365
 msgid "Down"
-msgstr "Descer"
+msgstr ""
 
-#: actions.c:350
+#: actions.c:367
 msgid "Enter"
 msgstr ""
 
-#: actions.c:361
+#: actions.c:378
 msgid "EraseEOF"
 msgstr ""
 
-#: actions.c:354
+#: actions.c:371
 msgid "Escape"
 msgstr ""
 
@@ -106,111 +110,115 @@ msgstr ""
 msgid "Font"
 msgstr "Fonte"
 
-#: actions.c:384
+#: actions.c:401
 msgid "Full Screen"
-msgstr "Tela-cheia"
+msgstr "Tela cheia"
 
-#: actions.c:312
+#: actions.c:328
 msgid "Help"
 msgstr "Ajuda"
 
-#: actions.c:355
+#: actions.c:372
 msgid "Home"
 msgstr ""
 
-#: actions.c:389
+#: actions.c:406
 msgid "Insert"
-msgstr "Inserir"
-
-#: actions.c:346
-msgid "Left"
-msgstr "Esquerda"
-
-#: actions.c:385
-msgid "Margined Paste"
-msgstr "Colar com margem"
-
-#: actions.c:349
-msgid "Next Field"
-msgstr "Próximo campo"
-
-#: actions.c:290
-msgid "No Translators"
 msgstr ""
 
 #: actions.c:363
+msgid "Left"
+msgstr ""
+
+#: actions.c:402
+msgid "Margined Paste"
+msgstr "Colar com margem"
+
+#: actions.c:366
+msgid "Next Field"
+msgstr "Próximo campo"
+
+#: actions.c:306
+msgid "No Translators"
+msgstr ""
+
+#: actions.c:380
 msgid "Page-Down"
 msgstr ""
 
-#: actions.c:362
+#: actions.c:379
 msgid "Page-Up"
 msgstr ""
 
-#: actions.c:325
+#: actions.c:342
 msgid "Paste"
 msgstr "Colar"
 
-#: actions.c:326
+#: actions.c:343
 msgid "Paste _next"
 msgstr "Colar próximo"
 
-#: actions.c:333
+#: actions.c:350
 msgid "Print"
 msgstr "Imprimir"
 
-#: actions.c:335
+#: actions.c:352
 msgid "Print copy"
 msgstr "Imprimir cópia"
 
-#: actions.c:334
+#: actions.c:351
 msgid "Print selected"
 msgstr "Imprimir seleção"
 
-#: actions.c:387
+#: actions.c:404
 msgid "Rectangle Select"
-msgstr "Selecionar retângulo"
+msgstr "Selecionar em bloco"
 
-#: actions.c:353
+#: actions.c:381
+msgid "Redraw screen"
+msgstr ""
+
+#: actions.c:370
 msgid "Reset"
 msgstr ""
 
-#: actions.c:356
+#: actions.c:373
 msgid "Return"
 msgstr ""
 
-#: actions.c:345
+#: actions.c:362
 msgid "Right"
 msgstr ""
 
-#: actions.c:341
+#: actions.c:358
 msgid "Select Down"
 msgstr ""
 
-#: actions.c:342
+#: actions.c:359
 msgid "Select Field"
-msgstr ""
+msgstr "Selecionar campo"
 
-#: actions.c:339
+#: actions.c:356
 msgid "Select Left"
 msgstr ""
 
-#: actions.c:338
+#: actions.c:355
 msgid "Select Right"
 msgstr ""
 
-#: actions.c:340
+#: actions.c:357
 msgid "Select Up"
 msgstr ""
 
-#: actions.c:329
+#: actions.c:346
 msgid "Select all"
-msgstr ""
+msgstr "Selecionar tudo"
 
-#: actions.c:383
+#: actions.c:400
 msgid "Show Cursor Position"
 msgstr "Mostra posição do cursor"
 
-#: actions.c:271
+#: actions.c:287
 msgid ""
 "This program is free software; you can redistribute it and/or modify it "
 "under the terms of the GNU General Public License as published by the Free "
@@ -227,99 +235,87 @@ msgid ""
 "Franklin St, Fifth Floor, Boston, MA 02111-1307 USA"
 msgstr ""
 
-#: actions.c:347
+#: actions.c:364
 msgid "Up"
 msgstr ""
 
-#: actions.c:318
+#: screen.c:631 screen.c:655
+msgid "X"
+msgstr ""
+
+#: screen.c:635
+msgid "X -f"
+msgstr ""
+
+#: screen.c:663
+msgid "X Connecting"
+msgstr "X Conectando"
+
+#: screen.c:627
+msgid "X Disconnected"
+msgstr "X Desconectado"
+
+#: screen.c:651
+msgid "X Inhibit"
+msgstr ""
+
+#: screen.c:643
+msgid "X Numeric"
+msgstr "X Numérico"
+
+#: screen.c:647
+msgid "X Overflow"
+msgstr ""
+
+#: screen.c:639
+msgid "X Protected"
+msgstr "X Protegido"
+
+#: screen.c:659
+msgid "X Resolving"
+msgstr "X Resolvendo"
+
+#: screen.c:615
+msgid "X System"
+msgstr ""
+
+#: screen.c:619
+msgid "X Wait"
+msgstr "X Aguarde"
+
+#: actions.c:334
 msgid "_Connect"
 msgstr "_Conectar"
 
-#: actions.c:319
+#: actions.c:335
 msgid "_Disconnect"
 msgstr "_Desconectar"
 
-#: actions.c:313
+#: actions.c:329
 msgid "_Edit"
 msgstr "_Editar"
 
-#: actions.c:310
+#: actions.c:326
 msgid "_File"
 msgstr "_Arquivo"
 
-#: actions.c:311
+#: actions.c:327
 msgid "_Network"
 msgstr "_Rede"
 
-#: actions.c:314
+#: actions.c:330
 msgid "_Options"
 msgstr "_Opções"
 
-#: actions.c:320
+#: actions.c:336
 msgid "_Quit"
-msgstr "_Sair"
+msgstr "Sair"
 
-#: actions.c:328
+#: actions.c:345
 msgid "_Reselect"
-msgstr "_Reselecionar"
+msgstr "Reselecionar"
 
-#: actions.c:327
+#: actions.c:344
 msgid "_Unselect"
 msgstr "Deselecionar"
-
-#: screen.c:609
-msgid "a"
-msgstr ""
-
-#: screen.c:613
-msgid "bX System"
-msgstr "bX·Sistema"
-
-#: screen.c:617
-msgid "cX Wait"
-msgstr "cX·Aguarde"
-
-#: screen.c:621
-msgid "d"
-msgstr ""
-
-#: screen.c:625
-msgid "eX Disconnected"
-msgstr "eX Desconectado"
-
-#: screen.c:629
-msgid "fX"
-msgstr ""
-
-#: screen.c:633
-msgid "gX -f"
-msgstr ""
-
-#: screen.c:637
-msgid "hX Protected"
-msgstr "hX Protegido"
-
-#: screen.c:641
-msgid "iX Numeric"
-msgstr "iX Numérico"
-
-#: screen.c:645
-msgid "jX Overflow"
-msgstr ""
-
-#: screen.c:649
-msgid "kX Inhibit"
-msgstr ""
-
-#: screen.c:653
-msgid "lX"
-msgstr ""
-
-#: screen.c:657
-msgid "mX Resolving"
-msgstr "mX Resolvendo"
-
-#: screen.c:661
-msgid "nX Connecting"
-msgstr "nX Conectando"
 

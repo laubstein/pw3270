@@ -1274,7 +1274,7 @@ void usage(char *msg)
 	if (msg != CN)
 		Warning(msg);
 
-	xs_error("Usage: %s [options] [ps:][LUname@]hostname[:port]",programname);
+	popup_an_error("Usage: %s [options] [ps:][LUname@]hostname[:port]",programname);
 }
 
 #if defined(_WIN32) /*[*/

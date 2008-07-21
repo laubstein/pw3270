@@ -30,6 +30,9 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #endif /*]*/
+
+#include <lib3270/api.h>
+
 #include <assert.h>
 #include <stdarg.h>
 #include "3270ds.h"
@@ -69,7 +72,7 @@ static Boolean omit_due_space_limit = False;
 #define	RPQ_VERSION	4
 
 /*
- * Define a table of RPQ self-defing terms. 
+ * Define a table of RPQ self-defing terms.
  * NOTE: Synonyms could be specified by coding different text items but using
  * the same "id" value.
  * Items should be listed in alphabetical order by "text" name so if the user
@@ -160,7 +163,7 @@ do_qr_rpqnames(void)
 
 		case RPQ_TIMEZONE:	/* UTC time offset */
 			omit_due_space_limit = (remaining < 2);
-			if (!omit_due_space_limit) 
+			if (!omit_due_space_limit)
 				SET16(obptr, get_rpq_timezone());
 			break;
 
@@ -194,7 +197,7 @@ do_qr_rpqnames(void)
 
 		default:		/* unsupported ID, (can't happen) */
 			Error("Unsupported RPQ term");
-			break;		
+			break;
 		}
 
 		if (omit_due_space_limit)
@@ -218,7 +221,7 @@ do_qr_rpqnames(void)
 		 * When we calculated the length of the term, a few lines
 		 * above, that length included the term length and term id
 		 * prefix too. (TERM_PREFIX_SIZE)
-		 * But just prior to the switch statement, we decremented the 
+		 * But just prior to the switch statement, we decremented the
 		 * remaining space by that amount so subsequent routines would
 		 * be told how much space they have for their data, without
 		 * each routine having to account for that prefix.
@@ -241,7 +244,7 @@ do_qr_rpqnames(void)
 
 /* Utility function used by the RPQNAMES query reply. */
 static Boolean
-select_rpq_terms(void) 
+select_rpq_terms(void)
 {
 	int i,j,k,len;
 	char *uplist;
@@ -295,7 +298,7 @@ select_rpq_terms(void)
 			if (!isupper(*p1))
 				break;
 		}
-		len = p1-kw; 
+		len = p1-kw;
 
 		is_no_form = ((len > 2) && (strncmp("NO", kw, 2) == 0));
 		if (is_no_form) {
@@ -333,7 +336,7 @@ select_rpq_terms(void)
 	free(uplist);
 
 	/*
-	 * Return to caller with indication (T/F) of any items 
+	 * Return to caller with indication (T/F) of any items
 	 * to be selected (T) or are all terms suppressed? (F)
 	 */
 	for (i=0; i<NS_RPQ; i++) {
@@ -367,7 +370,7 @@ get_rpq_timezone(void)
 	struct rpq_keyword *kw;
 
 
-	/* id isn't necessarily the table index... locate item */	
+	/* id isn't necessarily the table index... locate item */
 	for (kw = &rpq_keywords[0]; kw -> id != RPQ_TIMEZONE; kw++) {
 	}
 
@@ -377,7 +380,7 @@ get_rpq_timezone(void)
 		long x;
 
 		p1 = x3270rpq+kw->oride;
-		
+
 		x = strtol(p1, &p2, 10);
 		if (errno != 0) {
 			rpq_warning("RPQ TIMEZONE term is invalid - "
@@ -385,7 +388,7 @@ get_rpq_timezone(void)
 			return 4;
 		}
 		if ((*p2 != '\0') && (*p2 != ':') && (!isspace(*p2)))
-			return 4; 
+			return 4;
 
 		hhmm = ldiv(x, 100L);
 
@@ -432,7 +435,7 @@ get_rpq_timezone(void)
 
 /* Utility function used by the RPQNAMES query reply. */
 static int
-get_rpq_user(unsigned char buf[], const int buflen) 
+get_rpq_user(unsigned char buf[], const int buflen)
 {
 	/*
 	 * Text may be specified in one of two ways, but not both.
@@ -452,7 +455,7 @@ get_rpq_user(unsigned char buf[], const int buflen)
 	int x;
 	struct rpq_keyword *kw;
 
-	/* id isn't necessarily the table index... locate item */	
+	/* id isn't necessarily the table index... locate item */
 	for (kw = &rpq_keywords[0]; kw -> id != RPQ_USER; kw++) {
 	}
 
@@ -491,7 +494,7 @@ get_rpq_user(unsigned char buf[], const int buflen)
 						"bytes", x);
 				break; /* too long, truncate */
 			}
-	
+
 			*p_h++ = c;	/* copy (upper case) character */
 			*p_h = '\0';	/* keep string properly terminated */
 		}
@@ -537,7 +540,7 @@ get_rpq_user(unsigned char buf[], const int buflen)
 					"characters", x);
 			break;
 		}
-			
+
 		/*
 		 * \ means take next char as literal. Skip \ take next char.
 		 * If there is no next char, then we'll take the \
@@ -553,7 +556,7 @@ get_rpq_user(unsigned char buf[], const int buflen)
 
 #if !defined(_WIN32) /*[*/
 static int
-get_rpq_address(unsigned char *buf, const int maxlen) 
+get_rpq_address(unsigned char *buf, const int maxlen)
 {
 	struct rpq_keyword *kw;
 	int x = 0;
@@ -563,7 +566,7 @@ get_rpq_address(unsigned char *buf, const int maxlen)
 		return 0;
 	}
 
-	/* id isn't necessarily the table index... locate item */	
+	/* id isn't necessarily the table index... locate item */
 	for (kw = &rpq_keywords[0]; kw->id != RPQ_ADDRESS; kw++) {
 	}
 

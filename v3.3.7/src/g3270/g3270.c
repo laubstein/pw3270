@@ -208,18 +208,18 @@ static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, cons
 
 static int g3270_init(int *argc, char ***argv)
 {
+	/* Init GTK stuff */
+	g_thread_init(0);
+	gtk_init(argc, argv);
+
+	g_log_set_default_handler(log_callback,"GLog");
+
 #if defined(_WIN32) /*[*/
 	gchar *ptr = g_strdup(*argv[0]);
 	g_chdir(g_path_get_dirname(ptr));
 	g_free(ptr);
 	Trace("Current dir: %s",g_get_current_dir());
 #endif
-
-	/* Init GTK stuff */
-	g_thread_init(0);
-	gtk_init(argc, argv);
-
-	g_log_set_default_handler(log_callback,"GLog");
 
 	OpenConfigFile();
 
@@ -229,13 +229,13 @@ static int g3270_init(int *argc, char ***argv)
 
 	if(Register3270IOCallbacks(&g3270_io_callbacks))
 	{
-		g_error( _( "Can't register into lib3270 I/O callback table." ) );
+		popup_an_error( N_( "Can't register into lib3270 I/O callback table." ) );
 		return -1;
 	}
 
 	if(Register3270ScreenCallbacks(&g3270_screen_callbacks))
 	{
-		g_error( _( "Can't register into lib3270 screen callback table." ) );
+		popup_an_error( N_( "Can't register into lib3270 screen callback table." ) );
 		return -1;
 	}
 
@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
 
 			if(!PCONNECTED)
 			{
-				Trace("Negotiation with %s failed!",cl_hostname);
+				popup_an_error( N_( "Negotiation with %s failed!" ),cl_hostname);
 				x3270_exit(1);
 			}
 		}
@@ -331,35 +331,6 @@ int main(int argc, char *argv[])
 	Trace("%s main loop has finished","GTK");
 
 	CloseConfigFile();
-	return 0;
-}
-
-gchar * FindSystemConfigFile(const gchar *name)
-{
-	const gchar * const	*list =  g_get_system_config_dirs();
- 	gchar					*filename;
- 	int						f;
-
-	// Search for the file in gtk's system config path
- 	for(f=0;list[f];f++)
- 	{
-		filename = g_build_filename(list[f],PACKAGE_NAME,name,NULL);
-		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
-			return filename;
-		g_free(filename);
- 	}
-
-	// Check if the file is available in current directory
-	if(g_file_test(name,G_FILE_TEST_IS_REGULAR))
-		return g_strdup(name);
-
-#ifdef DEBUG
-	filename = g_build_filename("..","..","src",PACKAGE_NAME,name,NULL);
-	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
-		return filename;
-	g_free(filename);
-#endif
-
 	return 0;
 }
 
