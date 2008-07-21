@@ -181,6 +181,8 @@
 		int find_field_length(int baddr);
 		unsigned char get_field_attribute(int baddr);
 
+		void 	popup_an_error(const char *fmt, ...);
+
 		/* Misc API calls */
 		void	Input_String(const unsigned char *str);
 		int		Toggled(int ix);

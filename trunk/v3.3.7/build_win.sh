@@ -27,7 +27,7 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-cp image/*.jpg $IMAGE
+cp image/*.jpg $IMAGE/g3270.jpg
 if [ "$?" != "0" ]; then
 	exit -1
 fi
@@ -49,7 +49,7 @@ fi
 
 mv g3270_*.zip /tmp
 cd $IMAGE
-zip -9 -m -r $PACKET *
+zip -9 -r $PACKET *
 if [ "$?" != "0" ]; then
 	exit -1
 fi

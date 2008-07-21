@@ -37,6 +37,8 @@
 #endif /*]*/
 #endif /*]*/
 
+#include <lib3270/api.h>
+
 #include "3270ds.h"
 #include "popupsc.h"
 #include "proxyc.h"

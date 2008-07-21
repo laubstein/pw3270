@@ -87,9 +87,14 @@
 	file = FindSystemConfigFile(PACKAGE_NAME ".jpg");
 	if(file)
 	{
+		Log("Loading %s",file);
 		main_icon = gdk_pixbuf_new_from_file(file, NULL);
 		gtk_window_set_icon(GTK_WINDOW(topwindow),main_icon);
 		g_free(file);
+	}
+	else
+	{
+		Log("Can't find %s",PACKAGE_NAME ".jpg");
 	}
 
 	for(f=0;f<CURSOR_MODE_USER;f++)

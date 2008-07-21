@@ -47,6 +47,8 @@
 #include <langinfo.h>
 #endif /*]*/
 
+#include <lib3270/api.h>
+
 #define EURO_SUFFIX	"-euro"
 #define ES_SIZE		(sizeof(EURO_SUFFIX) - 1)
 

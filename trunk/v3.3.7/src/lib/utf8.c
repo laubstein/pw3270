@@ -19,6 +19,7 @@
  */
 
 #include "globals.h"
+#include <lib3270/api.h>
 
 #include "popupsc.h"
 #include "utf8c.h"
