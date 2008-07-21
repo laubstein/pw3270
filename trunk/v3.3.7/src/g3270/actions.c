@@ -75,8 +75,6 @@
 
  };
 
-#define IS_FUNCTION_KEY(event)   (event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(event->state & (GDK_MOD1_MASK|GDK_CONTROL_MASK)))
-
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
  static void action_pf(GtkWidget *w, gpointer id)
@@ -454,6 +452,16 @@
 	return ui_manager;
  }
 
+ int GetFunctionKey(GdkEventKey *event)
+ {
+ 	int rc = (event->keyval - GDK_F1)+1;
+
+ 	if(event->state & GDK_SHIFT_MASK)
+ 	   rc += 12;
+
+	return rc;
+ }
+
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
  	// TODO (perry#2#): Put all keyboard actions as accelerators.
@@ -495,7 +503,7 @@
 	if(IS_FUNCTION_KEY(event))
     {
 		action_ClearSelection();
-        sprintf(buffer,"%d",(event->keyval - GDK_F1)+1);
+    	sprintf(buffer,"%d",GetFunctionKey(event));
         action_internal(PF_action, IA_DEFAULT, buffer, CN);
         return TRUE;
     }

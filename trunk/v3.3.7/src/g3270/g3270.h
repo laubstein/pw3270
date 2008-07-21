@@ -97,6 +97,7 @@
 
 	#define OIAROW				(top_margin+(fHeight*terminal_rows))
 	#define CHARSET 			charset ? charset : "ISO-8859-1"
+	#define IS_FUNCTION_KEY(event)   (event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(event->state & (GDK_MOD1_MASK|GDK_CONTROL_MASK)))
 
 	extern GtkWidget				*topwindow;
 	extern GdkPixmap				*pixmap;
@@ -163,7 +164,7 @@
 	void 		action_Save(void);
 	void		action_Restore(void);
 	void 		action_Redraw(void);
-	void 			action_SelectColors(void);
+	void 		action_SelectColors(void);
 
 
 	int 			LoadColors(void);
@@ -174,6 +175,7 @@
 	gchar 			*FindSystemConfigFile(const gchar *name);
 	void 			RestoreWindowSize(const gchar *group, GtkWidget *widget);
 	void 			SaveWindowSize(const gchar *group, GtkWidget *widget);
+	int 			GetFunctionKey(GdkEventKey *event);
 
 	int 			CloseConfigFile(void);
 	int				OpenConfigFile(void);
