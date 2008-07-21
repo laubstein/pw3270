@@ -30,10 +30,9 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
- GtkWidget *topwindow 	= NULL;
- GdkPixbuf *main_icon	= NULL;
- GdkCursor *wCursor[CURSOR_MODE_USER];
-
+ GtkWidget	*topwindow 	= NULL;
+ GList 		*main_icon	= NULL;
+ GdkCursor	*wCursor[CURSOR_MODE_USER];
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -80,7 +79,7 @@
  	int				f;
 	GtkUIManager	*ui_manager;
 	gchar			*file;
-	GdkPixbuf		*main_icon;
+	GdkPixbuf		*pix;
 
 	topwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -88,8 +87,9 @@
 	if(file)
 	{
 		Log("Loading %s",file);
-		main_icon = gdk_pixbuf_new_from_file(file, NULL);
-		gtk_window_set_icon(GTK_WINDOW(topwindow),main_icon);
+		pix = gdk_pixbuf_new_from_file(file, NULL);
+		main_icon = g_list_append(main_icon, pix);
+		gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
 		g_free(file);
 	}
 	else

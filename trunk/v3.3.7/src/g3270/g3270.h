@@ -46,38 +46,38 @@
 
 	enum TERMINAL_COLOR
 	{
-		TERMINAL_COLOR_00,
-		TERMINAL_COLOR_01,
-		TERMINAL_COLOR_02,
-		TERMINAL_COLOR_03,
-		TERMINAL_COLOR_04,
-		TERMINAL_COLOR_05,
-		TERMINAL_COLOR_06,
-		TERMINAL_COLOR_07,
-		TERMINAL_COLOR_08,
-		TERMINAL_COLOR_09,
-		TERMINAL_COLOR_10,
-		TERMINAL_COLOR_11,
-		TERMINAL_COLOR_12,
-		TERMINAL_COLOR_13,
-		TERMINAL_COLOR_14,
-		TERMINAL_COLOR_15,
+		TERMINAL_COLOR_BACKGROUND,
+		TERMINAL_COLOR_BLUE,
+		TERMINAL_COLOR_RED,
+		TERMINAL_COLOR_PINK,
+		TERMINAL_COLOR_GREEN,
+		TERMINAL_COLOR_TURQUOISE,
+		TERMINAL_COLOR_YELLOW,
+		TERMINAL_COLOR_WHITE,
+		TERMINAL_COLOR_BLACK,
+		TERMINAL_COLOR_DARK_BLUE,
+		TERMINAL_COLOR_ORANGE,
+		TERMINAL_COLOR_PURPLE,
+		TERMINAL_COLOR_DARK_GREEN,
+		TERMINAL_COLOR_DARK_TURQUOISE,
+		TERMINAL_COLOR_MUSTARD,
+		TERMINAL_COLOR_GRAY,
 
 		TERMINAL_COLOR_FIELD_DEFAULT,
 		TERMINAL_COLOR_FIELD_INTENSIFIED,
 		TERMINAL_COLOR_FIELD_PROTECTED,
 		TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED,
 
-		TERMINAL_COLOR_SELECTED_FG,
 		TERMINAL_COLOR_SELECTED_BG,
+		TERMINAL_COLOR_SELECTED_FG,
 
 		TERMINAL_COLOR_CURSOR,
 		TERMINAL_COLOR_CROSS_HAIR,
 
 		// Oia Colors
-		TERMINAL_COLOR_OIA_SEPARATOR,
-		TERMINAL_COLOR_OIA,
 		TERMINAL_COLOR_OIA_BACKGROUND,
+		TERMINAL_COLOR_OIA,
+		TERMINAL_COLOR_OIA_SEPARATOR,
 		TERMINAL_COLOR_OIA_STATUS_OK,
 		TERMINAL_COLOR_OIA_STATUS_INVALID,
 
@@ -107,8 +107,6 @@
 	extern GdkCursor        		*wCursor[CURSOR_MODE_USER];
 	extern PangoFontDescription	*font;
 	extern gint					cMode;
-	extern GdkPixbuf 				*main_icon;
-
 
 	extern int 					terminal_rows;
 	extern int				 		terminal_cols;
@@ -165,17 +163,27 @@
 	void 		action_Save(void);
 	void		action_Restore(void);
 	void 		action_Redraw(void);
+	void 			action_SelectColors(void);
 
 
+	int 			LoadColors(void);
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
 	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el);
 	void			UpdateKeyboardState(guint state);
 	int				PrintText(const char *name, gchar *text);
 	gchar 			*FindSystemConfigFile(const gchar *name);
+	void 			RestoreWindowSize(const gchar *group, GtkWidget *widget);
+	void 			SaveWindowSize(const gchar *group, GtkWidget *widget);
 
 	int 			CloseConfigFile(void);
 	int				OpenConfigFile(void);
+
 	gchar 			*GetString(const gchar *group, const gchar *key, const gchar *def);
+	void 			SetString(const gchar *group, const gchar *key, const gchar *val);
+
+	gint 			GetInt(const gchar *group, const gchar *key, gint def);
+	void			SetInt(const gchar *group, const gchar *key, gint val);
+
 
 
 #endif // G3270_H_INCLUDED

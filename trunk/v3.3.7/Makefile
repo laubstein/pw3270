@@ -34,7 +34,7 @@ SSL_MODULES = libcrypto libssl openssl
 
 # Sources
 G3270_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
-				clipboard.c print.c config.c
+				clipboard.c print.c config.c colors.c
 
 LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 				ft.c ft_cut.c ft_dft.c glue.c help.c host.c icmd.c idle.c kybd.c \

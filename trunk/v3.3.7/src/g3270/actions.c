@@ -271,10 +271,6 @@
  	gtk_main_quit();
  }
 
- void action_SelectColors(void)
- {
- }
-
  static void action_About(GtkWidget *w, gpointer user_data)
  {
  	static const char *authors[] = {	"Paul Mattes <Paul.Mattes@usa.net>",
@@ -297,6 +293,16 @@
 		"Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02111-1307 "
 		"USA" );
 
+	GdkPixbuf	*logo = NULL;
+	gchar		*file = FindSystemConfigFile(PACKAGE_NAME ".jpg");
+
+	if(file)
+	{
+		Log("Loading %s",file);
+		logo = gdk_pixbuf_new_from_file(file, NULL);
+		g_free(file);
+	}
+
  	gtk_show_about_dialog(	GTK_WINDOW(topwindow),
 							"program-name",    		PACKAGE_NAME,
 							"authors", 				authors,
@@ -305,8 +311,12 @@
 							"version", 				PACKAGE_VERSION,
 							"translator-credits",	N_( "No Translators" ),
 							"wrap-license",			TRUE,
+							"logo",					logo,
 							NULL
 						);
+
+	if(logo)
+		gdk_pixbuf_unref(logo);
  }
 
 /*
