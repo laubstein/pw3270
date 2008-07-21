@@ -293,6 +293,7 @@
  {
  	DrawScreen(terminal,color,pixmap);
 	DrawOIA(terminal,color,pixmap);
+	gtk_widget_queue_draw(terminal);
  }
 
  /**

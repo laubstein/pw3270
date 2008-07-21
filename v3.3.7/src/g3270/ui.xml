@@ -54,6 +54,7 @@
 		<toolitem name='Connect' action='Connect' />
 		<toolitem name='Disconnect' action='Disconnect' />
 		<separator/>
+		<toolitem name='SelectColors' action='SelectColors' />
 		<toolitem name='PrintScreen' action='PrintScreen' />
 		<toolitem name='Quit' action='Quit' />
 	</toolbar>

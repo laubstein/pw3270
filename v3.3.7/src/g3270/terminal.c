@@ -262,10 +262,12 @@
 	// Configure im context
     gtk_im_context_set_client_window(im,widget->window);
     gdk_window_set_cursor(widget->window,wCursor[0]);
+
+    // Load imagems
     LoadImages(widget->window, widget->style->fg_gc[GTK_WIDGET_STATE(widget)]);
 
+	// Set terminal size
 	gdk_drawable_get_size(widget->window,&width,&height);
-
 	ResizeTerminal(widget, width, height);
 
  }
@@ -314,67 +316,6 @@
 	}
 
 	return FALSE;
- }
-
- int LoadColors(void)
- {
- 	static const char *DefaultColors =	"black,"			// TERMINAL_COLOR_00
-											"#00FFFF,"			// TERMINAL_COLOR_01
-											"red,"				// TERMINAL_COLOR_02
-											"pink,"				// TERMINAL_COLOR_03
-											"green1,"			// TERMINAL_COLOR_04
-											"turquoise,"		// TERMINAL_COLOR_05
-											"yellow,"			// TERMINAL_COLOR_06
-											"white,"			// TERMINAL_COLOR_07
-											"black,"			// TERMINAL_COLOR_08
-											"DeepSkyBlue,"		// TERMINAL_COLOR_09
-											"orange,"			// TERMINAL_COLOR_10
-											"DeepSkyBlue,"		// TERMINAL_COLOR_11
-											"PaleGreen,"		// TERMINAL_COLOR_12
-											"PaleTurquoise,"	// TERMINAL_COLOR_13
-											"grey,"				// TERMINAL_COLOR_14
-											"white,"			// TERMINAL_COLOR_15
-
-											"green1,"			// TERMINAL_COLOR_FIELD_DEFAULT
-											"red,"				// TERMINAL_COLOR_FIELD_INTENSIFIED
-											"DeepSkyBlue,"		// TERMINAL_COLOR_FIELD_PROTECTED
-											"white,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
-
-											"black,"			// TERMINAL_COLOR_SELECTED_FG,
-											"white,"			// TERMINAL_COLOR_SELECTED_BG
-
-											"LimeGreen," 		// TERMINAL_COLOR_CURSOR
-											"LimeGreen," 		// TERMINAL_COLOR_CROSS_HAIR
-											"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
-											"LimeGreen,"		// TERMINAL_COLOR_OIA
-											"black,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
-											"white,"			// TERMINAL_COLOR_OIA_STATUS_OK
-											"red";				// TERMINAL_COLOR_OIA_STATUS_INVALID
-
-
- 	int 	f;
-
-	// FIXME (perry#9#): Load colors from configuration file.
- 	char	*buffer = GetString("Terminal","Colors",DefaultColors);
- 	char	*ptr = strtok(buffer,",");
-
- 	for(f=0;ptr && f < TERMINAL_COLOR_COUNT;f++)
- 	{
- 		if(ptr)
- 		{
-			gdk_color_parse(ptr,color+f);
-			ptr = strtok(NULL,",");
- 		}
-		else
-		{
-			gdk_color_parse("LimeGreen",color+f);
-		}
-		gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+f,TRUE,TRUE);
- 	}
-
- 	g_free(buffer);
-
- 	return 0;
  }
 
  static void set_crosshair(int value, int reason)
@@ -427,6 +368,7 @@
  GtkWidget *CreateTerminalWindow(void)
  {
 	memset(fsize,0,MAX_FONT_SIZES * sizeof(FONTSIZE));
+	memset(color,0,sizeof(GdkColor)*TERMINAL_COLOR_COUNT);
 
  	LoadColors();
 

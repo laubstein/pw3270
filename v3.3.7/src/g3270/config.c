@@ -27,6 +27,7 @@
  #include "config.h"
  #include "g3270.h"
  #include <ctype.h>
+ #include <string.h>
 
  #define CHECK_FILENAME(...)	filename = g_build_filename( __VA_ARGS__, NULL ); \
 								if(g_file_test(filename,G_FILE_TEST_IS_REGULAR)) \
@@ -142,9 +143,15 @@
 	return 0;
  }
 
- void action_Save(void)
+ void SaveWindowSize(const gchar *group, GtkWidget *widget)
  {
  	int 			pos[2];
+	gtk_window_get_size(GTK_WINDOW(widget),&pos[0],&pos[1]);
+	g_key_file_set_integer_list(conf,group,"size",pos,2);
+ }
+
+ void action_Save(void)
+ {
 	GdkWindowState	CurrentState;
 	int				f;
 
@@ -156,12 +163,7 @@
 	CurrentState = gdk_window_get_state(topwindow->window);
 
 	if( !(CurrentState & (GDK_WINDOW_STATE_FULLSCREEN|GDK_WINDOW_STATE_MAXIMIZED|GDK_WINDOW_STATE_ICONIFIED)) )
-	{
-		// Save top window's size
-		gtk_window_get_size(GTK_WINDOW(topwindow),&pos[0],&pos[1]);
-		Trace("Topwindow size: %dx%d",pos[0],pos[1]);
-		g_key_file_set_integer_list(conf,"TopWindow","size",pos,2);
-	}
+		SaveWindowSize("TopWindow",topwindow);
 
 	for(f=0;f<(sizeof(WindowState)/sizeof(struct _WindowState));f++)
 		g_key_file_set_boolean(conf,"TopWindow",WindowState[f].name, CurrentState & WindowState[f].flag);
@@ -183,6 +185,39 @@
 	return ret;
  }
 
+ void SetString(const gchar *group, const gchar *key, const gchar *val)
+ {
+ 	if(conf)
+		g_key_file_set_string(conf,group,key,val);
+ }
+
+ gint GetInt(const gchar *group, const gchar *key, gint def)
+ {
+ 	if(!(conf && g_key_file_has_key(conf,group,key,NULL)))
+		return def;
+	return g_key_file_get_integer(conf,group,key,NULL);
+ }
+
+ void SetInt(const gchar *group, const gchar *key, gint val)
+ {
+ 	if(conf)
+		g_key_file_set_integer(conf,group,key,val);
+ }
+
+ void RestoreWindowSize(const gchar *group, GtkWidget *widget)
+ {
+	if(g_key_file_has_key(conf,group,"size",NULL))
+	{
+		gsize 	sz		= 2;
+		gint	*vlr	=  g_key_file_get_integer_list(conf,group,"size",&sz,NULL);
+		if(vlr)
+		{
+			gtk_window_resize(GTK_WINDOW(widget),vlr[0],vlr[1]);
+			g_free(vlr);
+		}
+	}
+ }
+
  void action_Restore(void)
  {
 	Trace("%s conf: %p",__FUNCTION__,conf);
@@ -191,19 +226,7 @@
 		return;
 
  	/* Set window size */
-	if(g_key_file_has_key(conf,"TopWindow","size",NULL))
-	{
-		gsize 	sz		= 2;
-		gint	*vlr	=  g_key_file_get_integer_list(conf,"TopWindow","size",&sz,NULL);
-		if(vlr)
-		{
-			Trace("Window size: %dx%d (sz=%d)",vlr[0],vlr[1],sz);
-			gtk_window_resize(GTK_WINDOW(topwindow),vlr[0],vlr[1]);
-			g_free(vlr);
-		}
-	}
-
-
+	RestoreWindowSize("TopWindow",topwindow);
 
  }
 
