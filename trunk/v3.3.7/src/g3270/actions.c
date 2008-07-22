@@ -331,11 +331,17 @@
  static const GtkActionEntry internal_action_entries[] =
  {
  	/* Top menus */
- 	{	"FileMenu",			NULL,					N_( "_File" ),			NULL,			NULL,	NULL							},
+ 	{	"FileMenu",			NULL,					N_( "_File" ),			NULL,			NULL,	NULL								},
  	{	"NetworkMenu",		NULL,					N_( "_Network" ),		NULL,			NULL,	NULL								},
  	{	"HelpMenu",			NULL,					N_( "Help" ),			NULL,			NULL,	NULL								},
  	{	"EditMenu",			NULL,					N_( "_Edit" ),			NULL,			NULL,	NULL								},
  	{	"OptionsMenu",		NULL,					N_( "_Options" ),		NULL,			NULL,	NULL								},
+ 	{	"SettingsMenu",		NULL,					N_( "Settings" ),		NULL,			NULL,	NULL								},
+
+ 	/* Stock menus */
+ 	{	"Preferences",		GTK_STOCK_PREFERENCES,	N_( "Preferences" ),	NULL,			NULL,	NULL								},
+ 	{	"Network",			GTK_STOCK_NETWORK,		N_( "Network" ),		NULL,			NULL,	NULL								},
+ 	{	"Properties",		GTK_STOCK_PROPERTIES,	N_( "Properties" ),		NULL,			NULL,	NULL								},
 
 	/* Misc actions */
  	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	G_CALLBACK(action_About)			},
@@ -437,15 +443,15 @@
 		if(!gtk_ui_manager_add_ui_from_file(ui_manager,ui,&error))
 		{
 			if(error && error->message)
-				g_error( _( "Can't build Application UI: %s" ),error->message);
+				popup_an_error( _( "Can't build Application UI: %s" ),error->message);
 			else
-				g_error( _( "Can't build Application UI!" ));
+				popup_an_error( _( "Can't build Application UI!" ));
 		}
 		g_free(ui);
 	}
 	else
 	{
-		g_error( _( "Can't find UI definition file" ) );
+		popup_an_error( _( "Can't find UI definition file" ) );
 	}
 
 	gtk_ui_manager_ensure_update(ui_manager);
@@ -467,29 +473,29 @@
  	// TODO (perry#2#): Put all keyboard actions as accelerators.
  	static const struct WindowActions keyproc[] =
  	{
-        G3270_ACTION( GDK_KP_Left,			GDK_SHIFT_MASK,		action_SelectLeft),
-        G3270_ACTION( GDK_KP_Up,			GDK_SHIFT_MASK,		action_SelectUp),
-        G3270_ACTION( GDK_KP_Right,			GDK_SHIFT_MASK,		action_SelectRight),
-        G3270_ACTION( GDK_KP_Down,			GDK_SHIFT_MASK,		action_SelectDown),
+        G3270_ACTION(	GDK_KP_Left,		GDK_SHIFT_MASK,		action_SelectLeft),
+        G3270_ACTION(	GDK_KP_Up,			GDK_SHIFT_MASK,		action_SelectUp),
+        G3270_ACTION(	GDK_KP_Right,		GDK_SHIFT_MASK,		action_SelectRight),
+        G3270_ACTION(	GDK_KP_Down,		GDK_SHIFT_MASK,		action_SelectDown),
 
-        G3270_ACTION( GDK_Left,				GDK_SHIFT_MASK,		action_SelectLeft),
-        G3270_ACTION( GDK_Up,				GDK_SHIFT_MASK,		action_SelectUp),
-        G3270_ACTION( GDK_Right,			GDK_SHIFT_MASK,		action_SelectRight),
-        G3270_ACTION( GDK_Down,				GDK_SHIFT_MASK,		action_SelectDown),
+        G3270_ACTION(	GDK_Left,			GDK_SHIFT_MASK,		action_SelectLeft),
+        G3270_ACTION(	GDK_Up,				GDK_SHIFT_MASK,		action_SelectUp),
+        G3270_ACTION(	GDK_Right,			GDK_SHIFT_MASK,		action_SelectRight),
+        G3270_ACTION(	GDK_Down,			GDK_SHIFT_MASK,		action_SelectDown),
 
-		G3270_ACTION( GDK_Left,				0,					action_Left),
-		G3270_ACTION( GDK_Up,				0,					action_Up),
-		G3270_ACTION( GDK_Right,			0,					action_Right),
-		G3270_ACTION( GDK_Down,				0,					action_Down),
+		G3270_ACTION(	GDK_Left,			0,					action_Left),
+		G3270_ACTION(	GDK_Up,				0,					action_Up),
+		G3270_ACTION(	GDK_Right,			0,					action_Right),
+		G3270_ACTION(	GDK_Down,			0,					action_Down),
 
-		G3270_ACTION( GDK_KP_Left,			0,					action_Left),
-		G3270_ACTION( GDK_KP_Up,			0,					action_Up),
-		G3270_ACTION( GDK_KP_Right,			0,					action_Right),
-		G3270_ACTION( GDK_KP_Down,			0,					action_Down),
+		G3270_ACTION(	GDK_KP_Left,		0,					action_Left),
+		G3270_ACTION(	GDK_KP_Up,			0,					action_Up),
+		G3270_ACTION(	GDK_KP_Right,		0,					action_Right),
+		G3270_ACTION(	GDK_KP_Down,		0,					action_Down),
 
-		G3270_ACTION( GDK_ISO_Left_Tab,		0,					action_BackTab),
-		G3270_ACTION( GDK_Tab,				0,					action_Tab),
-		G3270_ACTION( GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab),
+		G3270_ACTION(	GDK_ISO_Left_Tab,	0,					action_BackTab),
+		G3270_ACTION(	GDK_Tab,			0,					action_Tab),
+		G3270_ACTION(	GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab),
 
 		PF_ACTION(		GDK_Page_Up,		GDK_SHIFT_MASK,		"23"),
 		PF_ACTION(		GDK_Page_Down,		GDK_SHIFT_MASK,		"24"),

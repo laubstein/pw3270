@@ -28,15 +28,17 @@
 			<menuitem action='Disconnect' />
 		</menu>
 
-		<menu action='OptionsMenu'>
+		<menu action='SettingsMenu'>
 			<menuitem action='SelectColors' />
-			<menuitem action='ToggleCursorBlink' />
-			<menuitem action='ToggleCursorPos'  />
-			<menuitem action='ToggleFullScreen'  />
-			<menuitem action='ToggleMarginedPaste'  />
-			<menuitem action='ToggleCrossHair'  />
-			<menuitem action='ToggleRectSelect'  />
-			<menuitem action='ToggleReconnect'  />
+			<menu action='OptionsMenu'>
+				<menuitem action='ToggleCursorBlink' />
+				<menuitem action='ToggleCursorPos'  />
+				<menuitem action='ToggleFullScreen'  />
+				<menuitem action='ToggleMarginedPaste'  />
+				<menuitem action='ToggleCrossHair'  />
+				<menuitem action='ToggleRectSelect'  />
+				<menuitem action='ToggleReconnect'  />
+			</menu>
 		</menu>
 
 		<menu action='HelpMenu'>
