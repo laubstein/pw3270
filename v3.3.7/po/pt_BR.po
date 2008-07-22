@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-22 11:01-0300\n"
-"PO-Revision-Date: 2008-07-22 11:04-0300\n"
+"POT-Creation-Date: 2008-07-22 12:00-0300\n"
+"PO-Revision-Date: 2008-07-22 13:16-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgstr "Copiar anexando"
 
 #: actions.c:413
 msgid "Auto-Reconnect"
-msgstr "Reconexão automática"
+msgstr "Auto reconectar"
 
 #: colors.c:185 colors.c:207 colors.c:214
 msgid "Background"
@@ -60,19 +60,19 @@ msgstr "Não foi possível montar a interface com usuário"
 #: actions.c:440
 #, c-format
 msgid "Can't build Application UI: %s"
-msgstr "Não foi possível montar a interface com usuário: %s"
+msgstr "Não foi possível montar interface com usuário: %s"
 
 #: actions.c:448
 msgid "Can't find UI definition file"
-msgstr "Arquivo com a definição de interface não foi encontrado"
+msgstr "Arquivo de definição da interface com usuário não foi encontrado."
 
 #: g3270.c:232
 msgid "Can't register into lib3270 I/O callback table."
-msgstr "Não foi possível registrar tabela de I/O 3270"
+msgstr "Não foi possível registrar tabela de I/O na biblioteca 3270."
 
 #: g3270.c:238
 msgid "Can't register into lib3270 screen callback table."
-msgstr "Não foi possível registrar chamadas de tela na biblioteca 3270"
+msgstr "Não foi possível registrar funções de tela na biblioteca 3270."
 
 #: actions.c:355
 msgid "Clear fields"
@@ -112,7 +112,7 @@ msgstr "Verde escuro"
 
 #: colors.c:202
 msgid "Default"
-msgstr ""
+msgstr "Padrão"
 
 #: actions.c:384
 msgid "Delete Char"
@@ -144,7 +144,7 @@ msgstr ""
 
 #: colors.c:176
 msgid "Fields"
-msgstr ""
+msgstr "Campos"
 
 #: print.c:148
 msgid "Font"
@@ -156,7 +156,7 @@ msgstr "Frente"
 
 #: actions.c:409
 msgid "Full Screen"
-msgstr "Tela cheia"
+msgstr "Tela-cheia"
 
 #: colors.c:200
 msgid "Gray"
@@ -188,7 +188,7 @@ msgstr ""
 
 #: colors.c:218
 msgid "Locked status"
-msgstr ""
+msgstr "Bloqueado"
 
 #: actions.c:410
 msgid "Margined Paste"
@@ -201,7 +201,7 @@ msgstr "Mostarda"
 #: g3270.c:318
 #, c-format
 msgid "Negotiation with %s failed!"
-msgstr "Negociação com %s falhou"
+msgstr "Negociação com %s falhou!"
 
 #: actions.c:374
 msgid "Next Field"
@@ -213,11 +213,11 @@ msgstr ""
 
 #: colors.c:210
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: colors.c:217
 msgid "Normal status"
-msgstr ""
+msgstr "Normal"
 
 #: colors.c:179
 msgid "OIA"
@@ -225,7 +225,7 @@ msgstr ""
 
 #: colors.c:195
 msgid "Orange"
-msgstr ""
+msgstr "Laranja"
 
 #: actions.c:388
 msgid "Page-Down"
@@ -245,7 +245,7 @@ msgstr "Colar próximo"
 
 #: colors.c:188
 msgid "Pink"
-msgstr ""
+msgstr "Rosa"
 
 #: actions.c:358
 msgid "Print"
@@ -261,15 +261,15 @@ msgstr "Imprimir seleção"
 
 #: colors.c:204
 msgid "Protected"
-msgstr ""
+msgstr "Protegido"
 
 #: colors.c:205
 msgid "Protected/Intensified"
-msgstr ""
+msgstr "Protegido/Intensificado"
 
 #: colors.c:196
 msgid "Purple"
-msgstr ""
+msgstr "Púrpura"
 
 #: actions.c:412
 msgid "Rectangle Select"
@@ -277,7 +277,7 @@ msgstr "Seleção em bloco"
 
 #: colors.c:187
 msgid "Red"
-msgstr ""
+msgstr "Vermelho"
 
 #: actions.c:389
 msgid "Redraw screen"
@@ -321,15 +321,15 @@ msgstr "Selecionar tudo"
 
 #: colors.c:177
 msgid "Selection"
-msgstr ""
+msgstr "Seleção"
 
 #: colors.c:216
 msgid "Separator"
-msgstr ""
+msgstr "Separador"
 
 #: actions.c:408
 msgid "Show Cursor Position"
-msgstr "Mostra posição do cursor"
+msgstr "Mostrar posição do cursor"
 
 #: colors.c:175
 msgid "Terminal"
@@ -354,7 +354,7 @@ msgstr ""
 
 #: colors.c:190 colors.c:198
 msgid "Turquoise"
-msgstr ""
+msgstr "Turquesa"
 
 #: actions.c:372
 msgid "Up"
@@ -362,7 +362,7 @@ msgstr ""
 
 #: colors.c:192
 msgid "White"
-msgstr ""
+msgstr "Branco"
 
 #: screen.c:631 screen.c:655
 msgid "X"
@@ -378,7 +378,7 @@ msgstr "X Conectando"
 
 #: screen.c:627
 msgid "X Disconnected"
-msgstr "X Desconectando"
+msgstr "X Desconectado"
 
 #: screen.c:651
 msgid "X Inhibit"
@@ -402,7 +402,7 @@ msgstr "X Resolvendo"
 
 #: screen.c:615
 msgid "X System"
-msgstr ""
+msgstr "X Sistema"
 
 #: screen.c:619
 msgid "X Wait"
@@ -410,7 +410,7 @@ msgstr "X Aguarde"
 
 #: colors.c:191
 msgid "Yellow"
-msgstr ""
+msgstr "Amarelo"
 
 #: actions.c:342
 msgid "_Connect"
@@ -434,7 +434,7 @@ msgstr "_Rede"
 
 #: actions.c:338
 msgid "_Options"
-msgstr "_Opções"
+msgstr "Opções"
 
 #: actions.c:344
 msgid "_Quit"
