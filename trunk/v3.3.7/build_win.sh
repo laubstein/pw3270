@@ -37,6 +37,11 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
+cp g3270.conf $IMAGE
+if [ "$?" != "0" ]; then
+	exit -1
+fi
+
 mkdir -p $LOCALE/pt_BR/LC_MESSAGES
 if [ "$?" != "0" ]; then
 	exit -1

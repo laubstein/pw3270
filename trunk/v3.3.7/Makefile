@@ -8,21 +8,14 @@ OBJEXT=o
 DLLEXT=dll
 BINEXT=exe
 
-# Set command paths and mkfb (which has to run locally) based on whether
-# compiling natively on Cygwin, or cross-compiling on Linux.
-ifeq ($(CROSS),1)
+# Set command paths and mkfb (which has to run locally)
 MKFB = mkfb
 CC = mingw32-gcc
 NATIVECC = gcc
 WINDRES = mingw32-windres
-PKG_CONFIG_PATH=/home/perry/mingw/lib/pkgconfig
-else
-MKFB = mkfb.exe
-CC = gcc
-NATIVECC = gcc
-WINDRES = windres
-endif
+PKG_CONFIG_PATH=/usr/i386-mingw32/lib/pkgconfig
 
+# Set compile/link parameters
 XCPPFLAGS = -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500
 CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall -Werror $(XCPPFLAGS) -O -DG3270 -Isrc/include
 DLLFLAGS = $(EXTRA_FLAGS) -mno-cygwin -shared -Wl,--export-all-symbols -Wl,--enable-auto-import
@@ -49,13 +42,13 @@ Debug: bin/Debug/g3270.$(BINEXT) bin/Debug/w3n46.dll
 Release: bin/Release/g3270.$(BINEXT) bin/Release/w3n46.dll
 
 # Rules
-GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h
+GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
 
 # Debug Rules
 obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DDEBUG=1 -DLIB3270=1 -DHAVE_LIBSSL=1 $(CFLAGS) `pkg-config --cflags $(SSL_MODULES)` -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
+	@$(CC) -DDEBUG=1 -DLIB3270=1 -DHAVE_LIBSSL=1 `pkg-config --cflags $(SSL_MODULES)` $(CFLAGS) -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $< 
 
 obj/Debug/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...

@@ -58,9 +58,9 @@
 
  static GtkIMContext	*im;
 
- static PangoFontDescription	*font					= NULL;
+ static PangoFontDescription	*font		= NULL;
+ static int					szFonts		= MAX_FONT_SIZES;
  static FONTSIZE				fsize[MAX_FONT_SIZES];
-
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
@@ -118,49 +118,65 @@
 	return 0;
  }
 
- /**
-  * Cache font sizes.
-  *
-  * Get the font metrics for the selected size, cache it for speed up terminal resizing.
-  *
-  * @param sel		The font size.
-  *
-  */
- static void SetFontSize(int sel)
- {
-	PangoLayout *layout;
-
- 	if(fsize[sel].size)
- 	{
-		pango_font_description_set_size(font,fsize[sel].size);
-		gtk_widget_modify_font(terminal,font);
-		return;
- 	}
-
-	// TODO (perry#9#): Fint a better and faster way to get the character size.
-	fsize[sel].size = (sel+1) * PANGO_SCALE;
-	pango_font_description_set_size(font,fsize[sel].size);
-
-	gtk_widget_modify_font(terminal,font);
-	layout = gtk_widget_create_pango_layout(terminal,"A");
-
-	pango_layout_get_pixel_size(layout,&fsize[sel].width,&fsize[sel].height);
-
-	g_object_unref(layout);
-
- }
-
  static int lWidth = -1;
  static int lHeight = -1;
  static int lFont = -1;
 
+ static void UpdateFontData(int sel)
+ {
+	PangoLayout *layout;
+
+	pango_font_description_set_size(font,fsize[sel].size);
+	gtk_widget_modify_font(terminal,font);
+	layout = gtk_widget_create_pango_layout(terminal,"A");
+	pango_layout_get_pixel_size(layout,&fsize[sel].width,&fsize[sel].height);
+	g_object_unref(layout);
+
+ }
+
+ static void LoadFontSizes(void)
+ {
+	/* Load all font sizes */
+	const gchar	*conf;
+	gchar			**ptr;
+	int 			f;
+
+	conf = GetString("Terminal","FontSizes","");
+
+	if(conf && *conf)
+	{
+		Trace("Font sizes: %s",conf);
+		ptr = g_strsplit(conf,",",MAX_FONT_SIZES);
+		for(f=0;ptr[f];f++)
+		{
+			fsize[f].size = atoi(ptr[f]) * PANGO_SCALE;
+			UpdateFontData(f);
+			Trace("Font %d (%s) fits on %dx%d",f,ptr[f],terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
+		}
+		szFonts = f;
+		g_strfreev(ptr);
+	}
+	else
+	{
+		Trace("Loading font sizes from 0 to %d",MAX_FONT_SIZES);
+		szFonts = MAX_FONT_SIZES;
+
+		for(f=0;f<MAX_FONT_SIZES;f++)
+		{
+			fsize[f].size = (f+1) * PANGO_SCALE;
+			UpdateFontData(f);
+			Trace("Font %d fits on %dx%d",f,terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
+		}
+	}
+ }
+
  static void ResizeTerminal(GtkWidget *widget, gint width, gint height)
  {
-	int 		f;
-	int 		left	= left_margin;
-	int 		top		= top_margin;;
-	GdkPixmap	*pix;
-	GdkGC		*gc;
+ 	int				f;
+	int 			left	= left_margin;
+	int 			top		= top_margin;;
+	GdkPixmap		*pix;
+	GdkGC			*gc;
 
 	if(lWidth == width && lHeight == height && lFont > 0)
 		return;
@@ -170,19 +186,13 @@
 
 	if(lFont == -1)
 	{
-		/* Font all font sizes */
 		lFont = -2;
-		Trace("Loading font sizes from 0 to %d",MAX_FONT_SIZES);
-		for(f=0;f<MAX_FONT_SIZES;f++)
-		{
-			SetFontSize(f);
-			Trace("Font %d fits on %dx%d",f,terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
-		}
-		gtk_widget_set_usize(widget,(terminal_rows*fsize->height)+4,(terminal_cols*fsize->width)+4);
+		LoadFontSizes();
+		gtk_widget_set_usize(widget,(terminal_cols*fsize->width),((terminal_rows+1)*fsize->height));
 	}
 
 	/* Get the best font for the current window size */
-	for(f=0;f<MAX_FONT_SIZES && (fsize[f].height*(terminal_rows+1)) < height && (fsize[f].width*terminal_cols) < width;f++);
+	for(f=0;f<szFonts && (fsize[f].height*(terminal_rows+1)) < height && (fsize[f].width*terminal_cols) < width;f++);
 
 	if(f >= MAX_FONT_SIZES)
 		f = (MAX_FONT_SIZES-1);
@@ -198,7 +208,7 @@
 
 		if(pixmap)
 		{
-			/* Font size, invalidate entire image */
+			/* Font size changed, invalidate entire image */
 			gdk_pixmap_unref(pixmap);
 			pixmap = NULL;
 		}
@@ -269,6 +279,7 @@
 	// Set terminal size
 	gdk_drawable_get_size(widget->window,&width,&height);
 	ResizeTerminal(widget, width, height);
+
 
  }
 
@@ -399,10 +410,12 @@
     // Connect mouse events
     g_signal_connect(G_OBJECT(terminal), "button-press-event",		G_CALLBACK(mouse_button_press),		0);
     g_signal_connect(G_OBJECT(terminal), "button-release-event",	G_CALLBACK(mouse_button_release),	0);
-    g_signal_connect(G_OBJECT(terminal), "motion-notify-event",		G_CALLBACK(mouse_motion),			0);
+    g_signal_connect(G_OBJECT(terminal), "motion-notify-event",		G_CALLBACK(mouse_motion),    		0);
     g_signal_connect(G_OBJECT(terminal), "scroll-event",			G_CALLBACK(mouse_scroll),			0);
 
-	font = pango_font_description_from_string("Courier");
+	font = pango_font_description_from_string(GetString("Terminal","Font","Courier"));
+	if(!font)
+		font = pango_font_description_from_string(GetString("Terminal","Font","Courier"));
 
 	register_tchange(CROSSHAIR,set_crosshair);
 	register_tchange(CURSOR_POS,set_showcursor);
