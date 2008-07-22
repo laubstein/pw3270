@@ -17,6 +17,10 @@
 			<separator/>
 			<menuitem action='Clear'/>
 			<separator/>
+			<menuitem action='EditScreen'/>
+			<menuitem action='EditCopy'/>
+			<menuitem action='EditSelection'/>
+			<separator/>
 			<menuitem action='SelectAll'/>
 			<menuitem action='SelectField'/>
 			<menuitem action='Unselect'/>
