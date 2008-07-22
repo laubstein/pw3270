@@ -42,6 +42,38 @@
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
+ static void action_pf(GtkWidget *w, gpointer id);
+ static void action_Clear(GtkWidget *w, gpointer user_data);
+ static void action_Up(GtkWidget *w, gpointer user_data);
+ static void action_Down(GtkWidget *w, gpointer user_data);
+ static void action_Left(GtkWidget *w, gpointer user_data);
+ static void action_Right(GtkWidget *w, gpointer user_data);
+ static void action_Tab(GtkWidget *w, gpointer user_data);
+ static void action_BackTab(GtkWidget *w, gpointer user_data);
+ static void action_Reset(GtkWidget *w, gpointer user_data);
+ static void action_Connect(GtkWidget *w, gpointer user_data);
+ static void action_Enter(GtkWidget *w, gpointer user_data);
+ static void action_Insert(void);
+ static void action_Home(void);
+ static void action_DeleteWord(void);
+ static void action_DeleteField(void);
+ static void action_Delete(void);
+ static void action_BackSpace(void);
+ static void action_EraseEOF(void);
+ static void action_CrossHair(GtkWidget *w, gpointer user_data);
+ static void action_BlinkCursor(GtkWidget *w, gpointer user_data);
+ static void action_RectSelect(GtkWidget *w, gpointer user_data);
+ static void action_FullScreen(GtkWidget *w, gpointer user_data);
+ static void action_ToggleMarginedPaste(void);
+ static void action_ShowCursorPos(GtkWidget *w, gpointer user_data);
+ static void action_AutoReconnect(GtkWidget *w, gpointer user_data);
+ static void action_Disconnect(GtkWidget *w, gpointer user_data);
+ static void action_PrintScreen(GtkWidget *w, gpointer user_data);
+ static void action_PrintSelected(GtkWidget *w, gpointer user_data);
+ static void action_PrintClipboard(GtkWidget *w, gpointer user_data);
+ static void action_Quit(void);
+ static void action_About(GtkWidget *w, gpointer user_data);
+
 /*---[ Callback tables ]----------------------------------------------------------------------------------------*/
 
  #ifdef DEBUG
@@ -72,8 +104,113 @@
 #ifdef DEBUG
 	const char	 *action_trace;
 #endif
+ };
+
+/*---[ Action tables ]------------------------------------------------------------------------------------------*/
+
+/*
+	The name of the action.
+	The stock id for the action, or the name of an icon from the icon theme.
+	The label for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain(). If label is NULL, the label of the stock item with id stock_id is used.
+	The accelerator for the action, in the format understood by gtk_accelerator_parse().
+	The tooltip for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
+	The function to call when the action is activated.
+
+	http://library.gnome.org/devel/gtk/stable/gtk-Stock-Items.html
+
+ */
+ static const GtkActionEntry internal_action_entries[] =
+ {
+ 	/* Top menus */
+ 	{	"FileMenu",			NULL,					N_( "_File" ),			NULL,			NULL,	NULL								},
+ 	{	"NetworkMenu",		NULL,					N_( "_Network" ),		NULL,			NULL,	NULL								},
+ 	{	"HelpMenu",			NULL,					N_( "Help" ),			NULL,			NULL,	NULL								},
+ 	{	"EditMenu",			NULL,					N_( "_Edit" ),			NULL,			NULL,	NULL								},
+ 	{	"OptionsMenu",		NULL,					N_( "_Options" ),		NULL,			NULL,	NULL								},
+ 	{	"SettingsMenu",		NULL,					N_( "Settings" ),		NULL,			NULL,	NULL								},
+
+ 	/* Stock menus */
+ 	{	"Preferences",		GTK_STOCK_PREFERENCES,	N_( "Preferences" ),	NULL,			NULL,	NULL								},
+ 	{	"Network",			GTK_STOCK_NETWORK,		N_( "Network" ),		NULL,			NULL,	NULL								},
+ 	{	"Properties",		GTK_STOCK_PROPERTIES,	N_( "Properties" ),		NULL,			NULL,	NULL								},
+
+	/* Misc actions */
+ 	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	G_CALLBACK(action_About)			},
+ 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(action_Connect)			},
+ 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)		},
+ 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),			NULL,			NULL,	G_CALLBACK(action_Quit)				},
+ 	{	"SelectColors",		GTK_STOCK_SELECT_COLOR,	N_( "Colors" ),			NULL,			NULL,	G_CALLBACK(action_SelectColors)		},
+
+ 	/* Edit actions */
+ 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			NULL,			NULL,	G_CALLBACK(action_Copy)				},
+ 	{	"Append",			GTK_STOCK_ADD,			N_( "Add to copy" ),	NULL,			NULL,	G_CALLBACK(action_Append)			},
+ 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),			NULL,			NULL,	G_CALLBACK(action_Paste)			},
+ 	{	"PasteNext",		NULL,					N_( "Paste _next" ),	NULL,			NULL,	G_CALLBACK(action_PasteNext)		},
+ 	{	"Unselect",			NULL,					N_( "_Unselect" ),		NULL,			NULL,	G_CALLBACK(action_ClearSelection)	},
+ 	{	"Reselect",			NULL,					N_( "_Reselect" ),		NULL,			NULL,	G_CALLBACK(Reselect)				},
+ 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),		"<Alt>A",		NULL,	G_CALLBACK(action_SelectAll)		},
+ 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),	"Clear",		NULL,	G_CALLBACK(action_Clear)			},
+
+ 	/* Printer actions */
+	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),			"Print",		NULL,	G_CALLBACK(action_PrintScreen)		},
+	{	"PrintSelected",	NULL,					N_( "Print selected" ),	NULL,			NULL,	G_CALLBACK(action_PrintSelected)	},
+	{	"PrintClipboard",	NULL,					N_( "Print copy" ),		NULL,			NULL,	G_CALLBACK(action_PrintClipboard)	},
+
+	/* Select actions */
+	{ 	"SelectRight",		NULL,					N_( "Select Right" ),	"<Shift>Right",	NULL,	G_CALLBACK(action_SelectRight)		},
+	{ 	"SelectLeft",		NULL,					N_( "Select Left" ),	"<Shift>Left",	NULL,	G_CALLBACK(action_SelectLeft)		},
+	{ 	"SelectUp",			NULL,					N_( "Select Up" ),		"<Shift>Up",	NULL,	G_CALLBACK(action_SelectUp)			},
+	{ 	"SelectDown",		NULL,					N_( "Select Down" ),	"<Shift>Down",	NULL,	G_CALLBACK(action_SelectDown)		},
+	{	"SelectField",		NULL,					N_( "Select Field" ),	"<Ctrl>f",		NULL,	G_CALLBACK(action_SelectField)		},
+
+	/* Cursor Movement */
+	{ 	"CursorRight",		GTK_STOCK_GO_FORWARD,	N_( "Right" ),			"Right",		NULL,	G_CALLBACK(action_Right)			},
+	{ 	"CursorLeft",		GTK_STOCK_GO_BACK,		N_( "Left" ),			"Left",			NULL,	G_CALLBACK(action_Left)				},
+	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),				"Up",			NULL,	G_CALLBACK(action_Up)				},
+	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),			"Down",			NULL,	G_CALLBACK(action_Down)				},
+	{ 	"NextField",		NULL,					N_( "Next Field" ),		"Tab",			NULL,	G_CALLBACK(action_Tab)				},
+	{ 	"Enter",			NULL,					N_( "Enter" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
+
+	/* Terminal Actions */
+	{ 	"Reset",			NULL,					N_( "Reset" ),			"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
+	{ 	"Escape",			NULL,					N_( "Escape" ),			"Escape",		NULL,	G_CALLBACK(action_Reset)			},
+	{ 	"Home",				NULL,					N_( "Home" ),			"Home",			NULL,	G_CALLBACK(action_Home)				},
+	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
+	{	"DeleteWord",		NULL,					N_( "Delete Word" ),	"<Ctrl>w",		NULL,	G_CALLBACK(action_DeleteWord)		},
+	{	"DeleteField",		NULL,					N_( "Delete Field" ),	"<Ctrl>u",		NULL,	G_CALLBACK(action_DeleteField)		},
+	{	"Delete",			NULL,					N_( "Delete Char" ),	"Delete",		NULL,	G_CALLBACK(action_Delete)			},
+	{	"Erase",			NULL,					N_( "Backspace" ),		"BackSpace",	NULL,	G_CALLBACK(action_BackSpace)		},
+	{	"EraseEOF",			NULL,					N_( "EraseEOF" ),		"End",			NULL,	G_CALLBACK(action_EraseEOF)			},
+	{	"PageUP",			NULL,					N_( "Page-Up" ),		"Page_Up",		NULL,	G_CALLBACK(action_PageUP) 			},
+	{	"PageDown",			NULL,					N_( "Page-Down" ),		"Page_Down",	NULL,	G_CALLBACK(action_PageDown)			},
+	{	"Redraw",			NULL,					N_( "Redraw screen" ),	NULL,			NULL,	G_CALLBACK(action_Redraw)			},
 
  };
+
+/*
+	The name of the action.
+	The stock id for the action, or the name of an icon from the icon theme.
+	The label for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
+	The accelerator for the action, in the format understood by gtk_accelerator_parse().
+	The tooltip for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
+	The function to call when the action is activated.
+	The initial state of the toggle action.
+
+	http://library.gnome.org/devel/gtk/stable/GtkActionGroup.html#GtkToggleActionEntry
+*/
+ static const GtkToggleActionEntry internal_action_toggles[] =
+ {
+ 	{	"ToggleCursorBlink",	NULL,					N_( "Blink Cursor" ),			NULL, 			NULL,	G_CALLBACK(action_BlinkCursor),				FALSE },
+ 	{	"ToggleCursorPos",		NULL,					N_( "Show Cursor Position" ),	NULL, 			NULL,	G_CALLBACK(action_ShowCursorPos), 			TRUE  },
+ 	{	"ToggleFullScreen",		NULL,					N_( "Full Screen" ),			NULL,			NULL,	G_CALLBACK(action_FullScreen),				FALSE },
+ 	{	"ToggleMarginedPaste",	NULL,					N_( "Margined Paste" ),			NULL, 			NULL,	G_CALLBACK(action_ToggleMarginedPaste), 	FALSE },
+ 	{	"ToggleCrossHair",		NULL,					N_( "Cross Hair Cursor" ),		"<Alt>X",		NULL,	G_CALLBACK(action_CrossHair),				FALSE },
+ 	{	"ToggleRectSelect",		NULL,					N_( "Rectangle Select" ),		NULL, 			NULL,	G_CALLBACK(action_RectSelect),				FALSE },
+ 	{	"ToggleReconnect",		NULL,					N_( "Auto-Reconnect" ),			NULL, 			NULL,	G_CALLBACK(action_AutoReconnect), 			FALSE },
+ 	{	"ToggleInsert",			NULL,					N_( "Insert" ),					"Insert", 		NULL,	G_CALLBACK(action_Insert),		 			FALSE },
+
+ };
+
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -317,109 +454,125 @@
 		gdk_pixbuf_unref(logo);
  }
 
-/*
-	The name of the action.
-	The stock id for the action, or the name of an icon from the icon theme.
-	The label for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain(). If label is NULL, the label of the stock item with id stock_id is used.
-	The accelerator for the action, in the format understood by gtk_accelerator_parse().
-	The tooltip for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
-	The function to call when the action is activated.
-
-	http://library.gnome.org/devel/gtk/stable/gtk-Stock-Items.html
-
- */
- static const GtkActionEntry internal_action_entries[] =
+ static gint CreateTemporaryFile(gchar **filename)
  {
- 	/* Top menus */
- 	{	"FileMenu",			NULL,					N_( "_File" ),			NULL,			NULL,	NULL								},
- 	{	"NetworkMenu",		NULL,					N_( "_Network" ),		NULL,			NULL,	NULL								},
- 	{	"HelpMenu",			NULL,					N_( "Help" ),			NULL,			NULL,	NULL								},
- 	{	"EditMenu",			NULL,					N_( "_Edit" ),			NULL,			NULL,	NULL								},
- 	{	"OptionsMenu",		NULL,					N_( "_Options" ),		NULL,			NULL,	NULL								},
- 	{	"SettingsMenu",		NULL,					N_( "Settings" ),		NULL,			NULL,	NULL								},
+	GError	*error	= NULL;
+ 	gint	fd		= g_file_open_tmp("XXXXXX.3270",filename,&error);
 
- 	/* Stock menus */
- 	{	"Preferences",		GTK_STOCK_PREFERENCES,	N_( "Preferences" ),	NULL,			NULL,	NULL								},
- 	{	"Network",			GTK_STOCK_NETWORK,		N_( "Network" ),		NULL,			NULL,	NULL								},
- 	{	"Properties",		GTK_STOCK_PROPERTIES,	N_( "Properties" ),		NULL,			NULL,	NULL								},
+	if(fd < 0)
+	{
+		if(error && error->message)
+			popup_an_error( N_( "Error creating temporary file: %s" ),error->message);
+		else
+			popup_an_error( N_( "Unexpected error creating temporary file" ));
 
-	/* Misc actions */
- 	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	G_CALLBACK(action_About)			},
- 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(action_Connect)			},
- 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)		},
- 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),			NULL,			NULL,	G_CALLBACK(action_Quit)				},
- 	{	"SelectColors",		GTK_STOCK_SELECT_COLOR,	N_( "Colors" ),			NULL,			NULL,	G_CALLBACK(action_SelectColors)		},
-
- 	/* Edit actions */
- 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			NULL,			NULL,	G_CALLBACK(action_Copy)				},
- 	{	"Append",			GTK_STOCK_ADD,			N_( "Add to copy" ),	NULL,			NULL,	G_CALLBACK(action_Append)			},
- 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),			NULL,			NULL,	G_CALLBACK(action_Paste)			},
- 	{	"PasteNext",		NULL,					N_( "Paste _next" ),	NULL,			NULL,	G_CALLBACK(action_PasteNext)		},
- 	{	"Unselect",			NULL,					N_( "_Unselect" ),		NULL,			NULL,	G_CALLBACK(action_ClearSelection)	},
- 	{	"Reselect",			NULL,					N_( "_Reselect" ),		NULL,			NULL,	G_CALLBACK(Reselect)				},
- 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),		"<Alt>A",		NULL,	G_CALLBACK(action_SelectAll)		},
- 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),	"Clear",		NULL,	G_CALLBACK(action_Clear)			},
-
- 	/* Printer actions */
-	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),			"Print",		NULL,	G_CALLBACK(action_PrintScreen)		},
-	{	"PrintSelected",	NULL,					N_( "Print selected" ),	NULL,			NULL,	G_CALLBACK(action_PrintSelected)	},
-	{	"PrintClipboard",	NULL,					N_( "Print copy" ),		NULL,			NULL,	G_CALLBACK(action_PrintClipboard)	},
-
-	/* Select actions */
-	{ 	"SelectRight",		NULL,					N_( "Select Right" ),	"<Shift>Right",	NULL,	G_CALLBACK(action_SelectRight)		},
-	{ 	"SelectLeft",		NULL,					N_( "Select Left" ),	"<Shift>Left",	NULL,	G_CALLBACK(action_SelectLeft)		},
-	{ 	"SelectUp",			NULL,					N_( "Select Up" ),		"<Shift>Up",	NULL,	G_CALLBACK(action_SelectUp)			},
-	{ 	"SelectDown",		NULL,					N_( "Select Down" ),	"<Shift>Down",	NULL,	G_CALLBACK(action_SelectDown)		},
-	{	"SelectField",		NULL,					N_( "Select Field" ),	"<Ctrl>f",		NULL,	G_CALLBACK(action_SelectField)		},
-
-	/* Cursor Movement */
-	{ 	"CursorRight",		GTK_STOCK_GO_FORWARD,	N_( "Right" ),			"Right",		NULL,	G_CALLBACK(action_Right)			},
-	{ 	"CursorLeft",		GTK_STOCK_GO_BACK,		N_( "Left" ),			"Left",			NULL,	G_CALLBACK(action_Left)				},
-	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),				"Up",			NULL,	G_CALLBACK(action_Up)				},
-	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),			"Down",			NULL,	G_CALLBACK(action_Down)				},
-	{ 	"NextField",		NULL,					N_( "Next Field" ),		"Tab",			NULL,	G_CALLBACK(action_Tab)				},
-	{ 	"Enter",			NULL,					N_( "Enter" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
-
-	/* Terminal Actions */
-	{ 	"Reset",			NULL,					N_( "Reset" ),			"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
-	{ 	"Escape",			NULL,					N_( "Escape" ),			"Escape",		NULL,	G_CALLBACK(action_Reset)			},
-	{ 	"Home",				NULL,					N_( "Home" ),			"Home",			NULL,	G_CALLBACK(action_Home)				},
-	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
-	{	"DeleteWord",		NULL,					N_( "Delete Word" ),	"<Ctrl>w",		NULL,	G_CALLBACK(action_DeleteWord)		},
-	{	"DeleteField",		NULL,					N_( "Delete Field" ),	"<Ctrl>u",		NULL,	G_CALLBACK(action_DeleteField)		},
-	{	"Delete",			NULL,					N_( "Delete Char" ),	"Delete",		NULL,	G_CALLBACK(action_Delete)			},
-	{	"Erase",			NULL,					N_( "Backspace" ),		"BackSpace",	NULL,	G_CALLBACK(action_BackSpace)		},
-	{	"EraseEOF",			NULL,					N_( "EraseEOF" ),		"End",			NULL,	G_CALLBACK(action_EraseEOF)			},
-	{	"PageUP",			NULL,					N_( "Page-Up" ),		"Page_Up",		NULL,	G_CALLBACK(action_PageUP) 			},
-	{	"PageDown",			NULL,					N_( "Page-Down" ),		"Page_Down",	NULL,	G_CALLBACK(action_PageDown)			},
-	{	"Redraw",			NULL,					N_( "Redraw screen" ),	NULL,			NULL,	G_CALLBACK(action_Redraw)			},
-
- };
+		return fd;
+	}
 
 
-/*
-	The name of the action.
-	The stock id for the action, or the name of an icon from the icon theme.
-	The label for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
-	The accelerator for the action, in the format understood by gtk_accelerator_parse().
-	The tooltip for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
-	The function to call when the action is activated.
-	The initial state of the toggle action.
+ 	return fd;
+ }
 
-	http://library.gnome.org/devel/gtk/stable/GtkActionGroup.html#GtkToggleActionEntry
-*/
- static const GtkToggleActionEntry internal_action_toggles[] =
+ static void ExecWithScreenContents(const gchar *cmd, gboolean all)
  {
- 	{	"ToggleCursorBlink",	NULL,					N_( "Blink Cursor" ),			NULL, 			NULL,	G_CALLBACK(action_BlinkCursor),				FALSE },
- 	{	"ToggleCursorPos",		NULL,					N_( "Show Cursor Position" ),	NULL, 			NULL,	G_CALLBACK(action_ShowCursorPos), 			TRUE  },
- 	{	"ToggleFullScreen",		NULL,					N_( "Full Screen" ),			NULL,			NULL,	G_CALLBACK(action_FullScreen),				FALSE },
- 	{	"ToggleMarginedPaste",	NULL,					N_( "Margined Paste" ),			NULL, 			NULL,	G_CALLBACK(action_ToggleMarginedPaste), 	FALSE },
- 	{	"ToggleCrossHair",		NULL,					N_( "Cross Hair Cursor" ),		"<Alt>X",		NULL,	G_CALLBACK(action_CrossHair),				FALSE },
- 	{	"ToggleRectSelect",		NULL,					N_( "Rectangle Select" ),		NULL, 			NULL,	G_CALLBACK(action_RectSelect),				FALSE },
- 	{	"ToggleReconnect",		NULL,					N_( "Auto-Reconnect" ),			NULL, 			NULL,	G_CALLBACK(action_AutoReconnect), 			FALSE },
- 	{	"ToggleInsert",			NULL,					N_( "Insert" ),					"Insert", 		NULL,	G_CALLBACK(action_Insert),		 			FALSE },
+ 	gchar	*filename	= NULL;
+ 	gint	fd			= CreateTemporaryFile(&filename);
+ 	gchar	*screen		= GetScreenContents(all);
+ 	size_t	sz;
 
- };
+	if(fd > 0)
+	{
+		sz = strlen(screen);
+		if(write(fd,screen,sz) != sz)
+		{
+			popup_an_error(N_("Can't write to temporary file"));
+			close(fd);
+			remove(filename);
+		}
+		else
+		{
+			close(fd);
+			Trace("%s Command to execute: %s %s",__FUNCTION__,cmd,filename);
+		}
+	}
+
+ 	g_free(screen);
+ }
+
+ static void ExecWithScreen(GtkAction *action, gpointer cmd)
+ {
+ 	ExecWithScreenContents(cmd,TRUE);
+ }
+
+ static void ExecWithCopy(GtkAction *action, gpointer cmd)
+ {
+ 	Trace("%s Command to execute: %s",__FUNCTION__,cmd);
+ }
+
+ static void ExecWithSelection(GtkAction *action, gpointer cmd)
+ {
+ 	ExecWithScreenContents(cmd,FALSE);
+ }
+
+ static void LoadCustomActions(GtkActionGroup *actions)
+ {
+	gchar 		*filename = FindSystemConfigFile("actions.conf");
+	GKeyFile	*conf;
+
+	Trace("Actions.conf: %p",filename);
+
+	if(!filename)
+		return;
+
+	Trace("Loading %s",filename);
+
+	// Load custom actions
+	conf = g_key_file_new();
+
+	if(g_key_file_load_from_file(conf,filename,G_KEY_FILE_NONE,NULL))
+	{
+		int f;
+		gchar **group = g_key_file_get_groups(conf,NULL);
+
+		for(f=0;group[f];f++)
+		{
+			static const gchar *name[] = { "label", "tooltip", "stock_id", "type", "action" };
+
+			int			p;
+			GtkAction 	*action;
+			gchar		*parm[(sizeof(name) / sizeof(const gchar *))];
+
+			Trace("Processing action %s",group[f]);
+
+			for(p=0;p<(sizeof(name) / sizeof(const gchar *));p++)
+			{
+				parm[p] = g_key_file_get_locale_string(conf,group[f],name[p],NULL,NULL);
+				if(!parm[p])
+					parm[p] = g_key_file_get_string(conf,group[f],name[p],NULL);
+			}
+
+			action = gtk_action_new(group[f],parm[0],parm[1],parm[2]);
+			if(action)
+			{
+				// FIXME (perry#1#): Add a closure function to g_free the allocated string.
+				if(!stricmp(parm[3],"ExecWithScreen"))
+					g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(ExecWithScreen),g_strdup(parm[4]));
+				else if(!stricmp(parm[3],"ExecWithCopy"))
+					g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(ExecWithCopy),g_strdup(parm[4]));
+				else if(!stricmp(parm[3],"ExecWithSelection"))
+					g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(ExecWithSelection),g_strdup(parm[4]));
+				else
+					Log("Unexpected action type: %s",parm[3]);
+
+				gtk_action_group_add_action(actions,action);
+			}
+		}
+		g_strfreev(group);
+	}
+
+	g_key_file_free(conf);
+	g_free(filename);
+ }
 
  GtkUIManager * LoadApplicationUI(GtkWidget *widget)
  {
@@ -428,12 +581,16 @@
 	GError			*error = NULL;
 	gchar			*ui;
 
+	// Load actions
 	actions = gtk_action_group_new("InternalActions");
 	gtk_action_group_set_translation_domain(actions, GETTEXT_PACKAGE);
 
 	gtk_action_group_add_actions(actions, internal_action_entries, G_N_ELEMENTS (internal_action_entries), topwindow);
 	gtk_action_group_add_toggle_actions(actions,internal_action_toggles, G_N_ELEMENTS(internal_action_toggles),0);
 
+	LoadCustomActions(actions);
+
+	// Add actions and load UI
 	gtk_ui_manager_insert_action_group(ui_manager,actions, 0);
 
 	ui = FindSystemConfigFile("ui.xml");
