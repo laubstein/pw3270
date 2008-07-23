@@ -310,6 +310,12 @@
 	if(gtk_im_context_filter_keypress(im,event))
 		return TRUE;
 
+	if(KeyboardAction(widget,event,user_data))
+	{
+		gtk_im_context_reset(im);
+		return TRUE;
+	}
+
 	return FALSE;
  }
 
@@ -319,12 +325,6 @@
 
 	if(gtk_im_context_filter_keypress(im,event))
 		return TRUE;
-
-	if(KeyboardAction(widget,event,user_data))
-	{
-		gtk_im_context_reset(im);
-		return TRUE;
-	}
 
 	return FALSE;
  }

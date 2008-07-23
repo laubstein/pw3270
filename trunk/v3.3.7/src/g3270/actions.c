@@ -411,7 +411,7 @@
  	static const char *authors[] = {	"Paul Mattes <Paul.Mattes@usa.net>",
 										"GTRC",
 										"Perry Werneck <perry.werneck@gmail.com>",
-										"and others",
+										N_( "and others" ),
 										NULL};
 
 	static const char license[] =
@@ -454,29 +454,94 @@
 		gdk_pixbuf_unref(logo);
  }
 
- static gint CreateTemporaryFile(gchar **filename)
+/*
+ gpointer command_thread(GSList *args)
  {
-	GError	*error	= NULL;
- 	gint	fd		= g_file_open_tmp("XXXXXX.3270",filename,&error);
-
-	if(fd < 0)
-	{
-		if(error && error->message)
-			popup_an_error( N_( "Error creating temporary file: %s" ),error->message);
-		else
-			popup_an_error( N_( "Unexpected error creating temporary file" ));
-
-		return fd;
-	}
+ 	Trace("Command thread for %s %s started", g_slist_nth_data(args,0), g_slist_nth_data(args,2));
 
 
- 	return fd;
+
+ 	Trace("Command thread for %s %s finished", g_slist_nth_data(args,0), g_slist_nth_data(args,2));
+
+	remove(g_slist_nth_data(args,2));
+	g_slist_foreach(args,(GFunc) g_free,NULL);
+	g_slist_free(args);
+ 	return 0;
+ }
+*/
+
+ void process_ended(GPid pid,gint status,gchar *tempfile)
+ {
+ 	Trace("Process %d ended with status %d",(int) pid, status);
+ 	remove(tempfile);
  }
 
- static void ExecWithScreenContents(const gchar *cmd, gboolean all)
+ static void RunCommand(const gchar *cmd, const gchar *str)
  {
- 	gchar	*filename	= NULL;
- 	gint	fd			= CreateTemporaryFile(&filename);
+	GError	*error		= NULL;
+	gchar	*filename	= NULL;
+	GPid 	pid			= 0;
+	gchar	*argv[3];
+	gchar	tmpname[20];
+
+	Trace("Running comand %s\n%s",cmd,str);
+
+	do
+	{
+		g_free(filename);
+		sprintf(tmpname,"%08lx.tmp",rand() ^ ((unsigned long) time(0)));
+		filename = g_build_filename(g_get_tmp_dir(),tmpname,NULL);
+	} while(g_file_test(filename,G_FILE_TEST_EXISTS));
+
+	Trace("Temporary file: %s",filename);
+
+	if(!g_file_set_contents(filename,str,-1,&error))
+	{
+		if(error)
+		{
+			popup_an_error( N_( "Error creating temporary file:\n%s" ), error->message ? error->message : N_( "Unexpected error" ));
+			g_error_free(error);
+		}
+		remove(filename);
+		g_free(filename);
+		return;
+	}
+
+	argv[0] = (gchar *) cmd;
+	argv[1] = filename;
+	argv[2] = NULL;
+
+	Trace("Spawning %s %s",cmd,filename);
+
+	error = NULL;
+
+	if(!g_spawn_async(	NULL,							// const gchar *working_directory,
+						argv,							// gchar **argv,
+						NULL,							// gchar **envp,
+						G_SPAWN_SEARCH_PATH,			// GSpawnFlags flags,
+						NULL,							// GSpawnChildSetupFunc child_setup,
+						NULL,							// gpointer user_data,
+						&pid,							// GPid *child_pid,
+						&error ))						// GError **error);
+	{
+		if(error)
+		{
+			popup_an_error( N_( "Error spawning %s\n%s" ), argv[0], error->message ? error->message : N_( "Unexpected error" ));
+			g_error_free(error);
+		}
+		remove(filename);
+		g_free(filename);
+		return;
+	}
+
+	Trace("pid %d",(int) pid);
+
+	g_child_watch_add(pid,(GChildWatchFunc) process_ended,filename);
+ }
+
+
+ /*
+ {
  	gchar	*screen		= GetScreenContents(all);
  	size_t	sz;
 
@@ -492,16 +557,21 @@
 		else
 		{
 			close(fd);
-			Trace("%s Command to execute: %s %s",__FUNCTION__,cmd,filename);
+			RunCommand(cmd,filename);
 		}
 	}
 
+	g_free(filename);
  	g_free(screen);
  }
+ */
 
  static void ExecWithScreen(GtkAction *action, gpointer cmd)
  {
- 	ExecWithScreenContents(cmd,TRUE);
+ 	gchar *screen = GetScreenContents(TRUE);
+ 	RunCommand(cmd,screen);
+ 	g_free(screen);
+
  }
 
  static void ExecWithCopy(GtkAction *action, gpointer cmd)
@@ -511,7 +581,9 @@
 
  static void ExecWithSelection(GtkAction *action, gpointer cmd)
  {
- 	ExecWithScreenContents(cmd,FALSE);
+ 	gchar *screen = GetScreenContents(FALSE);
+ 	RunCommand(cmd,screen);
+ 	g_free(screen);
  }
 
  static void LoadCustomActions(GtkActionGroup *actions)

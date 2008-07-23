@@ -10,7 +10,7 @@
 #	tooltip=
 #	stock_id=
 
-	action=notepad.exe %s
+	action=notepad.exe
 
 [EditCopy]
 
@@ -21,7 +21,7 @@
 #	tooltip=
 #	stock_id=
 
-	action=notepad.exe %s
+	action=notepad.exe
 
 
 [EditSelection]
@@ -33,5 +33,5 @@
 #	tooltip=
 #	stock_id=
 
-	action=notepad.exe %s
+	action=notepad.exe
 
