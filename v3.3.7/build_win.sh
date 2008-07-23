@@ -42,11 +42,10 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-cp actions.win $IMAGE/actions.conf
-if [ "$?" != "0" ]; then
-	exit -1
-fi
-
+#cp actions.win $IMAGE/actions.conf
+#if [ "$?" != "0" ]; then
+#	exit -1
+#fi
 
 mkdir -p $LOCALE/pt_BR/LC_MESSAGES
 if [ "$?" != "0" ]; then
