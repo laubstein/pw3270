@@ -225,7 +225,6 @@ struct toggle_name {
 	const char *name;
 	int index;
 };
-extern struct toggle_name toggle_names[];
 
 /*   extended attributes */
 struct ea {

@@ -44,6 +44,7 @@
 
 
 #if defined(LIB3270)
+
 static void no_callback(int value, int reason)
 {
 }
@@ -88,7 +89,27 @@ do_toggle_reason(int ix, enum toggle_type reason)
 
 #if defined(LIB3270)
 	t->callback(t->value, (int) reason);
+	notify_toggle_changed(ix, t->value, reason);
 #endif
+}
+
+int set_toggle(int ix, int value)
+{
+	Boolean v = ((Boolean) (value != 0)); // Convert int in Boolean
+
+	struct toggle	*t;
+
+	if(ix < 0 || ix >= N_TOGGLES)
+		return EINVAL;
+
+	t = &appres.toggle[ix];
+
+	if(t->value == v)
+		return 0;
+
+	do_toggle_reason(ix, TT_INTERACTIVE);
+
+	return 0;
 }
 
 void do_toggle(int ix)
@@ -150,6 +171,11 @@ initialize_toggles(void)
 		appres.toggle[SCREEN_TRACE].upcall(&appres.toggle[SCREEN_TRACE],
 		    TT_INITIAL);
 #endif /*]*/
+
+#if defined(LIB3270)
+	appres.toggle[CURSOR_POS].value = True;
+#endif /*]*/
+
 }
 
 /*
@@ -177,6 +203,7 @@ shutdown_toggles(void)
 #endif /*]*/
 }
 
+/*
 void
 Toggle_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -211,5 +238,26 @@ Toggle_action(Widget w unused, XEvent *event, String *params,
 		popup_an_error("%s: Unknown keyword '%s' (must be 'set' or "
 		    "'clear')", action_name(Toggle_action), params[1]);
 	}
+}
+*/
+
+const char	*get_toggle_name(int ix)
+{
+	if(ix < N_TOGGLES)
+		return toggle_names[ix];
+	return "";
+}
+
+int	get_toggle_by_name(const char *name)
+{
+	int f;
+
+	for(f=0;f<N_TOGGLES;f++)
+	{
+		if(!strcmp(name,toggle_names[f]))
+			return f;
+	}
+
+	return -1;
 }
 

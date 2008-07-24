@@ -64,7 +64,7 @@
 
  }
 
- static void  set_widget_flags(GtkWidget *widget, gpointer data)
+ static void set_widget_flags(GtkWidget *widget, gpointer data)
  {
  	if(!widget)
 		return;

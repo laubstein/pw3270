@@ -1045,6 +1045,14 @@ void Error(const char *s)
 		exit(1);
 }
 
+#if defined(LIB3270)
+void notify_toggle_changed(int ix, int value, int reason)
+{
+	if(callbacks && callbacks->toggle_changed)
+		callbacks->toggle_changed(ix,value,reason,toggle_names[ix]);
+}
+#endif
+
 void Warning(const char *s)
 {
 	WriteLog("Warning","%s",s);

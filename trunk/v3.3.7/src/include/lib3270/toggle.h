@@ -49,8 +49,15 @@
 		N_TOGGLES
 	};
 
-	int register_tchange(int ix, void (*callback)(int value, int reason));
-	void do_toggle(int ix);
+	extern const char *toggle_names[N_TOGGLES];
+
+	int 		register_tchange(int ix, void (*callback)(int value, int reason));
+	void		do_toggle(int ix);
+	int			set_toggle(int ix, int value);
+
+	const char	*get_toggle_name(int ix);
+	int			get_toggle_by_name(const char *name);
+
 
 
 #endif /* TOGGLE3270_H_INCLUDED */

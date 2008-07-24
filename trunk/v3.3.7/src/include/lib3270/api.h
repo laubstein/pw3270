@@ -149,7 +149,7 @@
 		{
 			unsigned short sz;
 
-			int (*init)(void);
+			int	(*init)(void);
 			void (*Error)(const char *s);
 			void (*Warning)(const char *s);
 			void (*setsize)(int rows, int cols);
@@ -170,7 +170,7 @@
 			void (*set)(OIA_FLAG id, int on);
 			void (*erase)(void);
 			void (*popup_an_error)(const char *msg);
-
+			void (*toggle_changed)(int ix, int value, int reason, const char *name);
 
 		};
 

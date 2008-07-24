@@ -265,7 +265,7 @@ XtActionsRec all_actions[] = {
 #if defined(X3270_DISPLAY) || defined(WC3270) /*[*/
 	{ "Title",		Title_action },
 #endif /*]*/
-	{ "Toggle",		Toggle_action },
+//	{ "Toggle",		Toggle_action },
 	{ "ToggleInsert",	ToggleInsert_action },
 	{ "ToggleReverse",	ToggleReverse_action },
 #if defined(C3270) && defined(X3270_TRACE) /*[*/

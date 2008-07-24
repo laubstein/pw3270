@@ -103,40 +103,26 @@ Boolean	       *standard_font = &sfont;
 char	       *profile_name = CN;
 #endif /*]*/
 
-struct toggle_name toggle_names[N_TOGGLES] = {
-	{ ResMonoCase,        MONOCASE },
-	{ ResAltCursor,       ALT_CURSOR },
-	{ ResCursorBlink,     CURSOR_BLINK },
-	{ ResShowTiming,      SHOW_TIMING },
-	{ ResCursorPos,       CURSOR_POS },
-#if defined(X3270_TRACE) /*[*/
-	{ ResDsTrace,         DS_TRACE },
-#else /*][*/
-	{ ResDsTrace,         -1 },
-#endif /*]*/
-	{ ResScrollBar,       SCROLL_BAR },
-#if defined(X3270_ANSI) /*[*/
-	{ ResLineWrap,        LINE_WRAP },
-#else /*][*/
-	{ ResLineWrap,        -1 },
-#endif /*]*/
-	{ ResBlankFill,       BLANK_FILL },
-#if defined(X3270_TRACE) /*[*/
-	{ ResScreenTrace,     SCREEN_TRACE },
-	{ ResEventTrace,      EVENT_TRACE },
-#else /*][*/
-	{ ResScreenTrace,     -1 },
-	{ ResEventTrace,      -1 },
-#endif /*]*/
-	{ ResMarginedPaste,   MARGINED_PASTE },
-	{ ResRectangleSelect, RECTANGLE_SELECT },
-	{ ResCrosshair,       -1 },
-	{ ResVisibleControl,  -1 },
-#if defined(X3270_SCRIPT) || defined(TCL3270) /*[*/
-	{ ResAidWait,         AID_WAIT },
-#else /*][*/
-	{ ResAidWait,         -1 },
-#endif /*]*/
+const char *toggle_names[N_TOGGLES] =
+{
+	"Monocase",
+	"AltCursor",
+	"CursorBlink",
+	"ShowTiming",
+	"CursorPos",
+	"DSTrace",
+	"ScrollBar",
+	"LineWrap",
+	"BlankFill",
+	"ScreenTrace",
+	"EventTrace",
+	"MarginedPaste",
+	"RectSelect",
+	"CrossHair",
+	"VisibleControl",
+	"AidWait",
+	"FullScreen",
+	"Reconnect",
 };
 
 #if defined(_WIN32) /*[*/
@@ -573,9 +559,10 @@ parse_options(int *argcp, const char **argv)
 	appres.dft_buffer_size = DFT_BUF;
 #endif /*]*/
 
-#if defined(C3270) /*[*/
+#if defined(C3270) && !defined(LIB3270) /*[*/
 	appres.toggle[CURSOR_POS].value = True;
 #endif /*]*/
+
 #if defined(X3270_SCRIPT) || defined(TCL3270) /*[*/
 	appres.toggle[AID_WAIT].value = True;
 #endif /*]*/
@@ -658,6 +645,7 @@ parse_options(int *argcp, const char **argv)
 static void
 parse_set_clear(int *argcp, const char **argv)
 {
+	/*
 	int i, j;
 	int argc_out = 0;
 	const char **argv_out =
@@ -675,10 +663,10 @@ parse_set_clear(int *argcp, const char **argv)
 			continue;
 		}
 
-		if (i == *argcp - 1)	/* missing arg */
+		if (i == *argcp - 1)	// missing arg
 			continue;
 
-		/* Delete the argument. */
+		// Delete the argument.
 		i++;
 
 		for (j = 0; j < N_TOGGLES; j++)
@@ -697,6 +685,7 @@ parse_set_clear(int *argcp, const char **argv)
 	(void) memcpy((char *)argv, (char *)argv_out,
 	    (argc_out + 1) * sizeof(char *));
 	Free(argv_out);
+	*/
 }
 
 /*
@@ -976,6 +965,7 @@ parse_xrm(const char *arg, const char *where)
 			break;
 		}
 	}
+/*
 	if (address == NULL) {
 		for (i = 0; i < N_TOGGLES; i++) {
 			if (toggle_names[i].index >= 0 &&
@@ -988,6 +978,7 @@ parse_xrm(const char *arg, const char *where)
 			}
 		}
 	}
+*/
 #if defined(C3270) /*[*/
 	if (address == NULL) {
 		if (!strncasecmp(ResKeymap ".", arg + match_len,

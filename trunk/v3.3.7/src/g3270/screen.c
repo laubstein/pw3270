@@ -71,6 +71,7 @@
  static void	changed(int bstart, int bend);
  static void	error(const char *s);
  static int	init(void);
+ static void 	update_toggle(int ix, int value, int reason, const char *name);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -99,6 +100,7 @@
 	set_oia,		// void (*set)(OIA_FLAG id, int on);
 	erase,			// void (*erase)(void);
 	error,			// void (*popup_an_error)(const char *msg);
+	update_toggle,	// void (*toggle_changed)(int ix, int value, int reason, const char *name);
 
  };
 
@@ -855,4 +857,28 @@
 	ctlr_set_rows_cols(2, 80, 24);
 
 	return 0;
+ }
+
+/*
+ static void update_toogle_by_name(GtkWidget *widget, gpointer data)
+ {
+ 	if(!widget)
+		return;
+
+	if(GTK_IS_CONTAINER(widget))
+	{
+		gtk_container_foreach(GTK_CONTAINER(widget),update_toogle_by_name,data);
+		return;
+	}
+
+	Trace("Widget %p is named \"%s\"",widget,gtk_widget_get_name(widget));
+
+ }
+*/
+ static void update_toggle(int ix, int value, int reason, const char *name)
+ {
+ 	Trace("Updating toggle \"%s\"",name);
+
+//	update_toogle_by_name(topwindow,0);
+
  }

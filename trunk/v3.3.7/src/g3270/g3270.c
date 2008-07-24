@@ -254,13 +254,6 @@ int main(int argc, char *argv[])
 	/* Handle initial settings. */
 	initialize_toggles();
 
-	if(CreateTopWindow())
-		return -1;
-
-//#ifdef DEBUG
-//	gdk_window_set_debug_updates(TRUE);
-//#endif
-
 	add_resource("keymap.base",
 #if defined(_WIN32) /*[*/
 	    base_keymap
@@ -272,6 +265,12 @@ int main(int argc, char *argv[])
 
 	cl_hostname = lib3270_init(&argc, (const char **)argv);
 
+	if(CreateTopWindow())
+		return -1;
+
+//#ifdef DEBUG
+//	gdk_window_set_debug_updates(TRUE);
+//#endif
 
 	register_schange(ST_CONNECT, main_connect);
 //	register_schange(ST_3270_MODE, main_connect);
