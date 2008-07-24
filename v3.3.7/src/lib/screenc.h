@@ -33,7 +33,7 @@ extern Boolean screen_new_display_charsets(char *cslist, char *csname);
 extern void mcursor_locked();
 extern void mcursor_normal();
 extern void mcursor_waiting();
-
+extern void notify_toggle_changed(int ix, int value, int reason);
 
 extern Boolean escaped;
 

@@ -60,13 +60,6 @@
  static void action_Delete(void);
  static void action_BackSpace(void);
  static void action_EraseEOF(void);
- static void action_CrossHair(GtkWidget *w, gpointer user_data);
- static void action_BlinkCursor(GtkWidget *w, gpointer user_data);
- static void action_RectSelect(GtkWidget *w, gpointer user_data);
- static void action_FullScreen(GtkWidget *w, gpointer user_data);
- static void action_ToggleMarginedPaste(void);
- static void action_ShowCursorPos(GtkWidget *w, gpointer user_data);
- static void action_AutoReconnect(GtkWidget *w, gpointer user_data);
  static void action_Disconnect(GtkWidget *w, gpointer user_data);
  static void action_PrintScreen(GtkWidget *w, gpointer user_data);
  static void action_PrintSelected(GtkWidget *w, gpointer user_data);
@@ -200,17 +193,8 @@
 */
  static const GtkToggleActionEntry internal_action_toggles[] =
  {
- 	{	"ToggleCursorBlink",	NULL,					N_( "Blink Cursor" ),			NULL, 			NULL,	G_CALLBACK(action_BlinkCursor),				FALSE },
- 	{	"ToggleCursorPos",		NULL,					N_( "Show Cursor Position" ),	NULL, 			NULL,	G_CALLBACK(action_ShowCursorPos), 			TRUE  },
- 	{	"ToggleFullScreen",		NULL,					N_( "Full Screen" ),			NULL,			NULL,	G_CALLBACK(action_FullScreen),				FALSE },
- 	{	"ToggleMarginedPaste",	NULL,					N_( "Margined Paste" ),			NULL, 			NULL,	G_CALLBACK(action_ToggleMarginedPaste), 	FALSE },
- 	{	"ToggleCrossHair",		NULL,					N_( "Cross Hair Cursor" ),		"<Alt>X",		NULL,	G_CALLBACK(action_CrossHair),				FALSE },
- 	{	"ToggleRectSelect",		NULL,					N_( "Rectangle Select" ),		NULL, 			NULL,	G_CALLBACK(action_RectSelect),				FALSE },
- 	{	"ToggleReconnect",		NULL,					N_( "Auto-Reconnect" ),			NULL, 			NULL,	G_CALLBACK(action_AutoReconnect), 			FALSE },
  	{	"ToggleInsert",			NULL,					N_( "Insert" ),					"Insert", 		NULL,	G_CALLBACK(action_Insert),		 			FALSE },
-
  };
-
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -338,42 +322,6 @@
  	action_internal(EraseEOF_action, IA_DEFAULT, CN, CN);
  }
 
- static void action_CrossHair(GtkWidget *w, gpointer user_data)
- {
- 	do_toggle(CROSSHAIR);
- }
-
- static void action_BlinkCursor(GtkWidget *w, gpointer user_data)
- {
- 	do_toggle(CURSOR_BLINK);
- }
-
- static void action_RectSelect(GtkWidget *w, gpointer user_data)
- {
- 	do_toggle(RECTANGLE_SELECT);
- }
-
- static void action_FullScreen(GtkWidget *w, gpointer user_data)
- {
- 	do_toggle(FULL_SCREEN);
- }
-
- static void action_ToggleMarginedPaste(void)
- {
- 	do_toggle(MARGINED_PASTE);
- }
-
-
- static void action_ShowCursorPos(GtkWidget *w, gpointer user_data)
- {
- 	do_toggle(CURSOR_POS);
- }
-
- static void action_AutoReconnect(GtkWidget *w, gpointer user_data)
- {
- 	do_toggle(RECONNECT);
- }
-
  static void action_Disconnect(GtkWidget *w, gpointer user_data)
  {
  	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
@@ -454,22 +402,6 @@
 		gdk_pixbuf_unref(logo);
  }
 
-/*
- gpointer command_thread(GSList *args)
- {
- 	Trace("Command thread for %s %s started", g_slist_nth_data(args,0), g_slist_nth_data(args,2));
-
-
-
- 	Trace("Command thread for %s %s finished", g_slist_nth_data(args,0), g_slist_nth_data(args,2));
-
-	remove(g_slist_nth_data(args,2));
-	g_slist_foreach(args,(GFunc) g_free,NULL);
-	g_slist_free(args);
- 	return 0;
- }
-*/
-
  void process_ended(GPid pid,gint status,gchar *tempfile)
  {
  	Trace("Process %d ended with status %d",(int) pid, status);
@@ -538,33 +470,6 @@
 
 	g_child_watch_add(pid,(GChildWatchFunc) process_ended,filename);
  }
-
-
- /*
- {
- 	gchar	*screen		= GetScreenContents(all);
- 	size_t	sz;
-
-	if(fd > 0)
-	{
-		sz = strlen(screen);
-		if(write(fd,screen,sz) != sz)
-		{
-			popup_an_error(N_("Can't write to temporary file"));
-			close(fd);
-			remove(filename);
-		}
-		else
-		{
-			close(fd);
-			RunCommand(cmd,filename);
-		}
-	}
-
-	g_free(filename);
- 	g_free(screen);
- }
- */
 
  static void ExecWithScreen(GtkAction *action, gpointer cmd)
  {
@@ -646,6 +551,64 @@
 	g_free(filename);
  }
 
+ static void toggle_action(GtkToggleAction *action, int id)
+ {
+ 	Trace("%s: %s active=%d",__FUNCTION__,get_toggle_name(id),gtk_toggle_action_get_active(action));
+ 	set_toggle(id,gtk_toggle_action_get_active(action));
+ }
+
+ static void LoadToggleActions(GtkActionGroup *actions)
+ {
+ 	static const struct _toggle_info
+ 	{
+ 		const gchar *label;
+ 		const gchar *tooltip;
+ 		const gchar *stock_id;
+	}
+	toggle_info[N_TOGGLES] =
+	{
+		{ N_( "Monocase" ),				NULL,	NULL	},
+		{ N_( "Alt Cursor" ),			NULL,	NULL	},
+		{ N_( "Blink Cursor" ),			NULL,	NULL	},
+		{ N_( "Show timing" ),			NULL,	NULL	},
+		{ N_( "Show Cursor Position" ),	NULL,	NULL	},
+		{ N_( "DS Trace" ),				NULL,	NULL	},
+		{ N_( "Scroll bar" ),			NULL,	NULL	},
+		{ N_( "Line Wrap" ),			NULL,	NULL	},
+		{ N_( "Blank Fill" ),			NULL,	NULL	},
+		{ N_( "Screen Trace" ),			NULL,	NULL	},
+		{ N_( "Event Trace" ),			NULL,	NULL	},
+		{ N_( "Margined Paste" ),		NULL,	NULL	},
+		{ N_( "Rectangle Select" ),		NULL,	NULL	},
+		{ N_( "Cross Hair Cursor" ),	NULL,	NULL	},
+		{ N_( "Visible Control" ),		NULL,	NULL	},
+		{ N_( "Aid wait" ),				NULL,	NULL	},
+		{ N_( "Full Screen" ),			NULL,	NULL	},
+		{ N_( "Auto-Reconnect" ),		NULL,	NULL	}
+	};
+
+ 	int f;
+
+ 	for(f=0;f<N_TOGGLES;f++)
+ 	{
+ 		char buffer[20] = "Toggle";
+
+ 		strncat(buffer,get_toggle_name(f),20);
+
+ 		GtkToggleAction *action = gtk_toggle_action_new(	buffer,
+															toggle_info[f].label,
+															toggle_info[f].tooltip,
+															toggle_info[f].stock_id );
+		gtk_toggle_action_set_active(action,Toggled(f));
+		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_action),(gpointer) f);
+
+		Trace("%s: %s=%d",__FUNCTION__,buffer,Toggled(f));
+
+		gtk_action_group_add_action(actions,(GtkAction *) action);
+ 	}
+
+ }
+
  GtkUIManager * LoadApplicationUI(GtkWidget *widget)
  {
 	GtkUIManager 	*ui_manager = gtk_ui_manager_new(); // http://library.gnome.org/devel/gtk/stable/GtkUIManager.html
@@ -654,13 +617,14 @@
 	gchar			*ui;
 
 	// Load actions
-	actions = gtk_action_group_new("InternalActions");
+	actions = gtk_action_group_new("Actions");
 	gtk_action_group_set_translation_domain(actions, GETTEXT_PACKAGE);
 
 	gtk_action_group_add_actions(actions, internal_action_entries, G_N_ELEMENTS (internal_action_entries), topwindow);
 	gtk_action_group_add_toggle_actions(actions,internal_action_toggles, G_N_ELEMENTS(internal_action_toggles),0);
 
 	LoadCustomActions(actions);
+	LoadToggleActions(actions);
 
 	// Add actions and load UI
 	gtk_ui_manager_insert_action_group(ui_manager,actions, 0);
