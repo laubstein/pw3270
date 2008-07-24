@@ -69,6 +69,7 @@
 #if defined(X3270_DBCS) /*[*/
 #include "widec.h"
 #endif /*]*/
+#include "lib3270.h"
 
 /* Statics */
 static enum	{ NONE, COMPOSE, FIRST } composing = NONE;
@@ -382,6 +383,8 @@ operator_error(int error_type)
 static void
 key_AID(unsigned char aid_code)
 {
+	fprintf(stderr,"\nIN_SSCP: %d cursor_addr: %d\n",IN_SSCP,cursor_addr);fflush(stderr);
+
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
 		register unsigned i;
@@ -2275,7 +2278,7 @@ EraseEOF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 	register int	baddr;
 	register unsigned char	fa;
 	enum dbcs_state d;
-	enum dbcs_why why;
+	enum dbcs_why why = 0;
 
 	action_debug(EraseEOF_action, event, params, num_params);
 	reset_idle_timer();
@@ -2972,8 +2975,8 @@ int Get3270CursorCol(void)
 int SelectFieldByPosition(int lin, int col)
 {
 	register int    baddr, faddr;
-    register unsigned char  fa;	
-	
+    register unsigned char  fa;
+
 	baddr = (lin * COLS) + col;
 	faddr = find_field_attribute(baddr);
     fa = ea_buf[faddr].fa;
@@ -2982,7 +2985,7 @@ int SelectFieldByPosition(int lin, int col)
 		cursor_move(baddr);
 		return 0;
 	}
-	
+
 	return EINVAL;
 }
 
@@ -3011,7 +3014,7 @@ emulate_input(char *s, int len, Boolean pasting)
 	int literal = 0;
 	int nc = 0;
 	int lin;
-	int col;
+//	int col;
 	int lineChanged = 0;
 	enum iaction ia = pasting ? IA_PASTE : IA_STRING;
 	int orig_addr = cursor_addr;
@@ -3027,7 +3030,7 @@ emulate_input(char *s, int len, Boolean pasting)
 	char c;
 	char *ws;
 #endif /*]*/
-	
+
 	/*
 	 * Convert from a multi-byte string to a Unicode string.
 	 */
@@ -3050,7 +3053,7 @@ emulate_input(char *s, int len, Boolean pasting)
 	 * this character," while "continue" means "rescan this character."
 	 */
     lin = Get3270CursorRow();
-	
+
 	while (len) {
 
         if(lin == Get3270CursorRow())
@@ -3109,7 +3112,7 @@ emulate_input(char *s, int len, Boolean pasting)
 				{
 					if(lineChanged < 2)
 						action_internal(Newline_action, ia, CN, CN);
-				
+
 				}
 				else
 				{

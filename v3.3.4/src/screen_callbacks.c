@@ -232,6 +232,8 @@ static void status_reset(void)
       SetOIAStatus(STATUS_NONSPECIFIC);
    else
       SetOIAStatus(STATUS_BLANK);
+
+   DBGPrintf("Reset kybd: %d",(int) GetKeyboardStatus());
 }
 
 /* Toggle reverse mode */

@@ -102,7 +102,7 @@
  #endif
 
  #define LockThreads()		gdk_lock()
- #define UnlockThreads()	CHKPoint(); gdk_unlock()
+ #define UnlockThreads()	gdk_unlock()
 
 #ifdef __cplusplus
  extern "C" {
