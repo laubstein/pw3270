@@ -217,7 +217,7 @@ msgstr "Mostarda"
 #: g3270.c:318
 #, c-format
 msgid "Negotiation with %s failed!"
-msgstr "Negociação com \\"%s\\" falhou!"
+msgstr "Negociação com %s falhou!"
 
 #: actions.c:134
 msgid "Network"
