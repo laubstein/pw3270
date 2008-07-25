@@ -119,6 +119,7 @@
 	extern gint					cRow;
 	extern gboolean 				WaitingForChanges;
 	extern char					*charset;
+	extern GtkActionGroup			*main_actions;
 
 	extern const struct lib3270_io_callbacks g3270_io_callbacks;
 	extern const struct lib3270_screen_callbacks g3270_screen_callbacks;

@@ -28,6 +28,7 @@
  #include "g3270.h"
  #include <ctype.h>
  #include <string.h>
+ #include <lib3270/toggle.h>
 
  #define CHECK_FILENAME(...)	filename = g_build_filename( __VA_ARGS__, NULL ); \
 								if(g_file_test(filename,G_FILE_TEST_IS_REGULAR)) \
@@ -49,7 +50,6 @@
  };
 
  static GKeyFile	*conf	= NULL;
- static gboolean	changed	= FALSE;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -85,7 +85,8 @@
 
  int OpenConfigFile(void)
  {
-	gchar *filename = FindConfigFile();
+	gchar	*filename = FindConfigFile();
+	int		f;
 
 	if(conf)
 	{
@@ -101,19 +102,26 @@
 		g_key_file_load_from_file(conf,filename,G_KEY_FILE_NONE,NULL);
 	}
 
+	/* Load initial settings */
+	for(f=0;f<N_TOGGLES;f++)
+	{
+ 		const char *name = get_toggle_name(f);
+
+		if(g_key_file_has_key(conf,"Toggles",name,NULL))
+			set_toggle(f,g_key_file_get_boolean(conf,"Toggles",name,NULL));
+	}
 
  	return 0;
  }
 
  int SaveConfigFile(void)
  {
- 	gchar *ptr;
- 	gchar *filename;
+ 	gchar	*ptr;
+ 	gchar	*filename;
+ 	int		f;
 
- 	if(!changed)
-		return 0;
-
-	changed = FALSE;
+	for(f=0;f<N_TOGGLES;f++)
+		g_key_file_set_boolean(conf,"Toggles",get_toggle_name(f),Toggled(f));
 
  	ptr = g_key_file_to_data(conf,NULL,NULL);
 
@@ -168,7 +176,6 @@
 	for(f=0;f<(sizeof(WindowState)/sizeof(struct _WindowState));f++)
 		g_key_file_set_boolean(conf,"TopWindow",WindowState[f].name, CurrentState & WindowState[f].flag);
 
-	changed = TRUE;
 	SaveConfigFile();
  }
 

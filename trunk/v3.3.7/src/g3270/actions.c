@@ -121,6 +121,7 @@
  	{	"EditMenu",			NULL,					N_( "_Edit" ),			NULL,			NULL,	NULL								},
  	{	"OptionsMenu",		NULL,					N_( "_Options" ),		NULL,			NULL,	NULL								},
  	{	"SettingsMenu",		NULL,					N_( "Settings" ),		NULL,			NULL,	NULL								},
+	{	"FontSettings",		GTK_STOCK_SELECT_FONT,	N_( "Select font" ),	NULL,			NULL,	NULL								},
 
  	/* Stock menus */
  	{	"Preferences",		GTK_STOCK_PREFERENCES,	N_( "Preferences" ),	NULL,			NULL,	NULL								},
@@ -195,6 +196,9 @@
  {
  	{	"ToggleInsert",			NULL,					N_( "Insert" ),					"Insert", 		NULL,	G_CALLBACK(action_Insert),		 			FALSE },
  };
+
+
+ GtkActionGroup	*main_actions = NULL;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -272,7 +276,7 @@
  	if(PCONNECTED)
  		return;
 
-	// TODO (perry#5#): If there's no previous server ask for one.
+	// TODO (perry#5#): If there's no previous server ask for it.
  	action_ClearSelection();
 	action_internal(Reconnect_action, IA_DEFAULT, CN, CN);
 
@@ -553,7 +557,6 @@
 
  static void toggle_action(GtkToggleAction *action, int id)
  {
- 	Trace("%s: %s active=%d",__FUNCTION__,get_toggle_name(id),gtk_toggle_action_get_active(action));
  	set_toggle(id,gtk_toggle_action_get_active(action));
  }
 
@@ -612,22 +615,21 @@
  GtkUIManager * LoadApplicationUI(GtkWidget *widget)
  {
 	GtkUIManager 	*ui_manager = gtk_ui_manager_new(); // http://library.gnome.org/devel/gtk/stable/GtkUIManager.html
-	GtkActionGroup	*actions;
 	GError			*error = NULL;
 	gchar			*ui;
 
 	// Load actions
-	actions = gtk_action_group_new("Actions");
-	gtk_action_group_set_translation_domain(actions, GETTEXT_PACKAGE);
+	main_actions = gtk_action_group_new("Actions");
+	gtk_action_group_set_translation_domain(main_actions, GETTEXT_PACKAGE);
 
-	gtk_action_group_add_actions(actions, internal_action_entries, G_N_ELEMENTS (internal_action_entries), topwindow);
-	gtk_action_group_add_toggle_actions(actions,internal_action_toggles, G_N_ELEMENTS(internal_action_toggles),0);
+	gtk_action_group_add_actions(main_actions, internal_action_entries, G_N_ELEMENTS (internal_action_entries), topwindow);
+	gtk_action_group_add_toggle_actions(main_actions,internal_action_toggles, G_N_ELEMENTS(internal_action_toggles),0);
 
-	LoadCustomActions(actions);
-	LoadToggleActions(actions);
+	LoadCustomActions(main_actions);
+	LoadToggleActions(main_actions);
 
 	// Add actions and load UI
-	gtk_ui_manager_insert_action_group(ui_manager,actions, 0);
+	gtk_ui_manager_insert_action_group(ui_manager,main_actions, 0);
 
 	ui = FindSystemConfigFile("ui.xml");
 	if(ui)
@@ -647,6 +649,7 @@
 		popup_an_error( _( "Can't find UI definition file" ) );
 	}
 
+	/* Update UI */
 	gtk_ui_manager_ensure_update(ui_manager);
 	return ui_manager;
  }

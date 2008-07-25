@@ -54,16 +54,6 @@
     gtk_main_quit();
  }
 
- static void set_fullscreen(int value, int reason)
- {
- 	Trace("Fullscren mode toggled (value: %d",value);
- 	if(value)
-		gtk_window_fullscreen(GTK_WINDOW(topwindow));
-	else
-		gtk_window_unfullscreen(GTK_WINDOW(topwindow));
-
- }
-
  static void set_widget_flags(GtkWidget *widget, gpointer data)
  {
  	if(!widget)
@@ -195,8 +185,6 @@
 #else
 	gtk_window_set_role(GTK_WINDOW(topwindow), "G3270_TOP" );
 #endif
-
-	register_tchange(FULL_SCREEN,set_fullscreen);
 
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
 

@@ -52,10 +52,22 @@ static void no_callback(int value, int reason)
 /* Register a callback to monitor toggle changes */
 int register_tchange(int ix, void (*callback)(int value, int reason))
 {
+	struct toggle *t;
+
 	if(ix < 0 || ix >= N_TOGGLES)
 		return EINVAL;
 
-	appres.toggle[ix].callback = callback ? callback : no_callback;
+	t = &appres.toggle[ix];
+
+	if(callback)
+	{
+		t->callback = callback;
+		t->callback(t->value, (int) TT_INITIAL);
+	}
+	else
+	{
+		t->callback = no_callback;
+	}
 
 	return 0;
 }

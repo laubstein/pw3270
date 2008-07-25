@@ -36,6 +36,7 @@
 
 #include <errno.h>
 #include <lib3270/3270ds.h>
+#include <lib3270/toggle.h>
 #include "ftc.h"
 #include "macrosc.h"
 #include "printerc.h"
@@ -206,6 +207,17 @@ static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, cons
 	WriteLog(id, "%s", message);
 }
 
+static void set_fullscreen(int value, int reason)
+{
+ 	Trace("Fullscren mode toggled (value: %d",value);
+
+ 	if(value)
+		gtk_window_fullscreen(GTK_WINDOW(topwindow));
+	else
+		gtk_window_unfullscreen(GTK_WINDOW(topwindow));
+
+}
+
 static int g3270_init(int *argc, char ***argv)
 {
 	/* Init GTK stuff */
@@ -246,13 +258,12 @@ int main(int argc, char *argv[])
 {
 	const char	*cl_hostname = CN;
 
+	initialize_toggles();
+
 //	printf("%s\n\nCopyright 1989-2008 by Paul Mattes, GTRC and others.\n",build);
 
 	if(g3270_init(&argc,&argv))
 		return -1;
-
-	/* Handle initial settings. */
-	initialize_toggles();
 
 	add_resource("keymap.base",
 #if defined(_WIN32) /*[*/
@@ -288,6 +299,11 @@ int main(int argc, char *argv[])
 	gtk_widget_grab_default(terminal);
 
 	/* Update screen */
+	while(gtk_events_pending())
+		gtk_main_iteration();
+
+	register_tchange(FULL_SCREEN,set_fullscreen);
+
 	while(gtk_events_pending())
 		gtk_main_iteration();
 

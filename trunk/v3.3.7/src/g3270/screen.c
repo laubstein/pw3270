@@ -87,7 +87,7 @@
 	set_charset,	// void (*charset)(char *dcs);
 	title,			// void (*title)(char *text);
 	changed,		// void (*changed)(int bstart, int bend);
-	NULL,			// void (*ring_bell)(void);
+	gdk_beep,		// void (*ring_bell)(void);
 	action_Redraw,	// void (*redraw)(void);
 	MoveCursor,		// void (*move_cursor)(int row, int col);
 	suspend,		// void (*suspend)(void);
@@ -859,26 +859,23 @@
 	return 0;
  }
 
-/*
- static void update_toogle_by_name(GtkWidget *widget, gpointer data)
+ void update_toggle(int ix, int value, int reason, const char *name)
  {
- 	if(!widget)
-		return;
+ 	GtkToggleAction *action;
+	char 			buffer[20] = "Toggle";
 
-	if(GTK_IS_CONTAINER(widget))
+	strncat(buffer,name,20);
+
+	action = (GtkToggleAction *) gtk_action_group_get_action(main_actions,buffer);
+
+	Trace("Action: %p",action);
+
+	if(!action)
 	{
-		gtk_container_foreach(GTK_CONTAINER(widget),update_toogle_by_name,data);
+		Log("No acction for toggle %s",name);
 		return;
 	}
 
-	Trace("Widget %p is named \"%s\"",widget,gtk_widget_get_name(widget));
-
- }
-*/
- static void update_toggle(int ix, int value, int reason, const char *name)
- {
- 	Trace("Updating toggle \"%s\"",name);
-
-//	update_toogle_by_name(topwindow,0);
+	gtk_toggle_action_set_active(action,value);
 
  }

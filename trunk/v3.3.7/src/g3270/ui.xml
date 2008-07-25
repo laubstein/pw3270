@@ -34,6 +34,9 @@
 
 		<menu action='SettingsMenu'>
 			<menuitem action='SelectColors' />
+
+			<menu action='FontSettings' />
+
 			<menu action='OptionsMenu'>
 				<menuitem action='ToggleCursorBlink' />
 				<menuitem action='ToggleCursorPos'  />
