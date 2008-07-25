@@ -17,7 +17,7 @@ PKG_CONFIG_PATH=/usr/i386-mingw32/lib/pkgconfig
 
 # Set compile/link parameters
 XCPPFLAGS = -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500
-CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall -Werror $(XCPPFLAGS) -O -DG3270 -Isrc/include
+CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall $(XCPPFLAGS) -O -DG3270 -Isrc/include
 DLLFLAGS = $(EXTRA_FLAGS) -mno-cygwin -shared -Wl,--export-all-symbols -Wl,--enable-auto-import
 BINFLAGS = -mwindows
 
@@ -48,7 +48,7 @@ GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
 obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DDEBUG=1 -DLIB3270=1 -DHAVE_LIBSSL=1 `pkg-config --cflags $(SSL_MODULES)` $(CFLAGS) -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $< 
+	@$(CC) -DDEBUG=1 -DLIB3270=1 -DHAVE_LIBSSL=1 `pkg-config --cflags $(SSL_MODULES)` $(CFLAGS) -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
 
 obj/Debug/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
@@ -64,22 +64,22 @@ obj/Debug/version.o: src/version.c
 obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DLIB3270=1 -DHAVE_LIBSSL=1 $(CFLAGS) `pkg-config --cflags $(SSL_MODULES)` -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
+	@$(CC) -DLIB3270=1 -DHAVE_LIBSSL=1 $(CFLAGS) -Werror `pkg-config --cflags $(SSL_MODULES)` -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
 
 obj/Release/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(CFLAGS) `pkg-config --cflags $(GTK_MODULES)` -Isrc/lib -o $@ -c $<
+	@$(CC) $(CFLAGS) -Werror `pkg-config --cflags $(GTK_MODULES)` -Isrc/lib -o $@ -c $<
 
 obj/Release/version.o: src/version.c
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(CFLAGS) -Isrc/lib -o $@ -c $<
+	@$(CC) $(CFLAGS) -Werror -Isrc/lib -o $@ -c $<
 
 obj/Release/src/lib/w3n46.o: src/lib/resolver.c
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(CFLAGS) -Isrc/lib -DW3N46 -c -o $@ $^
+	@$(CC) $(CFLAGS) -Werror -Isrc/lib -DW3N46 -c -o $@ $^
 
 # Release Targets
 bin/Release/g3270.$(BINEXT): bin/Release/lib3270.$(DLLEXT) $(foreach SRC, $(basename $(G3270_SRCS)), obj/Release/src/g3270/$(SRC).$(OBJEXT))
