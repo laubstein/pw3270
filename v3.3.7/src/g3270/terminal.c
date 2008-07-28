@@ -141,6 +141,8 @@
 	gchar			**ptr;
 	int 			f;
 
+	memset(fsize,0,MAX_FONT_SIZES * sizeof(FONTSIZE));
+
 	conf = GetString("Terminal","FontSizes","");
 
 	if(conf && *conf)
@@ -165,7 +167,7 @@
 		{
 			fsize[f].size = (f+1) * PANGO_SCALE;
 			UpdateFontData(f);
-			Trace("Font %d fits on %dx%d",f,terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
+//			Trace("Font %d fits on %dx%d",f,terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
 		}
 	}
  }
@@ -376,12 +378,33 @@
 		ResizeTerminal(widget,allocation->width,allocation->height);
  }
 
+ void SetTerminalFont(const gchar *fontname)
+ {
+ 	Trace("Selected font: %s (last: %p)",fontname,font);
+
+	lFont = -1;
+
+ 	if(font)
+		pango_font_description_free(font);
+
+	font = pango_font_description_from_string(fontname);
+
+	if(terminal && terminal->window)
+	{
+		gdk_drawable_get_size(terminal->window,&sWidth,&sHeight);
+		ResizeTerminal(terminal,sWidth,sHeight);
+		gtk_widget_queue_draw(terminal);
+	}
+
+ }
+
  GtkWidget *CreateTerminalWindow(void)
  {
 	memset(fsize,0,MAX_FONT_SIZES * sizeof(FONTSIZE));
 	memset(color,0,sizeof(GdkColor)*TERMINAL_COLOR_COUNT);
 
  	LoadColors();
+	SetTerminalFont(GetString("Terminal","Font","Courier"));
 
 	im = gtk_im_context_simple_new();
 
@@ -412,10 +435,6 @@
     g_signal_connect(G_OBJECT(terminal), "button-release-event",	G_CALLBACK(mouse_button_release),	0);
     g_signal_connect(G_OBJECT(terminal), "motion-notify-event",		G_CALLBACK(mouse_motion),    		0);
     g_signal_connect(G_OBJECT(terminal), "scroll-event",			G_CALLBACK(mouse_scroll),			0);
-
-	font = pango_font_description_from_string(GetString("Terminal","Font","Courier"));
-	if(!font)
-		font = pango_font_description_from_string(GetString("Terminal","Font","Courier"));
 
 	register_tchange(CROSSHAIR,set_crosshair);
 	register_tchange(CURSOR_POS,set_showcursor);

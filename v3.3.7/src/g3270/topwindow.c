@@ -95,6 +95,103 @@
  	return 0;
  }
 
+ static void activate_font(GtkCheckMenuItem *item, gchar *text)
+ {
+	if(gtk_check_menu_item_get_active(item))
+	{
+		gchar *vlr	= strdup(text);
+		char *ptr	= strchr(vlr,',');
+
+		if(ptr)
+		{
+			*(ptr++) = 0;
+			SetString("Terminal","FontSizes",ptr);
+		}
+		else
+		{
+			SetString("Terminal","FontSizes",NULL);
+		}
+
+		SetTerminalFont(vlr);
+		SetString("Terminal","Font",vlr);
+
+		g_free(vlr);
+	}
+ }
+
+ static void LoadFontMenu(GtkWidget *menu_item)
+ {
+	gchar			*filename;
+	GError			*error		= NULL;
+	gchar			*text		= NULL;
+	const gchar	*selected	= GetString("Terminal","Font","Courier");
+	gchar			**ln;
+
+	if(!menu_item)
+		return;
+
+	filename = FindSystemConfigFile("fonts.conf");
+	if(!filename)
+		return;
+
+	if(!g_file_get_contents(filename,&text,NULL,&error))
+	{
+		popup_an_error( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+		g_error_free(error);
+		g_free(filename);
+		g_free(text);
+		return;
+	}
+
+	if(*filename)
+	{
+		ln = g_strsplit(text,"\n",0);
+
+		if(ln)
+		{
+		 	GtkWidget	*menu	= gtk_menu_new();
+		 	int 		f;
+		 	GSList 		*group	= NULL;
+
+		 	for(f=0;ln[f];f++)
+		 	{
+		 		ln[f] = g_strstrip(ln[f]);
+
+		 		if(*ln[f])
+		 		{
+		 			GtkWidget 	*item;
+		 			gchar		*arg	= g_strdup(ln[f]);
+		 			char		*ptr	= strchr(ln[f],',');
+
+		 			if(ptr)
+						*ptr = 0;
+
+					item = gtk_radio_menu_item_new_with_label(group,ln[f]);
+
+		 			// FIXME (perry#2#): the user_data isn't being freed!
+		 			group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+					g_signal_connect(G_OBJECT(item),"toggled",G_CALLBACK(activate_font),arg);
+					gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
+
+					if(!strcmp(text,selected))
+						gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),TRUE);
+		 		}
+		 	}
+
+			gtk_widget_show_all(menu);
+			gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item),menu);
+			g_strfreev(ln);
+		}
+
+	}
+
+
+	g_free(text);
+
+
+	g_free(filename);
+ }
+
  int CreateTopWindow(void)
  {
  	static int cr[CURSOR_MODE_USER] = { GDK_ARROW, GDK_WATCH, GDK_X_CURSOR };
@@ -172,6 +269,8 @@
 				g_object_ref(*popup[f].widget);
 			}
 		}
+
+		LoadFontMenu(gtk_ui_manager_get_widget(ui_manager,"/MainMenubar/SettingsMenu/FontSettings"));
 
 		g_object_unref(ui_manager);
 	}
