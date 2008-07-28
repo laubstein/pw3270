@@ -605,7 +605,7 @@
 		gtk_toggle_action_set_active(action,Toggled(f));
 		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_action),(gpointer) f);
 
-		Trace("%s: %s=%d",__FUNCTION__,buffer,Toggled(f));
+//		Trace("%s: %s=%d",__FUNCTION__,buffer,Toggled(f));
 
 		gtk_action_group_add_action(actions,(GtkAction *) action);
  	}
