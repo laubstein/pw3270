@@ -14,12 +14,12 @@
 /* c3270 verson of statusc.h */
 
 #define status_kybdlock()
-#define status_script(on)
-#define status_timing(t0, t1)
-#define status_untiming()
 
 extern void status_compose(Boolean on, unsigned char c, enum keytype keytype);
 extern void status_ctlr_done(void);
+extern void status_script(Boolean on);
+extern void status_timing(struct timeval *t0, struct timeval *t1);
+extern void status_untiming(void);
 
 // extern void status_insert_mode(Boolean on);
 #define status_insert_mode(on) set_toggle(INSERT,on)

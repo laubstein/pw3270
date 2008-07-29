@@ -39,6 +39,7 @@
 #include "xioc.h"
 #include "screen.h"
 #include "errno.h"
+#include "statusc.h"
 #include <lib3270/api.h>
 
 #include <windows.h>
@@ -637,6 +638,23 @@ static void
 status_printer(Boolean on)
 {
 	set(OIA_FLAG_PRINTER,on);
+}
+
+void status_script(Boolean on)
+{
+	set(OIA_FLAG_SCRIPT,on);
+}
+
+void status_timing(struct timeval *t0, struct timeval *t1)
+{
+	if(callbacks && callbacks->show_timer)
+		callbacks->show_timer(t1->tv_sec - t0->tv_sec);
+}
+
+void status_untiming(void)
+{
+	if(callbacks && callbacks->show_timer)
+		callbacks->show_timer(-1);
 }
 
 void Redraw_action(Widget w unused, XEvent *event unused, String *params unused, Cardinal *num_params unused)

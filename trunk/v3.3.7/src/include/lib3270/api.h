@@ -134,6 +134,7 @@
 			OIA_FLAG_TYPEAHEAD,
 			OIA_FLAG_PRINTER,
 			OIA_FLAG_REVERSE,
+			OIA_FLAG_SCRIPT,
 
 			OIA_FLAG_USER
 		} OIA_FLAG;
@@ -170,6 +171,7 @@
 			void	(*erase)(void);
 			void	(*popup_an_error)(const char *msg);
 			void	(*toggle_changed)(int ix, int value, int reason, const char *name);
+			void	(*show_timer)(long seconds);
 
 		};
 
