@@ -72,6 +72,7 @@
 		<Unit filename="src/g3270/print.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/g3270/resources.rc" />
 		<Unit filename="src/g3270/screen.c">
 			<Option compilerVar="CC" />
 		</Unit>
