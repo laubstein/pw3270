@@ -126,9 +126,6 @@ bin/Debug/w3n46.dll: obj/Release/src/lib/w3n46.o
 src/lib/fallbacks.c:  src/lib/X3270.xad
 	@make -C src/lib fallbacks.c
 
-src/g3270/g3270.ico: src/g3270/g3270.jpg Makefile
-	@convert $< $@
-
 src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@src/mkversion.sh
 
@@ -152,7 +149,6 @@ clean:
 	@rm -f	src/lib/version.o
 	@rm -f	src/lib/mkfb.exe
 	@rm -f	src/version.c
-	@rm -f	src/g3270/g3270.ico
 	@rm -f	sources.lst
 	@rm -f	g3270.tar.gz
 	@rm -f $(PACKAGE).pot
