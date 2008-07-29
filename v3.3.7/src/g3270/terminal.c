@@ -522,8 +522,6 @@
 	if(row == cRow && col == cCol)
 		return;
 
-	Trace("Moving cursor to %d,%d",row,col);
-
 	gtk_im_context_reset(im);
 	InvalidateCursor();
 
@@ -547,7 +545,7 @@
 	cursor.width 	= fWidth;
 
 	if(Toggled(INSERT))
-		cursor.height 	= fHeight;
+		cursor.height 	= (fHeight/3)+1;
 	else
 		cursor.height 	= (fHeight >> 2)+1;
 

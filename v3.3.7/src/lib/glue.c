@@ -1228,8 +1228,7 @@ popup_an_errno(int errn, const char *fmt, ...)
 
 	WriteLog("3270", "Error Popup:\n%s\nrc=%d (%s)",vmsgbuf,errn,strerror(errn));
 
-	// TODO (perry#1#): Find a way (callback?) to pass the message to the application.
-
+	Error(vmsgbuf);
 }
 
 void

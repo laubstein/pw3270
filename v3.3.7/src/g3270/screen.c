@@ -32,6 +32,10 @@
 #include <lib3270/localdefs.h>
 #include <lib3270/toggle.h>
 
+#ifdef WIN32
+	#include <windows.h>
+#endif
+
 #include "locked.bm"
 #include "unlocked.bm"
 #include "shift.bm"
@@ -71,8 +75,10 @@
  static void	DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
  static void	changed(int bstart, int bend);
  static void	error(const char *s);
+ static void 	warning(const char *msg);
  static int	init(void);
  static void 	update_toggle(int ix, int value, int reason, const char *name);
+ static void	show_timer(long seconds);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -82,7 +88,7 @@
 
 	init,			// int (*init)(void);
 	error,			// void (*Error)(const char *s);
-	NULL,			// void (*Warning)(const char *s);
+	warning,		// void (*Warning)(int id, const char *s);
 	setsize,		// void (*setsize)(int rows, int cols);
 	addch,			// void (*addch)(int row, int col, int c, int attr);
 	set_charset,	// void (*charset)(char *dcs);
@@ -102,6 +108,7 @@
 	erase,			// void (*erase)(void);
 	error,			// void (*popup_an_error)(const char *msg);
 	update_toggle,	// void (*toggle_changed)(int ix, int value, int reason, const char *name);
+	show_timer,		// void	(*show_timer)(long seconds);
 
  };
 
@@ -147,6 +154,7 @@
  static gchar						*luname			= 0;
  static const gchar				*status_msg		= NULL;
  static guint						kbrd_state		= 0;
+ static char 						timer[9]		= "";
 
  static gboolean					oia_flag[OIA_FLAG_USER];
 
@@ -198,8 +206,6 @@
         Log("Error converting string \"%s\" to %s",string,CHARSET);
         return;
     }
-
-    Trace("Converted input string: \"%s\"",input);
 
     // NOTE (perry#1#): Is it the best way?
     Input_String((const unsigned char *) input);
@@ -388,13 +394,10 @@
 	GdkColor		*bg		= clr+TERMINAL_COLOR_OIA_BACKGROUND;
 	GdkColor		*fg		= clr+TERMINAL_COLOR_OIA;
 	int				col		= left_margin;
-	char			str[11];
-	GdkModifierType mask;
+	char			str[12];
 
 	if(!draw)
 		return;
-
-	gdk_window_get_pointer(widget->window,NULL,NULL,&mask);
 
 	gc = gdk_gc_new(draw);
 
@@ -411,9 +414,7 @@
 
 	//  0          "4" in a square
 	pango_layout_set_text(layout,"4",-1);
-	gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
-	gdk_gc_set_foreground(gc,fg);
-	gdk_draw_rectangle(draw,gc,0,col,row,fWidth-1,fHeight);
+	gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
 
 	col += fWidth;
 
@@ -423,7 +424,6 @@
 		pango_layout_set_text(layout,(IN_E) ? "B" : "A",-1);
 		gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
 		gdk_gc_set_foreground(gc,fg);
-		gdk_draw_line(draw,gc,col,row+fHeight,col+fWidth-1,row+fHeight);
 	}
 
 	col += fWidth;
@@ -447,9 +447,7 @@
 	else
 	{
 		pango_layout_set_text(layout,"?",-1);
-		gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
-		gdk_gc_set_foreground(gc,fg);
-		gdk_draw_rectangle(draw,gc,0,col,row,fWidth-1,fHeight);
+		gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
 	}
 
 	// 8...       message area
@@ -486,35 +484,33 @@
 	}
 
 	//	M-34		Caps indications ("A" or blank)
-	// FIXME (perry#1#): It's not working as expected!
-	// if(mask & GDK_LOCK_MASK)
-	//	str[2] = 'A';
-
-	// NOTE (perry#9#): I think it would be better if we use images (SVG?) instead of text.
+	if(kbrd_state & GDK_LOCK_MASK)
+		str[2] = 'A';
 
     //   M-33       Typeahead indication ("T" or blank)
 	str[3] = oia_flag[OIA_FLAG_TYPEAHEAD]	? 'T' : ' ';
 
-    //   M-32       SSL Status - USING IMAGE IN M-43 - see DrawImage() below
-
     //   M-31       Alternate keymap indication ("K" or blank)
 
     //   M-30       Reverse input mode indication ("R" or blank)
-	str[6] = oia_flag[OIA_FLAG_REVERSE] 	? 'R' : ' ';
+	str[6] = oia_flag[OIA_FLAG_REVERSE] ? 'R' : ' ';
 
     //   M-29       Insert mode indication (Special symbol/"I" or blank)
 	str[7] = Toggled(INSERT) ? 'I' : ' ';
 
     //   M-28       Printer indication ("P" or blank)
-	str[8] = oia_flag[OIA_FLAG_PRINTER]		? 'P' : ' ';
+	str[8] = oia_flag[OIA_FLAG_PRINTER]	? 'P' : ' ';
 
-	str[9] = 0;
+    //   M-27		Script indication ("S" or blank)
+	str[9] = oia_flag[OIA_FLAG_SCRIPT] ? 'S' : ' ';
+
+	str[10] = 0;
 
 	pango_layout_set_text(layout,str,-1);
 	gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
 
 	//	M-39       Shift indication (Special symbol/"^" or blank)
-	if(mask & GDK_SHIFT_MASK)
+	if(kbrd_state & GDK_SHIFT_MASK)
 		DrawImage(draw,gc,2,left_margin+(fWidth*(terminal_cols-39)),row,fWidth<<1,fHeight);
 
 	// Draw SSL indicator (M-43)
@@ -525,6 +521,13 @@
 	{
 		pango_layout_set_text(layout,luname,-1);
 		gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-25)),row,layout,clr+TERMINAL_COLOR_OIA_LU,bg);
+	}
+
+	//	M-15..M-9	command timing (Clock symbol and m:ss, or blank)
+	if(*timer)
+	{
+		pango_layout_set_text(layout,timer,-1);
+		gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-15)),row,layout,clr+TERMINAL_COLOR_OIA_TIMER,bg);
 	}
 
 	//  M-7..M     cursor position (rrr/ccc or blank)
@@ -600,9 +603,9 @@
 			{
 				DrawElement(draw,clr,gc,layout,x,y,el);
 			}
-			else if(el->selected)
+			else
 			{
-				gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_SELECTED_BG);
+				gdk_gc_set_foreground(gc,clr+(el->selected ? TERMINAL_COLOR_SELECTED_BG : el->bg));
 				gdk_draw_rectangle(draw,gc,1,x,y,fWidth,fHeight);
 			}
 
@@ -811,6 +814,7 @@
 
  void UpdateKeyboardState(guint state)
  {
+
  	if(state == kbrd_state)
 		return;
 
@@ -863,6 +867,21 @@
 	return g_realloc(buffer,strlen(buffer)+1);
  }
 
+ static void warning(const char *msg)
+ {
+ 	GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+												GTK_DIALOG_DESTROY_WITH_PARENT,
+												GTK_MESSAGE_WARNING,
+												GTK_BUTTONS_CLOSE,
+												"%s",gettext(msg) );
+
+ 	g_warning(msg);
+
+	gtk_dialog_run(GTK_DIALOG (dialog));
+	gtk_widget_destroy(dialog);
+
+ }
+
  static void error(const char *msg)
  {
  	GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
@@ -904,5 +923,23 @@
 	}
 
 	gtk_toggle_action_set_active(action,value);
+
+ }
+
+ static void show_timer(long seconds)
+ {
+ 	if(seconds > 0)
+ 	{
+		Trace("Timer: %d seconds",(int) seconds);
+		g_snprintf(timer,6,"%02d:%02d",(int) (seconds/60),(int) (seconds % 60));
+		DrawOIA(terminal,color,pixmap);
+ 	}
+ 	else if(*timer)
+ 	{
+ 		*timer = 0;
+		DrawOIA(terminal,color,pixmap);
+ 	}
+
+	gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);
 
  }

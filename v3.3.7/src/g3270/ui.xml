@@ -15,16 +15,12 @@
 			<menuitem action='Paste'/>
 			<menuitem action='PasteNext'/>
 			<separator/>
-			<menuitem action='Clear'/>
-			<separator/>
-			<menuitem action='EditScreen'/>
-			<menuitem action='EditCopy'/>
-			<menuitem action='EditSelection'/>
-			<separator/>
 			<menuitem action='SelectAll'/>
 			<menuitem action='SelectField'/>
 			<menuitem action='Unselect'/>
 			<menuitem action='Reselect'/>
+			<separator/>
+			<menuitem action='Clear'/>
 		</menu>
 
 		<menu action='NetworkMenu'>
