@@ -27,7 +27,7 @@ SSL_MODULES = libcrypto libssl openssl
 
 # Sources
 G3270_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
-				clipboard.c print.c config.c colors.c
+				clipboard.c print.c config.c colors.c resources.rc
 
 LIBRARY_SRCS =	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 				ft.c ft_cut.c ft_dft.c glue.c help.c host.c icmd.c idle.c kybd.c \
@@ -55,6 +55,10 @@ obj/Debug/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) `pkg-config --cflags $(GTK_MODULES)` -Isrc/lib -ggdb -o $@ -c $<
 
+obj/Debug/src/g3270/resources.o: src/g3270/resources.rc src/g3270/g3270.ico Makefile
+	@echo $< ...
+	@$(WINDRES) --include-dir=src/g3270 -i $< -o $@
+
 obj/Debug/version.o: src/version.c
 	@echo $< ...
 	@mkdir -p `dirname $@`
@@ -70,6 +74,10 @@ obj/Release/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) -Werror `pkg-config --cflags $(GTK_MODULES)` -Isrc/lib -o $@ -c $<
+
+obj/Release/src/g3270/resources.o: src/g3270/resources.rc src/g3270/g3270.ico Makefile
+	@echo $< ...
+	@$(WINDRES) --include-dir=src/g3270 -i $< -o $@
 
 obj/Release/version.o: src/version.c
 	@echo $< ...
@@ -118,6 +126,9 @@ bin/Debug/w3n46.dll: obj/Release/src/lib/w3n46.o
 src/lib/fallbacks.c:  src/lib/X3270.xad
 	@make -C src/lib fallbacks.c
 
+src/g3270/g3270.ico: src/g3270/g3270.jpg Makefile
+	@convert $< $@
+
 src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@src/mkversion.sh
 
@@ -141,6 +152,7 @@ clean:
 	@rm -f	src/lib/version.o
 	@rm -f	src/lib/mkfb.exe
 	@rm -f	src/version.c
+	@rm -f	src/g3270/g3270.ico
 	@rm -f	sources.lst
 	@rm -f	g3270.tar.gz
 	@rm -f $(PACKAGE).pot

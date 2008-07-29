@@ -357,6 +357,50 @@
 
  }
 
+ static void DrawStatus(PangoLayout *layout, GdkGC *gc, GdkColor *clr, GdkDrawable *draw)
+ {
+ 	int col = left_margin+(fWidth << 3);
+
+	gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_OIA_BACKGROUND);
+	gdk_draw_rectangle(draw,gc,1,col,OIAROW+1,fWidth << 4,fHeight+1);
+
+	if(sts_data && status_msg && *status_msg)
+	{
+		if(*status_msg == 'X')
+		{
+			int f;
+
+			gdk_gc_set_foreground(gc,clr+sts_data->clr);
+
+			for(f=0;f<3;f++)
+			{
+				gdk_draw_line(draw,gc,col+f,OIAROW+2, col+f+(fWidth-3),(OIAROW+fHeight)-2);
+				gdk_draw_line(draw,gc,col+f+(fWidth-3),OIAROW+2, col+f,(OIAROW+fHeight)-2);
+			}
+
+			col += fWidth;
+			pango_layout_set_text(layout,status_msg+1,-1);
+		}
+		else
+		{
+			pango_layout_set_text(layout,status_msg,-1);
+		}
+		gdk_draw_layout_with_colors(draw,gc,col,OIAROW+1,layout,clr+sts_data->clr,clr+TERMINAL_COLOR_OIA_BACKGROUND);
+	}
+#ifdef DEBUG
+	else if(sts_data)
+	{
+		pango_layout_set_text(layout,sts_data->dbg,-1);
+		gdk_draw_layout_with_colors(draw,gc,col,OIAROW+1,layout,clr+sts_data->clr,clr+TERMINAL_COLOR_OIA_BACKGROUND);
+	}
+	else
+	{
+		pango_layout_set_text(layout,"STATUS_NONE",-1);
+		gdk_draw_layout_with_colors(draw,gc,col,OIAROW+1,layout,clr+TERMINAL_COLOR_OIA,clr+TERMINAL_COLOR_OIA_BACKGROUND);
+	}
+#endif
+ }
+
  void DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw)
  {
     /*
@@ -451,30 +495,11 @@
 	}
 
 	// 8...       message area
-	col += (fWidth<<2);
-
-#ifdef DEBUG
-	if(sts_data)
-	{
-		pango_layout_set_text(layout,status_msg && *status_msg ? status_msg : sts_data->dbg,-1);
-		gdk_draw_layout_with_colors(draw,gc,col,row,layout,clr+sts_data->clr,bg);
-	}
-	else
-	{
-		pango_layout_set_text(layout,"STATUS_CODE_NONE",-1);
-		gdk_draw_layout_with_colors(draw,gc,col,row,layout,clr+TERMINAL_COLOR_OIA_STATUS_INVALID,bg);
-	}
-#else
-	if(sts_data && status_msg)
-	{
-		pango_layout_set_text(layout,status_msg,-1);
-		gdk_draw_layout_with_colors(draw,gc,col,row,layout,clr+sts_data->clr,bg);
-	}
-#endif
+	DrawStatus(layout, gc, clr, draw);
 
 	memset(str,' ',10);
 
-    // M-36       Compose indication ("C" or blank)
+    // M-36...35	Compose indication ("C" or blank)
 	col = left_margin+(fWidth*(terminal_cols-36));
 
 	if(compose)
@@ -719,8 +744,18 @@
 	if(id == STATUS_CODE_BLANK)
 		set_cursor(CURSOR_MODE_NORMAL);
 
-	DrawOIA(terminal,color,pixmap);
-	gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);
+	if(terminal && pixmap)
+	{
+		GdkGC		*gc		= gdk_gc_new(pixmap);
+		PangoLayout *layout = gtk_widget_create_pango_layout(terminal,"");
+
+		DrawStatus(layout, gc, color, pixmap);
+
+		g_object_unref(layout);
+		gdk_gc_destroy(gc);
+
+		gtk_widget_queue_draw_area(terminal,left_margin+(fWidth << 3),OIAROW,fWidth << 4,fHeight+1);
+	}
 
  }
 
