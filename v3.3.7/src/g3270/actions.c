@@ -587,7 +587,8 @@
 		{ N_( "Visible Control" ),		NULL,	NULL	},
 		{ N_( "Aid wait" ),				NULL,	NULL	},
 		{ N_( "Full Screen" ),			NULL,	NULL	},
-		{ N_( "Auto-Reconnect" ),		NULL,	NULL	}
+		{ N_( "Auto-Reconnect" ),		NULL,	NULL	},
+		{ N_( "Insert" ),				NULL,	NULL	}
 	};
 
  	int f;
@@ -596,18 +597,22 @@
  	{
  		char buffer[20] = "Toggle";
 
- 		strncat(buffer,get_toggle_name(f),20);
+		if(toggle_info[f].label)
+		{
+			strncat(buffer,get_toggle_name(f),20);
 
- 		GtkToggleAction *action = gtk_toggle_action_new(	buffer,
-															toggle_info[f].label,
-															toggle_info[f].tooltip,
-															toggle_info[f].stock_id );
-		gtk_toggle_action_set_active(action,Toggled(f));
-		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_action),(gpointer) f);
+			GtkToggleAction *action = gtk_toggle_action_new(	buffer,
+																toggle_info[f].label,
+																toggle_info[f].tooltip,
+																toggle_info[f].stock_id );
+			gtk_toggle_action_set_active(action,Toggled(f));
+			g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_action),(gpointer) f);
+
+			gtk_action_group_add_action(actions,(GtkAction *) action);
+		}
 
 //		Trace("%s: %s=%d",__FUNCTION__,buffer,Toggled(f));
 
-		gtk_action_group_add_action(actions,(GtkAction *) action);
  	}
 
  }

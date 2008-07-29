@@ -45,6 +45,7 @@
 		AID_WAIT,
 		FULL_SCREEN,
 		RECONNECT,
+		INSERT,
 
 		N_TOGGLES
 	};

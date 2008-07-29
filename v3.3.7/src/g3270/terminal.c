@@ -27,11 +27,13 @@
 #include "g3270.h"
 #include <lib3270/toggle.h>
 #include <gdk/gdk.h>
+#include <gdk/gdkkeysyms.h>
 #include <string.h>
 #include <malloc.h>
 
 // TODO (perry#7#): Find a better way to get font sizes!!!
 #define MAX_FONT_SIZES	54
+#define KEYBOARD_STATE_MASK (GDK_SHIFT_MASK|GDK_ALT_MASK|GDK_LOCK_MASK)
 
 /*---[ Structs ]------------------------------------------------------------------------------------------------*/
 
@@ -307,7 +309,7 @@
 
  static gboolean key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
-	UpdateKeyboardState(event->state & GDK_SHIFT_MASK);
+	UpdateKeyboardState(event->state & KEYBOARD_STATE_MASK);
 
 	if(gtk_im_context_filter_keypress(im,event))
 		return TRUE;
@@ -323,7 +325,7 @@
 
  static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
-	UpdateKeyboardState(event->state & GDK_SHIFT_MASK);
+	UpdateKeyboardState(event->state & KEYBOARD_STATE_MASK);
 
 	if(gtk_im_context_filter_keypress(im,event))
 		return TRUE;
@@ -370,6 +372,15 @@
 	gtk_widget_queue_draw(terminal);
  }
 
+ static void set_insert(int value, int reason)
+ {
+ 	if(terminal && pixmap)
+ 	{
+		DrawOIA(terminal,color,pixmap);
+		gtk_widget_queue_draw(terminal);
+ 	}
+ 	RedrawCursor();
+ }
 
  static void size_allocate(GtkWidget *widget, GtkAllocation *allocation, gpointer user_data)
  {
@@ -440,6 +451,7 @@
 	register_tchange(CURSOR_POS,set_showcursor);
 	register_tchange(CURSOR_BLINK,set_blink);
 	register_tchange(RECTANGLE_SELECT,set_rectangle_select);
+	register_tchange(INSERT,set_insert);
 
 	return terminal;
  }
@@ -533,7 +545,11 @@
 	cursor.x 		= left_margin + (cCol * fWidth);
 	cursor.y 		= top_margin + ((cRow+1) * fHeight);
 	cursor.width 	= fWidth;
-	cursor.height 	= (fHeight >> 2)+1;
+
+	if(Toggled(INSERT))
+		cursor.height 	= fHeight;
+	else
+		cursor.height 	= (fHeight >> 2)+1;
 
 	// Mark to redraw
 	gtk_im_context_set_cursor_location(im,&cursor);

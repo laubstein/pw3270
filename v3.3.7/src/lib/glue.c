@@ -123,6 +123,7 @@ const char *toggle_names[N_TOGGLES] =
 	"AidWait",
 	"FullScreen",
 	"Reconnect",
+	"Insert"
 };
 
 #if defined(_WIN32) /*[*/

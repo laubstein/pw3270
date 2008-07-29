@@ -35,6 +35,7 @@
 #include "locked.bm"
 #include "unlocked.bm"
 #include "shift.bm"
+#include "four.bm"
 
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
 
@@ -67,7 +68,7 @@
  static void	set_oia(OIA_FLAG id, int on);
  static void	set_compose(int on, unsigned char c, int keytype);
  static void	set_lu(const char *lu);
- static void	DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height, int Width);
+ static void	DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
  static void	changed(int bstart, int bend);
  static void	error(const char *s);
  static int	init(void);
@@ -115,6 +116,7 @@
  	{ locked_bits,		locked_width,	locked_height,   	TERMINAL_COLOR_SSL 		},
  	{ unlocked_bits,	unlocked_width,	unlocked_height, 	TERMINAL_COLOR_SSL 		},
  	{ shift_bits,		shift_width, 	shift_height,		TERMINAL_COLOR_OIA 		},
+ 	{ four_bits,		four_width, 	four_height,		TERMINAL_COLOR_OIA 		},
  };
 
  #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
@@ -354,43 +356,45 @@
     /*
      * The status line is laid out thusly (M is maxCOLS):
      *
-     *   0          "4" in a square
-     *   1          "A" underlined
-     *   2          solid box if connected, "?" in a box if not
-     *   3..7       empty
-     *   8...       message area
-     *   M-43       SSL Status
-     *   M-41       Meta indication ("M" or blank)
-     *   M-40       Alt indication ("A" or blank)
-     *   M-39       Shift indication (Special symbol/"^" or blank)
-     *   M-38..M-37 empty
-     *   M-36       Compose indication ("C" or blank)
-     *   M-35       Compose first character
-     *   M-34       empty
-     *   M-33       Typeahead indication ("T" or blank)
-     *   M-31       Alternate keymap indication ("K" or blank)
-     *   M-30       Reverse input mode indication ("R" or blank)
-     *   M-29       Insert mode indication (Special symbol/"I" or blank)
-     *   M-28       Printer indication ("P" or blank)
-     *   M-27       Script indication ("S" or blank)
-     *   M-26		empty
-     *   M-25..M-14	LU Name
-
-     *   M-15..M-9  command timing (Clock symbol and m:ss, or blank)
-     *   M-7..M     cursor position (rrr/ccc or blank)
+     *	0			"4" in a square
+     *	1			"A" underlined
+     *	2			solid box if connected, "?" in a box if not
+     *	3..7		empty
+     *	8...		message area
+     *	M-43...42	SSL Status
+     *	M-41		Meta indication ("M" or blank)
+     *	M-40		Alt indication ("A" or blank)
+     *	M-39...38	Shift Status
+     *	M-37		empty
+     *	M-36		Compose indication ("C" or blank)
+     *	M-35		Compose first character
+     *	M-34		Caps indications ("A" or blank)
+     *	M-33		Typeahead indication ("T" or blank)
+     *	M-31		Alternate keymap indication ("K" or blank)
+     *	M-30		Reverse input mode indication ("R" or blank)
+     *	M-29		Insert mode indication (Special symbol/"I" or blank)
+     *	M-28		Printer indication ("P" or blank)
+     *	M-27		Script indication ("S" or blank)
+     *	M-26		empty
+     *	M-25..M-14	LU Name
+     *	M-15..M-9	command timing (Clock symbol and m:ss, or blank)
+     *	M-7..M		cursor position (rrr/ccc or blank)
      *
      */
-	GdkGC 		*gc;
-	PangoLayout *layout;
-	int   		row		= OIAROW;
-	int			width	= (fWidth*terminal_cols);
-	GdkColor	*bg		= clr+TERMINAL_COLOR_OIA_BACKGROUND;
-	GdkColor	*fg		= clr+TERMINAL_COLOR_OIA;
-	int			col		= left_margin;
-	char		str[11];
+	GdkGC 			*gc;
+	PangoLayout 	*layout;
+	int   			row		= OIAROW;
+	int				width	= (fWidth*terminal_cols);
+	GdkColor		*bg		= clr+TERMINAL_COLOR_OIA_BACKGROUND;
+	GdkColor		*fg		= clr+TERMINAL_COLOR_OIA;
+	int				col		= left_margin;
+	char			str[11];
+	GdkModifierType mask;
 
 	if(!draw)
 		return;
+
+	gdk_window_get_pointer(widget->window,NULL,NULL,&mask);
 
 	gc = gdk_gc_new(draw);
 
@@ -401,11 +405,16 @@
 	gdk_draw_line(draw,gc,left_margin,row,left_margin+width,row);
 	row++;
 
+	layout = gtk_widget_create_pango_layout(widget,"");
+
 	gdk_gc_set_foreground(gc,fg);
 
 	//  0          "4" in a square
-	layout = gtk_widget_create_pango_layout(widget,"4");
-	gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
+	pango_layout_set_text(layout,"4",-1);
+	gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
+	gdk_gc_set_foreground(gc,fg);
+	gdk_draw_rectangle(draw,gc,0,col,row,fWidth-1,fHeight);
+
 	col += fWidth;
 
 	//  1          "A" underlined
@@ -413,24 +422,35 @@
 	{
 		pango_layout_set_text(layout,(IN_E) ? "B" : "A",-1);
 		gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
+		gdk_gc_set_foreground(gc,fg);
+		gdk_draw_line(draw,gc,col,row+fHeight,col+fWidth-1,row+fHeight);
 	}
 
 	col += fWidth;
 
 	// 2          solid box if connected, "?" in a box if not
-	str[1] = 0;
 	if(IN_ANSI)
-		*str = 'N';
+	{
+		pango_layout_set_text(layout,"N",-1);
+		gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
+	}
 	else if(oia_flag[OIA_FLAG_BOXSOLID])
-		*str = ' ';
+	{
+		gdk_gc_set_foreground(gc,fg);
+		gdk_draw_rectangle(draw,gc,1,col,row,fWidth-1,fHeight+1);
+	}
 	else if(IN_SSCP)
-		*str = 'S';
+	{
+		pango_layout_set_text(layout,"S",-1);
+		gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
+	}
 	else
-		*str = '?';
-
-	pango_layout_set_text(layout,str,-1);
-	gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
-
+	{
+		pango_layout_set_text(layout,"?",-1);
+		gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
+		gdk_gc_set_foreground(gc,fg);
+		gdk_draw_rectangle(draw,gc,0,col,row,fWidth-1,fHeight);
+	}
 
 	// 8...       message area
 	col += (fWidth<<2);
@@ -465,9 +485,10 @@
 		str[1] = compose;
 	}
 
-	//	M-39       Shift indication (Special symbol/"^" or blank)
-	if(kbrd_state & GDK_SHIFT_MASK)
-		DrawImage(draw,gc,2,left_margin+(fWidth*(terminal_cols-39)),row+1,fHeight-2,fWidth);
+	//	M-34		Caps indications ("A" or blank)
+	// FIXME (perry#1#): It's not working as expected!
+	// if(mask & GDK_LOCK_MASK)
+	//	str[2] = 'A';
 
 	// NOTE (perry#9#): I think it would be better if we use images (SVG?) instead of text.
 
@@ -482,7 +503,7 @@
 	str[6] = oia_flag[OIA_FLAG_REVERSE] 	? 'R' : ' ';
 
     //   M-29       Insert mode indication (Special symbol/"I" or blank)
-	str[7] = oia_flag[OIA_FLAG_INSERT]		? 'I' : ' ';
+	str[7] = Toggled(INSERT) ? 'I' : ' ';
 
     //   M-28       Printer indication ("P" or blank)
 	str[8] = oia_flag[OIA_FLAG_PRINTER]		? 'P' : ' ';
@@ -492,8 +513,12 @@
 	pango_layout_set_text(layout,str,-1);
 	gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
 
+	//	M-39       Shift indication (Special symbol/"^" or blank)
+	if(mask & GDK_SHIFT_MASK)
+		DrawImage(draw,gc,2,left_margin+(fWidth*(terminal_cols-39)),row,fWidth<<1,fHeight);
+
 	// Draw SSL indicator (M-43)
-	DrawImage(draw,gc,oia_flag[OIA_FLAG_SECURE] ? 0 : 1 ,left_margin+(fWidth*(terminal_cols-43)),row+1,fHeight-2,fWidth);
+	DrawImage(draw,gc,oia_flag[OIA_FLAG_SECURE] ? 0 : 1 ,left_margin+(fWidth*(terminal_cols-43)),row+1,fWidth<<1,fHeight);
 
 	// M-25 LU Name
 	if(luname)
@@ -505,7 +530,7 @@
 	//  M-7..M     cursor position (rrr/ccc or blank)
 	if(Toggled(CURSOR_POS))
 	{
-		sprintf(str,"%03d/%03d",cRow+1,cCol+1);
+		g_snprintf(str,8,"%03d/%03d",cRow+1,cCol+1);
 		pango_layout_set_text(layout,str,-1);
 		gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-7)),row,layout,clr+TERMINAL_COLOR_OIA_CURSOR,bg);
 	}
@@ -743,10 +768,10 @@
 
  }
 
- static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Height, int Width)
+ static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height)
  {
-    double ratio;
-    int    temp;
+//    double ratio;
+//    int    temp;
 
  	if( ((Height != pix[id].Height) || (Width != pix[id].Width)) && pix[id].pix )
  	{
@@ -757,9 +782,9 @@
  	if(!pix[id].pix)
  	{
  		/* Resize by Height */
-        ratio = ((double) gdk_pixbuf_get_width(pix[id].base)) / ((double) gdk_pixbuf_get_height(pix[id].base));
-		temp  = (int) ((double) ratio * ((double) Height));
-	    pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,temp,Height,GDK_INTERP_HYPER);
+        // ratio = ((double) gdk_pixbuf_get_width(pix[id].base)) / ((double) gdk_pixbuf_get_height(pix[id].base));
+		// temp  = (int) ((double) ratio * ((double) Height));
+	    pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,Width,Height,GDK_INTERP_HYPER);
  	}
 
     if(pix[id].pix)
@@ -790,6 +815,8 @@
 		return;
 
  	kbrd_state = state;
+
+ 	Trace("Keyboard state changed to %08x",state);
 
  	// TODO (perry#1#): Draw only the state flags.
  	if(terminal && pixmap)
