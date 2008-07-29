@@ -134,7 +134,6 @@
 			OIA_FLAG_TYPEAHEAD,
 			OIA_FLAG_PRINTER,
 			OIA_FLAG_REVERSE,
-			OIA_FLAG_INSERT,
 
 			OIA_FLAG_USER
 		} OIA_FLAG;
@@ -149,28 +148,28 @@
 		{
 			unsigned short sz;
 
-			int	(*init)(void);
-			void (*Error)(const char *s);
-			void (*Warning)(const char *s);
-			void (*setsize)(int rows, int cols);
-			int	(*addch)(int row, int col, int c, unsigned short attr);
-			void (*charset)(char *dcs);
-			void (*title)(char *text);
-			void (*changed)(int bstart, int bend);
-			void (*ring_bell)(void);
-			void (*redraw)(void);
-			void (*move_cursor)(int row, int col);
-			void (*suspend)(void);
-			void (*resume)(void);
-			void (*reset)(int lock);
-			void (*status)(STATUS_CODE id);
-			void (*compose)(int on, unsigned char c, int keytype);
-			void (*cursor)(CURSOR_MODE mode);
-			void (*lu)(const char *lu);
-			void (*set)(OIA_FLAG id, int on);
-			void (*erase)(void);
-			void (*popup_an_error)(const char *msg);
-			void (*toggle_changed)(int ix, int value, int reason, const char *name);
+			int		(*init)(void);
+			void	(*Error)(const char *s);
+			void	(*Warning)(const char *s);
+			void	(*setsize)(int rows, int cols);
+			int		(*addch)(int row, int col, int c, unsigned short attr);
+			void	(*charset)(char *dcs);
+			void	(*title)(char *text);
+			void	(*changed)(int bstart, int bend);
+			void	(*ring_bell)(void);
+			void	(*redraw)(void);
+			void	(*move_cursor)(int row, int col);
+			void	(*suspend)(void);
+			void	(*resume)(void);
+			void	(*reset)(int lock);
+			void	(*status)(STATUS_CODE id);
+			void	(*compose)(int on, unsigned char c, int keytype);
+			void	(*cursor)(CURSOR_MODE mode);
+			void	(*lu)(const char *lu);
+			void	(*set)(OIA_FLAG id, int on);
+			void	(*erase)(void);
+			void	(*popup_an_error)(const char *msg);
+			void	(*toggle_changed)(int ix, int value, int reason, const char *name);
 
 		};
 

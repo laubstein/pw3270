@@ -29,6 +29,7 @@
 	#define G3270_H_INCLUDED
 
 	#include <gtk/gtk.h>
+	#include <gdk/gdk.h>
 	#include <glib.h>
 	#include <glib/gi18n.h>
 
@@ -98,6 +99,10 @@
 	#define OIAROW				(top_margin+(fHeight*terminal_rows))
 	#define CHARSET 			charset ? charset : "ISO-8859-1"
 	#define IS_FUNCTION_KEY(event)   (event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(event->state & (GDK_MOD1_MASK|GDK_CONTROL_MASK)))
+
+	#ifndef GDK_ALT_MASK
+		#define GDK_ALT_MASK GDK_MOD1_MASK
+	#endif
 
 	extern GtkWidget				*topwindow;
 	extern GdkPixmap				*pixmap;

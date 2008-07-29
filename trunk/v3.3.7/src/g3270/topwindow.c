@@ -127,6 +127,9 @@
 	const gchar	*selected	= GetString("Terminal","Font","Courier");
 	gchar			**ln;
 
+
+	Trace("Selected font: \"%s\"",selected);
+
 	if(!menu_item)
 		return;
 
@@ -173,7 +176,7 @@
 					g_signal_connect(G_OBJECT(item),"toggled",G_CALLBACK(activate_font),arg);
 					gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
 
-					if(!strcmp(text,selected))
+					if(!strcmp(arg,selected))
 						gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),TRUE);
 		 		}
 		 	}
@@ -185,10 +188,7 @@
 
 	}
 
-
 	g_free(text);
-
-
 	g_free(filename);
  }
 

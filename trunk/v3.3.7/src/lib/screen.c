@@ -79,86 +79,41 @@ static void relabel(Boolean ignored);
 void
 set_display_charset(char *dcs)
 {
-	/*
-	char *copy;
-	char *s;
-	char *cs;
-	int want_cp = 0;
-	*/
-
 	if(callbacks && callbacks->charset)
 		callbacks->charset(dcs);
-
-	/*
-	windows_cp = GetConsoleCP();
-
-	copy = strdup(dcs);
-	s = copy;
-	while ((cs = strtok(s, ",")) != NULL) {
-		s = NULL;
-
-		if (!strncmp(cs, "windows-", 8)) {
-			want_cp = atoi(cs + 8);
-			break;
-		} else if (!strncmp(cs, "iso8859-", 8)) {
-			want_cp = 28590 + atoi(cs + 8);
-			break;
-		} else if (!strcmp(cs, "koi8-r")) {
-			want_cp = 20866;
-			break;
-		}
-	}
-	free(copy);
-
-	if (want_cp != 0 && windows_cp != want_cp) {
-	    	if (SetConsoleOutputCP(want_cp)) {
-			(void)SetConsoleCP(want_cp);
-		    	windows_cp = want_cp;
-		} else {
-			fprintf(stderr,
-				"Unable to set output character set to '%s' "
-				"(Windows code page %d).\n",
-				dcs, want_cp);
-		}
-	}
-
-	check_aplmap(windows_cp);
-	*/
 }
 
 /*
  * Vitrual curses functions.
  */
-static int cur_row = 0;
-static int cur_col = 0;
-static int cur_attr = 0;
+// static int cur_row = 0;
+// static int cur_col = 0;
 
-static void
-move(int row, int col)
-{
-	cur_row = row;
-	cur_col = col;
-}
+/*
+static int cur_attr = 0;
 
 static void
 attrset(int a)
 {
 	cur_attr = a;
 }
+*/
 
 static void
-addch(int c)
+addch(int row, int col, int c, int attr)
 {
 	if(callbacks && callbacks->addch)
-		callbacks->addch(cur_row, cur_col, c, cur_attr);
+		callbacks->addch(row, col, c, attr);
 
 	// Increment and wrap.
+	/*
 	if (++cur_col >= maxCOLS)
 	{
 		cur_col = 0;
 		if (++cur_row >= maxROWS)
 			cur_row = 0;
 	}
+	*/
 }
 
 /* Initialize the screen. */
@@ -379,21 +334,12 @@ void screen_disp(void)
 	int row, col;
 	int a;
 	int c;
+	int attr = defattr;
 	unsigned char fa;
 #if defined(X3270_DBCS) /*[*/
 	enum dbcs_state d;
 #endif /*]*/
 	int fa_addr;
-
-	if (!screen_has_changes)
-	{
-		/* Move the cursor. */
-		if (flipped)
-			move(cursor_addr / cCOLS,cCOLS-1 - (cursor_addr % cCOLS));
-		else
-			move(cursor_addr / cCOLS, cursor_addr % cCOLS);
-		return;
-	}
 
 	fa = get_field_attribute(0);
 	a = color_from_fa(fa);
@@ -401,29 +347,26 @@ void screen_disp(void)
 	for (row = 0; row < ROWS; row++) {
 		int baddr;
 
-		if (!flipped)
-			move(row, 0);
 		for (col = 0; col < cCOLS; col++) {
-			if (flipped)
-				move(row, cCOLS-1 - col);
 			baddr = row*cCOLS+col;
 			if (ea_buf[baddr].fa) {
 			    	/* Field attribute. */
 			    	fa_addr = baddr;
 				fa = ea_buf[baddr].fa;
 				a = calc_attrs(baddr, baddr, fa);
-				attrset(defattr);
-				addch(' ');
+//				attrset(defattr);
+				addch(row,col,' ',attr = defattr);
 			} else if (FA_IS_ZERO(fa)) {
 			    	/* Blank. */
-				attrset(a);
-				addch(' ');
+//				attrset(a);
+				addch(row,col,' ',attr=a);
 			} else {
 			    	/* Normal text. */
 				if (!(ea_buf[baddr].gr ||
 				      ea_buf[baddr].fg ||
 				      ea_buf[baddr].bg)) {
-					attrset(a);
+					// attrset(a);
+					attr = a;
 				} else {
 					int b;
 
@@ -431,8 +374,8 @@ void screen_disp(void)
 					 * Override some of the field
 					 * attributes.
 					 */
-					b = calc_attrs(baddr, fa_addr, fa);
-					attrset(b);
+					attr = b = calc_attrs(baddr, fa_addr, fa);
+//					attrset(b);
 				}
 #if defined(X3270_DBCS) /*[*/
 				d = ctlr_dbcs_state(baddr);
@@ -454,21 +397,21 @@ void screen_disp(void)
 					if (ea_buf[baddr].cs == CS_LINEDRAW) {
 						c = linedraw_to_acs(ea_buf[baddr].cc);
 						if (c != -1)
-							addch(c);
+							addch(row,col,c,attr);
 						else
-							addch(' ');
+							addch(row,col,' ',attr);
 					} else if (ea_buf[baddr].cs == CS_APL ||
 						   (ea_buf[baddr].cs & CS_GE)) {
 						c = apl_to_acs(ea_buf[baddr].cc);
 						if (c != -1)
-							addch(c);
+							addch(row,col,c,attr);
 						else
-							addch(' ');
+							addch(row,col,' ',attr);
 					} else {
 						if (toggled(MONOCASE))
-							addch(asc2uc[ebc2asc[ea_buf[baddr].cc]]);
+							addch(row,col,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
 						else
-							addch(ebc2asc[ea_buf[baddr].cc]);
+							addch(row,col,ebc2asc[ea_buf[baddr].cc],attr);
 					}
 #if defined(X3270_DBCS) /*[*/
 				}
@@ -476,11 +419,7 @@ void screen_disp(void)
 			}
 		}
 	}
-	attrset(defattr);
-	if (flipped)
-		move(cursor_addr / cCOLS, cCOLS-1 - (cursor_addr % cCOLS));
-	else
-		move(cursor_addr / cCOLS, cursor_addr % cCOLS);
+//	attrset(defattr);
 
 	screen_has_changes = FALSE;
 }
@@ -528,12 +467,6 @@ void
 status_ctlr_done(void)
 {
 	set(OIA_FLAG_UNDERA,True);
-}
-
-void
-status_insert_mode(Boolean on)
-{
-	set(OIA_FLAG_INSERT,on);
 }
 
 void
@@ -1010,11 +943,8 @@ void screen_changed(int bstart, int bend)
 {
 	screen_has_changes = TRUE;
 
-	if(!callbacks)
-		return;
-
 	/* If the application can manage screen changes, let it do it */
-	if(callbacks->changed)
+	if(callbacks && callbacks->changed)
 	{
 		callbacks->changed(bstart,bend);
 		return;

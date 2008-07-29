@@ -20,7 +20,11 @@
 
 extern void status_compose(Boolean on, unsigned char c, enum keytype keytype);
 extern void status_ctlr_done(void);
-extern void status_insert_mode(Boolean on);
+
+// extern void status_insert_mode(Boolean on);
+#define status_insert_mode(on) set_toggle(INSERT,on)
+
+
 extern void status_lu(const char *);
 extern void status_minus(void);
 extern void status_oerr(int error_type);
