@@ -73,6 +73,20 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
+ static void SetMode(int m)
+ {
+ 	static const gchar	*name[] = { "Copy", "Append" };
+ 	int						f;
+
+ 	if(m == mode)
+		return;
+
+	mode = m;
+
+	for(f=0;f<G_N_ELEMENTS(name);f++)
+		gtk_action_set_sensitive(gtk_action_group_get_action(main_actions,name[f]),(mode != SELECT_MODE_NONE));
+ }
+
  static int CheckForFunction(int baddr, int length)
  {
  	int ret = 0;
@@ -200,7 +214,7 @@
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1 | BUTTON_FLAG_COMBO:
 		DecodePosition(event,startRow,startCol);
-		mode = SELECT_MODE_FIELD;
+		SetMode(SELECT_MODE_FIELD);
 		Trace("Button 1 double-clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
 		break;
 
@@ -220,12 +234,12 @@
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 3 | BUTTON_FLAG_COMBO:
 		Trace("Button 2 double-clicked in combo mode at %ld,%ld",(long) event->x, (long) event->y);
-		mode = SELECT_MODE_APPEND;
+		SetMode(SELECT_MODE_APPEND);
 		break;
 
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3 | BUTTON_FLAG_COMBO:
 		Trace("Button 2 clicked in combo mode at %ld,%ld",(long) event->x, (long) event->y);
-		mode = SELECT_MODE_COPY;
+		SetMode(SELECT_MODE_COPY);
 		break;
 
 #ifdef DEBUG
@@ -414,7 +428,7 @@
 		return;
 
 	action_ClearSelection();
-	mode = value ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
+	SetMode(value ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 
 	if(mode == SELECT_MODE_TEXT)
 		UpdateSelectedText();
@@ -424,7 +438,7 @@
 
  void Reselect(void)
  {
-	mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
+	SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 	if(mode == SELECT_MODE_TEXT)
 		UpdateSelectedText();
 	else
@@ -436,7 +450,7 @@
  	switch(mode)
  	{
 	case SELECT_MODE_NONE:	// Starting selection
-		mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
+		SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 		return mouse_motion(widget,event,user_data); // Recursive call to update selection box
 
 	case SELECT_MODE_RECTANGLE:
@@ -470,20 +484,20 @@
  void action_ClearSelection(void)
  {
 	SetSelection(FALSE);
-	mode = SELECT_MODE_NONE;
+	SetMode(SELECT_MODE_NONE);
  }
 
  void action_SelectAll(GtkWidget *w, gpointer user_data)
  {
  	SetSelection(TRUE);
-	mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
+	SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  }
 
  void action_SelectLeft(GtkWidget *w, gpointer user_data)
  {
  	if(mode == SELECT_MODE_NONE)
  	{
- 		mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
+ 		SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}
@@ -499,7 +513,7 @@
  {
  	if(mode == SELECT_MODE_NONE)
  	{
- 		mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
+ 		SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}
@@ -515,7 +529,7 @@
  {
  	if(mode == SELECT_MODE_NONE)
  	{
- 		mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
+ 		SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}
@@ -531,7 +545,7 @@
  {
  	if(mode == SELECT_MODE_NONE)
  	{
- 		mode = Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT;
+ 		SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}
