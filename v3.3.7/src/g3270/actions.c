@@ -269,6 +269,33 @@
  	action_internal(Reset_action, IA_DEFAULT, CN, CN);
  }
 
+ void DisableNetworkActions(void)
+ {
+ 	static const gchar	*name[] = { "Disconnect", "Connect" };
+ 	int						f;
+	GtkAction 				*action;
+
+ 	for(f=0;f < G_N_ELEMENTS(actions);f++)
+ 	{
+		action = gtk_action_group_get_action(main_actions,name[f]);
+		if(action)
+			gtk_action_set_sensitive(action,FALSE);
+ 	}
+ }
+
+ static void action_Disconnect(GtkWidget *w, gpointer user_data)
+ {
+ 	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
+
+ 	if(!PCONNECTED)
+ 		return;
+
+	DisableNetworkActions();
+ 	action_ClearSelection();
+ 	action_internal(Disconnect_action, IA_DEFAULT, CN, CN);
+ }
+
+
  static void action_Connect(GtkWidget *w, gpointer user_data)
  {
  	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
@@ -277,6 +304,8 @@
  		return;
 
 	// TODO (perry#5#): If there's no previous server ask for it.
+
+	DisableNetworkActions();
  	action_ClearSelection();
 	action_internal(Reconnect_action, IA_DEFAULT, CN, CN);
 
@@ -324,17 +353,6 @@
  void action_EraseEOF(void)
  {
  	action_internal(EraseEOF_action, IA_DEFAULT, CN, CN);
- }
-
- static void action_Disconnect(GtkWidget *w, gpointer user_data)
- {
- 	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
-
- 	if(!PCONNECTED)
- 		return;
-
- 	action_ClearSelection();
- 	action_internal(Disconnect_action, IA_DEFAULT, CN, CN);
  }
 
  static void action_PrintScreen(GtkWidget *w, gpointer user_data)
