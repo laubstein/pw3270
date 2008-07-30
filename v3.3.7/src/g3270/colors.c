@@ -29,34 +29,10 @@
  #include <ctype.h>
  #include <string.h>
 
-/*---[ Implement ]----------------------------------------------------------------------------------------------*/
-
- int SaveColors(void)
- {
-	int 	f;
-	gchar	clr[4096];
-	gchar	*ptr;
-
- 	for(f=0;f < TERMINAL_COLOR_COUNT;f++)
- 	{
- 		if(f > 0)
-			g_strlcat(clr,",",4095);
-
-		ptr = gdk_color_to_string(color+f);
-		g_strlcat(clr,ptr,4095);
-		g_free(ptr);
-
- 	}
-
-	SetString("Terminal","Colors",clr);
-
- 	return 0;
- }
+/*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
 #define ALTERNATIVE_COLORS 1
 
- int LoadColors(void)
- {
 #ifdef ALTERNATIVE_COLORS
 
  	static const char *DefaultColors =	"#000000,"			// TERMINAL_COLOR_BACKGROUND
@@ -81,13 +57,13 @@
 											"#00FFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED
 											"#FFFFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
 
-											"white,"			// TERMINAL_COLOR_SELECTED_BG
-											"black,"			// TERMINAL_COLOR_SELECTED_FG,
+											"#FFFFFF,"			// TERMINAL_COLOR_SELECTED_BG
+											"#000000,"			// TERMINAL_COLOR_SELECTED_FG,
 
 											"#00FF00," 			// TERMINAL_COLOR_CURSOR
 											"#00FF00," 			// TERMINAL_COLOR_CROSS_HAIR
 
-											"black,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
+											"#000000,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
 											"#00FF00,"			// TERMINAL_COLOR_OIA
 											"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
 											"#FFFFFF,"			// TERMINAL_COLOR_OIA_STATUS_OK
@@ -133,10 +109,35 @@
 #endif
 
 
- 	int 	f;
+/*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
-	// FIXME (perry#9#): Load colors from configuration file.
- 	char	*buffer = GetString("Terminal","Colors",DefaultColors);
+ int SaveColors(void)
+ {
+	int 	f;
+	gchar	clr[4096];
+	gchar	*ptr;
+
+ 	for(f=0;f < TERMINAL_COLOR_COUNT;f++)
+ 	{
+ 		if(f > 0)
+			g_strlcat(clr,",",4095);
+
+		ptr = gdk_color_to_string(color+f);
+		g_strlcat(clr,ptr,4095);
+		g_free(ptr);
+
+ 	}
+
+	SetString("Terminal","Colors",clr);
+
+ 	return 0;
+ }
+
+ int LoadColors(void)
+ {
+
+ 	int 	f;
+ 	char	*buffer	= GetString("Terminal","Colors",DefaultColors);
  	char	*ptr	= strtok(buffer,",");
 
  	for(f=0;ptr && f < TERMINAL_COLOR_COUNT;f++)
@@ -275,8 +276,9 @@
 	dialog = gtk_dialog_new_with_buttons (	_( "Color setup" ),
 											GTK_WINDOW(topwindow),
 											GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-											GTK_STOCK_OK,     GTK_RESPONSE_ACCEPT,
-											GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+											_( "Restore defaults" ),	1,
+											GTK_STOCK_OK,     			GTK_RESPONSE_ACCEPT,
+											GTK_STOCK_CANCEL, 			GTK_RESPONSE_REJECT,
 											NULL);
 
 	box = gtk_hpaned_new();
@@ -327,6 +329,11 @@
 
 	switch(gtk_dialog_run(GTK_DIALOG(dialog)))
 	{
+	case 1:					// Restore default colors
+		SetString("Terminal","Colors",NULL);
+		LoadColors();
+		break;
+
 	case GTK_RESPONSE_ACCEPT:	// Save selected colors
 		SaveColors();
 		break;
