@@ -195,7 +195,12 @@
  void SetString(const gchar *group, const gchar *key, const gchar *val)
  {
  	if(conf)
-		g_key_file_set_string(conf,group,key,val);
+ 	{
+ 		if(val)
+			g_key_file_set_string(conf,group,key,val);
+		else
+			g_key_file_remove_key(conf,group,key,NULL);
+ 	}
  }
 
  gint GetInt(const gchar *group, const gchar *key, gint def)
