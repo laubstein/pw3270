@@ -643,8 +643,8 @@
 			strncat(buffer,get_toggle_name(f),20);
 
 			GtkToggleAction *action = gtk_toggle_action_new(	buffer,
-																toggle_info[f].label,
-																toggle_info[f].tooltip,
+																gettext(toggle_info[f].label),
+																gettext(toggle_info[f].tooltip),
 																toggle_info[f].stock_id );
 			gtk_toggle_action_set_active(action,Toggled(f));
 			g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_action),(gpointer) f);
@@ -665,8 +665,8 @@
 		Trace("Creating action \"%s\"",buffer);
 
 		GtkAction *action = gtk_action_new(	buffer,
-											toggle_list[f].label,
-											toggle_list[f].tooltip,
+											gettext(toggle_list[f].label),
+											gettext(toggle_list[f].tooltip),
 											toggle_list[f].stock_id );
 
 		if(toggle_list[f].set)
