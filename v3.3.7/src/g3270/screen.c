@@ -942,22 +942,27 @@
 
  void update_toggle(int ix, int value, int reason, const char *name)
  {
- 	GtkToggleAction *action;
-	char 			buffer[20] = "Toggle";
+ 	GtkAction	*action;
+	char		buffer[20] = "Toggle";
 
 	strncat(buffer,name,20);
 
-	action = (GtkToggleAction *) gtk_action_group_get_action(main_actions,buffer);
+	action = gtk_action_group_get_action(main_actions,buffer);
 
-	Trace("Action: %p",action);
+	// Update toggle buttons
+	if(action)
+		gtk_toggle_action_set_active((GtkToggleAction *) action,value);
 
-	if(!action)
-	{
-		Log("No acction for toggle %s",name);
-		return;
-	}
+	// Update toolbar items
+	g_snprintf(buffer,19,"Reset%s", name);
+	action = gtk_action_group_get_action(main_actions,buffer);
+	if(action)
+		gtk_action_set_visible(action,value ? TRUE : FALSE);
 
-	gtk_toggle_action_set_active(action,value);
+	g_snprintf(buffer,19,"Set%s", name);
+	action = gtk_action_group_get_action(main_actions,buffer);
+	if(action)
+		gtk_action_set_visible(action,value ? FALSE : TRUE);
 
  }
 

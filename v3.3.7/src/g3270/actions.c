@@ -53,6 +53,13 @@
  static void action_Reset(GtkWidget *w, gpointer user_data);
  static void action_Connect(GtkWidget *w, gpointer user_data);
  static void action_Enter(GtkWidget *w, gpointer user_data);
+ static void action_Disconnect(GtkWidget *w, gpointer user_data);
+ static void action_PrintScreen(GtkWidget *w, gpointer user_data);
+ static void action_PrintSelected(GtkWidget *w, gpointer user_data);
+ static void action_PrintClipboard(GtkWidget *w, gpointer user_data);
+ static void action_Quit(void);
+ static void action_About(GtkWidget *w, gpointer user_data);
+
  static void action_Insert(void);
  static void action_Home(void);
  static void action_DeleteWord(void);
@@ -60,12 +67,6 @@
  static void action_Delete(void);
  static void action_BackSpace(void);
  static void action_EraseEOF(void);
- static void action_Disconnect(GtkWidget *w, gpointer user_data);
- static void action_PrintScreen(GtkWidget *w, gpointer user_data);
- static void action_PrintSelected(GtkWidget *w, gpointer user_data);
- static void action_PrintClipboard(GtkWidget *w, gpointer user_data);
- static void action_Quit(void);
- static void action_About(GtkWidget *w, gpointer user_data);
 
 /*---[ Callback tables ]----------------------------------------------------------------------------------------*/
 
@@ -178,7 +179,6 @@
 	{	"PageUP",			NULL,					N_( "Page-Up" ),		"Page_Up",		NULL,	G_CALLBACK(action_PageUP) 			},
 	{	"PageDown",			NULL,					N_( "Page-Down" ),		"Page_Down",	NULL,	G_CALLBACK(action_PageDown)			},
 	{	"Redraw",			NULL,					N_( "Redraw screen" ),	NULL,			NULL,	G_CALLBACK(action_Redraw)			},
-
  };
 
 /*
@@ -560,8 +560,31 @@
  	set_toggle(id,gtk_toggle_action_get_active(action));
  }
 
+ static void toggle_set(GtkAction *action,int id)
+ {
+ 	set_toggle(id,TRUE);
+ }
+
+ static void toggle_reset(GtkAction *action,int id)
+ {
+ 	set_toggle(id,FALSE);
+ }
+
  static void LoadToggleActions(GtkActionGroup *actions)
  {
+ 	static const struct _toggle_list
+ 	{
+ 		gboolean		set;
+ 		int				toggle;
+		const gchar	*label;
+		const gchar	*tooltip;
+		const gchar	*stock_id;
+	} toggle_list[] =
+	{
+		{ TRUE,		FULL_SCREEN,	NULL,	NULL,	GTK_STOCK_FULLSCREEN		},
+		{ FALSE,	FULL_SCREEN,	NULL,	NULL,	GTK_STOCK_LEAVE_FULLSCREEN	},
+	};
+
  	static const struct _toggle_info
  	{
  		const gchar *label;
@@ -610,9 +633,38 @@
 
 			gtk_action_group_add_action(actions,(GtkAction *) action);
 		}
+ 	}
 
-//		Trace("%s: %s=%d",__FUNCTION__,buffer,Toggled(f));
+ 	for(f=0;f< G_N_ELEMENTS(toggle_list);f++)
+ 	{
+ 		int		id = toggle_list[f].toggle;
+ 		char	buffer[20];
 
+ 		strcpy(buffer,toggle_list[f].set ? "Set" : "Reset" );
+
+		strncat(buffer,get_toggle_name(id),20);
+
+		Trace("Creating action \"%s\"",buffer);
+
+		GtkAction *action = gtk_action_new(	buffer,
+											toggle_list[f].label,
+											toggle_list[f].tooltip,
+											toggle_list[f].stock_id );
+
+		if(toggle_list[f].set)
+		{
+			g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(toggle_set),(gpointer) id);
+			if(Toggled(id))
+				gtk_action_set_visible(action,FALSE);
+		}
+		else
+		{
+			g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(toggle_reset),(gpointer) id);
+			if(!Toggled(id))
+				gtk_action_set_visible(action,FALSE);
+		}
+
+		gtk_action_group_add_action(actions,action);
  	}
 
  }
