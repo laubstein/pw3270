@@ -59,6 +59,8 @@
 		<toolitem name='Connect' action='Connect' />
 		<toolitem name='Disconnect' action='Disconnect' />
 		<separator/>
+		<toolitem name='SetFullScreen' action='SetFullScreen' />
+		<toolitem name='ResetFullScreen' action='ResetFullScreen' />
 		<toolitem name='SelectColors' action='SelectColors' />
 		<toolitem name='PrintScreen' action='PrintScreen' />
 		<toolitem name='Quit' action='Quit' />
