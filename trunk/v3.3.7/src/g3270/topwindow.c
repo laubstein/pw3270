@@ -194,13 +194,14 @@
 
  int CreateTopWindow(void)
  {
- 	static int cr[CURSOR_MODE_USER] = { GDK_ARROW, GDK_WATCH, GDK_X_CURSOR };
+ 	static int 			cr[CURSOR_MODE_USER] = { GDK_ARROW, GDK_WATCH, GDK_X_CURSOR };
+ 	static const gchar	*disabled[] = { "Copy", "Append" };
 
- 	GtkWidget		*vbox;
- 	int				f;
-	GtkUIManager	*ui_manager;
-	gchar			*file;
-	GdkPixbuf		*pix;
+ 	GtkWidget				*vbox;
+ 	int						f;
+	GtkUIManager			*ui_manager;
+	gchar					*file;
+	GdkPixbuf				*pix;
 
 	topwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -284,6 +285,9 @@
 #else
 	gtk_window_set_role(GTK_WINDOW(topwindow), "G3270_TOP" );
 #endif
+
+	for(f=0;f<G_N_ELEMENTS(disabled);f++)
+		gtk_action_set_sensitive(gtk_action_group_get_action(main_actions,disabled[f]),FALSE);
 
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
 
