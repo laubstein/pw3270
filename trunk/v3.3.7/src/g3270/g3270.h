@@ -194,6 +194,7 @@
 	gint 			GetInt(const gchar *group, const gchar *key, gint def);
 	void			SetInt(const gchar *group, const gchar *key, gint val);
 
+	void 			DisableNetworkActions(void);
 
 
 #endif // G3270_H_INCLUDED

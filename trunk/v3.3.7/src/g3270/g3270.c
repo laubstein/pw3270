@@ -179,6 +179,8 @@ static char *base_3270_keymap =
 /* Callback for connection state changes. */
 static void main_connect(Boolean status)
 {
+	GtkAction *action;
+
 	Trace("%s: status: %d Connected: %d",__FUNCTION__,status,(int) CONNECTED);
 
 	if(status)
@@ -199,6 +201,14 @@ static void main_connect(Boolean status)
 		gtk_widget_queue_draw(terminal);
 		gtk_widget_grab_focus(terminal);
 	}
+
+	action = gtk_action_group_get_action(main_actions,"Disconnect");
+	if(action)
+		gtk_action_set_sensitive(action,status ? TRUE : FALSE);
+
+	action = gtk_action_group_get_action(main_actions,"Connect");
+	if(action)
+		gtk_action_set_sensitive(action,status ? FALSE : TRUE);
 
 }
 
@@ -310,6 +320,8 @@ int main(int argc, char *argv[])
 	/* Connect to the host. */
 	screen_suspend();
 	if (cl_hostname != CN) {
+
+		DisableNetworkActions();
 
 		if(host_connect(cl_hostname) < 0)
 		{
