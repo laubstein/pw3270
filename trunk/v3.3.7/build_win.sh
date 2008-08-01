@@ -26,3 +26,8 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
+wine  ~/.wine/drive_c/Arquivos\ de\ programas/NSIS/makensis.exe g3270.nsi
+if [ "$?" != "0" ]; then
+	echo "*** ERRO AO GERAR O PACOTE DE INSTALACAO"
+	exit -1
+fi
