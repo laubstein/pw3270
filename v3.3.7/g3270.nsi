@@ -16,14 +16,19 @@ setOutPath $INSTDIR
  
 createShortCut "$SMPROGRAMS\g3270.lnk" "$INSTDIR\g3270.exe"
 
-# define what to install and place it in the output path
-file g3270.exe
-file lib3270.dll
-file fonts.conf
+# Binary files
+file bin\Release\g3270.exe
+file bin\Release\lib3270.dll
+file bin\Release\w3n46.dll
+
+# UI definition files
+file src\g3270\fonts.conf
+file src\g3270\ui.xml
+file src\g3270\g3270.jpg
+file src\g3270\g3270.ico
+
+# Default configuration file
 file g3270.conf
-file w3n46.dll
-file ui.xml
-file g3270.jpg
 
 # Locale files
 CreateDirectory "$INSTDIR\locale\pt_BR\LC_MESSAGES"
@@ -60,6 +65,7 @@ delete $INSTDIR\g3270.conf
 delete $INSTDIR\w3n46.dll
 delete $INSTDIR\ui.xml
 delete $INSTDIR\g3270.jpg
+delete $INSTDIR\g3270.ico
 delete $INSTDIR\g3270.log
 delete "$SMPROGRAMS\g3270.lnk"
 rmdir /r "$INSTDIR\locale"
