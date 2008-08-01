@@ -35,6 +35,7 @@
 		</Compiler>
 		<Unit filename="Makefile" />
 		<Unit filename="actions.win" />
+		<Unit filename="g3270.nsi" />
 		<Unit filename="src/c3270/c3270.c">
 			<Option compilerVar="CC" />
 		</Unit>
