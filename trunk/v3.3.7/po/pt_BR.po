@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-30 15:56-0300\n"
-"PO-Revision-Date: 2008-07-30 16:05-0300\n"
+"POT-Creation-Date: 2008-07-30 17:29-0300\n"
+"PO-Revision-Date: 2008-07-31 08:38-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -71,24 +71,25 @@ msgstr "Azul"
 
 #: actions.c:718
 msgid "Can't build Application UI!"
-msgstr "Não foi possível montar a interface com usuário"
+msgstr "Não foi possível montar a interface da aplicação!"
 
 #: actions.c:716
 #, c-format
 msgid "Can't build Application UI: %s"
-msgstr "Não foi possível montar interface com usuário: %s"
+msgstr "Não foi possível montar a interface da aplicação:\n"
+"%s"
 
 #: actions.c:724
 msgid "Can't find UI definition file"
-msgstr "Arquivo de definição da interface com usuário não foi encontrado."
+msgstr "Não encontrei arquivo de definição de interface."
 
 #: g3270.c:254
 msgid "Can't register into lib3270 I/O callback table."
-msgstr "Não foi possível registrar tabela de I/O na biblioteca 3270."
+msgstr "Não foi possível efetuar o registro na tabela de I/O 3270."
 
 #: g3270.c:260
 msgid "Can't register into lib3270 screen callback table."
-msgstr "Não foi possível registrar funções de tela na biblioteca 3270."
+msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 
 #: actions.c:147
 msgid "Clear fields"
@@ -124,7 +125,7 @@ msgstr ""
 
 #: colors.c:237
 msgid "Dark Blue"
-msgstr "Azul"
+msgstr "Azul escuro"
 
 #: colors.c:240
 msgid "Dark Green"
@@ -136,11 +137,11 @@ msgstr ""
 
 #: actions.c:175
 msgid "Delete Field"
-msgstr ""
+msgstr "Apagar campo"
 
 #: actions.c:174
 msgid "Delete Word"
-msgstr ""
+msgstr "Apagar palavra"
 
 #: actions.c:165
 msgid "Down"
@@ -167,7 +168,7 @@ msgstr "Erro criando arquivo temporário:\n"
 msgid ""
 "Error loading %s\n"
 "%s"
-msgstr "Erro carregando arquivo %s\n"
+msgstr "Erro lendo %s\n"
 "%s"
 
 #: actions.c:483
@@ -228,7 +229,7 @@ msgstr "Intensificado/Desprotegido"
 
 #: actions.c:163
 msgid "Left"
-msgstr ""
+msgstr "Esquerda"
 
 #: actions.c:621
 msgid "Line Wrap"
@@ -236,7 +237,7 @@ msgstr ""
 
 #: colors.c:261
 msgid "Locked status"
-msgstr "Bloqueado"
+msgstr ""
 
 #: actions.c:625
 msgid "Margined Paste"
@@ -269,11 +270,11 @@ msgstr ""
 
 #: colors.c:253
 msgid "Normal"
-msgstr "Normal"
+msgstr ""
 
 #: colors.c:260
 msgid "Normal status"
-msgstr "Normal"
+msgstr ""
 
 #: colors.c:247
 msgid "Normal/Protected"
@@ -409,7 +410,7 @@ msgstr "Separador"
 
 #: actions.c:124
 msgid "Settings"
-msgstr "Configurações"
+msgstr "Configuração"
 
 #: actions.c:618
 msgid "Show Cursor Position"
@@ -446,7 +447,7 @@ msgstr "Turquesa"
 
 #: topwindow.c:142 actions.c:456 actions.c:483
 msgid "Unexpected error"
-msgstr "Erro inesperado"
+msgstr "Erro inexperado"
 
 #: actions.c:164
 msgid "Up"
@@ -482,7 +483,7 @@ msgstr ""
 
 #: screen.c:698
 msgid "X Numeric"
-msgstr "X Numérico"
+msgstr ""
 
 #: screen.c:702
 msgid "X Overflow"
@@ -498,7 +499,7 @@ msgstr "X Resolvendo"
 
 #: screen.c:670
 msgid "X System"
-msgstr "X Sistema"
+msgstr ""
 
 #: screen.c:674
 msgid "X Wait"
@@ -530,11 +531,11 @@ msgstr "_Rede"
 
 #: actions.c:123
 msgid "_Options"
-msgstr "Opções"
+msgstr "_Opções"
 
 #: actions.c:136
 msgid "_Quit"
-msgstr "Sair"
+msgstr "_Sair"
 
 #: actions.c:145
 msgid "_Reselect"
@@ -546,5 +547,5 @@ msgstr "Deselecionar"
 
 #: actions.c:384
 msgid "and others"
-msgstr "e outros"
+msgstr ""
 
