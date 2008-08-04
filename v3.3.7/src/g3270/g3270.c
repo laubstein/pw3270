@@ -279,13 +279,28 @@ static int g3270_init(int *argc, char ***argv)
 	return 0;
 }
 
+static void wait4negotiations(const char *cl_hostname)
+{
+	Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);
+
+	while(!IN_ANSI && !IN_3270)
+	{
+		while(gtk_events_pending())
+			gtk_main_iteration();
+
+		if(!PCONNECTED)
+		{
+			popup_an_error( N_( "Negotiation with %s failed!" ),cl_hostname);
+			return;
+		}
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	const char	*cl_hostname = CN;
 
 	initialize_toggles();
-
-//	printf("%s\n\nCopyright 1989-2008 by Paul Mattes, GTRC and others.\n",build);
 
 	if(g3270_init(&argc,&argv))
 		return -1;
@@ -325,10 +340,6 @@ int main(int argc, char *argv[])
 	gtk_widget_grab_focus(terminal);
 	gtk_widget_grab_default(terminal);
 
-	/* Update screen */
-	while(gtk_events_pending())
-		gtk_main_iteration();
-
 	register_tchange(FULL_SCREEN,set_fullscreen);
 
 	while(gtk_events_pending())
@@ -342,30 +353,11 @@ int main(int argc, char *argv[])
 	else
 		cl_hostname = GetString("Network","Hostname",CN);
 
-	if(cl_hostname != CN) {
-
+	if(cl_hostname != CN)
+	{
 		DisableNetworkActions();
-
-		if(host_connect(cl_hostname) < 0)
-		{
-			while(gtk_events_pending())
-				gtk_main_iteration();
-		}
-		else
-		{
-			/* Wait for negotiations to complete or fail. */
-			Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);
-
-			while(!IN_ANSI && !IN_3270)
-			{
-
-				while(gtk_events_pending())
-					gtk_main_iteration();
-
-				if(!PCONNECTED)
-					popup_an_error( N_( "Negotiation with %s failed!" ),cl_hostname);
-			}
-		}
+		if(host_connect(cl_hostname) >= 0)
+			wait4negotiations(cl_hostname);
 	}
 
 	screen_resume();
@@ -373,9 +365,7 @@ int main(int argc, char *argv[])
 	peer_script_init();
 
 	/* Process events forever. */
-	Trace("Entering %s main loop","GTK");
 	gtk_main();
-	Trace("%s main loop has finished","GTK");
 
 	CloseConfigFile();
 	return 0;
