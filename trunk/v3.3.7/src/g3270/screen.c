@@ -61,7 +61,6 @@
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
- static void	title(char *text);
  static void	setsize(int rows, int cols);
  static int  	addch(int row, int col, int c, unsigned short attr);
  static void	set_charset(char *dcs);
@@ -92,7 +91,7 @@
 	setsize,		// void (*setsize)(int rows, int cols);
 	addch,			// void (*addch)(int row, int col, int c, int attr);
 	set_charset,	// void (*charset)(char *dcs);
-	title,			// void (*title)(char *text);
+	settitle,		// void (*title)(char *text);
 	changed,		// void (*changed)(int bstart, int bend);
 	gdk_beep,		// void (*ring_bell)(void);
 	action_Redraw,	// void (*redraw)(void);
@@ -189,11 +188,17 @@
  	}
  }
 
- static void title(char *text)
+ void settitle(char *text)
  {
- 	Trace("Window %p title: \"%s\"",topwindow,text);
+ 	gchar buffer[80];
+
+ 	if(text && *text)
+ 		g_snprintf(buffer,79,"%s - %s",PACKAGE_NAME,text);
+	else
+ 		g_snprintf(buffer,79,"%s",PACKAGE_NAME);
+
  	if(topwindow)
-		gtk_window_set_title(GTK_WINDOW(topwindow),text ? text : PACKAGE_NAME);
+		gtk_window_set_title(GTK_WINDOW(topwindow),buffer);
 
  }
 
@@ -369,15 +374,14 @@
 		if(*status_msg == 'X')
 		{
 			int f;
-
-#define X_LINES 4
+			int cols = (fWidth/3)+1;
 
 			gdk_gc_set_foreground(gc,clr+sts_data->clr);
 
-			for(f=0;f<X_LINES;f++)
+			for(f=0;f<cols;f++)
 			{
-				gdk_draw_line(draw,gc,col,OIAROW+f+2, col+(fWidth-1),(OIAROW+fHeight+f)-X_LINES);
-				gdk_draw_line(draw,gc,col+(fWidth-1),OIAROW+f+2, col,(OIAROW+fHeight+f)-X_LINES);
+				gdk_draw_line(draw,gc,col,OIAROW+f+3, col+(fWidth-1),(OIAROW+(fHeight-2)+f)-cols);
+				gdk_draw_line(draw,gc,col+(fWidth-1),OIAROW+f+3, col,(OIAROW+(fHeight-2)+f)-cols);
 			}
 
 			col += fWidth;

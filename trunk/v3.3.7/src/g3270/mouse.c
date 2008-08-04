@@ -47,7 +47,7 @@
 	SELECT_MODE_COPY,
 	SELECT_MODE_APPEND,
 
-	SELECT_INVALID
+	SELECT_MODE_INVALID
  };
 
 /*---[ Prototipes ]-----------------------------------------------------------*/
@@ -63,7 +63,7 @@
  static int startCol 	= 0;
  static int endRow 	= 0;
  static int endCol		= 0;
- static int mode		= SELECT_MODE_NONE;
+ static int mode		= SELECT_MODE_INVALID;
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
@@ -75,16 +75,20 @@
 
  static void SetMode(int m)
  {
- 	static const gchar	*name[] = { "Copy", "Append" };
+ 	static const gchar	*name[] = { "Copy", "Append", "PrintSelected", "SaveSelected", "Unselect" };
  	int						f;
 
  	if(m == mode)
 		return;
 
+	if(m == SELECT_MODE_NONE && mode != SELECT_MODE_INVALID)
+		gtk_action_set_sensitive(gtk_action_group_get_action(main_actions,"Reselect"),TRUE);
+
 	mode = m;
 
 	for(f=0;f<G_N_ELEMENTS(name);f++)
 		gtk_action_set_sensitive(gtk_action_group_get_action(main_actions,name[f]),(mode != SELECT_MODE_NONE));
+
  }
 
  static int CheckForFunction(int baddr, int length)

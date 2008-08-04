@@ -2,6 +2,10 @@
 	<menubar name='MainMenubar'>
 
 		<menu action='FileMenu'>
+			<menuitem action='SaveScreen'/>
+			<menuitem action='SaveSelected'/>
+			<menuitem action='SaveClipboard'/>
+			<separator/>
 			<menuitem action='PrintScreen'/>
 			<menuitem action='PrintSelected'/>
 			<menuitem action='PrintClipboard'/>
@@ -21,6 +25,7 @@
 			<menuitem action='Reselect'/>
 			<separator/>
 			<menuitem action='Clear'/>
+			<menuitem action='EraseEOF' />
 		</menu>
 
 		<menu action='NetworkMenu'>

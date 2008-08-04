@@ -124,9 +124,38 @@
  	return G_OBJECT(font_dialog);
  }
 
+ static void print_done(GtkPrintOperation *prt, GtkPrintOperationResult result, gpointer user_data)
+ {
+	GKeyFile 				*conf		= GetConf();
+	gchar					*ptr;
+	GtkPrintSettings		*settings	= gtk_print_operation_get_print_settings(prt);
+	PangoFontDescription	*FontDescr	= (PangoFontDescription *) g_object_get_data(G_OBJECT(prt),"g3270_FontDescr");
+	GtkPageSetup			*setup		= gtk_print_operation_get_default_page_setup(prt);
+
+	if(!conf)
+		return;
+
+	if(settings)
+		gtk_print_settings_to_key_file(settings,conf,"PrintSettings");
+
+	if(setup)
+		gtk_page_setup_to_key_file(setup,NULL,NULL);
+
+	if(FontDescr)
+	{
+		ptr = pango_font_description_to_string(FontDescr);
+		if(ptr)
+		{
+			g_key_file_set_string(conf,"Print","Font",ptr);
+			g_free(ptr);
+		}
+	}
+ }
+
  int PrintText(const char *name, gchar *text)
  {
- 	GtkPrintOperation *prt;
+	GKeyFile			*conf	= GetConf();
+ 	GtkPrintOperation	*prt;
 
  	if(!text)
 		return -EINVAL;
@@ -138,7 +167,7 @@
 
 	// Set job parameters
 	g_object_set_data_full(G_OBJECT(prt),"g3270_text",g_strsplit(g_strchomp(text),"\n",-1),(void (*)(gpointer)) g_strfreev);
-	g_object_set_data_full(G_OBJECT(prt),"g3270_FontName",g_strdup("Courier 10"),g_free);
+	g_object_set_data_full(G_OBJECT(prt),"g3270_FontName",g_strdup(GetString("Print","Font","Courier 10")),g_free);
 
 	// Configure print operation
 	gtk_print_operation_set_job_name(prt,name);
@@ -150,10 +179,18 @@
     g_signal_connect(prt, "draw-page",      		G_CALLBACK(draw_page),   			0);
 	g_signal_connect(prt, "create-custom-widget",   G_CALLBACK(create_custom_widget),	0);
 	g_signal_connect(prt, "custom-widget-apply",   	G_CALLBACK(custom_widget_apply),	0);
+    g_signal_connect(prt, "done",      				G_CALLBACK(print_done),	 			0);
 
-	gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new());
-	gtk_print_operation_set_print_settings(prt,gtk_print_settings_new());
-
+	if(conf)
+	{
+		gtk_print_operation_set_print_settings(prt,gtk_print_settings_new_from_key_file(conf,"PrintSettings",NULL));
+		gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new_from_key_file(conf,NULL,NULL));
+	}
+	else
+	{
+		gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new());
+		gtk_print_operation_set_print_settings(prt,gtk_print_settings_new());
+	}
 
 	// Run Print dialog
 	gtk_print_operation_run(prt,GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG,GTK_WINDOW(topwindow),NULL);

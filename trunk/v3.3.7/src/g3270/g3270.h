@@ -195,6 +195,9 @@
 	void			SetInt(const gchar *group, const gchar *key, gint val);
 
 	void 			DisableNetworkActions(void);
+	void 			ClearClipboard(void);
+	void			settitle(char *text);
+	GKeyFile 		*GetConf(void);
 
 
 #endif // G3270_H_INCLUDED
