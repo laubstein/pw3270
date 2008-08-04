@@ -104,7 +104,7 @@
 		{
 			// Draw cross-hair cursor
 			gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CROSS_HAIR);
-			gdk_draw_line(widget->window,gc,cursor.x,0,cursor.x,OIAROW);
+			gdk_draw_line(widget->window,gc,cursor.x,0,cursor.x,OIAROW-1);
 			gdk_draw_line(widget->window,gc,0,cursor.y,sWidth,cursor.y);
 		}
 

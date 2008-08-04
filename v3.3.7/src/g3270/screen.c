@@ -370,12 +370,14 @@
 		{
 			int f;
 
+#define X_LINES 4
+
 			gdk_gc_set_foreground(gc,clr+sts_data->clr);
 
-			for(f=0;f<3;f++)
+			for(f=0;f<X_LINES;f++)
 			{
-				gdk_draw_line(draw,gc,col+f,OIAROW+2, col+f+(fWidth-3),(OIAROW+fHeight)-2);
-				gdk_draw_line(draw,gc,col+f+(fWidth-3),OIAROW+2, col+f,(OIAROW+fHeight)-2);
+				gdk_draw_line(draw,gc,col,OIAROW+f+2, col+(fWidth-1),(OIAROW+fHeight+f)-X_LINES);
+				gdk_draw_line(draw,gc,col+(fWidth-1),OIAROW+f+2, col,(OIAROW+fHeight+f)-X_LINES);
 			}
 
 			col += fWidth;
