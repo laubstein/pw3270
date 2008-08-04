@@ -67,6 +67,9 @@
  static void action_Delete(void);
  static void action_BackSpace(void);
  static void action_EraseEOF(void);
+ static void action_SaveScreen(void);
+ static void action_SaveSelected(void);
+ static void action_SaveClipboard(void);
 
 /*---[ Callback tables ]----------------------------------------------------------------------------------------*/
 
@@ -150,6 +153,12 @@
 	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),			"Print",		NULL,	G_CALLBACK(action_PrintScreen)		},
 	{	"PrintSelected",	NULL,					N_( "Print selected" ),	NULL,			NULL,	G_CALLBACK(action_PrintSelected)	},
 	{	"PrintClipboard",	NULL,					N_( "Print copy" ),		NULL,			NULL,	G_CALLBACK(action_PrintClipboard)	},
+
+ 	/* Save actions */
+ 	{	"Save",				GTK_STOCK_SAVE,			N_( "Save" ),			NULL,			NULL,	NULL								},
+	{	"SaveScreen",		NULL,					N_( "Save screen" ),	NULL,			NULL,	G_CALLBACK(action_SaveScreen)		},
+	{	"SaveSelected",		NULL,					N_( "Save selected" ),	NULL,			NULL,	G_CALLBACK(action_SaveSelected)		},
+	{	"SaveClipboard",	NULL,					N_( "Save copy" ),		NULL,			NULL,	G_CALLBACK(action_SaveClipboard)	},
 
 	/* Select actions */
 	{ 	"SelectRight",		NULL,					N_( "Select Right" ),	"<Shift>Right",	NULL,	G_CALLBACK(action_SelectRight)		},
@@ -800,3 +809,45 @@
 	return FALSE;
  }
 
+ static int SaveText(const char *title, gchar *text)
+ {
+
+	GtkWidget *dialog = gtk_file_chooser_dialog_new( gettext(title),
+                                                     GTK_WINDOW(topwindow),
+                                                     GTK_FILE_CHOOSER_ACTION_SAVE,
+                                                     GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
+                                                     GTK_STOCK_SAVE,	GTK_RESPONSE_ACCEPT,
+                                                     NULL );
+
+
+	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	{
+		GError	*error = NULL;
+		gchar	*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+
+		if(!g_file_set_contents(filename,text,-1,&error))
+		{
+			popup_an_error( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			g_error_free(error);
+		}
+	}
+
+	gtk_widget_destroy(dialog);
+ 	g_free(text);
+ 	return 0;
+ }
+
+ static void action_SaveScreen(void)
+ {
+	SaveText(N_( "Save screen contents" ), GetScreenContents(TRUE));
+ }
+
+ static void action_SaveSelected(void)
+ {
+	SaveText(N_( "Save selected text" ), GetSelection());
+ }
+
+ static void action_SaveClipboard(void)
+ {
+	SaveText(N_( "Save clipboard contents" ), GetClipboard());
+ }

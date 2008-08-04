@@ -179,7 +179,12 @@ static char *base_3270_keymap =
 /* Callback for connection state changes. */
 static void main_connect(Boolean status)
 {
-	GtkAction *action;
+	static const gchar *disconnected[] 	= { "Connect" };
+	static const gchar *connected[]		= { "Disconnect", "PrintScreen", "SaveScreen" };
+
+	int			f;
+	GtkAction 	*action;
+	gboolean	sts;
 
 	Trace("%s: status: %d Connected: %d",__FUNCTION__,status,(int) CONNECTED);
 
@@ -202,13 +207,23 @@ static void main_connect(Boolean status)
 		gtk_widget_grab_focus(terminal);
 	}
 
-	action = gtk_action_group_get_action(main_actions,"Disconnect");
-	if(action)
-		gtk_action_set_sensitive(action,status ? TRUE : FALSE);
+	sts = status ? FALSE : TRUE;
 
-	action = gtk_action_group_get_action(main_actions,"Connect");
-	if(action)
-		gtk_action_set_sensitive(action,status ? FALSE : TRUE);
+	for(f=0;f<G_N_ELEMENTS(disconnected);f++)
+	{
+		action = gtk_action_group_get_action(main_actions,disconnected[f]);
+		if(action)
+			gtk_action_set_sensitive(action,sts);
+	}
+
+	sts = !sts;
+
+	for(f=0;f<G_N_ELEMENTS(connected);f++)
+	{
+		action = gtk_action_group_get_action(main_actions,connected[f]);
+		if(action)
+			gtk_action_set_sensitive(action,sts);
+	}
 
 }
 
@@ -289,6 +304,7 @@ int main(int argc, char *argv[])
 	if(CreateTopWindow())
 		return -1;
 
+	main_connect(0);
 
 //#ifdef DEBUG
 //	gdk_window_set_debug_updates(TRUE);
@@ -320,7 +336,13 @@ int main(int argc, char *argv[])
 
 	/* Connect to the host. */
 	screen_suspend();
-	if (cl_hostname != CN) {
+
+	if(cl_hostname != CN)
+		SetString("Network","Hostname",cl_hostname);
+	else
+		cl_hostname = GetString("Network","Hostname",CN);
+
+	if(cl_hostname != CN) {
 
 		DisableNetworkActions();
 
@@ -328,23 +350,20 @@ int main(int argc, char *argv[])
 		{
 			while(gtk_events_pending())
 				gtk_main_iteration();
-
-			x3270_exit(1);
 		}
-
-		/* Wait for negotiations to complete or fail. */
-		Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);
-
-		while(!IN_ANSI && !IN_3270)
+		else
 		{
+			/* Wait for negotiations to complete or fail. */
+			Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);
 
-			while(gtk_events_pending())
-				gtk_main_iteration();
-
-			if(!PCONNECTED)
+			while(!IN_ANSI && !IN_3270)
 			{
-				popup_an_error( N_( "Negotiation with %s failed!" ),cl_hostname);
-				x3270_exit(1);
+
+				while(gtk_events_pending())
+					gtk_main_iteration();
+
+				if(!PCONNECTED)
+					popup_an_error( N_( "Negotiation with %s failed!" ),cl_hostname);
 			}
 		}
 	}

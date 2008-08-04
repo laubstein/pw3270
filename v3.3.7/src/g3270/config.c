@@ -271,3 +271,9 @@ gchar * FindSystemConfigFile(const gchar *name)
 	return 0;
 }
 
+GKeyFile *GetConf(void)
+{
+	if(!conf)
+		OpenConfigFile();
+	return conf;
+}
