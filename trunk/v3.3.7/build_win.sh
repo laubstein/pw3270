@@ -1,19 +1,19 @@
 #!/bin/bash
 
-IMAGE=image.w32
+PACKAGE_NAME=g3270
+PACKAGE_VERSION=3.3.7p5
 LOCALE=locale
 
-mv ~/Desktop/g3270_installer.exe ~/tmp
+mv ~/Desktop/g3270_installer.exe ~/tmp > /dev/null 2>&1
 
-rm -fr bin/Release
-make Release
-
+sed "s/@PACKAGE_NAME@/$PACKAGE_NAME/g;s/@PACKAGE_VERSION@/$PACKAGE_VERSION/g" g3270.nsi.in > g3270.nsi
 if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-rm -fr $IMAGE
-mkdir $IMAGE
+rm -fr bin/Release
+make Release
+
 if [ "$?" != "0" ]; then
 	exit -1
 fi
