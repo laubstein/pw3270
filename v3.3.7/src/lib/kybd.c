@@ -2584,6 +2584,7 @@ DeleteWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 		else
 			do_erase();
 	}
+	screen_disp();
 }
 
 
@@ -2631,6 +2632,7 @@ DeleteField_action(Widget w unused, XEvent *event, String *params, Cardinal *num
 		ctlr_add(baddr, EBC_null, 0);
 		INC_BA(baddr);
 	}
+	screen_disp();
 }
 
 

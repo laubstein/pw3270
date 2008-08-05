@@ -25,7 +25,7 @@
 			<menuitem action='Reselect'/>
 			<separator/>
 			<menuitem action='Clear'/>
-			<menuitem action='EraseEOF' />
+			<menuitem action='EraseField' />
 		</menu>
 
 		<menu action='NetworkMenu'>
@@ -106,7 +106,6 @@
 	<accelerator action='Return'/>
 	<accelerator action='Escape' />
 	<accelerator action='DeleteWord'/>
-	<accelerator action='DeleteField' />
 	<accelerator action='Delete' />
 	<accelerator action='Erase' />
 	<accelerator action='EraseEOF' />
