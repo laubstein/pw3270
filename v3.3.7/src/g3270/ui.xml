@@ -112,5 +112,6 @@
 	<accelerator action='PageUP' />
 	<accelerator action='PageDown' />
 	<accelerator action='NextField' />
+	<accelerator action='DumpScreen' />
 
 </ui>

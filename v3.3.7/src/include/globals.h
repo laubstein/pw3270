@@ -249,6 +249,8 @@ struct ea {
 #define CS_DBCS		0x03	/*  DBCS character set (X'F8') */
 #define CS_GE		0x04	/* cs flag for Graphic Escape */
 
+struct ea * copy_device_buffer(int *el);	/* Return a "malloced" copy of the device buffer, set number of elements */
+
 /*   translation lists */
 struct trans_list {
 	char			*name;

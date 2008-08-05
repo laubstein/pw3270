@@ -1043,3 +1043,13 @@ extern void popup_an_error(const char *fmt, ...)
 		WriteLog("3270","Error Popup: %s",vmsgbuf);
 
 }
+
+struct ea * copy_device_buffer(int *el)
+{
+	int			sz		=  sizeof(struct ea) * (maxROWS * maxCOLS);
+	struct ea	*ret	=  malloc(sz);
+	memcpy(ret,ea_buf,sz);
+	if(el)
+		*el = (maxROWS * maxCOLS);
+	return ret;
+}
