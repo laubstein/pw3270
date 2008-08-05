@@ -654,13 +654,47 @@
  		const gchar *accelerator;
 	} action_info[] =
 	{
-		{ "EraseEOF",		N_( "EraseEOF" ),		NULL,	NULL,	EraseEOF_action,	"End"			},
-		{ "Home",			N_( "Home" ),			NULL,	NULL,	Home_action,		"Home"			},
-		{ "DeleteWord",		N_( "Delete Word" ),	NULL,	NULL,	DeleteWord_action,	N_( "<Ctrl>w" )	},
-		{ "DeleteField",	N_( "Delete Field" ),	NULL,	NULL,	DeleteField_action,	N_( "<Ctrl>u" ) },
-		{ "Delete",			N_( "Delete Char" ),	NULL,	NULL,	Delete_action,		"Delete" 		},
-		{ "Erase",			N_( "Backspace" ),		NULL,	NULL,	Erase_action,		"BackSpace" 	},
-		{ "NextField",		N_( "Next field" ),		NULL,	NULL,	Tab_action,			"Tab"			}
+		{ "EraseEOF",		N_( "Erase EOF" ),
+							N_( "Erase to the end of the field" ),
+							NULL,
+							EraseEOF_action,
+							"End" },
+
+		{ "Home",			N_( "Field start" ),
+							NULL,
+							NULL,
+							Home_action,
+							"Home" },
+
+		{ "DeleteWord",		N_( "Delete Word" ),
+							NULL,
+							NULL,
+							DeleteWord_action,
+							N_( "<Ctrl>w" )	},
+
+		{ "EraseField",		N_( "Erase Field" ),
+							NULL,
+							NULL,
+							DeleteField_action,
+							N_( "<Ctrl>u" ) },
+
+		{ "Delete",			N_( "Delete Char" ),
+							NULL,
+							NULL,
+							Delete_action,
+							"Delete" },
+
+		{ "Erase",			N_( "Backspace" ),
+							NULL,
+							NULL,
+							Erase_action,
+							"BackSpace" },
+
+		{ "NextField",		N_( "Next field" ),
+							NULL,
+							NULL,
+							Tab_action,
+							"Tab" }
 	};
 
 	int f;
