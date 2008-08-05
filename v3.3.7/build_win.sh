@@ -3,6 +3,8 @@
 IMAGE=image.w32
 LOCALE=locale
 
+mv ~/Desktop/g3270_installer.exe ~/tmp
+
 rm -fr bin/Release
 make Release
 
@@ -31,3 +33,5 @@ if [ "$?" != "0" ]; then
 	echo "*** ERRO AO GERAR O PACOTE DE INSTALACAO"
 	exit -1
 fi
+
+mv g3270_installer.exe ~/Desktop/
