@@ -1,0 +1,80 @@
+Name "@PACKAGE_NAME@"
+Caption "@PACKAGE_NAME@ - 3270 Emulator for windows/gtk"
+outfile "@PACKAGE_NAME@_installer.exe"
+XPStyle on
+ 
+# define the directory to install to
+installDir $PROGRAMFILES\@PACKAGE_NAME@
+ 
+RequestExecutionLevel admin
+
+# default section
+section
+ 
+# define the output path for this file
+setOutPath $INSTDIR
+ 
+createShortCut "$SMPROGRAMS\@PACKAGE_NAME@.lnk" "$INSTDIR\@PACKAGE_NAME@.exe"
+
+# Binary files
+file bin\Release\@PACKAGE_NAME@.exe
+file bin\Release\lib3270.dll
+file bin\Release\w3n46.dll
+
+# UI definition files
+file src\g3270\fonts.conf
+file src\g3270\ui.xml
+file src\g3270\@PACKAGE_NAME@.jpg
+file src\g3270\@PACKAGE_NAME@.ico
+
+# Default configuration file
+file @PACKAGE_NAME@.conf
+
+# Locale files
+CreateDirectory "$INSTDIR\locale\pt_BR\LC_MESSAGES"
+file "/oname=$INSTDIR\locale\pt_BR\LC_MESSAGES\@PACKAGE_NAME@.mo" "locale\pt_BR\LC_MESSAGES\@PACKAGE_NAME@.mo"
+
+# define uninstaller name
+writeUninstaller $INSTDIR\uninstall.exe
+ 
+WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+                 "DisplayName" "@PACKAGE_NAME@ - 3270 emulator for windows/gtk"
+WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+                 "UninstallString" "$INSTDIR\uninstall.exe"
+WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+                 "InstallLocation" "$INSTDIR"
+WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+                 "NoModify" "1"
+WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+                 "NoRepair" "1"
+WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+                 "DisplayVersion" "@PACKAGE_VERSION@"
+
+
+
+sectionEnd
+
+# create a section to define what the uninstaller does.
+# the section will always be named "Uninstall"
+section "Uninstall"
+ 
+# Always delete uninstaller first
+delete $INSTDIR\uninstaller.exe
+  
+# now delete installed files
+delete $INSTDIR\@PACKAGE_NAME@.exe
+delete $INSTDIR\lib3270.dll
+delete $INSTDIR\fonts.conf
+delete $INSTDIR\@PACKAGE_NAME@.conf
+delete $INSTDIR\w3n46.dll
+delete $INSTDIR\ui.xml
+delete $INSTDIR\@PACKAGE_NAME@.jpg
+delete $INSTDIR\@PACKAGE_NAME@.ico
+delete $INSTDIR\@PACKAGE_NAME@.log
+delete "$SMPROGRAMS\@PACKAGE_NAME@.lnk"
+rmdir /r "$INSTDIR\locale"
+
+# Remove registry 
+DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@"
+
+sectionEnd
