@@ -63,6 +63,7 @@
  static void action_SaveScreen(void);
  static void action_SaveSelected(void);
  static void action_SaveClipboard(void);
+ static void action_DumpScreen(void);
 
 /*---[ Callback tables ]----------------------------------------------------------------------------------------*/
 
@@ -131,6 +132,7 @@
  	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)		},
  	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),			NULL,			NULL,	G_CALLBACK(action_Quit)				},
  	{	"SelectColors",		GTK_STOCK_SELECT_COLOR,	N_( "Colors" ),			NULL,			NULL,	G_CALLBACK(action_SelectColors)		},
+	{	"DumpScreen",		NULL,					N_( "Dump screen" ),	"<Alt>D",		NULL,	G_CALLBACK(action_DumpScreen)		},
 
  	/* Edit actions */
  	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			NULL,			NULL,	G_CALLBACK(action_Copy)				},
@@ -858,6 +860,34 @@
 	gtk_widget_destroy(dialog);
  	g_free(text);
  	return 0;
+ }
+
+ static void action_DumpScreen(void)
+ {
+	GtkWidget *dialog = gtk_file_chooser_dialog_new( _( "Dump screen contents" ),
+                                                     GTK_WINDOW(topwindow),
+                                                     GTK_FILE_CHOOSER_ACTION_SAVE,
+                                                     GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
+                                                     GTK_STOCK_SAVE,	GTK_RESPONSE_ACCEPT,
+                                                     NULL );
+
+
+	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	{
+		GError		*error = NULL;
+		gchar		*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+		int			sz;
+		struct ea	*buffer = copy_device_buffer(&sz);
+
+		if(!g_file_set_contents(filename,(gchar *) buffer,sz*sizeof(struct ea),&error))
+		{
+			popup_an_error( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			g_error_free(error);
+		}
+		free(buffer);
+	}
+
+	gtk_widget_destroy(dialog);
  }
 
  static void action_SaveScreen(void)
