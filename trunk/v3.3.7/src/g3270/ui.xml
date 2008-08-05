@@ -112,5 +112,6 @@
 	<accelerator action='EraseEOF' />
 	<accelerator action='PageUP' />
 	<accelerator action='PageDown' />
+	<accelerator action='NextField' />
 
 </ui>

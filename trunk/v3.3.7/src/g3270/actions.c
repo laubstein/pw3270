@@ -60,13 +60,6 @@
  static void action_Quit(void);
  static void action_About(GtkWidget *w, gpointer user_data);
 
- static void action_Insert(void);
- static void action_Home(void);
- static void action_DeleteWord(void);
- static void action_DeleteField(void);
- static void action_Delete(void);
- static void action_BackSpace(void);
- static void action_EraseEOF(void);
  static void action_SaveScreen(void);
  static void action_SaveSelected(void);
  static void action_SaveClipboard(void);
@@ -172,40 +165,16 @@
 	{ 	"CursorLeft",		GTK_STOCK_GO_BACK,		N_( "Left" ),			"Left",			NULL,	G_CALLBACK(action_Left)				},
 	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),				"Up",			NULL,	G_CALLBACK(action_Up)				},
 	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),			"Down",			NULL,	G_CALLBACK(action_Down)				},
-	{ 	"NextField",		NULL,					N_( "Next Field" ),		"Tab",			NULL,	G_CALLBACK(action_Tab)				},
 	{ 	"Enter",			NULL,					N_( "Enter" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
 
 	/* Terminal Actions */
 	{ 	"Reset",			NULL,					N_( "Reset" ),			"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
 	{ 	"Escape",			NULL,					N_( "Escape" ),			"Escape",		NULL,	G_CALLBACK(action_Reset)			},
-	{ 	"Home",				NULL,					N_( "Home" ),			"Home",			NULL,	G_CALLBACK(action_Home)				},
 	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
-	{	"DeleteWord",		NULL,					N_( "Delete Word" ),	"<Ctrl>w",		NULL,	G_CALLBACK(action_DeleteWord)		},
-	{	"DeleteField",		NULL,					N_( "Delete Field" ),	"<Ctrl>u",		NULL,	G_CALLBACK(action_DeleteField)		},
-	{	"Delete",			NULL,					N_( "Delete Char" ),	"Delete",		NULL,	G_CALLBACK(action_Delete)			},
-	{	"Erase",			NULL,					N_( "Backspace" ),		"BackSpace",	NULL,	G_CALLBACK(action_BackSpace)		},
-	{	"EraseEOF",			NULL,					N_( "EraseEOF" ),		"End",			NULL,	G_CALLBACK(action_EraseEOF)			},
 	{	"PageUP",			NULL,					N_( "Page-Up" ),		"Page_Up",		NULL,	G_CALLBACK(action_PageUP) 			},
 	{	"PageDown",			NULL,					N_( "Page-Down" ),		"Page_Down",	NULL,	G_CALLBACK(action_PageDown)			},
 	{	"Redraw",			NULL,					N_( "Redraw screen" ),	NULL,			NULL,	G_CALLBACK(action_Redraw)			},
  };
-
-/*
-	The name of the action.
-	The stock id for the action, or the name of an icon from the icon theme.
-	The label for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
-	The accelerator for the action, in the format understood by gtk_accelerator_parse().
-	The tooltip for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
-	The function to call when the action is activated.
-	The initial state of the toggle action.
-
-	http://library.gnome.org/devel/gtk/stable/GtkActionGroup.html#GtkToggleActionEntry
-*/
- static const GtkToggleActionEntry internal_action_toggles[] =
- {
- 	{	"ToggleInsert",			NULL,					N_( "Insert" ),					"Insert", 		NULL,	G_CALLBACK(action_Insert),		 			FALSE },
- };
-
 
  GtkActionGroup	*main_actions = NULL;
 
@@ -329,41 +298,6 @@
 		action_Connect(w,user_data);
  }
 
- void action_Insert(void)
- {
- 	action_internal(ToggleInsert_action, IA_DEFAULT, CN, CN);
- }
-
- void action_Home(void)
- {
- 	action_internal(Home_action, IA_DEFAULT, CN, CN);
- }
-
- void action_DeleteWord(void)
- {
- 	action_internal(DeleteWord_action, IA_DEFAULT, CN, CN);
- }
-
- void action_DeleteField(void)
- {
- 	action_internal(DeleteField_action, IA_DEFAULT, CN, CN);
- }
-
- void action_Delete(void)
- {
- 	action_internal(Delete_action, IA_DEFAULT, CN, CN);
- }
-
- void action_BackSpace(void)
- {
- 	action_internal(Erase_action, IA_DEFAULT, CN, CN);
- }
-
- void action_EraseEOF(void)
- {
- 	action_internal(EraseEOF_action, IA_DEFAULT, CN, CN);
- }
-
  static void action_PrintScreen(GtkWidget *w, gpointer user_data)
  {
 	PrintText("g3270", GetScreenContents(TRUE));
@@ -390,7 +324,7 @@
  	static const char *authors[] = {	"Paul Mattes <Paul.Mattes@usa.net>",
 										"GTRC",
 										"Perry Werneck <perry.werneck@gmail.com>",
-										N_( "and others" ),
+										"and others",
 										NULL};
 
 	static const char license[] =
@@ -423,7 +357,6 @@
 							"license", 				gettext( license ),
 							"comments",				_( "3270 Terminal emulator for GTK."),
 							"version", 				PACKAGE_VERSION,
-							"translator-credits",	N_( "No Translators" ),
 							"wrap-license",			TRUE,
 							"logo",					logo,
 							NULL
@@ -599,6 +532,7 @@
 
  static void LoadToggleActions(GtkActionGroup *actions)
  {
+	// TODO (perry#9#): Add tooltips
  	static const struct _toggle_list
  	{
  		gboolean		set;
@@ -612,33 +546,35 @@
 		{ FALSE,	FULL_SCREEN,	NULL,	NULL,	GTK_STOCK_LEAVE_FULLSCREEN	},
 	};
 
+	// TODO (perry#9#): Add tooltips
  	static const struct _toggle_info
  	{
  		const gchar *label;
  		const gchar *tooltip;
  		const gchar *stock_id;
+ 		const gchar *accelerator;
 	}
 	toggle_info[N_TOGGLES] =
 	{
-		{ N_( "Monocase" ),				NULL,	NULL	},
-		{ N_( "Alt Cursor" ),			NULL,	NULL	},
-		{ N_( "Blink Cursor" ),			NULL,	NULL	},
-		{ N_( "Show timing" ),			NULL,	NULL	},
-		{ N_( "Show Cursor Position" ),	NULL,	NULL	},
-		{ N_( "DS Trace" ),				NULL,	NULL	},
-		{ N_( "Scroll bar" ),			NULL,	NULL	},
-		{ N_( "Line Wrap" ),			NULL,	NULL	},
-		{ N_( "Blank Fill" ),			NULL,	NULL	},
-		{ N_( "Screen Trace" ),			NULL,	NULL	},
-		{ N_( "Event Trace" ),			NULL,	NULL	},
-		{ N_( "Margined Paste" ),		NULL,	NULL	},
-		{ N_( "Rectangle Select" ),		NULL,	NULL	},
-		{ N_( "Cross Hair Cursor" ),	NULL,	NULL	},
-		{ N_( "Visible Control" ),		NULL,	NULL	},
-		{ N_( "Aid wait" ),				NULL,	NULL	},
-		{ N_( "Full Screen" ),			NULL,	NULL	},
-		{ N_( "Auto-Reconnect" ),		NULL,	NULL	},
-		{ N_( "Insert" ),				NULL,	NULL	}
+		{ N_( "Monocase" ),				NULL,	NULL,	NULL				},
+		{ N_( "Alt Cursor" ),			NULL,	NULL,	NULL				},
+		{ N_( "Blink Cursor" ),			NULL,	NULL,	NULL				},
+		{ N_( "Show timing" ),			NULL,	NULL,	NULL				},
+		{ N_( "Show Cursor Position" ),	NULL,	NULL,	NULL				},
+		{ N_( "DS Trace" ),				NULL,	NULL,	NULL				},
+		{ N_( "Scroll bar" ),			NULL,	NULL,	NULL				},
+		{ N_( "Line Wrap" ),			NULL,	NULL,	NULL				},
+		{ N_( "Blank Fill" ),			NULL,	NULL,	NULL				},
+		{ N_( "Screen Trace" ),			NULL,	NULL,	NULL				},
+		{ N_( "Event Trace" ),			NULL,	NULL,	NULL				},
+		{ N_( "Margined Paste" ),		NULL,	NULL,	NULL				},
+		{ N_( "Rectangle Select" ),		NULL,	NULL,	NULL				},
+		{ N_( "Cross Hair Cursor" ),	NULL,	NULL,	N_( "<alt>X" )		},
+		{ N_( "Visible Control" ),		NULL,	NULL,	NULL				},
+		{ N_( "Aid wait" ),				NULL,	NULL,	NULL				},
+		{ N_( "Full Screen" ),			NULL,	NULL,	N_( "<alt>Home" )	},
+		{ N_( "Auto-Reconnect" ),		NULL,	NULL,	NULL				},
+		{ N_( "Insert" ),				NULL,	NULL,	"Insert"			}
 	};
 
  	int f;
@@ -658,7 +594,11 @@
 			gtk_toggle_action_set_active(action,Toggled(f));
 			g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_action),(gpointer) f);
 
-			gtk_action_group_add_action(actions,(GtkAction *) action);
+			if(toggle_info[f].accelerator)
+				gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(toggle_info[f].accelerator));
+			else
+				gtk_action_group_add_action(actions,(GtkAction *) action);
+
 		}
  	}
 
@@ -696,6 +636,54 @@
 
  }
 
+ static void call3270(GtkAction *action, XtActionProc call)
+ {
+ 	action_internal(call, IA_DEFAULT, CN, CN);
+ }
+
+ static void Load3270Actions(GtkActionGroup *actions)
+ {
+	// TODO (perry#9#): Add tooltips
+ 	static const struct _action_info
+ 	{
+ 		const gchar *name;
+ 		const gchar *label;
+ 		const gchar *tooltip;
+ 		const gchar *stock_id;
+ 		XtActionProc call;
+ 		const gchar *accelerator;
+	} action_info[] =
+	{
+		{ "EraseEOF",		N_( "EraseEOF" ),		NULL,	NULL,	EraseEOF_action,	"End"			},
+		{ "Home",			N_( "Home" ),			NULL,	NULL,	Home_action,		"Home"			},
+		{ "DeleteWord",		N_( "Delete Word" ),	NULL,	NULL,	DeleteWord_action,	N_( "<Ctrl>w" )	},
+		{ "DeleteField",	N_( "Delete Field" ),	NULL,	NULL,	DeleteField_action,	N_( "<Ctrl>u" ) },
+		{ "Delete",			N_( "Delete Char" ),	NULL,	NULL,	Delete_action,		"Delete" 		},
+		{ "Erase",			N_( "Backspace" ),		NULL,	NULL,	Erase_action,		"BackSpace" 	},
+		{ "NextField",		N_( "Next field" ),		NULL,	NULL,	Tab_action,			"Tab"			}
+	};
+
+	int f;
+
+ 	for(f=0;f<G_N_ELEMENTS(action_info);f++)
+ 	{
+		GtkAction *action = gtk_action_new(	action_info[f].name,
+											gettext(action_info[f].label),
+											gettext(action_info[f].tooltip),
+											action_info[f].stock_id );
+
+		g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(call3270),(gpointer) action_info[f].call);
+
+		if(action_info[f].accelerator)
+			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(action_info[f].accelerator));
+		else
+			gtk_action_group_add_action(actions,(GtkAction *) action);
+
+ 	}
+
+ }
+
+
  GtkUIManager * LoadApplicationUI(GtkWidget *widget)
  {
 	GtkUIManager 	*ui_manager = gtk_ui_manager_new(); // http://library.gnome.org/devel/gtk/stable/GtkUIManager.html
@@ -707,8 +695,9 @@
 	gtk_action_group_set_translation_domain(main_actions, GETTEXT_PACKAGE);
 
 	gtk_action_group_add_actions(main_actions, internal_action_entries, G_N_ELEMENTS (internal_action_entries), topwindow);
-	gtk_action_group_add_toggle_actions(main_actions,internal_action_toggles, G_N_ELEMENTS(internal_action_toggles),0);
+//	gtk_action_group_add_toggle_actions(main_actions,internal_action_toggles, G_N_ELEMENTS(internal_action_toggles),0);
 
+	Load3270Actions(main_actions);
 	LoadCustomActions(main_actions);
 	LoadToggleActions(main_actions);
 
