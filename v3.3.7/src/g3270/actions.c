@@ -64,6 +64,7 @@
  static void action_SaveSelected(void);
  static void action_SaveClipboard(void);
  static void action_DumpScreen(void);
+ static void action_LoadScreenDump(void);
 
 /*---[ Callback tables ]----------------------------------------------------------------------------------------*/
 
@@ -113,69 +114,70 @@
  static const GtkActionEntry internal_action_entries[] =
  {
  	/* Top menus */
- 	{	"FileMenu",			NULL,					N_( "_File" ),			NULL,			NULL,	NULL								},
- 	{	"NetworkMenu",		NULL,					N_( "_Network" ),		NULL,			NULL,	NULL								},
- 	{	"HelpMenu",			NULL,					N_( "Help" ),			NULL,			NULL,	NULL								},
- 	{	"EditMenu",			NULL,					N_( "_Edit" ),			NULL,			NULL,	NULL								},
- 	{	"OptionsMenu",		NULL,					N_( "_Options" ),		NULL,			NULL,	NULL								},
- 	{	"SettingsMenu",		NULL,					N_( "Settings" ),		NULL,			NULL,	NULL								},
-	{	"FontSettings",		GTK_STOCK_SELECT_FONT,	N_( "Select font" ),	NULL,			NULL,	NULL								},
+ 	{	"FileMenu",			NULL,					N_( "_File" ),				NULL,			NULL,	NULL								},
+ 	{	"NetworkMenu",		NULL,					N_( "_Network" ),			NULL,			NULL,	NULL								},
+ 	{	"HelpMenu",			NULL,					N_( "Help" ),				NULL,			NULL,	NULL								},
+ 	{	"EditMenu",			NULL,					N_( "_Edit" ),				NULL,			NULL,	NULL								},
+ 	{	"OptionsMenu",		NULL,					N_( "_Options" ),			NULL,			NULL,	NULL								},
+ 	{	"SettingsMenu",		NULL,					N_( "Settings" ),			NULL,			NULL,	NULL								},
+	{	"FontSettings",		GTK_STOCK_SELECT_FONT,	N_( "Select font" ),		NULL,			NULL,	NULL								},
 
  	/* Stock menus */
- 	{	"Preferences",		GTK_STOCK_PREFERENCES,	N_( "Preferences" ),	NULL,			NULL,	NULL								},
- 	{	"Network",			GTK_STOCK_NETWORK,		N_( "Network" ),		NULL,			NULL,	NULL								},
- 	{	"Properties",		GTK_STOCK_PROPERTIES,	N_( "Properties" ),		NULL,			NULL,	NULL								},
+ 	{	"Preferences",		GTK_STOCK_PREFERENCES,	N_( "Preferences" ),		NULL,			NULL,	NULL								},
+ 	{	"Network",			GTK_STOCK_NETWORK,		N_( "Network" ),			NULL,			NULL,	NULL								},
+ 	{	"Properties",		GTK_STOCK_PROPERTIES,	N_( "Properties" ),			NULL,			NULL,	NULL								},
 
 	/* Misc actions */
- 	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),			NULL,			NULL,	G_CALLBACK(action_About)			},
- 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),		NULL,			NULL,	G_CALLBACK(action_Connect)			},
- 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),	NULL,			NULL,	G_CALLBACK(action_Disconnect)		},
- 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),			NULL,			NULL,	G_CALLBACK(action_Quit)				},
- 	{	"SelectColors",		GTK_STOCK_SELECT_COLOR,	N_( "Colors" ),			NULL,			NULL,	G_CALLBACK(action_SelectColors)		},
-	{	"DumpScreen",		NULL,					N_( "Dump screen" ),	"<Alt>D",		NULL,	G_CALLBACK(action_DumpScreen)		},
+ 	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),				NULL,			NULL,	G_CALLBACK(action_About)			},
+ 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),			NULL,			NULL,	G_CALLBACK(action_Connect)			},
+ 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),		NULL,			NULL,	G_CALLBACK(action_Disconnect)		},
+ 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),				NULL,			NULL,	G_CALLBACK(action_Quit)				},
+ 	{	"SelectColors",		GTK_STOCK_SELECT_COLOR,	N_( "Colors" ),				NULL,			NULL,	G_CALLBACK(action_SelectColors)		},
+	{	"DumpScreen",		NULL,					N_( "Dump screen" ),		"<Alt>D",		NULL,	G_CALLBACK(action_DumpScreen)		},
+	{	"LoadScreenDump",	NULL,					N_( "Load screen dump" ),	"<Alt>R",		NULL,	G_CALLBACK(action_LoadScreenDump)	},
 
  	/* Edit actions */
- 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),			NULL,			NULL,	G_CALLBACK(action_Copy)				},
- 	{	"Append",			GTK_STOCK_ADD,			N_( "Add to copy" ),	NULL,			NULL,	G_CALLBACK(action_Append)			},
- 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),			NULL,			NULL,	G_CALLBACK(action_Paste)			},
- 	{	"PasteNext",		NULL,					N_( "Paste _next" ),	NULL,			NULL,	G_CALLBACK(action_PasteNext)		},
- 	{	"Unselect",			NULL,					N_( "_Unselect" ),		NULL,			NULL,	G_CALLBACK(action_ClearSelection)	},
- 	{	"Reselect",			NULL,					N_( "_Reselect" ),		NULL,			NULL,	G_CALLBACK(Reselect)				},
- 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),		"<Alt>A",		NULL,	G_CALLBACK(action_SelectAll)		},
- 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),	"Clear",		NULL,	G_CALLBACK(action_Clear)			},
+ 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),				NULL,			NULL,	G_CALLBACK(action_Copy)				},
+ 	{	"Append",			GTK_STOCK_ADD,			N_( "Add to copy" ),		NULL,			NULL,	G_CALLBACK(action_Append)			},
+ 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),				NULL,			NULL,	G_CALLBACK(action_Paste)			},
+ 	{	"PasteNext",		NULL,					N_( "Paste _next" ),		NULL,			NULL,	G_CALLBACK(action_PasteNext)		},
+ 	{	"Unselect",			NULL,					N_( "_Unselect" ),			NULL,			NULL,	G_CALLBACK(action_ClearSelection)	},
+ 	{	"Reselect",			NULL,					N_( "_Reselect" ),			NULL,			NULL,	G_CALLBACK(Reselect)				},
+ 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Alt>A",		NULL,	G_CALLBACK(action_SelectAll)		},
+ 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),		"Clear",		NULL,	G_CALLBACK(action_Clear)			},
 
  	/* Printer actions */
-	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),			"Print",		NULL,	G_CALLBACK(action_PrintScreen)		},
-	{	"PrintSelected",	NULL,					N_( "Print selected" ),	NULL,			NULL,	G_CALLBACK(action_PrintSelected)	},
-	{	"PrintClipboard",	NULL,					N_( "Print copy" ),		NULL,			NULL,	G_CALLBACK(action_PrintClipboard)	},
+	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),				"Print",		NULL,	G_CALLBACK(action_PrintScreen)		},
+	{	"PrintSelected",	NULL,					N_( "Print selected" ),		NULL,			NULL,	G_CALLBACK(action_PrintSelected)	},
+	{	"PrintClipboard",	NULL,					N_( "Print copy" ),			NULL,			NULL,	G_CALLBACK(action_PrintClipboard)	},
 
  	/* Save actions */
- 	{	"Save",				GTK_STOCK_SAVE,			N_( "Save" ),			NULL,			NULL,	NULL								},
-	{	"SaveScreen",		NULL,					N_( "Save screen" ),	NULL,			NULL,	G_CALLBACK(action_SaveScreen)		},
-	{	"SaveSelected",		NULL,					N_( "Save selected" ),	NULL,			NULL,	G_CALLBACK(action_SaveSelected)		},
-	{	"SaveClipboard",	NULL,					N_( "Save copy" ),		NULL,			NULL,	G_CALLBACK(action_SaveClipboard)	},
+ 	{	"Save",				GTK_STOCK_SAVE,			N_( "Save" ),				NULL,			NULL,	NULL								},
+	{	"SaveScreen",		NULL,					N_( "Save screen" ),		NULL,			NULL,	G_CALLBACK(action_SaveScreen)		},
+	{	"SaveSelected",		NULL,					N_( "Save selected" ),		NULL,			NULL,	G_CALLBACK(action_SaveSelected)		},
+	{	"SaveClipboard",	NULL,					N_( "Save copy" ),			NULL,			NULL,	G_CALLBACK(action_SaveClipboard)	},
 
 	/* Select actions */
-	{ 	"SelectRight",		NULL,					N_( "Select Right" ),	"<Shift>Right",	NULL,	G_CALLBACK(action_SelectRight)		},
-	{ 	"SelectLeft",		NULL,					N_( "Select Left" ),	"<Shift>Left",	NULL,	G_CALLBACK(action_SelectLeft)		},
-	{ 	"SelectUp",			NULL,					N_( "Select Up" ),		"<Shift>Up",	NULL,	G_CALLBACK(action_SelectUp)			},
-	{ 	"SelectDown",		NULL,					N_( "Select Down" ),	"<Shift>Down",	NULL,	G_CALLBACK(action_SelectDown)		},
-	{	"SelectField",		NULL,					N_( "Select Field" ),	"<Ctrl>f",		NULL,	G_CALLBACK(action_SelectField)		},
+	{ 	"SelectRight",		NULL,					N_( "Select Right" ),		"<Shift>Right",	NULL,	G_CALLBACK(action_SelectRight)		},
+	{ 	"SelectLeft",		NULL,					N_( "Select Left" ),		"<Shift>Left",	NULL,	G_CALLBACK(action_SelectLeft)		},
+	{ 	"SelectUp",			NULL,					N_( "Select Up" ),			"<Shift>Up",	NULL,	G_CALLBACK(action_SelectUp)			},
+	{ 	"SelectDown",		NULL,					N_( "Select Down" ),		"<Shift>Down",	NULL,	G_CALLBACK(action_SelectDown)		},
+	{	"SelectField",		NULL,					N_( "Select Field" ),		"<Ctrl>f",		NULL,	G_CALLBACK(action_SelectField)		},
 
 	/* Cursor Movement */
-	{ 	"CursorRight",		GTK_STOCK_GO_FORWARD,	N_( "Right" ),			"Right",		NULL,	G_CALLBACK(action_Right)			},
-	{ 	"CursorLeft",		GTK_STOCK_GO_BACK,		N_( "Left" ),			"Left",			NULL,	G_CALLBACK(action_Left)				},
-	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),				"Up",			NULL,	G_CALLBACK(action_Up)				},
-	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),			"Down",			NULL,	G_CALLBACK(action_Down)				},
-	{ 	"Enter",			NULL,					N_( "Enter" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
+	{ 	"CursorRight",		GTK_STOCK_GO_FORWARD,	N_( "Right" ),				"Right",		NULL,	G_CALLBACK(action_Right)			},
+	{ 	"CursorLeft",		GTK_STOCK_GO_BACK,		N_( "Left" ),				"Left",			NULL,	G_CALLBACK(action_Left)				},
+	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),					"Up",			NULL,	G_CALLBACK(action_Up)				},
+	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),				"Down",			NULL,	G_CALLBACK(action_Down)				},
+	{ 	"Enter",			NULL,					N_( "Enter" ),				"Return",		NULL,	G_CALLBACK(action_Enter)			},
 
 	/* Terminal Actions */
-	{ 	"Reset",			NULL,					N_( "Reset" ),			"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
-	{ 	"Escape",			NULL,					N_( "Escape" ),			"Escape",		NULL,	G_CALLBACK(action_Reset)			},
-	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),			"Return",		NULL,	G_CALLBACK(action_Enter)			},
-	{	"PageUP",			NULL,					N_( "Page-Up" ),		"Page_Up",		NULL,	G_CALLBACK(action_PageUP) 			},
-	{	"PageDown",			NULL,					N_( "Page-Down" ),		"Page_Down",	NULL,	G_CALLBACK(action_PageDown)			},
-	{	"Redraw",			NULL,					N_( "Redraw screen" ),	NULL,			NULL,	G_CALLBACK(action_Redraw)			},
+	{ 	"Reset",			NULL,					N_( "Reset" ),				"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
+	{ 	"Escape",			NULL,					N_( "Escape" ),				"Escape",		NULL,	G_CALLBACK(action_Reset)			},
+	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",		NULL,	G_CALLBACK(action_Enter)			},
+	{	"PageUP",			NULL,					N_( "Page-Up" ),			"Page_Up",		NULL,	G_CALLBACK(action_PageUP) 			},
+	{	"PageDown",			NULL,					N_( "Page-Down" ),			"Page_Down",	NULL,	G_CALLBACK(action_PageDown)			},
+	{	"Redraw",			NULL,					N_( "Redraw screen" ),		NULL,			NULL,	G_CALLBACK(action_Redraw)			},
  };
 
  GtkActionGroup	*main_actions = NULL;
@@ -860,6 +862,41 @@
 	gtk_widget_destroy(dialog);
  	g_free(text);
  	return 0;
+ }
+
+ static void action_LoadScreenDump(void)
+ {
+	GtkWidget *dialog = gtk_file_chooser_dialog_new( _( "Load screen dump" ),
+                                                     GTK_WINDOW(topwindow),
+													 GTK_FILE_CHOOSER_ACTION_OPEN,
+                                                     GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
+                                                     GTK_STOCK_OPEN,	GTK_RESPONSE_ACCEPT,
+                                                     NULL );
+
+
+	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	{
+		GError		*error = NULL;
+		gchar		*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+		gsize		sz;
+		struct ea	*buffer	= NULL;
+
+		if(!g_file_get_contents(filename, (gchar **) &buffer, &sz, &error))
+		{
+			popup_an_error( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			g_error_free(error);
+		}
+		else
+		{
+			sz /= sizeof(struct ea);
+			if(set_device_buffer(buffer,sz))
+				popup_an_error( N_( "Can't set device buffer contents" ) );
+		}
+
+		g_free(buffer);
+	}
+
+	gtk_widget_destroy(dialog);
  }
 
  static void action_DumpScreen(void)

@@ -1044,6 +1044,18 @@ extern void popup_an_error(const char *fmt, ...)
 
 }
 
+int set_device_buffer(struct ea *src, int el)
+{
+	if(el > (maxROWS * maxCOLS))
+		return EINVAL;
+
+	memcpy(ea_buf,src,sizeof(struct ea) * el);
+
+	screen_disp();
+
+	return 0;
+}
+
 struct ea * copy_device_buffer(int *el)
 {
 	int			sz		=  sizeof(struct ea) * (maxROWS * maxCOLS);

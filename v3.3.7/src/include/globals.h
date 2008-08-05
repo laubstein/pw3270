@@ -250,6 +250,7 @@ struct ea {
 #define CS_GE		0x04	/* cs flag for Graphic Escape */
 
 struct ea * copy_device_buffer(int *el);	/* Return a "malloced" copy of the device buffer, set number of elements */
+int set_device_buffer(struct ea *src, int el);	/* Set the contents of the device buffer for debugging purposes */
 
 /*   translation lists */
 struct trans_list {
