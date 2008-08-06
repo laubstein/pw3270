@@ -199,5 +199,18 @@
 	void			settitle(char *text);
 	GKeyFile 		*GetConf(void);
 
+	enum _SELECT_MODE
+	{
+		SELECT_MODE_NONE,
+		SELECT_MODE_TEXT,
+		SELECT_MODE_RECTANGLE,
+		SELECT_MODE_FIELD,
+		SELECT_MODE_COPY,
+		SELECT_MODE_APPEND,
+
+		SELECT_MODE_INVALID
+	};
+
+	void SetSelectionMode(int m);
 
 #endif // G3270_H_INCLUDED

@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-08-05 15:36-0300\n"
-"PO-Revision-Date: 2008-08-05 15:37-0300\n"
+"PO-Revision-Date: 2008-08-05 17:13-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -281,7 +281,7 @@ msgstr ""
 
 #: colors.c:261
 msgid "Locked status"
-msgstr ""
+msgstr "Bloqueada"
 
 #: actions.c:574
 msgid "Margined Paste"
@@ -314,7 +314,7 @@ msgstr ""
 
 #: colors.c:260
 msgid "Normal status"
-msgstr ""
+msgstr "Situação normal"
 
 #: colors.c:247
 msgid "Normal/Protected"
