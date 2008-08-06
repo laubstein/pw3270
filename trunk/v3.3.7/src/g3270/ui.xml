@@ -115,5 +115,11 @@
 	<accelerator action='DumpScreen' />
 	<accelerator action='LoadScreenDump' />
 	<accelerator action='SysREQ'/>
+	<accelerator action='SelectRight' />
+	<accelerator action='SelectLeft' />
+	<accelerator action='SelectUp' />
+	<accelerator action='SelectDown' />
+	<accelerator action='ShiftPageUP' />
+	<accelerator action='ShiftPageDown' />
 
 </ui>

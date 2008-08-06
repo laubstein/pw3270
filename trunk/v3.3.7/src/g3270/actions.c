@@ -42,7 +42,7 @@
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
- static void action_pf(GtkWidget *w, gpointer id);
+// static void action_pf(GtkWidget *w, gpointer id);
  static void action_Clear(GtkWidget *w, gpointer user_data);
  static void action_Up(GtkWidget *w, gpointer user_data);
  static void action_Down(GtkWidget *w, gpointer user_data);
@@ -69,15 +69,9 @@
 /*---[ Callback tables ]----------------------------------------------------------------------------------------*/
 
  #ifdef DEBUG
-	#define LIB3270_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_lib3270, (gpointer) action, #action }
-	#define PF_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_pf, (gpointer) action, "action_pf(" #action ")" }
 	#define G3270_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action, 0, #action }
-	#define TOGGLE_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action_Toggle, (gpointer) action, "action_Toggle(" #action ")" }
  #else
-	#define LIB3270_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action_lib3270, (gpointer) action }
-	#define PF_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action_pf, (gpointer) action }
 	#define G3270_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action, 0 }
-	#define TOGGLE_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action_Toggle, (gpointer) action }
  #endif
 
  struct WindowActions
@@ -175,35 +169,16 @@
 	{ 	"Reset",			NULL,					N_( "Reset" ),				"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
 	{ 	"Escape",			NULL,					N_( "Escape" ),				"Escape",		NULL,	G_CALLBACK(action_Reset)			},
 	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",		NULL,	G_CALLBACK(action_Enter)			},
-//	{	"PageUP",			NULL,					N_( "Page-Up" ),			"Page_Up",		NULL,	G_CALLBACK(action_PageUP) 			},
-//	{	"PageDown",			NULL,					N_( "Page-Down" ),			"Page_Down",	NULL,	G_CALLBACK(action_PageDown)			},
 	{	"Redraw",			NULL,					N_( "Redraw screen" ),		NULL,			NULL,	G_CALLBACK(action_Redraw)			},
  };
 
  GtkActionGroup	*main_actions = NULL;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
-
+/*
  static void action_pf(GtkWidget *w, gpointer id)
  {
 	action_internal(PF_action, IA_DEFAULT, id, CN);
- }
-
-/*
- void action_PageUP(GtkWidget *w, gpointer user_data)
- {
-	WaitingForChanges = TRUE;
-
-	// TODO (perry#1#): Read FN association from configuration file.
-	action_internal(PF_action, IA_DEFAULT, "7", CN);
- }
-
- void action_PageDown(GtkWidget *w, gpointer user_data)
- {
-	WaitingForChanges = TRUE;
-
-	// TODO (perry#1#): Read FN association from configuration file.
-	action_internal(PF_action, IA_DEFAULT, "8", CN);
  }
 */
 
@@ -520,6 +495,9 @@
 					parm[p] = g_key_file_get_string(conf,group[f],name[p],NULL);
 			}
 
+			if(!parm[0])
+				parm[0] = group[f];
+
 			for(p=0;p<G_N_ELEMENTS(call) && !run;p++)
 			{
 				if(!strcmp(parm[3],call[p].name))
@@ -821,16 +799,6 @@
  	// TODO (perry#2#): Put all keyboard actions as accelerators.
  	static const struct WindowActions keyproc[] =
  	{
-        G3270_ACTION(	GDK_KP_Left,		GDK_SHIFT_MASK,		action_SelectLeft),
-        G3270_ACTION(	GDK_KP_Up,			GDK_SHIFT_MASK,		action_SelectUp),
-        G3270_ACTION(	GDK_KP_Right,		GDK_SHIFT_MASK,		action_SelectRight),
-        G3270_ACTION(	GDK_KP_Down,		GDK_SHIFT_MASK,		action_SelectDown),
-
-        G3270_ACTION(	GDK_Left,			GDK_SHIFT_MASK,		action_SelectLeft),
-        G3270_ACTION(	GDK_Up,				GDK_SHIFT_MASK,		action_SelectUp),
-        G3270_ACTION(	GDK_Right,			GDK_SHIFT_MASK,		action_SelectRight),
-        G3270_ACTION(	GDK_Down,			GDK_SHIFT_MASK,		action_SelectDown),
-
 		G3270_ACTION(	GDK_Left,			0,					action_Left),
 		G3270_ACTION(	GDK_Up,				0,					action_Up),
 		G3270_ACTION(	GDK_Right,			0,					action_Right),
@@ -845,9 +813,8 @@
 		G3270_ACTION(	GDK_Tab,			0,					action_Tab),
 		G3270_ACTION(	GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab),
 
-		PF_ACTION(		GDK_Page_Up,		GDK_SHIFT_MASK,		"23"),
-		PF_ACTION(		GDK_Page_Down,		GDK_SHIFT_MASK,		"24"),
-
+//		PF_ACTION(		GDK_Page_Up,		GDK_SHIFT_MASK,		"23"),
+//		PF_ACTION(		GDK_Page_Down,		GDK_SHIFT_MASK,		"24"),
  	};
 
  	int		f;
