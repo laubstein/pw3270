@@ -698,7 +698,14 @@
 							NULL,
 							NULL,
 							Tab_action,
-							"Tab" }
+							"Tab" },
+
+		{ "SysREQ",			N_( "Sys Req" ),
+							NULL,
+							NULL,
+							SysReq_action,
+							"Sys_Req" },
+
 	};
 
 	int f;

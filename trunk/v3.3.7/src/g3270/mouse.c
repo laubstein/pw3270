@@ -38,18 +38,6 @@
 										row = ( (((unsigned long) event->y) - top_margin)/fHeight );
 
 
- enum _SELECT_MODE
- {
-	SELECT_MODE_NONE,
-	SELECT_MODE_TEXT,
-	SELECT_MODE_RECTANGLE,
-	SELECT_MODE_FIELD,
-	SELECT_MODE_COPY,
-	SELECT_MODE_APPEND,
-
-	SELECT_MODE_INVALID
- };
-
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
  static void UpdateSelectedRegion(int start, int end);
@@ -73,7 +61,7 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
- static void SetMode(int m)
+ void SetSelectionMode(int m)
  {
  	static const gchar	*name[] = { "Copy", "Append", "PrintSelected", "SaveSelected", "Unselect" };
  	int						f;
@@ -129,6 +117,8 @@
 	}
 
 	SelectField(cRow,cCol);
+
+	SetSelectionMode(SELECT_MODE_FIELD);
 
 	if(redraw && terminal && pixmap)
 	{
@@ -218,7 +208,7 @@
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1 | BUTTON_FLAG_COMBO:
 		DecodePosition(event,startRow,startCol);
-		SetMode(SELECT_MODE_FIELD);
+		SetSelectionMode(SELECT_MODE_FIELD);
 		Trace("Button 1 double-clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
 		break;
 
@@ -238,12 +228,12 @@
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 3 | BUTTON_FLAG_COMBO:
 		Trace("Button 2 double-clicked in combo mode at %ld,%ld",(long) event->x, (long) event->y);
-		SetMode(SELECT_MODE_APPEND);
+		SetSelectionMode(SELECT_MODE_APPEND);
 		break;
 
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3 | BUTTON_FLAG_COMBO:
 		Trace("Button 2 clicked in combo mode at %ld,%ld",(long) event->x, (long) event->y);
-		SetMode(SELECT_MODE_COPY);
+		SetSelectionMode(SELECT_MODE_COPY);
 		break;
 
 #ifdef DEBUG
@@ -432,7 +422,7 @@
 		return;
 
 	action_ClearSelection();
-	SetMode(value ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
+	SetSelectionMode(value ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 
 	if(mode == SELECT_MODE_TEXT)
 		UpdateSelectedText();
@@ -442,7 +432,7 @@
 
  void Reselect(void)
  {
-	SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
+	SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 	if(mode == SELECT_MODE_TEXT)
 		UpdateSelectedText();
 	else
@@ -454,7 +444,7 @@
  	switch(mode)
  	{
 	case SELECT_MODE_NONE:	// Starting selection
-		SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
+		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 		return mouse_motion(widget,event,user_data); // Recursive call to update selection box
 
 	case SELECT_MODE_RECTANGLE:
@@ -488,20 +478,20 @@
  void action_ClearSelection(void)
  {
 	SetSelection(FALSE);
-	SetMode(SELECT_MODE_NONE);
+	SetSelectionMode(SELECT_MODE_NONE);
  }
 
  void action_SelectAll(GtkWidget *w, gpointer user_data)
  {
  	SetSelection(TRUE);
-	SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
+	SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  }
 
  void action_SelectLeft(GtkWidget *w, gpointer user_data)
  {
  	if(mode == SELECT_MODE_NONE)
  	{
- 		SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
+ 		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}
@@ -517,7 +507,7 @@
  {
  	if(mode == SELECT_MODE_NONE)
  	{
- 		SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
+ 		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}
@@ -533,7 +523,7 @@
  {
  	if(mode == SELECT_MODE_NONE)
  	{
- 		SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
+ 		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}
@@ -549,7 +539,7 @@
  {
  	if(mode == SELECT_MODE_NONE)
  	{
- 		SetMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
+ 		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  		startRow = endRow = cRow;
  		startCol = endCol = cCol;
  	}

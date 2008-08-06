@@ -114,5 +114,6 @@
 	<accelerator action='NextField' />
 	<accelerator action='DumpScreen' />
 	<accelerator action='LoadScreenDump' />
+	<accelerator action='SysREQ'/>
 
 </ui>
