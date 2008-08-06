@@ -152,11 +152,18 @@
 	{	"SaveClipboard",	NULL,					N_( "Save copy" ),			NULL,			NULL,	G_CALLBACK(action_SaveClipboard)	},
 
 	/* Select actions */
+	{	"SelectField",		NULL,					N_( "Select Field" ),		"<Ctrl>f",		NULL,	G_CALLBACK(action_SelectField)		},
+
 	{ 	"SelectRight",		NULL,					N_( "Select Right" ),		"<Shift>Right",	NULL,	G_CALLBACK(action_SelectRight)		},
 	{ 	"SelectLeft",		NULL,					N_( "Select Left" ),		"<Shift>Left",	NULL,	G_CALLBACK(action_SelectLeft)		},
 	{ 	"SelectUp",			NULL,					N_( "Select Up" ),			"<Shift>Up",	NULL,	G_CALLBACK(action_SelectUp)			},
 	{ 	"SelectDown",		NULL,					N_( "Select Down" ),		"<Shift>Down",	NULL,	G_CALLBACK(action_SelectDown)		},
-	{	"SelectField",		NULL,					N_( "Select Field" ),		"<Ctrl>f",		NULL,	G_CALLBACK(action_SelectField)		},
+
+	{	"SelectionRight",	NULL,					N_( "Selection Right" ),	"<Alt>Right",	NULL,	G_CALLBACK(action_SelectionRight)	},
+	{	"SelectionLeft",	NULL,					N_( "Selection Left" ),		"<Alt>Left",	NULL,	G_CALLBACK(action_SelectionLeft)	},
+	{	"SelectionUp",		NULL,					N_( "Selection Up" ),		"<Alt>Up",		NULL,	G_CALLBACK(action_SelectionUp)		},
+	{	"SelectionDown",	NULL,					N_( "Selection Down" ),		"<Alt>Down",	NULL,	G_CALLBACK(action_SelectionDown)	},
+
 
 	/* Cursor Movement */
 	{ 	"CursorRight",		GTK_STOCK_GO_FORWARD,	N_( "Right" ),				"Right",		NULL,	G_CALLBACK(action_Right)			},
@@ -175,12 +182,6 @@
  GtkActionGroup	*main_actions = NULL;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
-/*
- static void action_pf(GtkWidget *w, gpointer id)
- {
-	action_internal(PF_action, IA_DEFAULT, id, CN);
- }
-*/
 
  void action_Clear(GtkWidget *w, gpointer user_data)
  {
@@ -813,8 +814,6 @@
 		G3270_ACTION(	GDK_Tab,			0,					action_Tab),
 		G3270_ACTION(	GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab),
 
-//		PF_ACTION(		GDK_Page_Up,		GDK_SHIFT_MASK,		"23"),
-//		PF_ACTION(		GDK_Page_Down,		GDK_SHIFT_MASK,		"24"),
  	};
 
  	int		f;

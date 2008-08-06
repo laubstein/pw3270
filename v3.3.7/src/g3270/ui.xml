@@ -119,6 +119,11 @@
 	<accelerator action='SelectLeft' />
 	<accelerator action='SelectUp' />
 	<accelerator action='SelectDown' />
+	<accelerator action='SelectionRight' />
+	<accelerator action='SelectionLeft' />
+	<accelerator action='SelectionUp' />
+	<accelerator action='SelectionDown' />
+
 	<accelerator action='ShiftPageUP' />
 	<accelerator action='ShiftPageDown' />
 

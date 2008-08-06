@@ -155,8 +155,6 @@
 	gboolean 	mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 	gboolean 	mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
-//	void 		action_PageDown(GtkWidget *w, gpointer user_data);
-//	void 		action_PageUP(GtkWidget *w, gpointer user_data);
 	void 		action_Paste(GtkWidget *w, gpointer user_data);
 	void 		action_PasteNext(GtkWidget *w, gpointer user_data);
 	void 		action_SelectAll(GtkWidget *w, gpointer user_data);
@@ -164,6 +162,10 @@
 	void		action_SelectUp(GtkWidget *w, gpointer user_data);
 	void		action_SelectRight(GtkWidget *w, gpointer user_data);
 	void		action_SelectDown(GtkWidget *w, gpointer user_data);
+	void		action_SelectionLeft(GtkWidget *w, gpointer user_data);
+	void		action_SelectionUp(GtkWidget *w, gpointer user_data);
+	void		action_SelectionRight(GtkWidget *w, gpointer user_data);
+	void		action_SelectionDown(GtkWidget *w, gpointer user_data);
 
 	void 		action_Append(void);
 	void 		action_Copy(void);

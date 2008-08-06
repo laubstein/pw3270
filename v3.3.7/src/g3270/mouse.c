@@ -530,3 +530,45 @@
  	doSelect(Down_action);
  }
 
+ static void MoveSelection(int row, int col)
+ {
+ 	if(mode == SELECT_MODE_NONE)
+		return;
+
+	startRow 	+= row;
+	endRow 		+= row;
+	startCol 	+= col;
+	endCol 		+= col;
+
+	Reselect();
+
+ }
+
+ void action_SelectionUp(GtkWidget *w, gpointer user_data)
+ {
+	if(startRow > 0 && endRow > 0)
+		MoveSelection(-1,0);
+ }
+
+ void action_SelectionDown(GtkWidget *w, gpointer user_data)
+ {
+ 	int maxrow = terminal_rows-1;
+
+	if(startRow < maxrow && endRow < maxrow)
+		MoveSelection(1,0);
+ }
+
+ void action_SelectionLeft(GtkWidget *w, gpointer user_data)
+ {
+	if(startCol > 0 && endCol > 0)
+		MoveSelection(0,-1);
+ }
+
+ void action_SelectionRight(GtkWidget *w, gpointer user_data)
+ {
+ 	int maxcol = terminal_cols-1;
+
+	if(startCol < maxcol && endCol < maxcol)
+		MoveSelection(0,1);
+ }
+
