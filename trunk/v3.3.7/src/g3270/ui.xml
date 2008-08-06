@@ -112,8 +112,6 @@
 	<accelerator action='PageUP' />
 	<accelerator action='PageDown' />
 	<accelerator action='NextField' />
-	<accelerator action='DumpScreen' />
-	<accelerator action='LoadScreenDump' />
 	<accelerator action='SysREQ'/>
 	<accelerator action='SelectRight' />
 	<accelerator action='SelectLeft' />
@@ -124,7 +122,15 @@
 	<accelerator action='SelectionUp' />
 	<accelerator action='SelectionDown' />
 
+	<accelerator action='CursorRight' />
+	<accelerator action='CursorLeft' />
+	<accelerator action='CursorUp' />
+	<accelerator action='CursorDown' />
+
 	<accelerator action='ShiftPageUP' />
 	<accelerator action='ShiftPageDown' />
+
+	<accelerator action='DumpScreen' />
+	<accelerator action='LoadScreenDump' />
 
 </ui>

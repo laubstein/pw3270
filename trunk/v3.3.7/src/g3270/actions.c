@@ -42,7 +42,6 @@
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
-// static void action_pf(GtkWidget *w, gpointer id);
  static void action_Clear(GtkWidget *w, gpointer user_data);
  static void action_Up(GtkWidget *w, gpointer user_data);
  static void action_Down(GtkWidget *w, gpointer user_data);
@@ -50,7 +49,7 @@
  static void action_Right(GtkWidget *w, gpointer user_data);
  static void action_Tab(GtkWidget *w, gpointer user_data);
  static void action_BackTab(GtkWidget *w, gpointer user_data);
- static void action_Reset(GtkWidget *w, gpointer user_data);
+// static void action_Reset(GtkWidget *w, gpointer user_data);
  static void action_Connect(GtkWidget *w, gpointer user_data);
  static void action_Enter(GtkWidget *w, gpointer user_data);
  static void action_Disconnect(GtkWidget *w, gpointer user_data);
@@ -173,8 +172,8 @@
 	{ 	"Enter",			NULL,					N_( "Enter" ),				"Return",		NULL,	G_CALLBACK(action_Enter)			},
 
 	/* Terminal Actions */
-	{ 	"Reset",			NULL,					N_( "Reset" ),				"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
-	{ 	"Escape",			NULL,					N_( "Escape" ),				"Escape",		NULL,	G_CALLBACK(action_Reset)			},
+//	{ 	"Reset",			NULL,					N_( "Reset" ),				"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
+//	{ 	"Escape",			NULL,					N_( "Escape" ),				"Escape",		NULL,	G_CALLBACK(action_Reset)			},
 	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",		NULL,	G_CALLBACK(action_Enter)			},
 	{	"Redraw",			NULL,					N_( "Redraw screen" ),		NULL,			NULL,	G_CALLBACK(action_Redraw)			},
  };
@@ -183,34 +182,35 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
- void action_Clear(GtkWidget *w, gpointer user_data)
+ static void clear_and_call(GtkAction *action, XtActionProc call)
  {
  	action_ClearSelection();
- 	action_internal(EraseInput_action, IA_DEFAULT, CN, CN);
+ 	action_internal(call, IA_DEFAULT, CN, CN);
+ }
+
+ void action_Clear(GtkWidget *w, gpointer user_data)
+ {
+ 	clear_and_call(NULL,EraseInput_action);
  }
 
  void action_Up(GtkWidget *w, gpointer user_data)
  {
-  	action_ClearSelection();
-	action_internal(Up_action, IA_DEFAULT, CN, CN);
+  	clear_and_call(NULL,Up_action);
  }
 
  void action_Down(GtkWidget *w, gpointer user_data)
  {
- 	action_ClearSelection();
- 	action_internal(Down_action, IA_DEFAULT, CN, CN);
+ 	clear_and_call(NULL,Down_action);
  }
 
  void action_Left(GtkWidget *w, gpointer user_data)
  {
- 	action_ClearSelection();
- 	action_internal(Left_action, IA_DEFAULT, CN, CN);
+ 	clear_and_call(NULL,Left_action);
  }
 
  void action_Right(GtkWidget *w, gpointer user_data)
  {
- 	action_ClearSelection();
- 	action_internal(Right_action, IA_DEFAULT, CN, CN);
+ 	clear_and_call(NULL,Right_action);
  }
 
  void action_Tab(GtkWidget *w, gpointer user_data)
@@ -221,12 +221,6 @@
  void action_BackTab(GtkWidget *w, gpointer user_data)
  {
  	action_internal(BackTab_action, IA_DEFAULT, CN, CN);
- }
-
- void action_Reset(GtkWidget *w, gpointer user_data)
- {
- 	action_ClearSelection();
- 	action_internal(Reset_action, IA_DEFAULT, CN, CN);
  }
 
  void DisableNetworkActions(void)
@@ -367,7 +361,7 @@
 	do
 	{
 		g_free(filename);
-		sprintf(tmpname,"%08lx.tmp",rand() ^ ((unsigned long) time(0)));
+		g_snprintf(tmpname,19,"%08lx.tmp",rand() ^ ((unsigned long) time(0)));
 		filename = g_build_filename(g_get_tmp_dir(),tmpname,NULL);
 	} while(g_file_test(filename,G_FILE_TEST_EXISTS));
 
@@ -660,8 +654,7 @@
 
  static void Load3270Actions(GtkActionGroup *actions)
  {
-	// TODO (perry#9#): Add tooltips
- 	static const struct _action_info
+ 	struct call_3270
  	{
  		const gchar *name;
  		const gchar *label;
@@ -669,7 +662,25 @@
  		const gchar *stock_id;
  		XtActionProc call;
  		const gchar *accelerator;
-	} action_info[] =
+	};
+
+	// TODO (perry#9#): Add tooltips
+ 	static const struct call_3270 action_clear[] =
+	{
+		{ "Reset",			N_( "Reset" ),
+							NULL,
+							NULL,
+							Reset_action,
+							N_( "<Ctrl>r" ) },
+
+		{ "Escape",			N_( "Escape" ),
+							NULL,
+							NULL,
+							Reset_action,
+							"Escape" }
+	};
+
+ 	static const struct call_3270 action_info[] =
 	{
 		{ "EraseEOF",		N_( "Erase EOF" ),
 							N_( "Erase to the end of the field" ),
@@ -739,6 +750,21 @@
 
  	}
 
+ 	for(f=0;f<G_N_ELEMENTS(action_clear);f++)
+ 	{
+		GtkAction *action = gtk_action_new(	action_clear[f].name,
+											gettext(action_clear[f].label),
+											gettext(action_clear[f].tooltip),
+											action_clear[f].stock_id );
+
+		g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(clear_and_call),(gpointer) action_clear[f].call);
+
+		if(action_info[f].accelerator)
+			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(action_clear[f].accelerator));
+		else
+			gtk_action_group_add_action(actions,(GtkAction *) action);
+
+ 	}
  }
 
 
@@ -753,7 +779,6 @@
 	gtk_action_group_set_translation_domain(main_actions, GETTEXT_PACKAGE);
 
 	gtk_action_group_add_actions(main_actions, internal_action_entries, G_N_ELEMENTS (internal_action_entries), topwindow);
-//	gtk_action_group_add_toggle_actions(main_actions,internal_action_toggles, G_N_ELEMENTS(internal_action_toggles),0);
 
 	Load3270Actions(main_actions);
 	LoadCustomActions(main_actions);
