@@ -175,8 +175,8 @@
 	{ 	"Reset",			NULL,					N_( "Reset" ),				"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
 	{ 	"Escape",			NULL,					N_( "Escape" ),				"Escape",		NULL,	G_CALLBACK(action_Reset)			},
 	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",		NULL,	G_CALLBACK(action_Enter)			},
-	{	"PageUP",			NULL,					N_( "Page-Up" ),			"Page_Up",		NULL,	G_CALLBACK(action_PageUP) 			},
-	{	"PageDown",			NULL,					N_( "Page-Down" ),			"Page_Down",	NULL,	G_CALLBACK(action_PageDown)			},
+//	{	"PageUP",			NULL,					N_( "Page-Up" ),			"Page_Up",		NULL,	G_CALLBACK(action_PageUP) 			},
+//	{	"PageDown",			NULL,					N_( "Page-Down" ),			"Page_Down",	NULL,	G_CALLBACK(action_PageDown)			},
 	{	"Redraw",			NULL,					N_( "Redraw screen" ),		NULL,			NULL,	G_CALLBACK(action_Redraw)			},
  };
 
@@ -189,6 +189,7 @@
 	action_internal(PF_action, IA_DEFAULT, id, CN);
  }
 
+/*
  void action_PageUP(GtkWidget *w, gpointer user_data)
  {
 	WaitingForChanges = TRUE;
@@ -204,6 +205,7 @@
 	// TODO (perry#1#): Read FN association from configuration file.
 	action_internal(PF_action, IA_DEFAULT, "8", CN);
  }
+*/
 
  void action_Clear(GtkWidget *w, gpointer user_data)
  {
@@ -459,8 +461,25 @@
  	g_free(screen);
  }
 
+ static void ExecPF(GtkAction *action, gpointer cmd)
+ {
+	action_internal(PF_action, IA_DEFAULT, cmd, CN);
+ }
+
  static void LoadCustomActions(GtkActionGroup *actions)
  {
+ 	static const struct _call
+ 	{
+ 		const gchar *name;
+		void 	(*run)(GtkAction *action, gpointer cmd);
+ 	} call[] =
+ 	{
+ 		{ "ExecWithScreen", 	ExecWithScreen		},
+ 		{ "ExecWithCopy",		ExecWithCopy		},
+ 		{ "ExecWithSelection",	ExecWithSelection	},
+ 		{ "ExecPF",				ExecPF				}
+ 	};
+
 	gchar 		*filename = FindSystemConfigFile("actions.conf");
 	GKeyFile	*conf;
 
@@ -481,35 +500,50 @@
 
 		for(f=0;group[f];f++)
 		{
-			static const gchar *name[] = { "label", "tooltip", "stock_id", "type", "action" };
+			static const gchar *name[] = {	"label", 		// 0
+												"tooltip",		// 1
+												"stock_id",		// 2
+												"type",			// 3
+												"action",		// 4
+												"accelerator" 	// 5
+											};
 
 			int			p;
 			GtkAction 	*action;
-			gchar		*parm[(sizeof(name) / sizeof(const gchar *))];
+			gchar		*parm[G_N_ELEMENTS(name)];
+			void 		(*run)(GtkAction *action, gpointer cmd)	= NULL;
 
-			Trace("Processing action %s",group[f]);
-
-			for(p=0;p<(sizeof(name) / sizeof(const gchar *));p++)
+			for(p=0;p<G_N_ELEMENTS(name);p++)
 			{
 				parm[p] = g_key_file_get_locale_string(conf,group[f],name[p],NULL,NULL);
 				if(!parm[p])
 					parm[p] = g_key_file_get_string(conf,group[f],name[p],NULL);
 			}
 
-			action = gtk_action_new(group[f],parm[0],parm[1],parm[2]);
-			if(action)
+			for(p=0;p<G_N_ELEMENTS(call) && !run;p++)
 			{
-				// FIXME (perry#1#): Add a closure function to g_free the allocated string.
-				if(!stricmp(parm[3],"ExecWithScreen"))
-					g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(ExecWithScreen),g_strdup(parm[4]));
-				else if(!stricmp(parm[3],"ExecWithCopy"))
-					g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(ExecWithCopy),g_strdup(parm[4]));
-				else if(!stricmp(parm[3],"ExecWithSelection"))
-					g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(ExecWithSelection),g_strdup(parm[4]));
-				else
-					Log("Unexpected action type: %s",parm[3]);
+				if(!strcmp(parm[3],call[p].name))
+					run = call[p].run;
+			}
 
-				gtk_action_group_add_action(actions,action);
+			if(!run)
+			{
+				Log("Invalid action type %s in %s",parm[3],filename);
+			}
+			else
+			{
+				action = gtk_action_new(group[f],parm[0],parm[1],parm[2]);
+
+				if(action)
+				{
+					// FIXME (perry#1#): Add a closure function to g_free the allocated string.
+					g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(run),g_strdup(parm[4]));
+
+					if(parm[5])
+						gtk_action_group_add_action_with_accel(actions,action,parm[5]);
+					else
+						gtk_action_group_add_action(actions,action);
+				}
 			}
 		}
 		g_strfreev(group);

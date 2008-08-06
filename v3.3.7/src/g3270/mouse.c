@@ -463,13 +463,19 @@
 
  gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
  {
-    // FIXME (perry#1#): Read association from scroll to function key from configuration file.
-    if(event->direction < 2 && !WaitingForChanges)
+ 	static const char *pfkey[]		= { "7", 		"8" };
+ 	static const gchar *action_name[]	= { "ScrollUP", "ScrollDown" };
+
+    if(event->direction < 2 && event->direction >= 0 && !WaitingForChanges)
  	{
-		if(event->direction)
-			action_PageDown(widget,0);
+		GtkAction *action = gtk_action_group_get_action(main_actions,action_name[event->direction]);
+
+		WaitingForChanges = TRUE;
+
+		if(action)
+			gtk_action_activate(action);
 		else
-			action_PageUP(widget,0);
+			action_internal(PF_action, IA_DEFAULT, pfkey[event->direction], CN);
 	}
 
  	return 0;
