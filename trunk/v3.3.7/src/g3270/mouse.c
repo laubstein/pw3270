@@ -322,7 +322,7 @@
 	if(startCol > endCol)
 	{
 		left = endCol;
-		right = endCol;
+		right = startCol;
 	}
 	else
 	{
@@ -493,7 +493,7 @@
 	SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  }
 
- void action_SelectLeft(GtkWidget *w, gpointer user_data)
+ static void doSelect(XtActionProc call)
  {
  	if(mode == SELECT_MODE_NONE)
  	{
@@ -502,58 +502,31 @@
  		startCol = endCol = cCol;
  	}
 
- 	action_internal(Left_action, IA_DEFAULT, CN, CN);
+ 	action_internal(call, IA_DEFAULT, CN, CN);
+
 	endRow = cRow;
 	endCol = cCol;
 
 	Reselect();
  }
 
- void action_SelectUp(GtkWidget *w, gpointer user_data)
+ void action_SelectLeft(GtkWidget *w, gpointer user_data)
  {
- 	if(mode == SELECT_MODE_NONE)
- 	{
- 		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
- 		startRow = endRow = cRow;
- 		startCol = endCol = cCol;
- 	}
-
- 	action_internal(Up_action, IA_DEFAULT, CN, CN);
-	endRow = cRow;
-	endCol = cCol;
-
-	Reselect();
+ 	doSelect(Left_action);
  }
 
  void action_SelectRight(GtkWidget *w, gpointer user_data)
  {
- 	if(mode == SELECT_MODE_NONE)
- 	{
- 		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
- 		startRow = endRow = cRow;
- 		startCol = endCol = cCol;
- 	}
+ 	doSelect(Right_action);
+ }
 
- 	action_internal(Right_action, IA_DEFAULT, CN, CN);
-	endRow = cRow;
-	endCol = cCol;
-
-	Reselect();
+ void action_SelectUp(GtkWidget *w, gpointer user_data)
+ {
+ 	doSelect(Up_action);
  }
 
  void action_SelectDown(GtkWidget *w, gpointer user_data)
  {
- 	if(mode == SELECT_MODE_NONE)
- 	{
- 		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
- 		startRow = endRow = cRow;
- 		startCol = endCol = cCol;
- 	}
-
- 	action_internal(Down_action, IA_DEFAULT, CN, CN);
-	endRow = cRow;
-	endCol = cCol;
-
-	Reselect();
+ 	doSelect(Down_action);
  }
 
