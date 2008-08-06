@@ -49,6 +49,7 @@
 		<Unit filename="src/g3270/actions.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/g3270/actions.conf" />
 		<Unit filename="src/g3270/clipboard.c">
 			<Option compilerVar="CC" />
 		</Unit>
