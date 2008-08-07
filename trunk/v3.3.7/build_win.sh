@@ -20,6 +20,11 @@ echo "s#@SSL_LIBS@#`pkg-config --libs $SSL_MODULES`#g;" >> $TEMPFILE
 echo "s#@NATIVECC@#gcc#g;" >> $TEMPFILE
 echo "s#@WINDRES@#mingw32-windres#g;" >> $TEMPFILE
 echo "s#@OS_LIBS@#-lws2_32#g;" >> $TEMPFILE
+echo "s#@XCPPFLAGS@#-D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500#g;" >> $TEMPFILE
+echo "s#@DLLEXT@#dll#g;" >> $TEMPFILE
+echo "s#@OBJEXT@#o#g;" >> $TEMPFILE
+echo "s#@BINEXT@#.exe#g;" >> $TEMPFILE
+echo "s#@EXTRASRC@#resources.rc#g;" >> $TEMPFILE
 
 mv ~/Desktop/g3270_installer.exe ~/tmp > /dev/null 2>&1
 
