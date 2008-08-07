@@ -431,7 +431,7 @@
  	g_free(screen);
  }
 
- static void ExecPF(GtkAction *action, gpointer cmd)
+ static void PFKey(GtkAction *action, gpointer cmd)
  {
 	action_internal(PF_action, IA_DEFAULT, cmd, CN);
  }
@@ -447,7 +447,7 @@
  		{ "ExecWithScreen", 	ExecWithScreen		},
  		{ "ExecWithCopy",		ExecWithCopy		},
  		{ "ExecWithSelection",	ExecWithSelection	},
- 		{ "ExecPF",				ExecPF				}
+ 		{ "PFKey",				PFKey				}
  	};
 
 	gchar 		*filename = FindSystemConfigFile("actions.conf");
@@ -473,8 +473,8 @@
 			static const gchar *name[] = {	"label", 		// 0
 												"tooltip",		// 1
 												"stock_id",		// 2
-												"type",			// 3
-												"action",		// 4
+												"action",		// 3
+												"value",		// 4
 												"accelerator" 	// 5
 											};
 
