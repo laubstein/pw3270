@@ -175,7 +175,7 @@
 	void		action_Restore(void);
 	void 		action_Redraw(void);
 	void 		action_SelectColors(void);
-
+	void 		action_SetHostname(void);
 
 	int 			LoadColors(void);
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
@@ -186,6 +186,7 @@
 	void 			RestoreWindowSize(const gchar *group, GtkWidget *widget);
 	void 			SaveWindowSize(const gchar *group, GtkWidget *widget);
 	int 			GetFunctionKey(GdkEventKey *event);
+	int 			wait4negotiations(const char *cl_hostname);
 
 	int 			CloseConfigFile(void);
 	int				OpenConfigFile(void);

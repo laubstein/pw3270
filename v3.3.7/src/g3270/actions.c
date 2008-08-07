@@ -49,7 +49,6 @@
  static void action_Right(GtkWidget *w, gpointer user_data);
  static void action_Tab(GtkWidget *w, gpointer user_data);
  static void action_BackTab(GtkWidget *w, gpointer user_data);
-// static void action_Reset(GtkWidget *w, gpointer user_data);
  static void action_Connect(GtkWidget *w, gpointer user_data);
  static void action_Enter(GtkWidget *w, gpointer user_data);
  static void action_Disconnect(GtkWidget *w, gpointer user_data);
@@ -128,6 +127,7 @@
  	{	"SelectColors",		GTK_STOCK_SELECT_COLOR,	N_( "Colors" ),				NULL,			NULL,	G_CALLBACK(action_SelectColors)		},
 	{	"DumpScreen",		NULL,					N_( "Dump screen" ),		"<Alt>D",		NULL,	G_CALLBACK(action_DumpScreen)		},
 	{	"LoadScreenDump",	NULL,					N_( "Load screen dump" ),	"<Alt>R",		NULL,	G_CALLBACK(action_LoadScreenDump)	},
+	{ 	"SetHostname",		GTK_STOCK_HOME,			N_( "Set hostname" ),		NULL,			NULL,	G_CALLBACK(action_SetHostname)		},
 
  	/* Edit actions */
  	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),				NULL,			NULL,	G_CALLBACK(action_Copy)				},
@@ -172,8 +172,6 @@
 	{ 	"Enter",			NULL,					N_( "Enter" ),				"Return",		NULL,	G_CALLBACK(action_Enter)			},
 
 	/* Terminal Actions */
-//	{ 	"Reset",			NULL,					N_( "Reset" ),				"<Ctrl>r",		NULL,	G_CALLBACK(action_Reset)			},
-//	{ 	"Escape",			NULL,					N_( "Escape" ),				"Escape",		NULL,	G_CALLBACK(action_Reset)			},
 	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",		NULL,	G_CALLBACK(action_Enter)			},
 	{	"Redraw",			NULL,					N_( "Redraw screen" ),		NULL,			NULL,	G_CALLBACK(action_Redraw)			},
  };
@@ -972,4 +970,74 @@
  static void action_SaveClipboard(void)
  {
 	SaveText(N_( "Save clipboard contents" ), GetClipboard());
+ }
+
+ void action_SetHostname(void)
+ {
+ 	const char		*host 		= GetString("Network","Hostname","");
+ 	gboolean		again		= TRUE;
+	char 			buffer[1024];
+ 	GtkTable		*table		= GTK_TABLE(gtk_table_new(2,2,FALSE));
+ 	GtkEntry		*entry		= GTK_ENTRY(gtk_entry_new());
+ 	GtkToggleButton	*checkbox	= GTK_TOGGLE_BUTTON(gtk_check_button_new_with_label( _( "Secure connection" ) ));
+ 	GtkWidget 		*dialog 	= gtk_dialog_new_with_buttons(	_( "Select hostname" ),
+																GTK_WINDOW(topwindow),
+																GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
+																GTK_STOCK_CONNECT,	GTK_RESPONSE_ACCEPT,
+																GTK_STOCK_CANCEL,	GTK_RESPONSE_REJECT,
+																NULL	);
+
+	gtk_window_set_icon_name(GTK_WINDOW(dialog),GTK_STOCK_HOME);
+	gtk_entry_set_max_length(entry,1000);
+	gtk_entry_set_width_chars(entry,60);
+
+	gtk_table_attach(table,gtk_label_new( _( "Hostname:" ) ), 0,1,0,1,0,0,5,0);
+	gtk_table_attach(table,GTK_WIDGET(entry), 1,2,0,1,GTK_EXPAND|GTK_FILL,0,0,0);
+	gtk_table_attach(table,GTK_WIDGET(checkbox), 1,2,1,2,GTK_EXPAND|GTK_FILL,0,0,0);
+
+
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),GTK_WIDGET(table),FALSE,FALSE,2);
+
+	if(strncmp(host,"L:",2))
+	{
+		gtk_entry_set_text(entry,host);
+	}
+	else
+	{
+		gtk_toggle_button_set_active(checkbox,TRUE);
+		gtk_entry_set_text(entry,host+2);
+	}
+
+	gtk_widget_show_all(GTK_WIDGET(table));
+
+ 	while(again)
+ 	{
+ 		switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+ 		{
+		case GTK_RESPONSE_ACCEPT:
+			if(gtk_toggle_button_get_active(checkbox))
+				strcpy(buffer,"L:");
+			else
+				*buffer = 0;
+
+			strncat(buffer,gtk_entry_get_text(entry),1023);
+
+			if(host_connect(buffer) >= 0)
+			{
+				if(!wait4negotiations(buffer))
+				{
+					again = FALSE;
+					SetString("Network","Hostname",host);
+				}
+			}
+			break;
+
+		case GTK_RESPONSE_REJECT:
+			again = FALSE;
+			break;
+ 		}
+ 	}
+
+	gtk_widget_destroy(dialog);
+
  }

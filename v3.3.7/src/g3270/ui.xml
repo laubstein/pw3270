@@ -35,7 +35,7 @@
 
 		<menu action='SettingsMenu'>
 			<menuitem action='SelectColors' />
-
+			<menuitem action='SetHostname' />
 			<menuitem action='FontSettings' />
 
 			<menu action='OptionsMenu'>
