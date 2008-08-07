@@ -179,7 +179,7 @@ static char *base_3270_keymap =
 /* Callback for connection state changes. */
 static void main_connect(Boolean status)
 {
-	static const gchar *disconnected[] 	= { "Connect" };
+	static const gchar *disconnected[] 	= { "Connect", "SetHostname" };
 	static const gchar *connected[]		= { "Disconnect", "PrintScreen", "SaveScreen" };
 
 	int			f;
@@ -279,7 +279,7 @@ static int g3270_init(int *argc, char ***argv)
 	return 0;
 }
 
-static void wait4negotiations(const char *cl_hostname)
+int wait4negotiations(const char *cl_hostname)
 {
 	Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);
 
@@ -291,9 +291,10 @@ static void wait4negotiations(const char *cl_hostname)
 		if(!PCONNECTED)
 		{
 			popup_an_error( N_( "Negotiation with %s failed!" ),cl_hostname);
-			return;
+			return -1;
 		}
 	}
+	return 0;
 }
 
 int main(int argc, char *argv[])

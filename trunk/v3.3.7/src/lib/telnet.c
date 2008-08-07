@@ -627,8 +627,7 @@ net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving,
 				output_id = AddOutput(sock, output_possible);
 #endif /*]*/
 			} else {
-				popup_a_sockerr("Connect to %s, port %d",
-				    hostname, current_port);
+				popup_a_sockerr("%s:%d",hostname, current_port);
 				close_fail;
 			}
 		} else {
@@ -985,8 +984,7 @@ net_input(void)
 #endif /*]*/
 			trace_dsn("RCVD socket error %d\n", errno);
 			if (HALF_CONNECTED) {
-				popup_a_sockerr("Connect to %s, port %d",
-				    hostname, current_port);
+				popup_a_sockerr("%s:%d",hostname, current_port);
 			} else if (socket_errno() != SE_ECONNRESET) {
 				popup_a_sockerr("Socket read");
 			}

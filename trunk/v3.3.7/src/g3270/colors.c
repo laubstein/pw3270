@@ -281,6 +281,8 @@
 											GTK_STOCK_CANCEL, 			GTK_RESPONSE_REJECT,
 											NULL);
 
+	gtk_window_set_icon_name(GTK_WINDOW(dialog),GTK_STOCK_SELECT_COLOR);
+
 	box = gtk_hpaned_new();
 	gtk_paned_set_position(GTK_PANED(box),GetInt("ColorSetup","PanedPosition",120));
 
