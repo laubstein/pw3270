@@ -972,6 +972,7 @@
 	SaveText(N_( "Save clipboard contents" ), GetClipboard());
  }
 
+
  void action_SetHostname(void)
  {
  	const char		*host 		= GetString("Network","Hostname","");
