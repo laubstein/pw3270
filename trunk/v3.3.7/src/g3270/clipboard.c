@@ -94,25 +94,29 @@
 
  static void paste_string(gchar *str)
  {
- 	int remaining;
+ 	int		remaining;
+ 	gchar	*saved;
 
  	if(!str)
-		return;
-
- 	if(contents)
  	{
-		g_free(contents);
-		contents = NULL;
+ 		g_free(contents);
+ 		contents = NULL;
+		return;
  	}
 
 	Trace("Paste buffer:\n%s",str);
 
 	remaining = emulate_input(str,-1,True);
-    if(remaining < 1)
-		return;
 
-	// Save the rest of the string in the contents buffer
-	contents = g_convert(str+remaining, -1, "UTF-8", CHARSET, NULL, NULL, NULL);
+	saved = contents;
+    if(remaining > 0)
+		contents = g_strdup(str+remaining);
+	else
+		contents = NULL;
+
+	g_free(saved);
+
+	screen_disp();
 
  }
 
@@ -129,7 +133,7 @@
     if(!buffer)
     {
     	// TODO (perry#3#): Notify user!
-        Log("Error converting clipboard string to charset %s",CHARSET);
+        PopupAnError( N_( "Error converting clipboard string to charset %s" ),CHARSET);
         return;
     }
 
@@ -141,20 +145,20 @@
     }
 
 	paste_string(buffer);
-
 	g_free(buffer);
-
  }
 
- void action_Paste(GtkWidget *w, gpointer user_data)
+ void action_Paste(void)
  {
 	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,DEFAULT_CLIPBOARD),clipboard_text_received,(gpointer) 0);
  }
 
- void action_PasteNext(GtkWidget *w, gpointer user_data)
+ void action_PasteNext(void)
  {
  	if(contents)
 		paste_string(contents);
+	else
+		action_Paste();
  }
 
  void ClearClipboard(void)

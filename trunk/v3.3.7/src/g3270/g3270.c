@@ -354,7 +354,11 @@ int main(int argc, char *argv[])
 	else
 		cl_hostname = GetString("Network","Hostname",CN);
 
-	if(cl_hostname != CN)
+	if(cl_hostname == CN)
+	{
+		action_SetHostname();
+	}
+	else
 	{
 		DisableNetworkActions();
 		if(host_connect(cl_hostname) >= 0)
