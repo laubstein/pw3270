@@ -105,6 +105,9 @@
 		#define GDK_ALT_MASK GDK_MOD1_MASK
 	#endif
 
+	#define PopupAnError(fmt, ...)	WriteLog("ERR",fmt,__VA_ARGS__)
+	#define PopupAWarning(fmt, ...)	WriteLog("WARN",fmt,__VA_ARGS__)
+
 	extern GtkWidget				*topwindow;
 	extern GdkPixmap				*pixmap;
 	extern GtkWidget				*SelectionPopup;
@@ -155,8 +158,6 @@
 	gboolean 	mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 	gboolean 	mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
-	void 		action_Paste(GtkWidget *w, gpointer user_data);
-	void 		action_PasteNext(GtkWidget *w, gpointer user_data);
 	void 		action_SelectAll(GtkWidget *w, gpointer user_data);
 	void		action_SelectLeft(GtkWidget *w, gpointer user_data);
 	void		action_SelectUp(GtkWidget *w, gpointer user_data);
@@ -176,6 +177,8 @@
 	void 		action_Redraw(void);
 	void 		action_SelectColors(void);
 	void 		action_SetHostname(void);
+	void 		action_Paste(void);
+	void 		action_PasteNext(void);
 
 	int 			LoadColors(void);
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
