@@ -33,12 +33,13 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
+make clean
+
 sed --file=$TEMPFILE g3270.nsi.in > g3270.nsi
 if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-make clean
 make Release
 
 if [ "$?" != "0" ]; then
