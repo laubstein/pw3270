@@ -118,6 +118,7 @@
 	/* Create movement buttons */
 	SMALL_BUTTON(GTK_STOCK_GO_UP,Up_action,2,4);
 	SMALL_BUTTON(GTK_STOCK_GO_BACK,Left_action,0,5);
+	SMALL_BUTTON(GTK_STOCK_GOTO_TOP,Home_action,2,5);
 	SMALL_BUTTON(GTK_STOCK_GO_FORWARD,Right_action,4,5);
 	SMALL_BUTTON(GTK_STOCK_GO_DOWN,Down_action,2,6);
 
