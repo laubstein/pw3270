@@ -33,7 +33,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="Makefile" />
+		<Unit filename="Makefile.in" />
 		<Unit filename="g3270.nsi.in" />
 		<Unit filename="src/c3270/c3270.c">
 			<Option compilerVar="CC" />
