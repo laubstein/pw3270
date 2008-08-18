@@ -94,8 +94,8 @@
 
  static void paste_string(gchar *str)
  {
- 	int		remaining;
- 	gchar	*saved;
+ 	int			remaining;
+ 	gchar		*saved;
 
  	if(!str)
  	{
@@ -110,14 +110,13 @@
 
 	saved = contents;
     if(remaining > 0)
-		contents = g_strdup(str+remaining);
+		contents = g_strdup(str+(strlen(str)-(remaining+1)));
 	else
 		contents = NULL;
 
 	g_free(saved);
 
 	screen_disp();
-
  }
 
  static void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)

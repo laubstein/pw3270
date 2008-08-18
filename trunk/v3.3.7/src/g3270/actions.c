@@ -106,74 +106,73 @@
  static const GtkActionEntry internal_action_entries[] =
  {
  	/* Top menus */
- 	{	"FileMenu",			NULL,					N_( "_File" ),				NULL,			NULL,	NULL								},
- 	{	"NetworkMenu",		NULL,					N_( "_Network" ),			NULL,			NULL,	NULL								},
- 	{	"HelpMenu",			NULL,					N_( "Help" ),				NULL,			NULL,	NULL								},
- 	{	"EditMenu",			NULL,					N_( "_Edit" ),				NULL,			NULL,	NULL								},
- 	{	"OptionsMenu",		NULL,					N_( "_Options" ),			NULL,			NULL,	NULL								},
- 	{	"SettingsMenu",		NULL,					N_( "Settings" ),			NULL,			NULL,	NULL								},
-	{	"FontSettings",		GTK_STOCK_SELECT_FONT,	N_( "Select font" ),		NULL,			NULL,	NULL								},
+ 	{	"FileMenu",			NULL,					N_( "_File" ),				NULL,				NULL,	NULL								},
+ 	{	"NetworkMenu",		NULL,					N_( "_Network" ),			NULL,				NULL,	NULL								},
+ 	{	"HelpMenu",			NULL,					N_( "Help" ),				NULL,				NULL,	NULL								},
+ 	{	"EditMenu",			NULL,					N_( "_Edit" ),				NULL,				NULL,	NULL								},
+ 	{	"OptionsMenu",		NULL,					N_( "_Options" ),			NULL,				NULL,	NULL								},
+ 	{	"SettingsMenu",		NULL,					N_( "Settings" ),			NULL,				NULL,	NULL								},
+	{	"FontSettings",		GTK_STOCK_SELECT_FONT,	N_( "Select font" ),		NULL,				NULL,	NULL								},
 
  	/* Stock menus */
- 	{	"Preferences",		GTK_STOCK_PREFERENCES,	N_( "Preferences" ),		NULL,			NULL,	NULL								},
- 	{	"Network",			GTK_STOCK_NETWORK,		N_( "Network" ),			NULL,			NULL,	NULL								},
- 	{	"Properties",		GTK_STOCK_PROPERTIES,	N_( "Properties" ),			NULL,			NULL,	NULL								},
+ 	{	"Preferences",		GTK_STOCK_PREFERENCES,	N_( "Preferences" ),		NULL,				NULL,	NULL								},
+ 	{	"Network",			GTK_STOCK_NETWORK,		N_( "Network" ),			NULL,				NULL,	NULL								},
+ 	{	"Properties",		GTK_STOCK_PROPERTIES,	N_( "Properties" ),			NULL,				NULL,	NULL								},
 
 	/* Misc actions */
- 	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),				NULL,			NULL,	G_CALLBACK(action_About)			},
- 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),			NULL,			NULL,	G_CALLBACK(action_Connect)			},
- 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),		NULL,			NULL,	G_CALLBACK(action_Disconnect)		},
- 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),				NULL,			NULL,	G_CALLBACK(action_Quit)				},
- 	{	"SelectColors",		GTK_STOCK_SELECT_COLOR,	N_( "Colors" ),				NULL,			NULL,	G_CALLBACK(action_SelectColors)		},
-	{	"DumpScreen",		NULL,					N_( "Dump screen" ),		"<Alt>D",		NULL,	G_CALLBACK(action_DumpScreen)		},
-	{	"LoadScreenDump",	NULL,					N_( "Load screen dump" ),	"<Alt>R",		NULL,	G_CALLBACK(action_LoadScreenDump)	},
-	{ 	"SetHostname",		GTK_STOCK_HOME,			N_( "Set hostname" ),		NULL,			NULL,	G_CALLBACK(action_SetHostname)		},
+ 	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),				NULL,				NULL,	G_CALLBACK(action_About)			},
+ 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),			NULL,				NULL,	G_CALLBACK(action_Connect)			},
+ 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),		NULL,				NULL,	G_CALLBACK(action_Disconnect)		},
+ 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),				NULL,				NULL,	G_CALLBACK(action_Quit)				},
+ 	{	"SelectColors",		GTK_STOCK_SELECT_COLOR,	N_( "Colors" ),				NULL,				NULL,	G_CALLBACK(action_SelectColors)		},
+	{	"DumpScreen",		NULL,					N_( "Dump screen" ),		"<Alt>D",			NULL,	G_CALLBACK(action_DumpScreen)		},
+	{	"LoadScreenDump",	NULL,					N_( "Load screen dump" ),	"<Alt>R",			NULL,	G_CALLBACK(action_LoadScreenDump)	},
+	{ 	"SetHostname",		GTK_STOCK_HOME,			N_( "Set hostname" ),		NULL,				NULL,	G_CALLBACK(action_SetHostname)		},
 
  	/* Edit actions */
- 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),				NULL,			NULL,	G_CALLBACK(action_Copy)				},
- 	{	"Append",			GTK_STOCK_ADD,			N_( "Add to copy" ),		NULL,			NULL,	G_CALLBACK(action_Append)			},
- 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),				NULL,			NULL,	G_CALLBACK(action_Paste)			},
- 	{	"PasteNext",		NULL,					N_( "Paste _next" ),		NULL,			NULL,	G_CALLBACK(action_PasteNext)		},
- 	{	"Unselect",			NULL,					N_( "_Unselect" ),			NULL,			NULL,	G_CALLBACK(action_ClearSelection)	},
- 	{	"Reselect",			NULL,					N_( "_Reselect" ),			NULL,			NULL,	G_CALLBACK(Reselect)				},
- 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Alt>A",		NULL,	G_CALLBACK(action_SelectAll)		},
- 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),		"Clear",		NULL,	G_CALLBACK(action_Clear)			},
+ 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),				NULL,				NULL,	G_CALLBACK(action_Copy)				},
+ 	{	"Append",			GTK_STOCK_ADD,			N_( "Add to copy" ),		"<Shift><Ctrl>c",	NULL,	G_CALLBACK(action_Append)			},
+ 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),				NULL,				NULL,	G_CALLBACK(action_Paste)			},
+ 	{	"PasteNext",		NULL,					N_( "Paste next" ),			"<Shift><Ctrl>v",	NULL,	G_CALLBACK(action_PasteNext)		},
+ 	{	"Unselect",			NULL,					N_( "_Unselect" ),			NULL,				NULL,	G_CALLBACK(action_ClearSelection)	},
+ 	{	"Reselect",			NULL,					N_( "_Reselect" ),			NULL,				NULL,	G_CALLBACK(Reselect)				},
+ 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Alt>A",			NULL,	G_CALLBACK(action_SelectAll)		},
+ 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),		"Clear",			NULL,	G_CALLBACK(action_Clear)			},
 
  	/* Printer actions */
-	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),				"Print",		NULL,	G_CALLBACK(action_PrintScreen)		},
-	{	"PrintSelected",	NULL,					N_( "Print selected" ),		NULL,			NULL,	G_CALLBACK(action_PrintSelected)	},
-	{	"PrintClipboard",	NULL,					N_( "Print copy" ),			NULL,			NULL,	G_CALLBACK(action_PrintClipboard)	},
+	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),				"Print",			NULL,	G_CALLBACK(action_PrintScreen)		},
+	{	"PrintSelected",	NULL,					N_( "Print selected" ),		NULL,				NULL,	G_CALLBACK(action_PrintSelected)	},
+	{	"PrintClipboard",	NULL,					N_( "Print copy" ),			NULL,				NULL,	G_CALLBACK(action_PrintClipboard)	},
 
  	/* Save actions */
- 	{	"Save",				GTK_STOCK_SAVE,			N_( "Save" ),				NULL,			NULL,	NULL								},
-	{	"SaveScreen",		NULL,					N_( "Save screen" ),		NULL,			NULL,	G_CALLBACK(action_SaveScreen)		},
-	{	"SaveSelected",		NULL,					N_( "Save selected" ),		NULL,			NULL,	G_CALLBACK(action_SaveSelected)		},
-	{	"SaveClipboard",	NULL,					N_( "Save copy" ),			NULL,			NULL,	G_CALLBACK(action_SaveClipboard)	},
+ 	{	"Save",				GTK_STOCK_SAVE,			N_( "Save" ),				NULL,				NULL,	NULL								},
+	{	"SaveScreen",		NULL,					N_( "Save screen" ),		NULL,				NULL,	G_CALLBACK(action_SaveScreen)		},
+	{	"SaveSelected",		NULL,					N_( "Save selected" ),		NULL,				NULL,	G_CALLBACK(action_SaveSelected)		},
+	{	"SaveClipboard",	NULL,					N_( "Save copy" ),			NULL,				NULL,	G_CALLBACK(action_SaveClipboard)	},
 
 	/* Select actions */
-	{	"SelectField",		NULL,					N_( "Select Field" ),		"<Ctrl>f",		NULL,	G_CALLBACK(action_SelectField)		},
+	{	"SelectField",		NULL,					N_( "Select Field" ),		"<Ctrl>f",			NULL,	G_CALLBACK(action_SelectField)		},
 
-	{ 	"SelectRight",		NULL,					N_( "Select Right" ),		"<Shift>Right",	NULL,	G_CALLBACK(action_SelectRight)		},
-	{ 	"SelectLeft",		NULL,					N_( "Select Left" ),		"<Shift>Left",	NULL,	G_CALLBACK(action_SelectLeft)		},
-	{ 	"SelectUp",			NULL,					N_( "Select Up" ),			"<Shift>Up",	NULL,	G_CALLBACK(action_SelectUp)			},
-	{ 	"SelectDown",		NULL,					N_( "Select Down" ),		"<Shift>Down",	NULL,	G_CALLBACK(action_SelectDown)		},
+	{ 	"SelectRight",		NULL,					N_( "Select Right" ),		"<Shift>Right",		NULL,	G_CALLBACK(action_SelectRight)		},
+	{ 	"SelectLeft",		NULL,					N_( "Select Left" ),		"<Shift>Left",		NULL,	G_CALLBACK(action_SelectLeft)		},
+	{ 	"SelectUp",			NULL,					N_( "Select Up" ),			"<Shift>Up",		NULL,	G_CALLBACK(action_SelectUp)			},
+	{ 	"SelectDown",		NULL,					N_( "Select Down" ),		"<Shift>Down",		NULL,	G_CALLBACK(action_SelectDown)		},
 
-	{	"SelectionRight",	NULL,					N_( "Selection Right" ),	"<Alt>Right",	NULL,	G_CALLBACK(action_SelectionRight)	},
-	{	"SelectionLeft",	NULL,					N_( "Selection Left" ),		"<Alt>Left",	NULL,	G_CALLBACK(action_SelectionLeft)	},
-	{	"SelectionUp",		NULL,					N_( "Selection Up" ),		"<Alt>Up",		NULL,	G_CALLBACK(action_SelectionUp)		},
-	{	"SelectionDown",	NULL,					N_( "Selection Down" ),		"<Alt>Down",	NULL,	G_CALLBACK(action_SelectionDown)	},
-
+	{	"SelectionRight",	NULL,					N_( "Selection Right" ),	"<Alt>Right",		NULL,	G_CALLBACK(action_SelectionRight)	},
+	{	"SelectionLeft",	NULL,					N_( "Selection Left" ),		"<Alt>Left",		NULL,	G_CALLBACK(action_SelectionLeft)	},
+	{	"SelectionUp",		NULL,					N_( "Selection Up" ),		"<Alt>Up",			NULL,	G_CALLBACK(action_SelectionUp)		},
+	{	"SelectionDown",	NULL,					N_( "Selection Down" ),		"<Alt>Down",		NULL,	G_CALLBACK(action_SelectionDown)	},
 
 	/* Cursor Movement */
-	{ 	"CursorRight",		GTK_STOCK_GO_FORWARD,	N_( "Right" ),				"Right",		NULL,	G_CALLBACK(action_Right)			},
-	{ 	"CursorLeft",		GTK_STOCK_GO_BACK,		N_( "Left" ),				"Left",			NULL,	G_CALLBACK(action_Left)				},
-	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),					"Up",			NULL,	G_CALLBACK(action_Up)				},
-	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),				"Down",			NULL,	G_CALLBACK(action_Down)				},
-	{ 	"Enter",			NULL,					N_( "Enter" ),				"Return",		NULL,	G_CALLBACK(action_Enter)			},
+	{ 	"CursorRight",		GTK_STOCK_GO_FORWARD,	N_( "Right" ),				"Right",			NULL,	G_CALLBACK(action_Right)			},
+	{ 	"CursorLeft",		GTK_STOCK_GO_BACK,		N_( "Left" ),				"Left",				NULL,	G_CALLBACK(action_Left)				},
+	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),					"Up",				NULL,	G_CALLBACK(action_Up)				},
+	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),				"Down",				NULL,	G_CALLBACK(action_Down)				},
+	{ 	"Enter",			NULL,					N_( "Enter" ),				"Return",			NULL,	G_CALLBACK(action_Enter)			},
 
 	/* Terminal Actions */
-	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",		NULL,	G_CALLBACK(action_Enter)			},
-	{	"Redraw",			NULL,					N_( "Redraw screen" ),		NULL,			NULL,	G_CALLBACK(action_Redraw)			},
+	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",			NULL,	G_CALLBACK(action_Enter)			},
+	{	"Redraw",			NULL,					N_( "Redraw screen" ),		NULL,				NULL,	G_CALLBACK(action_Redraw)			},
  };
 
  GtkActionGroup	*main_actions = NULL;
@@ -972,7 +971,6 @@
 	SaveText(N_( "Save clipboard contents" ), GetClipboard());
  }
 
-
  void action_SetHostname(void)
  {
  	const char		*host 		= GetString("Network","Hostname","");
@@ -1028,7 +1026,7 @@
 				if(!wait4negotiations(buffer))
 				{
 					again = FALSE;
-					SetString("Network","Hostname",host);
+					SetString("Network","Hostname",buffer);
 				}
 			}
 			break;
