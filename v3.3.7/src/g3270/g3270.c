@@ -337,7 +337,8 @@ int main(int argc, char *argv[])
 #endif /*]*/
 
 	Trace("Topwindow: %p (%d) terminal: %p (%d)",topwindow,GTK_IS_WIDGET(topwindow),terminal,GTK_IS_WIDGET(terminal));
-	gtk_widget_show_all(topwindow);
+	gtk_widget_show(topwindow);
+
 	gtk_widget_grab_focus(terminal);
 	gtk_widget_grab_default(terminal);
 

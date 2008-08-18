@@ -46,6 +46,7 @@
 		FULL_SCREEN,
 		RECONNECT,
 		INSERT,
+		KEYPAD,
 
 		N_TOGGLES
 	};

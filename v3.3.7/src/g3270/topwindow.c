@@ -198,6 +198,8 @@
  	static const gchar	*disabled[] = { "Reselect", "Disconnect" };
 
  	GtkWidget				*vbox;
+ 	GtkWidget				*hbox;
+ 	GtkWidget				*keypad;
  	int						f;
 	GtkUIManager			*ui_manager;
 	gchar					*file;
@@ -276,9 +278,18 @@
 		g_object_unref(ui_manager);
 	}
 
+	gtk_widget_show_all(vbox);
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);
 
-	gtk_box_pack_start(GTK_BOX(vbox), terminal, TRUE, TRUE, 0);
+    hbox = gtk_hbox_new(FALSE,0);
+	gtk_box_pack_start(GTK_BOX(hbox), terminal, TRUE, TRUE, 0);
+	gtk_widget_show_all(hbox);
+
+	keypad = CreateKeypadWindow();
+	set_widget_flags(keypad,0);
+	gtk_box_pack_end(GTK_BOX(hbox), keypad, FALSE, FALSE, 0);
+
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 
 #ifdef PACKAGE_NAME
 	gtk_window_set_role(GTK_WINDOW(topwindow), PACKAGE_NAME "_TOP" );
