@@ -134,6 +134,8 @@
 	extern const struct lib3270_screen_callbacks g3270_screen_callbacks;
 
 	int			CreateTopWindow(void);
+	GtkWidget	*CreateKeypadWindow(void);
+
 	GtkWidget 	*CreateTerminalWindow(void);
 
 	int 		DrawScreen(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);

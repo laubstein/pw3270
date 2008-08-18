@@ -136,7 +136,7 @@
  	{	"PasteNext",		NULL,					N_( "Paste next" ),			"<Shift><Ctrl>v",	NULL,	G_CALLBACK(action_PasteNext)		},
  	{	"Unselect",			NULL,					N_( "_Unselect" ),			NULL,				NULL,	G_CALLBACK(action_ClearSelection)	},
  	{	"Reselect",			NULL,					N_( "_Reselect" ),			NULL,				NULL,	G_CALLBACK(Reselect)				},
- 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Alt>A",			NULL,	G_CALLBACK(action_SelectAll)		},
+ 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
  	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),		"Clear",			NULL,	G_CALLBACK(action_Clear)			},
 
  	/* Printer actions */
@@ -564,29 +564,31 @@
 	}
 	toggle_info[N_TOGGLES] =
 	{
-		{ N_( "Monocase" ),				NULL,	NULL,	NULL				},
-		{ N_( "Alt Cursor" ),			NULL,	NULL,	NULL				},
-		{ N_( "Blink Cursor" ),			NULL,	NULL,	NULL				},
-		{ N_( "Show timing" ),			NULL,	NULL,	NULL				},
-		{ N_( "Show Cursor Position" ),	NULL,	NULL,	NULL				},
-		{ N_( "DS Trace" ),				NULL,	NULL,	NULL				},
-		{ N_( "Scroll bar" ),			NULL,	NULL,	NULL				},
-		{ N_( "Line Wrap" ),			NULL,	NULL,	NULL				},
-		{ N_( "Blank Fill" ),			NULL,	NULL,	NULL				},
-		{ N_( "Screen Trace" ),			NULL,	NULL,	NULL				},
-		{ N_( "Event Trace" ),			NULL,	NULL,	NULL				},
-		{ N_( "Margined Paste" ),		NULL,	NULL,	NULL				},
-		{ N_( "Rectangle Select" ),		NULL,	NULL,	NULL				},
-		{ N_( "Cross Hair Cursor" ),	NULL,	NULL,	N_( "<alt>X" )		},
-		{ N_( "Visible Control" ),		NULL,	NULL,	NULL				},
-		{ N_( "Aid wait" ),				NULL,	NULL,	NULL				},
-		{ N_( "Full Screen" ),			NULL,	NULL,	N_( "<alt>Home" )	},
-		{ N_( "Auto-Reconnect" ),		NULL,	NULL,	NULL				},
-		{ N_( "Insert" ),				NULL,	NULL,	"Insert"			}
+		{ N_( "Monocase" ),						NULL,	NULL,	NULL				},
+		{ N_( "Alt Cursor" ),					NULL,	NULL,	NULL				},
+		{ N_( "Blinking Cursor" ),				NULL,	NULL,	NULL				},
+		{ N_( "Show timing" ),					NULL,	NULL,	NULL				},
+		{ N_( "Track Cursor" ),					NULL,	NULL,	NULL				},
+		{ N_( "DS Trace" ),						NULL,	NULL,	NULL				},
+		{ N_( "Scroll bar" ),					NULL,	NULL,	NULL				},
+		{ N_( "Line Wrap" ),					NULL,	NULL,	NULL				},
+		{ N_( "Blank Fill" ),					NULL,	NULL,	NULL				},
+		{ N_( "Screen Trace" ),					NULL,	NULL,	NULL				},
+		{ N_( "Event Trace" ),					NULL,	NULL,	NULL				},
+		{ N_( "Paste with left margin" ),		NULL,	NULL,	NULL				},
+		{ N_( "Select by rectangles" ),			NULL,	NULL,	NULL				},
+		{ N_( "Cross Hair Cursor" ),			NULL,	NULL,	N_( "<alt>X" )		},
+		{ N_( "Visible Control chars" ),		NULL,	NULL,	NULL				},
+		{ N_( "Aid wait" ),						NULL,	NULL,	NULL				},
+		{ N_( "Full Screen" ),					NULL,	NULL,	N_( "<alt>Home" )	},
+		{ N_( "Auto-Reconnect" ),				NULL,	NULL,	NULL				},
+		{ N_( "Insert" ),						NULL,	NULL,	"Insert"			},
+		{ N_( "Keypad" ),						NULL,	NULL,	NULL				}
 	};
 
  	int f;
 
+	/* Toggle actions */
  	for(f=0;f<N_TOGGLES;f++)
  	{
  		char buffer[20] = "Toggle";
@@ -610,6 +612,7 @@
 		}
  	}
 
+	/* Set/Reset actions */
  	for(f=0;f< G_N_ELEMENTS(toggle_list);f++)
  	{
  		int		id = toggle_list[f].toggle;

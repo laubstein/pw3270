@@ -46,6 +46,7 @@
 				<menuitem action='ToggleCrossHair'  />
 				<menuitem action='ToggleRectSelect'  />
 				<menuitem action='ToggleReconnect'  />
+				<menuitem action='ToggleKeypad'  />
 			</menu>
 		</menu>
 
