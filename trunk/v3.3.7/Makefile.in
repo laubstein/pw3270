@@ -170,9 +170,12 @@ clean:
 	@rm -f $(PACKAGE).po
 	@rm -fr autom4te.cache
 	@rm -f config.status
+	@rm -f *.lnk
+	@rm -fr locale
+	@rm -f *.nsi
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.log" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "leak.out" -exec mv -f {} $(TMPDIR) \;
-	@rm -f svn-commit.tmp
+	@rm -f svn-commit*.tmp
