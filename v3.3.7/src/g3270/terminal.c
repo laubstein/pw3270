@@ -196,7 +196,7 @@
 	}
 
 	/* Get the best font for the current window size */
-	for(f=0;f<szFonts && (fsize[f].height*(terminal_rows+1)) < height && (fsize[f].width*terminal_cols) < width;f++);
+	for(f=0;f<szFonts && ((fsize[f].height*(terminal_rows+1))+2) < height && (fsize[f].width*terminal_cols) < width;f++);
 
 	if(f >= MAX_FONT_SIZES)
 		f = (MAX_FONT_SIZES-1);
