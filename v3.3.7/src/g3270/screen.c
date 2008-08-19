@@ -528,8 +528,10 @@
 	}
 	else
 	{
+		gdk_gc_set_foreground(gc,fg);
 		pango_layout_set_text(layout,"?",-1);
-		gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
+		gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
+		gdk_draw_rectangle(draw,gc,0,col,row,fWidth-1,fHeight+1);
 	}
 
 	// 8...       message area
