@@ -451,11 +451,6 @@ void cursor_move(int baddr)
 		callbacks->move_cursor(baddr/cCOLS, baddr%cCOLS);
 }
 
-void toggle_monocase(struct toggle *t unused, enum toggle_type tt unused)
-{
-	screen_disp();
-}
-
 /* Status line stuff. */
 
 static void set(OIA_FLAG id, Boolean on)

@@ -28,7 +28,6 @@ extern void screen_erase(void);
 extern void screen_init(void);
 extern void screen_flip(void);
 extern FILE *start_pager(void);
-extern void toggle_monocase(struct toggle *t, enum toggle_type tt);
 extern Boolean screen_new_display_charsets(char *cslist, char *csname);
 extern void mcursor_locked();
 extern void mcursor_normal();

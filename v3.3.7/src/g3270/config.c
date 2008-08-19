@@ -107,10 +107,13 @@
 	{
  		const char *name = get_toggle_name(f);
 
+		Trace("Setting toggle \"%s\"",name);
+
 		if(g_key_file_has_key(conf,"Toggles",name,NULL))
 			set_toggle(f,g_key_file_get_boolean(conf,"Toggles",name,NULL));
 	}
 
+	Trace("%s loaded",filename);
  	return 0;
  }
 

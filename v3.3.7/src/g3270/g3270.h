@@ -220,5 +220,6 @@
 	};
 
 	void SetSelectionMode(int m);
+	void set_monocase(int value, int reason);
 
 #endif // G3270_H_INCLUDED

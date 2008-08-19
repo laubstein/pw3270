@@ -79,6 +79,8 @@
  static void	show_timer(long seconds);
  static void	DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
  static void 	DrawImageByWidth(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
+ static gchar	*convert_monocase(int c, gsize *sz);
+ static gchar	*convert_regular(int c, gsize *sz);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -156,6 +158,7 @@
  static guint						kbrd_state		= 0;
  static char 						timer[9]		= "";
 
+ static gchar 						*(*convert_charset)(int c, gsize *sz) = convert_regular;
  static gboolean					oia_flag[OIA_FLAG_USER];
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
@@ -219,6 +222,34 @@
     g_free(input);
  }
 
+ static gchar * convert_monocase(int c, gsize *sz)
+ {
+	gchar in[2]	= { (char) c, 0 };
+	gchar *ptr	= g_convert(in, -1, "UTF-8", CHARSET, NULL, sz, NULL);
+	gchar *ret;
+
+	if(!ptr)
+		return ptr;
+
+	ret = g_utf8_strup(ptr,*sz);
+
+	g_free(ptr);
+
+	return ret;
+ }
+
+ static gchar * convert_regular(int c, gsize *sz)
+ {
+	gchar in[2] = { (char) c, 0 };
+ 	return g_convert(in, -1, "UTF-8", CHARSET, NULL, sz, NULL);
+ }
+
+ void set_monocase(int value, int reason)
+ {
+	convert_charset = value ? convert_monocase : convert_regular;
+	screen_disp();
+ }
+
  static int addch(int row, int col, int c, unsigned short attr)
  {
  	gchar	ch[MAX_CHR_LENGTH];
@@ -237,14 +268,13 @@
 
 	if(c)
 	{
-		gsize sz;
-		gchar in[2] = { (char) c, 0 };
-		gchar *str = g_convert(in, -1, "UTF-8", CHARSET, NULL, &sz, NULL);
+		gsize sz = 1;
+		gchar *str = convert_charset(c,&sz);
 
 		if(sz < MAX_CHR_LENGTH)
 			memcpy(ch,str,sz);
 		else
-			Log("Invalid size when converting \"%s\" to \"%s\"",in,ch);
+			Log("Invalid size when converting \"%c\" to \"%s\"",c,ch);
 		g_free(str);
 
 	}

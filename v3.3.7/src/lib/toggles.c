@@ -92,7 +92,6 @@ do_toggle_reason(int ix, enum toggle_type reason)
 	 * menu label(s).
 	 */
 	toggle_toggle(t);
-
 	t->upcall(t, reason);
 
 #if defined(X3270_MENUS) /*[*/
@@ -103,6 +102,7 @@ do_toggle_reason(int ix, enum toggle_type reason)
 	t->callback(t->value, (int) reason);
 	notify_toggle_changed(ix, t->value, reason);
 #endif
+
 }
 
 int set_toggle(int ix, int value)
@@ -151,9 +151,10 @@ initialize_toggles(void)
 	}
 #endif
 
-#if defined(X3270_DISPLAY) || defined(C3270) /*[*/
-	appres.toggle[MONOCASE].upcall =         toggle_monocase;
-#endif /*]*/
+//#if defined(X3270_DISPLAY) || defined(C3270) /*[*/
+// 	appres.toggle[MONOCASE].upcall =         toggle_monocase;
+//#endif /*]*/
+
 #if defined(X3270_DISPLAY) /*[*/
 	appres.toggle[ALT_CURSOR].upcall =       toggle_altCursor;
 	appres.toggle[CURSOR_BLINK].upcall =     toggle_cursorBlink;

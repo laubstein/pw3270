@@ -343,6 +343,7 @@ int main(int argc, char *argv[])
 	gtk_widget_grab_default(terminal);
 
 	register_tchange(FULL_SCREEN,set_fullscreen);
+	register_tchange(MONOCASE,set_monocase);
 
 	while(gtk_events_pending())
 		gtk_main_iteration();
