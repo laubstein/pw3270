@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-08-19 14:43-0300\n"
-"PO-Revision-Date: 2008-08-19 14:44-0300\n"
+"PO-Revision-Date: 2008-08-19 14:57-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -137,11 +137,11 @@ msgstr "Copiar"
 
 #: actions.c:580
 msgid "Cross Hair Cursor"
-msgstr ""
+msgstr "Régua"
 
 #: colors.c:254
 msgid "Cross-hair"
-msgstr ""
+msgstr "Régua"
 
 #: colors.c:221
 msgid "Cursor"
