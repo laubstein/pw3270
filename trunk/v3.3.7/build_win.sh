@@ -42,6 +42,11 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
+sed --file=$TEMPFILE src/lib/conf.h.in > src/lib/conf.h
+if [ "$?" != "0" ]; then
+	exit -1
+fi
+
 sed --file=$TEMPFILE g3270.nsi.in > g3270.nsi
 if [ "$?" != "0" ]; then
 	exit -1
