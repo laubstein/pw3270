@@ -71,13 +71,14 @@
  static void	set_oia(OIA_FLAG id, int on);
  static void	set_compose(int on, unsigned char c, int keytype);
  static void	set_lu(const char *lu);
- static void	DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
  static void	changed(int bstart, int bend);
  static void	error(const char *s);
  static void 	warning(const char *msg);
  static int	init(void);
  static void 	update_toggle(int ix, int value, int reason, const char *name);
  static void	show_timer(long seconds);
+ static void	DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
+ static void 	DrawImageByWidth(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -463,8 +464,9 @@
 	gdk_gc_set_foreground(gc,fg);
 
 	//  0          "4" in a square
-	pango_layout_set_text(layout,"4",-1);
-	gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
+//	pango_layout_set_text(layout,"4",-1);
+//	gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
+	DrawImageByWidth(draw,gc,3,col,row,fWidth,fHeight);
 
 	col += fWidth;
 
@@ -812,10 +814,10 @@
 
  }
 
- static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height)
+ static void DrawImageByWidth(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height)
  {
-//    double ratio;
-//    int    temp;
+	double ratio;
+	int    temp;
 
  	if( ((Height != pix[id].Height) || (Width != pix[id].Width)) && pix[id].pix )
  	{
@@ -825,18 +827,37 @@
 
  	if(!pix[id].pix)
  	{
- 		/* Resize by Height */
-        // ratio = ((double) gdk_pixbuf_get_width(pix[id].base)) / ((double) gdk_pixbuf_get_height(pix[id].base));
-		// temp  = (int) ((double) ratio * ((double) Height));
-	    pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,Width,Height,GDK_INTERP_HYPER);
+ 		/* Resize by Width */
+        ratio = ((double) gdk_pixbuf_get_height(pix[id].base)) / ((double) gdk_pixbuf_get_width(pix[id].base));
+		temp  = (int) ((double) ratio * ((double) Height));
+	    pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,Width,temp,GDK_INTERP_HYPER);
+	    pix[id].Height = Height;
+	    pix[id].Width = Width;
+ 	}
+
+	DrawImage(drawable, gc, id, x, y, Width, Height);
+
+ }
+
+ static void DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height)
+ {
+
+ 	if( ((Height != pix[id].Height) || (Width != pix[id].Width)) && pix[id].pix )
+ 	{
+ 		gdk_pixbuf_unref(pix[id].pix);
+		pix[id].pix = 0;
+ 	}
+
+ 	if(!pix[id].pix)
+ 	{
+		pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,Width,Height,GDK_INTERP_HYPER);
+		pix[id].Height = Height;
+		pix[id].Width  = Width;
  	}
 
     if(pix[id].pix)
-    {
-   	   pix[id].Height = Height;
-	   pix[id].Width  = Width;
-	   gdk_pixbuf_render_to_drawable(pix[id].pix,drawable,gc,0,0,x,y,-1,-1,GDK_RGB_DITHER_NORMAL,0,0);
-    }
+		gdk_pixbuf_render_to_drawable(pix[id].pix,drawable,gc,0,0,x,y,-1,-1,GDK_RGB_DITHER_NORMAL,0,0);
+
  }
 
  void DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el)

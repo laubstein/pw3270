@@ -97,7 +97,7 @@
 	#define CURSOR_MODE_CROSS 	0x02
 	#define CURSOR_MODE_BASE	0x04
 
-	#define OIAROW				(top_margin+(fHeight*terminal_rows))
+	#define OIAROW				(top_margin+1+(fHeight*terminal_rows))
 	#define CHARSET 			charset ? charset : "ISO-8859-1"
 	#define IS_FUNCTION_KEY(event)   (event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(event->state & (GDK_MOD1_MASK|GDK_CONTROL_MASK)))
 
