@@ -27,6 +27,12 @@ echo "s&@BINEXT@&.exe&g;" >> $TEMPFILE
 echo "s&@EXTRASRC@&resources.rc&g;" >> $TEMPFILE
 echo "s&#undef PACKAGE_NAME&#define PACKAGE_NAME \"$PACKAGE_NAME\"&g;" >> $TEMPFILE
 echo "s&#undef PACKAGE_VERSION&#define PACKAGE_VERSION \"$PACKAGE_VERSION\"&g;" >> $TEMPFILE
+echo "s&#undef X3270_TN3270E&#define X3270_TN3270E 1&g;" >> $TEMPFILE
+echo "s&#undef X3270_TRACE&#define X3270_TRACE 1&g;" >> $TEMPFILE
+echo "s&#undef X3270_FT&#define X3270_FT 1&g;" >> $TEMPFILE
+echo "s&#undef X3270_ANSI&#define X3270_ANSI 1&g;" >> $TEMPFILE
+echo "s&#undef X3270_PRINTER&#define X3270_PRINTER 1&g;" >> $TEMPFILE
+echo "s&#undef HAVE_LIBSSL&#define HAVE_LIBSSL 1&g;" >> $TEMPFILE
 
 mv ~/Desktop/g3270_installer.exe ~/tmp > /dev/null 2>&1
 
