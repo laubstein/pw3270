@@ -40,6 +40,7 @@
 
 			<menu action='OptionsMenu'>
 				<menuitem action='ToggleCursorBlink' />
+				<menuitem action='ToggleMonocase' />
 				<menuitem action='ToggleCursorPos'  />
 				<menuitem action='ToggleFullScreen'  />
 				<menuitem action='ToggleMarginedPaste'  />
