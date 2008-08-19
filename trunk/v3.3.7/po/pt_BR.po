@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-18 15:07-0300\n"
-"PO-Revision-Date: 2008-08-18 15:10-0300\n"
+"POT-Creation-Date: 2008-08-19 14:43-0300\n"
+"PO-Revision-Date: 2008-08-19 14:44-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -115,7 +115,7 @@ msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
-#: keypad.c:141
+#: keypad.c:142
 msgid "Clear"
 msgstr ""
 
@@ -183,14 +183,14 @@ msgstr ""
 msgid "Enter"
 msgstr ""
 
-#: keypad.c:143
+#: keypad.c:144
 msgid ""
 "Erase\n"
 "EOF"
 msgstr "Apagar\n"
 "Campo"
 
-#: keypad.c:144
+#: keypad.c:145
 msgid ""
 "Erase\n"
 "Input"
@@ -320,7 +320,7 @@ msgstr "Bloqueada"
 
 #: actions.c:567
 msgid "Monocase"
-msgstr ""
+msgstr "Só maiúsculas"
 
 #: colors.c:242
 msgid "Mustard"
@@ -411,7 +411,7 @@ msgstr "Vermelho"
 msgid "Redraw screen"
 msgstr "Redesenhar a tela"
 
-#: actions.c:670 keypad.c:142
+#: actions.c:670 keypad.c:143
 msgid "Reset"
 msgstr ""
 
@@ -589,47 +589,47 @@ msgstr ""
 msgid "White"
 msgstr "Branco"
 
-#: screen.c:692 screen.c:716
+#: screen.c:726 screen.c:750
 msgid "X"
 msgstr ""
 
-#: screen.c:696
+#: screen.c:730
 msgid "X -f"
 msgstr ""
 
-#: screen.c:724
+#: screen.c:758
 msgid "X Connecting"
 msgstr "X Conectando"
 
-#: screen.c:712
+#: screen.c:746
 msgid "X Inhibit"
 msgstr ""
 
-#: screen.c:688
+#: screen.c:722
 msgid "X Not Connected"
 msgstr "X Não conectado"
 
-#: screen.c:704
+#: screen.c:738
 msgid "X Numeric"
 msgstr "X Numérico"
 
-#: screen.c:708
+#: screen.c:742
 msgid "X Overflow"
 msgstr ""
 
-#: screen.c:700
+#: screen.c:734
 msgid "X Protected"
 msgstr "X Protegido"
 
-#: screen.c:720
+#: screen.c:754
 msgid "X Resolving"
 msgstr "X Resolvendo"
 
-#: screen.c:676
+#: screen.c:710
 msgid "X System"
 msgstr ""
 
-#: screen.c:680
+#: screen.c:714
 msgid "X Wait"
 msgstr "X Aguarde"
 
