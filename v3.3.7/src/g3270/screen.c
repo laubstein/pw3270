@@ -252,11 +252,12 @@
 
  static int addch(int row, int col, int c, unsigned short attr)
  {
- 	gchar	ch[MAX_CHR_LENGTH];
- 	short	fg;
- 	short	bg;
- 	ELEMENT *el;
- 	int		pos = (row*terminal_cols)+col;
+ 	gchar				ch[MAX_CHR_LENGTH];
+ 	short				fg;
+ 	short				bg;
+ 	unsigned short	extended = 0;
+ 	ELEMENT 			*el;
+ 	int					pos = (row*terminal_cols)+col;
 
  	if(!screen || col >= terminal_cols || row >= terminal_rows)
 		return EINVAL;
@@ -268,14 +269,22 @@
 
 	if(c)
 	{
-		gsize sz = 1;
-		gchar *str = convert_charset(c,&sz);
-
-		if(sz < MAX_CHR_LENGTH)
-			memcpy(ch,str,sz);
+		if(attr & CHAR_ATTR_UNCONVERTED)
+		{
+			extended	= (unsigned short) c;
+			c			= ' ';
+		}
 		else
-			Log("Invalid size when converting \"%c\" to \"%s\"",c,ch);
-		g_free(str);
+		{
+			gsize sz = 1;
+			gchar *str = convert_charset(c,&sz);
+
+			if(sz < MAX_CHR_LENGTH)
+				memcpy(ch,str,sz);
+			else
+				Log("Invalid size when converting \"%c\" to \"%s\"",c,ch);
+			g_free(str);
+		}
 
 	}
 
@@ -289,11 +298,12 @@
 	// Get element entry in the buffer, update ONLY if changed
  	el = screen + pos;
 
-	if( !(bg != el->bg || fg != el->fg || memcmp(el->ch,ch,MAX_CHR_LENGTH)))
+	if( !(bg != el->bg || fg != el->fg || el->extended != extended || memcmp(el->ch,ch,MAX_CHR_LENGTH)))
 		return 0;
 
-	el->bg = bg;
-	el->fg = fg;
+	el->bg			= bg;
+	el->fg 			= fg;
+	el->extended	= extended;
 	memcpy(el->ch,ch,MAX_CHR_LENGTH);
 
 	if(draw && terminal && pixmap)
@@ -665,17 +675,7 @@
 		x = left_margin;
 		for(col = 0; col < terminal_cols;col++)
 		{
-			// Set character attributes in the layout
-			if(el->ch && *el->ch != ' ' && *el->ch)
-			{
-				DrawElement(draw,clr,gc,layout,x,y,el);
-			}
-			else
-			{
-				gdk_gc_set_foreground(gc,clr+(el->selected ? TERMINAL_COLOR_SELECTED_BG : el->bg));
-				gdk_draw_rectangle(draw,gc,1,x,y,fWidth,fHeight);
-			}
-
+			DrawElement(draw,clr,gc,layout,x,y,el);
 			el++;
 			x += fWidth;
 		}
@@ -894,17 +894,122 @@
 
  }
 
+ static void DrawCorner(GdkDrawable *drawable, GdkGC *gc, GdkColor *fg, int x1, int y1, int x2, int y2, int x3, int y3)
+ {
+	GdkPoint points[] = { { x1, y1 }, { x2, y2 }, { x3, y3 } };
+	gdk_gc_set_foreground(gc,fg);
+	gdk_draw_lines(drawable,gc,points,3);
+ }
+
  void DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el)
  {
+	short fg;
+	short bg;
+
  	if(!(gc && draw && layout && el))
 		return;
 
-	pango_layout_set_text(layout,el->ch,-1);
-
 	if(el->selected)
-		gdk_draw_layout_with_colors(draw,gc,x,y,layout,color+TERMINAL_COLOR_SELECTED_FG,clr+TERMINAL_COLOR_SELECTED_BG);
+	{
+		fg = TERMINAL_COLOR_SELECTED_FG;
+		bg = TERMINAL_COLOR_SELECTED_BG;
+	}
 	else
-		gdk_draw_layout_with_colors(draw,gc,x,y,layout,color+el->fg,clr+el->bg);
+	{
+		fg = el->fg;
+		bg = el->bg;
+	}
+
+	switch(el->extended)
+	{
+	case 0:	// Standard char or empty space, draw directly
+		if(el->ch && *el->ch != ' ' && *el->ch)
+		{
+			pango_layout_set_text(layout,el->ch,-1);
+			gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+		}
+		else
+		{
+			gdk_gc_set_foreground(gc,clr+bg);
+			gdk_draw_rectangle(draw,gc,1,x,y,fWidth,fHeight);
+		}
+		break;
+
+//	case 0xaf: // CG 0xd1, degree
+//		break;
+
+	case 0xd4: // CG 0xac, LR corner
+		DrawCorner(draw, gc, clr+fg, x, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y);
+		break;
+
+	case 0xd5: // CG 0xad, UR corner
+		DrawCorner(draw, gc, clr+fg, x, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y+fHeight);
+		break;
+
+	case 0xc5: // CG 0xa4, UL corner
+		DrawCorner(draw, gc, clr+fg, x+fWidth, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y+fHeight);
+		break;
+
+	case 0xc4: // CG 0xa3, LL corner
+		DrawCorner(draw, gc, clr+fg, x+fWidth, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y);
+		break;
+
+//	case 0xd3: // CG 0xab, plus
+//		break;
+
+	case 0xa2: // CG 0x92, horizontal line
+		gdk_gc_set_foreground(gc,clr+fg);
+		y += (fHeight >> 1);
+		gdk_draw_line(draw,gc,x,y,x+fWidth,y);
+		break;
+
+//	case 0xc6: // CG 0xa5, left tee
+//		break;
+
+//	case 0xd6: // CG 0xae, right tee
+//		break;
+
+//	case 0xc7: // CG 0xa6, bottom tee
+//		break;
+
+//	case 0xd7: // CG 0xaf, top tee
+//		break;
+
+//	case 0xbf: // CG 0x15b, stile
+//		break;
+
+	case 0x85: // CG 0x184, vertical line
+		gdk_gc_set_foreground(gc,clr+fg);
+		x += (fWidth >> 1);
+		gdk_draw_line(draw,gc,x,y,x,y+fHeight);
+		break;
+
+//	case 0x8c: // CG 0xf7, less or equal
+//		break;
+
+//	case 0xae: // CG 0xd9, greater or equal
+//		break;
+
+//	case 0xbe: // CG 0x3e, not equal
+//		break;
+
+//	case 0xa3: // CG 0x93, bullet
+//		break;
+
+	case 0xad:
+		pango_layout_set_text(layout,"[",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+		break;
+
+	case 0xbd:
+		pango_layout_set_text(layout,"]",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+		break;
+
+	default:	// Unknown char, draw "?"
+		pango_layout_set_text(layout,"?",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+	}
 
  }
 

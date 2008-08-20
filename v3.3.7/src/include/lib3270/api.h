@@ -145,6 +145,8 @@
 		#define COLOR_ATTR_UNDERLINE	0x0400
 		#define COLOR_ATTR_INTENSIFY	0x0800
 
+		#define CHAR_ATTR_UNCONVERTED	0x1000
+
 		struct lib3270_screen_callbacks
 		{
 			unsigned short sz;

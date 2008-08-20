@@ -38,10 +38,11 @@
 	#define MAX_CHR_LENGTH 3
 	typedef struct _element
 	{
-		gchar		ch[MAX_CHR_LENGTH];
-		short		fg;
-		short		bg;
-		gboolean	selected;
+		gchar				ch[MAX_CHR_LENGTH];
+		short				fg;
+		short				bg;
+		unsigned short	extended;
+		gboolean			selected;
 	} ELEMENT;
 	extern ELEMENT *screen;
 

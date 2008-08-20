@@ -71,8 +71,7 @@ static void status_3270_mode(Boolean ignored);
 static void status_printer(Boolean on);
 static int color_from_fa(unsigned char fa);
 static Boolean ts_value(const char *s, enum ts *tsp);
-static int linedraw_to_acs(unsigned char c);
-static int apl_to_acs(unsigned char c);
+// static int apl_to_acs(unsigned char c);
 static void relabel(Boolean ignored);
 // static void check_aplmap(int codepage);
 
@@ -334,7 +333,7 @@ void screen_disp(void)
 {
 	int row, col;
 	int a;
-	int c;
+//	int c;
 	int attr = defattr;
 	unsigned char fa;
 #if defined(X3270_DBCS) /*[*/
@@ -355,18 +354,15 @@ void screen_disp(void)
 			    	fa_addr = baddr;
 				fa = ea_buf[baddr].fa;
 				a = calc_attrs(baddr, baddr, fa);
-//				attrset(defattr);
 				addch(row,col,' ',attr = defattr);
 			} else if (FA_IS_ZERO(fa)) {
 			    	/* Blank. */
-//				attrset(a);
 				addch(row,col,' ',attr=a);
 			} else {
 			    	/* Normal text. */
 				if (!(ea_buf[baddr].gr ||
 				      ea_buf[baddr].fg ||
 				      ea_buf[baddr].bg)) {
-					// attrset(a);
 					attr = a;
 				} else {
 					int b;
@@ -376,7 +372,6 @@ void screen_disp(void)
 					 * attributes.
 					 */
 					attr = b = calc_attrs(baddr, fa_addr, fa);
-//					attrset(b);
 				}
 #if defined(X3270_DBCS) /*[*/
 				d = ctlr_dbcs_state(baddr);
@@ -395,20 +390,16 @@ void screen_disp(void)
 					}
 				} else if (!IS_RIGHT(d)) {
 #endif /*]*/
-					if (ea_buf[baddr].cs == CS_LINEDRAW) {
-						c = linedraw_to_acs(ea_buf[baddr].cc);
-						if (c != -1)
-							addch(row,col,c,attr);
-						else
-							addch(row,col,' ',attr);
-					} else if (ea_buf[baddr].cs == CS_APL ||
-						   (ea_buf[baddr].cs & CS_GE)) {
-						c = apl_to_acs(ea_buf[baddr].cc);
-						if (c != -1)
-							addch(row,col,c,attr);
-						else
-							addch(row,col,' ',attr);
-					} else {
+					if (ea_buf[baddr].cs == CS_LINEDRAW)
+					{
+						addch(row,col,ea_buf[baddr].cc,attr);
+					}
+					else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
+					{
+						addch(row,col,ea_buf[baddr].cc,attr|CHAR_ATTR_UNCONVERTED);
+					}
+					else
+					{
 						if (toggled(MONOCASE))
 							addch(row,col,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
 						else
@@ -684,180 +675,68 @@ screen_80(void)
 }
 
 /*
- * Translate an x3270 font line-drawing character (the first two rows of a
- * standard X11 fixed-width font) to an ASCII-art equivalent.
- *
- * Returns -1 if there is no translation.
- */
-static int
-linedraw_to_acs(unsigned char c)
-{
-    	int r;
-
-	/* FIXME: Need aplmap equivalent functionality for xterm linedraw. */
-
-	/* Use Unicode. */
-	switch (c) {
-	case 0x0:	/* '_', block */
-		r = -1;
-		break;
-	case 0x1:	/* '`', diamond */
-		r = 0x25c6;
-		break;
-	case 0x2:	/* 'a', checkerboard */
-		r = -1;
-		break;
-	case 0x7:	/* 'f', degree */
-		r = 0xb0;
-		break;
-	case 0x8:	/* 'g', plusminus */
-		r = 0xb1;
-		break;
-	case 0x9:	/* 'h', board? */
-		r = -1;
-		break;
-	case 0xa:	/* 'i', lantern? */
-		r = -1;
-		break;
-	case 0xb:	/* 'j', LR corner */
-		r = 0x2518;
-		break;
-	case 0xc:	/* 'k', UR corner */
-		r = 0x2510;
-		break;
-	case 0xd:	/* 'l', UL corner */
-		r = 0x250c;
-		break;
-	case 0xe:	/* 'm', LL corner */
-		r = 0x2514;
-		break;
-	case 0xf:	/* 'n', plus */
-		r = 0x253c;
-		break;
-	case 0x10:	/* 'o', top horizontal */
-		r = '-';
-		break;
-	case 0x11:	/* 'p', row 3 horizontal */
-		r = '-';
-		break;
-	case 0x12:	/* 'q', middle horizontal */
-		r = 0x2500;
-		break;
-	case 0x13:	/* 'r', row 7 horizontal */
-		r = '-';
-		break;
-	case 0x14:	/* 's', bottom horizontal */
-		r = '_';
-		break;
-	case 0x15:	/* 't', left tee */
-		r = 0x251c;
-		break;
-	case 0x16:	/* 'u', right tee */
-		r = 0x2524;
-		break;
-	case 0x17:	/* 'v', bottom tee */
-		r = 0x2534;
-		break;
-	case 0x18:	/* 'w', top tee */
-		r = 0x252c;
-		break;
-	case 0x19:	/* 'x', vertical line */
-		r = 0x2502;
-		break;
-	case 0x1a:	/* 'y', less or equal */
-		r = 0x2264;
-		break;
-	case 0x1b:	/* 'z', greater or equal */
-		r = 0x2265;
-		break;
-	case 0x1c:	/* '{', pi */
-		r = 0x03c0;
-		break;
-	case 0x1d:	/* '|', not equal */
-		r = 0x2260;
-		break;
-	case 0x1e:	/* '}', sterling */
-		r = 0xa3;
-		break;
-	case 0x1f:	/* '~', bullet */
-		r = 0x2022;
-		break;
-	default:
-		r = -1;
-		break;
-	}
-
-	/* If we're pre-NT, we can't assume that Unicode works. */
-	if (!is_nt && (r & ~0xff))
-	    	r = -1;
-
-	return r;
-}
-
 int have_aplmap = 0;
 unsigned char aplmap[256];
 
-static int
-apl_to_acs(unsigned char c)
+static int apl_to_acs(unsigned char c)
 {
     	int r;
 
-	/* If there's an explicit map for this Windows code page, use it. */
+	// If there's an explicit map for this Windows code page, use it.
 	if (have_aplmap) {
 	    	r = aplmap[c];
 		return r? r: -1;
 	}
 
-	/* Use Unicode. */
+	// Use Unicode.
 	switch (c) {
-	case 0xaf: /* CG 0xd1, degree */
-		r = 0xb0;	/* XXX may not map to bullet in current
-				       codepage */
+	case 0xaf: // CG 0xd1, degree
+		r = 0xb0;	// XXX may not map to bullet in current codepage
 		break;
-	case 0xd4: /* CG 0xac, LR corner */
+	case 0xd4: // CG 0xac, LR corner
 		r = 0x2518;
 		break;
-	case 0xd5: /* CG 0xad, UR corner */
+	case 0xd5: // CG 0xad, UR corner
 		r = 0x2510;
 		break;
-	case 0xc5: /* CG 0xa4, UL corner */
+	case 0xc5: // CG 0xa4, UL corner
 		r = 0x250c;
 		break;
-	case 0xc4: /* CG 0xa3, LL corner */
+	case 0xc4: // CG 0xa3, LL corner
 		r = 0x2514;
 		break;
-	case 0xd3: /* CG 0xab, plus */
+	case 0xd3: // CG 0xab, plus
 		r = 0x253c;
 		break;
-	case 0xa2: /* CG 0x92, horizontal line */
+	case 0xa2: // CG 0x92, horizontal line
 		r = 0x2500;
 		break;
-	case 0xc6: /* CG 0xa5, left tee */
+	case 0xc6: // CG 0xa5, left tee
 		r = 0x251c;
 		break;
-	case 0xd6: /* CG 0xae, right tee */
+	case 0xd6: // CG 0xae, right tee
 		r = 0x2524;
 		break;
-	case 0xc7: /* CG 0xa6, bottom tee */
+	case 0xc7: // CG 0xa6, bottom tee
 		r = 0x2534;
 		break;
-	case 0xd7: /* CG 0xaf, top tee */
+	case 0xd7: // CG 0xaf, top tee
 		r = 0x252c;
 		break;
-	case 0xbf: /* CG 0x15b, stile */
-	case 0x85: /* CG 0x184, vertical line */
+	case 0xbf: // CG 0x15b, stile
+	case 0x85: // CG 0x184, vertical line
 		r = 0x2502;
 		break;
-	case 0x8c: /* CG 0xf7, less or equal */
+	case 0x8c: // CG 0xf7, less or equal
 		r = 0x2264;
 		break;
-	case 0xae: /* CG 0xd9, greater or equal */
+	case 0xae: // CG 0xd9, greater or equal
 		r = 0x2265;
 		break;
-	case 0xbe: /* CG 0x3e, not equal */
+	case 0xbe: // CG 0x3e, not equal
 		r = 0x2260;
 		break;
-	case 0xa3: /* CG 0x93, bullet */
+	case 0xa3: // CG 0x93, bullet
 		r = 0x2022;
 		break;
 	case 0xad:
@@ -871,12 +750,9 @@ apl_to_acs(unsigned char c)
 		break;
 	}
 
-	/* If pre-NT, we can't assume that Unicode works. */
-	if (!is_nt && (r & ~0xff))
-	    	r = -1;
-
 	return r;
 }
+*/
 
 /* Read the aplMap.<windows-codepage> resource into aplmap[]. */ /*
 static void
