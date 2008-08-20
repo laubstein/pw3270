@@ -974,6 +974,12 @@
 	SaveText(N_( "Save clipboard contents" ), GetClipboard());
  }
 
+ void SetHostname(const gchar *hostname)
+ {
+	SetString("Network","Hostname",hostname);
+	CallPlugins("SetHostname",hostname);
+ }
+
  void action_SetHostname(void)
  {
  	const char		*host 		= GetString("Network","Hostname","");
@@ -1029,7 +1035,7 @@
 				if(!wait4negotiations(buffer))
 				{
 					again = FALSE;
-					SetString("Network","Hostname",buffer);
+					SetHostname(buffer);
 				}
 			}
 			break;

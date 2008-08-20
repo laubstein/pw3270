@@ -225,6 +225,6 @@
 	int		UnloadPlugins(void);
 	void	CallPlugins(const gchar *name, const gchar *arg);
 
-
+	void 	SetHostname(const gchar *hostname);
 
 #endif // G3270_H_INCLUDED
