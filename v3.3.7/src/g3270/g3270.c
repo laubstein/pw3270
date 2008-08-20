@@ -356,7 +356,7 @@ int main(int argc, char *argv[])
 	screen_suspend();
 
 	if(cl_hostname != CN)
-		SetString("Network","Hostname",cl_hostname);
+		SetHostname(cl_hostname);
 	else
 		cl_hostname = GetString("Network","Hostname",CN);
 
@@ -381,4 +381,5 @@ int main(int argc, char *argv[])
 	CloseConfigFile();
 	return 0;
 }
+
 
