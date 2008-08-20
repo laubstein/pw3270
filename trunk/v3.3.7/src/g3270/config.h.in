@@ -2,10 +2,13 @@
 
 	#define CONFIG_H_INCLUDED 1
 
-        #undef PACKAGE_NAME
-        #undef PACKAGE_VERSION
+	#undef PACKAGE_NAME
+	#undef PACKAGE_VERSION
+	#undef LOCALEDIR
+	#undef GETTEXT_PACKAGE
 
-	#define GETTEXT_PACKAGE "g3270"
-	#define LOCALEDIR "locale"
+	#ifndef GETTEXT_PACKAGE
+		#define GETTEXT_PACKAGE PACKAGE_NAME
+	#endif
 
 #endif /* CONFIG_H_INCLUDED */
