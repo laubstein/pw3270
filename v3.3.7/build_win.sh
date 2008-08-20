@@ -33,6 +33,7 @@ echo "s&#undef X3270_FT&#define X3270_FT 1&g;" >> $TEMPFILE
 echo "s&#undef X3270_ANSI&#define X3270_ANSI 1&g;" >> $TEMPFILE
 echo "s&#undef X3270_PRINTER&#define X3270_PRINTER 1&g;" >> $TEMPFILE
 echo "s&#undef HAVE_LIBSSL&#define HAVE_LIBSSL 1&g;" >> $TEMPFILE
+echo "s&#undef LOCALEDIR&#define LOCALEDIR \"$LOCALE\"&g;" >> $TEMPFILE
 
 mv ~/Desktop/g3270_installer.exe ~/tmp > /dev/null 2>&1
 

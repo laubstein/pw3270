@@ -58,7 +58,7 @@
 		<Unit filename="src/g3270/config.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/g3270/config.h" />
+		<Unit filename="src/g3270/config.h.in" />
 		<Unit filename="src/g3270/fonts.conf" />
 		<Unit filename="src/g3270/g3270.c">
 			<Option compilerVar="CC" />
