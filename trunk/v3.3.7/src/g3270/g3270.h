@@ -219,7 +219,12 @@
 		SELECT_MODE_INVALID
 	};
 
-	void SetSelectionMode(int m);
-	void set_monocase(int value, int reason);
+	void	SetSelectionMode(int m);
+	void	set_monocase(int value, int reason);
+	int 	LoadPlugins(const gchar *path);
+	int		UnloadPlugins(void);
+	void	CallPlugins(const gchar *name, const gchar *arg);
+
+
 
 #endif // G3270_H_INCLUDED
