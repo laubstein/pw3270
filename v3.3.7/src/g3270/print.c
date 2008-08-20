@@ -38,8 +38,8 @@
  static int doPrint(GtkPrintOperation *prt, GtkPrintContext *context,cairo_t *cr,gint page)
  {
  	gchar					**text;
-	PangoFontDescription	*FontDescr		= (PangoFontDescription *) g_object_get_data(G_OBJECT(prt),"g3270_FontDescr");
-	PangoLayout				*FontLayout		= (PangoLayout *) g_object_get_data(G_OBJECT(prt),"g3270_FontLayout");
+	PangoFontDescription	*FontDescr	= (PangoFontDescription *) g_object_get_data(G_OBJECT(prt),"g3270_FontDescr");
+	PangoLayout				*FontLayout	= (PangoLayout *) g_object_get_data(G_OBJECT(prt),"g3270_FontLayout");
 	int						pg			= 0;
 	gdouble					maxHeight 	= gtk_print_context_get_height(context);
 	gdouble					current		= 0;
