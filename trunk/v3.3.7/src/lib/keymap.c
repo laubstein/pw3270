@@ -67,8 +67,7 @@ static Boolean last_nvt = False;
 // static int lookup_ccode(const char *s);
 static void keymap_3270_mode(Boolean);
 
-static void read_one_keymap(const char *name, const char *fn, const char *r0,
-    int flags);
+// static void read_one_keymap(const char *name, const char *fn, const char *r0,int flags);
 static void clear_keymap(void);
 static void set_inactive(void);
 
@@ -185,10 +184,10 @@ parse_keydef(char **str, int *ccode, int *hint)
  * On success, returns a resource string (which must be closed) or NULL
  *  (indicating a file name to open is in *fullname) in '*r'.
  */
+/*
 static int
 locate_keymap(const char *name, char **fullname, char **r)
 {
-/*
 	char *rs;			// resource value
 	char *fnx;			// expanded file name
 	char *fny;
@@ -235,9 +234,9 @@ locate_keymap(const char *name, char **fullname, char **r)
 
 	// No dice.
 	Free(fny);
-*/
 	return -1;
 }
+*/
 
 /*
  * Compare a pair of keymaps for compatablity (could k2 match k1).
@@ -318,6 +317,7 @@ add_keymap_entry(int ncodes, int *codes, int *hints, const char *file,
 static void
 read_keymap(const char *name)
 {
+/*
 	char *name_3270 = xs_buffer("%s.3270", name);
 	char *name_nvt = xs_buffer("%s.nvt", name);
 	int rc, rc_3270, rc_nvt;
@@ -328,8 +328,7 @@ read_keymap(const char *name)
 	rc_3270 = locate_keymap(name_3270, &fn_3270, &r0_3270);
 	rc_nvt = locate_keymap(name_nvt, &fn_nvt, &r0_nvt);
 	if (rc < 0 && rc_3270 < 0 && rc_nvt < 0) {
-		xs_warning("No such keymap resource or file: %s",
-		    name);
+		xs_warning("No such keymap resource or file: %s",name);
 		Free(name_3270);
 		Free(name_nvt);
 		return;
@@ -352,6 +351,7 @@ read_keymap(const char *name)
 	}
 	Free(name_3270);
 	Free(name_nvt);
+*/
 }
 
 /*
@@ -360,10 +360,11 @@ read_keymap(const char *name)
  *
  * Keymap files look suspiciously like x3270 keymaps, but aren't.
  */
+/*
+
 static void
 read_one_keymap(const char *name, const char *fn, const char *r0, int flags)
 {
-/*
 	char *r = CN;			// resource value
 	char *r_copy = CN;		// initial value of r
 	FILE *f = NULL;			// resource file
@@ -476,8 +477,8 @@ read_one_keymap(const char *name, const char *fn, const char *r0, int flags)
 		fclose(f);
 	if (xfn != fn)
 	    Free(xfn);
-*/
 }
+*/
 
 /* Multi-key keymap support. */
 static struct keymap *current_match = NULL;
