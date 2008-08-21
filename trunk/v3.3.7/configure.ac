@@ -37,6 +37,9 @@ dnl Initialise automake with the package name, version and
 dnl bug-reporting address.
 AC_INIT([g3270], [3.3.7p5], [perry.werneck@gmail.com])
 
+dnl Place auxilliary scripts here.
+AC_CONFIG_AUX_DIR([scripts])
+
 dnl Put macro definitions here (though they aren't used).
 AC_CONFIG_HEADER([src/g3270/config.h])
 
@@ -50,7 +53,7 @@ AC_PROG_LIBTOOL
 
 # Checks for libraries.
 PKG_CHECK_EXISTS
-PKG_CHECK_MODULES( [GTK], [glib-2.0 gtk+-2.0 >= 2.12 gthread-2.0 gthread-2.0 gmodule-2.0], AC_DEFINE(HAVE_GTK) )
+PKG_CHECK_MODULES( [GTK], [glib-2.0 gtk+-2.0 >= 2.10 gthread-2.0 gthread-2.0 gmodule-2.0], AC_DEFINE(HAVE_GTK) )
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
 
