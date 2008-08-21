@@ -37,7 +37,6 @@
 		<Unit filename="build_win.sh">
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="config_win32.sh" />
 		<Unit filename="configure.ac" />
 		<Unit filename="g3270.nsi.in" />
 		<Unit filename="src/g3270/actions.c">
@@ -277,6 +276,9 @@
 		</Unit>
 		<Unit filename="src/lib/xioc.h" />
 		<Unit filename="src/lib/xl.h" />
+		<Unit filename="win32.sh">
+			<Option target="Release" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />
