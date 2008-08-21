@@ -86,6 +86,7 @@ AC_SUBST(CROSS)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
+AC_OUTPUT(g3270.spec)
 
 dnl Output the generated config.status script.
 AC_OUTPUT
