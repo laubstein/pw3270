@@ -31,6 +31,7 @@ echo "s&@EXEOPT@&-mwindows&g;" >> $TEMPFILE
 echo "s&@EXTRA_FLAGS@&-mno-cygwin&g;" >> $TEMPFILE
 echo "s&@EXTRASRC@&resources.rc&g;" >> $TEMPFILE
 echo "s&@EXTRA_TARGETS@&w3n46.dll&g;" >> $TEMPFILE
+echo "s&@host_os@&windows&g;" >> $TEMPFILE
 echo "s&#undef PACKAGE_NAME&#define PACKAGE_NAME \"$PACKAGE_NAME\"&g;" >> $TEMPFILE
 echo "s&#undef PACKAGE_VERSION&#define PACKAGE_VERSION \"$PACKAGE_VERSION\"&g;" >> $TEMPFILE
 echo "s&#undef X3270_TN3270E&#define X3270_TN3270E 1&g;" >> $TEMPFILE
