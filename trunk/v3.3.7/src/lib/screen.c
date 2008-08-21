@@ -42,9 +42,13 @@
 #include "statusc.h"
 #include <lib3270/api.h>
 
-#include <windows.h>
-#include <wincon.h>
-#include "winversc.h"
+#if defined(_WIN32)
+	#include <windows.h>
+	#include <wincon.h>
+	#include "winversc.h"
+#else
+	#include <stdarg.h>
+#endif
 
 
 #define get_color_pair(fg,bg) (((bg&0x0F) << 4) | (fg&0x0F))
@@ -59,7 +63,7 @@ static int defattr = 0;
 // static unsigned long input_id;
 
 // Boolean escaped = True;
-Boolean screen_has_changes = FALSE;
+Boolean screen_has_changes = 0;
 
 enum ts { TS_AUTO, TS_ON, TS_OFF };
 enum ts ab_mode = TS_AUTO;
@@ -164,9 +168,9 @@ screen_init(void)
 
 	/* If the want monochrome, assume they want green. */
 	if (!appres.m3279) {
-	    	defattr |= FOREGROUND_GREEN;
-		if (ab_mode == TS_ON)
-			defattr |= FOREGROUND_INTENSITY;
+    	defattr = COLOR_GREEN;
+//		if (ab_mode == TS_ON)
+//			defattr = COLOR_WHITE;
 	}
 
 	/* Pull in the user's color mappings. */
@@ -320,7 +324,7 @@ void screen_erase(void)
 	if(callbacks && callbacks->erase)
 	{
 		callbacks->erase();
-		screen_has_changes = FALSE;
+		screen_has_changes = 0;
 		return;
 	}
 
@@ -413,7 +417,7 @@ void screen_disp(void)
 	}
 //	attrset(defattr);
 
-	screen_has_changes = FALSE;
+	screen_has_changes = 0;
 }
 
 void screen_suspend(void)
@@ -830,7 +834,7 @@ relabel(Boolean ignored unused)
 
 void screen_changed(int bstart, int bend)
 {
-	screen_has_changes = TRUE;
+	screen_has_changes = 1;
 
 	/* If the application can manage screen changes, let it do it */
 	if(callbacks && callbacks->changed)
