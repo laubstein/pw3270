@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-19 14:43-0300\n"
-"PO-Revision-Date: 2008-08-19 14:57-0300\n"
+"POT-Creation-Date: 2008-08-20 17:30-0300\n"
+"PO-Revision-Date: 2008-08-20 17:31-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -35,6 +35,10 @@ msgstr ""
 
 #: actions.c:583
 msgid "<alt>Home"
+msgstr ""
+
+#: actions.c:579
+msgid "<alt>S"
 msgstr ""
 
 #: actions.c:580
@@ -282,7 +286,7 @@ msgstr "Verde"
 msgid "Help"
 msgstr "Ajuda"
 
-#: actions.c:996
+#: actions.c:1002
 msgid "Hostname:"
 msgstr "Endereço do servidor:"
 
@@ -411,6 +415,10 @@ msgstr "Vermelho"
 msgid "Redraw screen"
 msgstr "Redesenhar a tela"
 
+#: actions.c:138
+msgid "Reselect"
+msgstr ""
+
 #: actions.c:670 keypad.c:143
 msgid "Reset"
 msgstr ""
@@ -463,7 +471,7 @@ msgstr ""
 msgid "Scroll bar"
 msgstr ""
 
-#: actions.c:984
+#: actions.c:990
 msgid "Secure connection"
 msgstr "Conexão segura"
 
@@ -499,7 +507,7 @@ msgstr "Seleção retangular"
 msgid "Select font"
 msgstr "Selecionar fonte"
 
-#: actions.c:985
+#: actions.c:991
 msgid "Select hostname"
 msgstr "Selecionar servidor"
 
@@ -577,6 +585,10 @@ msgstr "Turquesa"
 msgid "Unexpected error"
 msgstr "Erro inexperado"
 
+#: actions.c:137
+msgid "Unselect"
+msgstr "Desmarcar"
+
 #: actions.c:169
 msgid "Up"
 msgstr ""
@@ -589,47 +601,47 @@ msgstr ""
 msgid "White"
 msgstr "Branco"
 
-#: screen.c:726 screen.c:750
+#: screen.c:728 screen.c:752
 msgid "X"
 msgstr ""
 
-#: screen.c:730
+#: screen.c:732
 msgid "X -f"
 msgstr ""
 
-#: screen.c:758
+#: screen.c:760
 msgid "X Connecting"
 msgstr "X Conectando"
 
-#: screen.c:746
+#: screen.c:748
 msgid "X Inhibit"
 msgstr ""
 
-#: screen.c:722
+#: screen.c:724
 msgid "X Not Connected"
 msgstr "X Não conectado"
 
-#: screen.c:738
+#: screen.c:740
 msgid "X Numeric"
 msgstr "X Numérico"
 
-#: screen.c:742
+#: screen.c:744
 msgid "X Overflow"
 msgstr ""
 
-#: screen.c:734
+#: screen.c:736
 msgid "X Protected"
 msgstr "X Protegido"
 
-#: screen.c:754
+#: screen.c:756
 msgid "X Resolving"
 msgstr "X Resolvendo"
 
-#: screen.c:710
+#: screen.c:712
 msgid "X System"
 msgstr ""
 
-#: screen.c:714
+#: screen.c:716
 msgid "X Wait"
 msgstr "X Aguarde"
 
@@ -664,12 +676,4 @@ msgstr "_Opções"
 #: actions.c:126
 msgid "_Quit"
 msgstr "_Sair"
-
-#: actions.c:138
-msgid "_Reselect"
-msgstr "Reselecionar"
-
-#: actions.c:137
-msgid "_Unselect"
-msgstr "Deselecionar"
 
