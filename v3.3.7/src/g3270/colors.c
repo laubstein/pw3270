@@ -115,16 +115,25 @@
  {
 	int 	f;
 	gchar	clr[4096];
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
 	gchar	*ptr;
+#else
+	int		sz;
+#endif
 
  	for(f=0;f < TERMINAL_COLOR_COUNT;f++)
  	{
  		if(f > 0)
 			g_strlcat(clr,",",4095);
 
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
 		ptr = gdk_color_to_string(color+f);
 		g_strlcat(clr,ptr,4095);
 		g_free(ptr);
+#else
+		sz = strlen(clr);
+		g_snprintf(clr+sz,4094-sz,"#%04x%04x%04x",(color+f)->red,(color+f)->green,(color+f)->blue);
+#endif
 
  	}
 

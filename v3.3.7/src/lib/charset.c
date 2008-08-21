@@ -52,7 +52,7 @@
 #define EURO_SUFFIX	"-euro"
 #define ES_SIZE		(sizeof(EURO_SUFFIX) - 1)
 
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32) || defined(LIB3270) /*[*/
 extern void set_display_charset(char *dcs);
 #endif /*]*/
 

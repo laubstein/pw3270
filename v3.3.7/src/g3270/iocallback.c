@@ -25,9 +25,13 @@
  */
 
 #if defined(_WIN32) /*[*/
-#include <windows.h>
-#include "winversc.h"
-#include "windirsc.h"
+	#include <windows.h>
+	#include "winversc.h"
+	#include "windirsc.h"
+#else
+	#include <poll.h>
+	#include <malloc.h>
+	#include <string.h>
 #endif /*]*/
 
 #include <stdio.h>
@@ -135,6 +139,7 @@ static void g3270_RemoveInput(unsigned long id)
 static unsigned long g3270_AddOutput(int source, void (*fn)(void))
 {
 	#warning not implemented
+	return -1;
 }
 #endif /*]*/
 
@@ -144,6 +149,7 @@ static unsigned long g3270_AddExcept(int source, void (*fn)(void))
 	return 0;
 #else /*][*/
 	#warning Not Implemented
+	return 0;
 #endif /*]*/
 }
 
@@ -208,7 +214,17 @@ static gboolean IO_check(GSource *source)
 		return TRUE;
 
 #else /*][*/
-	#warning Not Implemented
+
+	struct pollfd fds;
+
+	memset(&fds,0,sizeof(fds));
+
+	fds.fd     = ((IO_Source *) source)->poll.fd;
+    fds.events = ((IO_Source *) source)->poll.events;
+
+	if(poll(&fds,1,0) > 0)
+		return TRUE;
+
 #endif /*]*/
 
 	return FALSE;
