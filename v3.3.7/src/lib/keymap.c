@@ -30,7 +30,10 @@
 #include "statusc.h"
 #include "trace_dsc.h"
 #include "utilc.h"
-#include <windows.h>
+
+#if defined(_WIN32)
+	#include <windows.h>
+#endif
 
 #define WC3270KM_SUFFIX	"wc3270km"
 #define SUFFIX_LEN	sizeof(WC3270KM_SUFFIX)
@@ -61,7 +64,7 @@ static struct keymap **nextk = &master_keymap;
 static Boolean last_3270 = False;
 static Boolean last_nvt = False;
 
-static int lookup_ccode(const char *s);
+// static int lookup_ccode(const char *s);
 static void keymap_3270_mode(Boolean);
 
 static void read_one_keymap(const char *name, const char *fn, const char *r0,
@@ -83,6 +86,7 @@ enum {
 	PKE_USYM = -4
 } pk_error;
 
+/*
 static char *pk_errmsg[] = {
 	"Missing <Key>",
 	"Unknown modifier",
@@ -99,7 +103,7 @@ parse_keydef(char **str, int *ccode, int *hint)
 	int flags = 0;
 	KeySym Ks;
 
-	/* Check for nothing. */
+	// Check for nothing.
 	while (isspace(*s))
 		s++;
 	if (!*s)
@@ -160,17 +164,18 @@ parse_keydef(char **str, int *ccode, int *hint)
 	} else
 		*ccode = (int)Ks;
 
-	/* Canonicalize Ctrl for printable characters. */
+	// Canonicalize Ctrl for printable characters.
 	if ((flags & KM_CTRL) && !(*ccode & ~0xff)) {
 		*ccode &= 0x1f;
 		flags &= ~KM_CTRL;
 	}
 
-	/* Return the remaining string, and success. */
+	// Return the remaining string, and success.
 	*str = t;
 	*hint = flags;
 	return 1;
 }
+*/
 
 /*
  * Locate a keymap resource or file.
@@ -183,36 +188,35 @@ parse_keydef(char **str, int *ccode, int *hint)
 static int
 locate_keymap(const char *name, char **fullname, char **r)
 {
-	char *rs;			/* resource value */
-	char *fnx;			/* expanded file name */
+/*
+	char *rs;			// resource value
+	char *fnx;			// expanded file name
 	char *fny;
 	char *fnp;
 	int a;
 
-	/* Return nothing, to begin with. */
+	// Return nothing, to begin with.
 	*fullname = CN;
 	*r = CN;
 
-	/* See if it's a resource. */
+	// See if it's a resource.
 	rs = get_fresource(ResKeymap ".%s", name);
 
-	/* If there's a plain version, return it. */
+	// If there's a plain version, return it.
 	if (rs != CN) {
 		*fullname = NewString(name);
 		*r = NewString(rs);
 		return 1;
 	}
 
-	/* See if it's a file. */
+	// See if it's a file.
 	fnx = do_subst(name, True, True);
 	fny = xs_buffer("%s.%s", fnx, WC3270KM_SUFFIX);
 	Free(fnx);
 	fnx = CN;
 
-	/*
-	 * Try the application data directory first, then (for compatiblity
-	 * with older releases) the install directory.
-	 */
+	// Try the application data directory first, then (for compatiblity
+	// with older releases) the install directory.
 	fnp = xs_buffer("%s%s", myappdata, fny);
 	a = access(fnp, R_OK);
 	Free(fnp);
@@ -229,8 +233,9 @@ locate_keymap(const char *name, char **fullname, char **r)
 		return 1;
 	}
 
-	/* No dice. */
+	// No dice.
 	Free(fny);
+*/
 	return -1;
 }
 
@@ -264,7 +269,7 @@ codecmp(struct keymap *k1, struct keymap *k2, int len)
 
 }
 
-/* Add a keymap entry. */
+/* Add a keymap entry.
 static void
 add_keymap_entry(int ncodes, int *codes, int *hints, const char *file,
     int line, const char *action)
@@ -272,7 +277,7 @@ add_keymap_entry(int ncodes, int *codes, int *hints, const char *file,
 	struct keymap *k;
 	struct keymap *j;
 
-	/* Allocate a new node. */
+	// Allocate a new node.
 	k = Malloc(sizeof(struct keymap));
 	k->next = NULL;
 	k->successor = NULL;
@@ -285,12 +290,12 @@ add_keymap_entry(int ncodes, int *codes, int *hints, const char *file,
 	k->line = line;
 	k->action = NewString(action);
 
-	/* See if it's inactive, or supercedes other entries. */
+	// See if it's inactive, or supercedes other entries.
 	if ((!last_3270 && (k->hints[0] & KM_3270_ONLY)) ||
 	    (!last_nvt  && (k->hints[0] & KM_NVT_ONLY))) {
 		k->hints[0] |= KM_INACTIVE;
 	} else for (j = master_keymap; j != NULL; j = j->next) {
-		/* It may supercede other entries. */
+		// It may supercede other entries.
 		if (j->ncodes == k->ncodes &&
 		    !codecmp(j, k, k->ncodes)) {
 			j->hints[0] |= KM_INACTIVE;
@@ -298,10 +303,11 @@ add_keymap_entry(int ncodes, int *codes, int *hints, const char *file,
 		}
 	}
 
-	/* Link it in. */
+	// Link it in.
 	*nextk = k;
 	nextk = &k->next;
 }
+*/
 
 /*
  * Read a keymap from a file.
@@ -357,19 +363,20 @@ read_keymap(const char *name)
 static void
 read_one_keymap(const char *name, const char *fn, const char *r0, int flags)
 {
-	char *r = CN;			/* resource value */
-	char *r_copy = CN;		/* initial value of r */
-	FILE *f = NULL;			/* resource file */
-	char buf[1024];			/* file read buffer */
-	int line = 0;			/* line number */
-	char *left, *right;		/* chunks of line */
+/*
+	char *r = CN;			// resource value
+	char *r_copy = CN;		// initial value of r
+	FILE *f = NULL;			// resource file
+	char buf[1024];		// file read buffer
+	int line = 0;			// line number
+	char *left, *right;	// chunks of line
 	static int ncodes = 0;
 	static int maxcodes = 0;
 	static int *codes = NULL, *hints = NULL;
 	int rc = 0;
 	char *xfn = NULL;
 
-	/* Find the resource or file. */
+	// Find the resource or file.
 	if (r0 != CN) {
 		r = r_copy = NewString(r0);
 		xfn = (char *)fn;
@@ -377,10 +384,8 @@ read_one_keymap(const char *name, const char *fn, const char *r0, int flags)
 		char *path;
 	    	int sl;
 
-		/*
-		 * Try the application data directory first, then (for
-		 * compatiblity with older releases) the install directory.
-		 */
+		// Try the application data directory first, then (for
+		// compatiblity with older releases) the install directory.
 		path = xs_buffer("%s%s", myappdata, fn);
 		f = fopen(path, "r");
 		if (f == NULL) {
@@ -413,7 +418,7 @@ read_one_keymap(const char *name, const char *fn, const char *r0, int flags)
 
 		line++;
 
-		/* Skip empty lines and comments. */
+		// Skip empty lines and comments.
 		if (r == CN) {
 			s = buf;
 			while (isspace(*s))
@@ -422,7 +427,7 @@ read_one_keymap(const char *name, const char *fn, const char *r0, int flags)
 				continue;
 		}
 
-		/* Split. */
+		// Split.
 		if (rc < 0 ||
 		    (r == CN && split_dresource(&s, &left, &right) < 0)) {
 			popup_an_error("%s, line %d: syntax error",
@@ -442,7 +447,7 @@ read_one_keymap(const char *name, const char *fn, const char *r0, int flags)
 			goto done;
 		}
 
-		/* Accumulate keycodes. */
+		// Accumulate keycodes.
 		ncodes = 0;
 		do {
 			if (++ncodes > maxcodes) {
@@ -460,7 +465,7 @@ read_one_keymap(const char *name, const char *fn, const char *r0, int flags)
 			}
 		} while (pkr != 0);
 
-		/* Add it to the list. */
+		// Add it to the list.
 		hints[0] |= flags;
 		add_keymap_entry(ncodes, codes, hints, xfn, line, right);
 	}
@@ -471,6 +476,7 @@ read_one_keymap(const char *name, const char *fn, const char *r0, int flags)
 		fclose(f);
 	if (xfn != fn)
 	    Free(xfn);
+*/
 }
 
 /* Multi-key keymap support. */
@@ -479,6 +485,7 @@ static int consumed = 0;
 static char *ignore = "[ignore]";
 
 /* Find the shortest keymap with a longer match than k. */
+/*
 static struct keymap *
 longer_match(struct keymap *k, int nc)
 {
@@ -497,10 +504,11 @@ longer_match(struct keymap *k, int nc)
 	}
 	return shortest;
 }
+*/
 
 /*
  * Helper function that returns a keymap action, sets the status line, and
- * traces the result.  
+ * traces the result.
  *
  * If s is NULL, then this is a failed initial lookup.
  * If s is 'ignore', then this is a lookup in progress (k non-NULL) or a
@@ -525,9 +533,10 @@ status_ret(char *s, struct keymap *k)
 }
 
 /* Timeout for ambiguous keymaps. */
-static struct keymap *timeout_match = NULL;
-static unsigned long kto = 0L;
+// static struct keymap *timeout_match = NULL;
+// static unsigned long kto = 0L;
 
+/*
 static void
 key_timeout(void)
 {
@@ -537,7 +546,9 @@ key_timeout(void)
 	push_keymap_action(status_ret(timeout_match->action, NULL));
 	timeout_match = NULL;
 }
+*/
 
+/*
 static struct keymap *
 ambiguous(struct keymap *k, int nc)
 {
@@ -551,11 +562,13 @@ ambiguous(struct keymap *k, int nc)
 	}
 	return j;
 }
+*/
 
 /*
  * Check for compatability between a keymap and a key's modifier state.
  * Returns 1 for success, 0 for failure.
  */
+/*
 static int
 compatible_hint(int hint, int state)
 {
@@ -565,19 +578,19 @@ compatible_hint(int hint, int state)
 	if (!h)
 		return 1;
 
-	/*
-	 * This used to be fairly straightforward, but it got murky when
-	 * we split the left and right ctrl and alt keys.
-	 *
-	 * Basically, what we want is if both left and right Alt or Ctrl
-	 * are set in 'hint', then either left or right Alt or Ctrl set in
-	 * 'state' would be a match.  If only left or right is set in 'hint',
-	 * then the match in 'state' has to be exact.
-	 *
-	 * We do this by checking for both being set in 'hint' and either
-	 * being set in 'state'.  If this is the case, we set both in 'state'
-	 * and try for an exact match.
-	 */
+	//
+	// This used to be fairly straightforward, but it got murky when
+	// we split the left and right ctrl and alt keys.
+	//
+	// Basically, what we want is if both left and right Alt or Ctrl
+	// are set in 'hint', then either left or right Alt or Ctrl set in
+	// 'state' would be a match.  If only left or right is set in 'hint',
+	// then the match in 'state' has to be exact.
+	//
+	// We do this by checking for both being set in 'hint' and either
+	// being set in 'state'.  If this is the case, we set both in 'state'
+	// and try for an exact match.
+
 	if ((h & KM_CTRL) == KM_CTRL) {
 		if (s & KM_CTRL)
 			s |= KM_CTRL;
@@ -589,6 +602,7 @@ compatible_hint(int hint, int state)
 
 	return (h & s) == h;
 }
+*/
 
 /*
  * Look up an key in the keymap, return the matching action if there is one.
@@ -599,20 +613,21 @@ compatible_hint(int hint, int state)
 char *
 lookup_key(unsigned long code, unsigned long state)
 {
+/*
 	struct keymap *j, *k;
 	int n_shortest = 0;
 	int state_match = 0;
 
-	/* trace_event("lookup_key(0x%08lx, 0x%lx)\n", code, state); */
+	// trace_event("lookup_key(0x%08lx, 0x%lx)\n", code, state);
 
-	/* If there's a timeout pending, cancel it. */
+	// If there's a timeout pending, cancel it.
 	if (kto) {
 		RemoveTimeOut(kto);
 		kto = 0L;
 		timeout_match = NULL;
 	}
 
-	/* Translate the Windows state to KM flags. */
+	// Translate the Windows state to KM flags.
 	if (state & SHIFT_PRESSED)
 		state_match |= KM_SHIFT;
 	if (state & LEFT_ALT_PRESSED)
@@ -624,7 +639,7 @@ lookup_key(unsigned long code, unsigned long state)
 	if (state & RIGHT_CTRL_PRESSED)
 		state_match |= KM_RCTRL;
 
-	/* If there's no match pending, find the shortest one. */
+	// If there's no match pending, find the shortest one.
 	if (current_match == NULL) {
 		struct keymap *shortest = NULL;
 
@@ -651,19 +666,19 @@ lookup_key(unsigned long code, unsigned long state)
 			return NULL;
 	}
 
-	/* See if this character matches the next one we want. */
+	// See if this character matches the next one we want.
 	if (code == current_match->codes[consumed] &&
             compatible_hint(current_match->hints[consumed], state_match)) {
 		consumed++;
 		if (consumed == current_match->ncodes) {
-			/* Final match. */
+			// Final match.
 			j = ambiguous(current_match, consumed);
 			if (j == NULL)
 				return status_ret(current_match->action, NULL);
 			else
 				return status_ret(ignore, j);
 		} else {
-			/* Keep looking. */
+			// Keep looking.
 			trace_event(" partial keymap match in %s:%d %s\n",
 			    current_match->file, current_match->line,
 			    (n_shortest > 1)? " and other(s)": "");
@@ -671,7 +686,7 @@ lookup_key(unsigned long code, unsigned long state)
 		}
 	}
 
-	/* It doesn't.  Try for a better candidate. */
+	// It doesn't.  Try for a better candidate.
 	for (k = master_keymap; k != NULL; k = k->next) {
 		if (IS_INACTIVE(k))
 			continue;
@@ -695,12 +710,14 @@ lookup_key(unsigned long code, unsigned long state)
 		}
 	}
 
-	/* Complain. */
-	Beep(750, 150);
+	// Complain.
+	ring_bell();
 	trace_event(" keymap lookup failure after partial match\n");
+	*/
 	return status_ret(ignore, NULL);
 }
 
+/*
 static struct {
 	const char *name;
 	unsigned long code;
@@ -781,8 +798,10 @@ static struct {
 
 	{ CN, 0 }
 };
+*/
 
 /* Look up a symbolic vkey name and return its code. */
+/*
 static int
 lookup_ccode(const char *s)
 {
@@ -794,11 +813,13 @@ lookup_ccode(const char *s)
 	}
 	return -1;
 }
+*/
 
 /* Look up a vkey code and return its name. */
 const char *
 lookup_cname(unsigned long ccode, Boolean special_only)
 {
+/*
 	int i;
 
 	for (i = 0; vk_key[i].name != CN; i++) {
@@ -812,6 +833,7 @@ lookup_cname(unsigned long ccode, Boolean special_only)
 		cbuf[1] = '\0';
 		return cbuf;
 	}
+*/
 	return CN;
 }
 

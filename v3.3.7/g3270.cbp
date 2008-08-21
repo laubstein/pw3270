@@ -38,6 +38,7 @@
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="config_win32.sh" />
+		<Unit filename="configure.ac" />
 		<Unit filename="g3270.nsi.in" />
 		<Unit filename="src/g3270/actions.c">
 			<Option compilerVar="CC" />

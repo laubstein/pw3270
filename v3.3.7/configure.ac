@@ -82,7 +82,7 @@ AC_SUBST(DLLEXT)
 AC_SUBST(WINDRES)
 AC_SUBST(NATIVECC)
 AC_SUBST(CROSS)
-
+AC_SUBST(OS_LIBS)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)

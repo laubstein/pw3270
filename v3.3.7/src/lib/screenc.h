@@ -52,6 +52,7 @@ extern void Paste_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 extern void Title_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern void screen_title(char *text);
 extern int windows_cp;
 #endif /*]*/
+
+extern void screen_title(char *text);
