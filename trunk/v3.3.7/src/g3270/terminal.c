@@ -29,6 +29,7 @@
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <string.h>
+#include <stdlib.h>
 #include <malloc.h>
 
 // TODO (perry#7#): Find a better way to get font sizes!!!
@@ -60,7 +61,7 @@
 
  static GtkIMContext	*im;
 
- static PangoFontDescription	*font		= NULL;
+ static PangoFontDescription	*font_descr	= NULL;
  static int					szFonts		= MAX_FONT_SIZES;
  static FONTSIZE				fsize[MAX_FONT_SIZES];
 
@@ -128,8 +129,8 @@
  {
 	PangoLayout *layout;
 
-	pango_font_description_set_size(font,fsize[sel].size);
-	gtk_widget_modify_font(terminal,font);
+	pango_font_description_set_size(font_descr,fsize[sel].size);
+	gtk_widget_modify_font(terminal,font_descr);
 	layout = gtk_widget_create_pango_layout(terminal,"A");
 	pango_layout_get_pixel_size(layout,&fsize[sel].width,&fsize[sel].height);
 	g_object_unref(layout);
@@ -207,8 +208,8 @@
 	{
 		Trace("Font size changes from %d to %d (%dx%d)",lFont,f,terminal_cols*fsize[f].width,terminal_rows*fsize[f].height);
 		lFont = f;
-		pango_font_description_set_size(font,fsize[f].size);
-		gtk_widget_modify_font(terminal,font);
+		pango_font_description_set_size(font_descr,fsize[f].size);
+		gtk_widget_modify_font(terminal,font_descr);
 
 		if(pixmap)
 		{
@@ -391,14 +392,14 @@
 
  void SetTerminalFont(const gchar *fontname)
  {
- 	Trace("Selected font: %s (last: %p)",fontname,font);
+ 	Trace("Selected font: %s (last: %p)",fontname,font_descr);
 
 	lFont = -1;
 
- 	if(font)
-		pango_font_description_free(font);
+ 	if(font_descr)
+		pango_font_description_free(font_descr);
 
-	font = pango_font_description_from_string(fontname);
+	font_descr = pango_font_description_from_string(fontname);
 
 	if(terminal && terminal->window)
 	{

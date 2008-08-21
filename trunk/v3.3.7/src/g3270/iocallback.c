@@ -134,7 +134,7 @@ static void g3270_RemoveInput(unsigned long id)
 #if !defined(_WIN32) /*[*/
 static unsigned long g3270_AddOutput(int source, void (*fn)(void))
 {
-	#error not implemented
+	#warning not implemented
 }
 #endif /*]*/
 
@@ -143,7 +143,7 @@ static unsigned long g3270_AddExcept(int source, void (*fn)(void))
 #if defined(_WIN32) /*[*/
 	return 0;
 #else /*][*/
-	#error Not Implemented
+	#warning Not Implemented
 #endif /*]*/
 }
 
@@ -202,8 +202,14 @@ static gboolean IO_check(GSource *source)
 	 * function was called, so the source should be checked again here.
 	 *
 	 */
+#if defined(_WIN32) /*[*/
+
 	if(WaitForSingleObject((HANDLE) ((IO_Source *) source)->source,0) == WAIT_OBJECT_0)
 		return TRUE;
+
+#else /*][*/
+	#warning Not Implemented
+#endif /*]*/
 
 	return FALSE;
 }

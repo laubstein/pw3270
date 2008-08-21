@@ -28,7 +28,10 @@ PACKAGE_VERSION=@PACKAGE_VERSION@
 
 # OS Stuff
 @CROSS@
-TARGETS = $(PACKAGE)@BINEXT@ @EXTRA_TARGETS@
+windows-exeopt = -mwindows
+
+windows-targets = w3n46.dll
+TARGETS = $(PACKAGE)@BINEXT@ $(@host_os@-targets)
 
 # Set command paths and mkfb (which has to run locally)
 MKFB = mkfb
@@ -42,20 +45,23 @@ else
 endif
 
 # Set compile/link parameters
+windows-dllflags=-Wl,--export-all-symbols -Wl,--enable-auto-import
 CFLAGS = @EXTRA_FLAGS@ -g -Wall @XCPPFLAGS@ -O -DG3270 -Isrc/include
-DLLFLAGS = @EXTRA_FLAGS@ -shared -Wl,--export-all-symbols -Wl,--enable-auto-import
+DLLFLAGS = @EXTRA_FLAGS@ -shared $(@host_os@-dllflags)
 
 # Sources
+windows-srcs = 			resources.rc
 G3270_SRCS =			g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
-						clipboard.c print.c config.c colors.c keypad.c plugin.c @EXTRASRC@
+						clipboard.c print.c config.c colors.c keypad.c plugin.c $(@host_os@-srcs)
 
-WIN32_SRCS = 			w3misc.c winvers.c windirs.c
+windows-libsrcs = 		w3misc.c winvers.c windirs.c
+linux-gnu-libsrcs =
 
 LIBRARY_COMMOM_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 						ft.c ft_cut.c ft_dft.c glue.c help.c host.c icmd.c idle.c kybd.c \
 						macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
 						sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
-						xio.c keymap.c resolver.c log.c $(WIN32_SRCS)
+						xio.c keymap.c resolver.c log.c $(@host_os@-libsrcs)
 
 LIBRARY_SRCS = $(LIBRARY_COMMOM_SRCS)
 
@@ -116,7 +122,7 @@ obj/Release/src/lib/w3n46.o: src/lib/resolver.c
 bin/Release/g3270@BINEXT@: bin/Release/lib3270.@DLLEXT@ $(foreach SRC, $(basename $(G3270_SRCS)), obj/Release/src/g3270/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @EXEOPT@ -o $@ $^ @GTK_LIBS@ @OS_LIBS@
+	@$(CC) $(@host_os@-exeopt) -o $@ $^ @GTK_LIBS@ @OS_LIBS@
 
 bin/Release/lib3270.@DLLEXT@: obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
@@ -130,7 +136,7 @@ bin/Release/w3n46.dll: obj/Release/src/lib/w3n46.o
 bin/Debug/g3270@BINEXT@: bin/Debug/lib3270.@DLLEXT@ $(foreach SRC, $(basename $(G3270_SRCS)), obj/Debug/src/g3270/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @EXEOPT@ -o $@ $^ @GTK_LIBS@ @OS_LIBS@
+	@$(CC) $(@host_os@-exeopt) -o $@ $^ @GTK_LIBS@ @OS_LIBS@
 
 bin/Debug/lib3270.@DLLEXT@: obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
