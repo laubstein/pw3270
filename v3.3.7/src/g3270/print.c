@@ -124,6 +124,13 @@
  	return G_OBJECT(font_dialog);
  }
 
+#if !(GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12)
+ static void SavePrintSetting(const gchar *key, const gchar *value, GKeyFile *cfg)
+ {
+ 	 g_key_file_set_string(cfg, "PrintSettings", key, value);
+ }
+#endif
+
  static void print_done(GtkPrintOperation *prt, GtkPrintOperationResult result, gpointer user_data)
  {
 	GKeyFile 				*conf		= GetConf();
@@ -136,10 +143,20 @@
 		return;
 
 	if(settings)
+	{
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
 		gtk_print_settings_to_key_file(settings,conf,"PrintSettings");
+#else
+		gtk_print_settings_foreach(settings,(GtkPrintSettingsFunc) SavePrintSetting,conf);
+#endif
+	}
 
 	if(setup)
+	{
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
 		gtk_page_setup_to_key_file(setup,NULL,NULL);
+#endif
+	}
 
 	if(FontDescr)
 	{
@@ -154,6 +171,12 @@
 
  int PrintText(const char *name, gchar *text)
  {
+#if !(GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12)
+	gchar 				**list;
+	GtkPrintSettings	*settings;
+	int 				f;
+#endif
+
 	GKeyFile			*conf	= GetConf();
  	GtkPrintOperation	*prt;
 
@@ -183,8 +206,24 @@
 
 	if(conf)
 	{
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
 		gtk_print_operation_set_print_settings(prt,gtk_print_settings_new_from_key_file(conf,"PrintSettings",NULL));
 		gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new_from_key_file(conf,NULL,NULL));
+#else
+		settings = gtk_print_settings_new();
+		if(settings)
+		{
+			list = g_key_file_get_keys(conf,"PrintSettings",NULL,NULL);
+			if(list)
+			{
+				for(f=0;list[f];f++)
+					gtk_print_settings_set(settings,list[f],g_key_file_get_string(conf,"PrintSettings",list[f],NULL));
+				g_strfreev(list);
+			}
+		}
+		gtk_print_operation_set_print_settings(prt,settings);
+		gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new());
+#endif
 	}
 	else
 	{
@@ -199,3 +238,5 @@
 
     return 0;
  }
+
+
