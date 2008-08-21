@@ -17,8 +17,8 @@ echo "s&@CC@&$CC&g;" >> $TEMPFILE
 echo "s&@PACKAGE_VERSION@&$PACKAGE_VERSION&g;" >> $TEMPFILE
 echo "s&@GTK_CFLAGS@&`pkg-config --cflags $GTK_MODULES`&g;" >> $TEMPFILE
 echo "s&@GTK_LIBS@&`pkg-config --libs $GTK_MODULES`&g;" >> $TEMPFILE
-echo "s&@SSL_CFLAGS@&`pkg-config --cflags $SSL_MODULES`&g;" >> $TEMPFILE
-echo "s&@SSL_LIBS@&`pkg-config --libs $SSL_MODULES`&g;" >> $TEMPFILE
+echo "s&@LIBSSL_CFLAGS@&`pkg-config --cflags $SSL_MODULES`&g;" >> $TEMPFILE
+echo "s&@LIBSSL_LIBS@&`pkg-config --libs $SSL_MODULES`&g;" >> $TEMPFILE
 echo "s&@NATIVECC@&gcc&g;" >> $TEMPFILE
 echo "s&@WINDRES@&mingw32-windres&g;" >> $TEMPFILE
 echo "s&@OS_LIBS@&-lws2_32&g;" >> $TEMPFILE
@@ -26,7 +26,9 @@ echo "s&@XCPPFLAGS@&-D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500&g;" >> $TEMPFILE
 echo "s&@DLLEXT@&dll&g;" >> $TEMPFILE
 echo "s&@OBJEXT@&o&g;" >> $TEMPFILE
 echo "s&@BINEXT@&.exe&g;" >> $TEMPFILE
+echo "s&@CROSS@&CROSS=1&g;" >> $TEMPFILE
 echo "s&@EXEOPT@&-mwindows&g;" >> $TEMPFILE
+echo "s&@EXTRA_FLAGS@&-mno-cygwin&g;" >> $TEMPFILE
 echo "s&@EXTRASRC@&resources.rc&g;" >> $TEMPFILE
 echo "s&@EXTRA_TARGETS@&w3n46.dll&g;" >> $TEMPFILE
 echo "s&#undef PACKAGE_NAME&#define PACKAGE_NAME \"$PACKAGE_NAME\"&g;" >> $TEMPFILE
@@ -39,6 +41,7 @@ echo "s&#undef X3270_PRINTER&#define X3270_PRINTER 1&g;" >> $TEMPFILE
 echo "s&#undef HAVE_LIBSSL&#define HAVE_LIBSSL 1&g;" >> $TEMPFILE
 echo "s&#undef LOCALEDIR&#define LOCALEDIR \"$LOCALE\"&g;" >> $TEMPFILE
 echo "s&#undef PLUGINDIR&#define PLUGINDIR \"$PLUGIN\"&g;" >> $TEMPFILE
+
 
 mv ~/Desktop/g3270_installer.exe ~/tmp > /dev/null 2>&1
 
