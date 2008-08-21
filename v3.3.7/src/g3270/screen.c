@@ -250,12 +250,37 @@
 	screen_disp();
  }
 
+ static void convertchar(ELEMENT *el, unsigned short c)
+ {
+ 	static const struct _xlat
+ 	{
+ 		unsigned short 	cg;
+ 		const gchar		*chr;
+ 	} xlat[] =
+ 	{	{ 0x8c, "≤"	},	// CG 0xf7, less or equal
+		{ 0xae, "≥"	},	// CG 0xd9, greater or equal
+		{ 0xbe,	"≠"	}	// 0x3e, not equal
+ 	};
+
+ 	int f;
+
+	for(f=0;f<G_N_ELEMENTS(xlat);f++)
+	{
+		if(c == xlat[f].cg)
+		{
+			g_strlcpy(el->ch,xlat[f].chr,MAX_CHR_LENGTH);
+			return;
+		}
+	}
+
+	el->extended	= (unsigned short) c;
+	*el->ch			= ' ';
+
+ }
+
  static int addch(int row, int col, int c, unsigned short attr)
  {
- 	gchar				ch[MAX_CHR_LENGTH];
- 	short				fg;
- 	short				bg;
- 	unsigned short	extended = 0;
+ 	ELEMENT				in;
  	ELEMENT 			*el;
  	int					pos = (row*terminal_cols)+col;
 
@@ -265,14 +290,13 @@
 	if(pos > szScreen)
 		return EFAULT;
 
-	memset(ch,0,MAX_CHR_LENGTH);
+	memset(&in,0,sizeof(in));
 
 	if(c)
 	{
 		if(attr & CHAR_ATTR_UNCONVERTED)
 		{
-			extended	= (unsigned short) c;
-			c			= ' ';
+			convertchar(&in,(unsigned short) c);
 		}
 		else
 		{
@@ -280,31 +304,29 @@
 			gchar *str = convert_charset(c,&sz);
 
 			if(sz < MAX_CHR_LENGTH)
-				memcpy(ch,str,sz);
+				memcpy(in.ch,str,sz);
 			else
-				Log("Invalid size when converting \"%c\" to \"%s\"",c,ch);
+				Log("Invalid size when converting \"%c\" to \"%s\"",c,str);
 			g_free(str);
 		}
-
 	}
 
-	bg = (attr & 0xF0) >> 4;
+	in.bg = (attr & 0xF0) >> 4;
 
 	if(attr & COLOR_ATTR_FIELD)
-		fg = (attr & 0x03)+TERMINAL_COLOR_FIELD;
+		in.fg = (attr & 0x03)+TERMINAL_COLOR_FIELD;
 	else
-		fg = (attr & 0x0F);
+		in.fg = (attr & 0x0F);
 
 	// Get element entry in the buffer, update ONLY if changed
  	el = screen + pos;
 
-	if( !(bg != el->bg || fg != el->fg || el->extended != extended || memcmp(el->ch,ch,MAX_CHR_LENGTH)))
+	in.selected = el->selected;
+
+	if(!memcmp(&in,el,sizeof(ELEMENT)))
 		return 0;
 
-	el->bg			= bg;
-	el->fg 			= fg;
-	el->extended	= extended;
-	memcpy(el->ch,ch,MAX_CHR_LENGTH);
+	memcpy(el,&in,sizeof(ELEMENT));
 
 	if(draw && terminal && pixmap)
 	{
@@ -903,6 +925,7 @@
 
  void DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el)
  {
+ 	// http://www.guntherkrauss.de/computer/xml/daten/edicode.html
 	short fg;
 	short bg;
 
@@ -954,8 +977,11 @@
 		DrawCorner(draw, gc, clr+fg, x+fWidth, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y);
 		break;
 
-//	case 0xd3: // CG 0xab, plus
-//		break;
+	case 0xd3: // CG 0xab, plus
+		gdk_gc_set_foreground(gc,clr+fg);
+		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
+		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
+		break;
 
 	case 0xa2: // CG 0x92, horizontal line
 		gdk_gc_set_foreground(gc,clr+fg);
@@ -963,17 +989,29 @@
 		gdk_draw_line(draw,gc,x,y,x+fWidth,y);
 		break;
 
-//	case 0xc6: // CG 0xa5, left tee
-//		break;
+	case 0xc6: // CG 0xa5, left tee
+		gdk_gc_set_foreground(gc,clr+fg);
+		gdk_draw_line(draw,gc,x+(fWidth >> 1),y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
+		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
+		break;
 
-//	case 0xd6: // CG 0xae, right tee
-//		break;
+	case 0xd6: // CG 0xae, right tee
+		gdk_gc_set_foreground(gc,clr+fg);
+		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+(fWidth >> 1),y+(fHeight >> 1));
+		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
+		break;
 
-//	case 0xc7: // CG 0xa6, bottom tee
-//		break;
+	case 0xc7: // CG 0xa6, bottom tee
+		gdk_gc_set_foreground(gc,clr+fg);
+		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
+		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+(fHeight>>1));
+		break;
 
-//	case 0xd7: // CG 0xaf, top tee
-//		break;
+	case 0xd7: // CG 0xaf, top tee
+		gdk_gc_set_foreground(gc,clr+fg);
+		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
+		gdk_draw_line(draw,gc,x+(fWidth >> 1),y+(fHeight >> 1),x+(fWidth >> 1),y+fHeight);
+		break;
 
 //	case 0xbf: // CG 0x15b, stile
 //		break;
@@ -985,12 +1023,18 @@
 		break;
 
 //	case 0x8c: // CG 0xf7, less or equal
+//		pango_layout_set_text(layout,"≤",-1);
+//		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
 //		break;
 
 //	case 0xae: // CG 0xd9, greater or equal
+//		pango_layout_set_text(layout,"≥",-1);
+//		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
 //		break;
 
 //	case 0xbe: // CG 0x3e, not equal
+//		pango_layout_set_text(layout,"≠",-1);
+//		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
 //		break;
 
 //	case 0xa3: // CG 0x93, bullet
