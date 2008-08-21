@@ -99,7 +99,7 @@ Boolean		exiting = False;
 char	       *command_string = CN;
 static Boolean	sfont = False;
 Boolean	       *standard_font = &sfont;
-#if defined(WC3270) /*[*/
+#if defined(WC3270) || defined(LIB3270)/*[*/
 char	       *profile_name = CN;
 #endif /*]*/
 
@@ -577,7 +577,7 @@ parse_options(int *argcp, const char **argv)
 	appres.highlight_underline = True;
 #endif /*]*/
 
-#if defined(C3270) && !defined(_WIN32) /*[*/
+#if defined(C3270) && !defined(_WIN32) && !defined(LIB3270) /*[*/
 	/* Merge in the profile. */
 	merge_profile();
 #endif /*]*/

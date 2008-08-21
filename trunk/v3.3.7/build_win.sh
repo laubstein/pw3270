@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./config_win32.sh
+./win32.sh
 if [ "$?" != "0" ]; then
 	exit -1
 fi
