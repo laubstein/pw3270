@@ -27,18 +27,23 @@ PACKAGE=@PACKAGE@
 PACKAGE_VERSION=@PACKAGE_VERSION@
 
 # OS Stuff
-CROSS=1
+@CROSS@
 TARGETS = $(PACKAGE)@BINEXT@ @EXTRA_TARGETS@
 
 # Set command paths and mkfb (which has to run locally)
 MKFB = mkfb
 CC = @CC@
-NATIVECC = @NATIVECC@
-WINDRES = @WINDRES@
+
+ifdef CROSS
+	NATIVECC = @NATIVECC@
+	WINDRES = @WINDRES@
+else
+	NATIVECC = $(CC)
+endif
 
 # Set compile/link parameters
-CFLAGS = $(EXTRA_FLAGS) -mno-cygwin -g -Wall @XCPPFLAGS@ -O -DG3270 -Isrc/include
-DLLFLAGS = $(EXTRA_FLAGS) -mno-cygwin -shared -Wl,--export-all-symbols -Wl,--enable-auto-import
+CFLAGS = @EXTRA_FLAGS@ -g -Wall @XCPPFLAGS@ -O -DG3270 -Isrc/include
+DLLFLAGS = @EXTRA_FLAGS@ -shared -Wl,--export-all-symbols -Wl,--enable-auto-import
 
 # Sources
 G3270_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
@@ -62,7 +67,7 @@ GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
 obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DDEBUG=1 -DLIB3270=1 $(CFLAGS) @SSL_CFLAGS@ -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
+	@$(CC) -DDEBUG=1 -DLIB3270=1 $(CFLAGS) @LIBSSL_CFLAGS@ -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
 
 obj/Debug/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
@@ -82,7 +87,7 @@ obj/Debug/version.o: src/version.c
 obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DLIB3270=1 $(CFLAGS) -Werror @SSL_CFLAGS@ -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
+	@$(CC) -DLIB3270=1 $(CFLAGS) -Werror @LIBSSL_CFLAGS@ -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
 
 obj/Release/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
@@ -112,7 +117,7 @@ bin/Release/g3270@BINEXT@: bin/Release/lib3270.@DLLEXT@ $(foreach SRC, $(basenam
 bin/Release/lib3270.@DLLEXT@: obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(DLLFLAGS) -o $@ $^ @SSL_LIBS@ @OS_LIBS@
+	@$(CC) $(DLLFLAGS) -o $@ $^ @LIBSSL_LIBS@ @OS_LIBS@
 
 bin/Release/w3n46.dll: obj/Release/src/lib/w3n46.o
 	@$(CC) $(DLLFLAGS) -o $@ $^ @OS_LIBS@
@@ -126,7 +131,7 @@ bin/Debug/g3270@BINEXT@: bin/Debug/lib3270.@DLLEXT@ $(foreach SRC, $(basename $(
 bin/Debug/lib3270.@DLLEXT@: obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(DLLFLAGS) -o $@ $^ @SSL_LIBS@ @OS_LIBS@
+	@$(CC) $(DLLFLAGS) -o $@ $^ @LIBSSL_LIBS@ @OS_LIBS@
 
 bin/Debug/w3n46.dll: obj/Release/src/lib/w3n46.o
 	@$(CC) $(DLLFLAGS) -o $@ $^ @OS_LIBS@
