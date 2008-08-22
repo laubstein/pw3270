@@ -106,6 +106,7 @@
 	<accelerator action='Home'/>
 	<accelerator action='Reset'/>
 	<accelerator action='Return'/>
+	<accelerator action='Enter'/>
 	<accelerator action='Escape' />
 	<accelerator action='DeleteWord'/>
 	<accelerator action='Delete' />
