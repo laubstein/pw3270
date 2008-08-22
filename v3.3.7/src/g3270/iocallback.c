@@ -135,9 +135,11 @@ static unsigned long g3270_AddInput(int source, void (*fn)(void))
 
 static void g3270_RemoveSource(unsigned long id)
 {
-	Trace("Removing input %p",(void *) id);
-	if(id != -1)
+	if(id)
+	{
+		Trace("Removing input %p",(void *) id);
 		g_source_destroy((GSource *) id);
+	}
 }
 
 #if !defined(_WIN32) /*[*/
@@ -150,8 +152,12 @@ static unsigned long g3270_AddOutput(int source, void (*fn)(void))
 
 static unsigned long g3270_AddExcept(int source, void (*fn)(void))
 {
+#if defined(_WIN32) /*[*/
+	return 0;
+#else
 	Trace("Adding Except handle %08x",source);
 	return AddSource(source,G_IO_HUP|G_IO_ERR,fn);
+#endif
 }
 
 static gboolean do_timer(TIMER *t)

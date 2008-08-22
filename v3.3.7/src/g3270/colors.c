@@ -121,6 +121,8 @@
 	int		sz;
 #endif
 
+	*clr = 0;
+
  	for(f=0;f < TERMINAL_COLOR_COUNT;f++)
  	{
  		if(f > 0)

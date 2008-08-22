@@ -69,6 +69,7 @@
 
  static void RedrawCursor(void);
  static void set_showcursor(int value, int reason);
+ static void set_blink(int value, int reason);
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -97,7 +98,7 @@
 										event->area.x,event->area.y,
 										event->area.width,event->area.height);
 
-	if((cMode & CURSOR_MODE_ENABLED) && GTK_WIDGET_HAS_FOCUS(widget))
+	if((cMode & CURSOR_MODE_ENABLED))
 	{
 		// Draw cursor
 
@@ -351,7 +352,10 @@
 
  	if(cMode & CURSOR_MODE_ENABLED)
  	{
-		cMode ^= CURSOR_MODE_SHOW;
+ 		if(GTK_WIDGET_HAS_FOCUS(terminal))
+			cMode ^= CURSOR_MODE_SHOW;
+		else
+			cMode |= CURSOR_MODE_SHOW;
 		InvalidateCursor();
  	}
 	return TRUE;

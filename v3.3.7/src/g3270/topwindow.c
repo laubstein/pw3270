@@ -51,7 +51,8 @@
 
  static void destroy( GtkWidget *widget, gpointer   data )
  {
-    gtk_main_quit();
+ 	topwindow = NULL;
+	g3270_quit();
  }
 
  static void set_widget_flags(GtkWidget *widget, gpointer data)
@@ -171,7 +172,7 @@
 	if(!menu_item)
 		return;
 
-//	filename = FindSystemConfigFile("fonts.conf");
+	filename = FindSystemConfigFile("fonts.conf");
 	if(!filename)
 	{
 		LoadSystemFonts(widget, menu_item, selected);
@@ -359,3 +360,8 @@
 	return 0;
  }
 
+ void g3270_quit(void)
+ {
+ 	action_internal(Disconnect_action, IA_DEFAULT, CN, CN);
+	gtk_main_quit();
+ }

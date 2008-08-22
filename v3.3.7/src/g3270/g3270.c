@@ -286,17 +286,31 @@ int wait4negotiations(const char *cl_hostname)
 {
 	Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);
 
+	gtk_widget_set_sensitive(topwindow,FALSE);
+
 	while(!IN_ANSI && !IN_3270)
 	{
 		while(gtk_events_pending())
 			gtk_main_iteration();
 
+		if(!topwindow)
+		{
+			Log("Connection with %s aborted by request",cl_hostname);
+			return EINTR;
+		}
+
 		if(!PCONNECTED)
 		{
 			popup_an_error( N_( "Negotiation with %s failed!" ),cl_hostname);
-			return -1;
+			gtk_widget_set_sensitive(topwindow,TRUE);
+			return EINVAL;
 		}
 	}
+
+	Trace("Negotiations with %s completed",cl_hostname);
+
+	gtk_widget_set_sensitive(topwindow,TRUE);
+	gtk_widget_grab_focus(terminal);
 	return 0;
 }
 
@@ -374,11 +388,13 @@ int main(int argc, char *argv[])
 			wait4negotiations(cl_hostname);
 	}
 
-	screen_resume();
-	screen_disp();
-	peer_script_init();
-
-	gtk_main();
+	if(topwindow)
+	{
+		screen_resume();
+		screen_disp();
+		peer_script_init();
+		gtk_main();
+	}
 
 	UnloadPlugins();
 	CloseConfigFile();
