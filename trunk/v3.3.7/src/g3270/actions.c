@@ -349,6 +349,7 @@
  {
  	Trace("Process %d ended with status %d",(int) pid, status);
  	remove(tempfile);
+ 	g_free(tempfile);
  }
 
  static void RunCommand(const gchar *cmd, const gchar *str)
@@ -390,14 +391,14 @@
 
 	error = NULL;
 
-	if(!g_spawn_async(	NULL,							// const gchar *working_directory,
-						argv,							// gchar **argv,
-						NULL,							// gchar **envp,
-						G_SPAWN_SEARCH_PATH,			// GSpawnFlags flags,
-						NULL,							// GSpawnChildSetupFunc child_setup,
-						NULL,							// gpointer user_data,
-						&pid,							// GPid *child_pid,
-						&error ))						// GError **error);
+	if(!g_spawn_async(	NULL,											// const gchar *working_directory,
+						argv,											// gchar **argv,
+						NULL,											// gchar **envp,
+						G_SPAWN_SEARCH_PATH|G_SPAWN_DO_NOT_REAP_CHILD,	// GSpawnFlags flags,
+						NULL,											// GSpawnChildSetupFunc child_setup,
+						NULL,											// gpointer user_data,
+						&pid,											// GPid *child_pid,
+						&error ))										// GError **error);
 	{
 		if(error)
 		{
