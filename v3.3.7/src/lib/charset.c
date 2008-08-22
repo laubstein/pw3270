@@ -199,15 +199,13 @@ charset_init(char *csname)
 		charset_defaults();
 		set_cgcsgids(CN);
 		set_charset_name(CN);
-#if defined(X3270_DISPLAY) || (defined(C3270) && !defined(_WIN32)) /*[*/
+#if defined(_WIN32) || defined(LIB3270)/*[*/
+		set_display_charset("iso8859-1");
+#elif defined(X3270_DISPLAY) || (defined(C3270) && !defined(_WIN32)) /*[*/
 		(void) screen_new_display_charsets(default_display_charset,
 		    "us");
 #else /*][*/
-#if defined(_WIN32) /*[*/
-		set_display_charset("iso8859-1");
-#else /*][*/
 		utf8_set_display_charsets(default_display_charset, "us");
-#endif /*]*/
 #endif /*]*/
 		return CS_OKAY;
 	}
@@ -417,7 +415,7 @@ resource_charset(char *csname, char *cs, char *ftcs)
 	}
 #endif /*]*/
 
-#if defined(X3270_DISPLAY) || (defined(C3270) && !defined(_WIN32)) /*[*/
+#if defined(X3270_DISPLAY) || (defined(C3270) && !defined(_WIN32) && !defined(LIB3270)) /*[*/
 	if (!screen_new_display_charsets(
 		    rcs? rcs: default_display_charset,
 		    csname)) {
