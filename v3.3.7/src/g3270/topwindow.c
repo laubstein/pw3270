@@ -194,7 +194,12 @@
 
  int CreateTopWindow(void)
  {
+#if defined(_WIN32)
  	static int 			cr[CURSOR_MODE_USER] = { GDK_ARROW, GDK_WATCH, GDK_X_CURSOR };
+#else
+ 	static int 			cr[CURSOR_MODE_USER] = { GDK_XTERM, GDK_WATCH, GDK_X_CURSOR };
+#endif
+
  	static const gchar	*disabled[] = { "Reselect", "Disconnect" };
 
  	GtkWidget				*vbox;

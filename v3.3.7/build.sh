@@ -49,6 +49,7 @@ cp bin/Release/g3270		~/bin/g3270
 cp bin/Release/lib3270.so	~/bin/g3270
 cp src/g3270/*.conf		~/bin/g3270
 cp src/g3270/*.xml		~/bin/g3270
+cp /home/perry/Project/g3270/conf/sisbb.jpg ~/bin/g3270/g3270.jpg
 
 cat > ~/bin/g3270.sh << EOF 
 #!/bin/bash

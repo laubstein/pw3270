@@ -419,7 +419,7 @@
 
  static void ExecWithCopy(GtkAction *action, gpointer cmd)
  {
- 	Trace("%s Command to execute: %s",__FUNCTION__,cmd);
+ 	Trace("%s Command to execute: %s",__FUNCTION__,(gchar *) cmd);
  }
 
  static void ExecWithSelection(GtkAction *action, gpointer cmd)
