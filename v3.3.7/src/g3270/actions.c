@@ -590,7 +590,7 @@
 		{ N_( "Full Screen" ),					NULL,	NULL,	N_( "<alt>Home" )	},
 		{ N_( "Auto-Reconnect" ),				NULL,	NULL,	NULL				},
 		{ N_( "Insert" ),						NULL,	NULL,	"Insert"			},
-		{ N_( "Keypad" ),						NULL,	NULL,	NULL				}
+		{ N_( "Keypad" ),						NULL,	NULL,	N_( "<alt>K" )		}
 	};
 
  	int f;
