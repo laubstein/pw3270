@@ -32,6 +32,7 @@ fi
 
 make clean
 
+scp g3270_installer.exe perry@os2team:win32
 mv g3270_installer.exe ~/Desktop/
 
 #
