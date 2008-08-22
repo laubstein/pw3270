@@ -102,7 +102,7 @@ obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 obj/Release/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(CFLAGS) -Werror @GTK_CFLAGS@ -Isrc/lib -o $@ -c $<
+	@$(CC) $(CFLAGS) @GTK_CFLAGS@ -Isrc/lib -o $@ -c $<
 
 obj/Release/src/g3270/resources.o: src/g3270/resources.rc src/g3270/g3270.ico Makefile
 	@echo $< ...
@@ -127,7 +127,7 @@ bin/Release/g3270@BINEXT@: bin/Release/lib3270.@DLLEXT@ $(foreach SRC, $(basenam
 bin/Release/lib3270.@DLLEXT@: obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(DLLFLAGS) -Wl,-soname,$(@F)-o $@ $^ @LIBSSL_LIBS@ @OS_LIBS@
+	@$(CC) $(DLLFLAGS) -Wl,-soname,$(@F) -o $@ $^ @LIBSSL_LIBS@ @OS_LIBS@
 
 bin/Release/w3n46.dll: obj/Release/src/lib/w3n46.o
 	@$(CC) $(DLLFLAGS) -o $@ $^ @OS_LIBS@
