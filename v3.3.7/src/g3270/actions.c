@@ -727,7 +727,7 @@
 
 		{ "NextField",		N_( "Next field" ),
 							NULL,
-							NULL,
+							GTK_STOCK_GOTO_LAST,
 							Tab_action,
 							"Tab" },
 
