@@ -141,7 +141,7 @@ bin/Debug/g3270@BINEXT@: bin/Debug/lib3270.@DLLEXT@ $(foreach SRC, $(basename $(
 bin/Debug/lib3270.@DLLEXT@: obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	$(CC) $(DLLFLAGS) -Wl,-soname,$(@F) -o $@ $^ @LIBSSL_LIBS@ @OS_LIBS@
+	@$(CC) $(DLLFLAGS) -Wl,-soname,$(@F) -o $@ $^ @LIBSSL_LIBS@ @OS_LIBS@
 
 bin/Debug/w3n46.dll: obj/Release/src/lib/w3n46.o
 	@$(CC) $(DLLFLAGS) -o $@ $^ @OS_LIBS@
