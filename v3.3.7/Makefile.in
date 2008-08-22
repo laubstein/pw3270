@@ -169,6 +169,17 @@ $(PACKAGE).po: $(PACKAGE).pot
 run: bin/Debug/g3270@BINEXT@
 	cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270
 
+tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
+
+$(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
+	@rm -fr $(TMPDIR)/$(PACKAGE).tmp
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp -r * $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@rm -f $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/Makefile
+	@rm -f $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/*.layout
+	@tar --create --gzip --verbose --directory $(TMPDIR)/$(PACKAGE).tmp --exclude=.svn --file=$@ $(PACKAGE)-$(PACKAGE_VERSION)
+	@echo $@
+
 clean:
 	@rm -fr obj
 	@rm -fr bin
@@ -177,7 +188,7 @@ clean:
 	@rm -f	src/lib/mkfb.exe
 	@rm -f	src/version.c
 	@rm -f	sources.lst
-	@rm -f	g3270.tar.gz
+	@rm -f	$(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 	@rm -f $(PACKAGE).pot
 	@rm -f $(PACKAGE).po
 	@rm -fr autom4te.cache

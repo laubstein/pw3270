@@ -4,7 +4,7 @@ Group:          System/X11/Terminals
 Version:        @PACKAGE_VERSION@
 Release:        0.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
-Source:         %{name}.tar.gz
+Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 Requires:       openssl %{name}-lib
@@ -32,7 +32,7 @@ devel for tn3270 protocol library for %{name}
 
 %prep
 
-%setup -q -n %{name}
+%setup -q -n %{name}-%{version}
 autoconf
 %configure --disable-trace
 
