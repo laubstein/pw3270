@@ -34,11 +34,11 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="Makefile.in" />
-		<Unit filename="build_win.sh">
-			<Option target="Release" />
-		</Unit>
 		<Unit filename="configure.ac" />
 		<Unit filename="g3270.nsi.in" />
+		<Unit filename="g3270.spec.in">
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/g3270/actions.c">
 			<Option compilerVar="CC" />
 		</Unit>
