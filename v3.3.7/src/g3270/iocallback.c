@@ -43,7 +43,7 @@
 #endif
 
 static unsigned long	g3270_AddInput(int source, void (*fn)(void));
-static void			g3270_RemoveInput(unsigned long id);
+static void			g3270_RemoveSource(unsigned long id);
 
 #if !defined(_WIN32) /*[*/
 static unsigned long	g3270_AddOutput(int source, void (*fn)(void));
@@ -83,7 +83,7 @@ const struct lib3270_io_callbacks g3270_io_callbacks =
 	g3270_RemoveTimeOut,
 
 	g3270_AddInput,
-	g3270_RemoveInput,
+	g3270_RemoveSource,
 
 	g3270_AddExcept,
 
@@ -112,45 +112,46 @@ const struct lib3270_io_callbacks g3270_io_callbacks =
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
-static unsigned long g3270_AddInput(int source, void (*fn)(void))
+static unsigned long AddSource(int source, gushort events, void (*fn)(void))
 {
 	IO_Source *src = (IO_Source *) g_source_new(&IOSources,sizeof(IO_Source));
 
 	src->source			= source;
 	src->fn				= fn;
 	src->poll.fd		= source;
-	src->poll.events	= G_IO_IN | G_IO_HUP | G_IO_ERR;
+	src->poll.events	= events;
 
 	g_source_attach((GSource *) src,NULL);
 	g_source_add_poll((GSource *) src,&src->poll);
 
-	Trace("Input %08x added in %p",source,src);
-
 	return (unsigned long) src;
 }
 
-static void g3270_RemoveInput(unsigned long id)
+static unsigned long g3270_AddInput(int source, void (*fn)(void))
 {
-	Trace("Input %p Removed",(void *) id);
-	g_source_destroy((GSource *) id);
+	Trace("Adding Input handle %08x",source);
+	return AddSource(source,G_IO_IN|G_IO_HUP|G_IO_ERR,fn);
+}
+
+static void g3270_RemoveSource(unsigned long id)
+{
+	Trace("Removing input %p",(void *) id);
+	if(id != -1)
+		g_source_destroy((GSource *) id);
 }
 
 #if !defined(_WIN32) /*[*/
 static unsigned long g3270_AddOutput(int source, void (*fn)(void))
 {
-	#warning not implemented
-	return -1;
+	Trace("Adding Output handle %08x",source);
+	return AddSource(source,G_IO_OUT|G_IO_HUP|G_IO_ERR,fn);
 }
 #endif /*]*/
 
 static unsigned long g3270_AddExcept(int source, void (*fn)(void))
 {
-#if defined(_WIN32) /*[*/
-	return 0;
-#else /*][*/
-	#warning Not Implemented
-	return 0;
-#endif /*]*/
+	Trace("Adding Except handle %08x",source);
+	return AddSource(source,G_IO_HUP|G_IO_ERR,fn);
 }
 
 static gboolean do_timer(TIMER *t)

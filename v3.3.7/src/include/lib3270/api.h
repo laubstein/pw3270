@@ -29,7 +29,9 @@
 		#define LIB3270_H_INCLUDED "2.0"
 
 		/* Debug & log */
-		#ifdef DEBUG
+		#if defined( DEBUG ) && defined( linux )
+			#define Trace( fmt, ... )		fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr);
+		#elif defined( DEBUG )
 			#define Trace( fmt, ... )		WriteLog("TRACE", "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ )
 		#else
 			#define Trace( fmt, ... )	/* __VA_ARGS__ */

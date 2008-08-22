@@ -168,7 +168,8 @@
 	{ 	"CursorLeft",		GTK_STOCK_GO_BACK,		N_( "Left" ),				"Left",				NULL,	G_CALLBACK(action_Left)				},
 	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),					"Up",				NULL,	G_CALLBACK(action_Up)				},
 	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),				"Down",				NULL,	G_CALLBACK(action_Down)				},
-	{ 	"Enter",			NULL,					N_( "Enter" ),				"Return",			NULL,	G_CALLBACK(action_Enter)			},
+	{ 	"Return",			NULL,					N_( "Enter" ),				"Return",			NULL,	G_CALLBACK(action_Enter)			},
+	{ 	"Enter",			NULL,					N_( "Enter" ),				"KP_Enter",			NULL,	G_CALLBACK(action_Enter)			},
 
 	/* Terminal Actions */
 	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",			NULL,	G_CALLBACK(action_Enter)			},
@@ -852,6 +853,8 @@
         action_internal(PF_action, IA_DEFAULT, buffer, CN);
         return TRUE;
     }
+
+//	Trace("Key: %s",gdk_keyval_name(event->keyval));
 
     /* Check for special keyproc actions */
 	for(f=0; f < (sizeof(keyproc)/sizeof(struct WindowActions));f++)
