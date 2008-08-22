@@ -138,7 +138,7 @@
  	{	"Unselect",			NULL,					N_( "Unselect" ),			"<Ctrl>u",			NULL,	G_CALLBACK(action_ClearSelection)	},
  	{	"Reselect",			NULL,					N_( "Reselect" ),			"<Ctrl>r",			NULL,	G_CALLBACK(Reselect)				},
  	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
- 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Clear fields" ),		"Clear",			NULL,	G_CALLBACK(action_Clear)			},
+ 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Erase input" ),		"Clear",			NULL,	G_CALLBACK(action_Clear)			},
 
  	/* Printer actions */
 	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),				"Print",			NULL,	G_CALLBACK(action_PrintScreen)		},
