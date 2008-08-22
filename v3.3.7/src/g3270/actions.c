@@ -326,13 +326,17 @@
 	}
 
  	gtk_show_about_dialog(	GTK_WINDOW(topwindow),
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
 							"program-name",    		PACKAGE_NAME,
+#else
+							"name",    				PACKAGE_NAME,
+#endif
+							"logo",					logo,
 							"authors", 				authors,
 							"license", 				gettext( license ),
 							"comments",				_( "3270 Terminal emulator for GTK."),
 							"version", 				PACKAGE_VERSION,
 							"wrap-license",			TRUE,
-							"logo",					logo,
 							NULL
 						);
 
