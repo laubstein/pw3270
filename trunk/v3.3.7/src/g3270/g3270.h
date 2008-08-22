@@ -208,6 +208,8 @@
 	void			settitle(char *text);
 	GKeyFile 		*GetConf(void);
 
+	void			g3270_quit(void);
+
 	enum _SELECT_MODE
 	{
 		SELECT_MODE_NONE,

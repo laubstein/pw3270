@@ -26,6 +26,7 @@
 
  #include <gdk/gdk.h>
  #include <gdk/gdkkeysyms.h>
+ #include <errno.h>
 
  #include "config.h"
  #include <globals.h>
@@ -290,7 +291,7 @@
  static void action_Quit(void)
  {
  	action_Save();
- 	gtk_main_quit();
+ 	g3270_quit();
  }
 
  static void action_About(GtkWidget *w, gpointer user_data)
@@ -1027,9 +1028,13 @@
 
  	while(again)
  	{
+ 		gtk_widget_set_sensitive(dialog,TRUE);
  		switch(gtk_dialog_run(GTK_DIALOG(dialog)))
  		{
 		case GTK_RESPONSE_ACCEPT:
+
+			gtk_widget_set_sensitive(dialog,FALSE);
+
 			if(gtk_toggle_button_get_active(checkbox))
 				strcpy(buffer,"L:");
 			else
@@ -1039,10 +1044,16 @@
 
 			if(host_connect(buffer) >= 0)
 			{
-				if(!wait4negotiations(buffer))
+				switch(wait4negotiations(buffer))
 				{
+				case 0:				// Connection OK
 					again = FALSE;
 					SetHostname(buffer);
+					break;
+
+				case EINTR:			// Operation interrupted
+					again = FALSE;
+					break;
 				}
 			}
 			break;
