@@ -119,9 +119,47 @@
 	}
  }
 
- static void LoadFontMenu(GtkWidget *menu_item)
+ static void LoadSystemFonts(GtkWidget *widget, GtkWidget *menu_item, const gchar *selected)
  {
-	gchar			*filename;
+ 	// Stolen from http://svn.gnome.org/svn/gtk+/trunk/gtk/gtkfontsel.c
+	PangoFontFamily **families;
+	gint 			n_families, i;
+
+ 	GtkWidget		*menu	= gtk_menu_new();
+ 	GSList 			*group	= NULL;
+
+	pango_context_list_families(gtk_widget_get_pango_context(widget),&families, &n_families);
+
+	Trace("Font families: %d",n_families);
+
+	for(i=0; i<n_families; i++)
+    {
+    	if(pango_font_family_is_monospace(families[i]))
+    	{
+			const gchar 	*name = pango_font_family_get_name (families[i]);
+			GtkWidget		*item = gtk_radio_menu_item_new_with_label(group,name);
+
+			Trace("Adding font %s",name);
+
+			// FIXME (perry#2#): the user_data isn't being freed!
+			group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+			g_signal_connect(G_OBJECT(item),"toggled",G_CALLBACK(activate_font),g_strdup(name));
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
+
+			if(!strcmp(name,selected))
+				gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),TRUE);
+
+    	}
+    }
+
+	gtk_widget_show_all(menu);
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item),menu);
+
+ }
+
+ static void LoadFontMenu(GtkWidget *widget, GtkWidget *menu_item)
+ {
+	gchar			*filename	= NULL;
 	GError			*error		= NULL;
 	gchar			*text		= NULL;
 	const gchar	*selected	= GetString("Terminal","Font","Courier");
@@ -133,9 +171,12 @@
 	if(!menu_item)
 		return;
 
-	filename = FindSystemConfigFile("fonts.conf");
+//	filename = FindSystemConfigFile("fonts.conf");
 	if(!filename)
+	{
+		LoadSystemFonts(widget, menu_item, selected);
 		return;
+	}
 
 	if(!g_file_get_contents(filename,&text,NULL,&error))
 	{
@@ -191,6 +232,7 @@
 	g_free(text);
 	g_free(filename);
  }
+
 
  int CreateTopWindow(void)
  {
@@ -278,8 +320,7 @@
 			}
 		}
 
-		LoadFontMenu(gtk_ui_manager_get_widget(ui_manager,"/MainMenubar/SettingsMenu/FontSettings"));
-
+		LoadFontMenu(topwindow,gtk_ui_manager_get_widget(ui_manager,"/MainMenubar/SettingsMenu/FontSettings"));
 		g_object_unref(ui_manager);
 	}
 
@@ -312,6 +353,7 @@
 	settitle(GetString("TopWindow","Title",""));
 
 	action_Restore();
+
 	gtk_window_set_position(GTK_WINDOW(topwindow),GTK_WIN_POS_CENTER);
 
 	return 0;

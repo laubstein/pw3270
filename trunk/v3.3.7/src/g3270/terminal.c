@@ -146,9 +146,10 @@
 
 	memset(fsize,0,MAX_FONT_SIZES * sizeof(FONTSIZE));
 
-	conf = GetString("Terminal","FontSizes","");
+	// Default font sizes from http://svn.gnome.org/svn/gtk+/trunk/gtk/gtkfontsel.c
+	conf = GetString("Terminal","FontSizes","6,7,8,9,10,11,12,13,14,16,18,20,22,24,26,28,32,36,40,48,56,64,72");
 
-	if(conf && *conf)
+	if(conf && *conf && *conf != '*') // "*" in g3270.conf reverts to default behavior of "all" font sizes
 	{
 		Trace("Font sizes: %s",conf);
 		ptr = g_strsplit(conf,",",MAX_FONT_SIZES);
