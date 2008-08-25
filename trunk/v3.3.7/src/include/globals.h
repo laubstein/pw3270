@@ -21,7 +21,7 @@
  */
 
 /* Autoconf settings. */
-#include "conf.h"			/* autoconf settings */
+#include <lib3270/config.h>			/* autoconf settings */
 #if defined(X3270_TN3270E) && !defined(X3270_ANSI) /*[*/
 #define X3270_ANSI	1	/* RFC2355 requires NVT mode */
 #endif /*]*/

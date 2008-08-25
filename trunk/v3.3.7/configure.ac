@@ -52,12 +52,12 @@ AC_PROG_CC
 AC_PROG_LIBTOOL
 
 # Optional
-AC_ARG_WITH([trace], 
-	[AS_HELP_STRING([--with-trace], [enable trace functions])], 
+AC_ARG_ENABLE([trace],
+	[AS_HELP_STRING([--enable-trace], [enable trace functions])],
 [
-	g3270_cv_trace="$withval"
+	g3270_cv_trace="$enableval"
 ],[
-	g3270_cv_trace="$no"
+	g3270_cv_trace="yes"
 ])
 
 # Checks for libraries.
