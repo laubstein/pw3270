@@ -991,11 +991,13 @@
 
  void action_SetHostname(void)
  {
- 	const char		*host 		= GetString("Network","Hostname","");
+ 	char			*hostname;
+ 	char			*ptr;
  	gboolean		again		= TRUE;
 	char 			buffer[1024];
- 	GtkTable		*table		= GTK_TABLE(gtk_table_new(2,2,FALSE));
- 	GtkEntry		*entry		= GTK_ENTRY(gtk_entry_new());
+ 	GtkTable		*table		= GTK_TABLE(gtk_table_new(2,4,FALSE));
+ 	GtkEntry		*host		= GTK_ENTRY(gtk_entry_new());
+ 	GtkEntry		*port		= GTK_ENTRY(gtk_entry_new());
  	GtkToggleButton	*checkbox	= GTK_TOGGLE_BUTTON(gtk_check_button_new_with_label( _( "Secure connection" ) ));
  	GtkWidget 		*dialog 	= gtk_dialog_new_with_buttons(	_( "Select hostname" ),
 																GTK_WINDOW(topwindow),
@@ -1005,25 +1007,44 @@
 																NULL	);
 
 	gtk_window_set_icon_name(GTK_WINDOW(dialog),GTK_STOCK_HOME);
-	gtk_entry_set_max_length(entry,1000);
-	gtk_entry_set_width_chars(entry,60);
+	gtk_entry_set_max_length(host,0xFF);
+	gtk_entry_set_width_chars(host,60);
+
+	gtk_entry_set_max_length(port,6);
+	gtk_entry_set_width_chars(port,7);
 
 	gtk_table_attach(table,gtk_label_new( _( "Hostname:" ) ), 0,1,0,1,0,0,5,0);
-	gtk_table_attach(table,GTK_WIDGET(entry), 1,2,0,1,GTK_EXPAND|GTK_FILL,0,0,0);
+	gtk_table_attach(table,GTK_WIDGET(host), 1,2,0,1,GTK_EXPAND|GTK_FILL,0,0,0);
+
+	gtk_table_attach(table,gtk_label_new( _( "Port:" ) ), 2,3,0,1,0,0,5,0);
+	gtk_table_attach(table,GTK_WIDGET(port), 3,4,0,1,GTK_FILL,0,0,0);
+
 	gtk_table_attach(table,GTK_WIDGET(checkbox), 1,2,1,2,GTK_EXPAND|GTK_FILL,0,0,0);
 
+	gtk_container_set_border_width(GTK_CONTAINER(table),5);
 
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),GTK_WIDGET(table),FALSE,FALSE,2);
 
-	if(strncmp(host,"L:",2))
+	strncpy(hostname = buffer,GetString("Network","Hostname",""),1023);
+
+	if(!strncmp(hostname,"L:",2))
 	{
-		gtk_entry_set_text(entry,host);
+		gtk_toggle_button_set_active(checkbox,TRUE);
+		hostname += 2;
+	}
+
+	ptr = strchr(hostname,':');
+	if(ptr)
+	{
+		*(ptr++) = 0;
+		gtk_entry_set_text(port,ptr);
 	}
 	else
 	{
-		gtk_toggle_button_set_active(checkbox,TRUE);
-		gtk_entry_set_text(entry,host+2);
+		gtk_entry_set_text(port,GetString("Network","DefaultPort","8023"));
 	}
+
+	gtk_entry_set_text(host,hostname);
 
 	gtk_widget_show_all(GTK_WIDGET(table));
 
@@ -1041,7 +1062,9 @@
 			else
 				*buffer = 0;
 
-			strncat(buffer,gtk_entry_get_text(entry),1023);
+			strncat(buffer,gtk_entry_get_text(host),1023);
+			strncat(buffer,":",1023);
+			strncat(buffer,gtk_entry_get_text(port),1023);
 
 			if(host_connect(buffer) >= 0)
 			{

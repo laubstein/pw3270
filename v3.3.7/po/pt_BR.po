@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-22 16:41-0300\n"
-"PO-Revision-Date: 2008-08-22 16:42-0300\n"
+"POT-Creation-Date: 2008-08-25 11:04-0300\n"
+"PO-Revision-Date: 2008-08-25 11:06-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -35,6 +35,10 @@ msgstr ""
 
 #: actions.c:590
 msgid "<alt>Home"
+msgstr ""
+
+#: actions.c:593
+msgid "<alt>K"
 msgstr ""
 
 #: actions.c:586
@@ -207,7 +211,7 @@ msgstr "Apagar campo"
 
 #: actions.c:141
 msgid "Erase input"
-msgstr ""
+msgstr "Apagar campos"
 
 #: actions.c:693
 msgid "Erase to the end of the field"
