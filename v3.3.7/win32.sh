@@ -59,12 +59,7 @@ fi
 
 make clean
 
-sed --file=$TEMPFILE src/g3270/config.h.in > src/g3270/config.h
-if [ "$?" != "0" ]; then
-	exit -1
-fi
-
-sed --file=$TEMPFILE src/lib/conf.h.in > src/lib/conf.h
+sed --file=$TEMPFILE src/include/lib3270/config.h.in > src/include/lib3270/config.h
 if [ "$?" != "0" ]; then
 	exit -1
 fi
