@@ -41,7 +41,7 @@ dnl Place auxilliary scripts here.
 AC_CONFIG_AUX_DIR([scripts])
 
 dnl Put macro definitions here (though they aren't used).
-AC_CONFIG_HEADER([src/include/config.h])
+AC_CONFIG_HEADER([src/include/lib3270/config.h])
 
 dnl Initialise automake stuff.
 AM_INIT_AUTOMAKE
@@ -89,11 +89,9 @@ fi
 AC_DEFINE([X3270_TN3270E])
 AC_DEFINE([X3270_ANSI])
 AC_DEFINE([X3270_APL])
-AC_DEFINE([X3270_DBCS])
 AC_DEFINE([X3270_FT])
 AC_DEFINE([X3270_LOCAL_PROCESS])
 AC_DEFINE([X3270_PRINTER])
-AC_DEFINE([X3270_SCRIPT])
 
 # Fixed values
 AC_SUBST(DLLEXT, "so")

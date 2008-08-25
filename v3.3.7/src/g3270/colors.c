@@ -24,7 +24,7 @@
 *
 */
 
- #include "config.h"
+ #include <lib3270/config.h>
  #include "g3270.h"
  #include <ctype.h>
  #include <string.h>
