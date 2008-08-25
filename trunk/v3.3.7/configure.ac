@@ -41,7 +41,7 @@ dnl Place auxilliary scripts here.
 AC_CONFIG_AUX_DIR([scripts])
 
 dnl Put macro definitions here (though they aren't used).
-AC_CONFIG_HEADER([src/g3270/config.h])
+AC_CONFIG_HEADER([src/include/config.h])
 
 dnl Initialise automake stuff.
 AM_INIT_AUTOMAKE
@@ -111,7 +111,6 @@ AC_SUBST(OS_LIBS)
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
 AC_OUTPUT(g3270.spec)
-AC_OUTPUT(src/lib/conf.h)
 
 dnl Output the generated config.status script.
 AC_OUTPUT
