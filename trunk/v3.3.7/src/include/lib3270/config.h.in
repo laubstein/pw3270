@@ -4,7 +4,12 @@
 
 	#undef PACKAGE_NAME
 	#undef PACKAGE_VERSION
+	#undef HAVE_LIBSSL
 	#undef GETTEXT_PACKAGE
+
+	#ifndef LIBX3270DIR
+		#define LIBX3270DIR "."
+	#endif
 
 	#ifndef LOCALEDIR
 		#define LOCALEDIR "."

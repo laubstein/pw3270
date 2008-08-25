@@ -26,7 +26,7 @@
 
  #include "g3270.h"
  #include <gdk/gdkkeysyms.h>
- #include "config.h"
+ #include <lib3270/config.h>
 
  #include <globals.h>
  #include <lib3270/kybdc.h>

@@ -28,7 +28,7 @@
  #include <gdk/gdkkeysyms.h>
  #include <errno.h>
 
- #include "config.h"
+ #include <lib3270/config.h>
  #include <globals.h>
 
  #include "g3270.h"

@@ -25,7 +25,7 @@
 */
 
 #include "g3270.h"
-#include "config.h"
+#include <lib3270/config.h>
 #include <malloc.h>
 #include <string.h>
 #include <errno.h>

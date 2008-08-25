@@ -19,7 +19,7 @@
  *	file
  */
 
-#include "conf.h"
+#include "../include/lib3270/config.h"
 
 #include <stdio.h>
 #include <string.h>
