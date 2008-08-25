@@ -52,8 +52,6 @@
 		<Unit filename="src/g3270/config.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/g3270/config.h.in" />
-		<Unit filename="src/g3270/fonts.conf" />
 		<Unit filename="src/g3270/g3270.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -88,6 +86,7 @@
 		<Unit filename="src/include/globals.h" />
 		<Unit filename="src/include/lib3270/actionsc.h" />
 		<Unit filename="src/include/lib3270/api.h" />
+		<Unit filename="src/include/lib3270/config.h.in" />
 		<Unit filename="src/include/lib3270/kybdc.h" />
 		<Unit filename="src/include/lib3270/localdefs.h" />
 		<Unit filename="src/include/lib3270/plugins.h" />
@@ -119,7 +118,6 @@
 		<Unit filename="src/lib/charsetc.h" />
 		<Unit filename="src/lib/childc.h" />
 		<Unit filename="src/lib/conf.h" />
-		<Unit filename="src/lib/conf.h.in" />
 		<Unit filename="src/lib/ctlr.c">
 			<Option compilerVar="CC" />
 		</Unit>
