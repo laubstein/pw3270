@@ -146,8 +146,10 @@
 	LARGE_TEXT_BUTTON( _( "Erase\nEOF" ), EraseEOF_action, 0, 10);
 	LARGE_TEXT_BUTTON( _( "Erase\nInput" ), EraseInput_action, 1, 10);
 
-	LARGE_BUTTON(GTK_STOCK_OK,Tab_action,0,11);
-	LARGE_BUTTON(GTK_STOCK_APPLY,Enter_action,1,11);
+
+	/* "Enter" Button */
+	widget = image_button(GTK_STOCK_OK,Enter_action);
+	gtk_table_attach_defaults(GTK_TABLE(table),widget,0,6,11,12);
 
 	/* Buttons ok, add table */
 	gtk_box_pack_start(GTK_BOX(vbox),table,FALSE,FALSE,0);

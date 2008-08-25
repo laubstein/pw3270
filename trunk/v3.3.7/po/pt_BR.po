@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-25 11:04-0300\n"
-"PO-Revision-Date: 2008-08-25 11:06-0300\n"
+"POT-Creation-Date: 2008-08-25 14:53-0300\n"
+"PO-Revision-Date: 2008-08-25 14:53-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -123,7 +123,7 @@ msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
-#: keypad.c:142
+#: keypad.c:144
 msgid "Clear"
 msgstr ""
 
@@ -187,14 +187,14 @@ msgstr ""
 msgid "Enter"
 msgstr ""
 
-#: keypad.c:144
+#: keypad.c:146
 msgid ""
 "Erase\n"
 "EOF"
 msgstr "Apagar\n"
 "Campo"
 
-#: keypad.c:145
+#: keypad.c:147
 msgid ""
 "Erase\n"
 "Input"
@@ -290,7 +290,7 @@ msgstr "Verde"
 msgid "Help"
 msgstr "Ajuda"
 
-#: actions.c:1011
+#: actions.c:1016
 msgid "Hostname:"
 msgstr "Endereço do servidor:"
 
@@ -387,6 +387,10 @@ msgstr "Colar com margem"
 msgid "Pink"
 msgstr "Rosa"
 
+#: actions.c:1019
+msgid "Port:"
+msgstr "Porta:"
+
 #: actions.c:119
 msgid "Preferences"
 msgstr "Preferências"
@@ -423,7 +427,7 @@ msgstr "Redesenhar a tela"
 msgid "Reselect"
 msgstr "Reselecionar"
 
-#: actions.c:677 keypad.c:143
+#: actions.c:677 keypad.c:145
 msgid "Reset"
 msgstr ""
 
@@ -475,7 +479,7 @@ msgstr ""
 msgid "Scroll bar"
 msgstr ""
 
-#: actions.c:999
+#: actions.c:1001
 msgid "Secure connection"
 msgstr "Conexão segura"
 
@@ -511,7 +515,7 @@ msgstr "Seleção retangular"
 msgid "Select font"
 msgstr "Selecionar fonte"
 
-#: actions.c:1000
+#: actions.c:1002
 msgid "Select hostname"
 msgstr "Selecionar servidor"
 
