@@ -95,6 +95,8 @@
  	GtkWidget	*vbox 	= gtk_vbox_new(FALSE,0);
  	gchar		label[10];
 
+	gtk_container_set_border_width(GTK_CONTAINER(table),3);
+
 	/* Create PF Buttons */
 	for(f=0;f<12;f++)
 	{
