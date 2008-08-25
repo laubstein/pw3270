@@ -323,9 +323,7 @@ int main(int argc, char *argv[])
 	if(g3270_init(&argc,&argv))
 		return -1;
 
-#if defined(PLUGINDIR)
-	LoadPlugins(PLUGINDIR);
-#endif
+	LoadPlugins();
 
 	add_resource("keymap.base",
 #if defined(_WIN32) /*[*/
