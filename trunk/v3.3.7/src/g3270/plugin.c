@@ -26,6 +26,7 @@
 
 #include <errno.h>
 #include <glib.h>
+#include <lib3270/config.h>
 #include <lib3270/plugins.h>
 #include "g3270.h"
 
@@ -39,12 +40,15 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
+#ifdef HAVE_PLUGINS
  static GSList *plugins = NULL;
+#endif
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
  int LoadPlugins(void)
  {
+#ifdef HAVE_PLUGINS
  	GDir			*dir;
  	const gchar	*name;
  	gchar			*path;
@@ -79,35 +83,44 @@
 	g_dir_close(dir);
 	g_free(path);
 
+#endif
+
     return 0;
  }
 
  void unload(GModule *handle,gpointer arg)
  {
+#ifdef HAVE_PLUGINS
  	g_module_close(handle);
+#endif
  }
 
  int UnloadPlugins(void)
  {
+#ifdef HAVE_PLUGINS
  	g_slist_foreach(plugins,(GFunc) unload,NULL);
  	g_slist_free(plugins);
  	plugins = NULL;
+#endif
 	return 0;
  }
 
+#ifdef HAVE_PLUGINS
  void call(GModule *handle, CALL_PARAMETER *arg)
  {
 	void (*ptr)(const gchar *arg) = NULL;
 	if(g_module_symbol(handle, arg->name, (gpointer) ptr))
 		ptr(arg->arg);
  }
+#endif
 
  void CallPlugins(const gchar *name, const gchar *arg)
  {
+#ifdef HAVE_PLUGINS
  	CALL_PARAMETER p = { name, arg };
 
  	if(plugins)
  	 	g_slist_foreach(plugins,(GFunc) call,&p);
-
+#endif
  }
 

@@ -1027,11 +1027,18 @@
 
 	strncpy(hostname = buffer,GetString("Network","Hostname",""),1023);
 
+#ifdef HAVE_LIBSSL
 	if(!strncmp(hostname,"L:",2))
 	{
 		gtk_toggle_button_set_active(checkbox,TRUE);
 		hostname += 2;
 	}
+#else
+	gtk_toggle_button_set_active(checkbox,FALSE);
+	gtk_widget_set_sensitive(GTK_WIDGET(checkbox),FALSE);
+	if(!strncmp(hostname,"L:",2))
+		hostname += 2;
+#endif
 
 	ptr = strchr(hostname,':');
 	if(ptr)
