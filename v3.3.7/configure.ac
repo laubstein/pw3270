@@ -60,6 +60,23 @@ AC_ARG_ENABLE([trace],
 	g3270_cv_trace="yes"
 ])
 
+AC_ARG_ENABLE([plugins],
+	[AS_HELP_STRING([--enable-plugins], [enable plugin support])],
+[
+	g3270_cv_plugins="$enableval"
+],[
+	g3270_cv_plugins="yes"
+])
+
+AC_ARG_ENABLE([ssl],
+	[AS_HELP_STRING([--enable-ssl], [enable ssl support (if available)])],
+[
+	g3270_cv_ssl="$enableval"
+],[
+	g3270_cv_ssl="yes"
+])
+
+
 # Checks for libraries.
 PKG_CHECK_EXISTS
 PKG_CHECK_MODULES( [GTK], [glib-2.0 gtk+-2.0 >= 2.10 gthread-2.0 gthread-2.0 gmodule-2.0], AC_DEFINE(HAVE_GTK) )
@@ -74,9 +91,12 @@ AC_SUBST(GNOMEUI_LIBS)
 AC_SUBST(GNOMEUI_CFLAGS)
 
 # Check for libssl
-PKG_CHECK_MODULES( [LIBSSL], [libssl],
-				AC_DEFINE(HAVE_LIBSSL),
-				AC_MSG_NOTICE([libssl not present.]) )
+if test "$g3270_cv_ssl" == "yes"; then
+	PKG_CHECK_MODULES( [LIBSSL], [libssl],
+					AC_DEFINE(HAVE_LIBSSL),
+					AC_MSG_NOTICE([libssl not present.]) )
+fi
+
 AC_SUBST(LIBSSL_LIBS)
 AC_SUBST(LIBSSL_CFLAGS)
 
@@ -84,6 +104,10 @@ AC_SUBST(LIBSSL_CFLAGS)
 
 if test "$g3270_cv_trace" == "yes"; then
 	AC_DEFINE([X3270_TRACE])
+fi
+
+if test "$g3270_cv_plugins" == "yes"; then
+	AC_DEFINE([HAVE_PLUGINS])
 fi
 
 AC_DEFINE([X3270_TN3270E])
