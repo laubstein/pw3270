@@ -23,8 +23,14 @@
 # Perry Werneck<perry.werneck@gmail.com>
 #
 
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+libdir=@libdir@
 PACKAGE=@PACKAGE@
 PACKAGE_VERSION=@PACKAGE_VERSION@
+DATAPATH=@DATAPATH@
+LOCALEDIR=@localedir@
 
 # OS Stuff
 @CROSS@
@@ -46,7 +52,7 @@ endif
 
 # Set compile/link parameters
 windows-dllflags=-Wl,--export-all-symbols -Wl,--enable-auto-import
-CFLAGS = @EXTRA_FLAGS@ -g -Wall @XCPPFLAGS@ -O -DG3270 -Isrc/include
+CFLAGS = @EXTRA_FLAGS@ -g -Wall @XCPPFLAGS@ -O -DG3270 -DDATAPATH=\"$(DATAPATH)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
 DLLFLAGS = @EXTRA_FLAGS@ -shared $(@host_os@-dllflags)
 
 # Sources
@@ -170,6 +176,20 @@ run: bin/Debug/g3270@BINEXT@
 	cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270
 
 tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
+
+install: Release po/pt_BR.po
+	@mkdir -p $(DESTDIR)/$(bindir)
+	@mkdir -p $(DESTDIR)/$(libdir)
+	@mkdir -p $(DESTDIR)/$(DATAPATH)
+	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
+	@for i in $(TARGETS); do install --mode=755 bin/Release/$$i $(DESTDIR)/$(bindir); done
+	@install --mode=755 bin/Release/lib3270.so $(DESTDIR)/$(libdir)
+	@install --mode=644 src/g3270/actions.conf $(DESTDIR)/$(DATAPATH)
+	@install --mode=644 src/g3270/ui.xml $(DESTDIR)/$(DATAPATH)
+	@install --mode=644 src/g3270/$(PACKAGE).jpg $(DESTDIR)/$(DATAPATH)
+
+	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES
+	@msgfmt -c -v -o $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
 
 $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 	@rm -fr $(TMPDIR)/$(PACKAGE).tmp

@@ -106,8 +106,8 @@
 		#define GDK_ALT_MASK GDK_MOD1_MASK
 	#endif
 
-	#define PopupAnError(fmt, ...)	WriteLog("ERR",fmt,__VA_ARGS__)
-	#define PopupAWarning(fmt, ...)	WriteLog("WARN",fmt,__VA_ARGS__)
+	#define PopupAWarning(fmt, ...)	PopupAnError(fmt,__VA_ARGS__)
+
 
 	extern GtkWidget				*topwindow;
 	extern GdkPixmap				*pixmap;
@@ -224,10 +224,12 @@
 
 	void	SetSelectionMode(int m);
 	void	set_monocase(int value, int reason);
-	int 	LoadPlugins(const gchar *path);
+	int 	LoadPlugins(void);
 	int		UnloadPlugins(void);
 	void	CallPlugins(const gchar *name, const gchar *arg);
 
 	void 	SetHostname(const gchar *hostname);
+
+	void 	PopupAnError(const gchar *fmt, ...);
 
 #endif // G3270_H_INCLUDED

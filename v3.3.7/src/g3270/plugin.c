@@ -43,15 +43,20 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
- int LoadPlugins(const gchar *path)
+ int LoadPlugins(void)
  {
  	GDir			*dir;
  	const gchar	*name;
+ 	gchar			*path;
  	GModule			*handle;
  	gchar			*filename;
 
 	if(!g_module_supported())
 		return EINVAL;
+
+	path = g_build_filename(DATAPATH,"plugins",NULL);
+
+	Trace("Loading plugins in \"%s\"",path);
 
     dir = g_dir_open(path,0,NULL);
     if(!dir)
@@ -72,6 +77,7 @@
 	}
 
 	g_dir_close(dir);
+	g_free(path);
 
     return 0;
  }

@@ -32,13 +32,48 @@ fi
 
 make clean
 
-scp g3270_installer.exe perry@os2team:win32
+scp g3270_installer.exe perry@os2team:public_html/g3270
 mv g3270_installer.exe ~/Desktop/
 
 #
-# Build Local Linux version
+# Build Linux version
 #
 ./configure
+
+RPMDIR=`rpm --eval="%{u2p:%{_rpmdir}}"`
+RPMARCH=`rpm --eval="%{u2p:%{_target_cpu}}"`
+VENDOR=`rpm --eval="%{u2p:%{_vendor}}"`
+RELEASE=`grep Release g3270.spec | sed 's/ //g' |cut -d: -f2 |cut -d. -f1`
+
+make tgz
+if [ "$?" != "0" ]; then
+	exit -1
+fi
+
+cp *.tar.gz `rpm --eval="%{u2p:%{_sourcedir}}"`
+if [ "$?" != "0" ]; then
+	exit -1
+fi
+
+rpmbuild -ba g3270.spec
+if [ "$?" != "0" ]; then
+	exit -1
+fi
+
+echo "Enviando arquivo source para o servidor..."
+scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/g3270*.src.rpm $USER@os2team.df.intrabb.bb.com.br:public_html/g3270
+if [ "$?" != "0" ]; then
+	echo "Erro ao copiar o pacote fonte"
+	exit -1
+fi
+
+echo "Enviando arquivo binario para o servidor..."
+scp $RPMDIR/$RPMARCH/g3270*.rpm $USER@os2team.df.intrabb.bb.com.br:public_html/g3270
+if [ "$?" != "0" ]; then
+	echo "Erro ao copiar o pacote binario"
+	exit -1
+fi
+
 make Release
 if [ "$?" != "0" ]; then
 	exit -1
@@ -59,3 +94,6 @@ LD_LIBRARY_PATH=. ./g3270
 EOF
 chmod +x ~/bin/g3270.sh
 make clean
+
+echo "Pacotes g3270 gerados"
+

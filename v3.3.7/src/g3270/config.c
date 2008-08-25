@@ -251,6 +251,13 @@ gchar * FindSystemConfigFile(const gchar *name)
  	gchar					*filename;
  	int						f;
 
+#ifdef DATAPATH
+	filename = g_build_filename(DATAPATH,name,NULL);
+	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+		return filename;
+	g_free(filename);
+#endif
+
 	// Search for the file in gtk's system config path
  	for(f=0;list[f];f++)
  	{

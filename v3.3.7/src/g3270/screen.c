@@ -1128,20 +1128,33 @@
 	g_free(text);
  }
 
- static void error(const char *msg)
- {
- 	gchar		*text	= g_convert(msg, -1, "UTF-8", CHARSET, NULL, NULL, NULL);
- 	GtkWidget 	*dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
-													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_CLOSE,
-													"%s",text );
 
- 	g_warning(msg);
+ void PopupAnError(const char *fmt, ...)
+ {
+	va_list 	args;
+ 	gchar		*text;
+ 	GtkWidget 	*dialog;
+
+	va_start(args, fmt);
+	text = g_strdup_vprintf(gettext(fmt),args);
+    va_end(args);
+
+ 	g_warning(text);
+
+ 	dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+										GTK_DIALOG_DESTROY_WITH_PARENT,
+										GTK_MESSAGE_ERROR,
+										GTK_BUTTONS_CLOSE,
+										"%s",text );
 
 	gtk_dialog_run(GTK_DIALOG (dialog));
 	gtk_widget_destroy(dialog);
 	g_free(text);
+ }
+
+ static void error(const char *msg)
+ {
+ 	PopupAnError("%s",msg);
  }
 
  static int init(void)

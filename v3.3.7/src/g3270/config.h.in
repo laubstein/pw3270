@@ -4,9 +4,11 @@
 
 	#undef PACKAGE_NAME
 	#undef PACKAGE_VERSION
-	#undef LOCALEDIR
 	#undef GETTEXT_PACKAGE
-	#undef PLUGINDIR
+
+	#ifndef LOCALEDIR
+		#define LOCALEDIR "."
+	#endif
 
 	#ifndef GETTEXT_PACKAGE
 		#define GETTEXT_PACKAGE PACKAGE_NAME
