@@ -21,19 +21,21 @@
 
 /* Libraries. */
 #undef HAVE_LIBSSL
+#undef HAVE_TRACE
 
 /* Extras */
 #define LIBX3270DIR	"."
 
 /* Optional parts. */
-#undef X3270_TN3270E
-#undef X3270_ANSI
-#undef X3270_APL
-#undef X3270_DBCS
-#undef X3270_FT
-#undef X3270_LOCAL_PROCESS
-#undef X3270_PRINTER
-#undef X3270_SCRIPT
-#undef X3270_TN3270E
+#define X3270_TN3270E
+#define X3270_ANSI
+#define X3270_APL
+#define X3270_DBCS
+#define X3270_FT
+#define X3270_LOCAL_PROCESS
+#define X3270_PRINTER
+#define X3270_SCRIPT
+#define X3270_TN3270E
+
 #undef X3270_TRACE
 

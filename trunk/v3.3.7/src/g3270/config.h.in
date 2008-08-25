@@ -14,4 +14,16 @@
 		#define GETTEXT_PACKAGE PACKAGE_NAME
 	#endif
 
+	/* Optional parts. */
+	#undef X3270_TRACE
+	#undef X3270_TN3270E
+	#undef X3270_ANSI
+	#undef X3270_APL
+	#undef X3270_DBCS
+	#undef X3270_FT
+	#undef X3270_LOCAL_PROCESS
+	#undef X3270_PRINTER
+	#undef X3270_SCRIPT
+	#undef X3270_TN3270E
+
 #endif /* CONFIG_H_INCLUDED */
