@@ -51,6 +51,15 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
+# Optional
+AC_ARG_WITH([trace], 
+	[AS_HELP_STRING([--with-trace], [enable trace functions])], 
+[
+	g3270_cv_trace="$withval"
+],[
+	g3270_cv_trace="$no"
+])
+
 # Checks for libraries.
 PKG_CHECK_EXISTS
 PKG_CHECK_MODULES( [GTK], [glib-2.0 gtk+-2.0 >= 2.10 gthread-2.0 gthread-2.0 gmodule-2.0], AC_DEFINE(HAVE_GTK) )
@@ -72,10 +81,23 @@ AC_SUBST(LIBSSL_LIBS)
 AC_SUBST(LIBSSL_CFLAGS)
 
 # Other options
-DLLEXT="so"
-DATAPATH=$datarootdir/$PACKAGE
 
-AC_SUBST(DATAPATH)
+if test "$g3270_cv_trace" == "yes"; then
+	AC_DEFINE([X3270_TRACE])
+fi
+
+AC_DEFINE([X3270_TN3270E])
+AC_DEFINE([X3270_ANSI])
+AC_DEFINE([X3270_APL])
+AC_DEFINE([X3270_DBCS])
+AC_DEFINE([X3270_FT])
+AC_DEFINE([X3270_LOCAL_PROCESS])
+AC_DEFINE([X3270_PRINTER])
+AC_DEFINE([X3270_SCRIPT])
+
+# Fixed values
+AC_SUBST(DLLEXT, "so")
+AC_SUBST(DATAPATH, "$datarootdir/$PACKAGE")
 AC_SUBST(EXTRA_FLAGS)
 AC_SUBST(XCPPFLAGS)
 AC_SUBST(EXTRA_TARGETS)
@@ -89,6 +111,7 @@ AC_SUBST(OS_LIBS)
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
 AC_OUTPUT(g3270.spec)
+AC_OUTPUT(src/lib/conf.h)
 
 dnl Output the generated config.status script.
 AC_OUTPUT
