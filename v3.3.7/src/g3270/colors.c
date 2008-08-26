@@ -301,7 +301,7 @@
 	dialog = gtk_dialog_new_with_buttons (	_( "Color setup" ),
 											GTK_WINDOW(topwindow),
 											GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-											N_( "Load profile" ),		1,
+											_( "Load profile" ),		1,
 											GTK_STOCK_OK,     			GTK_RESPONSE_ACCEPT,
 											GTK_STOCK_CANCEL, 			GTK_RESPONSE_REJECT,
 											NULL);
@@ -355,7 +355,7 @@
  	menu = gtk_menu_new();
  	for(f=0;f<G_N_ELEMENTS(color_profile);f++)
  	{
-		widget = gtk_menu_item_new_with_label(color_profile[f].name);
+		widget = gtk_menu_item_new_with_label(gettext(color_profile[f].name));
 		gtk_widget_show_all(widget);
 		g_signal_connect(G_OBJECT(widget),"activate",G_CALLBACK(activate_profile),(gpointer) color_profile[f].colors);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu),widget);
