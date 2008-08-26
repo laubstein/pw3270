@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-26 09:40-0300\n"
-"PO-Revision-Date: 2008-08-26 09:41-0300\n"
+"POT-Creation-Date: 2008-08-26 11:40-0300\n"
+"PO-Revision-Date: 2008-08-26 11:40-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -21,31 +21,31 @@ msgstr ""
 msgid "3270 Terminal emulator for GTK."
 msgstr "Emulador 3270 para GTK"
 
-#: actions.c:682
+#: actions.c:723
 msgid "<Ctrl>r"
 msgstr ""
 
-#: actions.c:715
+#: actions.c:756
 msgid "<Ctrl>u"
 msgstr ""
 
-#: actions.c:709
+#: actions.c:750
 msgid "<Ctrl>w"
 msgstr ""
 
-#: actions.c:591
+#: actions.c:597
 msgid "<alt>Home"
 msgstr ""
 
-#: actions.c:594
+#: actions.c:600
 msgid "<alt>K"
 msgstr ""
 
-#: actions.c:587
+#: actions.c:593
 msgid "<alt>S"
 msgstr ""
 
-#: actions.c:588
+#: actions.c:594
 msgid "<alt>X"
 msgstr ""
 
@@ -57,57 +57,61 @@ msgstr "Sobre"
 msgid "Add to copy"
 msgstr "Copiar anexando"
 
-#: actions.c:590
+#: actions.c:596
 msgid "Aid wait"
 msgstr ""
 
-#: actions.c:576
+#: actions.c:582
 msgid "Alt Cursor"
 msgstr ""
 
-#: actions.c:592
+#: actions.c:598
 msgid "Auto-Reconnect"
 msgstr "Auto reconectar"
 
-#: colors.c:239 colors.c:261 colors.c:268
+#: colors.c:251 colors.c:273 colors.c:280
 msgid "Background"
 msgstr "Fundo"
 
-#: actions.c:723
+#: actions.c:764
 msgid "Backspace"
 msgstr ""
 
-#: colors.c:230
+#: colors.c:242
 msgid "Base attributes"
 msgstr "Atributos básicos"
 
-#: colors.c:247
+#: colors.c:259
 msgid "Black"
 msgstr "Preto"
 
-#: actions.c:583
+#: actions.c:589
 msgid "Blank Fill"
 msgstr ""
 
-#: actions.c:577
+#: actions.c:583
 msgid "Blinking Cursor"
 msgstr "Cursor piscante"
 
-#: colors.c:240
+#: colors.c:252
 msgid "Blue"
 msgstr "Azul"
 
-#: actions.c:807
+#: actions.c:615
+msgid "Bold"
+msgstr "Negrito"
+
+#: actions.c:848
 msgid "Can't build Application UI!"
 msgstr "Não foi possível montar a interface da aplicação!"
 
-#: actions.c:805
+#: actions.c:846
 #, c-format
 msgid "Can't build Application UI: %s"
 msgstr "Não foi possível montar a interface da aplicação:\n"
 "%s"
 
-#: actions.c:813
+#: actions.c:854
 msgid "Can't find UI definition file"
 msgstr "Não encontrei arquivo de definição de interface."
 
@@ -119,7 +123,7 @@ msgstr "Não foi possível efetuar o registro na tabela de I/O 3270."
 msgid "Can't register into lib3270 screen callback table."
 msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 
-#: actions.c:936
+#: actions.c:977
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
@@ -127,7 +131,7 @@ msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 msgid "Clear"
 msgstr ""
 
-#: colors.c:287
+#: colors.c:301
 msgid "Color setup"
 msgstr "Configuração de cores"
 
@@ -139,35 +143,35 @@ msgstr "Cores"
 msgid "Copy"
 msgstr "Copiar"
 
-#: actions.c:588
+#: actions.c:594
 msgid "Cross Hair Cursor"
 msgstr "Régua"
 
-#: colors.c:265
+#: colors.c:277
 msgid "Cross-hair"
 msgstr "Régua"
 
-#: colors.c:232
+#: colors.c:244
 msgid "Cursor"
 msgstr ""
 
-#: actions.c:580
+#: actions.c:586
 msgid "DS Trace"
 msgstr ""
 
-#: colors.c:248
+#: colors.c:260
 msgid "Dark Blue"
 msgstr "Azul escuro"
 
-#: colors.c:251
+#: colors.c:263
 msgid "Dark Green"
 msgstr "Verde escuro"
 
-#: actions.c:717
+#: actions.c:758
 msgid "Delete Char"
 msgstr ""
 
-#: actions.c:705
+#: actions.c:746
 msgid "Delete Word"
 msgstr "Apagar palavra"
 
@@ -179,7 +183,7 @@ msgstr ""
 msgid "Dump screen"
 msgstr "Salvar captura de tela"
 
-#: actions.c:947
+#: actions.c:988
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
@@ -201,11 +205,11 @@ msgid ""
 msgstr "Apagar\n"
 "campos"
 
-#: actions.c:693
+#: actions.c:734
 msgid "Erase EOF"
 msgstr "Apagar campo"
 
-#: actions.c:711
+#: actions.c:752
 msgid "Erase Field"
 msgstr "Apagar campo"
 
@@ -213,7 +217,7 @@ msgstr "Apagar campo"
 msgid "Erase input"
 msgstr "Apagar campos"
 
-#: actions.c:694
+#: actions.c:735
 msgid "Erase to the end of the field"
 msgstr "Apagar até o final do campo"
 
@@ -230,7 +234,7 @@ msgid ""
 msgstr "Erro criando arquivo temporário:\n"
 "%s"
 
-#: topwindow.c:185 actions.c:929
+#: topwindow.c:186 actions.c:970
 #, c-format
 msgid ""
 "Error loading %s\n"
@@ -238,7 +242,7 @@ msgid ""
 msgstr "Erro lendo %s\n"
 "%s"
 
-#: actions.c:900 actions.c:964
+#: actions.c:941 actions.c:1005
 #, c-format
 msgid ""
 "Error saving %s\n"
@@ -254,15 +258,15 @@ msgid ""
 msgstr "Erro iniciando %s\n"
 "%s"
 
-#: actions.c:684
+#: actions.c:725
 msgid "Escape"
 msgstr ""
 
-#: actions.c:585
+#: actions.c:591
 msgid "Event Trace"
 msgstr ""
 
-#: actions.c:699
+#: actions.c:740
 msgid "Field start"
 msgstr "Início do campo"
 
@@ -270,19 +274,19 @@ msgstr "Início do campo"
 msgid "Font"
 msgstr "Fonte"
 
-#: colors.c:262 colors.c:269
+#: colors.c:274 colors.c:281
 msgid "Foreground"
 msgstr "Frente"
 
-#: actions.c:591
+#: actions.c:597
 msgid "Full Screen"
 msgstr "Tela-cheia"
 
-#: colors.c:254
+#: colors.c:266
 msgid "Gray"
 msgstr "Cinza"
 
-#: colors.c:243
+#: colors.c:255
 msgid "Green"
 msgstr "Verde"
 
@@ -290,23 +294,23 @@ msgstr "Verde"
 msgid "Help"
 msgstr "Ajuda"
 
-#: actions.c:1018
+#: actions.c:1059
 msgid "Hostname:"
 msgstr "Endereço do servidor:"
 
-#: actions.c:593
+#: actions.c:599
 msgid "Insert"
 msgstr ""
 
-#: colors.c:259
+#: colors.c:271
 msgid "Intensified/Protected"
 msgstr "Intensificado/Protegido"
 
-#: colors.c:257
+#: colors.c:269
 msgid "Intensified/Unprotected"
 msgstr "Intensificado/Desprotegido"
 
-#: actions.c:594
+#: actions.c:600
 msgid "Keypad"
 msgstr "Teclado de funções"
 
@@ -314,23 +318,27 @@ msgstr "Teclado de funções"
 msgid "Left"
 msgstr "Esquerda"
 
-#: actions.c:582
+#: actions.c:588
 msgid "Line Wrap"
 msgstr ""
 
-#: actions.c:131 actions.c:912
+#: colors.c:304
+msgid "Load profile"
+msgstr ""
+
+#: actions.c:131 actions.c:953
 msgid "Load screen dump"
 msgstr "Carregar captura de tela"
 
-#: colors.c:272
+#: colors.c:284
 msgid "Locked status"
 msgstr "Bloqueada"
 
-#: actions.c:575
+#: actions.c:581
 msgid "Monocase"
 msgstr "Só maiúsculas"
 
-#: colors.c:253
+#: colors.c:265
 msgid "Mustard"
 msgstr "Mostarda"
 
@@ -343,31 +351,31 @@ msgstr "Negociação com %s falhou!"
 msgid "Network"
 msgstr "Rede"
 
-#: actions.c:729
+#: actions.c:770
 msgid "Next field"
 msgstr "Próximo campo"
 
-#: colors.c:264
+#: colors.c:276
 msgid "Normal"
 msgstr ""
 
-#: colors.c:271
+#: colors.c:283
 msgid "Normal status"
 msgstr "Situação normal"
 
-#: colors.c:258
+#: colors.c:270
 msgid "Normal/Protected"
 msgstr "Normal/Protegido"
 
-#: colors.c:256
+#: colors.c:268
 msgid "Normal/Unprotected"
 msgstr "Normal/Desprotegido"
 
-#: colors.c:233
+#: colors.c:245
 msgid "OIA"
 msgstr ""
 
-#: colors.c:249
+#: colors.c:261
 msgid "Orange"
 msgstr "Laranja"
 
@@ -379,15 +387,15 @@ msgstr "Colar"
 msgid "Paste next"
 msgstr "Colar próximo"
 
-#: actions.c:586
+#: actions.c:592
 msgid "Paste with left margin"
 msgstr "Colar com margem"
 
-#: colors.c:242
+#: colors.c:254
 msgid "Pink"
 msgstr "Rosa"
 
-#: actions.c:1021
+#: actions.c:1062
 msgid "Port:"
 msgstr "Porta:"
 
@@ -407,15 +415,23 @@ msgstr "Imprimir cópia"
 msgid "Print selected"
 msgstr "Imprimir seleção"
 
+#: colors.c:41
+msgid "Profile 1"
+msgstr ""
+
+#: colors.c:75
+msgid "Profile 2"
+msgstr ""
+
 #: actions.c:122
 msgid "Properties"
 msgstr "Propriedades"
 
-#: colors.c:250
+#: colors.c:262
 msgid "Purple"
 msgstr "Púrpura"
 
-#: colors.c:241
+#: colors.c:253
 msgid "Red"
 msgstr "Vermelho"
 
@@ -427,13 +443,9 @@ msgstr "Redesenhar a tela"
 msgid "Reselect"
 msgstr "Reselecionar"
 
-#: actions.c:678 keypad.c:145
+#: actions.c:719 keypad.c:145
 msgid "Reset"
 msgstr ""
-
-#: colors.c:290
-msgid "Restore defaults"
-msgstr "Restaurar padrão"
 
 #: actions.c:177
 msgid "Return"
@@ -447,7 +459,7 @@ msgstr ""
 msgid "Save"
 msgstr "Salvar"
 
-#: actions.c:985
+#: actions.c:1026
 msgid "Save clipboard contents"
 msgstr "Salvar área de transferência"
 
@@ -459,7 +471,7 @@ msgstr "Salvar cópia"
 msgid "Save screen"
 msgstr "Salvar tela"
 
-#: actions.c:975
+#: actions.c:1016
 msgid "Save screen contents"
 msgstr "Salvar conteúdo da tela"
 
@@ -467,19 +479,19 @@ msgstr "Salvar conteúdo da tela"
 msgid "Save selected"
 msgstr "Salvar seleção"
 
-#: actions.c:980
+#: actions.c:1021
 msgid "Save selected text"
 msgstr "Salvar texto selecionado"
 
-#: actions.c:584
+#: actions.c:590
 msgid "Screen Trace"
 msgstr ""
 
-#: actions.c:581
+#: actions.c:587
 msgid "Scroll bar"
 msgstr ""
 
-#: actions.c:1003
+#: actions.c:1044
 msgid "Secure connection"
 msgstr "Conexão segura"
 
@@ -507,7 +519,7 @@ msgstr ""
 msgid "Select all"
 msgstr "Selecionar tudo"
 
-#: actions.c:587
+#: actions.c:593
 msgid "Select by rectangles"
 msgstr "Seleção retangular"
 
@@ -515,11 +527,11 @@ msgstr "Seleção retangular"
 msgid "Select font"
 msgstr "Selecionar fonte"
 
-#: actions.c:1004
+#: actions.c:1045
 msgid "Select hostname"
 msgstr "Selecionar servidor"
 
-#: colors.c:231
+#: colors.c:243
 msgid "Selected text"
 msgstr "Texto selecionado"
 
@@ -539,7 +551,7 @@ msgstr ""
 msgid "Selection Up"
 msgstr ""
 
-#: colors.c:270
+#: colors.c:282
 msgid "Separator"
 msgstr "Separador"
 
@@ -551,15 +563,15 @@ msgstr "Mudar servidor"
 msgid "Settings"
 msgstr "Configuração"
 
-#: actions.c:578
+#: actions.c:584
 msgid "Show timing"
 msgstr "Mostrar tempo"
 
-#: actions.c:735
+#: actions.c:776
 msgid "Sys Req"
 msgstr ""
 
-#: colors.c:229
+#: colors.c:241
 msgid "Terminal"
 msgstr ""
 
@@ -580,16 +592,16 @@ msgid ""
 "Franklin St, Fifth Floor, Boston, MA 02111-1307 USA"
 msgstr ""
 
-#: actions.c:579
+#: actions.c:585
 msgid "Track Cursor"
 msgstr "Mostrar posição do cursor"
 
-#: colors.c:244 colors.c:252
+#: colors.c:256 colors.c:264
 msgid "Turquoise"
 msgstr "Turquesa"
 
-#: topwindow.c:185 actions.c:379 actions.c:406 actions.c:900 actions.c:929
-#: actions.c:964
+#: topwindow.c:186 actions.c:379 actions.c:406 actions.c:941 actions.c:970
+#: actions.c:1005
 msgid "Unexpected error"
 msgstr "Erro inexperado"
 
@@ -601,11 +613,11 @@ msgstr "Desmarcar"
 msgid "Up"
 msgstr ""
 
-#: actions.c:589
+#: actions.c:595
 msgid "Visible Control chars"
 msgstr ""
 
-#: colors.c:246
+#: colors.c:258
 msgid "White"
 msgstr "Branco"
 
@@ -653,7 +665,7 @@ msgstr ""
 msgid "X Wait"
 msgstr "X Aguarde"
 
-#: colors.c:245
+#: colors.c:257
 msgid "Yellow"
 msgstr "Amarelo"
 
