@@ -28,6 +28,8 @@
 
 	#define G3270_H_INCLUDED
 
+	#include <locale.h>
+	#include <lib3270/config.h>
 	#include <gtk/gtk.h>
 	#include <gdk/gdk.h>
 	#include <glib.h>

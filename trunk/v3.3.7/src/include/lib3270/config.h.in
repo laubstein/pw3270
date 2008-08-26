@@ -6,18 +6,9 @@
 	#undef PACKAGE_VERSION
 	#undef HAVE_LIBSSL
 	#undef HAVE_PLUGINS
-	#undef GETTEXT_PACKAGE
 
 	#ifndef LIBX3270DIR
 		#define LIBX3270DIR "."
-	#endif
-
-	#ifndef LOCALEDIR
-		#define LOCALEDIR "."
-	#endif
-
-	#ifndef GETTEXT_PACKAGE
-		#define GETTEXT_PACKAGE PACKAGE_NAME
 	#endif
 
 	/* Optional parts. */

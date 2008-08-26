@@ -825,7 +825,7 @@
 
 	// Load actions
 	main_actions = gtk_action_group_new("Actions");
-	gtk_action_group_set_translation_domain(main_actions, GETTEXT_PACKAGE);
+	gtk_action_group_set_translation_domain(main_actions, PACKAGE_NAME);
 
 	gtk_action_group_add_actions(main_actions, internal_action_entries, G_N_ELEMENTS (internal_action_entries), topwindow);
 
