@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-26 11:40-0300\n"
-"PO-Revision-Date: 2008-08-26 11:40-0300\n"
+"POT-Creation-Date: 2008-08-26 11:42-0300\n"
+"PO-Revision-Date: 2008-08-26 11:43-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -324,7 +324,7 @@ msgstr ""
 
 #: colors.c:304
 msgid "Load profile"
-msgstr ""
+msgstr "Carregar perfil"
 
 #: actions.c:131 actions.c:953
 msgid "Load screen dump"
@@ -417,11 +417,11 @@ msgstr "Imprimir seleção"
 
 #: colors.c:41
 msgid "Profile 1"
-msgstr ""
+msgstr "Perfil 1"
 
 #: colors.c:75
 msgid "Profile 2"
-msgstr ""
+msgstr "Perfil 2"
 
 #: actions.c:122
 msgid "Properties"
