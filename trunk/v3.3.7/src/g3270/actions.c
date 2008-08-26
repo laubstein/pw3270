@@ -36,6 +36,7 @@
  #include <lib3270/actionsc.h>
  #include <lib3270/toggle.h>
  #include <lib3270/hostc.h>
+ #include <lib3270/plugins.h>
 
  #ifndef GDK_NUMLOCK_MASK
 	#define GDK_NUMLOCK_MASK GDK_MOD2_MASK
@@ -375,7 +376,7 @@
 	{
 		if(error)
 		{
-			popup_an_error( N_( "Error creating temporary file:\n%s" ), error->message ? error->message : N_( "Unexpected error" ));
+			PopupAnError( N_( "Error creating temporary file:\n%s" ), error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
 		remove(filename);
@@ -402,7 +403,7 @@
 	{
 		if(error)
 		{
-			popup_an_error( N_( "Error spawning %s\n%s" ), argv[0], error->message ? error->message : N_( "Unexpected error" ));
+			PopupAnError( N_( "Error spawning %s\n%s" ), argv[0], error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
 		remove(filename);
@@ -813,6 +814,7 @@
 	}
 
 	/* Update UI */
+	SetUIManager(ui_manager);
 	gtk_ui_manager_ensure_update(ui_manager);
 	return ui_manager;
  }
@@ -895,7 +897,7 @@
 
 		if(!g_file_set_contents(filename,text,-1,&error))
 		{
-			popup_an_error( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			PopupAnError( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
 	}
@@ -924,14 +926,14 @@
 
 		if(!g_file_get_contents(filename, (gchar **) &buffer, &sz, &error))
 		{
-			popup_an_error( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			PopupAnError( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
 		else
 		{
 			sz /= sizeof(struct ea);
 			if(set_device_buffer(buffer,sz))
-				popup_an_error( N_( "Can't set device buffer contents" ) );
+				PopupAnError( N_( "Can't set device buffer contents" ) );
 		}
 
 		g_free(buffer);
@@ -959,7 +961,7 @@
 
 		if(!g_file_set_contents(filename,(gchar *) buffer,sz*sizeof(struct ea),&error))
 		{
-			popup_an_error( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			PopupAnError( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
 		free(buffer);

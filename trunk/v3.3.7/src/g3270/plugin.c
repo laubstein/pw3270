@@ -106,12 +106,20 @@
  }
 
 #ifdef HAVE_PLUGINS
- void call(GModule *handle, CALL_PARAMETER *arg)
+ static void call(GModule *handle, CALL_PARAMETER *arg)
  {
 	void (*ptr)(const gchar *arg) = NULL;
 	if(g_module_symbol(handle, arg->name, (gpointer) ptr))
 		ptr(arg->arg);
  }
+
+ static void setui(GModule *handle, GtkUIManager *ui)
+ {
+	void (*ptr)(GtkUIManager *ui) = NULL;
+	if(g_module_symbol(handle, "SetUIManager", (gpointer) ptr))
+		ptr(ui);
+ }
+
 #endif
 
  void CallPlugins(const gchar *name, const gchar *arg)
@@ -121,6 +129,14 @@
 
  	if(plugins)
  	 	g_slist_foreach(plugins,(GFunc) call,&p);
+#endif
+ }
+
+ void SetUIManager(GtkUIManager *ui)
+ {
+#ifdef HAVE_PLUGINS
+ 	if(plugins)
+ 	 	g_slist_foreach(plugins,(GFunc) setui,ui);
 #endif
  }
 

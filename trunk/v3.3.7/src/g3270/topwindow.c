@@ -33,6 +33,7 @@
  #include <lib3270/actionsc.h>
  #include <lib3270/toggle.h>
  #include <lib3270/hostc.h>
+ #include <lib3270/plugins.h>
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
@@ -181,7 +182,7 @@
 
 	if(!g_file_get_contents(filename,&text,NULL,&error))
 	{
-		popup_an_error( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+		PopupAnError( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
 		g_error_free(error);
 		g_free(filename);
 		g_free(text);
