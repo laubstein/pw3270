@@ -1071,6 +1071,8 @@
  	kbrd_state = state;
 
  	Trace("Keyboard state changed to %08x",state);
+/*
+	// For some reason the "shift" status is failing
 
  	// TODO (perry#1#): Draw only the state flags.
  	if(terminal && pixmap)
@@ -1078,7 +1080,7 @@
 		DrawOIA(terminal,color,pixmap);
 		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);
  	}
-
+*/
  }
 
  gchar * GetScreenContents(gboolean all)

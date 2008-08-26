@@ -34,7 +34,10 @@
 
 // TODO (perry#7#): Find a better way to get font sizes!!!
 #define MAX_FONT_SIZES	54
-#define KEYBOARD_STATE_MASK (GDK_SHIFT_MASK|GDK_ALT_MASK|GDK_LOCK_MASK)
+
+
+#define KEYBOARD_STATE_MASK GDK_SHIFT_MASK
+// |GDK_ALT_MASK|GDK_LOCK_MASK)
 
 /*---[ Structs ]------------------------------------------------------------------------------------------------*/
 
@@ -303,6 +306,7 @@
 
  static gboolean focus_in(GtkWidget *widget, GdkEventFocus *event, gpointer x)
  {
+	Trace("Terminal %p got focus",widget);
 	gtk_im_context_focus_in(im);
 	InvalidateCursor();
 	return 0;
@@ -310,9 +314,9 @@
 
  static gboolean focus_out(GtkWidget *widget, GdkEventFocus *event, gpointer x)
  {
+	Trace("Terminal %p lost focus",widget);
 	gtk_im_context_focus_out(im);
 	InvalidateCursor();
-	Trace("Terminal %p lost focus",widget);
 	return 0;
  }
 
@@ -470,10 +474,10 @@
     g_signal_connect(G_OBJECT(im),			"commit",				G_CALLBACK(im_commit),				0);
 
     // Connect mouse events
-    g_signal_connect(G_OBJECT(terminal), "button-press-event",		G_CALLBACK(mouse_button_press),		0);
-    g_signal_connect(G_OBJECT(terminal), "button-release-event",	G_CALLBACK(mouse_button_release),	0);
-    g_signal_connect(G_OBJECT(terminal), "motion-notify-event",		G_CALLBACK(mouse_motion),    		0);
-    g_signal_connect(G_OBJECT(terminal), "scroll-event",			G_CALLBACK(mouse_scroll),			0);
+    g_signal_connect(G_OBJECT(terminal), 	"button-press-event",		G_CALLBACK(mouse_button_press),		0);
+    g_signal_connect(G_OBJECT(terminal), 	"button-release-event",	G_CALLBACK(mouse_button_release),	0);
+    g_signal_connect(G_OBJECT(terminal), 	"motion-notify-event",		G_CALLBACK(mouse_motion),    		0);
+    g_signal_connect(G_OBJECT(terminal), 	"scroll-event",			G_CALLBACK(mouse_scroll),			0);
 
 	register_tchange(CROSSHAIR,set_crosshair);
 	register_tchange(CURSOR_POS,set_showcursor);
