@@ -31,82 +31,82 @@
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
-#define ALTERNATIVE_COLORS 1
+ 	static const struct _color_profile
+ 	{
+ 		const gchar *name;
+ 		const gchar *colors;
+	}
+	color_profile[] =
+	{
+		{	N_( "Profile 1" ),	"#000000,"			// TERMINAL_COLOR_BACKGROUND
+								"#7890F0,"			// TERMINAL_COLOR_BLUE
+								"#FF0000,"			// TERMINAL_COLOR_RED
+								"#FF00FF,"			// TERMINAL_COLOR_PINK
+								"#00FF00,"			// TERMINAL_COLOR_GREEN
+								"#00FFFF,"			// TERMINAL_COLOR_TURQUOISE
+								"#FFFF00,"			// TERMINAL_COLOR_YELLOW
+								"#FFFFFF,"			// TERMINAL_COLOR_WHITE
+								"#000000,"			// TERMINAL_COLOR_BLACK
+								"#000080,"			// TERMINAL_COLOR_DARK_BLUE
+								"#FFA200,"			// TERMINAL_COLOR_ORANGE
+								"#800080,"			// TERMINAL_COLOR_PURPLE
+								"#008000,"			// TERMINAL_COLOR_DARK_GREEN
+								"#008080,"			// TERMINAL_COLOR_DARK_TURQUOISE
+								"#A0A000,"			// TERMINAL_COLOR_MUSTARD
+								"#C0C0C0,"			// TERMINAL_COLOR_GRAY
 
-#ifdef ALTERNATIVE_COLORS
+								"#00FF00,"			// TERMINAL_COLOR_FIELD_DEFAULT
+								"#FF0000,"			// TERMINAL_COLOR_FIELD_INTENSIFIED
+								"#00FFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED
+								"#FFFFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
 
- 	static const char *DefaultColors =	"#000000,"			// TERMINAL_COLOR_BACKGROUND
-											"#7890F0,"			// TERMINAL_COLOR_BLUE
-											"#FF0000,"			// TERMINAL_COLOR_RED
-											"#FF00FF,"			// TERMINAL_COLOR_PINK
-											"#00FF00,"			// TERMINAL_COLOR_GREEN
-											"#00FFFF,"			// TERMINAL_COLOR_TURQUOISE
-											"#FFFF00,"			// TERMINAL_COLOR_YELLOW
-											"#FFFFFF,"			// TERMINAL_COLOR_WHITE
-											"#000000,"			// TERMINAL_COLOR_BLACK
-											"#000080,"			// TERMINAL_COLOR_DARK_BLUE
-											"#FFA200,"			// TERMINAL_COLOR_ORANGE
-											"#800080,"			// TERMINAL_COLOR_PURPLE
-											"#008000,"			// TERMINAL_COLOR_DARK_GREEN
-											"#008080,"			// TERMINAL_COLOR_DARK_TURQUOISE
-											"#A0A000,"			// TERMINAL_COLOR_MUSTARD
-											"#C0C0C0,"			// TERMINAL_COLOR_GRAY
+								"#FFFFFF,"			// TERMINAL_COLOR_SELECTED_BG
+								"#000000,"			// TERMINAL_COLOR_SELECTED_FG,
 
-											"#00FF00,"			// TERMINAL_COLOR_FIELD_DEFAULT
-											"#FF0000,"			// TERMINAL_COLOR_FIELD_INTENSIFIED
-											"#00FFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED
-											"#FFFFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
+								"#00FF00," 			// TERMINAL_COLOR_CURSOR
+								"#00FF00," 			// TERMINAL_COLOR_CROSS_HAIR
 
-											"#FFFFFF,"			// TERMINAL_COLOR_SELECTED_BG
-											"#000000,"			// TERMINAL_COLOR_SELECTED_FG,
+								"#000000,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
+								"#00FF00,"			// TERMINAL_COLOR_OIA
+								"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
+								"#FFFFFF,"			// TERMINAL_COLOR_OIA_STATUS_OK
+								"#FF0000"			// TERMINAL_COLOR_OIA_STATUS_INVALID
+		},
+		{	N_( "Profile 2" ),	"black,"			// TERMINAL_COLOR_BACKGROUND
+								"blue,"				// TERMINAL_COLOR_BLUE
+								"red,"				// TERMINAL_COLOR_RED
+								"pink,"				// TERMINAL_COLOR_PINK
+								"green,"			// TERMINAL_COLOR_GREEN
+								"turquoise,"		// TERMINAL_COLOR_TURQUOISE
+								"yellow,"			// TERMINAL_COLOR_YELLOW
+								"white,"			// TERMINAL_COLOR_WHITE
+								"black,"			// TERMINAL_COLOR_BLACK
+								"DeepSkyBlue,"		// TERMINAL_COLOR_DARK_BLUE
+								"orange,"			// TERMINAL_COLOR_ORANGE
+								"DeepSkyBlue,"		// TERMINAL_COLOR_PURPLE
+								"PaleGreen,"		// TERMINAL_COLOR_DARK_GREEN
+								"PaleTurquoise,"	// TERMINAL_COLOR_DARK_TURQUOISE
+								"grey,"				// TERMINAL_COLOR_MUSTARD
+								"white,"			// TERMINAL_COLOR_GRAY
 
-											"#00FF00," 			// TERMINAL_COLOR_CURSOR
-											"#00FF00," 			// TERMINAL_COLOR_CROSS_HAIR
+								"green1,"			// TERMINAL_COLOR_FIELD_DEFAULT
+								"red,"				// TERMINAL_COLOR_FIELD_INTENSIFIED
+								"DeepSkyBlue,"		// TERMINAL_COLOR_FIELD_PROTECTED
+								"white,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
 
-											"#000000,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
-											"#00FF00,"			// TERMINAL_COLOR_OIA
-											"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
-											"#FFFFFF,"			// TERMINAL_COLOR_OIA_STATUS_OK
-											"#FF0000";			// TERMINAL_COLOR_OIA_STATUS_INVALID
+								"white,"			// TERMINAL_COLOR_SELECTED_BG
+								"black,"			// TERMINAL_COLOR_SELECTED_FG,
 
+								"LimeGreen," 		// TERMINAL_COLOR_CURSOR
+								"LimeGreen," 		// TERMINAL_COLOR_CROSS_HAIR
 
-#else
-
- 	static const char *DefaultColors =	"black,"			// TERMINAL_COLOR_BACKGROUND
-											"blue,"				// TERMINAL_COLOR_BLUE
-											"red,"				// TERMINAL_COLOR_RED
-											"pink,"				// TERMINAL_COLOR_PINK
-											"green,"			// TERMINAL_COLOR_GREEN
-											"turquoise,"		// TERMINAL_COLOR_TURQUOISE
-											"yellow,"			// TERMINAL_COLOR_YELLOW
-											"white,"			// TERMINAL_COLOR_WHITE
-											"black,"			// TERMINAL_COLOR_BLACK
-											"DeepSkyBlue,"		// TERMINAL_COLOR_DARK_BLUE
-											"orange,"			// TERMINAL_COLOR_ORANGE
-											"DeepSkyBlue,"		// TERMINAL_COLOR_PURPLE
-											"PaleGreen,"		// TERMINAL_COLOR_DARK_GREEN
-											"PaleTurquoise,"	// TERMINAL_COLOR_DARK_TURQUOISE
-											"grey,"				// TERMINAL_COLOR_MUSTARD
-											"white,"			// TERMINAL_COLOR_GRAY
-
-											"green1,"			// TERMINAL_COLOR_FIELD_DEFAULT
-											"red,"				// TERMINAL_COLOR_FIELD_INTENSIFIED
-											"DeepSkyBlue,"		// TERMINAL_COLOR_FIELD_PROTECTED
-											"white,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
-
-											"white,"			// TERMINAL_COLOR_SELECTED_BG
-											"black,"			// TERMINAL_COLOR_SELECTED_FG,
-
-											"LimeGreen," 		// TERMINAL_COLOR_CURSOR
-											"LimeGreen," 		// TERMINAL_COLOR_CROSS_HAIR
-
-											"black,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
-											"LimeGreen,"		// TERMINAL_COLOR_OIA
-											"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
-											"white,"			// TERMINAL_COLOR_OIA_STATUS_OK
-											"red";				// TERMINAL_COLOR_OIA_STATUS_INVALID
-
-#endif
+								"black,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
+								"LimeGreen,"		// TERMINAL_COLOR_OIA
+								"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
+								"white,"			// TERMINAL_COLOR_OIA_STATUS_OK
+								"red"				// TERMINAL_COLOR_OIA_STATUS_INVALID
+		}
+	};
 
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
@@ -144,11 +144,9 @@
  	return 0;
  }
 
- int LoadColors(void)
+ static void ParseColor(char *buffer)
  {
-
  	int 	f;
- 	char	*buffer	= GetString("Terminal","Colors",DefaultColors);
  	char	*ptr	= strtok(buffer,",");
 
  	for(f=0;ptr && f < TERMINAL_COLOR_COUNT;f++)
@@ -165,8 +163,13 @@
 		gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+f,TRUE,TRUE);
  	}
 
- 	g_free(buffer);
+ }
 
+ int LoadColors(void)
+ {
+ 	char	*buffer	= GetString("Terminal","Colors",color_profile[0].colors);
+ 	ParseColor(buffer);
+ 	g_free(buffer);
  	return 0;
  }
 
@@ -216,6 +219,15 @@
 
 	gtk_widget_set_sensitive(widget,1);
 
+ }
+
+ static void activate_profile(GtkMenuItem *menuitem, const gchar *clr)
+ {
+ 	gchar *buffer = g_strdup(clr);
+ 	Trace("Activating profile %s",buffer);
+	ParseColor(buffer);
+	g_free(buffer);
+	action_Redraw();
  }
 
  void action_SelectColors(void)
@@ -281,13 +293,15 @@
 	GtkWidget		*frame;
 	GtkTreeIter		iter;
 	GtkTreeIter		parent;
-	int				title = 0;
+	GtkWidget		*menu;
+	gboolean		again	= TRUE;
+	int				title 	= 0;
 	int				f;
 
 	dialog = gtk_dialog_new_with_buttons (	_( "Color setup" ),
 											GTK_WINDOW(topwindow),
 											GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-											_( "Restore defaults" ),	1,
+											N_( "Load profile" ),		1,
 											GTK_STOCK_OK,     			GTK_RESPONSE_ACCEPT,
 											GTK_STOCK_CANCEL, 			GTK_RESPONSE_REJECT,
 											NULL);
@@ -337,23 +351,37 @@
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),box);
 	gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
 
+	// Load color profiles
+ 	menu = gtk_menu_new();
+ 	for(f=0;f<G_N_ELEMENTS(color_profile);f++)
+ 	{
+		widget = gtk_menu_item_new_with_label(color_profile[f].name);
+		gtk_widget_show_all(widget);
+		g_signal_connect(G_OBJECT(widget),"activate",G_CALLBACK(activate_profile),(gpointer) color_profile[f].colors);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu),widget);
+ 	}
+
 	// Run dialog
 	RestoreWindowSize("ColorSetup", dialog);
 
-	switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+	while(again)
 	{
-	case 1:					// Restore default colors
-		SetString("Terminal","Colors",NULL);
-		LoadColors();
-		break;
+		switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+		{
+		case 1:					// Restore default colors
+			gtk_menu_popup(GTK_MENU(menu),NULL,NULL,0,0,0,0);
+			break;
 
-	case GTK_RESPONSE_ACCEPT:	// Save selected colors
-		SaveColors();
-		break;
+		case GTK_RESPONSE_ACCEPT:	// Save selected colors
+			SaveColors();
+			again = FALSE;
+			break;
 
-	case GTK_RESPONSE_REJECT:	// Reload colors from configuration file
-		LoadColors();
-		break;
+		case GTK_RESPONSE_REJECT:	// Reload colors from configuration file
+			LoadColors();
+			again = FALSE;
+			break;
+		}
 	}
 
 	SaveWindowSize("ColorSetup",dialog);

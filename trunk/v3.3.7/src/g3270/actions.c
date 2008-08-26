@@ -546,6 +546,12 @@
  	set_toggle(id,FALSE);
  }
 
+ static void toggle_bold(GtkToggleAction *action, gpointer dunno)
+ {
+	SetBoolean("Toggles","Bold", gtk_toggle_action_get_active(action));
+	FontChanged();
+ }
+
  static void LoadToggleActions(GtkActionGroup *actions)
  {
 	// TODO (perry#9#): Add tooltips
@@ -594,7 +600,42 @@
 		{ N_( "Keypad" ),						NULL,	NULL,	N_( "<alt>K" )		}
 	};
 
+	// TODO (perry#9#): Add tooltips
+ 	static const struct _toggle_internal
+ 	{
+ 		const gchar *label;
+ 		const gchar *tooltip;
+ 		const gchar *stock_id;
+ 		const gchar *accelerator;
+		void 		 (*call)(GtkToggleAction *action, gpointer dunno);
+
+	}
+	toggle_internal[] =
+	{
+		{ N_( "Bold" ),							NULL,	NULL,	NULL,	toggle_bold	}
+	};
+
  	int f;
+
+	/* Internal toggles */
+ 	for(f=0;f< G_N_ELEMENTS(toggle_internal);f++)
+ 	{
+ 		char buffer[20];
+
+ 		g_snprintf(buffer,19,"Toggle%s",toggle_internal[f].label);
+
+		GtkToggleAction *action = gtk_toggle_action_new(	buffer,
+															gettext(toggle_internal[f].label),
+															gettext(toggle_internal[f].tooltip),
+															toggle_info[f].stock_id );
+
+		gtk_toggle_action_set_active(action,GetBoolean("Toggles",toggle_internal[f].label,FALSE));
+		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_internal[f].call),(gpointer) toggle_internal[f].label);
+		if(toggle_internal[f].accelerator)
+			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(toggle_internal[f].accelerator));
+		else
+			gtk_action_group_add_action(actions,(GtkAction *) action);
+ 	}
 
 	/* Toggle actions */
  	for(f=0;f<N_TOGGLES;f++)

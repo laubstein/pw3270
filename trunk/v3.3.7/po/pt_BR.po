@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-26 08:24-0300\n"
-"PO-Revision-Date: 2008-08-26 08:25-0300\n"
+"POT-Creation-Date: 2008-08-26 09:40-0300\n"
+"PO-Revision-Date: 2008-08-26 09:41-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -609,47 +609,47 @@ msgstr ""
 msgid "White"
 msgstr "Branco"
 
-#: screen.c:750 screen.c:774
+#: screen.c:755 screen.c:779
 msgid "X"
 msgstr ""
 
-#: screen.c:754
+#: screen.c:759
 msgid "X -f"
 msgstr ""
 
-#: screen.c:782
+#: screen.c:787
 msgid "X Connecting"
 msgstr "X Conectando"
 
-#: screen.c:770
+#: screen.c:775
 msgid "X Inhibit"
 msgstr ""
 
-#: screen.c:746
+#: screen.c:751
 msgid "X Not Connected"
 msgstr "X Não conectado"
 
-#: screen.c:762
+#: screen.c:767
 msgid "X Numeric"
 msgstr "X Numérico"
 
-#: screen.c:766
+#: screen.c:771
 msgid "X Overflow"
 msgstr ""
 
-#: screen.c:758
+#: screen.c:763
 msgid "X Protected"
 msgstr "X Protegido"
 
-#: screen.c:778
+#: screen.c:783
 msgid "X Resolving"
 msgstr "X Resolvendo"
 
-#: screen.c:734
+#: screen.c:739
 msgid "X System"
 msgstr ""
 
-#: screen.c:738
+#: screen.c:743
 msgid "X Wait"
 msgstr "X Aguarde"
 

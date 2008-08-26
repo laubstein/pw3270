@@ -196,11 +196,16 @@
 	int 			GetFunctionKey(GdkEventKey *event);
 	int 			wait4negotiations(const char *cl_hostname);
 
+	void			FontChanged(void);
+
 	int 			CloseConfigFile(void);
 	int				OpenConfigFile(void);
 
 	gchar 			*GetString(const gchar *group, const gchar *key, const gchar *def);
 	void 			SetString(const gchar *group, const gchar *key, const gchar *val);
+
+	gboolean 		GetBoolean(const gchar *group, const gchar *key, const gboolean def);
+	void 			SetBoolean(const gchar *group, const gchar *key, const gboolean val);
 
 	gint 			GetInt(const gchar *group, const gchar *key, gint def);
 	void			SetInt(const gchar *group, const gchar *key, gint val);
