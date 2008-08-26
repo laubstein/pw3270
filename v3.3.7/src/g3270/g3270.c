@@ -179,8 +179,20 @@ static char *base_3270_keymap =
 /* Callback for connection state changes. */
 static void main_connect(Boolean status)
 {
-	static const gchar *disconnected[] 	= { "Connect", "SetHostname" };
-	static const gchar *connected[]		= { "Disconnect", "PrintScreen", "SaveScreen" };
+	static const gchar *disconnected[] 	=	{ 	"Connect",
+													"SetHostname"
+												};
+	static const gchar *connected[]		=	{ 	"Disconnect",
+													"PrintScreen",
+													"SaveScreen",
+													"EraseEOF",
+													"EraseField",
+													"Clear",
+													"Paste",
+													"PasteNext",
+													"SelectAll",
+													"SelectField"
+												};
 
 	int			f;
 	GtkAction 	*action;
@@ -212,8 +224,7 @@ static void main_connect(Boolean status)
 	for(f=0;f<G_N_ELEMENTS(disconnected);f++)
 	{
 		action = gtk_action_group_get_action(main_actions,disconnected[f]);
-		if(action)
-			gtk_action_set_sensitive(action,sts);
+		gtk_action_set_sensitive(action,sts);
 	}
 
 	sts = !sts;
@@ -224,8 +235,7 @@ static void main_connect(Boolean status)
 	for(f=0;f<G_N_ELEMENTS(connected);f++)
 	{
 		action = gtk_action_group_get_action(main_actions,connected[f]);
-		if(action)
-			gtk_action_set_sensitive(action,sts);
+		gtk_action_set_sensitive(action,sts);
 	}
 
 }
