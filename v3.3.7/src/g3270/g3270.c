@@ -269,13 +269,13 @@ static int g3270_init(int *argc, char ***argv)
 
 	if(Register3270IOCallbacks(&g3270_io_callbacks))
 	{
-		popup_an_error( N_( "Can't register into lib3270 I/O callback table." ) );
+		PopupAnError( N_( "Can't register into lib3270 I/O callback table." ) );
 		return -1;
 	}
 
 	if(Register3270ScreenCallbacks(&g3270_screen_callbacks))
 	{
-		popup_an_error( N_( "Can't register into lib3270 screen callback table." ) );
+		PopupAnError( N_( "Can't register into lib3270 screen callback table." ) );
 		return -1;
 	}
 
@@ -301,7 +301,7 @@ int wait4negotiations(const char *cl_hostname)
 
 		if(!PCONNECTED)
 		{
-			popup_an_error( N_( "Negotiation with %s failed!" ),cl_hostname);
+			PopupAnError( N_( "Negotiation with %s failed!" ),cl_hostname);
 			gtk_widget_set_sensitive(topwindow,TRUE);
 			return EINVAL;
 		}
