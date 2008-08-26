@@ -347,6 +347,9 @@
 		gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
 	}
 
+	if(row == cRow && col == cCol)
+		RedrawCursor();
+
 	return 0;
  }
 
@@ -706,6 +709,8 @@
 
 	g_object_unref(layout);
 	gdk_gc_destroy(gc);
+
+	RedrawCursor();
 
 	return 0;
 
