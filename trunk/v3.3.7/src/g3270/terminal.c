@@ -47,27 +47,29 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
- GtkWidget				*terminal			= NULL;
- GdkPixmap				*pixmap				= NULL;
- GdkColor				color[TERMINAL_COLOR_COUNT+1];
- gint					cMode				= CURSOR_MODE_ENABLED|CURSOR_MODE_BASE|CURSOR_MODE_SHOW;
- gint					cCol				= 0;
- gint					cRow				= 0;
+ GtkWidget						*terminal		= NULL;
+ GdkPixmap						*pixmap			= NULL;
+ GdkColor						color[TERMINAL_COLOR_COUNT+1];
 
- static GdkRectangle	cursor;
- static gint			sWidth				= 0;
- static gint			sHeight				= 0;
- static int			blink_enabled		= 0;
+ static gint					sWidth			= 0;
+ static gint					sHeight			= 0;
 
- static GtkIMContext	*im;
+ static GtkIMContext			*im;
 
- static PangoFontDescription	*font_descr	= NULL;
- static int					szFonts		= MAX_FONT_SIZES;
+ static PangoFontDescription	*font_descr		= NULL;
+ static int					szFonts			= MAX_FONT_SIZES;
  static FONTSIZE				fsize[MAX_FONT_SIZES];
+
+ // Cursor info
+ gint							cMode			= CURSOR_MODE_ENABLED|CURSOR_MODE_BASE|CURSOR_MODE_SHOW;
+ gint							cCol			= 0;
+ gint							cRow			= 0;
+ static GdkPixmap				*pCursor		= NULL;
+ static GdkRectangle			rCursor;
+ static int					blink_enabled	= 0;
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
- static void RedrawCursor(void);
  static void set_showcursor(int value, int reason);
  static void set_blink(int value, int reason);
 
@@ -106,15 +108,19 @@
 		{
 			// Draw cross-hair cursor
 			gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CROSS_HAIR);
-			gdk_draw_line(widget->window,gc,cursor.x,0,cursor.x,OIAROW-1);
-			gdk_draw_line(widget->window,gc,0,cursor.y,sWidth,cursor.y);
+			gdk_draw_line(widget->window,gc,rCursor.x,0,rCursor.x,OIAROW-1);
+			gdk_draw_line(widget->window,gc,0,rCursor.y+fHeight,sWidth,rCursor.y+fHeight);
 		}
 
 		if( (cMode & (CURSOR_MODE_BASE|CURSOR_MODE_SHOW)) == (CURSOR_MODE_BASE|CURSOR_MODE_SHOW) )
 		{
 			// Draw standard cursor
-			gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CURSOR);
-			gdk_draw_rectangle(widget->window,gc,TRUE,cursor.x,cursor.y-cursor.height,cursor.width,cursor.height);
+			gdk_draw_drawable(		widget->window,	gc,
+									GDK_DRAWABLE(pCursor),
+									0,rCursor.height,
+									rCursor.x,rCursor.y+rCursor.height,
+									rCursor.width,fHeight-rCursor.height);
+
 		}
 	}
 
@@ -220,6 +226,11 @@
 			pixmap = NULL;
 		}
 
+		if(pCursor)
+		{
+			gdk_pixmap_unref(pCursor);
+			pCursor = NULL;
+		}
 	}
 
 	/* Center image */
@@ -464,11 +475,11 @@
 
  void InvalidateCursor(void)
  {
-	gtk_widget_queue_draw_area(terminal,cursor.x,cursor.y-cursor.height,cursor.width,cursor.height);
+	gtk_widget_queue_draw_area(terminal,rCursor.x,rCursor.y-fHeight,fWidth,fHeight);
 	if(cMode & CURSOR_MODE_CROSS)
 	{
-		gtk_widget_queue_draw_area(terminal,0,cursor.y,sWidth,cursor.height);
-		gtk_widget_queue_draw_area(terminal,cursor.x,0,cursor.width,sHeight);
+		gtk_widget_queue_draw_area(terminal,rCursor.x,0,rCursor.x,OIAROW-1);
+		gtk_widget_queue_draw_area(terminal,0,rCursor.y+fHeight,sWidth,rCursor.y+fHeight);
 	}
  }
 
@@ -541,22 +552,47 @@
 
  }
 
- static void RedrawCursor(void)
+ void RedrawCursor(void)
  {
-	memset(&cursor,0,sizeof(cursor));
+	ELEMENT 	el;
+	GdkGC   	*gc;
+	PangoLayout *layout;
+
+	memset(&rCursor,0,sizeof(rCursor));
+
+	// Draw cursor pixmap
+	if(!pCursor)
+		pCursor = gdk_pixmap_new(terminal->window,fWidth,fHeight,-1);
+
+	memcpy(&el,screen + (cRow*terminal_cols)+cCol,sizeof(ELEMENT));
+	el.fg = 0;
+	el.bg = TERMINAL_COLOR_CURSOR;
+
+	gc = gdk_gc_new(pCursor);
+	layout = gtk_widget_create_pango_layout(terminal,el.ch);
+	DrawElement(pCursor, color, gc, layout, 0, 0, &el);
+	gdk_gc_destroy(gc);
+	g_object_unref(layout);
 
 	// Set cursor position
-	cursor.x 		= left_margin + (cCol * fWidth);
-	cursor.y 		= top_margin + ((cRow+1) * fHeight);
-	cursor.width 	= fWidth;
+	rCursor.x 		= left_margin + (cCol * fWidth);
+	rCursor.y 		= top_margin + (cRow * fHeight);
+	rCursor.width 	= fWidth;
 
 	if(Toggled(INSERT))
-		cursor.height 	= (fHeight/3)+1;
+	{
+		rCursor.height = 0;
+	}
 	else
-		cursor.height 	= (fHeight >> 2)+1;
+	{
+		rCursor.height =fHeight - (fHeight/4);
+
+		if(rCursor.height < 1)
+			rCursor.height = 1;
+	}
 
 	// Mark to redraw
-	gtk_im_context_set_cursor_location(im,&cursor);
+	gtk_im_context_set_cursor_location(im,&rCursor);
 	InvalidateCursor();
  }
 

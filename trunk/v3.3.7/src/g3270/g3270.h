@@ -152,6 +152,7 @@
 	void 		set_rectangle_select(int value, int reason);
 	void 		SetStatusCode(STATUS_CODE id);
 	void 		SetTerminalFont(const gchar *fontname);
+	void 		RedrawCursor(void);
 
 	#define		GetSelection() GetScreenContents(0)
 	gchar 		*GetClipboard(void);
