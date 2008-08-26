@@ -564,8 +564,8 @@
 		const gchar	*stock_id;
 	} toggle_list[] =
 	{
-		{ TRUE,		FULL_SCREEN,	NULL,	NULL,	GTK_STOCK_FULLSCREEN		},
-		{ FALSE,	FULL_SCREEN,	NULL,	NULL,	GTK_STOCK_LEAVE_FULLSCREEN	},
+		{ TRUE,		FULL_SCREEN,	N_( "Fullscreen" ),	NULL,	GTK_STOCK_FULLSCREEN		},
+		{ FALSE,	FULL_SCREEN,	N_( "Window"),		NULL,	GTK_STOCK_LEAVE_FULLSCREEN	},
 	};
 
 	// TODO (perry#9#): Add tooltips

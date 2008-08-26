@@ -381,6 +381,9 @@
 			LoadColors();
 			again = FALSE;
 			break;
+
+		default:
+			again = FALSE;
 		}
 	}
 

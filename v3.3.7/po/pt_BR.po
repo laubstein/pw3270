@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-26 11:42-0300\n"
-"PO-Revision-Date: 2008-08-26 11:43-0300\n"
+"POT-Creation-Date: 2008-08-26 13:13-0300\n"
+"PO-Revision-Date: 2008-08-26 13:13-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -280,6 +280,10 @@ msgstr "Frente"
 
 #: actions.c:597
 msgid "Full Screen"
+msgstr "Tela-cheia"
+
+#: actions.c:567
+msgid "Fullscreen"
 msgstr "Tela-cheia"
 
 #: colors.c:266
@@ -620,6 +624,10 @@ msgstr ""
 #: colors.c:258
 msgid "White"
 msgstr "Branco"
+
+#: actions.c:568
+msgid "Window"
+msgstr "Janela"
 
 #: screen.c:755 screen.c:779
 msgid "X"
