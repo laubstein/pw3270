@@ -1064,6 +1064,7 @@
 
  void UpdateKeyboardState(guint state)
  {
+/*
 
  	if(state == kbrd_state)
 		return;
@@ -1071,7 +1072,6 @@
  	kbrd_state = state;
 
  	Trace("Keyboard state changed to %08x",state);
-/*
 	// For some reason the "shift" status is failing
 
  	// TODO (perry#1#): Draw only the state flags.
