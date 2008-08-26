@@ -248,7 +248,6 @@
 
  	GtkWidget				*vbox;
  	GtkWidget				*hbox;
- 	GtkWidget				*keypad;
  	int						f;
 	GtkUIManager			*ui_manager;
 	gchar					*file;

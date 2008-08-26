@@ -218,6 +218,9 @@ static void main_connect(Boolean status)
 
 	sts = !sts;
 
+	if(keypad)
+		gtk_widget_set_sensitive(keypad,sts);
+
 	for(f=0;f<G_N_ELEMENTS(connected);f++)
 	{
 		action = gtk_action_group_get_action(main_actions,connected[f]);
