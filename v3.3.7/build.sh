@@ -1,5 +1,7 @@
 #!/bin/sh
 
+svn update
+
 #
 # Build windows version
 #
