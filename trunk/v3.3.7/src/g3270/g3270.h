@@ -110,6 +110,7 @@
 
 
 	extern GtkWidget				*topwindow;
+	extern GtkWidget				*keypad;
 	extern GdkPixmap				*pixmap;
 	extern GtkWidget				*SelectionPopup;
 	extern GtkWidget				*DefaultPopup;

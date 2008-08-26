@@ -167,6 +167,7 @@
 
 	register_tchange(KEYPAD,set_visible);
 
+	gtk_widget_set_name(keypad,"KeyPAD");
  	return keypad;
  }
 
