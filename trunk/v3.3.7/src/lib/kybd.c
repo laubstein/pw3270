@@ -106,7 +106,6 @@ static struct xks {
 	KeySym assoc;
 } *xk;
 
-static Boolean		insert = False;		/* insert mode */
 static Boolean		reverse = False;	/* reverse-input mode */
 
 /* Globals */
@@ -350,16 +349,6 @@ kybd_init(void)
 }
 
 /*
- * Toggle insert mode.
- */
-static void
-insert_mode(Boolean on)
-{
-	insert = on;
-	status_insert_mode(on);
-}
-
-/*
  * Toggle reverse mode.
  */
 static void
@@ -440,7 +429,7 @@ key_AID(unsigned char aid_code)
 	if (!IN_SSCP || aid_code != AID_CLEAR) {
 		status_twait();
 		mcursor_waiting();
-		insert_mode(False);
+		set_toggle(INSERT,0);
 		kybdlock_set(KL_OIA_TWAIT | KL_OIA_LOCKED, "key_AID");
 	}
 	aid = aid_code;
@@ -710,7 +699,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 	/* Add the character. */
 	if (ea_buf[baddr].cc == EBC_so) {
 
-		if (insert) {
+		if (toggled(INSERT)) {
 			if (!ins_prep(faddr, baddr, 1))
 				return False;
 		} else {
@@ -747,7 +736,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 		/* fall through... */
 	case DBCS_LEFT:
 		if (why == DBCS_ATTRIBUTE) {
-			if (insert) {
+			if (toggled(INSERT)) {
 				if (!ins_prep(faddr, baddr, 1))
 					return False;
 			} else {
@@ -764,7 +753,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 		} else {
 			Boolean was_si;
 
-			if (insert) {
+			if (toggled(INSERT)) {
 				/*
 				 * Inserting SBCS into a DBCS subfield.
 				 * If this is the first position, we
@@ -821,7 +810,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 		break;
 	default:
 	case DBCS_NONE:
-		if (insert && !ins_prep(faddr, baddr, 1))
+		if (toggled(INSERT) && !ins_prep(faddr, baddr, 1))
 			return False;
 		break;
 	}
@@ -1428,7 +1417,7 @@ do_reset(Boolean explicit)
 	}
 
 	/* Always clear insert mode. */
-	insert_mode(False);
+	set_toggle(INSERT,0);
 
 	/* Otherwise, if not connect, reset is a no-op. */
 	if (!CONNECTED)
@@ -2653,7 +2642,7 @@ Insert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 	if (IN_ANSI)
 		return;
 #endif /*]*/
-	insert_mode(True);
+	set_toggle(INSERT,True);
 }
 
 
@@ -2673,10 +2662,8 @@ ToggleInsert_action(Widget w unused, XEvent *event, String *params, Cardinal *nu
 	if (IN_ANSI)
 		return;
 #endif /*]*/
-	if (insert)
-		insert_mode(False);
-	else
-		insert_mode(True);
+
+	do_toggle(INSERT);
 }
 
 

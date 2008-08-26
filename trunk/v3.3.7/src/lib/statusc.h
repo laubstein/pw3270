@@ -21,10 +21,6 @@ extern void status_script(Boolean on);
 extern void status_timing(struct timeval *t0, struct timeval *t1);
 extern void status_untiming(void);
 
-// extern void status_insert_mode(Boolean on);
-#define status_insert_mode(on) set_toggle(INSERT,on)
-
-
 extern void status_lu(const char *);
 extern void status_minus(void);
 extern void status_oerr(int error_type);
