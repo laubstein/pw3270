@@ -38,73 +38,73 @@
 	}
 	color_profile[] =
 	{
-		{	N_( "Profile 1" ),	"#000000,"			// TERMINAL_COLOR_BACKGROUND
-								"#7890F0,"			// TERMINAL_COLOR_BLUE
-								"#FF0000,"			// TERMINAL_COLOR_RED
-								"#FF00FF,"			// TERMINAL_COLOR_PINK
-								"#00FF00,"			// TERMINAL_COLOR_GREEN
-								"#00FFFF,"			// TERMINAL_COLOR_TURQUOISE
-								"#FFFF00,"			// TERMINAL_COLOR_YELLOW
-								"#FFFFFF,"			// TERMINAL_COLOR_WHITE
-								"#000000,"			// TERMINAL_COLOR_BLACK
-								"#000080,"			// TERMINAL_COLOR_DARK_BLUE
-								"#FFA200,"			// TERMINAL_COLOR_ORANGE
-								"#800080,"			// TERMINAL_COLOR_PURPLE
-								"#008000,"			// TERMINAL_COLOR_DARK_GREEN
-								"#008080,"			// TERMINAL_COLOR_DARK_TURQUOISE
-								"#A0A000,"			// TERMINAL_COLOR_MUSTARD
-								"#C0C0C0,"			// TERMINAL_COLOR_GRAY
+		{	N_( "Default Color set 1" ),	"#000000,"			// TERMINAL_COLOR_BACKGROUND
+											"#7890F0,"			// TERMINAL_COLOR_BLUE
+											"#FF0000,"			// TERMINAL_COLOR_RED
+											"#FF00FF,"			// TERMINAL_COLOR_PINK
+											"#00FF00,"			// TERMINAL_COLOR_GREEN
+											"#00FFFF,"			// TERMINAL_COLOR_TURQUOISE
+											"#FFFF00,"			// TERMINAL_COLOR_YELLOW
+											"#FFFFFF,"			// TERMINAL_COLOR_WHITE
+											"#000000,"			// TERMINAL_COLOR_BLACK
+											"#000080,"			// TERMINAL_COLOR_DARK_BLUE
+											"#FFA200,"			// TERMINAL_COLOR_ORANGE
+											"#800080,"			// TERMINAL_COLOR_PURPLE
+											"#008000,"			// TERMINAL_COLOR_DARK_GREEN
+											"#008080,"			// TERMINAL_COLOR_DARK_TURQUOISE
+											"#A0A000,"			// TERMINAL_COLOR_MUSTARD
+											"#C0C0C0,"			// TERMINAL_COLOR_GRAY
 
-								"#00FF00,"			// TERMINAL_COLOR_FIELD_DEFAULT
-								"#FF0000,"			// TERMINAL_COLOR_FIELD_INTENSIFIED
-								"#00FFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED
-								"#FFFFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
+											"#00FF00,"			// TERMINAL_COLOR_FIELD_DEFAULT
+											"#FF0000,"			// TERMINAL_COLOR_FIELD_INTENSIFIED
+											"#00FFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED
+											"#FFFFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
 
-								"#FFFFFF,"			// TERMINAL_COLOR_SELECTED_BG
-								"#000000,"			// TERMINAL_COLOR_SELECTED_FG,
+											"#FFFFFF,"			// TERMINAL_COLOR_SELECTED_BG
+											"#000000,"			// TERMINAL_COLOR_SELECTED_FG,
 
-								"#00FF00," 			// TERMINAL_COLOR_CURSOR
-								"#00FF00," 			// TERMINAL_COLOR_CROSS_HAIR
+											"#00FF00," 			// TERMINAL_COLOR_CURSOR
+											"#00FF00," 			// TERMINAL_COLOR_CROSS_HAIR
 
-								"#000000,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
-								"#00FF00,"			// TERMINAL_COLOR_OIA
-								"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
-								"#FFFFFF,"			// TERMINAL_COLOR_OIA_STATUS_OK
-								"#FF0000"			// TERMINAL_COLOR_OIA_STATUS_INVALID
+											"#000000,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
+											"#00FF00,"			// TERMINAL_COLOR_OIA
+											"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
+											"#FFFFFF,"			// TERMINAL_COLOR_OIA_STATUS_OK
+											"#FF0000"			// TERMINAL_COLOR_OIA_STATUS_INVALID
 		},
-		{	N_( "Profile 2" ),	"black,"			// TERMINAL_COLOR_BACKGROUND
-								"blue,"				// TERMINAL_COLOR_BLUE
-								"red,"				// TERMINAL_COLOR_RED
-								"pink,"				// TERMINAL_COLOR_PINK
-								"green,"			// TERMINAL_COLOR_GREEN
-								"turquoise,"		// TERMINAL_COLOR_TURQUOISE
-								"yellow,"			// TERMINAL_COLOR_YELLOW
-								"white,"			// TERMINAL_COLOR_WHITE
-								"black,"			// TERMINAL_COLOR_BLACK
-								"DeepSkyBlue,"		// TERMINAL_COLOR_DARK_BLUE
-								"orange,"			// TERMINAL_COLOR_ORANGE
-								"DeepSkyBlue,"		// TERMINAL_COLOR_PURPLE
-								"PaleGreen,"		// TERMINAL_COLOR_DARK_GREEN
-								"PaleTurquoise,"	// TERMINAL_COLOR_DARK_TURQUOISE
-								"grey,"				// TERMINAL_COLOR_MUSTARD
-								"white,"			// TERMINAL_COLOR_GRAY
+		{	N_( "Default Color Set 2" ),	"black,"			// TERMINAL_COLOR_BACKGROUND
+											"blue,"				// TERMINAL_COLOR_BLUE
+											"red,"				// TERMINAL_COLOR_RED
+											"pink,"				// TERMINAL_COLOR_PINK
+											"green,"			// TERMINAL_COLOR_GREEN
+											"turquoise,"		// TERMINAL_COLOR_TURQUOISE
+											"yellow,"			// TERMINAL_COLOR_YELLOW
+											"white,"			// TERMINAL_COLOR_WHITE
+											"black,"			// TERMINAL_COLOR_BLACK
+											"DeepSkyBlue,"		// TERMINAL_COLOR_DARK_BLUE
+											"orange,"			// TERMINAL_COLOR_ORANGE
+											"DeepSkyBlue,"		// TERMINAL_COLOR_PURPLE
+											"PaleGreen,"		// TERMINAL_COLOR_DARK_GREEN
+											"PaleTurquoise,"	// TERMINAL_COLOR_DARK_TURQUOISE
+											"grey,"				// TERMINAL_COLOR_MUSTARD
+											"white,"			// TERMINAL_COLOR_GRAY
 
-								"green1,"			// TERMINAL_COLOR_FIELD_DEFAULT
-								"red,"				// TERMINAL_COLOR_FIELD_INTENSIFIED
-								"DeepSkyBlue,"		// TERMINAL_COLOR_FIELD_PROTECTED
-								"white,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
+											"green1,"			// TERMINAL_COLOR_FIELD_DEFAULT
+											"red,"				// TERMINAL_COLOR_FIELD_INTENSIFIED
+											"DeepSkyBlue,"		// TERMINAL_COLOR_FIELD_PROTECTED
+											"white,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
 
-								"white,"			// TERMINAL_COLOR_SELECTED_BG
-								"black,"			// TERMINAL_COLOR_SELECTED_FG,
+											"white,"			// TERMINAL_COLOR_SELECTED_BG
+											"black,"			// TERMINAL_COLOR_SELECTED_FG,
 
-								"LimeGreen," 		// TERMINAL_COLOR_CURSOR
-								"LimeGreen," 		// TERMINAL_COLOR_CROSS_HAIR
+											"LimeGreen," 		// TERMINAL_COLOR_CURSOR
+											"LimeGreen," 		// TERMINAL_COLOR_CROSS_HAIR
 
-								"black,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
-								"LimeGreen,"		// TERMINAL_COLOR_OIA
-								"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
-								"white,"			// TERMINAL_COLOR_OIA_STATUS_OK
-								"red"				// TERMINAL_COLOR_OIA_STATUS_INVALID
+											"black,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
+											"LimeGreen,"		// TERMINAL_COLOR_OIA
+											"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
+											"white,"			// TERMINAL_COLOR_OIA_STATUS_OK
+											"red"				// TERMINAL_COLOR_OIA_STATUS_INVALID
 		}
 	};
 
@@ -221,6 +221,7 @@
 
  }
 
+/*
  static void activate_profile(GtkMenuItem *menuitem, const gchar *clr)
  {
  	gchar *buffer = g_strdup(clr);
@@ -229,6 +230,7 @@
 	g_free(buffer);
 	action_Redraw();
  }
+*/
 
  void action_SelectColors(void)
  {
@@ -293,7 +295,8 @@
 	GtkWidget		*frame;
 	GtkTreeIter		iter;
 	GtkTreeIter		parent;
-	GtkWidget		*menu;
+	GtkCellRenderer *rend;
+//	GtkWidget		*menu;
 	gboolean		again	= TRUE;
 	int				title 	= 0;
 	int				f;
@@ -301,15 +304,35 @@
 	dialog = gtk_dialog_new_with_buttons (	_( "Color setup" ),
 											GTK_WINDOW(topwindow),
 											GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-											_( "Load profile" ),		1,
-											GTK_STOCK_OK,     			GTK_RESPONSE_ACCEPT,
-											GTK_STOCK_CANCEL, 			GTK_RESPONSE_REJECT,
-											NULL);
+											NULL );
 
 	gtk_window_set_icon_name(GTK_WINDOW(dialog),GTK_STOCK_SELECT_COLOR);
 
 	box = gtk_hpaned_new();
 	gtk_paned_set_position(GTK_PANED(box),GetInt("ColorSetup","PanedPosition",120));
+
+	// Buttons
+ 	model = (GtkTreeModel *) gtk_list_store_new(2,G_TYPE_STRING,G_TYPE_INT);
+
+	widget = gtk_combo_box_new_with_model(model);
+
+	rend = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(widget), rend, TRUE);
+	gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(widget), rend, "text", 0, NULL);
+
+	gtk_list_store_append((GtkListStore *) model,&iter);
+	gtk_list_store_set((GtkListStore *) model, &iter, 0, _( "Custom colors" ), 1, 0, -1);
+
+ 	for(f=0;f<G_N_ELEMENTS(color_profile);f++)
+ 	{
+		gtk_list_store_append((GtkListStore *) model,&iter);
+		gtk_list_store_set((GtkListStore *) model, &iter, 0, gettext(color_profile[f].name), 1, f+1, -1);
+ 	}
+
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area),widget,FALSE,FALSE,0);
+
+	gtk_dialog_add_action_widget(GTK_DIALOG(dialog),gtk_button_new_from_stock(GTK_STOCK_OK),GTK_RESPONSE_ACCEPT);
+	gtk_dialog_add_action_widget(GTK_DIALOG(dialog),gtk_button_new_from_stock(GTK_STOCK_CANCEL),GTK_RESPONSE_REJECT);
 
 	// Color selection box
 	color = gtk_color_selection_new();
@@ -352,6 +375,7 @@
 	gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
 
 	// Load color profiles
+	/*
  	menu = gtk_menu_new();
  	for(f=0;f<G_N_ELEMENTS(color_profile);f++)
  	{
@@ -360,6 +384,7 @@
 		g_signal_connect(G_OBJECT(widget),"activate",G_CALLBACK(activate_profile),(gpointer) color_profile[f].colors);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu),widget);
  	}
+ 	*/
 
 	// Run dialog
 	RestoreWindowSize("ColorSetup", dialog);
@@ -369,7 +394,7 @@
 		switch(gtk_dialog_run(GTK_DIALOG(dialog)))
 		{
 		case 1:					// Restore default colors
-			gtk_menu_popup(GTK_MENU(menu),NULL,NULL,0,0,0,0);
+//			gtk_menu_popup(GTK_MENU(menu),NULL,NULL,0,0,0,0);
 			break;
 
 		case GTK_RESPONSE_ACCEPT:	// Save selected colors
