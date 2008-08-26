@@ -167,7 +167,7 @@
 		{
 			fsize[f].size = atoi(ptr[f]) * PANGO_SCALE;
 			UpdateFontData(f);
-			Trace("Font %d (%s) fits on %dx%d",f,ptr[f],terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
+//			Trace("Font %d (%s) fits on %dx%d",f,ptr[f],terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
 		}
 		szFonts = f;
 		g_strfreev(ptr);

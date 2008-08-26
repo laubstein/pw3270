@@ -79,6 +79,11 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
+make po/pt_BR.po
+if [ "$?" != "0" ]; then
+	exit -1
+fi
+
 rm -fr ~/bin/g3270
 mkdir -p ~/bin/g3270
 cp bin/Release/g3270		~/bin/g3270
@@ -86,6 +91,7 @@ cp bin/Release/lib3270.so	~/bin/g3270
 cp src/g3270/actions.conf	~/bin/g3270
 cp src/g3270/*.xml		~/bin/g3270
 cp /home/perry/Project/g3270/conf/sisbb.jpg ~/bin/g3270/g3270.jpg
+cp po/pt_BR.po /usr/share/locale/pt_BR/LC_MESSAGES/g3270.mo
 
 cat > ~/bin/g3270.sh << EOF 
 #!/bin/bash

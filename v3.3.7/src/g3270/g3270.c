@@ -273,13 +273,6 @@ static int g3270_init(int *argc, char ***argv)
 
 	OpenConfigFile();
 
-#ifdef LOCALEDIR
-	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
-#endif
-
-	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-	textdomain(GETTEXT_PACKAGE);
-
 	if(Register3270IOCallbacks(&g3270_io_callbacks))
 	{
 		PopupAnError( N_( "Can't register into lib3270 I/O callback table." ) );
@@ -330,6 +323,14 @@ int wait4negotiations(const char *cl_hostname)
 int main(int argc, char *argv[])
 {
 	const char	*cl_hostname = CN;
+
+	Trace("Locale: \"%s\" \"%s\"",PACKAGE_NAME,LOCALEDIR);
+
+	// http://bo.majewski.name/bluear/gnu/GTK/i18n/
+	setlocale( LC_ALL, "" );
+	bindtextdomain(PACKAGE_NAME, LOCALEDIR);
+	bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
+	textdomain(PACKAGE_NAME);
 
 	initialize_toggles();
 
