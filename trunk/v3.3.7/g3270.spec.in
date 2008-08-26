@@ -6,9 +6,8 @@ Release:        0.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
 Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-
 Requires:       openssl shared-mime-info %{name}-lib
-BuildRequires:  autoconf openssl-devel sed pkgconfig
+BuildRequires:  autoconf sed pkgconfig gtk2-devel
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
@@ -18,6 +17,8 @@ any IBM host that supports 3270-style connections over TELNET.
 Provides:	%{name}-lib
 Summary:	3270 Communication library for %{name}
 Group:		Development/Libraries
+Requires:       openssl %{name}-lib
+BuildRequires:  autoconf openssl-devel sed pkgconfig
 
 %description lib
 tn3270 protocol library for %{name}
@@ -87,12 +88,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%{_bindir}
-%{_datadir}/applications
-%{_datadir}/locale
-
-%{_datadir}/%{name}/*.xml
-%{_datadir}/%{name}/*.jpg
+%{_bindir}/%{name}
+%{_datadir}/applications/*.desktop
+%{_datadir}/locale/*/LC_MESSAGES/*.mo
+%{_datadir}/%{name}/ui.xml
+%{_datadir}/%{name}/%{name}.jpg
 
 %config(noreplace) %{_datadir}/%{name}/*.conf
 
