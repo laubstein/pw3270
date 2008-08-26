@@ -406,6 +406,17 @@
 		ResizeTerminal(widget,allocation->width,allocation->height);
  }
 
+ void FontChanged(void)
+ {
+ 	gchar vlr[1024];
+
+	g_snprintf(vlr,1023,"%s%s",GetString("Terminal","Font","Courier"),
+								GetBoolean("Toggles","Bold",FALSE) ? " Bold" : "" );
+
+	SetTerminalFont(vlr);
+
+ }
+
  void SetTerminalFont(const gchar *fontname)
  {
  	Trace("Selected font: %s (last: %p)",fontname,font_descr);
@@ -432,7 +443,7 @@
 	memset(color,0,sizeof(GdkColor)*TERMINAL_COLOR_COUNT);
 
  	LoadColors();
-	SetTerminalFont(GetString("Terminal","Font","Courier"));
+ 	FontChanged();
 
 	im = gtk_im_context_simple_new();
 
@@ -475,7 +486,7 @@
 
  void InvalidateCursor(void)
  {
-	gtk_widget_queue_draw_area(terminal,rCursor.x,rCursor.y-fHeight,fWidth,fHeight);
+	gtk_widget_queue_draw_area(terminal,rCursor.x,rCursor.y+rCursor.height,rCursor.width,fHeight-rCursor.height);
 	if(cMode & CURSOR_MODE_CROSS)
 	{
 		gtk_widget_queue_draw_area(terminal,rCursor.x,0,rCursor.x,OIAROW-1);

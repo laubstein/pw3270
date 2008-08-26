@@ -117,6 +117,18 @@
  	return 0;
  }
 
+ gboolean GetBoolean(const gchar *group, const gchar *key, const gboolean def)
+ {
+	if(!g_key_file_has_key(conf,group,key,NULL))
+		return def;
+	return g_key_file_get_boolean(conf,group,key,NULL);
+ }
+
+ void SetBoolean(const gchar *group, const gchar *key, const gboolean val)
+ {
+	g_key_file_set_boolean(conf,group,key,val);
+ }
+
  int SaveConfigFile(void)
  {
  	gchar	*ptr;

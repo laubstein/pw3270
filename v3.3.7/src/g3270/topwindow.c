@@ -114,10 +114,11 @@
 			SetString("Terminal","FontSizes",NULL);
 		}
 
-		SetTerminalFont(vlr);
 		SetString("Terminal","Font",vlr);
 
 		g_free(vlr);
+
+		FontChanged();
 	}
  }
 

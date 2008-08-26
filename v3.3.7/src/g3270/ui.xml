@@ -48,6 +48,7 @@
 				<menuitem action='ToggleRectSelect'  />
 				<menuitem action='ToggleReconnect'  />
 				<menuitem action='ToggleKeypad'  />
+				<menuitem action='ToggleBold'  />
 			</menu>
 		</menu>
 
