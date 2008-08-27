@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-27 10:07-0300\n"
-"PO-Revision-Date: 2008-08-27 10:08-0300\n"
+"POT-Creation-Date: 2008-08-27 16:07-0300\n"
+"PO-Revision-Date: 2008-08-27 16:08-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -115,11 +115,11 @@ msgstr "Não foi possível montar a interface da aplicação:\n"
 msgid "Can't find UI definition file"
 msgstr "Não encontrei arquivo de definição de interface."
 
-#: g3270.c:278
+#: g3270.c:318
 msgid "Can't register into lib3270 I/O callback table."
 msgstr "Não foi possível efetuar o registro na tabela de I/O 3270."
 
-#: g3270.c:284
+#: g3270.c:324
 msgid "Can't register into lib3270 screen callback table."
 msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 
@@ -129,7 +129,7 @@ msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
 #: keypad.c:144
 msgid "Clear"
-msgstr ""
+msgstr "Limpar"
 
 #: colors.c:335
 msgid "Color setup"
@@ -354,7 +354,7 @@ msgstr "Só maiúsculas"
 msgid "Mustard"
 msgstr "Mostarda"
 
-#: g3270.c:310
+#: g3270.c:350
 #, c-format
 msgid "Negotiation with %s failed!"
 msgstr "Negociação com %s falhou!"
