@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-26 13:26-0300\n"
-"PO-Revision-Date: 2008-08-26 13:26-0300\n"
+"POT-Creation-Date: 2008-08-27 10:07-0300\n"
+"PO-Revision-Date: 2008-08-27 10:08-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -69,7 +69,7 @@ msgstr ""
 msgid "Auto-Reconnect"
 msgstr "Auto reconectar"
 
-#: colors.c:251 colors.c:273 colors.c:280
+#: colors.c:284 colors.c:306 colors.c:313
 msgid "Background"
 msgstr "Fundo"
 
@@ -77,11 +77,11 @@ msgstr "Fundo"
 msgid "Backspace"
 msgstr ""
 
-#: colors.c:242
+#: colors.c:275
 msgid "Base attributes"
 msgstr "Atributos básicos"
 
-#: colors.c:259
+#: colors.c:292
 msgid "Black"
 msgstr "Preto"
 
@@ -93,7 +93,7 @@ msgstr ""
 msgid "Blinking Cursor"
 msgstr "Cursor piscante"
 
-#: colors.c:252
+#: colors.c:285
 msgid "Blue"
 msgstr "Azul"
 
@@ -115,11 +115,11 @@ msgstr "Não foi possível montar a interface da aplicação:\n"
 msgid "Can't find UI definition file"
 msgstr "Não encontrei arquivo de definição de interface."
 
-#: g3270.c:285
+#: g3270.c:278
 msgid "Can't register into lib3270 I/O callback table."
 msgstr "Não foi possível efetuar o registro na tabela de I/O 3270."
 
-#: g3270.c:291
+#: g3270.c:284
 msgid "Can't register into lib3270 screen callback table."
 msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 
@@ -131,7 +131,7 @@ msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 msgid "Clear"
 msgstr ""
 
-#: colors.c:301
+#: colors.c:335
 msgid "Color setup"
 msgstr "Configuração de cores"
 
@@ -147,25 +147,37 @@ msgstr "Copiar"
 msgid "Cross Hair Cursor"
 msgstr "Régua"
 
-#: colors.c:277
+#: colors.c:310
 msgid "Cross-hair"
 msgstr "Régua"
 
-#: colors.c:244
+#: colors.c:277
 msgid "Cursor"
 msgstr ""
+
+#: colors.c:266
+msgid "Custom colors"
+msgstr "Cores personalizadas"
 
 #: actions.c:586
 msgid "DS Trace"
 msgstr ""
 
-#: colors.c:260
+#: colors.c:293
 msgid "Dark Blue"
 msgstr "Azul escuro"
 
-#: colors.c:263
+#: colors.c:296
 msgid "Dark Green"
 msgstr "Verde escuro"
+
+#: colors.c:75
+msgid "Default Color Set 2"
+msgstr "Esquema de cores padrão 2"
+
+#: colors.c:41
+msgid "Default Color set 1"
+msgstr "Esquema de cores padrão 1"
 
 #: actions.c:758
 msgid "Delete Char"
@@ -274,7 +286,7 @@ msgstr "Início do campo"
 msgid "Font"
 msgstr "Fonte"
 
-#: colors.c:274 colors.c:281
+#: colors.c:307 colors.c:314
 msgid "Foreground"
 msgstr "Frente"
 
@@ -286,11 +298,11 @@ msgstr "Tela-cheia"
 msgid "Fullscreen"
 msgstr "Tela-cheia"
 
-#: colors.c:266
+#: colors.c:299
 msgid "Gray"
 msgstr "Cinza"
 
-#: colors.c:255
+#: colors.c:288
 msgid "Green"
 msgstr "Verde"
 
@@ -306,11 +318,11 @@ msgstr "Endereço do servidor:"
 msgid "Insert"
 msgstr ""
 
-#: colors.c:271
+#: colors.c:304
 msgid "Intensified/Protected"
 msgstr "Intensificado/Protegido"
 
-#: colors.c:269
+#: colors.c:302
 msgid "Intensified/Unprotected"
 msgstr "Intensificado/Desprotegido"
 
@@ -326,15 +338,11 @@ msgstr "Esquerda"
 msgid "Line Wrap"
 msgstr ""
 
-#: colors.c:304
-msgid "Load profile"
-msgstr "Carregar perfil"
-
 #: actions.c:131 actions.c:953
 msgid "Load screen dump"
 msgstr "Carregar captura de tela"
 
-#: colors.c:284
+#: colors.c:317
 msgid "Locked status"
 msgstr "Bloqueada"
 
@@ -342,11 +350,11 @@ msgstr "Bloqueada"
 msgid "Monocase"
 msgstr "Só maiúsculas"
 
-#: colors.c:265
+#: colors.c:298
 msgid "Mustard"
 msgstr "Mostarda"
 
-#: g3270.c:317
+#: g3270.c:310
 #, c-format
 msgid "Negotiation with %s failed!"
 msgstr "Negociação com %s falhou!"
@@ -359,27 +367,27 @@ msgstr "Rede"
 msgid "Next field"
 msgstr "Próximo campo"
 
-#: colors.c:276
+#: colors.c:309
 msgid "Normal"
 msgstr ""
 
-#: colors.c:283
+#: colors.c:316
 msgid "Normal status"
 msgstr "Situação normal"
 
-#: colors.c:270
+#: colors.c:303
 msgid "Normal/Protected"
 msgstr "Normal/Protegido"
 
-#: colors.c:268
+#: colors.c:301
 msgid "Normal/Unprotected"
 msgstr "Normal/Desprotegido"
 
-#: colors.c:245
+#: colors.c:278
 msgid "OIA"
 msgstr ""
 
-#: colors.c:261
+#: colors.c:294
 msgid "Orange"
 msgstr "Laranja"
 
@@ -395,7 +403,7 @@ msgstr "Colar próximo"
 msgid "Paste with left margin"
 msgstr "Colar com margem"
 
-#: colors.c:254
+#: colors.c:287
 msgid "Pink"
 msgstr "Rosa"
 
@@ -419,23 +427,15 @@ msgstr "Imprimir cópia"
 msgid "Print selected"
 msgstr "Imprimir seleção"
 
-#: colors.c:41
-msgid "Profile 1"
-msgstr "Perfil 1"
-
-#: colors.c:75
-msgid "Profile 2"
-msgstr "Perfil 2"
-
 #: actions.c:122
 msgid "Properties"
 msgstr "Propriedades"
 
-#: colors.c:262
+#: colors.c:295
 msgid "Purple"
 msgstr "Púrpura"
 
-#: colors.c:253
+#: colors.c:286
 msgid "Red"
 msgstr "Vermelho"
 
@@ -535,7 +535,7 @@ msgstr "Selecionar fonte"
 msgid "Select hostname"
 msgstr "Selecionar servidor"
 
-#: colors.c:243
+#: colors.c:276
 msgid "Selected text"
 msgstr "Texto selecionado"
 
@@ -555,7 +555,7 @@ msgstr ""
 msgid "Selection Up"
 msgstr ""
 
-#: colors.c:282
+#: colors.c:315
 msgid "Separator"
 msgstr "Separador"
 
@@ -575,7 +575,7 @@ msgstr "Mostrar tempo"
 msgid "Sys Req"
 msgstr ""
 
-#: colors.c:241
+#: colors.c:274
 msgid "Terminal"
 msgstr ""
 
@@ -600,7 +600,7 @@ msgstr ""
 msgid "Track Cursor"
 msgstr "Mostrar posição do cursor"
 
-#: colors.c:256 colors.c:264
+#: colors.c:289 colors.c:297
 msgid "Turquoise"
 msgstr "Turquesa"
 
@@ -621,7 +621,7 @@ msgstr ""
 msgid "Visible Control chars"
 msgstr ""
 
-#: colors.c:258
+#: colors.c:291
 msgid "White"
 msgstr "Branco"
 
@@ -673,7 +673,7 @@ msgstr ""
 msgid "X Wait"
 msgstr "X Aguarde"
 
-#: colors.c:257
+#: colors.c:290
 msgid "Yellow"
 msgstr "Amarelo"
 
