@@ -29,7 +29,12 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <time.h>
+#include <lib3270/config.h>
 #include <lib3270/api.h>
+
+/*---[ Constants ]------------------------------------------------------------------------------------------*/
+
+ const char *logfile = PACKAGE_NAME ".log";
 
 /*---[ Implementacao ]--------------------------------------------------------------------------------------*/
 
@@ -45,9 +50,9 @@
 
  static FILE *prefix(const char *module)
  {
-    FILE *out = fopen("g3270.log","a");
-
-	writetime(out,module);
+    FILE *out = fopen(logfile,"a");
+    if(out)
+		writetime(out,module);
 	return out;
  }
 
@@ -99,6 +104,8 @@
        return 0;
 
     out = prefix(module);
+    if(!out)
+		return -1;
 
     va_start(arg_ptr, fmt);
     vfprintf(out, fmt, arg_ptr);
