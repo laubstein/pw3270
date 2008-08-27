@@ -37,9 +37,10 @@
 			#define Trace( fmt, ... )	/* __VA_ARGS__ */
 		#endif
 
+
+		int Set3270Log(const char *filename);
 		int WriteLog(const char *module, const char *fmt, ...);
 		int WriteRCLog(const char *module, int rc, const char *fmt, ...);
-
 
 		#define Log(fmt, ...)		WriteLog("MSG",fmt,__VA_ARGS__)
 

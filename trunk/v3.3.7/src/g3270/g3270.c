@@ -256,14 +256,35 @@ static void set_fullscreen(int value, int reason)
 
 }
 
+static gboolean trylog(gchar *path)
+{
+	gboolean rc = (Set3270Log(path) == 0);
+
+#ifdef DEBUG
+	if(rc)
+	{
+		Trace("Writing log in %s",path);
+	}
+	else
+	{
+		Trace("Log in %s failed",path);
+	}
+#endif
+
+	g_free(path);
+	return rc;
+}
+
 static int g3270_init(int *argc, char ***argv)
 {
+	static const gchar	*logname	= PACKAGE_NAME ".log";
+	gboolean				has_log		= FALSE;
+
 	/* Init GTK stuff */
 	g_thread_init(0);
 	gtk_init(argc, argv);
 
-	g_log_set_default_handler(log_callback,"GLog");
-
+	/* If running on win32 changes to program path */
 #if defined(_WIN32) /*[*/
 	gchar *ptr = g_strdup(*argv[0]);
 	g_chdir(g_path_get_dirname(ptr));
@@ -271,6 +292,25 @@ static int g3270_init(int *argc, char ***argv)
 	Trace("Current dir: %s",g_get_current_dir());
 #endif
 
+	/* Init Log system */
+	has_log = trylog(g_build_filename(G_DIR_SEPARATOR_S, "var","log",logname,NULL));
+
+	if(!has_log)
+		has_log = trylog(g_build_filename(g_get_home_dir(),"var","log",logname,NULL));
+
+	if(!has_log)
+		has_log = trylog(g_build_filename(g_get_home_dir(),"log",logname,NULL));
+
+	if(!has_log)
+		has_log = trylog(g_build_filename(g_get_home_dir(),PACKAGE_NAME,logname,NULL));
+
+	if(!has_log)
+		has_log = trylog(g_build_filename(g_get_tmp_dir(),logname,NULL));
+
+
+	g_log_set_default_handler(log_callback,"GLog");
+
+	/* Start */
 	OpenConfigFile();
 
 	if(Register3270IOCallbacks(&g3270_io_callbacks))

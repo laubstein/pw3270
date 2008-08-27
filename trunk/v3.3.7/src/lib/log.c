@@ -29,14 +29,34 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <time.h>
+#include <fcntl.h>
 #include <lib3270/config.h>
 #include <lib3270/api.h>
 
 /*---[ Constants ]------------------------------------------------------------------------------------------*/
 
- const char *logfile = PACKAGE_NAME ".log";
+ static char logfile[FILENAME_MAX] = PACKAGE_NAME ".log";
 
 /*---[ Implementacao ]--------------------------------------------------------------------------------------*/
+
+ int Set3270Log(const char *filename)
+ {
+ 	FILE *out;
+
+ 	if(strlen(filename) >= FILENAME_MAX)
+		return EINVAL;
+
+	out = fopen(filename,"a");
+
+	if(out)
+	{
+		strcpy(logfile,filename);
+		fclose(out);
+		return 0;
+	}
+
+	return errno;
+ }
 
  static void writetime(FILE *out, const char *module)
  {
