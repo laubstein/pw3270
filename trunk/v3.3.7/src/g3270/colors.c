@@ -111,14 +111,16 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
- int SaveColors(void)
+ static int SaveColors(GtkComboBox *combo)
  {
-	int 	f;
-	gchar	clr[4096];
+	int 			f;
+	gchar			clr[4096];
+	GtkTreeIter 	iter;
+
 #if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
-	gchar	*ptr;
+	gchar			*ptr;
 #else
-	int		sz;
+	int				sz;
 #endif
 
 	*clr = 0;
@@ -140,6 +142,14 @@
  	}
 
 	SetString("Terminal","Colors",clr);
+
+ 	if(gtk_combo_box_get_active_iter(combo,&iter))
+ 	{
+		GValue		value	= { 0, };
+
+		gtk_tree_model_get_value(gtk_combo_box_get_model(combo),&iter,1,&value);
+		SetString("Terminal","ColorScheme",g_value_get_string(&value));
+ 	}
 
  	return 0;
  }
@@ -175,7 +185,8 @@
 
  static void color_changed(GtkColorSelection *widget, gpointer *user_data)
  {
- 	int id = (int) g_object_get_data(G_OBJECT(widget),"selected");
+ 	int			id		= (int) g_object_get_data(G_OBJECT(widget),"selected");
+ 	GtkComboBox	*combo	= (GtkComboBox *) g_object_get_data(G_OBJECT(widget),"combo");
 
 	Trace("Color(%d) changed",id);
 
@@ -185,8 +196,10 @@
 	gtk_color_selection_get_current_color(widget,color+id);
 	gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+id,TRUE,TRUE);
 
-	// Redraw screen
-	action_Redraw();
+	if(gtk_combo_box_get_active(combo))
+		gtk_combo_box_set_active(combo,0);
+	else
+		action_Redraw();
 
  }
 
@@ -221,19 +234,37 @@
 
  }
 
-/*
- static void activate_profile(GtkMenuItem *menuitem, const gchar *clr)
+ static void activate_scheme(GtkComboBox *widget, gpointer user_data)
  {
- 	gchar *buffer = g_strdup(clr);
- 	Trace("Activating profile %s",buffer);
-	ParseColor(buffer);
-	g_free(buffer);
-	action_Redraw();
+	GValue			value	= { 0, };
+ 	GtkTreeIter 	iter;
+ 	const gchar	*vlr;
+ 	char			*ptr;
+
+ 	if(!gtk_combo_box_get_active_iter(widget,&iter))
+			return;
+
+#ifdef DEBUG
+	gtk_tree_model_get_value(gtk_combo_box_get_model(widget),&iter,1,&value);
+	Trace("Color scheme changed to %s",g_value_get_string(&value));
+#endif
+
+	gtk_tree_model_get_value(gtk_combo_box_get_model(widget),&iter,2,&value);
+	vlr = g_value_get_string(&value);
+	if(vlr)
+	{
+		Trace("Mudando cores para %s",vlr);
+		ptr = g_strdup(vlr);
+		ParseColor(ptr);
+		g_free(ptr);
+		action_Redraw();
+	}
  }
-*/
 
  void action_SelectColors(void)
  {
+ 	static const gchar *custom = N_( "Custom colors" );
+
  	static const struct _node
  	{
  		int			id;
@@ -289,6 +320,7 @@
 
 	GtkWidget		*dialog;
 	GtkWidget		*widget;
+	GtkWidget		*combo;
 	GtkWidget		*color;
 	GtkWidget		*box;
 	GtkTreeModel	*model;
@@ -296,8 +328,7 @@
 	GtkTreeIter		iter;
 	GtkTreeIter		parent;
 	GtkCellRenderer *rend;
-//	GtkWidget		*menu;
-	gboolean		again	= TRUE;
+	const gchar	*scheme	= GetString("Terminal","ColorScheme",color_profile->name);
 	int				title 	= 0;
 	int				f;
 
@@ -312,24 +343,34 @@
 	gtk_paned_set_position(GTK_PANED(box),GetInt("ColorSetup","PanedPosition",120));
 
 	// Buttons
- 	model = (GtkTreeModel *) gtk_list_store_new(2,G_TYPE_STRING,G_TYPE_INT);
+ 	model = (GtkTreeModel *) gtk_list_store_new(3,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING);
 
-	widget = gtk_combo_box_new_with_model(model);
+	combo = gtk_combo_box_new_with_model(model);
 
 	rend = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(widget), rend, TRUE);
-	gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(widget), rend, "text", 0, NULL);
+	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(combo), rend, TRUE);
+	gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo), rend, "text", 0, NULL);
 
 	gtk_list_store_append((GtkListStore *) model,&iter);
-	gtk_list_store_set((GtkListStore *) model, &iter, 0, _( "Custom colors" ), 1, 0, -1);
+	gtk_list_store_set((GtkListStore *) model, &iter, 0, gettext(custom), 1, custom, 2, NULL, -1);
+	parent = iter;
 
  	for(f=0;f<G_N_ELEMENTS(color_profile);f++)
  	{
 		gtk_list_store_append((GtkListStore *) model,&iter);
-		gtk_list_store_set((GtkListStore *) model, &iter, 0, gettext(color_profile[f].name), 1, f+1, -1);
+		gtk_list_store_set((GtkListStore *) model, &iter,	0, gettext(color_profile[f].name),
+															1, color_profile[f].name,
+															2, color_profile[f].colors,
+															-1 );
+
+		if(!strcmp(scheme,color_profile[f].name))
+			parent = iter;
  	}
 
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area),widget,FALSE,FALSE,0);
+	g_signal_connect(G_OBJECT(combo), "changed", G_CALLBACK(activate_scheme),0);
+	gtk_combo_box_set_active_iter(GTK_COMBO_BOX(combo),&parent);
+
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area),combo,FALSE,FALSE,0);
 
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog),gtk_button_new_from_stock(GTK_STOCK_OK),GTK_RESPONSE_ACCEPT);
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog),gtk_button_new_from_stock(GTK_STOCK_CANCEL),GTK_RESPONSE_REJECT);
@@ -338,6 +379,8 @@
 	color = gtk_color_selection_new();
 	g_object_set_data(G_OBJECT(color),"selected",(gpointer) -1);
 	g_signal_connect(G_OBJECT(color), "color-changed", G_CALLBACK(color_changed), 0);
+
+	g_object_set_data(G_OBJECT(color),"combo",(gpointer) combo);
 
 	gtk_widget_set_sensitive(color,0);
 	gtk_color_selection_set_has_opacity_control(GTK_COLOR_SELECTION(color),FALSE);
@@ -374,42 +417,19 @@
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),box);
 	gtk_widget_show_all(GTK_WIDGET(GTK_DIALOG(dialog)->vbox));
 
-	// Load color profiles
-	/*
- 	menu = gtk_menu_new();
- 	for(f=0;f<G_N_ELEMENTS(color_profile);f++)
- 	{
-		widget = gtk_menu_item_new_with_label(gettext(color_profile[f].name));
-		gtk_widget_show_all(widget);
-		g_signal_connect(G_OBJECT(widget),"activate",G_CALLBACK(activate_profile),(gpointer) color_profile[f].colors);
-		gtk_menu_shell_append(GTK_MENU_SHELL(menu),widget);
- 	}
- 	*/
-
 	// Run dialog
 	RestoreWindowSize("ColorSetup", dialog);
 
-	while(again)
+	switch(gtk_dialog_run(GTK_DIALOG(dialog)))
 	{
-		switch(gtk_dialog_run(GTK_DIALOG(dialog)))
-		{
-		case 1:					// Restore default colors
-//			gtk_menu_popup(GTK_MENU(menu),NULL,NULL,0,0,0,0);
-			break;
+	case GTK_RESPONSE_ACCEPT:	// Save selected colors
+		SaveColors(GTK_COMBO_BOX(combo));
+		break;
 
-		case GTK_RESPONSE_ACCEPT:	// Save selected colors
-			SaveColors();
-			again = FALSE;
-			break;
+	case GTK_RESPONSE_REJECT:	// Reload colors from configuration file
+		LoadColors();
+		break;
 
-		case GTK_RESPONSE_REJECT:	// Reload colors from configuration file
-			LoadColors();
-			again = FALSE;
-			break;
-
-		default:
-			again = FALSE;
-		}
 	}
 
 	SaveWindowSize("ColorSetup",dialog);
