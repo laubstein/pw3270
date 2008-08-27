@@ -34,8 +34,8 @@ fi
 
 make clean
 
-scp g3270_installer.exe perry@os2team:public_html/g3270
-mv g3270_installer.exe ~/Desktop/
+scp g3270-*.exe perry@os2team:public_html/g3270
+mv g3270-*.exe ~/Desktop/
 
 #
 # Build Linux version
