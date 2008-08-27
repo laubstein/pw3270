@@ -54,6 +54,10 @@
  GdkPixmap						*pixmap			= NULL;
  GdkColor						color[TERMINAL_COLOR_COUNT+1];
 
+ static int 					lWidth 			= -1;
+ static int 					lHeight 		= -1;
+ static int 					lFont 			= -1;
+
  static gint					sWidth			= 0;
  static gint					sHeight			= 0;
 
@@ -130,10 +134,6 @@
 	gdk_gc_destroy(gc);
 	return 0;
  }
-
- static int lWidth = -1;
- static int lHeight = -1;
- static int lFont = -1;
 
  static void UpdateFontData(int sel)
  {
@@ -250,7 +250,7 @@
 		return;
 
 	/* Font size hasn't changed, rebuild pixmap using the saved image */
-	pix = gdk_pixmap_new(widget->window,width,height,-1);
+	pix = gdk_pixmap_new(widget->window,sWidth = width,sHeight = height,-1);
 	gc = gdk_gc_new(pix);
 
 	gdk_gc_set_foreground(gc,color);
