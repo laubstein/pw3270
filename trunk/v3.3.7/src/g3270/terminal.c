@@ -85,6 +85,10 @@
  static GdkPixmap * GetPixmap(GtkWidget *widget)
  {
 	GdkPixmap	*pix;
+
+	if(!widget->window)
+		return NULL;
+
 	gdk_drawable_get_size(widget->window,&sWidth,&sHeight);
 	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
 	DrawScreen(widget, color, pix);
@@ -572,6 +576,9 @@
 	ELEMENT 	el;
 	GdkGC   	*gc;
 	PangoLayout *layout;
+
+	if(!terminal->window)
+		return;
 
 	memset(&rCursor,0,sizeof(rCursor));
 
