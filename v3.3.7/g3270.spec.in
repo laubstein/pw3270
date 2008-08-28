@@ -6,8 +6,8 @@ Release:        0.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
 Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-Requires:       openssl shared-mime-info %{name}-lib
-BuildRequires:  autoconf sed pkgconfig gtk2-devel
+Requires:       openssl shared-mime-info %{name}-lib libgnome libgnomeui
+BuildRequires:  autoconf sed pkgconfig gtk2-devel libgnome-devel libgnomeui-devel
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with

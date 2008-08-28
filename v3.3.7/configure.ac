@@ -53,7 +53,7 @@ AC_PROG_LIBTOOL
 
 # Optional
 AC_ARG_ENABLE([trace],
-	[AS_HELP_STRING([--enable-trace], [enable trace functions])],
+	[AS_HELP_STRING([--disable-trace], [disable trace])],
 [
 	g3270_cv_trace="$enableval"
 ],[
@@ -61,7 +61,7 @@ AC_ARG_ENABLE([trace],
 ])
 
 AC_ARG_ENABLE([plugins],
-	[AS_HELP_STRING([--enable-plugins], [enable plugin support])],
+	[AS_HELP_STRING([--disable-plugins], [disable plugin support])],
 [
 	g3270_cv_plugins="$enableval"
 ],[
@@ -69,11 +69,19 @@ AC_ARG_ENABLE([plugins],
 ])
 
 AC_ARG_ENABLE([ssl],
-	[AS_HELP_STRING([--enable-ssl], [enable ssl support (if available)])],
+	[AS_HELP_STRING([--disable-ssl], [disable ssl support])],
 [
 	g3270_cv_ssl="$enableval"
 ],[
 	g3270_cv_ssl="yes"
+])
+
+AC_ARG_ENABLE([gnome],
+	[AS_HELP_STRING([--disable-gnome], [disable gnome support])],
+[
+	g3270_cv_gnome="$enableval"
+],[
+	g3270_cv_gnome="yes"
 ])
 
 
@@ -83,12 +91,14 @@ PKG_CHECK_MODULES( [GTK], [glib-2.0 gtk+-2.0 >= 2.10 gthread-2.0 gthread-2.0 gmo
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
 
-# Check for GNOMEUI
-PKG_CHECK_MODULES( [GNOMEUI], [libgnomeui-2.0],
-				AC_DEFINE(HAVE_GNOMEUI),
-				AC_MSG_NOTICE([gnomeui not present.]) )
-AC_SUBST(GNOMEUI_LIBS)
-AC_SUBST(GNOMEUI_CFLAGS)
+# Check for GNOME
+if test "$g3270_cv_gnome" == "yes"; then
+	PKG_CHECK_MODULES( [LIBGNOME], [libgnome-2.0 libgnomeui-2.0],
+					AC_DEFINE(HAVE_LIBGNOME),
+					AC_MSG_NOTICE([gnomeui not present.]) )
+fi
+AC_SUBST(LIBGNOME_LIBS)
+AC_SUBST(LIBGNOME_CFLAGS)
 
 # Check for libssl
 if test "$g3270_cv_ssl" == "yes"; then

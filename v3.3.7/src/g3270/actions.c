@@ -336,7 +336,11 @@
 							"logo",					logo,
 							"authors", 				authors,
 							"license", 				gettext( license ),
+#ifdef HAVE_LIBGNOME
+							"comments",				_( "3270 Terminal emulator for Gnome."),
+#else
 							"comments",				_( "3270 Terminal emulator for GTK."),
+#endif
 							"version", 				PACKAGE_VERSION,
 							"wrap-license",			TRUE,
 							NULL
