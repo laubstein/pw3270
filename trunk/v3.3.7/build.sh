@@ -109,3 +109,4 @@ make clean
 
 echo "Pacotes g3270 gerados"
 
+
