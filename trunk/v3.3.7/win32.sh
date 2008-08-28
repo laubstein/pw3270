@@ -17,6 +17,8 @@ echo "s&@CC@&$CC&g;" >> $TEMPFILE
 echo "s&@PACKAGE_VERSION@&$PACKAGE_VERSION&g;" >> $TEMPFILE
 echo "s&@GTK_CFLAGS@&`pkg-config --cflags $GTK_MODULES`&g;" >> $TEMPFILE
 echo "s&@GTK_LIBS@&`pkg-config --libs $GTK_MODULES`&g;" >> $TEMPFILE
+echo "s&@LIBGNOME_CFLAGS@&&g;" >> $TEMPFILE
+echo "s&@LIBGNOME_LIBS@&&g;" >> $TEMPFILE
 echo "s&@LIBSSL_CFLAGS@&`pkg-config --cflags $SSL_MODULES`&g;" >> $TEMPFILE
 echo "s&@LIBSSL_LIBS@&`pkg-config --libs $SSL_MODULES`&g;" >> $TEMPFILE
 echo "s&@NATIVECC@&gcc&g;" >> $TEMPFILE

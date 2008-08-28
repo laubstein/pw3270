@@ -25,9 +25,19 @@
  */
 
 #include <lib3270/config.h>
-#include "globals.h"
+#include <stdio.h>
+#include <gtk/gtk.h>
 #include <glib.h>
+#include <glib/gi18n.h>
+
+#ifdef HAVE_LIBGNOME
+	#include <gnome.h>
+#endif
+
 #include <glib/gstdio.h>
+
+
+#include "globals.h"
 
 #if !defined(_WIN32) /*[*/
 #include <sys/wait.h>
@@ -176,6 +186,12 @@ static char *base_3270_keymap =
      "Shift <Key>RIGHT:  NextWord\n";
 #endif /*]*/
 
+/* Globals */
+#ifdef HAVE_LIBGNOME
+GnomeClient *client = 0;
+#endif
+
+
 /* Callback for connection state changes. */
 static void main_connect(Boolean status)
 {
@@ -281,10 +297,6 @@ static int g3270_init(int *argc, char ***argv)
 	static const gchar	*logname	= PACKAGE_NAME ".log";
 	gboolean				has_log		= FALSE;
 
-	/* Init GTK stuff */
-	g_thread_init(0);
-	gtk_init(argc, argv);
-
 	/* If running on win32 changes to program path */
 #if defined(_WIN32) /*[*/
 	gchar *ptr = g_strdup(*argv[0]);
@@ -326,6 +338,7 @@ static int g3270_init(int *argc, char ***argv)
 		return -1;
 	}
 
+	Trace("%s completed!",__FUNCTION__);
 	return 0;
 }
 
@@ -361,8 +374,45 @@ int wait4negotiations(const char *cl_hostname)
 	return 0;
 }
 
+#ifdef HAVE_LIBGNOME
+static gint save_session (GnomeClient *client, gint phase, GnomeSaveStyle save_style,
+              gint is_shutdown, GnomeInteractStyle interact_style,
+              gint is_fast, gpointer client_data)
+{
+	gchar** argv;
+	guint argc;
+
+	Trace("Saving session for %s",(char *) client_data);
+
+//	action_save(0,0);
+
+	/* allocate 0-filled, so it will be NULL-terminated */
+	argv = g_malloc0(sizeof(gchar*)*4);
+	argc = 0;
+
+	argv[argc++] = client_data;
+
+	gnome_client_set_clone_command(client, argc, argv);
+	gnome_client_set_restart_command(client, argc, argv);
+
+	return TRUE;
+}
+
+static gint session_die(GnomeClient* client, gpointer client_data)
+{
+	WriteLog("GNOME","Exiting by request");
+	gtk_main_quit();
+	return FALSE;
+}
+#endif
+
 int main(int argc, char *argv[])
 {
+#ifdef HAVE_LIBGNOME
+	static GnomeProgram	*gnome_program;
+	static GOptionContext	*gnome_context;
+#endif
+
 	const char	*cl_hostname = CN;
 
 	Trace("Locale: \"%s\" \"%s\"",PACKAGE_NAME,LOCALEDIR);
@@ -374,6 +424,32 @@ int main(int argc, char *argv[])
 	textdomain(PACKAGE_NAME);
 
 	initialize_toggles();
+
+#ifdef HAVE_LIBGNOME
+
+	gnome_context = g_option_context_new (_("- 3270 Emulator for Gnome"));
+
+	gnome_program = gnome_program_init (	PACKAGE_NAME,
+											PACKAGE_VERSION,
+											LIBGNOMEUI_MODULE, 					argc, argv,
+											GNOME_PARAM_GOPTION_CONTEXT, 		gnome_context,
+											GNOME_PARAM_HUMAN_READABLE_NAME,	_("3270 Emulator"),
+											NULL
+								);
+
+	client = gnome_master_client();
+	gtk_signal_connect(GTK_OBJECT(client), "save_yourself", GTK_SIGNAL_FUNC(save_session), argv[0]);
+	gtk_signal_connect(GTK_OBJECT(client), "die", GTK_SIGNAL_FUNC(session_die), NULL);
+
+	Trace("Gnome session setup for client %p finished",client);
+
+#else
+
+	g_thread_init(NULL);
+	gdk_threads_init();
+	gtk_init(&argc, &argv);
+
+#endif
 
 	if(g3270_init(&argc,&argv))
 		return -1;

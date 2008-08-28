@@ -6,6 +6,7 @@
 	#undef PACKAGE_VERSION
 	#undef HAVE_LIBSSL
 	#undef HAVE_PLUGINS
+	#undef HAVE_LIBGNOME
 
 	#ifndef LIBX3270DIR
 		#define LIBX3270DIR "."
