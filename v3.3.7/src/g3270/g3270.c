@@ -243,6 +243,7 @@ static void main_connect(Boolean status)
 static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer id)
 {
 	WriteLog(id, "%s %s", log_domain, message);
+	Trace("%s %s", log_domain, message);
 }
 
 static void set_fullscreen(int value, int reason)
