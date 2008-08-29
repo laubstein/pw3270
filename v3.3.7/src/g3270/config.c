@@ -97,10 +97,7 @@
 	conf = g_key_file_new();
 
 	if(filename)
-	{
-		Log("Loading %s",filename);
 		g_key_file_load_from_file(conf,filename,G_KEY_FILE_NONE,NULL);
-	}
 
 	/* Load initial settings */
 	for(f=0;f<N_TOGGLES;f++)

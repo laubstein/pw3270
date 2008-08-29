@@ -259,7 +259,7 @@
 	file = FindSystemConfigFile(PACKAGE_NAME ".jpg");
 	if(file)
 	{
-		Log("Loading %s",file);
+		Trace("Loading %s",file);
 		pix = gdk_pixbuf_new_from_file(file, NULL);
 		main_icon = g_list_append(main_icon, pix);
 		gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
