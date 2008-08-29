@@ -446,7 +446,6 @@ int main(int argc, char *argv[])
 #else
 
 	g_thread_init(NULL);
-	gdk_threads_init();
 	gtk_init(&argc, &argv);
 
 #endif
