@@ -40,6 +40,7 @@ mv g3270-*.exe ~/Desktop/
 #
 # Build Linux version
 #
+autoconf
 ./configure
 
 RPMDIR=`rpm --eval="%{u2p:%{_rpmdir}}"`
