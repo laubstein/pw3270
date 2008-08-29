@@ -27,9 +27,6 @@ file src\g3270\ui.xml
 file src\g3270\@PACKAGE_NAME@.jpg
 file src\g3270\@PACKAGE_NAME@.ico
 
-# Default configuration file
-file @PACKAGE_NAME@.conf
-
 # Locale files
 CreateDirectory "$INSTDIR\locale\pt_BR\LC_MESSAGES"
 file "/oname=$INSTDIR\locale\pt_BR\LC_MESSAGES\@PACKAGE_NAME@.mo" "locale\pt_BR\LC_MESSAGES\@PACKAGE_NAME@.mo"
