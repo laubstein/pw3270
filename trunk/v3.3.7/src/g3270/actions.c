@@ -322,7 +322,7 @@
 
 	if(file)
 	{
-		Log("Loading %s",file);
+		Trace("Loading %s",file);
 		logo = gdk_pixbuf_new_from_file(file, NULL);
 		g_free(file);
 	}
@@ -843,7 +843,7 @@
 	ui = FindSystemConfigFile("ui.xml");
 	if(ui)
 	{
-		Log("Loading interface from %s",ui);
+		Trace("Loading interface from %s",ui);
 		if(!gtk_ui_manager_add_ui_from_file(ui_manager,ui,&error))
 		{
 			if(error && error->message)

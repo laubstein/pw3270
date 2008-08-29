@@ -9,43 +9,55 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-27 16:07-0300\n"
-"PO-Revision-Date: 2008-08-27 16:08-0300\n"
+"POT-Creation-Date: 2008-08-28 14:55-0300\n"
+"PO-Revision-Date: 2008-08-28 14:57-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
 
-#: actions.c:339
+#: g3270.c:430
+msgid "- 3270 Emulator for Gnome"
+msgstr "- Emulador 3270 para gnome"
+
+#: g3270.c:436
+msgid "3270 Emulator"
+msgstr "Emulador 3270"
+
+#: actions.c:342
 msgid "3270 Terminal emulator for GTK."
 msgstr "Emulador 3270 para GTK"
 
-#: actions.c:723
+#: actions.c:340
+msgid "3270 Terminal emulator for Gnome."
+msgstr "Emulador de terminal 3270 para Gnome"
+
+#: actions.c:727
 msgid "<Ctrl>r"
 msgstr ""
 
-#: actions.c:756
+#: actions.c:760
 msgid "<Ctrl>u"
 msgstr ""
 
-#: actions.c:750
+#: actions.c:754
 msgid "<Ctrl>w"
 msgstr ""
 
-#: actions.c:597
+#: actions.c:601
 msgid "<alt>Home"
 msgstr ""
 
-#: actions.c:600
+#: actions.c:604
 msgid "<alt>K"
 msgstr ""
 
-#: actions.c:593
+#: actions.c:597
 msgid "<alt>S"
 msgstr ""
 
-#: actions.c:594
+#: actions.c:598
 msgid "<alt>X"
 msgstr ""
 
@@ -57,15 +69,15 @@ msgstr "Sobre"
 msgid "Add to copy"
 msgstr "Copiar anexando"
 
-#: actions.c:596
+#: actions.c:600
 msgid "Aid wait"
 msgstr ""
 
-#: actions.c:582
+#: actions.c:586
 msgid "Alt Cursor"
 msgstr ""
 
-#: actions.c:598
+#: actions.c:602
 msgid "Auto-Reconnect"
 msgstr "Auto reconectar"
 
@@ -73,7 +85,7 @@ msgstr "Auto reconectar"
 msgid "Background"
 msgstr "Fundo"
 
-#: actions.c:764
+#: actions.c:768
 msgid "Backspace"
 msgstr ""
 
@@ -85,11 +97,11 @@ msgstr "Atributos básicos"
 msgid "Black"
 msgstr "Preto"
 
-#: actions.c:589
+#: actions.c:593
 msgid "Blank Fill"
 msgstr ""
 
-#: actions.c:583
+#: actions.c:587
 msgid "Blinking Cursor"
 msgstr "Cursor piscante"
 
@@ -97,33 +109,33 @@ msgstr "Cursor piscante"
 msgid "Blue"
 msgstr "Azul"
 
-#: actions.c:615
+#: actions.c:619
 msgid "Bold"
 msgstr "Negrito"
 
-#: actions.c:848
+#: actions.c:852
 msgid "Can't build Application UI!"
 msgstr "Não foi possível montar a interface da aplicação!"
 
-#: actions.c:846
+#: actions.c:850
 #, c-format
 msgid "Can't build Application UI: %s"
 msgstr "Não foi possível montar a interface da aplicação:\n"
 "%s"
 
-#: actions.c:854
+#: actions.c:858
 msgid "Can't find UI definition file"
 msgstr "Não encontrei arquivo de definição de interface."
 
-#: g3270.c:318
+#: g3270.c:331
 msgid "Can't register into lib3270 I/O callback table."
 msgstr "Não foi possível efetuar o registro na tabela de I/O 3270."
 
-#: g3270.c:324
+#: g3270.c:337
 msgid "Can't register into lib3270 screen callback table."
 msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 
-#: actions.c:977
+#: actions.c:981
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
@@ -143,7 +155,7 @@ msgstr "Cores"
 msgid "Copy"
 msgstr "Copiar"
 
-#: actions.c:594
+#: actions.c:598
 msgid "Cross Hair Cursor"
 msgstr "Régua"
 
@@ -159,7 +171,7 @@ msgstr ""
 msgid "Custom colors"
 msgstr "Cores personalizadas"
 
-#: actions.c:586
+#: actions.c:590
 msgid "DS Trace"
 msgstr ""
 
@@ -179,11 +191,11 @@ msgstr "Esquema de cores padrão 2"
 msgid "Default Color set 1"
 msgstr "Esquema de cores padrão 1"
 
-#: actions.c:758
+#: actions.c:762
 msgid "Delete Char"
 msgstr ""
 
-#: actions.c:746
+#: actions.c:750
 msgid "Delete Word"
 msgstr "Apagar palavra"
 
@@ -195,7 +207,7 @@ msgstr ""
 msgid "Dump screen"
 msgstr "Salvar captura de tela"
 
-#: actions.c:988
+#: actions.c:992
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
@@ -217,11 +229,11 @@ msgid ""
 msgstr "Apagar\n"
 "campos"
 
-#: actions.c:734
+#: actions.c:738
 msgid "Erase EOF"
 msgstr "Apagar campo"
 
-#: actions.c:752
+#: actions.c:756
 msgid "Erase Field"
 msgstr "Apagar campo"
 
@@ -229,7 +241,7 @@ msgstr "Apagar campo"
 msgid "Erase input"
 msgstr "Apagar campos"
 
-#: actions.c:735
+#: actions.c:739
 msgid "Erase to the end of the field"
 msgstr "Apagar até o final do campo"
 
@@ -238,7 +250,7 @@ msgstr "Apagar até o final do campo"
 msgid "Error converting clipboard string to charset %s"
 msgstr "Erro convertendo área de transferência para %s"
 
-#: actions.c:379
+#: actions.c:383
 #, c-format
 msgid ""
 "Error creating temporary file:\n"
@@ -246,7 +258,7 @@ msgid ""
 msgstr "Erro criando arquivo temporário:\n"
 "%s"
 
-#: topwindow.c:186 actions.c:970
+#: topwindow.c:186 actions.c:974
 #, c-format
 msgid ""
 "Error loading %s\n"
@@ -254,7 +266,7 @@ msgid ""
 msgstr "Erro lendo %s\n"
 "%s"
 
-#: actions.c:941 actions.c:1005
+#: actions.c:945 actions.c:1009
 #, c-format
 msgid ""
 "Error saving %s\n"
@@ -262,7 +274,7 @@ msgid ""
 msgstr "Erro salvando %s\n"
 "%s"
 
-#: actions.c:406
+#: actions.c:410
 #, c-format
 msgid ""
 "Error spawning %s\n"
@@ -270,15 +282,15 @@ msgid ""
 msgstr "Erro iniciando %s\n"
 "%s"
 
-#: actions.c:725
+#: actions.c:729
 msgid "Escape"
 msgstr ""
 
-#: actions.c:591
+#: actions.c:595
 msgid "Event Trace"
 msgstr ""
 
-#: actions.c:740
+#: actions.c:744
 msgid "Field start"
 msgstr "Início do campo"
 
@@ -290,11 +302,11 @@ msgstr "Fonte"
 msgid "Foreground"
 msgstr "Frente"
 
-#: actions.c:597
+#: actions.c:601
 msgid "Full Screen"
 msgstr "Tela-cheia"
 
-#: actions.c:567
+#: actions.c:571
 msgid "Fullscreen"
 msgstr "Tela-cheia"
 
@@ -310,11 +322,11 @@ msgstr "Verde"
 msgid "Help"
 msgstr "Ajuda"
 
-#: actions.c:1059
+#: actions.c:1063
 msgid "Hostname:"
 msgstr "Endereço do servidor:"
 
-#: actions.c:599
+#: actions.c:603
 msgid "Insert"
 msgstr ""
 
@@ -326,7 +338,7 @@ msgstr "Intensificado/Protegido"
 msgid "Intensified/Unprotected"
 msgstr "Intensificado/Desprotegido"
 
-#: actions.c:600
+#: actions.c:604
 msgid "Keypad"
 msgstr "Teclado de funções"
 
@@ -334,11 +346,11 @@ msgstr "Teclado de funções"
 msgid "Left"
 msgstr "Esquerda"
 
-#: actions.c:588
+#: actions.c:592
 msgid "Line Wrap"
 msgstr ""
 
-#: actions.c:131 actions.c:953
+#: actions.c:131 actions.c:957
 msgid "Load screen dump"
 msgstr "Carregar captura de tela"
 
@@ -346,7 +358,7 @@ msgstr "Carregar captura de tela"
 msgid "Locked status"
 msgstr "Bloqueada"
 
-#: actions.c:581
+#: actions.c:585
 msgid "Monocase"
 msgstr "Só maiúsculas"
 
@@ -354,7 +366,7 @@ msgstr "Só maiúsculas"
 msgid "Mustard"
 msgstr "Mostarda"
 
-#: g3270.c:350
+#: g3270.c:364
 #, c-format
 msgid "Negotiation with %s failed!"
 msgstr "Negociação com %s falhou!"
@@ -363,7 +375,7 @@ msgstr "Negociação com %s falhou!"
 msgid "Network"
 msgstr "Rede"
 
-#: actions.c:770
+#: actions.c:774
 msgid "Next field"
 msgstr "Próximo campo"
 
@@ -399,7 +411,7 @@ msgstr "Colar"
 msgid "Paste next"
 msgstr "Colar próximo"
 
-#: actions.c:592
+#: actions.c:596
 msgid "Paste with left margin"
 msgstr "Colar com margem"
 
@@ -407,7 +419,7 @@ msgstr "Colar com margem"
 msgid "Pink"
 msgstr "Rosa"
 
-#: actions.c:1062
+#: actions.c:1066
 msgid "Port:"
 msgstr "Porta:"
 
@@ -447,7 +459,7 @@ msgstr "Redesenhar a tela"
 msgid "Reselect"
 msgstr "Reselecionar"
 
-#: actions.c:719 keypad.c:145
+#: actions.c:723 keypad.c:145
 msgid "Reset"
 msgstr ""
 
@@ -463,7 +475,7 @@ msgstr ""
 msgid "Save"
 msgstr "Salvar"
 
-#: actions.c:1026
+#: actions.c:1030
 msgid "Save clipboard contents"
 msgstr "Salvar área de transferência"
 
@@ -475,7 +487,7 @@ msgstr "Salvar cópia"
 msgid "Save screen"
 msgstr "Salvar tela"
 
-#: actions.c:1016
+#: actions.c:1020
 msgid "Save screen contents"
 msgstr "Salvar conteúdo da tela"
 
@@ -483,19 +495,19 @@ msgstr "Salvar conteúdo da tela"
 msgid "Save selected"
 msgstr "Salvar seleção"
 
-#: actions.c:1021
+#: actions.c:1025
 msgid "Save selected text"
 msgstr "Salvar texto selecionado"
 
-#: actions.c:590
+#: actions.c:594
 msgid "Screen Trace"
 msgstr ""
 
-#: actions.c:587
+#: actions.c:591
 msgid "Scroll bar"
 msgstr ""
 
-#: actions.c:1044
+#: actions.c:1048
 msgid "Secure connection"
 msgstr "Conexão segura"
 
@@ -523,7 +535,7 @@ msgstr ""
 msgid "Select all"
 msgstr "Selecionar tudo"
 
-#: actions.c:593
+#: actions.c:597
 msgid "Select by rectangles"
 msgstr "Seleção retangular"
 
@@ -531,7 +543,7 @@ msgstr "Seleção retangular"
 msgid "Select font"
 msgstr "Selecionar fonte"
 
-#: actions.c:1045
+#: actions.c:1049
 msgid "Select hostname"
 msgstr "Selecionar servidor"
 
@@ -567,11 +579,11 @@ msgstr "Mudar servidor"
 msgid "Settings"
 msgstr "Configuração"
 
-#: actions.c:584
+#: actions.c:588
 msgid "Show timing"
 msgstr "Mostrar tempo"
 
-#: actions.c:776
+#: actions.c:780
 msgid "Sys Req"
 msgstr ""
 
@@ -596,7 +608,7 @@ msgid ""
 "Franklin St, Fifth Floor, Boston, MA 02111-1307 USA"
 msgstr ""
 
-#: actions.c:585
+#: actions.c:589
 msgid "Track Cursor"
 msgstr "Mostrar posição do cursor"
 
@@ -604,8 +616,8 @@ msgstr "Mostrar posição do cursor"
 msgid "Turquoise"
 msgstr "Turquesa"
 
-#: topwindow.c:186 actions.c:379 actions.c:406 actions.c:941 actions.c:970
-#: actions.c:1005
+#: topwindow.c:186 actions.c:383 actions.c:410 actions.c:945 actions.c:974
+#: actions.c:1009
 msgid "Unexpected error"
 msgstr "Erro inexperado"
 
@@ -617,7 +629,7 @@ msgstr "Desmarcar"
 msgid "Up"
 msgstr ""
 
-#: actions.c:595
+#: actions.c:599
 msgid "Visible Control chars"
 msgstr ""
 
@@ -625,7 +637,7 @@ msgstr ""
 msgid "White"
 msgstr "Branco"
 
-#: actions.c:568
+#: actions.c:572
 msgid "Window"
 msgstr "Janela"
 
