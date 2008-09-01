@@ -931,8 +931,8 @@
  void DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el)
  {
  	// http://www.guntherkrauss.de/computer/xml/daten/edicode.html
-	short fg;
-	short bg;
+	short			fg;
+	short 			bg;
 
  	if(!(gc && draw && layout && el))
 		return;
@@ -944,9 +944,15 @@
 	}
 	else
 	{
-		fg = el->fg;
-		bg = el->bg;
+		fg = (el->fg & 0xFF);
+		bg = (el->bg & 0xFF);
 	}
+
+	// TODO (perry#2#): Test attribute COLOR_ATTR_UNDERLINE
+/*	if(fg & COLOR_ATTR_UNDERLINE)
+	{
+	}
+*/
 
 	switch(el->extended)
 	{
