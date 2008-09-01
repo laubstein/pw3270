@@ -41,8 +41,8 @@
 	typedef struct _element
 	{
 		gchar				ch[MAX_CHR_LENGTH];
-		short				fg;
-		short				bg;
+		unsigned short	fg;
+		unsigned short	bg;
 		unsigned short	extended;
 		gboolean			selected;
 	} ELEMENT;

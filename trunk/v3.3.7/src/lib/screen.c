@@ -60,48 +60,26 @@ static const struct lib3270_screen_callbacks *callbacks = NULL;
 
 
 static int defattr = 0;
-// static unsigned long input_id;
-
-// Boolean escaped = True;
 Boolean screen_has_changes = 0;
 
 enum ts { TS_AUTO, TS_ON, TS_OFF };
 enum ts ab_mode = TS_AUTO;
 
-int windows_cp = 0;
+// int windows_cp = 0;
 
 static void status_connect(Boolean ignored);
 static void status_3270_mode(Boolean ignored);
 static void status_printer(Boolean on);
 static int color_from_fa(unsigned char fa);
 static Boolean ts_value(const char *s, enum ts *tsp);
-// static int apl_to_acs(unsigned char c);
 static void relabel(Boolean ignored);
-// static void check_aplmap(int codepage);
 
-/* Try to set the console output character set. */
 void
 set_display_charset(char *dcs)
 {
 	if(callbacks && callbacks->charset)
 		callbacks->charset(dcs);
 }
-
-/*
- * Vitrual curses functions.
- */
-// static int cur_row = 0;
-// static int cur_col = 0;
-
-/*
-static int cur_attr = 0;
-
-static void
-attrset(int a)
-{
-	cur_attr = a;
-}
-*/
 
 static void
 addch(int row, int col, int c, int attr)
