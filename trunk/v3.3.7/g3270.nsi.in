@@ -75,7 +75,7 @@ Section "@PACKAGE_NAME@" SecApp
 
 sectionEnd
 
-Section "GTK+" SecGTK
+Section "GTK+ Runtime" SecGTK
 
 	setOutPath $INSTDIR
 	file "@GTKROOT@\lib\*.*"
