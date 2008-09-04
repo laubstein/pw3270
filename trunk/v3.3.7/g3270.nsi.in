@@ -37,6 +37,7 @@ Section "@PACKAGE_NAME@" SecApp
 	setOutPath $INSTDIR
 
 	createShortCut "$SMPROGRAMS\@PACKAGE_NAME@.lnk" "$INSTDIR\@PACKAGE_NAME@.exe"
+	createShortCut "$DESKTOP\@PACKAGE_NAME@.lnk" "$INSTDIR\@PACKAGE_NAME@.exe"
 
 	# Binary files
 	file bin\Release\@PACKAGE_NAME@.exe
@@ -114,6 +115,7 @@ section "Uninstall"
 	delete $INSTDIR\@PACKAGE_NAME@.ico
 	delete $INSTDIR\@PACKAGE_NAME@.log
 	delete "$SMPROGRAMS\@PACKAGE_NAME@.lnk"
+	delete "$DESKTOP\@PACKAGE_NAME@.lnk"
 
 	RMDir /r "$INSTDIR\locale"
 	RMDir /r "$INSTDIR\share"
