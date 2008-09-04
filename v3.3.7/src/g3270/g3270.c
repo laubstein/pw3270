@@ -303,10 +303,12 @@ static int g3270_init(int *argc, char ***argv)
 	g_chdir(g_path_get_dirname(ptr));
 	g_free(ptr);
 	Trace("Current dir: %s",g_get_current_dir());
+	has_log = trylog(g_build_filename(G_DIR_SEPARATOR_S, g_get_current_dir(),logname,NULL));
 #endif
 
 	/* Init Log system */
-	has_log = trylog(g_build_filename(G_DIR_SEPARATOR_S, "var","log",logname,NULL));
+	if(!has_log)
+		has_log = trylog(g_build_filename(G_DIR_SEPARATOR_S, "var","log",logname,NULL));
 
 	if(!has_log)
 		has_log = trylog(g_build_filename(g_get_home_dir(),"var","log",logname,NULL));
@@ -322,6 +324,8 @@ static int g3270_init(int *argc, char ***argv)
 
 
 	g_log_set_default_handler(log_callback,"GLog");
+
+	gtk_rc_parse("etc/gtk-2.0/gtkrc");
 
 	/* Start */
 	OpenConfigFile();

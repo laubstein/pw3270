@@ -1,9 +1,23 @@
 #!/bin/bash
 
-PACKAGE_NAME=g3270
-PACKAGE_VERSION=3.3.7p5
+name=g3270
+version=3.3.7p5
+icon=g3270.ico
 LOCALE=locale
 PLUGIN=plugins
+gtkroot=GTK2-Runtime
+
+until [ -z "$1" ]
+do
+   if [ ${1:0:2} = '--' ]; then
+      tmp=${1:2}
+      parameter=${tmp%%=*}
+      value=${tmp##*=}
+      eval "$parameter=$value" > /dev/null 2>&1
+   fi
+   shift
+done
+
 
 CC="mingw32-gcc"
 PKG_CONFIG_PATH="/usr/i386-mingw32/lib/pkgconfig"
@@ -11,10 +25,10 @@ GTK_MODULES="glib-2.0 gtk+-2.0 gthread-2.0 gmodule-2.0"
 SSL_MODULES="libcrypto libssl openssl"
 
 TEMPFILE=`mktemp`
-echo "s&@PACKAGE_NAME@&$PACKAGE_NAME&g;" > $TEMPFILE
-echo "s&@PACKAGE@&$PACKAGE_NAME&g;" >> $TEMPFILE
+echo "s&@PACKAGE_NAME@&$name&g;" > $TEMPFILE
+echo "s&@PACKAGE@&$name&g;" >> $TEMPFILE
 echo "s&@CC@&$CC&g;" >> $TEMPFILE
-echo "s&@PACKAGE_VERSION@&$PACKAGE_VERSION&g;" >> $TEMPFILE
+echo "s&@PACKAGE_VERSION@&$version&g;" >> $TEMPFILE
 echo "s&@GTK_CFLAGS@&`pkg-config --cflags $GTK_MODULES`&g;" >> $TEMPFILE
 echo "s&@GTK_LIBS@&`pkg-config --libs $GTK_MODULES`&g;" >> $TEMPFILE
 echo "s&@LIBGNOME_CFLAGS@&&g;" >> $TEMPFILE
@@ -39,9 +53,12 @@ echo "s&@exec_prefix@&.&g;" >> $TEMPFILE
 echo "s&@bindir@&.&g;" >> $TEMPFILE
 echo "s&@libdir@&.&g;" >> $TEMPFILE
 echo "s&@localedir@&$LOCALE&g;" >> $TEMPFILE
+echo "s&@ICON_NAME@&$icon&g;" >> $TEMPFILE
+echo "s&@GTKROOT@&$gtkroot&g;" >> $TEMPFILE
 
-echo "s&#undef PACKAGE_NAME&#define PACKAGE_NAME \"$PACKAGE_NAME\"&g;" >> $TEMPFILE
-echo "s&#undef PACKAGE_VERSION&#define PACKAGE_VERSION \"$PACKAGE_VERSION\"&g;" >> $TEMPFILE
+
+echo "s&#undef PACKAGE_NAME&#define PACKAGE_NAME \"$name\"&g;" >> $TEMPFILE
+echo "s&#undef PACKAGE_VERSION&#define PACKAGE_VERSION \"$version\"&g;" >> $TEMPFILE
 echo "s&#undef X3270_TN3270E&#define X3270_TN3270E 1&g;" >> $TEMPFILE
 echo "s&#undef X3270_TRACE&#define X3270_TRACE 1&g;" >> $TEMPFILE
 echo "s&#undef X3270_FT&#define X3270_FT 1&g;" >> $TEMPFILE
@@ -59,7 +76,7 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-make clean
+# make clean
 
 sed --file=$TEMPFILE src/include/lib3270/config.h.in > src/include/lib3270/config.h
 if [ "$?" != "0" ]; then
@@ -71,4 +88,9 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-echo $PACKAGE_NAME $PACKAGE_VERSION configured for win32
+sed --file=$TEMPFILE src/g3270/resources.rc.in > src/g3270/resources.rc
+if [ "$?" != "0" ]; then
+	exit -1
+fi
+
+echo $name $version configured for win32
