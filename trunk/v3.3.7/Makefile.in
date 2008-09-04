@@ -192,9 +192,30 @@ install: Release po/pt_BR.po
 	@msgfmt -c -v -o $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
 
 $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
+
 	@rm -fr $(TMPDIR)/$(PACKAGE).tmp
+
 	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
-	@cp -r * $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp g3270.cbp $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp aclocal.m4 $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp AUTHORS $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp configure.ac $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp g3270.nsi.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp g3270.spec.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp Makefile.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	
+	mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
+	cp -r image/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/po
+	@cp -r po/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/po
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/src
+	@cp -r src/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/src
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/scripts
+	@cp -r scripts/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/scripts
+
 	@rm -f $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/Makefile
 	@rm -f $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/*.layout
 	@tar --create --gzip --verbose --directory $(TMPDIR)/$(PACKAGE).tmp --exclude=.svn --file=$@ $(PACKAGE)-$(PACKAGE_VERSION)

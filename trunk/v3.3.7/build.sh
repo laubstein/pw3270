@@ -5,7 +5,7 @@ svn update
 #
 # Build windows version
 #
-./win32.sh
+./win32.sh --gtkroot="GTK2-Runtime"
 if [ "$?" != "0" ]; then
 	exit -1
 fi
