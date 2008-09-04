@@ -25,6 +25,7 @@
  */
 
 #include <errno.h>
+#include <lib3270/config.h>
 #include "globals.h"
 #include "appres.h"
 
@@ -185,9 +186,13 @@ initialize_toggles(void)
 		    TT_INITIAL);
 #endif /*]*/
 
-#if defined(LIB3270)
+#if defined(TOGGLE_CURSOR_POS)
 	appres.toggle[CURSOR_POS].value = True;
 #endif /*]*/
+
+#if defined(TOGGLE_RECTANGLE_SELECT)
+	appres.toggle[RECTANGLE_SELECT].value = True;
+#endif
 
 }
 
