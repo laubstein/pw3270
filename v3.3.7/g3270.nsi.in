@@ -47,12 +47,12 @@ Section "@PACKAGE_NAME@" SecApp
 	# UI definition files
 	file src\g3270\actions.conf
 	file src\g3270\ui.xml
-	file src\g3270\@PACKAGE_NAME@.jpg
-	file src\g3270\@PACKAGE_NAME@.ico
+	file "/oname=$INSTDIR\@PACKAGE_NAME@.jpg" src\g3270\g3270.jpg 
+	file "/oname=$INSTDIR\@PACKAGE_NAME@.ico" src\g3270\g3270.ico
 
 	# Locale files
-	CreateDirectory "$INSTDIR\locale\pt_BR\LC_MESSAGES"
-	file "/oname=$INSTDIR\locale\pt_BR\LC_MESSAGES\@PACKAGE_NAME@.mo" "locale\pt_BR\LC_MESSAGES\@PACKAGE_NAME@.mo"
+	CreateDirectory "$INSTDIR\@localedir@\pt_BR\LC_MESSAGES"
+	file "/oname=$INSTDIR\locale\pt_BR\LC_MESSAGES\@PACKAGE_NAME@.mo" "@localedir@\pt_BR\LC_MESSAGES\@PACKAGE_NAME@.mo"
 
 	# define uninstaller name
 	writeUninstaller $INSTDIR\uninstall.exe
