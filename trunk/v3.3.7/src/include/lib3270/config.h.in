@@ -24,4 +24,8 @@
 	#undef X3270_SCRIPT
 	#undef X3270_TN3270E
 
+	/* Default toggles */
+	#define TOGGLE_RECTANGLE_SELECT
+	#define TOGGLE_CURSOR_POS
+
 #endif /* CONFIG_H_INCLUDED */
