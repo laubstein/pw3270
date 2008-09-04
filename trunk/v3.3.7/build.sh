@@ -2,10 +2,12 @@
 
 svn update
 
+NAME=SisBB
+
 #
 # Build windows version
 #
-./win32.sh --gtkroot="GTK2-Runtime"
+./win32.sh --gtkroot="GTK2-Runtime" --name=$NAME
 if [ "$?" != "0" ]; then
 	exit -1
 fi
@@ -21,12 +23,12 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-msgfmt -c -v -o locale/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
+msgfmt -c -v -o locale/pt_BR/LC_MESSAGES/$NAME.mo po/pt_BR.po
 if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-cp locale/pt_BR/LC_MESSAGES/g3270.mo /usr/share/locale/pt_BR/LC_MESSAGES/g3270.mo
+cp locale/pt_BR/LC_MESSAGES/$NAME.mo /usr/share/locale/pt_BR/LC_MESSAGES/g3270.mo
 if [ "$?" != "0" ]; then
 	exit -1
 fi
@@ -37,10 +39,10 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-make clean
+scp $NAME-*.exe perry@os2team:public_html/g3270
+mv $NAME-*.exe ~/Desktop/
 
-scp g3270-*.exe perry@os2team:public_html/g3270
-mv g3270-*.exe ~/Desktop/
+make clean
 
 #
 # Build Linux version

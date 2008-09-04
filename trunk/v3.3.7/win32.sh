@@ -2,8 +2,7 @@
 
 name=g3270
 version=3.3.7p5
-icon=g3270.ico
-LOCALE=locale
+locale="locale"
 PLUGIN=plugins
 gtkroot=GTK2-Runtime
 
@@ -52,10 +51,8 @@ echo "s&@prefix@&.&g;" >> $TEMPFILE
 echo "s&@exec_prefix@&.&g;" >> $TEMPFILE
 echo "s&@bindir@&.&g;" >> $TEMPFILE
 echo "s&@libdir@&.&g;" >> $TEMPFILE
-echo "s&@localedir@&$LOCALE&g;" >> $TEMPFILE
-echo "s&@ICON_NAME@&$icon&g;" >> $TEMPFILE
+echo "s&@localedir@&$locale&g;" >> $TEMPFILE
 echo "s&@GTKROOT@&$gtkroot&g;" >> $TEMPFILE
-
 
 echo "s&#undef PACKAGE_NAME&#define PACKAGE_NAME \"$name\"&g;" >> $TEMPFILE
 echo "s&#undef PACKAGE_VERSION&#define PACKAGE_VERSION \"$version\"&g;" >> $TEMPFILE
@@ -65,7 +62,7 @@ echo "s&#undef X3270_FT&#define X3270_FT 1&g;" >> $TEMPFILE
 echo "s&#undef X3270_ANSI&#define X3270_ANSI 1&g;" >> $TEMPFILE
 echo "s&#undef X3270_PRINTER&#define X3270_PRINTER 1&g;" >> $TEMPFILE
 echo "s&#undef HAVE_LIBSSL&#define HAVE_LIBSSL 1&g;" >> $TEMPFILE
-echo "s&#undef LOCALEDIR&#define LOCALEDIR \"$LOCALE\"&g;" >> $TEMPFILE
+echo "s&#undef LOCALEDIR&#define LOCALEDIR \"$locale\"&g;" >> $TEMPFILE
 echo "s&#undef PLUGINDIR&#define PLUGINDIR \"$PLUGIN\"&g;" >> $TEMPFILE
 
 
