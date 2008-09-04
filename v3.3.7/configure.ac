@@ -68,18 +68,18 @@ AC_ARG_ENABLE([plugins],
 	g3270_cv_plugins="yes"
 ])
 
-AC_ARG_ENABLE([ssl],
-	[AS_HELP_STRING([--disable-ssl], [disable ssl support])],
+AC_ARG_WITH([ssl],
+	[AS_HELP_STRING([--without-ssl], [do not use libssl])],
 [
-	g3270_cv_ssl="$enableval"
+	g3270_cv_ssl="$withval"
 ],[
 	g3270_cv_ssl="yes"
 ])
 
-AC_ARG_ENABLE([gnome],
-	[AS_HELP_STRING([--disable-gnome], [disable gnome support])],
+AC_ARG_WITH([gnome],
+	[AS_HELP_STRING([--without-gnome], [do not use libgnome])],
 [
-	g3270_cv_gnome="$enableval"
+	g3270_cv_gnome="$withval"
 ],[
 	g3270_cv_gnome="yes"
 ])
