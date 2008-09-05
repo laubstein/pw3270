@@ -5,6 +5,8 @@ version=3.3.7p5
 locale="locale"
 PLUGIN=plugins
 gtkroot=GTK2-Runtime
+icon="image/default.ico"
+logo="image/default.jpg"
 
 until [ -z "$1" ]
 do
@@ -53,6 +55,8 @@ echo "s&@bindir@&.&g;" >> $TEMPFILE
 echo "s&@libdir@&.&g;" >> $TEMPFILE
 echo "s&@localedir@&$locale&g;" >> $TEMPFILE
 echo "s&@GTKROOT@&$gtkroot&g;" >> $TEMPFILE
+echo "s&@ICONFILE@&$icon&g;" >> $TEMPFILE
+echo "s&@LOGOFILE@&$logo&g;" >> $TEMPFILE
 
 echo "s&#undef PACKAGE_NAME&#define PACKAGE_NAME \"$name\"&g;" >> $TEMPFILE
 echo "s&#undef PACKAGE_VERSION&#define PACKAGE_VERSION \"$version\"&g;" >> $TEMPFILE

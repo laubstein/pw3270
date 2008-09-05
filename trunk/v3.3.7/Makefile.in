@@ -72,9 +72,9 @@ LIBRARY_COMMOM_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 LIBRARY_SRCS = $(LIBRARY_COMMOM_SRCS)
 
 # Main Targets
-Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN))
+Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) src/g3270/$(PACKAGE).jpg
 
-Release: $(foreach BIN, $(TARGETS), bin/Release/$(BIN))
+Release: $(foreach BIN, $(TARGETS), bin/Release/$(BIN)) src/g3270/$(PACKAGE).jpg
 
 # Rules
 GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
@@ -90,7 +90,7 @@ obj/Debug/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) @GTK_CFLAGS@ @LIBGNOME_CFLAGS@ -Isrc/lib -ggdb -o $@ -c $<
 
-obj/Debug/src/g3270/resources.o: src/g3270/resources.rc src/g3270/g3270.ico Makefile
+obj/Debug/src/g3270/resources.o: src/g3270/resources.rc src/g3270/$(PACKAGE).ico Makefile
 	@echo $< ...
 	@$(WINDRES) --include-dir=src/g3270 -i $< -o $@
 
@@ -151,6 +151,12 @@ bin/Debug/lib3270.@DLLEXT@: obj/Debug/version.o obj/Release/src/lib/fallbacks.o 
 
 bin/Debug/w3n46.dll: obj/Release/src/lib/w3n46.o
 	@$(CC) $(DLLFLAGS) -o $@ $^ @OS_LIBS@
+
+src/g3270/$(PACKAGE).ico: @ICONFILE@
+	@cp @ICONFILE@ $@
+
+src/g3270/$(PACKAGE).jpg: @LOGOFILE@
+	@cp @LOGOFILE@ $@
 
 # Other targets
 src/lib/fallbacks.c:  src/lib/X3270.xad
@@ -237,6 +243,8 @@ clean:
 	@rm -f *.lnk
 	@rm -fr locale
 	@rm -f *.nsi
+	@rm -f src/g3270/$(PACKAGE).ico
+	@rm -f src/g3270/$(PACKAGE).jpg
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;

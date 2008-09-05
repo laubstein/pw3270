@@ -84,12 +84,20 @@ AC_ARG_WITH([gnome],
 	g3270_cv_gnome="yes"
 ])
 
-AC_ARG_WITH([image],
-	[AS_HELP_STRING([--with-image], [set icon & logo filenames])],
+AC_ARG_WITH([icon],
+	[AS_HELP_STRING([--with-icon], [set icon filename])],
 [
-	g3270_cv_image="$withval"
+	g3270_cv_icon="$withval"
 ],[
-	g3270_cv_gnome="default"
+	g3270_cv_icon="image/default.ico"
+])
+
+AC_ARG_WITH([logo],
+	[AS_HELP_STRING([--with-logo], [set logo filename])],
+[
+	g3270_cv_logo="$withval"
+],[
+	g3270_cv_logo="image/default.ico"
 ])
 
 
@@ -134,6 +142,9 @@ AC_DEFINE([X3270_APL])
 AC_DEFINE([X3270_FT])
 AC_DEFINE([X3270_LOCAL_PROCESS])
 AC_DEFINE([X3270_PRINTER])
+
+AC_SUBST(ICONFILE,$g3270_cv_icon)
+AC_SUBST(LOGOFILE,$g3270_cv_logo)
 
 # Fixed values
 AC_SUBST(DLLEXT, "so")
