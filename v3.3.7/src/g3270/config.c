@@ -252,15 +252,28 @@
 
  }
 
+static int filetest(const gchar *filename)
+{
+	Trace("Searching for %s (%d)",filename,(int) g_file_test(filename,G_FILE_TEST_IS_REGULAR));
+	return g_file_test(filename,G_FILE_TEST_IS_REGULAR);
+}
+
 gchar * FindSystemConfigFile(const gchar *name)
 {
 	const gchar * const	*list =  g_get_system_config_dirs();
  	gchar					*filename;
  	int						f;
 
+#ifdef DEBUG
+	filename = g_build_filename("..","..","src",PACKAGE_NAME,name,NULL);
+	if(filetest(filename))
+		return filename;
+	g_free(filename);
+#endif
+
 #ifdef DATAPATH
 	filename = g_build_filename(DATAPATH,name,NULL);
-	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+	if(filetest(filename))
 		return filename;
 	g_free(filename);
 #endif
@@ -269,18 +282,18 @@ gchar * FindSystemConfigFile(const gchar *name)
  	for(f=0;list[f];f++)
  	{
 		filename = g_build_filename(list[f],PACKAGE_NAME,name,NULL);
-		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+		if(filetest(filename))
 			return filename;
 		g_free(filename);
  	}
 
 	// Check if the file is available in current directory
-	if(g_file_test(name,G_FILE_TEST_IS_REGULAR))
+	if(filetest(name))
 		return g_strdup(name);
 
 #ifdef DEBUG
-	filename = g_build_filename("..","..","src",PACKAGE_NAME,name,NULL);
-	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+	filename = g_build_filename(G_DIR_SEPARATOR_S,"usr","share",PACKAGE_NAME,name,NULL);
+	if(filetest(filename))
 		return filename;
 	g_free(filename);
 #endif

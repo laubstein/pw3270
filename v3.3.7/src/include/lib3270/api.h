@@ -30,9 +30,10 @@
 
 		/* Debug & log */
 		#if defined( DEBUG ) && defined( linux )
-			#define Trace( fmt, ... )		fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr);
+			#define Trace( fmt, ... )		fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr); \
+											WriteLog("TRACE", "%s(%d) " fmt , __FILE__, __LINE__, __VA_ARGS__ )
 		#elif defined( DEBUG )
-			#define Trace( fmt, ... )		WriteLog("TRACE", "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ )
+			#define Trace( fmt, ... )		WriteLog("TRACE", "%s(%d) " fmt, __FILE__, __LINE__, __VA_ARGS__ )
 		#else
 			#define Trace( fmt, ... )	/* __VA_ARGS__ */
 		#endif

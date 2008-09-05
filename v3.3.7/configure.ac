@@ -84,6 +84,14 @@ AC_ARG_WITH([gnome],
 	g3270_cv_gnome="yes"
 ])
 
+AC_ARG_WITH([image],
+	[AS_HELP_STRING([--with-image], [set icon & logo filenames])],
+[
+	g3270_cv_image="$withval"
+],[
+	g3270_cv_gnome="default"
+])
+
 
 # Checks for libraries.
 PKG_CHECK_EXISTS
