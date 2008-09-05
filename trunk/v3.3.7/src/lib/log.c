@@ -52,6 +52,9 @@
 	{
 		strcpy(logfile,filename);
 		fclose(out);
+#if defined(linux)
+		printf("Logfile set to %s\n",logfile);
+#endif
 		return 0;
 	}
 

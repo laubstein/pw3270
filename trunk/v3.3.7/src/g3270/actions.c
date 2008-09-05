@@ -847,15 +847,15 @@
 		if(!gtk_ui_manager_add_ui_from_file(ui_manager,ui,&error))
 		{
 			if(error && error->message)
-				PopupAnError( _( "Can't build Application UI: %s" ),error->message);
+				WarningPopup( _( "Can't build Application UI: %s" ),error->message);
 			else
-				PopupAnError( _( "Can't build Application UI!" ));
+				WarningPopup( _( "Can't build Application UI!" ));
 		}
 		g_free(ui);
 	}
 	else
 	{
-		PopupAnError( _( "Can't find UI definition file" ) );
+		WarningPopup( _( "Can't find UI definition file" ) );
 	}
 
 	/* Update UI */

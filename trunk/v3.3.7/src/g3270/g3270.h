@@ -240,5 +240,6 @@
 	void 	SetHostname(const gchar *hostname);
 
 	void 	PopupAnError(const gchar *fmt, ...);
+	void 	WarningPopup(const gchar *fmt, ...);
 
 #endif // G3270_H_INCLUDED

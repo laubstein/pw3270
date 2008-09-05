@@ -1142,6 +1142,29 @@
  }
 
 
+ void WarningPopup(const char *fmt, ...)
+ {
+	va_list 	args;
+ 	gchar		*text;
+ 	GtkWidget 	*dialog;
+
+	va_start(args, fmt);
+	text = g_strdup_vprintf(gettext(fmt),args);
+    va_end(args);
+
+ 	g_warning(text);
+
+ 	dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+										GTK_DIALOG_DESTROY_WITH_PARENT,
+										GTK_MESSAGE_WARNING,
+										GTK_BUTTONS_OK,
+										"%s",text );
+
+	gtk_dialog_run(GTK_DIALOG (dialog));
+	gtk_widget_destroy(dialog);
+	g_free(text);
+ }
+
  void PopupAnError(const char *fmt, ...)
  {
 	va_list 	args;
