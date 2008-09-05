@@ -3,11 +3,13 @@
 svn update
 
 NAME=SisBB
+ICON=sisbb/sisbb98.ico
+LOGO=sisbb/sisbb98.jpg
 
 #
 # Build windows version
 #
-./win32.sh --gtkroot="GTK2-Runtime" --name=$NAME
+./win32.sh --gtkroot="GTK2-Runtime" --name=$NAME --icon=$ICON --logo=$LOGO
 if [ "$?" != "0" ]; then
 	exit -1
 fi
