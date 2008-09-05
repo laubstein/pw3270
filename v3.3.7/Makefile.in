@@ -110,7 +110,7 @@ obj/Release/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) @GTK_CFLAGS@ @LIBGNOME_CFLAGS@ -Isrc/lib -o $@ -c $<
 
-obj/Release/src/g3270/resources.o: src/g3270/resources.rc src/g3270/g3270.ico src/g3270/$(PACKAGE).ico Makefile
+obj/Release/src/g3270/resources.o: src/g3270/resources.rc src/g3270/$(PACKAGE).ico Makefile
 	@echo $< ...
 	@$(WINDRES) --include-dir=src/g3270 -i $< -o $@
 
