@@ -132,7 +132,25 @@
 	extern gint					cRow;
 	extern gboolean 				WaitingForChanges;
 	extern char					*charset;
-	extern GtkActionGroup			*main_actions;
+
+	enum g3270_action_groups
+	{
+		ACTION_GROUP_COMMON,
+		ACTION_GROUP_ONLINE,
+		ACTION_GROUP_OFFLINE,
+		ACTION_GROUP_SELECTION,
+		ACTION_GROUP_CLIPBOARD,
+
+		ACTION_GROUP_MAX
+	};
+
+	extern GtkActionGroup			*action_group[ACTION_GROUP_MAX];
+
+	#define common_actions		action_group[ACTION_GROUP_COMMON]
+	#define online_actions		action_group[ACTION_GROUP_ONLINE]
+	#define offline_actions		action_group[ACTION_GROUP_OFFLINE]
+	#define selection_actions	action_group[ACTION_GROUP_SELECTION]
+	#define clipboard_actions	action_group[ACTION_GROUP_CLIPBOARD]
 
 	extern const struct lib3270_io_callbacks g3270_io_callbacks;
 	extern const struct lib3270_screen_callbacks g3270_screen_callbacks;

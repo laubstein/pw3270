@@ -245,8 +245,6 @@
  	static int 			cr[CURSOR_MODE_USER] = { GDK_XTERM, GDK_WATCH, GDK_X_CURSOR };
 #endif
 
- 	static const gchar	*disabled[] = { "Reselect", "Disconnect" };
-
  	GtkWidget				*vbox;
  	GtkWidget				*hbox;
  	int						f;
@@ -348,8 +346,10 @@
 	action_ClearSelection();
 	ClearClipboard();
 
-	for(f=0;f<G_N_ELEMENTS(disabled);f++)
-		gtk_action_set_sensitive(gtk_action_group_get_action(main_actions,disabled[f]),FALSE);
+	gtk_action_group_set_sensitive(online_actions,FALSE);
+	gtk_action_group_set_sensitive(offline_actions,TRUE);
+	gtk_action_group_set_sensitive(clipboard_actions,FALSE);
+	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"Reselect"),FALSE);
 
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
 	settitle(GetString("TopWindow","Title",""));

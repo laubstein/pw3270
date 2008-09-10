@@ -195,26 +195,9 @@ GnomeClient *client = 0;
 /* Callback for connection state changes. */
 static void main_connect(Boolean status)
 {
-	static const gchar *disconnected[] 	=	{ 	"Connect",
-													"SetHostname"
-												};
-	static const gchar *connected[]		=	{ 	"Disconnect",
-													"PrintScreen",
-													"SaveScreen",
-													"EraseEOF",
-													"EraseField",
-													"Clear",
-													"Paste",
-													"PasteNext",
-													"SelectAll",
-													"SelectField"
-												};
+	gboolean online = (CONNECTED) ? TRUE : FALSE;
 
-	int			f;
-	GtkAction 	*action;
-	gboolean	sts;
-
-	Trace("%s: status: %d Connected: %d",__FUNCTION__,status,(int) CONNECTED);
+	Trace("%s: status: %d Connected: %d",__FUNCTION__,status,(int) online);
 
 	if(status)
 	{
@@ -225,34 +208,23 @@ static void main_connect(Boolean status)
 		SetStatusCode(STATUS_CODE_DISCONNECTED);
 		cMode &= ~CURSOR_MODE_ENABLED;
 		ctlr_erase(True);
+		online = FALSE;
 	}
 
 	if(terminal)
 	{
-		gtk_widget_set_sensitive(terminal,status ? TRUE : FALSE);
+		gtk_widget_set_sensitive(terminal,online);
 		DrawOIA(terminal,color,pixmap);
 		gtk_widget_queue_draw(terminal);
 		gtk_widget_grab_focus(terminal);
 	}
 
-	sts = status ? FALSE : TRUE;
-
-	for(f=0;f<G_N_ELEMENTS(disconnected);f++)
-	{
-		action = gtk_action_group_get_action(main_actions,disconnected[f]);
-		gtk_action_set_sensitive(action,sts);
-	}
-
-	sts = !sts;
+	gtk_action_group_set_sensitive(online_actions,online);
+	gtk_action_group_set_sensitive(offline_actions,!online);
 
 	if(keypad)
-		gtk_widget_set_sensitive(keypad,sts);
+		gtk_widget_set_sensitive(keypad,online);
 
-	for(f=0;f<G_N_ELEMENTS(connected);f++)
-	{
-		action = gtk_action_group_get_action(main_actions,connected[f]);
-		gtk_action_set_sensitive(action,sts);
-	}
 
 }
 

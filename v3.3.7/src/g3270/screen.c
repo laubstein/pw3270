@@ -1208,7 +1208,7 @@
 
 	strncat(buffer,name,20);
 
-	action = gtk_action_group_get_action(main_actions,buffer);
+	action = gtk_action_group_get_action(common_actions,buffer);
 
 	// Update toggle buttons
 	if(action)
@@ -1216,12 +1216,12 @@
 
 	// Update toolbar items
 	g_snprintf(buffer,19,"Reset%s", name);
-	action = gtk_action_group_get_action(main_actions,buffer);
+	action = gtk_action_group_get_action(common_actions,buffer);
 	if(action)
 		gtk_action_set_visible(action,value ? TRUE : FALSE);
 
 	g_snprintf(buffer,19,"Set%s", name);
-	action = gtk_action_group_get_action(main_actions,buffer);
+	action = gtk_action_group_get_action(common_actions,buffer);
 	if(action)
 		gtk_action_set_visible(action,value ? FALSE : TRUE);
 
