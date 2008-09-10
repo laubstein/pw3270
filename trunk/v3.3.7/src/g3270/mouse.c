@@ -63,19 +63,15 @@
 
  void SetSelectionMode(int m)
  {
- 	static const gchar	*name[] = { "Copy", "Append", "PrintSelected", "SaveSelected", "Unselect" };
- 	int						f;
-
  	if(m == mode)
 		return;
 
 	if(m == SELECT_MODE_NONE && mode != SELECT_MODE_INVALID)
-		gtk_action_set_sensitive(gtk_action_group_get_action(main_actions,"Reselect"),TRUE);
+		gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"Reselect"),TRUE);
 
 	mode = m;
 
-	for(f=0;f<G_N_ELEMENTS(name);f++)
-		gtk_action_set_sensitive(gtk_action_group_get_action(main_actions,name[f]),(mode != SELECT_MODE_NONE));
+	gtk_action_group_set_sensitive(selection_actions,(mode == SELECT_MODE_NONE) ? FALSE : TRUE );
 
  }
 
@@ -468,7 +464,7 @@
 
     if(event->direction < 2 && event->direction >= 0 && !WaitingForChanges)
  	{
-		GtkAction *action = gtk_action_group_get_action(main_actions,action_name[event->direction]);
+		GtkAction *action = gtk_action_group_get_action(common_actions,action_name[event->direction]);
 
 		WaitingForChanges = TRUE;
 

@@ -34,7 +34,7 @@
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
  static gchar 			*contents = NULL;
- static const gchar	*clipboard_actions[] = { "SaveClipboard", "PrintClipboard" };
+// static const gchar	*clipboard_actions[] = { "SaveClipboard", "PrintClipboard" };
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -45,19 +45,15 @@
 
  static void setClipboardcontents(void)
  {
- 	int f;
  	if(!(contents && terminal))
  	{
-		for(f=0;f<G_N_ELEMENTS(clipboard_actions);f++)
-			gtk_action_set_sensitive(gtk_action_group_get_action(main_actions,clipboard_actions[f]),FALSE);
+		gtk_action_group_set_sensitive(clipboard_actions,FALSE);
 		return;
  	}
 
 	Trace("Clipboard set to:\n%s",contents);
 	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,DEFAULT_CLIPBOARD),contents,-1);
-
-	for(f=0;f<G_N_ELEMENTS(clipboard_actions);f++)
-		gtk_action_set_sensitive(gtk_action_group_get_action(main_actions,clipboard_actions[f]),TRUE);
+	gtk_action_group_set_sensitive(clipboard_actions,TRUE);
 
  }
 
@@ -162,16 +158,12 @@
 
  void ClearClipboard(void)
  {
- 	int f;
-
+	gtk_action_group_set_sensitive(clipboard_actions,FALSE);
  	if(contents)
  	{
  		g_free(contents);
  		contents = NULL;
  	}
-
-	for(f=0;f<G_N_ELEMENTS(clipboard_actions);f++)
-		gtk_action_set_sensitive(gtk_action_group_get_action(main_actions,clipboard_actions[f]),FALSE);
  }
 
 
