@@ -24,19 +24,32 @@
 *
 */
 
-#include <errno.h>
-#include <glib.h>
-#include <lib3270/config.h>
-#include <lib3270/plugins.h>
-#include "g3270.h"
+ #include <errno.h>
+ #include <glib.h>
+
+ #include <lib3270/config.h>
+ #include <globals.h>
+
+ #include "g3270.h"
+ #include <lib3270/kybdc.h>
+ #include <lib3270/actionsc.h>
+
+ #include <lib3270/plugins.h>
 
 /*---[ Structs ]------------------------------------------------------------------------------------------------*/
 
- typedef struct _call_parameter
+ struct call_parameter
  {
  	const gchar *name;
  	const gchar *arg;
- } CALL_PARAMETER;
+ };
+
+ struct custom_action_call
+ {
+	GtkUIManager	*ui;
+	GtkActionGroup	**groups;
+	guint			n_groups;
+ } custom_action_call;
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
@@ -106,7 +119,7 @@
  }
 
 #ifdef HAVE_PLUGINS
- static void call(GModule *handle, CALL_PARAMETER *arg)
+ static void call(GModule *handle, struct call_parameter *arg)
  {
 	void (*ptr)(const gchar *arg) = NULL;
 	if(g_module_symbol(handle, arg->name, (gpointer) ptr))
@@ -125,7 +138,7 @@
  void CallPlugins(const gchar *name, const gchar *arg)
  {
 #ifdef HAVE_PLUGINS
- 	CALL_PARAMETER p = { name, arg };
+ 	struct call_parameter p = { name, arg };
 
  	if(plugins)
  	 	g_slist_foreach(plugins,(GFunc) call,&p);
@@ -140,3 +153,207 @@
 #endif
  }
 
+ static void process_ended(GPid pid,gint status,gchar *tempfile)
+ {
+ 	Trace("Process %d ended with status %d",(int) pid, status);
+ 	remove(tempfile);
+ 	g_free(tempfile);
+ }
+
+ static void RunCommand(const gchar *cmd, const gchar *str)
+ {
+	GError	*error		= NULL;
+	gchar	*filename	= NULL;
+	GPid 	pid			= 0;
+	gchar	*argv[3];
+	gchar	tmpname[20];
+
+	Trace("Running comand %s\n%s",cmd,str);
+
+	do
+	{
+		g_free(filename);
+		g_snprintf(tmpname,19,"%08lx.tmp",rand() ^ ((unsigned long) time(0)));
+		filename = g_build_filename(g_get_tmp_dir(),tmpname,NULL);
+	} while(g_file_test(filename,G_FILE_TEST_EXISTS));
+
+	Trace("Temporary file: %s",filename);
+
+	if(!g_file_set_contents(filename,str,-1,&error))
+	{
+		if(error)
+		{
+			PopupAnError( N_( "Error creating temporary file:\n%s" ), error->message ? error->message : N_( "Unexpected error" ));
+			g_error_free(error);
+		}
+		remove(filename);
+		g_free(filename);
+		return;
+	}
+
+	argv[0] = (gchar *) cmd;
+	argv[1] = filename;
+	argv[2] = NULL;
+
+	Trace("Spawning %s %s",cmd,filename);
+
+	error = NULL;
+
+	if(!g_spawn_async(	NULL,											// const gchar *working_directory,
+						argv,											// gchar **argv,
+						NULL,											// gchar **envp,
+						G_SPAWN_SEARCH_PATH|G_SPAWN_DO_NOT_REAP_CHILD,	// GSpawnFlags flags,
+						NULL,											// GSpawnChildSetupFunc child_setup,
+						NULL,											// gpointer user_data,
+						&pid,											// GPid *child_pid,
+						&error ))										// GError **error);
+	{
+		if(error)
+		{
+			PopupAnError( N_( "Error spawning %s\n%s" ), argv[0], error->message ? error->message : N_( "Unexpected error" ));
+			g_error_free(error);
+		}
+		remove(filename);
+		g_free(filename);
+		return;
+	}
+
+	Trace("pid %d",(int) pid);
+
+	g_child_watch_add(pid,(GChildWatchFunc) process_ended,filename);
+ }
+
+ static void ExecWithScreen(GtkAction *action, gpointer cmd)
+ {
+ 	gchar *screen = GetScreenContents(TRUE);
+ 	RunCommand(cmd,screen);
+ 	g_free(screen);
+
+ }
+
+ static void ExecWithCopy(GtkAction *action, gpointer cmd)
+ {
+ 	Trace("%s Command to execute: %s",__FUNCTION__,(gchar *) cmd);
+ }
+
+ static void ExecWithSelection(GtkAction *action, gpointer cmd)
+ {
+ 	gchar *screen = GetScreenContents(FALSE);
+ 	RunCommand(cmd,screen);
+ 	g_free(screen);
+ }
+
+ static void PFKey(GtkAction *action, gpointer cmd)
+ {
+	action_internal(PF_action, IA_DEFAULT, cmd, CN);
+ }
+
+#ifdef HAVE_PLUGINS
+ static void loadaction(GModule *handle, struct custom_action_call *arg)
+ {
+	void (*ptr)(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions) = NULL;
+	if(g_module_symbol(handle, "LoadCustomActions", (gpointer) ptr))
+		ptr(arg->ui,arg->groups,arg->n_groups);
+ }
+#endif
+
+ void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions)
+ {
+ 	static const struct _call
+ 	{
+ 		const gchar *name;
+		void 	(*run)(GtkAction *action, gpointer cmd);
+ 	} call[] =
+ 	{
+ 		{ "ExecWithScreen", 	ExecWithScreen		},
+ 		{ "ExecWithCopy",		ExecWithCopy		},
+ 		{ "ExecWithSelection",	ExecWithSelection	},
+ 		{ "PFKey",				PFKey				}
+ 	};
+
+	gchar 		*filename;
+	GKeyFile	*conf;
+
+#ifdef HAVE_PLUGINS
+	struct custom_action_call arg = { ui, groups, n_actions };
+
+ 	if(plugins)
+ 	 	g_slist_foreach(plugins,(GFunc) loadaction,&arg);
+
+#endif
+
+	filename = FindSystemConfigFile("actions.conf");
+
+	Trace("Actions.conf: %p",filename);
+
+	if(!filename)
+		return;
+
+	Trace("Loading %s",filename);
+
+	// Load custom actions
+	conf = g_key_file_new();
+
+	if(g_key_file_load_from_file(conf,filename,G_KEY_FILE_NONE,NULL))
+	{
+		int f;
+		gchar **group = g_key_file_get_groups(conf,NULL);
+
+		for(f=0;group[f];f++)
+		{
+			static const gchar *name[] = {	"label", 		// 0
+												"tooltip",		// 1
+												"stock_id",		// 2
+												"action",		// 3
+												"value",		// 4
+												"accelerator" 	// 5
+											};
+
+			int			p;
+			GtkAction 	*action;
+			gchar		*parm[G_N_ELEMENTS(name)];
+			void 		(*run)(GtkAction *action, gpointer cmd)	= NULL;
+
+			for(p=0;p<G_N_ELEMENTS(name);p++)
+			{
+				parm[p] = g_key_file_get_locale_string(conf,group[f],name[p],NULL,NULL);
+				if(!parm[p])
+					parm[p] = g_key_file_get_string(conf,group[f],name[p],NULL);
+			}
+
+			if(!parm[0])
+				parm[0] = group[f];
+
+			for(p=0;p<G_N_ELEMENTS(call) && !run;p++)
+			{
+				if(!strcmp(parm[3],call[p].name))
+					run = call[p].run;
+			}
+
+			if(!run)
+			{
+				Log("Invalid action type %s in %s",parm[3],filename);
+			}
+			else
+			{
+				action = gtk_action_new(group[f],parm[0],parm[1],parm[2]);
+
+				if(action)
+				{
+					// FIXME (perry#1#): Add a closure function to g_free the allocated string.
+					g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(run),g_strdup(parm[4]));
+
+					if(parm[5])
+						gtk_action_group_add_action_with_accel(groups[0],action,parm[5]);
+					else
+						gtk_action_group_add_action(groups[0],action);
+				}
+			}
+		}
+		g_strfreev(group);
+	}
+
+	g_key_file_free(conf);
+	g_free(filename);
+
+ }

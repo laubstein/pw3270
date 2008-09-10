@@ -358,101 +358,7 @@
 		gdk_pixbuf_unref(logo);
  }
 
- void process_ended(GPid pid,gint status,gchar *tempfile)
- {
- 	Trace("Process %d ended with status %d",(int) pid, status);
- 	remove(tempfile);
- 	g_free(tempfile);
- }
-
- static void RunCommand(const gchar *cmd, const gchar *str)
- {
-	GError	*error		= NULL;
-	gchar	*filename	= NULL;
-	GPid 	pid			= 0;
-	gchar	*argv[3];
-	gchar	tmpname[20];
-
-	Trace("Running comand %s\n%s",cmd,str);
-
-	do
-	{
-		g_free(filename);
-		g_snprintf(tmpname,19,"%08lx.tmp",rand() ^ ((unsigned long) time(0)));
-		filename = g_build_filename(g_get_tmp_dir(),tmpname,NULL);
-	} while(g_file_test(filename,G_FILE_TEST_EXISTS));
-
-	Trace("Temporary file: %s",filename);
-
-	if(!g_file_set_contents(filename,str,-1,&error))
-	{
-		if(error)
-		{
-			PopupAnError( N_( "Error creating temporary file:\n%s" ), error->message ? error->message : N_( "Unexpected error" ));
-			g_error_free(error);
-		}
-		remove(filename);
-		g_free(filename);
-		return;
-	}
-
-	argv[0] = (gchar *) cmd;
-	argv[1] = filename;
-	argv[2] = NULL;
-
-	Trace("Spawning %s %s",cmd,filename);
-
-	error = NULL;
-
-	if(!g_spawn_async(	NULL,											// const gchar *working_directory,
-						argv,											// gchar **argv,
-						NULL,											// gchar **envp,
-						G_SPAWN_SEARCH_PATH|G_SPAWN_DO_NOT_REAP_CHILD,	// GSpawnFlags flags,
-						NULL,											// GSpawnChildSetupFunc child_setup,
-						NULL,											// gpointer user_data,
-						&pid,											// GPid *child_pid,
-						&error ))										// GError **error);
-	{
-		if(error)
-		{
-			PopupAnError( N_( "Error spawning %s\n%s" ), argv[0], error->message ? error->message : N_( "Unexpected error" ));
-			g_error_free(error);
-		}
-		remove(filename);
-		g_free(filename);
-		return;
-	}
-
-	Trace("pid %d",(int) pid);
-
-	g_child_watch_add(pid,(GChildWatchFunc) process_ended,filename);
- }
-
- static void ExecWithScreen(GtkAction *action, gpointer cmd)
- {
- 	gchar *screen = GetScreenContents(TRUE);
- 	RunCommand(cmd,screen);
- 	g_free(screen);
-
- }
-
- static void ExecWithCopy(GtkAction *action, gpointer cmd)
- {
- 	Trace("%s Command to execute: %s",__FUNCTION__,(gchar *) cmd);
- }
-
- static void ExecWithSelection(GtkAction *action, gpointer cmd)
- {
- 	gchar *screen = GetScreenContents(FALSE);
- 	RunCommand(cmd,screen);
- 	g_free(screen);
- }
-
- static void PFKey(GtkAction *action, gpointer cmd)
- {
-	action_internal(PF_action, IA_DEFAULT, cmd, CN);
- }
-
+/*
  static void LoadCustomActions(GtkActionGroup *actions)
  {
  	static const struct _call
@@ -542,6 +448,7 @@
 	g_key_file_free(conf);
 	g_free(filename);
  }
+*/
 
  static void toggle_action(GtkToggleAction *action, int id)
  {
@@ -859,8 +766,8 @@
 	}
 
 	Load3270Actions(online_actions);
-	LoadCustomActions(common_actions);
 	LoadToggleActions(common_actions);
+	LoadCustomActions(ui_manager,action_group,ACTION_GROUP_MAX);
 
 	// Add actions and load UI
 	for(f=0;f < ACTION_GROUP_MAX; f++)
