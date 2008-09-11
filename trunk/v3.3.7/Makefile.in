@@ -195,13 +195,13 @@ tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 install: Release po/pt_BR.po
 	@mkdir -p $(DESTDIR)/$(bindir)
 	@mkdir -p $(DESTDIR)/$(LIBDIR)
-	@mkdir -p $(DESTDIR)/$(DATAROOTDIR)
+	@mkdir -p $(DESTDIR)/$(DATAROOTDIR)/ui
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
 	@mkdir -p $(DESTDIR)/@includedir@/lib3270
 	@for i in $(TARGETS); do install --mode=755 bin/Release/$$i $(DESTDIR)/$(bindir); done
 	@install --mode=755 bin/Release/lib3270.so $(DESTDIR)/$(LIBDIR)
 	@install --mode=644 src/g3270/actions.conf $(DESTDIR)/$(DATAROOTDIR)
-	@install --mode=644 src/g3270/ui.xml $(DESTDIR)/$(DATAROOTDIR)
+	@install --mode=644 ui/g3270.xml $(DESTDIR)/$(DATAROOTDIR)/ui
 	@install --mode=644 src/g3270/$(PACKAGE).jpg $(DESTDIR)/$(DATAROOTDIR)
 	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
 
