@@ -271,8 +271,8 @@ gchar * FindSystemConfigFile(const gchar *name)
 	g_free(filename);
 #endif
 
-#ifdef DATAPATH
-	filename = g_build_filename(DATAPATH,name,NULL);
+#ifdef DATAROOTDIR
+	filename = g_build_filename(DATAROOTDIR,PACKAGE_NAME,name,NULL);
 	if(filetest(filename))
 		return filename;
 	g_free(filename);

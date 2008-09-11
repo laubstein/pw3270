@@ -59,23 +59,14 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
- int LoadPlugins(void)
- {
 #ifdef HAVE_PLUGINS
+
+ static int scan_for_plugins(const gchar *path)
+ {
  	GDir			*dir;
  	const gchar	*name;
- 	gchar			*path;
  	GModule			*handle;
  	gchar			*filename;
-
-	if(!g_module_supported())
-		return EINVAL;
-
-#ifdef DEBUG
-	path = g_build_filename(".","plugins",NULL);
-#else
-	path = g_build_filename(DATAPATH,"plugins",NULL);
-#endif
 
 	Trace("Loading plugins in \"%s\"",path);
 
@@ -108,11 +99,34 @@
 	}
 
 	g_dir_close(dir);
-	g_free(path);
+
+    return 0;
+ }
 
 #endif
 
-    return 0;
+ int LoadPlugins(void)
+ {
+#ifdef HAVE_PLUGINS
+ 	gchar *path;
+
+	if(!g_module_supported())
+		return EINVAL;
+
+#ifdef DEBUG
+	path = g_build_filename(".","plugins",NULL);
+	scan_for_plugins(path);
+	g_free(path);
+#else
+	path = g_build_filename(".","plugins",NULL);
+	scan_for_plugins(path);
+	g_free(path);
+#endif
+
+
+#endif
+
+	return 0;
  }
 
  void unload(GModule *handle,gpointer arg)
