@@ -23,13 +23,9 @@
 # Perry Werneck<perry.werneck@gmail.com>
 #
 
-MODULE_NAME=rx3270
-
-ifdef DEBUG
-	DEBUG_FLAGS = -DDEBUG=1
-else
-	DEBUG_FLAGS = -DNDEBUG=1
-endif
+MODULE_NAME ?= rx3270
+OBJDEBUG ?= ../../../obj/Debug/src/plugins/rexx
+BINDEBUG ?= ../../../bin/Debug/plugins
 
 # OS Stuff
 @CROSS@
@@ -47,11 +43,20 @@ DLLFLAGS = @EXTRA_FLAGS@ -shared $(@host_os@-dllflags)
 SOURCES = main.c
 
 # Rules
-%.o: %.c Makefile
-	@$(CC) $(DEBUG_FLAGS) $(CFLAGS) -ggdb -o $@ -c $<
+
+$(OBJDEBUG)/%.o: %.c Makefile
+	@mkdir -p `dirname $@`
+	@$(CC) -DDEBUG=1 $(CFLAGS) -ggdb -o $@ -c $<
+
+# Targets
+
+$(BINDEBUG)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDEBUG)/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) -o $@ $^ $(DLLFLAGS)
 
 clean:
-	@rm -f *.o
+	@rm -fr obj
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;

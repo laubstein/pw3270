@@ -99,11 +99,6 @@ obj/Debug/version.o: src/version.c
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
 
-obj/Debug/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/Makefile $(GLOBAL_DEPENDS)
-	@make DEBUG=1 -C src/plugins/rexx `basename $@`
-	@mkdir -p `dirname $@`
-	@mv src/plugins/rexx/`basename $@` $@
-
 # Release rules
 obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
@@ -162,6 +157,16 @@ src/g3270/$(PACKAGE).ico: @ICONFILE@
 
 src/g3270/$(PACKAGE).jpg: @LOGOFILE@
 	@cp @LOGOFILE@ $@
+
+# Plugins
+bin/Debug/plugins/rx3270.@DLLEXT@: obj/Debug/src/plugins/rexx/*.o
+	@make -C src/plugins/rexx ../../../bin/Debug/plugins/`basename $@`
+
+obj/Debug/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/Makefile $(GLOBAL_DEPENDS)
+	@make -C src/plugins/rexx ../../../obj/Debug/src/plugins/rexx/`basename $@`
+
+
+
 
 # Other targets
 src/lib/fallbacks.c:  src/lib/X3270.xad
