@@ -188,11 +188,13 @@ install: Release po/pt_BR.po
 	@mkdir -p $(DESTDIR)/$(libdir)
 	@mkdir -p $(DESTDIR)/$(DATAPATH)
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
+	@mkdir -p $(DESTDIR)/@includedir@/lib3270
 	@for i in $(TARGETS); do install --mode=755 bin/Release/$$i $(DESTDIR)/$(bindir); done
 	@install --mode=755 bin/Release/lib3270.so $(DESTDIR)/$(libdir)
 	@install --mode=644 src/g3270/actions.conf $(DESTDIR)/$(DATAPATH)
 	@install --mode=644 src/g3270/ui.xml $(DESTDIR)/$(DATAPATH)
 	@install --mode=644 src/g3270/$(PACKAGE).jpg $(DESTDIR)/$(DATAPATH)
+	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
 
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES
 	@msgfmt -c -v -o $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
@@ -207,6 +209,7 @@ $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 	@cp AUTHORS $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp configure.ac $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp g3270.nsi.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp g3270.pc.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp g3270.spec.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp Makefile.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	
