@@ -31,6 +31,7 @@ PACKAGE=@PACKAGE@
 PACKAGE_VERSION=@PACKAGE_VERSION@
 DATAPATH=@DATAPATH@
 LOCALEDIR=@localedir@
+PLUGINS=@SELECTED_PLUGINS@
 
 # OS Stuff
 @CROSS@
@@ -72,7 +73,7 @@ LIBRARY_COMMOM_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 LIBRARY_SRCS = $(LIBRARY_COMMOM_SRCS)
 
 # Main Targets
-Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) src/g3270/$(PACKAGE).jpg
+Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).jpg
 
 Release: $(foreach BIN, $(TARGETS), bin/Release/$(BIN)) src/g3270/$(PACKAGE).jpg
 
@@ -166,8 +167,6 @@ obj/Debug/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/Makefile $
 	@make -C src/plugins/rexx ../../../obj/Debug/src/plugins/rexx/`basename $@`
 
 
-
-
 # Other targets
 src/lib/fallbacks.c:  src/lib/X3270.xad
 	@make -C src/lib fallbacks.c
@@ -188,7 +187,7 @@ $(PACKAGE).pot: sources.lst $(foreach SRC, $(G3270_SRCS), src/g3270/$(SRC))
 $(PACKAGE).po: $(PACKAGE).pot
 	@msginit --no-translator -o $(PACKAGE).po -i $(PACKAGE).pot
 
-run: bin/Debug/g3270@BINEXT@ src/g3270/$(PACKAGE).jpg
+run: bin/Debug/g3270@BINEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).jpg
 	cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270
 
 tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
