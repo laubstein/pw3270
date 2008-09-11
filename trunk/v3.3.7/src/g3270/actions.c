@@ -358,98 +358,6 @@
 		gdk_pixbuf_unref(logo);
  }
 
-/*
- static void LoadCustomActions(GtkActionGroup *actions)
- {
- 	static const struct _call
- 	{
- 		const gchar *name;
-		void 	(*run)(GtkAction *action, gpointer cmd);
- 	} call[] =
- 	{
- 		{ "ExecWithScreen", 	ExecWithScreen		},
- 		{ "ExecWithCopy",		ExecWithCopy		},
- 		{ "ExecWithSelection",	ExecWithSelection	},
- 		{ "PFKey",				PFKey				}
- 	};
-
-	gchar 		*filename = FindSystemConfigFile("actions.conf");
-	GKeyFile	*conf;
-
-	Trace("Actions.conf: %p",filename);
-
-	if(!filename)
-		return;
-
-	Trace("Loading %s",filename);
-
-	// Load custom actions
-	conf = g_key_file_new();
-
-	if(g_key_file_load_from_file(conf,filename,G_KEY_FILE_NONE,NULL))
-	{
-		int f;
-		gchar **group = g_key_file_get_groups(conf,NULL);
-
-		for(f=0;group[f];f++)
-		{
-			static const gchar *name[] = {	"label", 		// 0
-												"tooltip",		// 1
-												"stock_id",		// 2
-												"action",		// 3
-												"value",		// 4
-												"accelerator" 	// 5
-											};
-
-			int			p;
-			GtkAction 	*action;
-			gchar		*parm[G_N_ELEMENTS(name)];
-			void 		(*run)(GtkAction *action, gpointer cmd)	= NULL;
-
-			for(p=0;p<G_N_ELEMENTS(name);p++)
-			{
-				parm[p] = g_key_file_get_locale_string(conf,group[f],name[p],NULL,NULL);
-				if(!parm[p])
-					parm[p] = g_key_file_get_string(conf,group[f],name[p],NULL);
-			}
-
-			if(!parm[0])
-				parm[0] = group[f];
-
-			for(p=0;p<G_N_ELEMENTS(call) && !run;p++)
-			{
-				if(!strcmp(parm[3],call[p].name))
-					run = call[p].run;
-			}
-
-			if(!run)
-			{
-				Log("Invalid action type %s in %s",parm[3],filename);
-			}
-			else
-			{
-				action = gtk_action_new(group[f],parm[0],parm[1],parm[2]);
-
-				if(action)
-				{
-					// FIXME (perry#1#): Add a closure function to g_free the allocated string.
-					g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(run),g_strdup(parm[4]));
-
-					if(parm[5])
-						gtk_action_group_add_action_with_accel(actions,action,parm[5]);
-					else
-						gtk_action_group_add_action(actions,action);
-				}
-			}
-		}
-		g_strfreev(group);
-	}
-
-	g_key_file_free(conf);
-	g_free(filename);
- }
-*/
-
  static void toggle_action(GtkToggleAction *action, int id)
  {
  	set_toggle(id,gtk_toggle_action_get_active(action));
@@ -735,7 +643,6 @@
  	}
  }
 
-
  GtkUIManager * LoadApplicationUI(GtkWidget *widget)
  {
  	static const struct _group
@@ -754,8 +661,10 @@
 
 	GtkUIManager 	*ui_manager = gtk_ui_manager_new(); // http://library.gnome.org/devel/gtk/stable/GtkUIManager.html
 	GError			*error = NULL;
-	gchar			*ui;
 	int				f;
+	gchar			*path;
+	gchar			*filename;
+ 	GDir			*dir;
 
 	// Load actions
 	for(f=0;f < ACTION_GROUP_MAX; f++)
@@ -773,26 +682,53 @@
 	for(f=0;f < ACTION_GROUP_MAX; f++)
 		gtk_ui_manager_insert_action_group(ui_manager,action_group[f], 0);
 
-	ui = FindSystemConfigFile("ui.xml");
-	if(ui)
-	{
-		Trace("Loading interface from %s",ui);
-		if(!gtk_ui_manager_add_ui_from_file(ui_manager,ui,&error))
+	/* Load UI definition files */
+#if defined( DEBUG )
+	path = g_build_filename("..","..","ui",NULL);
+#elif defined( LIBDIR )
+	path = g_build_filename(DATAROOTDIR,PACKAGE_NAME,"ui",NULL);
+#else
+	path = g_build_filename(".","ui",NULL);
+#endif
+
+    dir = g_dir_open(path,0,NULL);
+
+	Trace("Searching for UI definitions in %s (dir: %p)",path,dir);
+
+    if(!dir)
+    {
+		WarningPopup( _( "Can't find UI definitions in\n%s" ), path);
+    }
+    else
+    {
+		const gchar *name = g_dir_read_name(dir);
+		while(name)
 		{
-			if(error && error->message)
-				WarningPopup( _( "Can't build Application UI: %s" ),error->message);
-			else
-				WarningPopup( _( "Can't build Application UI!" ));
+			filename = g_build_filename(path,name,NULL);
+
+			if(g_str_has_suffix(filename,"xml"))
+			{
+				Trace("Loading %s",filename);
+
+				if(!gtk_ui_manager_add_ui_from_file(ui_manager,filename,&error))
+				{
+					if(error && error->message)
+						WarningPopup( _( "Can't load %s: %s" ),filename,error->message);
+					else
+						WarningPopup( _( "Can't load %s" ), filename);
+				}
+			}
+
+			g_free(filename);
+			name = g_dir_read_name(dir);
 		}
-		g_free(ui);
-	}
-	else
-	{
-		WarningPopup( _( "Can't find UI definition file" ) );
-	}
+		g_dir_close(dir);
+    }
+
+	g_free(path);
 
 	/* Update UI */
-	SetUIManager(ui_manager);
+	AddPluginUI(ui_manager);
 	gtk_ui_manager_ensure_update(ui_manager);
 	return ui_manager;
  }

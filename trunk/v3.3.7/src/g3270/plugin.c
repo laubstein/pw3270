@@ -113,8 +113,12 @@
 	if(!g_module_supported())
 		return EINVAL;
 
-#ifdef DEBUG
+#if defined( DEBUG )
 	path = g_build_filename(".","plugins",NULL);
+	scan_for_plugins(path);
+	g_free(path);
+#elif defined( LIBDIR )
+	path = g_build_filename(LIBDIR,PACKAGE_NAME,"plugins",NULL);
 	scan_for_plugins(path);
 	g_free(path);
 #else
@@ -150,14 +154,14 @@
  static void call(GModule *handle, struct call_parameter *arg)
  {
 	void (*ptr)(const gchar *arg) = NULL;
-	if(g_module_symbol(handle, arg->name, (gpointer) ptr))
+	if(g_module_symbol(handle, arg->name, (gpointer) &ptr))
 		ptr(arg->arg);
  }
 
- static void setui(GModule *handle, GtkUIManager *ui)
+ static void addui(GModule *handle, GtkUIManager *ui)
  {
 	void (*ptr)(GtkUIManager *ui) = NULL;
-	if(g_module_symbol(handle, "SetUIManager", (gpointer) ptr))
+	if(g_module_symbol(handle, "AddPluginUI", (gpointer) &ptr))
 		ptr(ui);
  }
 
@@ -173,11 +177,11 @@
 #endif
  }
 
- void SetUIManager(GtkUIManager *ui)
+ void AddPluginUI(GtkUIManager *ui)
  {
 #ifdef HAVE_PLUGINS
  	if(plugins)
- 	 	g_slist_foreach(plugins,(GFunc) setui,ui);
+ 	 	g_slist_foreach(plugins,(GFunc) addui,ui);
 #endif
  }
 
@@ -280,7 +284,10 @@
  static void loadaction(GModule *handle, struct custom_action_call *arg)
  {
 	void (*ptr)(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions) = NULL;
-	if(g_module_symbol(handle, "LoadCustomActions", (gpointer) ptr))
+
+	Trace("Searching for custom actions in %p",handle);
+
+	if(g_module_symbol(handle, "LoadCustomActions", (gpointer) &ptr))
 		ptr(arg->ui,arg->groups,arg->n_groups);
  }
 #endif

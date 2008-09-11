@@ -43,7 +43,11 @@
 		int WriteLog(const char *module, const char *fmt, ...);
 		int WriteRCLog(const char *module, int rc, const char *fmt, ...);
 
-		#define Log(fmt, ...)		WriteLog("MSG",fmt,__VA_ARGS__)
+		#ifdef G3270_MODULE_NAME
+			#define Log(fmt, ...)		WriteLog(G3270_MODULE_NAME,fmt,__VA_ARGS__)
+		#else
+			#define Log(fmt, ...)		WriteLog("MSG",fmt,__VA_ARGS__)
+		#endif
 
 		/** connection state */
 		enum cstate
@@ -142,6 +146,17 @@
 
 			OIA_FLAG_USER
 		} OIA_FLAG;
+
+		enum g3270_action_groups
+		{
+			ACTION_GROUP_COMMON,
+			ACTION_GROUP_ONLINE,
+			ACTION_GROUP_OFFLINE,
+			ACTION_GROUP_SELECTION,
+			ACTION_GROUP_CLIPBOARD,
+
+			ACTION_GROUP_MAX
+		};
 
 		#define COLOR_ATTR_NONE			0x0000
 		#define COLOR_ATTR_FIELD		0x0100
