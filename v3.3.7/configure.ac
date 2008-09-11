@@ -162,6 +162,7 @@ AC_SUBST(OS_LIBS)
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
 AC_OUTPUT(g3270.spec)
+AC_OUTPUT(g3270.pc)
 
 dnl Output the generated config.status script.
 AC_OUTPUT
