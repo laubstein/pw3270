@@ -71,7 +71,11 @@
 	if(!g_module_supported())
 		return EINVAL;
 
+#ifdef DEBUG
+	path = g_build_filename(".","plugins",NULL);
+#else
 	path = g_build_filename(DATAPATH,"plugins",NULL);
+#endif
 
 	Trace("Loading plugins in \"%s\"",path);
 
@@ -84,11 +88,21 @@
 	{
 //		G_MODULE_SUFFIX
 		filename = g_build_filename(path,name,NULL);
+
+		Trace("Loading plugin in %s",filename);
+
 		handle = g_module_open(filename,G_MODULE_BIND_LOCAL);
+
+		Trace("Handle for %s: %p",filename,handle);
+
 		if(handle)
+		{
 			plugins = g_slist_append(plugins,handle);
+		}
 		else
+		{
 			Log("Can't load %s",filename);
+		}
 		g_free(filename);
 		name = g_dir_read_name(dir);
 	}

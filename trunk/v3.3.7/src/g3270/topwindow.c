@@ -142,7 +142,7 @@
 			const gchar 	*name = pango_font_family_get_name (families[i]);
 			GtkWidget		*item = gtk_radio_menu_item_new_with_label(group,name);
 
-			Trace("Adding font %s",name);
+//			Trace("Adding font %s",name);
 
 			// FIXME (perry#2#): the user_data isn't being freed!
 			group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
