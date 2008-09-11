@@ -40,6 +40,8 @@ echo "s&@NATIVECC@&gcc&g;" >> $TEMPFILE
 echo "s&@WINDRES@&mingw32-windres&g;" >> $TEMPFILE
 echo "s&@OS_LIBS@&-lws2_32&g;" >> $TEMPFILE
 echo "s&@XCPPFLAGS@&-D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500&g;" >> $TEMPFILE
+echo "s&@PROGRAM_FLAGS@&&g;" >> $TEMPFILE
+echo "s&@PROGRAM_LIBS@&&g;" >> $TEMPFILE
 echo "s&@DLLEXT@&dll&g;" >> $TEMPFILE
 echo "s&@OBJEXT@&o&g;" >> $TEMPFILE
 echo "s&@BINEXT@&.exe&g;" >> $TEMPFILE
