@@ -193,5 +193,9 @@ AC_OUTPUT(Makefile)
 AC_OUTPUT(g3270.spec)
 AC_OUTPUT(g3270.pc)
 
+if test "$g3270_cv_rexx" == "yes"; then
+	AC_OUTPUT(src/plugins/rexx/Makefile)
+fi
+
 dnl Output the generated config.status script.
 AC_OUTPUT

@@ -99,6 +99,11 @@ obj/Debug/version.o: src/version.c
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
 
+obj/Debug/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/Makefile $(GLOBAL_DEPENDS)
+	@make DEBUG=1 -C src/plugins/rexx `basename $@`
+	@mkdir -p `dirname $@`
+	@mv src/plugins/rexx/`basename $@` $@
+
 # Release rules
 obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
@@ -249,6 +254,7 @@ clean:
 	@rm -f *.nsi
 	@rm -f src/g3270/$(PACKAGE).ico
 	@rm -f src/g3270/$(PACKAGE).jpg
+	@make -C src/plugins/rexx clean
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
