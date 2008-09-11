@@ -69,21 +69,20 @@ AC_ARG_ENABLE([plugins],
 	g3270_cv_plugins="yes"
 ])
 
-AC_ARG_WITH([rexx],
-	[AS_HELP_STRING([--without-rexx], [do not build rexx plugin])],
-[
-	g3270_cv_rexx="$withval"
-],[
-	g3270_cv_rexx="$g3270_cv_plugins"
-])
-
-
 AC_ARG_WITH([ssl],
 	[AS_HELP_STRING([--without-ssl], [do not use libssl])],
 [
 	g3270_cv_ssl="$withval"
 ],[
 	g3270_cv_ssl="yes"
+])
+
+AC_ARG_WITH([rexx],
+	[AS_HELP_STRING([--without-rexx], [do not use rexx])],
+[
+	g3270_cv_rexx="$withval"
+],[
+	g3270_cv_rexx="yes"
 ])
 
 AC_ARG_WITH([gnome],
@@ -133,6 +132,20 @@ if test "$g3270_cv_ssl" == "yes"; then
 					AC_MSG_NOTICE([libssl not present.]) )
 fi
 
+# Check for rexx devel
+if test "$g3270_cv_rexx" == "yes"; then
+	AC_CHECK_PROGS(REXX_CONFIG, oorexx-config)
+
+	if test -n "$REXX_CONFIG"; then
+		AC_DEFINE(HAVE_REXX)
+		PROGRAM_FLAGS="$PROGRAM_FLAGS `$REXX_CONFIG --cflags`"
+		PROGRAM_LIBS="$PROGRAM_LIBS `$REXX_CONFIG --libs`"
+	else
+		AC_MSG_NOTICE([rexx not present.])
+	fi
+
+fi
+
 AC_SUBST(LIBSSL_LIBS)
 AC_SUBST(LIBSSL_CFLAGS)
 
@@ -168,6 +181,8 @@ AC_SUBST(WINDRES)
 AC_SUBST(NATIVECC)
 AC_SUBST(CROSS)
 AC_SUBST(OS_LIBS)
+AC_SUBST(PROGRAM_LIBS)
+AC_SUBST(PROGRAM_FLAGS)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)

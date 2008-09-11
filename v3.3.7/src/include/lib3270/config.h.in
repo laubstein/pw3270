@@ -7,6 +7,7 @@
 	#undef HAVE_LIBSSL
 	#undef HAVE_PLUGINS
 	#undef HAVE_LIBGNOME
+	#undef HAVE_REXX
 
 	#ifndef LIBX3270DIR
 		#define LIBX3270DIR "."
