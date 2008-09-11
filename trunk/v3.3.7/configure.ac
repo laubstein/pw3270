@@ -64,9 +64,19 @@ AC_ARG_ENABLE([plugins],
 	[AS_HELP_STRING([--disable-plugins], [disable plugin support])],
 [
 	g3270_cv_plugins="$enableval"
+
 ],[
 	g3270_cv_plugins="yes"
 ])
+
+AC_ARG_WITH([rexx],
+	[AS_HELP_STRING([--without-rexx], [do not build rexx plugin])],
+[
+	g3270_cv_rexx="$withval"
+],[
+	g3270_cv_rexx="$g3270_cv_plugins"
+])
+
 
 AC_ARG_WITH([ssl],
 	[AS_HELP_STRING([--without-ssl], [do not use libssl])],
