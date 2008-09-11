@@ -59,8 +59,8 @@ echo "s&@localedir@&$locale&g;" >> $TEMPFILE
 echo "s&@GTKROOT@&$gtkroot&g;" >> $TEMPFILE
 echo "s&@ICONFILE@&$icon&g;" >> $TEMPFILE
 echo "s&@LOGOFILE@&$logo&g;" >> $TEMPFILE
-echo "s&@DATAPATH@&.&g;" >> $TEMPFILE
 echo "s&@datarootdir@&.&g;" >> $TEMPFILE
+echo "s&@SELECTED_PLUGINS@&&g;" >> $TEMPFILE
 
 echo "s&#undef PACKAGE_NAME&#define PACKAGE_NAME \"$name\"&g;" >> $TEMPFILE
 echo "s&#undef PACKAGE_VERSION&#define PACKAGE_VERSION \"$version\"&g;" >> $TEMPFILE

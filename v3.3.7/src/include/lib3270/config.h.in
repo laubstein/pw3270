@@ -4,6 +4,7 @@
 
 	#undef PACKAGE_NAME
 	#undef PACKAGE_VERSION
+
 	#undef HAVE_LIBSSL
 	#undef HAVE_PLUGINS
 	#undef HAVE_LIBGNOME

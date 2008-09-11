@@ -20,7 +20,7 @@
 
 	void SetHostname(const gchar *hostname);
 	void SetLUname(const gchar *luname);
-	void SetUIManager(GtkUIManager *ui);
+	void AddPluginUI(GtkUIManager *ui);
 	void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions);
 
 #endif // PLUGINS_H_INCLUDED

@@ -133,17 +133,6 @@
 	extern gboolean 				WaitingForChanges;
 	extern char					*charset;
 
-	enum g3270_action_groups
-	{
-		ACTION_GROUP_COMMON,
-		ACTION_GROUP_ONLINE,
-		ACTION_GROUP_OFFLINE,
-		ACTION_GROUP_SELECTION,
-		ACTION_GROUP_CLIPBOARD,
-
-		ACTION_GROUP_MAX
-	};
-
 	extern GtkActionGroup			*action_group[ACTION_GROUP_MAX];
 
 	#define common_actions		action_group[ACTION_GROUP_COMMON]
