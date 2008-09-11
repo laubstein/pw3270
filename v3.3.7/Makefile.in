@@ -53,7 +53,7 @@ endif
 
 # Set compile/link parameters
 windows-dllflags=-Wl,--export-all-symbols -Wl,--enable-auto-import
-CFLAGS = @EXTRA_FLAGS@ -g -Wall @XCPPFLAGS@ -O -DG3270 -DDATAPATH=\"$(DATAPATH)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
+CFLAGS = @EXTRA_FLAGS@ -g -Wall @XCPPFLAGS@ -O -DG3270 -DDATAPATH=\"$(DATAPATH)\" -DDATAROOTDIR=\"@datarootdir@\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
 DLLFLAGS = @EXTRA_FLAGS@ -shared $(@host_os@-dllflags)
 
 # Sources
