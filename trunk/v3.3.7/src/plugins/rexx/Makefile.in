@@ -56,7 +56,6 @@ $(BINDEBUG)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OB
 	@$(CC) -o $@ $^ $(DLLFLAGS)
 
 clean:
-	@rm -fr obj
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
