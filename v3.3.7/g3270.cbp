@@ -274,6 +274,10 @@
 		</Unit>
 		<Unit filename="src/lib/xioc.h" />
 		<Unit filename="src/lib/xl.h" />
+		<Unit filename="src/plugins/rexx/Makefile.in" />
+		<Unit filename="src/plugins/rexx/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="win32.sh">
 			<Option target="Release" />
 		</Unit>

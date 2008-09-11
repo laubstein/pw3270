@@ -1,0 +1,60 @@
+#
+# Copyright 2008, Banco do Brasil S.A.
+#
+# This file is part of g3270
+#
+# This program file is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program in a file named COPYING; if not, write to the
+# Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301 USA
+#
+# Authors:
+#
+# Perry Werneck<perry.werneck@gmail.com>
+#
+
+MODULE_NAME=rx3270
+
+ifdef DEBUG
+	DEBUG_FLAGS = -DDEBUG=1
+else
+	DEBUG_FLAGS = -DNDEBUG=1
+endif
+
+# OS Stuff
+@CROSS@
+
+
+# Set command paths and mkfb (which has to run locally)
+MKFB = mkfb
+CC = @CC@
+
+# Set compile/link parameters
+windows-dllflags=-Wl,--export-all-symbols -Wl,--enable-auto-import
+CFLAGS = @EXTRA_FLAGS@ -g -Wall @GTK_CFLAGS@ @REXX_CFLAGS@ -O -I../../include
+DLLFLAGS = @EXTRA_FLAGS@ -shared $(@host_os@-dllflags)
+
+SOURCES = main.c
+
+# Rules
+%.o: %.c Makefile
+	@$(CC) $(DEBUG_FLAGS) $(CFLAGS) -ggdb -o $@ -c $<
+
+clean:
+	@rm -f *.o
+	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.log" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "leak.out" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.tmp" -exec mv -f {} $(TMPDIR) \;
