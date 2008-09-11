@@ -44,11 +44,14 @@ Section "@PACKAGE_NAME@" SecApp
 	file bin\Release\lib3270.dll
 	file bin\Release\w3n46.dll
 
-	# UI definition files
+	# Configuration files
 	file src\g3270\actions.conf
-	file src\g3270\ui.xml
 	file "/oname=$INSTDIR\@PACKAGE_NAME@.jpg" src\g3270\@PACKAGE_NAME@.jpg 
 	file "/oname=$INSTDIR\@PACKAGE_NAME@.ico" src\g3270\@PACKAGE_NAME@.ico
+
+	# UI definition files
+	CreateDirectory "$INSTDIR\ui"
+	file "/oname=$INSTDIR\ui\@PACKAGE_NAME@.xml" ui\g3270.xml
 
 	# Locale files
 	CreateDirectory "$INSTDIR\@localedir@\pt_BR\LC_MESSAGES"
