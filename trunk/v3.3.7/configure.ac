@@ -132,22 +132,25 @@ if test "$g3270_cv_ssl" == "yes"; then
 					AC_MSG_NOTICE([libssl not present.]) )
 fi
 
+AC_SUBST(LIBSSL_LIBS)
+AC_SUBST(LIBSSL_CFLAGS)
+
 # Check for rexx devel
 if test "$g3270_cv_rexx" == "yes"; then
 	AC_CHECK_PROGS(REXX_CONFIG, oorexx-config)
 
 	if test -n "$REXX_CONFIG"; then
 		AC_DEFINE(HAVE_REXX)
-		PROGRAM_FLAGS="$PROGRAM_FLAGS `$REXX_CONFIG --cflags`"
-		PROGRAM_LIBS="$PROGRAM_LIBS `$REXX_CONFIG --libs`"
+		REXX_CFLAGS="`$REXX_CONFIG --cflags`"
+		REXX_LIBS="$PROGRAM_LIBS `$REXX_CONFIG --libs`"
 	else
 		AC_MSG_NOTICE([rexx not present.])
 	fi
 
 fi
 
-AC_SUBST(LIBSSL_LIBS)
-AC_SUBST(LIBSSL_CFLAGS)
+AC_SUBST(REXX_LIBS)
+AC_SUBST(REXX_CFLAGS)
 
 # Other options
 
