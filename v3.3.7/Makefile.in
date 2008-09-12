@@ -29,7 +29,7 @@ bindir=@bindir@
 LIBDIR=@libdir@
 PACKAGE=@PACKAGE@
 PACKAGE_VERSION=@PACKAGE_VERSION@
-DATAROOTDIR=@datarootdir@
+datarootdir=@datarootdir@
 LOCALEDIR=@localedir@
 PLUGINS=@SELECTED_PLUGINS@
 
@@ -53,7 +53,7 @@ endif
 
 # Set compile/link parameters
 windows-dllflags=-Wl,--export-all-symbols -Wl,--enable-auto-import
-CFLAGS = @EXTRA_FLAGS@ -g -Wall @XCPPFLAGS@ -O -DG3270 -DLIBDIR=\"$(LIBDIR)\" -DDATAROOTDIR=\"$(DATAROOTDIR)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
+CFLAGS = @EXTRA_FLAGS@ -g -Wall @XCPPFLAGS@ -O -DG3270 -DLIBDIR=\"$(LIBDIR)\" -DDATAROOTDIR=\"$(datarootdir)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
 DLLFLAGS = @EXTRA_FLAGS@ -shared $(@host_os@-dllflags)
 
 # Sources
@@ -195,14 +195,14 @@ tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 install: Release po/pt_BR.po
 	@mkdir -p $(DESTDIR)/$(bindir)
 	@mkdir -p $(DESTDIR)/$(LIBDIR)
-	@mkdir -p $(DESTDIR)/$(DATAROOTDIR)/$(PACKAGE)/ui
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
 	@mkdir -p $(DESTDIR)/@includedir@/lib3270
 	@for i in $(TARGETS); do install --mode=755 bin/Release/$$i $(DESTDIR)/$(bindir); done
 	@install --mode=755 bin/Release/lib3270.so $(DESTDIR)/$(LIBDIR)
-	@install --mode=644 src/g3270/actions.conf $(DESTDIR)/$(DATAROOTDIR)/$(PACKAGE)
-	@install --mode=644 ui/g3270.xml $(DESTDIR)/$(DATAROOTDIR)/$(PACKAGE)/ui
-	@install --mode=644 src/g3270/$(PACKAGE).jpg $(DESTDIR)/$(DATAROOTDIR)/$(PACKAGE)
+	@install --mode=644 src/g3270/actions.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 ui/g3270.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+	@install --mode=644 src/g3270/$(PACKAGE).jpg $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
 
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES
@@ -224,6 +224,9 @@ $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 
 	mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
 	cp -r image/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
+
+	mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/ui
+	cp -r ui/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/ui
 
 	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/po
 	@cp -r po/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/po

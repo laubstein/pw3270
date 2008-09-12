@@ -9,7 +9,8 @@ LOGO=sisbb/sisbb98.jpg
 #
 # Build windows version
 #
-./win32.sh --gtkroot="GTK2-Runtime" --name=$NAME --icon=$ICON --logo=$LOGO
+ln -sf ~/win32/GTK-Runtime .
+./win32.sh --gtkroot="GTK-Runtime" --locale="locale" --name=$NAME --icon=$ICON --logo=$LOGO
 if [ "$?" != "0" ]; then
 	exit -1
 fi
@@ -130,7 +131,6 @@ mkdir -p ~/bin/g3270
 cp bin/Release/g3270		~/bin/g3270
 cp bin/Release/lib3270.so	~/bin/g3270
 cp src/g3270/actions.conf	~/bin/g3270
-cp src/g3270/*.xml		~/bin/g3270
 cp /home/perry/Project/g3270/sisbb01.png ~/bin/g3270/g3270.jpg
 
 cat > ~/bin/g3270.sh << EOF 

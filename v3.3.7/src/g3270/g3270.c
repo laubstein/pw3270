@@ -382,6 +382,28 @@ static gint session_die(GnomeClient* client, gpointer client_data)
 }
 #endif
 
+static void init_locale(void)
+{
+	setlocale( LC_ALL, "" );
+
+#if defined( LOCALEDIR )
+
+	// http://bo.majewski.name/bluear/gnu/GTK/i18n/
+	Trace("Localedir: %s",LOCALEDIR);
+	bindtextdomain(PACKAGE_NAME, LOCALEDIR);
+
+#else
+
+	Trace("Localedir: %s",DATAROOTDIR G_DIR_SEPARATOR_S "locale");
+	bindtextdomain(PACKAGE_NAME, DATAROOTDIR G_DIR_SEPARATOR_S "locale" );
+
+#endif
+
+	bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
+	textdomain(PACKAGE_NAME);
+
+}
+
 int main(int argc, char *argv[])
 {
 #ifdef HAVE_LIBGNOME
@@ -391,13 +413,7 @@ int main(int argc, char *argv[])
 
 	const char	*cl_hostname = CN;
 
-	Trace("Locale: \"%s\" \"%s\"",PACKAGE_NAME,LOCALEDIR);
-
-	// http://bo.majewski.name/bluear/gnu/GTK/i18n/
-	setlocale( LC_ALL, "" );
-	bindtextdomain(PACKAGE_NAME, LOCALEDIR);
-	bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
-	textdomain(PACKAGE_NAME);
+	init_locale();
 
 	initialize_toggles();
 
