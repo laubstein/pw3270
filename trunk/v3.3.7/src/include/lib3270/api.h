@@ -64,18 +64,18 @@
 			CONNECTED_TN3270E		/**< connected in TN3270E mode, 3270 mode */
 		};
 
-		enum cstate QueryCSate(void);
+		enum cstate QueryCstate(void);
 
 		#ifndef LIB3270
-			#define PCONNECTED	((int) QueryCSate() >= (int)RESOLVING)
-			#define HALF_CONNECTED	(QueryCSate() == RESOLVING || QueryCSate() == PENDING)
-			#define CONNECTED	((int) QueryCSate() >= (int)CONNECTED_INITIAL)
-			#define IN_NEITHER	(QueryCSate() == CONNECTED_INITIAL)
-			#define IN_ANSI		(QueryCSate() == CONNECTED_ANSI || QueryCSate() == CONNECTED_NVT)
-			#define IN_3270		(QueryCSate() == CONNECTED_3270 || QueryCSate() == CONNECTED_TN3270E || QueryCSate() == CONNECTED_SSCP)
-			#define IN_SSCP		(QueryCSate() == CONNECTED_SSCP)
-			#define IN_TN3270E	(QueryCSate() == CONNECTED_TN3270E)
-			#define IN_E		(QueryCSate() >= CONNECTED_INITIAL_E)
+			#define PCONNECTED	((int) QueryCstate() >= (int)RESOLVING)
+			#define HALF_CONNECTED	(QueryCstate() == RESOLVING || QueryCstate() == PENDING)
+			#define CONNECTED	((int) QueryCstate() >= (int)CONNECTED_INITIAL)
+			#define IN_NEITHER	(QueryCstate() == CONNECTED_INITIAL)
+			#define IN_ANSI		(QueryCstate() == CONNECTED_ANSI || QueryCstate() == CONNECTED_NVT)
+			#define IN_3270		(QueryCstate() == CONNECTED_3270 || QueryCstate() == CONNECTED_TN3270E || QueryCstate() == CONNECTED_SSCP)
+			#define IN_SSCP		(QueryCstate() == CONNECTED_SSCP)
+			#define IN_TN3270E	(QueryCstate() == CONNECTED_TN3270E)
+			#define IN_E		(QueryCstate() >= CONNECTED_INITIAL_E)
 		#endif
 
 
