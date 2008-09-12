@@ -49,6 +49,13 @@
 			#define Log(fmt, ...)		WriteLog("MSG",fmt,__VA_ARGS__)
 		#endif
 
+		/**   input key type */
+		enum keytype
+		{
+			KT_STD,
+			KT_GE
+		};
+
 		/** connection state */
 		enum cstate
 		{

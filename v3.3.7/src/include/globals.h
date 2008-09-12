@@ -263,7 +263,7 @@ struct trans_list {
 extern struct trans_list *trans_list;
 
 /*   input key type */
-enum keytype { KT_STD, KT_GE };
+// enum keytype { KT_STD, KT_GE };
 
 /*   state changes */
 #define ST_RESOLVING	1
