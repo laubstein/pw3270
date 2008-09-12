@@ -105,7 +105,43 @@
 											"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
 											"white,"			// TERMINAL_COLOR_OIA_STATUS_OK
 											"red"				// TERMINAL_COLOR_OIA_STATUS_INVALID
+		},
+		/*
+		{	N_( "Reverse" ),				"white,"			// TERMINAL_COLOR_BACKGROUND
+											"blue,"				// TERMINAL_COLOR_BLUE
+											"firebrick,"		// TERMINAL_COLOR_RED
+											"pink,"				// TERMINAL_COLOR_PINK
+											"green4,"			// TERMINAL_COLOR_GREEN
+											"cadetBlue,"		// TERMINAL_COLOR_TURQUOISE
+											"goldenrod,"			// TERMINAL_COLOR_YELLOW
+											"black,"			// TERMINAL_COLOR_WHITE
+											"black,"			// TERMINAL_COLOR_BLACK
+											"blue3,"		// TERMINAL_COLOR_DARK_BLUE
+											"orange,"			// TERMINAL_COLOR_ORANGE
+											"purple,"		// TERMINAL_COLOR_PURPLE
+											"PaleGreen,"		// TERMINAL_COLOR_DARK_GREEN
+											"DarkTurquoise,"	// TERMINAL_COLOR_DARK_TURQUOISE
+											"grey,"				// TERMINAL_COLOR_MUSTARD
+											"dark grey,"		// TERMINAL_COLOR_GRAY
+
+											"green4,"			// TERMINAL_COLOR_FIELD_DEFAULT
+											"firebrick,"		// TERMINAL_COLOR_FIELD_INTENSIFIED
+											"blue,"			// TERMINAL_COLOR_FIELD_PROTECTED
+											"black,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
+
+											"black,"			// TERMINAL_COLOR_SELECTED_BG
+											"white,"			// TERMINAL_COLOR_SELECTED_FG,
+
+											"black," 		// TERMINAL_COLOR_CURSOR
+											"black," 		// TERMINAL_COLOR_CROSS_HAIR
+
+											"black,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
+											"green4,"		// TERMINAL_COLOR_OIA
+											"green4,"			// TERMINAL_COLOR_OIA_SEPARATOR
+											"black,"			// TERMINAL_COLOR_OIA_STATUS_OK
+											"firebrick"				// TERMINAL_COLOR_OIA_STATUS_INVALID
 		}
+		*/
 	};
 
 
