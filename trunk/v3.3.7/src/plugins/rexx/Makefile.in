@@ -26,6 +26,8 @@
 MODULE_NAME ?= rx3270
 OBJDEBUG ?= ../../../obj/Debug/src/plugins/rexx
 BINDEBUG ?= ../../../bin/Debug/plugins
+OBJRELEASE ?= ../../../obj/Release/src/plugins/rexx
+BINRELEASE ?= ../../../bin/Release/plugins
 
 # OS Stuff
 @CROSS@
@@ -48,9 +50,18 @@ $(OBJDEBUG)/%.o: %.c Makefile
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) -ggdb -o $@ -c $<
 
+$(OBJRELEASE)/%.o: %.c Makefile
+	@mkdir -p `dirname $@`
+	@$(CC) -DNDEBUG=1 $(CFLAGS) -ggdb -o $@ -c $<
+
 # Targets
 
 $(BINDEBUG)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDEBUG)/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) -o $@ $^ $(DLLFLAGS)
+
+$(BINRELEASE)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJRELEASE)/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) -o $@ $^ $(DLLFLAGS)
