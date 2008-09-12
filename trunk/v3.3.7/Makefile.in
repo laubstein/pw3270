@@ -75,7 +75,7 @@ LIBRARY_SRCS = $(LIBRARY_COMMOM_SRCS)
 # Main Targets
 Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).jpg
 
-Release: $(foreach BIN, $(TARGETS), bin/Release/$(BIN)) src/g3270/$(PACKAGE).jpg $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@)
+Release: $(foreach BIN, $(TARGETS), bin/Release/$(BIN)) src/g3270/$(PACKAGE).jpg $(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN).@DLLEXT@)
 
 # Rules
 GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
@@ -199,11 +199,12 @@ tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 
 install: Release po/pt_BR.po
 	@mkdir -p $(DESTDIR)/$(bindir)
-	@mkdir -p $(DESTDIR)/$(LIBDIR)
+	@mkdir -p $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
 	@mkdir -p $(DESTDIR)/@includedir@/lib3270
 	@for i in $(TARGETS); do install --mode=755 bin/Release/$$i $(DESTDIR)/$(bindir); done
+	@for i in $(PLUGINS); do install --mode=755 bin/Release/plugins/$$i.@DLLEXT@ $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins; done
 	@install --mode=755 bin/Release/lib3270.so $(DESTDIR)/$(LIBDIR)
 	@install --mode=644 src/g3270/actions.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 ui/g3270.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui

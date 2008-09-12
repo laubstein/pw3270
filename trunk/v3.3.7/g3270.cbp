@@ -89,6 +89,7 @@
 		<Unit filename="src/include/lib3270/kybdc.h" />
 		<Unit filename="src/include/lib3270/localdefs.h" />
 		<Unit filename="src/include/lib3270/plugins.h" />
+		<Unit filename="src/include/lib3270/statusc.h" />
 		<Unit filename="src/include/lib3270/toggle.h" />
 		<Unit filename="src/lib/Makefile" />
 		<Unit filename="src/lib/XtGlue.c">
@@ -116,7 +117,6 @@
 		</Unit>
 		<Unit filename="src/lib/charsetc.h" />
 		<Unit filename="src/lib/childc.h" />
-		<Unit filename="src/lib/conf.h" />
 		<Unit filename="src/lib/ctlr.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -223,7 +223,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/lib/shortcutc.h" />
-		<Unit filename="src/lib/statusc.h" />
 		<Unit filename="src/lib/tables.c">
 			<Option compilerVar="CC" />
 		</Unit>
