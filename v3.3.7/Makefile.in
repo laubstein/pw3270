@@ -75,7 +75,7 @@ LIBRARY_SRCS = $(LIBRARY_COMMOM_SRCS)
 # Main Targets
 Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).jpg
 
-Release: $(foreach BIN, $(TARGETS), bin/Release/$(BIN)) src/g3270/$(PACKAGE).jpg
+Release: $(foreach BIN, $(TARGETS), bin/Release/$(BIN)) src/g3270/$(PACKAGE).jpg $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@)
 
 # Rules
 GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
@@ -160,12 +160,17 @@ src/g3270/$(PACKAGE).jpg: @LOGOFILE@
 	@cp @LOGOFILE@ $@
 
 # Plugins
+bin/Release/plugins/rx3270.@DLLEXT@: obj/Release/src/plugins/rexx/*.o
+	@make -C src/plugins/rexx ../../../bin/Release/plugins/`basename $@`
+
+obj/Release/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/Makefile $(GLOBAL_DEPENDS)
+	@make -C src/plugins/rexx ../../../obj/Release/src/plugins/rexx/`basename $@`
+
 bin/Debug/plugins/rx3270.@DLLEXT@: obj/Debug/src/plugins/rexx/*.o
 	@make -C src/plugins/rexx ../../../bin/Debug/plugins/`basename $@`
 
 obj/Debug/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/Makefile $(GLOBAL_DEPENDS)
 	@make -C src/plugins/rexx ../../../obj/Debug/src/plugins/rexx/`basename $@`
-
 
 # Other targets
 src/lib/fallbacks.c:  src/lib/X3270.xad
