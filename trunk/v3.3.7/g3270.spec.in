@@ -31,6 +31,16 @@ Group:		Development/Libraries
 %description devel
 devel for tn3270 protocol library for %{name}
 
+%package rexx
+Provides:	%{name}-rexx
+Summary:	Devel for 3270 Communication library for %{name}
+Group:		Development/Libraries
+Requires:       %{name} ooRexx
+BuildRequires:  ooRexx
+
+%description rexx
+Plugin to add Rexx support in %{name}
+
 %prep
 
 %setup -q -n %{name}-%{version}
@@ -97,9 +107,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %files lib
 %defattr(-,root,root)
-%{_libdir}
+%{_libdir}/lib3270.so
 
 %files devel
 %{_includedir}/lib3270
 %{_libdir}/pkgconfig
+
+%files rexx
+%defattr(-,root,root)
+%{_libdir}/%{name}/plugins/rx3270.so
 
