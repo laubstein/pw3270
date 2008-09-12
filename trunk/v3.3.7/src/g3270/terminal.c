@@ -478,9 +478,9 @@
     g_signal_connect(G_OBJECT(im),			"commit",				G_CALLBACK(im_commit),				0);
 
     // Connect mouse events
-    g_signal_connect(G_OBJECT(terminal), 	"button-press-event",		G_CALLBACK(mouse_button_press),		0);
+    g_signal_connect(G_OBJECT(terminal), 	"button-press-event",	G_CALLBACK(mouse_button_press),		0);
     g_signal_connect(G_OBJECT(terminal), 	"button-release-event",	G_CALLBACK(mouse_button_release),	0);
-    g_signal_connect(G_OBJECT(terminal), 	"motion-notify-event",		G_CALLBACK(mouse_motion),    		0);
+    g_signal_connect(G_OBJECT(terminal), 	"motion-notify-event",	G_CALLBACK(mouse_motion),    		0);
     g_signal_connect(G_OBJECT(terminal), 	"scroll-event",			G_CALLBACK(mouse_scroll),			0);
 
 	register_tchange(CROSSHAIR,set_crosshair);

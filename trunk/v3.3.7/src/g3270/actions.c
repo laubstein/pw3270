@@ -424,7 +424,7 @@
 		{ N_( "Full Screen" ),					NULL,	NULL,	N_( "<alt>Home" )	},
 		{ N_( "Auto-Reconnect" ),				NULL,	NULL,	NULL				},
 		{ N_( "Insert" ),						NULL,	NULL,	"Insert"			},
-		{ N_( "Keypad" ),						NULL,	NULL,	N_( "<alt>K" )		}
+		{ N_( "Keypad" ),						NULL,	NULL,	N_( "<alt>K" )		},
 	};
 
 	// TODO (perry#9#): Add tooltips
