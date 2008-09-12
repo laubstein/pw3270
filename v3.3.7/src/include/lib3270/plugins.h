@@ -21,7 +21,7 @@
 	void SetHostname(const gchar *hostname);
 	void SetLUname(const gchar *luname);
 	void AddPluginUI(GtkUIManager *ui);
-	void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions);
+	void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf);
 
 #endif // PLUGINS_H_INCLUDED
 

@@ -49,7 +49,7 @@
 	{ "Sticky",		GDK_WINDOW_STATE_STICKY,		gtk_window_stick                }
  };
 
- static GKeyFile	*conf	= NULL;
+ static GKeyFile * g3270_config	= NULL;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -88,24 +88,24 @@
 	gchar	*filename = FindConfigFile();
 	int		f;
 
-	if(conf)
+	if(g3270_config)
 	{
-		g_key_file_free(conf);
-		conf = NULL;
+		g_key_file_free(g3270_config);
+		g3270_config = NULL;
 	}
 
-	conf = g_key_file_new();
+	g3270_config = g_key_file_new();
 
 	if(filename)
-		g_key_file_load_from_file(conf,filename,G_KEY_FILE_NONE,NULL);
+		g_key_file_load_from_file(g3270_config,filename,G_KEY_FILE_NONE,NULL);
 
 	/* Load initial settings */
 	for(f=0;f<N_TOGGLES;f++)
 	{
  		const char *name = get_toggle_name(f);
 
-		if(g_key_file_has_key(conf,"Toggles",name,NULL))
-			set_toggle(f,g_key_file_get_boolean(conf,"Toggles",name,NULL));
+		if(g_key_file_has_key(g3270_config,"Toggles",name,NULL))
+			set_toggle(f,g_key_file_get_boolean(g3270_config,"Toggles",name,NULL));
 	}
 
 	Trace("%s loaded",filename);
@@ -114,14 +114,14 @@
 
  gboolean GetBoolean(const gchar *group, const gchar *key, const gboolean def)
  {
-	if(!g_key_file_has_key(conf,group,key,NULL))
+	if(!g_key_file_has_key(g3270_config,group,key,NULL))
 		return def;
-	return g_key_file_get_boolean(conf,group,key,NULL);
+	return g_key_file_get_boolean(g3270_config,group,key,NULL);
  }
 
  void SetBoolean(const gchar *group, const gchar *key, const gboolean val)
  {
-	g_key_file_set_boolean(conf,group,key,val);
+	g_key_file_set_boolean(g3270_config,group,key,val);
  }
 
  int SaveConfigFile(void)
@@ -131,9 +131,9 @@
  	int		f;
 
 	for(f=0;f<N_TOGGLES;f++)
-		g_key_file_set_boolean(conf,"Toggles",get_toggle_name(f),Toggled(f));
+		g_key_file_set_boolean(g3270_config,"Toggles",get_toggle_name(f),Toggled(f));
 
- 	ptr = g_key_file_to_data(conf,NULL,NULL);
+ 	ptr = g_key_file_to_data(g3270_config,NULL,NULL);
 
 	if(ptr)
 	{
@@ -156,8 +156,8 @@
  int CloseConfigFile(void)
  {
  	SaveConfigFile();
-	g_key_file_free(conf);
-	conf = NULL;
+	g_key_file_free(g3270_config);
+	g3270_config = NULL;
 	return 0;
  }
 
@@ -165,7 +165,7 @@
  {
  	int 			pos[2];
 	gtk_window_get_size(GTK_WINDOW(widget),&pos[0],&pos[1]);
-	g_key_file_set_integer_list(conf,group,"size",pos,2);
+	g_key_file_set_integer_list(g3270_config,group,"size",pos,2);
  }
 
  void action_Save(void)
@@ -173,9 +173,7 @@
 	GdkWindowState	CurrentState;
 	int				f;
 
-	Trace("%s conf: %p",__FUNCTION__,conf);
-
-	if(!conf)
+	if(!g3270_config)
 		return;
 
 	CurrentState = gdk_window_get_state(topwindow->window);
@@ -184,7 +182,7 @@
 		SaveWindowSize("TopWindow",topwindow);
 
 	for(f=0;f<(sizeof(WindowState)/sizeof(struct _WindowState));f++)
-		g_key_file_set_boolean(conf,"TopWindow",WindowState[f].name, CurrentState & WindowState[f].flag);
+		g_key_file_set_boolean(g3270_config,"TopWindow",WindowState[f].name, CurrentState & WindowState[f].flag);
 
 	SaveConfigFile();
  }
@@ -193,8 +191,8 @@
  {
  	gchar *ret = NULL;
 
- 	if(conf)
-		ret = g_key_file_get_string(conf,group,key,NULL);
+ 	if(g3270_config)
+		ret = g_key_file_get_string(g3270_config,group,key,NULL);
 
 	if(!ret)
 		return g_strdup(def);
@@ -204,34 +202,34 @@
 
  void SetString(const gchar *group, const gchar *key, const gchar *val)
  {
- 	if(conf)
+ 	if(g3270_config)
  	{
  		if(val)
-			g_key_file_set_string(conf,group,key,val);
+			g_key_file_set_string(g3270_config,group,key,val);
 		else
-			g_key_file_remove_key(conf,group,key,NULL);
+			g_key_file_remove_key(g3270_config,group,key,NULL);
  	}
  }
 
  gint GetInt(const gchar *group, const gchar *key, gint def)
  {
- 	if(!(conf && g_key_file_has_key(conf,group,key,NULL)))
+ 	if(!(g3270_config && g_key_file_has_key(g3270_config,group,key,NULL)))
 		return def;
-	return g_key_file_get_integer(conf,group,key,NULL);
+	return g_key_file_get_integer(g3270_config,group,key,NULL);
  }
 
  void SetInt(const gchar *group, const gchar *key, gint val)
  {
- 	if(conf)
-		g_key_file_set_integer(conf,group,key,val);
+ 	if(g3270_config)
+		g_key_file_set_integer(g3270_config,group,key,val);
  }
 
  void RestoreWindowSize(const gchar *group, GtkWidget *widget)
  {
-	if(g_key_file_has_key(conf,group,"size",NULL))
+	if(g_key_file_has_key(g3270_config,group,"size",NULL))
 	{
 		gsize 	sz		= 2;
-		gint	*vlr	=  g_key_file_get_integer_list(conf,group,"size",&sz,NULL);
+		gint	*vlr	=  g_key_file_get_integer_list(g3270_config,group,"size",&sz,NULL);
 		if(vlr)
 		{
 			gtk_window_resize(GTK_WINDOW(widget),vlr[0],vlr[1]);
@@ -242,9 +240,7 @@
 
  void action_Restore(void)
  {
-	Trace("%s conf: %p",__FUNCTION__,conf);
-
-	if(!conf)
+	if(!g3270_config)
 		return;
 
  	/* Set window size */
@@ -303,7 +299,7 @@ gchar * FindSystemConfigFile(const gchar *name)
 
 GKeyFile *GetConf(void)
 {
-	if(!conf)
+	if(!g3270_config)
 		OpenConfigFile();
-	return conf;
+	return g3270_config;
 }

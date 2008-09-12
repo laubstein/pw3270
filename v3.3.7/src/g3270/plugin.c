@@ -49,6 +49,7 @@
 	GtkUIManager	*ui;
 	GtkActionGroup	**groups;
 	guint			n_groups;
+	GKeyFile 		*conf;
  } custom_action_call;
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
@@ -283,16 +284,16 @@
 #ifdef HAVE_PLUGINS
  static void loadaction(GModule *handle, struct custom_action_call *arg)
  {
-	void (*ptr)(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions) = NULL;
+	void (*ptr)(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf) = NULL;
 
 	Trace("Searching for custom actions in %p",handle);
 
 	if(g_module_symbol(handle, "LoadCustomActions", (gpointer) &ptr))
-		ptr(arg->ui,arg->groups,arg->n_groups);
+		ptr(arg->ui,arg->groups,arg->n_groups,arg->conf);
  }
 #endif
 
- void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions)
+ void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf)
  {
  	static const struct _call
  	{
@@ -307,10 +308,9 @@
  	};
 
 	gchar 		*filename;
-	GKeyFile	*conf;
 
 #ifdef HAVE_PLUGINS
-	struct custom_action_call arg = { ui, groups, n_actions };
+	struct custom_action_call arg = { ui, groups, n_actions, conf };
 
  	if(plugins)
  	 	g_slist_foreach(plugins,(GFunc) loadaction,&arg);
