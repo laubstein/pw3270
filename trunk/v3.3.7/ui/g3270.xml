@@ -28,6 +28,8 @@
 			<menuitem action='EraseField' />
 		</menu>
 
+		<menu action='ScriptsMenu' />
+
 		<menu action='NetworkMenu'>
 			<menuitem action='Connect' />
 			<menuitem action='Disconnect' />

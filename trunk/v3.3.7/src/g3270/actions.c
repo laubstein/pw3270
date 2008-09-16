@@ -173,6 +173,9 @@
  	{	"EditMenu",			NULL,					N_( "_Edit" ),				NULL,				NULL,	NULL								},
  	{	"OptionsMenu",		NULL,					N_( "_Options" ),			NULL,				NULL,	NULL								},
  	{	"SettingsMenu",		NULL,					N_( "Settings" ),			NULL,				NULL,	NULL								},
+ 	{	"ScriptsMenu",		NULL,					N_( "Scripts" ),			NULL,				NULL,	NULL								},
+
+	/* Sub menus */
 	{	"FontSettings",		GTK_STOCK_SELECT_FONT,	N_( "Select font" ),		NULL,				NULL,	NULL								},
 
  	/* Stock menus */
