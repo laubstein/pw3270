@@ -576,6 +576,7 @@
 	gchar			*filename;
  	GDir			*dir;
  	const gchar 	*name;
+ 	int				qtd		= 0;
  	GtkWidget 		*top	= gtk_ui_manager_get_widget(ui,"/MainMenubar/ScriptsMenu/RexxScripts");
  	GtkWidget		*menu;
 
@@ -596,6 +597,7 @@
 
     if(!dir)
     {
+   		gtk_widget_hide(top);
     	g_free(path);
 		return;
     }
@@ -613,6 +615,7 @@
  			Trace("Appending script %s (item: %p)",name,item);
 			g_signal_connect(G_OBJECT(item),"activate",G_CALLBACK(activate_script),g_strdup(filename));
 			gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
+			qtd++;
 		}
 
 		g_free(filename);
@@ -620,7 +623,11 @@
 	}
 	g_dir_close(dir);
 
-	gtk_widget_show_all(menu);
+	if(qtd)
+		gtk_widget_show_all(menu);
+	else
+   		gtk_widget_hide(top);
+
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(top),menu);
 
 	g_free(path);
