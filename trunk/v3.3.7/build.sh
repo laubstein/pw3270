@@ -120,6 +120,7 @@ fi
 make bin/Release/plugins/rx3270.so
 mkdir -p /home/perry/bin/g3270/lib/g3270/plugins
 cp bin/Release/plugins/*.so /home/perry/bin/g3270/lib/g3270/plugins
+cp ui/rexx.xml /home/perry/bin/g3270/share/g3270/ui
 
 cat > ~/bin/g3270.sh << EOF 
 #!/bin/bash
