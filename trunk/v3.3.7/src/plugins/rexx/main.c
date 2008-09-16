@@ -36,6 +36,7 @@
  #include <string.h>
  #include <sys/time.h>                   /* System time-related data types */
  #include <stdlib.h>
+ #include <unistd.h>
 
  /* include the lib3270 stuff */
  #define G3270_MODULE_NAME "rexx"
@@ -402,11 +403,11 @@
 
  static void call_rexx(const gchar *prg, const gchar *arg)
  {
-	LONG      			return_code;                 // interpreter return code
-	RXSTRING  			argv[1];                     // program argument string
-	RXSTRING  			retstr;                      // program return value
-	SHORT     			rc;                          // converted return code
-	CHAR      			return_buffer[250];          // returned buffer
+	LONG      			return_code;                 	// interpreter return code
+	RXSTRING  			argv;           	          	// program argument string
+	RXSTRING  			retstr;                      	// program return value
+	SHORT     			rc		= 0;                   	// converted return code
+	CHAR      			return_buffer[RXAUTOBUFLEN];	// returned buffer
 	struct blinker		*blink	= g_malloc0(sizeof(struct blinker));
 
 	blink->enabled = TRUE;
@@ -415,20 +416,24 @@
 	g_timeout_add_full(G_PRIORITY_DEFAULT, (guint) 600, (GSourceFunc) do_blink, blink, g_free);
 
 	// build the argument string
-	MAKERXSTRING(argv[0], arg, strlen(arg));
+	memset(&argv,0,sizeof(argv));
+	MAKERXSTRING(argv, arg, strlen(arg));
 
 	// set up default return
-	MAKERXSTRING(retstr, return_buffer, sizeof(return_buffer));
+	*return_buffer = 0;
+	memset(&retstr,0,sizeof(retstr));
+	MAKERXSTRING(retstr, return_buffer, sizeof(RXAUTOBUFLEN));
 
+	Trace("Waiting for events for %s",prg);
 	while(gtk_events_pending())
 		gtk_main_iteration();
 
-
-	return_code = RexxStart(	1,				// one argument
-								argv,			// argument array
+	Trace("Starting %s",prg);
+	return_code = RexxStart(	1,				// No argument
+								&argv,			// argument array
 								(char *) prg,	// REXX procedure name
 								NULL,			// use disk version
-								"Editor",		// default address name
+								"",				// default address name
 								RXCOMMAND,		// calling as a subcommand
 								NULL,			// no exits used
 								&rc,			// converted return code
@@ -437,14 +442,24 @@
 	Trace("RexxStart(%s): %d",prg,(int) return_code);
 
 	// process return value
+	/*
 	while(!RexxDidRexxTerminate())
+	{
 		gtk_main_iteration();
+	}
+	*/
+
+	Trace("Return value: \"%s\"",retstr.strptr);
 
 	blink->enabled = FALSE;
 
-	// need to return storage?
-	if(RXSTRPTR(retstr) != return_buffer)
+	if(RXSTRPTR(retstr) && RXSTRPTR(retstr) != return_buffer)
+	{
+		Trace("Releasing %p (expected %p)",RXSTRPTR(retstr),return_buffer);
 		RexxFreeMemory(RXSTRPTR(retstr));
+	}
+
+	Trace("Call of \"%s\" ends",prg);
 
  }
 
@@ -477,7 +492,7 @@
  	Trace("Rexx module %p unloaded",module);
  }
 
- static void RunRexxScript(GtkAction *action, GKeyFile *conf)
+ static void RunExternalRexx(GtkAction *action, GKeyFile *conf)
  {
 	gchar 		*ptr;
 	GtkWidget 	*dialog = gtk_file_chooser_dialog_new(	_( "Select Rexx script to run" ),
@@ -518,7 +533,8 @@
  		void (*call)(GtkAction *action, GKeyFile *conf);
  	} action_info[] =
  	{
- 		{ "RunRexxScript", N_( "Run rexx script" ), NULL, RunRexxScript }
+ 		{ "RunExternalRexx",	N_( "External rexx script" ), 	NULL, 	RunExternalRexx	},
+ 		{ "RexxScripts",		N_( "Rexx scripts" ),			NULL,	NULL			},
  	};
 
 	int f;
@@ -541,8 +557,72 @@
 											gettext(action_info[f].tooltip),
 											NULL );
 
-		g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(action_info[f].call),(gpointer) conf);
+		if(action_info[f].call)
+			g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(action_info[f].call),(gpointer) conf);
 		gtk_action_group_add_action(groups[0],action);
 	}
  }
 
+ static void activate_script(GtkMenuItem *menuitem, const gchar *path)
+ {
+ 	Trace("-- \"%s\" --",path);
+	call_rexx(path,path);
+ 	Trace("-- \"%s\" --",path);
+ }
+
+ void AddPluginUI(GtkUIManager *ui)
+ {
+	gchar			*path;
+	gchar			*filename;
+ 	GDir			*dir;
+ 	const gchar 	*name;
+ 	GtkWidget 		*top	= gtk_ui_manager_get_widget(ui,"/MainMenubar/ScriptsMenu/RexxScripts");
+ 	GtkWidget		*menu;
+
+	Trace("Rexx scripts menu: %p",top);
+
+ 	if(!top)
+ 		return;
+
+#if defined( DEBUG )
+	path = g_build_filename("..","..","rexx",NULL);
+#elif defined( DATAROOTDIR )
+	path = g_build_filename(DATAROOTDIR,PACKAGE_NAME,"rexx",NULL);
+#else
+	path = g_build_filename(".","rexx",NULL);
+#endif
+
+    dir = g_dir_open(path,0,NULL);
+
+    if(!dir)
+    {
+    	g_free(path);
+		return;
+    }
+
+	menu = gtk_menu_new();
+	name = g_dir_read_name(dir);
+
+	while(name)
+	{
+		filename = g_build_filename(path,name,NULL);
+
+		if(g_str_has_suffix(filename,"rex"))
+		{
+ 			GtkWidget *item = gtk_menu_item_new_with_label(name);
+ 			Trace("Appending script %s (item: %p)",name,item);
+			g_signal_connect(G_OBJECT(item),"activate",G_CALLBACK(activate_script),g_strdup(filename));
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
+		}
+
+		g_free(filename);
+		name = g_dir_read_name(dir);
+	}
+	g_dir_close(dir);
+
+	gtk_widget_show_all(menu);
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(top),menu);
+
+	g_free(path);
+
+ }

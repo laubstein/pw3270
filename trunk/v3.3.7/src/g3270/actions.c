@@ -685,9 +685,6 @@
 	for(f=0;f < ACTION_GROUP_MAX; f++)
 		gtk_ui_manager_insert_action_group(ui_manager,action_group[f], 0);
 
-	/* Load UI definition files */
-	AddPluginUI(ui_manager);
-
 #if defined( DEBUG )
 	path = g_build_filename("..","..","ui",NULL);
 #elif defined( LIBDIR )
@@ -731,6 +728,9 @@
     }
 
 	g_free(path);
+
+	gtk_ui_manager_ensure_update(ui_manager);
+	AddPluginUI(ui_manager);
 
 	gtk_ui_manager_ensure_update(ui_manager);
 	return ui_manager;
