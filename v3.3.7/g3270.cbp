@@ -39,6 +39,7 @@
 		<Unit filename="g3270.spec.in">
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="rexx/sample.rex" />
 		<Unit filename="src/g3270/actions.c">
 			<Option compilerVar="CC" />
 		</Unit>
