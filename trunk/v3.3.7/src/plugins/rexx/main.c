@@ -480,7 +480,7 @@
  static void RunRexxScript(GtkAction *action, GKeyFile *conf)
  {
 	gchar 		*ptr;
-	GtkWidget 	*dialog = gtk_file_chooser_dialog_new(	_( "Select Rexx script to run"),
+	GtkWidget 	*dialog = gtk_file_chooser_dialog_new(	_( "Select Rexx script to run" ),
 														 GTK_WINDOW(topwindow),
 														 GTK_FILE_CHOOSER_ACTION_OPEN,
 														 GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
