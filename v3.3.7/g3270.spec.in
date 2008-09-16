@@ -82,7 +82,7 @@ desktop-file-install    --vendor %{_build_vendor} \
 
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
 install -m 644 %{name}.pc %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
-
+install -m 644 ui/rexx.xml %{buildroot}%{_datadir}/%{name}/ui/rexx.xml
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -116,4 +116,5 @@ rm -rf $RPM_BUILD_ROOT
 %files rexx
 %defattr(-,root,root)
 %{_libdir}/%{name}/plugins/rx3270.so
+%{_datadir}/%{name}/ui/rexx.xml
 

@@ -508,11 +508,14 @@
 
  }
 
+/*
  void AddPluginUI(GtkUIManager *ui)
  {
  	const gchar *descr = 	"<ui>"
 								"<menubar name='MainMenubar'>"
-									"<menu action='FileMenu'>"
+									"<menu action='FileMenu' />"
+									"<menu action='EditMenu' />"
+									"<menu action='ScriptsMenu'>"
 										"<menuitem action='RunRexxScript'/>"
 									"</menu>"
 								"</menubar>"
@@ -521,6 +524,7 @@
 	gtk_ui_manager_add_ui_from_string(ui,descr,-1,NULL);
 
  }
+*/
 
  void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf)
  {
