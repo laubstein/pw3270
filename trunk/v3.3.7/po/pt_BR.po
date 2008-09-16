@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-16 10:39-0300\n"
-"PO-Revision-Date: 2008-09-16 10:43-0300\n"
+"POT-Creation-Date: 2008-09-16 10:56-0300\n"
+"PO-Revision-Date: 2008-09-16 10:56-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
@@ -475,13 +475,9 @@ msgstr ""
 msgid "Right"
 msgstr "Direita"
 
-#: src/plugins/rexx/main.c:483
-msgid "Run Rexx script"
-msgstr "Executar script REXX"
-
-#: src/plugins/rexx/main.c:539
-msgid "Run rexx command"
-msgstr "Executar comando rexx"
+#: src/plugins/rexx/main.c:521
+msgid "Run rexx script"
+msgstr "Executar script rexx"
 
 #: src/g3270/actions.c:192
 msgid "Save"
@@ -538,6 +534,10 @@ msgstr "Selecionar campo"
 #: src/g3270/actions.c:120
 msgid "Select Left"
 msgstr ""
+
+#: src/plugins/rexx/main.c:483
+msgid "Select Rexx script to run"
+msgstr "Selecione script rexx a executar"
 
 #: src/g3270/actions.c:119
 msgid "Select Right"

@@ -480,7 +480,7 @@
  static void RunRexxScript(GtkAction *action, GKeyFile *conf)
  {
 	gchar 		*ptr;
-	GtkWidget 	*dialog = gtk_file_chooser_dialog_new(	_( "Run Rexx script"),
+	GtkWidget 	*dialog = gtk_file_chooser_dialog_new(	_( "Select Rexx script to run"),
 														 GTK_WINDOW(topwindow),
 														 GTK_FILE_CHOOSER_ACTION_OPEN,
 														 GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
@@ -508,24 +508,6 @@
 
  }
 
-/*
- void AddPluginUI(GtkUIManager *ui)
- {
- 	const gchar *descr = 	"<ui>"
-								"<menubar name='MainMenubar'>"
-									"<menu action='FileMenu' />"
-									"<menu action='EditMenu' />"
-									"<menu action='ScriptsMenu'>"
-										"<menuitem action='RunRexxScript'/>"
-									"</menu>"
-								"</menubar>"
-							"</ui>";
-
-	gtk_ui_manager_add_ui_from_string(ui,descr,-1,NULL);
-
- }
-*/
-
  void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf)
  {
  	static const struct _action_info
@@ -536,7 +518,7 @@
  		void (*call)(GtkAction *action, GKeyFile *conf);
  	} action_info[] =
  	{
- 		{ "RunRexxScript", N_( "Run rexx command" ), NULL, RunRexxScript }
+ 		{ "RunRexxScript", N_( "Run rexx script" ), NULL, RunRexxScript }
  	};
 
 	int f;
