@@ -16,7 +16,6 @@ if [ "$?" != "0" ]; then
 fi
 
 make Release
-
 if [ "$?" != "0" ]; then
 	exit -1
 fi
