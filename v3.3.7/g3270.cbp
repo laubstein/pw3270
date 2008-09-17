@@ -274,7 +274,23 @@
 		<Unit filename="src/lib/xioc.h" />
 		<Unit filename="src/lib/xl.h" />
 		<Unit filename="src/plugins/rexx/Makefile.in" />
+		<Unit filename="src/plugins/rexx/actions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/gui.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/plugins/rexx/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/rx3270.h" />
+		<Unit filename="src/plugins/rexx/screen.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/toggle.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ui/g3270.xml" />

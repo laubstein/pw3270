@@ -310,6 +310,33 @@ void screen_erase(void)
 	screen_disp();
 }
 
+/* Get screen contents */
+int screen_read(char *dest, int baddr, int count)
+{
+	int max = (maxROWS * maxCOLS);
+	*dest = 0;
+
+	while(count-- > 0)
+	{
+		if(baddr > max)
+		{
+			*dest = 0;
+			return EFAULT;
+		}
+
+		if(ea_buf[baddr].cc)
+			*dest = ebc2asc[ea_buf[baddr].cc];
+		else
+			*dest = ' ';
+
+		dest++;
+		baddr++;
+	}
+	*dest = 0;
+
+	return 0;
+}
+
 /* Display what's in the buffer. */
 void screen_disp(void)
 {
