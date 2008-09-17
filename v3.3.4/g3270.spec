@@ -24,6 +24,7 @@ tn3270 protocol library for %{name}
 
 %package devel
 Provides:	%{name}-devel
+Requires:	%{name}-lib
 Summary:	Devel for 3270 Communication library for %{name}
 Group:		Development/Libraries
 
@@ -138,7 +139,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/x3270
 
 %files devel
-%{_includedir}/%{name}
+%{_includedir}/lib3270
 %{_libdir}/pkgconfig
 
 
