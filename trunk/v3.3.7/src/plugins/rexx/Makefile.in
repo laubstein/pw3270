@@ -42,7 +42,7 @@ windows-dllflags=-Wl,--export-all-symbols -Wl,--enable-auto-import
 CFLAGS = @EXTRA_FLAGS@ -g -Wall @GTK_CFLAGS@ @REXX_CFLAGS@ -O -I../../include
 DLLFLAGS = @EXTRA_FLAGS@ @REXX_LIBS@ @GTK_LIBS@ -shared $(@host_os@-dllflags)
 
-SOURCES = main.c
+SOURCES = main.c actions.c gui.c screen.c toggle.c tools.c
 
 # Rules
 

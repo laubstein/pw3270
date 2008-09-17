@@ -206,14 +206,16 @@
 		int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
 		const char *lib3270_init(int *argc, const char **argv);
 
+		/* Set/Get screen contents */
 		int find_field_attribute(int baddr);
 		int find_field_length(int baddr);
 		unsigned char get_field_attribute(int baddr);
-
-		void 	popup_an_error(const char *fmt, ...);
+		int screen_read(char *dest, int baddr, int count);
+		void	Input_String(const unsigned char *str);
 
 		/* Misc API calls */
-		void	Input_String(const unsigned char *str);
+		void 	popup_an_error(const char *fmt, ...);
+
 		int		Toggled(int ix);
 		void 	cursor_move(int baddr);
 		int 	CallAndWait(int(*callback)(void *), void *parm);
