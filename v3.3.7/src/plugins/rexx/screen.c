@@ -75,7 +75,15 @@
 /*                                                                            */
 /* Description: Read screen contents.                                         */
 /*                                                                            */
+/* Rexx Args:	NONE to read the entire screen                                */
+/*                                                                            */
+/* Rexx Args:   Number of chars to read from cursor position                  */
+/*                                                                            */
 /* Rexx Args:   Start position                                                */
+/*              Number of chars to read                                       */
+/*                                                                            */
+/* Rexx Args:   Start Row                                                     */
+/*				Start Col													  */
 /*              Number of chars to read                                       */
 /*                                                                            */
 /* Returns:	    Screen contents                                               */
@@ -83,14 +91,53 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270ReadScreen(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	int start;
- 	int qtd;
+ 	int start, qtd, rows, cols, row;
 
-	if(Argc != 2)
+	switch(Argc)
+	{
+	case 0:	// Get entire screen
+		screen_size(&rows,&cols);
+		qtd = (rows*(cols+1)+1);
+		Retstr->strptr = RexxAllocateMemory(qtd);
+
+		Trace("Screen buffer size: %d (%dx%d)",qtd,rows,cols);
+
+		memset(Retstr->strptr,0,qtd);
+		start = qtd = 0;
+		for(row = 0; row < rows;row++)
+		{
+			screen_read(Retstr->strptr+qtd,start,cols);
+			qtd += cols;
+			start += cols;
+			Retstr->strptr[qtd++] = '\n';
+		}
+		Retstr->strptr[qtd] = 0;
+
+		Trace("Bytes read: %d",qtd);
+
+		Retstr->strlength = strlen(Retstr->strptr);
+
+		return RXFUNC_OK;
+
+	case 1:	// Just size, get current cursor position
+		start	= 0;
+		qtd 	= atoi(Argv[0].strptr);
+		break;
+
+	case 2:	// Use start position
+		start	= atoi(Argv[0].strptr);
+		qtd 	= atoi(Argv[1].strptr);
+		break;
+
+	case 3:	// Get start position from row/col
+		screen_size(&rows,&cols);
+		start 	= (atoi(Argv[0].strptr) * rows) + atoi(Argv[1].strptr);
+		qtd 	= atoi(Argv[2].strptr);
+		break;
+
+	default:
 		return RXFUNC_BADCALL;
-
-	start	= atoi(Argv[0].strptr);
-	qtd 	= atoi(Argv[1].strptr);
+	}
 
 	if(qtd < 1)
 		return RXFUNC_BADCALL;

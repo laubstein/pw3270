@@ -310,10 +310,18 @@ void screen_erase(void)
 	screen_disp();
 }
 
+void screen_size(int *rows, int *cols)
+{
+	*rows = ROWS;
+	*cols = cCOLS;
+}
+
 /* Get screen contents */
 int screen_read(char *dest, int baddr, int count)
 {
-	int max = (maxROWS * maxCOLS);
+	unsigned char fa	= get_field_attribute(baddr);
+	int 			max = (maxROWS * maxCOLS);
+
 	*dest = 0;
 
 	while(count-- > 0)
@@ -324,7 +332,12 @@ int screen_read(char *dest, int baddr, int count)
 			return EFAULT;
 		}
 
-		if(ea_buf[baddr].cc)
+		if (ea_buf[baddr].fa)
+			fa = ea_buf[baddr].fa;
+
+		if(FA_IS_ZERO(fa))
+			*dest = ' ';
+		else if(ea_buf[baddr].cc)
 			*dest = ebc2asc[ea_buf[baddr].cc];
 		else
 			*dest = ' ';
