@@ -52,12 +52,12 @@ if [ "$1" != "--debug" ]; then
    	svn cp -m "Empacotamento $PACKET_VERSION" http://$USER@suportelinux.df.bb.com.br/svn/$PACKAGE/trunk http://$USER@suportelinux.df.bb.com.br/svn/$PACKAGE/tags/$PACKET_VERSION
    fi
 
-   echo "Enviando arquivo source para o servidor..."
-   scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/$PACKAGE*.src.rpm $USER@suportelinux.df.bb.com.br:/dados/src/$VENDOR/$PACKAGE-latest.src.rpm
-   if [ "$?" != "0" ]; then
-      echo "Erro ao copiar o pacote fonte"
-      exit -1
-   fi
+#   echo "Enviando arquivo source para o servidor..."
+#   scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/$PACKAGE*.src.rpm $USER@suportelinux.df.bb.com.br:/dados/src/$VENDOR/$PACKAGE-latest.src.rpm
+#   if [ "$?" != "0" ]; then
+#      echo "Erro ao copiar o pacote fonte"
+#      exit -1
+#   fi
 
    echo "Enviando arquivo binario o servidor..."
    scp $RPMDIR/$RPMARCH/$PACKAGE*.rpm $USER@os2team.df.intrabb.bb.com.br:/home/matriz/pacotes/$VENDOR/bb/$RPMARCH
