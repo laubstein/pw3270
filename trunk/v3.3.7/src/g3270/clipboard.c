@@ -70,7 +70,7 @@
  	gchar *sel;
  	gchar *last = contents;
 
- 	if(!contents)
+ 	if(!last)
  	{
 		action_Copy();
 		return;
