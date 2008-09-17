@@ -210,8 +210,9 @@
 		int find_field_attribute(int baddr);
 		int find_field_length(int baddr);
 		unsigned char get_field_attribute(int baddr);
-		int screen_read(char *dest, int baddr, int count);
+		int 	screen_read(char *dest, int baddr, int count);
 		void	Input_String(const unsigned char *str);
+		void 	screen_size(int *rows, int *cols);
 
 		/* Misc API calls */
 		void 	popup_an_error(const char *fmt, ...);
