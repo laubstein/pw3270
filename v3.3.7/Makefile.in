@@ -179,7 +179,7 @@ src/lib/fallbacks.c:  src/lib/X3270.xad
 src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@src/mkversion.sh
 
-sources.lst: Makefile src/g3270/*.c src/plugins/rexx/*.c
+sources.lst: Makefile src/g3270/*.c src/plugins/rexx/*.c Makefile
 	@rm -f $@
 	@for i in src/g3270/*.c; do echo $$i >> $@; done
 	@for i in src/plugins/rexx/*.c; do echo $$i >> $@; done
@@ -194,7 +194,8 @@ $(PACKAGE).po: $(PACKAGE).pot
 	@msginit --no-translator -o $(PACKAGE).po -i $(PACKAGE).pot
 
 run: bin/Debug/g3270@BINEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).jpg
-	cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270
+	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
+	@cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270
 
 tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 

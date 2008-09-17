@@ -58,8 +58,9 @@
  	static const gchar 	*name = PACKAGE_NAME ".conf";
 	const gchar * const	*list;
  	gchar					*filename;
- 	const gchar			*fixed[] = { g_get_user_config_dir(), g_get_home_dir() };
+ 	const gchar			*fixed[] = { g_get_user_config_dir(), g_get_home_dir(),  };
  	int						f;
+
 
 	// Search the fixed paths
 	for(f=0; f < (sizeof(fixed)/sizeof(const gchar *)); f++)
@@ -74,6 +75,11 @@
  	{
 		CHECK_FILENAME(list[f],PACKAGE_NAME,name);
  	}
+
+#ifdef DATAROOTDIR
+	// Search DATADIR
+	CHECK_FILENAME(DATAROOTDIR,PACKAGE_NAME,name);
+#endif
 
 	// Check if the file is available in current directory
 	if(g_file_test(name,G_FILE_TEST_IS_REGULAR))

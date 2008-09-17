@@ -9,19 +9,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-16 11:07-0300\n"
-"PO-Revision-Date: 2008-09-16 11:07-0300\n"
+"POT-Creation-Date: 2008-09-17 17:44-0300\n"
+"PO-Revision-Date: 2008-09-17 17:47-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
 
-#: src/g3270/g3270.c:422
+#: src/g3270/g3270.c:425
 msgid "- 3270 Emulator for Gnome"
 msgstr "- Emulador 3270 para Gnome"
 
-#: src/g3270/g3270.c:428
+#: src/g3270/g3270.c:431
 msgid "3270 Emulator"
 msgstr "Emulador 3270"
 
@@ -113,7 +113,7 @@ msgstr "Azul"
 msgid "Bold"
 msgstr "Negrito"
 
-#: src/g3270/actions.c:705
+#: src/g3270/actions.c:702
 #, c-format
 msgid ""
 "Can't find UI definitions in\n"
@@ -121,12 +121,12 @@ msgid ""
 msgstr "Não encontrei definições de interface em\n"
 "%s"
 
-#: src/g3270/actions.c:723
+#: src/g3270/actions.c:720
 #, c-format
 msgid "Can't load %s"
 msgstr "Não foi possível carregar %s"
 
-#: src/g3270/actions.c:721
+#: src/g3270/actions.c:718
 #, c-format
 msgid "Can't load %s: %s"
 msgstr "Não foi possível carregar %s: %s"
@@ -237,7 +237,7 @@ msgstr "Apagar\n"
 msgid "Erase EOF"
 msgstr "Apagar campo"
 
-#: src/g3270/actions.c:582
+#: src/g3270/actions.c:582 src/g3270/g3270.c:405 src/g3270/g3270.c:406
 msgid "Erase Field"
 msgstr "Apagar campo"
 
@@ -292,6 +292,10 @@ msgstr ""
 
 #: src/g3270/actions.c:421
 msgid "Event Trace"
+msgstr ""
+
+#: src/plugins/rexx/actions.c:76
+msgid "External rexx script"
 msgstr ""
 
 #: src/g3270/actions.c:570
@@ -471,13 +475,13 @@ msgstr ""
 msgid "Return"
 msgstr ""
 
+#: src/plugins/rexx/actions.c:77
+msgid "Rexx scripts"
+msgstr ""
+
 #: src/g3270/actions.c:130
 msgid "Right"
 msgstr "Direita"
-
-#: src/plugins/rexx/main.c:521
-msgid "Run rexx script"
-msgstr "Executar script rexx"
 
 #: src/g3270/actions.c:192
 msgid "Save"
@@ -535,7 +539,7 @@ msgstr "Selecionar campo"
 msgid "Select Left"
 msgstr ""
 
-#: src/plugins/rexx/main.c:483
+#: src/plugins/rexx/actions.c:38
 msgid "Select Rexx script to run"
 msgstr "Selecione script rexx a executar"
 
