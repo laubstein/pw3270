@@ -30,11 +30,6 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-cp locale/pt_BR/LC_MESSAGES/$NAME.mo /usr/share/locale/pt_BR/LC_MESSAGES/g3270.mo
-if [ "$?" != "0" ]; then
-	exit -1
-fi
-
 wine  ~/.wine/drive_c/Arquivos\ de\ programas/NSIS/makensis.exe g3270.nsi
 if [ "$?" != "0" ]; then
 	echo "*** ERRO AO GERAR O PACOTE DE INSTALACAO"
@@ -94,9 +89,15 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
+rm -fr /home/perry/bin/g3270
 ./configure --enable-plugins --prefix=/home/perry/bin/g3270
 
 make install
+if [ "$?" != "0" ]; then
+	exit -1
+fi
+
+cp  /home/perry/bin/g3270/share/locale/pt_BR/LC_MESSAGES/g3270.mo /usr/share/locale/pt_BR/LC_MESSAGES/g3270.mo
 if [ "$?" != "0" ]; then
 	exit -1
 fi

@@ -402,6 +402,9 @@ static void init_locale(void)
 	bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
 	textdomain(PACKAGE_NAME);
 
+	Trace("---> %s <---",gettext("Erase Field"));
+	Trace("---> %s <---", _( "Erase Field" ) );
+
 }
 
 int main(int argc, char *argv[])
