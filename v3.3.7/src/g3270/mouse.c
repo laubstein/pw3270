@@ -247,11 +247,12 @@
 
 	DecodePosition(event,row,col);
 
-	Trace("Button %d release",event->button);
+	Trace("Button %d release Action: %d",event->button, (int) ( ((mode & 0x0F) << 4) | (event->button & 0x0F)));
 
 	switch( ((mode & 0x0F) << 4) | (event->button & 0x0F))
  	{
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 1: // Single click, just move cursor
+		Trace("Single click (button: %d)",event->button);
 		action_ClearSelection();
 		cursor_move((row*terminal_cols)+col);
 		break;
@@ -262,11 +263,13 @@
 		break;
 
 	case ((SELECT_MODE_COPY & 0x0F) << 4) | 1:
+		Trace("Copy text (button: %d)",event->button);
 		action_Copy();
 		action_ClearSelection();
 		break;
 
 	case ((SELECT_MODE_APPEND & 0x0F) << 4) | 1:
+		Trace("Append text (button: %d)",event->button);
 		action_Append();
 		action_ClearSelection();
 		break;
