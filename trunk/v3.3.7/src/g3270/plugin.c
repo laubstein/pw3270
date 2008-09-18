@@ -353,6 +353,8 @@
 			gchar		*parm[G_N_ELEMENTS(name)];
 			void 		(*run)(GtkAction *action, gpointer cmd)	= NULL;
 
+			Trace("Custom action(%d): %s",f,group[f]);
+
 			for(p=0;p<G_N_ELEMENTS(name);p++)
 			{
 				parm[p] = g_key_file_get_locale_string(conf,group[f],name[p],NULL,NULL);
@@ -371,11 +373,14 @@
 
 			if(!run)
 			{
-				Log("Invalid action type %s in %s",parm[3],filename);
+				WarningPopup( N_( "Invalid action \"%s\" when loading %s" ),parm[3],filename);
+				Log("Invalid action %s in %s",parm[3],filename);
 			}
 			else
 			{
 				action = gtk_action_new(group[f],parm[0],parm[1],parm[2]);
+
+				Trace("gtk_action_new(%s,%s,%s,%s): %p",group[f],parm[0],parm[1],parm[2],action);
 
 				if(action)
 				{
