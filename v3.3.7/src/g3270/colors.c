@@ -105,42 +105,7 @@
 											"#7890F0,"			// TERMINAL_COLOR_OIA_SEPARATOR
 											"white,"			// TERMINAL_COLOR_OIA_STATUS_OK
 											"red"				// TERMINAL_COLOR_OIA_STATUS_INVALID
-		},
-
-#ifdef DEBUG
-{       N_( "X3270" ),                                  "black,"                // TERMINAL_COLOR_BACKGROUND
-                                                                        "deepSkyBlue,"          // TERMINAL_COLOR_BLUE
-                                                                        "red,"          // TERMINAL_COLOR_RED
-                                                                        "pink,"         // TERMINAL_COLOR_PINK
-                                                                        "green,"                // TERMINAL_COLOR_GREEN
-                                                                        "turquoise,"            // TERMINAL_COLOR_TURQUOISE
-                                                                        "yellow,"               // TERMINAL_COLOR_YELLOW
-                                                                        "white,"                // TERMINAL_COLOR_WHITE
-                                                                        "black,"                // TERMINAL_COLOR_BLACK
-                                                                        "blue3,"                // TERMINAL_COLOR_DARK_BLUE
-                                                                        "orange,"               // TERMINAL_COLOR_ORANGE
-                                                                        "purple,"               // TERMINAL_COLOR_PURPLE
-                                                                        "paleGreen,"            // TERMINAL_COLOR_DARK_GREEN
-                                                                        "paleTurquoise2,"               // TERMINAL_COLOR_DARK_TURQUOISE
-                                                                        "grey,"         // TERMINAL_COLOR_MUSTARD
-                                                                        "white,"                // TERMINAL_COLOR_GRAY
-
-                                                                        "pink,"         // TERMINAL_COLOR_FIELD_DEFAULT
-                                                                        "deepSkyBlue,"          // TERMINAL_COLOR_FIELD_INTENSIFIED
-                                                                        "black,"                // TERMINAL_COLOR_FIELD_PROTECTED
-                                                                        "grey,"         // TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
-
-                                                                        "dimGrey,"              // TERMINAL_COLOR_SELECTED_BG
-                                                                        "black,"                // TERMINAL_COLOR_SELECTED_FG
-                                                                        "white,"                // TERMINAL_COLOR_CURSOR
-                                                                        "white,"                // TERMINAL_COLOR_CROSS_HAIR
-                                                                        "black,"                // TERMINAL_COLOR_OIA_BACKGROUND
-                                                                        "white,"                // TERMINAL_COLOR_OIA
-                                                                        "white,"                // TERMINAL_COLOR_OIA_SEPARATOR
-                                                                        "white,"                // TERMINAL_COLOR_OIA_STATUS_OK
-                                                                        "white"         // TERMINAL_COLOR_OIA_STATUS_INVALID
-}
-#endif
+		}
 
 	};
 
@@ -364,6 +329,7 @@
 	GtkTreeIter		iter;
 	GtkTreeIter		parent;
 	GtkCellRenderer *rend;
+	gchar			*file;
 	const gchar	*scheme	= GetString("Terminal","ColorScheme",color_profile->name);
 	int				title 	= 0;
 	int				f;
@@ -401,6 +367,45 @@
 
 		if(!strcmp(scheme,color_profile[f].name))
 			parent = iter;
+ 	}
+
+ 	file = FindSystemConfigFile("colors.conf");
+ 	if(file)
+ 	{
+		gchar 		**group;
+		GKeyFile	*conf = g_key_file_new();
+
+		g_key_file_load_from_file(conf,file,G_KEY_FILE_NONE,NULL);
+ 		g_free(file);
+
+		group = g_key_file_get_groups(conf,NULL);
+
+		for(f=0;group[f];f++)
+		{
+			gchar *str = g_strjoin( ",",	g_key_file_get_string(conf,group[f],"Terminal",NULL),
+											g_key_file_get_string(conf,group[f],"BaseAttributes",NULL),
+											g_key_file_get_string(conf,group[f],"SelectedText",NULL),
+											g_key_file_get_string(conf,group[f],"Cursor",NULL),
+											g_key_file_get_string(conf,group[f],"OIA",NULL),
+											NULL
+								);
+
+			Trace("Colors(%s): \"%s\"",group[f],str);
+
+			gtk_list_store_append((GtkListStore *) model,&iter);
+			gtk_list_store_set((GtkListStore *) model, &iter,	0, g_key_file_get_locale_string(conf,group[f],"Label",NULL,NULL),
+																1, group[f],
+																2, str,
+																-1 );
+			if(!strcmp(scheme,group[f]))
+				parent = iter;
+
+			g_free(str);
+		}
+
+		g_strfreev(group);
+		g_key_file_free(conf);
+
  	}
 
 	g_signal_connect(G_OBJECT(combo), "changed", G_CALLBACK(activate_scheme),0);
