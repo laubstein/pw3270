@@ -41,42 +41,54 @@ return 0
 ConvertColor: procedure
 	parse arg list
 
-	name = "TERMINAL_COLOR_BACKGROUND TERMINAL_COLOR_BLUE TERMINAL_COLOR_RED TERMINAL_COLOR_PINK TERMINAL_COLOR_GREEN TERMINAL_COLOR_TURQUOISE TERMINAL_COLOR_YELLOW TERMINAL_COLOR_WHITE TERMINAL_COLOR_BLACK TERMINAL_COLOR_DARK_BLUE TERMINAL_COLOR_ORANGE TERMINAL_COLOR_PURPLE TERMINAL_COLOR_DARK_GREEN TERMINAL_COLOR_DARK_TURQUOISE TERMINAL_COLOR_MUSTARD TERMINAL_COLOR_GRAY TERMINAL_COLOR_FIELD_DEFAULT TERMINAL_COLOR_FIELD_INTENSIFIED TERMINAL_COLOR_FIELD_PROTECTED TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED TERMINAL_COLOR_SELECTED_BG TERMINAL_COLOR_SELECTED_FG TERMINAL_COLOR_CURSOR TERMINAL_COLOR_CROSS_HAIR TERMINAL_COLOR_OIA_BACKGROUND TERMINAL_COLOR_OIA TERMINAL_COLOR_OIA_SEPARATOR TERMINAL_COLOR_OIA_STATUS_OK TERMINAL_COLOR_OIA_STATUS_INVALID"
-
 	clr.0 = words(list)-1
 
 	do f = 1 to clr.0
 		clr.f = word(list,f+1)
 	end
 
-	say '{	N_( "'||word(list,1)||'" ),					"'||clr.1||',"		// '||word(name,1)
+	say '['||word(list,1)||']'
+	say 'Label='||word(list,1)
 
+	str=clr.1
 	do f = 2 to 16
-		say '									"'||clr.f||',"		// '||word(name,f)
+		str=str||','||clr.f
 	end
+	
+	say 'Terminal='||str
 
-	say ''
-
+	str = ''
 	do f = 1 to 4
 		x = 19+f
-		p = clr.x
-		say '									"'||clr.p||',"		// '||word(name,16+f)
+		p = (clr.x)+1
+		str=str||','||clr.p
 	end
 
-	say ''
+	say 'BaseAttributes='||substr(str,2)
 
-	ls = "19 1 8 8 1"
+	str = ''
+	ls = "19 1"
 	do f = 1 to words(ls)
 		p = word(ls,f)
-		say '									"'||clr.p||',"		// '||word(name,20+f)
+		str=str||','||clr.p
 	end
 
-	p = 17
-	do f = 1 to 3
-		say '									"'||clr.p||',"		// '||word(name,25+f)
+	say 'SelectedText='||substr(str,2)
+
+	str = ''
+	ls = "8 8"
+	do f = 1 to words(ls)
+		p = word(ls,f)
+		str=str||','||clr.p
 	end
-	say '									"'||clr.p||'"		// '||word(name,25+f)
-	say '}'
-	say ''
-	say ''
+	say 'Cursor='||substr(str,2)
+
+	str = ''
+	ls = "1 8 8 8 8"
+	do f = 1 to words(ls)
+		p = word(ls,f)
+		str=str||','||clr.p
+	end
+	say 'OIA='||substr(str,2)
+
 return 0
