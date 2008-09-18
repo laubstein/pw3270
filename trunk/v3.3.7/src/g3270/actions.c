@@ -687,7 +687,9 @@
 
 #if defined( DEBUG )
 	path = g_build_filename("..","..","ui",NULL);
-#elif defined( LIBDIR )
+#elif defined(_WIN32)
+	path = g_build_filename(".","ui",NULL);
+#elif defined( DATAROOTDIR )
 	path = g_build_filename(DATAROOTDIR,PACKAGE_NAME,"ui",NULL);
 #else
 	path = g_build_filename(".","ui",NULL);

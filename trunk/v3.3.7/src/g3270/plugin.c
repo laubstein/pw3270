@@ -118,6 +118,10 @@
 	path = g_build_filename(".","plugins",NULL);
 	scan_for_plugins(path);
 	g_free(path);
+#elif defined(_WIN32)
+	path = g_build_filename(".","plugins",NULL);
+	scan_for_plugins(path);
+	g_free(path);
 #elif defined( LIBDIR )
 	path = g_build_filename(LIBDIR,PACKAGE_NAME,"plugins",NULL);
 	scan_for_plugins(path);
