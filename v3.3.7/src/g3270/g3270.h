@@ -28,12 +28,16 @@
 
 	#define G3270_H_INCLUDED
 
-	#include <locale.h>
 	#include <lib3270/config.h>
+	#define ENABLE_NLS
+	#define GETTEXT_PACKAGE PACKAGE_NAME
+
+	#include <libintl.h>
+	#include <glib/gi18n.h>
+
 	#include <gtk/gtk.h>
 	#include <gdk/gdk.h>
 	#include <glib.h>
-	#include <glib/gi18n.h>
 
 	#include <lib3270/api.h>
 

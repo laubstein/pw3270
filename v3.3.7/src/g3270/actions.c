@@ -455,8 +455,8 @@
  		g_snprintf(buffer,19,"Toggle%s",toggle_internal[f].label);
 
 		GtkToggleAction *action = gtk_toggle_action_new(	buffer,
-															toggle_internal[f].label,
-															toggle_internal[f].tooltip,
+															gettext(toggle_internal[f].label),
+															gettext(toggle_internal[f].tooltip),
 															toggle_info[f].stock_id );
 
 		gtk_toggle_action_set_active(action,GetBoolean("Toggles",toggle_internal[f].label,FALSE));
@@ -477,8 +477,8 @@
 			strncat(buffer,get_toggle_name(f),20);
 
 			GtkToggleAction *action = gtk_toggle_action_new(	buffer,
-																toggle_info[f].label,
-																toggle_info[f].tooltip,
+																gettext(toggle_info[f].label),
+																gettext(toggle_info[f].tooltip),
 																toggle_info[f].stock_id );
 			gtk_toggle_action_set_active(action,Toggled(f));
 			g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_action),(gpointer) f);

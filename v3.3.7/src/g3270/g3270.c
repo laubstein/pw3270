@@ -24,18 +24,16 @@
  *		Main proceudre.
  */
 
-#include <lib3270/config.h>
+#include "g3270.h"
+
 #include <stdio.h>
 #include <gtk/gtk.h>
-#include <glib.h>
-#include <glib/gi18n.h>
 
 #ifdef HAVE_LIBGNOME
 	#include <gnome.h>
 #endif
 
 #include <glib/gstdio.h>
-
 
 #include "globals.h"
 
@@ -60,7 +58,6 @@
 #include "windirsc.h"
 #endif /*]*/
 
-#include "g3270.h"
 #include <lib3270/hostc.h>
 
 #if !defined(_WIN32) /*[*/
@@ -402,9 +399,6 @@ static void init_locale(void)
 	bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
 	textdomain(PACKAGE_NAME);
 
-	Trace("---> %s <---",gettext("Bold"));
-	Trace("---> %s <---", _( "Bold" ) );
-
 }
 
 int main(int argc, char *argv[])
@@ -510,6 +504,16 @@ int main(int argc, char *argv[])
 		if(host_connect(cl_hostname) >= 0)
 			wait4negotiations(cl_hostname);
 	}
+
+	Trace("---> %s <---",gettext("Bold"));
+	Trace("---> %s <---", _( "Bold" ) );
+	Trace("---> %s <---", (char *) dgettext(PACKAGE_NAME, "Bold" ) );
+
+	Trace("---> %s <---",gettext("Colors"));
+	Trace("---> %s <---",_( "Colors" ));
+	Trace("---> %s <---",(char *) dgettext(PACKAGE_NAME, "Colors" ));
+
+
 
 	if(topwindow)
 	{

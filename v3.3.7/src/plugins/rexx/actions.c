@@ -36,11 +36,11 @@
  {
 	gchar 		*ptr;
 	GtkWidget 	*dialog = gtk_file_chooser_dialog_new(	_( "Select Rexx script to run" ),
-														 GTK_WINDOW(g3270_topwindow),
-														 GTK_FILE_CHOOSER_ACTION_OPEN,
-														 GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
-														 GTK_STOCK_EXECUTE,	GTK_RESPONSE_ACCEPT,
-														 NULL );
+														GTK_WINDOW(g3270_topwindow),
+														GTK_FILE_CHOOSER_ACTION_OPEN,
+														GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
+														GTK_STOCK_EXECUTE,	GTK_RESPONSE_ACCEPT,
+														NULL );
 
 
 	gtk_file_chooser_set_show_hidden(GTK_FILE_CHOOSER(dialog),FALSE);
@@ -93,8 +93,8 @@
 	for(f=0;f<G_N_ELEMENTS(action_info);f++)
 	{
 		GtkAction *action = gtk_action_new(	action_info[f].name,
-											gettext(action_info[f].label),
-											gettext(action_info[f].tooltip),
+											dgettext(GETTEXT_PACKAGE,action_info[f].label),
+											dgettext(GETTEXT_PACKAGE,action_info[f].tooltip),
 											NULL );
 
 		if(action_info[f].call)
