@@ -106,42 +106,42 @@
 											"white,"			// TERMINAL_COLOR_OIA_STATUS_OK
 											"red"				// TERMINAL_COLOR_OIA_STATUS_INVALID
 		},
-		/*
-		{	N_( "Reverse" ),				"white,"			// TERMINAL_COLOR_BACKGROUND
-											"blue,"				// TERMINAL_COLOR_BLUE
-											"firebrick,"		// TERMINAL_COLOR_RED
-											"pink,"				// TERMINAL_COLOR_PINK
-											"green4,"			// TERMINAL_COLOR_GREEN
-											"cadetBlue,"		// TERMINAL_COLOR_TURQUOISE
-											"goldenrod,"			// TERMINAL_COLOR_YELLOW
-											"black,"			// TERMINAL_COLOR_WHITE
-											"black,"			// TERMINAL_COLOR_BLACK
-											"blue3,"		// TERMINAL_COLOR_DARK_BLUE
-											"orange,"			// TERMINAL_COLOR_ORANGE
-											"purple,"		// TERMINAL_COLOR_PURPLE
-											"PaleGreen,"		// TERMINAL_COLOR_DARK_GREEN
-											"DarkTurquoise,"	// TERMINAL_COLOR_DARK_TURQUOISE
-											"grey,"				// TERMINAL_COLOR_MUSTARD
-											"dark grey,"		// TERMINAL_COLOR_GRAY
 
-											"green4,"			// TERMINAL_COLOR_FIELD_DEFAULT
-											"firebrick,"		// TERMINAL_COLOR_FIELD_INTENSIFIED
-											"blue,"			// TERMINAL_COLOR_FIELD_PROTECTED
-											"black,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
+#ifdef DEBUG
+{       N_( "X3270" ),                                  "black,"                // TERMINAL_COLOR_BACKGROUND
+                                                                        "deepSkyBlue,"          // TERMINAL_COLOR_BLUE
+                                                                        "red,"          // TERMINAL_COLOR_RED
+                                                                        "pink,"         // TERMINAL_COLOR_PINK
+                                                                        "green,"                // TERMINAL_COLOR_GREEN
+                                                                        "turquoise,"            // TERMINAL_COLOR_TURQUOISE
+                                                                        "yellow,"               // TERMINAL_COLOR_YELLOW
+                                                                        "white,"                // TERMINAL_COLOR_WHITE
+                                                                        "black,"                // TERMINAL_COLOR_BLACK
+                                                                        "blue3,"                // TERMINAL_COLOR_DARK_BLUE
+                                                                        "orange,"               // TERMINAL_COLOR_ORANGE
+                                                                        "purple,"               // TERMINAL_COLOR_PURPLE
+                                                                        "paleGreen,"            // TERMINAL_COLOR_DARK_GREEN
+                                                                        "paleTurquoise2,"               // TERMINAL_COLOR_DARK_TURQUOISE
+                                                                        "grey,"         // TERMINAL_COLOR_MUSTARD
+                                                                        "white,"                // TERMINAL_COLOR_GRAY
 
-											"black,"			// TERMINAL_COLOR_SELECTED_BG
-											"white,"			// TERMINAL_COLOR_SELECTED_FG,
+                                                                        "pink,"         // TERMINAL_COLOR_FIELD_DEFAULT
+                                                                        "deepSkyBlue,"          // TERMINAL_COLOR_FIELD_INTENSIFIED
+                                                                        "black,"                // TERMINAL_COLOR_FIELD_PROTECTED
+                                                                        "grey,"         // TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
 
-											"black," 		// TERMINAL_COLOR_CURSOR
-											"black," 		// TERMINAL_COLOR_CROSS_HAIR
+                                                                        "dimGrey,"              // TERMINAL_COLOR_SELECTED_BG
+                                                                        "black,"                // TERMINAL_COLOR_SELECTED_FG
+                                                                        "white,"                // TERMINAL_COLOR_CURSOR
+                                                                        "white,"                // TERMINAL_COLOR_CROSS_HAIR
+                                                                        "black,"                // TERMINAL_COLOR_OIA_BACKGROUND
+                                                                        "white,"                // TERMINAL_COLOR_OIA
+                                                                        "white,"                // TERMINAL_COLOR_OIA_SEPARATOR
+                                                                        "white,"                // TERMINAL_COLOR_OIA_STATUS_OK
+                                                                        "white"         // TERMINAL_COLOR_OIA_STATUS_INVALID
+}
+#endif
 
-											"black,"	 		// TERMINAL_COLOR_OIA_BACKGROUND
-											"green4,"		// TERMINAL_COLOR_OIA
-											"green4,"			// TERMINAL_COLOR_OIA_SEPARATOR
-											"black,"			// TERMINAL_COLOR_OIA_STATUS_OK
-											"firebrick"				// TERMINAL_COLOR_OIA_STATUS_INVALID
-		}
-		*/
 	};
 
 
