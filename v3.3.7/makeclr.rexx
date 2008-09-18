@@ -29,12 +29,10 @@
 
 ok = ConvertColor("X3270 black deepSkyBlue red pink green turquoise yellow white black blue3 orange purple paleGreen paleTurquoise2 grey white white black dimGrey 4 2 1 15")
 
-/*
 ok = ConvertColor("Reverse black blue firebrick pink green4 cadetBlue goldenrod black black blue3 orange purple paleGreen darkTurquoise grey black black white dimGrey 4 2 1 0")
 ok = ConvertColor("Bright black blue red magenta green turquoise yellow white black blue3 orange purple paleGreen cyan grey white white black dimGrey 4 2 1 15")
 ok = ConvertColor("CPE black LightBlue1 PaleVioletRed1 pink green turquoise yellow white black LightBlue3 orange MediumPurple1 paleGreen paleTurquoise2 grey80 white white black dimGrey 4 2 1 15")
 ok = ConvertColor("Green green green green green green green green green green green green green green green green green white black dimGrey 4 15 4 15")
-*/
 
 return 0
 
@@ -50,7 +48,7 @@ ConvertColor: procedure
 	say '['||word(list,1)||']'
 	say 'Label='||word(list,1)
 
-	str=clr.1
+	str=clr.18
 	do f = 2 to 16
 		str=str||','||clr.f
 	end
@@ -84,7 +82,7 @@ ConvertColor: procedure
 	say 'Cursor='||substr(str,2)
 
 	str = ''
-	ls = "1 8 8 8 8"
+	ls = "18 8 8 8 8"
 	do f = 1 to words(ls)
 		p = word(ls,f)
 		str=str||','||clr.p
