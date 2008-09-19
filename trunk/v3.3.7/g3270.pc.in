@@ -8,4 +8,4 @@ Name: @PACKAGE@
 Description: GTK-3270 Terminal Emulator
 Version: @PACKAGE_VERSION@
 Libs: -L\@libdir@ -l3270
-Cflags: -I@includedir@
+Cflags: -I@includedir@ -DV337=1
