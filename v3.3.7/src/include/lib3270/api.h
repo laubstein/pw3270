@@ -214,6 +214,7 @@
 		void	Input_String(const unsigned char *str);
 		void 	screen_size(int *rows, int *cols);
 		int 	query_screen_change_counter(void);
+		int		query_secure_connection(void);
 
 		/* Misc API calls */
 		void 	popup_an_error(const char *fmt, ...);
