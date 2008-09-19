@@ -297,7 +297,7 @@
  }
 #endif
 
- void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf)
+ static int scan_for_actions(const gchar *path, GtkActionGroup **groups)
  {
  	static const struct _call
  	{
@@ -311,7 +311,108 @@
  		{ "PFKey",				PFKey				}
  	};
 
-	gchar 		*filename;
+	GDir			*dir;
+	const gchar	*name;
+
+	/* Load custom action files */
+
+	Trace("Loading actions in \"%s\"",path);
+
+	dir = g_dir_open(path,0,NULL);
+	if(!dir)
+		return ENOENT;
+
+	name = g_dir_read_name(dir);
+	while(name)
+	{
+		if(g_str_has_suffix(name,"act"))
+		{
+			GKeyFile 	*conf;
+			gchar		*filename = g_build_filename(path,name,NULL);
+
+			Trace("Loading %s",filename);
+
+			// Load custom actions
+			conf = g_key_file_new();
+
+			if(g_key_file_load_from_file(conf,filename,G_KEY_FILE_NONE,NULL))
+			{
+				int f;
+				gchar **group = g_key_file_get_groups(conf,NULL);
+
+				for(f=0;group[f];f++)
+				{
+					static const gchar *name[] = {	"label", 		// 0
+														"tooltip",		// 1
+														"stock_id",		// 2
+														"action",		// 3
+														"value",		// 4
+														"accelerator" 	// 5
+													};
+
+					int			p;
+					GtkAction 	*action;
+					gchar		*parm[G_N_ELEMENTS(name)];
+					void 		(*run)(GtkAction *action, gpointer cmd)	= NULL;
+
+					Trace("Custom action(%d): %s",f,group[f]);
+
+					for(p=0;p<G_N_ELEMENTS(name);p++)
+					{
+						parm[p] = g_key_file_get_locale_string(conf,group[f],name[p],NULL,NULL);
+						if(!parm[p])
+							parm[p] = g_key_file_get_string(conf,group[f],name[p],NULL);
+					}
+
+					if(!parm[0])
+						parm[0] = group[f];
+
+					for(p=0;p<G_N_ELEMENTS(call) && !run;p++)
+					{
+						if(!strcmp(parm[3],call[p].name))
+							run = call[p].run;
+					}
+
+					if(!run)
+					{
+						WarningPopup( N_( "Invalid action \"%s\" when loading %s" ),parm[3],filename);
+						Log("Invalid action %s in %s",parm[3],filename);
+					}
+					else
+					{
+						action = gtk_action_new(group[f],parm[0],parm[1],parm[2]);
+
+						Trace("gtk_action_new(%s,%s,%s,%s): %p",group[f],parm[0],parm[1],parm[2],action);
+
+						if(action)
+						{
+							// FIXME (perry#1#): Add a closure function to g_free the allocated string.
+							g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(run),g_strdup(parm[4]));
+
+							if(parm[5])
+								gtk_action_group_add_action_with_accel(groups[0],action,parm[5]);
+							else
+								gtk_action_group_add_action(groups[0],action);
+						}
+					}
+				}
+				g_strfreev(group);
+			}
+
+			g_key_file_free(conf);
+			g_free(filename);
+		}
+		name = g_dir_read_name(dir);
+	}
+
+	g_dir_close(dir);
+
+	return 0;
+ }
+
+ void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf)
+ {
+	gchar *path;
 
 #ifdef HAVE_PLUGINS
 	struct custom_action_call arg = { ui, groups, n_actions, conf };
@@ -321,83 +422,17 @@
 
 #endif
 
-	filename = FindSystemConfigFile("actions.conf");
+#if defined( DEBUG )
+	path = g_build_filename("..","..","ui",NULL);
+#elif defined(_WIN32)
+	path = g_build_filename(".","ui",NULL);
+#elif defined( DATAROOTDIR )
+	path = g_build_filename(DATAROOTDIR,PACKAGE_NAME,"ui",NULL);
+#else
+	path = g_build_filename(".","ui",NULL);
+#endif
 
-	Trace("Actions.conf: %p",filename);
-
-	if(!filename)
-		return;
-
-	Trace("Loading %s",filename);
-
-	// Load custom actions
-	conf = g_key_file_new();
-
-	if(g_key_file_load_from_file(conf,filename,G_KEY_FILE_NONE,NULL))
-	{
-		int f;
-		gchar **group = g_key_file_get_groups(conf,NULL);
-
-		for(f=0;group[f];f++)
-		{
-			static const gchar *name[] = {	"label", 		// 0
-												"tooltip",		// 1
-												"stock_id",		// 2
-												"action",		// 3
-												"value",		// 4
-												"accelerator" 	// 5
-											};
-
-			int			p;
-			GtkAction 	*action;
-			gchar		*parm[G_N_ELEMENTS(name)];
-			void 		(*run)(GtkAction *action, gpointer cmd)	= NULL;
-
-			Trace("Custom action(%d): %s",f,group[f]);
-
-			for(p=0;p<G_N_ELEMENTS(name);p++)
-			{
-				parm[p] = g_key_file_get_locale_string(conf,group[f],name[p],NULL,NULL);
-				if(!parm[p])
-					parm[p] = g_key_file_get_string(conf,group[f],name[p],NULL);
-			}
-
-			if(!parm[0])
-				parm[0] = group[f];
-
-			for(p=0;p<G_N_ELEMENTS(call) && !run;p++)
-			{
-				if(!strcmp(parm[3],call[p].name))
-					run = call[p].run;
-			}
-
-			if(!run)
-			{
-				WarningPopup( N_( "Invalid action \"%s\" when loading %s" ),parm[3],filename);
-				Log("Invalid action %s in %s",parm[3],filename);
-			}
-			else
-			{
-				action = gtk_action_new(group[f],parm[0],parm[1],parm[2]);
-
-				Trace("gtk_action_new(%s,%s,%s,%s): %p",group[f],parm[0],parm[1],parm[2],action);
-
-				if(action)
-				{
-					// FIXME (perry#1#): Add a closure function to g_free the allocated string.
-					g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(run),g_strdup(parm[4]));
-
-					if(parm[5])
-						gtk_action_group_add_action_with_accel(groups[0],action,parm[5]);
-					else
-						gtk_action_group_add_action(groups[0],action);
-				}
-			}
-		}
-		g_strfreev(group);
-	}
-
-	g_key_file_free(conf);
-	g_free(filename);
+	scan_for_actions(path,groups);
+	g_free(path);
 
  }
