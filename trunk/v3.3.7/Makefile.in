@@ -211,6 +211,7 @@ install: Release po/pt_BR.po
 	@install --mode=644 ui/g3270.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/g3270.act $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 src/g3270/$(PACKAGE).jpg $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 src/g3270/colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
 
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES

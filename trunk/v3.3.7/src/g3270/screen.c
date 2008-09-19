@@ -688,6 +688,7 @@
 	// Fill pixmap with background color
 	gdk_drawable_get_size(draw,&width,&height);
 
+	gdk_gc_set_foreground(gc,color);
 	gdk_draw_rectangle(draw,gc,1,0,0,width,height);
 
 	// Draw screen contens
@@ -848,6 +849,8 @@
     	Loaded = 1;
 	}
 
+	Trace("Recarregando %d imagens",IMAGE_COUNT);
+
  	for(f=0;f<IMAGE_COUNT;f++)
  	{
  		// Load bitmap setting the right colors
@@ -871,8 +874,22 @@
 													imagedata[f].height );
 
         gdk_pixmap_unref(temp);
+
+		// Destroy cached pixmap
+ 		pix[f].Height	= 0;
+ 		pix[f].Width	= 0;
+		if(pix[f].pix)
+		{
+			gdk_pixbuf_unref(pix[f].pix);
+			pix[f].pix = 0;
+		}
  	}
 
+ }
+
+ void ReloadPixmaps(void)
+ {
+	LoadImages(terminal->window, terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)]);
  }
 
  static void DrawImageByWidth(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height)
@@ -894,6 +911,7 @@
 	    pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,Width,temp,GDK_INTERP_HYPER);
 	    pix[id].Height = Height;
 	    pix[id].Width = Width;
+	    Trace("Rescaling pixmap %d (%p)",id,pix[id].pix);
  	}
 
 	DrawImage(drawable, gc, id, x, y, Width, Height);

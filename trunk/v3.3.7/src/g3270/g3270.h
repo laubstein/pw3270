@@ -161,7 +161,9 @@
 	void 		ParseInput(const gchar *string);
 	void 		MoveCursor(int row, int col);
 	void 		InvalidateCursor(void);
-	void 		LoadImages(GdkDrawable *drawable, GdkGC *gc);
+	void		LoadImages(GdkDrawable *drawable, GdkGC *gc);
+	void 		InvalidatePixmaps(GdkDrawable *drawable, GdkGC *gc);
+	void 		ReloadPixmaps(void);
 	void 		Reselect(void);
 	void 		set_rectangle_select(int value, int reason);
 	void 		SetStatusCode(STATUS_CODE id);

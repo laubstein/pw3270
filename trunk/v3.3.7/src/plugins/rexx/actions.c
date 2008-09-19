@@ -45,7 +45,7 @@
 
 	gtk_file_chooser_set_show_hidden(GTK_FILE_CHOOSER(dialog),FALSE);
 
-	ptr = g_key_file_get_string(conf,CONFIG_GROUP,"lasturi",NULL);
+	ptr = g_key_file_get_string(conf,"uri","RexxScript",NULL);
 	if(ptr)
 	{
 		gtk_file_chooser_set_uri(GTK_FILE_CHOOSER(dialog),ptr);
@@ -55,7 +55,7 @@
 	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	{
 		gtk_widget_hide(dialog);
-		g_key_file_set_string(conf,CONFIG_GROUP,"lasturi",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
+		g_key_file_set_string(conf,"uri","RexxScript",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
 		call_rexx(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)),"");
 	}
 

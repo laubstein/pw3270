@@ -45,8 +45,9 @@ Section "@PACKAGE_NAME@" SecApp
 	file bin\Release\w3n46.dll
 
 	# Configuration files
-	file "/oname=$INSTDIR\@PACKAGE_NAME@.jpg" src\g3270\@PACKAGE_NAME@.jpg
-	file "/oname=$INSTDIR\@PACKAGE_NAME@.ico" src\g3270\@PACKAGE_NAME@.ico
+	file "/oname=$INSTDIR\@PACKAGE_NAME@.jpg"	src\g3270\@PACKAGE_NAME@.jpg
+	file "/oname=$INSTDIR\@PACKAGE_NAME@.ico"	src\g3270\@PACKAGE_NAME@.ico
+	file "/oname=$INSTDIR\colors.conf"			src\g3270\colors.conf
 
 	# UI definition files
 	CreateDirectory "$INSTDIR\ui"
