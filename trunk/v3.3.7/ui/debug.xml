@@ -1,0 +1,8 @@
+<ui>
+	<menubar name='MainMenubar'>
+		<menu action='DebugMenu'>
+			<menuitem action='DumpScreen'/>
+			<menuitem action='LoadScreenDump'/>
+		</menu>
+	</menubar>
+</ui>

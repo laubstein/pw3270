@@ -93,6 +93,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*.desktop
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
 %{_datadir}/%{name}/ui/%{name}.xml
+%{_datadir}/%{name}/ui/%{name}.act
 %{_datadir}/%{name}/%{name}.jpg
 
 %post

@@ -292,7 +292,6 @@
 		<Unit filename="src/plugins/rexx/tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="ui/default.act" />
 		<Unit filename="ui/g3270.xml" />
 		<Unit filename="ui/rexx.xml" />
 		<Unit filename="win32.sh">
