@@ -254,7 +254,8 @@
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 1: // Single click, just move cursor
 		Trace("Single click (button: %d)",event->button);
 		action_ClearSelection();
-		cursor_move((row*terminal_cols)+col);
+		if(row >= 0 && row <= terminal_rows && col >= 0 && col <= terminal_cols)
+			cursor_move((row*terminal_cols)+col);
 		break;
 
 	case ((SELECT_MODE_FIELD & 0x0F) << 4) | 1:	// Double click, select field

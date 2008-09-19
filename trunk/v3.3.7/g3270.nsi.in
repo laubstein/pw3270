@@ -45,7 +45,6 @@ Section "@PACKAGE_NAME@" SecApp
 	file bin\Release\w3n46.dll
 
 	# Configuration files
-	file src\g3270\actions.conf
 	file "/oname=$INSTDIR\@PACKAGE_NAME@.jpg" src\g3270\@PACKAGE_NAME@.jpg
 	file "/oname=$INSTDIR\@PACKAGE_NAME@.ico" src\g3270\@PACKAGE_NAME@.ico
 
