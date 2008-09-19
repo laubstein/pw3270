@@ -117,8 +117,12 @@
 		return RXFUNC_BADCALL;
 	}
 
+	Trace("Wait from %ld to %ld",(long) clock(),(long) end);
+
 	while(clock() < end)
 		gtk_main_iteration();
+
+	Trace("Sleep ended (clock: %ld)",(long) clock());
 
 	return RetValue(Retstr,0);
  }

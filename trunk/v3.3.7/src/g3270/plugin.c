@@ -93,7 +93,7 @@
 		}
 		else
 		{
-			Log("Can't load %s",filename);
+			Log("Can't load %s: %s",filename,g_module_error());
 		}
 		g_free(filename);
 		name = g_dir_read_name(dir);

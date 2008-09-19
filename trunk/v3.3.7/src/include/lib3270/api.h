@@ -213,6 +213,7 @@
 		int 	screen_read(char *dest, int baddr, int count);
 		void	Input_String(const unsigned char *str);
 		void 	screen_size(int *rows, int *cols);
+		int 	query_screen_change_counter(void);
 
 		/* Misc API calls */
 		void 	popup_an_error(const char *fmt, ...);

@@ -39,7 +39,7 @@
 
 /*---[ Globals ]----------------------------------------------------------------------------------*/
 
- GtkWidget 	*g3270_topwindow = NULL;
+ GtkWidget 	*g3270_topwindow	= NULL;
 
 /*---[ Rexx entry points ]------------------------------------------------------------------------*/
 
@@ -68,7 +68,8 @@
 	EXPORT_REXX_FUNCTION( rx3270FindFieldLength		),
 	EXPORT_REXX_FUNCTION( rx3270MoveCursor			),
 	EXPORT_REXX_FUNCTION( rx3270ReadScreen			),
-	EXPORT_REXX_FUNCTION( rx3270SendPFKey			)
+	EXPORT_REXX_FUNCTION( rx3270SendPFKey			),
+	EXPORT_REXX_FUNCTION( rx3270WaitForChanges		)
  };
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/

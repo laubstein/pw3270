@@ -91,7 +91,7 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270ReadScreen(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	int start, qtd, rows, cols, row;
+ 	int start, qtd, rows, cols, row, col;
 
 	switch(Argc)
 	{
@@ -131,8 +131,18 @@
 
 	case 3:	// Get start position from row/col
 		screen_size(&rows,&cols);
-		start 	= (atoi(Argv[0].strptr) * rows) + atoi(Argv[1].strptr);
+
+		row = atoi(Argv[0].strptr)-1;
+		col = atoi(Argv[1].strptr)-1;
+
+		if(row < 0 || row > rows || col < 0 || col > cols)
+		{
+			ReturnString("");
+		}
+
+		start 	= (row * cols) + col;
 		qtd 	= atoi(Argv[2].strptr);
+
 		break;
 
 	default:
@@ -164,3 +174,21 @@
 	ReturnValue(0);
  }
 
+ ULONG APIENTRY rx3270WaitForChanges(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	int last;
+
+	if(Argc)
+		return RXFUNC_BADCALL;
+
+	last = query_screen_change_counter();
+
+	while(last == query_screen_change_counter())
+	{
+		if(!CONNECTED)
+			return -1;
+		gtk_main_iteration();
+	}
+
+	ReturnValue(0);
+ }
