@@ -95,6 +95,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}/ui/%{name}.xml
 %{_datadir}/%{name}/ui/%{name}.act
 %{_datadir}/%{name}/%{name}.jpg
+%{_datadir}/%{name}/colors.conf
 
 %post
 /sbin/ldconfig

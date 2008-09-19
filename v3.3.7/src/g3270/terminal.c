@@ -290,7 +290,7 @@
 
  static void realize(GtkWidget *widget, void *t)
  {
- 	int width, height;
+ 	gint width, height;
 
     Trace("Realizing %p",widget);
 
@@ -304,7 +304,6 @@
 	// Set terminal size
 	gdk_drawable_get_size(widget->window,&width,&height);
 	ResizeTerminal(widget, width, height);
-
 
  }
 

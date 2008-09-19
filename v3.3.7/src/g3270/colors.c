@@ -194,13 +194,20 @@
 	if(id < 0 || id >= TERMINAL_COLOR_COUNT)
 		return;
 
+    LoadImages(terminal->window, terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)]);
+
 	gtk_color_selection_get_current_color(widget,color+id);
 	gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+id,TRUE,TRUE);
 
 	if(gtk_combo_box_get_active(combo))
+	{
 		gtk_combo_box_set_active(combo,0);
+	}
 	else
+	{
+		ReloadPixmaps();
 		action_Redraw();
+	}
 
  }
 
@@ -258,6 +265,7 @@
 		ptr = g_strdup(vlr);
 		ParseColor(ptr);
 		g_free(ptr);
+		ReloadPixmaps();
 		action_Redraw();
 	}
  }
@@ -477,6 +485,7 @@
 	SetInt("ColorSetup","PanedPosition",gtk_paned_get_position(GTK_PANED(box)));
 
 	gtk_widget_destroy(dialog);
+	ReloadPixmaps();
 	action_Redraw();
 
  }
