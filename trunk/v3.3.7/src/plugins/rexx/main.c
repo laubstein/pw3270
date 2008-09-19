@@ -43,7 +43,6 @@
 
 /*---[ Rexx entry points ]------------------------------------------------------------------------*/
 
-
  #define EXPORT_REXX_FUNCTION(x) { #x, (PFN) x }
 
  static const struct _entrypoint

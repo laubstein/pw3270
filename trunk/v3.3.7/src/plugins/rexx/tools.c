@@ -101,28 +101,28 @@
 
  ULONG APIENTRY rx3270Sleep(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
-	clock_t end = clock();
+	time_t end = time(0);
 
 	switch(Argc)
 	{
 	case 0:
-		end += CLOCKS_PER_SEC;
+		end++;
 		break;
 
 	case 1:
-		end += (atoi(Argv[0].strptr) * CLOCKS_PER_SEC);
+		end += atoi(Argv[0].strptr);
 		break;
 
 	default:
 		return RXFUNC_BADCALL;
 	}
 
-	Trace("Wait from %ld to %ld",(long) clock(),(long) end);
+	Trace("Wait from %ld to %ld (CPS %ld)",(long) clock(),(long) end, (long) CLOCKS_PER_SEC);
 
-	while(clock() < end)
+	while(time(0) < end)
 		gtk_main_iteration();
 
-	Trace("Sleep ended (clock: %ld)",(long) clock());
+	Trace("Sleep ended (clock: %ld)",(long) time(0));
 
 	return RetValue(Retstr,0);
  }
