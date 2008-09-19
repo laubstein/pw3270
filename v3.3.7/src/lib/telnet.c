@@ -3450,3 +3450,8 @@ net_proxy_port(void)
 	else
 	    	return NULL;
 }
+
+int query_secure_connection(void)
+{
+        return (int) secure_connection;
+}

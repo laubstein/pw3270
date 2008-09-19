@@ -93,6 +93,7 @@
 		}
 		else
 		{
+			Trace("Can't load %s: %s",filename,g_module_error());
 			Log("Can't load %s: %s",filename,g_module_error());
 		}
 		g_free(filename);
