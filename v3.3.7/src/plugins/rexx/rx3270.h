@@ -69,7 +69,7 @@
 	ULONG	RetValue(PRXSTRING Retstr, int value);
 
 	#define ReturnValue(x) return RetValue(Retstr,x)
-	#define ReturnString(x) return RetStrin(Retstr,x)
+	#define ReturnString(x) return RetString(Retstr,x)
 
 	/* Rexx entry points */
 	ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
@@ -89,10 +89,10 @@
 	ULONG APIENTRY rx3270MoveCursor(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270ReadScreen(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270SendPFKey(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270WaitForChanges(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 
 	/* Globals */
 	extern GtkWidget *g3270_topwindow;
-
 
 #endif // RX3270_H_INCLUDED
 

@@ -850,9 +850,17 @@ relabel(Boolean ignored unused)
 	}
 }
 
+static int screen_changes	= 0;
+
+int query_screen_change_counter(void)
+{
+	return screen_changes;
+}
+
 void screen_changed(int bstart, int bend)
 {
 	screen_has_changes = 1;
+	screen_changes++;
 
 	/* If the application can manage screen changes, let it do it */
 	if(callbacks && callbacks->changed)
