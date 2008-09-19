@@ -18,6 +18,7 @@
 			<menuitem action='Append'/>
 			<menuitem action='Paste'/>
 			<menuitem action='PasteNext'/>
+			<menuitem action='PasteTextFile'/>
 			<separator/>
 			<menuitem action='SelectAll'/>
 			<menuitem action='SelectField'/>
@@ -135,8 +136,5 @@
 
 	<accelerator action='ShiftPageUP' />
 	<accelerator action='ShiftPageDown' />
-
-	<accelerator action='DumpScreen' />
-	<accelerator action='LoadScreenDump' />
 
 </ui>

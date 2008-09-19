@@ -270,7 +270,9 @@
 
  static void ExecWithCopy(GtkAction *action, gpointer cmd)
  {
- 	Trace("%s Command to execute: %s",__FUNCTION__,(gchar *) cmd);
+ 	gchar *text = GetClipboard();
+ 	RunCommand(cmd,text);
+ 	g_free(text);
  }
 
  static void ExecWithSelection(GtkAction *action, gpointer cmd)
@@ -286,6 +288,7 @@
  }
 
 #ifdef HAVE_PLUGINS
+
  static void loadaction(GModule *handle, struct custom_action_call *arg)
  {
 	void (*ptr)(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf) = NULL;
@@ -294,7 +297,25 @@
 
 	if(g_module_symbol(handle, "LoadCustomActions", (gpointer) &ptr))
 		ptr(arg->ui,arg->groups,arg->n_groups,arg->conf);
+
  }
+
+ struct external_action
+ {
+ 	gchar 	name[0x0100];
+ 	void 	(*exec)(GtkAction *action, gpointer cmd);
+ };
+
+ static void findaction(GModule *handle, struct external_action *arg)
+ {
+ 	if(arg->exec)
+		return;
+
+	if(!g_module_symbol(handle,arg->name,(gpointer) &arg->exec))
+		arg->exec = NULL;
+
+ }
+
 #endif
 
  static int scan_for_actions(const gchar *path, GtkActionGroup **groups)
@@ -372,6 +393,24 @@
 						if(!strcmp(parm[3],call[p].name))
 							run = call[p].run;
 					}
+
+#ifdef HAVE_PLUGINS
+					if(!run && plugins)
+					{
+						// Search for plugin exported actions
+						struct external_action arg;
+
+						memset(&arg,0,sizeof(arg));
+						g_snprintf(arg.name,0xFF,"G3270Action_%s",parm[3]);
+
+						g_slist_foreach(plugins,(GFunc) findaction, &arg);
+
+						Trace("%s: %p",arg.name,arg.exec);
+
+						run = arg.exec;
+
+					}
+#endif
 
 					if(!run)
 					{

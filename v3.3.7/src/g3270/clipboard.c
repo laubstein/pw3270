@@ -143,6 +143,40 @@
 	g_free(buffer);
  }
 
+ void action_PasteTextFile(void)
+ {
+	GtkWidget *dialog = gtk_file_chooser_dialog_new( _( "Paste text file" ),
+                                                     GTK_WINDOW(topwindow),
+													 GTK_FILE_CHOOSER_ACTION_OPEN,
+                                                     GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
+                                                     GTK_STOCK_OPEN,	GTK_RESPONSE_ACCEPT,
+                                                     NULL );
+
+
+	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	{
+		GError		*error = NULL;
+		gchar		*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+		gsize		sz;
+		gchar		*buffer;
+
+		if(!g_file_get_contents(filename, &buffer, &sz, &error))
+		{
+			PopupAnError( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			g_error_free(error);
+		}
+		else
+		{
+			paste_string(buffer);
+		}
+
+		g_free(buffer);
+	}
+
+	gtk_widget_destroy(dialog);
+
+ }
+
  void action_Paste(void)
  {
 	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,DEFAULT_CLIPBOARD),clipboard_text_received,(gpointer) 0);

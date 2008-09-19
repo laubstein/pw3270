@@ -187,17 +187,19 @@
 	void		action_SelectionRight(GtkWidget *w, gpointer user_data);
 	void		action_SelectionDown(GtkWidget *w, gpointer user_data);
 
-	void 		action_Append(void);
-	void 		action_Copy(void);
-	void 		action_SelectField(void);
-	void		action_ClearSelection(void);
-	void 		action_Save(void);
-	void		action_Restore(void);
-	void 		action_Redraw(void);
-	void 		action_SelectColors(void);
-	void 		action_SetHostname(void);
-	void 		action_Paste(void);
-	void 		action_PasteNext(void);
+	void 			action_Append(void);
+	void 			action_Copy(void);
+	void 			action_SelectField(void);
+	void			action_ClearSelection(void);
+	void 			action_Save(void);
+	void			action_Restore(void);
+	void 			action_Redraw(void);
+	void 			action_SelectColors(void);
+	void 			action_SetHostname(void);
+	void 			action_Paste(void);
+	void 			action_PasteNext(void);
+	void 			action_PasteTextFile(void);
+
 
 	int 			LoadColors(void);
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);

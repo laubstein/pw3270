@@ -135,6 +135,7 @@
  	/* Edit actions */
  	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),				NULL,				NULL,	G_CALLBACK(action_Paste)			},
  	{	"PasteNext",		NULL,					N_( "Paste next" ),			"<Shift><Ctrl>v",	NULL,	G_CALLBACK(action_PasteNext)		},
+ 	{	"PasteTextFile",	NULL,					N_( "Paste text file" ),	NULL,				NULL,	G_CALLBACK(action_PasteTextFile)	},
  	{	"Reselect",			NULL,					N_( "Reselect" ),			"<Ctrl>r",			NULL,	G_CALLBACK(Reselect)				},
  	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
  	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Erase input" ),		"Clear",			NULL,	G_CALLBACK(action_Clear)			},
@@ -174,6 +175,7 @@
  	{	"OptionsMenu",		NULL,					N_( "_Options" ),			NULL,				NULL,	NULL								},
  	{	"SettingsMenu",		NULL,					N_( "Settings" ),			NULL,				NULL,	NULL								},
  	{	"ScriptsMenu",		NULL,					N_( "Scripts" ),			NULL,				NULL,	NULL								},
+ 	{	"DebugMenu",		NULL,					N_( "Debug" ),				NULL,				NULL,	NULL								},
 
 	/* Sub menus */
 	{	"FontSettings",		GTK_STOCK_SELECT_FONT,	N_( "Select font" ),		NULL,				NULL,	NULL								},
