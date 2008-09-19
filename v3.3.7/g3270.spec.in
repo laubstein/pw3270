@@ -95,8 +95,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}/ui/%{name}.xml
 %{_datadir}/%{name}/%{name}.jpg
 
-%config(noreplace) %{_datadir}/%{name}/*.conf
-
 %post
 /sbin/ldconfig
 /usr/bin/update-mime-database /usr/share/mime >/dev/null
