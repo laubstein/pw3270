@@ -46,12 +46,13 @@ Section "@PACKAGE_NAME@" SecApp
 
 	# Configuration files
 	file src\g3270\actions.conf
-	file "/oname=$INSTDIR\@PACKAGE_NAME@.jpg" src\g3270\@PACKAGE_NAME@.jpg 
+	file "/oname=$INSTDIR\@PACKAGE_NAME@.jpg" src\g3270\@PACKAGE_NAME@.jpg
 	file "/oname=$INSTDIR\@PACKAGE_NAME@.ico" src\g3270\@PACKAGE_NAME@.ico
 
 	# UI definition files
 	CreateDirectory "$INSTDIR\ui"
 	file "/oname=$INSTDIR\ui\@PACKAGE_NAME@.xml" ui\g3270.xml
+	file "/oname=$INSTDIR\ui\@PACKAGE_NAME@.xml" ui\g3270.act
 
 	# Locale files
 	CreateDirectory "$INSTDIR\@localedir@\pt_BR\LC_MESSAGES"
