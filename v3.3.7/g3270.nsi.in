@@ -52,7 +52,7 @@ Section "@PACKAGE_NAME@" SecApp
 	# UI definition files
 	CreateDirectory "$INSTDIR\ui"
 	file "/oname=$INSTDIR\ui\@PACKAGE_NAME@.xml" ui\g3270.xml
-	file "/oname=$INSTDIR\ui\@PACKAGE_NAME@.xml" ui\g3270.act
+	file "/oname=$INSTDIR\ui\@PACKAGE_NAME@.act" ui\g3270.act
 
 	# Locale files
 	CreateDirectory "$INSTDIR\@localedir@\pt_BR\LC_MESSAGES"

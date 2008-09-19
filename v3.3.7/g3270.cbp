@@ -43,7 +43,6 @@
 		<Unit filename="src/g3270/actions.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/g3270/actions.conf" />
 		<Unit filename="src/g3270/clipboard.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -293,6 +292,7 @@
 		<Unit filename="src/plugins/rexx/tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="ui/default.act" />
 		<Unit filename="ui/g3270.xml" />
 		<Unit filename="ui/rexx.xml" />
 		<Unit filename="win32.sh">
