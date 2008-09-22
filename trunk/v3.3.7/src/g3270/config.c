@@ -35,6 +35,7 @@
 									return filename; \
 								g_free(filename);
 
+
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
  static const struct _WindowState
