@@ -216,6 +216,7 @@
 	void 			SaveWindowSize(const gchar *group, GtkWidget *widget);
 	int 			GetFunctionKey(GdkEventKey *event);
 	int 			wait4negotiations(const char *cl_hostname);
+	GdkPixbuf 		*LoadLogo(void);
 
 	void			FontChanged(void);
 
