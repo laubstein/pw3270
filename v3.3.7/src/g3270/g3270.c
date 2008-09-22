@@ -434,7 +434,8 @@ int main(int argc, char *argv[])
 
 	gnome_program = gnome_program_init (	PACKAGE_NAME,
 											PACKAGE_VERSION,
-											LIBGNOMEUI_MODULE, 					argc, argv,
+											LIBGNOMEUI_MODULE,
+											argc, argv,
 											GNOME_PARAM_GOPTION_CONTEXT, 		context,
 											GNOME_PARAM_HUMAN_READABLE_NAME,	_("3270 Emulator"),
 											NULL
