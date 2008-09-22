@@ -194,6 +194,7 @@ const char *lib3270_init(int *argc, const char **argv)
 	return cl_hostname;
 }
 
+// FIXME (perry#2#): This doesn't work under gnome. Need to find another way to set appres fields
 int parse_command_line(int argc, const char **argv, const char **cl_hostname)
 {
 	int cl, i;
@@ -471,7 +472,7 @@ parse_options(int *argcp, const char **argv)
     { OptSocket,   OPT_BOOLEAN, True,  ResSocket,    offset(socket) },
 #endif /*]*/
     { OptTermName, OPT_STRING,  False, ResTermName,  offset(termname) },
-#if defined(WC3270) /*[*/
+#if defined(WC3270) || defined(G3270) /*[*/
     { OptTitle,    OPT_STRING,  False, ResTitle,     offset(title) },
 #endif /*]*/
 #if defined(X3270_TRACE) /*[*/
