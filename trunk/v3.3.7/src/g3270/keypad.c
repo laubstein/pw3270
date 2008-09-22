@@ -48,9 +48,9 @@
 
  }
 
- static void pf_button(GtkButton *button, gchar *key)
+ static void pf_button(GtkButton *button, int key)
  {
-	action_internal(PF_action, IA_DEFAULT, key, CN);
+ 	PFKey(key);
  }
 
  static void pa_button(GtkButton *button, gchar *key)
@@ -103,10 +103,7 @@
 		g_snprintf(label,9,"PF%d",f+1);
 		widget = gtk_button_new_with_label(label);
 
-		g_snprintf(label,9,"%d",f+1);
-
-		// FIXME (perry#2#): Add a closure function to "g_free" the allocated string.
-		g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(pf_button),g_strdup(label));
+		g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(pf_button),(gpointer) (f+1));
 
 		gtk_table_attach_defaults(GTK_TABLE(table),widget,col,col+2,row,row+1);
 		col += 2;

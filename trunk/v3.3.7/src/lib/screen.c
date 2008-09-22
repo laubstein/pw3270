@@ -58,6 +58,7 @@ extern char *profile_name;
 
 static const struct lib3270_screen_callbacks *callbacks = NULL;
 
+static int counter[COUNTER_ID_USER] = { 0, 0 };
 
 static int defattr = 0;
 Boolean screen_has_changes = 0;
@@ -472,9 +473,9 @@ static void set(OIA_FLAG id, Boolean on)
 		callbacks->set(id,on);
 }
 
-void
-status_ctlr_done(void)
+void status_ctlr_done(void)
 {
+	counter[COUNTER_ID_CTLR_DONE]++;
 	set(OIA_FLAG_UNDERA,True);
 }
 
@@ -850,17 +851,15 @@ relabel(Boolean ignored unused)
 	}
 }
 
-static int screen_changes	= 0;
-
-int query_screen_change_counter(void)
+int query_counter(COUNTER_ID id)
 {
-	return screen_changes;
+	return counter[id];
 }
 
 void screen_changed(int bstart, int bend)
 {
 	screen_has_changes = 1;
-	screen_changes++;
+	counter[COUNTER_ID_SCREEN_CHANGED]++;
 
 	/* If the application can manage screen changes, let it do it */
 	if(callbacks && callbacks->changed)

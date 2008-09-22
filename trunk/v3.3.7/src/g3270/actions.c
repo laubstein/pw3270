@@ -199,7 +199,9 @@
  };
 
 
- GtkActionGroup	*action_group[ACTION_GROUP_MAX] = { NULL };
+ GtkActionGroup		*action_group[ACTION_GROUP_MAX] = { NULL };
+ gboolean 			keep_selected					= FALSE;
+
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -384,6 +386,12 @@
 	FontChanged();
  }
 
+ static void toggle_keep_selected(GtkToggleAction *action, gpointer dunno)
+ {
+ 	keep_selected = gtk_toggle_action_get_active(action);
+	SetBoolean("Toggles","KeepSelected",keep_selected);
+ }
+
  static void LoadToggleActions(GtkActionGroup *actions)
  {
 	// TODO (perry#9#): Add tooltips
@@ -435,6 +443,7 @@
 	// TODO (perry#9#): Add tooltips
  	static const struct _toggle_internal
  	{
+ 		const gchar *name;
  		const gchar *label;
  		const gchar *tooltip;
  		const gchar *stock_id;
@@ -444,7 +453,8 @@
 	}
 	toggle_internal[] =
 	{
-		{ N_( "Bold" ),							NULL,	NULL,	NULL,	toggle_bold	}
+		{ "Bold", 			N_( "Bold" ),			NULL,	NULL,	NULL,	toggle_bold				},
+		{ "KeepSelected", 	N_( "Keep selected" ),	NULL,	NULL,	NULL,	toggle_keep_selected	}
 	};
 
  	int f;
@@ -454,14 +464,14 @@
  	{
  		char buffer[20];
 
- 		g_snprintf(buffer,19,"Toggle%s",toggle_internal[f].label);
+ 		g_snprintf(buffer,19,"Toggle%s",toggle_internal[f].name);
 
 		GtkToggleAction *action = gtk_toggle_action_new(	buffer,
 															gettext(toggle_internal[f].label),
 															gettext(toggle_internal[f].tooltip),
 															toggle_info[f].stock_id );
 
-		gtk_toggle_action_set_active(action,GetBoolean("Toggles",toggle_internal[f].label,FALSE));
+		gtk_toggle_action_set_active(action,GetBoolean("Toggles",toggle_internal[f].name,FALSE));
 		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_internal[f].call),(gpointer) toggle_internal[f].label);
 		if(toggle_internal[f].accelerator)
 			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(toggle_internal[f].accelerator));
@@ -469,28 +479,26 @@
 			gtk_action_group_add_action(actions,(GtkAction *) action);
  	}
 
+	keep_selected = GetBoolean("Toggles","KeepSelected",keep_selected);
+
 	/* Toggle actions */
  	for(f=0;f<N_TOGGLES;f++)
  	{
  		char buffer[20] = "Toggle";
 
-		if(toggle_info[f].label)
-		{
-			strncat(buffer,get_toggle_name(f),20);
+		strncat(buffer,get_toggle_name(f),20);
 
-			GtkToggleAction *action = gtk_toggle_action_new(	buffer,
-																gettext(toggle_info[f].label),
-																gettext(toggle_info[f].tooltip),
-																toggle_info[f].stock_id );
-			gtk_toggle_action_set_active(action,Toggled(f));
-			g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_action),(gpointer) f);
+		GtkToggleAction *action = gtk_toggle_action_new(	buffer,
+															gettext(toggle_info[f].label),
+															gettext(toggle_info[f].tooltip),
+															toggle_info[f].stock_id );
+		gtk_toggle_action_set_active(action,Toggled(f));
+		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_action),(gpointer) f);
 
-			if(toggle_info[f].accelerator)
-				gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(toggle_info[f].accelerator));
-			else
-				gtk_action_group_add_action(actions,(GtkAction *) action);
-
-		}
+		if(toggle_info[f].accelerator)
+			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(toggle_info[f].accelerator));
+		else
+			gtk_action_group_add_action(actions,(GtkAction *) action);
  	}
 
 	/* Set/Reset actions */
@@ -750,6 +758,18 @@
 	return rc;
  }
 
+ gboolean PFKey(int key)
+ {
+ 	char ks[6];
+
+	if(!keep_selected)
+		action_ClearSelection();
+
+ 	g_snprintf(ks,5,"%d",key);
+	action_internal(PF_action, IA_DEFAULT, ks, CN);
+	return TRUE;
+ }
+
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
  	// TODO (perry#2#): Put all keyboard actions as accelerators.
@@ -776,14 +796,7 @@
 
 	/* Is function key? */
 	if(IS_FUNCTION_KEY(event))
-    {
-		action_ClearSelection();
-    	sprintf(buffer,"%d",GetFunctionKey(event));
-        action_internal(PF_action, IA_DEFAULT, buffer, CN);
-        return TRUE;
-    }
-
-//	Trace("Key: %s",gdk_keyval_name(event->keyval));
+		return(PFKey(GetFunctionKey(event)));
 
     /* Check for special keyproc actions */
 	for(f=0; f < (sizeof(keyproc)/sizeof(struct WindowActions));f++)

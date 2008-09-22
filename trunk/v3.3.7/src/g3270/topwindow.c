@@ -72,16 +72,8 @@
  static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
  	// http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-key-press-event
- 	char ks[6];
-
     if(IS_FUNCTION_KEY(event))
-    {
-		action_ClearSelection();
-    	snprintf(ks,5,"%d",GetFunctionKey(event));
-		action_internal(PF_action, IA_DEFAULT, ks, CN);
-    	return TRUE;
-    }
-
+		return(PFKey(GetFunctionKey(event)));
     return FALSE;
  }
 

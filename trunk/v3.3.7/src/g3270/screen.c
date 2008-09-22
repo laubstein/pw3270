@@ -148,6 +148,7 @@
  int								fHeight			= 0;
  ELEMENT							*screen			= NULL;
  char								*charset		= NULL;
+ char								*window_title	= PACKAGE_NAME;
 
  static int						szScreen		= 0;
  static gboolean					draw			= FALSE;
@@ -160,6 +161,7 @@
 
  static gchar 						*(*convert_charset)(int c, gsize *sz) = convert_regular;
  static gboolean					oia_flag[OIA_FLAG_USER];
+
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
@@ -197,9 +199,9 @@
  	gchar buffer[80];
 
  	if(text && *text)
- 		g_snprintf(buffer,79,"%s - %s",PACKAGE_NAME,text);
+ 		g_snprintf(buffer,79,"%s - %s",window_title,text);
 	else
- 		g_snprintf(buffer,79,"%s",PACKAGE_NAME);
+ 		g_snprintf(buffer,79,"%s",window_title);
 
  	if(topwindow)
 		gtk_window_set_title(GTK_WINDOW(topwindow),buffer);
@@ -392,9 +394,16 @@
 
 	if(screen)
 	{
-		memset(screen,0,szScreen);
+		gboolean selected;
+
+//		memset(screen,0,szScreen);
 		for(f=0;f<szScreen;f++)
-			screen[f].ch[0] = ' ';
+		{
+			selected		= screen[f].selected;
+			memset(screen+f,0,sizeof(ELEMENT));
+			screen[f].ch[0]		= ' ';
+			screen[f].selected	= selected;
+		}
 	}
 
 	if(terminal && pixmap)
