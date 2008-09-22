@@ -228,6 +228,32 @@
 	g_free(filename);
  }
 
+ GdkPixbuf * LoadLogo(void)
+ {
+ 	// TODO (perry#5#): Make it configurable.
+	GdkPixbuf	*pix;
+	gchar 		*file;
+
+	file = FindSystemConfigFile(PACKAGE_NAME ".png");
+	if(file)
+	{
+		Trace("Loading %s",file);
+		pix = gdk_pixbuf_new_from_file(file, NULL);
+		g_free(file);
+		return pix;
+	}
+
+	file = FindSystemConfigFile(PACKAGE_NAME ".jpg");
+	if(file)
+	{
+		Trace("Loading %s",file);
+		pix = gdk_pixbuf_new_from_file(file, NULL);
+		g_free(file);
+		return pix;
+	}
+
+	return NULL;
+ }
 
  int CreateTopWindow(void)
  {
@@ -241,23 +267,15 @@
  	GtkWidget				*hbox;
  	int						f;
 	GtkUIManager			*ui_manager;
-	gchar					*file;
 	GdkPixbuf				*pix;
 
 	topwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	pix = LoadLogo();
 
-	file = FindSystemConfigFile(PACKAGE_NAME ".jpg");
-	if(file)
+	if(pix)
 	{
-		Trace("Loading %s",file);
-		pix = gdk_pixbuf_new_from_file(file, NULL);
 		main_icon = g_list_append(main_icon, pix);
 		gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
-		g_free(file);
-	}
-	else
-	{
-		Log("Can't find %s",PACKAGE_NAME ".jpg");
 	}
 
 	for(f=0;f<CURSOR_MODE_USER;f++)

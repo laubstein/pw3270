@@ -332,15 +332,7 @@
 		"Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02111-1307 "
 		"USA" );
 
-	GdkPixbuf	*logo = NULL;
-	gchar		*file = FindSystemConfigFile(PACKAGE_NAME ".jpg");
-
-	if(file)
-	{
-		Trace("Loading %s",file);
-		logo = gdk_pixbuf_new_from_file(file, NULL);
-		g_free(file);
-	}
+	GdkPixbuf	*logo = LoadLogo();
 
  	gtk_show_about_dialog(	GTK_WINDOW(topwindow),
 #if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
