@@ -3455,3 +3455,8 @@ int query_secure_connection(void)
 {
         return (int) secure_connection;
 }
+
+int Get3270Socket(void)
+{
+        return sock;
+}

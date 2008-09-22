@@ -69,7 +69,7 @@
  	GModule			*handle;
  	gchar			*filename;
 
-	Trace("Loading plugins in \"%s\"",path);
+	Log("Loading plugins in \"%s\"",path);
 
     dir = g_dir_open(path,0,NULL);
     if(!dir)
@@ -283,8 +283,10 @@
  	g_free(screen);
  }
 
- static void PFKey(GtkAction *action, gpointer cmd)
+ static void ExecPFKey(GtkAction *action, gpointer cmd)
  {
+	if(!keep_selected)
+		action_ClearSelection();
 	action_internal(PF_action, IA_DEFAULT, cmd, CN);
  }
 
@@ -330,7 +332,7 @@
  		{ "ExecWithScreen", 	ExecWithScreen		},
  		{ "ExecWithCopy",		ExecWithCopy		},
  		{ "ExecWithSelection",	ExecWithSelection	},
- 		{ "PFKey",				PFKey				}
+ 		{ "PFKey",				ExecPFKey			}
  	};
 
 	GDir			*dir;

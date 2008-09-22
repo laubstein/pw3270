@@ -63,6 +63,21 @@
 
  }
 
+ void G3270Action_Rexx(GtkAction *action, gpointer cmd)
+ {
+ 	gchar *script 	= g_strdup(cmd);
+ 	gchar *arg		= strchr(script,' ');
+
+	if(arg)
+		*(arg++) = 0;
+	else
+		arg = "";
+
+	call_rexx(script,g_strstrip(arg));
+
+	g_free(script);
+ }
+
  void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf)
  {
  	static const struct _action_info

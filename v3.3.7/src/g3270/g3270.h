@@ -137,8 +137,10 @@
 	extern gint					cRow;
 	extern gboolean 				WaitingForChanges;
 	extern char					*charset;
+	extern gchar 					*window_title;
 
 	extern GtkActionGroup			*action_group[ACTION_GROUP_MAX];
+	extern gboolean 				keep_selected;
 
 	#define common_actions		action_group[ACTION_GROUP_COMMON]
 	#define online_actions		action_group[ACTION_GROUP_ONLINE]
@@ -169,6 +171,7 @@
 	void 		SetStatusCode(STATUS_CODE id);
 	void 		SetTerminalFont(const gchar *fontname);
 	void 		RedrawCursor(void);
+	gboolean	PFKey(int key);
 
 	#define		GetSelection() GetScreenContents(0)
 	gchar 		*GetClipboard(void);

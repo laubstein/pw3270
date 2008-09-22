@@ -154,6 +154,17 @@
 			OIA_FLAG_USER
 		} OIA_FLAG;
 
+		typedef enum _COUNTER_ID
+		{
+			COUNTER_ID_SCREEN_CHANGED,
+			COUNTER_ID_CTLR_DONE,
+
+			COUNTER_ID_USER
+		} COUNTER_ID;
+		int query_counter(COUNTER_ID id);
+
+		#define	query_screen_change_counter() query_counter(COUNTER_ID_SCREEN_CHANGED)
+
 		enum g3270_action_groups
 		{
 			ACTION_GROUP_COMMON,
@@ -164,6 +175,9 @@
 
 			ACTION_GROUP_MAX
 		};
+
+
+
 
 		#define COLOR_ATTR_NONE			0x0000
 		#define COLOR_ATTR_FIELD		0x0100
@@ -213,7 +227,6 @@
 		int 	screen_read(char *dest, int baddr, int count);
 		void	Input_String(const unsigned char *str);
 		void 	screen_size(int *rows, int *cols);
-		int 	query_screen_change_counter(void);
 		int		query_secure_connection(void);
 
 		/* Misc API calls */
@@ -229,5 +242,6 @@
 		void 	screen_resume(void);
 		void 	screen_suspend(void);
 		void	screen_disp(void);
+		int 	Get3270Socket(void);
 
 #endif // LIB3270_H_INCLUDED
