@@ -792,7 +792,7 @@
  	};
 
  	int		f;
- 	char	buffer[10];
+// 	char	buffer[10];
 
 	/* Is function key? */
 	if(IS_FUNCTION_KEY(event))

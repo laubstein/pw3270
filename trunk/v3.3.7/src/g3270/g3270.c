@@ -404,8 +404,19 @@ static void init_locale(void)
 int main(int argc, char *argv[])
 {
 #ifdef HAVE_LIBGNOME
+
+/*
+	static GOptionEntry entries[] =
+	{
+		{ "title", 't', 0, G_OPTION_ARG_STRING, &window_title, N_( "Window title" ), PACKAGE_NAME },
+
+		{ NULL }
+	};
+*/
+
 	static GnomeProgram	*gnome_program;
-	static GOptionContext	*gnome_context;
+	static GOptionContext	*context;
+
 #endif
 
 	const char	*cl_hostname = CN;
@@ -416,12 +427,15 @@ int main(int argc, char *argv[])
 
 #ifdef HAVE_LIBGNOME
 
-	gnome_context = g_option_context_new (_("- 3270 Emulator for Gnome"));
+	context = g_option_context_new (_("- 3270 Emulator for Gnome"));
+
+//	g_option_context_add_main_entries(context, entries, PACKAGE_NAME);
+//	g_option_context_add_group (context, gtk_get_option_group (TRUE));
 
 	gnome_program = gnome_program_init (	PACKAGE_NAME,
 											PACKAGE_VERSION,
 											LIBGNOMEUI_MODULE, 					argc, argv,
-											GNOME_PARAM_GOPTION_CONTEXT, 		gnome_context,
+											GNOME_PARAM_GOPTION_CONTEXT, 		context,
 											GNOME_PARAM_HUMAN_READABLE_NAME,	_("3270 Emulator"),
 											NULL
 								);
