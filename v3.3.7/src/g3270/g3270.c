@@ -357,7 +357,7 @@ static gint save_session (GnomeClient *client, gint phase, GnomeSaveStyle save_s
 
 	Trace("Saving session for %s",(char *) client_data);
 
-//	action_save(0,0);
+	action_Save();
 
 	/* allocate 0-filled, so it will be NULL-terminated */
 	argv = g_malloc0(sizeof(gchar*)*4);
