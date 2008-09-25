@@ -1,3 +1,5 @@
+%define _rexx	%(which oorexx-config > /dev/null 2>&1; if [ "$?" = "0" ]; then echo 1; else echo 0; fi)
+
 Name:           @PACKAGE@
 License:        GPL
 Group:          System/X11/Terminals
@@ -31,6 +33,7 @@ Group:		Development/Libraries
 %description devel
 devel for tn3270 protocol library for %{name}
 
+%if 0%{?_rexx}
 %package rexx
 Provides:	%{name}-rexx
 Summary:	Devel for 3270 Communication library for %{name}
@@ -40,6 +43,8 @@ BuildRequires:  ooRexx
 
 %description rexx
 Plugin to add Rexx support in %{name}
+
+%endif
 
 %prep
 
@@ -82,8 +87,11 @@ desktop-file-install    --vendor %{_build_vendor} \
 
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
 install -m 644 %{name}.pc %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
-install -m 644 ui/rexx.xml %{buildroot}%{_datadir}/%{name}/ui/rexx.xml
 install -m 644 ui/debug.xml %{buildroot}%{_datadir}/%{name}/ui/debug.xml
+
+%if 0%{?_rexx}
+install -m 644 ui/rexx.xml %{buildroot}%{_datadir}/%{name}/ui/rexx.xml
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -115,8 +123,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig
 %{_datadir}/%{name}/ui/debug.xml
 
+%if 0%{?_rexx}
 %files rexx
 %defattr(-,root,root)
 %{_libdir}/%{name}/plugins/rx3270.so
 %{_datadir}/%{name}/ui/rexx.xml
+%endif
+
 
