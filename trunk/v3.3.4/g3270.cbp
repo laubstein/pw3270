@@ -41,6 +41,7 @@
 		<Unit filename="configure.ac" />
 		<Unit filename="g3270.spec" />
 		<Unit filename="license.txt" />
+		<Unit filename="menu.conf" />
 		<Unit filename="src/actions.c">
 			<Option compilerVar="CC" />
 		</Unit>
