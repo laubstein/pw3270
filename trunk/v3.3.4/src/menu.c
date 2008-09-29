@@ -232,6 +232,9 @@
 
     DBGPrintf("Open: %s %p",filename,arq);
 
+    if(!arq)
+	return 0;
+
     memset(&item,0,sizeof(item));
 
     while(fgets((char *) buffer,1023,arq))
