@@ -20,7 +20,7 @@ do
 done
 
 
-CC="mingw32-gcc"
+CC="/usr/i386-mingw32/bin/i386-mingw32-gcc"
 PKG_CONFIG_PATH="/usr/i386-mingw32/lib/pkgconfig"
 GTK_MODULES="glib-2.0 gtk+-2.0 gthread-2.0 gmodule-2.0"
 SSL_MODULES="libcrypto libssl openssl"
