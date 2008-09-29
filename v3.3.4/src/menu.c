@@ -233,7 +233,7 @@
     DBGPrintf("Open: %s %p",filename,arq);
 
     if(!arq)
-	return 0;
+        return 0;
 
     memset(&item,0,sizeof(item));
 
