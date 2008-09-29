@@ -19,7 +19,7 @@ do
    shift
 done
 
-
+WINDRES="/usr/i386-mingw32/bin/i386-mingw32-windres"
 CC="/usr/i386-mingw32/bin/i386-mingw32-gcc"
 PKG_CONFIG_PATH="/usr/i386-mingw32/lib/pkgconfig"
 GTK_MODULES="glib-2.0 gtk+-2.0 gthread-2.0 gmodule-2.0"
@@ -30,14 +30,14 @@ echo "s&@PACKAGE_NAME@&$name&g;" > $TEMPFILE
 echo "s&@PACKAGE@&$name&g;" >> $TEMPFILE
 echo "s&@CC@&$CC&g;" >> $TEMPFILE
 echo "s&@PACKAGE_VERSION@&$version&g;" >> $TEMPFILE
-echo "s&@GTK_CFLAGS@&`pkg-config --cflags $GTK_MODULES`&g;" >> $TEMPFILE
-echo "s&@GTK_LIBS@&`pkg-config --libs $GTK_MODULES`&g;" >> $TEMPFILE
+echo "s&@GTK_CFLAGS@&`PKG_CONFIG_PATH=$PKG_CONFIG_PATH pkg-config --cflags $GTK_MODULES`&g;" >> $TEMPFILE
+echo "s&@GTK_LIBS@&`PKG_CONFIG_PATH=$PKG_CONFIG_PATH pkg-config --libs $GTK_MODULES`&g;" >> $TEMPFILE
 echo "s&@LIBGNOME_CFLAGS@&&g;" >> $TEMPFILE
 echo "s&@LIBGNOME_LIBS@&&g;" >> $TEMPFILE
-echo "s&@LIBSSL_CFLAGS@&`pkg-config --cflags $SSL_MODULES`&g;" >> $TEMPFILE
-echo "s&@LIBSSL_LIBS@&`pkg-config --libs $SSL_MODULES`&g;" >> $TEMPFILE
+echo "s&@LIBSSL_CFLAGS@&`PKG_CONFIG_PATH=$PKG_CONFIG_PATH pkg-config --cflags $SSL_MODULES`&g;" >> $TEMPFILE
+echo "s&@LIBSSL_LIBS@&`PKG_CONFIG_PATH=$PKG_CONFIG_PATH pkg-config --libs $SSL_MODULES`&g;" >> $TEMPFILE
 echo "s&@NATIVECC@&gcc&g;" >> $TEMPFILE
-echo "s&@WINDRES@&mingw32-windres&g;" >> $TEMPFILE
+echo "s&@WINDRES@&$WINDRES&g;" >> $TEMPFILE
 echo "s&@OS_LIBS@&-lws2_32&g;" >> $TEMPFILE
 echo "s&@XCPPFLAGS@&-D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500&g;" >> $TEMPFILE
 echo "s&@PROGRAM_FLAGS@&&g;" >> $TEMPFILE
