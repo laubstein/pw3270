@@ -24,6 +24,8 @@
 #
 
 MODULE_NAME ?= rx3270
+SOURCES = main.c actions.c gui.c screen.c toggle.c tools.c
+
 BINROOT ?= ../../../bin
 OBJDEBUG ?= ../../../obj/Debug/src/plugins/rexx
 BINDEBUG ?= $(BINROOT)/Debug/plugins
@@ -42,8 +44,6 @@ CC = @CC@
 windows-dllflags=-Wl,--export-all-symbols -Wl,--enable-auto-import
 CFLAGS = @EXTRA_FLAGS@ -g -Wall @GTK_CFLAGS@ @REXX_CFLAGS@ -O -I../../include
 DLLFLAGS = @EXTRA_FLAGS@ @REXX_LIBS@ @GTK_LIBS@ -shared $(@host_os@-dllflags)
-
-SOURCES = main.c actions.c gui.c screen.c toggle.c tools.c
 
 # Rules
 
@@ -74,3 +74,8 @@ clean:
 	@find . -name "*.log" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "leak.out" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.tmp" -exec mv -f {} $(TMPDIR) \;
+	@rm -f $(BINDEBUG)/$(MODULE_NAME).@DLLEXT@
+	@rm -f $(BINRELEASE)/$(MODULE_NAME).@DLLEXT@
+	@rm -f $(foreach SRC, $(basename $(SOURCES)), $(OBJRELEASE)/$(SRC).@OBJEXT@)
+	@rm -f $(foreach SRC, $(basename $(SOURCES)), $(OBJDEBUG)/$(SRC).@OBJEXT@)
+
