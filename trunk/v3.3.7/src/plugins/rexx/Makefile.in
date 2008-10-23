@@ -24,10 +24,11 @@
 #
 
 MODULE_NAME ?= rx3270
+BINROOT ?= ../../../bin
 OBJDEBUG ?= ../../../obj/Debug/src/plugins/rexx
-BINDEBUG ?= ../../../bin/Debug/plugins
+BINDEBUG ?= $(BINROOT)/Debug/plugins
 OBJRELEASE ?= ../../../obj/Release/src/plugins/rexx
-BINRELEASE ?= ../../../bin/Release/plugins
+BINRELEASE ?= $(BINROOT)/Release/plugins
 
 # OS Stuff
 @CROSS@
@@ -59,12 +60,12 @@ $(OBJRELEASE)/%.o: %.c Makefile
 $(BINDEBUG)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDEBUG)/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) -o $@ $^ $(DLLFLAGS)
+	@$(CC) -o $@ $^ -L$(BINROOT)/Debug -l3270 $(DLLFLAGS)
 
 $(BINRELEASE)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJRELEASE)/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) -o $@ $^ $(DLLFLAGS)
+	@$(CC) -o $@ $^ -L$(BINROOT)/Release -l3270 $(DLLFLAGS)
 
 clean:
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
