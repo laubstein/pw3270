@@ -262,7 +262,6 @@ clean:
 	@rm -f	$(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 	@rm -f $(PACKAGE).pot
 	@rm -f $(PACKAGE).po
-	@rm -f src/g3270/resources.rc
 	@rm -fr autom4te.cache
 	@rm -f config.status
 	@rm -f *.lnk

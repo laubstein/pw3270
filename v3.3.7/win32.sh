@@ -5,6 +5,8 @@ version=3.3.7p5
 locale="locale"
 PLUGIN=plugins
 gtkroot=GTK2-Runtime
+crossroot=/usr/i386-mingw32
+rexxroot=/usr/i386-mingw32/ooRexx
 icon="image/default.ico"
 logo="image/default.jpg"
 
@@ -19,11 +21,17 @@ do
    shift
 done
 
-WINDRES="/usr/i386-mingw32/bin/i386-mingw32-windres"
-CC="/usr/i386-mingw32/bin/i386-mingw32-gcc"
-PKG_CONFIG_PATH="/usr/i386-mingw32/lib/pkgconfig"
+WINDRES="$crossroot/bin/i386-mingw32-windres"
+CC="$crossroot/bin/i386-mingw32-gcc"
+PKG_CONFIG_PATH="$crossroot/lib/pkgconfig"
 GTK_MODULES="glib-2.0 gtk+-2.0 gthread-2.0 gmodule-2.0"
 SSL_MODULES="libcrypto libssl openssl"
+
+if [ -e "$rexxroot/api/rexx.h" ]; then
+	SELECTED_PLUGINS="rx3270"
+	REXX_CFLAGS="-I$rexxroot/api"
+	REXX_LIBS="-L$rexxroot/api -lrexx -lrexxapi"
+fi
 
 TEMPFILE=`mktemp`
 echo "s&@PACKAGE_NAME@&$name&g;" > $TEMPFILE
@@ -50,6 +58,8 @@ echo "s&@EXEOPT@&-mwindows&g;" >> $TEMPFILE
 echo "s&@EXTRA_FLAGS@&-mno-cygwin&g;" >> $TEMPFILE
 echo "s&@EXTRASRC@&resources.rc&g;" >> $TEMPFILE
 echo "s&@EXTRA_TARGETS@&w3n46.dll&g;" >> $TEMPFILE
+echo "s&@REXX_CFLAGS@&$REXX_CFLAGS&g;" >> $TEMPFILE
+echo "s&@REXX_LIBS@&$REXX_LIBS&g;" >> $TEMPFILE
 echo "s&@host_os@&windows&g;" >> $TEMPFILE
 echo "s&@prefix@&.&g;" >> $TEMPFILE
 echo "s&@exec_prefix@&.&g;" >> $TEMPFILE
@@ -63,7 +73,7 @@ echo "s&@GTKROOT@&$gtkroot&g;" >> $TEMPFILE
 echo "s&@ICONFILE@&$icon&g;" >> $TEMPFILE
 echo "s&@LOGOFILE@&$logo&g;" >> $TEMPFILE
 echo "s&@datarootdir@&.&g;" >> $TEMPFILE
-echo "s&@SELECTED_PLUGINS@&&g;" >> $TEMPFILE
+echo "s&@SELECTED_PLUGINS@&$SELECTED_PLUGINS&g;" >> $TEMPFILE
 
 echo "s&#undef PACKAGE_NAME&#define PACKAGE_NAME \"$name\"&g;" >> $TEMPFILE
 echo "s&#undef PACKAGE_VERSION&#define PACKAGE_VERSION \"$version\"&g;" >> $TEMPFILE
@@ -96,6 +106,11 @@ if [ "$?" != "0" ]; then
 fi
 
 sed --file=$TEMPFILE src/g3270/resources.rc.in > src/g3270/resources.rc
+if [ "$?" != "0" ]; then
+	exit -1
+fi
+
+sed --file=$TEMPFILE src/plugins/rexx/Makefile.in > src/plugins/rexx/Makefile
 if [ "$?" != "0" ]; then
 	exit -1
 fi
