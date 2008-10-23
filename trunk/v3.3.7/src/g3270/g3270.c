@@ -267,7 +267,7 @@ static int g3270_init(int *argc, char ***argv)
 	gboolean				has_log		= FALSE;
 
 	/* If running on win32 changes to program path */
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32) || defined( DEBUG ) /*[*/
 	gchar *ptr = g_strdup(*argv[0]);
 	g_chdir(g_path_get_dirname(ptr));
 	g_free(ptr);
