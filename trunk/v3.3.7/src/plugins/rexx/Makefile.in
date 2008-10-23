@@ -76,6 +76,6 @@ clean:
 	@find . -name "*.tmp" -exec mv -f {} $(TMPDIR) \;
 	@rm -f $(BINDEBUG)/$(MODULE_NAME).@DLLEXT@
 	@rm -f $(BINRELEASE)/$(MODULE_NAME).@DLLEXT@
-	@rm -f $(foreach SRC, $(basename $(SOURCES)), $(OBJRELEASE)/$(SRC).@OBJEXT@)
-	@rm -f $(foreach SRC, $(basename $(SOURCES)), $(OBJDEBUG)/$(SRC).@OBJEXT@)
+	@rm -f $(OBJRELEASE)/*.@OBJEXT@
+	@rm -f $(OBJDEBUG)/*.@OBJEXT@
 
