@@ -75,26 +75,51 @@
 /* Rexx Args:   New cursor row                                                */
 /*              New cursor col                                                */
 /*                                                                            */
-/* Returns:	    none                                                          */
+/* Returns:	    Original cursor position                                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 ULONG APIENTRY rx3270MoveCursor(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
 {
+    int rc = -1;
+
     switch(Argc)
     {
+    case 0:
+        rc = cursor_get_addr();
+        break;
+
     case 1:
-        cursor_move(atoi(Argv[0].strptr));
+        rc = cursor_set_addr(atoi(Argv[0].strptr));
         break;
 
     case 2:
-        cursor_move((atoi(Argv[0].strptr) * ctlr_get_cols()) + atoi(Argv[1].strptr));
+        rc = cursor_set_addr((atoi(Argv[0].strptr) * ctlr_get_cols()) + atoi(Argv[1].strptr));
         break;
 
     default:
 		return RXFUNC_BADCALL;
     }
 
-    ReturnOk();
+	ReturnValue(rc);
+ }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270GetCursorPosition                            */
+/*                                                                            */
+/* Description: Get cursor position.                                          */
+/*                                                                            */
+/* Rexx Args:   None                                                          */
+/*                                                                            */
+/* Returns:	    Current cursor position                                       */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+{
+    if(Argc)
+		return RXFUNC_BADCALL;
+
+	ReturnValue(cursor_get_addr());
  }
 
 /*----------------------------------------------------------------------------*/
