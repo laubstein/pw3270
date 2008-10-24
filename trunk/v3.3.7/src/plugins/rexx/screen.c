@@ -25,8 +25,13 @@
 */
 
  #include "rx3270.h"
+ #include <errno.h>
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
+
+#ifndef ENOTCONN
+    #define ENOTCONN -1
+#endif
 
 /*---[ Statics ]----------------------------------------------------------------------------------*/
 
@@ -210,7 +215,7 @@ ULONG APIENTRY rx3270MoveCursor(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuena
 	{
 		if(!CONNECTED)
 		{
-            ReturnValue(ENOTCONN);
+            ReturnValue( ENOTCONN );
 		}
 		gtk_main_iteration();
 	}
