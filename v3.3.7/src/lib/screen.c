@@ -454,15 +454,24 @@ void screen_resume(void)
 
 }
 
-void cursor_move(int baddr)
+int cursor_get_addr(void)
 {
-	if(cursor_addr == baddr) // Prevent unnecessary calls
-		return;
+    return cursor_addr;
+}
 
-	cursor_addr = baddr;
+int cursor_set_addr(int baddr)
+{
+    int ret = cursor_addr;
 
-	if(callbacks && callbacks->move_cursor)
-		callbacks->move_cursor(baddr/cCOLS, baddr%cCOLS);
+    if(cursor_addr != baddr)
+    {
+        cursor_addr = baddr;
+
+        if(callbacks && callbacks->move_cursor)
+            callbacks->move_cursor(baddr/cCOLS, baddr%cCOLS);
+    }
+
+    return ret;
 }
 
 /* Status line stuff. */

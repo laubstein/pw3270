@@ -229,11 +229,12 @@
 		void 	screen_size(int *rows, int *cols);
 		int		query_secure_connection(void);
 
-		/* Misc API calls */
+        /* Misc calls */
+		int 	Get3270Socket(void);
 		void 	popup_an_error(const char *fmt, ...);
 
 		int		Toggled(int ix);
-		void 	cursor_move(int baddr);
+
 		int 	CallAndWait(int(*callback)(void *), void *parm);
 
 		void    ctlr_erase(int alt);
@@ -241,9 +242,15 @@
         int     ctlr_get_cols(void);
         int     ctlr_get_rows(void);
 
-		void 	screen_resume(void);
-		void 	screen_suspend(void);
-		void	screen_disp(void);
-		int 	Get3270Socket(void);
+        /* Screen calls */
+		void    screen_resume(void);
+		void    screen_suspend(void);
+		void    screen_disp(void);
+
+        /* Cursor calls */
+		int     cursor_get_addr(void);
+        int     cursor_set_addr(int baddr);
+		#define cursor_move(x) cursor_set_addr(x)
+
 
 #endif // LIB3270_H_INCLUDED
