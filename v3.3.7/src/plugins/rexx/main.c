@@ -51,25 +51,26 @@
  	PFN				call;
  } entrypoint[] =
  {
-	EXPORT_REXX_FUNCTION( rx3270Version				),
-	EXPORT_REXX_FUNCTION( rx3270Actions				),
-	EXPORT_REXX_FUNCTION( rx3270ToggleON			),
-	EXPORT_REXX_FUNCTION( rx3270ToggleOFF			),
-	EXPORT_REXX_FUNCTION( rx3270Toggle				),
-	EXPORT_REXX_FUNCTION( rx3270Toggled				),
-	EXPORT_REXX_FUNCTION( rx3270Log					),
-	EXPORT_REXX_FUNCTION( rx3270QueryCState			),
-	EXPORT_REXX_FUNCTION( rx3270Popup 				),
-	EXPORT_REXX_FUNCTION( rx3270UpdateScreen		),
-	EXPORT_REXX_FUNCTION( rx3270Sleep				),
-	EXPORT_REXX_FUNCTION( rx3270InputString			),
-	EXPORT_REXX_FUNCTION( rx3270FindFieldAttribute	),
-	EXPORT_REXX_FUNCTION( rx3270FindFieldLength		),
-	EXPORT_REXX_FUNCTION( rx3270MoveCursor			),
-	EXPORT_REXX_FUNCTION( rx3270GetCursorPosition	),
-	EXPORT_REXX_FUNCTION( rx3270ReadScreen			),
-	EXPORT_REXX_FUNCTION( rx3270SendPFKey			),
-	EXPORT_REXX_FUNCTION( rx3270WaitForChanges		)
+	EXPORT_REXX_FUNCTION( rx3270Version				    ),
+	EXPORT_REXX_FUNCTION( rx3270Actions				    ),
+	EXPORT_REXX_FUNCTION( rx3270QueryScreenAttribute    ),
+	EXPORT_REXX_FUNCTION( rx3270ToggleON			    ),
+	EXPORT_REXX_FUNCTION( rx3270ToggleOFF			    ),
+	EXPORT_REXX_FUNCTION( rx3270Toggle				    ),
+	EXPORT_REXX_FUNCTION( rx3270Toggled				    ),
+	EXPORT_REXX_FUNCTION( rx3270Log					    ),
+	EXPORT_REXX_FUNCTION( rx3270QueryCState			    ),
+	EXPORT_REXX_FUNCTION( rx3270Popup 				    ),
+	EXPORT_REXX_FUNCTION( rx3270UpdateScreen		    ),
+	EXPORT_REXX_FUNCTION( rx3270Sleep				    ),
+	EXPORT_REXX_FUNCTION( rx3270InputString			    ),
+	EXPORT_REXX_FUNCTION( rx3270FindFieldAttribute	    ),
+	EXPORT_REXX_FUNCTION( rx3270FindFieldLength		    ),
+	EXPORT_REXX_FUNCTION( rx3270MoveCursor			    ),
+	EXPORT_REXX_FUNCTION( rx3270GetCursorPosition	    ),
+	EXPORT_REXX_FUNCTION( rx3270ReadScreen			    ),
+	EXPORT_REXX_FUNCTION( rx3270SendPFKey			    ),
+	EXPORT_REXX_FUNCTION( rx3270WaitForChanges		    )
  };
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
