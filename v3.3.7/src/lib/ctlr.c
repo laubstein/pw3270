@@ -2803,3 +2803,14 @@ void
 toggle_nop(struct toggle *t unused, enum toggle_type tt unused)
 {
 }
+
+int ctlr_get_rows(void)
+{
+    return ROWS;
+}
+
+int ctlr_get_cols(void)
+{
+    return COLS;
+}
+

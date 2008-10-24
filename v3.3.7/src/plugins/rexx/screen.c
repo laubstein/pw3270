@@ -59,14 +59,37 @@
 	return RetValue(Retstr,find_field_length(atoi(Argv[0].strptr)));
  }
 
- ULONG APIENTRY rx3270MoveCursor(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
- {
-	if(Argc != 1)
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270MoveCursor                                   */
+/*                                                                            */
+/* Description: Set cursor position.                                          */
+/*                                                                            */
+/* Rexx Args:   New cursor position                                           */
+/*                                                                            */
+/* Rexx Args:   New cursor row                                                */
+/*              New cursor col                                                */
+/*                                                                            */
+/* Returns:	    none                                                          */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ULONG APIENTRY rx3270MoveCursor(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+{
+    switch(Argc)
+    {
+    case 1:
+        cursor_move(atoi(Argv[0].strptr));
+        break;
+
+    case 2:
+        cursor_move((atoi(Argv[0].strptr) * ctlr_get_cols()) + atoi(Argv[1].strptr));
+        break;
+
+    default:
 		return RXFUNC_BADCALL;
+    }
 
-	cursor_move(atoi(Argv[0].strptr));
-
-	return RetValue(Retstr,0);
+    ReturnOk();
  }
 
 /*----------------------------------------------------------------------------*/
@@ -186,7 +209,9 @@
 	while(last == query_screen_change_counter())
 	{
 		if(!CONNECTED)
-			return -1;
+		{
+            ReturnValue(ENOTCONN);
+		}
 		gtk_main_iteration();
 	}
 

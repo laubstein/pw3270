@@ -68,8 +68,9 @@
 	ULONG	RetString(PRXSTRING Retstr, const char *value);
 	ULONG	RetValue(PRXSTRING Retstr, int value);
 
-	#define ReturnValue(x) return RetValue(Retstr,x)
+	#define ReturnValue(x)  return RetValue(Retstr,x)
 	#define ReturnString(x) return RetString(Retstr,x)
+	#define ReturnOk()  	strcpy(Retstr->strptr,"0"); Retstr->strlength = 1; return RXFUNC_OK;
 
 	/* Rexx entry points */
 	ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
