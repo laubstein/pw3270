@@ -9,7 +9,7 @@ LOGO=sisbb/sisbb98.jpg
 #
 # Build windows version
 #
-ln -sf ~/win32/GTK-Runtime .
+ln -sf /usr/i386-mingw32/GTK-Runtime .
 ./win32.sh --gtkroot="GTK-Runtime" --locale="locale" --name=$NAME --icon=$ICON --logo=$LOGO
 if [ "$?" != "0" ]; then
 	exit -1
@@ -37,7 +37,8 @@ if [ "$?" != "0" ]; then
 fi
 
 scp $NAME-*.exe perry@os2team:public_html/g3270
-mv $NAME-*.exe ~/Desktop/
+mkdir -p ~/win32
+mv $NAME-*.exe ~/win32/
 
 make clean
 
