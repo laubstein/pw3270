@@ -105,6 +105,51 @@ ULONG APIENTRY rx3270MoveCursor(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuena
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
+/* Rexx External Function: rx3270QueryScreenAttribute                         */
+/*                                                                            */
+/* Description: Get Screen Atribute                                           */
+/*                                                                            */
+/* Rexx Args:                                                                 */
+/*                                                                            */
+/* Returns:	    Value of the selected attribute                               */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ULONG APIENTRY rx3270QueryScreenAttribute(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+{
+    static const struct _attr
+    {
+        const char *name;
+        int (*call)(void);
+    } attr[] =
+    {
+        {   "SCREEN_COLS",  ctlr_get_cols   },
+        {   "SCREEN_ROWS",  ctlr_get_rows   },
+        {   "CURSOR_ADDR",  cursor_get_addr }
+    };
+
+    int f;
+    int sz;
+
+    if(Argc != 1)
+        return RXFUNC_BADCALL;
+
+    sz = strlen(Argv[0].strptr);
+
+    for(f=0;f < G_N_ELEMENTS(attr); f++)
+    {
+        if(!g_ascii_strncasecmp(Argv[0].strptr,attr[f].name,sz))
+        {
+            f = attr[f].call();
+            ReturnValue(f);
+        }
+    }
+
+
+    ReturnValue(-1);
+}
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
 /* Rexx External Function: rx3270GetCursorPosition                            */
 /*                                                                            */
 /* Description: Get cursor position.                                          */
