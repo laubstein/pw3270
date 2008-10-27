@@ -84,11 +84,19 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-scp $RPMDIR/$RPMARCH/g3270*.rpm $USER@os2team.df.intrabb.bb.com.br:/home/matriz/pacotes/$VENDOR/bb/$RPMARCH
+TARGET_FOLDER=$USER@os2team.df.intrabb.bb.com.br:/home/matriz/pacotes/$VENDOR/bb/$RPMARCH
+
+if [ "$VENDOR" == "suse" ]; then
+	TARGET_FOLDER="$USER@storage:/dados/suse/$(rpm --eval="%{suse_version}" | cut -b1-2)/bb/i586"
+fi
+
+scp $RPMDIR/$RPMARCH/g3270*.rpm $TARGET_FOLDER
 if [ "$?" != "0" ]; then
 	echo "Erro ao copiar o pacote binario"
 	exit -1
 fi
+
+mv $RPMDIR/$RPMARCH/g3270*.rpm $TMPDIR
 
 rm -fr /home/perry/bin/g3270
 ./configure --enable-plugins --prefix=/home/perry/bin/g3270
