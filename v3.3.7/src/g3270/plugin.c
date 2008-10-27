@@ -69,7 +69,7 @@
  	GModule			*handle;
  	gchar			*filename;
 
-	Log("Loading plugins in \"%s\"",path);
+//	Log("Loading plugins in \"%s\"",path);
 
     dir = g_dir_open(path,0,NULL);
     if(!dir)
