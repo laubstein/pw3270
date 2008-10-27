@@ -38,6 +38,17 @@
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270InputString                                  */
+/*                                                                            */
+/* Description: "type" informed string.                                       */
+/*                                                                            */
+/* Rexx Args:   String to input                                               */
+/*                                                                            */
+/* Returns:	    None                                                          */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270InputString(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	if(Argc != 1)
@@ -109,7 +120,10 @@ ULONG APIENTRY rx3270MoveCursor(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuena
 /*                                                                            */
 /* Description: Get Screen Atribute                                           */
 /*                                                                            */
-/* Rexx Args:                                                                 */
+/* Rexx Args:   Screen attribute to get                                       */
+/*              SCREEN_COLS to get the number of the colums in the screen     */
+/*              SCREEN_ROWS to get the number of the rows in the screen       */
+/*              CURSOR_ADDR to get the current cursor position                */
 /*                                                                            */
 /* Returns:	    Value of the selected attribute                               */
 /*                                                                            */
@@ -259,6 +273,18 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
     return RXFUNC_OK;
  }
 
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270SendPFKey                                    */
+/*                                                                            */
+/* Description: Activate a PF-Key action.                                     */
+/*                                                                            */
+/* Rexx Args:	Number of the key to activate (1 for PF1, 2, PF2, etc).       */
+/*                                                                            */
+/* Returns:	    None                                                          */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270SendPFKey(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	char buffer[10];
@@ -272,6 +298,17 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 	ReturnValue(0);
  }
 
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270WaitForChanges                               */
+/*                                                                            */
+/* Description: Wait until the screen changes.                                */
+/*                                                                            */
+/* Rexx Args:	None                                                          */
+/*                                                                            */
+/* Returns:	    0 if ok or error code                                         */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270WaitForChanges(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	int last;

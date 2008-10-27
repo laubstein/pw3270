@@ -31,6 +31,17 @@
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270Log                                          */
+/*                                                                            */
+/* Description: Send string to g3270's log file                               */
+/*                                                                            */
+/* Rexx Args:   String to log                                                 */
+/*                                                                            */
+/* Returns:	    None                                                          */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270Log(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	if(Argc != 1)
@@ -41,6 +52,27 @@
 	return RetValue(Retstr,0);
  }
 
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270QueryCState                                  */
+/*                                                                            */
+/* Description: Query 3270 connection state                                   */
+/*                                                                            */
+/* Rexx Args:   None                                                          */
+/*                                                                            */
+/* Returns:	    Connection state                                              */
+/*              NOT_CONNECTED                                                 */
+/*              RESOLVING                                                     */
+/*              PENDING                                                       */
+/*              CONNECTED_INITIAL                                             */
+/*              CONNECTED_ANSI                                                */
+/*              CONNECTED_3270                                                */
+/*              CONNECTED_INITIAL_E                                           */
+/*              CONNECTED_NVT                                                 */
+/*              CONNECTED_SSCP                                                */
+/*              CONNECTED_TN3270E                                             */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270QueryCState(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	#define DECLARE_XLAT_STATE( x ) { x, #x }
@@ -80,7 +112,18 @@
 	return RetString(Retstr,"UNEXPECTED");
  }
 
- ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270Version                                      */
+/*                                                                            */
+/* Description: Query rx3270 current version                                  */
+/*                                                                            */
+/* Rexx Args:   None                                                          */
+/*                                                                            */
+/* Returns:	    String with the version information                           */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	strncpy(Retstr->strptr,PACKAGE_VERSION,RXAUTOBUFLEN-1);
     Retstr->strlength = strlen(Retstr->strptr);
