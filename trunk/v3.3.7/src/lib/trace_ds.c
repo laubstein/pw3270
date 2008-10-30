@@ -787,19 +787,23 @@ tracefile_on(int reason, enum toggle_type tt)
 		return;
 	}
 	if (appres.trace_file)
+	{
 		tracefile = appres.trace_file;
-	else {
+	}
+	else
+	{
 #if defined(_WIN32) /*[*/
-		tracefile_buf = xs_buffer("%sx3trc.%u.txt", myappdata,
-			getpid());
+		tracefile_buf = xs_buffer("%sx3trc.%u.txt", myappdata,getpid());
 #else /*][*/
-		tracefile_buf = xs_buffer("%s/x3trc.%u", appres.trace_dir,
-			getpid());
+
+        if(appres.trace_dir)
+            tracefile_buf = xs_buffer("%s/x3trc.%u", appres.trace_dir,getpid());
+        else
+            tracefile_buf = xs_buffer("%s/x3trc.%u", ".",getpid());
+
 #endif /*]*/
 		tracefile = tracefile_buf;
 	}
-
-	tracefile = "trace.txt";  // FIXME (perry#1#): Set trace file from commandline option or configuration file.
 
 
 #if defined(X3270_DISPLAY) /*[*/
@@ -1025,11 +1029,12 @@ toggle_screenTrace(struct toggle *t unused, enum toggle_type tt)
 			tracefile = appres.screentrace_file;
 		else {
 #if defined(_WIN32) /*[*/
-			tracefile_buf = xs_buffer("%sx3scr.%u.txt",
-				myappdata, getpid());
+			tracefile_buf = xs_buffer("%sx3scr.%u.txt",myappdata, getpid());
 #else /*][*/
-			tracefile_buf = xs_buffer("%s/x3scr.%u",
-				appres.trace_dir, getpid());
+            if(appres.trace_dir)
+                tracefile_buf = xs_buffer("%s/x3scr.%u",appres.trace_dir, getpid());
+            else
+                tracefile_buf = xs_buffer("%s/x3scr.%u",".", getpid());
 #endif /*]*/
 			tracefile = tracefile_buf;
 		}
