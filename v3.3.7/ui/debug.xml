@@ -3,6 +3,9 @@
 		<menu action='DebugMenu'>
 			<menuitem action='DumpScreen'/>
 			<menuitem action='LoadScreenDump'/>
+			<menuitem action='ToggleDSTrace'/>
+			<!-- Screen Trace Hangs! <menuitem action='ToggleScreenTrace'/> -->
+			<menuitem action='ToggleEventTrace'/>
 		</menu>
 	</menubar>
 </ui>
