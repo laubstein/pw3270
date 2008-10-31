@@ -175,6 +175,26 @@
 	g_key_file_set_integer_list(g3270_config,group,"size",pos,2);
  }
 
+ void action_Restore(void)
+ {
+    int f;
+
+	if(!g3270_config)
+		return;
+
+ 	/* Set window size */
+	RestoreWindowSize("TopWindow",topwindow);
+
+	for(f=0;f<(sizeof(WindowState)/sizeof(struct _WindowState));f++)
+	{
+		if(g_key_file_get_boolean(g3270_config,"TopWindow",WindowState[f].name,NULL))
+		{
+		    WindowState[f].activate(GTK_WINDOW(topwindow));
+		}
+	}
+ }
+
+
  void action_Save(void)
  {
 	GdkWindowState	CurrentState;
@@ -243,16 +263,6 @@
 			g_free(vlr);
 		}
 	}
- }
-
- void action_Restore(void)
- {
-	if(!g3270_config)
-		return;
-
- 	/* Set window size */
-	RestoreWindowSize("TopWindow",topwindow);
-
  }
 
 static int filetest(const gchar *filename)
