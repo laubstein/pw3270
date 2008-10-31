@@ -47,7 +47,7 @@ BuildWin() {
 
 }
 
-BuildLinux() {
+BuildRPM() {
 	#
 	# Build Linux version
 	#
@@ -159,8 +159,8 @@ else
 	do
 		if [ "$1" == "win" ]; then
 			BuildWin
-		elif [ "$1" == "linux" ]; then
-			BuildLinux
+		elif [ "$1" == "rpm" ]; then
+			BuildRPM
 		elif [ "$1" == "local" ]; then
 			BuildLocal
 		fi
