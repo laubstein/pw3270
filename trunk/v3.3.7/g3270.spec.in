@@ -8,7 +8,7 @@ Release:        0.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
 Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-Requires:       openssl shared-mime-info %{name}-lib libgnome libgnomeui
+Requires:       openssl shared-mime-info libgnome libgnomeui %{name}-lib = @PACKAGE_VERSION@
 BuildRequires:  autoconf sed pkgconfig gtk2-devel libgnome-devel libgnomeui-devel
 
 %description
@@ -38,7 +38,7 @@ devel for tn3270 protocol library for %{name}
 Provides:	%{name}-rexx
 Summary:	Devel for 3270 Communication library for %{name}
 Group:		Development/Libraries
-Requires:       %{name} ooRexx
+Requires:       ooRexx %{name}-lib = @PACKAGE_VERSION@
 BuildRequires:  ooRexx
 
 %description rexx
