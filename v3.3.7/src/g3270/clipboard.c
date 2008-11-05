@@ -90,7 +90,7 @@
 
  static void paste_string(gchar *str)
  {
- 	int			remaining;
+ 	int			remaining = -1;
  	gchar		*saved;
 
  	if(!str)
@@ -100,9 +100,36 @@
 		return;
  	}
 
-	Trace("Paste buffer:\n%s",str);
+	if(TOGGLED_SMART_PASTE)
+	{
+		int 	addr = cursor_get_addr();
+		char	buffer[2];
 
-	remaining = emulate_input(str,-1,True);
+		Trace("Extended paste buffer:\n%s",str);
+
+		remaining = strlen(str);
+
+		while(remaining > 0)
+		{
+			screen_read(buffer, addr, 1);
+			if(*buffer != *str)
+			{
+				// Changed, move and insert
+				cursor_set_addr(addr);
+				if(emulate_input(str,1,True) < 0)
+					remaining = 0;
+			}
+			remaining--;
+			addr++;
+			str++;
+		}
+
+	}
+	else
+	{
+		Trace("Paste buffer:\n%s",str);
+		remaining = emulate_input(str,-1,True);
+	}
 
 	saved = contents;
     if(remaining > 0)
@@ -195,6 +222,7 @@
 
  void action_PasteNext(void)
  {
+
  	if(contents)
 		paste_string(contents);
 	else
