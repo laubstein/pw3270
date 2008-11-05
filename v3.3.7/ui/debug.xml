@@ -1,5 +1,12 @@
 <ui>
 	<menubar name='MainMenubar'>
+
+		<menu action='SettingsMenu'>
+			<menu action='OptionsMenu'>
+				<menuitem action='ToggleExtendedPaste' />
+			</menu>
+		</menu>
+
 		<menu action='DebugMenu'>
 			<menuitem action='DumpScreen'/>
 			<menuitem action='LoadScreenDump'/>

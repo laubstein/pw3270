@@ -285,7 +285,7 @@
 
  static void ExecPFKey(GtkAction *action, gpointer cmd)
  {
-	if(!keep_selected)
+	if(!TOGGLED_KEEP_SELECTED)
 		action_ClearSelection();
 	action_internal(PF_action, IA_DEFAULT, cmd, CN);
  }

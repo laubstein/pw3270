@@ -66,6 +66,24 @@
  static void action_DumpScreen(void);
  static void action_LoadScreenDump(void);
 
+/*---[ Gui toggles ]--------------------------------------------------------------------------------------------*/
+
+ static const struct _gui_toggle_info
+ {
+    const gchar *name;
+    const gchar *label;
+    const gchar *tooltip;
+    const gchar *stock_id;
+    const gchar *accelerator;
+ } gui_toggle_info[GUI_TOGGLE_COUNT] =
+ {
+    { "Bold", 			N_( "Bold" ),			NULL,	NULL,	NULL	},
+    { "KeepSelected", 	N_( "Keep selected" ),	NULL,	NULL,	NULL	},
+    { "ExtendedPaste",	N_( "Extended paste" ), NULL,   NULL,   NULL    }
+ };
+
+ gboolean gui_toggle[GUI_TOGGLE_COUNT] = { 0 };
+
 /*---[ Callback tables ]----------------------------------------------------------------------------------------*/
 
  #ifdef DEBUG
@@ -200,7 +218,6 @@
 
 
  GtkActionGroup		*action_group[ACTION_GROUP_MAX] = { NULL };
- gboolean 			keep_selected					= FALSE;
 
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
@@ -372,16 +389,15 @@
  	set_toggle(id,FALSE);
  }
 
- static void toggle_bold(GtkToggleAction *action, gpointer dunno)
+ static void toggle_gui(GtkToggleAction *action, int id)
  {
-	SetBoolean("Toggles","Bold", gtk_toggle_action_get_active(action));
-	FontChanged();
- }
+    gui_toggle[id] = gtk_toggle_action_get_active(action);
 
- static void toggle_keep_selected(GtkToggleAction *action, gpointer dunno)
- {
- 	keep_selected = gtk_toggle_action_get_active(action);
-	SetBoolean("Toggles","KeepSelected",keep_selected);
+	SetBoolean("Toggles",gui_toggle_info[id].name,gui_toggle[id]);
+
+    if(id == GUI_TOGGLE_BOLD)
+        FontChanged();
+
  }
 
  static void LoadToggleActions(GtkActionGroup *actions)
@@ -432,46 +448,32 @@
 		{ N_( "Keypad" ),						NULL,	NULL,	N_( "<alt>K" )		},
 	};
 
-	// TODO (perry#9#): Add tooltips
- 	static const struct _toggle_internal
- 	{
- 		const gchar *name;
- 		const gchar *label;
- 		const gchar *tooltip;
- 		const gchar *stock_id;
- 		const gchar *accelerator;
-		void 		 (*call)(GtkToggleAction *action, gpointer dunno);
-
-	}
-	toggle_internal[] =
-	{
-		{ "Bold", 			N_( "Bold" ),			NULL,	NULL,	NULL,	toggle_bold				},
-		{ "KeepSelected", 	N_( "Keep selected" ),	NULL,	NULL,	NULL,	toggle_keep_selected	}
-	};
-
  	int f;
 
 	/* Internal toggles */
- 	for(f=0;f< G_N_ELEMENTS(toggle_internal);f++)
+ 	for(f=0;f< GUI_TOGGLE_COUNT;f++)
  	{
- 		char buffer[20];
+ 		char buffer[40];
 
- 		g_snprintf(buffer,19,"Toggle%s",toggle_internal[f].name);
+ 		g_snprintf(buffer,29,"Toggle%s",gui_toggle_info[f].name);
 
 		GtkToggleAction *action = gtk_toggle_action_new(	buffer,
-															gettext(toggle_internal[f].label),
-															gettext(toggle_internal[f].tooltip),
-															toggle_info[f].stock_id );
+															gettext(gui_toggle_info[f].label),
+															gettext(gui_toggle_info[f].tooltip),
+															gui_toggle_info[f].stock_id );
 
-		gtk_toggle_action_set_active(action,GetBoolean("Toggles",toggle_internal[f].name,FALSE));
-		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_internal[f].call),(gpointer) toggle_internal[f].label);
-		if(toggle_internal[f].accelerator)
-			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(toggle_internal[f].accelerator));
+		Trace("%s: %p",buffer,action);
+
+        gui_toggle[f] = GetBoolean("Toggles",gui_toggle_info[f].name,FALSE);
+
+		gtk_toggle_action_set_active(action,gui_toggle[f]);
+		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_gui),(gpointer) f);
+
+		if(gui_toggle_info[f].accelerator)
+			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(gui_toggle_info[f].accelerator));
 		else
 			gtk_action_group_add_action(actions,(GtkAction *) action);
  	}
-
-	keep_selected = GetBoolean("Toggles","KeepSelected",keep_selected);
 
 	/* Toggle actions */
  	for(f=0;f<N_TOGGLES;f++)
@@ -525,6 +527,7 @@
 
 		gtk_action_group_add_action(actions,action);
  	}
+
 
  }
 
@@ -754,7 +757,7 @@
  {
  	char ks[6];
 
-	if(!keep_selected)
+	if(!TOGGLED_KEEP_SELECTED)
 		action_ClearSelection();
 
  	g_snprintf(ks,5,"%d",key);
