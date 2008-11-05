@@ -12,6 +12,8 @@ BuildWin() {
 	#
 	echo -e "\e]2;Building Windows Installer\a"
 
+	make clean
+
 	ln -sf /usr/i386-mingw32/GTK-Runtime .
 	./win32.sh --gtkroot="GTK-Runtime" --locale="locale" --name=$NAME --icon=$ICON --logo=$LOGO
 	if [ "$?" != "0" ]; then
@@ -43,8 +45,6 @@ BuildWin() {
 	mkdir -p ~/win32
 	mv $NAME-*.exe ~/win32/
 
-	make clean
-
 }
 
 BuildRPM() {
@@ -61,6 +61,7 @@ BuildRPM() {
 	VENDOR=`rpm --eval="%{u2p:%{_vendor}}"`
 	RELEASE=`grep Release g3270.spec | sed 's/ //g' |cut -d: -f2 |cut -d. -f1`
 
+	make clean
 	make tgz
 	if [ "$?" != "0" ]; then
 		exit -1
@@ -95,7 +96,7 @@ BuildRPM() {
 	TARGET_FOLDER=$USER@os2team.df.intrabb.bb.com.br:/home/matriz/pacotes/$VENDOR/bb/$RPMARCH
 
 	if [ "$VENDOR" == "suse" ]; then
-		TARGET_FOLDER="$USER@storage:/dados/suse/$(rpm --eval="%{suse_version}" | cut -b1-2)/bb/i586"
+		TARGET_FOLDER="$USER@storage:/dados/suse/$(rpm --eval="%{suse_version}" | cut -b1-2)/bb/$RPMARCH"
 	fi
 
 	scp $RPMDIR/$RPMARCH/g3270*.rpm $TARGET_FOLDER
@@ -103,6 +104,9 @@ BuildRPM() {
 		echo "Erro ao copiar o pacote binario"
 		exit -1
 	fi
+
+	mv $RPMDIR/$RPMARCH/g3270*.rpm $TMPDIR
+	mv `rpm --eval="%{u2p:%{_srcrpmdir}}"`/g3270*.src.rpm $TMPDIR
 
 	make clean
 
@@ -114,11 +118,10 @@ BuildLocal() {
 	#
 	echo -e "\e]2;Building Local Debug\a"
 
-	mv $RPMDIR/$RPMARCH/g3270*.rpm $TMPDIR
-
 	rm -fr /home/perry/bin/g3270
 	./configure --enable-plugins --prefix=/home/perry/bin/g3270
 
+	make clean
 	make install
 	if [ "$?" != "0" ]; then
 		exit -1
@@ -150,7 +153,7 @@ BuildLocal() {
 if [ -z "$1" ]; then
 
 	BuildWin
-	BuildLinux
+	BuildRPM
 	BuildLocal
 
 else
@@ -169,6 +172,6 @@ else
 	done
 fi
 
-echo -e "\e]2;G3270 Build Ok!\a"
+echo "G3270 Build Ok!"
 
 
