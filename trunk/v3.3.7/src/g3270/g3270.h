@@ -52,6 +52,21 @@
 	} ELEMENT;
 	extern ELEMENT *screen;
 
+    enum GUI_TOGGLE
+    {
+        GUI_TOGGLE_BOLD,
+        GUI_TOGGLE_KEEP_SELECTED,
+        GUI_TOGGLE_EXTENDED_PASTE,
+
+        GUI_TOGGLE_COUNT
+    };
+
+    #define TOGGLED_BOLD			gui_toggle[GUI_TOGGLE_BOLD]
+    #define TOGGLED_KEEP_SELECTED	gui_toggle[GUI_TOGGLE_KEEP_SELECTED]
+    #define TOGGLED_EXTENDED_PASTE	gui_toggle[GUI_TOGGLE_EXTENDED_PASTE]
+
+    extern gboolean gui_toggle[GUI_TOGGLE_COUNT];
+
 	enum TERMINAL_COLOR
 	{
 		TERMINAL_COLOR_BACKGROUND,
@@ -140,7 +155,6 @@
 	extern gchar 					*window_title;
 
 	extern GtkActionGroup			*action_group[ACTION_GROUP_MAX];
-	extern gboolean 				keep_selected;
 
 	#define common_actions		action_group[ACTION_GROUP_COMMON]
 	#define online_actions		action_group[ACTION_GROUP_ONLINE]
