@@ -79,7 +79,7 @@
  {
     { "Bold", 			N_( "Bold" ),			NULL,	NULL,	NULL	},
     { "KeepSelected", 	N_( "Keep selected" ),	NULL,	NULL,	NULL	},
-    { "ExtendedPaste",	N_( "Extended paste" ), NULL,   NULL,   NULL    }
+    { "SmartPaste",		N_( "Smart paste" ),	NULL,   NULL,   NULL    }
  };
 
  gboolean gui_toggle[GUI_TOGGLE_COUNT] = { 0 };

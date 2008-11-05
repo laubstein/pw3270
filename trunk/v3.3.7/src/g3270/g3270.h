@@ -56,14 +56,14 @@
     {
         GUI_TOGGLE_BOLD,
         GUI_TOGGLE_KEEP_SELECTED,
-        GUI_TOGGLE_EXTENDED_PASTE,
+        GUI_TOGGLE_SMART_PASTE,
 
         GUI_TOGGLE_COUNT
     };
 
     #define TOGGLED_BOLD			gui_toggle[GUI_TOGGLE_BOLD]
     #define TOGGLED_KEEP_SELECTED	gui_toggle[GUI_TOGGLE_KEEP_SELECTED]
-    #define TOGGLED_EXTENDED_PASTE	gui_toggle[GUI_TOGGLE_EXTENDED_PASTE]
+    #define TOGGLED_SMART_PASTE		gui_toggle[GUI_TOGGLE_SMART_PASTE]
 
     extern gboolean gui_toggle[GUI_TOGGLE_COUNT];
 

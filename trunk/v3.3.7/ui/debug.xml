@@ -3,7 +3,6 @@
 
 		<menu action='SettingsMenu'>
 			<menu action='OptionsMenu'>
-				<menuitem action='ToggleExtendedPaste' />
 			</menu>
 		</menu>
 

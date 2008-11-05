@@ -53,6 +53,7 @@
 				<menuitem action='ToggleKeypad'  />
 				<menuitem action='ToggleBold'  />
 				<menuitem action='ToggleKeepSelected' />
+				<menuitem action='ToggleSmartPaste' />
 			</menu>
 
 		</menu>
