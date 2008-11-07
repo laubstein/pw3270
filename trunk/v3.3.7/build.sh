@@ -120,7 +120,7 @@ BuildDebug() {
 
 	PREFIX=$HOME/bin/g3270
 
-	rm -fr $HOME/bin/g3270
+	rm -fr $PREFIX
 	./configure --enable-plugins --prefix=$PREFIX
 
 	make clean
@@ -129,15 +129,14 @@ BuildDebug() {
 		exit -1
 	fi
 
-	mkdir -p $HOME/bin/g3270/bin/debug
-	mkdir -p $HOME/bin/g3270/lib
-	mkdir -p $HOME/bin/g3270/ui
+	mkdir -p $PREFIX/bin/debug/plugins
+	mkdir -p $PREFIX/lib
+	mkdir -p $PREFIX/ui
 
 	install --mode=755 bin/Debug/g3270 $PREFIX/bin/debug
 	install --mode=755 bin/Debug/lib3270.so $PREFIX/lib
 	install --mode=644 ui/g3270.xml $PREFIX/ui
 	install --mode=644 ui/g3270.act $PREFIX/ui
-	install --mode=644 ui/debug $PREFIX/ui
 	install --mode=644 src/g3270/g3270.jpg $PREFIX
 	install --mode=644 src/g3270/colors.conf $PREFIX
 
@@ -151,10 +150,11 @@ BuildDebug() {
 	msgfmt -c -v -o $PREFIX/share/locale/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
 
 	make bin/Debug/plugins/rx3270.so
-	mkdir -p $PREFIX/lib/g3270/plugins
-	cp bin/Debug/plugins/*.so $PREFIX/lib/g3270/plugins
-	cp ui/rexx.xml $PREFIX/share/g3270/ui
-	cp ui/debug.xml $PREFIX/share/g3270/ui
+
+	mkdir -p $PREFIX/lib/plugins
+	cp bin/Debug/plugins/*.so $PREFIX/bin/debug/plugins
+	cp ui/rexx.xml $PREFIX/ui
+	cp ui/debug.xml $PREFIX/ui
 
 	start_script=$HOME/bin/g3270.sh
 
