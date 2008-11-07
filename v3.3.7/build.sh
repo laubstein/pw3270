@@ -137,14 +137,18 @@ BuildDebug() {
 	install --mode=755 bin/Debug/lib3270.so $PREFIX/lib
 	install --mode=644 ui/g3270.xml $PREFIX/ui
 	install --mode=644 ui/g3270.act $PREFIX/ui
+	install --mode=644 ui/debug $PREFIX/ui
 	install --mode=644 src/g3270/g3270.jpg $PREFIX
 	install --mode=644 src/g3270/colors.conf $PREFIX
 
 	make po/pt_BR.po
-	cp  po/pt_BR.po /usr/share/locale/pt_BR/LC_MESSAGES/g3270.mo
+	msgfmt -c -v -o /usr/share/locale/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
 	if [ "$?" != "0" ]; then
 		exit -1
 	fi
+
+	mkdir -p $PREFIX/share/locale/pt_BR/LC_MESSAGES
+	msgfmt -c -v -o $PREFIX/share/locale/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
 
 	make bin/Debug/plugins/rx3270.so
 	mkdir -p $PREFIX/lib/g3270/plugins
