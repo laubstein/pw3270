@@ -112,37 +112,52 @@ BuildRPM() {
 
 }
 
-BuildLocal() {
+BuildDebug() {
 	#
-	# Build Local
+	# Build Debug
 	#
 	echo -e "\e]2;Building Local Debug\a"
 
-	rm -fr /home/perry/bin/g3270
-	./configure --enable-plugins --prefix=/home/perry/bin/g3270
+	PREFIX=$HOME/bin/g3270
+
+	rm -fr $HOME/bin/g3270
+	./configure --enable-plugins --prefix=$PREFIX
 
 	make clean
-	make install
+	make Debug
 	if [ "$?" != "0" ]; then
 		exit -1
 	fi
 
-	cp  /home/perry/bin/g3270/share/locale/pt_BR/LC_MESSAGES/g3270.mo /usr/share/locale/pt_BR/LC_MESSAGES/g3270.mo
+	mkdir -p $HOME/bin/g3270/bin/debug
+	mkdir -p $HOME/bin/g3270/lib
+	mkdir -p $HOME/bin/g3270/ui
+
+	install --mode=755 bin/Debug/g3270 $PREFIX/bin/debug
+	install --mode=755 bin/Debug/lib3270.so $PREFIX/lib
+	install --mode=644 ui/g3270.xml $PREFIX/ui
+	install --mode=644 ui/g3270.act $PREFIX/ui
+	install --mode=644 src/g3270/g3270.jpg $PREFIX
+	install --mode=644 src/g3270/colors.conf $PREFIX
+
+	make po/pt_BR.po
+	cp  po/pt_BR.po /usr/share/locale/pt_BR/LC_MESSAGES/g3270.mo
 	if [ "$?" != "0" ]; then
 		exit -1
 	fi
 
-	make bin/Release/plugins/rx3270.so
-	mkdir -p /home/perry/bin/g3270/lib/g3270/plugins
-	cp bin/Release/plugins/*.so /home/perry/bin/g3270/lib/g3270/plugins
-	cp ui/rexx.xml /home/perry/bin/g3270/share/g3270/ui
-	cp ui/debug.xml /home/perry/bin/g3270/share/g3270/ui
+	make bin/Debug/plugins/rx3270.so
+	mkdir -p $PREFIX/lib/g3270/plugins
+	cp bin/Debug/plugins/*.so $PREFIX/lib/g3270/plugins
+	cp ui/rexx.xml $PREFIX/share/g3270/ui
+	cp ui/debug.xml $PREFIX/share/g3270/ui
 
-	start_script=~/bin/g3270.sh
+	start_script=$HOME/bin/g3270.sh
 
+	rm -f $start_script
 	echo #!/bin/bash > $start_script 
-	echo cd /home/perry/bin/g3270/bin >> $start_script
-	echo LD_LIBRARY_PATH=../lib ./g3270 >> $start_script 
+	echo "cd \`dirname \$0\`/g3270/bin/debug" >> $start_script
+	echo LD_LIBRARY_PATH=../../lib ./g3270 >> $start_script 
 
 	chmod +x $start_script
 
@@ -154,7 +169,7 @@ if [ -z "$1" ]; then
 
 	BuildWin
 	BuildRPM
-	BuildLocal
+	BuildDebug
 
 else
 
@@ -164,8 +179,8 @@ else
 			BuildWin
 		elif [ "$1" == "rpm" ]; then
 			BuildRPM
-		elif [ "$1" == "local" ]; then
-			BuildLocal
+		elif [ "$1" == "debug" ]; then
+			BuildDebug
 		fi
 
 		shift

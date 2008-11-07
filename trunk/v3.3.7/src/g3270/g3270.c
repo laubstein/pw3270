@@ -360,7 +360,7 @@ static gint save_session (GnomeClient *client, gint phase, GnomeSaveStyle save_s
 	action_Save();
 
 	/* allocate 0-filled, so it will be NULL-terminated */
-	argv = g_malloc0(sizeof(gchar*)*4);
+	argv = g_malloc0(sizeof(gchar*)*2);
 	argc = 0;
 
 	argv[argc++] = client_data;
