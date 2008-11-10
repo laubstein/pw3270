@@ -323,14 +323,14 @@
 
  static void UpdateSelectedRectangle(void)
  {
- 	int			x,y,row,col;
-	GdkGC		*gc		= NULL;
-	PangoLayout *layout	= NULL;
- 	int			pos		= 0;
- 	int			left;
- 	int			right;
- 	int			top;
- 	int			bottom;
+ 	int				x,y,row,col;
+	GdkGC			*gc		= NULL;
+	PangoLayout 	*layout	= NULL;
+ 	int				pos		= 0;
+ 	int				left;
+ 	int				right;
+ 	int				top;
+ 	int				bottom;
 
 	if(!(select_mode && screen && terminal))
 		return;
@@ -370,7 +370,24 @@
 		x = left_margin;
 		for(col = 0; col < terminal_cols;col++)
 		{
-			gboolean selected = (col >= left && col <= right && row >= top && row <= bottom);
+			unsigned char selected = 0;
+
+			if(col >= left && col <= right && row >= top && row <= bottom)
+			{
+				selected = SELECTION_BOX;
+
+				if(col == left)
+					selected |= SELECTION_BOX_LEFT;
+
+				if(col == right)
+					selected |= SELECTION_BOX_RIGHT;
+
+				if(row == top)
+					selected |= SELECTION_BOX_TOP;
+
+				if(row == bottom)
+					selected |= SELECTION_BOX_BOTTOM;
+			}
 
 			if(screen[pos].selected != selected)
 			{
@@ -427,7 +444,7 @@
 		x = left_margin;
 		for(col = 0; col < terminal_cols;col++)
 		{
-			gboolean selected = (pos >= start && pos <= end) ? TRUE : FALSE;
+			unsigned char selected = (pos >= start && pos <= end) ? SELECTION_BOX : 0;
 			if(screen[pos].selected != selected)
 			{
 				// Changed, mark to update
