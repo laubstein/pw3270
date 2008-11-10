@@ -57,6 +57,11 @@
 		DRAG_TYPE_NONE
 	};
 
+	#define SELECTION_BOX			0x01
+	#define SELECTION_BOX_LEFT		0x10
+	#define SELECTION_BOX_RIGHT		0x20
+	#define SELECTION_BOX_TOP		0x40
+	#define SELECTION_BOX_BOTTOM	0x80
 
 	extern int 			drag_type;
 	extern CURSOR_MODE		cursor_mode;
@@ -68,7 +73,7 @@
 		unsigned short	fg;
 		unsigned short	bg;
 		unsigned short	extended;
-		gboolean			selected;
+		unsigned char		selected;
 	} ELEMENT;
 	extern ELEMENT *screen;
 

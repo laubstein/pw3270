@@ -971,7 +971,7 @@
  	if(!(gc && draw && layout && el))
 		return;
 
-	if(el->selected)
+	if(el->selected & SELECTION_BOX)
 	{
 		fg = TERMINAL_COLOR_SELECTED_FG;
 		bg = TERMINAL_COLOR_SELECTED_BG;
@@ -1099,6 +1099,25 @@
 		pango_layout_set_text(layout,"?",-1);
 		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
 	}
+
+	if(el->selected & 0xF0)
+	{
+		gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_SELECTED_BORDER);
+
+		if(el->selected & SELECTION_BOX_TOP)
+			gdk_draw_line(draw,gc,x,y,x+fWidth,y);
+
+		if(el->selected & SELECTION_BOX_LEFT)
+			gdk_draw_line(draw,gc,x,y,x,y+(fHeight-1));
+
+		if(el->selected & SELECTION_BOX_BOTTOM)
+			gdk_draw_line(draw,gc,x,y+(fHeight-1),x+fWidth,y+(fHeight-1));
+
+		if(el->selected & SELECTION_BOX_RIGHT)
+			gdk_draw_line(draw,gc,x+(fWidth-1),y,x+(fWidth-1),y+(fHeight-1));
+
+	}
+
 
  }
 
