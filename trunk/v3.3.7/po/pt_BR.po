@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-07 08:21-0200\n"
-"PO-Revision-Date: 2008-11-07 08:29-0200\n"
+"POT-Creation-Date: 2008-11-10 17:08-0200\n"
+"PO-Revision-Date: 2008-11-10 17:09-0200\n"
 "Last-Translator:  <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -81,7 +81,7 @@ msgstr ""
 msgid "Auto-Reconnect"
 msgstr "Reconexão automática"
 
-#: src/g3270/colors.c:293 src/g3270/colors.c:315 src/g3270/colors.c:322
+#: src/g3270/colors.c:365 src/g3270/colors.c:387 src/g3270/colors.c:395
 msgid "Background"
 msgstr "Fundo"
 
@@ -89,11 +89,11 @@ msgstr "Fundo"
 msgid "Backspace"
 msgstr ""
 
-#: src/g3270/colors.c:284
+#: src/g3270/colors.c:356
 msgid "Base attributes"
 msgstr "Atributos básicos"
 
-#: src/g3270/colors.c:301
+#: src/g3270/colors.c:373
 msgid "Black"
 msgstr "Preto"
 
@@ -105,7 +105,7 @@ msgstr ""
 msgid "Blinking Cursor"
 msgstr "Cursor piscante"
 
-#: src/g3270/colors.c:294
+#: src/g3270/colors.c:366
 msgid "Blue"
 msgstr "Azul"
 
@@ -113,6 +113,10 @@ msgstr "Azul"
 #: src/g3270/g3270.c:525
 msgid "Bold"
 msgstr "Negrito"
+
+#: src/g3270/colors.c:389
+msgid "Border"
+msgstr "Borda"
 
 #: src/g3270/actions.c:709
 #, c-format
@@ -148,7 +152,7 @@ msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 msgid "Clear"
 msgstr "Limpar"
 
-#: src/g3270/colors.c:345
+#: src/g3270/colors.c:418
 msgid "Color setup"
 msgstr "Configuração de cores"
 
@@ -165,15 +169,15 @@ msgstr "Copiar"
 msgid "Cross Hair Cursor"
 msgstr "Régua"
 
-#: src/g3270/colors.c:319
+#: src/g3270/colors.c:392
 msgid "Cross-hair"
 msgstr "Régua"
 
-#: src/g3270/colors.c:286
+#: src/g3270/colors.c:358
 msgid "Cursor"
 msgstr ""
 
-#: src/g3270/colors.c:275
+#: src/g3270/colors.c:347
 msgid "Custom colors"
 msgstr "Cores personalizadas"
 
@@ -181,11 +185,11 @@ msgstr "Cores personalizadas"
 msgid "DS Trace"
 msgstr ""
 
-#: src/g3270/colors.c:302
+#: src/g3270/colors.c:374
 msgid "Dark Blue"
 msgstr "Azul escuro"
 
-#: src/g3270/colors.c:305
+#: src/g3270/colors.c:377
 msgid "Dark Green"
 msgstr "Verde escuro"
 
@@ -193,7 +197,7 @@ msgstr "Verde escuro"
 msgid "Debug"
 msgstr ""
 
-#: src/g3270/colors.c:75
+#: src/g3270/colors.c:76
 msgid "Default Color Set 2"
 msgstr "Esquema de cores padrão 2"
 
@@ -312,7 +316,7 @@ msgstr "Início do campo"
 msgid "Font"
 msgstr "Fonte"
 
-#: src/g3270/colors.c:316 src/g3270/colors.c:323
+#: src/g3270/colors.c:388 src/g3270/colors.c:396
 msgid "Foreground"
 msgstr "Frente"
 
@@ -324,11 +328,11 @@ msgstr "Tela-cheia"
 msgid "Fullscreen"
 msgstr "Tela-cheia"
 
-#: src/g3270/colors.c:308
+#: src/g3270/colors.c:380
 msgid "Gray"
 msgstr "Cinza"
 
-#: src/g3270/colors.c:297
+#: src/g3270/colors.c:369
 msgid "Green"
 msgstr "Verde"
 
@@ -344,11 +348,11 @@ msgstr "Endereço do servidor:"
 msgid "Insert"
 msgstr ""
 
-#: src/g3270/colors.c:313
+#: src/g3270/colors.c:385
 msgid "Intensified/Protected"
 msgstr "Intensificado/Protegido"
 
-#: src/g3270/colors.c:311
+#: src/g3270/colors.c:383
 msgid "Intensified/Unprotected"
 msgstr "Intensificado/Desprotegido"
 
@@ -377,7 +381,7 @@ msgstr ""
 msgid "Load screen dump"
 msgstr "Carregar captura de tela"
 
-#: src/g3270/colors.c:326
+#: src/g3270/colors.c:399
 msgid "Locked status"
 msgstr "Bloqueada"
 
@@ -385,7 +389,7 @@ msgstr "Bloqueada"
 msgid "Monocase"
 msgstr "Só maiúsculas"
 
-#: src/g3270/colors.c:307
+#: src/g3270/colors.c:379
 msgid "Mustard"
 msgstr "Mostarda"
 
@@ -402,27 +406,27 @@ msgstr "Rede"
 msgid "Next field"
 msgstr "Próximo campo"
 
-#: src/g3270/colors.c:318
+#: src/g3270/colors.c:391
 msgid "Normal"
 msgstr ""
 
-#: src/g3270/colors.c:325
+#: src/g3270/colors.c:398
 msgid "Normal status"
 msgstr "Situação normal"
 
-#: src/g3270/colors.c:312
+#: src/g3270/colors.c:384
 msgid "Normal/Protected"
 msgstr "Normal/Protegido"
 
-#: src/g3270/colors.c:310
+#: src/g3270/colors.c:382
 msgid "Normal/Unprotected"
 msgstr "Normal/Desprotegido"
 
-#: src/g3270/colors.c:287
+#: src/g3270/colors.c:359
 msgid "OIA"
 msgstr ""
 
-#: src/g3270/colors.c:303
+#: src/g3270/colors.c:375
 msgid "Orange"
 msgstr "Laranja"
 
@@ -442,7 +446,7 @@ msgstr "Colar arquivo texto"
 msgid "Paste with left margin"
 msgstr "Colar com margem"
 
-#: src/g3270/colors.c:296
+#: src/g3270/colors.c:368
 msgid "Pink"
 msgstr "Rosa"
 
@@ -470,11 +474,11 @@ msgstr "Imprimir seleção"
 msgid "Properties"
 msgstr "Propriedades"
 
-#: src/g3270/colors.c:304
+#: src/g3270/colors.c:376
 msgid "Purple"
 msgstr "Púrpura"
 
-#: src/g3270/colors.c:295
+#: src/g3270/colors.c:367
 msgid "Red"
 msgstr "Vermelho"
 
@@ -586,7 +590,7 @@ msgstr "Selecionar fonte"
 msgid "Select hostname"
 msgstr "Selecionar servidor"
 
-#: src/g3270/colors.c:285
+#: src/g3270/colors.c:357
 msgid "Selected text"
 msgstr "Texto selecionado"
 
@@ -606,7 +610,7 @@ msgstr ""
 msgid "Selection Up"
 msgstr ""
 
-#: src/g3270/colors.c:324
+#: src/g3270/colors.c:397
 msgid "Separator"
 msgstr "Separador"
 
@@ -630,7 +634,7 @@ msgstr "Colar inteligente"
 msgid "Sys Req"
 msgstr ""
 
-#: src/g3270/colors.c:283
+#: src/g3270/colors.c:355
 msgid "Terminal"
 msgstr ""
 
@@ -655,7 +659,7 @@ msgstr ""
 msgid "Track Cursor"
 msgstr "Mostrar posição do cursor"
 
-#: src/g3270/colors.c:298 src/g3270/colors.c:306
+#: src/g3270/colors.c:370 src/g3270/colors.c:378
 msgid "Turquoise"
 msgstr "Turquesa"
 
@@ -677,7 +681,7 @@ msgstr ""
 msgid "Visible Control chars"
 msgstr ""
 
-#: src/g3270/colors.c:300
+#: src/g3270/colors.c:372
 msgid "White"
 msgstr "Branco"
 
@@ -729,7 +733,7 @@ msgstr ""
 msgid "X Wait"
 msgstr "X Aguarde"
 
-#: src/g3270/colors.c:299
+#: src/g3270/colors.c:371
 msgid "Yellow"
 msgstr "Amarelo"
 
