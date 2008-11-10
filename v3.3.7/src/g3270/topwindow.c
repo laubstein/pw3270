@@ -362,6 +362,8 @@
 		g_object_unref(ui_manager);
 	}
 
+	FontChanged();
+
 	gtk_widget_show_all(vbox);
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);
 

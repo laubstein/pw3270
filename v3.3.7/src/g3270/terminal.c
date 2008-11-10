@@ -417,8 +417,8 @@
  {
  	gchar vlr[1024];
 
-	g_snprintf(vlr,1023,"%s%s",GetString("Terminal","Font","Courier"),
-								GetBoolean("Toggles","Bold",FALSE) ? " Bold" : "" );
+	g_snprintf(vlr,1023,"%s%s",	GetString("Terminal","Font","Courier"),
+								TOGGLED_BOLD ? " Bold" : "" );
 
 	SetTerminalFont(vlr);
 
