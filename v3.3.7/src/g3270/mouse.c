@@ -42,6 +42,7 @@
 
  static void UpdateSelectedRegion(int start, int end);
  static void SelectField(int row, int col);
+ static void SetDragType(int type);
 
 /*---[ Constants ]------------------------------------------------------------*/
 
@@ -51,6 +52,8 @@
  static int startCol 	= 0;
  static int endRow 	= 0;
  static int endCol		= 0;
+ static int dragRow	= 0;
+ static int dragCol	= 0;
  static int mode		= SELECT_MODE_INVALID;
 
 /*---[ Globals ]--------------------------------------------------------------*/
@@ -58,6 +61,8 @@
  gboolean	WaitingForChanges 	= TRUE;
  GtkWidget	*SelectionPopup		= 0;
  GtkWidget	*DefaultPopup		= 0;
+ int 		drag_type			= DRAG_TYPE_NONE;
+
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -196,10 +201,29 @@
 	switch( ((event->type & 0x0F) << 4) | (event->button & 0x0F) | button_flags)
 	{
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 1:
-		button_flags |= BUTTON_FLAG_COMBO;
-		action_ClearSelection();
-		DecodePosition(event,startRow,startCol);
-		Trace("Button 1 clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
+
+		switch(drag_type)
+		{
+		case DRAG_TYPE_NONE:
+			button_flags |= BUTTON_FLAG_COMBO;
+			action_ClearSelection();
+			DecodePosition(event,startRow,startCol);
+			Trace("Button 1 clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
+			break;
+
+		case DRAG_TYPE_INSIDE:
+			SetSelectionMode(SELECT_MODE_DRAG);
+			DecodePosition(event,dragRow,dragCol);
+			dragRow -= startRow;
+			dragCol -= startCol;
+			Trace("Selection mode Drag: %d (Position: %d,%d)",SELECT_MODE_DRAG,dragRow,dragCol);
+			break;
+
+		default:
+			Trace("Selection mode Drag: %d",SELECT_MODE_DRAG);
+			SetSelectionMode(SELECT_MODE_DRAG);
+
+		}
 		break;
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1 | BUTTON_FLAG_COMBO:
@@ -275,9 +299,19 @@
 		action_ClearSelection();
 		break;
 
+	case ((SELECT_MODE_DRAG & 0x0F) << 4) | 1: // Left Drag
+		mode &= ~SELECT_MODE_DRAG;
+		mode |= SELECT_MODE_RECTANGLE;
+		SetDragType(DRAG_TYPE_NONE);
+		Trace("Ending selection drag (Button: %d New mode: %d)",event->button,mode);
+		break;
+
+	case ((SELECT_MODE_RECTANGLE & 0x0F) << 4) | 1: // End rectangle select
+		break;
+
 #ifdef DEBUG
 	default:
-		Trace("Unexpected action %04x",((mode & 0x0F) << 4) | (event->button & 0x0F));
+		Trace("Unexpected action %04x mode: %d",((mode & 0x0F) << 4) | (event->button & 0x0F),mode);
 #endif
  	}
 
@@ -439,25 +473,186 @@
 		UpdateSelectedRectangle();
  }
 
+ static void SetDragType(int type)
+ {
+ 	if(drag_type == type)
+		return;
+
+ 	drag_type = type;
+ 	if(terminal && terminal->window)
+ 	{
+ 		Trace("Type: %d",type);
+
+ 		if(type >= 0)
+			gdk_window_set_cursor(terminal->window,wCursor[CURSOR_MODE_USER+type]);
+ 		else
+			gdk_window_set_cursor(terminal->window,wCursor[cursor_mode]);
+ 	}
+
+ }
+
  gboolean mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
  {
- 	switch(mode)
- 	{
-	case SELECT_MODE_NONE:	// Starting selection
-		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
-		return mouse_motion(widget,event,user_data); // Recursive call to update selection box
+	int row, col, r, c;
 
-	case SELECT_MODE_RECTANGLE:
-		DecodePosition(event,endRow,endCol);
+	if(button_flags & BUTTON_FLAG_COMBO)
+	{
+		// Moving with button 1 pressed, update selection
+		switch(mode)
+		{
+		case SELECT_MODE_NONE:	// Start selection
+			SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
+			return mouse_motion(widget,event,user_data); // Recursive call to update selection box
+
+		case SELECT_MODE_RECTANGLE:
+			DecodePosition(event,endRow,endCol);
+			UpdateSelectedRectangle();
+			break;
+
+		case SELECT_MODE_TEXT:
+			DecodePosition(event,endRow,endCol);
+			UpdateSelectedText();
+			break;
+
+		}
+	}
+	else if(mode == SELECT_MODE_RECTANGLE)
+	{
+		int row, col;
+
+		DecodePosition(event,row,col);
+
+		if(row == startRow && col == startCol)
+		{
+			Trace("Top-left (%d,%x)",row,col);
+			SetDragType(DRAG_TYPE_TOP_LEFT);
+		}
+		else if(row == startRow && col == endCol)
+		{
+			Trace("Top-right (%d,%x)",row,col);
+			SetDragType(DRAG_TYPE_TOP_RIGHT);
+		}
+		else if(row == startRow)
+		{
+			Trace("Top (%d,%x)",row,col);
+			SetDragType(DRAG_TYPE_TOP);
+		}
+		else if(row == endRow && col == startCol)
+		{
+			Trace("Bottom-left (%d,%x)",row,col);
+			SetDragType(DRAG_TYPE_BOTTOM_LEFT);
+		}
+		else if(row == endRow && col == endCol)
+		{
+			Trace("Bottom-right (%d,%x)",row,col);
+			SetDragType(DRAG_TYPE_BOTTOM_RIGHT);
+		}
+		else if(row == endRow)
+		{
+			Trace("Bottom (%d,%x)",row,col);
+			SetDragType(DRAG_TYPE_BOTTOM);
+		}
+		else if(col == startCol)
+		{
+			Trace("Left (%d,%x)",row,col);
+			SetDragType(DRAG_TYPE_LEFT);
+		}
+		else if(col == endCol)
+		{
+			Trace("Right (%d,%x)",row,col);
+			SetDragType(DRAG_TYPE_RIGHT);
+		}
+		else if(col >= startCol && col <= endCol && row >= startRow && row <= endRow)
+		{
+			Trace("Inside (%d,%x)",row,col);
+			SetDragType(DRAG_TYPE_INSIDE);
+		}
+		else
+		{
+			SetDragType(DRAG_TYPE_NONE);
+		}
+
+	}
+	else if(mode == SELECT_MODE_DRAG)
+	{
+		DecodePosition(event,row,col);
+
+		Trace("Drag_type: %d Position: %d,%d",drag_type,row,col);
+
+		switch(drag_type)
+		{
+		case DRAG_TYPE_TOP_LEFT:
+			if(row <= endRow)
+				startRow = row;
+			if(col <= endCol)
+				startCol = col;
+			break;
+
+		case DRAG_TYPE_TOP_RIGHT:
+			if(row <= endRow)
+				startRow = row;
+			if(col >= startCol)
+				endCol = col;
+			break;
+
+		case DRAG_TYPE_TOP:
+			if(row <= endRow)
+				startRow = row;
+			break;
+
+		case DRAG_TYPE_BOTTOM_LEFT:
+			if(row >= startRow)
+				endRow = row;
+			if(col <= endCol)
+				startCol = col;
+			break;
+
+		case DRAG_TYPE_BOTTOM_RIGHT:
+			if(row >= startRow)
+				endRow = row;
+			if(col >= startCol)
+				endCol = col;
+			break;
+
+		case DRAG_TYPE_BOTTOM:
+			if(row >= startRow)
+				endRow = row;
+			break;
+
+		case DRAG_TYPE_LEFT:
+			if(col <= endCol)
+				startCol = col;
+			break;
+
+		case DRAG_TYPE_RIGHT:
+			if(col >= startCol)
+				endCol = col;
+			break;
+
+		case DRAG_TYPE_INSIDE:
+
+			r = endRow - startRow;
+			c = endCol - startCol;
+
+			if( ((row-dragRow) > 0) && ((row-dragRow+r) < terminal_rows) )
+			{
+				startRow = row-dragRow;
+				endRow = startRow + r;
+			}
+
+			if( ((col-dragCol) > 0) && ((col-dragCol+c) < terminal_cols) )
+			{
+				startCol = col-dragCol;
+				endCol = startCol + c;
+			}
+
+			break;
+		}
+
 		UpdateSelectedRectangle();
-		break;
 
-	case SELECT_MODE_TEXT:
-		DecodePosition(event,endRow,endCol);
-		UpdateSelectedText();
-		break;
+	}
 
- 	}
     return 0;
  }
 
@@ -483,6 +678,7 @@
 
  void action_ClearSelection(void)
  {
+ 	SetDragType(DRAG_TYPE_NONE);
 	SetSelection(FALSE);
 	SetSelectionMode(SELECT_MODE_NONE);
  }
