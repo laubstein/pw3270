@@ -634,16 +634,28 @@
 			r = endRow - startRow;
 			c = endCol - startCol;
 
-			if( ((row-dragRow) > 0) && ((row-dragRow+r) < terminal_rows) )
+			startRow = row-dragRow;
+
+			// Get new row
+			if(startRow < 0)
+				startRow = 0;
+			endRow = startRow + r;
+			if(endRow >= (terminal_rows-1))
 			{
-				startRow = row-dragRow;
-				endRow = startRow + r;
+				endRow = (terminal_rows-1);
+				startRow = endRow - r;
 			}
 
-			if( ((col-dragCol) > 0) && ((col-dragCol+c) < terminal_cols) )
+			// Get new col
+			startCol = col-dragCol;
+			if(startCol < 0)
+				startCol = 0;
+			endCol = startCol + c;
+
+			if(endCol >= (terminal_cols-1))
 			{
-				startCol = col-dragCol;
-				endCol = startCol + c;
+				endCol = (terminal_cols-1);
+				startCol = endCol - c;
 			}
 
 			break;
