@@ -49,6 +49,7 @@
 		<Unit filename="src/g3270/colors.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/g3270/colors.conf" />
 		<Unit filename="src/g3270/config.c">
 			<Option compilerVar="CC" />
 		</Unit>

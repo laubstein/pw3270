@@ -48,13 +48,13 @@
 
 /*---[ Statics ]--------------------------------------------------------------*/
 
- static int startRow 	= 0;
- static int startCol 	= 0;
- static int endRow 	= 0;
- static int endCol		= 0;
- static int dragRow	= 0;
- static int dragCol	= 0;
- static int mode		= SELECT_MODE_INVALID;
+ static int startRow 			= 0;
+ static int startCol 			= 0;
+ static int endRow 			= 0;
+ static int endCol				= 0;
+ static int dragRow			= 0;
+ static int dragCol			= 0;
+ static int select_mode		= SELECT_MODE_INVALID;
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
@@ -68,15 +68,15 @@
 
  void SetSelectionMode(int m)
  {
- 	if(m == mode)
+ 	if(m == select_mode)
 		return;
 
-	if(m == SELECT_MODE_NONE && mode != SELECT_MODE_INVALID)
+	if(m == SELECT_MODE_NONE && select_mode != SELECT_MODE_INVALID)
 		gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"Reselect"),TRUE);
 
-	mode = m;
+	select_mode = m;
 
-	gtk_action_group_set_sensitive(selection_actions,(mode == SELECT_MODE_NONE) ? FALSE : TRUE );
+	gtk_action_group_set_sensitive(selection_actions,(select_mode == SELECT_MODE_NONE) ? FALSE : TRUE );
 
  }
 
@@ -233,7 +233,7 @@
 		break;
 
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3:
-		w = (mode == SELECT_MODE_NONE) ? DefaultPopup : SelectionPopup;
+		w = (select_mode == SELECT_MODE_NONE) ? DefaultPopup : SelectionPopup;
 		Trace("Button 2 clicked at %ld,%ld Menu: %p",(long) event->x, (long) event->y, w);
 		if(w)
 		{
@@ -271,9 +271,9 @@
 
 	DecodePosition(event,row,col);
 
-	Trace("Button %d release Action: %d",event->button, (int) ( ((mode & 0x0F) << 4) | (event->button & 0x0F)));
+	Trace("Button %d release Action: %d",event->button, (int) ( ((select_mode & 0x0F) << 4) | (event->button & 0x0F)));
 
-	switch( ((mode & 0x0F) << 4) | (event->button & 0x0F))
+	switch( ((select_mode & 0x0F) << 4) | (event->button & 0x0F))
  	{
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 1: // Single click, just move cursor
 		Trace("Single click (button: %d)",event->button);
@@ -300,10 +300,10 @@
 		break;
 
 	case ((SELECT_MODE_DRAG & 0x0F) << 4) | 1: // Left Drag
-		mode &= ~SELECT_MODE_DRAG;
-		mode |= SELECT_MODE_RECTANGLE;
+		select_mode &= ~SELECT_MODE_DRAG;
+		select_mode |= SELECT_MODE_RECTANGLE;
 		SetDragType(DRAG_TYPE_NONE);
-		Trace("Ending selection drag (Button: %d New mode: %d)",event->button,mode);
+		Trace("Ending selection drag (Button: %d New mode: %d)",event->button,select_mode);
 		break;
 
 	case ((SELECT_MODE_RECTANGLE & 0x0F) << 4) | 1: // End rectangle select
@@ -311,7 +311,7 @@
 
 #ifdef DEBUG
 	default:
-		Trace("Unexpected action %04x mode: %d",((mode & 0x0F) << 4) | (event->button & 0x0F),mode);
+		Trace("Unexpected action %04x mode: %d",((select_mode & 0x0F) << 4) | (event->button & 0x0F),select_mode);
 #endif
  	}
 
@@ -332,7 +332,7 @@
  	int			top;
  	int			bottom;
 
-	if(!(mode && screen && terminal))
+	if(!(select_mode && screen && terminal))
 		return;
 
 	// Clear selection box, invalidate drawing area.
@@ -452,13 +452,13 @@
 
  void set_rectangle_select(int value, int reason)
  {
- 	if(mode != SELECT_MODE_RECTANGLE && mode != SELECT_MODE_TEXT)
+ 	if(select_mode != SELECT_MODE_RECTANGLE && select_mode != SELECT_MODE_TEXT)
 		return;
 
 	action_ClearSelection();
 	SetSelectionMode(value ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 
-	if(mode == SELECT_MODE_TEXT)
+	if(select_mode == SELECT_MODE_TEXT)
 		UpdateSelectedText();
 	else
 		UpdateSelectedRectangle();
@@ -467,7 +467,7 @@
  void Reselect(void)
  {
 	SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
-	if(mode == SELECT_MODE_TEXT)
+	if(select_mode == SELECT_MODE_TEXT)
 		UpdateSelectedText();
 	else
 		UpdateSelectedRectangle();
@@ -498,7 +498,7 @@
 	if(button_flags & BUTTON_FLAG_COMBO)
 	{
 		// Moving with button 1 pressed, update selection
-		switch(mode)
+		switch(select_mode)
 		{
 		case SELECT_MODE_NONE:	// Start selection
 			SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
@@ -516,7 +516,7 @@
 
 		}
 	}
-	else if(mode == SELECT_MODE_RECTANGLE)
+	else if(select_mode == SELECT_MODE_RECTANGLE)
 	{
 		int row, col;
 
@@ -573,7 +573,7 @@
 		}
 
 	}
-	else if(mode == SELECT_MODE_DRAG)
+	else if(select_mode == SELECT_MODE_DRAG)
 	{
 		DecodePosition(event,row,col);
 
@@ -703,7 +703,7 @@
 
  static void doSelect(XtActionProc call)
  {
- 	if(mode == SELECT_MODE_NONE)
+ 	if(select_mode == SELECT_MODE_NONE)
  	{
  		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  		startRow = endRow = cRow;
@@ -740,7 +740,7 @@
 
  static void MoveSelection(int row, int col)
  {
- 	if(mode == SELECT_MODE_NONE)
+ 	if(select_mode == SELECT_MODE_NONE)
 		return;
 
 	startRow 	+= row;

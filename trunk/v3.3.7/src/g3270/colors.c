@@ -62,6 +62,7 @@
 
 											"#FFFFFF,"			// TERMINAL_COLOR_SELECTED_BG
 											"#000000,"			// TERMINAL_COLOR_SELECTED_FG,
+											"#FFFFFF,"			// TERMINAL_COLOR_SELECTED_BORDER
 
 											"#00FF00," 			// TERMINAL_COLOR_CURSOR
 											"#00FF00," 			// TERMINAL_COLOR_CROSS_HAIR
@@ -96,6 +97,8 @@
 
 											"white,"			// TERMINAL_COLOR_SELECTED_BG
 											"black,"			// TERMINAL_COLOR_SELECTED_FG,
+											"white,"			// TERMINAL_COLOR_SELECTED_BORDER
+
 
 											"LimeGreen," 		// TERMINAL_COLOR_CURSOR
 											"LimeGreen," 		// TERMINAL_COLOR_CROSS_HAIR
@@ -155,31 +158,100 @@
  	return 0;
  }
 
- static void ParseColor(char *buffer)
- {
- 	int 	f;
- 	char	*ptr	= strtok(buffer,",");
 
- 	for(f=0;ptr && f < TERMINAL_COLOR_COUNT;f++)
- 	{
- 		if(ptr)
- 		{
-			gdk_color_parse(ptr,color+f);
-			ptr = strtok(NULL,",");
- 		}
-		else
+ static void parsecolorentry(int id, const gchar *str)
+ {
+	gdk_color_parse(str,color+id);
+	gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+id,TRUE,TRUE);
+ }
+
+ static void ParseColorList(char *colors)
+ {
+ 	int		f;
+ 	gchar	**clr = g_strsplit(colors,",",TERMINAL_COLOR_COUNT+1);
+
+	for(f=0;clr[f] && f < TERMINAL_COLOR_COUNT;f++);
+	Trace("%d colors in %s (max=%d)",f,colors,TERMINAL_COLOR_COUNT);
+
+	switch(f)
+	{
+	case 29: // Release 1 colors
+		for(f=0;f < TERMINAL_COLOR_SELECTED_BORDER;f++)
+			parsecolorentry(f,clr[f]);
+
+		parsecolorentry(TERMINAL_COLOR_SELECTED_BORDER,clr[TERMINAL_COLOR_SELECTED_BG]);
+
+		for(f=TERMINAL_COLOR_SELECTED_BORDER+1;f < TERMINAL_COLOR_COUNT;f++)
+			parsecolorentry(f,clr[f-1]);
+
+		break;
+
+	case TERMINAL_COLOR_COUNT:	// Complete string
+		for(f=0;f < TERMINAL_COLOR_COUNT;f++)
+			parsecolorentry(f,clr[f]);
+		break;
+
+	default: // Unexpected, parse only standard base colors
+
+		Trace("Unexpected color count in %s, loading base colors",colors);
+
+		for(f=0;f < TERMINAL_COLOR_FIELD_DEFAULT;f++)
+			parsecolorentry(f,clr[f]);
+
+		parsecolorentry(TERMINAL_COLOR_FIELD_DEFAULT,				clr[TERMINAL_COLOR_GREEN]);
+		parsecolorentry(TERMINAL_COLOR_FIELD_INTENSIFIED,			clr[TERMINAL_COLOR_RED]);
+		parsecolorentry(TERMINAL_COLOR_FIELD_PROTECTED,				clr[TERMINAL_COLOR_DARK_BLUE]);
+		parsecolorentry(TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED,	clr[TERMINAL_COLOR_WHITE]);
+
+		parsecolorentry(TERMINAL_COLOR_SELECTED_BG,					clr[TERMINAL_COLOR_WHITE]);
+		parsecolorentry(TERMINAL_COLOR_SELECTED_FG,					clr[TERMINAL_COLOR_BLACK]);
+
+		for(f=TERMINAL_COLOR_CURSOR;f < TERMINAL_COLOR_COUNT;f++)
+			parsecolorentry(f,clr[TERMINAL_COLOR_GREEN]);
+
+	}
+
+	g_strfreev(clr);
+
+/*
+
+ 	int 	f		= 0;
+ 	char	buffer	= g_strdup(str);
+ 	char	*ptr;
+
+
+ 	for(ptr = strtok(buffer,",");ptr;ptr =
+		f++;
+
+	strcpy(buffer,str);
+
+
+	if(f == TERMINAL_COLOR_COUNT)
+	{
+		for(f=0;ptr && f < TERMINAL_COLOR_COUNT;f++)
 		{
-			gdk_color_parse("LimeGreen",color+f);
+			if(ptr)
+			{
+				gdk_color_parse(ptr,color+f);
+				ptr = strtok(NULL,",");
+			}
+			else
+			{
+				gdk_color_parse("LimeGreen",color+f);
+			}
+			gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+f,TRUE,TRUE);
 		}
-		gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+f,TRUE,TRUE);
- 	}
+	}
+
+	g_free(buffer);
+*/
 
  }
 
  int LoadColors(void)
  {
  	char	*buffer	= GetString("Terminal","Colors",color_profile[0].colors);
- 	ParseColor(buffer);
+ 	ParseColorList(buffer);
  	g_free(buffer);
  	return 0;
  }
@@ -263,7 +335,7 @@
 	{
 		Trace("Mudando cores para %s",vlr);
 		ptr = g_strdup(vlr);
-		ParseColor(ptr);
+		ParseColorList(ptr);
 		g_free(ptr);
 		ReloadPixmaps();
 		action_Redraw();
@@ -314,6 +386,7 @@
 
 		N_( "Background" ),					// TERMINAL_COLOR_SELECTED_BG
 		N_( "Foreground" ),					// TERMINAL_COLOR_SELECTED_FG
+		N_( "Border" ),						// TERMINAL_COLOR_SELECTED_FG
 
 		N_( "Normal" ),						// TERMINAL_COLOR_CURSOR
 		N_( "Cross-hair" ),					// TERMINAL_COLOR_CROSS_HAIR
