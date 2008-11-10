@@ -445,6 +445,22 @@
 		for(col = 0; col < terminal_cols;col++)
 		{
 			unsigned char selected = (pos >= start && pos <= end) ? SELECTION_BOX : 0;
+
+			if(selected)
+			{
+				if(!(row && screen[pos-terminal_cols].selected))
+					selected |= SELECTION_BOX_TOP;
+
+				if(!(pos && col && screen[pos-1].selected))
+					selected |= SELECTION_BOX_LEFT;
+
+				if(pos+1 > end || col == (terminal_cols-1))
+					selected |= SELECTION_BOX_RIGHT;
+
+				if((pos+terminal_cols) > end)
+					selected |= SELECTION_BOX_BOTTOM;
+			}
+
 			if(screen[pos].selected != selected)
 			{
 				// Changed, mark to update
