@@ -838,10 +838,17 @@
 
  }
 
+ CURSOR_MODE cursor_mode = -1;
+
  static void set_cursor(CURSOR_MODE mode)
  {
- 	if(terminal && terminal->window && mode < CURSOR_MODE_USER)
-		gdk_window_set_cursor(terminal->window,wCursor[mode]);
+ 	if(mode == cursor_mode || mode > CURSOR_MODE_USER || !terminal || !terminal->window)
+		return;
+
+	cursor_mode = mode;
+
+	if(drag_type >= 0)
+		gdk_window_set_cursor(terminal->window,wCursor[cursor_mode]);
 
  }
 

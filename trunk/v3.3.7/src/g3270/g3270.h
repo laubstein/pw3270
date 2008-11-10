@@ -40,6 +40,26 @@
 	#include <glib.h>
 
 	#include <lib3270/api.h>
+ 	#define CURSOR_MODE_G3270 (CURSOR_MODE_USER+9)
+
+	enum _drag_type
+	{
+		DRAG_TYPE_TOP_LEFT, 	// Top-left
+		DRAG_TYPE_TOP_RIGHT,	// Top-right
+		DRAG_TYPE_TOP,			// Top
+		DRAG_TYPE_BOTTOM_LEFT,	// Bottom-left
+		DRAG_TYPE_BOTTOM_RIGHT,	// Bottom-right
+		DRAG_TYPE_BOTTOM,		// Bottom
+		DRAG_TYPE_LEFT,			// Left
+		DRAG_TYPE_RIGHT,		// Right
+		DRAG_TYPE_INSIDE,		// Inside
+
+		DRAG_TYPE_NONE
+	};
+
+
+	extern int 			drag_type;
+	extern CURSOR_MODE		cursor_mode;
 
 	#define MAX_CHR_LENGTH 3
 	typedef struct _element
@@ -138,7 +158,7 @@
 	extern GtkWidget				*DefaultPopup;
 	extern GtkWidget				*terminal;
 	extern GdkColor				color[TERMINAL_COLOR_COUNT+1];
-	extern GdkCursor        		*wCursor[CURSOR_MODE_USER];
+	extern GdkCursor        		*wCursor[CURSOR_MODE_G3270];
 	extern PangoFontDescription	*font;
 	extern gint					cMode;
 
@@ -261,6 +281,7 @@
 		SELECT_MODE_FIELD,
 		SELECT_MODE_COPY,
 		SELECT_MODE_APPEND,
+		SELECT_MODE_DRAG,
 
 		SELECT_MODE_INVALID
 	};
