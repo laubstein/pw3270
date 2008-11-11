@@ -39,7 +39,10 @@
 
  GtkWidget	*topwindow 	= NULL;
  GList 		*main_icon	= NULL;
+
+#ifndef WIN32
  GdkCursor	*wCursor[CURSOR_MODE_G3270];
+#endif
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -257,23 +260,7 @@
 
  int CreateTopWindow(void)
  {
-#if defined(_WIN32)
- 	static int 			cr[CURSOR_MODE_G3270] = { 	GDK_ARROW,
-														GDK_WATCH,
-														GDK_X_CURSOR,
-
-														GDK_TOP_LEFT_CORNER, 		// Top-left
-														GDK_TOP_RIGHT_CORNER,		// Top-right
-														GDK_TREK,					// Top
-														GDK_BOTTOM_LEFT_CORNER,		// Bottom-left
-														GDK_BOTTOM_RIGHT_CORNER,	// Bottom-right
-														GDK_BOTTOM_TEE,				// Bottom
-														GDK_LEFT_SIDE,				// Left
-														GDK_RIGHT_PTR,				// Right
-														GDK_SIZING				// Inside
-
-													};
-#else
+#ifndef WIN32
  	static int 			cr[CURSOR_MODE_G3270] = { 	GDK_XTERM,
 														GDK_WATCH,
 														GDK_X_CURSOR,
@@ -289,11 +276,13 @@
 														GDK_FLEUR					// Inside
 
 													};
+
+ 	int						f;
+
 #endif
 
  	GtkWidget				*vbox;
  	GtkWidget				*hbox;
- 	int						f;
 	GtkUIManager			*ui_manager;
 	GdkPixbuf				*pix;
 
@@ -306,8 +295,10 @@
 		gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
 	}
 
+#ifndef WIN32
 	for(f=0;f<CURSOR_MODE_G3270;f++)
 		wCursor[f] = gdk_cursor_new(cr[f]);
+#endif
 
 	g_signal_connect(G_OBJECT(topwindow),	"delete_event", 		G_CALLBACK(delete_event),			0);
 	g_signal_connect(G_OBJECT(topwindow),	"destroy", 				G_CALLBACK(destroy),				0);

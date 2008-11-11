@@ -512,6 +512,8 @@
 		return;
 
  	drag_type = type;
+
+#ifndef WIN32
  	if(terminal && terminal->window)
  	{
  		Trace("Type: %d",type);
@@ -521,6 +523,7 @@
  		else
 			gdk_window_set_cursor(terminal->window,wCursor[cursor_mode]);
  	}
+#endif
 
  }
 
@@ -813,3 +816,7 @@
 		MoveSelection(0,1);
  }
 
+ gboolean mouse_enter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
+ {
+ 	return 0;
+ }

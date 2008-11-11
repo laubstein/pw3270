@@ -28,6 +28,10 @@
 
 	#define G3270_H_INCLUDED
 
+	#ifdef WIN32
+		#include <windows.h>
+	#endif
+
 	#include <lib3270/config.h>
 	#define ENABLE_NLS
 	#define GETTEXT_PACKAGE PACKAGE_NAME
@@ -164,7 +168,11 @@
 	extern GtkWidget				*DefaultPopup;
 	extern GtkWidget				*terminal;
 	extern GdkColor				color[TERMINAL_COLOR_COUNT+1];
+
+#ifndef WIN32
 	extern GdkCursor        		*wCursor[CURSOR_MODE_G3270];
+#endif
+
 	extern PangoFontDescription	*font;
 	extern gint					cMode;
 
@@ -219,6 +227,7 @@
 
 	gboolean 	mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data);
 	gboolean 	mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
+	gboolean 	mouse_enter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data);
 	gboolean 	mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 	gboolean 	mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
