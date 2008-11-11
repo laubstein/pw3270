@@ -84,6 +84,8 @@ echo "s&#undef X3270_ANSI&#define X3270_ANSI 1&g;" >> $TEMPFILE
 echo "s&#undef X3270_PRINTER&#define X3270_PRINTER 1&g;" >> $TEMPFILE
 echo "s&#undef HAVE_LIBSSL&#define HAVE_LIBSSL 1&g;" >> $TEMPFILE
 echo "s&#undef PLUGINDIR&#define PLUGINDIR \"$PLUGIN\"&g;" >> $TEMPFILE
+echo "s&#undef MOUSE_POINTER_CHANGE&#define MOUSE_POINTER_CHANGE 1&g;" >> $TEMPFILE
+	
 
 
 mv ~/Desktop/g3270_installer.exe ~/tmp > /dev/null 2>&1

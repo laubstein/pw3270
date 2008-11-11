@@ -297,7 +297,7 @@
 	// Configure im context
     gtk_im_context_set_client_window(im,widget->window);
 
-#ifndef WIN32
+#ifdef MOUSE_POINTER_CHANGE
     gdk_window_set_cursor(widget->window,wCursor[0]);
 #endif
 

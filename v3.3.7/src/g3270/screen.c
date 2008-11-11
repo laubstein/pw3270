@@ -847,8 +847,8 @@
 
 	cursor_mode = mode;
 
-#ifndef WIN32
-	if(drag_type >= 0)
+#ifdef MOUSE_POINTER_CHANGE
+	if(drag_type == DRAG_TYPE_NONE)
 		gdk_window_set_cursor(terminal->window,wCursor[cursor_mode]);
 #endif
 
