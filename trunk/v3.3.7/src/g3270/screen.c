@@ -847,8 +847,10 @@
 
 	cursor_mode = mode;
 
+#ifndef WIN32
 	if(drag_type >= 0)
 		gdk_window_set_cursor(terminal->window,wCursor[cursor_mode]);
+#endif
 
  }
 
