@@ -26,6 +26,8 @@
 	#undef X3270_SCRIPT
 	#undef X3270_TN3270E
 
+	#undef MOUSE_POINTER_CHANGE
+
 	/* Default toggles */
 	#define TOGGLE_RECTANGLE_SELECT
 	#define TOGGLE_CURSOR_POS

@@ -513,7 +513,7 @@
 
  	drag_type = type;
 
-#ifndef WIN32
+#ifdef MOUSE_POINTER_CHANGE
  	if(terminal && terminal->window)
  	{
  		Trace("Type: %d",type);

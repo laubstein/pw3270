@@ -169,7 +169,7 @@
 	extern GtkWidget				*terminal;
 	extern GdkColor				color[TERMINAL_COLOR_COUNT+1];
 
-#ifndef WIN32
+#ifdef MOUSE_POINTER_CHANGE
 	extern GdkCursor        		*wCursor[CURSOR_MODE_G3270];
 #endif
 

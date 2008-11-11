@@ -77,6 +77,14 @@ AC_ARG_WITH([ssl],
 	g3270_cv_ssl="yes"
 ])
 
+AC_ARG_ENABLE([mouse-pointer-change],
+	[AS_HELP_STRING([--disable-mouse-pointer-change], [disable mouse pointer changes])],
+[
+	g3270_cv_pointer_change="$enableval"
+],[
+	g3270_cv_pointer_change="yes"
+])
+
 AC_ARG_WITH([rexx],
 	[AS_HELP_STRING([--without-rexx], [disable rexx plugin])],
 [
@@ -161,6 +169,10 @@ fi
 
 if test "$g3270_cv_plugins" == "yes"; then
 	AC_DEFINE([HAVE_PLUGINS])
+fi
+
+if test "$g3270_cv_pointer_change" == "yes"; then
+	AC_DEFINE([MOUSE_POINTER_CHANGE])
 fi
 
 AC_DEFINE([X3270_TN3270E])

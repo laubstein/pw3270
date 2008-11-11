@@ -40,7 +40,7 @@
  GtkWidget	*topwindow 	= NULL;
  GList 		*main_icon	= NULL;
 
-#ifndef WIN32
+#ifdef MOUSE_POINTER_CHANGE
  GdkCursor	*wCursor[CURSOR_MODE_G3270];
 #endif
 
@@ -260,7 +260,7 @@
 
  int CreateTopWindow(void)
  {
-#ifndef WIN32
+#ifdef MOUSE_POINTER_CHANGE
  	static int 			cr[CURSOR_MODE_G3270] = { 	GDK_XTERM,
 														GDK_WATCH,
 														GDK_X_CURSOR,
@@ -295,7 +295,7 @@
 		gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
 	}
 
-#ifndef WIN32
+#ifdef MOUSE_POINTER_CHANGE
 	for(f=0;f<CURSOR_MODE_G3270;f++)
 		wCursor[f] = gdk_cursor_new(cr[f]);
 #endif
