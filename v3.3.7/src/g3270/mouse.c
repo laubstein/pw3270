@@ -34,10 +34,6 @@
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
- #define DecodePosition(event,row,col)	col = ( (((unsigned long) event->x) - left_margin)/fWidth ); \
-										row = ( (((unsigned long) event->y) - top_margin)/fHeight );
-
-
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
  static void UpdateSelectedRegion(int start, int end);
@@ -187,6 +183,46 @@
 	}
  }
 
+ #define DecodePosition(event,row,col) _DecodePosition(event->x,event->y,&row,&col)
+
+ static int _DecodePosition(long x, long y, int *row, int *col)
+ {
+ 	int rc = 0;
+
+ 	if(x < left_margin)
+ 	{
+ 		*col = 0;
+ 		rc = -1;
+ 	}
+	else if(x > (left_margin+(terminal_cols * fWidth)))
+	{
+		*col = terminal_cols-1;
+		rc = -1;
+	}
+	else
+	{
+		*col = ((((unsigned long) x) - left_margin)/fWidth);
+	}
+
+	if(y < top_margin)
+	{
+		*row = 0;
+		rc = -1;
+	}
+	else if(y > (top_margin+(terminal_rows * fHeight)))
+	{
+		*row = terminal_rows-1;
+		rc = -1;
+	}
+	else
+	{
+		*row = ((((unsigned long) y) - top_margin)/fHeight);
+	}
+
+	return rc;
+ }
+
+
  #define BUTTON_FLAG_COMBO	0x80
 
  static gint button_flags = 0;
@@ -205,10 +241,12 @@
 		switch(drag_type)
 		{
 		case DRAG_TYPE_NONE:
-			button_flags |= BUTTON_FLAG_COMBO;
+
 			action_ClearSelection();
-			DecodePosition(event,startRow,startCol);
-			Trace("Button 1 clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
+
+			if(!DecodePosition(event,startRow,startCol))
+				button_flags |= BUTTON_FLAG_COMBO;
+
 			break;
 
 		case DRAG_TYPE_INSIDE:
@@ -556,9 +594,15 @@
 	{
 		int row, col;
 
-		DecodePosition(event,row,col);
-
-		if(row == startRow && col == startCol)
+		if(DecodePosition(event,row,col))
+		{
+			SetDragType(DRAG_TYPE_NONE);
+		}
+		else if(row < startRow || row > endRow || col < startCol || col > endCol)
+		{
+			SetDragType(DRAG_TYPE_NONE);
+		}
+		else if(row == startRow && col == startCol)
 		{
 			Trace("Top-left (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_TOP_LEFT);
