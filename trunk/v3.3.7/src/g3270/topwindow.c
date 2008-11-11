@@ -261,7 +261,45 @@
  int CreateTopWindow(void)
  {
 #ifdef MOUSE_POINTER_CHANGE
- 	static int 			cr[CURSOR_MODE_G3270] = { 	GDK_XTERM,
+
+	#ifdef WIN32
+
+/*
+  { "appstarting", IDC_APPSTARTING },
+  { "arrow", IDC_ARROW },
+  { "cross", IDC_CROSS },
+#ifdef IDC_HAND
+  { "hand",  IDC_HAND },
+#endif
+  { "help",  IDC_HELP },
+  { "ibeam", IDC_IBEAM },
+  { "sizeall", IDC_SIZEALL },
+  { "sizenesw", IDC_SIZENESW },
+  { "sizens", IDC_SIZENS },
+  { "sizenwse", IDC_SIZENWSE },
+  { "sizewe", IDC_SIZEWE },
+  { "uparrow", IDC_UPARROW },
+  { "wait", IDC_WAIT }
+*/
+		static const gchar *cr[CURSOR_MODE_G3270] = {	"arrow",
+														"wait",
+														"arrow",
+
+														"sizenwse",	// Top-left
+														"sizenesw",	// Top-right
+														"sizens",	// Top
+														"sizenesw",	// Bottom-left
+														"sizenwse",	// Bottom-right
+														"sizens",	// Bottom
+														"sizewe",	// Left
+														"sizewe",	// Right
+														"sizeall"	// Inside
+
+													};
+
+	#else
+
+		static int 		cr[CURSOR_MODE_G3270] = { 	GDK_XTERM,
 														GDK_WATCH,
 														GDK_X_CURSOR,
 
@@ -276,6 +314,8 @@
 														GDK_FLEUR					// Inside
 
 													};
+
+	#endif
 
  	int						f;
 
@@ -296,8 +336,15 @@
 	}
 
 #ifdef MOUSE_POINTER_CHANGE
-	for(f=0;f<CURSOR_MODE_G3270;f++)
-		wCursor[f] = gdk_cursor_new(cr[f]);
+
+	#ifdef WIN32
+		for(f=0;f<CURSOR_MODE_G3270;f++)
+			wCursor[f] = gdk_cursor_new_from_name(gdk_display_get_default(), cr[f]);
+	#else
+		for(f=0;f<CURSOR_MODE_G3270;f++)
+			wCursor[f] = gdk_cursor_new(cr[f]);
+	#endif
+
 #endif
 
 	g_signal_connect(G_OBJECT(topwindow),	"delete_event", 		G_CALLBACK(delete_event),			0);

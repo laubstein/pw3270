@@ -862,5 +862,19 @@
 
  gboolean mouse_enter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
  {
+/*
+#if defined(WIN32) && defined(MOUSE_POINTER_CHANGE)
+
+	switch(event->type)
+	{
+	case GDK_ENTER_NOTIFY:
+		break;
+
+	case GDK_LEAVE_NOTIFY:
+		break;
+	}
+
+#endif
+*/
  	return 0;
  }
