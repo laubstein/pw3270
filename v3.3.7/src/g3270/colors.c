@@ -60,9 +60,9 @@
 											"#00FFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED
 											"#FFFFFF,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
 
-											"#FFFFFF,"			// TERMINAL_COLOR_SELECTED_BG
-											"#000000,"			// TERMINAL_COLOR_SELECTED_FG,
-											"#FFFFFF,"			// TERMINAL_COLOR_SELECTED_BORDER
+											"#404040,"			// TERMINAL_COLOR_SELECTED_BG
+											"#FFFFFF,"			// TERMINAL_COLOR_SELECTED_FG,
+											"#FFFF00,"			// TERMINAL_COLOR_SELECTED_BORDER
 
 											"#00FF00," 			// TERMINAL_COLOR_CURSOR
 											"#00FF00," 			// TERMINAL_COLOR_CROSS_HAIR
@@ -95,9 +95,9 @@
 											"DeepSkyBlue,"		// TERMINAL_COLOR_FIELD_PROTECTED
 											"white,"			// TERMINAL_COLOR_FIELD_PROTECTED_INTENSIFIED
 
-											"white,"			// TERMINAL_COLOR_SELECTED_BG
-											"black,"			// TERMINAL_COLOR_SELECTED_FG,
-											"white,"			// TERMINAL_COLOR_SELECTED_BORDER
+											"DimGray,"			// TERMINAL_COLOR_SELECTED_BG
+											"white,"			// TERMINAL_COLOR_SELECTED_FG,
+											"yellow,"			// TERMINAL_COLOR_SELECTED_BORDER
 
 
 											"LimeGreen," 		// TERMINAL_COLOR_CURSOR
