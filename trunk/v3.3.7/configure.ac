@@ -69,6 +69,16 @@ AC_ARG_ENABLE([plugins],
 	g3270_cv_plugins="yes"
 ])
 
+AC_ARG_ENABLE([print-font-dialog],
+	[AS_HELP_STRING([--disable-print-font-dialog], [disable font selection dialog on print jobs])],
+[
+	g3270_cv_print_font="$enableval"
+
+],[
+	g3270_cv_print_font="yes"
+])
+
+
 AC_ARG_WITH([ssl],
 	[AS_HELP_STRING([--without-ssl], [do not use libssl])],
 [
@@ -169,6 +179,10 @@ fi
 
 if test "$g3270_cv_plugins" == "yes"; then
 	AC_DEFINE([HAVE_PLUGINS])
+fi
+
+if test "$g3270_cv_print_font" == "yes"; then
+	AC_DEFINE([HAVE_PRINT_FONT_DIALOG])
 fi
 
 if test "$g3270_cv_pointer_change" == "yes"; then

@@ -105,6 +105,9 @@
 		gtk_print_operation_set_n_pages(prt,pages);
  }
 
+#ifdef HAVE_PRINT_FONT_DIALOG
+/*---[ Begin font selection dialog ]------------------------------------------------------------------------------*/
+
  static void custom_widget_apply(GtkPrintOperation *prt, GtkWidget *font_dialog, gpointer user_data)
  {
  	gchar *font = gtk_font_selection_get_font_name(GTK_FONT_SELECTION(font_dialog));
@@ -124,6 +127,10 @@
  	return G_OBJECT(font_dialog);
  }
 
+/*---[ End Font Selection Dialog ]--------------------------------------------------------------------------------*/
+
+#endif
+
 #if !(GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12)
  static void SavePrintSetting(const gchar *key, const gchar *value, GKeyFile *cfg)
  {
@@ -136,7 +143,9 @@
 	GKeyFile 				*conf		= GetConf();
 	gchar					*ptr;
 	GtkPrintSettings		*settings	= gtk_print_operation_get_print_settings(prt);
+#ifdef HAVE_PRINT_FONT_DIALOG
 	PangoFontDescription	*FontDescr	= (PangoFontDescription *) g_object_get_data(G_OBJECT(prt),"g3270_FontDescr");
+#endif
 	GtkPageSetup			*setup		= gtk_print_operation_get_default_page_setup(prt);
 
 	if(!conf)
@@ -158,6 +167,7 @@
 #endif
 	}
 
+#ifdef HAVE_PRINT_FONT_DIALOG
 	if(FontDescr)
 	{
 		ptr = pango_font_description_to_string(FontDescr);
@@ -167,6 +177,8 @@
 			g_free(ptr);
 		}
 	}
+#endif
+
  }
 
  int PrintText(const char *name, gchar *text)
@@ -200,8 +212,10 @@
 	gtk_print_operation_set_custom_tab_label(prt,_( "Font" ));
 	g_signal_connect(prt, "begin-print",    		G_CALLBACK(begin_print), 			0);
     g_signal_connect(prt, "draw-page",      		G_CALLBACK(draw_page),   			0);
+#ifdef HAVE_PRINT_FONT_DIALOG
 	g_signal_connect(prt, "create-custom-widget",   G_CALLBACK(create_custom_widget),	0);
 	g_signal_connect(prt, "custom-widget-apply",   	G_CALLBACK(custom_widget_apply),	0);
+#endif
     g_signal_connect(prt, "done",      				G_CALLBACK(print_done),	 			0);
 
 	if(conf)

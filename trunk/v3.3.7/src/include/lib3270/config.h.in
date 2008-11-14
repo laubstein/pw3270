@@ -9,6 +9,7 @@
 	#undef HAVE_PLUGINS
 	#undef HAVE_LIBGNOME
 	#undef HAVE_REXX
+	#undef HAVE_PRINT_FONT_DIALOG
 
 	#ifndef LIBX3270DIR
 		#define LIBX3270DIR "."
