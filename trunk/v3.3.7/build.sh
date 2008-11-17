@@ -169,6 +169,11 @@ BuildDebug() {
 
 }
 
+if [ -z "$TMPDIR" ]; then
+	TMPDIR=/tmp
+	export TMPDIR
+fi
+
 if [ -z "$1" ]; then
 
 	BuildWin
