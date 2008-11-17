@@ -61,6 +61,11 @@ BuildRPM() {
 	VENDOR=`rpm --eval="%{u2p:%{_vendor}}"`
 	RELEASE=`grep Release g3270.spec | sed 's/ //g' |cut -d: -f2 |cut -d. -f1`
 
+	mkdir -p $RPMDIR
+	mkdir -p $RPMARCH
+	mkdir -p `rpm --eval="%{u2p:%{_srcrpmdir}}"`
+	mkdir -p `rpm --eval="%{u2p:%{_builddir}}"`
+
 	make clean
 	make tgz
 	if [ "$?" != "0" ]; then
