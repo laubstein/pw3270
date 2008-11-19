@@ -95,6 +95,14 @@ AC_ARG_ENABLE([mouse-pointer-change],
 	g3270_cv_pointer_change="yes"
 ])
 
+AC_ARG_ENABLE([primary-selection],
+	[AS_HELP_STRING([--disable-primary-selection], [disable usage of GDK_SELECTION_PRIMARY])],
+[
+	g3270_cv_use_primary_selection="$enableval"
+],[
+	g3270_cv_use_primary_selection="yes"
+])
+
 AC_ARG_WITH([rexx],
 	[AS_HELP_STRING([--without-rexx], [disable rexx plugin])],
 [
@@ -188,6 +196,12 @@ fi
 if test "$g3270_cv_pointer_change" == "yes"; then
 	AC_DEFINE([MOUSE_POINTER_CHANGE])
 fi
+
+if test "$g3270_cv_use_primary_selection" == "yes"; then
+	AC_DEFINE([USE_PRIMARY_SELECTION])
+fi
+
+
 
 AC_DEFINE([X3270_TN3270E])
 AC_DEFINE([X3270_ANSI])

@@ -40,17 +40,23 @@
  static void SelectField(int row, int col);
  static void SetDragType(int type);
 
+#ifndef USE_PRIMARY_SELECTION
+	#define SelectionChanged() /* */
+#else
+	static void SelectionChanged(void);
+#endif
+
 /*---[ Constants ]------------------------------------------------------------*/
 
 /*---[ Statics ]--------------------------------------------------------------*/
 
- static int startRow 			= 0;
- static int startCol 			= 0;
- static int endRow 			= 0;
- static int endCol				= 0;
- static int dragRow			= 0;
- static int dragCol			= 0;
- static int select_mode		= SELECT_MODE_INVALID;
+ static int 			startRow 	= 0;
+ static int 			startCol 	= 0;
+ static int 			endRow 		= 0;
+ static int 			endCol		= 0;
+ static int 			dragRow		= 0;
+ static int 			dragCol		= 0;
+ static int 			select_mode	= SELECT_MODE_INVALID;
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
@@ -58,7 +64,6 @@
  GtkWidget	*SelectionPopup		= 0;
  GtkWidget	*DefaultPopup		= 0;
  int 		drag_type			= DRAG_TYPE_NONE;
-
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -446,6 +451,7 @@
 	if(gc)
 		gdk_gc_destroy(gc);
 
+	SelectionChanged();
  }
 
  static void UpdateSelectedText(void)
@@ -518,6 +524,8 @@
 	if(gc)
 		gdk_gc_destroy(gc);
 
+
+	SelectionChanged();
 
  }
 
@@ -773,6 +781,11 @@
  	SetDragType(DRAG_TYPE_NONE);
 	SetSelection(FALSE);
 	SetSelectionMode(SELECT_MODE_NONE);
+
+#ifdef USE_PRIMARY_SELECTION
+	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_PRIMARY),"",-1);
+#endif
+
  }
 
  void action_SelectAll(GtkWidget *w, gpointer user_data)
@@ -878,3 +891,13 @@
 */
  	return 0;
  }
+
+#ifdef USE_PRIMARY_SELECTION
+ static void SelectionChanged(void)
+ {
+	gchar *selection = GetSelection();
+	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_PRIMARY),selection,-1);
+	g_free(selection);
+ }
+#endif
+
