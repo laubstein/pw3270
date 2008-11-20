@@ -104,6 +104,7 @@ BuildRPM() {
 		TARGET_FOLDER="$USER@storage:/dados/suse/$(rpm --eval="%{suse_version}" | cut -b1-2)/bb/$RPMARCH"
 	fi
 
+	echo "Copiando pacotes para o servidor..."
 	scp $RPMDIR/$RPMARCH/g3270*.rpm $TARGET_FOLDER
 	if [ "$?" != "0" ]; then
 		echo "Erro ao copiar o pacote binario"
