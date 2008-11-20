@@ -251,6 +251,7 @@
 	void 			action_SelectColors(void);
 	void 			action_SetHostname(void);
 	void 			action_Paste(void);
+	void			action_PasteSelection(void);
 	void 			action_PasteNext(void);
 	void 			action_PasteTextFile(void);
 

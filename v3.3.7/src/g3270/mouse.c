@@ -325,6 +325,11 @@
 			cursor_move((row*terminal_cols)+col);
 		break;
 
+	case ((SELECT_MODE_NONE & 0x0F) << 4) | 2: // Single click on button 2
+		Trace("Single click (button: %d)",event->button);
+		action_PasteSelection();
+		break;
+
 	case ((SELECT_MODE_FIELD & 0x0F) << 4) | 1:	// Double click, select field
 		Trace("Selecting field (button: %d)",event->button);
 		SelectField(startRow,startCol);

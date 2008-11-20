@@ -142,7 +142,7 @@
 	screen_disp();
  }
 
- static void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
+ static void process_text_received(const gchar *text)
  {
  	gchar *buffer;
  	gchar *ptr;
@@ -169,6 +169,25 @@
 	paste_string(buffer);
 	g_free(buffer);
  }
+
+ static void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
+ {
+	process_text_received(text);
+ }
+
+#ifdef USE_PRIMARY_SELECTION
+static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
+ {
+ 	if(!text)
+ 	{
+		Trace("Primary clipboard is empty, requesting default %p",clipboard);
+ 		gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,DEFAULT_CLIPBOARD),clipboard_text_received,(gpointer) 0);
+ 		return;
+ 	}
+	Trace("Pasting primary selection %p",clipboard);
+	process_text_received(text);
+ }
+#endif
 
  void action_PasteTextFile(void)
  {
@@ -218,6 +237,15 @@
  void action_Paste(void)
  {
 	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,DEFAULT_CLIPBOARD),clipboard_text_received,(gpointer) 0);
+ }
+
+ void action_PasteSelection(void)
+ {
+#ifdef USE_PRIMARY_SELECTION
+	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_PRIMARY),primary_text_received,(gpointer) 0);
+#else
+	action_PasteNext();
+#endif
  }
 
  void action_PasteNext(void)
