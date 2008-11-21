@@ -100,7 +100,7 @@
 	if(TOGGLED_SMART_PASTE)
 	{
 		int 	addr = cursor_get_addr();
-		int		max  = (terminal_rows*terminal_cols);
+		int		max  = ((terminal_rows-1)*terminal_cols);
 		char	buffer[2];
 
 		remaining = strlen(str);
@@ -214,6 +214,9 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 		gsize		sz = 0;
 		gchar		*buffer;
 
+		gtk_widget_set_sensitive(dialog,FALSE);
+		gtk_widget_set_sensitive(topwindow,FALSE);
+
 		g_key_file_set_string(conf,"uri","PasteTextFile",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
 
 		Trace("Loading %s",filename);
@@ -229,6 +232,9 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 		}
 
 		g_free(buffer);
+
+		gtk_widget_set_sensitive(topwindow,TRUE);
+
 	}
 
 	gtk_widget_destroy(dialog);
