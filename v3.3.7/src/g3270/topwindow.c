@@ -258,6 +258,16 @@
 	return NULL;
  }
 
+#ifdef USE_PRIMARY_SELECTION
+
+ static void selection_owner_changed(GtkClipboard *clipboard, GdkEventOwnerChange *event, gpointer user_data)
+ {
+ 	if(!GTK_WIDGET_HAS_FOCUS(terminal))
+		action_ClearSelection();
+ }
+
+#endif
+
  int CreateTopWindow(void)
  {
 #ifdef MOUSE_POINTER_CHANGE
@@ -423,6 +433,13 @@
 
 	action_ClearSelection();
 	ClearClipboard();
+
+#ifdef USE_PRIMARY_SELECTION
+
+	g_signal_connect(	G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_PRIMARY)),
+						"owner-change",G_CALLBACK(selection_owner_changed),0 );
+
+#endif
 
 	gtk_action_group_set_sensitive(online_actions,FALSE);
 	gtk_action_group_set_sensitive(offline_actions,TRUE);
