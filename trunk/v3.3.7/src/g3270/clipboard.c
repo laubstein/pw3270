@@ -29,12 +29,9 @@
  #include <lib3270/kybdc.h>
  #include <string.h>
 
- #define DEFAULT_CLIPBOARD GDK_NONE
-
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
- static gchar 			*contents = NULL;
-// static const gchar	*clipboard_actions[] = { "SaveClipboard", "PrintClipboard" };
+ static gchar *contents = NULL;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -52,7 +49,7 @@
  	}
 
 	Trace("Clipboard set to:\n%s",contents);
-	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,DEFAULT_CLIPBOARD),contents,-1);
+	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),contents,-1);
 	gtk_action_group_set_sensitive(clipboard_actions,TRUE);
 
  }
@@ -181,7 +178,7 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
  	if(!text)
  	{
 		Trace("Primary clipboard is empty, requesting default %p",clipboard);
- 		gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,DEFAULT_CLIPBOARD),clipboard_text_received,(gpointer) 0);
+ 		gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_text_received,(gpointer) 0);
  		return;
  	}
 	Trace("Pasting primary selection %p",clipboard);
@@ -236,7 +233,7 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 
  void action_Paste(void)
  {
-	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,DEFAULT_CLIPBOARD),clipboard_text_received,(gpointer) 0);
+	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_text_received,(gpointer) 0);
  }
 
  void action_PasteSelection(void)

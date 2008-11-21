@@ -783,13 +783,16 @@
 
  void action_ClearSelection(void)
  {
+ 	if(select_mode == SELECT_MODE_NONE)
+		return;
+
  	SetDragType(DRAG_TYPE_NONE);
 	SetSelection(FALSE);
 	SetSelectionMode(SELECT_MODE_NONE);
 
-#ifdef USE_PRIMARY_SELECTION
-	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_PRIMARY),"",-1);
-#endif
+// #ifdef USE_PRIMARY_SELECTION
+//	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_PRIMARY),"",-1);
+// #endif
 
  }
 
