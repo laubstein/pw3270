@@ -268,6 +268,21 @@
 
 #endif
 
+#ifdef USE_SELECTIONS
+
+ static void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
+ {
+	gtk_action_group_set_sensitive(paste_actions,text ? TRUE : FALSE);
+ }
+
+ static void clipboard_owner_changed(GtkClipboard *clipboard, GdkEventOwnerChange *event, gpointer user_data)
+ {
+ 	Trace("Clipboard %p changed Reason: %d",clipboard,(int) event->reason);
+	gtk_clipboard_request_text(clipboard,clipboard_text_received,0);
+ }
+
+#endif
+
  int CreateTopWindow(void)
  {
 #ifdef MOUSE_POINTER_CHANGE
@@ -445,6 +460,22 @@
 	gtk_action_group_set_sensitive(offline_actions,TRUE);
 	gtk_action_group_set_sensitive(clipboard_actions,FALSE);
 	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"Reselect"),FALSE);
+	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"PasteNext"),FALSE);
+
+#ifdef USE_SELECTIONS
+
+	gtk_action_group_set_sensitive(paste_actions,FALSE);
+
+	g_signal_connect(	G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_NONE)),
+						"owner-change",G_CALLBACK(clipboard_owner_changed),0 );
+
+	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_text_received,0);
+
+#else
+
+	gtk_action_group_set_sensitive(paste_actions,TRUE);
+
+#endif
 
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
 	settitle(GetString("TopWindow","Title",""));

@@ -100,13 +100,12 @@
 	if(TOGGLED_SMART_PASTE)
 	{
 		int 	addr = cursor_get_addr();
+		int		max  = (terminal_rows*terminal_cols);
 		char	buffer[2];
-
-		Trace("Extended paste buffer:\n%s",str);
 
 		remaining = strlen(str);
 
-		while(remaining > 0)
+		while(remaining > 0 && addr < max)
 		{
 			screen_read(buffer, addr, 1);
 			if(*buffer != *str)
@@ -133,6 +132,8 @@
 		contents = g_strdup(str+(strlen(str)-(remaining+1)));
 	else
 		contents = NULL;
+
+	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"PasteNext"),contents != NULL);
 
 	g_free(saved);
 
@@ -165,6 +166,7 @@
 
 	paste_string(buffer);
 	g_free(buffer);
+
  }
 
  static void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
@@ -209,10 +211,12 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 	{
 		GError		*error = NULL;
 		gchar		*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-		gsize		sz;
+		gsize		sz = 0;
 		gchar		*buffer;
 
 		g_key_file_set_string(conf,"uri","PasteTextFile",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
+
+		Trace("Loading %s",filename);
 
 		if(!g_file_get_contents(filename, &buffer, &sz, &error))
 		{
@@ -221,7 +225,7 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 		}
 		else
 		{
-			paste_string(buffer);
+			process_text_received(buffer);
 		}
 
 		g_free(buffer);
@@ -247,7 +251,6 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 
  void action_PasteNext(void)
  {
-
  	if(contents)
 		paste_string(contents);
 	else
