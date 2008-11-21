@@ -151,7 +151,6 @@
 	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),				"Down",				NULL,	G_CALLBACK(action_Down)				},
 
  	/* Edit actions */
- 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),				NULL,				NULL,	G_CALLBACK(action_Paste)			},
  	{	"PasteNext",		NULL,					N_( "Paste next" ),			"<Shift><Ctrl>v",	NULL,	G_CALLBACK(action_PasteNext)		},
  	{	"PasteTextFile",	NULL,					N_( "Paste text file" ),	NULL,				NULL,	G_CALLBACK(action_PasteTextFile)	},
  	{	"Reselect",			NULL,					N_( "Reselect" ),			"<Shift><Ctrl>r",	NULL,	G_CALLBACK(Reselect)				},
@@ -181,6 +180,11 @@
 	{	"PrintClipboard",	NULL,					N_( "Print copy" ),			NULL,				NULL,	G_CALLBACK(action_PrintClipboard)	},
 	{	"SaveClipboard",	NULL,					N_( "Save copy" ),			NULL,				NULL,	G_CALLBACK(action_SaveClipboard)	},
 
+ };
+
+ static const GtkActionEntry paste_action_entries[] =
+ {
+ 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),				NULL,				NULL,	G_CALLBACK(action_Paste)			},
  };
 
  static const GtkActionEntry common_action_entries[] =
@@ -665,6 +669,7 @@
 		{ "Offline",	offline_action_entries,		G_N_ELEMENTS(offline_action_entries)	},
 		{ "Selection",	selection_action_entries,	G_N_ELEMENTS(selection_action_entries)	},
 		{ "Clipboard",	clipboard_action_entries,	G_N_ELEMENTS(clipboard_action_entries)	},
+		{ "Paste",		paste_action_entries,		G_N_ELEMENTS(paste_action_entries)	},
 	};
 
 	GtkUIManager 	*ui_manager = gtk_ui_manager_new(); // http://library.gnome.org/devel/gtk/stable/GtkUIManager.html

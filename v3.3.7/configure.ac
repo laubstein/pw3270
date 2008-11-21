@@ -95,6 +95,14 @@ AC_ARG_ENABLE([mouse-pointer-change],
 	g3270_cv_pointer_change="yes"
 ])
 
+AC_ARG_ENABLE([selections],
+	[AS_HELP_STRING([--disable-selections], [ignore selection events])],
+[
+	g3270_cv_use_selections="$enableval"
+],[
+	g3270_cv_use_selections="yes"
+])
+
 AC_ARG_ENABLE([primary-selection],
 	[AS_HELP_STRING([--disable-primary-selection], [disable usage of GDK_SELECTION_PRIMARY])],
 [
@@ -195,6 +203,10 @@ fi
 
 if test "$g3270_cv_pointer_change" == "yes"; then
 	AC_DEFINE([MOUSE_POINTER_CHANGE])
+fi
+
+if test "$g3270_cv_use_selections" == "yes"; then
+	AC_DEFINE([USE_SELECTIONS])
 fi
 
 if test "$g3270_cv_use_primary_selection" == "yes"; then
