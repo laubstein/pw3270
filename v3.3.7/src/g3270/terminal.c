@@ -503,7 +503,7 @@
 	}
  }
 
- static void DrawCursorPosition(void)
+ void DrawCursorPosition(void)
  {
 	GdkGC 		*gc		= gdk_gc_new(terminal->window);
 	PangoLayout *layout;
@@ -560,15 +560,24 @@
 		return;
 
 	gtk_im_context_reset(im);
-	InvalidateCursor();
 
-	cCol			= col;
-	cRow			= row;
+ 	if(drawing_enabled)
+ 	{
+		InvalidateCursor();
 
-	RedrawCursor();
+		cCol			= col;
+		cRow			= row;
 
-	if(Toggled(CURSOR_POS) && terminal && pixmap)
-		DrawCursorPosition();
+		RedrawCursor();
+
+		if(Toggled(CURSOR_POS) && terminal && pixmap)
+			DrawCursorPosition();
+ 	}
+ 	else
+ 	{
+		cCol			= col;
+		cRow			= row;
+ 	}
 
  }
 

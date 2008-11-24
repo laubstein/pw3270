@@ -187,6 +187,7 @@
 	extern gboolean 				WaitingForChanges;
 	extern char					*charset;
 	extern gchar 					*window_title;
+	extern gboolean				drawing_enabled;
 
 	extern GtkActionGroup			*action_group[ACTION_GROUP_MAX];
 
@@ -221,6 +222,7 @@
 	void 		SetTerminalFont(const gchar *fontname);
 	void 		RedrawCursor(void);
 	gboolean	PFKey(int key);
+	void 		DrawCursorPosition(void);
 
 	#define		GetSelection() GetScreenContents(0)
 	gchar 		*GetClipboard(void);
