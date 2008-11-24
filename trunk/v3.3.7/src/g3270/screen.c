@@ -149,9 +149,9 @@
  ELEMENT							*screen			= NULL;
  char								*charset		= NULL;
  char								*window_title	= PACKAGE_NAME;
+ gboolean							drawing_enabled	= FALSE;
 
  static int						szScreen		= 0;
- static gboolean					draw			= FALSE;
  static const struct status_code	*sts_data		= NULL;
  static unsigned char			compose			= 0;
  static gchar						*luname			= 0;
@@ -180,16 +180,21 @@
 
  static void suspend(void)
  {
- 	draw = FALSE;
+ 	Trace("Screen suspend! (draw=%s)", drawing_enabled ? "Yes" : "No");
+ 	drawing_enabled = FALSE;
  }
 
  static void resume(void)
  {
- 	draw = TRUE;
+ 	Trace("Screen resume! (draw=%s)", drawing_enabled ? "Yes" : "No");
+ 	drawing_enabled = TRUE;
  	if(terminal && pixmap)
  	{
 		DrawScreen(terminal, color, pixmap);
 		DrawOIA(terminal,color,pixmap);
+		RedrawCursor();
+		if(Toggled(CURSOR_POS))
+			DrawCursorPosition();
 		gtk_widget_queue_draw(terminal);
  	}
  }
@@ -330,7 +335,7 @@
 
 	memcpy(el,&in,sizeof(ELEMENT));
 
-	if(draw && terminal && pixmap)
+	if(drawing_enabled && terminal && pixmap)
 	{
 		// Update pixmap, queue screen redraw.
 		gint 	x, y;
@@ -347,10 +352,11 @@
 		g_object_unref(layout);
 
 		gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
-	}
 
-	if(row == cRow && col == cCol)
-		RedrawCursor();
+		if(row == cRow && col == cCol)
+			RedrawCursor();
+
+	}
 
 	return 0;
  }

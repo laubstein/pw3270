@@ -97,6 +97,8 @@
 		return;
  	}
 
+	screen_suspend();
+
 	if(TOGGLED_SMART_PASTE)
 	{
 		int 	addr = cursor_get_addr();
@@ -137,7 +139,8 @@
 
 	g_free(saved);
 
-	screen_disp();
+	screen_resume();
+
  }
 
  static void process_text_received(const gchar *text)
