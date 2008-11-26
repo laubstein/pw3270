@@ -1,29 +1,32 @@
+dnl 
+dnl "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+dnl (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+dnl aplicativos mainframe.
+dnl 
+dnl Copyright (C) <2008> <Banco do Brasil S.A.>
+dnl 
+dnl Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+dnl os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+dnl Free Software Foundation.
+dnl 
+dnl Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+dnl GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+dnl A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+dnl obter mais detalhes.
+dnl 
+dnl Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+dnl programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+dnl Place, Suite 330, Boston, MA, 02111-1307, USA
+dnl 
+dnl Contatos: 
+dnl 
+dnl perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+dnl erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+dnl licinio@bb.com.br		(Licínio Luis Branco)
+dnl kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+dnl macmiranda@bb.com.br	(Marco Aurélio Caldas Miranda)
 dnl
-dnl Copyright 2008, Banco do Brasil S.A.
-dnl
-dnl This file is part of g3270
-dnl
-dnl This program file is free software; you can redistribute it and/or modify it
-dnl under the terms of the GNU General Public License as published by the
-dnl Free Software Foundation; version 3 of the License.
-dnl
-dnl This program is distributed in the hope that it will be useful, but WITHOUT
-dnl ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-dnl FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-dnl for more details.
-dnl
-dnl You should have received a copy of the GNU General Public License
-dnl along with this program in a file named COPYING; if not, write to the
-dnl Free Software Foundation, Inc.,
-dnl 51 Franklin Street, Fifth Floor,
-dnl Boston, MA 02110-1301 USA
-dnl
-dnl Authors:
-dnl
-dnl Perry Werneck<perry.werneck@gmail.com>
-dnl
-dnl http://www.gnu.org/software/autoconf/manual/autoconf-2.57/html_node/autoconf_toc.html
-dnl
+
 
 # https://stage.maemo.org/svn/maemo/projects/haf/branches/maemo-af-desktop/hildon-desktop/configure.ac
 # http://svn.abisource.com/libabiword-builder/trunk/configure.in
