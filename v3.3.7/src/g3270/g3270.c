@@ -1,27 +1,33 @@
-/*
- * Modifications and original code Copyright 1993, 1994, 1995, 1996,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Paul Mattes.
- * Original X11 Port Copyright 1990 by Jeff Sparkes.
- *   Permission to use, copy, modify, and distribute this software and its
- *   documentation for any purpose and without fee is hereby granted,
- *   provided that the above copyright notice appear in all copies and that
- *   both that copyright notice and this permission notice appear in
- *   supporting documentation.
+/* 
+ * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+ * aplicativos mainframe.
+ * 
+ * Copyright (C) <2008> <Banco do Brasil S.A.>
+ * 
+ * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+ * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+ * Free Software Foundation.
+ * 
+ * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+ * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+ * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+ * obter mais detalhes.
+ * 
+ * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+ * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA, 02111-1307, USA
+ * 
+ * Este programa está nomeado como @@FILENAME@@ e possui @@LINES@@ linhas de código.
+ * 
+ * Contatos: 
+ * 
+ * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+ * erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+ * licinio@bb.com.br		(Licínio Luis Branco)
+ * kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+ * macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
  *
- * Copyright 1989 by Georgia Tech Research Corporation, Atlanta, GA 30332.
- *   All Rights Reserved.  GTRC hereby grants public use of this software.
- *   Derivative works based on this software must incorporate this copyright
- *   notice.
- *
- * c3270 and wc3270 are distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the file LICENSE for more details.
- */
-
-/*
- *	g3270.c
- *		A GTK based 3270 Terminal Emulator
- *		Main proceudre.
  */
 
 #include "g3270.h"
