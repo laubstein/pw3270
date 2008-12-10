@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como g3270.c e possui 552 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -361,8 +361,6 @@ static gint save_session (GnomeClient *client, gint phase, GnomeSaveStyle save_s
 	gchar** argv;
 	guint argc;
 
-	Trace("Saving session for %s",(char *) client_data);
-
 	action_Save();
 
 	/* allocate 0-filled, so it will be NULL-terminated */
@@ -370,9 +368,12 @@ static gint save_session (GnomeClient *client, gint phase, GnomeSaveStyle save_s
 	argc = 0;
 
 	argv[argc++] = client_data;
+	argv[argc] = 0;
 
 	gnome_client_set_clone_command(client, argc, argv);
 	gnome_client_set_restart_command(client, argc, argv);
+
+	Trace("Session for \"%s\" saved (Argc=%d)",(char *) client_data,argc);
 
 	return TRUE;
 }
@@ -462,6 +463,19 @@ int main(int argc, char *argv[])
 
 	if(g3270_init(&argc,&argv))
 		return -1;
+
+#ifdef DEBUG
+	{
+		int f;
+
+		Trace("%s started with %d arguments",argv[0],argc);
+
+		for(f = 0; f<argc;f++)
+		{
+			Trace("Arg(%d) = \"%s\"",f,argv[f]);
+		}
+	}
+#endif
 
 	LoadPlugins();
 
