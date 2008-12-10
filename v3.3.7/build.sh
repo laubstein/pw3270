@@ -180,6 +180,8 @@ if [ -z "$TMPDIR" ]; then
 	export TMPDIR
 fi
 
+autoconf
+
 if [ -z "$1" ]; then
 
 	BuildWin
