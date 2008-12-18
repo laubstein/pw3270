@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como screen.c e possui 1314 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -982,6 +982,8 @@
  	// http://www.guntherkrauss.de/computer/xml/daten/edicode.html
 	short			fg;
 	short 			bg;
+	PangoAttribute	*attr;
+	PangoAttrList 	*attrlist;
 
  	if(!(gc && draw && layout && el))
 		return;
@@ -997,25 +999,26 @@
 		bg = (el->bg & 0xFF);
 	}
 
-	// TODO (perry#2#): Test attribute COLOR_ATTR_UNDERLINE
-/*	if(fg & COLOR_ATTR_UNDERLINE)
+	if(TOGGLED_UNDERLINE)
 	{
+		attrlist = pango_layout_get_attributes(layout);
+		if(!attrlist)
+				attrlist = pango_attr_list_new();
+
+		attr = pango_attr_underline_new((fg & COLOR_ATTR_UNDERLINE) ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE);
+		pango_attr_list_change(attrlist,attr);
+		pango_layout_set_attributes(layout,attrlist);
 	}
-*/
 
 	switch(el->extended)
 	{
 	case 0:	// Standard char or empty space, draw directly
 		if(el->ch && *el->ch != ' ' && *el->ch)
-		{
 			pango_layout_set_text(layout,el->ch,-1);
-			gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
-		}
 		else
-		{
-			gdk_gc_set_foreground(gc,clr+bg);
-			gdk_draw_rectangle(draw,gc,1,x,y,fWidth,fHeight);
-		}
+			pango_layout_set_text(layout," ",-1);
+
+		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
 		break;
 
 //	case 0xaf: // CG 0xd1, degree

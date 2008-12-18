@@ -86,6 +86,7 @@
         GUI_TOGGLE_BOLD,
         GUI_TOGGLE_KEEP_SELECTED,
         GUI_TOGGLE_SMART_PASTE,
+        GUI_TOGGLE_UNDERLINE,
 
         GUI_TOGGLE_COUNT
     };
@@ -93,6 +94,7 @@
     #define TOGGLED_BOLD			gui_toggle[GUI_TOGGLE_BOLD]
     #define TOGGLED_KEEP_SELECTED	gui_toggle[GUI_TOGGLE_KEEP_SELECTED]
     #define TOGGLED_SMART_PASTE		gui_toggle[GUI_TOGGLE_SMART_PASTE]
+    #define TOGGLED_UNDERLINE		gui_toggle[GUI_TOGGLE_UNDERLINE]
 
     extern gboolean gui_toggle[GUI_TOGGLE_COUNT];
 
