@@ -92,7 +92,6 @@
 		<Unit filename="src/include/lib3270/plugins.h" />
 		<Unit filename="src/include/lib3270/statusc.h" />
 		<Unit filename="src/include/lib3270/toggle.h" />
-		<Unit filename="src/lib/Makefile" />
 		<Unit filename="src/lib/XtGlue.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -109,9 +108,6 @@
 		<Unit filename="src/lib/aplc.h" />
 		<Unit filename="src/lib/appres.h" />
 		<Unit filename="src/lib/arpa_telnet.h" />
-		<Unit filename="src/lib/catf.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/lib/cg.h" />
 		<Unit filename="src/lib/charset.c">
 			<Option compilerVar="CC" />
@@ -220,9 +216,6 @@
 		</Unit>
 		<Unit filename="src/lib/sfc.h" />
 		<Unit filename="src/lib/shlobj_missing.h" />
-		<Unit filename="src/lib/shortcut.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/lib/shortcutc.h" />
 		<Unit filename="src/lib/tables.c">
 			<Option compilerVar="CC" />
@@ -265,9 +258,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/lib/winversc.h" />
-		<Unit filename="src/lib/wizard.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/lib/xio.c">
 			<Option compilerVar="CC" />
 		</Unit>
