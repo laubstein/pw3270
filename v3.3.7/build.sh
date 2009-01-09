@@ -198,6 +198,9 @@ else
 			BuildRPM
 		elif [ "$1" == "debug" ]; then
 			BuildDebug
+		else
+			echo "Parametro invalido: $1"
+			exit -1
 		fi
 
 		shift
