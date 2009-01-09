@@ -854,13 +854,23 @@
 
  static void action_LoadScreenDump(void)
  {
-	GtkWidget *dialog = gtk_file_chooser_dialog_new( _( "Load screen dump" ),
-                                                     GTK_WINDOW(topwindow),
-													 GTK_FILE_CHOOSER_ACTION_OPEN,
-                                                     GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
-                                                     GTK_STOCK_OPEN,	GTK_RESPONSE_ACCEPT,
-                                                     NULL );
+ 	gchar		*ptr;
+	GKeyFile	*conf   = GetConf();
 
+	GtkWidget 	*dialog = gtk_file_chooser_dialog_new( _( "Load screen dump" ),
+														GTK_WINDOW(topwindow),
+														GTK_FILE_CHOOSER_ACTION_OPEN,
+														GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
+														GTK_STOCK_OPEN,	GTK_RESPONSE_ACCEPT,
+														NULL );
+
+
+	ptr = g_key_file_get_string(conf,"uri","ScreenDump",NULL);
+	if(ptr)
+	{
+			gtk_file_chooser_set_uri(GTK_FILE_CHOOSER(dialog),ptr);
+			g_free(ptr);
+	}
 
 	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	{
@@ -868,6 +878,8 @@
 		gchar		*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 		gsize		sz;
 		struct ea	*buffer	= NULL;
+
+		g_key_file_set_string(conf,"uri","ScreenDump",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
 
 		if(!g_file_get_contents(filename, (gchar **) &buffer, &sz, &error))
 		{
@@ -889,13 +901,23 @@
 
  static void action_DumpScreen(void)
  {
-	GtkWidget *dialog = gtk_file_chooser_dialog_new( _( "Dump screen contents" ),
-                                                     GTK_WINDOW(topwindow),
-                                                     GTK_FILE_CHOOSER_ACTION_SAVE,
-                                                     GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
-                                                     GTK_STOCK_SAVE,	GTK_RESPONSE_ACCEPT,
-                                                     NULL );
+ 	gchar		*ptr;
+	GKeyFile	*conf   = GetConf();
 
+	GtkWidget 	*dialog = gtk_file_chooser_dialog_new( _( "Dump screen contents" ),
+														 GTK_WINDOW(topwindow),
+														 GTK_FILE_CHOOSER_ACTION_SAVE,
+														 GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
+														 GTK_STOCK_SAVE,	GTK_RESPONSE_ACCEPT,
+														 NULL );
+
+
+	ptr = g_key_file_get_string(conf,"uri","ScreenDump",NULL);
+	if(ptr)
+	{
+			gtk_file_chooser_set_uri(GTK_FILE_CHOOSER(dialog),ptr);
+			g_free(ptr);
+	}
 
 	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	{
@@ -903,6 +925,8 @@
 		gchar		*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 		int			sz;
 		struct ea	*buffer = copy_device_buffer(&sz);
+
+		g_key_file_set_string(conf,"uri","ScreenDump",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
 
 		if(!g_file_set_contents(filename,(gchar *) buffer,sz*sizeof(struct ea),&error))
 		{
