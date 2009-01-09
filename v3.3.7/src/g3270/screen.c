@@ -1010,112 +1010,121 @@
 		pango_layout_set_attributes(layout,attrlist);
 	}
 
-	switch(el->extended)
+	if(!el->extended)
 	{
-	case 0:	// Standard char or empty space, draw directly
+		// Standard char or empty space, draw directly
 		if(el->ch && *el->ch != ' ' && *el->ch)
 			pango_layout_set_text(layout,el->ch,-1);
 		else
 			pango_layout_set_text(layout," ",-1);
 
 		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
-		break;
 
-//	case 0xaf: // CG 0xd1, degree
-//		break;
+	}
+	else
+	{
+		// Graphics char
+		gdk_gc_set_foreground(gc,clr+bg);
+		gdk_draw_rectangle(draw,gc,TRUE,x,y,fWidth,fHeight);
 
-	case 0xd4: // CG 0xac, LR corner
-		DrawCorner(draw, gc, clr+fg, x, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y);
-		break;
+		switch(el->extended)
+		{
+//		case 0xaf: // CG 0xd1, degree
+//			break;
 
-	case 0xd5: // CG 0xad, UR corner
-		DrawCorner(draw, gc, clr+fg, x, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y+fHeight);
-		break;
+		case 0xd4: // CG 0xac, LR corner
+			DrawCorner(draw, gc, clr+fg, x, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y);
+			break;
 
-	case 0xc5: // CG 0xa4, UL corner
-		DrawCorner(draw, gc, clr+fg, x+fWidth, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y+fHeight);
-		break;
+		case 0xd5: // CG 0xad, UR corner
+			DrawCorner(draw, gc, clr+fg, x, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y+fHeight);
+			break;
 
-	case 0xc4: // CG 0xa3, LL corner
-		DrawCorner(draw, gc, clr+fg, x+fWidth, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y);
-		break;
+		case 0xc5: // CG 0xa4, UL corner
+			DrawCorner(draw, gc, clr+fg, x+fWidth, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y+fHeight);
+			break;
 
-	case 0xd3: // CG 0xab, plus
-		gdk_gc_set_foreground(gc,clr+fg);
-		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
-		break;
+		case 0xc4: // CG 0xa3, LL corner
+			DrawCorner(draw, gc, clr+fg, x+fWidth, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y);
+			break;
 
-	case 0xa2: // CG 0x92, horizontal line
-		gdk_gc_set_foreground(gc,clr+fg);
-		y += (fHeight >> 1);
-		gdk_draw_line(draw,gc,x,y,x+fWidth,y);
-		break;
+		case 0xd3: // CG 0xab, plus
+			gdk_gc_set_foreground(gc,clr+fg);
+			gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
+			gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
+			break;
 
-	case 0xc6: // CG 0xa5, left tee
-		gdk_gc_set_foreground(gc,clr+fg);
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
-		break;
+		case 0xa2: // CG 0x92, horizontal line
+			gdk_gc_set_foreground(gc,clr+fg);
+			y += (fHeight >> 1);
+			gdk_draw_line(draw,gc,x,y,x+fWidth,y);
+			break;
 
-	case 0xd6: // CG 0xae, right tee
-		gdk_gc_set_foreground(gc,clr+fg);
-		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+(fWidth >> 1),y+(fHeight >> 1));
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
-		break;
+		case 0xc6: // CG 0xa5, left tee
+			gdk_gc_set_foreground(gc,clr+fg);
+			gdk_draw_line(draw,gc,x+(fWidth >> 1),y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
+			gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
+			break;
 
-	case 0xc7: // CG 0xa6, bottom tee
-		gdk_gc_set_foreground(gc,clr+fg);
-		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+(fHeight>>1));
-		break;
+		case 0xd6: // CG 0xae, right tee
+			gdk_gc_set_foreground(gc,clr+fg);
+			gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+(fWidth >> 1),y+(fHeight >> 1));
+			gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
+			break;
 
-	case 0xd7: // CG 0xaf, top tee
-		gdk_gc_set_foreground(gc,clr+fg);
-		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y+(fHeight >> 1),x+(fWidth >> 1),y+fHeight);
-		break;
+		case 0xc7: // CG 0xa6, bottom tee
+			gdk_gc_set_foreground(gc,clr+fg);
+			gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
+			gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+(fHeight>>1));
+			break;
 
-//	case 0xbf: // CG 0x15b, stile
-//		break;
+		case 0xd7: // CG 0xaf, top tee
+			gdk_gc_set_foreground(gc,clr+fg);
+			gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
+			gdk_draw_line(draw,gc,x+(fWidth >> 1),y+(fHeight >> 1),x+(fWidth >> 1),y+fHeight);
+			break;
 
-	case 0x85: // CG 0x184, vertical line
-		gdk_gc_set_foreground(gc,clr+fg);
-		x += (fWidth >> 1);
-		gdk_draw_line(draw,gc,x,y,x,y+fHeight);
-		break;
+//		case 0xbf: // CG 0x15b, stile
+//			break;
 
-//	case 0x8c: // CG 0xf7, less or equal
-//		pango_layout_set_text(layout,"≤",-1);
-//		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
-//		break;
+		case 0x85: // CG 0x184, vertical line
+			gdk_gc_set_foreground(gc,clr+fg);
+			x += (fWidth >> 1);
+			gdk_draw_line(draw,gc,x,y,x,y+fHeight);
+			break;
 
-//	case 0xae: // CG 0xd9, greater or equal
-//		pango_layout_set_text(layout,"≥",-1);
-//		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
-//		break;
+//		case 0x8c: // CG 0xf7, less or equal
+//			pango_layout_set_text(layout,"≤",-1);
+//			gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+//			break;
 
-//	case 0xbe: // CG 0x3e, not equal
-//		pango_layout_set_text(layout,"≠",-1);
-//		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
-//		break;
+//		case 0xae: // CG 0xd9, greater or equal
+//			pango_layout_set_text(layout,"≥",-1);
+//			gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+//			break;
 
-//	case 0xa3: // CG 0x93, bullet
-//		break;
+//		case 0xbe: // CG 0x3e, not equal
+//			pango_layout_set_text(layout,"≠",-1);
+//			gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+//			break;
 
-	case 0xad:
-		pango_layout_set_text(layout,"[",-1);
-		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
-		break;
+//		case 0xa3: // CG 0x93, bullet
+//			break;
 
-	case 0xbd:
-		pango_layout_set_text(layout,"]",-1);
-		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
-		break;
+		case 0xad:
+			pango_layout_set_text(layout,"[",-1);
+			gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+			break;
 
-	default:	// Unknown char, draw "?"
-		pango_layout_set_text(layout,"?",-1);
-		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+		case 0xbd:
+			pango_layout_set_text(layout,"]",-1);
+			gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+			break;
+
+		default:	// Unknown char, draw "?"
+			pango_layout_set_text(layout,"?",-1);
+			gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+		}
 	}
 
 	if(el->selected & 0xF0)
@@ -1141,23 +1150,7 @@
 
  void UpdateKeyboardState(guint state)
  {
-/*
 
- 	if(state == kbrd_state)
-		return;
-
- 	kbrd_state = state;
-
- 	Trace("Keyboard state changed to %08x",state);
-	// For some reason the "shift" status is failing
-
- 	// TODO (perry#1#): Draw only the state flags.
- 	if(terminal && pixmap)
- 	{
-		DrawOIA(terminal,color,pixmap);
-		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);
- 	}
-*/
  }
 
  gchar * GetScreenContents(gboolean all)
