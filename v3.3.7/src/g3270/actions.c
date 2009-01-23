@@ -72,6 +72,12 @@
  static void action_DumpScreen(void);
  static void action_LoadScreenDump(void);
 
+#if defined(X3270_FT)
+ static void action_Download(void);
+ static void action_Upload(void);
+#endif
+
+
 /*---[ Gui toggles ]--------------------------------------------------------------------------------------------*/
 
  static const struct _gui_toggle_info
@@ -164,6 +170,12 @@
  	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
  	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Erase input" ),		"Clear",			NULL,	G_CALLBACK(action_Clear)			},
 
+#if defined(X3270_FT)
+	/* File-transfer actions */
+ 	{	"Download",			NULL,					N_( "Receive file" ),		NULL,				NULL,	G_CALLBACK(action_Download)			},
+ 	{	"Upload",   		NULL,					N_( "Send file" ),   		NULL,				NULL,	G_CALLBACK(action_Upload)			},
+#endif
+
  };
 
  static const GtkActionEntry offline_action_entries[] =
@@ -205,6 +217,9 @@
  	{	"SettingsMenu",		NULL,					N_( "Settings" ),			NULL,				NULL,	NULL								},
  	{	"ScriptsMenu",		NULL,					N_( "Scripts" ),			NULL,				NULL,	NULL								},
  	{	"DebugMenu",		NULL,					N_( "Debug" ),				NULL,				NULL,	NULL								},
+#if defined(X3270_FT)
+ 	{	"FTMenu",   		NULL,					N_( "File Transfer" ),		NULL,				NULL,	NULL								},
+#endif
 
 	/* Sub menus */
 	{	"FontSettings",		GTK_STOCK_SELECT_FONT,	N_( "Select font" ),		NULL,				NULL,	NULL								},
@@ -1069,3 +1084,155 @@
 	gtk_widget_destroy(dialog);
 
  }
+
+#if defined(X3270_FT)
+
+ struct ftdialog
+ {
+	gboolean 		receive;
+	const gchar 	*group_name;
+	GtkWidget		*local;
+	GtkWidget		*remote;
+	GtkWidget		*options;
+	GtkWidget		*mode;
+} ;
+
+
+ static void browse_file(GtkButton *button,struct ftdialog *info)
+ {
+ 	gchar		*ptr;
+	GKeyFile	*conf   = GetConf();
+
+	GtkWidget 	*dialog = gtk_file_chooser_dialog_new( info->receive ? _( "Select file to receive" ) : _( "Select file to send" ),
+														 GTK_WINDOW(topwindow),
+														 GTK_FILE_CHOOSER_ACTION_OPEN,
+														 GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
+														 info->receive ? GTK_STOCK_SAVE : GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+														 NULL );
+
+
+	ptr = g_key_file_get_string(conf,info->group_name,"uri",NULL);
+	if(ptr)
+	{
+			gtk_file_chooser_set_uri(GTK_FILE_CHOOSER(dialog),ptr);
+			g_free(ptr);
+	}
+
+	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	{
+		g_key_file_set_string(conf,info->group_name,"uri",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
+		gtk_entry_set_text(GTK_ENTRY(info->local),gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)));
+	}
+
+	gtk_widget_destroy(dialog);
+ }
+
+ static int ftdialog(gboolean receive)
+ {
+ 	/*
+ 	0					1			2
+  0 Local file name:	xxxxx		[search]
+  1 Host file name:		xxxxx
+  2 Transfer mode:		xxxxx
+  3 Transfer options:	xxxxxxxxxxxxxxxxxxxxx
+
+				Send Cancel
+	*/
+	static const gchar *label[] = {	N_( "Local file name:" 	),
+										N_( "Host file name:"	),
+										N_( "Transfer mode:"	),
+										N_( "Transfer options:"  )
+									};
+	static const struct _tmode
+	{
+		const gchar *opt;
+		const gchar *msg;
+	} tmode[] =						{	{ 	"Binary",	N_( "Binary" )	},
+										{	"Text",		N_( "Text" )	}
+									};
+
+
+	int rc;
+	int f;
+
+	GKeyFile		*conf   	= GetConf();
+	gchar			*str;
+	GtkWidget 		*table;
+	GtkWidget 		*widget;
+	GtkWidget 		*dialog;
+
+	struct ftdialog	info;
+
+	info.group_name	= receive ? "FileReceive" : "FileSend";
+	info.receive = receive;
+
+	dialog  = gtk_dialog_new_with_buttons(	receive ?  _( "Receive file from host" ) : _( "Send file to host" ), \
+													GTK_WINDOW(topwindow), \
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													receive ? GTK_STOCK_SAVE : GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+													GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+													NULL );
+
+	table = gtk_table_new(G_N_ELEMENTS(label),3,FALSE);
+	for(f=0;f < G_N_ELEMENTS(label);f++)
+	{
+		widget = gtk_label_new(gettext(label[f]));
+		gtk_table_attach(GTK_TABLE(table),widget,0,1,f,f+1,0,0,2,2);
+	}
+
+	info.local = gtk_entry_new_with_max_length(0x0100);
+	gtk_entry_set_width_chars(GTK_ENTRY(info.local),40);
+	gtk_table_attach(GTK_TABLE(table),info.local,1,2,0,1,GTK_EXPAND|GTK_SHRINK,GTK_EXPAND|GTK_SHRINK,2,2);
+
+	widget = gtk_button_new_with_label( _( "Browse" ) );
+	gtk_table_attach(GTK_TABLE(table),widget,2,3,0,1,0,0,2,2);
+	g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(browse_file),&info);
+
+	info.remote = gtk_entry_new_with_max_length(0x0100);
+	gtk_entry_set_width_chars(GTK_ENTRY(info.remote),40);
+	gtk_table_attach(GTK_TABLE(table),info.remote,1,2,1,2,GTK_EXPAND|GTK_SHRINK,GTK_EXPAND|GTK_SHRINK,2,2);
+
+	info.mode = gtk_combo_box_new_text();
+
+	for(f=0;f < G_N_ELEMENTS(tmode);f++)
+		gtk_combo_box_append_text(GTK_COMBO_BOX(info.mode),gettext(tmode[f].msg));
+
+	gtk_table_attach(GTK_TABLE(table),info.mode,1,2,2,3,GTK_EXPAND|GTK_SHRINK,GTK_EXPAND|GTK_SHRINK,2,2);
+
+	info.options = gtk_entry_new_with_max_length(0x0100);
+
+	str = g_key_file_get_string(conf,info.group_name,"options",NULL);
+	if(str)
+	{
+		gtk_entry_set_text(GTK_ENTRY(info.options),str);
+		g_free(str);
+	}
+	else
+	{
+		gtk_entry_set_text(GTK_ENTRY(info.options), receive ? "ASCII CRLF" : "ASCII CRLF RECFM(V) LRECL(133)" );
+	}
+
+	gtk_entry_set_width_chars(GTK_ENTRY(info.options),40);
+	gtk_table_attach(GTK_TABLE(table),info.options,1,2,3,4,GTK_EXPAND|GTK_SHRINK,GTK_EXPAND|GTK_SHRINK,2,2);
+
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),table);
+
+	gtk_widget_show_all(dialog);
+	rc = gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+
+	return rc;
+
+ }
+
+ static void action_Download(void)
+ {
+ 	ftdialog(TRUE);
+ }
+
+ static void action_Upload(void)
+ {
+ 	ftdialog(FALSE);
+ }
+
+#endif

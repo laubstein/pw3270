@@ -138,9 +138,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/lib/gluec.h" />
-		<Unit filename="src/lib/help.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/lib/host.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -292,6 +289,7 @@
 		<Extensions>
 			<code_completion />
 			<debugger />
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
