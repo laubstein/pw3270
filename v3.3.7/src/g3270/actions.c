@@ -1087,30 +1087,39 @@
 
 #if defined(X3270_FT)
 
- #define FT_FLAG_RECEIVE	0x0001
- #define FT_FLAG_ASCII		0x0002
- #define FT_FLAG_CRLF		0x0004
- #define FT_FLAG_APPEND		0x0008
- #define FT_FLAG_TSO		0x0010
+ #define FT_FLAG_RECEIVE				0x0001
+ #define FT_FLAG_ASCII					0x0002
+ #define FT_FLAG_CRLF					0x0004
+ #define FT_FLAG_APPEND					0x0008
+ #define FT_FLAG_TSO					0x0010
 
- int BeginFileTransfer(unsigned short flags, const char *local, const gchar *remote)
+ #define FT_RECORD_FORMAT_FIXED			0x0100
+ #define FT_RECORD_FORMAT_VARIABLE		0x0200
+ #define FT_RECORD_FORMAT_UNDEFINED		0x0300
+
+ #define FT_ALLOCATION_UNITS_TRACKS		0x1000
+ #define FT_ALLOCATION_UNITS_CYLINDERS	0x2000
+ #define FT_ALLOCATION_UNITS_AVBLOCK	0x3000
+
+ int BeginFileTransfer(unsigned short flags, const char *local, const char *remote)
  {
- 	char buffer[4096];
- 	char extra[40];
+ 	unsigned short	recfm = (flags & 0x0300) >> 8;
+ 	unsigned short	units = (flags & 0x3000) >> 12;
 
-	*extra = 0;
+ 	char 				buffer[4096];
+
+	Trace("Recfm: %d Units: %d",(int) recfm, (int) units);
 
  	/* Build the ind$file command */
-
- 	snprintf(buffer,4095,"%s %s %s%s%s%s%s",
+ 	snprintf(buffer,4095,"%s %s %s%s%s%s",
 						"ind$file",
 						(flags & FT_FLAG_RECEIVE)	? "get"		: "put",
 						remote,
 						(flags & FT_FLAG_ASCII) 	? " ascii"	: "",
 						(flags & FT_FLAG_CRLF) 		? " crlf"	: "",
-						(flags & FT_FLAG_APPEND)	? " append"	: "",
-						extra
+						(flags & FT_FLAG_APPEND)	? " append"	: ""
 			);
+
 
 	Trace("Command: \"%s\"",buffer);
  	return 0;
@@ -1120,36 +1129,25 @@
 
 #if defined(X3270_FT)
 
- static const struct _ftoptions
- {
-	unsigned short 	flag;
-	const gchar		*label;
- } ft_options[] 			=	{	{	FT_FLAG_ASCII,	N_( "Text file" )						},
-									{	FT_FLAG_TSO,	N_( "Host is TSO" )						},
-									{	FT_FLAG_CRLF,	N_( "Add/Remove CR at end of line" )	},
-									{	FT_FLAG_APPEND,	N_( "Append" )							}
-								};
-
-
  struct ftdialog
  {
-	gboolean 		receive;
-	const gchar 	*group_name;
-	GtkWidget		*file[2];
-	GtkWidget		*option[G_N_ELEMENTS(ft_options)];
+	unsigned short 	flags;
+	const gchar 		*group_name;
+	GtkWidget			*file[2];
  };
 
  static void browse_file(GtkButton *button,struct ftdialog *info)
  {
  	gchar		*ptr;
 	GKeyFile	*conf   = GetConf();
+	gboolean	recv	= (info->flags & FT_FLAG_RECEIVE) != 0;
 
-	GtkWidget 	*dialog = gtk_file_chooser_dialog_new( info->receive ? _( "Select file to receive" ) : _( "Select file to send" ),
-														 GTK_WINDOW(topwindow),
-														 GTK_FILE_CHOOSER_ACTION_OPEN,
-														 GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
-														 info->receive ? GTK_STOCK_SAVE : GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-														 NULL );
+	GtkWidget 	*dialog = gtk_file_chooser_dialog_new(	recv ? _( "Select file to receive" ) : _( "Select file to send" ),
+														GTK_WINDOW(topwindow),
+														GTK_FILE_CHOOSER_ACTION_OPEN,
+														GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
+														recv ? GTK_STOCK_SAVE : GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+														NULL );
 
 
 	ptr = g_key_file_get_string(conf,info->group_name,"uri",NULL);
@@ -1170,16 +1168,16 @@
 
  static int ftdialog(gboolean receive)
  {
- 	/*
- 	0					1		2		3		4
-  0 Local file name:	xxxxxxxxxxxxx	[search]
-  1 Host file name:		xxxxxxxxxxxxx
-  2 Transfer options:	[ ] Text
-  3						[ ] CR/LF
-  4						[ ] Append
+	static const struct _ftoptions
+	{
+		unsigned short 	flag;
+		const gchar		*label;
+	} ft_options[] 			=		{	{	FT_FLAG_ASCII,	N_( "Text file" )						},
+										{	FT_FLAG_TSO,	N_( "Host is TSO" )						},
+										{	FT_FLAG_CRLF,	N_( "Add/Remove CR at end of line" )	},
+										{	FT_FLAG_APPEND,	N_( "Append" )							}
+									};
 
-				Send Cancel
-	*/
 	static const gchar *label[] = {	N_( "Local file name:" 	),
 										N_( "Host file name:"	),
 										N_( "Transfer options:"	),
@@ -1193,11 +1191,16 @@
 	GtkWidget 			*dialog;
 	int					row;
 	int					col;
-	unsigned short	flags;
 	struct ftdialog	info;
 
+	/* Set initial values */
+	memset(&info,0,sizeof(info));
 	info.group_name	= receive ? "FileReceive" : "FileSend";
-	info.receive = receive;
+
+	if(receive)
+		info.flags = FT_FLAG_RECEIVE;
+
+	/* Create dialog */
 
 	dialog  = gtk_dialog_new_with_buttons(	receive ?  _( "Receive file from host" ) : _( "Send file to host" ), \
 													GTK_WINDOW(topwindow), \
@@ -1206,7 +1209,7 @@
 													GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
 													NULL );
 
-	table = gtk_table_new(G_N_ELEMENTS(label)+G_N_ELEMENTS(info.option),5,FALSE);
+	table = gtk_table_new(G_N_ELEMENTS(label)+G_N_ELEMENTS(ft_options),5,FALSE);
 	for(f=0;f < G_N_ELEMENTS(label);f++)
 	{
 		widget = gtk_label_new(gettext(label[f]));
@@ -1230,8 +1233,11 @@
 	col=1;
 	for(f=0;f < G_N_ELEMENTS(ft_options);f++)
 	{
-		info.option[f] = gtk_check_button_new_with_label( gettext(ft_options[f].label));
-		gtk_table_attach(GTK_TABLE(table),info.option[f],col,col+1,row,row+1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,GTK_EXPAND|GTK_SHRINK|GTK_FILL,2,2);
+		widget = gtk_check_button_new_with_label( gettext(ft_options[f].label));
+
+		#warning set callback to toggle flag
+
+		gtk_table_attach(GTK_TABLE(table),widget,col,col+1,row,row+1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,GTK_EXPAND|GTK_SHRINK|GTK_FILL,2,2);
 		if(col++ > 1)
 		{
 			row++;
@@ -1246,15 +1252,10 @@
 
 	if(rc == GTK_RESPONSE_ACCEPT)
 	{
-		flags = receive ? FT_FLAG_RECEIVE : 0;
-
-		for(f=0;f < G_N_ELEMENTS(ft_options);f++)
-		{
-			if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(info.option[f])));
-				flags |= ft_options[f].flag;
-		}
-
-		rc = BeginFileTransfer(flags,gtk_entry_get_text(GTK_ENTRY(info.file[0])),gtk_entry_get_text(GTK_ENTRY(info.file[1])));
+		rc = BeginFileTransfer(		info.flags,
+									gtk_entry_get_text(GTK_ENTRY(info.file[0])),
+									gtk_entry_get_text(GTK_ENTRY(info.file[1]))
+								);
 
 	}
 	else
