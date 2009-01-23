@@ -6,6 +6,11 @@
 			</menu>
 		</menu>
 
+		<menu action='FTMenu'>
+			<menuitem action='Download'/>
+			<menuitem action='Upload'/>
+		</menu>
+
 		<menu action='DebugMenu'>
 			<menuitem action='DumpScreen'/>
 			<menuitem action='LoadScreenDump'/>
