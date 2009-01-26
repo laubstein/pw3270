@@ -1104,6 +1104,7 @@
  #define FT_FLAG_CRLF					0x0004
  #define FT_FLAG_APPEND					0x0008
  #define FT_FLAG_TSO					0x0010
+ #define FT_FLAG_REMAP_ASCII			0x0020
 
  #define FT_RECORD_FORMAT_FIXED			0x0100
  #define FT_RECORD_FORMAT_VARIABLE		0x0200
@@ -1125,15 +1126,26 @@
  	unsigned short	recfm	= (flags & FT_RECORD_FORMAT_MASK) >> 8;
  	unsigned short	units	= (flags & FT_ALLOCATION_UNITS_MASK) >> 12;
 
- 	char 				buffer[4096];
+ 	char 				op[4096];
+ 	char				buffer[4096];
 
-	Trace("Recfm: %d Units: %d",(int) recfm, (int) units);
+	if(!(flags & FT_FLAG_RECEIVE))
+	{
+		if(access(local,R_OK))
+		{
+			Trace("Can't read \"%s\"",local);
+			return -1;
+		}
+	}
+
+	if(!*remote)
+	{
+		Trace("Invalid host file: \"%s\"",remote);
+		return -1;
+	}
 
  	/* Build the ind$file command */
- 	snprintf(buffer,4095,"%s %s %s%s%s%s",
-						"ind$file",
-						(flags & FT_FLAG_RECEIVE)	? "get"		: "put",
-						remote,
+ 	snprintf(op,4095,"%s%s%s",
 						(flags & FT_FLAG_ASCII) 	? " ascii"	: "",
 						(flags & FT_FLAG_CRLF) 		? " crlf"	: "",
 						(flags & FT_FLAG_APPEND)	? " append"	: ""
@@ -1146,25 +1158,25 @@
 			// TSO Host
 			if(recfm > 0)
 			{
-				snconcat(buffer,4096," recfm(%c)",rec[recfm-1]);
+				snconcat(op,4096," recfm(%c)",rec[recfm-1]);
 
 				if(lrecl > 0)
-					snconcat(buffer,4096," lrecl(%d)",lrecl);
+					snconcat(op,4096," lrecl(%d)",lrecl);
 
 				if(blksize > 0)
-					snconcat(buffer,4096," blksize(%d)", blksize);
+					snconcat(op,4096," blksize(%d)", blksize);
 			}
 
 			if(units > 0)
 			{
-				snconcat(buffer,4096," %s",un[units-1]);
+				snconcat(op,4096," %s",un[units-1]);
 
 				if(primspace > 0)
 				{
-					snconcat(buffer,4096," space(%d",primspace);
+					snconcat(op,4096," space(%d",primspace);
 					if(secspace)
-						snconcat(buffer,4096,",%d",secspace);
-					snconcat(buffer,4096,"%s",")");
+						snconcat(op,4096,",%d",secspace);
+					snconcat(op,4096,"%s",")");
 				}
 			}
 		}
@@ -1173,13 +1185,25 @@
 			// VM Host
 			if(recfm > 0)
 			{
-				snconcat(buffer,4096," recfm %c",rec[recfm-1]);
+				snconcat(op,4096," recfm %c",rec[recfm-1]);
 
 				if(lrecl > 0)
-					snconcat(buffer,4096," lrecl %d",lrecl);
+					snconcat(op,4096," lrecl %d",lrecl);
 
 			}
 		}
+	}
+
+	snprintf(buffer,4095,"%s %s %s",	"ind$file",
+										(flags & FT_FLAG_RECEIVE) ? "get" : "put",
+										remote );
+
+	if(*op)
+	{
+		if(flags & FT_FLAG_TSO)
+			snconcat(buffer,4095," %s",op+1);
+		else
+			snconcat(buffer,4095," (%s)",op+1);
 	}
 
 	Trace("Command: \"%s\"",buffer);
@@ -1197,6 +1221,7 @@
 	const gchar 		*group_name;
 	GtkWidget			*file[2];
 	GtkWidget			*entry[5];
+	GtkWidget			*ready;
 	int					value[5];
  };
 
@@ -1230,9 +1255,30 @@
 	gtk_widget_destroy(dialog);
  }
 
- static void toggle_flag (GtkToggleButton *button, gpointer user_data)
+ static void updatefields(struct ftdialog *info)
  {
- 	struct ftdialog *info = (struct ftdialog *) g_object_get_data(G_OBJECT(button),"info");
+ 	gboolean enable;
+
+ 	// recfm fields
+ 	enable = (info->flags & FT_RECORD_FORMAT_MASK) != 0;
+ 	if(info->entry[0])
+		gtk_widget_set_sensitive(info->entry[0],enable);
+ 	if(info->entry[1])
+		gtk_widget_set_sensitive(info->entry[1],enable);
+
+ 	// Unit fields
+ 	enable = (info->flags & FT_ALLOCATION_UNITS_MASK) != 0;
+ 	if(info->entry[2])
+		gtk_widget_set_sensitive(info->entry[2],enable);
+
+ 	if(info->entry[3])
+		gtk_widget_set_sensitive(info->entry[3],enable);
+
+ }
+
+ static void toggle_flag(GtkToggleButton *button, gpointer user_data)
+ {
+ 	struct ftdialog	*info = (struct ftdialog *) g_object_get_data(G_OBJECT(button),"info");
 
  	if(gtk_toggle_button_get_active(button))
 		info->flags |= ((unsigned int) user_data);
@@ -1240,7 +1286,24 @@
 		info->flags &= ~((unsigned int) user_data);
 
 	Trace("Flags changed to %04x",info->flags);
+	updatefields(info);
+ }
 
+ static void check_filenames(GtkEditable *editable,struct ftdialog *info)
+ {
+ 	int 			f;
+ 	const gchar	*ptr;
+
+ 	for(f=0;f<G_N_ELEMENTS(info->file);f++)
+ 	{
+ 		ptr = gtk_entry_get_text(GTK_ENTRY(info->file[f]));
+ 		if(!(ptr && *ptr))
+ 		{
+ 			gtk_widget_set_sensitive(info->ready,FALSE);
+ 			return;
+ 		}
+ 	}
+	gtk_widget_set_sensitive(info->ready,TRUE);
  }
 
  static int ftdialog(gboolean receive)
@@ -1249,10 +1312,11 @@
 	{
 		unsigned int	 	flag;
 		const gchar		*label;
-	} ft_options[] 			=		{	{	FT_FLAG_ASCII,	N_( "Text file" )						},
-										{	FT_FLAG_TSO,	N_( "Host is TSO" )						},
-										{	FT_FLAG_CRLF,	N_( "Add/Remove CR at end of line" )	},
-										{	FT_FLAG_APPEND,	N_( "Append" )							}
+	} ft_options[] 			=		{	{	FT_FLAG_ASCII,			N_( "Text file" )						},
+										{	FT_FLAG_TSO,			N_( "Host is TSO" )						},
+										{	FT_FLAG_CRLF,			N_( "Add/Remove CR at end of line" )	},
+										{	FT_FLAG_APPEND,			N_( "Append" )							},
+										{   FT_FLAG_REMAP_ASCII,	N_( "Remap ASCII Characters" )			}
 									};
 
 	static const gchar *label[] = {	N_( "Local file name:" 	),
@@ -1325,9 +1389,16 @@
 	dialog  = gtk_dialog_new_with_buttons(	receive ?  _( "Receive file from host" ) : _( "Send file to host" ), \
 													GTK_WINDOW(topwindow), \
 													GTK_DIALOG_DESTROY_WITH_PARENT,
-													receive ? GTK_STOCK_SAVE : GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-													GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
 													NULL );
+
+
+	info.ready = gtk_dialog_add_button(GTK_DIALOG(dialog),	receive ? GTK_STOCK_SAVE : GTK_STOCK_OPEN,
+															GTK_RESPONSE_ACCEPT);
+
+	gtk_widget_set_sensitive(info.ready,FALSE);
+
+	gtk_dialog_add_button(GTK_DIALOG(dialog),	GTK_STOCK_CANCEL,
+												GTK_RESPONSE_REJECT);
 
 	topbox = gtk_vbox_new(FALSE,2);
 
@@ -1340,6 +1411,8 @@
 		gtk_table_attach(GTK_TABLE(table),widget,0,1,f,f+1,GTK_FILL,GTK_FILL,2,2);
 
 		info.file[f] = gtk_entry_new_with_max_length(0x0100);
+		g_signal_connect(G_OBJECT(info.file[f]),"changed",G_CALLBACK(check_filenames),&info);
+
 		gtk_entry_set_width_chars(GTK_ENTRY(info.file[f]),40);
 		gtk_table_attach(GTK_TABLE(table),info.file[f],1,3,f,f+1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,GTK_EXPAND|GTK_SHRINK|GTK_FILL,2,2);
 	}
@@ -1352,7 +1425,7 @@
 
 	/* Transfer options */
 	frame = gtk_frame_new( _( "Transfer options" ) );
-	box   = gtk_table_new(2,2,FALSE);
+	box   = gtk_table_new(3,2,FALSE);
 
 	row=0;
 	col=0;
@@ -1465,7 +1538,6 @@
 		{
 			if(info.entry[f])
 			{
-				Trace("Opt(%d): %s - %s",f,opt[f].key,opt[f].def);
 				ptr = g_key_file_get_string(conf,info.group_name,opt[f].key,NULL);
 				if(ptr)
 					gtk_entry_set_text(GTK_ENTRY(info.entry[f]),ptr);
@@ -1476,31 +1548,28 @@
 	}
 
 	/* Run dialog */
+	updatefields(&info);
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),topbox);
 	gtk_widget_show_all(dialog);
 	rc = gtk_dialog_run(GTK_DIALOG(dialog));
 
 	if(rc == GTK_RESPONSE_ACCEPT)
 	{
-		/* Save options */
 		if(conf)
 		{
 			/* Save options */
 			for(f=0;f<5;f++)
 			{
 				if(info.entry[f])
-				{
-					ptr = (gchar *) gtk_entry_get_text(GTK_ENTRY(info.entry[f]));
-					if(ptr && *ptr)
-						g_key_file_set_string(conf,info.group_name,opt[f].key,ptr);
-				}
+					g_key_file_set_string(conf,info.group_name,opt[f].key,gtk_entry_get_text(GTK_ENTRY(info.entry[f])));
 			}
 			g_key_file_set_integer(conf,info.group_name,"flags",info.flags);
 		}
 
+		/* Get option values */
 		for(f=0;f<5;f++)
 		{
-			if(info.entry[f])
+			if(info.entry[f] && GTK_WIDGET_SENSITIVE(info.entry[f]))
 				ptr = (gchar *) gtk_entry_get_text(GTK_ENTRY(info.entry[f]));
 			else
 				ptr = "";

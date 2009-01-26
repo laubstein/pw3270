@@ -538,16 +538,6 @@ int main(int argc, char *argv[])
 			wait4negotiations(cl_hostname);
 	}
 
-	Trace("---> %s <---",gettext("Bold"));
-	Trace("---> %s <---", _( "Bold" ) );
-	Trace("---> %s <---", (char *) dgettext(PACKAGE_NAME, "Bold" ) );
-
-	Trace("---> %s <---",gettext("Colors"));
-	Trace("---> %s <---",_( "Colors" ));
-	Trace("---> %s <---",(char *) dgettext(PACKAGE_NAME, "Colors" ));
-
-
-
 	if(topwindow)
 	{
 		screen_resume();
