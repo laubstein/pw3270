@@ -1108,20 +1108,22 @@
  #define FT_RECORD_FORMAT_FIXED			0x0100
  #define FT_RECORD_FORMAT_VARIABLE		0x0200
  #define FT_RECORD_FORMAT_UNDEFINED		0x0300
+ #define FT_RECORD_FORMAT_MASK 			FT_RECORD_FORMAT_UNDEFINED
 
  #define FT_ALLOCATION_UNITS_TRACKS		0x1000
  #define FT_ALLOCATION_UNITS_CYLINDERS	0x2000
  #define FT_ALLOCATION_UNITS_AVBLOCK	0x3000
+ #define FT_ALLOCATION_UNITS_MASK		FT_ALLOCATION_UNITS_AVBLOCK
 
  #define snconcat(x,s,fmt,...) snprintf(x+strlen(x),s-strlen(x),fmt,__VA_ARGS__)
 
- int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace)
+ int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft)
  {
  	static const char	*rec	= "fvu";
  	static const char	*un[]	= { "tracks", "cylinders", "avblock" };
 
- 	unsigned short	recfm	= (flags & 0x0300) >> 8;
- 	unsigned short	units	= (flags & 0x3000) >> 12;
+ 	unsigned short	recfm	= (flags & FT_RECORD_FORMAT_MASK) >> 8;
+ 	unsigned short	units	= (flags & FT_ALLOCATION_UNITS_MASK) >> 12;
 
  	char 				buffer[4096];
 
@@ -1137,36 +1139,47 @@
 						(flags & FT_FLAG_APPEND)	? " append"	: ""
 			);
 
-	if(flags & FT_FLAG_TSO)
+	if(!(flags & FT_FLAG_RECEIVE))
 	{
-		if(recfm > 0)
-			snconcat(buffer,4096," recfm %c",rec[recfm-1]);
-
-		if(lrecl > 0)
-			snconcat(buffer,4096," lrecl %d",lrecl);
-	}
-	else
-	{
-		if(recfm > 0)
-			snconcat(buffer,4096," recfm(%c)",rec[recfm-1]);
-
-		if(lrecl > 0)
-			snconcat(buffer,4096," lrecl(%d)",lrecl);
-
-		if(blksize > 0)
-			snconcat(buffer,4096," blksize(%d)", blksize);
-
-		if(units > 0)
-			snconcat(buffer,4096," %s",un[units-1]);
-
-		if(primspace > 0)
+		if(flags & FT_FLAG_TSO)
 		{
-			snconcat(buffer,4096," (space%d",primspace);
-			if(secspace)
-				snconcat(buffer,4096,",%d",secspace);
-			snconcat(buffer,4096,"%s",")");
-		}
+			// TSO Host
+			if(recfm > 0)
+			{
+				snconcat(buffer,4096," recfm(%c)",rec[recfm-1]);
 
+				if(lrecl > 0)
+					snconcat(buffer,4096," lrecl(%d)",lrecl);
+
+				if(blksize > 0)
+					snconcat(buffer,4096," blksize(%d)", blksize);
+			}
+
+			if(units > 0)
+			{
+				snconcat(buffer,4096," %s",un[units-1]);
+
+				if(primspace > 0)
+				{
+					snconcat(buffer,4096," space(%d",primspace);
+					if(secspace)
+						snconcat(buffer,4096,",%d",secspace);
+					snconcat(buffer,4096,"%s",")");
+				}
+			}
+		}
+		else
+		{
+			// VM Host
+			if(recfm > 0)
+			{
+				snconcat(buffer,4096," recfm %c",rec[recfm-1]);
+
+				if(lrecl > 0)
+					snconcat(buffer,4096," lrecl %d",lrecl);
+
+			}
+		}
 	}
 
 	Trace("Command: \"%s\"",buffer);
@@ -1180,10 +1193,11 @@
 
  struct ftdialog
  {
-	unsigned short 	flags;
+	unsigned int	 	flags;
 	const gchar 		*group_name;
 	GtkWidget			*file[2];
 	GtkWidget			*entry[5];
+	int					value[5];
  };
 
  static void browse_file(GtkButton *button,struct ftdialog *info)
@@ -1218,12 +1232,12 @@
 
  static void toggle_flag (GtkToggleButton *button, gpointer user_data)
  {
- 	struct ftdialog *info = (struct ftdialog *) g_object_get_data(button,"info");
+ 	struct ftdialog *info = (struct ftdialog *) g_object_get_data(G_OBJECT(button),"info");
 
  	if(gtk_toggle_button_get_active(button))
-		info->flags |= ((unsigned short) user_data);
+		info->flags |= ((unsigned int) user_data);
 	else
-		info->flags &= ~((unsigned short) user_data);
+		info->flags &= ~((unsigned int) user_data);
 
 	Trace("Flags changed to %04x",info->flags);
 
@@ -1233,7 +1247,7 @@
  {
 	static const struct _ftoptions
 	{
-		unsigned short 	flag;
+		unsigned int	 	flag;
 		const gchar		*label;
 	} ft_options[] 			=		{	{	FT_FLAG_ASCII,	N_( "Text file" )						},
 										{	FT_FLAG_TSO,	N_( "Host is TSO" )						},
@@ -1293,14 +1307,18 @@
 	int					row;
 	int					col;
 	struct ftdialog	info;
-	unsigned short	flag;
+	unsigned int		flag;
 
 	/* Set initial values */
 	memset(&info,0,sizeof(info));
 	info.group_name	= receive ? "FileReceive" : "FileSend";
+	if(conf)
+		info.flags = g_key_file_get_integer(conf,info.group_name,"flags",NULL);
 
 	if(receive)
-		info.flags = FT_FLAG_RECEIVE;
+		info.flags |= FT_FLAG_RECEIVE;
+	else
+		info.flags &= ~FT_FLAG_RECEIVE;
 
 	/* Create dialog */
 
@@ -1341,7 +1359,7 @@
 	for(f=0;f < G_N_ELEMENTS(ft_options);f++)
 	{
 		widget = gtk_check_button_new_with_label( gettext(ft_options[f].label));
-
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget),(ft_options[f].flag & info.flags) != 0);
 		g_object_set_data(G_OBJECT(widget),"info",(gpointer) &info);
 		g_signal_connect(G_OBJECT(widget),"toggled", G_CALLBACK(toggle_flag),(gpointer) ft_options[f].flag);
 
@@ -1370,6 +1388,8 @@
 			flag = (f&0x03) << 8;
 
 			widget = gtk_radio_button_new_with_label(group,gettext(recfm[f]));
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget),(info.flags & FT_RECORD_FORMAT_MASK) == flag);
+
 			g_object_set_data(G_OBJECT(widget),"info",(gpointer) &info);
 			g_signal_connect(G_OBJECT(widget),"toggled", G_CALLBACK(toggle_flag),(gpointer) flag);
 
@@ -1388,6 +1408,7 @@
 			flag = (f&0x03) << 12;
 
 			widget = gtk_radio_button_new_with_label(group,gettext(unit[f]));
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget),(info.flags & FT_ALLOCATION_UNITS_MASK) == flag);
 			g_object_set_data(G_OBJECT(widget),"info",(gpointer) &info);
 			g_signal_connect(G_OBJECT(widget),"toggled", G_CALLBACK(toggle_flag),(gpointer) flag);
 
@@ -1436,9 +1457,10 @@
 
 	gtk_box_pack_start(GTK_BOX(topbox),hbox,TRUE,TRUE,0);
 
-	/* Load default options */
 	if(conf)
 	{
+		/* Load options */
+
 		for(f=0;f<5;f++)
 		{
 			if(info.entry[f])
@@ -1461,16 +1483,43 @@
 	if(rc == GTK_RESPONSE_ACCEPT)
 	{
 		/* Save options */
+		if(conf)
+		{
+			/* Save options */
+			for(f=0;f<5;f++)
+			{
+				if(info.entry[f])
+				{
+					ptr = (gchar *) gtk_entry_get_text(GTK_ENTRY(info.entry[f]));
+					if(ptr && *ptr)
+						g_key_file_set_string(conf,info.group_name,opt[f].key,ptr);
+				}
+			}
+			g_key_file_set_integer(conf,info.group_name,"flags",info.flags);
+		}
 
+		for(f=0;f<5;f++)
+		{
+			if(info.entry[f])
+				ptr = (gchar *) gtk_entry_get_text(GTK_ENTRY(info.entry[f]));
+			else
+				ptr = "";
+
+			if(ptr && *ptr)
+				info.value[f] = atoi(ptr);
+			else
+				info.value[f] = -1;
+		}
 
 		/* Begin transfer */
 		rc = BeginFileTransfer(		info.flags,
 									gtk_entry_get_text(GTK_ENTRY(info.file[0])),
 									gtk_entry_get_text(GTK_ENTRY(info.file[1])),
-									0,
-									0,
-									0,
-									0
+									info.value[0],
+									info.value[1],
+									info.value[2],
+									info.value[3],
+									info.value[4]
 								);
 
 	}
