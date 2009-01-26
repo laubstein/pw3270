@@ -66,6 +66,7 @@
  static void action_Quit(void);
  static void action_About(GtkWidget *w, gpointer user_data);
 
+ static void action_ToggleGDKDebug(GtkToggleAction *action, gpointer user_data);
  static void action_SaveScreen(void);
  static void action_SaveSelected(void);
  static void action_SaveClipboard(void);
@@ -430,6 +431,11 @@
 
  }
 
+ static void action_ToggleGDKDebug(GtkToggleAction *action, gpointer user_data)
+ {
+	gdk_window_set_debug_updates(gtk_toggle_action_get_active(action));
+ }
+
  static void LoadToggleActions(GtkActionGroup *actions)
  {
 	// TODO (perry#9#): Add tooltips
@@ -479,6 +485,12 @@
 	};
 
  	int f;
+ 	GtkToggleAction *action;
+
+	/* Debug toggles */
+	action = gtk_toggle_action_new(	"ToggleGDKDebug", _( "Debug screen updates"), NULL,NULL);
+	g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(action_ToggleGDKDebug),0);
+	gtk_action_group_add_action(actions,(GtkAction *) action);
 
 	/* Internal toggles */
  	for(f=0;f< GUI_TOGGLE_COUNT;f++)
@@ -1101,10 +1113,15 @@
  #define FT_ALLOCATION_UNITS_CYLINDERS	0x2000
  #define FT_ALLOCATION_UNITS_AVBLOCK	0x3000
 
- int BeginFileTransfer(unsigned short flags, const char *local, const char *remote)
+ #define snconcat(x,s,fmt,...) snprintf(x+strlen(x),s-strlen(x),fmt,__VA_ARGS__)
+
+ int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace)
  {
- 	unsigned short	recfm = (flags & 0x0300) >> 8;
- 	unsigned short	units = (flags & 0x3000) >> 12;
+ 	static const char	*rec	= "fvu";
+ 	static const char	*un[]	= { "tracks", "cylinders", "avblock" };
+
+ 	unsigned short	recfm	= (flags & 0x0300) >> 8;
+ 	unsigned short	units	= (flags & 0x3000) >> 12;
 
  	char 				buffer[4096];
 
@@ -1120,8 +1137,41 @@
 						(flags & FT_FLAG_APPEND)	? " append"	: ""
 			);
 
+	if(flags & FT_FLAG_TSO)
+	{
+		if(recfm)
+			snconcat(buffer,4096," recfm %c",rec[recfm-1]);
+
+		if(lrecl)
+			snconcat(buffer,4096," lrecl %d",lrecl);
+	}
+	else
+	{
+		if(recfm)
+			snconcat(buffer,4096," recfm(%c)",rec[recfm-1]);
+
+		if(lrecl)
+			snconcat(buffer,4096," lrecl(%d)",lrecl);
+
+		if(blksize)
+			snconcat(buffer,4096," blksize(%d)", blksize);
+
+		if(units)
+			snconcat(buffer,4096," %s",un[units-1]);
+
+
+		if(primspace)
+		{
+			snconcat(buffer,4096," (space%d",primspace);
+			if(secspace)
+				snconcat(buffer,4096,",%d",secspace);
+			snconcat(buffer,4096,"%s",")");
+		}
+
+	}
 
 	Trace("Command: \"%s\"",buffer);
+
  	return 0;
  }
 
@@ -1209,7 +1259,7 @@
 													GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
 													NULL );
 
-	table = gtk_table_new(G_N_ELEMENTS(label)+G_N_ELEMENTS(ft_options),5,FALSE);
+	table = gtk_table_new(G_N_ELEMENTS(label)+G_N_ELEMENTS(ft_options)+2,5,FALSE);
 	for(f=0;f < G_N_ELEMENTS(label);f++)
 	{
 		widget = gtk_label_new(gettext(label[f]));
@@ -1254,7 +1304,11 @@
 	{
 		rc = BeginFileTransfer(		info.flags,
 									gtk_entry_get_text(GTK_ENTRY(info.file[0])),
-									gtk_entry_get_text(GTK_ENTRY(info.file[1]))
+									gtk_entry_get_text(GTK_ENTRY(info.file[1])),
+									0,
+									0,
+									0,
+									0
 								);
 
 	}
