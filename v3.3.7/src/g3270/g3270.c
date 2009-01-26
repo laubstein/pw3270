@@ -495,16 +495,14 @@ int main(int argc, char *argv[])
 
 	main_connect(0);
 
-//#ifdef DEBUG
-//	gdk_window_set_debug_updates(TRUE);
-//#endif
-
 	register_schange(ST_CONNECT, main_connect);
+
 //	register_schange(ST_3270_MODE, main_connect);
 //	register_schange(ST_EXITING, main_exiting);
-#if defined(X3270_FT) /*[*/
-	ft_init();
-#endif /*]*/
+//#if defined(X3270_FT) /*[*/
+//	ft_init();
+//#endif /*]*/
+
 #if defined(X3270_PRINTER) /*[*/
 	printer_init();
 #endif /*]*/

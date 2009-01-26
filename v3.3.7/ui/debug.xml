@@ -3,6 +3,7 @@
 
 		<menu action='SettingsMenu'>
 			<menu action='OptionsMenu'>
+				<menuitem action='ToggleGDKDebug' />
 			</menu>
 		</menu>
 
