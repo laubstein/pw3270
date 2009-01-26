@@ -173,8 +173,8 @@
 
 #if defined(X3270_FT)
 	/* File-transfer actions */
- 	{	"Download",			NULL,					N_( "Receive file" ),		NULL,				NULL,	G_CALLBACK(action_Download)			},
- 	{	"Upload",   		NULL,					N_( "Send file" ),   		NULL,				NULL,	G_CALLBACK(action_Upload)			},
+ 	{	"Download",			GTK_STOCK_SAVE,			N_( "Receive file" ),		"<Alt>d",			NULL,	G_CALLBACK(action_Download)			},
+ 	{	"Upload",   		GTK_STOCK_OPEN,			N_( "Send file" ),   		"<Alt>u",			NULL,	G_CALLBACK(action_Upload)			},
 #endif
 
  };
@@ -1139,28 +1139,27 @@
 
 	if(flags & FT_FLAG_TSO)
 	{
-		if(recfm)
+		if(recfm > 0)
 			snconcat(buffer,4096," recfm %c",rec[recfm-1]);
 
-		if(lrecl)
+		if(lrecl > 0)
 			snconcat(buffer,4096," lrecl %d",lrecl);
 	}
 	else
 	{
-		if(recfm)
+		if(recfm > 0)
 			snconcat(buffer,4096," recfm(%c)",rec[recfm-1]);
 
-		if(lrecl)
+		if(lrecl > 0)
 			snconcat(buffer,4096," lrecl(%d)",lrecl);
 
-		if(blksize)
+		if(blksize > 0)
 			snconcat(buffer,4096," blksize(%d)", blksize);
 
-		if(units)
+		if(units > 0)
 			snconcat(buffer,4096," %s",un[units-1]);
 
-
-		if(primspace)
+		if(primspace > 0)
 		{
 			snconcat(buffer,4096," (space%d",primspace);
 			if(secspace)
@@ -1184,6 +1183,7 @@
 	unsigned short 	flags;
 	const gchar 		*group_name;
 	GtkWidget			*file[2];
+	GtkWidget			*entry[5];
  };
 
  static void browse_file(GtkButton *button,struct ftdialog *info)
@@ -1216,6 +1216,19 @@
 	gtk_widget_destroy(dialog);
  }
 
+ static void toggle_flag (GtkToggleButton *button, gpointer user_data)
+ {
+ 	struct ftdialog *info = (struct ftdialog *) g_object_get_data(button,"info");
+
+ 	if(gtk_toggle_button_get_active(button))
+		info->flags |= ((unsigned short) user_data);
+	else
+		info->flags &= ~((unsigned short) user_data);
+
+	Trace("Flags changed to %04x",info->flags);
+
+ }
+
  static int ftdialog(gboolean receive)
  {
 	static const struct _ftoptions
@@ -1230,18 +1243,57 @@
 
 	static const gchar *label[] = {	N_( "Local file name:" 	),
 										N_( "Host file name:"	),
-										N_( "Transfer options:"	),
+									};
+
+	static const gchar *recfm[] = {	N_( "Default" 			),
+										N_( "Fixed"				),
+										N_( "Variable"			),
+										N_( "Undefined"			)
+									};
+
+	static const gchar *extra[] =	{	N_( "LRECL:" 			),
+										N_( "BLKSIZE:" 			),
+										N_( "Primary space:"	),
+										N_( "Secondary space:"	)
+									};
+
+	static const gchar *unit[] = {	N_( "Default" 			),
+										N_( "Tracks"			),
+										N_( "Cylinders"			),
+										N_( "Avblock"			)
+									};
+
+	static const struct _opt
+	{
+		const gchar *key;
+		const gchar *def;
+	} opt[] =						{	{ "LRECL", 			"" 			},
+										{ "BLKSIZE", 		""			},
+										{ "PRIMARY_SPC", 	"" 			},
+										{ "SECONDARY_SPC",	"" 			},
+										{ "DFT",			"4096"		}
 									};
 
 	int rc;
 	int f;
 
+	GKeyFile			*conf   = GetConf();
+
+	GtkWidget			*topbox;
 	GtkWidget 			*table;
 	GtkWidget 			*widget;
 	GtkWidget 			*dialog;
+	GtkWidget			*frame;
+	GtkWidget			*box;
+	GtkWidget			*hbox;
+	GtkWidget			*vbox;
+	GSList				*group;
+	gchar				*ptr;
+
 	int					row;
 	int					col;
 	struct ftdialog	info;
+	unsigned short	flag;
 
 	/* Set initial values */
 	memset(&info,0,sizeof(info));
@@ -1259,16 +1311,16 @@
 													GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
 													NULL );
 
-	table = gtk_table_new(G_N_ELEMENTS(label)+G_N_ELEMENTS(ft_options)+2,5,FALSE);
+	topbox = gtk_vbox_new(FALSE,2);
+
+	/* Add file names */
+	table = gtk_table_new(G_N_ELEMENTS(label),5,FALSE);
 	for(f=0;f < G_N_ELEMENTS(label);f++)
 	{
 		widget = gtk_label_new(gettext(label[f]));
-		gtk_table_attach(GTK_TABLE(table),widget,0,1,f,f+1,0,0,2,2);
-	}
+		gtk_misc_set_alignment(GTK_MISC(widget),0,.5);
+		gtk_table_attach(GTK_TABLE(table),widget,0,1,f,f+1,GTK_FILL,GTK_FILL,2,2);
 
-	/* File names */
-	for(f=0;f < 2;f++)
-	{
 		info.file[f] = gtk_entry_new_with_max_length(0x0100);
 		gtk_entry_set_width_chars(GTK_ENTRY(info.file[f]),40);
 		gtk_table_attach(GTK_TABLE(table),info.file[f],1,3,f,f+1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,GTK_EXPAND|GTK_SHRINK|GTK_FILL,2,2);
@@ -1278,30 +1330,140 @@
 	gtk_table_attach(GTK_TABLE(table),widget,3,4,0,1,0,0,2,2);
 	g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(browse_file),&info);
 
+	gtk_box_pack_start(GTK_BOX(topbox),table,TRUE,TRUE,0);
+
 	/* Transfer options */
-	row=2;
-	col=1;
+	frame = gtk_frame_new( _( "Transfer options" ) );
+	box   = gtk_table_new(2,2,FALSE);
+
+	row=0;
+	col=0;
 	for(f=0;f < G_N_ELEMENTS(ft_options);f++)
 	{
 		widget = gtk_check_button_new_with_label( gettext(ft_options[f].label));
 
-		#warning set callback to toggle flag
+		g_object_set_data(G_OBJECT(widget),"info",(gpointer) &info);
+		g_signal_connect(G_OBJECT(widget),"toggled", G_CALLBACK(toggle_flag),(gpointer) ft_options[f].flag);
 
-		gtk_table_attach(GTK_TABLE(table),widget,col,col+1,row,row+1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,GTK_EXPAND|GTK_SHRINK|GTK_FILL,2,2);
-		if(col++ > 1)
+		gtk_table_attach(GTK_TABLE(box),widget,col,col+1,row,row+1,GTK_EXPAND|GTK_SHRINK|GTK_FILL,GTK_EXPAND|GTK_SHRINK|GTK_FILL,2,2);
+		if(col++ > 0)
 		{
 			row++;
-			col=1;
+			col=0;
+		}
+	}
+	gtk_container_add(GTK_CONTAINER(frame),box);
+	gtk_box_pack_start(GTK_BOX(topbox),frame,TRUE,TRUE,0);
+
+	row = G_N_ELEMENTS(label)+1;
+	if(!receive)
+	{
+		/* Formats */
+		hbox = gtk_hbox_new(TRUE,2);
+
+		/* Record */
+		frame	= gtk_frame_new( _( "Record format" ) );
+		vbox 	= gtk_vbox_new(TRUE,2);
+		group	= NULL;
+		for(f=0;f < G_N_ELEMENTS(recfm);f++)
+		{
+			flag = (f&0x03) << 8;
+
+			widget = gtk_radio_button_new_with_label(group,gettext(recfm[f]));
+			g_object_set_data(G_OBJECT(widget),"info",(gpointer) &info);
+			g_signal_connect(G_OBJECT(widget),"toggled", G_CALLBACK(toggle_flag),(gpointer) flag);
+
+			group = gtk_radio_button_get_group(GTK_RADIO_BUTTON(widget));
+			gtk_box_pack_start(GTK_BOX(vbox),widget,TRUE,TRUE,0);
+		}
+		gtk_container_add(GTK_CONTAINER(frame),vbox);
+		gtk_box_pack_start(GTK_BOX(hbox),frame,TRUE,TRUE,0);
+
+		/* Unit */
+		frame	= gtk_frame_new( _( "Space allocation units" ) );
+		vbox 	= gtk_vbox_new(TRUE,2);
+		group	= NULL;
+		for(f=0;f < G_N_ELEMENTS(unit);f++)
+		{
+			flag = (f&0x03) << 12;
+
+			widget = gtk_radio_button_new_with_label(group,gettext(unit[f]));
+			g_object_set_data(G_OBJECT(widget),"info",(gpointer) &info);
+			g_signal_connect(G_OBJECT(widget),"toggled", G_CALLBACK(toggle_flag),(gpointer) flag);
+
+			group = gtk_radio_button_get_group(GTK_RADIO_BUTTON(widget));
+			gtk_box_pack_start(GTK_BOX(vbox),widget,TRUE,TRUE,0);
+		}
+		gtk_container_add(GTK_CONTAINER(frame),vbox);
+		gtk_box_pack_end(GTK_BOX(hbox),frame,TRUE,TRUE,0);
+
+		/* Add record options */
+		gtk_box_pack_start(GTK_BOX(topbox),hbox,TRUE,TRUE,0);
+
+		/* Add LRECL, BLKSIZE, primary and secondary spaces */
+		hbox = gtk_table_new(3,4,FALSE);
+
+		for(f=0;f<2;f++)
+		{
+			// Left
+			widget = gtk_label_new( gettext( extra[f] )  );
+			gtk_misc_set_alignment(GTK_MISC(widget),0,.5);
+			gtk_table_attach(GTK_TABLE(hbox),widget,0,1,f,f+1,GTK_FILL,GTK_FILL,2,2);
+			info.entry[f] = gtk_entry_new_with_max_length(10);
+			gtk_entry_set_width_chars(GTK_ENTRY(info.entry[f]),10);
+			gtk_table_attach(GTK_TABLE(hbox),info.entry[f],1,2,f,f+1,GTK_FILL|GTK_EXPAND,GTK_FILL|GTK_EXPAND,2,2);
+
+			// Right
+			widget = gtk_label_new( gettext( extra[f+2] )  );
+			gtk_misc_set_alignment(GTK_MISC(widget),0,.5);
+			gtk_table_attach(GTK_TABLE(hbox),widget,2,3,f,f+1,GTK_FILL,GTK_FILL,2,2);
+			info.entry[f+2] = gtk_entry_new_with_max_length(10);
+			gtk_entry_set_width_chars(GTK_ENTRY(info.entry[f+2]),10);
+			gtk_table_attach(GTK_TABLE(hbox),info.entry[f+2],3,4,f,f+1,GTK_FILL|GTK_EXPAND,GTK_FILL|GTK_EXPAND,2,2);
+		}
+
+		gtk_box_pack_start(GTK_BOX(topbox),hbox,TRUE,TRUE,0);
+
+	}
+	/* Add dft option */
+	hbox = gtk_hbox_new(FALSE,2);
+	widget = gtk_label_new( _( "DFT Buffer size:" ) );
+	gtk_misc_set_alignment(GTK_MISC(widget),0,.5);
+	gtk_box_pack_start(GTK_BOX(hbox),widget,FALSE,FALSE,0);
+	info.entry[4] = gtk_entry_new_with_max_length(10);
+	gtk_entry_set_width_chars(GTK_ENTRY(info.entry[4]),10);
+	gtk_box_pack_start(GTK_BOX(hbox),info.entry[4],FALSE,FALSE,0);
+
+	gtk_box_pack_start(GTK_BOX(topbox),hbox,TRUE,TRUE,0);
+
+	/* Load default options */
+	if(conf)
+	{
+		for(f=0;f<5;f++)
+		{
+			if(info.entry[f])
+			{
+				Trace("Opt(%d): %s - %s",f,opt[f].key,opt[f].def);
+				ptr = g_key_file_get_string(conf,info.group_name,opt[f].key,NULL);
+				if(ptr)
+					gtk_entry_set_text(GTK_ENTRY(info.entry[f]),ptr);
+				else
+					gtk_entry_set_text(GTK_ENTRY(info.entry[f]),opt[f].def);
+			}
 		}
 	}
 
 	/* Run dialog */
-	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),table);
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),topbox);
 	gtk_widget_show_all(dialog);
 	rc = gtk_dialog_run(GTK_DIALOG(dialog));
 
 	if(rc == GTK_RESPONSE_ACCEPT)
 	{
+		/* Save options */
+
+
+		/* Begin transfer */
 		rc = BeginFileTransfer(		info.flags,
 									gtk_entry_get_text(GTK_ENTRY(info.file[0])),
 									gtk_entry_get_text(GTK_ENTRY(info.file[1])),
@@ -1316,6 +1478,7 @@
 	{
 		rc = -1;
 	}
+
 	gtk_widget_destroy(dialog);
 
 	return rc;
