@@ -335,17 +335,17 @@
 
  static void action_PrintScreen(GtkWidget *w, gpointer user_data)
  {
-	PrintText("g3270", GetScreenContents(TRUE));
+	PrintText(PACKAGE_NAME, GetScreenContents(TRUE));
  }
 
  static void action_PrintSelected(GtkWidget *w, gpointer user_data)
  {
-	PrintText("g3270", GetSelection());
+	PrintText(PACKAGE_NAME, GetSelection());
  }
 
  static void action_PrintClipboard(GtkWidget *w, gpointer user_data)
  {
-	PrintText("g3270", GetClipboard());
+	PrintText(PACKAGE_NAME, GetClipboard());
  }
 
  static void action_Quit(void)
@@ -1099,23 +1099,6 @@
 
 #if defined(X3270_FT)
 
- #define FT_FLAG_RECEIVE				0x0001
- #define FT_FLAG_ASCII					0x0002
- #define FT_FLAG_CRLF					0x0004
- #define FT_FLAG_APPEND					0x0008
- #define FT_FLAG_TSO					0x0010
- #define FT_FLAG_REMAP_ASCII			0x0020
-
- #define FT_RECORD_FORMAT_FIXED			0x0100
- #define FT_RECORD_FORMAT_VARIABLE		0x0200
- #define FT_RECORD_FORMAT_UNDEFINED		0x0300
- #define FT_RECORD_FORMAT_MASK 			FT_RECORD_FORMAT_UNDEFINED
-
- #define FT_ALLOCATION_UNITS_TRACKS		0x1000
- #define FT_ALLOCATION_UNITS_CYLINDERS	0x2000
- #define FT_ALLOCATION_UNITS_AVBLOCK	0x3000
- #define FT_ALLOCATION_UNITS_MASK		FT_ALLOCATION_UNITS_AVBLOCK
-
  #define snconcat(x,s,fmt,...) snprintf(x+strlen(x),s-strlen(x),fmt,__VA_ARGS__)
 
  int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft)
@@ -1132,16 +1115,13 @@
 	if(!(flags & FT_FLAG_RECEIVE))
 	{
 		if(access(local,R_OK))
-		{
-			Trace("Can't read \"%s\"",local);
-			return -1;
-		}
+			return ENOENT;
 	}
 
 	if(!*remote)
 	{
 		Trace("Invalid host file: \"%s\"",remote);
-		return -1;
+		return EINVAL;
 	}
 
  	/* Build the ind$file command */
@@ -1205,8 +1185,6 @@
 		else
 			snconcat(buffer,4095," (%s)",op+1);
 	}
-
-	Trace("Command: \"%s\"",buffer);
 
  	return 0;
  }

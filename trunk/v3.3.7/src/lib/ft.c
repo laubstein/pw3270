@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como ft.c e possui 1914 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -30,17 +30,13 @@
  *
  */
 
-
-/*
- *	ft.c
- *		This module handles the file transfer dialogs.
- */
-
+#include <lib3270/config.h>
 #include "globals.h"
 
-#if defined(X3270_FT) /*[*/
+#if defined(X3270_FT)
 
-#if defined(X3270_DISPLAY) /*[*/
+/*
+#if defined(X3270_DISPLAY)
 #include <X11/StringDefs.h>
 #include <X11/Xaw/Toggle.h>
 #include <X11/Xaw/Command.h>
@@ -51,7 +47,8 @@
 #include <X11/Xaw/TextSink.h>
 #include <X11/Xaw/AsciiSrc.h>
 #include <X11/Xaw/AsciiSink.h>
-#endif /*]*/
+#endif
+*/
 #include <errno.h>
 
 #include "appres.h"
@@ -61,9 +58,9 @@
 #include "ftc.h"
 #include "dialogc.h"
 #include "hostc.h"
-#if defined(C3270) || defined(WC3270) /*[*/
+#if defined(C3270) || defined(WC3270)
 #include "icmdc.h"
-#endif /*]*/
+#endif
 #include "kybdc.h"
 #include "macrosc.h"
 #include "objects.h"
@@ -76,38 +73,39 @@
 /* Macros. */
 #define eos(s)	strchr((s), '\0')
 
-#if defined(X3270_DISPLAY) /*[*/
-#define FILE_WIDTH	300	/* width of file name widgets */
-#define MARGIN		3	/* distance from margins to widgets */
-#define CLOSE_VGAP	0	/* distance between paired toggles */
-#define FAR_VGAP	10	/* distance between single toggles and groups */
-#define BUTTON_GAP	5	/* horizontal distance between buttons */
-#define COLUMN_GAP	40	/* distance between columns */
-#endif /*]*/
+#if defined(X3270_DISPLAY)
+#define FILE_WIDTH	300	// width of file name widgets
+#define MARGIN		3	// distance from margins to widgets
+#define CLOSE_VGAP	0	// distance between paired toggles
+#define FAR_VGAP	10	// distance between single toggles and groups
+#define BUTTON_GAP	5	// horizontal distance between buttons
+#define COLUMN_GAP	40	// distance between columns
+#endif
 
 #define BN	(Boolean *)NULL
 
-/* Externals. */
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+/* Externals.
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 extern Pixmap diamond;
 extern Pixmap no_diamond;
 extern Pixmap null;
 extern Pixmap dot;
 extern Pixmap no_dot;
-#endif /*]*/
+#endif
+*/
 
-/* Globals. */
-enum ft_state ft_state = FT_NONE;	/* File transfer state */
-char *ft_local_filename;		/* Local file to transfer to/from */
-FILE *ft_local_file = (FILE *)NULL;	/* File descriptor for local file */
-Boolean ft_last_cr = False;		/* CR was last char in local file */
-Boolean ascii_flag = True;		/* Convert to ascii */
-Boolean cr_flag = True;			/* Add crlf to each line */
-Boolean remap_flag = True;		/* Remap ASCII<->EBCDIC */
-unsigned long ft_length = 0;		/* Length of transfer */
+// Globals.
+enum ft_state ft_state = FT_NONE;		// File transfer state
+char *ft_local_filename;				// Local file to transfer to/from
+FILE *ft_local_file = (FILE *)NULL;		// File descriptor for local file
+Boolean ft_last_cr = False;				// CR was last char in local file
+Boolean ascii_flag = True;				// Convert to ascii
+Boolean cr_flag = True;					// Add crlf to each line
+Boolean remap_flag = True;				// Remap ASCII<->EBCDIC
+unsigned long ft_length = 0;			// Length of transfer
 
-/* Statics. */
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+/* Statics.
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 static Widget ft_dialog, ft_shell, local_file, host_file;
 static Widget lrecl_widget, blksize_widget;
 static Widget primspace_widget, secspace_widget;
@@ -117,59 +115,71 @@ static Widget ascii_toggle, binary_toggle;
 static Widget cr_widget;
 static Widget remap_widget;
 static Widget buffersize_widget;
-#endif /*]*/
+#endif
+*/
 
-static char *ft_host_filename;		/* Host file to transfer to/from */
-static Boolean receive_flag = True;	/* Current transfer is receive */
-static Boolean append_flag = False;	/* Append transfer */
-static Boolean vm_flag = False;		/* VM Transfer flag */
+// static char *ft_host_filename;		// Host file to transfer to/from
+// static Boolean receive_flag = True;	// Current transfer is receive
+// static Boolean append_flag = False;	// Append transfer
+// static Boolean vm_flag = False;		// VM Transfer flag
 
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+/*
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 static Widget recfm_options[5];
 static Widget units_options[5];
 static struct toggle_list recfm_toggles = { recfm_options };
 static struct toggle_list units_toggles = { units_options };
-#endif /*]*/
+#endif
+*/
 
+/*
 static enum recfm {
 	DEFAULT_RECFM, FIXED, VARIABLE, UNDEFINED
 } recfm = DEFAULT_RECFM;
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+*/
+/*
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 static Boolean recfm_default = True;
 static enum recfm r_default_recfm = DEFAULT_RECFM;
 static enum recfm r_fixed = FIXED;
 static enum recfm r_variable = VARIABLE;
 static enum recfm r_undefined = UNDEFINED;
-#endif /*]*/
+#endif
+*/
 
+/*
 static enum units {
 	DEFAULT_UNITS, TRACKS, CYLINDERS, AVBLOCK
 } units = DEFAULT_UNITS;
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+*/
+
+/*
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 static Boolean units_default = True;
 static enum units u_default_units = DEFAULT_UNITS;
 static enum units u_tracks = TRACKS;
 static enum units u_cylinders = CYLINDERS;
 static enum units u_avblock = AVBLOCK;
-#endif /*]*/
+#endif
+*/
 
-static Boolean allow_overwrite = False;
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+/* static Boolean allow_overwrite = False;
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 static sr_t *ft_sr = (sr_t *)NULL;
 
 static Widget progress_shell, from_file, to_file;
 static Widget ft_status, waiting, aborting;
 static String status_string;
-#endif /*]*/
-static struct timeval t0;		/* Starting time */
-static Boolean ft_is_cut;		/* File transfer is CUT-style */
+#endif
+static struct timeval t0;		// Starting time
+static Boolean ft_is_cut;		// File transfer is CUT-style
 
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 static Widget overwrite_shell;
-#endif /*]*/
+#endif
 static Boolean ft_is_action;
 
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 static void ft_cancel(Widget w, XtPointer client_data, XtPointer call_data);
 static void ft_popup_callback(Widget w, XtPointer client_data,
     XtPointer call_data);
@@ -200,43 +210,48 @@ static void toggle_receive(Widget w, XtPointer client_data,
     XtPointer call_data);
 static void toggle_vm(Widget w, XtPointer client_data, XtPointer call_data);
 static void units_callback(Widget w, XtPointer user_data, XtPointer call_data);
-#endif /*]*/
-static void ft_connected(Boolean ignored);
-static void ft_in3270(Boolean ignored);
+#endif
+// static void ft_connected(Boolean ignored);
+// static void ft_in3270(Boolean ignored);
+*/
 
-/* Main external entry point. */
+/* Main external entry point.
 
-#if !defined(X3270_DISPLAY) || !defined(X3270_MENUS) /*[*/
+#if !defined(X3270_DISPLAY) || !defined(X3270_MENUS)
 void
 ft_init(void)
 {
-	/* Register for state changes. */
+	// Register for state changes.
 	register_schange(ST_CONNECT, ft_connected);
 	register_schange(ST_3270_MODE, ft_in3270);
 }
-#endif /*]*/
+#endif
 
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+*/
+
+
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 /* "File Transfer" dialog. */
 
 /*
  * Pop up the "Transfer" menu.
  * Called back from the "File Transfer" option on the File menu.
- */
+ *
 void
 popup_ft(Widget w unused, XtPointer call_parms unused,
 	XtPointer call_data unused)
 {
-	/* Initialize it. */
+	// Initialize it.
 	if (ft_shell == (Widget)NULL)
 		ft_popup_init();
 
-	/* Pop it up. */
+	// Pop it up.
 	dialog_set(&ft_sr, ft_dialog);
 	popup_popup(ft_shell, XtGrabNone);
 }
+*/
 
-/* Initialize the transfer pop-up. */
+/* Initialize the transfer pop-up.
 static void
 ft_popup_init(void)
 {
@@ -253,14 +268,14 @@ ft_popup_init(void)
 	Widget start_button;
 	char buflen_buf[128];
 
-	/* Register for state changes. */
+	// Register for state changes.
 	register_schange(ST_CONNECT, ft_connected);
 	register_schange(ST_3270_MODE, ft_in3270);
 
-	/* Prep the dialog functions. */
+	// Prep the dialog functions.
 	dialog_set(&ft_sr, ft_dialog);
 
-	/* Create the menu shell. */
+	// Create the menu shell.
 	ft_shell = XtVaCreatePopupShell(
 	    "ftPopup", transientShellWidgetClass, toplevel,
 	    NULL);
@@ -269,12 +284,12 @@ ft_popup_init(void)
 	XtAddCallback(ft_shell, XtNpopupCallback, ft_popup_callback,
 	    (XtPointer)NULL);
 
-	/* Create the form within the shell. */
+	// Create the form within the shell.
 	ft_dialog = XtVaCreateManagedWidget(
 	    ObjDialog, formWidgetClass, ft_shell,
 	    NULL);
 
-	/* Create the file name widgets. */
+	// Create the file name widgets.
 	local_label = XtVaCreateManagedWidget(
 	    "local", labelWidgetClass, ft_dialog,
 	    XtNvertDistance, FAR_VGAP,
@@ -331,9 +346,9 @@ ft_popup_init(void)
 	    BN, False,
 	    BN, False);
 
-	/* Create the left column. */
+	// Create the left column.
 
-	/* Create send/receive toggles. */
+	// Create send/receive toggles.
 	send_toggle = XtVaCreateManagedWidget(
 	    "send", commandWidgetClass, ft_dialog,
 	    XtNfromVert, host_label,
@@ -355,7 +370,7 @@ ft_popup_init(void)
 	XtAddCallback(receive_toggle, XtNcallback, toggle_receive,
 	    (XtPointer)&s_true);
 
-	/* Create ASCII/binary toggles. */
+	// Create ASCII/binary toggles.
 	ascii_toggle = XtVaCreateManagedWidget(
 	    "ascii", commandWidgetClass, ft_dialog,
 	    XtNfromVert, receive_toggle,
@@ -377,7 +392,7 @@ ft_popup_init(void)
 	XtAddCallback(binary_toggle, XtNcallback, toggle_ascii,
 	    (XtPointer)&s_false);
 
-	/* Create append toggle. */
+	// Create append toggle.
 	append_widget = XtVaCreateManagedWidget(
 	    "append", commandWidgetClass, ft_dialog,
 	    XtNfromVert, binary_toggle,
@@ -388,7 +403,7 @@ ft_popup_init(void)
 	dialog_apply_bitmap(append_widget, append_flag ? dot : no_dot);
 	XtAddCallback(append_widget, XtNcallback, toggle_append, NULL);
 
-	/* Set up the recfm group. */
+	// Set up the recfm group.
 	recfm_label = XtVaCreateManagedWidget(
 	    "file", labelWidgetClass, ft_dialog,
 	    XtNfromVert, append_widget,
@@ -533,7 +548,7 @@ ft_popup_init(void)
 	    BN, False);
 
 
-	/* Find the widest widget in the left column. */
+	// Find the widest widget in the left column.
 	XtVaGetValues(send_toggle, XtNwidth, &maxw, NULL);
 	h_ref = send_toggle;
 #define REMAX(w) { \
@@ -549,9 +564,9 @@ ft_popup_init(void)
 	REMAX(append_widget);
 #undef REMAX
 
-	/* Create the right column buttons. */
+	// Create the right column buttons.
 
-	/* Create VM/TSO toggle. */
+	// Create VM/TSO toggle.
 	vm_toggle = XtVaCreateManagedWidget(
 	    "vm", commandWidgetClass, ft_dialog,
 	    XtNfromVert, host_label,
@@ -573,7 +588,7 @@ ft_popup_init(void)
 	dialog_apply_bitmap(tso_toggle, vm_flag ? no_diamond : diamond);
 	XtAddCallback(tso_toggle, XtNcallback, toggle_vm, (XtPointer)&s_false);
 
-	/* Create CR toggle. */
+	// Create CR toggle.
 	cr_widget = XtVaCreateManagedWidget(
 	    "cr", commandWidgetClass, ft_dialog,
 	    XtNfromVert, tso_toggle,
@@ -589,7 +604,7 @@ ft_popup_init(void)
 	    BN, False,
 	    BN, False);
 
-	/* Create remap toggle. */
+	// Create remap toggle.
 	remap_widget = XtVaCreateManagedWidget(
 	    "remap", commandWidgetClass, ft_dialog,
 	    XtNfromVert, cr_widget,
@@ -605,7 +620,7 @@ ft_popup_init(void)
 	    BN, False,
 	    BN, False);
 
-	/* Set up the Units group. */
+	// Set up the Units group.
 	units_label = XtVaCreateManagedWidget(
 	    "units", labelWidgetClass, ft_dialog,
 	    XtNfromVert, append_widget,
@@ -756,7 +771,7 @@ ft_popup_init(void)
 	    &vm_flag, False,
 	    &units_default, False);
 
-	/* Set up the DFT buffer size. */
+	// Set up the DFT buffer size.
 	buffersize_label = XtVaCreateManagedWidget(
 	    "buffersize", labelWidgetClass, ft_dialog,
 	    XtNfromVert, blksize_label,
@@ -789,7 +804,7 @@ ft_popup_init(void)
 	(void) sprintf(buflen_buf, "%d", dft_buffersize);
 	XtVaSetValues(buffersize_widget, XtNstring, buflen_buf, NULL);
 
-	/* Set up the buttons at the bottom. */
+	// Set up the buttons at the bottom.
 	start_button = XtVaCreateManagedWidget(
 	    ObjConfirmButton, commandWidgetClass, ft_dialog,
 	    XtNfromVert, buffersize_label,
@@ -808,31 +823,34 @@ ft_popup_init(void)
 	    NULL);
 	XtAddCallback(cancel_button, XtNcallback, ft_cancel, 0);
 }
+*/
 
 /* Callbacks for all the transfer widgets. */
 
-/* Transfer pop-up popping up. */
+/* Transfer pop-up popping up.
 static void
 ft_popup_callback(Widget w unused, XtPointer client_data unused,
 	XtPointer call_data unused)
 {
-	/* Set the focus to the local file widget. */
+	// Set the focus to the local file widget.
 	PA_dialog_focus_action(local_file, (XEvent *)NULL, (String *)NULL,
 	    (Cardinal *)NULL);
 
-	/* Disallow overwrites. */
+	// Disallow overwrites.
 	allow_overwrite = False;
 }
+*/
 
-/* Cancel button pushed. */
+/* Cancel button pushed.
 static void
 ft_cancel(Widget w unused, XtPointer client_data unused,
 	XtPointer call_data unused)
 {
 	XtPopdown(ft_shell);
 }
+*/
 
-/* recfm options. */
+/* recfm options.
 static void
 recfm_callback(Widget w, XtPointer user_data, XtPointer call_data unused)
 {
@@ -841,8 +859,9 @@ recfm_callback(Widget w, XtPointer user_data, XtPointer call_data unused)
 	dialog_check_sensitivity(&recfm_default);
 	dialog_flip_toggles(&recfm_toggles, w);
 }
+*/
 
-/* Units options. */
+/* Units options.
 static void
 units_callback(Widget w, XtPointer user_data, XtPointer call_data unused)
 {
@@ -851,8 +870,9 @@ units_callback(Widget w, XtPointer user_data, XtPointer call_data unused)
 	dialog_check_sensitivity(&units_default);
 	dialog_flip_toggles(&units_toggles, w);
 }
+*/
 
-/* OK button pushed. */
+/* OK button pushed.
 static void
 ft_start_callback(Widget w unused, XtPointer call_parms unused,
 	XtPointer call_data unused)
@@ -862,29 +882,31 @@ ft_start_callback(Widget w unused, XtPointer call_parms unused,
 		popup_progress();
 	}
 }
+*/
 
-/* Send/receive options. */
+/* Send/receive options.
 static void
 toggle_receive(Widget w unused, XtPointer client_data,
 	XtPointer call_data unused)
 {
-	/* Toggle the flag */
+	// Toggle the flag
 	receive_flag = *(Boolean *)client_data;
 
-	/* Change the widget states. */
+	// Change the widget states.
 	dialog_mark_toggle(receive_toggle, receive_flag ? diamond : no_diamond);
 	dialog_mark_toggle(send_toggle, receive_flag ? no_diamond : diamond);
 	dialog_check_sensitivity(&receive_flag);
 }
+*/
 
-/* Ascii/binary options. */
+/* Ascii/binary options.
 static void
 toggle_ascii(Widget w unused, XtPointer client_data, XtPointer call_data unused)
 {
-	/* Toggle the flag. */
+	// Toggle the flag.
 	ascii_flag = *(Boolean *)client_data;
 
-	/* Change the widget states. */
+	// Change the widget states.
 	dialog_mark_toggle(ascii_toggle, ascii_flag ? diamond : no_diamond);
 	dialog_mark_toggle(binary_toggle, ascii_flag ? no_diamond : diamond);
 	cr_flag = ascii_flag;
@@ -893,48 +915,51 @@ toggle_ascii(Widget w unused, XtPointer client_data, XtPointer call_data unused)
 	dialog_mark_toggle(remap_widget, remap_flag ? dot : no_dot);
 	dialog_check_sensitivity(&ascii_flag);
 }
+*/
 
-/* CR option. */
+/* CR option.
 static void
 toggle_cr(Widget w, XtPointer client_data unused, XtPointer call_data unused)
 {
-	/* Toggle the cr flag */
+	// Toggle the cr flag
 	cr_flag = !cr_flag;
 
 	dialog_mark_toggle(w, cr_flag ? dot : no_dot);
 }
+*/
 
-/* Append option. */
+/* Append option.
 static void
 toggle_append(Widget w, XtPointer client_data unused,
 	XtPointer call_data unused)
 {
-	/* Toggle Append Flag */
+	// Toggle Append Flag
 	append_flag = !append_flag;
-
 	dialog_mark_toggle(w, append_flag ? dot : no_dot);
 }
+*/
 
-/* Remap option. */
+/* Remap option.
 static void
 toggle_remap(Widget w, XtPointer client_data unused,
 	XtPointer call_data unused)
 {
-	/* Toggle Remap Flag */
+	// Toggle Remap Flag
 	remap_flag = !remap_flag;
 
 	dialog_mark_toggle(w, remap_flag ? dot : no_dot);
 }
+*/
 
-/* TSO/VM option. */
+/* TSO/VM option.
 static void
 toggle_vm(Widget w unused, XtPointer client_data unused,
     XtPointer call_data unused)
 {
-	/* Toggle the flag. */
+	// Toggle the flag.
 	vm_flag = *(Boolean *)client_data;
 
-	/* Change the widget states. */
+	// Change the widget states.
 	dialog_mark_toggle(vm_toggle, vm_flag ? diamond : no_diamond);
 	dialog_mark_toggle(tso_toggle, vm_flag ? no_diamond : diamond);
 
@@ -948,6 +973,7 @@ toggle_vm(Widget w unused, XtPointer client_data unused,
 	}
 	dialog_check_sensitivity(&vm_flag);
 }
+*/
 
 /*
  * Begin the transfer.
@@ -966,7 +992,7 @@ ft_start(void)
 
 	ft_is_action = False;
 
-	/* Get the DFT buffer size. */
+	// Get the DFT buffer size.
 	XtVaGetValues(buffersize_widget, XtNstring, &buffersize, NULL);
 	if (*buffersize)
 		dft_buffersize = atoi(buffersize);
@@ -976,18 +1002,18 @@ ft_start(void)
 	(void) sprintf(updated_buffersize, "%d", dft_buffersize);
 	XtVaSetValues(buffersize_widget, XtNstring, updated_buffersize, NULL);
 
-	/* Get the host file from its widget */
+	// Get the host file from its widget
 	XtVaGetValues(host_file, XtNstring, &ft_host_filename, NULL);
 	if (!*ft_host_filename)
 		return 0;
-	/* XXX: probably more validation to do here */
+	// XXX: probably more validation to do here
 
-	/* Get the local file from it widget */
+	// Get the local file from it widget
 	XtVaGetValues(local_file, XtNstring,  &ft_local_filename, NULL);
 	if (!*ft_local_filename)
 		return 0;
 
-	/* See if the local file can be overwritten. */
+	// See if the local file can be overwritten.
 	if (receive_flag && !append_flag && !allow_overwrite) {
 		ft_local_file = fopen(ft_local_filename, "r");
 		if (ft_local_file != (FILE *)NULL) {
@@ -998,7 +1024,7 @@ ft_start(void)
 		}
 	}
 
-	/* Open the local file. */
+	// Open the local file.
 	ft_local_file = fopen(ft_local_filename,
 	    receive_flag ?
 		(append_flag ? "a" : "w" ) :
@@ -1009,7 +1035,7 @@ ft_start(void)
 		return 0;
 	}
 
-	/* Build the ind$file command */
+	// Build the ind$file command
 	op[0] = '\0';
 	if (ascii_flag)
 		strcat(op, " ascii");
@@ -1049,7 +1075,7 @@ ft_start(void)
 					    blksize);
 			}
 			if (units != DEFAULT_UNITS) {
-				/* Space Entered, processs it */
+				// Space Entered, processs it
 				switch (units) {
 				    case TRACKS:
 					strcat(op, " tracks");
@@ -1100,18 +1126,18 @@ ft_start(void)
 		}
 	}
 
-	/* Insert the '(' for VM options. */
+	// Insert the '(' for VM options.
 	if (strlen(op) > 0 && vm_flag) {
 		opts[0] = ' ';
 		opts[1] = '(';
 		op = opts;
 	}
 
-	/*
-	 * Unless the user specified a particular file transfer command,
-	 * translate 'ind$file' so that it will have the proper EBCDIC value,
-	 * regardless of the local character set.
-	 */
+	//
+	// Unless the user specified a particular file transfer command,
+	// translate 'ind$file' so that it will have the proper EBCDIC value,
+	// regardless of the local character set.
+	//
 	if (appres.ft_command != CN) {
 		ft_command = appres.ft_command;
 	} else {
@@ -1128,14 +1154,14 @@ ft_start(void)
 		*t = '\0';
 	}
 
-	/* Build the whole command. */
+	// Build the whole command.
 	cmd = xs_buffer("%s %s %s%s\\n",
 	    ft_command,
 	    receive_flag ? "get" : "put", ft_host_filename, op);
 	if (appres.ft_command == CN)
 		Free(ft_command);
 
-	/* Erase the line and enter the command. */
+	// Erase the line and enter the command.
 	flen = kybd_prime();
 	if (!flen || flen < strlen(cmd) - 1) {
 		XtFree(cmd);
@@ -1146,7 +1172,7 @@ ft_start(void)
 	(void) emulate_input(cmd, strlen(cmd), False);
 	XtFree(cmd);
 
-	/* Get this thing started. */
+	// Get this thing started.
 	ft_state = FT_AWAIT_ACK;
 	ft_is_cut = False;
 	ft_last_cr = False;
@@ -1156,25 +1182,26 @@ ft_start(void)
 
 /* "Transfer in Progress" pop-up. */
 
-/* Pop up the "in progress" pop-up. */
+/* Pop up the "in progress" pop-up.
 static void
 popup_progress(void)
 {
-	/* Initialize it. */
+	// Initialize it.
 	if (progress_shell == (Widget)NULL)
 		progress_popup_init();
 
-	/* Pop it up. */
+	// Pop it up.
 	popup_popup(progress_shell, XtGrabNone);
 }
+*/
 
-/* Initialize the "in progress" pop-up. */
+/* Initialize the "in progress" pop-up.
 static void
 progress_popup_init(void)
 {
 	Widget progress_pop, from_label, to_label, cancel_button;
 
-	/* Create the shell. */
+	// Create the shell.
 	progress_shell = XtVaCreatePopupShell(
 	    "ftProgressPopup", transientShellWidgetClass, toplevel,
 	    NULL);
@@ -1183,12 +1210,12 @@ progress_popup_init(void)
 	XtAddCallback(progress_shell, XtNpopupCallback,
 	    progress_popup_callback, (XtPointer)NULL);
 
-	/* Create a form structure to contain the other stuff */
+	// Create a form structure to contain the other stuff
 	progress_pop = XtVaCreateManagedWidget(
 	    ObjDialog, formWidgetClass, progress_shell,
 	    NULL);
 
-	/* Create the widgets. */
+	// Create the widgets.
 	from_label = XtVaCreateManagedWidget(
 	    "fromLabel", labelWidgetClass, progress_pop,
 	    XtNvertDistance, FAR_VGAP,
@@ -1262,10 +1289,11 @@ progress_popup_init(void)
 	XtAddCallback(cancel_button, XtNcallback, progress_cancel_callback,
 	    NULL);
 }
+*/
 
 /* Callbacks for the "in progress" pop-up. */
 
-/* In-progress pop-up popped up. */
+/* In-progress pop-up popped up.
 static void
 progress_popup_callback(Widget w unused, XtPointer client_data unused,
 	XtPointer call_data unused)
@@ -1296,8 +1324,9 @@ progress_popup_callback(Widget w unused, XtPointer client_data unused,
 		break;
 	}
 }
+*/
 
-/* In-progress "cancel" button. */
+/* In-progress "cancel" button.
 static void
 progress_cancel_callback(Widget w unused, XtPointer client_data unused,
 	XtPointer call_data unused)
@@ -1308,26 +1337,28 @@ progress_cancel_callback(Widget w unused, XtPointer client_data unused,
 		XtUnmapWidget(ft_status);
 		XtMapWidget(aborting);
 	} else {
-		/* Impatient user or hung host -- just clean up. */
+		// Impatient user or hung host -- just clean up.
 		ft_complete(get_message("ftUserCancel"));
 	}
 }
+*/
 
 /* "Overwrite existing?" pop-up. */
 
-/* Pop up the "overwrite" pop-up. */
+/* Pop up the "overwrite" pop-up.
 static void
 popup_overwrite(void)
 {
-	/* Initialize it. */
+	// Initialize it.
 	if (overwrite_shell == (Widget)NULL)
 		overwrite_popup_init();
 
-	/* Pop it up. */
+	// Pop it up.
 	popup_popup(overwrite_shell, XtGrabExclusive);
 }
+*/
 
-/* Initialize the "overwrite" pop-up. */
+/* Initialize the "overwrite" pop-up.
 static void
 overwrite_popup_init(void)
 {
@@ -1335,7 +1366,7 @@ overwrite_popup_init(void)
 	String overwrite_string, label, lf;
 	Dimension d;
 
-	/* Create the shell. */
+	// Create the shell.
 	overwrite_shell = XtVaCreatePopupShell(
 	    "ftOverwritePopup", transientShellWidgetClass, toplevel,
 	    NULL);
@@ -1344,12 +1375,12 @@ overwrite_popup_init(void)
 	XtAddCallback(overwrite_shell, XtNpopdownCallback, overwrite_popdown,
 	    (XtPointer)NULL);
 
-	/* Create a form structure to contain the other stuff */
+	// Create a form structure to contain the other stuff
 	overwrite_pop = XtVaCreateManagedWidget(
 	    ObjDialog, formWidgetClass, overwrite_shell,
 	    NULL);
 
-	/* Create the widgets. */
+	// Create the widgets.
 	overwrite_name = XtVaCreateManagedWidget(
 	    "overwriteName", labelWidgetClass, overwrite_pop,
 	    XtNvertDistance, MARGIN,
@@ -1390,8 +1421,9 @@ overwrite_popup_init(void)
 	XtAddCallback(cancel_button, XtNcallback, overwrite_cancel_callback,
 	    NULL);
 }
+*/
 
-/* Overwrite "okay" button. */
+/* Overwrite "okay" button.
 static void
 overwrite_okay_callback(Widget w unused, XtPointer client_data unused,
 	XtPointer call_data unused)
@@ -1404,16 +1436,18 @@ overwrite_okay_callback(Widget w unused, XtPointer client_data unused,
 		popup_progress();
 	}
 }
+*/
 
-/* Overwrite "cancel" button. */
+/* Overwrite "cancel" button.
 static void
 overwrite_cancel_callback(Widget w unused, XtPointer client_data unused,
 	XtPointer call_data unused)
 {
 	XtPopdown(overwrite_shell);
 }
+*/
 
-/* Overwrite pop-up popped down. */
+/* Overwrite pop-up popped down.
 static void
 overwrite_popdown(Widget w unused, XtPointer client_data unused,
 	XtPointer call_data unused)
@@ -1421,7 +1455,8 @@ overwrite_popdown(Widget w unused, XtPointer client_data unused,
 	XtDestroyWidget(overwrite_shell);
 	overwrite_shell = (Widget)NULL;
 }
-#endif /*]*/
+*/
+#endif
 
 /* External entry points called by ft_dft and ft_cut. */
 
@@ -1429,32 +1464,33 @@ overwrite_popdown(Widget w unused, XtPointer client_data unused,
 void
 ft_complete(const char *errmsg)
 {
-	/* Close the local file. */
+/*
+	// Close the local file.
 	if (ft_local_file != (FILE *)NULL && fclose(ft_local_file) < 0)
 		popup_an_errno(errno, "close(%s)", ft_local_filename);
 	ft_local_file = (FILE *)NULL;
 
-	/* Clean up the state. */
+	// Clean up the state.
 	ft_state = FT_NONE;
 
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
-	/* Pop down the in-progress shell. */
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
+	// Pop down the in-progress shell.
 	if (!ft_is_action)
 		XtPopdown(progress_shell);
-#endif /*]*/
+#endif
 
-	/* Pop up the text. */
+	// Pop up the text.
 	if (errmsg != CN) {
 		char *msg_copy = NewString(errmsg);
 
-		/* Make sure the error message will fit on the display. */
+		// Make sure the error message will fit on the display.
 		if (strlen(msg_copy) > 50 && strchr(msg_copy, '\n') == CN) {
 			char *s = msg_copy + 50;
 
 			while (s > msg_copy && *s != ' ')
 				s--;
 			if (s > msg_copy)
-				*s = '\n';	/* yikes! */
+				*s = '\n';	// yikes!
 		}
 		popup_an_error(msg_copy);
 		Free(msg_copy);
@@ -1474,80 +1510,87 @@ ft_complete(const char *errmsg)
 			sms_info("%s", buf);
 			sms_continue();
 		}
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 		else
 			popup_an_info(buf);
-#endif /*]*/
+#endif
 		Free(buf);
 	}
+*/
 }
 
 /* Update the bytes-transferred count on the progress pop-up. */
 void
 ft_update_length(void)
 {
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 	char text_string[80];
 
-	/* Format the message */
+	// Format the message
 	if (!ft_is_action) {
 		sprintf(text_string, status_string, ft_length);
 
 		XtVaSetValues(ft_status, XtNlabel, text_string, NULL);
 	}
-#endif /*]*/
+#endif
 }
 
 /* Process a transfer acknowledgement. */
 void
 ft_running(Boolean is_cut)
 {
+/*
 	if (ft_state == FT_AWAIT_ACK)
 		ft_state = FT_RUNNING;
 	ft_is_cut = is_cut;
 	(void) gettimeofday(&t0, (struct timezone *)NULL);
 	ft_length = 0;
 
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 	if (!ft_is_action) {
 		XtUnmapWidget(waiting);
 		ft_update_length();
 		XtMapWidget(ft_status);
 	}
-#endif /*]*/
+#endif
+*/
 }
 
-/* Process a protocol-generated abort. */
+// Process a protocol-generated abort.
 void
 ft_aborting(void)
 {
+/*
 	if (ft_state == FT_RUNNING || ft_state == FT_ABORT_WAIT) {
 		ft_state = FT_ABORT_SENT;
-#if defined(X3270_DISPLAY) && defined(X3270_MENUS) /*[*/
+#if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 		if (!ft_is_action) {
 			XtUnmapWidget(waiting);
 			XtUnmapWidget(ft_status);
 			XtMapWidget(aborting);
 		}
-#endif /*]*/
+#endif
 	}
+*/
 }
 
-/* Process a disconnect abort. */
+/* Process a disconnect abort.
 static void
 ft_connected(Boolean ignored unused)
 {
 	if (!CONNECTED && ft_state != FT_NONE)
 		ft_complete(get_message("ftDisconnected"));
 }
+*/
 
-/* Process an abort from no longer being in 3270 mode. */
+/* Process an abort from no longer being in 3270 mode.
 static void
 ft_in3270(Boolean ignored unused)
 {
 	if (!IN_3270 && ft_state != FT_NONE)
 		ft_complete(get_message("ftNot3270"));
 }
+*/
 
 /*
  * Script/macro action for file transfer.
@@ -1566,7 +1609,7 @@ ft_in3270(Boolean ignored unused)
  *   Allocation=[default|tracks|cylinders|avblock] default default
  *   PrimarySpace=n		no default
  *   SecondarySpace=n		no default
- */
+ *
 static struct {
 	const char *name;
 	char *value;
@@ -1630,22 +1673,22 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 
 	ft_is_action = True;
 
-	/* Make sure we're connected. */
+	// Make sure we're connected.
 	if (!IN_3270) {
 		popup_an_error("Not connected");
 		return;
 	}
 
-//#if defined(C3270) || defined(WC3270) /*[*/
-//	/* Check for interactive mode. */
+//#if defined(C3270) || defined(WC3270)
+//	// Check for interactive mode.
 //	if (xnparams == 0 && escaped) {
 //	    	if (interactive_transfer(&xparams, &xnparams) < 0) {
 //		    	return;
 //		}
 //	}
-//#endif /*]*/
+//#endif
 
-	/* Set everything to the default. */
+	// Set everything to the default.
 	for (i = 0; i < N_PARMS; i++) {
 		Free(tp[i].value);
 		if (tp[i].keyword[0] != CN)
@@ -1655,7 +1698,7 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 			tp[i].value = CN;
 	}
 
-	/* See what they specified. */
+	// See what they specified.
 	for (j = 0; j < xnparams; j++) {
 		for (i = 0; i < N_PARMS; i++) {
 			char *eq;
@@ -1711,7 +1754,7 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 		}
 	}
 
-	/* Check for required values. */
+	// Check for required values.
 	if (tp[PARM_HOST_FILE].value == CN) {
 		popup_an_error("Missing 'HostFile' option");
 		return;
@@ -1721,10 +1764,10 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 		return;
 	}
 
-	/*
-	 * Start the transfer.  Much of this is duplicated from ft_start()
-	 * and should be made common.
-	 */
+	//
+	// Start the transfer.  Much of this is duplicated from ft_start()
+	// and should be made common.
+	//
 	if (tp[PARM_BUFFER_SIZE].value != CN)
 		dft_buffersize = atoi(tp[PARM_BUFFER_SIZE].value);
 	else
@@ -1762,7 +1805,7 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 	ft_host_filename = tp[PARM_HOST_FILE].value;
 	ft_local_filename = tp[PARM_LOCAL_FILE].value;
 
-	/* See if the local file can be overwritten. */
+	// See if the local file can be overwritten.
 	if (receive_flag && !append_flag && !allow_overwrite) {
 		ft_local_file = fopen(ft_local_filename, "r");
 		if (ft_local_file != (FILE *)NULL) {
@@ -1772,7 +1815,7 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 		}
 	}
 
-	/* Open the local file. */
+	// Open the local file.
 	ft_local_file = fopen(ft_local_filename,
 	    receive_flag ?
 		(append_flag ? "a" : "w" ) :
@@ -1782,7 +1825,7 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 		return;
 	}
 
-	/* Build the ind$file command */
+	// Build the ind$file command
 	op[0] = '\0';
 	if (ascii_flag)
 		strcat(op, " ascii");
@@ -1793,7 +1836,7 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 	if (!receive_flag) {
 		if (!vm_flag) {
 			if (recfm != DEFAULT_RECFM) {
-				/* RECFM Entered, process */
+				// RECFM Entered, process
 				strcat(op, " recfm(");
 				switch (recfm) {
 				    case FIXED:
@@ -1817,7 +1860,7 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 					    tp[PARM_BLKSIZE].value);
 			}
 			if (units != DEFAULT_UNITS) {
-				/* Space Entered, processs it */
+				// Space Entered, processs it
 				switch (units) {
 				    case TRACKS:
 					strcat(op, " tracks");
@@ -1861,18 +1904,18 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 		}
 	}
 
-	/* Insert the '(' for VM options. */
+	// Insert the '(' for VM options.
 	if (strlen(op) > 0 && vm_flag) {
 		opts[0] = ' ';
 		opts[1] = '(';
 		op = opts;
 	}
 
-	/*
-	 * Unless the user specified a particular file transfer command,
-	 * translate 'ind$file' so that it will have the proper EBCDIC value,
-	 * regardless of the local character set.
-	 */
+	//
+	// Unless the user specified a particular file transfer command,
+	// translate 'ind$file' so that it will have the proper EBCDIC value,
+	// regardless of the local character set.
+	//
 	if (appres.ft_command != CN) {
 		ft_command = appres.ft_command;
 	} else {
@@ -1889,14 +1932,14 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 		*t = '\0';
 	}
 
-	/* Build the whole command. */
+	// Build the whole command.
 	cmd = xs_buffer("%s %s %s%s\\n",
 	    ft_command,
 	    receive_flag ? "get" : "put", ft_host_filename, op);
 	if (appres.ft_command == CN)
 		Free(ft_command);
 
-	/* Erase the line and enter the command. */
+	// Erase the line and enter the command.
 	flen = kybd_prime();
 	if (!flen || flen < strlen(cmd) - 1) {
 		Free(cmd);
@@ -1906,9 +1949,10 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 	(void) emulate_input(cmd, strlen(cmd), False);
 	Free(cmd);
 
-	/* Get this thing started. */
+	// Get this thing started.
 	ft_state = FT_AWAIT_ACK;
 	ft_is_cut = False;
 }
+*/
 
-#endif /*]*/
+#endif

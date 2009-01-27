@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como @@FILENAME@@ e possui @@LINES@@ linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -92,6 +92,25 @@
 			#define IN_E		(QueryCstate() >= CONNECTED_INITIAL_E)
 		#endif
 
+		/* File transfer */
+		#define FT_FLAG_RECEIVE					0x0001
+		#define FT_FLAG_ASCII					0x0002
+		#define FT_FLAG_CRLF					0x0004
+		#define FT_FLAG_APPEND					0x0008
+		#define FT_FLAG_TSO						0x0010
+		#define FT_FLAG_REMAP_ASCII				0x0020
+
+		#define FT_RECORD_FORMAT_FIXED			0x0100
+		#define FT_RECORD_FORMAT_VARIABLE		0x0200
+		#define FT_RECORD_FORMAT_UNDEFINED		0x0300
+		#define FT_RECORD_FORMAT_MASK 			FT_RECORD_FORMAT_UNDEFINED
+
+		#define FT_ALLOCATION_UNITS_TRACKS		0x1000
+		#define FT_ALLOCATION_UNITS_CYLINDERS	0x2000
+		#define FT_ALLOCATION_UNITS_AVBLOCK		0x3000
+		#define FT_ALLOCATION_UNITS_MASK		FT_ALLOCATION_UNITS_AVBLOCK
+
+		int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft);
 
 		/* I/O processing */
 		struct lib3270_io_callbacks
