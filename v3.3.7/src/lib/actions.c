@@ -283,7 +283,7 @@ XtActionsRec all_actions[] = {
 	{ "Trace",		Trace_action },
 #endif/*]*/
 #if defined(X3270_FT) /*[*/
-	{ "Transfer",		Transfer_action },
+//	{ "Transfer",		Transfer_action },
 #endif /*]*/
 #if defined(X3270_DISPLAY) /*[*/
 	{ "Unselect",		Unselect_action },
