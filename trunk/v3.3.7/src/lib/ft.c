@@ -104,6 +104,117 @@ Boolean cr_flag = True;					// Add crlf to each line
 Boolean remap_flag = True;				// Remap ASCII<->EBCDIC
 unsigned long ft_length = 0;			// Length of transfer
 
+ #define snconcat(x,s,fmt,...) snprintf(x+strlen(x),s-strlen(x),fmt,__VA_ARGS__)
+
+ int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft)
+ {
+ 	static const char	*rec	= "fvu";
+ 	static const char	*un[]	= { "tracks", "cylinders", "avblock" };
+
+ 	unsigned short	recfm	= (flags & FT_RECORD_FORMAT_MASK) >> 8;
+ 	unsigned short	units	= (flags & FT_ALLOCATION_UNITS_MASK) >> 12;
+
+ 	char 				op[4096];
+ 	char				buffer[4096];
+
+	unsigned int		flen;
+
+	if(ft_local_file)
+		return EBUSY;
+
+	// Check remote file
+	if(!*remote)
+	{
+		Trace("Invalid host file: \"%s\"",remote);
+		return EINVAL;
+	}
+
+	// Open local file
+	ft_local_file = fopen(local,(flags & FT_FLAG_RECEIVE) ? ((flags & FT_FLAG_APPEND) ? "a" : "w") : "r");
+
+	if(!ft_local_file)
+		return errno;
+
+	Log("%s file \"%s\"",(flags & FT_FLAG_RECEIVE) ? "Receiving" : "Sending", local);
+
+ 	/* Build the ind$file command */
+ 	snprintf(op,4095,"%s%s%s",
+						(flags & FT_FLAG_ASCII) 	? " ascii"	: "",
+						(flags & FT_FLAG_CRLF) 		? " crlf"	: "",
+						(flags & FT_FLAG_APPEND)	? " append"	: ""
+			);
+
+	if(!(flags & FT_FLAG_RECEIVE))
+	{
+		if(flags & FT_FLAG_TSO)
+		{
+			// TSO Host
+			if(recfm > 0)
+			{
+				snconcat(op,4096," recfm(%c)",rec[recfm-1]);
+
+				if(lrecl > 0)
+					snconcat(op,4096," lrecl(%d)",lrecl);
+
+				if(blksize > 0)
+					snconcat(op,4096," blksize(%d)", blksize);
+			}
+
+			if(units > 0)
+			{
+				snconcat(op,4096," %s",un[units-1]);
+
+				if(primspace > 0)
+				{
+					snconcat(op,4096," space(%d",primspace);
+					if(secspace)
+						snconcat(op,4096,",%d",secspace);
+					snconcat(op,4096,"%s",")");
+				}
+			}
+		}
+		else
+		{
+			// VM Host
+			if(recfm > 0)
+			{
+				snconcat(op,4096," recfm %c",rec[recfm-1]);
+
+				if(lrecl > 0)
+					snconcat(op,4096," lrecl %d",lrecl);
+
+			}
+		}
+	}
+
+	snprintf(buffer,4095,"%s %s %s",	"ind$file",
+										(flags & FT_FLAG_RECEIVE) ? "get" : "put",
+										remote );
+
+	if(*op)
+	{
+		if(flags & FT_FLAG_TSO)
+			snconcat(buffer,4095," %s",op+1);
+		else
+			snconcat(buffer,4095," (%s)",op+1);
+	}
+
+	// Erase the line and enter the command.
+	flen = kybd_prime();
+	if (!flen || flen < strlen(buffer) - 1)
+	{
+		Log("Unable to send command \"%s\"",buffer);
+		fclose(ft_local_file);
+		ft_local_file = NULL;
+		return -1;
+	}
+
+	(void) emulate_input(buffer, strlen(buffer), False);
+
+ 	return 0;
+ }
+
+
 /* Statics.
 #if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 static Widget ft_dialog, ft_shell, local_file, host_file;
@@ -978,7 +1089,7 @@ toggle_vm(Widget w unused, XtPointer client_data unused,
 /*
  * Begin the transfer.
  * Returns 1 if the transfer has started, 0 otherwise.
- */
+ *
 static int
 ft_start(void)
 {
@@ -1046,7 +1157,7 @@ ft_start(void)
 	if (!receive_flag) {
 		if (!vm_flag) {
 			if (recfm != DEFAULT_RECFM) {
-				/* RECFM Entered, process */
+				// RECFM Entered, process
 				strcat(op, " recfm(");
 				switch (recfm) {
 				    case FIXED:
@@ -1180,9 +1291,9 @@ ft_start(void)
 	return 1;
 }
 
-/* "Transfer in Progress" pop-up. */
+// "Transfer in Progress" pop-up.
 
-/* Pop up the "in progress" pop-up.
+// Pop up the "in progress" pop-up.
 static void
 popup_progress(void)
 {
@@ -1464,6 +1575,8 @@ overwrite_popdown(Widget w unused, XtPointer client_data unused,
 void
 ft_complete(const char *errmsg)
 {
+	Log("%s \"%s\"",__FUNCTION__,errmsg);
+
 /*
 	// Close the local file.
 	if (ft_local_file != (FILE *)NULL && fclose(ft_local_file) < 0)
@@ -1523,6 +1636,9 @@ ft_complete(const char *errmsg)
 void
 ft_update_length(void)
 {
+	Log("%s ",__FUNCTION__);
+
+/*
 #if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 	char text_string[80];
 
@@ -1533,12 +1649,16 @@ ft_update_length(void)
 		XtVaSetValues(ft_status, XtNlabel, text_string, NULL);
 	}
 #endif
+*/
+
 }
 
 /* Process a transfer acknowledgement. */
 void
 ft_running(Boolean is_cut)
 {
+	Log("%s ",__FUNCTION__);
+
 /*
 	if (ft_state == FT_AWAIT_ACK)
 		ft_state = FT_RUNNING;
@@ -1560,6 +1680,7 @@ ft_running(Boolean is_cut)
 void
 ft_aborting(void)
 {
+	Log("%s ",__FUNCTION__);
 /*
 	if (ft_state == FT_RUNNING || ft_state == FT_ABORT_WAIT) {
 		ft_state = FT_ABORT_SENT;
