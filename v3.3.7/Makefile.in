@@ -64,7 +64,7 @@ DLLFLAGS = @EXTRA_FLAGS@ -shared $(@host_os@-dllflags)
 windows-srcs = 			resources.rc
 G3270_SRCS =			g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
 						clipboard.c print.c config.c colors.c keypad.c plugin.c filetransfer.c \
-						$(@host_os@-srcs)
+						version.c $(@host_os@-srcs)
 
 windows-libsrcs = 		w3misc.c winvers.c windirs.c
 linux-gnu-libsrcs =

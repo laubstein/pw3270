@@ -127,7 +127,7 @@ BuildDebug() {
 	PREFIX=$HOME/bin/g3270
 
 	rm -fr $PREFIX
-	./configure --enable-plugins --prefix=$PREFIX
+	./configure --enable-plugins --release="Debug" --prefix=$PREFIX
 
 	make clean
 	make Debug

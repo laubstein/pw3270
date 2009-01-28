@@ -257,6 +257,7 @@ AC_SUBST(libdir)
 AC_OUTPUT(Makefile)
 AC_OUTPUT(g3270.spec)
 AC_OUTPUT(g3270.pc)
+AC_OUTPUT(src/g3270/version.c)
 
 if test "$g3270_cv_rexx" == "yes"; then
 	AC_OUTPUT(src/plugins/rexx/Makefile)
