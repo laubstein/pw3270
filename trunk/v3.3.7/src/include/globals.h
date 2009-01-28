@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como @@FILENAME@@ e possui @@LINES@@ linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -276,16 +276,20 @@ extern struct trans_list *trans_list;
 // enum keytype { KT_STD, KT_GE };
 
 /*   state changes */
-#define ST_RESOLVING	1
-#define ST_HALF_CONNECT	2
-#define ST_CONNECT	3
-#define ST_3270_MODE	4
-#define ST_LINE_MODE	5
-#define ST_REMODEL	6
-#define ST_PRINTER	7
-#define ST_EXITING	8
-#define ST_CHARSET	9
-#define N_ST		10
+enum state_change
+{
+	ST_RESOLVING,
+	ST_HALF_CONNECT,
+	ST_CONNECT,
+	ST_3270_MODE,
+	ST_LINE_MODE,
+	ST_REMODEL,
+	ST_PRINTER,
+	ST_EXITING,
+	ST_CHARSET,
+
+	N_ST				// Always the last one
+};
 
 /* Naming convention for private actions. */
 #define PA_PFX	"PA-"
