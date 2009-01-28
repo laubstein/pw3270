@@ -5,6 +5,7 @@ svn update
 NAME=SisBB
 ICON=sisbb/sisbb98.ico
 LOGO=sisbb/sisbb98.jpg
+RELEASE=3
 
 BuildWin() {
 	#
@@ -15,7 +16,7 @@ BuildWin() {
 	make clean
 
 	ln -sf /usr/i386-mingw32/GTK-Runtime .
-	./win32.sh --gtkroot="GTK-Runtime" --locale="locale" --name=$NAME --icon=$ICON --logo=$LOGO
+	./win32.sh --gtkroot="GTK-Runtime" --locale="locale" --release=$RELEASE --name=$NAME --icon=$ICON --logo=$LOGO
 	if [ "$?" != "0" ]; then
 		exit -1
 	fi
@@ -54,12 +55,11 @@ BuildRPM() {
 	echo -e "\e]2;Building Linux RPM\a"
 
 	autoconf
-	./configure
+	./configure --with-release=$RELEASE
 
 	RPMDIR=`rpm --eval="%{u2p:%{_rpmdir}}"`
 	RPMARCH=`rpm --eval="%{u2p:%{_target_cpu}}"`
 	VENDOR=`rpm --eval="%{u2p:%{_vendor}}"`
-	RELEASE=`grep Release g3270.spec | sed 's/ //g' |cut -d: -f2 |cut -d. -f1`
 
 	mkdir -p $RPMDIR
 	mkdir -p $RPMARCH

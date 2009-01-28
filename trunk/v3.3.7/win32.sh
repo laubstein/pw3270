@@ -2,6 +2,7 @@
 
 name=g3270
 version=3.3.7p5
+release=`date +%y%m%d`
 locale="locale"
 PLUGIN=plugins
 gtkroot="GTK2-Runtime"
@@ -35,6 +36,7 @@ fi
 
 TEMPFILE=`mktemp`
 echo "s&@PACKAGE_NAME@&$name&g;" > $TEMPFILE
+echo "s&@PACKAGE_RELEASE@&$release&g;" > $TEMPFILE
 echo "s&@PACKAGE@&$name&g;" >> $TEMPFILE
 echo "s&@CC@&$CC&g;" >> $TEMPFILE
 echo "s&@PACKAGE_VERSION@&$version&g;" >> $TEMPFILE

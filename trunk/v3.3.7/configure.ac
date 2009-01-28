@@ -152,6 +152,14 @@ AC_ARG_WITH([logo],
 	g3270_cv_logo="image/default.ico"
 ])
 
+AC_ARG_WITH([release],
+	[AS_HELP_STRING([--with-release], [set program release])],
+[
+	g3270_cv_release="$withval"
+],[
+	g3270_cv_release="`date +%y%m%d`"
+])
+
 
 # Checks for libraries.
 PKG_CHECK_EXISTS
@@ -225,6 +233,7 @@ AC_DEFINE([X3270_FT])
 AC_DEFINE([X3270_LOCAL_PROCESS])
 AC_DEFINE([X3270_PRINTER])
 
+AC_SUBST(PACKAGE_RELEASE,$g3270_cv_release)
 AC_SUBST(ICONFILE,$g3270_cv_icon)
 AC_SUBST(LOGOFILE,$g3270_cv_logo)
 
