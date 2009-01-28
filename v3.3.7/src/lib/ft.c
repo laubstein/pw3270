@@ -31,6 +31,7 @@
  */
 
 #include <lib3270/config.h>
+#include <lib3270/api.h>
 #include "globals.h"
 
 #if defined(X3270_FT)
@@ -105,7 +106,22 @@ Boolean remap_flag = True;				// Remap ASCII<->EBCDIC
 unsigned long ft_length = 0;			// Length of transfer
 static Boolean ft_is_cut;				// File transfer is CUT-style
 
- #define snconcat(x,s,fmt,...) snprintf(x+strlen(x),s-strlen(x),fmt,__VA_ARGS__)
+static struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to main application
+
+#define snconcat(x,s,fmt,...) snprintf(x+strlen(x),s-strlen(x),fmt,__VA_ARGS__)
+#define set_ft_state(x) ft_state = x
+
+/*---[ Implement ]-------------------------------------------------------------------------------------------------------*/
+
+ int RegisterFTCallbacks(struct filetransfer_callbacks *cbk)
+ {
+ 	if(!(cbk && cbk->sz == sizeof(struct filetransfer_callbacks)) )
+		return EINVAL;
+
+	callbacks = cbk;
+
+	return 0;
+ }
 
  int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft)
  {
@@ -225,9 +241,13 @@ static Boolean ft_is_cut;				// File transfer is CUT-style
 	(void) emulate_input(buffer, strlen(buffer), False);
 
 	// Get this thing started.
-	ft_state = FT_AWAIT_ACK;
+	set_ft_state(FT_AWAIT_ACK);
+
 	ft_last_cr = False;
 	ft_is_cut = False;
+
+	if(callbacks && callbacks->begin)
+		callbacks->begin(flags,local,remote);
 
  	return 0;
  }
@@ -1301,7 +1321,7 @@ ft_start(void)
 	XtFree(cmd);
 
 	// Get this thing started.
-	ft_state = FT_AWAIT_ACK;
+	set_ft_state(FT_AWAIT_ACK);
 	ft_is_cut = False;
 	ft_last_cr = False;
 
@@ -1460,7 +1480,7 @@ progress_cancel_callback(Widget w unused, XtPointer client_data unused,
 	XtPointer call_data unused)
 {
 	if (ft_state == FT_RUNNING) {
-		ft_state = FT_ABORT_WAIT;
+		set_ft_state(FT_ABORT_WAIT);
 		XtUnmapWidget(waiting);
 		XtUnmapWidget(ft_status);
 		XtMapWidget(aborting);
@@ -1594,6 +1614,7 @@ ft_complete(const char *errmsg)
 {
 	Trace("%s",__FUNCTION__);
 
+	// Close the local file.
 	if(ft_local_file)
 	{
 		fclose(ft_local_file);
@@ -1604,17 +1625,13 @@ ft_complete(const char *errmsg)
 		Log("Unexpected call do %s(): ft_local_file is NULL",__FUNCTION__);
 	}
 
-	ft_state = FT_NONE;
+	// Clean up the state.
+	set_ft_state(FT_NONE);
+
+	if(callbacks && callbacks->complete)
+		callbacks->complete(errmsg);
 
 /*
-	// Close the local file.
-	if (ft_local_file != (FILE *)NULL && fclose(ft_local_file) < 0)
-		popup_an_errno(errno, "close(%s)", ft_local_filename);
-	ft_local_file = (FILE *)NULL;
-
-	// Clean up the state.
-	ft_state = FT_NONE;
-
 #if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 	// Pop down the in-progress shell.
 	if (!ft_is_action)
@@ -1667,6 +1684,9 @@ ft_update_length(void)
 {
 	Trace("%s",__FUNCTION__);
 
+	if(callbacks && callbacks->update)
+		callbacks->update(ft_length);
+
 /*
 #if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 	char text_string[80];
@@ -1689,17 +1709,16 @@ ft_running(Boolean is_cut)
 	Trace("%s",__FUNCTION__);
 
 	ft_is_cut = is_cut;
+	ft_length = 0;
 
 	if (ft_state == FT_AWAIT_ACK)
-		ft_state = FT_RUNNING;
+		set_ft_state(FT_RUNNING);
+
+	if(callbacks && callbacks->running)
+		callbacks->running(is_cut);
 
 /*
-
-	if (ft_state == FT_AWAIT_ACK)
-		ft_state = FT_RUNNING;
-	ft_is_cut = is_cut;
 	(void) gettimeofday(&t0, (struct timezone *)NULL);
-	ft_length = 0;
 
 #if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 	if (!ft_is_action) {
@@ -1718,7 +1737,11 @@ ft_aborting(void)
 	Trace("%s",__FUNCTION__);
 
 	if (ft_state == FT_RUNNING || ft_state == FT_ABORT_WAIT)
-		ft_state = FT_ABORT_SENT;
+		set_ft_state(FT_ABORT_SENT);
+
+	if(callbacks && callbacks->aborting)
+		callbacks->aborting();
+
 /*
 #if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 		if (!ft_is_action) {
@@ -2107,7 +2130,7 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 	Free(cmd);
 
 	// Get this thing started.
-	ft_state = FT_AWAIT_ACK;
+	set_ft_state(FT_AWAIT_ACK);
 	ft_is_cut = False;
 }
 */

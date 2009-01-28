@@ -112,6 +112,20 @@
 
 		int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft);
 
+		struct filetransfer_callbacks
+		{
+			unsigned short sz;
+
+			void (*begin)(unsigned short flags, const char *local, const char *remote);
+			void (*complete)(const char *errmsg);
+			void (*update)(unsigned long length);
+			void (*running)(int is_cut);
+			void (*aborting)(void);
+
+		};
+
+		int RegisterFTCallbacks(struct filetransfer_callbacks *cbk);
+
 		/* I/O processing */
 		struct lib3270_io_callbacks
 		{
