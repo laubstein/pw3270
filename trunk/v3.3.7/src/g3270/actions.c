@@ -1440,6 +1440,7 @@
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox),topbox);
 	gtk_widget_show_all(dialog);
 	rc = gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_hide(dialog);
 
 	if(rc == GTK_RESPONSE_ACCEPT)
 	{
@@ -1478,6 +1479,25 @@
 									info.value[3],
 									info.value[4]
 								);
+
+		Trace("BeginFileTransfer(%s): %d",gtk_entry_get_text(GTK_ENTRY(info.file[0])),rc);
+
+		if(rc)
+		{
+			// Can't transfer file, notify user
+			widget =  gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+												GTK_DIALOG_DESTROY_WITH_PARENT,
+												GTK_MESSAGE_ERROR,
+												GTK_BUTTONS_CLOSE,
+												receive ? _( "Can't receive \"%s\"" ) : _( "Can't send \"%s\"" ),
+												gtk_entry_get_text(GTK_ENTRY(info.file[0]))
+											);
+
+			gtk_window_set_title(GTK_WINDOW(widget),_( "File transfer failed" ) );
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(widget),"%s (rc=%d)",rc < 0 ? "Unexpected" : g_strerror(rc),rc);
+			gtk_dialog_run(GTK_DIALOG(widget));
+			gtk_widget_destroy(widget);
+		}
 
 	}
 	else

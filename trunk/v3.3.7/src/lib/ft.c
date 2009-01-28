@@ -103,6 +103,7 @@ Boolean ascii_flag = True;				// Convert to ascii
 Boolean cr_flag = True;					// Add crlf to each line
 Boolean remap_flag = True;				// Remap ASCII<->EBCDIC
 unsigned long ft_length = 0;			// Length of transfer
+static Boolean ft_is_cut;				// File transfer is CUT-style
 
  #define snconcat(x,s,fmt,...) snprintf(x+strlen(x),s-strlen(x),fmt,__VA_ARGS__)
 
@@ -118,6 +119,8 @@ unsigned long ft_length = 0;			// Length of transfer
  	char				buffer[4096];
 
 	unsigned int		flen;
+
+	Trace("%s(%s)",__FUNCTION__,local);
 
 	if(ft_local_file)
 		return EBUSY;
@@ -135,13 +138,21 @@ unsigned long ft_length = 0;			// Length of transfer
 	if(!ft_local_file)
 		return errno;
 
+	// Set options
+	dft_buffersize = dft;
+	set_dft_buffersize();
+
+	ascii_flag = ((flags & FT_FLAG_ASCII) != 0);
+	cr_flag = ((flags & FT_FLAG_CRLF) != 0);
+	remap_flag = ((flags & FT_FLAG_REMAP_ASCII) != 0);
+
 	Log("%s file \"%s\"",(flags & FT_FLAG_RECEIVE) ? "Receiving" : "Sending", local);
 
  	/* Build the ind$file command */
  	snprintf(op,4095,"%s%s%s",
-						(flags & FT_FLAG_ASCII) 	? " ascii"	: "",
-						(flags & FT_FLAG_CRLF) 		? " crlf"	: "",
-						(flags & FT_FLAG_APPEND)	? " append"	: ""
+						(flags & FT_FLAG_ASCII) 	? " ASCII"	: "",
+						(flags & FT_FLAG_CRLF) 		? " CRLF"	: "",
+						(flags & FT_FLAG_APPEND)	? " APPEND"	: ""
 			);
 
 	if(!(flags & FT_FLAG_RECEIVE))
@@ -187,8 +198,8 @@ unsigned long ft_length = 0;			// Length of transfer
 		}
 	}
 
-	snprintf(buffer,4095,"%s %s %s",	"ind$file",
-										(flags & FT_FLAG_RECEIVE) ? "get" : "put",
+	snprintf(buffer,4095,"%s %s %s",	"IND$FILE",
+										(flags & FT_FLAG_RECEIVE) ? "GET" : "PUT",
 										remote );
 
 	if(*op)
@@ -198,6 +209,8 @@ unsigned long ft_length = 0;			// Length of transfer
 		else
 			snconcat(buffer,4095," (%s)",op+1);
 	}
+
+	snconcat(buffer,4095,"%s","\n");
 
 	// Erase the line and enter the command.
 	flen = kybd_prime();
@@ -210,6 +223,11 @@ unsigned long ft_length = 0;			// Length of transfer
 	}
 
 	(void) emulate_input(buffer, strlen(buffer), False);
+
+	// Get this thing started.
+	ft_state = FT_AWAIT_ACK;
+	ft_last_cr = False;
+	ft_is_cut = False;
 
  	return 0;
  }
@@ -283,7 +301,6 @@ static Widget ft_status, waiting, aborting;
 static String status_string;
 #endif
 static struct timeval t0;		// Starting time
-static Boolean ft_is_cut;		// File transfer is CUT-style
 
 #if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 static Widget overwrite_shell;
@@ -1575,7 +1592,19 @@ overwrite_popdown(Widget w unused, XtPointer client_data unused,
 void
 ft_complete(const char *errmsg)
 {
-	Log("%s \"%s\"",__FUNCTION__,errmsg);
+	Trace("%s",__FUNCTION__);
+
+	if(ft_local_file)
+	{
+		fclose(ft_local_file);
+		ft_local_file = NULL;
+	}
+	else
+	{
+		Log("Unexpected call do %s(): ft_local_file is NULL",__FUNCTION__);
+	}
+
+	ft_state = FT_NONE;
 
 /*
 	// Close the local file.
@@ -1636,7 +1665,7 @@ ft_complete(const char *errmsg)
 void
 ft_update_length(void)
 {
-	Log("%s ",__FUNCTION__);
+	Trace("%s",__FUNCTION__);
 
 /*
 #if defined(X3270_DISPLAY) && defined(X3270_MENUS)
@@ -1657,9 +1686,15 @@ ft_update_length(void)
 void
 ft_running(Boolean is_cut)
 {
-	Log("%s ",__FUNCTION__);
+	Trace("%s",__FUNCTION__);
+
+	ft_is_cut = is_cut;
+
+	if (ft_state == FT_AWAIT_ACK)
+		ft_state = FT_RUNNING;
 
 /*
+
 	if (ft_state == FT_AWAIT_ACK)
 		ft_state = FT_RUNNING;
 	ft_is_cut = is_cut;
@@ -1680,10 +1715,11 @@ ft_running(Boolean is_cut)
 void
 ft_aborting(void)
 {
-	Log("%s ",__FUNCTION__);
-/*
-	if (ft_state == FT_RUNNING || ft_state == FT_ABORT_WAIT) {
+	Trace("%s",__FUNCTION__);
+
+	if (ft_state == FT_RUNNING || ft_state == FT_ABORT_WAIT)
 		ft_state = FT_ABORT_SENT;
+/*
 #if defined(X3270_DISPLAY) && defined(X3270_MENUS)
 		if (!ft_is_action) {
 			XtUnmapWidget(waiting);
