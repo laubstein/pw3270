@@ -30,25 +30,11 @@
  *
  */
 
- #include <gdk/gdk.h>
- #include <gdk/gdkkeysyms.h>
- #include <errno.h>
-
  #include <lib3270/config.h>
- #include <globals.h>
+ #include <string.h>
+ #include <stdlib.h>
 
  #include "g3270.h"
- #include <lib3270/kybdc.h>
- #include <lib3270/actionsc.h>
- #include <lib3270/toggle.h>
- #include <lib3270/hostc.h>
- #include <lib3270/plugins.h>
-
- #ifndef GDK_NUMLOCK_MASK
-	#define GDK_NUMLOCK_MASK GDK_MOD2_MASK
- #endif
-
-/*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -65,6 +51,41 @@
 	int					value[5];
  };
 
+/**
+ * Open file tranfer status dialog.
+ *
+ */
+
+/*
+http://www.suggestsoft.com/images/medieval-software/medieval-bluetooth-obex-file-transfer.gif
+
+--Informations----------------------------------------
+|
+| From: xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.
+|
+| To:   xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.
+------------------------------------------------------
+
+--Progress----------------------------------------------
+|
+| Total: xxx.xxx.xxx bytes	Current: xxx.xxx.xxx bytes
+|
+| Started: xx:xx:xx			ETA: xx:xx:xx
+|
+| xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+--------------------------------------------------------
+
+												[Cancel]
+*/
+
+
+/**
+ * File selection dialog.
+ *
+ * @param button
+ * @param info		Current file-transfer dialog info.
+ *
+ */
  static void browse_file(GtkButton *button,struct ftdialog *info)
  {
  	gchar		*ptr;
