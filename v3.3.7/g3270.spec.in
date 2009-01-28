@@ -4,7 +4,7 @@ Name:           @PACKAGE@
 License:        GPL
 Group:          System/X11/Terminals
 Version:        @PACKAGE_VERSION@
-Release:        3.%_vendor
+Release:        @PACKAGE_RELEASE@.%_vendor
 Summary:        IBM 3270 Terminal emulator for gtk.
 Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -50,7 +50,7 @@ Plugin to add Rexx support in %{name}
 
 %setup -q -n %{name}-%{version}
 autoconf
-%configure --disable-trace
+%configure --disable-trace --with-release=%{release}
 
 %build
 make clean
