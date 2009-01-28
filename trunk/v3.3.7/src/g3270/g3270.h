@@ -259,7 +259,8 @@
 	void			action_PasteSelection(void);
 	void 			action_PasteNext(void);
 	void 			action_PasteTextFile(void);
-
+	void 			action_Download(void);
+	void 			action_Upload(void);
 
 	int 			LoadColors(void);
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
