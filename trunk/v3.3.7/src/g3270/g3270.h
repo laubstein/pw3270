@@ -162,6 +162,10 @@
 
 	#define PopupAWarning(fmt, ...)	PopupAnError(fmt,__VA_ARGS__)
 
+ 	extern const gchar *program_name;
+ 	extern const gchar *program_version;
+ 	extern const gchar *program_release;
+ 	extern const gchar *program_fullversion;
 
 	extern GtkWidget				*topwindow;
 	extern GtkWidget				*keypad;

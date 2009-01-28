@@ -36,7 +36,7 @@ fi
 
 TEMPFILE=`mktemp`
 echo "s&@PACKAGE_NAME@&$name&g;" > $TEMPFILE
-echo "s&@PACKAGE_RELEASE@&$release&g;" > $TEMPFILE
+echo "s&@PACKAGE_RELEASE@&$release&g;" >> $TEMPFILE
 echo "s&@PACKAGE@&$name&g;" >> $TEMPFILE
 echo "s&@CC@&$CC&g;" >> $TEMPFILE
 echo "s&@PACKAGE_VERSION@&$version&g;" >> $TEMPFILE
@@ -115,6 +115,12 @@ if [ "$?" != "0" ]; then
 fi
 
 sed --file=$TEMPFILE src/plugins/rexx/Makefile.in > src/plugins/rexx/Makefile
+if [ "$?" != "0" ]; then
+	exit -1
+fi
+
+
+sed --file=$TEMPFILE src/g3270/version.c.in > src/g3270/version.c
 if [ "$?" != "0" ]; then
 	exit -1
 fi
