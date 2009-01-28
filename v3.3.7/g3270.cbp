@@ -53,6 +53,9 @@
 		<Unit filename="src/g3270/config.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/g3270/filetransfer.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/g3270/g3270.c">
 			<Option compilerVar="CC" />
 		</Unit>
