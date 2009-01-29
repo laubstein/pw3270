@@ -113,6 +113,11 @@ static struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to main ap
 
 /*---[ Implement ]-------------------------------------------------------------------------------------------------------*/
 
+ enum ft_state	QueryFTstate(void)
+ {
+ 	return ft_state;
+ }
+
  int RegisterFTCallbacks(struct filetransfer_callbacks *cbk)
  {
  	if(!(cbk && cbk->sz == sizeof(struct filetransfer_callbacks)) )

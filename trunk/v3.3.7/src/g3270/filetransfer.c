@@ -61,22 +61,33 @@ http://www.suggestsoft.com/images/medieval-software/medieval-bluetooth-obex-file
 
 --Informations----------------------------------------
 |
-| From: xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.
+| From:		xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx
 |
-| To:   xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.
+| To:		xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx
+|
+| Status:	xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx
 ------------------------------------------------------
 
 --Progress----------------------------------------------
 |
-| Total: xxx.xxx.xxx bytes	Current: xxx.xxx.xxx bytes
+| Total: 	xxx.xxx.xxx bytes	Current:	xxx.xxx.xxx bytes
 |
-| Started: xx:xx:xx			ETA: xx:xx:xx
+| Started:	xx:xx:xx			ETA: 		xx:xx:xx
 |
-| xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+| xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 --------------------------------------------------------
 
 												[Cancel]
 */
+
+/**
+ * Register file transfer callbacks
+ *
+ */
+ int initft(void)
+ {
+ 	return 0;
+ }
 
 
 /**
