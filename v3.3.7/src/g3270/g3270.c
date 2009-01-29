@@ -317,6 +317,11 @@ static int g3270_init(int *argc, char ***argv)
 		return -1;
 	}
 
+#ifdef X3270_FT
+	if(initft())
+		return -1;
+#endif
+
 	Trace("%s completed!",__FUNCTION__);
 	return 0;
 }

@@ -78,20 +78,6 @@
 			CONNECTED_TN3270E		/**< connected in TN3270E mode, 3270 mode */
 		};
 
-		enum cstate QueryCstate(void);
-
-		#ifndef LIB3270
-			#define PCONNECTED	((int) QueryCstate() >= (int)RESOLVING)
-			#define HALF_CONNECTED	(QueryCstate() == RESOLVING || QueryCstate() == PENDING)
-			#define CONNECTED	((int) QueryCstate() >= (int)CONNECTED_INITIAL)
-			#define IN_NEITHER	(QueryCstate() == CONNECTED_INITIAL)
-			#define IN_ANSI		(QueryCstate() == CONNECTED_ANSI || QueryCstate() == CONNECTED_NVT)
-			#define IN_3270		(QueryCstate() == CONNECTED_3270 || QueryCstate() == CONNECTED_TN3270E || QueryCstate() == CONNECTED_SSCP)
-			#define IN_SSCP		(QueryCstate() == CONNECTED_SSCP)
-			#define IN_TN3270E	(QueryCstate() == CONNECTED_TN3270E)
-			#define IN_E		(QueryCstate() >= CONNECTED_INITIAL_E)
-		#endif
-
 		/* File transfer */
 		#define FT_FLAG_RECEIVE					0x0001
 		#define FT_FLAG_ASCII					0x0002
@@ -110,6 +96,15 @@
 		#define FT_ALLOCATION_UNITS_AVBLOCK		0x3000
 		#define FT_ALLOCATION_UNITS_MASK		FT_ALLOCATION_UNITS_AVBLOCK
 
+		enum ft_state
+		{
+			FT_NONE,		/**< No transfer in progress */
+			FT_AWAIT_ACK,	/**< IND$FILE sent, awaiting acknowledgement message */
+			FT_RUNNING,		/**< Ack received, data flowing */
+			FT_ABORT_WAIT,	/**< Awaiting chance to send an abort */
+			FT_ABORT_SENT	/**< Abort sent; awaiting response */
+		};
+
 		int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft);
 
 		struct filetransfer_callbacks
@@ -125,6 +120,28 @@
 		};
 
 		int RegisterFTCallbacks(struct filetransfer_callbacks *cbk);
+
+		/* Library internals */
+		#ifdef LIB3270
+
+			extern enum ft_state ft_state;
+
+		#else
+
+			enum cstate 	QueryCstate(void);
+			enum ft_state	QueryFTstate(void);
+
+			#define PCONNECTED	((int) QueryCstate() >= (int)RESOLVING)
+			#define HALF_CONNECTED	(QueryCstate() == RESOLVING || QueryCstate() == PENDING)
+			#define CONNECTED	((int) QueryCstate() >= (int)CONNECTED_INITIAL)
+			#define IN_NEITHER	(QueryCstate() == CONNECTED_INITIAL)
+			#define IN_ANSI		(QueryCstate() == CONNECTED_ANSI || QueryCstate() == CONNECTED_NVT)
+			#define IN_3270		(QueryCstate() == CONNECTED_3270 || QueryCstate() == CONNECTED_TN3270E || QueryCstate() == CONNECTED_SSCP)
+			#define IN_SSCP		(QueryCstate() == CONNECTED_SSCP)
+			#define IN_TN3270E	(QueryCstate() == CONNECTED_TN3270E)
+			#define IN_E		(QueryCstate() >= CONNECTED_INITIAL_E)
+
+		#endif
 
 		/* I/O processing */
 		struct lib3270_io_callbacks

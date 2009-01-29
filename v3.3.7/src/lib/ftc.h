@@ -25,22 +25,17 @@ extern Boolean cr_flag;
 extern unsigned long ft_length;
 extern FILE *ft_local_file;
 extern char *ft_local_filename;
-enum ft_state {
-	FT_NONE,	/* No transfer in progress */
-	FT_AWAIT_ACK,	/* IND$FILE sent, awaiting acknowledgement message */
-	FT_RUNNING,	/* Ack received, data flowing */
-	FT_ABORT_WAIT,	/* Awaiting chance to send an abort */
-	FT_ABORT_SENT	/* Abort sent; awaiting response */
-	};
+
 extern Boolean ft_last_cr;
-extern enum ft_state ft_state;
 extern Boolean remap_flag;
 
 extern void ft_aborting(void);
 extern void ft_complete(const char *errmsg);
-extern void ft_init(void);
+// extern void ft_init(void);
 extern void ft_running(Boolean is_cut);
 extern void ft_update_length(void);
+
+/*
 extern void PA_dialog_focus_action(Widget w, XEvent *event, String *parms,
     Cardinal *num_parms);
 extern void PA_dialog_next_action(Widget w, XEvent *event, String *parms,
@@ -48,9 +43,6 @@ extern void PA_dialog_next_action(Widget w, XEvent *event, String *parms,
 extern void popup_ft(Widget w, XtPointer call_parms, XtPointer call_data);
 extern void Transfer_action(Widget w, XEvent *event, String *parms,
     Cardinal *num_parms);
-
-#if !defined(X3270_MENUS) /*[*/
-extern void ft_init(void);
-#endif /*]*/
+*/
 
 #endif /*]*/

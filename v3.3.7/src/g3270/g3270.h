@@ -227,6 +227,11 @@
 	void 		SetStatusCode(STATUS_CODE id);
 	void 		SetTerminalFont(const gchar *fontname);
 	void 		RedrawCursor(void);
+
+#ifdef X3270_FT
+	int 		initft(void);
+#endif
+
 	gboolean	PFKey(int key);
 	void 		DrawCursorPosition(void);
 
