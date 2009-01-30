@@ -203,6 +203,7 @@
 	#define selection_actions	action_group[ACTION_GROUP_SELECTION]
 	#define clipboard_actions	action_group[ACTION_GROUP_CLIPBOARD]
 	#define paste_actions		action_group[ACTION_GROUP_PASTE]
+	#define ft_actions			action_group[ACTION_GROUP_FT]
 
 	extern const struct lib3270_io_callbacks g3270_io_callbacks;
 	extern const struct lib3270_screen_callbacks g3270_screen_callbacks;

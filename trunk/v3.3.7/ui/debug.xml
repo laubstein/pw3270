@@ -1,14 +1,16 @@
 <ui>
 	<menubar name='MainMenubar'>
 
-		<menu action='SettingsMenu'>
-			<menu action='OptionsMenu'>
+		<menu action='FileMenu' >
+			<menu action='SendReceive'>
+				<menuitem action='Download'/>
+				<menuitem action='Upload'/>
 			</menu>
 		</menu>
 
-		<menu action='FTMenu'>
-			<menuitem action='Download'/>
-			<menuitem action='Upload'/>
+		<menu action='SettingsMenu'>
+			<menu action='OptionsMenu'>
+			</menu>
 		</menu>
 
 		<menu action='DebugMenu'>
