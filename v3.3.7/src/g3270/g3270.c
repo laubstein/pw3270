@@ -196,7 +196,14 @@ GnomeClient *client = 0;
 
 
 /* Callback for connection state changes. */
-static void main_connect(Boolean status)
+#ifdef 	X3270_FT
+static void connect_3270(Boolean status)
+{
+	gtk_action_group_set_sensitive(ft_actions,status);
+}
+#endif
+
+static void connect_main(Boolean status)
 {
 	gboolean online = (CONNECTED) ? TRUE : FALSE;
 
@@ -212,6 +219,9 @@ static void main_connect(Boolean status)
 		cMode &= ~CURSOR_MODE_ENABLED;
 		ctlr_erase(True);
 		online = FALSE;
+#ifdef 	X3270_FT
+		connect_3270(status);
+#endif
 	}
 
 	if(terminal)
@@ -501,15 +511,18 @@ int main(int argc, char *argv[])
 	if(CreateTopWindow())
 		return -1;
 
-	main_connect(0);
+	connect_main(0);
 
-	register_schange(ST_CONNECT, main_connect);
+	register_schange(ST_CONNECT, connect_main);
 
-//	register_schange(ST_3270_MODE, main_connect);
+#ifdef 	X3270_FT
+	connect_3270(0);
+	register_schange(ST_3270_MODE, connect_3270);
+#else
+	gtk_action_group_set_sensitive(ft_actions,FALSE);
+#endif
+
 //	register_schange(ST_EXITING, main_exiting);
-//#if defined(X3270_FT) /*[*/
-//	ft_init();
-//#endif /*]*/
 
 #if defined(X3270_PRINTER) /*[*/
 	printer_init();

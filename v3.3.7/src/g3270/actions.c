@@ -165,10 +165,15 @@
  	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
  	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Erase input" ),		"Clear",			NULL,	G_CALLBACK(action_Clear)			},
 
+ };
+
+ static const GtkActionEntry ft_action_entries[] =
+ {
 	/* File-transfer actions */
+ 	{	"FTMenu",   		NULL,					N_( "File Transfer" ),		NULL,				NULL,	NULL								},
+	{   "SendReceive",		NULL,					N_( "Send/Receive" ),		NULL,				NULL,	NULL								},
  	{	"Download",			GTK_STOCK_SAVE,			N_( "Receive file" ),		"<Alt>d",			NULL,	G_CALLBACK(action_Download)			},
  	{	"Upload",   		GTK_STOCK_OPEN,			N_( "Send file" ),   		"<Alt>u",			NULL,	G_CALLBACK(action_Upload)			},
-
  };
 
  static const GtkActionEntry offline_action_entries[] =
@@ -210,9 +215,6 @@
  	{	"SettingsMenu",		NULL,					N_( "Settings" ),			NULL,				NULL,	NULL								},
  	{	"ScriptsMenu",		NULL,					N_( "Scripts" ),			NULL,				NULL,	NULL								},
  	{	"DebugMenu",		NULL,					N_( "Debug" ),				NULL,				NULL,	NULL								},
-#if defined(X3270_FT)
- 	{	"FTMenu",   		NULL,					N_( "File Transfer" ),		NULL,				NULL,	NULL								},
-#endif
 
 	/* Sub menus */
 	{	"FontSettings",		GTK_STOCK_SELECT_FONT,	N_( "Select font" ),		NULL,				NULL,	NULL								},
@@ -694,12 +696,13 @@
 		guint 					n_entries;
 	} group[ACTION_GROUP_MAX] =
  	{
-		{ "Common",		common_action_entries,		G_N_ELEMENTS(common_action_entries)		},
-		{ "Online",		online_action_entries,		G_N_ELEMENTS(online_action_entries)		},
-		{ "Offline",	offline_action_entries,		G_N_ELEMENTS(offline_action_entries)	},
-		{ "Selection",	selection_action_entries,	G_N_ELEMENTS(selection_action_entries)	},
-		{ "Clipboard",	clipboard_action_entries,	G_N_ELEMENTS(clipboard_action_entries)	},
-		{ "Paste",		paste_action_entries,		G_N_ELEMENTS(paste_action_entries)	},
+		{ "Common",				common_action_entries,		G_N_ELEMENTS(common_action_entries)		},
+		{ "Online",				online_action_entries,		G_N_ELEMENTS(online_action_entries)		},
+		{ "Offline",			offline_action_entries,		G_N_ELEMENTS(offline_action_entries)	},
+		{ "Selection",			selection_action_entries,	G_N_ELEMENTS(selection_action_entries)	},
+		{ "Clipboard",			clipboard_action_entries,	G_N_ELEMENTS(clipboard_action_entries)	},
+		{ "Paste",				paste_action_entries,		G_N_ELEMENTS(paste_action_entries)		},
+		{ "FileTransfer",		ft_action_entries,			G_N_ELEMENTS(ft_action_entries)			},
 	};
 
 	GtkUIManager 	*ui_manager = gtk_ui_manager_new(); // http://library.gnome.org/devel/gtk/stable/GtkUIManager.html
