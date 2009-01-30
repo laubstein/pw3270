@@ -106,7 +106,7 @@ Boolean remap_flag = True;				// Remap ASCII<->EBCDIC
 unsigned long ft_length = 0;			// Length of transfer
 static Boolean ft_is_cut;				// File transfer is CUT-style
 
-static struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to main application
+static const struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to main application
 
 #define snconcat(x,s,fmt,...) snprintf(x+strlen(x),s-strlen(x),fmt,__VA_ARGS__)
 #define set_ft_state(x) ft_state = x
@@ -118,7 +118,7 @@ static struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to main ap
  	return ft_state;
  }
 
- int RegisterFTCallbacks(struct filetransfer_callbacks *cbk)
+ int RegisterFTCallbacks(const struct filetransfer_callbacks *cbk)
  {
  	if(!(cbk && cbk->sz == sizeof(struct filetransfer_callbacks)) )
 		return EINVAL;

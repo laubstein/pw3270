@@ -36,10 +36,9 @@
 
  #include "g3270.h"
 
-/*---[ Implement ]----------------------------------------------------------------------------------------------*/
-
 #if defined(X3270_FT)
 
+/*---[ Defines ]------------------------------------------------------------------------------------------------*/
 
  struct ftdialog
  {
@@ -50,6 +49,31 @@
 	GtkWidget			*ready;
 	int					value[5];
  };
+
+/*---[ Statics ]------------------------------------------------------------------------------------------------*/
+
+ static void ft_begin(unsigned short flags, const char *local, const char *remote);
+ static void ft_complete(const char *errmsg);
+ static void ft_update(unsigned long length);
+ static void ft_running(int is_cut);
+ static void ft_aborting(void);
+
+ static const	struct filetransfer_callbacks ft_callbacs =
+ {
+	sizeof(struct filetransfer_callbacks),
+
+	ft_begin,
+	ft_complete,
+	ft_update,
+	ft_running,
+	ft_aborting
+
+ };
+
+
+
+/*---[ Implement ]----------------------------------------------------------------------------------------------*/
+
 
 /**
  * Open file tranfer status dialog.
@@ -64,7 +88,7 @@ http://www.suggestsoft.com/images/medieval-software/medieval-bluetooth-obex-file
 | From:		xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx
 |
 | To:		xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx
-|
+|militec
 | Status:	xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx.xxx
 ------------------------------------------------------
 
@@ -86,7 +110,7 @@ http://www.suggestsoft.com/images/medieval-software/medieval-bluetooth-obex-file
  */
  int initft(void)
  {
- 	return 0;
+ 	return RegisterFTCallbacks(&ft_callbacs);
  }
 
 
@@ -494,6 +518,32 @@ http://www.suggestsoft.com/images/medieval-software/medieval-bluetooth-obex-file
 	return rc;
 
  }
+
+ static void ft_begin(unsigned short flags, const char *local, const char *remote)
+ {
+	Trace("%s",__FUNCTION__);
+ }
+
+ static void ft_complete(const char *errmsg)
+ {
+	Trace("%s",__FUNCTION__);
+ }
+
+ static void ft_update(unsigned long length)
+ {
+	Trace("%s",__FUNCTION__);
+ }
+
+ static void ft_running(int is_cut)
+ {
+	Trace("%s",__FUNCTION__);
+ }
+
+ static void ft_aborting(void)
+ {
+	Trace("%s",__FUNCTION__);
+ }
+
 
 #else
 

@@ -119,7 +119,7 @@
 
 		};
 
-		int RegisterFTCallbacks(struct filetransfer_callbacks *cbk);
+		int RegisterFTCallbacks(const struct filetransfer_callbacks *cbk);
 
 		/* Library internals */
 		#ifdef LIB3270
