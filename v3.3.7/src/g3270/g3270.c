@@ -319,7 +319,10 @@ static int g3270_init(int *argc, char ***argv)
 
 #ifdef X3270_FT
 	if(initft())
+	{
+		PopupAnError( N_( "Can't register into lib3270 file-transfer callback table." ) );
 		return -1;
+	}
 #endif
 
 	Trace("%s completed!",__FUNCTION__);
