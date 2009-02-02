@@ -180,6 +180,7 @@ if [ -z "$TMPDIR" ]; then
 	export TMPDIR
 fi
 
+aclocal
 autoconf
 
 if [ -z "$1" ]; then
