@@ -30,11 +30,12 @@
  *
  */
 
+ #include "g3270.h"
+
  #include <lib3270/config.h>
  #include <globals.h>
  #include <errno.h>
 
- #include "g3270.h"
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
