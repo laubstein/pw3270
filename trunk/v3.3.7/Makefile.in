@@ -78,9 +78,9 @@ LIBRARY_COMMOM_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 LIBRARY_SRCS = $(LIBRARY_COMMOM_SRCS)
 
 # Main Targets
-Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).jpg
+Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
 
-Release: $(foreach BIN, $(TARGETS), bin/Release/$(BIN)) src/g3270/$(PACKAGE).jpg $(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN).@DLLEXT@)
+Release: $(foreach BIN, $(TARGETS), bin/Release/$(BIN)) src/g3270/$(PACKAGE).@LOGOEXT@ $(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN).@DLLEXT@)
 
 # Rules
 GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
@@ -161,8 +161,8 @@ bin/Debug/w3n46.dll: obj/Release/src/lib/w3n46.o
 src/g3270/$(PACKAGE).ico: @ICONFILE@
 	@cp @ICONFILE@ $@
 
-src/g3270/$(PACKAGE).jpg: @LOGOFILE@
-	@cp @LOGOFILE@ $@
+src/g3270/$(PACKAGE).@LOGOEXT@: @LOGOFILE@
+	@convert @LOGOFILE@ $@
 
 # Plugins
 bin/Release/plugins/rx3270.@DLLEXT@: obj/Release/src/plugins/rexx/*.o
@@ -198,7 +198,7 @@ $(PACKAGE).pot: sources.lst
 $(PACKAGE).po: $(PACKAGE).pot
 	@msginit --no-translator -o $(PACKAGE).po -i $(PACKAGE).pot
 
-run: bin/Debug/g3270@BINEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).jpg
+run: bin/Debug/g3270@BINEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
 	@cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270
 
@@ -215,7 +215,7 @@ install: Release po/pt_BR.po
 	@install --mode=755 bin/Release/lib3270.so $(DESTDIR)/$(LIBDIR)
 	@install --mode=644 ui/g3270.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/g3270.act $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
-	@install --mode=644 src/g3270/$(PACKAGE).jpg $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 src/g3270/$(PACKAGE).@LOGOEXT@ $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 src/g3270/colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
 
@@ -273,7 +273,7 @@ clean:
 	@rm -fr locale
 	@rm -f *.nsi
 	@rm -f src/g3270/$(PACKAGE).ico
-	@rm -f src/g3270/$(PACKAGE).jpg
+	@rm -f src/g3270/$(PACKAGE).@LOGOEXT@
 	@make -C src/plugins/rexx clean
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;

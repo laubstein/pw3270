@@ -6,8 +6,8 @@ release=`date +%y%m%d`
 locale="locale"
 PLUGIN=plugins
 gtkroot="GTK2-Runtime"
-crossroot=/usr/i386-mingw32
-rexxroot=/usr/i386-mingw32/ooRexx
+crossroot=/usr/local/cross-tools
+rexxroot=/usr/local/cross-tools/ooRexx
 icon="image/default.ico"
 logo="image/default.jpg"
 
@@ -74,6 +74,7 @@ echo "s&#undef LOCALEDIR&#define LOCALEDIR \"$locale\"&g;" >> $TEMPFILE
 echo "s&@GTKROOT@&$gtkroot&g;" >> $TEMPFILE
 echo "s&@ICONFILE@&$icon&g;" >> $TEMPFILE
 echo "s&@LOGOFILE@&$logo&g;" >> $TEMPFILE
+echo "s&@LOGOEXT@&jpg&g;" >> $TEMPFILE
 echo "s&@datarootdir@&.&g;" >> $TEMPFILE
 echo "s&@SELECTED_PLUGINS@&$SELECTED_PLUGINS&g;" >> $TEMPFILE
 

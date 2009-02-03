@@ -124,10 +124,18 @@ BuildDebug() {
 	#
 	echo -e "\e]2;Building Local Debug\a"
 
+	if svn --xml info >/dev/null 2>&1; then
+		REV=`svn --xml info | tr -d '\r\n' | sed -e 's/.*<commit.*revision="\([0-9]*\)".*<\/commit>.*/\1/'`
+	elif svn --version --quiet >/dev/null 2>&1; then
+		REV=`svn info | grep "^Revision:" | cut -d" " -f2`
+	else
+		REV="Debug"
+	fi
+
 	PREFIX=$HOME/bin/g3270
 
 	rm -fr $PREFIX
-	./configure --enable-plugins --with-release="Debug" --prefix=$PREFIX
+	./configure --enable-plugins --with-release="svn$REV" --prefix=$PREFIX
 
 	make clean
 	make Debug
@@ -143,7 +151,7 @@ BuildDebug() {
 	install --mode=755 bin/Debug/lib3270.so $PREFIX/lib
 	install --mode=644 ui/g3270.xml $PREFIX/ui
 	install --mode=644 ui/g3270.act $PREFIX/ui
-	install --mode=644 src/g3270/g3270.jpg $PREFIX
+	install --mode=644 src/g3270/g3270.png $PREFIX
 	install --mode=644 src/g3270/colors.conf $PREFIX
 
 	make po/pt_BR.po
