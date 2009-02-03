@@ -55,7 +55,7 @@ autoconf
 %build
 make clean
 make Release
-make src/g3270/g3270.jpg
+make src/g3270/g3270.@LOGOEXT@
 strip bin/Release/g3270
 strip bin/Release/lib3270.so
 
@@ -103,7 +103,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
 %{_datadir}/%{name}/ui/%{name}.xml
 %{_datadir}/%{name}/ui/%{name}.act
-%{_datadir}/%{name}/%{name}.jpg
+%{_datadir}/%{name}/%{name}.@LOGOEXT@
 %{_datadir}/%{name}/colors.conf
 
 %post
