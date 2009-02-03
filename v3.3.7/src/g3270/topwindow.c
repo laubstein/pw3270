@@ -261,6 +261,15 @@
 		return pix;
 	}
 
+	file = FindSystemConfigFile(PACKAGE_NAME ".ico");
+	if(file)
+	{
+		Trace("Loading %s",file);
+		pix = gdk_pixbuf_new_from_file(file, NULL);
+		g_free(file);
+		return pix;
+	}
+
 	return NULL;
  }
 
