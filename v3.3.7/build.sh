@@ -143,6 +143,8 @@ BuildDebug() {
 		exit -1
 	fi
 
+	make src/g3270/g3270.png
+
 	mkdir -p $PREFIX/bin/debug/plugins
 	mkdir -p $PREFIX/lib
 	mkdir -p $PREFIX/ui
