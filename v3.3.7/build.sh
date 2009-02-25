@@ -77,6 +77,7 @@ BuildRPM() {
 		exit -1
 	fi
 
+	mv -f `rpm --eval="%{u2p:%{_srcrpmdir}}"`/g3270*.src.rpm /tmp > /dev/null 2>&1
 	rpmbuild -ba g3270.spec
 	if [ "$?" != "0" ]; then
 		exit -1
@@ -84,6 +85,7 @@ BuildRPM() {
 
 	if [ "$1" != "--debug" ]; then
 		echo "Enviando arquivo source para o servidor..."
+		echo scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/g3270*.src.rpm $USER@suportelinux.df.bb.com.br:src/suse/g3270-latest.src.rpm
 		scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/g3270*.src.rpm $USER@suportelinux.df.bb.com.br:src/suse/g3270-latest.src.rpm
 		if [ "$?" != "0" ]; then
 			echo "Erro ao copiar o pacote fonte"
