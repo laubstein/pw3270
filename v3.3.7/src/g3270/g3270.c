@@ -480,8 +480,6 @@ int main(int argc, char *argv[])
 
 #ifdef HAVE_LIBGNOME
 
-	#error Disable gnome!
-
 	context = g_option_context_new (_("- 3270 Emulator for Gnome"));
 
 	load_options(context);
