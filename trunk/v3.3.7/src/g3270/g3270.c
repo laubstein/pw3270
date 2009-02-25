@@ -277,14 +277,14 @@ static gboolean trylog(gchar *path)
 	return rc;
 }
 
-static int g3270_init(int *argc, char ***argv)
+static int g3270_init(const gchar *program)
 {
 	static const gchar	*logname	= PACKAGE_NAME ".log";
 	gboolean				has_log		= FALSE;
 
 	/* If running on win32 changes to program path */
 #if defined(_WIN32) || defined( DEBUG ) /*[*/
-	gchar *ptr = g_strdup(*argv[0]);
+	gchar *ptr = g_strdup(program);
 	g_chdir(g_path_get_dirname(ptr));
 	g_free(ptr);
 	Trace("Current dir: %s",g_get_current_dir());
@@ -402,6 +402,22 @@ static gint session_die(GnomeClient* client, gpointer client_data)
 	gtk_main_quit();
 	return FALSE;
 }
+
+#else
+
+static int parse_option_context(GOptionContext *context, int *argc, char ***argv)
+{
+	GError *error = NULL;
+
+	if(!g_option_context_parse( context, argc, argv, &error ))
+    {
+		g_print ( _( "Option parsing failed: %s\n" ), error->message);
+		return -1;
+    }
+
+	return 0;
+}
+
 #endif
 
 static void init_locale(void)
@@ -426,21 +442,33 @@ static void init_locale(void)
 
 }
 
-int main(int argc, char *argv[])
+static void load_options(GOptionContext *context)
 {
-#ifdef HAVE_LIBGNOME
-
-/*
 	static GOptionEntry entries[] =
 	{
-		{ "title", 't', 0, G_OPTION_ARG_STRING, &window_title, N_( "Window title" ), PACKAGE_NAME },
+		{ "config-file", 'c', 0, G_OPTION_ARG_STRING, &g3270_config_filename, N_( "Path to the configuration file" ), NULL },
 
 		{ NULL }
 	};
-*/
+
+//	const struct lib3270_option	*opt = get_3270_option_table(sizeof(struct lib3270_option));
+
+	g_option_context_add_main_entries(context, entries, NULL);
+
+	set_lib3270_default_options();
+
+	// FIXME (perry#8#): Create a lib3270 option group and parse options from opt[]
+
+}
+
+
+int main(int argc, char *argv[])
+{
+	static GOptionContext	*context;
+
+#ifdef HAVE_LIBGNOME
 
 	static GnomeProgram	*gnome_program;
-	static GOptionContext	*context;
 
 #endif
 
@@ -452,10 +480,11 @@ int main(int argc, char *argv[])
 
 #ifdef HAVE_LIBGNOME
 
+	#error Disable gnome!
+
 	context = g_option_context_new (_("- 3270 Emulator for Gnome"));
 
-//	g_option_context_add_main_entries(context, entries, PACKAGE_NAME);
-//	g_option_context_add_group (context, gtk_get_option_group (TRUE));
+	load_options(context);
 
 	gnome_program = gnome_program_init (	PACKAGE_NAME,
 											PACKAGE_VERSION,
@@ -474,12 +503,18 @@ int main(int argc, char *argv[])
 
 #else
 
+	context = g_option_context_new (_("- 3270 Emulator for GTK+"));
+	load_options(context);
+
 	g_thread_init(NULL);
 	gtk_init(&argc, &argv);
 
+	if(parse_option_context(context,&argc, &argv))
+		return -1;
+
 #endif
 
-	if(g3270_init(&argc,&argv))
+	if(g3270_init(argv[0]))
 		return -1;
 
 #ifdef DEBUG
@@ -506,7 +541,9 @@ int main(int argc, char *argv[])
 	    );
 	add_resource("keymap.base.3270", NewString(base_3270_keymap));
 
-	cl_hostname = lib3270_init(&argc, (const char **)argv);
+	Trace("%s","Initializing library...");
+	if(lib3270_init())
+		return -1;
 
 	if(CreateTopWindow())
 		return -1;

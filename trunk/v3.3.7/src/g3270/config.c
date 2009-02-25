@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como config.c e possui 329 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -57,7 +57,9 @@
 	{ "Sticky",		GDK_WINDOW_STATE_STICKY,		gtk_window_stick                }
  };
 
- static GKeyFile * g3270_config	= NULL;
+ static GKeyFile	* g3270_config	= NULL;
+
+ gchar				* g3270_config_filename = NULL;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -66,11 +68,38 @@
  	static const gchar 	*name = PACKAGE_NAME ".conf";
 	const gchar * const	*list;
  	gchar					*filename;
- 	const gchar			*fixed[] = { g_get_user_config_dir(), g_get_home_dir(),  };
+ 	const gchar			*fixed[] = { g_get_user_config_dir(), g_get_home_dir()  };
  	int						f;
 
+	// Check for pre-defined name
+	if(g3270_config_filename)
+	{
+		return g3270_config_filename;
+	}
+	else
+	{
+		// Search user config dir; if found set fixed filename to value found
 
-	// Search the fixed paths
+		filename = g_build_filename( g_get_user_config_dir(),name,NULL );
+		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+		{
+			g3270_config_filename = filename;
+			return filename;
+		}
+		g_free(filename);
+
+		filename = g_build_filename( g_get_user_config_dir(),PACKAGE_NAME,name,NULL );
+		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+		{
+			g3270_config_filename = filename;
+			return filename;
+		}
+		g_free(filename);
+	}
+
+	/*
+	 * Can't find user's defined configuration file, search on system paths
+	 */
 	for(f=0; f < (sizeof(fixed)/sizeof(const gchar *)); f++)
 	{
 		CHECK_FILENAME(fixed[f],name);
@@ -99,8 +128,8 @@
 
  int OpenConfigFile(void)
  {
-	gchar	*filename = FindConfigFile();
-	int		f;
+	int	 f;
+	gchar *filename = FindConfigFile();
 
 	if(g3270_config)
 	{
@@ -155,11 +184,19 @@
 
 		for(buffer = ptr;*ptr && isspace(*ptr);ptr++);
 
-		// Save the buffer contents
-		filename = g_build_filename( g_get_user_config_dir(), PACKAGE_NAME ".conf", NULL);
-		Trace("Saving %s...",filename);
-		g_file_set_contents(filename,ptr,-1,NULL);
-		g_free(filename);
+		if(g3270_config_filename)
+		{
+			// Save on fixed file
+			g_file_set_contents(g3270_config_filename,ptr,-1,NULL);
+		}
+		else
+		{
+			// Save the buffer contents
+			filename = g_build_filename( g_get_user_config_dir(), PACKAGE_NAME ".conf", NULL);
+			Trace("Saving %s...",filename);
+			g_file_set_contents(filename,ptr,-1,NULL);
+			g_free(filename);
+		}
 
 		// Release buffer
 		g_free(buffer);

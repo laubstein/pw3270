@@ -5,7 +5,7 @@ svn update
 NAME=SisBB
 ICON=sisbb/sisbb98.ico
 LOGO=sisbb/sisbb98.jpg
-RELEASE=4
+RELEASE=5
 
 BuildWin() {
 	#
