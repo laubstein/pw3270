@@ -276,8 +276,27 @@
 
 		};
 
+		struct lib3270_option
+		{
+			const char *name;
+			enum
+			{
+				OPT_BOOLEAN,
+				OPT_STRING,
+				OPT_XRM,
+				OPT_SKIP2,
+				OPT_NOP,
+				OPT_DONE
+			} type;
+			unsigned char	flag;
+			const char		*res_name;
+			void			*aoff;
+		};
+
 		int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
-		const char *lib3270_init(int *argc, const char **argv);
+		int lib3270_init(void);
+		void set_lib3270_default_options(void);
+		const struct lib3270_option * get_3270_option_table(int sz);
 
 		/* Set/Get screen contents */
 		int find_field_attribute(int baddr);

@@ -194,6 +194,7 @@
 	extern char					*charset;
 	extern gchar 					*window_title;
 	extern gboolean				drawing_enabled;
+	extern gchar					*g3270_config_filename;
 
 	extern GtkActionGroup			*action_group[ACTION_GROUP_MAX];
 
