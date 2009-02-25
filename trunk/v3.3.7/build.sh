@@ -16,7 +16,7 @@ BuildWin() {
 	make clean
 
 	ln -sf /usr/i386-mingw32/GTK-Runtime .
-	./win32.sh --gtkroot="GTK-Runtime" --locale="locale" --release=$RELEASE --name=$NAME --icon=$ICON --logo=$LOGO
+	./win32.sh --gtkroot="GTK-Runtime" --locale="locale" --release=$RELEASE --name=$NAME --icon=$ICON --logo=$LOGO --rexx=no
 	if [ "$?" != "0" ]; then
 		exit -1
 	fi

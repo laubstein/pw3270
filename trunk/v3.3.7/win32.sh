@@ -10,6 +10,7 @@ crossroot=/usr/local/cross-tools
 rexxroot=/usr/local/cross-tools/ooRexx
 icon="image/default.ico"
 logo="image/default.jpg"
+rexx=yes
 
 until [ -z "$1" ]
 do
@@ -28,10 +29,14 @@ PKG_CONFIG_PATH="$crossroot/lib/pkgconfig"
 GTK_MODULES="glib-2.0 gtk+-2.0 gthread-2.0 gmodule-2.0"
 SSL_MODULES="libcrypto libssl openssl"
 
-if [ -e "$rexxroot/api/rexx.h" ]; then
-	SELECTED_PLUGINS="rx3270"
-	REXX_CFLAGS="-I$rexxroot/api"
-	REXX_LIBS="-L$rexxroot/api -lrexx -lrexxapi"
+if [ "$rexx" == "yes" ]; then
+
+	if [ -e "$rexxroot/api/rexx.h" ]; then
+		SELECTED_PLUGINS="rx3270"
+		REXX_CFLAGS="-I$rexxroot/api"
+		REXX_LIBS="-L$rexxroot/api -lrexx -lrexxapi"
+	fi
+
 fi
 
 TEMPFILE=`mktemp`
