@@ -66,9 +66,9 @@
 
 enum toggle_type { TT_INITIAL, TT_INTERACTIVE, TT_ACTION, TT_FINAL };
 struct toggle {
-	Boolean value;		/* toggle value */
-	Boolean changed;	/* has the value changed since init */
-	Widget w[2];		/* the menu item widgets */
+	char	value;		/* toggle value */
+	char	changed;	/* has the value changed since init */
+	Widget	w[2];		/* the menu item widgets */
 	const char *label[2];	/* labels */
 	void (*upcall)(struct toggle *, enum toggle_type); /* change value */
 
@@ -93,54 +93,54 @@ typedef struct {
 
 	/* Options (not toggles) */
 #if defined(X3270_DISPLAY) || (defined(C3270) && !defined(_WIN32)) /*[*/
-	Boolean mono;
+	char mono;
 #endif /*]*/
-	Boolean extended;
-	Boolean m3279;
-	Boolean modified_sel;
-	Boolean	once;
+	char extended;
+	char m3279;
+	char modified_sel;
+	char once;
 #if defined(X3270_DISPLAY) /*[*/
-	Boolean visual_bell;
-	Boolean menubar;
-	Boolean active_icon;
-	Boolean label_icon;
-	Boolean invert_kpshift;
-	Boolean use_cursor_color;
-	Boolean allow_resize;
-	Boolean no_other;
-	Boolean do_confirms;
+	char visual_bell;
+	char menubar;
+	char active_icon;
+	char label_icon;
+	char invert_kpshift;
+	char use_cursor_color;
+	char allow_resize;
+	char no_other;
+	char do_confirms;
 #if !defined(G3270)
-	Boolean reconnect;
+	char reconnect;
 #endif
-	Boolean visual_select;
-	Boolean suppress_host;
-	Boolean suppress_font_menu;
+	char visual_select;
+	char suppress_host;
+	char suppress_font_menu;
 # if defined(X3270_KEYPAD) /*[*/
-	Boolean	keypad_on;
+	char keypad_on;
 # endif /*]*/
 #endif /*]*/
 #if defined(C3270) /*[*/
-	Boolean all_bold_on;
-	Boolean	curses_keypad;
-	Boolean cbreak_mode;
+	char all_bold_on;
+	char curses_keypad;
+	char cbreak_mode;
 #endif /*]*/
-	Boolean	apl_mode;
-	Boolean scripted;
-	Boolean numeric_lock;
-	Boolean secure;
-	Boolean oerr_lock;
-	Boolean	typeahead;
-	Boolean debug_tracing;
-	Boolean disconnect_clear;
-	Boolean highlight_bold;
-	Boolean color8;
-	Boolean bsd_tm;
-	Boolean unlock_delay;
+	char apl_mode;
+	char scripted;
+	char numeric_lock;
+	char secure;
+	char oerr_lock;
+	char typeahead;
+	char debug_tracing;
+	char disconnect_clear;
+	char highlight_bold;
+	char color8;
+	char bsd_tm;
+	char unlock_delay;
 #if defined(X3270_SCRIPT) /*[*/
-	Boolean socket;
+	char socket;
 #endif /*]*/
 #if defined(C3270) && defined(_WIN32) /*[*/
-	Boolean highlight_underline;
+	char highlight_underline;
 #endif /*]*/
 
 	/* Named resources */
@@ -158,7 +158,7 @@ typedef struct {
 	char	*debug_font;
 	char	*icon_font;
 	char	*icon_label_font;
-	int	save_lines;
+	int		save_lines;
 	char	*normal_name;
 	char	*select_name;
 	char	*bold_name;
@@ -166,11 +166,11 @@ typedef struct {
 	char	*keypadbg_name;
 	char	*selbg_name;
 	char	*cursor_color_name;
-	char    *color_scheme;
-	int	bell_volume;
+	char	*color_scheme;
+	int		bell_volume;
 	char	*char_class;
-	int	modified_sel_color;
-	int	visual_select_color;
+	int		modified_sel_color;
+	int		visual_select_color;
 #if defined(X3270_DBCS) /*[*/
 	char	*input_method;
 	char	*preedit_type;
@@ -201,7 +201,7 @@ typedef struct {
 	char	*screentrace_file;
 	char	*trace_file_size;
 # if defined(X3270_DISPLAY) || defined(WC3270) /*[*/
-	Boolean	trace_monitor;
+	char	trace_monitor;
 # endif /*]*/
 #endif /*]*/
 	char	*oversize;
@@ -211,7 +211,7 @@ typedef struct {
 #endif /*]*/
 	char	*connectfile_name;
 	char	*idle_command;
-	Boolean idle_command_enabled;
+	char	idle_command_enabled;
 	char	*idle_timeout;
 #if defined(X3270_SCRIPT) /*[*/
 	char	*plugin_command;
@@ -233,9 +233,9 @@ typedef struct {
 
 #if defined(X3270_ANSI) /*[*/
 	/* Line-mode TTY parameters */
-	Boolean	icrnl;
-	Boolean	inlcr;
-	Boolean	onlcr;
+	char	icrnl;
+	char	inlcr;
+	char	onlcr;
 	char	*erase;
 	char	*kill;
 	char	*werase;
