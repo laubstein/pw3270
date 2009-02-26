@@ -24,7 +24,7 @@
 #
 
 MODULE_NAME ?= rx3270
-SOURCES = main.c actions.c gui.c screen.c toggle.c tools.c
+SOURCES = main.c actions.c gui.c screen.c toggle.c tools.c init.c network.c
 
 BINROOT ?= ../../../bin
 OBJDEBUG ?= ../../../obj/Debug/src/plugins/rexx
@@ -57,12 +57,12 @@ $(OBJRELEASE)/%.o: %.c Makefile
 
 # Targets
 
-$(BINDEBUG)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDEBUG)/$(SRC).@OBJEXT@)
+$(BINDEBUG)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(SOURCES), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) -o $@ $^ -L$(BINROOT)/Debug -l3270 $(DLLFLAGS)
 
-$(BINRELEASE)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJRELEASE)/$(SRC).@OBJEXT@)
+$(BINRELEASE)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(SOURCES), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) -o $@ $^ -L$(BINROOT)/Release -l3270 $(DLLFLAGS)

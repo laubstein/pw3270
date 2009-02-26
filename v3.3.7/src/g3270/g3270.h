@@ -324,6 +324,7 @@
 	int 	LoadPlugins(void);
 	int		UnloadPlugins(void);
 	void	CallPlugins(const gchar *name, const gchar *arg);
+	void 	run_script(const gchar *script);
 
 	void 	SetHostname(const gchar *hostname);
 
