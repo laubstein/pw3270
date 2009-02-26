@@ -165,17 +165,11 @@ src/g3270/$(PACKAGE).@LOGOEXT@: @LOGOFILE@
 	@convert @LOGOFILE@ $@
 
 # Plugins
-bin/Release/plugins/rx3270.@DLLEXT@: obj/Release/src/plugins/rexx/*.o
-	@make -C src/plugins/rexx ../../../bin/Release/plugins/`basename $@`
+bin/Release/plugins/rx3270.@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
+	make -C src/plugins/rexx ../../../$@
 
-obj/Release/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/Makefile $(GLOBAL_DEPENDS)
-	@make -C src/plugins/rexx ../../../obj/Release/src/plugins/rexx/`basename $@`
-
-bin/Debug/plugins/rx3270.@DLLEXT@: obj/Debug/src/plugins/rexx/*.o
-	@make -C src/plugins/rexx ../../../bin/Debug/plugins/`basename $@`
-
-obj/Debug/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/Makefile $(GLOBAL_DEPENDS)
-	@make -C src/plugins/rexx ../../../obj/Debug/src/plugins/rexx/`basename $@`
+bin/Debug/plugins/rx3270.@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
+	make -C src/plugins/rexx ../../../$@
 
 # Other targets
 src/lib/fallbacks.c:  src/lib/X3270.xad

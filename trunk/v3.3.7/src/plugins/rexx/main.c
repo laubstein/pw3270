@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como main.c e possui 286 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -59,6 +59,8 @@
  } entrypoint[] =
  {
 	EXPORT_REXX_FUNCTION( rx3270Version				    ),
+	EXPORT_REXX_FUNCTION( rx3270Init				    ),
+	EXPORT_REXX_FUNCTION( rx3270Connect				    ),
 	EXPORT_REXX_FUNCTION( rx3270Actions				    ),
 	EXPORT_REXX_FUNCTION( rx3270QueryScreenAttribute    ),
 	EXPORT_REXX_FUNCTION( rx3270ToggleON			    ),
@@ -137,13 +139,6 @@
 	Trace("RexxStart(%s): %d",prg,(int) return_code);
 
 	// process return value
-	/*
-	while(!RexxDidRexxTerminate())
-	{
-		gtk_main_iteration();
-	}
-	*/
-
 	Trace("Return value: \"%s\"",retstr.strptr);
 
 	blink->enabled = FALSE;
@@ -176,6 +171,28 @@
 
  	return NULL;
  }
+
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270LoadFuncs                                    */
+/*                                                                            */
+/* Description: Register all functions in this library.                       */
+/*                                                                            */
+/* Rexx Args:   None                                                          */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuename, PRXSTRING Retstr)
+{
+	int f;
+
+	for(f=0;f < G_N_ELEMENTS(entrypoint); f++)
+		RexxRegisterFunctionExe((char *) entrypoint[f].name,entrypoint[f].call);
+
+	return RetValue(Retstr,0);
+}
+
+
 
  /*
   * If a module contains a function named g_module_unload() it is called automatically
@@ -282,5 +299,13 @@
 
     Retstr->strlength = strlen(Retstr->strptr);
     return RXFUNC_OK;
+ }
+
+ void CheckForG3270Script(const gchar *script)
+ {
+ 	if(g_str_has_suffix(script,".rex"))
+ 	{
+		call_rexx(script,"");
+ 	}
  }
 

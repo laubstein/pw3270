@@ -66,6 +66,7 @@
 
 #include <lib3270/hostc.h>
 
+
 #if !defined(_WIN32) /*[*/
 /* Base keymap. */
 static char *base_keymap1 =
@@ -194,7 +195,8 @@ static char *base_3270_keymap =
 GnomeClient *client = 0;
 #endif
 
-static const char	*cl_hostname = NULL;
+static const char	*cl_hostname	= NULL;
+static const char	*startup_script = NULL;
 
 /* Callback for connection state changes. */
 #ifdef 	X3270_FT
@@ -447,8 +449,9 @@ static void load_options(GOptionContext *context)
 {
 	static GOptionEntry entries[] =
 	{
-		{ "config-file", 	'c', 0, G_OPTION_ARG_FILENAME, 	&g3270_config_filename, N_( "Path to the configuration file" ), NULL },
-		{ "host",			'h', 0, G_OPTION_ARG_STRING,	&cl_hostname,			N_( "Host identifier" ),				NULL },
+		{ "config-file",	 	'c', 0, G_OPTION_ARG_FILENAME, 	&g3270_config_filename, N_( "Path to the configuration file" ), 		NULL },
+		{ "host",				'h', 0, G_OPTION_ARG_STRING,	&cl_hostname,			N_( "Host identifier" ),						NULL },
+		{ "startup-script", 	's', 0, G_OPTION_ARG_FILENAME, 	&startup_script,		N_( "Run script on startup (if available)" ),	NULL },
 
 		{ NULL }
 	};
@@ -608,10 +611,14 @@ int main(int argc, char *argv[])
 #endif /*]*/
 
 	Trace("Topwindow: %p (%d) terminal: %p (%d)",topwindow,GTK_IS_WIDGET(topwindow),terminal,GTK_IS_WIDGET(terminal));
-	gtk_widget_show(topwindow);
 
-	gtk_widget_grab_focus(terminal);
-	gtk_widget_grab_default(terminal);
+	if(!startup_script)
+	{
+		// No startup script, show main window
+		gtk_widget_show(topwindow);
+		gtk_widget_grab_focus(terminal);
+		gtk_widget_grab_default(terminal);
+	}
 
 	register_tchange(FULL_SCREEN,set_fullscreen);
 	register_tchange(MONOCASE,set_monocase);
@@ -643,6 +650,10 @@ int main(int argc, char *argv[])
 		screen_resume();
 		screen_disp();
 		peer_script_init();
+
+		if(startup_script)
+			run_script(startup_script);
+
 		gtk_main();
 	}
 
@@ -650,5 +661,6 @@ int main(int argc, char *argv[])
 	CloseConfigFile();
 	return 0;
 }
+
 
 
