@@ -283,6 +283,7 @@
 			{
 				OPT_BOOLEAN,
 				OPT_STRING,
+				OPT_INTEGER,
 				OPT_XRM,
 				OPT_SKIP2,
 				OPT_NOP,
@@ -291,10 +292,11 @@
 			unsigned char	flag;
 			const char		*res_name;
 			void			*aoff;
+			const char		*description;
 		};
 
 		int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
-		int lib3270_init(void);
+		int lib3270_init(const char *program_path);
 		void set_lib3270_default_options(void);
 		const struct lib3270_option * get_3270_option_table(int sz);
 

@@ -171,9 +171,6 @@
 		<Unit filename="src/lib/mkfb.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/lib/mkshort.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/lib/objects.h" />
 		<Unit filename="src/lib/popupsc.h" />
 		<Unit filename="src/lib/print.c">

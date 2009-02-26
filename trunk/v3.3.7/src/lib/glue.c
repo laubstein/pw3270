@@ -92,13 +92,13 @@ extern void merge_profile(void); /* XXX */
 #endif /*]*/
 
 /* Statics */
-static void no_minus(const char *arg);
+// static void no_minus(const char *arg);
 #if defined(LOCAL_PROCESS) /*[*/
 static void parse_local_process(int *argcp, const char **argv,
     const char **cmds);
 #endif /*]*/
-static void parse_options(int *argcp, const char **argv);
-static void parse_set_clear(int *argcp, const char **argv);
+// static void parse_options(int *argcp, const char **argv);
+// static void parse_set_clear(int *argcp, const char **argv);
 static int parse_model_number(char *m);
 
 /* Globals */
@@ -167,26 +167,40 @@ static int save_dirs(const char *argv0)
 }
 #endif /*]*/
 
+/*
 int parse_program_parameters(int argc, const char **argv)
 {
 	int rc = 0;
 
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 	(void) get_version_info();
 
 	rc = save_dirs(argv[0]);
 	if(rc)
 		return rc;
-#endif /*]*/
+#endif
 
 	return rc;
 }
+*/
 
-int lib3270_init(void)
+int lib3270_init(const char *program_path)
 {
 	int 	ovc, ovr;
 	int 	model_number;
 	char	junk;
+
+#if defined(_WIN32)
+	int		rc;
+
+	(void) get_version_info();
+
+	rc = save_dirs(program_path);
+	if(rc)
+		return rc;
+#endif
+
+
 	/*
 	 * Sort out model and color modes, based on the model number resource.
 	 */
@@ -232,9 +246,8 @@ int lib3270_init(void)
 	if (appres.apl_mode)
 		appres.charset = Apl;
 
-
 //	if (*cl_hostname == CN)
-		appres.once = False;
+//		appres.once = False;
 
 /*
 	if (appres.conf_dir == CN)
@@ -260,7 +273,7 @@ int lib3270_init(void)
 
 	return 0;
 }
-
+/*
 int parse_command_line(int argc, const char **argv, const char **cl_hostname)
 {
 	int cl, i;
@@ -268,22 +281,22 @@ int parse_command_line(int argc, const char **argv, const char **cl_hostname)
 //	char junk;
 	int hn_argc;
 //	int model_number;
-#if defined(WC3270) /*[*/
+#if defined(WC3270)
 	int sl;
-#endif /*]*/
+#endif
 
-	/* Figure out who we are */
-#if defined(_WIN32) /*[*/
+	// Figure out who we are
+#if defined(_WIN32)
 	programname = strrchr(argv[0], '\\');
-#else /*][*/
+#else
 	programname = strrchr(argv[0], '/');
-#endif /*]*/
+#endif
 	if (programname)
 		++programname;
 	else
 		programname = argv[0];
 
-	/* Save the command string. */
+	// Save the command string.
 	cl = strlen(programname);
 	for (i = 0; i < argc; i++) {
 		cl += 1 + strlen(argv[i]);
@@ -295,24 +308,24 @@ int parse_command_line(int argc, const char **argv, const char **cl_hostname)
 		(void) strcat(strcat(command_string, " "), argv[i]);
 	}
 
-#if defined(LOCAL_PROCESS) /*[*/
-        /* Pick out the -e option. */
+#if defined(LOCAL_PROCESS)
+        // Pick out the -e option.
         parse_local_process(&argc, argv, cl_hostname);
-#endif /*]*/
+#endif
 
-	/* Parse command-line options. */
+	// Parse command-line options.
 	parse_options(&argc, argv);
 
-	/* Pick out the remaining -set and -clear toggle options. */
+	// Pick out the remaining -set and -clear toggle options.
 	parse_set_clear(&argc, argv);
 
-	/* Now figure out if there's a hostname. */
+	// Now figure out if there's a hostname.
 	for (hn_argc = 1; hn_argc < argc; hn_argc++) {
 		if (!strcmp(argv[hn_argc], LAST_ARG))
 			break;
 	}
 
-	/* Verify command-line syntax. */
+	// Verify command-line syntax.
 	switch (hn_argc) {
 	    case 1:
 		break;
@@ -330,7 +343,7 @@ int parse_command_line(int argc, const char **argv, const char **cl_hostname)
 		break;
 	}
 
-	/* Delete the host name and any "--". */
+	// Delete the host name and any "--".
 	if (argv[hn_argc] != CN && !strcmp(argv[hn_argc], LAST_ARG))
 		hn_argc++;
 	if (hn_argc > 1) {
@@ -339,8 +352,8 @@ int parse_command_line(int argc, const char **argv, const char **cl_hostname)
 		}
 	}
 
-#if defined(WC3270) /*[*/
-	/* Merge in the profile. */
+#if defined(WC3270)
+	// Merge in the profile.
 	if (*cl_hostname != CN &&
 	    (((sl = strlen(*cl_hostname)) > PROFILE_SFX_LEN &&
 	      !strcasecmp(*cl_hostname + sl - PROFILE_SFX_LEN, PROFILE_SFX)) ||
@@ -374,11 +387,9 @@ int parse_command_line(int argc, const char **argv, const char **cl_hostname)
 
 		*cl_hostname = appres.hostname;
 	}
-#endif /*]*/
+#endif
 
-	/*
-	 * Sort out model and color modes, based on the model number resource.
-	 *
+	// Sort out model and color modes, based on the model number resource.
 	model_number = parse_model_number(appres.model);
 	if (model_number < 0) {
 		popup_an_error("Invalid model number: %s", appres.model);
@@ -420,16 +431,18 @@ int parse_command_line(int argc, const char **argv, const char **cl_hostname)
 	if (appres.conf_dir == CN)
 		appres.conf_dir = LIBX3270DIR;
 
-*/
 	return argc;
 }
+*/
 
+/*
 static void
 no_minus(const char *arg)
 {
 	if (arg[0] == '-')
 	    usage(xs_buffer("Unknown or incomplete option: %s", arg));
 }
+*/
 
 #if defined(LOCAL_PROCESS) /*[*/
 /*
@@ -579,66 +592,67 @@ void set_lib3270_default_options(void)
 
 static const struct lib3270_option options[] =
 {
+	// TODO (perry#5#): Add option descriptions.
 #if defined(C3270) /*[*/
-    { OptAllBold,  OPT_BOOLEAN, True,  ResAllBold,   offset(all_bold_on) },
+    { OptAllBold,  OPT_BOOLEAN, True,  ResAllBold,   offset(all_bold_on), NULL },
 #endif /*]*/
 #if defined(C3270) /*[*/
-    { OptAltScreen,OPT_STRING,  False, ResAltScreen, offset(altscreen) },
+    { OptAltScreen,OPT_STRING,  False, ResAltScreen, offset(altscreen), NULL },
 #endif /*]*/
-    { OptAplMode,  OPT_BOOLEAN, True,  ResAplMode,   offset(apl_mode) },
+    { OptAplMode,  OPT_BOOLEAN, True,  ResAplMode,   offset(apl_mode), NULL },
 #if defined(C3270) /*[*/
-    { OptCbreak,   OPT_BOOLEAN, True,  ResCbreak,    offset(cbreak_mode) },
+    { OptCbreak,   OPT_BOOLEAN, True,  ResCbreak,    offset(cbreak_mode), NULL },
 #endif /*]*/
 #if defined(HAVE_LIBSSL) /*[*/
-    { OptCertFile, OPT_STRING,  False, ResCertFile,  offset(cert_file) },
+    { OptCertFile, OPT_STRING,  False, ResCertFile,  offset(cert_file), NULL },
 #endif /*]*/
-    { OptCharset,  OPT_STRING,  False, ResCharset,   offset(charset) },
-    { OptClear,    OPT_SKIP2,   False, NULL,         NULL },
+    { OptCharset,  OPT_STRING,  False, ResCharset,   offset(charset), NULL },
+    { OptClear,    OPT_SKIP2,   False, NULL,         NULL, NULL },
 #if defined(C3270) /*[*/
-    { OptDefScreen,OPT_STRING,  False, ResDefScreen, offset(defscreen) },
+    { OptDefScreen,OPT_STRING,  False, ResDefScreen, offset(defscreen), NULL },
 #endif /*]*/
 #if defined(X3270_TRACE) /*[*/
-    { OptDsTrace,  OPT_BOOLEAN, True,  ResDsTrace,   toggle_offset(DS_TRACE) },
+    { OptDsTrace,  OPT_BOOLEAN, True,  ResDsTrace,   toggle_offset(DS_TRACE), NULL },
 #endif /*]*/
-    { OptHostsFile,OPT_STRING,  False, ResHostsFile, offset(hostsfile) },
+    { OptHostsFile,OPT_STRING,  False, ResHostsFile, offset(hostsfile), NULL },
 #if defined(C3270) /*[*/
-    { OptKeymap,   OPT_STRING,  False, ResKeymap,    offset(key_map) },
+    { OptKeymap,   OPT_STRING,  False, ResKeymap,    offset(key_map), NULL },
 #endif /*]*/
 #if defined(X3270_DBCS) /*[*/
-    { OptLocalEncoding,OPT_STRING,False,ResLocalEncoding,offset(local_encoding) },
+    { OptLocalEncoding,OPT_STRING,False,ResLocalEncoding,offset(local_encoding), NULL },
 #endif /*]*/
-    { OptModel,    OPT_STRING,  False, ResKeymap,    offset(model) },
+    { OptModel,    OPT_STRING,  False, ResKeymap,    offset(model), NULL },
 #if defined(C3270) && !defined(_WIN32) /*[*/
-    { OptMono,     OPT_BOOLEAN, True,  ResMono,      offset(mono) },
+    { OptMono,     OPT_BOOLEAN, True,  ResMono,      offset(mono), NULL },
 #endif /*]*/
-    { OptOnce,     OPT_BOOLEAN, True,  ResOnce,      offset(once) },
-    { OptOversize, OPT_STRING,  False, ResOversize,  offset(oversize) },
-    { OptPort,     OPT_STRING,  False, ResPort,      offset(port) },
+    { OptOnce,     OPT_BOOLEAN, True,  ResOnce,      offset(once), NULL },
+    { OptOversize, OPT_STRING,  False, ResOversize,  offset(oversize), NULL },
+    { OptPort,     OPT_STRING,  False, ResPort,      offset(port), NULL },
 #if defined(C3270) /*[*/
-    { OptPrinterLu,OPT_STRING,  False, ResPrinterLu, offset(printer_lu) },
+    { OptPrinterLu,OPT_STRING,  False, ResPrinterLu, offset(printer_lu), NULL },
 #endif /*]*/
-    { OptProxy,	   OPT_STRING,  False, ResProxy,     offset(proxy) },
+    { OptProxy,	   OPT_STRING,  False, ResProxy,     offset(proxy), NULL },
 #if defined(S3270) /*[*/
-    { OptScripted, OPT_NOP,     False, ResScripted,  NULL },
+    { OptScripted, OPT_NOP,     False, ResScripted,  NULL, NULL },
 #endif /*]*/
 #if defined(C3270) /*[*/
-    { OptSecure,   OPT_BOOLEAN, True,  ResSecure,    offset(secure) },
+    { OptSecure,   OPT_BOOLEAN, True,  ResSecure,    offset(secure), NULL },
 #endif /*]*/
-    { OptSet,      OPT_SKIP2,   False, NULL,         NULL },
+    { OptSet,      OPT_SKIP2,   False, NULL,         NULL, NULL },
 #if defined(X3270_SCRIPT) /*[*/
-    { OptSocket,   OPT_BOOLEAN, True,  ResSocket,    offset(socket) },
+    { OptSocket,   OPT_BOOLEAN, True,  ResSocket,    offset(socket), NULL },
 #endif /*]*/
-    { OptTermName, OPT_STRING,  False, ResTermName,  offset(termname) },
+    { OptTermName, OPT_STRING,  False, ResTermName,  offset(termname), NULL },
 #if defined(WC3270) || defined(G3270) /*[*/
-    { OptTitle,    OPT_STRING,  False, ResTitle,     offset(title) },
+    { OptTitle,    OPT_STRING,  False, ResTitle,     offset(title), NULL },
 #endif /*]*/
 #if defined(X3270_TRACE) /*[*/
-    { OptTraceFile,OPT_STRING,  False, ResTraceFile, offset(trace_file) },
-    { OptTraceFileSize,OPT_STRING,False,ResTraceFileSize,offset(trace_file_size) },
+    { OptTraceFile,OPT_STRING,  False, ResTraceFile, offset(trace_file), NULL },
+    { OptTraceFileSize,OPT_STRING,False,ResTraceFileSize,offset(trace_file_size), NULL },
 #endif /*]*/
-    { "-xrm",      OPT_XRM,     False, NULL,         NULL },
-    { LAST_ARG,    OPT_DONE,    False, NULL,         NULL },
-    { CN,          OPT_SKIP2,   False, NULL,         NULL }
+    { "-xrm",      OPT_XRM,     False, NULL,         NULL, NULL },
+    { LAST_ARG,    OPT_DONE,    False, NULL,         NULL, NULL },
+    { CN,          OPT_SKIP2,   False, NULL,         NULL, NULL }
 };
 
 /*
@@ -652,8 +666,49 @@ const struct lib3270_option * get_3270_option_table(int sz)
 }
 
 /*
+ * Parse command line option.
+ */
+int parse_option(const char *option_name, const char *value)
+{
+	int j;
+	const char *ptr;
+
+	for(j= 0; options[j].name != CN; j++)
+	{
+		ptr = options[j].name;
+		while(*ptr && *ptr == '-')
+			ptr++;
+
+		if(*ptr && !(strcmp(option_name, options[j].name) && strcmp(option_name,ptr)))
+		{
+			// Option found
+			switch (options[j].type)
+			{
+		    case OPT_BOOLEAN:
+				*(Boolean *) options[j].aoff = atoi(value);
+				if (options[j].res_name != CN)
+					add_resource(NewString(options[j].name),*(Boolean *) options[j].aoff ? "True": "False");
+				break;
+
+		    case OPT_STRING:
+				*(const char **)options[j].aoff = value;
+				if (options[j].res_name != CN)
+					add_resource(NewString(options[j].name),NewString(value));
+				break;
+
+			default:
+				return EINVAL;
+			}
+			return 0;
+		}
+	}
+	return ENOENT;
+}
+
+/*
  * Pick out command-line options and set up appres.
  */
+ /*
 static void
 parse_options(int *argcp, const char **argv)
 {
@@ -663,7 +718,7 @@ parse_options(int *argcp, const char **argv)
 
 
 	set_lib3270_default_options();
-	/* Parse the command-line options. */
+	// Parse the command-line options.
 	argv_out[argc_out++] = argv[0];
 
 	for (i = 1; i < *argcp; i++) {
@@ -684,7 +739,7 @@ parse_options(int *argcp, const char **argv)
 					     options[j].flag? "True": "False");
 			break;
 		    case OPT_STRING:
-			if (i == *argcp - 1)	/* missing arg */
+			if (i == *argcp - 1)	// missing arg
 				continue;
 			*(const char **)options[j].aoff = argv[++i];
 			if (options[j].res_name != CN)
@@ -692,7 +747,7 @@ parse_options(int *argcp, const char **argv)
 					     NewString(argv[i]));
 			break;
 		    case OPT_XRM:
-			if (i == *argcp - 1)	/* missing arg */
+			if (i == *argcp - 1)	// missing arg
 				continue;
 			parse_xrm(argv[++i], "-xrm");
 			break;
@@ -715,20 +770,21 @@ parse_options(int *argcp, const char **argv)
 	    (argc_out + 1) * sizeof(char *));
 	Free(argv_out);
 
-#if defined(X3270_TRACE) /*[*/
-	/* One isn't very useful without the other. */
+#if defined(X3270_TRACE)
+	// One isn't very useful without the other.
 	if (appres.toggle[DS_TRACE].value)
 		appres.toggle[EVENT_TRACE].value = True;
-#endif /*]*/
+#endif
 }
+*/
 
 /*
  * Pick out -set and -clear toggle options.
- */
+ */ 	/*
+
 static void
 parse_set_clear(int *argcp, const char **argv)
 {
-	/*
 	int i, j;
 	int argc_out = 0;
 	const char **argv_out =
@@ -768,8 +824,8 @@ parse_set_clear(int *argcp, const char **argv)
 	(void) memcpy((char *)argv, (char *)argv_out,
 	    (argc_out + 1) * sizeof(char *));
 	Free(argv_out);
-	*/
 }
+	*/
 
 /*
  * Parse the model number.

@@ -194,6 +194,7 @@ static char *base_3270_keymap =
 GnomeClient *client = 0;
 #endif
 
+static const char	*cl_hostname = NULL;
 
 /* Callback for connection state changes. */
 #ifdef 	X3270_FT
@@ -446,18 +447,63 @@ static void load_options(GOptionContext *context)
 {
 	static GOptionEntry entries[] =
 	{
-		{ "config-file", 'c', 0, G_OPTION_ARG_STRING, &g3270_config_filename, N_( "Path to the configuration file" ), NULL },
+		{ "config-file", 	'c', 0, G_OPTION_ARG_FILENAME, 	&g3270_config_filename, N_( "Path to the configuration file" ), NULL },
+		{ "host",			'h', 0, G_OPTION_ARG_STRING,	&cl_hostname,			N_( "Host identifier" ),				NULL },
 
 		{ NULL }
 	};
 
-//	const struct lib3270_option	*opt = get_3270_option_table(sizeof(struct lib3270_option));
+	const struct lib3270_option	*opt = get_3270_option_table(sizeof(struct lib3270_option));
+
+	int				f;
+	GOptionEntry	entry[2];
+	GOptionGroup 	*group;
 
 	g_option_context_add_main_entries(context, entries, NULL);
 
 	set_lib3270_default_options();
 
-	// FIXME (perry#8#): Create a lib3270 option group and parse options from opt[]
+	group = g_option_group_new( "lib3270", N_( "3270 options" ), N_( "Show lib3270 options" ), NULL, NULL);
+
+	for(f=0;opt[f].name;f++)
+	{
+		memset(entry,0,sizeof(GOptionEntry) *2);
+
+		entry->long_name = opt[f].name;
+//		entry->short_name;
+//		entry->flags;
+
+		switch(opt[f].type)
+		{
+		case OPT_BOOLEAN:		// FIXME (perry#1#): How can I set a boolean option?
+			entry->long_name = NULL;
+			break;
+
+		case OPT_STRING:
+			entry->arg = G_OPTION_ARG_STRING;
+			break;
+
+		case OPT_INTEGER:
+			entry->arg = G_OPTION_ARG_INT;
+			break;
+
+		default:	// Ignore other options.
+			entry->long_name = NULL;
+		}
+
+		if(entry->long_name)
+		{
+			while(*entry->long_name && *entry->long_name == '-')
+				entry->long_name++;
+
+			entry->arg_data = opt[f].aoff;
+			entry->description = opt[f].description;
+			// entry->arg_description;
+			g_option_group_add_entries(group, entry);
+
+		}
+	}
+	g_option_context_add_group(context,group);
 
 }
 
@@ -471,8 +517,6 @@ int main(int argc, char *argv[])
 	static GnomeProgram	*gnome_program;
 
 #endif
-
-	const char	*cl_hostname = CN;
 
 	init_locale();
 
@@ -539,8 +583,8 @@ int main(int argc, char *argv[])
 	    );
 	add_resource("keymap.base.3270", NewString(base_3270_keymap));
 
-	Trace("%s","Initializing library...");
-	if(lib3270_init())
+	Trace("Initializing library with %s...",argv[0]);
+	if(lib3270_init(argv[0]))
 		return -1;
 
 	if(CreateTopWindow())
