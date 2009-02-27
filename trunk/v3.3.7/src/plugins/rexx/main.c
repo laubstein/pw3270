@@ -80,6 +80,7 @@
 	EXPORT_REXX_FUNCTION( rx3270SendPFKey			    ),
 	EXPORT_REXX_FUNCTION( rx3270WaitForChanges		    ),
 	EXPORT_REXX_FUNCTION( rx3270SendENTERKey			),
+	EXPORT_REXX_FUNCTION( rx3270WaitForString			),
  };
 
  static const struct entrypoint plugin_entrypoint[] =
