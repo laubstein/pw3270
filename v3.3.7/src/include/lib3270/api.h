@@ -166,7 +166,7 @@
 
 			int 			(*CallAndWait)(int(*callback)(void *), void *parm);
 
-			int				(*Sleep)(int seconds);
+			int				(*Wait)(int seconds);
 			void 			(*RunPendingEvents)(int wait);
 
 
@@ -324,7 +324,7 @@
 
 		int		CallAndWait(int(*callback)(void *), void *parm);
 		void	RunPendingEvents(int wait);
-		int		Sleep(int seconds);
+		int		Wait(int seconds);
 
 		void	ctlr_erase(int alt);
 		void	ctlr_set_rows_cols(int mn, int ovc, int ovr);

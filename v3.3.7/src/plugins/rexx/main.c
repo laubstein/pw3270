@@ -191,12 +191,12 @@
 		RexxRegisterFunctionExe((char *) common_entrypoint[f].name,common_entrypoint[f].call);
 
  	// Load plugin functions
- 	Trace("Loading %d plugin calls",G_N_ELEMENTS(common_entrypoint));
+ 	Trace("Loading %d plugin calls",G_N_ELEMENTS(plugin_entrypoint));
 	for(f=0;f < G_N_ELEMENTS(plugin_entrypoint); f++)
 		RexxRegisterFunctionExe((char *) plugin_entrypoint[f].name,plugin_entrypoint[f].call);
 
 	// Disable standalone functions
- 	Trace("Disabling %d standalone calls",G_N_ELEMENTS(common_entrypoint));
+ 	Trace("Disabling %d standalone calls",G_N_ELEMENTS(standalone_entrypoint));
 	for(f=0;f < G_N_ELEMENTS(standalone_entrypoint); f++)
 		RexxRegisterFunctionExe((char *) standalone_entrypoint[f].name,(PSZ) rx3270Dunno);
 

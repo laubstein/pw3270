@@ -446,10 +446,14 @@ void RunPendingEvents(int wait)
 		callbacks->RunPendingEvents(wait);
 }
 
-int Sleep(int seconds)
+int Wait(int seconds)
 {
-	if(callbacks && callbacks->Sleep)
-		return callbacks->Sleep(seconds);
+	if(callbacks && callbacks->Wait)
+		return callbacks->Wait(seconds);
+#ifdef WIN32
+	Sleep(seconds);
+#else
 	sleep(seconds);
+#endif
 	return 0;
 }

@@ -37,10 +37,13 @@
  *		Glue for missing parts.
  */
 
+
+
 #include "globals.h"
 #if !defined(_WIN32) /*[*/
 #include <sys/wait.h>
 #endif /*]*/
+
 #include <signal.h>
 #include <errno.h>
 #include "appres.h"
@@ -74,7 +77,6 @@
 
 #include <lib3270/api.h>
 
-
 extern void usage(char *);
 
 #define LAST_ARG	"--"
@@ -102,17 +104,18 @@ static void parse_local_process(int *argcp, const char **argv,
 static int parse_model_number(char *m);
 
 /* Globals */
-const char     *programname;
-char		full_model_name[13] = "IBM-";
-char	       *model_name = &full_model_name[4];
-AppRes          appres;
-int		children = 0;
-Boolean		exiting = False;
-char	       *command_string = CN;
+const char		*programname;
+char			full_model_name[13] = "IBM-";
+char			*model_name = &full_model_name[4];
+AppRes			appres;
+int				children = 0;
+Boolean			exiting = False;
+char			*command_string = CN;
 static Boolean	sfont = False;
-Boolean	       *standard_font = &sfont;
+Boolean			*standard_font = &sfont;
+
 #if defined(WC3270) || defined(LIB3270)/*[*/
-char	       *profile_name = CN;
+char			*profile_name = CN;
 #endif /*]*/
 
 const char *toggle_names[N_TOGGLES] =
@@ -165,7 +168,8 @@ static int save_dirs(const char *argv0)
 
 	return 0;
 }
-#endif /*]*/
+
+#endif // _WIN32
 
 /*
 int parse_program_parameters(int argc, const char **argv)

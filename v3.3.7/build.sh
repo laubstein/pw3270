@@ -174,15 +174,15 @@ BuildDebug() {
 	cp ui/rexx.xml $PREFIX/ui
 	cp ui/debug.xml $PREFIX/ui
 
-	start_script=$HOME/bin/g3270.sh
-
-	rm -f $start_script
-	echo #!/bin/bash > $start_script 
-	echo "cd \`dirname \$0\`/g3270/bin/debug" >> $start_script
-	echo LD_LIBRARY_PATH=../../lib ./g3270 >> $start_script 
-
-	chmod +x $start_script
-
+#	start_script=$HOME/bin/g3270.sh
+#
+#	rm -f $start_script
+#	echo #!/bin/bash > $start_script 
+#	echo "cd \`dirname \$0\`/g3270/bin/debug" >> $start_script
+#	echo LD_LIBRARY_PATH=../../lib ./g3270 >> $start_script 
+#
+#	chmod +x $start_script
+#
 	make clean
 
 }
