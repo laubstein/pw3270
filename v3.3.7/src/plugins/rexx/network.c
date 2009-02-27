@@ -42,6 +42,7 @@
 /* Description: Connect with the supplied host                                */
 /*                                                                            */
 /* Rexx Args:   Host path                                                     */
+/*				Non zero to wait for connection to be ok.					  */
 /*                                                                            */
 /* Returns:	    0 if ok, error code if not ok                                 */
 /*                                                                            */
@@ -49,31 +50,100 @@
  ULONG APIENTRY rx3270Connect(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	int rc = 0;
+ 	int wait = 1;
 
-	if(Argc < 1)
+	if(Argc < 2)
 		return RXFUNC_BADCALL;
 
+	if(Argc > 1)
+		wait = atoi(Argv[1].strptr);
+
+	RunPendingEvents(0);
 	rc = host_connect(Argv[0].strptr);
+	RunPendingEvents(0);
+
 	if(rc >= 0)
 	{
-		while(!IN_ANSI && !IN_3270)
+		rc = 0;
+		if(wait)
 		{
-			Trace("%s","Waiting");
-			while(gtk_events_pending())
+			while(!IN_ANSI && !IN_3270)
 			{
-				Trace("%s","Waiting");
-				gtk_main_iteration();
-			}
-			Trace("%s","Done");
+				RunPendingEvents(TRUE);
 
-			if(!PCONNECTED)
-			{
-				return RetValue(Retstr,rc);
+				if(!PCONNECTED)
+				{
+					return RetValue(Retstr,ENOTCONN);
+				}
 			}
 		}
 	}
 
 	return RetValue(Retstr,rc);
+ }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270QueryCState                                  */
+/*                                                                            */
+/* Description: Query 3270 connection state                                   */
+/*                                                                            */
+/* Rexx Args:   None                                                          */
+/*                                                                            */
+/* Returns:	    Connection state                                              */
+/*              NOT_CONNECTED                                                 */
+/*              RESOLVING                                                     */
+/*              PENDING                                                       */
+/*              CONNECTED_INITIAL                                             */
+/*              CONNECTED_ANSI                                                */
+/*              CONNECTED_3270                                                */
+/*              CONNECTED_INITIAL_E                                           */
+/*              CONNECTED_NVT                                                 */
+/*              CONNECTED_SSCP                                                */
+/*              CONNECTED_TN3270E                                             */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270QueryCState(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	#define DECLARE_XLAT_STATE( x ) { x, #x }
+
+ 	static const struct _xlat_state
+ 	{
+ 		enum cstate	state;
+ 		const gchar	*ret;
+ 	} xlat_state[] =
+ 	{
+			DECLARE_XLAT_STATE( NOT_CONNECTED 		),
+			DECLARE_XLAT_STATE( RESOLVING			),
+			DECLARE_XLAT_STATE( PENDING				),
+			DECLARE_XLAT_STATE( CONNECTED_INITIAL	),
+			DECLARE_XLAT_STATE( CONNECTED_ANSI		),
+			DECLARE_XLAT_STATE( CONNECTED_3270		),
+			DECLARE_XLAT_STATE( CONNECTED_INITIAL_E	),
+			DECLARE_XLAT_STATE( CONNECTED_NVT		),
+			DECLARE_XLAT_STATE( CONNECTED_SSCP		),
+			DECLARE_XLAT_STATE( CONNECTED_TN3270E	)
+ 	};
+
+ 	int				f;
+ 	enum cstate 	state;
+
+	if(Argc != 0)
+		return RXFUNC_BADCALL;
+
+	RunPendingEvents(0);
+
+	state = QueryCstate();
+
+	for(f=0;f < G_N_ELEMENTS(xlat_state); f++)
+	{
+		if(state == xlat_state[f].state)
+		{
+			return RetString(Retstr,xlat_state[f].ret);
+		}
+	}
+
+	return RetString(Retstr,"UNEXPECTED");
  }
 
 

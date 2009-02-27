@@ -50,26 +50,19 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270Init(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
-	char	*rx3270_argv[] = {"", ""};
-	char 	**argv = (char **)&rx3270_argv;
-
-	int		rx3270_argc = 1;
  	int 	rc = 0;
+
+/*
 
 	if(Argc < 1)
 		return RXFUNC_BADCALL;
 
 	initialize_toggles();
 
-	rx3270_argv[0] = Argv[0].strptr;
-
 	rc = lib3270_init(Argv[0].strptr);
-
-	g_thread_init(NULL);
-	gtk_init(&rx3270_argc, &argv);
-
+*/
 	return RetValue(Retstr,rc);
- }
 
+ }
 
 

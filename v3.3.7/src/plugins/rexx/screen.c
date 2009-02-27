@@ -31,13 +31,10 @@
  */
 
  #include "rx3270.h"
- #include <errno.h>
+
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
-
-#ifndef ENOTCONN
-    #define ENOTCONN -1
-#endif
+ #include <lib3270/hostc.h>
 
 /*---[ Statics ]----------------------------------------------------------------------------------*/
 
@@ -282,6 +279,32 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
+/* Rexx External Function: rx3270SendENTERKey                                 */
+/*                                                                            */
+/* Description: Send and "ENTER"        .                                     */
+/*                                                                            */
+/* Rexx Args:	None                                                          */
+/*                                                                            */
+/* Returns:	    None                                                          */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270SendENTERKey(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	int rc = 0;
+
+	if(Argc != 0)
+		return RXFUNC_BADCALL;
+
+	if(PCONNECTED)
+		action_internal(Enter_action, IA_DEFAULT, CN, CN);
+	else
+		rc = ENOTCONN;
+
+	ReturnValue(rc);
+ }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
 /* Rexx External Function: rx3270SendPFKey                                    */
 /*                                                                            */
 /* Description: Activate a PF-Key action.                                     */
@@ -330,8 +353,38 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 		{
             ReturnValue( ENOTCONN );
 		}
-		gtk_main_iteration();
+		RunPendingEvents(TRUE);
 	}
 
 	ReturnValue(0);
+ }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270SetVisible		                              */
+/*                                                                            */
+/* Description: Set visibility state of g3270 main window                     */
+/*                                                                            */
+/* Rexx Args:	0 to hide window, now zero to show		                      */
+/*                                                                            */
+/* Returns:	    0 if ok or error code                                         */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270SetVisible(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	int rc = ENOENT;
+
+	if(Argc != 1)
+		return RXFUNC_BADCALL;
+
+	if(g3270_topwindow)
+	{
+		rc = 0;
+		if(atoi(Argv[0].strptr))
+			gtk_widget_show(g3270_topwindow);
+		else
+			gtk_widget_hide(g3270_topwindow);
+	}
+
+	ReturnValue(rc);
  }
