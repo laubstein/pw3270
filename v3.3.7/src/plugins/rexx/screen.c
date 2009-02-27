@@ -423,3 +423,102 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 
 	ReturnValue(rc);
  }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270WaitForString	                              */
+/*                                                                            */
+/* Description: Wait for desired string at position                           */
+/*                                                                            */
+/* Rexx Args:	String to search                                              */
+/*                                                                            */
+/* Rexx Args:	Buffer position                                               */
+/*				String to search                                              */
+/*                                                                            */
+/* Rexx Args:	Start row                                                     */
+/*				Start col                                                     */
+/*				String to search                                              */
+/*                                                                            */
+/* Returns:	    0 if ok or error code                                         */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270WaitForString(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	int			pos = -1;
+ 	const char	*str;
+ 	int			sz;
+ 	int			rc = -1;
+ 	int			rows,cols,row,col;
+ 	int 		last;
+ 	int			current;
+ 	char		*buffer;
+
+	screen_size(&rows,&cols);
+
+ 	switch(Argc)
+ 	{
+	case 1:	// Only string in any position
+		str = Argv[0].strptr;
+		sz = (rows*cols);
+		break;
+
+	case 2:	// Just buffer position
+		pos = atoi(Argv[0].strptr);
+		str = Argv[1].strptr;
+		sz  = strlen(str);
+		break;
+
+	case 3:	// String att row/col
+
+		row = atoi(Argv[0].strptr)-1;
+		col = atoi(Argv[1].strptr)-1;
+
+		if(row < 0 || row > rows || col < 0 || col > cols)
+		{
+			ReturnValue(EINVAL);
+		}
+
+		pos = (row * cols) + col;
+		str = Argv[2].strptr;
+		sz	= strlen(str);
+		break;
+
+	default:
+		return RXFUNC_BADCALL;
+ 	}
+
+	buffer = malloc(sz+2);
+	if(!buffer)
+	{
+		ReturnValue(ENOMEM);
+	}
+
+	last = query_screen_change_counter();
+
+	while(rc == -1)
+	{
+		RunPendingEvents(TRUE);
+
+		if(!CONNECTED)
+		{
+            rc = ENOTCONN;
+		}
+		else
+		{
+			current = query_screen_change_counter();
+
+			if(current != last)
+			{
+				last = current;
+				screen_read(buffer,pos,sz);
+				*(buffer+(sz+1)) = 0;
+				if(strstr(buffer,str))
+					rc = 0;
+			}
+		}
+	}
+
+	free(buffer);
+
+	ReturnValue(rc);
+ }
