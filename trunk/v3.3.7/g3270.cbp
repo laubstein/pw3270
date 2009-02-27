@@ -267,7 +267,13 @@
 		<Unit filename="src/plugins/rexx/gui.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/plugins/rexx/init.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/plugins/rexx/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/network.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/plugins/rexx/rx3270.h" />

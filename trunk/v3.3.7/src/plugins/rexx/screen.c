@@ -47,6 +47,17 @@
 /*                                                                            */
 /* Description: "type" informed string.                                       */
 /*                                                                            */
+/* Rexx Args:	NONE to send an Enter                                         */
+/*                                                                            */
+/* Rexx Args:	String to input                                               */
+/*                                                                            */
+/* Rexx Args:	Buffer position                                               */
+/*				String to input                                               */
+/*                                                                            */
+/* Rexx Args:	New Cursor row                                                */
+/*				New Cursor col                                                */
+/*				String to input                                               */
+/*                                                                            */
 /* Rexx Args:   String to input                                               */
 /*                                                                            */
 /* Returns:	    None                                                          */
@@ -54,10 +65,34 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270InputString(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
-	if(Argc != 1)
-		return RXFUNC_BADCALL;
+ 	if(!PCONNECTED)
+ 	{
+		return RetValue(Retstr,ENOTCONN);
+ 	}
 
-	Input_String((const unsigned char *) Argv[0].strptr);
+	switch(Argc)
+	{
+	case 0:
+		action_internal(Enter_action, IA_DEFAULT, CN, CN);
+		break;
+
+    case 1:
+		Input_String((const unsigned char *) Argv[0].strptr);
+		break;
+
+	case 2:
+        cursor_set_addr(atoi(Argv[0].strptr));
+		Input_String((const unsigned char *) Argv[1].strptr);
+        break;
+
+    case 3:
+        cursor_set_addr((atoi(Argv[0].strptr)-1) * ctlr_get_cols() + (atoi(Argv[1].strptr)-1));
+		Input_String((const unsigned char *) Argv[2].strptr);
+        break;
+
+	default:
+		return RXFUNC_BADCALL;
+	}
 
 	return RetValue(Retstr,0);
  }
