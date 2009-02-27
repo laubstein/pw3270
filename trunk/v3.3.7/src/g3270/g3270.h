@@ -214,6 +214,8 @@
 
 	GtkWidget 	*CreateTerminalWindow(void);
 
+	gboolean 	StartPlugins(const gchar *startup_script);
+
 	int 		DrawScreen(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
 	void 		DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
 
@@ -324,7 +326,6 @@
 	int 	LoadPlugins(void);
 	int		UnloadPlugins(void);
 	void	CallPlugins(const gchar *name, const gchar *arg);
-	void 	run_script(const gchar *script);
 
 	void 	SetHostname(const gchar *hostname);
 

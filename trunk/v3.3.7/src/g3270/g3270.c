@@ -510,7 +510,6 @@ static void load_options(GOptionContext *context)
 
 }
 
-
 int main(int argc, char *argv[])
 {
 	static GOptionContext	*context;
@@ -651,9 +650,10 @@ int main(int argc, char *argv[])
 		screen_disp();
 		peer_script_init();
 
-		if(startup_script)
-			run_script(startup_script);
+		// Start plugins after the creation of main loop
+		g_timeout_add((guint) 10, (GSourceFunc) StartPlugins, (gpointer) startup_script);
 
+		// Run main loop
 		gtk_main();
 	}
 

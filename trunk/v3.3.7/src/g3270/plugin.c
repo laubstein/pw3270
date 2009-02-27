@@ -178,7 +178,28 @@
 		ptr(ui);
  }
 
+ static void start_plugin(GModule *handle, struct call_parameter *arg)
+ {
+	void (*ptr)(GtkWidget *widget, const gchar *arg) = NULL;
+	if(g_module_symbol(handle, arg->name, (gpointer) &ptr))
+		ptr(topwindow,arg->arg);
+ }
+
 #endif
+
+gboolean StartPlugins(const gchar *startup_script)
+{
+#ifdef HAVE_PLUGINS
+ 	struct call_parameter p = { "g3270_plugin_startup", startup_script };
+
+	Trace("Starting plugins with \"%s\"...",startup_script);
+
+ 	if(plugins)
+ 	 	g_slist_foreach(plugins,(GFunc) start_plugin,&p);
+
+#endif
+	return FALSE;
+}
 
  void CallPlugins(const gchar *name, const gchar *arg)
  {
@@ -190,12 +211,7 @@
 #endif
  }
 
- void run_script(const gchar *script)
- {
-	CallPlugins("CheckForG3270Script",script);
- }
-
- void AddPluginUI(GtkUIManager *ui)
+  void AddPluginUI(GtkUIManager *ui)
  {
 #ifdef HAVE_PLUGINS
  	if(plugins)

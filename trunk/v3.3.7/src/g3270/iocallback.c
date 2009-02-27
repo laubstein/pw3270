@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como iocallback.c e possui 327 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -58,6 +58,8 @@ static unsigned long	g3270_AddOutput(int source, void (*fn)(void));
 static unsigned long	g3270_AddExcept(int source, void (*fn)(void));
 static unsigned long	g3270_AddTimeOut(unsigned long interval_ms, void (*proc)(void));
 static void 			g3270_RemoveTimeOut(unsigned long timer);
+static int				g3270_Sleep(int seconds);
+static void 			g3270_RunPendingEvents(int wait);
 
 static gboolean 		IO_prepare(GSource *source, gint *timeout);
 static gboolean 		IO_check(GSource *source);
@@ -98,11 +100,13 @@ const struct lib3270_io_callbacks g3270_io_callbacks =
 #endif /*]*/
 
 #ifdef G_THREADS_ENABLED
-	g3270_CallAndWait
+	g3270_CallAndWait,
 #else
-	NULL	// int (*CallAndWait)(int(*callback)(void *), void *parm);
+	NULL,	// int (*CallAndWait)(int(*callback)(void *), void *parm);
 #endif
 
+	g3270_Sleep,
+	g3270_RunPendingEvents,
 
 };
 
@@ -325,3 +329,22 @@ static int g3270_CallAndWait(int(*callback)(void *), void *parm)
 }
 #endif
 
+static int g3270_Sleep(int seconds)
+{
+	time_t end = time(0) + seconds;
+
+	while(time(0) < end)
+		gtk_main_iteration();
+
+	return 0;
+}
+
+static void g3270_RunPendingEvents(int wait)
+{
+	while(gtk_events_pending())
+		gtk_main_iteration();
+
+	if(wait)
+		gtk_main_iteration();
+
+}

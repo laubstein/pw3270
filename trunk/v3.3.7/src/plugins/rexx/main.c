@@ -50,18 +50,18 @@
 
 /*---[ Rexx entry points ]------------------------------------------------------------------------*/
 
- #define EXPORT_REXX_FUNCTION(x) { #x, (PFN) x }
+ #define EXPORT_REXX_FUNCTION(x) 		{ #x, (PFN) x }
 
- static const struct _entrypoint
+ struct entrypoint
  {
  	const char 	*name;
  	PFN				call;
- } entrypoint[] =
+ };
+
+ static const struct entrypoint common_entrypoint[] =
  {
 	EXPORT_REXX_FUNCTION( rx3270Version				    ),
-	EXPORT_REXX_FUNCTION( rx3270Init				    ),
 	EXPORT_REXX_FUNCTION( rx3270Connect				    ),
-	EXPORT_REXX_FUNCTION( rx3270Actions				    ),
 	EXPORT_REXX_FUNCTION( rx3270QueryScreenAttribute    ),
 	EXPORT_REXX_FUNCTION( rx3270ToggleON			    ),
 	EXPORT_REXX_FUNCTION( rx3270ToggleOFF			    ),
@@ -69,7 +69,6 @@
 	EXPORT_REXX_FUNCTION( rx3270Toggled				    ),
 	EXPORT_REXX_FUNCTION( rx3270Log					    ),
 	EXPORT_REXX_FUNCTION( rx3270QueryCState			    ),
-	EXPORT_REXX_FUNCTION( rx3270Popup 				    ),
 	EXPORT_REXX_FUNCTION( rx3270UpdateScreen		    ),
 	EXPORT_REXX_FUNCTION( rx3270Sleep				    ),
 	EXPORT_REXX_FUNCTION( rx3270InputString			    ),
@@ -79,8 +78,24 @@
 	EXPORT_REXX_FUNCTION( rx3270GetCursorPosition	    ),
 	EXPORT_REXX_FUNCTION( rx3270ReadScreen			    ),
 	EXPORT_REXX_FUNCTION( rx3270SendPFKey			    ),
-	EXPORT_REXX_FUNCTION( rx3270WaitForChanges		    )
+	EXPORT_REXX_FUNCTION( rx3270WaitForChanges		    ),
+	EXPORT_REXX_FUNCTION( rx3270SendENTERKey			),
  };
+
+ static const struct entrypoint plugin_entrypoint[] =
+ {
+	EXPORT_REXX_FUNCTION( rx3270Popup 				    ),
+	EXPORT_REXX_FUNCTION( rx3270Actions				    ),
+	EXPORT_REXX_FUNCTION( rx3270Quit					),
+	EXPORT_REXX_FUNCTION( rx3270SetVisible				),
+ };
+
+ static const struct entrypoint standalone_entrypoint[] =
+ {
+	EXPORT_REXX_FUNCTION( rx3270LoadFuncs				),
+	EXPORT_REXX_FUNCTION( rx3270Init				    )
+ };
+
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
@@ -121,9 +136,8 @@
 	memset(&retstr,0,sizeof(retstr));
 	MAKERXSTRING(retstr, return_buffer, sizeof(RXAUTOBUFLEN));
 
-	Trace("Waiting for events for %s",prg);
-	while(gtk_events_pending())
-		gtk_main_iteration();
+	Trace("%s","Running pending events");
+	RunPendingEvents(0);
 
 	Trace("Starting %s",prg);
 	return_code = RexxStart(	1,				// No argument
@@ -158,19 +172,43 @@
   * If a module contains a function named g_module_check_init() it is called automatically
   * when the module is loaded. It is passed the GModule structure and should return NULL
   * on success or a string describing the initialization error.
-  */
+  */ /*
  const gchar * g_module_check_init(GModule *module)
  {
- 	const gchar	*name = g_module_name(module);
-	int				f;
-
- 	Trace("Rexx module %p loaded (%s)",module,name);
-
-	for(f=0;f < G_N_ELEMENTS(entrypoint); f++)
-		RexxRegisterFunctionExe((char *) entrypoint[f].name,entrypoint[f].call);
-
  	return NULL;
  }
+*/
+
+ void g3270_plugin_startup(GtkWidget *topwindow, const gchar *script)
+ {
+	int	 f;
+
+	g3270_topwindow = topwindow;
+
+ 	// Load common functions
+ 	Trace("Loading %d common calls",G_N_ELEMENTS(common_entrypoint));
+	for(f=0;f < G_N_ELEMENTS(common_entrypoint); f++)
+		RexxRegisterFunctionExe((char *) common_entrypoint[f].name,common_entrypoint[f].call);
+
+ 	// Load plugin functions
+ 	Trace("Loading %d plugin calls",G_N_ELEMENTS(common_entrypoint));
+	for(f=0;f < G_N_ELEMENTS(plugin_entrypoint); f++)
+		RexxRegisterFunctionExe((char *) plugin_entrypoint[f].name,plugin_entrypoint[f].call);
+
+	// Disable standalone functions
+ 	Trace("Disabling %d standalone calls",G_N_ELEMENTS(common_entrypoint));
+	for(f=0;f < G_N_ELEMENTS(standalone_entrypoint); f++)
+		RexxRegisterFunctionExe((char *) standalone_entrypoint[f].name,(PSZ) rx3270Dunno);
+
+
+ 	// Check for startup script
+ 	if(!(script && g_str_has_suffix(script,".rex")))
+		return;
+
+ 	Trace("Calling %s",script);
+	call_rexx(script,"");
+ }
+
 
 
 /*----------------------------------------------------------------------------*/
@@ -184,12 +222,13 @@
 /*----------------------------------------------------------------------------*/
 ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuename, PRXSTRING Retstr)
 {
+	/*
 	int f;
 
 	for(f=0;f < G_N_ELEMENTS(entrypoint); f++)
 		RexxRegisterFunctionExe((char *) entrypoint[f].name,entrypoint[f].call);
-
-	return RetValue(Retstr,0);
+    */
+	return RetValue(Retstr,-1);
 }
 
 
@@ -299,13 +338,5 @@ ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuena
 
     Retstr->strlength = strlen(Retstr->strptr);
     return RXFUNC_OK;
- }
-
- void CheckForG3270Script(const gchar *script)
- {
- 	if(g_str_has_suffix(script,".rex"))
- 	{
-		call_rexx(script,"");
- 	}
  }
 

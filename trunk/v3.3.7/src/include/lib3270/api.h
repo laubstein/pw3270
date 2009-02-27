@@ -35,6 +35,10 @@
 
 		#define LIB3270_H_INCLUDED "2.0"
 
+		#ifndef CN
+			#define CN ((char *) NULL)
+		#endif
+
 		/* Debug & log */
 		#if defined( DEBUG ) && defined( linux )
 			#define Trace( fmt, ... )		fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr); \
@@ -161,6 +165,9 @@
 			#endif /*]*/
 
 			int 			(*CallAndWait)(int(*callback)(void *), void *parm);
+
+			int				(*Sleep)(int seconds);
+			void 			(*RunPendingEvents)(int wait);
 
 
 		};
@@ -315,10 +322,12 @@
 
 		int		Toggled(int ix);
 
-		int 	CallAndWait(int(*callback)(void *), void *parm);
+		int		CallAndWait(int(*callback)(void *), void *parm);
+		void	RunPendingEvents(int wait);
+		int		Sleep(int seconds);
 
-		void    ctlr_erase(int alt);
-		void    ctlr_set_rows_cols(int mn, int ovc, int ovr);
+		void	ctlr_erase(int alt);
+		void	ctlr_set_rows_cols(int mn, int ovc, int ovr);
         int     ctlr_get_cols(void);
         int     ctlr_get_rows(void);
 
