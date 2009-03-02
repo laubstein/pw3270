@@ -40,8 +40,11 @@
 
 
 #include "globals.h"
+
 #if !defined(_WIN32) /*[*/
-#include <sys/wait.h>
+	#include <sys/wait.h>
+#else
+	#include <windows.h>
 #endif /*]*/
 
 #include <signal.h>

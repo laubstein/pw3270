@@ -35,6 +35,12 @@
 
 		#define LIB3270_H_INCLUDED "2.0"
 
+		#include <errno.h>
+		#ifndef ETIMEDOUT
+			#define ETIMEDOUT -20000
+		#endif
+
+
 		#ifndef CN
 			#define CN ((char *) NULL)
 		#endif
