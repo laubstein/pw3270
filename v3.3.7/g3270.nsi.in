@@ -83,12 +83,12 @@ SubSection "@PACKAGE_NAME@" SecMain
 
 	SubSection "Plugins" SecPLugin
 
-#		Section /o "Rexx" RexxPlugin
-#			setOutPath $INSTDIR
-#			CreateDirectory "$INSTDIR\plugins"
-#			file "/oname=$INSTDIR\plugins\rx3270.dll" bin\Release\plugins\rx3270.dll
-#			file "/oname=$INSTDIR\ui\rexx.xml" ui\rexx.xml
-#		sectionEnd
+		Section /o "Rexx" RexxPlugin
+			setOutPath $INSTDIR
+			CreateDirectory "$INSTDIR\plugins"
+			file "/oname=$INSTDIR\plugins\rx3270.dll" bin\Release\plugins\rx3270.dll
+			file "/oname=$INSTDIR\ui\rexx.xml" ui\rexx.xml
+		sectionEnd
 
 
 	SubSectionEnd
