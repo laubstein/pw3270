@@ -38,7 +38,6 @@
 
 /*---[ Statics ]----------------------------------------------------------------------------------*/
 
-
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
@@ -368,30 +367,44 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 /*                                                                            */
 /* Description: Wait until the screen changes.                                */
 /*                                                                            */
-/* Rexx Args:	None                                                          */
+/* Rexx Args:	Timeout in seconds  (None to default to 60 seconds)           */
 /*                                                                            */
 /* Returns:	    0 if ok or error code                                         */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
+
  ULONG APIENTRY rx3270WaitForChanges(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	int last;
+ 	int 			last;
+ 	int				rc  = 0;
+ 	int 			end = time(0);
 
-	if(Argc)
+	switch(Argc)
+	{
+	case 0:
+		end += 60;
+		break;
+
+	case 1:
+		end += atoi(Argv[0].strptr);
+		break;
+
+	default:
 		return RXFUNC_BADCALL;
+	}
 
 	last = query_screen_change_counter();
 
-	while(last == query_screen_change_counter())
+	while(!rc && last == query_screen_change_counter())
 	{
 		if(!CONNECTED)
-		{
-            ReturnValue( ENOTCONN );
-		}
-		RunPendingEvents(TRUE);
+			rc = ENOTCONN;
+		else if(time(0) > end)
+			rc = ETIMEDOUT;
+		RunPendingEvents(1);
 	}
 
-	ReturnValue(0);
+	ReturnValue(rc);
  }
 
 /*----------------------------------------------------------------------------*/

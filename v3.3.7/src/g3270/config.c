@@ -131,6 +131,8 @@
 	int	 f;
 	gchar *filename = FindConfigFile();
 
+	Trace("Configuration file: %s",filename);
+
 	if(g3270_config)
 	{
 		g_key_file_free(g3270_config);
@@ -139,13 +141,19 @@
 
 	g3270_config = g_key_file_new();
 
+	Trace("Configuration file: %s - %p",filename,g3270_config);
+
 	if(filename)
 		g_key_file_load_from_file(g3270_config,filename,G_KEY_FILE_NONE,NULL);
 
 	/* Load initial settings */
+	Trace("Loading %d toggles",N_TOGGLES);
+
 	for(f=0;f<N_TOGGLES;f++)
 	{
  		const char *name = get_toggle_name(f);
+
+ 		Trace("Setting toggle(%d): %s",f,name);
 
 		if(g_key_file_has_key(g3270_config,"Toggles",name,NULL))
 			set_toggle(f,g_key_file_get_boolean(g3270_config,"Toggles",name,NULL));

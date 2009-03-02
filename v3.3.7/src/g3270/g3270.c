@@ -316,14 +316,17 @@ static int g3270_init(const gchar *program)
 	gtk_rc_parse("etc/gtk-2.0/gtkrc");
 
 	/* Start */
+	Trace("%s","Opening configuration file");
 	OpenConfigFile();
 
+	Trace("%s","Opening configuration file");
 	if(Register3270IOCallbacks(&g3270_io_callbacks))
 	{
 		PopupAnError( N_( "Can't register into lib3270 I/O callback table." ) );
 		return -1;
 	}
 
+	Trace("%s","Setting screen callbacks");
 	if(Register3270ScreenCallbacks(&g3270_screen_callbacks))
 	{
 		PopupAnError( N_( "Can't register into lib3270 screen callback table." ) );
@@ -331,6 +334,7 @@ static int g3270_init(const gchar *program)
 	}
 
 #ifdef X3270_FT
+	Trace("%s","Starting FT feature");
 	if(initft())
 	{
 		PopupAnError( N_( "Can't register into lib3270 file-transfer callback table." ) );
@@ -464,7 +468,7 @@ static void load_options(GOptionContext *context)
 
 	g_option_context_add_main_entries(context, entries, NULL);
 
-	set_lib3270_default_options();
+	Trace("%s","Setting default options");
 
 	group = g_option_group_new( "lib3270", N_( "3270 options" ), N_( "Show lib3270 options" ), NULL, NULL);
 
@@ -522,8 +526,6 @@ int main(int argc, char *argv[])
 
 	init_locale();
 
-	initialize_toggles();
-
 #ifdef HAVE_LIBGNOME
 
 	context = g_option_context_new (_("- 3270 Emulator for Gnome"));
@@ -561,19 +563,7 @@ int main(int argc, char *argv[])
 	if(g3270_init(argv[0]))
 		return -1;
 
-#ifdef DEBUG
-	{
-		int f;
-
-		Trace("%s started with %d arguments",argv[0],argc);
-
-		for(f = 0; f<argc;f++)
-		{
-			Trace("Arg(%d) = \"%s\"",f,argv[f]);
-		}
-	}
-#endif
-
+	Trace("%s","Loading plugins");
 	LoadPlugins();
 
 	add_resource("keymap.base",

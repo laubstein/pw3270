@@ -52,15 +52,12 @@
  {
  	int 	rc = 0;
 
-/*
 
 	if(Argc < 1)
 		return RXFUNC_BADCALL;
 
-	initialize_toggles();
-
 	rc = lib3270_init(Argv[0].strptr);
-*/
+
 	return RetValue(Retstr,rc);
 
  }
