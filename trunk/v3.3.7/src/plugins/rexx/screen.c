@@ -32,6 +32,7 @@
 
  #include "rx3270.h"
 
+ #include <errno.h>
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
  #include <lib3270/hostc.h>

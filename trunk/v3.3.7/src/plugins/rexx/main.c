@@ -200,7 +200,7 @@
 	// Disable standalone functions
  	Trace("Disabling %d standalone calls",G_N_ELEMENTS(standalone_entrypoint));
 	for(f=0;f < G_N_ELEMENTS(standalone_entrypoint); f++)
-		RexxRegisterFunctionExe((char *) standalone_entrypoint[f].name,(PSZ) rx3270Dunno);
+		RexxRegisterFunctionExe((char *) standalone_entrypoint[f].name,(PFN) rx3270Dunno);
 
 
  	// Check for startup script
@@ -236,7 +236,7 @@ ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuena
  	// Disable plugin functions
  	Trace("Disabing %d plugin calls",G_N_ELEMENTS(plugin_entrypoint));
 	for(f=0;f < G_N_ELEMENTS(plugin_entrypoint); f++)
-		RexxRegisterFunctionExe((char *) plugin_entrypoint[f].name,(PSZ) rx3270Dunno);
+		RexxRegisterFunctionExe((char *) plugin_entrypoint[f].name,(PFN) rx3270Dunno);
 
 	// Load standalone functions
  	Trace("Loading %d standalone calls",G_N_ELEMENTS(standalone_entrypoint));
