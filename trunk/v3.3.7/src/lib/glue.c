@@ -77,30 +77,30 @@
 
 #include <lib3270/api.h>
 
-extern void usage(char *);
+#if defined WIN32
+	BOOL WINAPI DllMain(HANDLE hinst, DWORD dwcallpurpose, LPVOID lpvResvd);
+#else
+	int lib3270_loaded(void) __attribute__((constructor));
+	int lib3270_unloaded(void) __attribute__((destructor));
+#endif
 
-#define LAST_ARG	"--"
 
-#if defined(WC3270) /*[*/
-#define PROFILE_SFX	".wc3270"
-#define PROFILE_SFX_LEN	(sizeof(PROFILE_SFX) - 1)
-#define PROFILE_SSFX	".wc3"
-#define PROFILE_SSFX_LEN (sizeof(PROFILE_SSFX) - 1)
-#endif /*]*/
 
-#if defined(C3270) /*[*/
-extern void merge_profile(void); /* XXX */
-// extern Boolean any_error_output;
-#endif /*]*/
+// extern void usage(char *);
+
+ #define LAST_ARG	"--"
+//#if defined(WC3270) /*[*/
+//#define PROFILE_SFX	".wc3270"
+//#define PROFILE_SFX_LEN	(sizeof(PROFILE_SFX) - 1)
+//#define PROFILE_SSFX	".wc3"
+//#define PROFILE_SSFX_LEN (sizeof(PROFILE_SSFX) - 1)
+//#endif /*]*/
+//
+//#if defined(C3270) /*[*/
+//extern void merge_profile(void); /* XXX */
+//#endif /*]*/
 
 /* Statics */
-// static void no_minus(const char *arg);
-#if defined(LOCAL_PROCESS) /*[*/
-static void parse_local_process(int *argcp, const char **argv,
-    const char **cmds);
-#endif /*]*/
-// static void parse_options(int *argcp, const char **argv);
-// static void parse_set_clear(int *argcp, const char **argv);
 static int parse_model_number(char *m);
 
 /* Globals */
@@ -171,23 +171,6 @@ static int save_dirs(const char *argv0)
 
 #endif // _WIN32
 
-/*
-int parse_program_parameters(int argc, const char **argv)
-{
-	int rc = 0;
-
-#if defined(_WIN32)
-	(void) get_version_info();
-
-	rc = save_dirs(argv[0]);
-	if(rc)
-		return rc;
-#endif
-
-	return rc;
-}
-*/
-
 int lib3270_init(const char *program_path)
 {
 	int 	ovc, ovr;
@@ -250,15 +233,6 @@ int lib3270_init(const char *program_path)
 	if (appres.apl_mode)
 		appres.charset = Apl;
 
-//	if (*cl_hostname == CN)
-//		appres.once = False;
-
-/*
-	if (appres.conf_dir == CN)
-		appres.conf_dir = LIBX3270DIR;
-
-*/
-
 	if (charset_init(appres.charset) != CS_OKAY)
 	{
 		xs_warning("Cannot find charset \"%s\"", appres.charset);
@@ -277,245 +251,49 @@ int lib3270_init(const char *program_path)
 
 	return 0;
 }
-/*
-int parse_command_line(int argc, const char **argv, const char **cl_hostname)
-{
-	int cl, i;
-//	int ovc, ovr;
-//	char junk;
-	int hn_argc;
-//	int model_number;
-#if defined(WC3270)
-	int sl;
-#endif
-
-	// Figure out who we are
-#if defined(_WIN32)
-	programname = strrchr(argv[0], '\\');
-#else
-	programname = strrchr(argv[0], '/');
-#endif
-	if (programname)
-		++programname;
-	else
-		programname = argv[0];
-
-	// Save the command string.
-	cl = strlen(programname);
-	for (i = 0; i < argc; i++) {
-		cl += 1 + strlen(argv[i]);
-	}
-	cl++;
-	command_string = Malloc(cl);
-	(void) strcpy(command_string, programname);
-	for (i = 0; i < argc; i++) {
-		(void) strcat(strcat(command_string, " "), argv[i]);
-	}
-
-#if defined(LOCAL_PROCESS)
-        // Pick out the -e option.
-        parse_local_process(&argc, argv, cl_hostname);
-#endif
-
-	// Parse command-line options.
-	parse_options(&argc, argv);
-
-	// Pick out the remaining -set and -clear toggle options.
-	parse_set_clear(&argc, argv);
-
-	// Now figure out if there's a hostname.
-	for (hn_argc = 1; hn_argc < argc; hn_argc++) {
-		if (!strcmp(argv[hn_argc], LAST_ARG))
-			break;
-	}
-
-	// Verify command-line syntax.
-	switch (hn_argc) {
-	    case 1:
-		break;
-	    case 2:
-		no_minus(argv[1]);
-		*cl_hostname = argv[1];
-		break;
-	    case 3:
-		no_minus(argv[1]);
-		no_minus(argv[2]);
-		*cl_hostname = xs_buffer("%s:%s", argv[1], argv[2]);
-		break;
-	    default:
-		usage(CN);
-		break;
-	}
-
-	// Delete the host name and any "--".
-	if (argv[hn_argc] != CN && !strcmp(argv[hn_argc], LAST_ARG))
-		hn_argc++;
-	if (hn_argc > 1) {
-		for (i = 1; i < argc - hn_argc + 2; i++) {
-			argv[i] = argv[i + hn_argc - 1];
-		}
-	}
-
-#if defined(WC3270)
-	// Merge in the profile.
-	if (*cl_hostname != CN &&
-	    (((sl = strlen(*cl_hostname)) > PROFILE_SFX_LEN &&
-	      !strcasecmp(*cl_hostname + sl - PROFILE_SFX_LEN, PROFILE_SFX)) ||
-	     ((sl = strlen(*cl_hostname)) > PROFILE_SSFX_LEN &&
-	      !strcasecmp(*cl_hostname + sl - PROFILE_SSFX_LEN, PROFILE_SSFX)))) {
-
-		const char *pname;
-
-		(void) read_resource_file(*cl_hostname, False);
-		if (appres.hostname == CN) {
-		    Error("Hostname not specified in session file.");
-		}
-
-		pname = strrchr(*cl_hostname, '\\');
-		if (pname != CN)
-		    	pname++;
-		else
-		    	pname = *cl_hostname;
-		profile_name = NewString(pname);
-
-		sl = strlen(profile_name);
-		if (sl > PROFILE_SFX_LEN &&
-			!strcmp(profile_name + sl - PROFILE_SFX_LEN,
-				PROFILE_SFX)) {
-			profile_name[sl - PROFILE_SFX_LEN] = '\0';
-		} else if (sl > PROFILE_SSFX_LEN &&
-			!strcmp(profile_name + sl - PROFILE_SSFX_LEN,
-				PROFILE_SSFX)) {
-			profile_name[sl - PROFILE_SSFX_LEN] = '\0';
-		}
-
-		*cl_hostname = appres.hostname;
-	}
-#endif
-
-	// Sort out model and color modes, based on the model number resource.
-	model_number = parse_model_number(appres.model);
-	if (model_number < 0) {
-		popup_an_error("Invalid model number: %s", appres.model);
-		model_number = 0;
-	}
-	if (!model_number) {
-#if defined(RESTRICT_3279)
-		model_number = 3;
-#else
-		model_number = 4;
-#endif
-	}
-#if defined(C3270) && !defined(_WIN32)
-	if (appres.mono)
-		appres.m3279 = False;
-#endif
-	if (!appres.extended)
-		appres.oversize = CN;
-
-#if defined(RESTRICT_3279)
-	if (appres.m3279 && model_number == 4)
-		model_number = 3;
-#endif
-	if (!appres.extended || appres.oversize == CN ||
-	    sscanf(appres.oversize, "%dx%d%c", &ovc, &ovr, &junk) != 2) {
-		ovc = 0;
-		ovr = 0;
-	}
-	set_rows_cols(model_number, ovc, ovr);
-	if (appres.termname != CN)
-		termtype = appres.termname;
-	else
-		termtype = full_model_name;
-
-	if (appres.apl_mode)
-		appres.charset = Apl;
-	if (*cl_hostname == CN)
-		appres.once = False;
-	if (appres.conf_dir == CN)
-		appres.conf_dir = LIBX3270DIR;
-
-	return argc;
-}
-*/
-
-/*
-static void
-no_minus(const char *arg)
-{
-	if (arg[0] == '-')
-	    usage(xs_buffer("Unknown or incomplete option: %s", arg));
-}
-*/
-
-#if defined(LOCAL_PROCESS) /*[*/
-/*
- * Pick out the -e option.
- */
-static void
-parse_local_process(int *argcp, const char **argv, const char **cmds)
-{
-	int i, j;
-	int e_len = -1;
-	char *cmds_buf = NULL;
-
-	for (i = 1; i < *argcp; i++) {
-		if (strcmp(argv[i], OptLocalProcess))
-			continue;
-
-		/* Matched.  Copy 'em. */
-		e_len = strlen(OptLocalProcess) + 1;
-		for (j = i+1; j < *argcp; j++) {
-			e_len += 1 + strlen(argv[j]);
-		}
-		e_len++;
-		cmds_buf = Malloc(e_len);
-		(void) strcpy(cmds_buf, OptLocalProcess);
-		for (j = i+1; j < *argcp; j++) {
-			(void) strcat(strcat(cmds_buf, " "), argv[j]);
-		}
-
-		/* Stamp out the remaining args. */
-		*argcp = i;
-		argv[i] = CN;
-		break;
-	}
-	*cmds = cmds_buf;
-}
-#endif /*]*/
 
 /*
  * Set default options
  */
-void set_lib3270_default_options(void)
+static void initialize(void)
 {
+	memset(&appres,0,sizeof(appres));
+
+	initialize_toggles();
 
 	/* Set the defaults. */
 #if defined(C3270) && !defined(_WIN32) /*[*/
 	appres.mono = False;
 #endif /*]*/
 	appres.extended = True;
+
 #if defined(C3270) /*[*/
 	appres.m3279 = True;
 #else /*][*/
 	appres.m3279 = False;
 #endif /*]*/
+
 	appres.modified_sel = False;
 	appres.apl_mode = False;
+
 #if defined(C3270) || defined(TCL3270) /*[*/
 	appres.scripted = False;
 #else /*][*/
 	appres.scripted = True;
 #endif /*]*/
+
 	appres.numeric_lock = False;
 	appres.secure = False;
+
 #if defined(C3270) /*[*/
 	appres.oerr_lock = True;
 #else /*][*/
 	appres.oerr_lock = False;
 #endif /*]*/
+
 	appres.typeahead = True;
 	appres.debug_tracing = True;
+
 #if defined(C3270) /*[*/
 	appres.compose_map = "latin1";
 #endif /*]*/
@@ -527,6 +305,7 @@ void set_lib3270_default_options(void)
 #if !defined(_WIN32) /*[*/
 	appres.charset = "bracket";
 #else /*][*/
+
 	if (is_nt)
 		appres.charset = "bracket";
 	else
@@ -535,13 +314,17 @@ void set_lib3270_default_options(void)
 
 	appres.termname = CN;
 	appres.macros = CN;
+
 #if defined(X3270_TRACE) && !defined(_WIN32) /*[*/
 	appres.trace_dir = "/tmp";
 #endif /*]*/
+
 #if defined(WC3270) /*[*/
 	appres.trace_monitor = True;
 #endif /*]*/
+
 	appres.oversize = CN;
+
 #if defined(C3270) /*[*/
 	appres.meta_escape = "auto";
 	appres.curses_keypad = True;
@@ -590,6 +373,33 @@ void set_lib3270_default_options(void)
 #endif /*]*/
 
 }
+
+#if defined WIN32
+
+BOOL WINAPI DllMain(HANDLE hinst, DWORD dwcallpurpose, LPVOID lpvResvd)
+{
+
+    if (dwcallpurpose == DLL_PROCESS_ATTACH)
+		initialize();
+
+    return TRUE;
+}
+
+#else
+
+int lib3270_loaded(void)
+{
+	initialize();
+    return 0;
+}
+
+int lib3270_unloaded(void)
+{
+    return 0;
+}
+
+#endif
+
 
 #define offset(n) (void *) &appres.n
 #define toggle_offset(index) offset(toggle[index].value)
@@ -668,168 +478,6 @@ const struct lib3270_option * get_3270_option_table(int sz)
 		return options;
 	return NULL;
 }
-
-/*
- * Parse command line option.
- */
-int parse_option(const char *option_name, const char *value)
-{
-	int j;
-	const char *ptr;
-
-	for(j= 0; options[j].name != CN; j++)
-	{
-		ptr = options[j].name;
-		while(*ptr && *ptr == '-')
-			ptr++;
-
-		if(*ptr && !(strcmp(option_name, options[j].name) && strcmp(option_name,ptr)))
-		{
-			// Option found
-			switch (options[j].type)
-			{
-		    case OPT_BOOLEAN:
-				*(Boolean *) options[j].aoff = atoi(value);
-				if (options[j].res_name != CN)
-					add_resource(NewString(options[j].name),*(Boolean *) options[j].aoff ? "True": "False");
-				break;
-
-		    case OPT_STRING:
-				*(const char **)options[j].aoff = value;
-				if (options[j].res_name != CN)
-					add_resource(NewString(options[j].name),NewString(value));
-				break;
-
-			default:
-				return EINVAL;
-			}
-			return 0;
-		}
-	}
-	return ENOENT;
-}
-
-/*
- * Pick out command-line options and set up appres.
- */
- /*
-static void
-parse_options(int *argcp, const char **argv)
-{
-	int i, j;
-	int argc_out = 0;
-	const char **argv_out = (const char **) Malloc((*argcp + 1) * sizeof(char *));
-
-
-	set_lib3270_default_options();
-	// Parse the command-line options.
-	argv_out[argc_out++] = argv[0];
-
-	for (i = 1; i < *argcp; i++) {
-		for (j = 0; options[j].name != CN; j++) {
-			if (!strcmp(argv[i], options[j].name))
-				break;
-		}
-		if (options[j].name == CN) {
-			argv_out[argc_out++] = argv[i];
-			continue;
-		}
-
-		switch (options[j].type) {
-		    case OPT_BOOLEAN:
-			*(Boolean *)options[j].aoff = options[j].flag;
-			if (options[j].res_name != CN)
-				add_resource(NewString(options[j].name),
-					     options[j].flag? "True": "False");
-			break;
-		    case OPT_STRING:
-			if (i == *argcp - 1)	// missing arg
-				continue;
-			*(const char **)options[j].aoff = argv[++i];
-			if (options[j].res_name != CN)
-				add_resource(NewString(options[j].name),
-					     NewString(argv[i]));
-			break;
-		    case OPT_XRM:
-			if (i == *argcp - 1)	// missing arg
-				continue;
-			parse_xrm(argv[++i], "-xrm");
-			break;
-		    case OPT_SKIP2:
-			argv_out[argc_out++] = argv[i++];
-			if (i < *argcp)
-				argv_out[argc_out++] = argv[i];
-			break;
-		    case OPT_NOP:
-			break;
-		    case OPT_DONE:
-			while (i < *argcp)
-				argv_out[argc_out++] = argv[i++];
-			break;
-		}
-	}
-	*argcp = argc_out;
-	argv_out[argc_out] = CN;
-	(void) memcpy((char *)argv, (char *)argv_out,
-	    (argc_out + 1) * sizeof(char *));
-	Free(argv_out);
-
-#if defined(X3270_TRACE)
-	// One isn't very useful without the other.
-	if (appres.toggle[DS_TRACE].value)
-		appres.toggle[EVENT_TRACE].value = True;
-#endif
-}
-*/
-
-/*
- * Pick out -set and -clear toggle options.
- */ 	/*
-
-static void
-parse_set_clear(int *argcp, const char **argv)
-{
-	int i, j;
-	int argc_out = 0;
-	const char **argv_out =
-	    (const char **) Malloc((*argcp + 1) * sizeof(char *));
-
-	argv_out[argc_out++] = argv[0];
-
-	for (i = 1; i < *argcp; i++) {
-		Boolean is_set = False;
-
-		if (!strcmp(argv[i], OptSet))
-			is_set = True;
-		else if (strcmp(argv[i], OptClear)) {
-			argv_out[argc_out++] = argv[i];
-			continue;
-		}
-
-		if (i == *argcp - 1)	// missing arg
-			continue;
-
-		// Delete the argument.
-		i++;
-
-		for (j = 0; j < N_TOGGLES; j++)
-			if (toggle_names[j].index >= 0 &&
-			    !strcmp(argv[i], toggle_names[j].name)) {
-				appres.toggle[toggle_names[j].index].value =
-				    is_set;
-				break;
-			}
-		if (j >= N_TOGGLES)
-			usage("Unknown toggle name");
-
-	}
-	*argcp = argc_out;
-	argv_out[argc_out] = CN;
-	(void) memcpy((char *)argv, (char *)argv_out,
-	    (argc_out + 1) * sizeof(char *));
-	Free(argv_out);
-}
-	*/
 
 /*
  * Parse the model number.
@@ -1110,20 +758,7 @@ parse_xrm(const char *arg, const char *where)
 			break;
 		}
 	}
-/*
-	if (address == NULL) {
-		for (i = 0; i < N_TOGGLES; i++) {
-			if (toggle_names[i].index >= 0 &&
-			    !strncapcmp(toggle_names[i].name, arg + match_len,
-			    rnlen)) {
-				address =
-				    &appres.toggle[toggle_names[i].index].value;
-				type = XRM_BOOLEAN;
-				break;
-			}
-		}
-	}
-*/
+
 #if defined(C3270) /*[*/
 	if (address == NULL) {
 		if (!strncasecmp(ResKeymap ".", arg + match_len,
@@ -1404,6 +1039,7 @@ action_output(const char *fmt, ...)
 */
 }
 
+/*
 void usage(char *msg)
 {
 	if (msg != CN)
@@ -1411,6 +1047,7 @@ void usage(char *msg)
 
 	popup_an_error("Usage: %s [options] [ps:][LUname@]hostname[:port]",programname);
 }
+*/
 
 #if defined(_WIN32) /*[*/
 

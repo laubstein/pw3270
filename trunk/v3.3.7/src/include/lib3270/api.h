@@ -303,8 +303,9 @@
 		};
 
 		int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
-		int lib3270_init(const char *program_path);
-		void set_lib3270_default_options(void);
+
+		int  lib3270_init(const char *program_path);
+
 		const struct lib3270_option * get_3270_option_table(int sz);
 
 		/* Set/Get screen contents */

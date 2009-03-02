@@ -62,6 +62,7 @@
  {
 	EXPORT_REXX_FUNCTION( rx3270Version				    ),
 	EXPORT_REXX_FUNCTION( rx3270Connect				    ),
+	EXPORT_REXX_FUNCTION( rx3270Disconnect				),
 	EXPORT_REXX_FUNCTION( rx3270QueryScreenAttribute    ),
 	EXPORT_REXX_FUNCTION( rx3270ToggleON			    ),
 	EXPORT_REXX_FUNCTION( rx3270ToggleOFF			    ),
@@ -223,25 +224,27 @@
 /*----------------------------------------------------------------------------*/
 ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuename, PRXSTRING Retstr)
 {
-	/*
-	int f;
+	int	 f;
 
-	for(f=0;f < G_N_ELEMENTS(entrypoint); f++)
-		RexxRegisterFunctionExe((char *) entrypoint[f].name,entrypoint[f].call);
-    */
+	g3270_topwindow = 0;
+
+ 	// Load common functions
+ 	Trace("Loading %d common calls",G_N_ELEMENTS(common_entrypoint));
+	for(f=0;f < G_N_ELEMENTS(common_entrypoint); f++)
+		RexxRegisterFunctionExe((char *) common_entrypoint[f].name,common_entrypoint[f].call);
+
+ 	// Disable plugin functions
+ 	Trace("Disabing %d plugin calls",G_N_ELEMENTS(plugin_entrypoint));
+	for(f=0;f < G_N_ELEMENTS(plugin_entrypoint); f++)
+		RexxRegisterFunctionExe((char *) plugin_entrypoint[f].name,(PSZ) rx3270Dunno);
+
+	// Load standalone functions
+ 	Trace("Loading %d standalone calls",G_N_ELEMENTS(standalone_entrypoint));
+	for(f=0;f < G_N_ELEMENTS(standalone_entrypoint); f++)
+		RexxRegisterFunctionExe((char *) standalone_entrypoint[f].name,standalone_entrypoint[f].call);
+
 	return RetValue(Retstr,-1);
 }
-
-
-
- /*
-  * If a module contains a function named g_module_unload() it is called automatically
-  * when the module is unloaded. It is passed the GModule structure.
-  */
- void g_module_unload(GModule *module)
- {
- 	Trace("Rexx module %p unloaded",module);
- }
 
  static void activate_script(GtkMenuItem *menuitem, const gchar *path)
  {

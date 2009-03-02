@@ -52,7 +52,7 @@
  	int rc = 0;
  	int wait = 1;
 
-	if(Argc < 2)
+	if(Argc < 1)
 		return RXFUNC_BADCALL;
 
 	if(Argc > 1)
@@ -147,4 +147,24 @@
  }
 
 
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270Disconnect                                   */
+/*                                                                            */
+/* Description: Disconnect from 3270 host                                     */
+/*                                                                            */
+/* Rexx Args:   None                                                          */
+/*                                                                            */
+/* Returns:	    0 if ok, error code if not ok                                 */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270Disconnect(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+	if(!PCONNECTED)
+	{
+		return RetValue(Retstr,ENOTCONN);
+	}
+
+	return RetValue(Retstr,0);
+ }
 
