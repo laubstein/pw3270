@@ -83,7 +83,7 @@ BuildRPM() {
 		exit -1
 	fi
 
-	if [ "$1" != "--debug" ]; then
+	if [ "$1" == "src" ]; then
 		echo "Enviando arquivo source para o servidor..."
 		echo scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/g3270*.src.rpm $USER@suportelinux.df.bb.com.br:src/suse/g3270-latest.src.rpm
 		scp `rpm --eval="%{u2p:%{_srcrpmdir}}"`/g3270*.src.rpm $USER@suportelinux.df.bb.com.br:src/suse/g3270-latest.src.rpm
@@ -187,6 +187,31 @@ BuildDebug() {
 
 }
 
+BuildRemote() {
+
+	EXEC_CMD="ssh $USER@os2team.df.intrabb.bb.com.br"
+	
+	rm -f ./GTK-Runtime
+
+	echo "Enviando arquivo fonte para o servidor de empacotamento..."
+	$EXEC_CMD "rm -rf tmp/build.tmp"
+	$EXEC_CMD "mkdir -p tmp/build.tmp"
+	$EXEC_CMD 'mkdir --parents --mode=755 `rpm --eval="%{u2p:%{_builddir}}"`'
+	$EXEC_CMD 'mkdir --parents --mode=755 `rpm --eval="%{u2p:%{_rpmdir}}"`/`rpm --eval="%{u2p:%{_target_cpu}}"`'
+	$EXEC_CMD 'mkdir --parents --mode=755 `rpm --eval="%{u2p:%{_rpmdir}}"`/noarch'
+	$EXEC_CMD 'mkdir --parents --mode=755 `rpm --eval="%{u2p:%{_specdir}}"`'
+	$EXEC_CMD 'mkdir --parents --mode=755 `rpm --eval="%{u2p:%{_sourcedir}}"`'
+	$EXEC_CMD 'mkdir --parents --mode=755 `rpm --eval="%{u2p:%{_srcrpmdir}}"`'
+	scp -r . $USER@os2team.df.intrabb.bb.com.br:tmp/build.tmp/.
+	if [ "$?" != "0" ]; then
+	   echo "Erro ao copiar fontes para o servidor virtual"
+	fi
+	$EXEC_CMD "cd tmp/build.tmp; ./build.sh rpm"
+
+	ln -sf /usr/i386-mingw32/GTK-Runtime ./GTK-Runtime
+
+}
+
 if [ -z "$TMPDIR" ]; then
 	TMPDIR=/tmp
 	export TMPDIR
@@ -198,8 +223,9 @@ autoconf
 if [ -z "$1" ]; then
 
 	BuildWin
-	BuildRPM
+	BuildRPM "src"
 	BuildDebug
+	BuildRemote
 
 else
 
@@ -211,6 +237,8 @@ else
 			BuildRPM
 		elif [ "$1" == "debug" ]; then
 			BuildDebug
+		elif [ "$1" == "remote" ]; then
+			BuildRemote
 		else
 			echo "Parametro invalido: $1"
 			exit -1
