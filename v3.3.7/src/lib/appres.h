@@ -250,7 +250,7 @@ typedef struct {
 	char	*hostname;
 #endif
 
-#if defined(WC3270) || defined(G3270) /*[*/
+#if defined(WC3270) /*[*/
 	char	*title;
 #endif /*]*/
 

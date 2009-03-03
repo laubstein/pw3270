@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como screen.c e possui 995 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -73,7 +73,9 @@
 #define get_color_pair(fg,bg) (((bg&0x0F) << 4) | (fg&0x0F))
 #define DEFCOLOR_MAP(f) ((((f) & FA_PROTECT) >> 4) | (((f) & FA_INT_HIGH_SEL) >> 3))
 
+#if defined(WC3270) /*[*/
 extern char *profile_name;
+#endif
 
 static const struct lib3270_screen_callbacks *callbacks = NULL;
 
@@ -179,12 +181,15 @@ screen_init(void)
 	ctlr_reinit(-1);
 
 	/* Set the window label. */
+#if defined(WC3270) /*[*/
+
 	if (appres.title != CN)
 		screen_title(appres.title);
 	else if (profile_name != CN)
 		screen_title(profile_name);
 	else
 		screen_title(NULL);
+#endif
 
 	/* Finish screen initialization. */
 	screen_suspend();
@@ -864,15 +869,20 @@ Title_action(Widget w unused, XEvent *event, String *params,
 static void
 relabel(Boolean ignored unused)
 {
+#if defined(WC3270) /*[*/
 	if (appres.title != CN)
 	    	return;
+#endif
 
 	if (PCONNECTED) {
 
+#if defined(WC3270) /*[*/
 		if (profile_name != CN)
 			screen_title(profile_name);
 		else
+#else
 			screen_title(reconnect_host);
+#endif
 
 	} else {
 	    	screen_title(0);

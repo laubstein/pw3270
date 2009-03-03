@@ -460,7 +460,7 @@ static const struct lib3270_option options[] =
     { OptSocket,   OPT_BOOLEAN, True,  ResSocket,    offset(socket), NULL },
 #endif /*]*/
     { OptTermName, OPT_STRING,  False, ResTermName,  offset(termname), NULL },
-#if defined(WC3270) || defined(G3270) /*[*/
+#if defined(WC3270) /*[*/
     { OptTitle,    OPT_STRING,  False, ResTitle,     offset(title), NULL },
 #endif /*]*/
 #if defined(X3270_TRACE) /*[*/
