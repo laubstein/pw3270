@@ -9,23 +9,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 3.3.7p5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-26 10:47-0300\n"
-"PO-Revision-Date: 2009-02-26 11:17-0300\n"
+"POT-Creation-Date: 2009-03-03 17:01-0300\n"
+"PO-Revision-Date: 2009-03-03 17:01-0300\n"
 "Last-Translator:  <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
 
-#: src/g3270/g3270.c:548
+#: src/g3270/g3270.c:559
 msgid "- 3270 Emulator for GTK+"
 msgstr "- Emulador 3270 para GTK+"
 
-#: src/g3270/g3270.c:527
+#: src/g3270/g3270.c:538
 msgid "- 3270 Emulator for Gnome"
 msgstr "- Emulador 3270 para Gnome"
 
-#: src/g3270/g3270.c:536
+#: src/g3270/g3270.c:547
 msgid "3270 Emulator"
 msgstr "Emulador 3270"
 
@@ -37,7 +37,7 @@ msgstr "Emulador 3270 para GTK"
 msgid "3270 Terminal emulator for Gnome."
 msgstr "Emulador de terminal 3270 para Gnome"
 
-#: src/g3270/g3270.c:466
+#: src/g3270/g3270.c:480
 msgid "3270 options"
 msgstr "Opções do 3270"
 
@@ -145,7 +145,7 @@ msgstr "Borda"
 msgid "Browse"
 msgstr ""
 
-#: src/g3270/actions.c:747
+#: src/g3270/actions.c:752
 #, c-format
 msgid ""
 "Can't find UI definitions in\n"
@@ -153,12 +153,12 @@ msgid ""
 msgstr "Não encontrei definições de interface em\n"
 "%s"
 
-#: src/g3270/actions.c:765
+#: src/g3270/actions.c:770
 #, c-format
 msgid "Can't load %s"
 msgstr "Não foi possível carregar %s"
 
-#: src/g3270/actions.c:763
+#: src/g3270/actions.c:768
 #, c-format
 msgid "Can't load %s: %s"
 msgstr "Não foi possível carregar %s: %s"
@@ -168,15 +168,15 @@ msgstr "Não foi possível carregar %s: %s"
 msgid "Can't receive \"%s\""
 msgstr "Não foi possível receber \"%s\""
 
-#: src/g3270/g3270.c:321
+#: src/g3270/g3270.c:325
 msgid "Can't register into lib3270 I/O callback table."
 msgstr "Não foi possível efetuar o registro na tabela de I/O 3270."
 
-#: src/g3270/g3270.c:334
+#: src/g3270/g3270.c:340
 msgid "Can't register into lib3270 file-transfer callback table."
 msgstr "Não foi possível fazer o registro das funções de transferência de arquivo na biblioteca 3270"
 
-#: src/g3270/g3270.c:327
+#: src/g3270/g3270.c:332
 msgid "Can't register into lib3270 screen callback table."
 msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 
@@ -185,7 +185,7 @@ msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 msgid "Can't send \"%s\""
 msgstr "Não foi possível enviar arquivo \"%s\""
 
-#: src/g3270/actions.c:915
+#: src/g3270/actions.c:920
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
@@ -277,7 +277,7 @@ msgstr ""
 msgid "Dump screen"
 msgstr "Salvar captura de tela"
 
-#: src/g3270/actions.c:929
+#: src/g3270/actions.c:934
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
@@ -320,7 +320,7 @@ msgstr "Apagar até o final do campo"
 msgid "Error converting clipboard string to charset %s"
 msgstr "Erro convertendo área de transferência para %s"
 
-#: src/g3270/plugin.c:231
+#: src/g3270/plugin.c:275
 #, c-format
 msgid ""
 "Error creating temporary file:\n"
@@ -328,7 +328,7 @@ msgid ""
 msgstr "Erro criando arquivo temporário:\n"
 "%s"
 
-#: src/g3270/actions.c:908 src/g3270/clipboard.c:235 src/g3270/topwindow.c:187
+#: src/g3270/actions.c:913 src/g3270/clipboard.c:235 src/g3270/topwindow.c:188
 #, c-format
 msgid ""
 "Error loading %s\n"
@@ -336,7 +336,7 @@ msgid ""
 msgstr "Erro lendo %s\n"
 "%s"
 
-#: src/g3270/actions.c:867 src/g3270/actions.c:955
+#: src/g3270/actions.c:872 src/g3270/actions.c:960
 #, c-format
 msgid ""
 "Error saving %s\n"
@@ -344,7 +344,7 @@ msgid ""
 msgstr "Erro salvando %s\n"
 "%s"
 
-#: src/g3270/plugin.c:258
+#: src/g3270/plugin.c:302
 #, c-format
 msgid ""
 "Error spawning %s\n"
@@ -380,7 +380,7 @@ msgstr "Transferência de arquivo falhou"
 msgid "Fixed"
 msgstr "Fixo"
 
-#: src/g3270/print.c:219
+#: src/g3270/print.c:221
 msgid "Font"
 msgstr "Fonte"
 
@@ -391,6 +391,10 @@ msgstr "Frente"
 #: src/g3270/actions.c:475
 msgid "Full Screen"
 msgstr "Tela-cheia"
+
+#: src/g3270/g3270.c:464
+msgid "Full path of plugins to load"
+msgstr "Caminho completo dos plugins a carregas"
 
 #: src/g3270/actions.c:445
 msgid "Fullscreen"
@@ -412,7 +416,7 @@ msgstr "Ajuda"
 msgid "Host file name:"
 msgstr "Nome do arquivo remoto:"
 
-#: src/g3270/g3270.c:451
+#: src/g3270/g3270.c:457
 msgid "Host identifier"
 msgstr "Identificador do host"
 
@@ -420,7 +424,7 @@ msgstr "Identificador do host"
 msgid "Host is TSO"
 msgstr ""
 
-#: src/g3270/actions.c:1009
+#: src/g3270/actions.c:1014
 msgid "Hostname:"
 msgstr "Endereço do servidor:"
 
@@ -436,7 +440,7 @@ msgstr "Intensificado/Protegido"
 msgid "Intensified/Unprotected"
 msgstr "Intensificado/Desprotegido"
 
-#: src/g3270/plugin.c:427
+#: src/g3270/plugin.c:471
 #, c-format
 msgid "Invalid action \"%s\" when loading %s"
 msgstr "Ação \"%s\" inválida ao carregar %s"
@@ -461,17 +465,21 @@ msgstr "Esquerda"
 msgid "Line Wrap"
 msgstr ""
 
-#: src/g3270/actions.c:182 src/g3270/actions.c:882
+#: src/g3270/actions.c:182 src/g3270/actions.c:887
 msgid "Load screen dump"
 msgstr "Carregar captura de tela"
 
 #: src/g3270/filetransfer.c:218
 msgid "Local file name:"
-msgstr ""
+msgstr "Nome do arquivo local:"
 
 #: src/g3270/colors.c:406
 msgid "Locked status"
 msgstr "Bloqueada"
+
+#: src/g3270/g3270.c:461
+msgid "Main window title"
+msgstr "Título da janela principal"
 
 #: src/g3270/actions.c:459
 msgid "Monocase"
@@ -481,7 +489,7 @@ msgstr "Só maiúsculas"
 msgid "Mustard"
 msgstr "Mostarda"
 
-#: src/g3270/g3270.c:362
+#: src/g3270/g3270.c:368
 #, c-format
 msgid "Negotiation with %s failed!"
 msgstr "Negociação com %s falhou!"
@@ -514,7 +522,7 @@ msgstr "Normal/Desprotegido"
 msgid "OIA"
 msgstr ""
 
-#: src/g3270/g3270.c:415
+#: src/g3270/g3270.c:421
 #, c-format
 msgid "Option parsing failed: %s\n"
 msgstr "Tratamento de opções falho: %s\n"
@@ -539,7 +547,15 @@ msgstr "Colar arquivo texto"
 msgid "Paste with left margin"
 msgstr "Colar com margem"
 
-#: src/g3270/g3270.c:450
+#: src/g3270/g3270.c:460
+msgid "Path to an image file for program icon"
+msgstr "Caminho para arquivo de imagem contendo o ícone do programa"
+
+#: src/g3270/g3270.c:459
+msgid "Path to search for data and configuration files"
+msgstr "Caminho dos arquivos de dados e configuração"
+
+#: src/g3270/g3270.c:456
 msgid "Path to the configuration file"
 msgstr "Caminho para o arquivo de configuração"
 
@@ -547,7 +563,7 @@ msgstr "Caminho para o arquivo de configuração"
 msgid "Pink"
 msgstr "Rosa"
 
-#: src/g3270/actions.c:1012
+#: src/g3270/actions.c:1017
 msgid "Port:"
 msgstr "Porta:"
 
@@ -623,11 +639,15 @@ msgstr "Scripts Rexx"
 msgid "Right"
 msgstr "Direita"
 
+#: src/g3270/g3270.c:458
+msgid "Run script on startup (if available)"
+msgstr ""
+
 #: src/g3270/actions.c:233
 msgid "Save"
 msgstr "Salvar"
 
-#: src/g3270/actions.c:976
+#: src/g3270/actions.c:981
 msgid "Save clipboard contents"
 msgstr "Salvar área de transferência"
 
@@ -639,7 +659,7 @@ msgstr "Salvar cópia"
 msgid "Save screen"
 msgstr "Salvar tela"
 
-#: src/g3270/actions.c:966
+#: src/g3270/actions.c:971
 msgid "Save screen contents"
 msgstr "Salvar conteúdo da tela"
 
@@ -647,7 +667,7 @@ msgstr "Salvar conteúdo da tela"
 msgid "Save selected"
 msgstr "Salvar seleção"
 
-#: src/g3270/actions.c:971
+#: src/g3270/actions.c:976
 msgid "Save selected text"
 msgstr "Salvar texto selecionado"
 
@@ -667,7 +687,7 @@ msgstr ""
 msgid "Secondary space:"
 msgstr ""
 
-#: src/g3270/actions.c:994
+#: src/g3270/actions.c:999
 msgid "Secure connection"
 msgstr "Conexão segura"
 
@@ -715,7 +735,7 @@ msgstr "Selecione arquivo a enviar"
 msgid "Select font"
 msgstr "Selecionar fonte"
 
-#: src/g3270/actions.c:995
+#: src/g3270/actions.c:1000
 msgid "Select hostname"
 msgstr "Selecionar servidor"
 
@@ -763,7 +783,7 @@ msgstr "Mudar servidor"
 msgid "Settings"
 msgstr "Configuração"
 
-#: src/g3270/g3270.c:466
+#: src/g3270/g3270.c:480
 msgid "Show lib3270 options"
 msgstr "Mostra opções da biblioteca 3270"
 
@@ -832,9 +852,9 @@ msgstr "Indefinido"
 msgid "Underline"
 msgstr "Sublinhado"
 
-#: src/g3270/actions.c:867 src/g3270/actions.c:908 src/g3270/actions.c:955
-#: src/g3270/clipboard.c:235 src/g3270/plugin.c:231 src/g3270/plugin.c:258
-#: src/g3270/topwindow.c:187
+#: src/g3270/actions.c:872 src/g3270/actions.c:913 src/g3270/actions.c:960
+#: src/g3270/clipboard.c:235 src/g3270/plugin.c:275 src/g3270/plugin.c:302
+#: src/g3270/topwindow.c:188
 msgid "Unexpected error"
 msgstr "Erro inesperado"
 
