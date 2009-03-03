@@ -194,7 +194,7 @@ $(PACKAGE).po: $(PACKAGE).pot
 
 run: bin/Debug/g3270@BINEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
-	@cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270
+	@cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270 --program-data="../../"
 
 tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 

@@ -60,6 +60,8 @@
  static GKeyFile	* g3270_config	= NULL;
 
  gchar				* g3270_config_filename = NULL;
+ gchar				* program_data = NULL;
+
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -329,12 +331,13 @@ gchar * FindSystemConfigFile(const gchar *name)
  	gchar					*filename;
  	int						f;
 
-#ifdef DEBUG
-	filename = g_build_filename("..","..","src",PACKAGE_NAME,name,NULL);
-	if(filetest(filename))
-		return filename;
-	g_free(filename);
-#endif
+	if(program_data)
+	{
+		filename = g_build_filename(program_data,name,NULL);
+		if(filetest(filename))
+			return filename;
+		g_free(filename);
+	}
 
 #ifdef DATAROOTDIR
 	filename = g_build_filename(DATAROOTDIR,PACKAGE_NAME,name,NULL);

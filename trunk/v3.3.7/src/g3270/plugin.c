@@ -62,18 +62,39 @@
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
 #ifdef HAVE_PLUGINS
- static GSList *plugins = NULL;
+ static GSList *plugins		= NULL;
+ gchar			*plugin_list	= NULL;
 #endif
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
 #ifdef HAVE_PLUGINS
 
+ static void load_plugin(const gchar *filename)
+ {
+ 	GModule *handle;
+
+	Trace("Loading plugin in %s",filename);
+
+	handle = g_module_open(filename,G_MODULE_BIND_LOCAL);
+
+	Trace("Handle for %s: %p",filename,handle);
+
+	if(handle)
+	{
+		plugins = g_slist_append(plugins,handle);
+	}
+	else
+	{
+		Trace("Can't load %s: %s",filename,g_module_error());
+		Log("Can't load %s: %s",filename,g_module_error());
+	}
+ }
+
  static int scan_for_plugins(const gchar *path)
  {
  	GDir			*dir;
  	const gchar	*name;
- 	GModule			*handle;
  	gchar			*filename;
 
 	Trace("Loading plugins in \"%s\"",path);
@@ -85,24 +106,9 @@
 	name = g_dir_read_name(dir);
 	while(name)
 	{
-//		G_MODULE_SUFFIX
 		filename = g_build_filename(path,name,NULL);
-
-		Trace("Loading plugin in %s",filename);
-
-		handle = g_module_open(filename,G_MODULE_BIND_LOCAL);
-
-		Trace("Handle for %s: %p",filename,handle);
-
-		if(handle)
-		{
-			plugins = g_slist_append(plugins,handle);
-		}
-		else
-		{
-			Trace("Can't load %s: %s",filename,g_module_error());
-			Log("Can't load %s: %s",filename,g_module_error());
-		}
+		if(g_str_has_suffix(filename,G_MODULE_SUFFIX))
+			load_plugin(filename);
 		g_free(filename);
 		name = g_dir_read_name(dir);
 	}
@@ -117,29 +123,46 @@
  int LoadPlugins(void)
  {
 #ifdef HAVE_PLUGINS
- 	gchar *path;
+
+ 	gchar	*path;
+ 	gchar	**list;
+ 	int		f;
 
 	if(!g_module_supported())
 		return EINVAL;
 
+	if(plugin_list)
+	{
+		// Load only defined plugins
+		list = g_strsplit(plugin_list,",",0);
+		if(list)
+		{
+			for(f=0;list[f];f++)
+				load_plugin(list[f]);
+			g_strfreev(list);
+		}
+	}
+	else
+	{
+		// Scan for all available plugins
 #if defined( DEBUG )
-	path = g_build_filename(".","plugins",NULL);
-	scan_for_plugins(path);
-	g_free(path);
+		path = g_build_filename(".","plugins",NULL);
+		scan_for_plugins(path);
+		g_free(path);
 #elif defined(_WIN32)
-	path = g_build_filename(".","plugins",NULL);
-	scan_for_plugins(path);
-	g_free(path);
+		path = g_build_filename(".","plugins",NULL);
+		scan_for_plugins(path);
+		g_free(path);
 #elif defined( LIBDIR )
-	path = g_build_filename(LIBDIR,PACKAGE_NAME,"plugins",NULL);
-	scan_for_plugins(path);
-	g_free(path);
+		path = g_build_filename(LIBDIR,PACKAGE_NAME,"plugins",NULL);
+		scan_for_plugins(path);
+		g_free(path);
 #else
-	path = g_build_filename(".","plugins",NULL);
-	scan_for_plugins(path);
-	g_free(path);
+		path = g_build_filename(".","plugins",NULL);
+		scan_for_plugins(path);
+		g_free(path);
 #endif
-
+	}
 
 #endif
 
@@ -492,15 +515,20 @@ gboolean StartPlugins(const gchar *startup_script)
 
 #endif
 
-#if defined( DEBUG )
-	path = g_build_filename("..","..","ui",NULL);
-#elif defined(_WIN32)
-	path = g_build_filename(".","ui",NULL);
+	if(program_data)
+	{
+		path = g_build_filename(program_data,"ui",NULL);
+	}
+	else
+	{
+#if defined(_WIN32)
+		path = g_build_filename(".","ui",NULL);
 #elif defined( DATAROOTDIR )
-	path = g_build_filename(DATAROOTDIR,PACKAGE_NAME,"ui",NULL);
+		path = g_build_filename(DATAROOTDIR,PACKAGE_NAME,"ui",NULL);
 #else
-	path = g_build_filename(".","ui",NULL);
+		path = g_build_filename(".","ui",NULL);
 #endif
+	}
 
 	scan_for_actions(path,groups);
 	g_free(path);
