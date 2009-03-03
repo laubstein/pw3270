@@ -137,7 +137,7 @@ BuildDebug() {
 	PREFIX=$HOME/bin/g3270
 
 	rm -fr $PREFIX
-	./configure --enable-plugins --with-release="svn$REV" --prefix=$PREFIX
+	./configure --enable-plugins --with-release="svn$REV"
 
 	make clean
 	make Debug
@@ -147,16 +147,11 @@ BuildDebug() {
 
 	make src/g3270/g3270.png
 
-	mkdir -p $PREFIX/bin/debug/plugins
-	mkdir -p $PREFIX/lib
-	mkdir -p $PREFIX/ui
+	rm -fr $PREFIX
+	mkdir -p $PREFIX/plugins
 
-	install --mode=755 bin/Debug/g3270 $PREFIX/bin/debug
-	install --mode=755 bin/Debug/lib3270.so $PREFIX/lib
-	install --mode=644 ui/g3270.xml $PREFIX/ui
-	install --mode=644 ui/g3270.act $PREFIX/ui
-	install --mode=644 src/g3270/g3270.png $PREFIX
-	install --mode=644 src/g3270/colors.conf $PREFIX
+	install --mode=755 bin/Debug/g3270 $PREFIX
+	install --mode=755 bin/Debug/lib3270.so $PREFIX
 
 	make po/pt_BR.po
 	msgfmt -c -v -o /usr/share/locale/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
@@ -164,26 +159,13 @@ BuildDebug() {
 		exit -1
 	fi
 
-	mkdir -p $PREFIX/share/locale/pt_BR/LC_MESSAGES
-	msgfmt -c -v -o $PREFIX/share/locale/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
+#	mkdir -p $PREFIX/share/locale/pt_BR/LC_MESSAGES
+#	msgfmt -c -v -o $PREFIX/share/locale/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
 
 	make bin/Debug/plugins/rx3270.so
 
-	mkdir -p $PREFIX/lib/plugins
-	cp bin/Debug/plugins/*.so $PREFIX/bin/debug/plugins
-	cp ui/rexx.xml $PREFIX/ui
-	cp ui/debug.xml $PREFIX/ui
-
-#	start_script=$HOME/bin/g3270.sh
-#
-#	rm -f $start_script
-#	echo #!/bin/bash > $start_script 
-#	echo "cd \`dirname \$0\`/g3270/bin/debug" >> $start_script
-#	echo LD_LIBRARY_PATH=../../lib ./g3270 >> $start_script 
-#
-#	chmod +x $start_script
-#
-	make clean
+	mkdir -p $PREFIX/plugins
+	cp bin/Debug/plugins/*.so $PREFIX/plugins
 
 }
 
