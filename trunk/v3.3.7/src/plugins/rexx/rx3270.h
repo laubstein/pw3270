@@ -32,6 +32,9 @@
 	#define ENABLE_NLS
 	#define GETTEXT_PACKAGE PACKAGE_NAME
 
+	#include <libintl.h>
+	#include <glib/gi18n.h>
+
 	/* include the REXX stuff */
 	#define RXFUNC_BADCALL 40
 	// #define INCL_REXXSAA	/* Complete Rexx support */
@@ -57,9 +60,6 @@
 	#include <lib3270/localdefs.h>
 	#include <lib3270/statusc.h>
 	#include <lib3270/toggle.h>
-
-	/* Include GTK stuff */
-	#include <glib/gi18n-lib.h>
 
 	#define CONFIG_GROUP "Rexx"
 
