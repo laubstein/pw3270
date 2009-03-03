@@ -453,9 +453,14 @@ static void load_options(GOptionContext *context)
 {
 	static GOptionEntry entries[] =
 	{
-		{ "config-file",	 	'c', 0, G_OPTION_ARG_FILENAME, 	&g3270_config_filename, N_( "Path to the configuration file" ), 		NULL },
-		{ "host",				'h', 0, G_OPTION_ARG_STRING,	&cl_hostname,			N_( "Host identifier" ),						NULL },
-		{ "startup-script", 	's', 0, G_OPTION_ARG_FILENAME, 	&startup_script,		N_( "Run script on startup (if available)" ),	NULL },
+		{ "config-file",	 	'c', 0, G_OPTION_ARG_FILENAME, 	&g3270_config_filename, N_( "Path to the configuration file" ), 					NULL },
+		{ "host",				'h', 0, G_OPTION_ARG_STRING,	&cl_hostname,			N_( "Host identifier" ),									NULL },
+		{ "startup-script", 	's', 0, G_OPTION_ARG_FILENAME, 	&startup_script,		N_( "Run script on startup (if available)" ),				NULL },
+		{ "program-data",	 	'd', 0, G_OPTION_ARG_STRING, 	&program_data,			N_( "Path to search for data and configuration files" ),	NULL },
+
+#ifdef HAVE_PLUGINS
+		{ "plugins",	 		'p', 0, G_OPTION_ARG_STRING, 	&plugin_list,			N_( "Full path of plugins to load" ),						NULL },
+#endif
 
 		{ NULL }
 	};

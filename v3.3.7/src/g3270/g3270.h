@@ -193,8 +193,13 @@
 	extern gboolean 				WaitingForChanges;
 	extern char					*charset;
 	extern gchar 					*window_title;
+	extern gchar					*program_data;
 	extern gboolean				drawing_enabled;
 	extern gchar					*g3270_config_filename;
+
+#ifdef HAVE_PLUGINS
+	extern gchar					*plugin_list;
+#endif
 
 	extern GtkActionGroup			*action_group[ACTION_GROUP_MAX];
 
