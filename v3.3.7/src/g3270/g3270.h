@@ -194,6 +194,7 @@
 	extern char					*charset;
 	extern gchar 					*window_title;
 	extern gchar					*program_data;
+	extern gchar					*program_logo;
 	extern gboolean				drawing_enabled;
 	extern gchar					*g3270_config_filename;
 
