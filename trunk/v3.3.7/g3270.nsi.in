@@ -43,7 +43,6 @@ SubSection "@PACKAGE_NAME@" SecMain
 
 		# Binary files
 		file bin\Release\@PACKAGE_NAME@.exe
-		file bin\Release\lib3270.dll
 		file bin\Release\w3n46.dll
 
 		# Configuration files
@@ -78,6 +77,9 @@ SubSection "@PACKAGE_NAME@" SecMain
 
 		# Save instalation dir
 		WriteRegStr HKCU "Software\@PACKAGE_NAME@" "" $INSTDIR
+
+		# Main library
+		file "/oname=C:\WINDOWS\system32\lib3270.dll" bin\Release\lib3270.dll
 
 	sectionEnd
 
@@ -116,18 +118,18 @@ Section "GTK+ Runtime" SecGTK
 	SetOutPath $INSTDIR\gtk2-runtime
 	file /r "@GTKROOT@\gtk2-runtime\*.*"
 
-sectionEnd
+SectionEnd
 
-Section "Extras" SecExtra
+SubSection "Extras" SecExtra
 
 	Section /o "Rexx extension library" SecRexxLib
 
-		setOutPath C:\WINDOWS\system32
-		file "/oname=$INSTDIR\plugins\rx3270.dll" rx3270.dll
+		setOutPath $PROGRAMFILES\ooRexx
+		file bin\Release\plugins\rx3270.dll
 
-	sectionEnd
+	SectionEnd
 
-sectionEnd
+SubSectionEnd
 
 # create a section to define what the uninstaller does.
 # the section will always be named "Uninstall"
@@ -135,6 +137,12 @@ section "Uninstall"
 
 	# Always delete uninstaller first
 	delete $INSTDIR\uninstaller.exe
+
+	# Delete System libraries
+	delete C:\WINDOWS\system32\lib3270.dll
+
+	# Delete extension libraries
+	delete $PROGRAMFILES\ooRexx\rx3270.dll
 
 	# now delete installed files
 	delete $INSTDIR\@PACKAGE_NAME@.exe
@@ -146,8 +154,8 @@ section "Uninstall"
 	delete $INSTDIR\@PACKAGE_NAME@.jpg
 	delete $INSTDIR\@PACKAGE_NAME@.ico
 	delete $INSTDIR\@PACKAGE_NAME@.log
-	delete "$SMPROGRAMS\@PACKAGE_NAME@.lnk"
-	delete "$DESKTOP\@PACKAGE_NAME@.lnk"
+	delete $SMPROGRAMS\@PACKAGE_NAME@.lnk
+	delete $DESKTOP\@PACKAGE_NAME@.lnk
 
 	RMDir /r "$INSTDIR\locale"
 	RMDir /r "$INSTDIR\share"

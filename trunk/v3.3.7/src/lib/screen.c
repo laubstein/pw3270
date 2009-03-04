@@ -874,17 +874,18 @@ relabel(Boolean ignored unused)
 	    	return;
 #endif
 
-	if (PCONNECTED) {
-
+	if (PCONNECTED)
+	{
 #if defined(WC3270) /*[*/
 		if (profile_name != CN)
 			screen_title(profile_name);
 		else
-#else
-			screen_title(reconnect_host);
 #endif
+			screen_title(reconnect_host);
 
-	} else {
+	}
+	else
+	{
 	    	screen_title(0);
 	}
 }

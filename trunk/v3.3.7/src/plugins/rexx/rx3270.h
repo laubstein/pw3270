@@ -77,6 +77,7 @@
 	#define ReturnOk()  	strcpy(Retstr->strptr,"0"); Retstr->strlength = 1; return RXFUNC_OK;
 
 	/* Rexx entry points */
+
 	ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270Init(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
