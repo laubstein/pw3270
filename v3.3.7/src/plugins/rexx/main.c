@@ -344,3 +344,4 @@ ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuena
     return RXFUNC_OK;
  }
 
+

@@ -41,7 +41,7 @@ MKFB = mkfb
 CC = @CC@
 
 # Set compile/link parameters
-windows-dllflags=-Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--exclude-symbols,REXXAPI_NULL_THUNK_DATA -Wl,--exclude-symbols,rexx_NULL_THUNK_DATA
+windows-dllflags=-Wl,--add-stdcall-alias  -Wl,--enable-auto-import -Wl,--exclude-symbols,REXXAPI_NULL_THUNK_DATA -Wl,--exclude-symbols,rexx_NULL_THUNK_DATA
 CFLAGS = @EXTRA_FLAGS@ -g -Wall @GTK_CFLAGS@ @REXX_CFLAGS@ -O -I../../include
 DLLFLAGS = @EXTRA_FLAGS@ @REXX_LIBS@ @GTK_LIBS@ -shared $(@host_os@-dllflags)
 
