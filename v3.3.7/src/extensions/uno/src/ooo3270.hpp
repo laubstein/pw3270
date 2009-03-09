@@ -40,8 +40,7 @@ using namespace ::com::sun::star::lang;
 using namespace ::com::sun::star::registry;
 using namespace ::br::com::bb;
 
-class I3270Impl : public I3270, public ::cppu::WeakImplHelper2< XCountable, XServiceInfo >
-// public XServiceInfo, public XTypeProvider
+class I3270Impl : public I3270, public XServiceInfo, public XTypeProvider
 {
 public:
 	I3270Impl( const Reference< XMultiServiceFactory > & xServiceManager );

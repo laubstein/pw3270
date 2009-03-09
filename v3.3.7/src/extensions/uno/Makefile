@@ -52,8 +52,13 @@ OO_LDFLAGS ?= -L$(OFFICE_HOME)/ure/lib -L$(OO_SDK_HOME)/lib -Wl,-rpath-link=$(OF
 IDLC ?= LD_LIBRARY_PATH=$(OFFICE_HOME)/ure/lib/ $(OO_SDK_HOME)/bin/idlc
 CPPUMAKER ?= LD_LIBRARY_PATH=$(OFFICE_HOME)/ure/lib/ $(OO_SDK_HOME)/bin/cppumaker
 REGMERGE ?= LD_LIBRARY_PATH=$(OFFICE_HOME)/ure/lib/ $(OFFICE_HOME)/ure/bin/regmerge
+REGCOMP ?= $(OFFICE_HOME)/ure/bin/regcomp
 
 #---[ Debug Rules ]------------------------------------------------------------------------------------------------
+
+x: bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
+	@cp src/$(COMP_NAME).uno.rdb bin/Debug
+	$(REGCOMP) -register -r bin/Debug/$(COMP_NAME).uno.rdb -c bin/Debug/$(COMP_IMPL_NAME)
 
 Debug: bin/Debug/$(COMP_NAME)
 

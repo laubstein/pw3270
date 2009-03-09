@@ -49,9 +49,9 @@ Sequence<OUString> SAL_CALL I3270Impl::getSupportedServiceNames(  ) throw(Runtim
 
 Sequence<OUString> SAL_CALL I3270Impl::getSupportedServiceNames_Static(  )
 {
-	OUString aName( RTL_CONSTASCII_USTRINGPARAM(SERVICENAME) );
+	OUString aName( RTL_CONSTASCII_USTRINGPARAM( SERVICENAME ) );
 
-	Trace("%s",__FUNCTION__);
+	Trace("%s returns: \"%s\"",__FUNCTION__,SERVICENAME);
 
 	return Sequence< OUString >( &aName, 1 );
 }
@@ -157,7 +157,7 @@ Any SAL_CALL I3270Impl::queryInterface( const Type & rType ) throw (RuntimeExcep
 {
 	Trace("%s",__FUNCTION__);
 
-	return cppu::queryInterface(rType,
+	return cppu::queryInterface( rType,
 					static_cast< XInterface* >( static_cast< XServiceInfo* >( this ) ),
 					static_cast< I3270* >( this ),
 					static_cast< XServiceInfo* >( this ) );
@@ -199,7 +199,7 @@ Sequence< Type > SAL_CALL I3270Impl::getTypes(  ) throw (RuntimeException)
 
 	seq[ 0 ] = ::cppu::UnoType< Reference< XTypeProvider > >::get();
 	seq[ 1 ] = ::cppu::UnoType< Reference< XServiceInfo > >::get();
-	seq[ 2 ] = ::cppu::UnoType< Reference< IMPLNAME > >::get();
+	seq[ 2 ] = ::cppu::UnoType< Reference< I3270 > >::get();
 
 	return seq;
 }
