@@ -1,0 +1,120 @@
+
+
+SHAREDLIB_EXT ?= so
+
+#---[ Component Data ]---------------------------------------------------------------------------------------------
+
+COMP_NAME = Ooo3270
+INTF_NAME = I3270
+OWNER_PATH = br/com/bb
+COMP_IMPL_NAME = $(COMP_NAME).uno.$(SHAREDLIB_EXT)
+COMP_RDB_NAME = $(COMP_NAME).uno.rdb
+
+CXX_FILES=main.cxx connection.cxx
+
+#---[ Settings ]---------------------------------------------------------------------------------------------------
+
+CPPU_ENV ?= gcc3
+
+#---[ OpenOffice environment variables ]---------------------------------------------------------------------------
+
+OO_SDK_HOME ?= /usr/lib/ooo3/solver
+OFFICE_HOME ?= /usr/lib/ooo3
+
+OO_INCLUDE_PATH ?= $(OO_SDK_HOME)/inc
+OO_CXX_INCLUDE_PATH ?= $(OO_SDK_HOME)/inc/offuh
+
+OO_CXXFLAGS ?= -DUNX -DGCC -DLINUX=1 -DCPPU_ENV=$(CPPU_ENV) -DLANGUAGE_BINDING_NAME=\"$(CPPU_ENV)\" -I$(OO_INCLUDE_PATH) -I$(OO_CXX_INCLUDE_PATH) -Isrc/inc
+OO_LDFLAGS ?= -L$(OFFICE_HOME)/ure/lib -L$(OO_SDK_HOME)/lib -Wl,-rpath-link=$(OFFICE_HOME)/ure/lib
+
+# -luno_cppu
+# LINK_LIBS=-L$(OUT)/lib -L$(PRJ)/$(PLATFORM)/lib -L"$(OFFICE_PROGRAM_PATH)"
+
+#SALLIB=-luno_sal
+#CPPULIB=-luno_cppu
+#CPPUHELPERLIB=-luno_cppuhelper$(COMID)
+#SALHELPERLIB=-luno_salhelper$(COMID)
+#REGLIB=-lreg
+#STORELIB=-lstore
+#STLPORTLIB=-lstlport_gcc
+
+
+#OO_SDK_CPP_HOME ?= /usr/bin
+#OO_SDK_MAKE_HOME ?= /usr/bin
+#OO_SDK_OUT ?= /home/perry/openoffice.org3.0_sdk
+#OO_SDK_URE_BIN_DIR ?= /usr/lib/ooo3/program
+#OO_SDK_URE_JAVA_DIR ?= /opt/openoffice.org/basis3.0/program/classes
+#OO_SDK_URE_LIB_DIR ?= / opt/openoffice.org/basis3.0/program
+#OO_SDK_ZIP_HOME ?= /usr/bin
+
+#---[ OpenOffice Tools ]-------------------------------------------------------------------------------------------
+
+IDLC ?= LD_LIBRARY_PATH=$(OFFICE_HOME)/ure/lib/ $(OO_SDK_HOME)/bin/idlc
+CPPUMAKER ?= LD_LIBRARY_PATH=$(OFFICE_HOME)/ure/lib/ $(OO_SDK_HOME)/bin/cppumaker
+REGMERGE ?= LD_LIBRARY_PATH=$(OFFICE_HOME)/ure/lib/ $(OFFICE_HOME)/ure/bin/regmerge
+
+#---[ Debug Rules ]------------------------------------------------------------------------------------------------
+
+Debug: bin/Debug/$(COMP_NAME)
+
+bin/Debug/$(COMP_NAME): obj/Debug/src/test_program.o bin/Debug/$(COMP_IMPL_NAME)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	$(CXX) $(OO_LDFLAGS) -L$(OO_SDK_HOME)/lib -luno_cppuhelpergcc3 -L./bin/Debug bin/Debug/$(COMP_IMPL_NAME) -o $@ obj/Debug/src/test_program.o
+
+obj/Debug/src/%.o: src/%.cxx src/*.hpp src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CXX) -DDEBUG=1 $(CXXFLAGS) $(OO_CXXFLAGS) -ggdb -o $@ -c $<
+
+bin/Debug/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Debug/src/$(basename $(OBJ)).o)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CXX) $(OO_LDFLAGS) -shared -Wl,-soname,$(@F) -o $@ $^
+
+run: bin/Debug/$(COMP_NAME)
+	@LD_LIBRARY_PATH=$(OO_SDK_HOME)/ure/lib:$(OFFICE_HOME)/ure/lib:bin/Debug bin/Debug/$(COMP_NAME)
+
+#---[ Release Rules ]----------------------------------------------------------------------------------------------
+
+
+#---[ Uno Rules ]--------------------------------------------------------------------------------------------------
+
+src/$(COMP_NAME).uno.rdb : src/$(COMP_NAME).urd
+	@echo $< ...
+	@rm -f $@
+	@$(REGMERGE) $@ / $(OO_SDK_HOME)/bin/types.rdb
+	@$(REGMERGE) $@ /UCR $<
+	@$(REGMERGE) $@ / $<
+
+src/$(COMP_NAME).urd: src/$(COMP_NAME).idl Makefile
+	@echo $< ...
+	@$(IDLC) -C -I. -I$(OO_SDK_HOME)/idl -Osrc $<
+
+src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp: src/$(COMP_NAME).uno.rdb
+	@rm -fr src/inc
+	@mkdir -p src/inc
+	@cd src/inc ; $(CPPUMAKER) -Gc -L -BUCR ../$(COMP_NAME).uno.rdb
+
+#---[ Misc Rules ]-------------------------------------------------------------------------------------------------
+
+%.zip: clean
+	@rm -f $@
+	@zip -9 -r $@ .
+
+#---[ Targets ]----------------------------------------------------------------------------------------------------
+
+clean:
+	@rm -fr obj
+	@rm -fr bin
+	@rm -fr src/inc
+	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.log" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "leak.out" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.urd" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.rdb" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.tmp" -exec mv -f {} $(TMPDIR) \;
+
+

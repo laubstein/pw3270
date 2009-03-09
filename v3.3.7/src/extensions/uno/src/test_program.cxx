@@ -1,0 +1,110 @@
+
+#include <stdio.h>
+
+#include <rtl/ustring.hxx>
+
+#include <osl/diagnose.h>
+
+#include <cppuhelper/bootstrap.hxx>
+
+// generated c++ interfaces
+#include <com/sun/star/lang/XComponent.hpp>
+#include <com/sun/star/lang/XMultiComponentFactory.hpp>
+#include <com/sun/star/registry/XImplementationRegistration.hpp>
+#include <br/com/bb/I3270.hpp>
+
+#include "config.hpp"
+
+using namespace br::com::bb;
+using namespace cppu;
+using namespace com::sun::star::uno;
+using namespace com::sun::star::lang;
+using namespace com::sun::star::registry;
+
+using namespace ::rtl;
+
+
+#ifndef Trace
+	#define Trace( fmt, ... )		fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr)
+#endif
+
+
+/*---[ Implement ]-----------------------------------------------------------------------------------------*/
+
+int SAL_CALL main(int argc, char **argv)
+{
+	Trace("Calling %s","createSimpleRegistry");
+	printf("%s(%d)\n",__FILE__,__LINE__);
+	Reference< XSimpleRegistry > xReg = createSimpleRegistry();
+	OSL_ENSURE( xReg.is(), "### cannot get service instance of \"com.sun.star.regiystry.SimpleRegistry\"!" );
+
+//	printf("%s(%d)\n",__FILE__,__LINE__);
+//	xReg->open(OUString::createFromAscii("Ooo3270.uno.rdb"), sal_False, sal_False);
+	xReg->open(OUString::createFromAscii("src/Ooo3270.uno.rdb"), sal_False, sal_False);
+
+	OSL_ENSURE( xReg->isValid(), "### cannot open test registry \"Ooo3270.uno.rdb\"!" );
+
+	Trace("Calling %s","bootstrap_InitialComponentContext");
+	Reference< XComponentContext > xContext = bootstrap_InitialComponentContext(xReg);
+	OSL_ENSURE( xContext.is(), "### cannot creage intial component context!" );
+
+	Trace("Calling %s","getServiceManager");
+	Reference< XMultiComponentFactory > xMgr = xContext->getServiceManager();
+	OSL_ENSURE( xMgr.is(), "### cannot get initial service manager!" );
+
+	// register my component
+	Trace("Calling %s","createInstanceWithContext");
+
+	Reference< XImplementationRegistration > xImplReg(
+		xMgr->createInstanceWithContext(OUString::createFromAscii("com.sun.star.registry.ImplementationRegistration"), xContext), UNO_QUERY);
+	OSL_ENSURE( xImplReg.is(), "### cannot get service instance of \"com.sun.star.registry.ImplementationRegistration\"!" );
+
+	if (xImplReg.is())
+	{
+		xImplReg->registerImplementation(
+			OUString::createFromAscii("com.sun.star.loader.SharedLibrary"), // loader for component
+
+#ifdef UNX
+#ifdef MACOSX
+			OUString::createFromAscii("Ooo3270.uno.so.dylib"),		// component location
+#else
+			OUString::createFromAscii("bin/Debug/Ooo3270.uno.so"),		// component location
+#endif
+#else
+			OUString::createFromAscii("Ooo3270.uno.dll"),		// component location
+#endif
+			Reference< XSimpleRegistry >()	 // registry omitted,
+						 // defaulting to service manager registry used
+			);
+
+		// get an object instance
+		Trace("Calling %s","createInstanceWithContext");
+
+		Reference< XInterface > xx ;
+		xx = xMgr->createInstanceWithContext(OUString::createFromAscii(IMPLNAME), xContext);
+
+		Reference< I3270 > xCount( xx, UNO_QUERY );
+
+		OSL_ENSURE( xCount.is(), "### cannot get service instance!");
+
+		Trace("object.is(): %d",xCount.is());
+
+		if(xCount.is())
+		{
+			// Wait for commands
+			char buffer[80];
+
+//						Trace("Connect(): %d" , xCount->Connect(OUString::createFromAscii("L:3270.df.bb:9023")));
+
+
+			printf("Waiting...\n");
+			fgets(buffer,80,stdin);
+
+
+		}
+	}
+
+
+	Reference< XComponent >::query( xContext )->dispose();
+	return 0;
+}

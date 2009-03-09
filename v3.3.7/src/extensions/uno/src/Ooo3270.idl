@@ -1,0 +1,53 @@
+
+#include <com/sun/star/uno/XInterface.idl>
+#include <com/sun/star/lang/XTypeProvider.idl>
+
+/*
+
+	http://wiki.services.openoffice.org/wiki/IDL_Files_and_Cpp
+	http://wiki.services.openoffice.org/wiki/IDL_Files_and_Cpp#Specifying_an_interface
+
+ */
+
+module br { module com { module bb {
+
+   /**
+     * Interface to lib3270.
+     */
+    interface I3270 : com::sun::star::uno::XInterface
+    {
+		string	getVersion();
+
+        short	Connect( [in] string hostinfo );
+        short 	Disconnect();
+        short	getConnectionState();
+
+        /*
+
+        setToggle()
+        getToggle()
+
+        getScreenContents()
+        queryScreenContent()
+
+		getCursorRow()
+		getCursorCol()
+
+		setCursorPosition()
+
+		InputString()
+		InputPFKey()
+		InputEnter()
+
+        */
+
+    };
+
+    service g3270
+    {
+        // exported interfaces:
+        interface I3270;
+    };
+
+}; }; };
+
