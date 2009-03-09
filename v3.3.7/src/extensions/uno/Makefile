@@ -20,6 +20,7 @@ CPPU_ENV ?= gcc3
 
 OO_SDK_HOME ?= /usr/lib/ooo3/solver
 OFFICE_HOME ?= /usr/lib/ooo3
+OO_PROGRAM_DIR ?= $(OFFICE_HOME)/basis3.0/program
 
 OO_INCLUDE_PATH ?= $(OO_SDK_HOME)/inc
 OO_CXX_INCLUDE_PATH ?= $(OO_SDK_HOME)/inc/offuh
@@ -56,10 +57,11 @@ REGCOMP ?= $(OFFICE_HOME)/ure/bin/regcomp
 
 #---[ Debug Rules ]------------------------------------------------------------------------------------------------
 
-#x: bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
-#	@cp src/$(COMP_NAME).uno.rdb bin/Debug
-#	$(REGCOMP) -register -r bin/Debug/$(COMP_NAME).uno.rdb -c bin/Debug/$(COMP_IMPL_NAME)
-#
+install-debug: bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
+	@cp -f bin/Debug/$(COMP_IMPL_NAME) $(OO_PROGRAM_DIR)
+	@cp -f src/$(COMP_NAME).uno.rdb $(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb
+	@$(REGCOMP) -register -r $(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb -c $(OO_PROGRAM_DIR)/$(COMP_IMPL_NAME)
+	@echo "bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb -> $(OO_PROGRAM_DIR)"
 
 Debug: bin/Debug/$(COMP_NAME)
 
