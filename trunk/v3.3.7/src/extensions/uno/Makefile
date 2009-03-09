@@ -56,9 +56,10 @@ REGCOMP ?= $(OFFICE_HOME)/ure/bin/regcomp
 
 #---[ Debug Rules ]------------------------------------------------------------------------------------------------
 
-x: bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
-	@cp src/$(COMP_NAME).uno.rdb bin/Debug
-	$(REGCOMP) -register -r bin/Debug/$(COMP_NAME).uno.rdb -c bin/Debug/$(COMP_IMPL_NAME)
+#x: bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
+#	@cp src/$(COMP_NAME).uno.rdb bin/Debug
+#	$(REGCOMP) -register -r bin/Debug/$(COMP_NAME).uno.rdb -c bin/Debug/$(COMP_IMPL_NAME)
+#
 
 Debug: bin/Debug/$(COMP_NAME)
 
