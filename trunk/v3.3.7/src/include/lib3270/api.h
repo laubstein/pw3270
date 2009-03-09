@@ -352,6 +352,12 @@
         int     cursor_set_addr(int baddr);
 		#define cursor_move(x) cursor_set_addr(x)
 
+	/* Host connect/disconnect and state change. */
+	extern int host_connect(const char *n);
+	extern int host_reconnect(void);
+	extern void host_disconnect(int disable);
+	extern void register_schange(int tx, void (*func)(int));
+
 
 #ifdef __cplusplus
 	}

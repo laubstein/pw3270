@@ -38,7 +38,7 @@
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
  #include <lib3270/toggle.h>
- #include <lib3270/hostc.h>
+// #include <lib3270/hostc.h>
  #include <lib3270/plugins.h>
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
@@ -508,6 +508,6 @@
 
  void g3270_quit(void)
  {
- 	action_internal(Disconnect_action, IA_DEFAULT, CN, CN);
+ 	host_disconnect(0);
 	gtk_main_quit();
  }

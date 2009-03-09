@@ -83,23 +83,26 @@ int SAL_CALL main(int argc, char **argv)
 		Reference< XInterface > xx ;
 		xx = xMgr->createInstanceWithContext(OUString::createFromAscii(IMPLNAME), xContext);
 
-		Reference< I3270 > xCount( xx, UNO_QUERY );
+		Reference< I3270 > srv( xx, UNO_QUERY );
 
-		OSL_ENSURE( xCount.is(), "### cannot get service instance!");
+		OSL_ENSURE( srv.is(), "### cannot get service instance!");
 
-		Trace("object.is(): %d",xCount.is());
+		Trace("object.is(): %d",srv.is());
 
-		if(xCount.is())
+		if(srv.is())
 		{
 			// Wait for commands
 			char buffer[80];
 
-//						Trace("Connect(): %d" , xCount->Connect(OUString::createFromAscii("L:3270.df.bb:9023")));
+			Trace("getConnectionState: %d", srv->getConnectionState());
+			Trace("Connect(): %d" , srv->Connect(OUString::createFromAscii("L:3270.df.bb:9023")));
 
 
 			printf("Waiting...\n");
 			fgets(buffer,80,stdin);
 
+
+			Trace("Disconnect(): %d" , srv->Disconnect());
 
 		}
 	}

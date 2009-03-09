@@ -64,7 +64,7 @@
 #include "windirsc.h"
 #endif /*]*/
 
-#include <lib3270/hostc.h>
+// #include <lib3270/hostc.h>
 
 
 #if !defined(_WIN32) /*[*/
@@ -200,13 +200,13 @@ static const char	*startup_script = NULL;
 
 /* Callback for connection state changes. */
 #ifdef 	X3270_FT
-static void connect_3270(Boolean status)
+static void connect_3270(int status)
 {
 	gtk_action_group_set_sensitive(ft_actions,status);
 }
 #endif
 
-static void connect_main(Boolean status)
+static void connect_main(int status)
 {
 	gboolean online = (CONNECTED) ? TRUE : FALSE;
 

@@ -89,12 +89,12 @@ enum ts ab_mode = TS_AUTO;
 
 // int windows_cp = 0;
 
-static void status_connect(Boolean ignored);
-static void status_3270_mode(Boolean ignored);
-static void status_printer(Boolean on);
+static void status_connect(int ignored);
+static void status_3270_mode(int ignored);
+static void status_printer(int on);
 static int color_from_fa(unsigned char fa);
 static Boolean ts_value(const char *s, enum ts *tsp);
-static void relabel(Boolean ignored);
+static void relabel(int ignored);
 
 void
 set_display_charset(char *dcs)
@@ -637,7 +637,7 @@ status_lu(const char *lu)
 }
 
 static void
-status_connect(Boolean connected)
+status_connect(int connected)
 {
 	STATUS_CODE id = STATUS_CODE_USER;
 
@@ -667,7 +667,7 @@ status_connect(Boolean connected)
 }
 
 static void
-status_3270_mode(Boolean ignored unused)
+status_3270_mode(int ignored unused)
 {
 	Boolean oia_boxsolid = (IN_3270 && !IN_SSCP);
 	if(oia_boxsolid)
@@ -677,7 +677,7 @@ status_3270_mode(Boolean ignored unused)
 }
 
 static void
-status_printer(Boolean on)
+status_printer(int on)
 {
 	set(OIA_FLAG_PRINTER,on);
 }
@@ -867,7 +867,7 @@ Title_action(Widget w unused, XEvent *event, String *params,
 }
 
 static void
-relabel(Boolean ignored unused)
+relabel(int ignored unused)
 {
 #if defined(WC3270) /*[*/
 	if (appres.title != CN)
