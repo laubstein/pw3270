@@ -31,7 +31,6 @@
  */
 
  #include "rx3270.h"
- #include <lib3270/hostc.h>
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
@@ -165,6 +164,7 @@
 		return RetValue(Retstr,ENOTCONN);
 	}
 
+	host_disconnect(0);
 	return RetValue(Retstr,0);
  }
 

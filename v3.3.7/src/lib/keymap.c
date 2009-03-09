@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como keymap.c e possui 1056 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -84,7 +84,7 @@ static Boolean last_3270 = False;
 static Boolean last_nvt = False;
 
 // static int lookup_ccode(const char *s);
-static void keymap_3270_mode(Boolean);
+static void keymap_3270_mode(int);
 
 // static void read_one_keymap(const char *name, const char *fn, const char *r0,int flags);
 static void clear_keymap(void);
@@ -957,7 +957,7 @@ set_inactive(void)
 
 /* 3270/NVT mode change. */
 static void
-keymap_3270_mode(Boolean ignored unused)
+keymap_3270_mode(int ignored unused)
 {
 	if (last_3270 != IN_3270 || last_nvt != IN_ANSI) {
 		last_3270 = IN_3270;

@@ -62,13 +62,13 @@ REGCOMP ?= $(OFFICE_HOME)/ure/bin/regcomp
 
 #---[ Debug Rules ]------------------------------------------------------------------------------------------------
 
-install-debug: bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
-	@cp -f bin/Debug/$(COMP_IMPL_NAME) $(OO_PROGRAM_DIR)
-	@cp -f src/$(COMP_NAME).uno.rdb $(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb
-	@$(REGCOMP) -register -r $(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb -c $(OO_PROGRAM_DIR)/$(COMP_IMPL_NAME)
-	@echo "bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb -> $(OO_PROGRAM_DIR)"
-
 Debug: bin/Debug/$(COMP_NAME)
+
+install-debug: bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
+	@cp -f bin/Debug/$(COMP_IMPL_NAME) $(DESTDIR)/$(OO_PROGRAM_DIR)
+	@cp -f src/$(COMP_NAME).uno.rdb $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb
+	@$(REGCOMP) -register -r $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb -c $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_IMPL_NAME)
+	@echo "bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb -> $(OO_PROGRAM_DIR)"
 
 bin/Debug/$(COMP_NAME): obj/Debug/src/test_program.o bin/Debug/$(COMP_IMPL_NAME)
 	@echo $@ ...
@@ -83,7 +83,7 @@ obj/Debug/src/%.o: src/%.cxx src/*.hpp src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 bin/Debug/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Debug/src/$(basename $(OBJ)).o)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CXX) $(OO_LDFLAGS) -shared -Wl,-soname,$(@F) -o $@ $^
+	@$(CXX) $(OO_LDFLAGS) $(G3270_LFLAGS) -shared -Wl,-soname,$(@F) -o $@ $^
 
 run: bin/Debug/$(COMP_NAME)
 	@LD_LIBRARY_PATH=$(OO_SDK_HOME)/ure/lib:$(OFFICE_HOME)/ure/lib:bin/Debug bin/Debug/$(COMP_NAME)

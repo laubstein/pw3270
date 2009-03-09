@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como host.c e possui 1054 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -669,8 +669,7 @@ host_connect(const char *n)
 /*
  * Reconnect to the last host.
  */
-static void
-host_reconnect(void)
+static void reconnect(void)
 {
 	if (auto_reconnect_inprogress || current_host == CN ||
 	    CONNECTED || HALF_CONNECTED)
@@ -687,12 +686,12 @@ try_reconnect(void)
 {
 	WriteLog("3270","Starting auto-reconnect (Host: %s)",reconnect_host ? reconnect_host : "-");
 	auto_reconnect_inprogress = False;
-	host_reconnect();
+	reconnect();
 }
 #endif /*]*/
 
 void
-host_disconnect(Boolean failed)
+host_disconnect(int failed)
 {
 	if (CONNECTED || HALF_CONNECTED) {
 		x_remove_input();
@@ -959,14 +958,14 @@ save_recent(const char *hn)
 
 struct st_callback {
 	struct st_callback *next;
-	void (*func)(Boolean);
+	void (*func)(int);
 };
 static struct st_callback *st_callbacks[N_ST];
 static struct st_callback *st_last[N_ST];
 
 /* Register a function interested in a state change. */
 void
-register_schange(int tx, void (*func)(Boolean))
+register_schange(int tx, void (*func)(int))
 {
 	struct st_callback *st;
 
@@ -982,7 +981,7 @@ register_schange(int tx, void (*func)(Boolean))
 
 /* Signal a state change. */
 void
-st_changed(int tx, Boolean mode)
+st_changed(int tx, int mode)
 {
 	struct st_callback *st;
 
@@ -1017,6 +1016,13 @@ Connect_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 }
 
 #if defined(X3270_MENUS) || defined(G3270) /*[*/
+
+ int host_reconnect(void)
+ {
+	action_internal(Reconnect_action, IA_DEFAULT, CN, CN);
+	return 0;
+ }
+
 void
 Reconnect_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
