@@ -226,14 +226,15 @@ Sequence<sal_Int8> SAL_CALL I3270Impl::getImplementationId(void) throw (RuntimeE
 Sequence< Type > SAL_CALL I3270Impl::getTypes(  ) throw (RuntimeException)
 {
 	// http://wiki.services.openoffice.org/wiki/Documentation/DevGuide/WritingUNO/C%2B%2B/Implementing_without_Helpers
-	Sequence< Type > seq( 2 );
+	Sequence< Type > seq( 3 );
 
-	Trace("%s",__FUNCTION__);
+	Trace("%s begin",__FUNCTION__);
 
 	seq[ 0 ] = ::cppu::UnoType< Reference< lang::XTypeProvider > >::get();
 	seq[ 1 ] = ::cppu::UnoType< Reference< lang::XServiceInfo > >::get();
-//	seq[ 2 ] = ::cppu::UnoType< Reference< I3270 > >::get();
+	seq[ 2 ] = ::cppu::UnoType< Reference< I3270 > >::get();
 
+	Trace("%s ends",__FUNCTION__);
 	return seq;
 }
 
