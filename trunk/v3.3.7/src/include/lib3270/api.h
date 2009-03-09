@@ -33,6 +33,10 @@
 
 #ifndef LIB3270_H_INCLUDED
 
+#ifdef __cplusplus
+	extern "C" {
+#endif
+
 		#define LIB3270_H_INCLUDED "2.0"
 
 		#include <errno.h>
@@ -348,5 +352,9 @@
         int     cursor_set_addr(int baddr);
 		#define cursor_move(x) cursor_set_addr(x)
 
+
+#ifdef __cplusplus
+	}
+#endif
 
 #endif // LIB3270_H_INCLUDED
