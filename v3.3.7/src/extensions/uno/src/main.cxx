@@ -153,17 +153,50 @@ void SAL_CALL I3270Impl::release() throw ()
 		delete this;
 }
 
-Any SAL_CALL I3270Impl::queryInterface( const Type & rType ) throw (RuntimeException)
+Any I3270Impl::queryInterface( Type const & type ) throw (RuntimeException)
 {
-	Trace("%s",__FUNCTION__);
+	if (type.equals( ::cppu::UnoType< Reference< XInterface > >::get()))
+	{
+		// return XInterface interface (resolve ambiguity caused by multiple inheritance from
+		// XInterface subclasses by casting to lang::XTypeProvider)
+		Trace("%s(type).equals %s",__FUNCTION__,"XInterface");
+		Reference< XInterface > x( static_cast< lang::XTypeProvider * >( this ) );
+		return makeAny( x );
 
-	return cppu::queryInterface( rType,
-					static_cast< XInterface* >( static_cast< XServiceInfo* >( this ) ),
-					static_cast< I3270* >( this ),
-					static_cast< XServiceInfo* >( this ) );
+	}
+	if (type.equals( ::cppu::UnoType< Reference< lang::XTypeProvider > >::get()))
+	{
+		// return XInterface interface
+		Trace("%s(type).equals %s",__FUNCTION__,"lang::XTypeProvider");
+		Reference< lang::XTypeProvider > x( static_cast< lang::XTypeProvider * >( this ) );
+		return makeAny( x );
+
+	}
+	if (type.equals( ::cppu::UnoType< Reference< lang::XServiceInfo > >::get()))
+	{
+		// return XServiceInfo interface
+		Trace("%s(type).equals %s",__FUNCTION__,"lang::XServiceInfo");
+		Reference< lang::XServiceInfo > x( static_cast< lang::XServiceInfo * >( this ) );
+		return makeAny( x );
+
+	}
+	if (type.equals( ::cppu::UnoType< Reference< I3270 > >::get()))
+	{
+		// return sample interface
+		Trace("%s(type).equals %s",__FUNCTION__,"I3270");
+		Reference< I3270 > x( static_cast< I3270 * >( this ) );
+		return makeAny( x );
+
+	}
+
+	// querying for unsupported type
+	Trace("%s(type).equals %s",__FUNCTION__,"Unsupported");
+
+	return Any();
+
 }
 
-/*---[ Implement XTypeProvides ]---------------------------------------------------------------------------*/
+/*---[ Implement XTypeProvider ]---------------------------------------------------------------------------*/
 
 Sequence<sal_Int8> SAL_CALL I3270Impl::getImplementationId(void) throw (RuntimeException)
 {
@@ -193,13 +226,13 @@ Sequence<sal_Int8> SAL_CALL I3270Impl::getImplementationId(void) throw (RuntimeE
 Sequence< Type > SAL_CALL I3270Impl::getTypes(  ) throw (RuntimeException)
 {
 	// http://wiki.services.openoffice.org/wiki/Documentation/DevGuide/WritingUNO/C%2B%2B/Implementing_without_Helpers
-	Sequence< Type > seq( 3 );
+	Sequence< Type > seq( 2 );
 
 	Trace("%s",__FUNCTION__);
 
-	seq[ 0 ] = ::cppu::UnoType< Reference< XTypeProvider > >::get();
-	seq[ 1 ] = ::cppu::UnoType< Reference< XServiceInfo > >::get();
-	seq[ 2 ] = ::cppu::UnoType< Reference< I3270 > >::get();
+	seq[ 0 ] = ::cppu::UnoType< Reference< lang::XTypeProvider > >::get();
+	seq[ 1 ] = ::cppu::UnoType< Reference< lang::XServiceInfo > >::get();
+//	seq[ 2 ] = ::cppu::UnoType< Reference< I3270 > >::get();
 
 	return seq;
 }
