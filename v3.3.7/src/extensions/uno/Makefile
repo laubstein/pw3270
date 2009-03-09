@@ -2,6 +2,11 @@
 
 SHAREDLIB_EXT ?= so
 
+#---[ G3270 ]------------------------------------------------------------------------------------------------------
+
+G3270_CFLAGS ?= `pkg-config --cflags g3270`
+G3270_LFLAGS ?= `pkg-config --libs g3270`
+
 #---[ Component Data ]---------------------------------------------------------------------------------------------
 
 COMP_NAME = Ooo3270
@@ -73,7 +78,7 @@ bin/Debug/$(COMP_NAME): obj/Debug/src/test_program.o bin/Debug/$(COMP_IMPL_NAME)
 obj/Debug/src/%.o: src/%.cxx src/*.hpp src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CXX) -DDEBUG=1 $(CXXFLAGS) $(OO_CXXFLAGS) -ggdb -o $@ -c $<
+	@$(CXX) -DDEBUG=1 $(CXXFLAGS) $(OO_CXXFLAGS) $(G3270_CFLAGS) -ggdb -o $@ -c $<
 
 bin/Debug/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Debug/src/$(basename $(OBJ)).o)
 	@echo $@ ...
