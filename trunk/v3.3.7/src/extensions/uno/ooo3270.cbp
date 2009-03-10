@@ -39,6 +39,7 @@
 		<Unit filename="src/inc/br/com/bb/I3270.hdl" />
 		<Unit filename="src/main.cxx" />
 		<Unit filename="src/ooo3270.hpp" />
+		<Unit filename="src/screen.cxx" />
 		<Unit filename="src/test_program.cxx" />
 		<Extensions>
 			<code_completion />

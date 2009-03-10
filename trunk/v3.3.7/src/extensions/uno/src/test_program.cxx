@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include <rtl/ustring.hxx>
 
@@ -97,10 +98,11 @@ int SAL_CALL main(int argc, char **argv)
 			Trace("getConnectionState: %d", srv->getConnectionState());
 			Trace("Connect(): %d" , srv->Connect(OUString::createFromAscii("L:3270.df.bb:9023")));
 
+			sleep(2);
+			srv->getScreenContentAt(20,39,5);
 
 			printf("Waiting...\n");
 			fgets(buffer,80,stdin);
-
 
 			Trace("Disconnect(): %d" , srv->Disconnect());
 

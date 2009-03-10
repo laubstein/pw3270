@@ -62,11 +62,16 @@ public:
 	virtual Sequence<sal_Int8> SAL_CALL getImplementationId(void) throw (RuntimeException);
 	virtual Sequence< Type > SAL_CALL getTypes() throw (RuntimeException);
 
-	// I3270 implementation
+	// I3270 implementation - Main
+	virtual OUString SAL_CALL getVersion() throw (RuntimeException);
+
+	// I3270 implementation - Connect/Disconnect
 	virtual sal_Int16 SAL_CALL getConnectionState() throw (RuntimeException);
 	virtual sal_Int16 SAL_CALL Connect( const OUString& hostinfo ) throw (RuntimeException);
 	virtual sal_Int16 SAL_CALL Disconnect() throw (RuntimeException);
-	virtual OUString SAL_CALL getVersion() throw (RuntimeException);
+
+	// I3270 implementation - Screen
+    virtual ::rtl::OUString SAL_CALL getScreenContentAt( ::sal_Int16 row, ::sal_Int16 col, ::sal_Int16 size ) throw (::com::sun::star::uno::RuntimeException);
 
 private:
 	sal_Int32 m_nRefCount;

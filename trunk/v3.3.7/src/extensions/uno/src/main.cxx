@@ -1,7 +1,8 @@
 
 #include "ooo3270.hpp"
-
 #include <rtl/uuid.h>
+
+#include <lib3270/api.h>
 
 // http://wiki.services.openoffice.org/wiki/Counter_Example
 // http://openoffice.org.sourcearchive.com/documentation/1.1.3/classframework_1_1BackingComp_69f84955c44b2e8be98cdbb6f4b675e7.html#69f84955c44b2e8be98cdbb6f4b675e7
@@ -240,9 +241,19 @@ Sequence< Type > SAL_CALL I3270Impl::getTypes(  ) throw (RuntimeException)
 
 /*---[ Implement I3270 ]-----------------------------------------------------------------------------------*/
 
+static bool started = false;
+
 I3270Impl::I3270Impl( const Reference< XMultiServiceFactory > & xServiceManager ) : m_nRefCount(0)
 {
 	Trace("Object created %s",__FUNCTION__);
+
+	if(!started)
+	{
+		started = true;
+		lib3270_init(PROGRAM_NAME);
+	}
+
+
 
 }
 
