@@ -177,7 +177,7 @@
 			int 			(*CallAndWait)(int(*callback)(void *), void *parm);
 
 			int				(*Wait)(int seconds);
-			void 			(*RunPendingEvents)(int wait);
+			int 			(*RunPendingEvents)(int wait);
 
 
 		};

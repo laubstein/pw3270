@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como telnet.c e possui 3473 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -919,6 +919,7 @@ net_input(void)
 
 #if defined(_WIN32) /*[*/
 		if (HALF_CONNECTED) {
+
 			if (connect(sock, &haddr.sa, sizeof(haddr)) < 0) {
 				int err = GetLastError();
 
@@ -1010,8 +1011,10 @@ net_input(void)
 
 		/* Process the data. */
 
-		if (HALF_CONNECTED) {
-			if (non_blocking(False) < 0) {
+		if (HALF_CONNECTED)
+		{
+			if (non_blocking(False) < 0)
+			{
 				host_disconnect(True);
 				return;
 			}
@@ -1065,6 +1068,7 @@ net_input(void)
 #endif /*]*/
 
 	}
+
 }
 
 

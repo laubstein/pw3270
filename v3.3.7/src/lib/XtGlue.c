@@ -90,7 +90,7 @@ static unsigned long DefaultAddOutput(int source, void (*fn)(void));
 
 static void DefaultRemoveInput(unsigned long id);
 
-static void DefaultProcessEvents(int block);
+static int DefaultProcessEvents(int block);
 
 static const struct lib3270_io_callbacks default_io_callbacks =
 {
@@ -111,7 +111,7 @@ static const struct lib3270_io_callbacks default_io_callbacks =
 	NULL, 		// int (*CallAndWait)(int(*callback)(void *), void *parm);
 
 	NULL, 		// int (*Wait)(int seconds);
-	DefaultProcessEvents,	// void (*RunPendingEvents)(int wait);
+	DefaultProcessEvents,	// int (*RunPendingEvents)(int wait);
 
 };
 
@@ -197,6 +197,8 @@ static unsigned long DefaultAddTimeOut(unsigned long interval_ms, void (*proc)(v
 		prev->next = t_new;
 	}
 
+	Trace("Timeout added: %p",t_new);
+
 	return (unsigned long)t_new;
 }
 
@@ -205,6 +207,8 @@ static void DefaultRemoveTimeOut(unsigned long timer)
 	timeout_t *st = (timeout_t *)timer;
 	timeout_t *t;
 	timeout_t *prev = TN;
+
+	Trace("Removing timeout: %p",st);
 
 	if (st->in_play)
 		return;
@@ -242,6 +246,9 @@ static unsigned long DefaultAddInput(int source, void (*fn)(void))
 	ip->next = inputs;
 	inputs = ip;
 	inputs_changed = True;
+
+	Trace("Input source added(%d - %p): %p",source,fn,ip);
+
 	return (unsigned long)ip;
 }
 
@@ -259,6 +266,9 @@ static unsigned long DefaultAddExcept(int source, void (*fn)(void))
 	ip->next = inputs;
 	inputs = ip;
 	inputs_changed = True;
+
+	Trace("Input exception added(%d - %p): %p",source,fn,ip);
+
 	return (unsigned long)ip;
 #endif /*]*/
 }
@@ -275,6 +285,9 @@ static unsigned long DefaultAddOutput(int source, void (*fn)(void))
 	ip->next = inputs;
 	inputs = ip;
 	inputs_changed = True;
+
+	Trace("Output source added(%d - %p): %p",source,fn,ip);
+
 	return (unsigned long)ip;
 }
 #endif /*]*/
@@ -283,6 +296,8 @@ static void DefaultRemoveInput(unsigned long id)
 {
 	input_t *ip;
 	input_t *prev = (input_t *)NULL;
+
+	Trace("Removing input source: %p",(input_t *) id);
 
 	for (ip = inputs; ip != (input_t *)NULL; ip = ip->next) {
 		if (ip == (input_t *)id)
@@ -304,7 +319,7 @@ static void DefaultRemoveInput(unsigned long id)
 #endif /*]*/
 
 /* Event dispatcher. */
-static void DefaultProcessEvents(int block)
+static int DefaultProcessEvents(int block)
 {
 #if defined(_WIN32) /*[*/
 	HANDLE ha[MAX_HA];
@@ -321,13 +336,14 @@ static void DefaultProcessEvents(int block)
 	input_t *ip, *ip_next;
 	struct timeout *t;
 	Boolean any_events;
-	Boolean processed_any = False;
+	int processed_any = 0;
 
-	processed_any = False;
     retry:
+
 	/* If we've processed any input, then don't block again. */
-	if (processed_any)
-		block = False;
+
+	if(processed_any)
+		block = 0;
 	any_events = False;
 #if defined(_WIN32) /*[*/
 	nha = 0;
@@ -336,8 +352,10 @@ static void DefaultProcessEvents(int block)
 	FD_ZERO(&wfds);
 	FD_ZERO(&xfds);
 #endif /*]*/
-	for (ip = inputs; ip != (input_t *)NULL; ip = ip->next) {
-		if ((unsigned long)ip->condition & InputReadMask) {
+	for (ip = inputs; ip != (input_t *)NULL; ip = ip->next)
+	{
+		if ((unsigned long)ip->condition & InputReadMask)
+		{
 #if defined(_WIN32) /*[*/
 			ha[nha++] = (HANDLE)ip->source;
 #else /*][*/
@@ -346,17 +364,21 @@ static void DefaultProcessEvents(int block)
 			any_events = True;
 		}
 #if !defined(_WIN32) /*[*/
-		if ((unsigned long)ip->condition & InputWriteMask) {
+		if ((unsigned long)ip->condition & InputWriteMask)
+		{
 			FD_SET(ip->source, &wfds);
 			any_events = True;
 		}
-		if ((unsigned long)ip->condition & InputExceptMask) {
+		if ((unsigned long)ip->condition & InputExceptMask)
+		{
 			FD_SET(ip->source, &xfds);
 			any_events = True;
 		}
 #endif /*]*/
 	}
-	if (block) {
+
+	if (block)
+	{
 		if (timeouts != TN) {
 #if defined(_WIN32) /*[*/
 			ms_ts(&now);
@@ -387,7 +409,9 @@ static void DefaultProcessEvents(int block)
 			tp = &twait;
 #endif /*]*/
 		}
-	} else {
+	}
+	else
+	{
 #if defined(_WIN32) /*[*/
 		tmo = 1;
 #else /*][*/
@@ -397,46 +421,56 @@ static void DefaultProcessEvents(int block)
 	}
 
 	if (!any_events)
-		return;
+		return processed_any;
+
 #if defined(_WIN32) /*[*/
 	ret = WaitForMultipleObjects(nha, ha, FALSE, tmo);
-	if (ret == WAIT_FAILED) {
+	if (ret == WAIT_FAILED)
+	{
 #else /*][*/
 	ns = select(FD_SETSIZE, &rfds, &wfds, &xfds, tp);
-	if (ns < 0) {
+	if (ns < 0)
+	{
 		if (errno != EINTR)
-			Warning("process_events: select() failed");
+			Warning( "process_events: select() failed" );
 #endif /*]*/
-		return;
+		return processed_any;
 	}
+
 	inputs_changed = False;
+
 #if defined(_WIN32) /*[*/
-	for (i = 0, ip = inputs; ip != (input_t *)NULL; ip = ip_next, i++) {
+	for (i = 0, ip = inputs; ip != (input_t *)NULL; ip = ip_next, i++)
+	{
 #else /*][*/
-	for (ip = inputs; ip != (input_t *)NULL; ip = ip_next) {
+	for (ip = inputs; ip != (input_t *)NULL; ip = ip_next)
+	{
 #endif /*]*/
 		ip_next = ip->next;
 		if (((unsigned long)ip->condition & InputReadMask) &&
 #if defined(_WIN32) /*[*/
-		    ret == WAIT_OBJECT_0 + i) {
+		    ret == WAIT_OBJECT_0 + i)
+		{
 #else /*][*/
-		    FD_ISSET(ip->source, &rfds)) {
+		    FD_ISSET(ip->source, &rfds))
+		{
 #endif /*]*/
 			(*ip->proc)();
 			processed_any = True;
 			if (inputs_changed)
 				goto retry;
 		}
+
 #if !defined(_WIN32) /*[*/
-		if (((unsigned long)ip->condition & InputWriteMask) &&
-		    FD_ISSET(ip->source, &wfds)) {
+		if (((unsigned long)ip->condition & InputWriteMask) && FD_ISSET(ip->source, &wfds))
+		{
 			(*ip->proc)();
 			processed_any = True;
 			if (inputs_changed)
 				goto retry;
 		}
-		if (((unsigned long)ip->condition & InputExceptMask) &&
-		    FD_ISSET(ip->source, &xfds)) {
+		if (((unsigned long)ip->condition & InputExceptMask) && FD_ISSET(ip->source, &xfds))
+		{
 			(*ip->proc)();
 			processed_any = True;
 			if (inputs_changed)
@@ -469,8 +503,11 @@ static void DefaultProcessEvents(int block)
 				break;
 		}
 	}
+
 	if (inputs_changed)
 		goto retry;
+
+	return processed_any;
 
 }
 
