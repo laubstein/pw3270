@@ -41,11 +41,7 @@
 	#error Deprecated
 #endif /*]*/
 
-#if !defined(_WIN32) /*[*/
-	#include <sys/socket.h>
-	#include <netinet/in.h>
-	#include <netdb.h>
-#else /*][*/
+#ifdef WIN32
 
 	/* Compiling for WinXP or later: Expose getaddrinfo()/freeaddrinfo(). */
 	#undef _WIN32_WINNT
@@ -54,9 +50,16 @@
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
 
+#else
+
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <netdb.h>
+
 #endif /*]*/
 
 #include <stdio.h>
+#include <string.h>
 #include <lib3270/api.h>
 
 #include "resolverc.h"
@@ -83,7 +86,8 @@ struct parms
  */
 static int cresolve_host_and_port(struct parms *p)
 {
-#ifdef WIN32
+#ifdef AF_INET6
+
 	struct addrinfo	 hints, *res;
 	int		 rc;
 
