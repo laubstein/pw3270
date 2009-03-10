@@ -41,7 +41,6 @@
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
  #include <lib3270/toggle.h>
-// #include <lib3270/hostc.h>
  #include <lib3270/plugins.h>
 
  #ifndef GDK_NUMLOCK_MASK
@@ -315,6 +314,7 @@
 	DisableNetworkActions();
  	action_ClearSelection();
 
+	Trace("Calling %s","host_reconnect");
  	host_reconnect();
  }
 
