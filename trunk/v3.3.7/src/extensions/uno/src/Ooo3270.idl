@@ -18,7 +18,7 @@ module br { module com { module bb {
     {
 		string	getVersion();
 
-        short	Connect( [in] string hostinfo );
+        short	Connect( [in] string hostinfo, [in] short wait );
         short 	Disconnect();
         short	getConnectionState();
 

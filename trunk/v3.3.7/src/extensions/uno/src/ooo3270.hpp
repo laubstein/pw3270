@@ -67,7 +67,7 @@ public:
 
 	// I3270 implementation - Connect/Disconnect
 	virtual sal_Int16 SAL_CALL getConnectionState() throw (RuntimeException);
-	virtual sal_Int16 SAL_CALL Connect( const OUString& hostinfo ) throw (RuntimeException);
+	virtual sal_Int16 SAL_CALL Connect( const OUString& hostinfo, ::sal_Int16 wait ) throw (RuntimeException);
 	virtual sal_Int16 SAL_CALL Disconnect() throw (RuntimeException);
 
 	// I3270 implementation - Screen

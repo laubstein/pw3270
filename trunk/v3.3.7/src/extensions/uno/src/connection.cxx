@@ -17,7 +17,7 @@ sal_Int16 SAL_CALL I3270Impl::getConnectionState() throw (RuntimeException)
 	return (sal_Int16) QueryCstate();
 }
 
-sal_Int16 SAL_CALL I3270Impl::Connect( const OUString& hostinfo ) throw (RuntimeException)
+sal_Int16 SAL_CALL I3270Impl::Connect( const OUString& hostinfo, ::sal_Int16 wait) throw (RuntimeException)
 {
 	int		rc;
 	OString str = rtl::OUStringToOString( hostinfo , RTL_TEXTENCODING_ASCII_US );
@@ -27,22 +27,7 @@ sal_Int16 SAL_CALL I3270Impl::Connect( const OUString& hostinfo ) throw (Runtime
 	if(QueryCstate() != NOT_CONNECTED)
 		return EINVAL;
 
-	rc = host_connect(str.getStr());
-
-	Trace("host_connect: %d",rc);
-
-	if(rc >= 0)
-	{
-			RunPendingEvents(1);
-
-			rc = 0;
-			while(!IN_ANSI && !IN_3270 && !rc)
-			{
-					RunPendingEvents(1);
-					if(!PCONNECTED)
-						rc = ENOTCONN;
-			}
-	}
+	rc = host_connect(str.getStr(),wait);
 
 	Trace("%s(%s): %d (IN_ANSI: %d IN_3270: %d)",__FUNCTION__,str.getStr(),rc,IN_ANSI,IN_3270);
 
