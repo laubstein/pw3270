@@ -99,7 +99,10 @@ int SAL_CALL main(int argc, char **argv)
 			Trace("Connect(): %d" , srv->Connect(OUString::createFromAscii("L:3270.df.bb:9023")));
 
 			sleep(2);
-			srv->getScreenContentAt(20,39,5);
+			OUString str	= srv->getScreenContentAt(20,39,5);
+			OString  OStr	= OUStringToOString( str,RTL_TEXTENCODING_UTF8);
+
+			Trace("ContentsAt(20,39): \"%s\"",OStr.pData->buffer);
 
 			printf("Waiting...\n");
 			fgets(buffer,80,stdin);
