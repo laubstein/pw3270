@@ -23,22 +23,24 @@ module br { module com { module bb {
         short	getConnectionState();
 
         string	getScreenContentAt([in] short row, [in] short col, [in] short size);
+        string	getScreenContent();
+        short	waitForScreen([in] short timeout);
+        short	waitForStringAt([in] short row, [in] short col, [in] string key, [in] short timeout);
+
+		short	sendEnterKey();
+		short 	setStringAt([in] short row, [in] short col, [in] string str);
 
         /*
 
         setToggle()
         getToggle()
 
-        queryScreenContent()
-
 		getCursorRow()
 		getCursorCol()
 
 		setCursorPosition()
 
-		InputString()
-		InputPFKey()
-		InputEnter()
+		sendPFKey()
 
         */
 

@@ -34,6 +34,7 @@
 		</Compiler>
 		<Unit filename="Makefile" />
 		<Unit filename="src/Ooo3270.idl" />
+		<Unit filename="src/actions.cxx" />
 		<Unit filename="src/config.hpp" />
 		<Unit filename="src/connection.cxx" />
 		<Unit filename="src/inc/br/com/bb/I3270.hdl" />
