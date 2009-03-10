@@ -93,18 +93,23 @@ int SAL_CALL main(int argc, char **argv)
 		if(srv.is())
 		{
 			// Wait for commands
-			char buffer[80];
+			char	buffer[80];
+			OString	str;
 
 			Trace("getConnectionState: %d", srv->getConnectionState());
 			Trace("Connect(): %d" , srv->Connect(OUString::createFromAscii("L:3270.df.bb:9023")));
 
-			sleep(2);
-			OUString str	= srv->getScreenContentAt(20,39,5);
-			OString  OStr	= OUStringToOString( str,RTL_TEXTENCODING_UTF8);
+			//str	=  OUStringToOString( srv->getScreenContentAt(20,39,5),RTL_TEXTENCODING_UTF8);
+			//Trace("ContentsAt(20,39): \"%s\"",str.pData->buffer);
+			Trace("waitForStringAt(SISBB) returned %d",srv->waitForStringAt(20,39,OUString::createFromAscii("SISBB"),20));
+			Trace("sendEnterKey() returned %d",srv->sendEnterKey());
+			Trace("waitForStringAt(Senha) returned %d",srv->waitForStringAt(14,2,OUString::createFromAscii("Senha"),20));
+			Trace("setStringAt returned %d",srv->setStringAt(13,21,OUString::createFromAscii("c1103788")));
 
-			Trace("ContentsAt(20,39): \"%s\"",OStr.pData->buffer);
+			str	=  OUStringToOString( srv->getScreenContent(),RTL_TEXTENCODING_UTF8);
+			Trace("Entire screen:\n%s\n",str.pData->buffer);
 
-			printf("Waiting...\n");
+			printf("Enter to exit...\n");
 			fgets(buffer,80,stdin);
 
 			Trace("Disconnect(): %d" , srv->Disconnect());
