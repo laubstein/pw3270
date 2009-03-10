@@ -41,7 +41,7 @@ PLUGINS=@SELECTED_PLUGINS@
 @CROSS@
 windows-exeopt = -mwindows
 
-windows-targets = w3n46.dll
+# windows-targets = w3n46.dll
 TARGETS = $(PACKAGE)@BINEXT@ $(@host_os@-targets)
 
 # Set command paths and mkfb (which has to run locally)

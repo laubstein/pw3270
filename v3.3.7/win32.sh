@@ -1,7 +1,7 @@
 #!/bin/bash
 
 name=g3270
-version=3.3.7p5
+version=4.0
 release=`date +%y%m%d`
 locale="locale"
 PLUGIN=plugins

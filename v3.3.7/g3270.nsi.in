@@ -43,7 +43,6 @@ SubSection "@PACKAGE_NAME@" SecMain
 
 		# Binary files
 		file bin\Release\@PACKAGE_NAME@.exe
-		file bin\Release\w3n46.dll
 
 		# Configuration files
 		file "/oname=$INSTDIR\@PACKAGE_NAME@.jpg"	src\g3270\@PACKAGE_NAME@.jpg
@@ -138,12 +137,6 @@ section "Uninstall"
 	# Always delete uninstaller first
 	delete $INSTDIR\uninstaller.exe
 
-	# Delete System libraries
-	delete C:\WINDOWS\system32\lib3270.dll
-
-	# Delete extension libraries
-	delete $PROGRAMFILES\ooRexx\rx3270.dll
-
 	# now delete installed files
 	delete $INSTDIR\@PACKAGE_NAME@.exe
 	delete $INSTDIR\lib3270.dll
@@ -168,6 +161,12 @@ section "Uninstall"
 
 	# Remove registry
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@"
+
+	# Delete System libraries
+	delete C:\WINDOWS\system32\lib3270.dll
+
+	# Delete extension libraries
+	delete $PROGRAMFILES\ooRexx\rx3270.dll
 
 	RMDir /r "$INSTDIR"
 
