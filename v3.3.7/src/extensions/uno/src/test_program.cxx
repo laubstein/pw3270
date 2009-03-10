@@ -97,7 +97,7 @@ int SAL_CALL main(int argc, char **argv)
 			OString	str;
 
 			Trace("getConnectionState: %d", srv->getConnectionState());
-			Trace("Connect(): %d" , srv->Connect(OUString::createFromAscii("L:3270.df.bb:9023")));
+			Trace("Connect(): %d" , srv->Connect(OUString::createFromAscii("L:3270.df.bb:9023"),1));
 
 			//str	=  OUStringToOString( srv->getScreenContentAt(20,39,5),RTL_TEXTENCODING_UTF8);
 			//Trace("ContentsAt(20,39): \"%s\"",str.pData->buffer);

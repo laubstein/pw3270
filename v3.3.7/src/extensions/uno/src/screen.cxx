@@ -33,7 +33,7 @@
 
 	Trace("Read\n%s\n",buffer);
 
-	ret = OUString::createFromAscii( buffer );
+	ret = OUString(buffer,strlen(buffer), RTL_TEXTENCODING_ISO_8859_1, RTL_TEXTTOUNICODE_FLAGS_UNDEFINED_IGNORE);
 
 	free(buffer);
 
@@ -68,7 +68,7 @@
 
 	Trace("Read\n%s\n",buffer);
 
-	ret = OUString::createFromAscii( buffer );
+	ret = OUString(buffer,strlen(buffer), RTL_TEXTENCODING_ISO_8859_1, RTL_TEXTTOUNICODE_FLAGS_UNDEFINED_IGNORE);
 
 	free(buffer);
 
