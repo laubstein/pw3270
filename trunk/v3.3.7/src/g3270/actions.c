@@ -57,7 +57,7 @@
  static void action_Tab(GtkWidget *w, gpointer user_data);
  static void action_BackTab(GtkWidget *w, gpointer user_data);
  static void action_Connect(GtkWidget *w, gpointer user_data);
- static void action_Enter(GtkWidget *w, gpointer user_data);
+ static void g3270_action_Enter(GtkWidget *w, gpointer user_data);
  static void action_Disconnect(GtkWidget *w, gpointer user_data);
  static void action_PrintScreen(GtkWidget *w, gpointer user_data);
  static void action_PrintSelected(GtkWidget *w, gpointer user_data);
@@ -232,8 +232,8 @@
  	{	"Save",				GTK_STOCK_SAVE,			N_( "Save" ),				NULL,				NULL,	NULL								},
 
 	/* Terminal Actions */
-	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",			NULL,	G_CALLBACK(action_Enter)			},
-	{ 	"Enter",			NULL,					N_( "Enter" ),				"KP_Enter",			NULL,	G_CALLBACK(action_Enter)			},
+	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",			NULL,	G_CALLBACK(g3270_action_Enter)		},
+	{ 	"Enter",			NULL,					N_( "Enter" ),				"KP_Enter",			NULL,	G_CALLBACK(g3270_action_Enter)			},
  };
 
 
@@ -318,11 +318,11 @@
  	host_reconnect();
  }
 
- void action_Enter(GtkWidget *w, gpointer user_data)
+ void g3270_action_Enter(GtkWidget *w, gpointer user_data)
  {
  	action_ClearSelection();
  	if(PCONNECTED)
-		action_internal(Enter_action, IA_DEFAULT, CN, CN);
+		action_Enter();
 	else
 		action_Connect(w,user_data);
  }
