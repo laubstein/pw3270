@@ -175,6 +175,9 @@ BuildRemote() {
 	
 	rm -f ./GTK-Runtime
 
+	make clean
+	make -C src/extensions/uno/ clean
+
 	echo "Enviando arquivo fonte para o servidor de empacotamento..."
 	$EXEC_CMD "rm -rf tmp/build.tmp"
 	$EXEC_CMD "mkdir -p tmp/build.tmp"
