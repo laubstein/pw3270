@@ -15,7 +15,7 @@ OWNER_PATH = br/com/bb
 COMP_IMPL_NAME = $(COMP_NAME).uno.$(SHAREDLIB_EXT)
 COMP_RDB_NAME = $(COMP_NAME).uno.rdb
 
-CXX_FILES=main.cxx connection.cxx
+CXX_FILES=main.cxx connection.cxx screen.cxx
 
 #---[ Settings ]---------------------------------------------------------------------------------------------------
 

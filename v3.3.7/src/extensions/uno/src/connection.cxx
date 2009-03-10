@@ -24,10 +24,6 @@ sal_Int16 SAL_CALL I3270Impl::Connect( const OUString& hostinfo ) throw (Runtime
 
 	Trace("%s(%s)",__FUNCTION__,str.getStr());
 
-	#error Correct IT!!
-	lib3270_init("unoextension");
-
-
 	if(QueryCstate() != NOT_CONNECTED)
 		return EINVAL;
 
@@ -42,18 +38,13 @@ sal_Int16 SAL_CALL I3270Impl::Connect( const OUString& hostinfo ) throw (Runtime
 			rc = 0;
 			while(!IN_ANSI && !IN_3270 && !rc)
 			{
-					Trace("%s %d %d %d","Waiting",IN_ANSI,IN_3270,PCONNECTED);
-
 					RunPendingEvents(1);
-
-					Trace("%s %d %d %d","Waiting",IN_ANSI,IN_3270,PCONNECTED);
-
 					if(!PCONNECTED)
 						rc = ENOTCONN;
 			}
 	}
 
-	Trace("%s(%s): %d",__FUNCTION__,str.getStr(),rc);
+	Trace("%s(%s): %d (IN_ANSI: %d IN_3270: %d)",__FUNCTION__,str.getStr(),rc,IN_ANSI,IN_3270);
 
 	return rc;
 }

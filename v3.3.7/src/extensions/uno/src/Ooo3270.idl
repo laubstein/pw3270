@@ -22,12 +22,13 @@ module br { module com { module bb {
         short 	Disconnect();
         short	getConnectionState();
 
+        string	getScreenContentAt([in] short row, [in] short col, [in] short size);
+
         /*
 
         setToggle()
         getToggle()
 
-        getScreenContents()
         queryScreenContent()
 
 		getCursorRow()
