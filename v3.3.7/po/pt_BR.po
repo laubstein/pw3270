@@ -7,10 +7,10 @@
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: g3270 3.3.7p5\n"
+"Project-Id-Version: g3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-03 17:01-0300\n"
-"PO-Revision-Date: 2009-03-03 17:01-0300\n"
+"POT-Creation-Date: 2009-03-10 16:05-0300\n"
+"PO-Revision-Date: 2009-03-10 16:06-0300\n"
 "Last-Translator:  <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -69,11 +69,11 @@ msgstr ""
 msgid "<alt>X"
 msgstr ""
 
-#: src/g3270/actions.c:228
+#: src/g3270/actions.c:227
 msgid "About"
 msgstr "Sobre"
 
-#: src/g3270/actions.c:188
+#: src/g3270/actions.c:187
 msgid "Add to copy"
 msgstr "Copiar anexando"
 
@@ -133,7 +133,7 @@ msgstr "Cursor piscante"
 msgid "Blue"
 msgstr "Azul"
 
-#: src/g3270/actions.c:87
+#: src/g3270/actions.c:86
 msgid "Bold"
 msgstr "Negrito"
 
@@ -143,7 +143,7 @@ msgstr "Borda"
 
 #: src/g3270/filetransfer.c:316
 msgid "Browse"
-msgstr ""
+msgstr "Procurar"
 
 #: src/g3270/actions.c:752
 #, c-format
@@ -197,11 +197,11 @@ msgstr "Limpar"
 msgid "Color setup"
 msgstr "Configuração de cores"
 
-#: src/g3270/actions.c:230
+#: src/g3270/actions.c:229
 msgid "Colors"
 msgstr "Cores"
 
-#: src/g3270/actions.c:190
+#: src/g3270/actions.c:189
 msgid "Copy"
 msgstr "Copiar"
 
@@ -241,7 +241,7 @@ msgstr "Azul escuro"
 msgid "Dark Green"
 msgstr "Verde escuro"
 
-#: src/g3270/actions.c:217
+#: src/g3270/actions.c:216
 msgid "Debug"
 msgstr ""
 
@@ -269,11 +269,11 @@ msgstr ""
 msgid "Delete Word"
 msgstr "Apagar palavra"
 
-#: src/g3270/actions.c:159
+#: src/g3270/actions.c:158
 msgid "Down"
 msgstr ""
 
-#: src/g3270/actions.c:139
+#: src/g3270/actions.c:138
 msgid "Dump screen"
 msgstr "Salvar captura de tela"
 
@@ -281,7 +281,7 @@ msgstr "Salvar captura de tela"
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
-#: src/g3270/actions.c:237
+#: src/g3270/actions.c:236
 msgid "Enter"
 msgstr ""
 
@@ -307,7 +307,7 @@ msgstr "Apagar campo"
 msgid "Erase Field"
 msgstr "Apagar campo"
 
-#: src/g3270/actions.c:166
+#: src/g3270/actions.c:165
 msgid "Erase input"
 msgstr "Apagar campos"
 
@@ -368,7 +368,7 @@ msgstr "Script rexx externo"
 msgid "Field start"
 msgstr "Início do campo"
 
-#: src/g3270/actions.c:173
+#: src/g3270/actions.c:172
 msgid "File Transfer"
 msgstr "Transferência de arquivo"
 
@@ -408,7 +408,7 @@ msgstr "Cinza"
 msgid "Green"
 msgstr "Verde"
 
-#: src/g3270/actions.c:212
+#: src/g3270/actions.c:211
 msgid "Help"
 msgstr "Ajuda"
 
@@ -445,7 +445,7 @@ msgstr "Intensificado/Desprotegido"
 msgid "Invalid action \"%s\" when loading %s"
 msgstr "Ação \"%s\" inválida ao carregar %s"
 
-#: src/g3270/actions.c:88
+#: src/g3270/actions.c:87
 msgid "Keep selected"
 msgstr "Manter selecionado"
 
@@ -457,7 +457,7 @@ msgstr "Teclado de funções"
 msgid "LRECL:"
 msgstr ""
 
-#: src/g3270/actions.c:157
+#: src/g3270/actions.c:156
 msgid "Left"
 msgstr "Esquerda"
 
@@ -465,7 +465,7 @@ msgstr "Esquerda"
 msgid "Line Wrap"
 msgstr ""
 
-#: src/g3270/actions.c:182 src/g3270/actions.c:887
+#: src/g3270/actions.c:181 src/g3270/actions.c:887
 msgid "Load screen dump"
 msgstr "Carregar captura de tela"
 
@@ -494,7 +494,7 @@ msgstr "Mostarda"
 msgid "Negotiation with %s failed!"
 msgstr "Negociação com %s falhou!"
 
-#: src/g3270/actions.c:224
+#: src/g3270/actions.c:223
 msgid "Network"
 msgstr "Rede"
 
@@ -531,15 +531,15 @@ msgstr "Tratamento de opções falho: %s\n"
 msgid "Orange"
 msgstr "Laranja"
 
-#: src/g3270/actions.c:204
+#: src/g3270/actions.c:203
 msgid "Paste"
 msgstr "Colar"
 
-#: src/g3270/actions.c:162
+#: src/g3270/actions.c:161
 msgid "Paste next"
 msgstr "Colar próximo"
 
-#: src/g3270/actions.c:163 src/g3270/clipboard.c:204
+#: src/g3270/actions.c:162 src/g3270/clipboard.c:204
 msgid "Paste text file"
 msgstr "Colar arquivo texto"
 
@@ -567,7 +567,7 @@ msgstr "Rosa"
 msgid "Port:"
 msgstr "Porta:"
 
-#: src/g3270/actions.c:223
+#: src/g3270/actions.c:222
 msgid "Preferences"
 msgstr "Preferências"
 
@@ -575,19 +575,19 @@ msgstr "Preferências"
 msgid "Primary space:"
 msgstr ""
 
-#: src/g3270/actions.c:138
+#: src/g3270/actions.c:137
 msgid "Print"
 msgstr "Imprimir"
 
-#: src/g3270/actions.c:197
+#: src/g3270/actions.c:196
 msgid "Print copy"
 msgstr "Imprimir cópia"
 
-#: src/g3270/actions.c:191
+#: src/g3270/actions.c:190
 msgid "Print selected"
 msgstr "Imprimir seleção"
 
-#: src/g3270/actions.c:225
+#: src/g3270/actions.c:224
 msgid "Properties"
 msgstr "Propriedades"
 
@@ -595,7 +595,7 @@ msgstr "Propriedades"
 msgid "Purple"
 msgstr "Púrpura"
 
-#: src/g3270/actions.c:175
+#: src/g3270/actions.c:174
 msgid "Receive file"
 msgstr "Receber arquivo"
 
@@ -611,7 +611,7 @@ msgstr ""
 msgid "Red"
 msgstr "Vermelho"
 
-#: src/g3270/actions.c:136
+#: src/g3270/actions.c:135
 msgid "Redraw screen"
 msgstr "Redesenhar a tela"
 
@@ -619,7 +619,7 @@ msgstr "Redesenhar a tela"
 msgid "Remap ASCII Characters"
 msgstr ""
 
-#: src/g3270/actions.c:164
+#: src/g3270/actions.c:163
 msgid "Reselect"
 msgstr "Reselecionar"
 
@@ -627,7 +627,7 @@ msgstr "Reselecionar"
 msgid "Reset"
 msgstr ""
 
-#: src/g3270/actions.c:236
+#: src/g3270/actions.c:235
 msgid "Return"
 msgstr ""
 
@@ -635,15 +635,15 @@ msgstr ""
 msgid "Rexx scripts"
 msgstr "Scripts Rexx"
 
-#: src/g3270/actions.c:156
+#: src/g3270/actions.c:155
 msgid "Right"
 msgstr "Direita"
 
 #: src/g3270/g3270.c:458
 msgid "Run script on startup (if available)"
-msgstr ""
+msgstr "Executa script na inicialização (Se disponível)"
 
-#: src/g3270/actions.c:233
+#: src/g3270/actions.c:232
 msgid "Save"
 msgstr "Salvar"
 
@@ -651,11 +651,11 @@ msgstr "Salvar"
 msgid "Save clipboard contents"
 msgstr "Salvar área de transferência"
 
-#: src/g3270/actions.c:198
+#: src/g3270/actions.c:197
 msgid "Save copy"
 msgstr "Salvar cópia"
 
-#: src/g3270/actions.c:137
+#: src/g3270/actions.c:136
 msgid "Save screen"
 msgstr "Salvar tela"
 
@@ -663,7 +663,7 @@ msgstr "Salvar tela"
 msgid "Save screen contents"
 msgstr "Salvar conteúdo da tela"
 
-#: src/g3270/actions.c:192
+#: src/g3270/actions.c:191
 msgid "Save selected"
 msgstr "Salvar seleção"
 
@@ -675,7 +675,7 @@ msgstr "Salvar texto selecionado"
 msgid "Screen Trace"
 msgstr ""
 
-#: src/g3270/actions.c:216
+#: src/g3270/actions.c:215
 msgid "Scripts"
 msgstr ""
 
@@ -691,15 +691,15 @@ msgstr ""
 msgid "Secure connection"
 msgstr "Conexão segura"
 
-#: src/g3270/actions.c:148
+#: src/g3270/actions.c:147
 msgid "Select Down"
 msgstr ""
 
-#: src/g3270/actions.c:143
+#: src/g3270/actions.c:142
 msgid "Select Field"
 msgstr "Selecionar campo"
 
-#: src/g3270/actions.c:146
+#: src/g3270/actions.c:145
 msgid "Select Left"
 msgstr ""
 
@@ -707,15 +707,15 @@ msgstr ""
 msgid "Select Rexx script to run"
 msgstr "Selecione script rexx a executar"
 
-#: src/g3270/actions.c:145
+#: src/g3270/actions.c:144
 msgid "Select Right"
 msgstr "Seleciona a direita"
 
-#: src/g3270/actions.c:147
+#: src/g3270/actions.c:146
 msgid "Select Up"
 msgstr ""
 
-#: src/g3270/actions.c:165
+#: src/g3270/actions.c:164
 msgid "Select all"
 msgstr "Selecionar tudo"
 
@@ -731,7 +731,7 @@ msgstr "Selecione arquivo a receber"
 msgid "Select file to send"
 msgstr "Selecione arquivo a enviar"
 
-#: src/g3270/actions.c:220
+#: src/g3270/actions.c:219
 msgid "Select font"
 msgstr "Selecionar fonte"
 
@@ -743,23 +743,23 @@ msgstr "Selecionar servidor"
 msgid "Selected text"
 msgstr "Texto selecionado"
 
-#: src/g3270/actions.c:153
+#: src/g3270/actions.c:152
 msgid "Selection Down"
 msgstr ""
 
-#: src/g3270/actions.c:151
+#: src/g3270/actions.c:150
 msgid "Selection Left"
 msgstr ""
 
-#: src/g3270/actions.c:150
+#: src/g3270/actions.c:149
 msgid "Selection Right"
 msgstr ""
 
-#: src/g3270/actions.c:152
+#: src/g3270/actions.c:151
 msgid "Selection Up"
 msgstr ""
 
-#: src/g3270/actions.c:176
+#: src/g3270/actions.c:175
 msgid "Send file"
 msgstr "Enviar arquivo"
 
@@ -767,7 +767,7 @@ msgstr "Enviar arquivo"
 msgid "Send file to host"
 msgstr "Enviar arquivo para o servidor"
 
-#: src/g3270/actions.c:174
+#: src/g3270/actions.c:173
 msgid "Send/Receive"
 msgstr "Enviar/Receber"
 
@@ -775,11 +775,11 @@ msgstr "Enviar/Receber"
 msgid "Separator"
 msgstr "Separador"
 
-#: src/g3270/actions.c:183
+#: src/g3270/actions.c:182
 msgid "Set hostname"
 msgstr "Mudar servidor"
 
-#: src/g3270/actions.c:215
+#: src/g3270/actions.c:214
 msgid "Settings"
 msgstr "Configuração"
 
@@ -791,7 +791,7 @@ msgstr "Mostra opções da biblioteca 3270"
 msgid "Show timing"
 msgstr "Mostrar tempo"
 
-#: src/g3270/actions.c:89
+#: src/g3270/actions.c:88
 msgid "Smart paste"
 msgstr "Colar inteligente"
 
@@ -848,7 +848,7 @@ msgstr "Turquesa"
 msgid "Undefined"
 msgstr "Indefinido"
 
-#: src/g3270/actions.c:90
+#: src/g3270/actions.c:89
 msgid "Underline"
 msgstr "Sublinhado"
 
@@ -858,11 +858,11 @@ msgstr "Sublinhado"
 msgid "Unexpected error"
 msgstr "Erro inesperado"
 
-#: src/g3270/actions.c:189
+#: src/g3270/actions.c:188
 msgid "Unselect"
 msgstr "Desmarcar"
 
-#: src/g3270/actions.c:158
+#: src/g3270/actions.c:157
 msgid "Up"
 msgstr ""
 
@@ -930,31 +930,31 @@ msgstr "X Aguarde"
 msgid "Yellow"
 msgstr "Amarelo"
 
-#: src/g3270/actions.c:181
+#: src/g3270/actions.c:180
 msgid "_Connect"
 msgstr "_Conectar"
 
-#: src/g3270/actions.c:140
+#: src/g3270/actions.c:139
 msgid "_Disconnect"
 msgstr "_Desconectar"
 
-#: src/g3270/actions.c:213
+#: src/g3270/actions.c:212
 msgid "_Edit"
 msgstr "_Editar"
 
-#: src/g3270/actions.c:210
+#: src/g3270/actions.c:209
 msgid "_File"
 msgstr "_Arquivo"
 
-#: src/g3270/actions.c:211
+#: src/g3270/actions.c:210
 msgid "_Network"
 msgstr "_Rede"
 
-#: src/g3270/actions.c:214
+#: src/g3270/actions.c:213
 msgid "_Options"
 msgstr "_Opções"
 
-#: src/g3270/actions.c:229
+#: src/g3270/actions.c:228
 msgid "_Quit"
 msgstr "_Sair"
 

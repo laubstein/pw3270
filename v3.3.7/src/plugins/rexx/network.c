@@ -57,26 +57,7 @@
 	if(Argc > 1)
 		wait = atoi(Argv[1].strptr);
 
-	RunPendingEvents(0);
-	rc = host_connect(Argv[0].strptr);
-	RunPendingEvents(0);
-
-	if(rc >= 0)
-	{
-		rc = 0;
-		if(wait)
-		{
-			while(!IN_ANSI && !IN_3270)
-			{
-				RunPendingEvents(TRUE);
-
-				if(!PCONNECTED)
-				{
-					return RetValue(Retstr,ENOTCONN);
-				}
-			}
-		}
-	}
+	rc = host_connect(Argv[0].strptr,wait);
 
 	return RetValue(Retstr,rc);
  }

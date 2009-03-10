@@ -165,12 +165,12 @@ XtActionsRec all_actions[] = {
 	{ "CircumNot",		CircumNot_action },
 	{ "Clear",		Clear_action },
 #if defined(C3270) /*[*/
-	{ "Close",		Disconnect_action },
+//	{ "Close",		Disconnect_action },
 #endif /*]*/
 #if defined(X3270_SCRIPT) /*[*/
 	{ "CloseScript",	CloseScript_action },
 #endif /*]*/
-	{ "Connect",		Connect_action },
+//	{ "Connect",		Connect_action },
 #if defined(X3270_SCRIPT) /*[*/
 	{ "ContinueScript",	ContinueScript_action },
 #endif /*]*/
@@ -178,7 +178,7 @@ XtActionsRec all_actions[] = {
 	{ "Delete", 		Delete_action },
 	{ "DeleteField",	DeleteField_action },
 	{ "DeleteWord",		DeleteWord_action },
-	{ "Disconnect",		Disconnect_action },
+//	{ "Disconnect",		Disconnect_action },
 	{ "Down",		Down_action },
 	{ "Dup",		Dup_action },
 	{ "Ebcdic",		Ebcdic_action },
@@ -225,7 +225,7 @@ XtActionsRec all_actions[] = {
 	{ "Newline",		Newline_action },
 	{ "NextWord",		NextWord_action },
 #if defined(C3270) || defined(WC3270) /*[*/
-	{ "Open",		Connect_action },
+//	{ "Open",		Connect_action },
 #endif /*]*/
 	{ "PA",			PA_action },
 	{ "PF",			PF_action },

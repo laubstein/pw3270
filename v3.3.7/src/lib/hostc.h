@@ -30,8 +30,10 @@
 	};
 	extern struct host *hosts;
 
+/*
 	extern void Connect_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
 	extern void Disconnect_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
+*/
 
 	extern void st_changed(int tx, int mode);
 	extern void hostfile_init(void);
