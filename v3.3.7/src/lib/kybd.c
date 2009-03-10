@@ -2212,17 +2212,24 @@ FieldMark_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 /*
  * Vanilla AID keys.
  */
-void
-Enter_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+
+void Enter_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(Enter_action, event, params, num_params);
+	action_Enter();
+}
+
+int	 action_Enter(void)
+{
 	reset_idle_timer();
 	if (kybdlock & KL_OIA_MINUS)
-		return;
+		return -1;
 	else if (kybdlock)
 		enq_ta(Enter_action, CN, CN);
 	else
 		key_AID(AID_ENTER);
+
+	return 0;
 }
 
 
