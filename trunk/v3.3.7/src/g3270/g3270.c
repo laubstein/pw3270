@@ -64,11 +64,9 @@
 #include "windirsc.h"
 #endif /*]*/
 
-// #include <lib3270/hostc.h>
-
-
-#if !defined(_WIN32) /*[*/
-/* Base keymap. */
+/*
+#if !defined(_WIN32)
+// Base keymap.
 static char *base_keymap1 =
 "Ctrl<Key>]: Escape\n"
 "Ctrl<Key>a Ctrl<Key>a: Key(0x01)\n"
@@ -116,7 +114,7 @@ static char *base_keymap3 =
 "<Key>F12: PF(12)\n"
 "Ctrl<Key>a <Key>F12: PF(24)\n";
 
-/* Base keymap, 3270 mode. */
+// Base keymap, 3270 mode.
 static char *base_3270_keymap =
 "Ctrl<Key>a <Key>a: Attn\n"
 "Ctrl<Key>c: Clear\n"
@@ -135,9 +133,9 @@ static char *base_3270_keymap =
 "<Key>HOME: Home\n"
 "<Key>END: FieldEnd\n";
 
-#else /*][*/
+#else
 
-/* Base keymap. */
+// Base keymap.
 static char *base_keymap =
        "Alt <Key>1:      PA(1)\n"
        "Alt <Key>2:      PA(2)\n"
@@ -161,7 +159,7 @@ static char *base_keymap =
      "Shift <Key>F11:    PF(23)\n"
      "Shift <Key>F12:    PF(24)\n";
 
-/* Base keymap, 3270 mode. */
+// Base keymap, 3270 mode.
 static char *base_3270_keymap =
       "Ctrl <Key>a:      Attn\n"
        "Alt <Key>a:      Attn\n"
@@ -188,7 +186,8 @@ static char *base_3270_keymap =
            "<Key>END:    FieldEnd\n"
      "Shift <Key>LEFT:   PreviousWord\n"
      "Shift <Key>RIGHT:  NextWord\n";
-#endif /*]*/
+#endif
+*/
 
 /* Globals */
 #ifdef HAVE_LIBGNOME
@@ -346,11 +345,10 @@ static int g3270_init(const gchar *program)
 	return 0;
 }
 
+/*
 int wait4negotiations(const char *cl_hostname)
 {
 	Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);
-
-	gtk_widget_set_sensitive(topwindow,FALSE);
 
 	while(!IN_ANSI && !IN_3270)
 	{
@@ -373,10 +371,9 @@ int wait4negotiations(const char *cl_hostname)
 
 	Trace("Negotiations with %s completed",cl_hostname);
 
-	gtk_widget_set_sensitive(topwindow,TRUE);
-	gtk_widget_grab_focus(terminal);
 	return 0;
 }
+*/
 
 #ifdef HAVE_LIBGNOME
 static gint save_session (GnomeClient *client, gint phase, GnomeSaveStyle save_style,
@@ -573,14 +570,16 @@ int main(int argc, char *argv[])
 	Trace("%s","Loading plugins");
 	LoadPlugins();
 
+/*
 	add_resource("keymap.base",
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 	    base_keymap
-#else /*][*/
+#else
 	    xs_buffer("%s%s%s", base_keymap1, base_keymap2, base_keymap3)
-#endif /*]*/
+#endif
 	    );
 	add_resource("keymap.base.3270", NewString(base_3270_keymap));
+*/
 
 	Trace("Initializing library with %s...",argv[0]);
 	if(lib3270_init(argv[0]))
@@ -637,8 +636,18 @@ int main(int argc, char *argv[])
 	else
 	{
 		DisableNetworkActions();
-		if(host_connect(cl_hostname) >= 0)
-			wait4negotiations(cl_hostname);
+		gtk_widget_set_sensitive(topwindow,FALSE);
+		RunPendingEvents(0);
+
+		if(host_connect(cl_hostname,1) == ENOTCONN)
+		{
+			PopupAnError( N_( "Negotiation with %s failed!" ),cl_hostname);
+		}
+
+		gtk_widget_set_sensitive(topwindow,TRUE);
+		gtk_widget_grab_focus(terminal);
+
+		RunPendingEvents(0);
 	}
 
 	if(topwindow)

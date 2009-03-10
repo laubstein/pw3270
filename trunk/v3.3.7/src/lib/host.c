@@ -494,16 +494,7 @@ split_success:
 	return r;
 }
 
-
-/*
- * Network connect/disconnect operations, combined with X input operations.
- *
- * Returns 0 for success, -1 for error.
- * Sets 'reconnect_host', 'current_host' and 'full_current_host' as
- * side-effects.
- */
-int
-host_connect(const char *n)
+static int do_connect(const char *n)
 {
 	char nb[2048];		/* name buffer */
 	char *s;		/* temporary */
@@ -665,21 +656,56 @@ host_connect(const char *n)
 	return 0;
 }
 
+/**
+ * Network connect operation, keep main loop running
+ *
+ * Sets 'reconnect_host', 'current_host' and 'full_current_host' as
+ * side-effects.
+ *
+ * @param	n		Host ID
+ * @param	wait	Non zero to wait for connection to be ok.
+ *
+ * @return 0 for success, error code on error
+ *
+ */
+int host_connect(const char *n, int wait)
+{
+	RunPendingEvents(0);
+
+	if(do_connect(n))
+		return -1;
+
+	if(wait)
+	{
+		while(!IN_ANSI && !IN_3270)
+		{
+			RunPendingEvents(1);
+
+			if(!PCONNECTED)
+			{
+				return ENOTCONN;
+			}
+		}
+	}
+
+	return 0;
+}
+
+
+
 #if defined(X3270_DISPLAY) || defined(G3270) /*[*/
 /*
  * Called from timer to attempt an automatic reconnection.
  */
-static void
-try_reconnect(void)
+static void try_reconnect(void)
 {
 	WriteLog("3270","Starting auto-reconnect (Host: %s)",reconnect_host ? reconnect_host : "-");
 	auto_reconnect_inprogress = False;
-	host_reconnect();
+	host_reconnect(0);
 }
 #endif /*]*/
 
-void
-host_disconnect(int failed)
+void host_disconnect(int failed)
 {
 	if (CONNECTED || HALF_CONNECTED) {
 		x_remove_input();
@@ -982,6 +1008,7 @@ st_changed(int tx, int mode)
 
 /* Explicit connect/disconnect actions. */
 
+/*
 void
 Connect_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -992,21 +1019,23 @@ Connect_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 		popup_an_error("Already connected");
 		return;
 	}
-	(void) host_connect(params[0]);
+	(void) host_connect(params[0],0);
 
-	/*
-	 * If called from a script and the connection was successful (or
-	 * half-successful), pause the script until we are connected and
-	 * we have identified the host type.
-	 */
+	// If called from a script and the connection was successful (or
+	// half-successful), pause the script until we are connected and
+	// we have identified the host type.
+	//
 	if (!w && (CONNECTED || HALF_CONNECTED))
 		sms_connect_wait();
 }
+*/
 
 #if defined(X3270_MENUS) || defined(G3270) /*[*/
 
-int host_reconnect(void)
+int host_reconnect(int wait)
 {
+	int rc;
+
 	if (CONNECTED || HALF_CONNECTED)
 		return EBUSY;
 
@@ -1016,10 +1045,12 @@ int host_reconnect(void)
 	if (auto_reconnect_inprogress)
 		return EBUSY;
 
-	if(host_connect(reconnect_host) >= 0)
+	rc = host_connect(reconnect_host,wait);
+
+	if(rc)
 	{
 		auto_reconnect_inprogress = False;
-		return -1;
+		return rc;
 	}
 
 	/*
@@ -1034,6 +1065,7 @@ int host_reconnect(void)
 }
 #endif /*]*/
 
+/*
 void
 Disconnect_action(Widget w unused, XEvent *event, String *params,
 	Cardinal *num_params)
@@ -1043,3 +1075,4 @@ Disconnect_action(Widget w unused, XEvent *event, String *params,
 		return;
 	host_disconnect(False);
 }
+*/

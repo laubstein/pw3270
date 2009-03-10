@@ -315,7 +315,7 @@
  	action_ClearSelection();
 
 	Trace("Calling %s","host_reconnect");
- 	host_reconnect();
+ 	host_reconnect(0);
  }
 
  void g3270_action_Enter(GtkWidget *w, gpointer user_data)
@@ -1071,19 +1071,11 @@
 			strncat(buffer,":",1023);
 			strncat(buffer,gtk_entry_get_text(port),1023);
 
-			if(host_connect(buffer) >= 0)
+			if(!host_connect(buffer,1))
 			{
-				switch(wait4negotiations(buffer))
-				{
-				case 0:				// Connection OK
-					again = FALSE;
-					SetHostname(buffer);
-					break;
-
-				case EINTR:			// Operation interrupted
-					again = FALSE;
-					break;
-				}
+				// Connection OK
+				again = FALSE;
+				SetHostname(buffer);
 			}
 			break;
 

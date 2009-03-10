@@ -356,8 +356,8 @@
 		int		action_Enter(void);
 
 		/* Host connect/disconnect and state change. */
-		extern int host_connect(const char *n);
-		extern int host_reconnect(void);
+		extern int host_connect(const char *n, int wait);
+		extern int host_reconnect(int wait);
 		extern void host_disconnect(int disable);
 		extern void register_schange(int tx, void (*func)(int));
 
