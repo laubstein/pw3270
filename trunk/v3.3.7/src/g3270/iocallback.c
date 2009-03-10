@@ -59,7 +59,7 @@ static unsigned long	g3270_AddExcept(int source, void (*fn)(void));
 static unsigned long	g3270_AddTimeOut(unsigned long interval_ms, void (*proc)(void));
 static void 			g3270_RemoveTimeOut(unsigned long timer);
 static int				g3270_Sleep(int seconds);
-static void 			g3270_RunPendingEvents(int wait);
+static int 			g3270_RunPendingEvents(int wait);
 
 static gboolean 		IO_prepare(GSource *source, gint *timeout);
 static gboolean 		IO_check(GSource *source);
@@ -339,12 +339,17 @@ static int g3270_Sleep(int seconds)
 	return 0;
 }
 
-static void g3270_RunPendingEvents(int wait)
+static int g3270_RunPendingEvents(int wait)
 {
+	int rc = 0;
 	while(gtk_events_pending())
+	{
+		rc = 1;
 		gtk_main_iteration();
+	}
 
 	if(wait)
 		gtk_main_iteration();
 
+	return rc;
 }

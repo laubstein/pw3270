@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como resolver.c e possui 274 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -101,11 +101,11 @@ struct parms
 };
 #pragma pack()
 
-#if defined(_WIN32) && !defined(ISDLL) /*[*/
-typedef int rhproc(const char *, char *, unsigned short *, struct sockaddr *,
-	socklen_t *, char *, int);
-#define DLL_RESOLVER_NAME "cresolve_host_and_port"
-#endif /*]*/
+//#if defined(_WIN32) && !defined(ISDLL)
+// typedef int rhproc(const char *, char *, unsigned short *, struct sockaddr *,
+//	socklen_t *, char *, int);
+// #define DLL_RESOLVER_NAME "cresolve_host_and_port"
+// #endif /*]*/
 
 /*
  * Resolve a hostname and port.
@@ -115,12 +115,14 @@ typedef int rhproc(const char *, char *, unsigned short *, struct sockaddr *,
 
 #if !defined(WIN32) || defined(ISDLL)
 
-int cresolve_host_and_port(struct parms *p)
+static int cresolve_host_and_port(struct parms *p)
 {
 /* Non-Windows version, or Windows DLL version. */
 #if defined(AF_INET6) /*[*/
 	struct addrinfo	 hints, *res;
 	int		 rc;
+
+	fprintf(stderr,"************\nResolving %s\n",p->host); fflush(stderr);
 
 	/* Use getaddrinfo() to resolve the hostname and port together. */
 	(void) memset(&hints, '\0', sizeof(struct addrinfo));
@@ -129,14 +131,17 @@ int cresolve_host_and_port(struct parms *p)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 	rc = getaddrinfo(p->host, p->portname, &hints, &res);
-	if (rc != 0) {
 
+	if (rc)
+	{
 		// FIXME (perry#1#): Correct this: What's wrong with gai_strerror?
 		// snprintf(errmsg, em_len, "%s/%s: %s", host, portname, gai_strerror(rc));
 		snprintf(p->errmsg, p->em_len, "%s/%s: %d", p->host, p->portname, rc);
 		return -2;
 	}
-	switch (res->ai_family) {
+
+	switch (res->ai_family)
+	{
 	case AF_INET:
 		*p->pport = ntohs(((struct sockaddr_in *)res->ai_addr)->sin_port);
 		break;
@@ -148,9 +153,13 @@ int cresolve_host_and_port(struct parms *p)
 		freeaddrinfo(res);
 		return -1;
 	}
+
 	(void) memcpy(p->sa, res->ai_addr, res->ai_addrlen);
 	*p->sa_len = res->ai_addrlen;
 	freeaddrinfo(res);
+
+	fprintf(stderr,"************\n%s OK\n",p->host); fflush(stderr);
+
 
 #else /*][*/
 
@@ -163,28 +172,35 @@ int cresolve_host_and_port(struct parms *p)
 
 	/* Get the port number. */
 	lport = strtoul(portname, &ptr, 0);
-	if (ptr == portname || *ptr != '\0' || lport == 0L || lport & ~0xffff) {
-		if (!(sp = getservbyname(portname, "tcp"))) {
-			snprintf(errmsg, em_len,
-			    "Unknown port number or service: %s",
-			    portname);
+	if (ptr == portname || *ptr != '\0' || lport == 0L || lport & ~0xffff)
+	{
+		if (!(sp = getservbyname(portname, "tcp")))
+		{
+			snprintf(errmsg, em_len,_( "Unknown port number or service: %s" ),portname);
 			return -1;
 		}
 		port = sp->s_port;
-	} else
+	}
+	else
+	{
 		port = htons((unsigned short)lport);
+	}
 	*pport = ntohs(port);
 
 	/* Use gethostbyname() to resolve the hostname. */
 	hp = gethostbyname(host);
-	if (hp == (struct hostent *) 0) {
+	if (hp == (struct hostent *) 0)
+	{
 		sin->sin_family = AF_INET;
 		sin->sin_addr.s_addr = inet_addr(host);
-		if (sin->sin_addr.s_addr == (unsigned long)-1) {
-			snprintf(errmsg, em_len, "Unknown host:\n%s", host);
+		if (sin->sin_addr.s_addr == (unsigned long)-1)
+		{
+			snprintf(errmsg, em_len, _( "Unknown host:\n%s" ), host);
 			return -2;
 		}
-	} else {
+	}
+	else
+	{
 		sin->sin_family = hp->h_addrtype;
 		(void) memmove(&sin->sin_addr, hp->h_addr, hp->h_length);
 	}
@@ -198,14 +214,15 @@ int cresolve_host_and_port(struct parms *p)
 #endif
 
 #if !defined(ISDLL) /*[*/
-int
-resolve_host_and_port(const char *host, char *portname, unsigned short *pport,struct sockaddr *sa, socklen_t *sa_len, char *errmsg, int em_len)
+int resolve_host_and_port(const char *host, char *portname, unsigned short *pport,struct sockaddr *sa, socklen_t *sa_len, char *errmsg, int em_len)
 {
+	int rc;
 	struct parms p = { sizeof(struct parms), host, portname, pport, sa, sa_len, errmsg, em_len };
 
+/*
 #if defined(_WIN32)
 
-	/* Win32 version: Use the right DLL. */
+	// Win32 version: Use the right DLL.
 
 	static int loaded = FALSE;
 	static FARPROC call = NULL;
@@ -215,7 +232,7 @@ resolve_host_and_port(const char *host, char *portname, unsigned short *pport,st
 		HMODULE handle;
 		char *dllname;
 
-		/* Figure out if we are pre- or post XP. */
+		// Figure out if we are pre- or post XP.
 		memset(&info, '\0', sizeof(info));
 		info.dwOSVersionInfoSize = sizeof(info);
 
@@ -226,10 +243,8 @@ resolve_host_and_port(const char *host, char *portname, unsigned short *pport,st
 			return -1;
 		}
 
-		/*
-		 * For pre-XP, load the IPv4-only DLL.
-		 * For XP and later, use the IPv4/IPv6 DLL.
-		 */
+		 // For pre-XP, load the IPv4-only DLL.
+		 // For XP and later, use the IPv4/IPv6 DLL.
 		if (info.dwMajorVersion < 5 ||
 		    (info.dwMajorVersion == 5 && info.dwMinorVersion < 1))
 		    	dllname = "w3n4.dll";
@@ -245,7 +260,7 @@ resolve_host_and_port(const char *host, char *portname, unsigned short *pport,st
 			return -1;
 		}
 
-		/* Look up the entry point we need. */
+		// Look up the entry point we need.
 		call = GetProcAddress(handle, DLL_RESOLVER_NAME);
 		Trace("Entry point for %s is %p",DLL_RESOLVER_NAME,call);
 		if (call == NULL) {
@@ -265,10 +280,14 @@ resolve_host_and_port(const char *host, char *portname, unsigned short *pport,st
 
 
 #endif
+*/
+	Trace("Calling resolver for %s", p.host);
 
-	Trace("Calling resolver at %p", call);
+	rc = CallAndWait((int (*)(void *)) cresolve_host_and_port,&p);
 
-	return CallAndWait((int (*)(void *)) call,&p);
+	Trace("Calling resolver for %s exits with %d", p.host, rc);
+
+	return rc;
 
 }
 #endif

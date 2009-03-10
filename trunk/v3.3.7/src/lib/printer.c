@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como printer.c e possui 750 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -101,8 +101,8 @@ static void	printer_otimeout(void);
 static void	printer_etimeout(void);
 static void	printer_dump(struct pr3o *p, Boolean is_err, Boolean is_dead);
 #endif /*]*/
-static void	printer_host_connect(Boolean connected unused);
-static void	printer_exiting(Boolean b unused);
+static void	printer_host_connect(int connected unused);
+static void	printer_exiting(int b unused);
 
 /* Globals */
 
@@ -413,7 +413,7 @@ printer_start(const char *lu)
 		*space = '\0';
 	}
 
-	if (!strcasecmp(subcommand, "wpr3287.exe") || 
+	if (!strcasecmp(subcommand, "wpr3287.exe") ||
 	    !strcasecmp(subcommand, "wpr3287")) {
 	    	char *pc;
 
@@ -449,7 +449,7 @@ printer_start(const char *lu)
 	printer_pid = process_information.dwProcessId;
 
 	Free(subcommand);
-	
+
 #endif /*]*/
 
 	Free(cmd_text);
@@ -662,7 +662,7 @@ printer_stop(void)
 
 /* The emulator is exiting.  Make sure the printer session is cleaned up. */
 static void
-printer_exiting(Boolean b unused)
+printer_exiting(int b unused)
 {
 	printer_stop();
 }
@@ -689,7 +689,7 @@ lu_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 
 /* Host connect/disconnect/3270-mode event. */
 static void
-printer_host_connect(Boolean connected unused)
+printer_host_connect(int connected unused)
 {
 	if (IN_3270) {
 		char *printer_lu = appres.printer_lu;
