@@ -35,50 +35,25 @@
  *		Hostname resolution.
  */
 
-/*
- * This file is compiled three different ways:
- *
- * - With no special #defines, it defines hostname resolution for the main
- *   program: resolve_host_and_port().  On non-Windows platforms, the name
- *   look-up is directly in the function.  On Windows platforms, the name
- *   look-up is done by the function dresolve_host_and_port() in an
- *   OS-specific DLL.
- *
- * - With W3N4 #defined, it defines dresolve_host_and_port() as IPv4-only
- *   hostname resolution for a Windows DLL.  This is for Windows 2000 or
- *   earlier.
- *
- * - With W3N46 #defined, it defines dresolve_host_and_port() as IPv4/IPv6
- *   hostname resolution for a Windows DLL.  This is for Windows XP or
- *   later.
- */
 
-#include "globals.h"
 
 #if defined(W3N4) || defined(W3N46) /*[*/
-#if !defined(_WIN32)
-#error W3N4/W3N46 valid only on Windows.
-#endif /*]*/
-#define ISDLL 1
+	#error Deprecated
 #endif /*]*/
 
 #if !defined(_WIN32) /*[*/
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <netdb.h>
 #else /*][*/
 
-#if defined(W3N46) /*[*/
-  /* Compiling DLL for WinXP or later: Expose getaddrinfo()/freeaddrinfo(). */
-#undef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501
-#endif /*]*/
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#if defined(W3N4) /*[*/
-  /* Compiling DLL for Win2K or earlier: No IPv6. */
-#undef AF_INET6
-#endif /*]*/
+	/* Compiling for WinXP or later: Expose getaddrinfo()/freeaddrinfo(). */
+	#undef _WIN32_WINNT
+	#define _WIN32_WINNT 0x0501
+
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
+
 #endif /*]*/
 
 #include <stdio.h>
@@ -101,28 +76,16 @@ struct parms
 };
 #pragma pack()
 
-//#if defined(_WIN32) && !defined(ISDLL)
-// typedef int rhproc(const char *, char *, unsigned short *, struct sockaddr *,
-//	socklen_t *, char *, int);
-// #define DLL_RESOLVER_NAME "cresolve_host_and_port"
-// #endif /*]*/
-
 /*
  * Resolve a hostname and port.
  * Returns 0 for success, -1 for fatal error (name resolution impossible),
  *  -2 for simple error (cannot resolve the name).
  */
-
-#if !defined(WIN32) || defined(ISDLL)
-
 static int cresolve_host_and_port(struct parms *p)
 {
-/* Non-Windows version, or Windows DLL version. */
-#if defined(AF_INET6) /*[*/
+#ifdef WIN32
 	struct addrinfo	 hints, *res;
 	int		 rc;
-
-	fprintf(stderr,"************\nResolving %s\n",p->host); fflush(stderr);
 
 	/* Use getaddrinfo() to resolve the hostname and port together. */
 	(void) memset(&hints, '\0', sizeof(struct addrinfo));
@@ -157,9 +120,6 @@ static int cresolve_host_and_port(struct parms *p)
 	(void) memcpy(p->sa, res->ai_addr, res->ai_addrlen);
 	*p->sa_len = res->ai_addrlen;
 	freeaddrinfo(res);
-
-	fprintf(stderr,"************\n%s OK\n",p->host); fflush(stderr);
-
 
 #else /*][*/
 
@@ -207,13 +167,11 @@ static int cresolve_host_and_port(struct parms *p)
 	sin->sin_port = port;
 	*sa_len = sizeof(struct sockaddr_in);
 
-#endif /*]*/
+#endif
 
 	return 0;
 }
-#endif
 
-#if !defined(ISDLL) /*[*/
 int resolve_host_and_port(const char *host, char *portname, unsigned short *pport,struct sockaddr *sa, socklen_t *sa_len, char *errmsg, int em_len)
 {
 	int rc;
@@ -290,4 +248,3 @@ int resolve_host_and_port(const char *host, char *portname, unsigned short *ppor
 	return rc;
 
 }
-#endif
