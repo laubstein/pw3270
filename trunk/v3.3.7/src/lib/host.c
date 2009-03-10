@@ -667,18 +667,6 @@ host_connect(const char *n)
 
 #if defined(X3270_DISPLAY) || defined(G3270) /*[*/
 /*
- * Reconnect to the last host.
- */
-static void reconnect(void)
-{
-	if (auto_reconnect_inprogress || current_host == CN ||
-	    CONNECTED || HALF_CONNECTED)
-		return;
-	if (host_connect(reconnect_host) >= 0)
-		auto_reconnect_inprogress = False;
-}
-
-/*
  * Called from timer to attempt an automatic reconnection.
  */
 static void
@@ -686,7 +674,7 @@ try_reconnect(void)
 {
 	WriteLog("3270","Starting auto-reconnect (Host: %s)",reconnect_host ? reconnect_host : "-");
 	auto_reconnect_inprogress = False;
-	reconnect();
+	host_reconnect();
 }
 #endif /*]*/
 
@@ -1017,35 +1005,32 @@ Connect_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 
 #if defined(X3270_MENUS) || defined(G3270) /*[*/
 
- int host_reconnect(void)
- {
-	action_internal(Reconnect_action, IA_DEFAULT, CN, CN);
-	return 0;
- }
-
-void
-Reconnect_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
+int host_reconnect(void)
 {
-	action_debug(Reconnect_action, event, params, num_params);
-	if (check_usage(Reconnect_action, *num_params, 0, 0) < 0)
-		return;
-	if (CONNECTED || HALF_CONNECTED) {
-		popup_an_error("Already connected");
-		return;
+	if (CONNECTED || HALF_CONNECTED)
+		return EBUSY;
+
+	if (current_host == CN)
+		return ENOENT;
+
+	if (auto_reconnect_inprogress)
+		return EBUSY;
+
+	if(host_connect(reconnect_host) >= 0)
+	{
+		auto_reconnect_inprogress = False;
+		return -1;
 	}
-	if (current_host == CN) {
-		popup_an_error("No previous host to connect to");
-		return;
-	}
-	host_reconnect();
 
 	/*
 	 * If called from a script and the connection was successful (or
 	 * half-successful), pause the script until we are connected and
 	 * we have identified the host type.
-	 */
 	if (!w && (CONNECTED || HALF_CONNECTED))
 		sms_connect_wait();
+	 */
+
+	return 0;
 }
 #endif /*]*/
 
