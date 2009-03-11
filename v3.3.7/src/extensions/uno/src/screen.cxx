@@ -79,15 +79,15 @@
 ::sal_Int16 SAL_CALL I3270Impl::waitForUpdate( ::sal_Int16 timeout )
 {
 	int		rc = 0;
-	int 	last = query_counter(COUNTER_ID_CTLR_DONE);
+	int 	last = query_counter(COUNTER_ID_RESET);
 	time_t	end = time(0)+timeout;
 
 	while(time(0) < end)
 	{
 		if(!CONNECTED)
-		{
 			return ENOTCONN;
-		}
+		else if(last != query_counter(COUNTER_ID_RESET))
+			return 0;
 
 		RunPendingEvents(1);
 	}
@@ -97,7 +97,6 @@
 
 ::sal_Int16 SAL_CALL I3270Impl::waitForScreen( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
 {
-
 	return waitForUpdate(timeout);
 }
 
