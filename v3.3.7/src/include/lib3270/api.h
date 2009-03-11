@@ -48,9 +48,12 @@
 		#endif
 
 		#ifndef ETIMEDOUT
-			#define ETIMEDOUT -20000
+			#define ETIMEDOUT -1238
 		#endif
 
+		#ifndef ENOTCONN
+			#define ENOTCONN -1107
+		#endif
 
 		#ifndef CN
 			#define CN ((char *) NULL)
