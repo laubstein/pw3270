@@ -1,0 +1,40 @@
+Name:           @PACKAGE@
+License:        GPL
+Group:          Productivity/Office/Suite
+Version:        @PACKAGE_VERSION@
+Release:        0.%_vendor
+Summary:        3270 calls for StarBasic.
+Source:         %{name}-%{version}.tar.gz
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+Requires:       %{name}-lib >= 4.0 OpenOffice_org
+BuildRequires:  autoconf sed pkgconfig
+
+%description
+Uno/OpenOffice library allowing 3270 access from StarBasic
+
+%prep
+%setup -q -n %{name}-%{version}
+autoconf
+%configure
+
+%build
+make clean
+make Release
+
+%install
+rm -rf $RPM_BUILD_ROOT
+%makeinstall
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+@OFFICE_HOME@
+
+%post
+
+%postun
+
+
+
