@@ -754,7 +754,7 @@
  	{
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_BLANK,
 									TERMINAL_COLOR_OIA_STATUS_OK,
-									NULL ),
+									"" ),
 
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_SYSWAIT,
 									TERMINAL_COLOR_OIA_STATUS_OK,
@@ -796,6 +796,10 @@
 									TERMINAL_COLOR_OIA_STATUS_INVALID,
 									N_( "X Inhibit" ) ),
 
+		STATUS_CODE_DESCRIPTION(	STATUS_CODE_KYBDLOCK,
+									TERMINAL_COLOR_OIA_STATUS_INVALID,
+									NULL ),
+
 		STATUS_CODE_DESCRIPTION(	STATUS_CODE_X,
 									TERMINAL_COLOR_OIA_STATUS_INVALID,
 									N_( "X" ) ),
@@ -824,28 +828,32 @@
 	last_id 	= id;
 	sts_data 	= tbl+id;
 
+	Trace("Status changed to %s (%s)",sts_data->dbg,sts_data->string ? sts_data->string : "NULL");
+
 	if(sts_data->string)
-		status_msg = gettext(sts_data->string);
-	else
-		status_msg = "";
-
-	Trace("Status changed to %s (%s)",sts_data->dbg,sts_data->string);
-
-	// FIXME (perry#2#): Find why the library is keeping the cursor as "locked" in some cases. When corrected this "workaround" can be removed.
-	if(id == STATUS_CODE_BLANK)
-		set_cursor(CURSOR_MODE_NORMAL);
-
-	if(terminal && pixmap)
 	{
-		GdkGC		*gc		= gdk_gc_new(pixmap);
-		PangoLayout *layout = gtk_widget_create_pango_layout(terminal,"");
+		if(*sts_data->string)
+			status_msg = gettext(sts_data->string);
+		else
+			status_msg = "";
 
-		DrawStatus(layout, gc, color, pixmap);
+		// FIXME (perry#2#): Find why the library is keeping the cursor as "locked" in some cases. When corrected this "workaround" can be removed.
+		if(id == STATUS_CODE_BLANK)
+			set_cursor(CURSOR_MODE_NORMAL);
 
-		g_object_unref(layout);
-		gdk_gc_destroy(gc);
+		if(terminal && pixmap)
+		{
+			GdkGC		*gc		= gdk_gc_new(pixmap);
+			PangoLayout *layout = gtk_widget_create_pango_layout(terminal,"");
 
-		gtk_widget_queue_draw_area(terminal,left_margin+(fWidth << 3),OIAROW,fWidth << 4,fHeight+1);
+			DrawStatus(layout, gc, color, pixmap);
+
+			g_object_unref(layout);
+			gdk_gc_destroy(gc);
+
+			gtk_widget_queue_draw_area(terminal,left_margin+(fWidth << 3),OIAROW,fWidth << 4,fHeight+1);
+		}
+
 	}
 
  }

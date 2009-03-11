@@ -76,22 +76,29 @@
 
 }
 
-::sal_Int16 SAL_CALL I3270Impl::waitForScreen( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
+::sal_Int16 SAL_CALL I3270Impl::waitForUpdate( ::sal_Int16 timeout )
 {
-	int rc = 0;
-	int last = query_screen_change_counter();
-	int end = time(0)+timeout;
+	int		rc = 0;
+	int 	last = query_counter(COUNTER_ID_CTLR_DONE);
+	time_t	end = time(0)+timeout;
 
-	while(!rc && last == query_screen_change_counter())
+	while(time(0) < end)
 	{
 		if(!CONNECTED)
-			rc = ENOTCONN;
-		else if(time(0) > end)
-			rc = ETIMEDOUT;
+		{
+			return ENOTCONN;
+		}
+
 		RunPendingEvents(1);
 	}
 
-	return rc;
+	return ETIMEDOUT;
+}
+
+::sal_Int16 SAL_CALL I3270Impl::waitForScreen( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
+{
+
+	return waitForUpdate(timeout);
 }
 
 ::sal_Int16 SAL_CALL I3270Impl::waitForStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key, ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
@@ -136,6 +143,32 @@
 			}
 		}
 	}
+
+	free(buffer);
+
+	return rc;
+}
+
+::sal_Bool SAL_CALL I3270Impl::queryStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key ) throw (::com::sun::star::uno::RuntimeException)
+{
+	OString str = rtl::OUStringToOString( key , RTL_TEXTENCODING_ASCII_US );
+	int 	sz, rows, cols, start;
+	char 	*buffer;
+	int 	last = -1;
+	bool	rc;
+
+	screen_size(&rows,&cols);
+
+	row--;
+	col--;
+	start = (row * cols) + col;
+
+	sz = strlen(str.getStr());
+	buffer = (char *) malloc(sz+1);
+
+	screen_read(buffer,start,sz);
+
+	rc = (strncmp(buffer,str.getStr(),sz) == 0);
 
 	free(buffer);
 

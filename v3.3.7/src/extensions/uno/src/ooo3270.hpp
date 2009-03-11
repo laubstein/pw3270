@@ -75,13 +75,17 @@ public:
     virtual ::rtl::OUString SAL_CALL getScreenContent() throw (::com::sun::star::uno::RuntimeException);
     virtual ::sal_Int16 SAL_CALL waitForScreen( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException);
     virtual ::sal_Int16 SAL_CALL waitForStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key, ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException);
+    virtual ::sal_Bool SAL_CALL queryStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key ) throw (::com::sun::star::uno::RuntimeException);
 
 	// I3270 implementation - Actions
-    virtual ::sal_Int16 SAL_CALL sendEnterKey(  ) throw (::com::sun::star::uno::RuntimeException);
+    virtual ::sal_Int16 SAL_CALL sendEnterKey( ::sal_Int16 wait ) throw (::com::sun::star::uno::RuntimeException);
     virtual ::sal_Int16 SAL_CALL setStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& str ) throw (::com::sun::star::uno::RuntimeException);
 
 private:
 	sal_Int32 m_nRefCount;
+
+	::sal_Int16 waitForUpdate( ::sal_Int16 timeout );
+
 
 };
 

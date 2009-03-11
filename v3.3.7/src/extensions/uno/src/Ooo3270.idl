@@ -13,6 +13,9 @@ module br { module com { module bb {
 
    /**
      * Interface to lib3270.
+     *
+     * http://wiki.services.openoffice.org/wiki/Documentation/DevGuide/ProUNO/Bridge/Default_Mappings
+     *
      */
     interface I3270 : com::sun::star::uno::XInterface
     {
@@ -26,8 +29,9 @@ module br { module com { module bb {
         string	getScreenContent();
         short	waitForScreen([in] short timeout);
         short	waitForStringAt([in] short row, [in] short col, [in] string key, [in] short timeout);
+		boolean	queryStringAt([in] short row, [in] short col, [in] string key);
 
-		short	sendEnterKey();
+		short	sendEnterKey([in] short wait);
 		short 	setStringAt([in] short row, [in] short col, [in] string str);
 
         /*

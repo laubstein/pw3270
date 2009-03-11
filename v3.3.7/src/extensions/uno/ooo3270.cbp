@@ -32,7 +32,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="Makefile" />
+		<Unit filename="Makefile.in" />
 		<Unit filename="src/Ooo3270.idl" />
 		<Unit filename="src/actions.cxx" />
 		<Unit filename="src/config.hpp" />
