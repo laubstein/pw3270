@@ -87,6 +87,7 @@ AC_SUBST(CXXFLAGS)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
+AC_OUTPUT(OpenOffice-3270.spec)
 
 dnl Output the generated config.status script.
 AC_OUTPUT
