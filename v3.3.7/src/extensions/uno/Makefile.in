@@ -26,6 +26,7 @@ CPPU_ENV ?= gcc3
 OO_SDK_HOME ?= @OO_SDK_HOME@
 OFFICE_HOME ?= @OFFICE_HOME@
 OO_PROGRAM_DIR ?= $(OFFICE_HOME)/basis3.0/program
+OFFICE_PROGRAM ?= @OFFICE_PROGRAM@
 
 OO_INCLUDE_PATH ?= $(OO_SDK_HOME)/inc
 OO_CXX_INCLUDE_PATH ?= $(OO_SDK_HOME)/inc/offuh
@@ -87,6 +88,9 @@ bin/Debug/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Debug/src/$(basena
 
 run: bin/Debug/$(COMP_NAME)
 	@LD_LIBRARY_PATH=$(OO_SDK_HOME)/ure/lib:$(OFFICE_HOME)/ure/lib:bin/Debug bin/Debug/$(COMP_NAME)
+
+ootest: install-debug
+	$(OFFICE_PROGRAM)
 
 #---[ Release Rules ]----------------------------------------------------------------------------------------------
 
