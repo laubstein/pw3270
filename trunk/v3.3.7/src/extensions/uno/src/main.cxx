@@ -141,15 +141,10 @@ extern "C" void * SAL_CALL component_getFactory(const sal_Char * pImplName, void
 void SAL_CALL I3270Impl::acquire() throw ()
 {
 	++m_nRefCount;
-
-	Trace("%s = %d",__FUNCTION__,m_nRefCount);
-
 }
 
 void SAL_CALL I3270Impl::release() throw ()
 {
-	Trace("%s = %d",__FUNCTION__,m_nRefCount);
-
 	if (! --m_nRefCount)
 		delete this;
 }
