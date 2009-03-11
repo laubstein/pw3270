@@ -79,7 +79,7 @@ extern char *profile_name;
 
 static const struct lib3270_screen_callbacks *callbacks = NULL;
 
-static int counter[COUNTER_ID_USER] = { 0, 0 };
+int lib3270_event_counter[COUNTER_ID_USER] = { 0, 0, 0 };
 
 static int defattr = 0;
 Boolean screen_has_changes = 0;
@@ -507,16 +507,17 @@ static void set(OIA_FLAG id, Boolean on)
 
 void status_ctlr_done(void)
 {
-	counter[COUNTER_ID_CTLR_DONE]++;
+	lib3270_event_counter[COUNTER_ID_CTLR_DONE]++;
 	set(OIA_FLAG_UNDERA,True);
 }
 
+/*
 void
 status_minus(void)
 {
-	if(callbacks && callbacks->status)
-		callbacks->status(STATUS_CODE_MINUS);
+	status_changed(STATUS_CODE_MINUS);
 }
+*/
 
 void
 status_oerr(int error_type)
@@ -539,59 +540,42 @@ status_oerr(int error_type)
 		return;
 	}
 
-	if(callbacks && callbacks->status)
-		callbacks->status(sts);
+	status_changed(sts);
 
 }
 
 void status_resolving(Boolean on)
 {
-	if(callbacks)
-	{
-		if(callbacks->cursor)
+	if(callbacks && callbacks->cursor)
 			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
 
-		if(callbacks->status)
-			callbacks->status(on ? STATUS_CODE_RESOLVING : STATUS_CODE_BLANK);
-	}
+	status_changed(on ? STATUS_CODE_RESOLVING : STATUS_CODE_BLANK);
 }
 
 void status_connecting(Boolean on)
 {
-	if(callbacks)
-	{
-		if(callbacks->cursor)
+	if(callbacks && callbacks->cursor)
 			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
 
-		if(callbacks->status)
-			callbacks->status(on ? STATUS_CODE_CONNECTING : STATUS_CODE_BLANK);
-	}
+	status_changed(on ? STATUS_CODE_CONNECTING : STATUS_CODE_BLANK);
 }
 
 void
 status_reset(void)
 {
 	if (kybdlock & KL_ENTER_INHIBIT)
-	{
-		if(callbacks && callbacks->status)
-			callbacks->status(STATUS_CODE_INHIBIT);
-	}
+		status_changed(STATUS_CODE_INHIBIT);
 	else if (kybdlock & KL_DEFERRED_UNLOCK)
-	{
-		if(callbacks && callbacks->status)
-			callbacks->status(STATUS_CODE_X);
-	}
+		status_changed(STATUS_CODE_X);
 	else
-	{
-		if(callbacks && callbacks->status)
-			callbacks->status(STATUS_CODE_BLANK);
-	}
+		status_changed(STATUS_CODE_BLANK);
 
 	if(screen_has_changes)
 		screen_disp();
 
 	if(callbacks && callbacks->reset)
 		callbacks->reset(kybdlock);
+
 }
 
 void
@@ -600,19 +584,32 @@ status_reverse_mode(Boolean on)
 	set(OIA_FLAG_REVERSE,on);
 }
 
+static STATUS_CODE current_status_code = STATUS_CODE_USER;
+
+void status_changed(STATUS_CODE id)
+{
+	if(id == current_status_code)
+		return;
+
+	current_status_code = id;
+
+	if(callbacks && callbacks->status)
+		callbacks->status(id);
+}
+
+/*
 void
 status_syswait(void)
 {
-	if(callbacks && callbacks->status)
-		callbacks->status(STATUS_CODE_SYSWAIT);
+	status_changed(STATUS_CODE_SYSWAIT);
 }
+*/
 
 void
 status_twait(void)
 {
 	set(OIA_FLAG_UNDERA,False);
-	if(callbacks && callbacks->status)
-		callbacks->status(STATUS_CODE_TWAIT);
+	status_changed(STATUS_CODE_TWAIT);
 }
 
 void
@@ -660,8 +657,7 @@ status_connect(int connected)
 		id = STATUS_CODE_DISCONNECTED;
 	}
 
-	if(callbacks && callbacks->status)
-		callbacks->status(id);
+	status_changed(id);
 
 }
 
@@ -729,122 +725,6 @@ screen_80(void)
 {
 }
 
-/*
-int have_aplmap = 0;
-unsigned char aplmap[256];
-
-static int apl_to_acs(unsigned char c)
-{
-    	int r;
-
-	// If there's an explicit map for this Windows code page, use it.
-	if (have_aplmap) {
-	    	r = aplmap[c];
-		return r? r: -1;
-	}
-
-	// Use Unicode.
-	switch (c) {
-	case 0xaf: // CG 0xd1, degree
-		r = 0xb0;	// XXX may not map to bullet in current codepage
-		break;
-	case 0xd4: // CG 0xac, LR corner
-		r = 0x2518;
-		break;
-	case 0xd5: // CG 0xad, UR corner
-		r = 0x2510;
-		break;
-	case 0xc5: // CG 0xa4, UL corner
-		r = 0x250c;
-		break;
-	case 0xc4: // CG 0xa3, LL corner
-		r = 0x2514;
-		break;
-	case 0xd3: // CG 0xab, plus
-		r = 0x253c;
-		break;
-	case 0xa2: // CG 0x92, horizontal line
-		r = 0x2500;
-		break;
-	case 0xc6: // CG 0xa5, left tee
-		r = 0x251c;
-		break;
-	case 0xd6: // CG 0xae, right tee
-		r = 0x2524;
-		break;
-	case 0xc7: // CG 0xa6, bottom tee
-		r = 0x2534;
-		break;
-	case 0xd7: // CG 0xaf, top tee
-		r = 0x252c;
-		break;
-	case 0xbf: // CG 0x15b, stile
-	case 0x85: // CG 0x184, vertical line
-		r = 0x2502;
-		break;
-	case 0x8c: // CG 0xf7, less or equal
-		r = 0x2264;
-		break;
-	case 0xae: // CG 0xd9, greater or equal
-		r = 0x2265;
-		break;
-	case 0xbe: // CG 0x3e, not equal
-		r = 0x2260;
-		break;
-	case 0xa3: // CG 0x93, bullet
-		r = 0x2022;
-		break;
-	case 0xad:
-		r = '[';
-		break;
-	case 0xbd:
-		r = ']';
-		break;
-	default:
-		r = -1;
-		break;
-	}
-
-	return r;
-}
-*/
-
-/* Read the aplMap.<windows-codepage> resource into aplmap[]. */ /*
-static void
-check_aplmap(int codepage)
-{
-	char *r = get_fresource("%s.%d", ResAplMap, codepage);
-	char *s;
-	char *left, *right;
-
-	if (r == CN) {
-	    	return;
-	}
-
-	have_aplmap = 1;
-	r = NewString(r);
-	s = r;
-	while (split_dresource(&s, &left, &right) == 1) {
-	    	unsigned long l, r;
-
-		l = strtoul(left, NULL, 0);
-		r = strtoul(right, NULL, 0);
-		if (l > 0 && l <= 0xff && r > 0 && r <= 0xff) {
-		    	aplmap[l] = (unsigned char)r;
-		}
-	}
-	Free(r);
-}
-*/
-
-/*
-void
-Paste_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
-{
-}
-*/
-
 /* Set the window title. */
 void
 screen_title(char *text)
@@ -891,13 +771,13 @@ relabel(int ignored unused)
 
 int query_counter(COUNTER_ID id)
 {
-	return counter[id];
+	return lib3270_event_counter[id];
 }
 
 void screen_changed(int bstart, int bend)
 {
 	screen_has_changes = 1;
-	counter[COUNTER_ID_SCREEN_CHANGED]++;
+	lib3270_event_counter[COUNTER_ID_SCREEN_CHANGED]++;
 
 	/* If the application can manage screen changes, let it do it */
 	if(callbacks && callbacks->changed)

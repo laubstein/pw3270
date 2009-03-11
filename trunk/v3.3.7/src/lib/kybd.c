@@ -1464,6 +1464,8 @@ do_reset(Boolean explicit)
 	mcursor_normal();
 	composing = NONE;
 	status_compose(False, 0, KT_STD);
+
+	lib3270_event_counter[COUNTER_ID_RESET]++;
 }
 
 void
