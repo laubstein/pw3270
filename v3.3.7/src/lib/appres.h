@@ -262,3 +262,6 @@ typedef struct {
 } AppRes, *AppResptr;
 
 extern AppRes appres;
+
+#define _( x ) x	// FIXME (perry#2#): Check for right implementation
+

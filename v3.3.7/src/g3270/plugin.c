@@ -272,7 +272,7 @@ gboolean StartPlugins(const gchar *startup_script)
 	{
 		if(error)
 		{
-			PopupAnError( N_( "Error creating temporary file:\n%s" ), error->message ? error->message : N_( "Unexpected error" ));
+			Warning( N_( "Can't create temporary file:\n%s" ), error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
 		remove(filename);
@@ -299,7 +299,7 @@ gboolean StartPlugins(const gchar *startup_script)
 	{
 		if(error)
 		{
-			PopupAnError( N_( "Error spawning %s\n%s" ), argv[0], error->message ? error->message : N_( "Unexpected error" ));
+			Warning( N_( "Error spawning %s\n%s" ), argv[0], error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
 		remove(filename);

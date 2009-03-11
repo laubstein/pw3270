@@ -79,8 +79,8 @@
  static void	set_compose(int on, unsigned char c, int keytype);
  static void	set_lu(const char *lu);
  static void	changed(int bstart, int bend);
- static void	error(const char *s);
- static void 	warning(const char *msg);
+ static void	error(const char *fmt, va_list arg);
+ static void 	warning(const char *fmt, va_list arg);
  static int	init(void);
  static void 	update_toggle(int ix, int value, int reason, const char *name);
  static void	show_timer(long seconds);
@@ -96,8 +96,8 @@
 	sizeof(struct lib3270_screen_callbacks),
 
 	init,			// int (*init)(void);
-	error,			// void (*Error)(const char *s);
-	warning,		// void (*Warning)(int id, const char *s);
+	error,			// void (*Error)(const char *fmt, va_list arg);
+	warning,		// void (*Warning)(const char *fmt, va_list arg);
 	setsize,		// void (*setsize)(int rows, int cols);
 	addch,			// void (*addch)(int row, int col, int c, int attr);
 	set_charset,	// void (*charset)(char *dcs);
@@ -115,7 +115,6 @@
 	set_lu,			// void (*lu)(const char *lu);
 	set_oia,		// void (*set)(OIA_FLAG id, int on);
 	erase,			// void (*erase)(void);
-	error,			// void (*popup_an_error)(const char *msg);
 	update_toggle,	// void (*toggle_changed)(int ix, int value, int reason, const char *name);
 	show_timer,		// void	(*show_timer)(long seconds);
 
@@ -1189,72 +1188,56 @@
 	return g_realloc(buffer,strlen(buffer)+1);
  }
 
- static void warning(const char *msg)
+ static void warning(const char *fmt, va_list arg)
  {
- 	gchar		*text	= g_convert(msg, -1, "UTF-8", CHARSET, NULL, NULL, NULL);
+ 	gchar		*msg	= g_strdup_vprintf(gettext(fmt),arg);
  	GtkWidget 	*dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_WARNING,
 													GTK_BUTTONS_CLOSE,
-													"%s",text );
+													"%s",msg );
 
  	g_warning(msg);
 
 	gtk_dialog_run(GTK_DIALOG (dialog));
 	gtk_widget_destroy(dialog);
-	g_free(text);
+
+	g_free(msg);
  }
 
-
+/*
  void WarningPopup(const char *fmt, ...)
  {
 	va_list 	args;
- 	gchar		*text;
- 	GtkWidget 	*dialog;
-
 	va_start(args, fmt);
-	text = g_strdup_vprintf(gettext(fmt),args);
+	warning(fmt,args);
     va_end(args);
-
- 	g_warning(text);
-
- 	dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
-										GTK_DIALOG_DESTROY_WITH_PARENT,
-										GTK_MESSAGE_WARNING,
-										GTK_BUTTONS_OK,
-										"%s",text );
-
-	gtk_dialog_run(GTK_DIALOG (dialog));
-	gtk_widget_destroy(dialog);
-	g_free(text);
  }
 
  void PopupAnError(const char *fmt, ...)
  {
 	va_list 	args;
- 	gchar		*text;
- 	GtkWidget 	*dialog;
-
 	va_start(args, fmt);
-	text = g_strdup_vprintf(gettext(fmt),args);
+	error(fmt,args);
     va_end(args);
+ }
+*/
 
- 	g_warning(text);
+ static void error(const char *fmt, va_list arg)
+ {
+ 	gchar		*msg	= g_strdup_vprintf(gettext(fmt),arg);
+ 	GtkWidget 	*dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_WARNING,
+													GTK_BUTTONS_CLOSE,
+													"%s",msg );
 
- 	dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
-										GTK_DIALOG_DESTROY_WITH_PARENT,
-										GTK_MESSAGE_ERROR,
-										GTK_BUTTONS_CLOSE,
-										"%s",text );
+ 	g_warning(msg);
 
 	gtk_dialog_run(GTK_DIALOG (dialog));
 	gtk_widget_destroy(dialog);
-	g_free(text);
- }
 
- static void error(const char *msg)
- {
- 	PopupAnError("%s",msg);
+	g_free(msg);
  }
 
  static int init(void)

@@ -198,7 +198,7 @@ charset_init(char *csname)
 
 #if !defined(_WIN32) /*[*/
 	/* Get all of the locale stuff right. */
-	setlocale(LC_ALL, "");
+//	setlocale(LC_ALL, "");
 
 	/* Figure out the locale code set (character set encoding). */
 	codeset_name = nl_langinfo(CODESET);

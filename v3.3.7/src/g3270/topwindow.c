@@ -185,7 +185,7 @@
 
 	if(!g_file_get_contents(filename,&text,NULL,&error))
 	{
-		PopupAnError( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+		Warning( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
 		g_error_free(error);
 		g_free(filename);
 		g_free(text);

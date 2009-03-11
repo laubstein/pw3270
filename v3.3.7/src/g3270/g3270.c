@@ -345,36 +345,6 @@ static int g3270_init(const gchar *program)
 	return 0;
 }
 
-/*
-int wait4negotiations(const char *cl_hostname)
-{
-	Trace("Waiting for negotiations with %s to complete or fail",cl_hostname);
-
-	while(!IN_ANSI && !IN_3270)
-	{
-		while(gtk_events_pending())
-			gtk_main_iteration();
-
-		if(!topwindow)
-		{
-			Log("Connection with %s aborted by request",cl_hostname);
-			return EINTR;
-		}
-
-		if(!PCONNECTED)
-		{
-			PopupAnError( N_( "Negotiation with %s failed!" ),cl_hostname);
-			gtk_widget_set_sensitive(topwindow,TRUE);
-			return EINVAL;
-		}
-	}
-
-	Trace("Negotiations with %s completed",cl_hostname);
-
-	return 0;
-}
-*/
-
 #ifdef HAVE_LIBGNOME
 static gint save_session (GnomeClient *client, gint phase, GnomeSaveStyle save_style,
               gint is_shutdown, GnomeInteractStyle interact_style,
@@ -492,6 +462,7 @@ static void load_options(GOptionContext *context)
 
 		case OPT_STRING:
 			entry->arg = G_OPTION_ARG_STRING;
+			entry->arg_description = *((const gchar **) opt[f].aoff);
 			break;
 
 		case OPT_INTEGER:
@@ -641,7 +612,7 @@ int main(int argc, char *argv[])
 
 		if(host_connect(cl_hostname,1) == ENOTCONN)
 		{
-			PopupAnError( N_( "Negotiation with %s failed!" ),cl_hostname);
+			Warning( N_( "Negotiation with %s failed!" ),cl_hostname);
 		}
 
 		gtk_widget_set_sensitive(topwindow,TRUE);

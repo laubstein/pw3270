@@ -49,6 +49,7 @@
 
 #include <signal.h>
 #include <errno.h>
+
 #include "appres.h"
 #include "3270ds.h"
 #include "resources.h"
@@ -222,8 +223,7 @@ int lib3270_init(const char *program_path)
 	if (appres.m3279 && model_number == 4)
 		model_number = 3;
 #endif
-	if (!appres.extended || appres.oversize == CN ||
-	    sscanf(appres.oversize, "%dx%d%c", &ovc, &ovr, &junk) != 2) {
+	if (!appres.extended || appres.oversize == CN || sscanf(appres.oversize, "%dx%d%c", &ovc, &ovr, &junk) != 2) {
 		ovc = 0;
 		ovr = 0;
 	}
@@ -238,7 +238,7 @@ int lib3270_init(const char *program_path)
 
 	if (charset_init(appres.charset) != CS_OKAY)
 	{
-		xs_warning("Cannot find charset \"%s\"", appres.charset);
+		Warning( _( "Cannot find charset \"%s\", using defaults" ), appres.charset);
 		(void) charset_init(CN);
 	}
 
@@ -459,7 +459,9 @@ static const struct lib3270_option options[] =
 #if defined(X3270_SCRIPT) /*[*/
     { OptSocket,   OPT_BOOLEAN, True,  ResSocket,    offset(socket), NULL },
 #endif /*]*/
+
     { OptTermName, OPT_STRING,  False, ResTermName,  offset(termname), NULL },
+
 #if defined(WC3270) /*[*/
     { OptTitle,    OPT_STRING,  False, ResTitle,     offset(title), NULL },
 #endif /*]*/

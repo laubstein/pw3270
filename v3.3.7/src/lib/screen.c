@@ -96,8 +96,7 @@ static int color_from_fa(unsigned char fa);
 static Boolean ts_value(const char *s, enum ts *tsp);
 static void relabel(int ignored);
 
-void
-set_display_charset(char *dcs)
+void set_display_charset(char *dcs)
 {
 	if(callbacks && callbacks->charset)
 		callbacks->charset(dcs);
@@ -922,14 +921,17 @@ int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk)
 	return 0;
 }
 
-void Error(const char *s)
+void Error(const char *fmt, ...)
 {
-	WriteLog("Error","%s",s);
+	va_list arg_ptr;
 
-	if(callbacks && callbacks->Error)
-		callbacks->Error(s);
-	else
-		exit(1);
+	va_start(arg_ptr, fmt);
+
+	if(callbacks && callbacks->Warning)
+		callbacks->Warning(fmt,arg_ptr);
+
+	va_end(arg_ptr);
+
 }
 
 #if defined(LIB3270)
@@ -940,12 +942,17 @@ void notify_toggle_changed(int ix, int value, int reason)
 }
 #endif
 
-void Warning(const char *s)
+void Warning(const char *fmt, ...)
 {
-	WriteLog("Warning","%s",s);
+	va_list arg_ptr;
+
+	va_start(arg_ptr, fmt);
 
 	if(callbacks && callbacks->Warning)
-		callbacks->Warning(s);
+		callbacks->Warning(fmt,arg_ptr);
+
+	va_end(arg_ptr);
+
 }
 
 void mcursor_locked()
@@ -969,17 +976,12 @@ extern void mcursor_waiting()
 /* Pop up an error dialog. */
 extern void popup_an_error(const char *fmt, ...)
 {
-	char 	vmsgbuf[4096];
 	va_list	args;
 
 	va_start(args, fmt);
-	(void) vsprintf(vmsgbuf, fmt, args);
+	if(callbacks && callbacks->Error)
+		callbacks->Error(fmt,args);
 	va_end(args);
-
-	if(callbacks && callbacks->popup_an_error)
-		callbacks->popup_an_error(vmsgbuf);
-	else
-		WriteLog("3270","Error Popup: %s",vmsgbuf);
 
 }
 

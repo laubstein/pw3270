@@ -359,7 +359,7 @@
 #define OptScrollBar		"-sb"
 #define OptSet			"-set"
 #define OptSocket		"-socket"
-#define OptTermName		"-tn"
+#define OptTermName		"-termname"
 #define OptTitle		"-title"
 #define OptTraceFile		"-tracefile"
 #define OptTraceFileSize	"-tracefilesize"
