@@ -160,7 +160,9 @@
 		#define GDK_ALT_MASK GDK_MOD1_MASK
 	#endif
 
-	#define PopupAWarning(fmt, ...)	PopupAnError(fmt,__VA_ARGS__)
+	#define PopupAWarning(fmt, ...)	Warning(fmt,__VA_ARGS__)
+	#define PopupAnError( x )		Error("%s",x);
+	#define WarningPopup(fmt, ...)	Warning(fmt,__VA_ARGS__);
 
  	extern const gchar *program_name;
  	extern const gchar *program_version;
@@ -334,8 +336,5 @@
 	void	CallPlugins(const gchar *name, const gchar *arg);
 
 	void 	SetHostname(const gchar *hostname);
-
-	void 	PopupAnError(const gchar *fmt, ...);
-	void 	WarningPopup(const gchar *fmt, ...);
 
 #endif // G3270_H_INCLUDED

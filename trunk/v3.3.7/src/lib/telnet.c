@@ -1215,7 +1215,7 @@ telnet_fsm(unsigned char c)
 				if (process_eor())
 					return -1;
 			} else
-				Warning("EOR received when not in 3270 mode, ignored.");
+				Warning( _( "EOR received when not in 3270 mode, ignored." ));
 			trace_dsn("RCVD EOR\n");
 			ibptr = ibuf;
 			telnet_state = TNS_DATA;

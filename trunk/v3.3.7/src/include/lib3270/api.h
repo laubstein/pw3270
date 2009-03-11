@@ -40,6 +40,13 @@
 		#define LIB3270_H_INCLUDED "2.0"
 
 		#include <errno.h>
+
+		#if defined(_WIN32)
+			#include <windows.h>
+		#else
+			#include <stdarg.h>
+		#endif
+
 		#ifndef ETIMEDOUT
 			#define ETIMEDOUT -20000
 		#endif
@@ -268,8 +275,8 @@
 			unsigned short sz;
 
 			int		(*init)(void);
-			void	(*Error)(const char *s);
-			void	(*Warning)(const char *s);
+			void	(*Error)(const char *fmt, va_list arg);
+			void	(*Warning)(const char *fmt, va_list arg);
 			void	(*setsize)(int rows, int cols);
 			int		(*addch)(int row, int col, int c, unsigned short attr);
 			void	(*charset)(char *dcs);
@@ -287,7 +294,6 @@
 			void	(*lu)(const char *lu);
 			void	(*set)(OIA_FLAG id, int on);
 			void	(*erase)(void);
-			void	(*popup_an_error)(const char *msg);
 			void	(*toggle_changed)(int ix, int value, int reason, const char *name);
 			void	(*show_timer)(long seconds);
 
@@ -317,6 +323,9 @@
 		int  lib3270_init(const char *program_path);
 
 		const struct lib3270_option * get_3270_option_table(int sz);
+
+		extern void Error(const char *fmt, ...);
+		extern void Warning(const char *fmt, ...);
 
 		/* Set/Get screen contents */
 		int find_field_attribute(int baddr);

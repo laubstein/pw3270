@@ -765,9 +765,9 @@
 				if(!gtk_ui_manager_add_ui_from_file(ui_manager,filename,&error))
 				{
 					if(error && error->message)
-						WarningPopup( _( "Can't load %s: %s" ),filename,error->message);
+						Warning( _( "Can't load %s: %s" ),filename,error->message);
 					else
-						WarningPopup( _( "Can't load %s" ), filename);
+						Warning( _( "Can't load %s" ), filename);
 				}
 			}
 
@@ -869,7 +869,7 @@
 
 		if(!g_file_set_contents(filename,text,-1,&error))
 		{
-			PopupAnError( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			Warning( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
 	}
@@ -910,14 +910,14 @@
 
 		if(!g_file_get_contents(filename, (gchar **) &buffer, &sz, &error))
 		{
-			PopupAnError( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			Warning( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
 		else
 		{
 			sz /= sizeof(struct ea);
 			if(set_device_buffer(buffer,sz))
-				PopupAnError( N_( "Can't set device buffer contents" ) );
+				Warning( N_( "Can't set device buffer contents" ) );
 		}
 
 		g_free(buffer);
@@ -957,7 +957,7 @@
 
 		if(!g_file_set_contents(filename,(gchar *) buffer,sz*sizeof(struct ea),&error))
 		{
-			PopupAnError( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			Warning( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
 		free(buffer);
