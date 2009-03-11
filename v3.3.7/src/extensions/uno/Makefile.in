@@ -4,8 +4,8 @@ SHAREDLIB_EXT ?= so
 
 #---[ G3270 ]------------------------------------------------------------------------------------------------------
 
-G3270_CFLAGS ?= `pkg-config --cflags g3270`
-G3270_LFLAGS ?= `pkg-config --libs g3270`
+G3270_CFLAGS ?= @G3270_CFLAGS@
+G3270_LFLAGS ?= @G3270_LIBS@
 
 #---[ Component Data ]---------------------------------------------------------------------------------------------
 
@@ -23,8 +23,8 @@ CPPU_ENV ?= gcc3
 
 #---[ OpenOffice environment variables ]---------------------------------------------------------------------------
 
-OO_SDK_HOME ?= /usr/lib/ooo3/solver
-OFFICE_HOME ?= /usr/lib/ooo3
+OO_SDK_HOME ?= @OO_SDK_HOME@
+OFFICE_HOME ?= @OFFICE_HOME@
 OO_PROGRAM_DIR ?= $(OFFICE_HOME)/basis3.0/program
 
 OO_INCLUDE_PATH ?= $(OO_SDK_HOME)/inc

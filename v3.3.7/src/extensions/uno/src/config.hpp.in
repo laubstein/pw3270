@@ -1,0 +1,13 @@
+
+
+#ifndef CONFIG_HPP_INCLUDED
+
+	#define CONFIG_HPP_INCLUDED
+
+	#undef SERVICENAME
+	#undef IMPLNAME
+	#undef PACKAGE_VERSION
+	#undef OFFICE_HOME
+	#undef OFFICE_PROGRAM
+
+#endif // CONFIG_HPP_INCLUDED
