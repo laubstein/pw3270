@@ -250,7 +250,7 @@ I3270Impl::I3270Impl( const Reference< XMultiServiceFactory > & xServiceManager 
 	if(!started)
 	{
 		started = true;
-		lib3270_init(PROGRAM_NAME);
+		lib3270_init(OFFICE_PROGRAM);
 	}
 
 
