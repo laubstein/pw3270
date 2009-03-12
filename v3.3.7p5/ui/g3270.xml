@@ -1,0 +1,145 @@
+<ui>
+	<menubar name='MainMenubar'>
+
+		<menu action='FileMenu'>
+			<menuitem action='SaveScreen'/>
+			<menuitem action='SaveSelected'/>
+			<menuitem action='SaveClipboard'/>
+			<separator/>
+			<menuitem action='PrintScreen'/>
+			<menuitem action='PrintSelected'/>
+			<menuitem action='PrintClipboard'/>
+			<separator/>
+			<menu action='SendReceive'/>
+			<menuitem action='Quit'/>
+		</menu>
+
+		<menu action='EditMenu'>
+			<menuitem action='Copy'/>
+			<menuitem action='Append'/>
+			<menuitem action='Paste'/>
+			<menuitem action='PasteNext'/>
+			<menuitem action='PasteTextFile'/>
+			<separator/>
+			<menuitem action='SelectAll'/>
+			<menuitem action='SelectField'/>
+			<menuitem action='Unselect'/>
+			<menuitem action='Reselect'/>
+			<separator/>
+			<menuitem action='Clear'/>
+			<menuitem action='EraseField' />
+		</menu>
+
+		<menu action='ScriptsMenu' />
+
+		<menu action='NetworkMenu'>
+			<menuitem action='Connect' />
+			<menuitem action='Disconnect' />
+		</menu>
+
+		<menu action='SettingsMenu'>
+			<menuitem action='SelectColors' />
+			<menuitem action='SetHostname' />
+			<menuitem action='FontSettings' />
+
+			<menu action='OptionsMenu'>
+				<menuitem action='ToggleCursorBlink' />
+				<menuitem action='ToggleMonocase' />
+				<menuitem action='ToggleCursorPos'  />
+				<menuitem action='ToggleFullScreen'  />
+				<menuitem action='ToggleMarginedPaste'  />
+				<menuitem action='ToggleCrossHair'  />
+				<menuitem action='ToggleRectSelect'  />
+				<menuitem action='ToggleReconnect'  />
+				<menuitem action='ToggleKeypad'  />
+				<menuitem action='ToggleBold'  />
+				<menuitem action='ToggleUnderline'  />
+				<menuitem action='ToggleKeepSelected' />
+				<menuitem action='ToggleSmartPaste' />
+			</menu>
+
+		</menu>
+
+		<menu action='HelpMenu'>
+			<menuitem action='About' />
+		</menu>
+
+	</menubar>
+
+	<toolbar action='MainToolbar'>
+		<toolitem name='SelectAll' action='SelectAll' />
+		<toolitem name='Copy' action='Copy' />
+		<toolitem name='Paste' action='Paste' />
+		<toolitem name='Clear' action='Clear' />
+		<separator/>
+		<toolitem name='Connect' action='Connect' />
+		<toolitem name='Disconnect' action='Disconnect' />
+		<separator/>
+		<toolitem name='SetFullScreen' action='SetFullScreen' />
+		<toolitem name='ResetFullScreen' action='ResetFullScreen' />
+		<toolitem name='SelectColors' action='SelectColors' />
+		<toolitem name='PrintScreen' action='PrintScreen' />
+		<toolitem name='Quit' action='Quit' />
+	</toolbar>
+
+	<popup action='SelectionPopup'>
+		<menuitem action='Copy'/>
+		<menuitem action='Append'/>
+		<menuitem action='Unselect'/>
+		<menuitem action='SelectAll'/>
+		<separator/>
+		<menuitem action='PrintScreen'/>
+		<menuitem action='PrintSelected'/>
+		<menuitem action='PrintClipboard'/>
+
+		<separator/>
+		<menuitem action='Quit'/>
+	</popup>
+
+	<popup action='DefaultPopup'>
+		<menuitem action='Paste'/>
+		<menuitem action='PasteNext'/>
+		<menuitem action='SelectAll'/>
+		<menuitem action='PrintScreen'/>
+		<menuitem action='PrintClipboard'/>
+
+		<separator/>
+		<menuitem action='NextField'/>
+		<menuitem action='Return'/>
+
+		<separator/>
+		<menuitem action='Quit'/>
+	</popup>
+
+	<accelerator action='ToggleInsert' />
+	<accelerator action='Home'/>
+	<accelerator action='Reset'/>
+	<accelerator action='Return'/>
+	<accelerator action='Enter'/>
+	<accelerator action='Escape' />
+	<accelerator action='DeleteWord'/>
+	<accelerator action='Delete' />
+	<accelerator action='Erase' />
+	<accelerator action='EraseEOF' />
+	<accelerator action='PageUP' />
+	<accelerator action='PageDown' />
+	<accelerator action='NextField' />
+	<accelerator action='SysREQ'/>
+	<accelerator action='SelectRight' />
+	<accelerator action='SelectLeft' />
+	<accelerator action='SelectUp' />
+	<accelerator action='SelectDown' />
+	<accelerator action='SelectionRight' />
+	<accelerator action='SelectionLeft' />
+	<accelerator action='SelectionUp' />
+	<accelerator action='SelectionDown' />
+
+	<accelerator action='CursorRight' />
+	<accelerator action='CursorLeft' />
+	<accelerator action='CursorUp' />
+	<accelerator action='CursorDown' />
+
+	<accelerator action='ShiftPageUP' />
+	<accelerator action='ShiftPageDown' />
+
+</ui>
