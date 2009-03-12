@@ -37,15 +37,22 @@
 	extern "C" {
 #endif
 
-		#define LIB3270_H_INCLUDED "2.0"
+		#define LIB3270_H_INCLUDED "4.0"
 
 		#include <errno.h>
 
 		#if defined(_WIN32)
 			#include <windows.h>
+
+			#define G3270_EXPORT __declspec (dllexport)
+
 		#else
 			#include <stdarg.h>
+
+			#define G3270_EXPORT
+
 		#endif
+
 
 		#ifndef ETIMEDOUT
 			#define ETIMEDOUT -1238
@@ -70,9 +77,9 @@
 		#endif
 
 
-		int Set3270Log(const char *filename);
-		int WriteLog(const char *module, const char *fmt, ...);
-		int WriteRCLog(const char *module, int rc, const char *fmt, ...);
+		G3270_EXPORT int Set3270Log(const char *filename);
+		G3270_EXPORT int WriteLog(const char *module, const char *fmt, ...);
+		G3270_EXPORT int WriteRCLog(const char *module, int rc, const char *fmt, ...);
 
 		#ifdef G3270_MODULE_NAME
 			#define Log(fmt, ...)		WriteLog(G3270_MODULE_NAME,fmt,__VA_ARGS__)
@@ -129,7 +136,7 @@
 			FT_ABORT_SENT	/**< Abort sent; awaiting response */
 		};
 
-		int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft);
+		G3270_EXPORT int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft);
 
 		struct filetransfer_callbacks
 		{
@@ -143,7 +150,7 @@
 
 		};
 
-		int RegisterFTCallbacks(const struct filetransfer_callbacks *cbk);
+		G3270_EXPORT int RegisterFTCallbacks(const struct filetransfer_callbacks *cbk);
 
 		/* Library internals */
 		#ifdef LIB3270
@@ -192,7 +199,7 @@
 
 		};
 
-		int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk);
+		G3270_EXPORT int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk);
 
 		/* Screen processing */
 		typedef enum _CURSOR_MODE
@@ -246,7 +253,8 @@
 
 			COUNTER_ID_USER
 		} COUNTER_ID;
-		int query_counter(COUNTER_ID id);
+
+		G3270_EXPORT int query_counter(COUNTER_ID id);
 
 		#define	query_screen_change_counter() query_counter(COUNTER_ID_SCREEN_CHANGED)
 
@@ -262,8 +270,6 @@
 
 			ACTION_GROUP_MAX
 		};
-
-
 
 
 		#define COLOR_ATTR_NONE			0x0000
@@ -322,57 +328,59 @@
 			const char		*description;
 		};
 
-		int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
+		G3270_EXPORT int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
 
-		int  lib3270_init(const char *program_path);
+		G3270_EXPORT int lib3270_init(const char *program_path);
 
-		const struct lib3270_option * get_3270_option_table(int sz);
+		G3270_EXPORT const struct lib3270_option * get_3270_option_table(int sz);
 
-		extern void Error(const char *fmt, ...);
-		extern void Warning(const char *fmt, ...);
+		G3270_EXPORT void Error(const char *fmt, ...);
+		G3270_EXPORT void Warning(const char *fmt, ...);
 
 		/* Set/Get screen contents */
-		int find_field_attribute(int baddr);
-		int find_field_length(int baddr);
-		unsigned char get_field_attribute(int baddr);
-		int 	screen_read(char *dest, int baddr, int count);
-		void	Input_String(const unsigned char *str);
-		void 	screen_size(int *rows, int *cols);
-		int		query_secure_connection(void);
+		G3270_EXPORT int find_field_attribute(int baddr);
+		G3270_EXPORT int find_field_length(int baddr);
+		G3270_EXPORT unsigned char get_field_attribute(int baddr);
+		G3270_EXPORT int screen_read(char *dest, int baddr, int count);
+		G3270_EXPORT void Input_String(const unsigned char *str);
+		G3270_EXPORT void screen_size(int *rows, int *cols);
+		G3270_EXPORT int query_secure_connection(void);
 
         /* Misc calls */
-		int 	Get3270Socket(void);
-		void 	popup_an_error(const char *fmt, ...);
+		G3270_EXPORT int Get3270Socket(void);
+		G3270_EXPORT void popup_an_error(const char *fmt, ...);
+		G3270_EXPORT STATUS_CODE query_3270_terminal_status(void);
 
-		int		Toggled(int ix);
+		G3270_EXPORT int Toggled(int ix);
 
-		int		CallAndWait(int(*callback)(void *), void *parm);
-		void	RunPendingEvents(int wait);
-		int		Wait(int seconds);
+		G3270_EXPORT int CallAndWait(int(*callback)(void *), void *parm);
+		G3270_EXPORT void RunPendingEvents(int wait);
+		G3270_EXPORT int Wait(int seconds);
 
-		void	ctlr_erase(int alt);
-		void	ctlr_set_rows_cols(int mn, int ovc, int ovr);
-        int		ctlr_get_cols(void);
-        int		ctlr_get_rows(void);
+		G3270_EXPORT void ctlr_erase(int alt);
+		G3270_EXPORT void ctlr_set_rows_cols(int mn, int ovc, int ovr);
+        G3270_EXPORT int ctlr_get_cols(void);
+        G3270_EXPORT int ctlr_get_rows(void);
 
         /* Screen calls */
-		void    screen_resume(void);
-		void    screen_suspend(void);
-		void    screen_disp(void);
+		G3270_EXPORT void screen_resume(void);
+		G3270_EXPORT void screen_suspend(void);
+		G3270_EXPORT void screen_disp(void);
 
         /* Cursor calls */
-		int     cursor_get_addr(void);
-        int     cursor_set_addr(int baddr);
+		G3270_EXPORT int cursor_get_addr(void);
+        G3270_EXPORT int cursor_set_addr(int baddr);
 		#define cursor_move(x) cursor_set_addr(x)
 
 		/* Actions */
-		int		action_Enter(void);
+		G3270_EXPORT int action_Enter(void);
+		G3270_EXPORT int action_PFKey(int key);
 
 		/* Host connect/disconnect and state change. */
-		extern int host_connect(const char *n, int wait);
-		extern int host_reconnect(int wait);
-		extern void host_disconnect(int disable);
-		extern void register_schange(int tx, void (*func)(int));
+		G3270_EXPORT int host_connect(const char *n, int wait);
+		G3270_EXPORT int host_reconnect(int wait);
+		G3270_EXPORT void host_disconnect(int disable);
+		G3270_EXPORT void register_schange(int tx, void (*func)(int));
 
 
 #ifdef __cplusplus

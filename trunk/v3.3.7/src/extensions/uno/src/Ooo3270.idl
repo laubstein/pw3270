@@ -24,15 +24,20 @@ module br { module com { module bb {
         short	Connect( [in] string hostinfo, [in] short wait );
         short 	Disconnect();
         short	getConnectionState();
+		boolean isConnected();
+		boolean isTerminalReady();
+		short	waitForEvents();
+		short	waitForTerminalReady([in] short timeout);
 
         string	getScreenContentAt([in] short row, [in] short col, [in] short size);
         string	getScreenContent();
-        short	waitForScreen([in] short timeout);
+        short	waitForReset([in] short timeout);
         short	waitForStringAt([in] short row, [in] short col, [in] string key, [in] short timeout);
 		boolean	queryStringAt([in] short row, [in] short col, [in] string key);
 
-		short	sendEnterKey([in] short wait);
+		short	sendEnterKey();
 		short 	setStringAt([in] short row, [in] short col, [in] string str);
+		short	sendPFKey([in] short key);
 
         /*
 

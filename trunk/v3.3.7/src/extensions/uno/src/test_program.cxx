@@ -102,7 +102,7 @@ int SAL_CALL main(int argc, char **argv)
 			//str	=  OUStringToOString( srv->getScreenContentAt(20,39,5),RTL_TEXTENCODING_UTF8);
 			//Trace("ContentsAt(20,39): \"%s\"",str.pData->buffer);
 			Trace("waitForStringAt(SISBB) returned %d",srv->waitForStringAt(20,39,OUString::createFromAscii("SISBB"),20));
-			Trace("sendEnterKey() returned %d",srv->sendEnterKey(5));
+			Trace("sendEnterKey() returned %d",srv->sendEnterKey());
 			Trace("waitForStringAt(Senha) returned %d",srv->waitForStringAt(14,2,OUString::createFromAscii("Senha"),20));
 			Trace("setStringAt returned %d",srv->setStringAt(13,21,OUString::createFromAscii("c1103788")));
 

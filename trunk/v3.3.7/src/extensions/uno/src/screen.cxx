@@ -76,28 +76,39 @@
 
 }
 
-::sal_Int16 SAL_CALL I3270Impl::waitForUpdate( ::sal_Int16 timeout )
+::sal_Bool SAL_CALL I3270Impl::isTerminalReady(  ) throw (::com::sun::star::uno::RuntimeException)
+{
+	if(!CONNECTED || query_3270_terminal_status() != STATUS_CODE_BLANK)
+		return false;
+
+	return true;
+}
+
+::sal_Int16 SAL_CALL I3270Impl::waitForReset( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
 {
 	int		rc = 0;
-	int 	last = query_counter(COUNTER_ID_RESET);
 	time_t	end = time(0)+timeout;
+	int		last = query_counter(COUNTER_ID_RESET);
+
+	Trace("Waiting for termnal reset (timeout: %d counter: %d)",timeout,last);
 
 	while(time(0) < end)
 	{
 		if(!CONNECTED)
+		{
+			Trace("%s","Connection lost");
 			return ENOTCONN;
-		else if(last != query_counter(COUNTER_ID_RESET))
+		}
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK && last != query_counter(COUNTER_ID_RESET))
+		{
+			Trace("Screen updated, counter: %d",query_counter(COUNTER_ID_RESET));
 			return 0;
+		}
 
 		RunPendingEvents(1);
 	}
 
 	return ETIMEDOUT;
-}
-
-::sal_Int16 SAL_CALL I3270Impl::waitForScreen( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
-{
-	return waitForUpdate(timeout);
 }
 
 ::sal_Int16 SAL_CALL I3270Impl::waitForStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key, ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
@@ -172,5 +183,30 @@
 	free(buffer);
 
 	return rc;
+}
+
+::sal_Int16 SAL_CALL I3270Impl::waitForTerminalReady( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
+{
+	int		rc = 0;
+	time_t	end = time(0)+timeout;
+
+	Trace("Waiting for terminal ready (timeout: %d)",timeout);
+
+	while(time(0) < end)
+	{
+		if(!CONNECTED)
+		{
+			Trace("%s","Connection lost");
+			return ENOTCONN;
+		}
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
+		{
+			return 0;
+		}
+
+		RunPendingEvents(1);
+	}
+
+	return ETIMEDOUT;
 }
 

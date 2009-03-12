@@ -458,6 +458,8 @@ PF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 	if (check_usage(PF_action, *num_params, 1, 1) < 0)
 		return;
 	k = atoi(params[0]);
+
+
 	if (k < 1 || k > PF_SZ) {
 		popup_an_error("%s: Invalid argument '%s'",
 		    action_name(PF_action), params[0]);
@@ -472,6 +474,20 @@ PF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 	else
 		key_AID(pf_xlate[k-1]);
 }
+
+G3270_EXPORT int action_PFKey(int key)
+{
+	char buffer[10];
+
+	if(key < 1 || key > PF_SZ)
+		return EINVAL;
+
+	snprintf(buffer,9,"%d",key);
+	action_internal(PF_action, IA_DEFAULT, buffer, 0);
+
+	return 0;
+}
+
 
 void
 PA_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
@@ -1466,6 +1482,8 @@ do_reset(Boolean explicit)
 	status_compose(False, 0, KT_STD);
 
 	lib3270_event_counter[COUNTER_ID_RESET]++;
+	Trace("Reset counter updated to %d",lib3270_event_counter[COUNTER_ID_RESET]);
+
 }
 
 void
@@ -2221,9 +2239,20 @@ void Enter_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 	action_Enter();
 }
 
-int	 action_Enter(void)
+/**
+ * Send an "Enter" action.
+ *
+ * Called when the user press the key enter.
+ *
+ * @return 0 if ok, -1 if the action can't be performed.
+ *
+ */
+G3270_EXPORT int action_Enter(void)
 {
 	reset_idle_timer();
+
+	Trace("%s (kybdlock & KL_OIA_MINUS): %d kybdlock: %d",__FUNCTION__,(kybdlock & KL_OIA_MINUS),kybdlock);
+
 	if (kybdlock & KL_OIA_MINUS)
 		return -1;
 	else if (kybdlock)
