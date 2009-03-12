@@ -1,0 +1,960 @@
+# translation of g3270.
+# Copyright (C) 2009 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# <>, 2009.
+# , fuzzy
+# 
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: g3270 3.3.7p5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-03-03 17:01-0300\n"
+"PO-Revision-Date: 2009-03-03 17:01-0300\n"
+"Last-Translator:  <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit"
+
+#: src/g3270/g3270.c:559
+msgid "- 3270 Emulator for GTK+"
+msgstr "- Emulador 3270 para GTK+"
+
+#: src/g3270/g3270.c:538
+msgid "- 3270 Emulator for Gnome"
+msgstr "- Emulador 3270 para Gnome"
+
+#: src/g3270/g3270.c:547
+msgid "3270 Emulator"
+msgstr "Emulador 3270"
+
+#: src/g3270/actions.c:387
+msgid "3270 Terminal emulator for GTK."
+msgstr "Emulador 3270 para GTK"
+
+#: src/g3270/actions.c:385
+msgid "3270 Terminal emulator for Gnome."
+msgstr "Emulador de terminal 3270 para Gnome"
+
+#: src/g3270/g3270.c:480
+msgid "3270 options"
+msgstr "Opções do 3270"
+
+#: src/g3270/actions.c:594
+msgid "<Ctrl>r"
+msgstr ""
+
+#: src/g3270/actions.c:627
+msgid "<Ctrl>u"
+msgstr ""
+
+#: src/g3270/actions.c:621
+msgid "<Ctrl>w"
+msgstr ""
+
+#: src/g3270/actions.c:475
+msgid "<alt>Home"
+msgstr ""
+
+#: src/g3270/actions.c:478
+msgid "<alt>K"
+msgstr ""
+
+#: src/g3270/actions.c:471
+msgid "<alt>S"
+msgstr ""
+
+#: src/g3270/actions.c:472
+msgid "<alt>X"
+msgstr ""
+
+#: src/g3270/actions.c:228
+msgid "About"
+msgstr "Sobre"
+
+#: src/g3270/actions.c:188
+msgid "Add to copy"
+msgstr "Copiar anexando"
+
+#: src/g3270/filetransfer.c:213
+msgid "Add/Remove CR at end of line"
+msgstr "Inserir/Remover CR no final da linha"
+
+#: src/g3270/actions.c:474
+msgid "Aid wait"
+msgstr ""
+
+#: src/g3270/actions.c:460
+msgid "Alt Cursor"
+msgstr ""
+
+#: src/g3270/filetransfer.c:214
+msgid "Append"
+msgstr "Adicionar"
+
+#: src/g3270/actions.c:476
+msgid "Auto-Reconnect"
+msgstr "Reconexão automática"
+
+#: src/g3270/filetransfer.c:237
+msgid "Avblock"
+msgstr ""
+
+#: src/g3270/filetransfer.c:229
+msgid "BLKSIZE:"
+msgstr ""
+
+#: src/g3270/colors.c:372 src/g3270/colors.c:394 src/g3270/colors.c:402
+msgid "Background"
+msgstr "Fundo"
+
+#: src/g3270/actions.c:635
+msgid "Backspace"
+msgstr ""
+
+#: src/g3270/colors.c:363
+msgid "Base attributes"
+msgstr "Atributos básicos"
+
+#: src/g3270/colors.c:380
+msgid "Black"
+msgstr "Preto"
+
+#: src/g3270/actions.c:467
+msgid "Blank Fill"
+msgstr ""
+
+#: src/g3270/actions.c:461
+msgid "Blinking Cursor"
+msgstr "Cursor piscante"
+
+#: src/g3270/colors.c:373
+msgid "Blue"
+msgstr "Azul"
+
+#: src/g3270/actions.c:87
+msgid "Bold"
+msgstr "Negrito"
+
+#: src/g3270/colors.c:396
+msgid "Border"
+msgstr "Borda"
+
+#: src/g3270/filetransfer.c:316
+msgid "Browse"
+msgstr ""
+
+#: src/g3270/actions.c:752
+#, c-format
+msgid ""
+"Can't find UI definitions in\n"
+"%s"
+msgstr "Não encontrei definições de interface em\n"
+"%s"
+
+#: src/g3270/actions.c:770
+#, c-format
+msgid "Can't load %s"
+msgstr "Não foi possível carregar %s"
+
+#: src/g3270/actions.c:768
+#, c-format
+msgid "Can't load %s: %s"
+msgstr "Não foi possível carregar %s: %s"
+
+#: src/g3270/filetransfer.c:500
+#, c-format
+msgid "Can't receive \"%s\""
+msgstr "Não foi possível receber \"%s\""
+
+#: src/g3270/g3270.c:325
+msgid "Can't register into lib3270 I/O callback table."
+msgstr "Não foi possível efetuar o registro na tabela de I/O 3270."
+
+#: src/g3270/g3270.c:340
+msgid "Can't register into lib3270 file-transfer callback table."
+msgstr "Não foi possível fazer o registro das funções de transferência de arquivo na biblioteca 3270"
+
+#: src/g3270/g3270.c:332
+msgid "Can't register into lib3270 screen callback table."
+msgstr "Não foi possível registrar chamadas de tela na interface 3270."
+
+#: src/g3270/filetransfer.c:500
+#, c-format
+msgid "Can't send \"%s\""
+msgstr "Não foi possível enviar arquivo \"%s\""
+
+#: src/g3270/actions.c:920
+msgid "Can't set device buffer contents"
+msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
+
+#: src/g3270/keypad.c:148
+msgid "Clear"
+msgstr "Limpar"
+
+#: src/g3270/colors.c:425
+msgid "Color setup"
+msgstr "Configuração de cores"
+
+#: src/g3270/actions.c:230
+msgid "Colors"
+msgstr "Cores"
+
+#: src/g3270/actions.c:190
+msgid "Copy"
+msgstr "Copiar"
+
+#: src/g3270/actions.c:472
+msgid "Cross Hair Cursor"
+msgstr "Régua"
+
+#: src/g3270/colors.c:399
+msgid "Cross-hair"
+msgstr "Régua"
+
+#: src/g3270/colors.c:365
+msgid "Cursor"
+msgstr ""
+
+#: src/g3270/colors.c:354
+msgid "Custom colors"
+msgstr "Cores personalizadas"
+
+#: src/g3270/filetransfer.c:236
+msgid "Cylinders"
+msgstr ""
+
+#: src/g3270/filetransfer.c:420
+msgid "DFT Buffer size:"
+msgstr ""
+
+#: src/g3270/actions.c:464
+msgid "DS Trace"
+msgstr ""
+
+#: src/g3270/colors.c:381
+msgid "Dark Blue"
+msgstr "Azul escuro"
+
+#: src/g3270/colors.c:384
+msgid "Dark Green"
+msgstr "Verde escuro"
+
+#: src/g3270/actions.c:217
+msgid "Debug"
+msgstr ""
+
+#: src/g3270/actions.c:485
+msgid "Debug screen updates"
+msgstr "Depurar atualizações da tela"
+
+#: src/g3270/filetransfer.c:222 src/g3270/filetransfer.c:234
+msgid "Default"
+msgstr ""
+
+#: src/g3270/colors.c:83
+msgid "Default Color Set 2"
+msgstr "Esquema de cores padrão 2"
+
+#: src/g3270/colors.c:48
+msgid "Default Color set 1"
+msgstr "Esquema de cores padrão 1"
+
+#: src/g3270/actions.c:629
+msgid "Delete Char"
+msgstr ""
+
+#: src/g3270/actions.c:617
+msgid "Delete Word"
+msgstr "Apagar palavra"
+
+#: src/g3270/actions.c:159
+msgid "Down"
+msgstr ""
+
+#: src/g3270/actions.c:139
+msgid "Dump screen"
+msgstr "Salvar captura de tela"
+
+#: src/g3270/actions.c:934
+msgid "Dump screen contents"
+msgstr "Salvar captura de tela"
+
+#: src/g3270/actions.c:237
+msgid "Enter"
+msgstr ""
+
+#: src/g3270/keypad.c:150
+msgid ""
+"Erase\n"
+"EOF"
+msgstr "Apagar\n"
+"Campo"
+
+#: src/g3270/keypad.c:151
+msgid ""
+"Erase\n"
+"Input"
+msgstr "Apagar\n"
+"campos"
+
+#: src/g3270/actions.c:605
+msgid "Erase EOF"
+msgstr "Apagar campo"
+
+#: src/g3270/actions.c:623
+msgid "Erase Field"
+msgstr "Apagar campo"
+
+#: src/g3270/actions.c:166
+msgid "Erase input"
+msgstr "Apagar campos"
+
+#: src/g3270/actions.c:606
+msgid "Erase to the end of the field"
+msgstr "Apagar até o final do campo"
+
+#: src/g3270/clipboard.c:165
+#, c-format
+msgid "Error converting clipboard string to charset %s"
+msgstr "Erro convertendo área de transferência para %s"
+
+#: src/g3270/plugin.c:275
+#, c-format
+msgid ""
+"Error creating temporary file:\n"
+"%s"
+msgstr "Erro criando arquivo temporário:\n"
+"%s"
+
+#: src/g3270/actions.c:913 src/g3270/clipboard.c:235 src/g3270/topwindow.c:188
+#, c-format
+msgid ""
+"Error loading %s\n"
+"%s"
+msgstr "Erro lendo %s\n"
+"%s"
+
+#: src/g3270/actions.c:872 src/g3270/actions.c:960
+#, c-format
+msgid ""
+"Error saving %s\n"
+"%s"
+msgstr "Erro salvando %s\n"
+"%s"
+
+#: src/g3270/plugin.c:302
+#, c-format
+msgid ""
+"Error spawning %s\n"
+"%s"
+msgstr "Erro iniciando %s\n"
+"%s"
+
+#: src/g3270/actions.c:596
+msgid "Escape"
+msgstr ""
+
+#: src/g3270/actions.c:469
+msgid "Event Trace"
+msgstr ""
+
+#: src/plugins/rexx/actions.c:98
+msgid "External rexx script"
+msgstr "Script rexx externo"
+
+#: src/g3270/actions.c:611
+msgid "Field start"
+msgstr "Início do campo"
+
+#: src/g3270/actions.c:173
+msgid "File Transfer"
+msgstr "Transferência de arquivo"
+
+#: src/g3270/filetransfer.c:504
+msgid "File transfer failed"
+msgstr "Transferência de arquivo falhou"
+
+#: src/g3270/filetransfer.c:223
+msgid "Fixed"
+msgstr "Fixo"
+
+#: src/g3270/print.c:221
+msgid "Font"
+msgstr "Fonte"
+
+#: src/g3270/colors.c:395 src/g3270/colors.c:403
+msgid "Foreground"
+msgstr "Frente"
+
+#: src/g3270/actions.c:475
+msgid "Full Screen"
+msgstr "Tela-cheia"
+
+#: src/g3270/g3270.c:464
+msgid "Full path of plugins to load"
+msgstr "Caminho completo dos plugins a carregas"
+
+#: src/g3270/actions.c:445
+msgid "Fullscreen"
+msgstr "Tela-cheia"
+
+#: src/g3270/colors.c:387
+msgid "Gray"
+msgstr "Cinza"
+
+#: src/g3270/colors.c:376
+msgid "Green"
+msgstr "Verde"
+
+#: src/g3270/actions.c:212
+msgid "Help"
+msgstr "Ajuda"
+
+#: src/g3270/filetransfer.c:219
+msgid "Host file name:"
+msgstr "Nome do arquivo remoto:"
+
+#: src/g3270/g3270.c:457
+msgid "Host identifier"
+msgstr "Identificador do host"
+
+#: src/g3270/filetransfer.c:212
+msgid "Host is TSO"
+msgstr ""
+
+#: src/g3270/actions.c:1014
+msgid "Hostname:"
+msgstr "Endereço do servidor:"
+
+#: src/g3270/actions.c:477
+msgid "Insert"
+msgstr ""
+
+#: src/g3270/colors.c:392
+msgid "Intensified/Protected"
+msgstr "Intensificado/Protegido"
+
+#: src/g3270/colors.c:390
+msgid "Intensified/Unprotected"
+msgstr "Intensificado/Desprotegido"
+
+#: src/g3270/plugin.c:471
+#, c-format
+msgid "Invalid action \"%s\" when loading %s"
+msgstr "Ação \"%s\" inválida ao carregar %s"
+
+#: src/g3270/actions.c:88
+msgid "Keep selected"
+msgstr "Manter selecionado"
+
+#: src/g3270/actions.c:478
+msgid "Keypad"
+msgstr "Teclado de funções"
+
+#: src/g3270/filetransfer.c:228
+msgid "LRECL:"
+msgstr ""
+
+#: src/g3270/actions.c:157
+msgid "Left"
+msgstr "Esquerda"
+
+#: src/g3270/actions.c:466
+msgid "Line Wrap"
+msgstr ""
+
+#: src/g3270/actions.c:182 src/g3270/actions.c:887
+msgid "Load screen dump"
+msgstr "Carregar captura de tela"
+
+#: src/g3270/filetransfer.c:218
+msgid "Local file name:"
+msgstr "Nome do arquivo local:"
+
+#: src/g3270/colors.c:406
+msgid "Locked status"
+msgstr "Bloqueada"
+
+#: src/g3270/g3270.c:461
+msgid "Main window title"
+msgstr "Título da janela principal"
+
+#: src/g3270/actions.c:459
+msgid "Monocase"
+msgstr "Só maiúsculas"
+
+#: src/g3270/colors.c:386
+msgid "Mustard"
+msgstr "Mostarda"
+
+#: src/g3270/g3270.c:368
+#, c-format
+msgid "Negotiation with %s failed!"
+msgstr "Negociação com %s falhou!"
+
+#: src/g3270/actions.c:224
+msgid "Network"
+msgstr "Rede"
+
+#: src/g3270/actions.c:641
+msgid "Next field"
+msgstr "Próximo campo"
+
+#: src/g3270/colors.c:398
+msgid "Normal"
+msgstr ""
+
+#: src/g3270/colors.c:405
+msgid "Normal status"
+msgstr "Situação normal"
+
+#: src/g3270/colors.c:391
+msgid "Normal/Protected"
+msgstr "Normal/Protegido"
+
+#: src/g3270/colors.c:389
+msgid "Normal/Unprotected"
+msgstr "Normal/Desprotegido"
+
+#: src/g3270/colors.c:366
+msgid "OIA"
+msgstr ""
+
+#: src/g3270/g3270.c:421
+#, c-format
+msgid "Option parsing failed: %s\n"
+msgstr "Tratamento de opções falho: %s\n"
+
+#: src/g3270/colors.c:382
+msgid "Orange"
+msgstr "Laranja"
+
+#: src/g3270/actions.c:204
+msgid "Paste"
+msgstr "Colar"
+
+#: src/g3270/actions.c:162
+msgid "Paste next"
+msgstr "Colar próximo"
+
+#: src/g3270/actions.c:163 src/g3270/clipboard.c:204
+msgid "Paste text file"
+msgstr "Colar arquivo texto"
+
+#: src/g3270/actions.c:470
+msgid "Paste with left margin"
+msgstr "Colar com margem"
+
+#: src/g3270/g3270.c:460
+msgid "Path to an image file for program icon"
+msgstr "Caminho para arquivo de imagem contendo o ícone do programa"
+
+#: src/g3270/g3270.c:459
+msgid "Path to search for data and configuration files"
+msgstr "Caminho dos arquivos de dados e configuração"
+
+#: src/g3270/g3270.c:456
+msgid "Path to the configuration file"
+msgstr "Caminho para o arquivo de configuração"
+
+#: src/g3270/colors.c:375
+msgid "Pink"
+msgstr "Rosa"
+
+#: src/g3270/actions.c:1017
+msgid "Port:"
+msgstr "Porta:"
+
+#: src/g3270/actions.c:223
+msgid "Preferences"
+msgstr "Preferências"
+
+#: src/g3270/filetransfer.c:230
+msgid "Primary space:"
+msgstr ""
+
+#: src/g3270/actions.c:138
+msgid "Print"
+msgstr "Imprimir"
+
+#: src/g3270/actions.c:197
+msgid "Print copy"
+msgstr "Imprimir cópia"
+
+#: src/g3270/actions.c:191
+msgid "Print selected"
+msgstr "Imprimir seleção"
+
+#: src/g3270/actions.c:225
+msgid "Properties"
+msgstr "Propriedades"
+
+#: src/g3270/colors.c:383
+msgid "Purple"
+msgstr "Púrpura"
+
+#: src/g3270/actions.c:175
+msgid "Receive file"
+msgstr "Receber arquivo"
+
+#: src/g3270/filetransfer.c:285
+msgid "Receive file from host"
+msgstr "Receber arquivo do servidor"
+
+#: src/g3270/filetransfer.c:352
+msgid "Record format"
+msgstr ""
+
+#: src/g3270/colors.c:374
+msgid "Red"
+msgstr "Vermelho"
+
+#: src/g3270/actions.c:136
+msgid "Redraw screen"
+msgstr "Redesenhar a tela"
+
+#: src/g3270/filetransfer.c:215
+msgid "Remap ASCII Characters"
+msgstr ""
+
+#: src/g3270/actions.c:164
+msgid "Reselect"
+msgstr "Reselecionar"
+
+#: src/g3270/actions.c:590 src/g3270/keypad.c:149
+msgid "Reset"
+msgstr ""
+
+#: src/g3270/actions.c:236
+msgid "Return"
+msgstr ""
+
+#: src/plugins/rexx/actions.c:99
+msgid "Rexx scripts"
+msgstr "Scripts Rexx"
+
+#: src/g3270/actions.c:156
+msgid "Right"
+msgstr "Direita"
+
+#: src/g3270/g3270.c:458
+msgid "Run script on startup (if available)"
+msgstr ""
+
+#: src/g3270/actions.c:233
+msgid "Save"
+msgstr "Salvar"
+
+#: src/g3270/actions.c:981
+msgid "Save clipboard contents"
+msgstr "Salvar área de transferência"
+
+#: src/g3270/actions.c:198
+msgid "Save copy"
+msgstr "Salvar cópia"
+
+#: src/g3270/actions.c:137
+msgid "Save screen"
+msgstr "Salvar tela"
+
+#: src/g3270/actions.c:971
+msgid "Save screen contents"
+msgstr "Salvar conteúdo da tela"
+
+#: src/g3270/actions.c:192
+msgid "Save selected"
+msgstr "Salvar seleção"
+
+#: src/g3270/actions.c:976
+msgid "Save selected text"
+msgstr "Salvar texto selecionado"
+
+#: src/g3270/actions.c:468
+msgid "Screen Trace"
+msgstr ""
+
+#: src/g3270/actions.c:216
+msgid "Scripts"
+msgstr ""
+
+#: src/g3270/actions.c:465
+msgid "Scroll bar"
+msgstr ""
+
+#: src/g3270/filetransfer.c:231
+msgid "Secondary space:"
+msgstr ""
+
+#: src/g3270/actions.c:999
+msgid "Secure connection"
+msgstr "Conexão segura"
+
+#: src/g3270/actions.c:148
+msgid "Select Down"
+msgstr ""
+
+#: src/g3270/actions.c:143
+msgid "Select Field"
+msgstr "Selecionar campo"
+
+#: src/g3270/actions.c:146
+msgid "Select Left"
+msgstr ""
+
+#: src/plugins/rexx/actions.c:45
+msgid "Select Rexx script to run"
+msgstr "Selecione script rexx a executar"
+
+#: src/g3270/actions.c:145
+msgid "Select Right"
+msgstr "Seleciona a direita"
+
+#: src/g3270/actions.c:147
+msgid "Select Up"
+msgstr ""
+
+#: src/g3270/actions.c:165
+msgid "Select all"
+msgstr "Selecionar tudo"
+
+#: src/g3270/actions.c:471
+msgid "Select by rectangles"
+msgstr "Seleção retangular"
+
+#: src/g3270/filetransfer.c:130
+msgid "Select file to receive"
+msgstr "Selecione arquivo a receber"
+
+#: src/g3270/filetransfer.c:130
+msgid "Select file to send"
+msgstr "Selecione arquivo a enviar"
+
+#: src/g3270/actions.c:220
+msgid "Select font"
+msgstr "Selecionar fonte"
+
+#: src/g3270/actions.c:1000
+msgid "Select hostname"
+msgstr "Selecionar servidor"
+
+#: src/g3270/colors.c:364
+msgid "Selected text"
+msgstr "Texto selecionado"
+
+#: src/g3270/actions.c:153
+msgid "Selection Down"
+msgstr ""
+
+#: src/g3270/actions.c:151
+msgid "Selection Left"
+msgstr ""
+
+#: src/g3270/actions.c:150
+msgid "Selection Right"
+msgstr ""
+
+#: src/g3270/actions.c:152
+msgid "Selection Up"
+msgstr ""
+
+#: src/g3270/actions.c:176
+msgid "Send file"
+msgstr "Enviar arquivo"
+
+#: src/g3270/filetransfer.c:285
+msgid "Send file to host"
+msgstr "Enviar arquivo para o servidor"
+
+#: src/g3270/actions.c:174
+msgid "Send/Receive"
+msgstr "Enviar/Receber"
+
+#: src/g3270/colors.c:404
+msgid "Separator"
+msgstr "Separador"
+
+#: src/g3270/actions.c:183
+msgid "Set hostname"
+msgstr "Mudar servidor"
+
+#: src/g3270/actions.c:215
+msgid "Settings"
+msgstr "Configuração"
+
+#: src/g3270/g3270.c:480
+msgid "Show lib3270 options"
+msgstr "Mostra opções da biblioteca 3270"
+
+#: src/g3270/actions.c:462
+msgid "Show timing"
+msgstr "Mostrar tempo"
+
+#: src/g3270/actions.c:89
+msgid "Smart paste"
+msgstr "Colar inteligente"
+
+#: src/g3270/filetransfer.c:372
+msgid "Space allocation units"
+msgstr ""
+
+#: src/g3270/actions.c:647
+msgid "Sys Req"
+msgstr ""
+
+#: src/g3270/colors.c:362
+msgid "Terminal"
+msgstr ""
+
+#: src/g3270/filetransfer.c:211
+msgid "Text file"
+msgstr "Arquivo texto"
+
+#: src/g3270/actions.c:360
+msgid ""
+"This program is free software; you can redistribute it and/or modify it "
+"under the terms of the GNU General Public License as published by the Free "
+"Software Foundation; either version 2 of the License, or (at your option) "
+"any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful, but WITHOUT "
+"ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or "
+"FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for "
+"more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License along with "
+"this program; if not, write to the Free Software Foundation, Inc., 51 "
+"Franklin St, Fifth Floor, Boston, MA 02111-1307 USA"
+msgstr ""
+
+#: src/g3270/actions.c:463
+msgid "Track Cursor"
+msgstr "Mostrar posição do cursor"
+
+#: src/g3270/filetransfer.c:235
+msgid "Tracks"
+msgstr "Trilhas"
+
+#: src/g3270/filetransfer.c:323
+msgid "Transfer options"
+msgstr "Opções de transferência"
+
+#: src/g3270/colors.c:377 src/g3270/colors.c:385
+msgid "Turquoise"
+msgstr "Turquesa"
+
+#: src/g3270/filetransfer.c:225
+msgid "Undefined"
+msgstr "Indefinido"
+
+#: src/g3270/actions.c:90
+msgid "Underline"
+msgstr "Sublinhado"
+
+#: src/g3270/actions.c:872 src/g3270/actions.c:913 src/g3270/actions.c:960
+#: src/g3270/clipboard.c:235 src/g3270/plugin.c:275 src/g3270/plugin.c:302
+#: src/g3270/topwindow.c:188
+msgid "Unexpected error"
+msgstr "Erro inesperado"
+
+#: src/g3270/actions.c:189
+msgid "Unselect"
+msgstr "Desmarcar"
+
+#: src/g3270/actions.c:158
+msgid "Up"
+msgstr ""
+
+#: src/g3270/filetransfer.c:224
+msgid "Variable"
+msgstr "Variável"
+
+#: src/g3270/actions.c:473
+msgid "Visible Control chars"
+msgstr ""
+
+#: src/g3270/colors.c:379
+msgid "White"
+msgstr "Branco"
+
+#: src/g3270/actions.c:446
+msgid "Window"
+msgstr "Janela"
+
+#: src/g3270/screen.c:778 src/g3270/screen.c:802
+msgid "X"
+msgstr ""
+
+#: src/g3270/screen.c:782
+msgid "X -f"
+msgstr ""
+
+#: src/g3270/screen.c:810
+msgid "X Connecting"
+msgstr "X Conectando"
+
+#: src/g3270/screen.c:798
+msgid "X Inhibit"
+msgstr "X Inibido"
+
+#: src/g3270/screen.c:774
+msgid "X Not Connected"
+msgstr "X Não conectado"
+
+#: src/g3270/screen.c:790
+msgid "X Numeric"
+msgstr "X Numérico"
+
+#: src/g3270/screen.c:794
+msgid "X Overflow"
+msgstr "X Estouro"
+
+#: src/g3270/screen.c:786
+msgid "X Protected"
+msgstr "X Protegido"
+
+#: src/g3270/screen.c:806
+msgid "X Resolving"
+msgstr "X Resolvendo"
+
+#: src/g3270/screen.c:762
+msgid "X System"
+msgstr "X Sistema"
+
+#: src/g3270/screen.c:766
+msgid "X Wait"
+msgstr "X Aguarde"
+
+#: src/g3270/colors.c:378
+msgid "Yellow"
+msgstr "Amarelo"
+
+#: src/g3270/actions.c:181
+msgid "_Connect"
+msgstr "_Conectar"
+
+#: src/g3270/actions.c:140
+msgid "_Disconnect"
+msgstr "_Desconectar"
+
+#: src/g3270/actions.c:213
+msgid "_Edit"
+msgstr "_Editar"
+
+#: src/g3270/actions.c:210
+msgid "_File"
+msgstr "_Arquivo"
+
+#: src/g3270/actions.c:211
+msgid "_Network"
+msgstr "_Rede"
+
+#: src/g3270/actions.c:214
+msgid "_Options"
+msgstr "_Opções"
+
+#: src/g3270/actions.c:229
+msgid "_Quit"
+msgstr "_Sair"
+
