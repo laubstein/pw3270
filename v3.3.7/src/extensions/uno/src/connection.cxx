@@ -45,3 +45,18 @@ sal_Int16 SAL_CALL I3270Impl::Disconnect() throw (RuntimeException)
 
 	return 0;
 }
+
+::sal_Bool SAL_CALL I3270Impl::isConnected(  ) throw (::com::sun::star::uno::RuntimeException)
+{
+	return (CONNECTED) ? true : false;
+}
+
+::sal_Int16 SAL_CALL I3270Impl::waitForEvents( ) throw (::com::sun::star::uno::RuntimeException)
+{
+	if(QueryCstate() == NOT_CONNECTED)
+		return EINVAL;
+
+	RunPendingEvents(1);
+
+	return 0;
+}

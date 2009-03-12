@@ -69,23 +69,25 @@ public:
 	virtual sal_Int16 SAL_CALL getConnectionState() throw (RuntimeException);
 	virtual sal_Int16 SAL_CALL Connect( const OUString& hostinfo, ::sal_Int16 wait ) throw (RuntimeException);
 	virtual sal_Int16 SAL_CALL Disconnect() throw (RuntimeException);
+    virtual ::sal_Bool SAL_CALL isConnected(  ) throw (::com::sun::star::uno::RuntimeException);
+    virtual ::sal_Int16 SAL_CALL waitForEvents( ) throw (::com::sun::star::uno::RuntimeException);
 
 	// I3270 implementation - Screen
     virtual ::rtl::OUString SAL_CALL getScreenContentAt( ::sal_Int16 row, ::sal_Int16 col, ::sal_Int16 size ) throw (::com::sun::star::uno::RuntimeException);
     virtual ::rtl::OUString SAL_CALL getScreenContent() throw (::com::sun::star::uno::RuntimeException);
-    virtual ::sal_Int16 SAL_CALL waitForScreen( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException);
+    virtual ::sal_Int16 SAL_CALL waitForReset( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException);
     virtual ::sal_Int16 SAL_CALL waitForStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key, ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException);
     virtual ::sal_Bool SAL_CALL queryStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key ) throw (::com::sun::star::uno::RuntimeException);
+    virtual ::sal_Bool SAL_CALL isTerminalReady(  ) throw (::com::sun::star::uno::RuntimeException);
+    virtual ::sal_Int16 SAL_CALL waitForTerminalReady( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException);
 
 	// I3270 implementation - Actions
-    virtual ::sal_Int16 SAL_CALL sendEnterKey( ::sal_Int16 wait ) throw (::com::sun::star::uno::RuntimeException);
+    virtual ::sal_Int16 SAL_CALL sendEnterKey() throw (::com::sun::star::uno::RuntimeException);
     virtual ::sal_Int16 SAL_CALL setStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& str ) throw (::com::sun::star::uno::RuntimeException);
+    virtual ::sal_Int16 SAL_CALL sendPFKey( ::sal_Int16 key ) throw (::com::sun::star::uno::RuntimeException);
 
 private:
 	sal_Int32 m_nRefCount;
-
-	::sal_Int16 waitForUpdate( ::sal_Int16 timeout );
-
 
 };
 

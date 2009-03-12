@@ -584,7 +584,19 @@ status_reverse_mode(Boolean on)
 	set(OIA_FLAG_REVERSE,on);
 }
 
-static STATUS_CODE current_status_code = STATUS_CODE_USER;
+static STATUS_CODE current_status_code = -1;
+
+/**
+ * Query the updated terminal status.
+ *
+ * @return status-code.
+ *
+ * @see STATUS_CODE
+ */
+G3270_EXPORT STATUS_CODE query_3270_terminal_status(void)
+{
+	return current_status_code;
+}
 
 void status_changed(STATUS_CODE id)
 {
