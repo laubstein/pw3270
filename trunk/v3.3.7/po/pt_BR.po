@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: g3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-11 11:09-0300\n"
-"PO-Revision-Date: 2009-03-11 11:10-0300\n"
+"POT-Creation-Date: 2009-03-12 16:27-0300\n"
+"PO-Revision-Date: 2009-03-12 16:28-0300\n"
 "Last-Translator:  <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -888,7 +888,7 @@ msgstr "Branco"
 msgid "Window"
 msgstr "Janela"
 
-#: src/g3270/screen.c:777 src/g3270/screen.c:801
+#: src/g3270/screen.c:777 src/g3270/screen.c:805
 msgid "X"
 msgstr ""
 
@@ -896,7 +896,7 @@ msgstr ""
 msgid "X -f"
 msgstr ""
 
-#: src/g3270/screen.c:809
+#: src/g3270/screen.c:813
 msgid "X Connecting"
 msgstr "X Conectando"
 
@@ -920,7 +920,7 @@ msgstr "X Estouro"
 msgid "X Protected"
 msgstr "X Protegido"
 
-#: src/g3270/screen.c:805
+#: src/g3270/screen.c:809
 msgid "X Resolving"
 msgstr "X Resolvendo"
 
