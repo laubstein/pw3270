@@ -17,6 +17,7 @@ export HOST_CC=/usr/bin/gcc
 export TARGET=i386-mingw32
 export cache=win32.cache
 
+OO_SDK_HOME="/usr/local/cross-tools/OpenOffice.org_3.0_SDK_win32/sdk"
 NATIVE_OO_SDK_HOME="/usr/lib/ooo3/solver"
 NATIVE_OFFICE_HOME="/usr/lib/ooo3"
 
@@ -28,12 +29,13 @@ autoconf
 		--target=$TARGET \
 		--host=$TARGET \
 		--build=i686-linux \
-		--with-office-sdk-home=/usr/local/cross-tools/OpenOffice.org_3.0_SDK_win32/sdk \
+		--with-office-sdk-home="$OO_SDK_HOME" \
 		--with-idlc-program="LD_LIBRARY_PATH=$NATIVE_OFFICE_HOME/ure/lib/ $NATIVE_OO_SDK_HOME/bin/idlc" \
 		--with-cppumaker-program="LD_LIBRARY_PATH=$NATIVE_OFFICE_HOME/ure/lib/ $NATIVE_OO_SDK_HOME/bin/cppumaker" \
 		--with-regmerge-program="LD_LIBRARY_PATH=$NATIVE_OFFICE_HOME/lib/ $NATIVE_OFFICE_HOME/ure/bin/regmerge" \
 		--with-regcomp-program="LD_LIBRARY_PATH=$NATIVE_OFFICE_HOME/ure/bin/regcomp" \
-		--with-types.rdb="$NATIVE_OO_SDK_HOME/bin/types.rdb"
+		--with-types.rdb="$NATIVE_OO_SDK_HOME/bin/types.rdb" \
+		--with-ooincludepath="$OO_SDK_HOME/include"
 
 
 status=$?
