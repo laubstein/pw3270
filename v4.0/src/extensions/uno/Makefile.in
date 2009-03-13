@@ -2,6 +2,10 @@
 
 SHAREDLIB_EXT ?= so
 
+#---[ Compiler ]---------------------------------------------------------------------------------------------------
+
+CXX=@CXX@
+
 #---[ G3270 ]------------------------------------------------------------------------------------------------------
 
 G3270_CFLAGS ?= @G3270_CFLAGS@
@@ -146,6 +150,7 @@ clean:
 	@rm -fr obj
 	@rm -fr bin
 	@rm -fr src/inc
+	@rm -fr build.tmp
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
