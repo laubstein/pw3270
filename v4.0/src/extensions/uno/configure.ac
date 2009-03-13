@@ -66,6 +66,45 @@ AC_ARG_WITH([office-program],
 	o3270_cv_ooprogram="/usr/lib/ooo3/program/soffice.bin"
 ])
 
+AC_ARG_WITH([idlc-program],
+	[AS_HELP_STRING([--with-idlc-program], [Define IDLC program command-line])],
+[
+	o3270_cv_idlc="$withval"
+],[
+	o3270_cv_idlc="LD_LIBRARY_PATH=\$(OFFICE_HOME)/ure/lib/ \$(OO_SDK_HOME)/bin/idlc"
+])
+
+AC_ARG_WITH([cppumaker-program],
+	[AS_HELP_STRING([--with-cppumaker-program], [Define cppumaker program command-line])],
+[
+	o3270_cv_cppumaker="$withval"
+],[
+	o3270_cv_cppumaker="LD_LIBRARY_PATH=\$(OFFICE_HOME)/ure/lib/ \$(OO_SDK_HOME)/bin/cppumaker"
+])
+
+AC_ARG_WITH([regmerge-program],
+	[AS_HELP_STRING([--with-regmerge-program], [Define regmerge program command-line])],
+[
+	o3270_cv_regmerge="$withval"
+],[
+	o3270_cv_regmerge="LD_LIBRARY_PATH=\$(OFFICE_HOME)/ure/lib/ \$(OFFICE_HOME)/ure/bin/regmerge"
+])
+
+AC_ARG_WITH([regcomp-program],
+	[AS_HELP_STRING([--with-regcomp-program], [Define regcomp program command-line])],
+[
+	o3270_cv_regcomp="$withval"
+],[
+	o3270_cv_regcomp="\$(OFFICE_HOME)/ure/bin/regcomp"
+])
+
+AC_ARG_WITH([types.rdb],
+	[AS_HELP_STRING([--with-types.rdb], [Define types.rdb file full path])],
+[
+	o3270_cv_types_rdb="$withval"
+],[
+	o3270_cv_types_rdb="\$(OO_SDK_HOME)/bin/types.rdb"
+])
 
 # Checks for libraries.
 PKG_CHECK_EXISTS
@@ -76,6 +115,12 @@ AC_SUBST(G3270_CFLAGS)
 AC_SUBST(OFFICE_HOME,$o3270_cv_oohome)
 AC_SUBST(OO_SDK_HOME,$o3270_cv_sdkhome)
 AC_SUBST(OFFICE_PROGRAM,$o3270_cv_ooprogram)
+
+AC_SUBST(IDLC,$o3270_cv_idlc)
+AC_SUBST(CPPUMAKER,$o3270_cv_cppumaker)
+AC_SUBST(REGMERGE,$o3270_cv_regmerge)
+AC_SUBST(REGCOMP,$o3270_cv_regcomp)
+AC_SUBST(TYPES_RDB,$o3270_cv_types_rdb)
 
 AC_DEFINE_UNQUOTED(SERVICENAME,"$o3270_cv_srvname")
 AC_DEFINE_UNQUOTED(IMPLNAME,"$o3270_cv_implname")
