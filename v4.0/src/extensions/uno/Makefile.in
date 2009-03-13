@@ -38,7 +38,8 @@ OFFICE_PROGRAM ?= @OFFICE_PROGRAM@
 OO_INCLUDE_PATH ?= @OO_INCLUDE_PATH@
 OO_CXX_INCLUDE_PATH ?= @OO_INCLUDE_PATH@/offuh
 
-OO_CXXFLAGS ?= -DUNX -DGCC -DLINUX=1 -DCPPU_ENV=$(CPPU_ENV) -DLANGUAGE_BINDING_NAME=\"$(CPPU_ENV)\" -I$(OO_INCLUDE_PATH) -I$(OO_CXX_INCLUDE_PATH) -Isrc/inc
+# -DUNX -DGCC -DLINUX=1
+OO_CXXFLAGS ?= -DCPPU_ENV=$(CPPU_ENV) -DWNT -DLANGUAGE_BINDING_NAME=\"$(CPPU_ENV)\" -I$(OO_INCLUDE_PATH) -I$(OO_CXX_INCLUDE_PATH) -Isrc/inc
 OO_LDFLAGS ?= -L$(OFFICE_HOME)/ure/lib -L$(OO_SDK_HOME)/lib -Wl,-rpath-link=$(OFFICE_HOME)/ure/lib
 
 # -luno_cppu
@@ -70,7 +71,7 @@ REGCOMP ?= @REGCOMP@
 
 #---[ Debug Rules ]------------------------------------------------------------------------------------------------
 
-Debug: bin/Debug/$(COMP_NAME)
+Debug: bin/Debug/$(COMP_NAME)@EXEEXT@
 
 install-debug: bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
 	@cp -f bin/Debug/$(COMP_IMPL_NAME) $(DESTDIR)/$(OO_PROGRAM_DIR)
@@ -78,7 +79,7 @@ install-debug: bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
 	@$(REGCOMP) -register -r $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb -c $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_IMPL_NAME)
 	@echo "bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb -> $(OO_PROGRAM_DIR)"
 
-bin/Debug/$(COMP_NAME): obj/Debug/src/test_program.o bin/Debug/$(COMP_IMPL_NAME)
+bin/Debug/$(COMP_NAME)@EXEEXT@: obj/Debug/src/test_program.o bin/Debug/$(COMP_IMPL_NAME)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	$(CXX) $(OO_LDFLAGS) -L$(OO_SDK_HOME)/lib -luno_cppuhelpergcc3 -L./bin/Debug bin/Debug/$(COMP_IMPL_NAME) -o $@ obj/Debug/src/test_program.o
@@ -93,7 +94,7 @@ bin/Debug/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Debug/src/$(basena
 	@mkdir -p `dirname $@`
 	@$(CXX) $(OO_LDFLAGS) $(G3270_LFLAGS) -shared -Wl,-soname,$(@F) -o $@ $^
 
-run: bin/Debug/$(COMP_NAME)
+run: bin/Debug/$(COMP_NAME)@EXEEXT@
 	@LD_LIBRARY_PATH=$(OO_SDK_HOME)/ure/lib:$(OFFICE_HOME)/ure/lib:bin/Debug bin/Debug/$(COMP_NAME)
 
 test: install-debug
