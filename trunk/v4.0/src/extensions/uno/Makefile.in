@@ -62,10 +62,10 @@ OO_LDFLAGS ?= -L$(OFFICE_HOME)/ure/lib -L$(OO_SDK_HOME)/lib -Wl,-rpath-link=$(OF
 
 #---[ OpenOffice Tools ]-------------------------------------------------------------------------------------------
 
-IDLC ?= LD_LIBRARY_PATH=$(OFFICE_HOME)/ure/lib/ $(OO_SDK_HOME)/bin/idlc
-CPPUMAKER ?= LD_LIBRARY_PATH=$(OFFICE_HOME)/ure/lib/ $(OO_SDK_HOME)/bin/cppumaker
-REGMERGE ?= LD_LIBRARY_PATH=$(OFFICE_HOME)/ure/lib/ $(OFFICE_HOME)/ure/bin/regmerge
-REGCOMP ?= $(OFFICE_HOME)/ure/bin/regcomp
+IDLC ?= @IDLC@
+CPPUMAKER ?= @CPPUMAKER@
+REGMERGE ?= @REGMERGE@
+REGCOMP ?= @REGCOMP@
 
 #---[ Debug Rules ]------------------------------------------------------------------------------------------------
 
@@ -127,7 +127,7 @@ bin/Release/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Release/src/$(ba
 src/$(COMP_NAME).uno.rdb : src/$(COMP_NAME).urd
 	@echo $< ...
 	@rm -f $@
-	@$(REGMERGE) $@ / $(OO_SDK_HOME)/bin/types.rdb
+	@$(REGMERGE) $@ / @TYPES_RDB@
 	@$(REGMERGE) $@ /UCR $<
 	@$(REGMERGE) $@ / $<
 
