@@ -17,11 +17,20 @@ BuildWin() {
 
 	ln -sf /usr/i386-mingw32/GTK-Runtime .
 	./win32.sh --gtkroot="GTK-Runtime" --locale="locale" --release=$RELEASE --name=$NAME --icon=$ICON --logo=$LOGO
+
 	if [ "$?" != "0" ]; then
 		exit -1
 	fi
 
 	make Release
+
+	if [ -d /usr/local/cross-tools/lib ]; then
+		cp -f bin/Release/lib3270.dll /usr/local/cross-tools/lib
+		if [ -d /usr/local/cross-tools/lib/pkgconfig ]; then
+			sed -e "s@prefix=.*@prefix=/usr/local/cross-tools@;s@target=.*@target=win32@" g3270.pc > /usr/local/cross-tools/lib/pkgconfig/g3270.pc
+		fi
+	fi
+
 	if [ "$?" != "0" ]; then
 		exit -1
 	fi
