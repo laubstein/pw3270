@@ -24,10 +24,12 @@ autoconf
 
 %build
 make clean
-make pkg
+make @PACKAGE@.oxt
 
 %install
 rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT/%ooo_prefix/%ooo_home/share/extension/install/
+install -m 644 @PACKAGE@.oxt $RPM_BUILD_ROOT/%ooo_prefix/%ooo_home/share/extension/install/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -37,8 +39,10 @@ rm -rf $RPM_BUILD_ROOT
 %ooo_prefix/%ooo_home/share/extension/install/@PACKAGE@.oxt
 
 %post
+unopkg add --shared @PACKAGE@.oxt
 
-%postun
+%preun
+unopkg remove --shared @PACKAGE@.oxt
 
 
 
