@@ -106,6 +106,14 @@ AC_ARG_WITH([types.rdb],
 	o3270_cv_types_rdb="\$(OO_SDK_HOME)/bin/types.rdb"
 ])
 
+AC_ARG_WITH([ooincludepath],
+	[AS_HELP_STRING([--with-ooincludepath], [Path to the openoffice include files])],
+[
+	o3270_cv_ooinclude="$withval"
+],[
+	o3270_cv_ooinclude="\$(OO_SDK_HOME)/inc"
+])
+
 # Checks for libraries.
 PKG_CHECK_EXISTS
 PKG_CHECK_MODULES( [G3270], [g3270 >= 4.0], AC_DEFINE(G3270) )
@@ -121,6 +129,7 @@ AC_SUBST(CPPUMAKER,$o3270_cv_cppumaker)
 AC_SUBST(REGMERGE,$o3270_cv_regmerge)
 AC_SUBST(REGCOMP,$o3270_cv_regcomp)
 AC_SUBST(TYPES_RDB,$o3270_cv_types_rdb)
+AC_SUBST(OO_INCLUDE_PATH,$o3270_cv_ooinclude)
 
 AC_DEFINE_UNQUOTED(SERVICENAME,"$o3270_cv_srvname")
 AC_DEFINE_UNQUOTED(IMPLNAME,"$o3270_cv_implname")
