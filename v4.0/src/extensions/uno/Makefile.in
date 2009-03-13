@@ -94,7 +94,7 @@ test: install-debug
 
 #---[ Release Rules ]----------------------------------------------------------------------------------------------
 
-Release: bin/Release/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
+Release: $(COMP_NAME).oxt
 
 obj/Release/src/%.o: src/%.cxx src/*.hpp src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 	@echo $< ...
@@ -105,6 +105,21 @@ bin/Release/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Release/src/$(ba
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CXX) $(OO_LDFLAGS) $(G3270_LFLAGS) -shared -Wl,-soname,$(@F) -o $@ $^
+
+$(COMP_NAME).oxt: bin/Release/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
+	@echo $<
+	rm -fr $<.tmp
+	mkdir -p $<.tmp
+
+$(COMP_NAME).oxt: bin/Release/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb Makefile 
+	@echo $@
+	@rm -fr build.tmp
+	@mkdir -p build.tmp/META-INF
+	@cp manifest.xml build.tmp/META-INF
+	@cp description.xml build.tmp
+	@cp bin/Release/$(COMP_IMPL_NAME) build.tmp
+	@cp src/$(COMP_NAME).uno.rdb build.tmp
+	@cd build.tmp ; zip -m -r ../$@ .
 
 #---[ Uno Rules ]--------------------------------------------------------------------------------------------------
 

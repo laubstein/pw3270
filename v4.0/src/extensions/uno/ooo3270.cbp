@@ -34,6 +34,7 @@
 		</Compiler>
 		<Unit filename="Makefile.in" />
 		<Unit filename="OpenOffice-3270.spec.in" />
+		<Unit filename="configure.ac" />
 		<Unit filename="src/Ooo3270.idl" />
 		<Unit filename="src/actions.cxx" />
 		<Unit filename="src/connection.cxx" />

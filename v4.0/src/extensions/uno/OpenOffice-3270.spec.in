@@ -1,13 +1,17 @@
 Name:           @PACKAGE@
-License:        GPL
-Group:          Productivity/Office/Suite
 Version:        @PACKAGE_VERSION@
 Release:        0.%_vendor
+
+%define	        ooo_prefix	%_libdir
+%define	        ooo_home	ooo3
+
+License:        GPL
+Group:          Productivity/Office/Suite
 Summary:        3270 calls for StarBasic.
 Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-Requires:       %{name}-lib >= 4.0 OpenOffice_org
-BuildRequires:  autoconf sed pkgconfig
+Requires:       g3270-lib >= 4.0 OpenOffice_org-libs-core
+BuildRequires:  autoconf sed pkgconfig zip OpenOffice_org-ure-devel
 
 %description
 Uno/OpenOffice library allowing 3270 access from StarBasic
@@ -15,22 +19,22 @@ Uno/OpenOffice library allowing 3270 access from StarBasic
 %prep
 %setup -q -n %{name}-%{version}
 autoconf
-%configure
+%configure	--with-office-sdk-home=%{ooo_prefix}/%{ooo_home}/solver \
+			--with-office-program=%{ooo_prefix}/%{ooo_home}/program/soffice.bin
 
 %build
 make clean
-make Release
+make pkg
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%makeinstall
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-@OFFICE_HOME@
+%ooo_prefix/%ooo_home/share/extension/install/@PACKAGE@.oxt
 
 %post
 
