@@ -1,16 +1,12 @@
 
 
 #include "config.hpp"
+#include <stdio.h>
 
 #if defined( DEBUG )
-
-	#include <stdio.h>
 	#define Trace( fmt, ... )		fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr)
-
 #else
-	#error DEBUG ONLY
 	#define Trace( fmt, ... )		/* __VA_ARGS__ */
-
 #endif
 
 

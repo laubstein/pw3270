@@ -33,9 +33,9 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="Makefile.in" />
+		<Unit filename="OpenOffice-3270.spec.in" />
 		<Unit filename="src/Ooo3270.idl" />
 		<Unit filename="src/actions.cxx" />
-		<Unit filename="src/config.hpp" />
 		<Unit filename="src/connection.cxx" />
 		<Unit filename="src/inc/br/com/bb/I3270.hdl" />
 		<Unit filename="src/main.cxx" />
