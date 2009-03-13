@@ -147,6 +147,33 @@ src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp: src/$(COMP_NAME).uno.rdb
 	@rm -f $@
 	@zip -9 -r $@ .
 
+tgz: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
+
+@PACKAGE@-@PACKAGE_VERSION@.tar.gz: clean
+	@echo $@ ...
+	@find . -name "stamp-h1" -exec mv -f {} $(TMPDIR) \;
+	@rm -fr $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
+
+	@mkdir -p $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
+	@cp aclocal.m4 $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
+	@cp AUTHORS $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
+	@cp configure.ac $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
+	@cp *.in $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
+
+	@mkdir -p $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/src
+	@cp -R src/* $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/src
+
+	@mkdir -p $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/scripts
+	@cp -R scripts/* $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/scripts
+
+	@rm -f @PACKAGE@-@PACKAGE_VERSION@.tar.gz
+	@tar --create --gzip --verbose --directory=$(TMPDIR) --exclude=.svn --file=@PACKAGE@-@PACKAGE_VERSION@.tar.gz @PACKAGE@-@PACKAGE_VERSION@
+
+rpm: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
+	mkdir -p `rpm --eval="%{u2p:%{_sourcedir}}"`
+	cp @PACKAGE@-@PACKAGE_VERSION@.tar.gz `rpm --eval="%{u2p:%{_sourcedir}}"`
+	rpmbuild -ba OpenOffice-3270.spec
+
 #---[ Targets ]----------------------------------------------------------------------------------------------------
 
 clean:
