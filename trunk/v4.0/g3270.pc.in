@@ -3,6 +3,7 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 target=x11
+version=@PACKAGE_VERSION@
 
 Name: @PACKAGE@
 Description: GTK-3270 Terminal Emulator
