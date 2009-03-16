@@ -42,7 +42,7 @@ else
 	DLLFLAGS = @REXX_LIBS@ @GTK_LIBS@ @OS_DLLFLAGS@
 endif
 
-CFLAGS = -g -Wall @GTK_CFLAGS@ @REXX_CFLAGS@ @OS_CFLAGS@ -O -I../../include
+CFLAGS = -g -Wall @REXX_CFLAGS@ @GTK_CFLAGS@ @OS_CFLAGS@ -O -I../../include
 
 # Rules
 

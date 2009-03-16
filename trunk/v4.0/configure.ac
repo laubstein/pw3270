@@ -135,8 +135,8 @@ AC_ARG_ENABLE([primary-selection],
 	g3270_cv_use_primary_selection="yes"
 ])
 
-AC_ARG_WITH([rexx],
-	[AS_HELP_STRING([--without-rexx], [disable rexx plugin])],
+AC_ARG_WITH([rexx-sdk],
+	[AS_HELP_STRING([--with-rexx-sdk], [Set Rexx SDK root path])],
 [
 	g3270_cv_rexx="$withval"
 ],[
@@ -211,12 +211,12 @@ AC_SUBST(LIBSSL_CFLAGS)
 if test "$g3270_cv_rexx" == "yes"; then
 	AC_DEFINE(HAVE_REXX)
 	REXX_CFLAGS="`$REXX_CONFIG --cflags`"
-	REXX_LIBS="$PROGRAM_LIBS `$REXX_CONFIG --libs`"
+	REXX_LIBS="`$REXX_CONFIG --libs`"
 	SELECTED_PLUGINS="rx3270 $SELECTED_PLUGINS"
 elif test "$g3270_cv_rexx" != "no"; then
 	AC_DEFINE(HAVE_REXX)
-	AC_DEFINE_UNQUOTED(REXX_CFLAGS,"-I$g3270_cv_rexx/include")
-	AC_DEFINE_UNQUOTED(REXX_LIBS,"-L$g3270_cv_rexx/lib/ooRexx -lrexx -lrexxapi")
+	REXX_CFLAGS="-I$g3270_cv_rexx/api"
+	REXX_LIBS="-L$g3270_cv_rexx/api -lrexx -lrexxapi"
 	SELECTED_PLUGINS="rx3270 $SELECTED_PLUGINS"
 fi
 
@@ -290,7 +290,7 @@ AC_OUTPUT(g3270.spec)
 AC_OUTPUT(g3270.pc)
 AC_OUTPUT(src/g3270/version.c)
 
-if test "$g3270_cv_rexx" == "yes"; then
+if test "$g3270_cv_rexx" != "no"; then
 	AC_OUTPUT(src/plugins/rexx/Makefile)
 fi
 
