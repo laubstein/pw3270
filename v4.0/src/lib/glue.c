@@ -73,6 +73,7 @@
 #include "trace_dsc.h"
 #include "utilc.h"
 #include "idlec.h"
+#include "printerc.h"
 
 #if defined(_WIN32) /*[*/
 #include "winversc.h"
@@ -251,6 +252,10 @@ int lib3270_init(const char *program_path)
 	hostfile_init();
 	ansi_init();
 	sms_init();
+
+#if defined(X3270_PRINTER)
+	printer_init();
+#endif
 
 	return 0;
 }

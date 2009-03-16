@@ -139,7 +139,6 @@ extern void Up_action(Widget w, XEvent *event, String *params,
 extern void add_xk(KeySym key, KeySym assoc);
 extern void clear_xks(void);
 extern void do_reset(Boolean explicit);
-extern int emulate_input(char *s, int len, Boolean pasting);
 extern void hex_input(char *s);
 extern void kybdlock_clr(unsigned int bits, const char *cause);
 extern void kybd_inhibit(Boolean inhibit);
@@ -148,5 +147,7 @@ extern int kybd_prime(void);
 extern void kybd_scroll_lock(Boolean lock);
 extern Boolean run_ta(void);
 extern int state_from_keymap(char keymap[32]);
+
+G3270_EXPORT int emulate_input(char *s, int len, int pasting);
 
 #endif /* KYBDC_H_INCLUDED */

@@ -858,7 +858,7 @@ int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk)
 
 }
 
-enum cstate QueryCstate(void)
+G3270_EXPORT enum cstate QueryCstate(void)
 {
 	return cstate;
 }

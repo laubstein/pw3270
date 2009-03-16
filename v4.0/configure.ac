@@ -67,7 +67,7 @@ case "$host" in
 	*-mingw32)       
 		DLLEXT=".dll"
 		OS_CFLAGS="-mno-cygwin -mms-bitfields -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500"
-		OS_DLLFLAGS="-mno-cygwin -Wl,--add-stdcall-alias -Wl,--enable-auto-import -shared -Wl,-soname,\$(@F)"
+		OS_DLLFLAGS="-mno-cygwin -Wl,--add-stdcall-alias -Wl,--export-all-symbols -Wl,--enable-auto-import -shared -Wl,-soname,\$(@F)"
 		OS_EXECOPT="-mwindows"
 		OS_LFLAGS="-lws2_32"
 		OS_LIBSRCS="w3misc.c winvers.c windirs.c"

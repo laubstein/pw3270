@@ -877,7 +877,7 @@ extern void popup_an_error(const char *fmt, ...)
 
 }
 
-int set_device_buffer(struct ea *src, int el)
+G3270_EXPORT int set_device_buffer(struct ea *src, int el)
 {
 	if(el > (maxROWS * maxCOLS))
 		return EINVAL;
@@ -889,7 +889,7 @@ int set_device_buffer(struct ea *src, int el)
 	return 0;
 }
 
-struct ea * copy_device_buffer(int *el)
+G3270_EXPORT struct ea * copy_device_buffer(int *el)
 {
 	int			sz		=  sizeof(struct ea) * (maxROWS * maxCOLS);
 	struct ea	*ret	=  malloc(sz);
