@@ -89,7 +89,7 @@ obj/Debug/src/%.o: src/%.cxx src/*.hpp src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 bin/Debug/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Debug/src/$(basename $(OBJ)).o)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CXX) $(OO_LDFLAGS) $(G3270_LFLAGS) -shared -Wl,-soname,$(@F) -o $@ $^
+	@$(CXX) $(OO_LDFLAGS) $(G3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^
 
 run: bin/Debug/$(COMP_NAME)@EXEEXT@
 	@LD_LIBRARY_PATH=$(OO_SDK_HOME)/ure/lib:$(OFFICE_HOME)/ure/lib:bin/Debug bin/Debug/$(COMP_NAME)
@@ -109,7 +109,7 @@ obj/Release/src/%.o: src/%.cxx src/*.hpp src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 bin/Release/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Release/src/$(basename $(OBJ)).o)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CXX) $(OO_LDFLAGS) $(G3270_LFLAGS) -shared -Wl,-soname,$(@F) -o $@ $^
+	@$(CXX) $(OO_LDFLAGS) $(G3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^
 
 %.oxt: bin/Release/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb description.xml manifest.xml
 	@echo $@
