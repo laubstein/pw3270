@@ -32,18 +32,17 @@ BINDEBUG ?= $(BINROOT)/Debug/plugins
 OBJRELEASE ?= ../../../obj/Release/src/plugins/rexx
 BINRELEASE ?= $(BINROOT)/Release/plugins
 
-# OS Stuff
-@CROSS@
-
-
-# Set command paths and mkfb (which has to run locally)
-MKFB = mkfb
 CC = @CC@
+DLLEXT = @DLLEXT@
 
 # Set compile/link parameters
-windows-dllflags=-Wl,--add-stdcall-alias  -Wl,--enable-auto-import -Wl,--exclude-symbols,REXXAPI_NULL_THUNK_DATA -Wl,--exclude-symbols,rexx_NULL_THUNK_DATA
-CFLAGS = @EXTRA_FLAGS@ -g -Wall @GTK_CFLAGS@ @REXX_CFLAGS@ -O -I../../include
-DLLFLAGS = @EXTRA_FLAGS@ @REXX_LIBS@ @GTK_LIBS@ -shared $(@host_os@-dllflags)
+ifeq  ($(DLLEXT),.dll)
+	DLLFLAGS = @REXX_LIBS@ @GTK_LIBS@ @OS_DLLFLAGS@ -Wl,--exclude-symbols,REXXAPI_NULL_THUNK_DATA -Wl,--exclude-symbols,rexx_NULL_THUNK_DATA
+else
+	DLLFLAGS = @REXX_LIBS@ @GTK_LIBS@ @OS_DLLFLAGS@
+endif
+
+CFLAGS = -g -Wall @GTK_CFLAGS@ @REXX_CFLAGS@ @OS_CFLAGS@ -O -I../../include
 
 # Rules
 
@@ -57,12 +56,12 @@ $(OBJRELEASE)/%.o: %.c Makefile
 
 # Targets
 
-$(BINDEBUG)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(SOURCES), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
+$(BINDEBUG)/$(MODULE_NAME)$(DLLEXT): $(foreach SRC, $(SOURCES), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) -o $@ $^ -L$(BINROOT)/Debug -l3270 $(DLLFLAGS)
 
-$(BINRELEASE)/$(MODULE_NAME).@DLLEXT@: $(foreach SRC, $(SOURCES), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
+$(BINRELEASE)/$(MODULE_NAME)$(DLLEXT): $(foreach SRC, $(SOURCES), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) -o $@ $^ -L$(BINROOT)/Release -l3270 $(DLLFLAGS)

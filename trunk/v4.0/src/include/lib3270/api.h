@@ -48,9 +48,6 @@
 
 		#else
 			#include <stdarg.h>
-
-			#error Windows only for now
-
 			#define G3270_EXPORT
 
 		#endif
