@@ -25,6 +25,18 @@ AM_INIT_AUTOMAKE
 AC_PROG_CXX
 AC_PROG_CC
 
+# Target options
+
+DLLEXT=".so"
+OS_CFLAGS="-DUNX -DGCC -DLINUX=1"
+
+case "$host" in
+    *-mingw32)       
+		DLLEXT=".dll"
+		OS_CFLAGS="-DWNT -mms-bitfields"
+
+esac
+
 # Optional
 AC_ARG_WITH([service-name],
 	[AS_HELP_STRING([--with-service-name], [Define UNO service name])],
@@ -137,9 +149,10 @@ AC_DEFINE_UNQUOTED(IMPLNAME,"$o3270_cv_implname")
 AC_DEFINE_UNQUOTED(OFFICE_HOME,"$o3270_cv_oohome")
 AC_DEFINE_UNQUOTED(OFFICE_PROGRAM,"$o3270_cv_ooprogram")
 
-
-# Fixed values
+# Misc values
 AC_SUBST(CXXFLAGS)
+AC_SUBST(OS_CFLAGS)
+AC_SUBST(DLLEXT)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
