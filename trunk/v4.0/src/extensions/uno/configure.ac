@@ -29,11 +29,13 @@ AC_PROG_CC
 
 DLLEXT=".so"
 OS_CFLAGS="-DUNX -DGCC -DLINUX=1"
+OS_DLLFLAGS="-shared -Wl,-soname,\$(@F)"
 
 case "$host" in
     *-mingw32)       
 		DLLEXT=".dll"
 		OS_CFLAGS="-DWNT -mms-bitfields"
+		OS_DLLFLAGS="-Wl,--add-stdcall-alias -Wl,--enable-auto-import -shared -Wl,-soname,\$(@F)"
 
 esac
 
@@ -153,6 +155,7 @@ AC_DEFINE_UNQUOTED(OFFICE_PROGRAM,"$o3270_cv_ooprogram")
 AC_SUBST(CXXFLAGS)
 AC_SUBST(OS_CFLAGS)
 AC_SUBST(DLLEXT)
+AC_SUBST(OS_DLLFLAGS)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
