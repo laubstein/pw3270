@@ -247,7 +247,10 @@ clean:
 	@rm -f *.nsi
 	@rm -f src/g3270/$(PACKAGE).ico
 	@rm -f src/g3270/$(PACKAGE).@LOGOEXT@
-	@make -C src/plugins/rexx clean
+
+	@if [ -e src/plugins/rexx/Makefile ]; then make -C src/plugins/rexx clean; fi
+	@if [ -e src/extensions/uno/Makefile ]; then make -C src/extensions/uno clean; fi
+
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
