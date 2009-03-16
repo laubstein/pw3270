@@ -53,6 +53,28 @@ AM_INIT_AUTOMAKE
 AC_PROG_CXX
 AC_PROG_CC
 
+# Target options
+
+DLLEXT=".so"
+OS_CFLAGS=""
+OS_DLLFLAGS="-shared -Wl,-soname,\$(@F)"
+OS_EXECOPT=""
+OS_LFLAGS=""
+OS_SRCS=""
+OS_MAINSRCS=""
+
+case "$host" in
+	*-mingw32)       
+		DLLEXT=".dll"
+		OS_CFLAGS="-mno-cygwin -mms-bitfields -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500"
+		OS_DLLFLAGS="-mno-cygwin -Wl,--add-stdcall-alias -Wl,--enable-auto-import -shared -Wl,-soname,\$(@F)"
+		OS_EXECOPT="-mwindows"
+		OS_LFLAGS="-lws2_32"
+		OS_LIBSRCS="w3misc.c winvers.c windirs.c"
+		OS_MAINSRCS="resources.rc"
+
+esac
+
 # Optional
 AC_ARG_ENABLE([trace],
 	[AS_HELP_STRING([--disable-trace], [disable trace])],
@@ -223,7 +245,9 @@ if test "$g3270_cv_use_primary_selection" == "yes"; then
 	AC_DEFINE([USE_PRIMARY_SELECTION])
 fi
 
-
+if test "_$HOST_CC" = "_" ; then
+	HOST_CC="\$(CC)"
+fi
 
 AC_DEFINE([X3270_TN3270E])
 AC_DEFINE([X3270_ANSI])
@@ -235,22 +259,25 @@ AC_SUBST(PACKAGE_RELEASE,$g3270_cv_release)
 AC_SUBST(ICONFILE,$g3270_cv_icon)
 AC_SUBST(LOGOFILE,$g3270_cv_logo)
 
-# Fixed values
-AC_SUBST(LOGOEXT, "png")
-AC_SUBST(DLLEXT, "so")
-AC_SUBST(EXTRA_FLAGS)
-AC_SUBST(XCPPFLAGS)
-AC_SUBST(EXTRA_TARGETS)
-AC_SUBST(BINEXT)
+# Extra values
+AC_SUBST(OS_CFLAGS)
+AC_SUBST(OS_DLLFLAGS)
+AC_SUBST(OS_EXECOPT)
+AC_SUBST(OS_SRCS)
 AC_SUBST(DLLEXT)
+AC_SUBST(EXEEXT)
+
+AC_SUBST(LOGOEXT, "png")
+AC_SUBST(EXTRA_TARGETS)
 AC_SUBST(WINDRES)
-AC_SUBST(NATIVECC)
-AC_SUBST(CROSS)
-AC_SUBST(OS_LIBS)
+AC_SUBST(HOST_CC)
+AC_SUBST(OS_LFLAGS)
 AC_SUBST(PROGRAM_LIBS)
 AC_SUBST(PROGRAM_FLAGS)
 AC_SUBST(SELECTED_PLUGINS)
 AC_SUBST(libdir)
+AC_SUBST(OS_MAINSRCS)
+AC_SUBST(OS_LIBSRCS)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)

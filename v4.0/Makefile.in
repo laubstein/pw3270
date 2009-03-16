@@ -37,50 +37,32 @@ datarootdir=@datarootdir@
 LOCALEDIR=@localedir@
 PLUGINS=@SELECTED_PLUGINS@
 
-# OS Stuff
-@CROSS@
-windows-exeopt = -mwindows
-
-# windows-targets = w3n46.dll
-TARGETS = $(PACKAGE)@BINEXT@ $(@host_os@-targets)
+TARGETS = $(PACKAGE)@EXEEXT@
 
 # Set command paths and mkfb (which has to run locally)
 MKFB = mkfb
 CC = @CC@
-
-ifdef CROSS
-	NATIVECC = @NATIVECC@
-	WINDRES = @WINDRES@
-else
-	NATIVECC = $(CC)
-endif
+NATIVECC = @HOST_CC@
+WINDRES = @WINDRES@
 
 # Set compile/link parameters
-windows-dllflags=-Wl,--export-all-symbols -Wl,--enable-auto-import
-CFLAGS = @EXTRA_FLAGS@ -g -Wall @XCPPFLAGS@ -O -DG3270 -DLIBDIR=\"$(LIBDIR)\" -DDATAROOTDIR=\"$(datarootdir)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
-DLLFLAGS = @EXTRA_FLAGS@ -shared $(@host_os@-dllflags)
+CFLAGS = @OS_CFLAGS@ -g -Wall -O -DG3270 -DLIBDIR=\"$(LIBDIR)\" -DDATAROOTDIR=\"$(datarootdir)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
 
 # Sources
-windows-srcs = 			resources.rc
-G3270_SRCS =			g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
-						clipboard.c print.c config.c colors.c keypad.c plugin.c filetransfer.c \
-						version.c $(@host_os@-srcs)
+G3270_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
+		clipboard.c print.c config.c colors.c keypad.c plugin.c filetransfer.c \
+		version.c @OS_MAINSRCS@
 
-windows-libsrcs = 		w3misc.c winvers.c windirs.c
-linux-gnu-libsrcs =
-
-LIBRARY_COMMOM_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
-						ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c idle.c kybd.c \
-						macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
-						sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
-						xio.c keymap.c resolver.c log.c $(@host_os@-libsrcs)
-
-LIBRARY_SRCS = $(LIBRARY_COMMOM_SRCS)
+LIBRARY_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
+		ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c idle.c kybd.c \
+		macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
+		sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
+		xio.c keymap.c resolver.c log.c @OS_LIBSRCS@
 
 # Main Targets
-Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
+Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
 
-Release: $(foreach BIN, $(TARGETS), bin/Release/$(BIN)) src/g3270/$(PACKAGE).@LOGOEXT@ $(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN).@DLLEXT@)
+Release: $(foreach BIN, $(TARGETS), bin/Release/$(BIN)) src/g3270/$(PACKAGE).@LOGOEXT@ $(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN)@DLLEXT@)
 
 # Rules
 GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
@@ -131,32 +113,29 @@ obj/Release/src/lib/w3n46.o: src/lib/resolver.c
 	@$(CC) $(CFLAGS) -Werror -Isrc/lib -DW3N46 -c -o $@ $^
 
 # Release Targets
-bin/Release/@PACKAGE_NAME@@BINEXT@: bin/Release/lib3270.@DLLEXT@ $(foreach SRC, $(basename $(G3270_SRCS)), obj/Release/src/g3270/$(SRC).@OBJEXT@)
+bin/Release/@PACKAGE_NAME@@EXEEXT@: bin/Release/lib3270@DLLEXT@ $(foreach SRC, $(basename $(G3270_SRCS)), obj/Release/src/g3270/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(@host_os@-exeopt) -o $@ $^ @GTK_LIBS@ @LIBGNOME_LIBS@ @PROGRAM_LIBS@ @OS_LIBS@
+	@$(CC) @OS_EXECOPT@ -o $@ $^ @GTK_LIBS@ @LIBGNOME_LIBS@ @PROGRAM_LIBS@ @OS_LFLAGS@
 
-bin/Release/lib3270.@DLLEXT@: obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
+bin/Release/lib3270@DLLEXT@: obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(DLLFLAGS) -Wl,-soname,$(@F) -o $@ $^ @LIBSSL_LIBS@ @OS_LIBS@
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ @LIBSSL_LIBS@ @OS_LFLAGS@
 
 bin/Release/w3n46.dll: obj/Release/src/lib/w3n46.o
-	@$(CC) $(DLLFLAGS) -o $@ $^ @OS_LIBS@
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ @OS_LFLAGS@
 
 # Debug Targets
-bin/Debug/@PACKAGE_NAME@@BINEXT@: bin/Debug/lib3270.@DLLEXT@ $(foreach SRC, $(basename $(G3270_SRCS)), obj/Debug/src/g3270/$(SRC).@OBJEXT@)
+bin/Debug/@PACKAGE_NAME@@EXEEXT@: bin/Debug/lib3270@DLLEXT@ $(foreach SRC, $(basename $(G3270_SRCS)), obj/Debug/src/g3270/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(@host_os@-exeopt) -o $@ $^ @GTK_LIBS@ @LIBGNOME_LIBS@ @PROGRAM_LIBS@ @OS_LIBS@
+	@$(CC) @OS_EXECOPT@ -o $@ $^ @GTK_LIBS@ @LIBGNOME_LIBS@ @OS_LFLAGS@
 
-bin/Debug/lib3270.@DLLEXT@: obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
+bin/Debug/lib3270@DLLEXT@: obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(DLLFLAGS) -Wl,-soname,$(@F) -o $@ $^ @LIBSSL_LIBS@ @OS_LIBS@
-
-bin/Debug/w3n46.dll: obj/Release/src/lib/w3n46.o
-	@$(CC) $(DLLFLAGS) -o $@ $^ @OS_LIBS@
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ @LIBSSL_LIBS@ @OS_LFLAGS@
 
 src/g3270/$(PACKAGE).ico: @ICONFILE@
 	@cp @ICONFILE@ $@
@@ -165,10 +144,10 @@ src/g3270/$(PACKAGE).@LOGOEXT@: @LOGOFILE@
 	@convert @LOGOFILE@ $@
 
 # Plugins
-bin/Release/plugins/rx3270.@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
+bin/Release/plugins/rx3270@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
 	make -C src/plugins/rexx ../../../$@
 
-bin/Debug/plugins/rx3270.@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
+bin/Debug/plugins/rx3270@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
 	make -C src/plugins/rexx ../../../$@
 
 # Other targets
@@ -192,7 +171,7 @@ $(PACKAGE).pot: sources.lst
 $(PACKAGE).po: $(PACKAGE).pot
 	@msginit --no-translator -o $(PACKAGE).po -i $(PACKAGE).pot
 
-run: bin/Debug/g3270@BINEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN).@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
+run: bin/Debug/g3270@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
 	@cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270 --program-data="../../"
 
@@ -205,7 +184,7 @@ install: Release po/pt_BR.po
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
 	@mkdir -p $(DESTDIR)/@includedir@/lib3270
 	@for i in $(TARGETS); do install --mode=755 bin/Release/$$i $(DESTDIR)/$(bindir); done
-	@for i in $(PLUGINS); do install --mode=755 bin/Release/plugins/$$i.@DLLEXT@ $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins; done
+	@for i in $(PLUGINS); do install --mode=755 bin/Release/plugins/$$i@DLLEXT@ $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins; done
 	@install --mode=755 bin/Release/lib3270.so $(DESTDIR)/$(LIBDIR)
 	@install --mode=644 ui/g3270.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/g3270.act $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
