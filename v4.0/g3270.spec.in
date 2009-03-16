@@ -29,6 +29,7 @@ tn3270 protocol library for %{name}
 Provides:	%{name}-devel
 Summary:	Devel for 3270 Communication library for %{name}
 Group:		Development/Libraries
+Requires:	%{name}-lib = @PACKAGE_VERSION@
 
 %description devel
 devel for tn3270 protocol library for %{name}
