@@ -35,7 +35,7 @@ autoconf
 		--with-regmerge-program="LD_LIBRARY_PATH=$NATIVE_OFFICE_HOME/lib/ $NATIVE_OFFICE_HOME/ure/bin/regmerge" \
 		--with-regcomp-program="LD_LIBRARY_PATH=$NATIVE_OFFICE_HOME/ure/bin/regcomp" \
 		--with-types.rdb="$NATIVE_OO_SDK_HOME/bin/types.rdb" \
-		--with-ooincludepath="$OO_SDK_HOME/include"
+		--with-office-include-path="$OO_SDK_HOME/include"
 
 
 status=$?

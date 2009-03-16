@@ -120,13 +120,22 @@ AC_ARG_WITH([types.rdb],
 	o3270_cv_types_rdb="\$(OO_SDK_HOME)/bin/types.rdb"
 ])
 
-AC_ARG_WITH([ooincludepath],
-	[AS_HELP_STRING([--with-ooincludepath], [Path to the openoffice include files])],
+AC_ARG_WITH([office-include-path],
+	[AS_HELP_STRING([--with-office-include-path], [Path to the openoffice include files])],
 [
 	o3270_cv_ooinclude="$withval"
 ],[
 	o3270_cv_ooinclude="\$(OO_SDK_HOME)/inc"
 ])
+
+AC_ARG_WITH([office-ure-lib],
+	[AS_HELP_STRING([--with-office-ure-lib], [Path to the openoffice runtime libraries])],
+[
+	o3270_cv_oourelib="$withval"
+],[
+	o3270_cv_oourelib="\$(OFFICE_HOME)/ure/lib"
+])
+
 
 # Checks for libraries.
 PKG_CHECK_EXISTS
@@ -138,6 +147,7 @@ AC_SUBST(EXEEXT)
 AC_SUBST(OFFICE_HOME,$o3270_cv_oohome)
 AC_SUBST(OO_SDK_HOME,$o3270_cv_sdkhome)
 AC_SUBST(OFFICE_PROGRAM,$o3270_cv_ooprogram)
+AC_SUBST(OO_URE_LIB,$o3270_cv_oourelib)
 
 AC_SUBST(IDLC,$o3270_cv_idlc)
 AC_SUBST(CPPUMAKER,$o3270_cv_cppumaker)
