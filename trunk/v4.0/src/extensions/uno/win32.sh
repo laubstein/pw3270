@@ -3,8 +3,8 @@ export PREFIX=/usr/local/cross-tools
 
 export TARGET=i386-mingw32
 
-export CC=$PREFIX"/bin/i386-mingw32-gcc -mms-bitfields"
-export CXX=$PREFIX"/bin/i386-mingw32-g++ -mms-bitfields"
+export CC=$PREFIX"/bin/i386-mingw32-gcc"
+export CXX=$PREFIX"/bin/i386-mingw32-g++"
 export CFLAGS="-O2 -march=i586 -mms-bitfields"
 export CXXFLAGS="-O2 -march=i586 -mms-bitfields"
 export PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig

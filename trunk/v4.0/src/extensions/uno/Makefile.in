@@ -1,7 +1,5 @@
 
 
-SHAREDLIB_EXT ?= so
-
 #---[ Compiler ]---------------------------------------------------------------------------------------------------
 
 CXX=@CXX@
@@ -18,7 +16,7 @@ G3270_LFLAGS ?= @G3270_LIBS@
 COMP_NAME ?= Ooo3270
 INTF_NAME ?= I3270
 OWNER_PATH ?= br/com/bb
-COMP_IMPL_NAME ?= $(COMP_NAME).uno.$(SHAREDLIB_EXT)
+COMP_IMPL_NAME ?= $(COMP_NAME).uno@DLLEXT@
 COMP_RDB_NAME ?= $(COMP_NAME).uno.rdb
 
 CXX_FILES = main.cxx connection.cxx screen.cxx actions.cxx
@@ -38,8 +36,7 @@ OFFICE_PROGRAM ?= @OFFICE_PROGRAM@
 OO_INCLUDE_PATH ?= @OO_INCLUDE_PATH@
 OO_CXX_INCLUDE_PATH ?= @OO_INCLUDE_PATH@/offuh
 
-# -DUNX -DGCC -DLINUX=1
-OO_CXXFLAGS ?= -DCPPU_ENV=$(CPPU_ENV) -DWNT -DLANGUAGE_BINDING_NAME=\"$(CPPU_ENV)\" -I$(OO_INCLUDE_PATH) -I$(OO_CXX_INCLUDE_PATH) -Isrc/inc
+OO_CXXFLAGS ?= -DCPPU_ENV=$(CPPU_ENV) @OS_CFLAGS@ -DLANGUAGE_BINDING_NAME=\"$(CPPU_ENV)\" -I$(OO_INCLUDE_PATH) -I$(OO_CXX_INCLUDE_PATH) -Isrc/inc
 OO_LDFLAGS ?= -L$(OFFICE_HOME)/ure/lib -L$(OO_SDK_HOME)/lib -Wl,-rpath-link=$(OFFICE_HOME)/ure/lib
 
 # -luno_cppu
