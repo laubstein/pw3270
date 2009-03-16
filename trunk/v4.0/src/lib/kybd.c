@@ -3169,7 +3169,7 @@ remargin(int lmargin)
 	return True;
 }
 
-/*
+/**
  * Pretend that a sequence of keys was entered at the keyboard.
  *
  * "Pasting" means that the sequence came from the X clipboard.  Returns are
@@ -3182,10 +3182,13 @@ remargin(int lmargin)
  * beginning of next line"; newlines mean "Enter AID" and the termination of
  * processing the string.  Backslashes are processed as in C.
  *
- * Returns the number of unprocessed characters.
+ * @param s		String to input.
+ * @param len		Size of the string (or -1 to null terminated strings)
+ * @param pasting	pasting flag (See comments).
+ *
+ * @Returns the number of unprocessed characters.
  */
-int
-emulate_input(char *s, int len, Boolean pasting)
+G3270_EXPORT int emulate_input(char *s, int len, int pasting)
 {
 	enum {
 	    BASE, BACKSLASH, BACKX, BACKP, BACKPA, BACKPF, OCTAL, HEX, XGE

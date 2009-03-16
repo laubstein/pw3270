@@ -49,6 +49,8 @@
 		#else
 			#include <stdarg.h>
 
+			#error Windows only for now
+
 			#define G3270_EXPORT
 
 		#endif
@@ -109,6 +111,41 @@
 			CONNECTED_TN3270E		/**< connected in TN3270E mode, 3270 mode */
 		};
 
+
+		/**  extended attributes */
+		struct ea
+		{
+			unsigned char cc;	/**< EBCDIC or ASCII character code */
+			unsigned char fa;	/**< field attribute, it nonzero */
+			unsigned char fg;	/**< foreground color (0x00 or 0xf<n>) */
+			unsigned char bg;	/**< background color (0x00 or 0xf<n>) */
+			unsigned char gr;	/**< ANSI graphics rendition bits */
+			unsigned char cs;	/**< character set (GE flag, or 0..2) */
+			unsigned char ic;	/**< input control (DBCS) */
+			unsigned char db;	/**< DBCS state */
+		};
+		#define GR_BLINK		0x01
+		#define GR_REVERSE		0x02
+		#define GR_UNDERLINE	0x04
+		#define GR_INTENSIFY	0x08
+
+		#define CS_MASK			0x03	/**< mask for specific character sets */
+		#define CS_BASE			0x00	/**< base character set (X'00') */
+		#define CS_APL			0x01	/**< APL character set (X'01' or GE) */
+		#define CS_LINEDRAW		0x02	/**< DEC line-drawing character set (ANSI) */
+		#define CS_DBCS			0x03	/**< DBCS character set (X'F8') */
+		#define CS_GE			0x04	/**< cs flag for Graphic Escape */
+
+		/**
+		 * Return a "malloced" copy of the device buffer, set number of elements
+		 */
+		G3270_EXPORT struct ea * copy_device_buffer(int *el);
+
+		/**
+		 * Set the contents of the device buffer for debugging purposes
+		 */
+		G3270_EXPORT int set_device_buffer(struct ea *src, int el);
+
 		/* File transfer */
 		#define FT_FLAG_RECEIVE					0x0001
 		#define FT_FLAG_ASCII					0x0002
@@ -159,8 +196,8 @@
 
 		#else
 
-			enum cstate 	QueryCstate(void);
-			enum ft_state	QueryFTstate(void);
+			G3270_EXPORT enum cstate 	QueryCstate(void);
+			G3270_EXPORT enum ft_state	QueryFTstate(void);
 
 			#define PCONNECTED	((int) QueryCstate() >= (int)RESOLVING)
 			#define HALF_CONNECTED	(QueryCstate() == RESOLVING || QueryCstate() == PENDING)

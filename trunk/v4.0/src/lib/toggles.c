@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como toggles.c e possui 293 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -63,7 +63,7 @@ static void no_callback(int value, int reason)
 }
 
 /* Register a callback to monitor toggle changes */
-int register_tchange(int ix, void (*callback)(int value, int reason))
+G3270_EXPORT int register_tchange(int ix, void (*callback)(int value, int reason))
 {
 	struct toggle *t;
 
@@ -118,7 +118,7 @@ do_toggle_reason(int ix, enum toggle_type reason)
 
 }
 
-int set_toggle(int ix, int value)
+G3270_EXPORT int set_toggle(int ix, int value)
 {
 	Boolean v = ((Boolean) (value != 0)); // Convert int in Boolean
 
@@ -233,45 +233,7 @@ shutdown_toggles(void)
 #endif /*]*/
 }
 
-/*
-void
-Toggle_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
-{
-	int j;
-
-	action_debug(Toggle_action, event, params, num_params);
-	if (check_usage(Toggle_action, *num_params, 1, 2) < 0)
-		return;
-	for (j = 0; j < N_TOGGLES; j++)
-		if (toggle_names[j].index >= 0 &&
-		    !strcasecmp(params[0], toggle_names[j].name)) {
-			break;
-		}
-	if (j >= N_TOGGLES) {
-		popup_an_error("%s: Unknown toggle name '%s'",
-		    action_name(Toggle_action), params[0]);
-		return;
-	}
-
-	if (*num_params == 1) {
-		do_toggle_reason(j, TT_ACTION);
-	} else if (!strcasecmp(params[1], "set")) {
-		if (!toggled(j)) {
-			do_toggle_reason(j, TT_ACTION);
-		}
-	} else if (!strcasecmp(params[1], "clear")) {
-		if (toggled(j)) {
-			do_toggle_reason(j, TT_ACTION);
-		}
-	} else {
-		popup_an_error("%s: Unknown keyword '%s' (must be 'set' or "
-		    "'clear')", action_name(Toggle_action), params[1]);
-	}
-}
-*/
-
-const char	*get_toggle_name(int ix)
+G3270_EXPORT const char	*get_toggle_name(int ix)
 {
 	if(ix < N_TOGGLES)
 		return toggle_names[ix];
