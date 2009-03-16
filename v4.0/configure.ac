@@ -213,6 +213,11 @@ if test "$g3270_cv_rexx" == "yes"; then
 	REXX_CFLAGS="`$REXX_CONFIG --cflags`"
 	REXX_LIBS="$PROGRAM_LIBS `$REXX_CONFIG --libs`"
 	SELECTED_PLUGINS="rx3270 $SELECTED_PLUGINS"
+elif test "$g3270_cv_rexx" != "no"; then
+	AC_DEFINE(HAVE_REXX)
+	AC_DEFINE_UNQUOTED(REXX_CFLAGS,"-I$g3270_cv_rexx/include")
+	AC_DEFINE_UNQUOTED(REXX_LIBS,"-L$g3270_cv_rexx/lib/ooRexx -lrexx -lrexxapi")
+	SELECTED_PLUGINS="rx3270 $SELECTED_PLUGINS"
 fi
 
 AC_SUBST(REXX_LIBS)

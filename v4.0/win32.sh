@@ -19,12 +19,17 @@ export HOST_CC=/usr/bin/gcc
 export TARGET=i386-mingw32
 export cache=win32.cache
 
+#REXX_PREFIX="/usr/local/cross-tools/ooRexx"
+#REXX_CFLAGS="-I$REXX_PREFIX/api"
+#REXX_LIBS="-L$REXX_PREFIX/api -lrexx -lrexxapi"
+
 autoconf
 ./configure	--cache-file="$cache" \
 		--target=$TARGET \
 		--host=$TARGET \
 		--build=i686-linux \
-		--without-gnome
+		--without-gnome \
+		--with-rexx="/usr/local/cross-tools/ooRexx"
 
 
 status=$?
