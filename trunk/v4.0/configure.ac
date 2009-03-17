@@ -184,6 +184,14 @@ AC_ARG_WITH([release],
 	g3270_cv_release="`date +%y%m%d`"
 ])
 
+AC_ARG_WITH([gtk-runtime],
+	[AS_HELP_STRING([--with-gtk-runtime], [GTK runtime path (For windows installer)])],
+[
+	g3270_cv_gtkruntime="$withval"
+],[
+	g3270_cv_gtkruntime="$PREFIX/GTK-Runtime"
+])
+
 
 # Checks for libraries.
 PKG_CHECK_EXISTS
@@ -286,6 +294,7 @@ AC_SUBST(SELECTED_PLUGINS)
 AC_SUBST(libdir)
 AC_SUBST(OS_MAINSRCS)
 AC_SUBST(OS_LIBSRCS)
+AC_SUBST(GTKRUNTIME,$g3270_cv_gtkruntime)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)

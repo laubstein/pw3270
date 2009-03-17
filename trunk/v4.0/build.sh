@@ -20,6 +20,7 @@ BuildWin() {
 			--with-icon="sisbb/sisbb98.ico" \
 			--with-logo="sisbb/sisbb98.jpg"
 
+# --with-gtk-runtime=/usr/i386-mingw32/GTK-Runtime
 # --gtkroot="GTK-Runtime" --locale="locale" --release=$RELEASE --name=$NAME --icon=$ICON --logo=$LOGO
 
 	if [ "$?" != "0" ]; then
