@@ -37,7 +37,8 @@ OO_INCLUDE_PATH ?= @OO_INCLUDE_PATH@
 OO_CXX_INCLUDE_PATH ?= @OO_INCLUDE_PATH@/offuh
 
 OO_CXXFLAGS ?= -DCPPU_ENV=$(CPPU_ENV) @OS_CFLAGS@ -DLANGUAGE_BINDING_NAME=\"$(CPPU_ENV)\" -I$(OO_INCLUDE_PATH) -I$(OO_CXX_INCLUDE_PATH) -Isrc/inc
-OO_LDFLAGS ?= -L@OO_URE_LIB@ -L$(OO_SDK_HOME)/lib -Wl,-rpath-link=@OO_URE_LIB@
+OO_LDFLAGS ?= -L@OO_URE_LIB@ -L$(OO_SDK_HOME)/lib -Wl,-rpath-link=@OO_URE_LIB@ @OO_LIBS@
+
 
 # -luno_cppu
 # LINK_LIBS=-L$(OUT)/lib -L$(PRJ)/$(PLATFORM)/lib -L"$(OFFICE_PROGRAM_PATH)"
@@ -89,7 +90,7 @@ obj/Debug/src/%.o: src/%.cxx src/*.hpp src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 bin/Debug/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Debug/src/$(basename $(OBJ)).o)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CXX) $(OO_LDFLAGS) $(G3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^
+	@$(CXX)  $(G3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^ $(OO_LDFLAGS)
 
 run: bin/Debug/$(COMP_NAME)@EXEEXT@
 	@LD_LIBRARY_PATH=$(OO_SDK_HOME)/ure/lib:$(OFFICE_HOME)/ure/lib:bin/Debug bin/Debug/$(COMP_NAME)
