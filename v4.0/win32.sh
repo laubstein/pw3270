@@ -29,7 +29,8 @@ autoconf
 		--host=$TARGET \
 		--build=i686-linux \
 		--without-gnome \
-		--with-rexx-sdk="/usr/local/cross-tools/ooRexx"
+		--with-rexx-sdk="/usr/local/cross-tools/ooRexx" \
+		$@
 
 
 status=$?

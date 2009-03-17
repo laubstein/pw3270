@@ -45,9 +45,9 @@ SubSection "@PACKAGE_NAME@" SecMain
 		file bin\Release\@PACKAGE_NAME@.exe
 
 		# Configuration files
-		file "/oname=$INSTDIR\@PACKAGE_NAME@.jpg"	src\g3270\@PACKAGE_NAME@.jpg
-		file "/oname=$INSTDIR\@PACKAGE_NAME@.ico"	src\g3270\@PACKAGE_NAME@.ico
-		file "/oname=$INSTDIR\colors.conf"			src\g3270\colors.conf
+		file "/oname=$INSTDIR\@PACKAGE_NAME@.jpg"	"bin\Release\@PACKAGE_NAME@.jpg"
+		file "/oname=$INSTDIR\@PACKAGE_NAME@.ico"	"bin\Release\@PACKAGE_NAME@.ico"
+		file "/oname=$INSTDIR\colors.conf"		src\g3270\colors.conf
 
 		# UI definition files
 		CreateDirectory "$INSTDIR\ui"
@@ -56,7 +56,7 @@ SubSection "@PACKAGE_NAME@" SecMain
 
 		# Locale files
 		CreateDirectory "$INSTDIR\@localedir@\pt_BR\LC_MESSAGES"
-		file "/oname=$INSTDIR\locale\pt_BR\LC_MESSAGES\@PACKAGE_NAME@.mo" "@localedir@\pt_BR\LC_MESSAGES\@PACKAGE_NAME@.mo"
+		file "/oname=$INSTDIR\locale\pt_BR\LC_MESSAGES\@PACKAGE_NAME@.mo" "bin\Release\pt_BR.mo"
 
 		# define uninstaller name
 		writeUninstaller $INSTDIR\uninstall.exe

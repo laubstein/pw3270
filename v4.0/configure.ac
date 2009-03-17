@@ -62,6 +62,7 @@ OS_EXECOPT=""
 OS_LFLAGS=""
 OS_SRCS=""
 OS_MAINSRCS=""
+LOGOEXT="png"
 
 case "$host" in
 	*-mingw32)
@@ -72,6 +73,8 @@ case "$host" in
 		OS_LFLAGS="-lws2_32"
 		OS_LIBSRCS="w3misc.c winvers.c windirs.c"
 		OS_MAINSRCS="resources.rc"
+		LOGOEXT="jpg"
+		localedir="locale"
 
 esac
 
@@ -170,7 +173,7 @@ AC_ARG_WITH([logo],
 [
 	g3270_cv_logo="$withval"
 ],[
-	g3270_cv_logo="image/default.ico"
+	g3270_cv_logo="image/default.jpg"
 ])
 
 AC_ARG_WITH([release],
@@ -272,7 +275,7 @@ AC_SUBST(OS_SRCS)
 AC_SUBST(DLLEXT)
 AC_SUBST(EXEEXT)
 
-AC_SUBST(LOGOEXT, "png")
+AC_SUBST(LOGOEXT)
 AC_SUBST(EXTRA_TARGETS)
 AC_SUBST(WINDRES)
 AC_SUBST(HOST_CC)
