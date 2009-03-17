@@ -18,9 +18,10 @@ BuildWin() {
 	ln -sf /usr/i386-mingw32/GTK-Runtime .
 	./win32.sh	--with-release=$RELEASE \
 			--with-icon="sisbb/sisbb98.ico" \
-			--with-logo="sisbb/sisbb98.jpg"
+			--with-logo="sisbb/sisbb98.jpg" \
+			--with-program-name="$NAME" \
+			--with-gtk-runtime="/usr/i386-mingw32/GTK-Runtime"
 
-# --with-gtk-runtime=/usr/i386-mingw32/GTK-Runtime
 # --gtkroot="GTK-Runtime" --locale="locale" --release=$RELEASE --name=$NAME --icon=$ICON --logo=$LOGO
 
 	if [ "$?" != "0" ]; then
@@ -42,7 +43,7 @@ BuildWin() {
 		exit -1
 	fi
 
-	scp $NAME-*.exe perry@os2team:public_html/g3270
+	echo scp $NAME-*.exe perry@os2team:public_html/g3270
 	mkdir -p ~/win32
 	mv $NAME-*.exe ~/win32/
 
