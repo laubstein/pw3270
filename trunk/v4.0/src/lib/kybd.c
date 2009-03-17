@@ -1540,30 +1540,41 @@ do_left(void)
 	cursor_move(baddr);
 }
 
-void
-Left_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
+void Left_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(Left_action, event, params, num_params);
+	action_CursorLeft();
+}
+
+G3270_EXPORT int action_CursorLeft(void)
+{
+//	action_debug(Left_action, event, params, num_params);
 	reset_idle_timer();
-	if (kybdlock) {
-		if (KYBDLOCK_IS_OERR) {
+	if (kybdlock)
+	{
+		if (KYBDLOCK_IS_OERR)
+		{
 			kybdlock_clr(KL_OERR_MASK, "Left");
 			status_reset();
-		} else {
+		}
+		else
+		{
 			enq_ta(Left_action, CN, CN);
-			return;
+			return 0;
 		}
 	}
 #if defined(X3270_ANSI) /*[*/
-	if (IN_ANSI) {
+	if (IN_ANSI)
+	{
 		ansi_send_left();
-		return;
+		return 0;
 	}
 #endif /*]*/
 	if (!flipped)
+	{
 		do_left();
-	else {
+	}
+	else
+	{
 		register int	baddr;
 
 		baddr = cursor_addr;
@@ -1571,6 +1582,7 @@ Left_action(Widget w unused, XEvent *event, String *params,
 		/* XXX: DBCS? */
 		cursor_move(baddr);
 	}
+	return 0;
 }
 
 
@@ -1797,42 +1809,54 @@ Erase_action(Widget w unused, XEvent *event, String *params,
 }
 
 
-/*
+void Right_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_CursorRight();
+}
+
+/**
  * Cursor right 1 position.
  */
-void
-Right_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
+G3270_EXPORT int action_CursorRight(void)
 {
 	register int	baddr;
 	enum dbcs_state d;
 
-	action_debug(Right_action, event, params, num_params);
+//	action_debug(Right_action, event, params, num_params);
 	reset_idle_timer();
-	if (kybdlock) {
-		if (KYBDLOCK_IS_OERR) {
+	if (kybdlock)
+	{
+		if (KYBDLOCK_IS_OERR)
+		{
 			kybdlock_clr(KL_OERR_MASK, "Right");
 			status_reset();
-		} else {
+		}
+		else
+		{
 			enq_ta(Right_action, CN, CN);
-			return;
+			return 0;
 		}
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
 		ansi_send_right();
-		return;
+		return 0;
 	}
 #endif /*]*/
-	if (!flipped) {
+	if (!flipped)
+	{
 		baddr = cursor_addr;
 		INC_BA(baddr);
 		d = ctlr_dbcs_state(baddr);
 		if (IS_RIGHT(d))
 			INC_BA(baddr);
 		cursor_move(baddr);
-	} else
+	}
+	else
+	{
 		do_left();
+	}
+	return 0;
 }
 
 
@@ -2097,32 +2121,46 @@ NextWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 /*
  * Cursor up 1 position.
  */
-void
-Up_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+void Up_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_CursorUp();
+}
+
+/**
+ * Cursor up 1 position.
+ *
+ * @return 0
+ *
+ */
+G3270_EXPORT int action_CursorUp(void)
 {
 	register int	baddr;
 
-	action_debug(Up_action, event, params, num_params);
+//	action_debug(Up_action, event, params, num_params);
 	reset_idle_timer();
 	if (kybdlock) {
-		if (KYBDLOCK_IS_OERR) {
+		if (KYBDLOCK_IS_OERR)
+		{
 			kybdlock_clr(KL_OERR_MASK, "Up");
 			status_reset();
-		} else {
+		}
+		else
+		{
 			enq_ta(Up_action, CN, CN);
-			return;
+			return 0;
 		}
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
 		ansi_send_up();
-		return;
+		return 0;
 	}
 #endif /*]*/
 	baddr = cursor_addr - COLS;
 	if (baddr < 0)
 		baddr = (cursor_addr + (ROWS * COLS)) - COLS;
 	cursor_move(baddr);
+	return 0;
 }
 
 
@@ -2132,27 +2170,43 @@ Up_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 void
 Down_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_CursorDown();
+}
+
+/**
+ * Cursor down 1 position.
+ *
+ * @return 0
+ *
+ */
+G3270_EXPORT int action_CursorDown(void)
+{
 	register int	baddr;
 
-	action_debug(Down_action, event, params, num_params);
+//	action_debug(Down_action, event, params, num_params);
 	reset_idle_timer();
-	if (kybdlock) {
-		if (KYBDLOCK_IS_OERR) {
+	if (kybdlock)
+	{
+		if (KYBDLOCK_IS_OERR)
+		{
 			kybdlock_clr(KL_OERR_MASK, "Down");
 			status_reset();
-		} else {
+		} else
+		{
 			enq_ta(Down_action, CN, CN);
-			return;
+			return 0;
 		}
 	}
 #if defined(X3270_ANSI) /*[*/
-	if (IN_ANSI) {
+	if (IN_ANSI)
+	{
 		ansi_send_down();
-		return;
+		return 0;
 	}
 #endif /*]*/
 	baddr = (cursor_addr + COLS) % (COLS * ROWS);
 	cursor_move(baddr);
+	return 0;
 }
 
 

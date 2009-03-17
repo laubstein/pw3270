@@ -1,25 +1,25 @@
-dnl 
+dnl
 dnl "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
 dnl (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
 dnl aplicativos mainframe.
-dnl 
+dnl
 dnl Copyright (C) <2008> <Banco do Brasil S.A.>
-dnl 
+dnl
 dnl Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
 dnl os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
 dnl Free Software Foundation.
-dnl 
+dnl
 dnl Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
 dnl GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
 dnl A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
 dnl obter mais detalhes.
-dnl 
+dnl
 dnl Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
 dnl programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
 dnl Place, Suite 330, Boston, MA, 02111-1307, USA
-dnl 
-dnl Contatos: 
-dnl 
+dnl
+dnl Contatos:
+dnl
 dnl perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
 dnl erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
 dnl licinio@bb.com.br		(Licínio Luis Branco)
@@ -64,7 +64,7 @@ OS_SRCS=""
 OS_MAINSRCS=""
 
 case "$host" in
-	*-mingw32)       
+	*-mingw32)
 		DLLEXT=".dll"
 		OS_CFLAGS="-mno-cygwin -mms-bitfields -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500"
 		OS_DLLFLAGS="-mno-cygwin -Wl,--add-stdcall-alias -Wl,--export-all-symbols -Wl,--enable-auto-import -shared -Wl,-soname,\$(@F)"
