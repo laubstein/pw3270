@@ -189,7 +189,15 @@ AC_ARG_WITH([gtk-runtime],
 [
 	g3270_cv_gtkruntime="$withval"
 ],[
-	g3270_cv_gtkruntime="$PREFIX/GTK-Runtime"
+	g3270_cv_gtkruntime="no"
+])
+
+AC_ARG_WITH([program-name],
+	[AS_HELP_STRING([--with-program-name], [Program name (For windows installer)])],
+[
+	g3270_cv_progname="$withval"
+],[
+	g3270_cv_progname="$PACKAGE_NAME"
 ])
 
 
@@ -274,6 +282,8 @@ AC_DEFINE([X3270_PRINTER])
 AC_SUBST(PACKAGE_RELEASE,$g3270_cv_release)
 AC_SUBST(ICONFILE,$g3270_cv_icon)
 AC_SUBST(LOGOFILE,$g3270_cv_logo)
+
+AC_SUBST(PROGRAM_NAME,$g3270_cv_progname)
 
 # Extra values
 AC_SUBST(OS_CFLAGS)

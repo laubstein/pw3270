@@ -67,9 +67,10 @@ Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
 		src/g3270/$(PACKAGE).ico \
 		$(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN)@DLLEXT@)
 	@install --mode=644 src/g3270/$(PACKAGE).@LOGOEXT@ bin/Release/$(PACKAGE).@LOGOEXT@
-	@install --mode=644 src/g3270/$(PACKAGE).ico bin/Release/$(PACKAGE).ico
+	@cp src/g3270/$(PACKAGE).ico bin/Release/$(PACKAGE).ico
 	@msgfmt -c -v -o bin/Release/pt_BR.mo po/pt_BR.po
-
+	@rm -f bin/Release/gtk-runtime
+	@ln -s "@GTKRUNTIME@" bin/Release/gtk-runtime
 
 # Rules
 GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
