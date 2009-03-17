@@ -409,6 +409,10 @@
 		/* Actions */
 		G3270_EXPORT int action_Enter(void);
 		G3270_EXPORT int action_PFKey(int key);
+		G3270_EXPORT int action_CursorUp(void);
+		G3270_EXPORT int action_CursorDown(void);
+		G3270_EXPORT int action_CursorLeft(void);
+		G3270_EXPORT int action_CursorRight(void);
 
 		/* Host connect/disconnect and state change. */
 		G3270_EXPORT int host_connect(const char *n, int wait);

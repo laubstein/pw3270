@@ -255,17 +255,20 @@
 
  void action_Up(GtkWidget *w, gpointer user_data)
  {
-  	clear_and_call(NULL,Up_action);
+ 	action_ClearSelection();
+	action_CursorUp();
  }
 
  void action_Down(GtkWidget *w, gpointer user_data)
  {
- 	clear_and_call(NULL,Down_action);
+ 	action_ClearSelection();
+	action_CursorDown();
  }
 
  void action_Left(GtkWidget *w, gpointer user_data)
  {
- 	clear_and_call(NULL,Left_action);
+ 	action_ClearSelection();
+	action_CursorLeft();
  }
 
  void action_Right(GtkWidget *w, gpointer user_data)

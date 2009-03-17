@@ -132,8 +132,7 @@ extern void ToggleInsert_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 extern void ToggleReverse_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern void Up_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params);
+extern void Up_action(Widget w, XEvent *event, String *params,    Cardinal *num_params);
 
 /* other functions */
 extern void add_xk(KeySym key, KeySym assoc);
