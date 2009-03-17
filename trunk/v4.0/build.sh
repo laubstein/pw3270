@@ -16,7 +16,11 @@ BuildWin() {
 	make clean
 
 	ln -sf /usr/i386-mingw32/GTK-Runtime .
-	./win32.sh --gtkroot="GTK-Runtime" --locale="locale" --release=$RELEASE --name=$NAME --icon=$ICON --logo=$LOGO
+	./win32.sh	--with-release=$RELEASE \
+			--with-icon="sisbb/sisbb98.ico" \
+			--with-logo="sisbb/sisbb98.jpg"
+
+# --gtkroot="GTK-Runtime" --locale="locale" --release=$RELEASE --name=$NAME --icon=$ICON --logo=$LOGO
 
 	if [ "$?" != "0" ]; then
 		exit -1
@@ -29,20 +33,6 @@ BuildWin() {
 		if [ -d /usr/local/cross-tools/lib/pkgconfig ]; then
 			sed -e "s@prefix=.*@prefix=/usr/local/cross-tools@;s@target=.*@target=win32@" g3270.pc > /usr/local/cross-tools/lib/pkgconfig/g3270.pc
 		fi
-	fi
-
-	if [ "$?" != "0" ]; then
-		exit -1
-	fi
-
-	mkdir -p locale/pt_BR/LC_MESSAGES
-	if [ "$?" != "0" ]; then
-		exit -1
-	fi
-
-	msgfmt -c -v -o locale/pt_BR/LC_MESSAGES/$NAME.mo po/pt_BR.po
-	if [ "$?" != "0" ]; then
-		exit -1
 	fi
 
 	wine  ~/.wine/drive_c/Arquivos\ de\ programas/NSIS/makensis.exe g3270.nsi
