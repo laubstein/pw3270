@@ -30,12 +30,14 @@ AC_PROG_CC
 DLLEXT=".so"
 OS_CFLAGS="-DUNX -DGCC -DLINUX=1"
 OS_DLLFLAGS="-shared -Wl,-soname,\$(@F)"
+OO_LIBS="-luno_cppu"
 
 case "$host" in
     *-mingw32)       
 		DLLEXT=".dll"
 		OS_CFLAGS="-DWNT -mms-bitfields"
 		OS_DLLFLAGS="-Wl,--add-stdcall-alias -Wl,--enable-auto-import -shared -Wl,-soname,\$(@F)"
+		OO_LIBS="-lisal -lcppu3"
 
 esac
 
@@ -166,6 +168,7 @@ AC_SUBST(CXXFLAGS)
 AC_SUBST(OS_CFLAGS)
 AC_SUBST(DLLEXT)
 AC_SUBST(OS_DLLFLAGS)
+AC_SUBST(OO_LIBS)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
