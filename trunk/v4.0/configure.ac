@@ -286,9 +286,19 @@ AC_SUBST(OS_LIBSRCS)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
-AC_OUTPUT(g3270.spec)
-AC_OUTPUT(g3270.pc)
 AC_OUTPUT(src/g3270/version.c)
+
+case "$host" in
+	*-mingw32)
+		AC_OUTPUT(g3270.nsi)
+	;;
+
+	*)
+		AC_OUTPUT(g3270.spec)
+		AC_OUTPUT(g3270.pc)
+
+	;;
+esac
 
 if test "$g3270_cv_rexx" != "no"; then
 	AC_OUTPUT(src/plugins/rexx/Makefile)
