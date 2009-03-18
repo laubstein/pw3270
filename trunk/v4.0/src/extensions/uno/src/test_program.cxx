@@ -79,7 +79,7 @@ int SAL_CALL main(int argc, char **argv)
 			);
 
 		// get an object instance
-		Trace("Calling %s","createInstanceWithContext");
+		Trace("Calling createInstanceWithContext(%s)",IMPLNAME);
 
 		Reference< XInterface > xx ;
 		xx = xMgr->createInstanceWithContext(OUString::createFromAscii(IMPLNAME), xContext);
