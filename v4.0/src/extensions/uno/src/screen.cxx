@@ -8,7 +8,7 @@
 
 /*---[ Screen related calls ]------------------------------------------------------------------------------*/
 
-::rtl::OUString SAL_CALL I3270Impl::getScreenContentAt( ::sal_Int16 row, ::sal_Int16 col, ::sal_Int16 size ) throw (::com::sun::star::uno::RuntimeException)
+::rtl::OUString SAL_CALL g3270::uno_impl::getScreenContentAt( ::sal_Int16 row, ::sal_Int16 col, ::sal_Int16 size ) throw (::com::sun::star::uno::RuntimeException)
 {
 	OUString ret;
 	int start, rows, cols;
@@ -41,7 +41,7 @@
 
 }
 
-::rtl::OUString SAL_CALL I3270Impl::getScreenContent() throw (::com::sun::star::uno::RuntimeException)
+::rtl::OUString SAL_CALL g3270::uno_impl::getScreenContent() throw (::com::sun::star::uno::RuntimeException)
 {
 	OUString ret;
 	int sz, rows, cols;
@@ -76,7 +76,7 @@
 
 }
 
-::sal_Bool SAL_CALL I3270Impl::isTerminalReady(  ) throw (::com::sun::star::uno::RuntimeException)
+::sal_Bool SAL_CALL g3270::uno_impl::isTerminalReady(  ) throw (::com::sun::star::uno::RuntimeException)
 {
 	if(!CONNECTED || query_3270_terminal_status() != STATUS_CODE_BLANK)
 		return false;
@@ -84,7 +84,7 @@
 	return true;
 }
 
-::sal_Int16 SAL_CALL I3270Impl::waitForReset( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
+::sal_Int16 SAL_CALL g3270::uno_impl::waitForReset( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
 {
 	int		rc = 0;
 	time_t	end = time(0)+timeout;
@@ -111,7 +111,7 @@
 	return ETIMEDOUT;
 }
 
-::sal_Int16 SAL_CALL I3270Impl::waitForStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key, ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
+::sal_Int16 SAL_CALL g3270::uno_impl::waitForStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key, ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
 {
 	OString str = rtl::OUStringToOString( key , RTL_TEXTENCODING_ASCII_US );
 	int 	rc = ETIMEDOUT;
@@ -159,7 +159,7 @@
 	return rc;
 }
 
-::sal_Bool SAL_CALL I3270Impl::queryStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key ) throw (::com::sun::star::uno::RuntimeException)
+::sal_Bool SAL_CALL g3270::uno_impl::queryStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key ) throw (::com::sun::star::uno::RuntimeException)
 {
 	OString str = rtl::OUStringToOString( key , RTL_TEXTENCODING_ASCII_US );
 	int 	sz, rows, cols, start;
@@ -185,7 +185,7 @@
 	return rc;
 }
 
-::sal_Int16 SAL_CALL I3270Impl::waitForTerminalReady( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
+::sal_Int16 SAL_CALL g3270::uno_impl::waitForTerminalReady( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
 {
 	int		rc = 0;
 	time_t	end = time(0)+timeout;
