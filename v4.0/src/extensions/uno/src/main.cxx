@@ -4,7 +4,7 @@
 #include <com/sun/star/registry/XRegistryKey.hpp>
 #include <com/sun/star/lang/XSingleComponentFactory.hpp>
 
-#include <comphelper/componentmodule.hxx>
+// #include <comphelper/componentmodule.hxx>
 
 #include <lib3270/api.h>
 
