@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como keypad.c e possui 176 linhas de código.
+ * Este programa está nomeado como keypad.c e possui 177 linhas de código.
  *
  * Contatos:
  *

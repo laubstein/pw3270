@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como telnet.c e possui 3473 linhas de código.
+ * Este programa está nomeado como telnet.c e possui 3477 linhas de código.
  *
  * Contatos:
  *
