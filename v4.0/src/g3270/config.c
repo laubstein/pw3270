@@ -67,7 +67,7 @@
 
  static gchar * FindConfigFile(void)
  {
- 	static const gchar 	*name = PACKAGE_NAME ".conf";
+ 	static const gchar 	*name = PROGRAM_NAME ".conf";
 	const gchar * const	*list;
  	gchar					*filename;
  	const gchar			*fixed[] = { g_get_user_config_dir(), g_get_home_dir()  };
@@ -90,6 +90,14 @@
 		}
 		g_free(filename);
 
+		filename = g_build_filename( g_get_user_config_dir(),PROGRAM_NAME,name,NULL );
+		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+		{
+			g3270_config_filename = filename;
+			return filename;
+		}
+		g_free(filename);
+
 		filename = g_build_filename( g_get_user_config_dir(),PACKAGE_NAME,name,NULL );
 		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
 		{
@@ -97,6 +105,7 @@
 			return filename;
 		}
 		g_free(filename);
+
 	}
 
 	/*
@@ -105,6 +114,7 @@
 	for(f=0; f < (sizeof(fixed)/sizeof(const gchar *)); f++)
 	{
 		CHECK_FILENAME(fixed[f],name);
+		CHECK_FILENAME(fixed[f],PROGRAM_NAME,name);
 		CHECK_FILENAME(fixed[f],PACKAGE_NAME,name);
 	}
 
@@ -112,11 +122,13 @@
 	list =  g_get_system_config_dirs();
  	for(f=0;list[f];f++)
  	{
+		CHECK_FILENAME(list[f],PROGRAM_NAME,name);
 		CHECK_FILENAME(list[f],PACKAGE_NAME,name);
  	}
 
 #ifdef DATAROOTDIR
 	// Search DATADIR
+	CHECK_FILENAME(DATAROOTDIR,PROGRAM_NAME,name);
 	CHECK_FILENAME(DATAROOTDIR,PACKAGE_NAME,name);
 #endif
 

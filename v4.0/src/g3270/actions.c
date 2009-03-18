@@ -332,17 +332,17 @@
 
  static void action_PrintScreen(GtkWidget *w, gpointer user_data)
  {
-	PrintText(PACKAGE_NAME, GetScreenContents(TRUE));
+	PrintText(PROGRAM_NAME, GetScreenContents(TRUE));
  }
 
  static void action_PrintSelected(GtkWidget *w, gpointer user_data)
  {
-	PrintText(PACKAGE_NAME, GetSelection());
+	PrintText(PROGRAM_NAME, GetSelection());
  }
 
  static void action_PrintClipboard(GtkWidget *w, gpointer user_data)
  {
-	PrintText(PACKAGE_NAME, GetClipboard());
+	PrintText(PROGRAM_NAME, GetClipboard());
  }
 
  static void action_Quit(void)

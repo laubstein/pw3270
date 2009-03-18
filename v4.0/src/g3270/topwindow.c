@@ -240,14 +240,13 @@
 
  GdkPixbuf * LoadLogo(void)
  {
- 	// TODO (perry#5#): Make it configurable.
 	GdkPixbuf	*pix;
 	gchar 		*file;
 
 	if(program_logo && g_file_test(program_logo,G_FILE_TEST_IS_REGULAR))
 		return gdk_pixbuf_new_from_file(program_logo,NULL);
 
-	file = FindSystemConfigFile(PACKAGE_NAME ".png");
+	file = FindSystemConfigFile(PROGRAM_NAME ".png");
 	if(file)
 	{
 		Trace("Loading %s",file);
@@ -256,7 +255,7 @@
 		return pix;
 	}
 
-	file = FindSystemConfigFile(PACKAGE_NAME ".jpg");
+	file = FindSystemConfigFile(PROGRAM_NAME ".jpg");
 	if(file)
 	{
 		Trace("Loading %s",file);
@@ -265,7 +264,7 @@
 		return pix;
 	}
 
-	file = FindSystemConfigFile(PACKAGE_NAME ".ico");
+	file = FindSystemConfigFile(PROGRAM_NAME ".ico");
 	if(file)
 	{
 		Trace("Loading %s",file);
