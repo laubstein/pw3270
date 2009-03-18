@@ -33,22 +33,25 @@ class uno_impl : public ::cppu::WeakImplHelper3< br::com::bb::I3270, lang::XServ
 {
 public:
 
+	uno_impl( const Reference< XComponentContext > & xContext );
+	~uno_impl();
+
 	// XInitialization will be called upon createInstanceWithArguments[AndContext]()
 	virtual void SAL_CALL initialize( Sequence< Any > const & args ) throw (Exception);
 
 	// XInterface implementation
-	// virtual void SAL_CALL acquire() throw ();
-	// virtual void SAL_CALL release() throw ();
-	// virtual Any SAL_CALL queryInterface( const Type & rType ) throw (RuntimeException);
+//	virtual void SAL_CALL acquire() throw ();
+//	virtual void SAL_CALL release() throw ();
+//	virtual Any SAL_CALL queryInterface( const Type & rType ) throw (RuntimeException);
 
 	// XServiceInfo	implementation
     virtual OUString SAL_CALL getImplementationName(  ) throw(RuntimeException);
-    virtual sal_Bool SAL_CALL supportsService( const OUString& ServiceName ) throw(RuntimeException);
+	virtual sal_Bool SAL_CALL supportsService( const OUString& ServiceName ) throw(RuntimeException);
     virtual Sequence< OUString > SAL_CALL getSupportedServiceNames(  ) throw(RuntimeException);
 
 	// XTypeProvider implementation
-	virtual Sequence<sal_Int8> SAL_CALL getImplementationId(void) throw (RuntimeException);
-	virtual Sequence< Type > SAL_CALL getTypes() throw (RuntimeException);
+//	virtual Sequence<sal_Int8> SAL_CALL getImplementationId(void) throw (RuntimeException);
+//	virtual Sequence< Type > SAL_CALL getTypes() throw (RuntimeException);
 
 	// I3270 implementation - Main
 	virtual OUString SAL_CALL getVersion() throw (RuntimeException);
@@ -74,8 +77,8 @@ public:
     virtual ::sal_Int16 SAL_CALL setStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& str ) throw (::com::sun::star::uno::RuntimeException);
     virtual ::sal_Int16 SAL_CALL sendPFKey( ::sal_Int16 key ) throw (::com::sun::star::uno::RuntimeException);
 
-private:
-	sal_Int32 m_nRefCount;
+// private:
+//	sal_Int32 m_nRefCount;
 
 };
 
