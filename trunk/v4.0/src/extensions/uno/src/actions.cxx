@@ -13,14 +13,14 @@
 
 /*---[ Action related calls ]------------------------------------------------------------------------------*/
 
-::sal_Int16 SAL_CALL I3270Impl::sendEnterKey() throw (::com::sun::star::uno::RuntimeException)
+::sal_Int16 SAL_CALL g3270::uno_impl::sendEnterKey() throw (::com::sun::star::uno::RuntimeException)
 {
 	CHECK_FOR_TERMINAL_STATUS
 
 	return action_Enter();
 }
 
-::sal_Int16 SAL_CALL I3270Impl::setStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& str ) throw (::com::sun::star::uno::RuntimeException)
+::sal_Int16 SAL_CALL g3270::uno_impl::setStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& str ) throw (::com::sun::star::uno::RuntimeException)
 {
 	int		rc;
 	OString vlr = rtl::OUStringToOString( str , RTL_TEXTENCODING_ASCII_US );
@@ -43,7 +43,7 @@
 	return 0;
 }
 
-::sal_Int16 SAL_CALL I3270Impl::sendPFKey( ::sal_Int16 key ) throw (::com::sun::star::uno::RuntimeException)
+::sal_Int16 SAL_CALL g3270::uno_impl::sendPFKey( ::sal_Int16 key ) throw (::com::sun::star::uno::RuntimeException)
 {
 	CHECK_FOR_TERMINAL_STATUS
 

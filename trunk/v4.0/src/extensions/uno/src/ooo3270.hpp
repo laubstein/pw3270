@@ -9,50 +9,42 @@
 	#define Trace( fmt, ... )		/* __VA_ARGS__ */
 #endif
 
+#include <cppuhelper/implbase3.hxx> // "3" implementing three interfaces
+#include <cppuhelper/factory.hxx>
+#include <cppuhelper/implementationentry.hxx>
 
-#include <cppuhelper/queryinterface.hxx> // helper for queryInterface() impl
-#include <cppuhelper/factory.hxx> // helper for component factory
-
-#include <cppuhelper/queryinterface.hxx> // helper for queryInterface() impl
-#include <cppuhelper/factory.hxx> // helper for component factory
-
-// generated c++ interfaces
-#include <com/sun/star/lang/XSingleServiceFactory.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
-#include <com/sun/star/lang/XTypeProvider.hpp>
-#include <com/sun/star/registry/XRegistryKey.hpp>
+#include <com/sun/star/lang/XInitialization.hpp>
+#include <com/sun/star/lang/IllegalArgumentException.hpp>
 
 #include <br/com/bb/I3270.hpp>
 
 
 /*---[ Object implementation ]-----------------------------------------------------------------------------*/
 
-using namespace ::rtl;
-using namespace ::osl;
-using namespace ::cppu;
-using namespace ::com::sun::star;
-using namespace ::com::sun::star::uno;
-using namespace ::com::sun::star::lang;
-using namespace ::com::sun::star::registry;
-using namespace ::br::com::bb;
+using namespace ::rtl; // for OUString
+using namespace ::com::sun::star; // for sdk interfaces
+using namespace ::com::sun::star::uno; // for basic types
 
-class I3270Impl : public br::com::bb::I3270, public lang::XServiceInfo, public lang::XTypeProvider
+namespace g3270
+{
+
+class uno_impl : public ::cppu::WeakImplHelper3< br::com::bb::I3270, lang::XServiceInfo, lang::XInitialization >
 {
 public:
-	I3270Impl( const Reference< XMultiServiceFactory > & xServiceManager );
-	~I3270Impl();
+
+	// XInitialization will be called upon createInstanceWithArguments[AndContext]()
+	virtual void SAL_CALL initialize( Sequence< Any > const & args ) throw (Exception);
 
 	// XInterface implementation
-	virtual void SAL_CALL acquire() throw ();
-	virtual void SAL_CALL release() throw ();
-	virtual Any SAL_CALL queryInterface( const Type & rType ) throw (RuntimeException);
+	// virtual void SAL_CALL acquire() throw ();
+	// virtual void SAL_CALL release() throw ();
+	// virtual Any SAL_CALL queryInterface( const Type & rType ) throw (RuntimeException);
 
 	// XServiceInfo	implementation
     virtual OUString SAL_CALL getImplementationName(  ) throw(RuntimeException);
     virtual sal_Bool SAL_CALL supportsService( const OUString& ServiceName ) throw(RuntimeException);
     virtual Sequence< OUString > SAL_CALL getSupportedServiceNames(  ) throw(RuntimeException);
-    static Sequence< OUString > SAL_CALL getSupportedServiceNames_Static(  );
 
 	// XTypeProvider implementation
 	virtual Sequence<sal_Int8> SAL_CALL getImplementationId(void) throw (RuntimeException);
@@ -87,3 +79,5 @@ private:
 
 };
 
+
+};
