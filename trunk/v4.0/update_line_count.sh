@@ -23,5 +23,19 @@ do
 		exit -1
 	fi
 
+	TEMPSOURCE=`mktemp`
+	cp -f $FILENAME $TEMPSOURCE
+	if [ "$?" != "0" ]; then
+		echo "Erro ao criar temporario para $FILENAME"
+		exit -1
+	fi
+
+	sed -e "s#@@FILENAME@@#`basename $FILENAME`#;s#e possui .* linhas de código#e possui $LINES linhas de código#" $TEMPSOURCE > $FILENAME
+	if [ "$?" != "0" ]; then
+		echo "Erro ao atualizar contagem de linhas em $FILENAME"
+		exit -1
+	fi
+
+
 done < $TEMPFILE
 rm -f $TEMPFILE

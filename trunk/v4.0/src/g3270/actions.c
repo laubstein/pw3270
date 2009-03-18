@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como actions.c e possui 1042 linhas de código.
+ * Este programa está nomeado como actions.c e possui 1093 linhas de código.
  *
  * Contatos:
  *
