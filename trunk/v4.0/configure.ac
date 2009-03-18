@@ -164,6 +164,7 @@ AC_ARG_WITH([icon],
 	[AS_HELP_STRING([--with-icon], [set icon filename])],
 [
 	g3270_cv_icon="$withval"
+	AC_DEFINE_UNQUOTED(PROGRAM_ICON,"$g3270_cv_icon")
 ],[
 	g3270_cv_icon="image/default.ico"
 ])
@@ -172,6 +173,8 @@ AC_ARG_WITH([logo],
 	[AS_HELP_STRING([--with-logo], [set logo filename])],
 [
 	g3270_cv_logo="$withval"
+	AC_DEFINE_UNQUOTED(PROGRAM_LOGO,"$g3270_cv_logo")
+
 ],[
 	g3270_cv_logo="image/default.jpg"
 ])
@@ -273,17 +276,20 @@ if test "_$HOST_CC" = "_" ; then
 	HOST_CC="\$(CC)"
 fi
 
+AC_DEFINE_UNQUOTED(PROGRAM_NAME,"$g3270_cv_progname")
+
 AC_DEFINE([X3270_TN3270E])
 AC_DEFINE([X3270_ANSI])
 AC_DEFINE([X3270_APL])
 AC_DEFINE([X3270_FT])
 AC_DEFINE([X3270_PRINTER])
 
+
 AC_SUBST(PACKAGE_RELEASE,$g3270_cv_release)
 AC_SUBST(ICONFILE,$g3270_cv_icon)
 AC_SUBST(LOGOFILE,$g3270_cv_logo)
 
-AC_SUBST(PROGRAM_NAME,$g3270_cv_progname)
+AC_SUBST(PROGRAM_NAME,"$g3270_cv_progname")
 
 # Extra values
 AC_SUBST(OS_CFLAGS)

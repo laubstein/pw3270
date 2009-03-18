@@ -156,7 +156,7 @@ static gboolean trylog(gchar *path)
 
 static int g3270_init(const gchar *program)
 {
-	static const gchar	*logname	= PACKAGE_NAME ".log";
+	static const gchar	*logname	= PROGRAM_NAME ".log";
 	gboolean				has_log		= FALSE;
 
 	/* If running on win32 changes to program path */
@@ -177,6 +177,9 @@ static int g3270_init(const gchar *program)
 
 	if(!has_log)
 		has_log = trylog(g_build_filename(g_get_home_dir(),"log",logname,NULL));
+
+	if(!has_log)
+		has_log = trylog(g_build_filename(g_get_home_dir(),PROGRAM_NAME,logname,NULL));
 
 	if(!has_log)
 		has_log = trylog(g_build_filename(g_get_home_dir(),PACKAGE_NAME,logname,NULL));
@@ -300,7 +303,7 @@ static void load_options(GOptionContext *context)
 		{ "startup-script", 	's', 0, G_OPTION_ARG_FILENAME, 	&startup_script,		N_( "Run script on startup (if available)" ),				NULL },
 		{ "program-data",	 	'd', 0, G_OPTION_ARG_STRING, 	&program_data,			N_( "Path to search for data and configuration files" ),	NULL },
 		{ "icon",	 			'i', 0, G_OPTION_ARG_FILENAME, 	&program_logo,			N_( "Path to an image file for program icon" ),				NULL },
-		{ "window-title",	 	't', 0, G_OPTION_ARG_STRING, 	&window_title,			N_( "Main window title" ),									PACKAGE_NAME },
+		{ "window-title",	 	't', 0, G_OPTION_ARG_STRING, 	&window_title,			N_( "Main window title" ),									PROGRAM_NAME },
 
 #ifdef HAVE_PLUGINS
 		{ "plugins",	 		'p', 0, G_OPTION_ARG_STRING, 	&plugin_list,			N_( "Full path of plugins to load" ),						NULL },

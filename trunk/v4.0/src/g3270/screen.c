@@ -154,7 +154,7 @@
  int								fHeight			= 0;
  ELEMENT							*screen			= NULL;
  char								*charset		= NULL;
- char								*window_title	= PACKAGE_NAME;
+ char								*window_title	= PROGRAM_NAME;
  gboolean							drawing_enabled	= FALSE;
 
  static int						szScreen		= 0;
