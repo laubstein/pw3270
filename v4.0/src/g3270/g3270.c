@@ -161,10 +161,6 @@ static int g3270_init(const gchar *program)
 
 	/* If running on win32 changes to program path */
 #if defined(_WIN32) || defined( DEBUG ) /*[*/
-	gchar *ptr = g_strdup(program);
-	g_chdir(g_path_get_dirname(ptr));
-	g_free(ptr);
-	Trace("Current dir: %s",g_get_current_dir());
 	has_log = trylog(g_build_filename(G_DIR_SEPARATOR_S, g_get_current_dir(),logname,NULL));
 #endif
 
@@ -272,28 +268,6 @@ static int parse_option_context(GOptionContext *context, int *argc, char ***argv
 
 #endif
 
-static void init_locale(void)
-{
-	setlocale( LC_ALL, "" );
-
-#if defined( LOCALEDIR )
-
-	// http://bo.majewski.name/bluear/gnu/GTK/i18n/
-	Trace("Localedir: %s",LOCALEDIR);
-	bindtextdomain(PACKAGE_NAME, LOCALEDIR);
-
-#else
-
-	Trace("Localedir: %s",DATAROOTDIR G_DIR_SEPARATOR_S "locale");
-	bindtextdomain(PACKAGE_NAME, DATAROOTDIR G_DIR_SEPARATOR_S "locale" );
-
-#endif
-
-	bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
-	textdomain(PACKAGE_NAME);
-
-}
-
 static void load_options(GOptionContext *context)
 {
 	static GOptionEntry entries[] =
@@ -377,7 +351,31 @@ int main(int argc, char *argv[])
 
 #endif
 
-	init_locale();
+#if defined(_WIN32)
+	{
+		gchar *ptr = g_strdup(argv[0]);
+		g_chdir(g_path_get_dirname(ptr));
+		g_free(ptr);
+	}
+#endif
+
+	setlocale( LC_ALL, "" );
+
+#if defined( LOCALEDIR )
+
+	// http://bo.majewski.name/bluear/gnu/GTK/i18n/
+	Trace("Localedir: %s",LOCALEDIR);
+	bindtextdomain(PACKAGE_NAME, LOCALEDIR);
+
+#else
+
+	Trace("Localedir: %s",DATAROOTDIR G_DIR_SEPARATOR_S "locale");
+	bindtextdomain(PACKAGE_NAME, DATAROOTDIR G_DIR_SEPARATOR_S "locale" );
+
+#endif
+
+	bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
+	textdomain(PACKAGE_NAME);
 
 #ifdef HAVE_LIBGNOME
 
