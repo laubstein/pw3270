@@ -43,7 +43,7 @@ BuildWin() {
 		exit -1
 	fi
 
-	echo scp $NAME-*.exe perry@os2team:public_html/g3270
+	scp $NAME-*.exe perry@os2team:public_html/g3270
 	mkdir -p ~/win32
 	mv $NAME-*.exe ~/win32/
 
