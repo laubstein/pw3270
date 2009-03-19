@@ -46,10 +46,16 @@ LD = @LD@
 NATIVECC = @HOST_CC@
 WINDRES = @WINDRES@
 
+####################################################################################################
 # Set compile/link parameters
+####################################################################################################
+
 CFLAGS = @OS_CFLAGS@ -g -Wall -O -DG3270 -DLIBDIR=\"$(LIBDIR)\" -DDATAROOTDIR=\"$(datarootdir)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
 API_CFLAGS=@LIBSSL_CFLAGS@ @API_CFLAGS@
+
 APP_CFLAGS=@GTK_CFLAGS@ @LIBGNOME_CFLAGS@ @APP_CFLAGS@
+APP_LDFLAGS=@GTK_LIBS@ @LIBGNOME_LIBS@ @OS_LFLAGS@
+
 
 ####################################################################################################
 # Sources
@@ -144,7 +150,7 @@ obj/Release/version.o: src/version.c
 bin/Release/@PACKAGE_NAME@@EXEEXT@: bin/Release/lib3270@DLLEXT@ $(foreach SRC, $(basename $(APP_SRCS)), obj/Release/src/g3270/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_EXECOPT@ @LD_RLSFLAGS@ -o $@ $^ @GTK_LIBS@ @LIBGNOME_LIBS@ @OS_LFLAGS@
+	@$(CC) @OS_EXECOPT@ @LD_RLSFLAGS@ -o $@ $^ $(APP_LDFLAGS)
 
 bin/Release/lib3270@DLLEXT@: obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
@@ -160,7 +166,7 @@ bin/Release/lib3270@DLLEXT@: obj/Release/version.o obj/Release/src/lib/fallbacks
 bin/Debug/@PACKAGE_NAME@@EXEEXT@: bin/Debug/lib3270@DLLEXT@ $(foreach SRC, $(basename $(APP_SRCS)), obj/Debug/src/g3270/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_EXECOPT@ -o $@ $^ -Lbin/Debug -l3270 @GTK_LIBS@ @LIBGNOME_LIBS@ @OS_LFLAGS@
+	@$(CC) @OS_EXECOPT@ -o $@ $^ -Lbin/Debug -l3270 $(APP_LDFLAGS)
 
 bin/Debug/lib3270@DLLEXT@: obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...

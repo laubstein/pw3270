@@ -121,6 +121,23 @@ SectionEnd
 
 SubSection "Extras" SecExtra
 
+	Section /o "Software Development Kit" SecSDK
+
+		CreateDirectory "$INSTDIR\sdk"
+		CreateDirectory "$INSTDIR\sdk\include"
+		CreateDirectory "$INSTDIR\sdk\include\lib3270"
+
+		file "/oname=$INSTDIR\sdk\include\lib3270.h" "src\include\lib3270.h"
+		file "/oname=$INSTDIR\sdk\include\lib3270\api.h" "src\include\lib3270\api.h"
+		file "/oname=$INSTDIR\sdk\include\lib3270\config.h" "src\include\lib3270\config.h"
+
+		CreateDirectory "$INSTDIR\sdk\lib"
+		file "/oname=$INSTDIR\sdk\lib\lib3270.def" "lib3270.def"
+		file "/oname=$INSTDIR\sdk\lib\lib3270.a" "lib3270.a"
+
+	SectionEnd
+
+
 	Section /o "Rexx extension library" SecRexxLib
 
 		setOutPath $PROGRAMFILES\ooRexx
@@ -153,6 +170,7 @@ section "Uninstall"
 	RMDir /r "$INSTDIR\share"
 	RMDir /r "$INSTDIR\etc"
 	RMDir /r "$INSTDIR\plugins"
+	RMDir /r "$INSTDIR\sdk"
 	RMDir /r "$INSTDIR\gtk2-runtime"
 
 	# Delete all files
