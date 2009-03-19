@@ -33,6 +33,7 @@ OBJRELEASE ?= ../../../obj/Release/src/plugins/rexx
 BINRELEASE ?= $(BINROOT)/Release/plugins
 
 CC = @CC@
+LD = @LD@
 DLLEXT = @DLLEXT@
 
 # Set compile/link parameters
@@ -64,7 +65,7 @@ $(BINDEBUG)/$(MODULE_NAME)$(DLLEXT): $(foreach SRC, $(SOURCES), $(OBJDEBUG)/$(ba
 $(BINRELEASE)/$(MODULE_NAME)$(DLLEXT): $(foreach SRC, $(SOURCES), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) -o $@ $^ -L$(BINROOT)/Release -l3270 $(DLLFLAGS)
+	@$(LD) @LD_RLSFLAGS@ -o $@ $^ -L$(BINROOT)/Release -l3270 $(DLLFLAGS)
 
 clean:
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;

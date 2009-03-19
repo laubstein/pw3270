@@ -144,14 +144,14 @@ obj/Release/version.o: src/version.c
 bin/Release/@PACKAGE_NAME@@EXEEXT@: bin/Release/lib3270@DLLEXT@ $(foreach SRC, $(basename $(APP_SRCS)), obj/Release/src/g3270/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_EXECOPT@ -o $@ $^ @GTK_LIBS@ @LIBGNOME_LIBS@ @OS_LFLAGS@
+	@$(CC) @OS_EXECOPT@ @LD_RLSFLAGS@ -o $@ $^ @GTK_LIBS@ @LIBGNOME_LIBS@ @OS_LFLAGS@
 
 bin/Release/lib3270@DLLEXT@: obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@rm -f $(basename \$(@F)).a
 	@rm -f $(basename \$(@F)).def
-	@$(LD) @OS_DLLFLAGS@ @LD_APIFLAGS@ -o $@ $^ @LIBSSL_LIBS@ @OS_LFLAGS@
+	@$(LD) @OS_DLLFLAGS@ @LD_APIFLAGS@ @LD_RLSFLAGS@ -o $@ $^ @LIBSSL_LIBS@ @OS_LFLAGS@
 
 ####################################################################################################
 # Debug Targets
@@ -167,7 +167,7 @@ bin/Debug/lib3270@DLLEXT@: obj/Debug/version.o obj/Release/src/lib/fallbacks.o $
 	@mkdir -p `dirname $@`
 	@rm -f $(basename \$(@F)).a
 	@rm -f $(basename \$(@F)).def
-	@$(LD) @OS_DLLFLAGS@ @LD_APIFLAGS@ -o $@ $^ @LIBSSL_LIBS@ @OS_LFLAGS@
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ @LIBSSL_LIBS@ @OS_LFLAGS@
 
 ####################################################################################################
 # Plugins
