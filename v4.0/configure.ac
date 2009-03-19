@@ -68,6 +68,7 @@ OS_SRCS=""
 OS_APPSRCS=""
 LOGOEXT="png"
 LD_APIFLAGS=""
+LD_RLSFLAGS="-Wl,--strip-debug"
 LD=$CC
 
 case "$host" in
@@ -77,7 +78,7 @@ case "$host" in
 		OS_DLLFLAGS="-mno-cygwin -shared -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
 
 		# http://oldwiki.mingw.org/index.php/MSVC-MinGW-DLL
-		LD_APIFLAGS="-Wl,--output-def,\$(basename \$(@F)).def,--out-implib,\$(basename \$(@F)).a"
+		LD_APIFLAGS="-Wl,--warn-duplicate-exports,--output-def,\$(basename \$(@F)).def,--out-implib,\$(basename \$(@F)).a"		
 
 		OS_EXECOPT="-mwindows"
 		OS_LFLAGS="-lws2_32"
@@ -311,6 +312,7 @@ AC_SUBST(APP_CFLAGS)
 
 AC_SUBST(OS_DLLFLAGS)
 AC_SUBST(LD_APIFLAGS)
+AC_SUBST(LD_RLSFLAGS)
 AC_SUBST(OS_EXECOPT)
 AC_SUBST(OS_SRCS)
 AC_SUBST(DLLEXT)

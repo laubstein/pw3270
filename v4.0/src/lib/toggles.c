@@ -143,6 +143,7 @@ G3270_EXPORT int do_toggle(int ix)
 		return EINVAL;
 
 	do_toggle_reason(ix, TT_INTERACTIVE);
+	return 0;
 }
 
 /*
