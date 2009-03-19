@@ -338,7 +338,7 @@ gboolean StartPlugins(const gchar *startup_script)
  {
 	if(!TOGGLED_KEEP_SELECTED)
 		action_ClearSelection();
-	action_internal(PF_action, IA_DEFAULT, cmd, CN);
+	action_PFKey(atoi(cmd));
  }
 
 #ifdef HAVE_PLUGINS

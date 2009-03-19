@@ -77,7 +77,7 @@ case "$host" in
 		OS_DLLFLAGS="-mno-cygwin -shared -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
 
 		# http://oldwiki.mingw.org/index.php/MSVC-MinGW-DLL
-		LD_APIFLAGS="-Wl,--export-all-symbols,--output-def,\$(basename \$(@F)).def,--out-implib,\$(basename \$(@F)).a"
+		LD_APIFLAGS="-Wl,--output-def,\$(basename \$(@F)).def,--out-implib,\$(basename \$(@F)).a"
 
 		OS_EXECOPT="-mwindows"
 		OS_LFLAGS="-lws2_32"

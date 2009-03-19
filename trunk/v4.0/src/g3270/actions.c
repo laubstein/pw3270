@@ -242,48 +242,45 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
- static void clear_and_call(GtkAction *action, XtActionProc call)
+ static void clear_and_call(GtkAction *action, int (*call)(void))
  {
  	action_ClearSelection();
- 	action_internal(call, IA_DEFAULT, CN, CN);
+ 	call();
  }
 
  void action_Clear(GtkWidget *w, gpointer user_data)
  {
- 	clear_and_call(NULL,EraseInput_action);
+ 	clear_and_call(0,action_EraseInput);
  }
 
  void action_Up(GtkWidget *w, gpointer user_data)
  {
- 	action_ClearSelection();
-	action_CursorUp();
+ 	clear_and_call(0,action_CursorUp);
  }
 
  void action_Down(GtkWidget *w, gpointer user_data)
  {
- 	action_ClearSelection();
-	action_CursorDown();
+ 	clear_and_call(0,action_CursorDown);
  }
 
  void action_Left(GtkWidget *w, gpointer user_data)
  {
- 	action_ClearSelection();
-	action_CursorLeft();
+ 	clear_and_call(0,action_CursorLeft);
  }
 
  void action_Right(GtkWidget *w, gpointer user_data)
  {
- 	clear_and_call(NULL,Right_action);
+ 	clear_and_call(0,action_CursorRight);
  }
 
  void action_Tab(GtkWidget *w, gpointer user_data)
  {
- 	action_internal(Tab_action, IA_DEFAULT, CN, CN);
+ 	action_NextField();
  }
 
  void action_BackTab(GtkWidget *w, gpointer user_data)
  {
- 	action_internal(BackTab_action, IA_DEFAULT, CN, CN);
+ 	action_PreviousField();
  }
 
  void DisableNetworkActions(void)
@@ -570,10 +567,12 @@
 
  }
 
- static void call3270(GtkAction *action, XtActionProc call)
+/*
+ static void call3270(GtkAction *action, int (*XtActionProc call)
  {
  	action_internal(call, IA_DEFAULT, CN, CN);
  }
+*/
 
  static void Load3270Actions(GtkActionGroup *actions)
  {
@@ -583,7 +582,7 @@
  		const gchar *label;
  		const gchar *tooltip;
  		const gchar *stock_id;
- 		XtActionProc call;
+ 		int			 (*call)(void);
  		const gchar *accelerator;
 	};
 
@@ -593,13 +592,13 @@
 		{ "Reset",			N_( "Reset" ),
 							NULL,
 							NULL,
-							Reset_action,
+							action_Reset,
 							N_( "<Ctrl>r" ) },
 
 		{ "Escape",			N_( "Escape" ),
 							NULL,
 							NULL,
-							Reset_action,
+							action_Reset,
 							"Escape" }
 	};
 
@@ -608,49 +607,49 @@
 		{ "EraseEOF",		N_( "Erase EOF" ),
 							N_( "Erase to the end of the field" ),
 							NULL,
-							EraseEOF_action,
+							action_EraseEOF,
 							"End" },
 
-		{ "Home",			N_( "Field start" ),
+		{ "Home",			N_( "First Field" ),
 							NULL,
 							NULL,
-							Home_action,
+							action_FirstField,
 							"Home" },
 
 		{ "DeleteWord",		N_( "Delete Word" ),
 							NULL,
 							NULL,
-							DeleteWord_action,
+							action_DeleteWord,
 							N_( "<Ctrl>w" )	},
 
 		{ "EraseField",		N_( "Erase Field" ),
 							NULL,
 							NULL,
-							DeleteField_action,
+							action_DeleteField,
 							N_( "<Ctrl>u" ) },
 
 		{ "Delete",			N_( "Delete Char" ),
 							NULL,
 							NULL,
-							Delete_action,
+							action_Delete,
 							"Delete" },
 
 		{ "Erase",			N_( "Backspace" ),
 							NULL,
 							NULL,
-							Erase_action,
+							action_Erase,
 							"BackSpace" },
 
 		{ "NextField",		N_( "Next field" ),
 							NULL,
 							GTK_STOCK_GOTO_LAST,
-							Tab_action,
+							action_NextField,
 							"Tab" },
 
 		{ "SysREQ",			N_( "Sys Req" ),
 							NULL,
 							NULL,
-							SysReq_action,
+							action_SysReq,
 							"Sys_Req" },
 
 	};
@@ -664,7 +663,7 @@
 											gettext(action_info[f].tooltip),
 											action_info[f].stock_id );
 
-		g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(call3270),(gpointer) action_info[f].call);
+		g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(action_info[f].call),0 );
 
 		if(action_info[f].accelerator)
 			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(action_info[f].accelerator));
@@ -801,13 +800,9 @@
 
  gboolean PFKey(int key)
  {
- 	char ks[6];
-
 	if(!TOGGLED_KEEP_SELECTED)
 		action_ClearSelection();
-
- 	g_snprintf(ks,5,"%d",key);
-	action_internal(PF_action, IA_DEFAULT, ks, CN);
+ 	action_PFKey(key);
 	return TRUE;
  }
 

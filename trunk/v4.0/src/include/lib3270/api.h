@@ -409,10 +409,26 @@
 		/* Actions */
 		G3270_EXPORT int action_Enter(void);
 		G3270_EXPORT int action_PFKey(int key);
+		G3270_EXPORT int action_PAKey(int key);
+		G3270_EXPORT int action_NextField(void);
+		G3270_EXPORT int action_PreviousField(void);
+		G3270_EXPORT int action_FirstField(void);
+		G3270_EXPORT int action_Reset(void);
+
 		G3270_EXPORT int action_CursorUp(void);
 		G3270_EXPORT int action_CursorDown(void);
 		G3270_EXPORT int action_CursorLeft(void);
 		G3270_EXPORT int action_CursorRight(void);
+
+		G3270_EXPORT int action_EraseInput(void);
+		G3270_EXPORT int action_ClearFields(void);
+
+		G3270_EXPORT int action_EraseEOF(void);
+		G3270_EXPORT int action_DeleteWord(void);
+		G3270_EXPORT int action_DeleteField(void);
+		G3270_EXPORT int action_Delete(void);
+		G3270_EXPORT int action_Erase(void);
+		G3270_EXPORT int action_SysReq(void);
 
 		/* Host connect/disconnect and state change. */
 		G3270_EXPORT int host_connect(const char *n, int wait);

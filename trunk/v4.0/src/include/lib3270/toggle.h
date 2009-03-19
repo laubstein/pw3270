@@ -66,11 +66,11 @@
 	extern void				shutdown_toggles(void);
 
 	G3270_EXPORT int 			register_tchange(int ix, void (*callback)(int value, int reason));
-	extern void				do_toggle(int ix);
+	G3270_EXPORT int			do_toggle(int ix);
 	G3270_EXPORT int			set_toggle(int ix, int value);
 
 	G3270_EXPORT const char	*get_toggle_name(int ix);
-	extern int					get_toggle_by_name(const char *name);
+	G3270_EXPORT int			get_toggle_by_name(const char *name);
 
 
 
