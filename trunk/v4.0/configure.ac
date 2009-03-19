@@ -56,23 +56,33 @@ AC_PROG_CC
 # Target options
 
 DLLEXT=".so"
+
 OS_CFLAGS=""
+API_CFLAGS="-DLIB3270=1 -Isrc/lib -Isrc/include/lib3270"
+APP_CFLAGS="-Isrc/lib"
+
 OS_DLLFLAGS="-shared -Wl,-soname,\$(@F)"
 OS_EXECOPT=""
 OS_LFLAGS=""
 OS_SRCS=""
-OS_MAINSRCS=""
+OS_APPSRCS=""
 LOGOEXT="png"
+LD_APIFLAGS=""
+LD=$CC
 
 case "$host" in
 	*-mingw32)
 		DLLEXT=".dll"
 		OS_CFLAGS="-mno-cygwin -mms-bitfields -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500"
-		OS_DLLFLAGS="-mno-cygwin -Wl,--add-stdcall-alias -Wl,--export-all-symbols -Wl,--enable-auto-import -shared -Wl,-soname,\$(@F)"
+		OS_DLLFLAGS="-mno-cygwin -shared -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
+
+		# http://oldwiki.mingw.org/index.php/MSVC-MinGW-DLL
+		LD_APIFLAGS="-Wl,--export-all-symbols,--output-def,\$(basename \$(@F)).def,--out-implib,\$(basename \$(@F)).a"
+
 		OS_EXECOPT="-mwindows"
 		OS_LFLAGS="-lws2_32"
-		OS_LIBSRCS="w3misc.c winvers.c windirs.c"
-		OS_MAINSRCS="resources.rc"
+		OS_APISRCS="w3misc.c winvers.c windirs.c"
+		OS_APPSRCS="resources.rc"
 		LOGOEXT="jpg"
 		localedir="locale"
 
@@ -291,9 +301,16 @@ AC_SUBST(LOGOFILE,$g3270_cv_logo)
 
 AC_SUBST(PROGRAM_NAME,"$g3270_cv_progname")
 
-# Extra values
+AC_SUBST(LD)
+AC_SUBST(HOST_CC)
+AC_SUBST(OS_LFLAGS)
+
 AC_SUBST(OS_CFLAGS)
+AC_SUBST(API_CFLAGS)
+AC_SUBST(APP_CFLAGS)
+
 AC_SUBST(OS_DLLFLAGS)
+AC_SUBST(LD_APIFLAGS)
 AC_SUBST(OS_EXECOPT)
 AC_SUBST(OS_SRCS)
 AC_SUBST(DLLEXT)
@@ -302,14 +319,10 @@ AC_SUBST(EXEEXT)
 AC_SUBST(LOGOEXT)
 AC_SUBST(EXTRA_TARGETS)
 AC_SUBST(WINDRES)
-AC_SUBST(HOST_CC)
-AC_SUBST(OS_LFLAGS)
-AC_SUBST(PROGRAM_LIBS)
-AC_SUBST(PROGRAM_FLAGS)
 AC_SUBST(SELECTED_PLUGINS)
 AC_SUBST(libdir)
-AC_SUBST(OS_MAINSRCS)
-AC_SUBST(OS_LIBSRCS)
+AC_SUBST(OS_APPSRCS)
+AC_SUBST(OS_APISRCS)
 AC_SUBST(GTKRUNTIME,$g3270_cv_gtkruntime)
 
 #dnl Configure which files to generate.
