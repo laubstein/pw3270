@@ -42,24 +42,33 @@ TARGETS = $(PACKAGE)@EXEEXT@
 # Set command paths and mkfb (which has to run locally)
 MKFB = mkfb
 CC = @CC@
+LD = @LD@
 NATIVECC = @HOST_CC@
 WINDRES = @WINDRES@
 
 # Set compile/link parameters
 CFLAGS = @OS_CFLAGS@ -g -Wall -O -DG3270 -DLIBDIR=\"$(LIBDIR)\" -DDATAROOTDIR=\"$(datarootdir)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
+API_CFLAGS=@LIBSSL_CFLAGS@ @API_CFLAGS@
+APP_CFLAGS=@GTK_CFLAGS@ @LIBGNOME_CFLAGS@ @APP_CFLAGS@
 
+####################################################################################################
 # Sources
-G3270_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
-		clipboard.c print.c config.c colors.c keypad.c plugin.c filetransfer.c \
-		version.c @OS_MAINSRCS@
+####################################################################################################
 
-LIBRARY_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
-		ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c idle.c kybd.c \
-		macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
-		sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
-		xio.c keymap.c resolver.c log.c @OS_LIBSRCS@
+APP_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
+			clipboard.c print.c config.c colors.c keypad.c plugin.c filetransfer.c \
+			version.c @OS_APPSRCS@
 
-# Main Targets
+API_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
+			ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c idle.c kybd.c \
+			macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
+			sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
+			xio.c keymap.c resolver.c log.c @OS_APISRCS@
+
+####################################################################################################
+# Targets
+####################################################################################################
+
 Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
 
 Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
@@ -72,19 +81,29 @@ Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
 	@rm -f bin/Release/gtk-runtime
 	@ln -s "@GTKRUNTIME@" bin/Release/gtk-runtime
 
+run: bin/Debug/g3270@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
+	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
+	@cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270 --program-data="../../"
+
+####################################################################################################
 # Rules
+####################################################################################################
+
 GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
 
+####################################################################################################
 # Debug Rules
+####################################################################################################
+
 obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DDEBUG=1 -DLIB3270=1 $(CFLAGS) @LIBSSL_CFLAGS@ -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
+	@$(CC) -DDEBUG=1 $(API_CFLAGS) $(CFLAGS) -ggdb -o $@ -c $<
 
 obj/Debug/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DDEBUG=1 $(CFLAGS) @GTK_CFLAGS@ @LIBGNOME_CFLAGS@ @PROGRAM_FLAGS@ -Isrc/lib -ggdb -o $@ -c $<
+	@$(CC) -DDEBUG=1 $(CFLAGS) $(APP_CFLAGS) -ggdb -o $@ -c $<
 
 obj/Debug/src/g3270/resources.o: src/g3270/resources.rc src/g3270/$(PACKAGE).ico Makefile
 	@echo $< ...
@@ -95,16 +114,19 @@ obj/Debug/version.o: src/version.c
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) -Isrc/lib -ggdb -o $@ -c $<
 
-# Release rules
+####################################################################################################
+# Release Rules
+####################################################################################################
+
 obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) -DLIB3270=1 $(CFLAGS) -Werror @LIBSSL_CFLAGS@ -Isrc/lib -Isrc/include/lib3270 -ggdb -o $@ -c $<
+	@$(CC) -Werror $(API_CFLAGS) $(CFLAGS) -o $@ -c $<
 
 obj/Release/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(CFLAGS) @GTK_CFLAGS@ @LIBGNOME_CFLAGS@ @PROGRAM_FLAGS@ -Isrc/lib -o $@ -c $<
+	@$(CC) $(CFLAGS) $(APP_CFLAGS) -o $@ -c $<
 
 obj/Release/src/g3270/resources.o: src/g3270/resources.rc src/g3270/$(PACKAGE).ico Makefile
 	@echo $< ...
@@ -115,39 +137,51 @@ obj/Release/version.o: src/version.c
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) -Werror -Isrc/lib -o $@ -c $<
 
-#
-#obj/Release/src/lib/w3n46.o: src/lib/resolver.c
-#	@echo $@ ...
-#	@mkdir -p `dirname $@`
-#	@$(CC) $(CFLAGS) -Werror -Isrc/lib -DW3N46 -c -o $@ $^
-#
-
+####################################################################################################
 # Release Targets
-bin/Release/@PACKAGE_NAME@@EXEEXT@: bin/Release/lib3270@DLLEXT@ $(foreach SRC, $(basename $(G3270_SRCS)), obj/Release/src/g3270/$(SRC).@OBJEXT@)
+####################################################################################################
+
+bin/Release/@PACKAGE_NAME@@EXEEXT@: bin/Release/lib3270@DLLEXT@ $(foreach SRC, $(basename $(APP_SRCS)), obj/Release/src/g3270/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_EXECOPT@ -o $@ $^ @GTK_LIBS@ @LIBGNOME_LIBS@ @PROGRAM_LIBS@ @OS_LFLAGS@
+	@$(CC) @OS_EXECOPT@ -o $@ $^ @GTK_LIBS@ @LIBGNOME_LIBS@ @OS_LFLAGS@
 
-bin/Release/lib3270@DLLEXT@: obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
+bin/Release/lib3270@DLLEXT@: obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_DLLFLAGS@ -o $@ $^ @LIBSSL_LIBS@ @OS_LFLAGS@
+	@rm -f $(basename \$(@F)).a
+	@rm -f $(basename \$(@F)).def
+	@$(LD) @OS_DLLFLAGS@ @LD_APIFLAGS@ -o $@ $^ @LIBSSL_LIBS@ @OS_LFLAGS@
 
-#
-#bin/Release/w3n46.dll: obj/Release/src/lib/w3n46.o
-#	@$(CC) @OS_DLLFLAGS@ -o $@ $^ @OS_LFLAGS@
-#
-
+####################################################################################################
 # Debug Targets
-bin/Debug/@PACKAGE_NAME@@EXEEXT@: bin/Debug/lib3270@DLLEXT@ $(foreach SRC, $(basename $(G3270_SRCS)), obj/Debug/src/g3270/$(SRC).@OBJEXT@)
+####################################################################################################
+
+bin/Debug/@PACKAGE_NAME@@EXEEXT@: bin/Debug/lib3270@DLLEXT@ $(foreach SRC, $(basename $(APP_SRCS)), obj/Debug/src/g3270/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) @OS_EXECOPT@ -o $@ $^ -Lbin/Debug -l3270 @GTK_LIBS@ @LIBGNOME_LIBS@ @OS_LFLAGS@
 
-bin/Debug/lib3270@DLLEXT@: obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(LIBRARY_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
+bin/Debug/lib3270@DLLEXT@: obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_DLLFLAGS@ -o $@ $^ @LIBSSL_LIBS@ @OS_LFLAGS@
+	@rm -f $(basename \$(@F)).a
+	@rm -f $(basename \$(@F)).def
+	@$(LD) @OS_DLLFLAGS@ @LD_APIFLAGS@ -o $@ $^ @LIBSSL_LIBS@ @OS_LFLAGS@
+
+####################################################################################################
+# Plugins
+####################################################################################################
+
+bin/Release/plugins/rx3270@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
+	make -C src/plugins/rexx ../../../$@
+
+bin/Debug/plugins/rx3270@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
+	make -C src/plugins/rexx ../../../$@
+
+####################################################################################################
+# Misc Targets
+####################################################################################################
 
 src/g3270/$(PACKAGE).ico: @ICONFILE@
 	@cp @ICONFILE@ $@
@@ -155,14 +189,6 @@ src/g3270/$(PACKAGE).ico: @ICONFILE@
 src/g3270/$(PACKAGE).@LOGOEXT@: @LOGOFILE@
 	@convert @LOGOFILE@ $@
 
-# Plugins
-bin/Release/plugins/rx3270@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
-	make -C src/plugins/rexx ../../../$@
-
-bin/Debug/plugins/rx3270@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
-	make -C src/plugins/rexx ../../../$@
-
-# Other targets
 src/lib/fallbacks.c:  src/lib/X3270.xad
 	@make -C src/lib fallbacks.c
 
@@ -182,10 +208,6 @@ $(PACKAGE).pot: sources.lst
 
 $(PACKAGE).po: $(PACKAGE).pot
 	@msginit --no-translator -o $(PACKAGE).po -i $(PACKAGE).pot
-
-run: bin/Debug/g3270@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
-	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
-	@cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270 --program-data="../../"
 
 tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 
@@ -263,6 +285,8 @@ clean:
 	@if [ -e src/plugins/rexx/Makefile ]; then make -C src/plugins/rexx clean; fi
 	@if [ -e src/extensions/uno/Makefile ]; then make -C src/extensions/uno clean; fi
 
+	@find . -name "*.def" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.a" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
