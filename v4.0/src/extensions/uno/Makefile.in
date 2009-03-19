@@ -180,6 +180,7 @@ clean:
 	@rm -fr bin
 	@rm -fr src/inc
 	@rm -fr build.tmp
+	@rm -f @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
