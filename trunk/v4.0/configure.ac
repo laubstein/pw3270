@@ -68,7 +68,7 @@ OS_SRCS=""
 OS_APPSRCS=""
 LOGOEXT="png"
 LD_APIFLAGS=""
-LD_RLSFLAGS="-Wl,--strip-debug"
+LD_RLSFLAGS="-Wl,--strip-all"
 LD=$CC
 
 case "$host" in

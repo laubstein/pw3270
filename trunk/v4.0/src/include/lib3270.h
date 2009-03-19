@@ -18,25 +18,21 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como version.c e possui - linhas de código.
+ * Este programa está nomeado como @@FILENAME@@ e possui @@LINES@@ linhas de código.
  *
  * Contatos:
  *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
- * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
+ * erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
  * kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
  * macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
  *
  */
 
- #include "g3270.h"
+#ifndef LIB3270_H_INCLUDED
 
-/*---[ Implement ]---------------------------------------------------------------------------------*/
+	#include <lib3270/api.h>
 
- const gchar *program_name		= "@PROGRAM_NAME@";
- const gchar *program_version		= "@PACKAGE_VERSION@";
- const gchar *program_fullversion	= "@PACKAGE_VERSION@-@PACKAGE_RELEASE@";
- const gchar *program_release		= "@PACKAGE_RELEASE@";
-
+#endif // LIB3270_H_INCLUDED
 
