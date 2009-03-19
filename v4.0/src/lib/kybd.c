@@ -492,25 +492,39 @@ G3270_EXPORT int action_PFKey(int key)
 void
 PA_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	unsigned k;
-
 	action_debug(PA_action, event, params, num_params);
+
 	if (check_usage(PA_action, *num_params, 1, 1) < 0)
 		return;
-	k = atoi(params[0]);
-	if (k < 1 || k > PA_SZ) {
-		popup_an_error("%s: Invalid argument '%s'",
-		    action_name(PA_action), params[0]);
+
+	action_PAKey(atoi(params[0]));
+}
+
+G3270_EXPORT int action_PAKey(int key)
+{
+	char buffer[10];
+
+	if (key < 1 || key > PA_SZ)
+	{
 		cancel_if_idle_command();
-		return;
+		return EINVAL;
 	}
 	reset_idle_timer();
 	if (kybdlock & KL_OIA_MINUS)
-		return;
+	{
+		return 0;
+	}
 	else if (kybdlock)
-		enq_ta(PA_action, params[0], CN);
+	{
+		snprintf(buffer,9,"%d",key);
+		enq_ta(PA_action, buffer, CN);
+	}
 	else
-		key_AID(pa_xlate[k-1]);
+	{
+		key_AID(pa_xlate[key-1]);
+	}
+
+	return 0;
 }
 
 
@@ -1336,6 +1350,11 @@ void
 Tab_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(Tab_action, event, params, num_params);
+	action_NextField();
+}
+
+G3270_EXPORT int action_NextField(void)
+{
 	reset_idle_timer();
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
@@ -1343,30 +1362,34 @@ Tab_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 			status_reset();
 		} else {
 			enq_ta(Tab_action, CN, CN);
-			return;
+			return 0;
 		}
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
 		net_sendc('\t');
-		return;
+		return 0;
 	}
 #endif /*]*/
 	cursor_move(next_unprotected(cursor_addr));
+	return 0;
 }
 
 
 /*
  * Tab backward to previous field.
  */
-void
-BackTab_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
+void BackTab_action(Widget w unused, XEvent *event, String *params,Cardinal *num_params)
+{
+	action_debug(BackTab_action, event, params, num_params);
+	action_PreviousField();
+}
+
+G3270_EXPORT int action_PreviousField(void)
 {
 	register int	baddr, nbaddr;
 	int		sbaddr;
 
-	action_debug(BackTab_action, event, params, num_params);
 	reset_idle_timer();
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
@@ -1374,11 +1397,11 @@ BackTab_action(Widget w unused, XEvent *event, String *params,
 			status_reset();
 		} else {
 			enq_ta(BackTab_action, CN, CN);
-			return;
+			return 0;
 		}
 	}
 	if (!IN_3270)
-		return;
+		return 0;
 	baddr = cursor_addr;
 	DEC_BA(baddr);
 	if (ea_buf[baddr].fa)	/* at bof */
@@ -1394,11 +1417,12 @@ BackTab_action(Widget w unused, XEvent *event, String *params,
 		DEC_BA(baddr);
 		if (baddr == sbaddr) {
 			cursor_move(0);
-			return;
+			return 0;
 		}
 	}
 	INC_BA(baddr);
 	cursor_move(baddr);
+	return 0;
 }
 
 
@@ -1491,35 +1515,46 @@ Reset_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
 	action_debug(Reset_action, event, params, num_params);
+	action_Reset();
+}
+
+G3270_EXPORT int action_Reset(void)
+{
 	reset_idle_timer();
 	do_reset(True);
+	return 0;
 }
 
 
 /*
  * Move to first unprotected field on screen.
  */
-void
-Home_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
+void Home_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(Home_action, event, params, num_params);
+	action_FirstField();
+}
+
+G3270_EXPORT int action_FirstField(void)
+{
 	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(Home_action, CN, CN);
-		return;
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
 		ansi_send_home();
-		return;
+		return 0;
 	}
 #endif /*]*/
 	if (!formatted) {
 		cursor_move(0);
-		return;
+		return 0;
 	}
 	cursor_move(next_unprotected(ROWS*COLS-1));
+
+	return 0;
 }
 
 
@@ -1671,19 +1706,24 @@ Delete_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
 	action_debug(Delete_action, event, params, num_params);
+	action_Delete();
+}
+
+G3270_EXPORT int action_Delete(void)
+{
 	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(Delete_action, CN, CN);
-		return;
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
 		net_sendc('\177');
-		return;
+		return 0;
 	}
 #endif /*]*/
 	if (!do_delete())
-		return;
+		return 0;
 	if (reverse) {
 		int baddr = cursor_addr;
 
@@ -1692,6 +1732,7 @@ Delete_action(Widget w unused, XEvent *event, String *params,
 			cursor_move(baddr);
 	}
 	screen_disp();
+	return 0;
 }
 
 
@@ -1794,18 +1835,24 @@ Erase_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
 	action_debug(Erase_action, event, params, num_params);
+	action_Erase();
+}
+
+G3270_EXPORT int action_Erase(void)
+{
 	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(Erase_action, CN, CN);
-		return;
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
 		net_send_erase();
-		return;
+		return 0;
 	}
 #endif /*]*/
 	do_erase();
+	return 0;
 }
 
 
@@ -2322,9 +2369,14 @@ void
 SysReq_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(SysReq_action, event, params, num_params);
+	action_SysReq();
+}
+
+G3270_EXPORT int action_SysReq(void)
+{
 	reset_idle_timer();
 	if (IN_ANSI)
-		return;
+		return 0;
 #if defined(X3270_TN3270E) /*[*/
 	if (IN_E) {
 		net_abort();
@@ -2332,33 +2384,38 @@ SysReq_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 #endif /*]*/
 	{
 		if (kybdlock & KL_OIA_MINUS)
-			return;
+			return 0;
 		else if (kybdlock)
 			enq_ta(SysReq_action, CN, CN);
 		else
 			key_AID(AID_SYSREQ);
 	}
+	return 0;
 }
 
 
 /*
  * Clear AID key
  */
-void
-Clear_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+void Clear_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(Clear_action, event, params, num_params);
+		action_debug(Clear_action, event, params, num_params);
+		action_ClearFields();
+}
+
+G3270_EXPORT int action_ClearFields(void)
+{
 	reset_idle_timer();
 	if (kybdlock & KL_OIA_MINUS)
-		return;
+		return 0;
 	if (kybdlock && CONNECTED) {
 		enq_ta(Clear_action, CN, CN);
-		return;
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
 		ansi_send_clear();
-		return;
+		return 0;
 	}
 #endif /*]*/
 	buffer_addr = 0;
@@ -2366,6 +2423,7 @@ Clear_action(Widget w unused, XEvent *event, String *params, Cardinal *num_param
 	cursor_move(0);
 	if (CONNECTED)
 		key_AID(AID_CLEAR);
+	return 0;
 }
 
 
@@ -2504,26 +2562,31 @@ MouseSelect_action(Widget w, XEvent *event, String *params,
 void
 EraseEOF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_debug(EraseEOF_action, event, params, num_params);
+	action_EraseEOF();
+}
+
+G3270_EXPORT int action_EraseEOF(void)
+{
 	register int	baddr;
 	register unsigned char	fa;
 	enum dbcs_state d;
 	enum dbcs_why why = DBCS_FIELD;
 
-	action_debug(EraseEOF_action, event, params, num_params);
 	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(EraseEOF_action, CN, CN);
-		return;
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI)
-		return;
+		return 0;
 #endif /*]*/
 	baddr = cursor_addr;
 	fa = get_field_attribute(baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
-		return;
+		return -1;
 	}
 	if (formatted) {	/* erase to next field attribute */
 		do {
@@ -2550,28 +2613,33 @@ EraseEOF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 	}
 	(void) ctlr_dbcs_postprocess();
 	screen_disp();
+	return 0;
 }
 
 
 /*
  * Erase all Input Key.
  */
-void
-EraseInput_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+void EraseInput_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_debug(EraseInput_action, event, params, num_params);
+	action_EraseInput();
+}
+
+G3270_EXPORT int action_EraseInput(void)
 {
 	register int	baddr, sbaddr;
 	unsigned char	fa;
 	Boolean		f;
 
-	action_debug(EraseInput_action, event, params, num_params);
 	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(EraseInput_action, CN, CN);
-		return;
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI)
-		return;
+		return 0;
 #endif /*]*/
 	if (formatted) {
 		/* find first field attribute */
@@ -2610,6 +2678,7 @@ EraseInput_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 		cursor_move(0);
 	}
 	screen_disp();
+	return 0;
 }
 
 
@@ -2624,23 +2693,28 @@ EraseInput_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 void
 DeleteWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_debug(DeleteWord_action, event, params, num_params);
+	action_DeleteWord();
+}
+
+G3270_EXPORT int action_DeleteWord(void)
+{
 	register int baddr;
 	register unsigned char	fa;
 
-	action_debug(DeleteWord_action, event, params, num_params);
 	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(DeleteWord_action, CN, CN);
-		return;
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
 		net_send_werase();
-		return;
+		return 0;
 	}
 #endif /*]*/
 	if (!formatted)
-		return;
+		return 0;
 
 	baddr = cursor_addr;
 	fa = get_field_attribute(baddr);
@@ -2648,7 +2722,7 @@ DeleteWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 	/* Make sure we're on a modifiable field. */
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
-		return;
+		return -1;
 	}
 
 	/* Backspace over any spaces to the left of the cursor. */
@@ -2656,7 +2730,7 @@ DeleteWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 		baddr = cursor_addr;
 		DEC_BA(baddr);
 		if (ea_buf[baddr].fa)
-			return;
+			return 0;
 		if (ea_buf[baddr].cc == EBC_null ||
 		    ea_buf[baddr].cc == EBC_space)
 			do_erase();
@@ -2669,7 +2743,7 @@ DeleteWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 		baddr = cursor_addr;
 		DEC_BA(baddr);
 		if (ea_buf[baddr].fa)
-			return;
+			return 0;
 		if (ea_buf[baddr].cc == EBC_null ||
 		    ea_buf[baddr].cc == EBC_space)
 			break;
@@ -2677,6 +2751,7 @@ DeleteWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 			do_erase();
 	}
 	screen_disp();
+	return 0;
 }
 
 
@@ -2691,29 +2766,34 @@ DeleteWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 void
 DeleteField_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_debug(DeleteField_action, event, params, num_params);
+	action_DeleteField();
+}
+
+G3270_EXPORT int action_DeleteField(void)
+{
 	register int	baddr;
 	register unsigned char	fa;
 
-	action_debug(DeleteField_action, event, params, num_params);
 	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(DeleteField_action, CN, CN);
-		return;
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
 		net_send_kill();
-		return;
+		return 0;
 	}
 #endif /*]*/
 	if (!formatted)
-		return;
+		return 0;
 
 	baddr = cursor_addr;
 	fa = get_field_attribute(baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
-		return;
+		return -1;
 	}
 	while (!ea_buf[baddr].fa)
 		DEC_BA(baddr);
@@ -2725,6 +2805,7 @@ DeleteField_action(Widget w unused, XEvent *event, String *params, Cardinal *num
 		INC_BA(baddr);
 	}
 	screen_disp();
+	return 0;
 }
 
 

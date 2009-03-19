@@ -33,8 +33,10 @@
  #include "rx3270.h"
 
  #include <errno.h>
+ /*
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
+ */
 
 /*---[ Statics ]----------------------------------------------------------------------------------*/
 
@@ -72,7 +74,7 @@
 	switch(Argc)
 	{
 	case 0:
-		action_internal(Enter_action, IA_DEFAULT, CN, CN);
+		action_Enter();
 		break;
 
     case 1:
@@ -330,7 +332,7 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 		return RXFUNC_BADCALL;
 
 	if(PCONNECTED)
-		action_internal(Enter_action, IA_DEFAULT, CN, CN);
+		rc = action_Enter();
 	else
 		rc = ENOTCONN;
 
@@ -350,15 +352,14 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270SendPFKey(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	char buffer[10];
+ 	int rc;
 
 	if(Argc != 1)
 		return RXFUNC_BADCALL;
 
-	g_snprintf(buffer,9,"%d",atoi(Argv[0].strptr));
-	action_internal(PF_action, IA_DEFAULT, buffer, 0);
+	rc = action_PFKey(atoi(Argv[0].strptr));
 
-	ReturnValue(0);
+	ReturnValue(rc);
  }
 
 /*----------------------------------------------------------------------------*/

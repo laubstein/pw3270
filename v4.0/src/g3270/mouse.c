@@ -152,14 +152,8 @@
 	if(length < 3)
 		function = CheckForFunction(baddr,length);
 
-	if(function > 0 && function < 24)
-	{
-		// Double-click in "F*", request function key
-		char buffer[10];
-		sprintf(buffer,"%d",function);
-		action_internal(PF_action, IA_DEFAULT, buffer, CN);
+	if(!action_PFKey(function))
 		return;
-	}
 
 	startRow = (baddr+1) / terminal_cols;
 	startCol = (baddr+1) % terminal_cols;
@@ -772,7 +766,7 @@
 
  gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
  {
- 	static const char *pfkey[]		= { "7", 		"8" };
+ 	static const int pfkey[]			= { 7,8 };
  	static const gchar *action_name[]	= { "ScrollUP", "ScrollDown" };
 
     if(event->direction < 2 && event->direction >= 0 && !WaitingForChanges)
@@ -784,7 +778,7 @@
 		if(action)
 			gtk_action_activate(action);
 		else
-			action_internal(PF_action, IA_DEFAULT, pfkey[event->direction], CN);
+			action_PFKey(pfkey[event->direction]);
 	}
 
  	return 0;
@@ -811,7 +805,7 @@
 	SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  }
 
- static void doSelect(XtActionProc call)
+ static void doSelect(int (*call)(void))
  {
  	if(select_mode == SELECT_MODE_NONE)
  	{
@@ -820,7 +814,7 @@
  		startCol = endCol = cCol;
  	}
 
- 	action_internal(call, IA_DEFAULT, CN, CN);
+ 	call();
 
 	endRow = cRow;
 	endCol = cCol;
@@ -830,22 +824,22 @@
 
  void action_SelectLeft(GtkWidget *w, gpointer user_data)
  {
- 	doSelect(Left_action);
+ 	doSelect(action_CursorLeft);
  }
 
  void action_SelectRight(GtkWidget *w, gpointer user_data)
  {
- 	doSelect(Right_action);
+ 	doSelect(action_CursorRight);
  }
 
  void action_SelectUp(GtkWidget *w, gpointer user_data)
  {
- 	doSelect(Up_action);
+ 	doSelect(action_CursorUp);
  }
 
  void action_SelectDown(GtkWidget *w, gpointer user_data)
  {
- 	doSelect(Down_action);
+ 	doSelect(action_CursorDown);
  }
 
  static void MoveSelection(int row, int col)

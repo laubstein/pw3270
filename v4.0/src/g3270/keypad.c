@@ -60,19 +60,19 @@
  	PFKey(key);
  }
 
- static void pa_button(GtkButton *button, gchar *key)
+ static void pa_button(GtkButton *button, int key)
  {
-	action_internal(PA_action, IA_DEFAULT, key, CN);
+ 	action_PAKey(key);
  }
 
- static void clear_and_call(GtkButton *button, XtActionProc call)
+ static void clear_and_call(GtkButton *button, int (*call)(void))
  {
  	action_ClearSelection();
  	if(call)
-		action_internal(call, IA_DEFAULT, CN, CN);
+		call();
  }
 
- static GtkWidget * image_button(const gchar *stock, XtActionProc call)
+ static GtkWidget * image_button(const gchar *stock, int (*call)(void))
  {
  	GtkWidget *widget = gtk_button_new();
  	gtk_container_add(GTK_CONTAINER(widget),gtk_image_new_from_stock(stock,GTK_ICON_SIZE_SMALL_TOOLBAR));
@@ -122,37 +122,32 @@
 	}
 
 	/* Create movement buttons */
-	SMALL_BUTTON(GTK_STOCK_GO_UP,Up_action,2,4);
-	SMALL_BUTTON(GTK_STOCK_GO_BACK,Left_action,0,5);
-	SMALL_BUTTON(GTK_STOCK_GOTO_TOP,Home_action,2,5);
-	SMALL_BUTTON(GTK_STOCK_GO_FORWARD,Right_action,4,5);
-	SMALL_BUTTON(GTK_STOCK_GO_DOWN,Down_action,2,6);
+	SMALL_BUTTON(GTK_STOCK_GO_UP,action_CursorUp,2,4);
+	SMALL_BUTTON(GTK_STOCK_GO_BACK,action_CursorLeft,0,5);
+	SMALL_BUTTON(GTK_STOCK_GOTO_TOP,action_FirstField,2,5);
+	SMALL_BUTTON(GTK_STOCK_GO_FORWARD,action_CursorRight,4,5);
+	SMALL_BUTTON(GTK_STOCK_GO_DOWN,action_CursorDown,2,6);
 
 	/* Create PA Buttons */
 	for(f=0;f<3;f++)
 	{
 		g_snprintf(label,9,"PA%d",f+1);
 		widget = gtk_button_new_with_label(label);
-
-		g_snprintf(label,9,"%d",f+1);
-
-		// FIXME (perry#2#): Add a closure function to "g_free" the allocated string.
-		g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(pa_button),g_strdup(label));
-
+		g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(pa_button),(gpointer) (f+1));
 		gtk_table_attach_defaults(GTK_TABLE(table),widget,(f<<1),(f<<1)+2,7,8);
 	}
 
 	/* Create extra buttons */
-	LARGE_BUTTON(GTK_STOCK_GOTO_FIRST,BackTab_action,0,8);
-	LARGE_BUTTON(GTK_STOCK_GOTO_LAST,Tab_action,1,8);
-	LARGE_TEXT_BUTTON( _( "Clear" ), Clear_action, 0, 9);
-	LARGE_TEXT_BUTTON( _( "Reset" ), Reset_action, 1, 9);
-	LARGE_TEXT_BUTTON( _( "Erase\nEOF" ), EraseEOF_action, 0, 10);
-	LARGE_TEXT_BUTTON( _( "Erase\nInput" ), EraseInput_action, 1, 10);
+	LARGE_BUTTON(GTK_STOCK_GOTO_FIRST,action_PreviousField,0,8);
+	LARGE_BUTTON(GTK_STOCK_GOTO_LAST,action_NextField,1,8);
+	LARGE_TEXT_BUTTON( _( "Clear" ), action_ClearFields, 0, 9);
+	LARGE_TEXT_BUTTON( _( "Reset" ), action_Reset, 1, 9);
+	LARGE_TEXT_BUTTON( _( "Erase\nEOF" ), action_EraseEOF, 0, 10);
+	LARGE_TEXT_BUTTON( _( "Erase\nInput" ), action_EraseInput, 1, 10);
 
 
 	/* "Enter" Button */
-	widget = image_button(GTK_STOCK_OK,Enter_action);
+	widget = image_button(GTK_STOCK_OK,action_Enter);
 	gtk_table_attach_defaults(GTK_TABLE(table),widget,0,6,11,12);
 
 	/* Buttons ok, add table */

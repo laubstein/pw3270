@@ -578,8 +578,7 @@ status_reset(void)
 
 }
 
-void
-status_reverse_mode(Boolean on)
+G3270_EXPORT void status_reverse_mode(int on)
 {
 	set(OIA_FLAG_REVERSE,on);
 }
@@ -598,7 +597,7 @@ G3270_EXPORT STATUS_CODE query_3270_terminal_status(void)
 	return current_status_code;
 }
 
-void status_changed(STATUS_CODE id)
+G3270_EXPORT void status_changed(STATUS_CODE id)
 {
 	if(id == current_status_code)
 		return;
@@ -617,21 +616,18 @@ status_syswait(void)
 }
 */
 
-void
-status_twait(void)
+G3270_EXPORT void status_twait(void)
 {
 	set(OIA_FLAG_UNDERA,False);
 	status_changed(STATUS_CODE_TWAIT);
 }
 
-void
-status_typeahead(Boolean on)
+G3270_EXPORT void status_typeahead(int on)
 {
 	set(OIA_FLAG_TYPEAHEAD,on);
 }
 
-void
-status_compose(Boolean on, unsigned char c, enum keytype keytype)
+G3270_EXPORT void status_compose(int on, unsigned char c, enum keytype keytype)
 {
 	if(callbacks && callbacks->compose)
 		callbacks->compose(on,c,keytype);
@@ -673,8 +669,7 @@ status_connect(int connected)
 
 }
 
-static void
-status_3270_mode(int ignored unused)
+static void status_3270_mode(int ignored unused)
 {
 	Boolean oia_boxsolid = (IN_3270 && !IN_SSCP);
 	if(oia_boxsolid)
@@ -683,13 +678,12 @@ status_3270_mode(int ignored unused)
 
 }
 
-static void
-status_printer(int on)
+static void status_printer(int on)
 {
 	set(OIA_FLAG_PRINTER,on);
 }
 
-void status_script(Boolean on)
+G3270_EXPORT void status_script(int on)
 {
 	set(OIA_FLAG_SCRIPT,on);
 }

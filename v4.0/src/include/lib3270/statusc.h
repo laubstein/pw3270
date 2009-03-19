@@ -15,23 +15,24 @@
 
 #include <lib3270/api.h>
 
-extern void status_compose(Boolean on, unsigned char c, enum keytype keytype);
-extern void status_ctlr_done(void);
-extern void status_script(Boolean on);
-extern void status_timing(struct timeval *t0, struct timeval *t1);
-extern void status_untiming(void);
+G3270_EXPORT void status_compose(int on, unsigned char c, enum keytype keytype);
+G3270_EXPORT void status_ctlr_done(void);
+G3270_EXPORT void status_script(int on);
+G3270_EXPORT void status_script(int on);
 
-extern void status_lu(const char *);
-extern void status_oerr(int error_type);
-extern void status_reset(void);
-extern void status_reverse_mode(Boolean on);
-extern void status_twait(void);
-extern void status_typeahead(Boolean on);
 
-extern void status_changed(STATUS_CODE id);
+G3270_EXPORT void status_timing(struct timeval *t0, struct timeval *t1);
+G3270_EXPORT void status_untiming(void);
 
-/* extern void status_minus(void); */
-/* extern void status_syswait(void); */
+G3270_EXPORT void status_lu(const char *);
+G3270_EXPORT void status_oerr(int error_type);
+G3270_EXPORT void status_reset(void);
+G3270_EXPORT void status_reverse_mode(int on);
+G3270_EXPORT void status_twait(void);
+G3270_EXPORT void status_typeahead(int on);
+
+G3270_EXPORT void status_changed(STATUS_CODE id);
+
 #define status_kybdlock() status_changed(STATUS_CODE_KYBDLOCK)
 #define status_syswait() status_changed(STATUS_CODE_SYSWAIT)
 #define status_minus() status_changed(STATUS_CODE_MINUS)
