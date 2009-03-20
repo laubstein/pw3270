@@ -13,5 +13,18 @@ xmlns:xlink="http://www.w3.org/1999/xlink">
     <OpenOffice.org-minimal-version value="2.2" d:name="OpenOffice.org 2.2"/>
   </dependencies>
 
+  <display-name>
+    <name lang="en">3270 access extension</name>
+  </display-name>
+ 
+  <icon>
+    <default xlink:href="g3270.png" />
+  </icon>
+
+  <extension-description>
+    <src xlink:href="description.txt" lang="en" />
+  </extension-description>
+
+
 
 </description>
