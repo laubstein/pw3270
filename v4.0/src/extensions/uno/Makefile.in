@@ -118,6 +118,8 @@ bin/Release/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Release/src/$(ba
 	@mkdir -p build.tmp/META-INF
 	@cp manifest.xml build.tmp/META-INF
 	@cp description.xml build.tmp
+	@cp description.txt build.tmp
+	@cp g3270.png build.tmp
 	@cp bin/Release/$(COMP_IMPL_NAME) build.tmp
 	@cp src/$(COMP_NAME).uno.rdb build.tmp
 	@cd build.tmp ; zip -m -r ../$@ .
