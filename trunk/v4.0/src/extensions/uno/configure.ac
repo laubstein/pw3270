@@ -32,6 +32,7 @@ OS_CFLAGS="-DUNX -DGCC -DLINUX=1"
 OS_DLLFLAGS="-shared -Wl,-soname,\$(@F)"
 OO_LIBS="-luno_cppu"
 CPPUENV="gcc3"
+SRCDIR="src/"
 
 case "$host" in
     *-mingw32)
@@ -39,7 +40,15 @@ case "$host" in
 		OS_CFLAGS="-DWNT -mms-bitfields"
 		OS_DLLFLAGS="-Wl,--add-stdcall-alias -Wl,--enable-auto-import -shared -Wl,-soname,\$(@F)"
 		OO_LIBS="-lisal -lcppu3"
+		;;
 
+    *-msvc)
+		DLLEXT=".dll"
+		OS_CFLAGS=""
+		OS_DLLFLAGS=""
+		OO_LIBS=""
+		SRCDIR="src\\\\"
+		;;
 esac
 
 # Optional
@@ -170,6 +179,7 @@ AC_SUBST(DLLEXT)
 AC_SUBST(OS_DLLFLAGS)
 AC_SUBST(OO_LIBS)
 AC_SUBST(CPPUENV)
+AC_SUBST(SRCDIR)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
