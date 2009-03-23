@@ -161,6 +161,7 @@ tgz: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 	@cp configure.ac $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
 	@cp *.in $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
 	@cp description.txt $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
+	@cp uno3270.png $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
 
 	@mkdir -p $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/src
 	@cp -R src/* $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/src
