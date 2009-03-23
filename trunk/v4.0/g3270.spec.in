@@ -1,10 +1,39 @@
 %define _rexx	%(which oorexx-config > /dev/null 2>&1; if [ "$?" = "0" ]; then echo 1; else echo 0; fi)
 
+%define _rel	0
+
+%define _fedora		%(if [ -f /etc/fedora-release ]; then echo 1; else echo 0; fi)
+%define _redhat		%(if [ -f /etc/redhat-release ]; then echo 1; else echo 0; fi)
+%define _mandrake	%(if [ -f /etc/mandrake-release ]; then echo 1; else echo 0; fi)
+
+%define _release	%{_rel}
+
+%if 0%{?suse_version}
+	%define _release %{_rel}.suse%{suse_version}
+%endif
+
+%if 0%{?mandriva_version}
+	%define _release %{_rel}.mdk%{mandrake_version}
+	%define _redhat 0
+%endif
+
+%if 0%{?fedora_version}
+	%define _release %{_rel}.fc%{fedora_version}
+	%define _redhat 0
+%endif
+
+%if 0%{?_redhat}
+	%define _redhat_prefix      %(grep -q "Red Hat Linux" /etc/redhat-release && echo rhl || echo el)
+	%define _redhat_vernum      %(rpm -qf --queryformat %{VERSION} /etc/redhat-release|tr -d '.')
+	%define _release          	%{_rel}.%{_redhat_prefix}%{_redhat_vernum}
+%endif
+
+
 Name:           @PACKAGE@
 License:        GPL
 Group:          System/X11/Terminals
 Version:        @PACKAGE_VERSION@
-Release:        @PACKAGE_RELEASE@.%_vendor
+Release:        %_release
 Summary:        IBM 3270 Terminal emulator for gtk.
 Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build

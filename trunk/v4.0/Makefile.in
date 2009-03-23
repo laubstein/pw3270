@@ -75,8 +75,6 @@ API_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 # Targets
 ####################################################################################################
 
-Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
-
 Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
 		src/g3270/$(PACKAGE).@LOGOEXT@ \
 		src/g3270/$(PACKAGE).ico \
@@ -86,10 +84,19 @@ Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
 	@msgfmt -c -v -o bin/Release/pt_BR.mo po/pt_BR.po
 	@rm -f bin/Release/gtk-runtime
 	@ln -s "@GTKRUNTIME@" bin/Release/gtk-runtime
+	@echo @PACKAGE@ Ok!
+
+Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
 
 run: bin/Debug/g3270@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
 	@cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270 --program-data="../../"
+
+rpm: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
+	mkdir -p `rpm --eval="%{u2p:%{_sourcedir}}"`
+	cp @PACKAGE@-@PACKAGE_VERSION@.tar.gz `rpm --eval="%{u2p:%{_sourcedir}}"`
+	rpmbuild -ba g3270.spec
+
 
 ####################################################################################################
 # Rules
