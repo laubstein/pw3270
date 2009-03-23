@@ -1,6 +1,3 @@
-%define _rexx	%(which oorexx-config > /dev/null 2>&1; if [ "$?" = "0" ]; then echo 1; else echo 0; fi)
-
-%define _uno	1
 %define	        ooo_prefix	%_libdir
 %define	        ooo_home	ooo3
 
@@ -31,6 +28,9 @@
 	%define _redhat_vernum      %(rpm -qf --queryformat %{VERSION} /etc/redhat-release|tr -d '.')
 	%define _release          	%{_rel}.%{_redhat_prefix}%{_redhat_vernum}
 %endif
+
+%define _uno	%(if [ -f %{ooo_prefix}/%{ooo_home}/solver/bin/idlc ]; then echo 1; else echo 0; fi)
+%define _rexx	%(which oorexx-config > /dev/null 2>&1; if [ "$?" = "0" ]; then echo 1; else echo 0; fi)
 
 
 Name:           @PACKAGE@
