@@ -36,7 +36,7 @@ OFFICE_PROGRAM ?= @OFFICE_PROGRAM@
 OO_INCLUDE_PATH ?= @OO_INCLUDE_PATH@
 OO_CXX_INCLUDE_PATH ?= @OO_INCLUDE_PATH@/offuh
 
-OO_CXXFLAGS ?= -DCPPU_ENV=$(CPPU_ENV) @OS_CFLAGS@ -DLANGUAGE_BINDING_NAME=\"$(CPPU_ENV)\" -I$(OO_INCLUDE_PATH) -I$(OO_CXX_INCLUDE_PATH) -Isrc/inc
+OO_CXXFLAGS ?= -DCPPU_ENV=$(CPPU_ENV) @OS_CFLAGS@ -DLANGUAGE_BINDING_NAME=\"$(CPPU_ENV)\" -I$(OO_INCLUDE_PATH) -I$(OO_CXX_INCLUDE_PATH) -I@SRCDIR@inc
 OO_LDFLAGS ?= -L@OO_URE_LIB@ -L$(OO_SDK_HOME)/lib -Wl,-rpath-link=@OO_URE_LIB@ @OO_LIBS@
 
 
@@ -71,17 +71,17 @@ REGCOMP ?= @REGCOMP@
 
 Release: @PACKAGE@.oxt
 
-obj/Release/src/%.o: src/%.cxx src/*.hpp src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp
+obj/Release/@SRCDIR@%.o: @SRCDIR@%.cxx @SRCDIR@*.hpp @SRCDIR@inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CXX) -DNDEBUG=1 $(CXXFLAGS) $(OO_CXXFLAGS) $(G3270_CFLAGS) -o $@ -c $<
 
-bin/Release/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Release/src/$(basename $(OBJ)).o)
+bin/Release/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Release/@SRCDIR@$(basename $(OBJ)).o)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CXX) $(OO_LDFLAGS) $(G3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^
 
-%.oxt: bin/Release/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb description.xml manifest.xml
+%.oxt: bin/Release/$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb description.xml manifest.xml
 	@echo $@
 	@rm -fr build.tmp
 	@mkdir -p build.tmp/META-INF
@@ -90,7 +90,7 @@ bin/Release/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Release/src/$(ba
 	@cp description.txt build.tmp
 	@cp uno3270.png build.tmp
 	@cp bin/Release/$(COMP_IMPL_NAME) build.tmp
-	@cp src/$(COMP_NAME).uno.rdb build.tmp
+	@cp @SRCDIR@$(COMP_NAME).uno.rdb build.tmp
 	@cd build.tmp ; zip -m -r ../$@ .
 	@echo $@ Ok.
 
@@ -98,23 +98,23 @@ bin/Release/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Release/src/$(ba
 
 Debug: bin/Debug/$(COMP_NAME)@EXEEXT@
 
-install-debug: bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb
+install-debug: bin/Debug/$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb
 	@cp -f bin/Debug/$(COMP_IMPL_NAME) $(DESTDIR)/$(OO_PROGRAM_DIR)
-	@cp -f src/$(COMP_NAME).uno.rdb $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb
+	@cp -f @SRCDIR@$(COMP_NAME).uno.rdb $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb
 	@$(REGCOMP) -register -r $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb -c $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_IMPL_NAME)
-	@echo "bin/Debug/$(COMP_IMPL_NAME) src/$(COMP_NAME).uno.rdb -> $(OO_PROGRAM_DIR)"
+	@echo "bin/Debug/$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb -> $(OO_PROGRAM_DIR)"
 
-bin/Debug/$(COMP_NAME)@EXEEXT@: obj/Debug/src/test_program.o bin/Debug/$(COMP_IMPL_NAME)
+bin/Debug/$(COMP_NAME)@EXEEXT@: obj/Debug/@SRCDIR@test_program.o bin/Debug/$(COMP_IMPL_NAME)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	$(CXX) $(OO_LDFLAGS) -L$(OO_SDK_HOME)/lib -luno_cppuhelpergcc3 -L./bin/Debug bin/Debug/$(COMP_IMPL_NAME) -o $@ obj/Debug/src/test_program.o
+	$(CXX) $(OO_LDFLAGS) -L$(OO_SDK_HOME)/lib -luno_cppuhelpergcc3 -L./bin/Debug bin/Debug/$(COMP_IMPL_NAME) -o $@ obj/Debug/@SRCDIR@test_program.o
 
-obj/Debug/src/%.o: src/%.cxx src/*.hpp src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp
+obj/Debug/@SRCDIR@%.o: @SRCDIR@%.cxx @SRCDIR@*.hpp @SRCDIR@inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CXX) -DDEBUG=1 $(CXXFLAGS) $(OO_CXXFLAGS) $(G3270_CFLAGS) -ggdb -o $@ -c $<
 
-bin/Debug/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Debug/src/$(basename $(OBJ)).o)
+bin/Debug/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Debug/@SRCDIR@$(basename $(OBJ)).o)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CXX)  $(G3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^ $(OO_LDFLAGS)
@@ -127,21 +127,21 @@ test: install-debug
 
 #---[ Uno Rules ]--------------------------------------------------------------------------------------------------
 
-src/$(COMP_NAME).uno.rdb : src/$(COMP_NAME).urd
+@SRCDIR@$(COMP_NAME).uno.rdb : @SRCDIR@$(COMP_NAME).urd
 	@echo $< ...
 	@rm -f $@
 	@$(REGMERGE) $@ / @TYPES_RDB@
 	@$(REGMERGE) $@ /UCR $<
 	@$(REGMERGE) $@ / $<
 
-src/$(COMP_NAME).urd: src/$(COMP_NAME).idl Makefile
+@SRCDIR@$(COMP_NAME).urd: @SRCDIR@$(COMP_NAME).idl Makefile
 	@echo $< ...
 	@$(IDLC) -C -I. -I$(OO_SDK_HOME)/idl -Osrc $<
 
-src/inc/$(OWNER_PATH)/$(INTF_NAME).hpp: src/$(COMP_NAME).uno.rdb
-	@rm -fr src/inc
-	@mkdir -p src/inc
-	@cd src/inc ; $(CPPUMAKER) -Gc -L -BUCR ../$(COMP_NAME).uno.rdb
+@SRCDIR@inc/$(OWNER_PATH)/$(INTF_NAME).hpp: @SRCDIR@$(COMP_NAME).uno.rdb
+	@rm -fr @SRCDIR@inc
+	@mkdir -p @SRCDIR@inc
+	@cd @SRCDIR@inc ; $(CPPUMAKER) -Gc -L -BUCR ../$(COMP_NAME).uno.rdb
 
 #---[ Misc Rules ]-------------------------------------------------------------------------------------------------
 
@@ -165,7 +165,7 @@ tgz: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 	@cp uno3270.png $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
 
 	@mkdir -p $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/src
-	@cp -R src/* $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/src
+	@cp -R @SRCDIR@* $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/src
 
 	@mkdir -p $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/scripts
 	@cp -R scripts/* $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/scripts
@@ -183,7 +183,7 @@ rpm: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 clean:
 	@rm -fr obj
 	@rm -fr bin
-	@rm -fr src/inc
+	@rm -fr @SRCDIR@inc
 	@rm -fr build.tmp
 	@rm -f @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 	@rm -f @PACKAGE@.oxt
