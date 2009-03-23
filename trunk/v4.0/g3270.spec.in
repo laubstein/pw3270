@@ -1,5 +1,6 @@
 %define	        ooo_prefix	%_libdir
 %define	        ooo_home	ooo3
+%define		ooo_sdk_home	%_libdir/ooo3/solver
 
 %define _rel	@PACKAGE_RELEASE@
 
@@ -29,7 +30,7 @@
 	%define _release          	%{_rel}.%{_redhat_prefix}%{_redhat_vernum}
 %endif
 
-%define _uno	%(if [ -f %{ooo_prefix}/%{ooo_home}/solver/bin/idlc ]; then echo 1; else echo 0; fi)
+%define _uno	%(if [ -f %{ooo_sdk_home}/bin/idlc ]; then echo 1; else echo 0; fi)
 %define _rexx	%(which oorexx-config > /dev/null 2>&1; if [ "$?" = "0" ]; then echo 1; else echo 0; fi)
 
 
@@ -98,6 +99,7 @@ Uno/OpenOffice library allowing 3270 access from StarBasic
 %prep
 
 %setup -q -n %{name}-%{version}
+
 autoconf
 %configure --disable-trace --with-release=@PACKAGE_RELEASE@
 
@@ -108,7 +110,7 @@ autoconf
 
 G3270_CFLAGS="-DV337=1 -I%{_builddir}/%{name}-%{version}/src/include" \
 G3270_LIBS="-L%{_builddir}/%{name}-%{version}/bin/Release -l3270" \
-./configure
+./configure --with-office-sdk-home="%{ooo_sdk_home}" --with-office-home="%{ooo_prefix}/%{ooo_home}"
 
 cd %{_builddir}/%{name}-%{version}
 %endif
