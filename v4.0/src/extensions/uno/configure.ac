@@ -31,9 +31,10 @@ DLLEXT=".so"
 OS_CFLAGS="-DUNX -DGCC -DLINUX=1"
 OS_DLLFLAGS="-shared -Wl,-soname,\$(@F)"
 OO_LIBS="-luno_cppu"
+CPPUENV=gcc3
 
 case "$host" in
-    *-mingw32)       
+    *-mingw32)
 		DLLEXT=".dll"
 		OS_CFLAGS="-DWNT -mms-bitfields"
 		OS_DLLFLAGS="-Wl,--add-stdcall-alias -Wl,--enable-auto-import -shared -Wl,-soname,\$(@F)"
@@ -163,12 +164,12 @@ AC_DEFINE_UNQUOTED(IMPLNAME,"$o3270_cv_implname")
 AC_DEFINE_UNQUOTED(OFFICE_HOME,"$o3270_cv_oohome")
 AC_DEFINE_UNQUOTED(OFFICE_PROGRAM,"$o3270_cv_ooprogram")
 
-# Misc values
 AC_SUBST(CXXFLAGS)
 AC_SUBST(OS_CFLAGS)
 AC_SUBST(DLLEXT)
 AC_SUBST(OS_DLLFLAGS)
 AC_SUBST(OO_LIBS)
+AC_SUBST(CPPUENV)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)

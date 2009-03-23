@@ -23,7 +23,7 @@ CXX_FILES = main.cxx connection.cxx screen.cxx actions.cxx
 
 #---[ Settings ]---------------------------------------------------------------------------------------------------
 
-CPPU_ENV ?= gcc3
+CPPU_ENV ?= @CPPUENV@
 
 #---[ OpenOffice environment variables ]---------------------------------------------------------------------------
 
@@ -119,7 +119,7 @@ bin/Release/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Release/src/$(ba
 	@cp manifest.xml build.tmp/META-INF
 	@cp description.xml build.tmp
 	@cp description.txt build.tmp
-	@cp g3270.png build.tmp
+	@cp uno3270.png build.tmp
 	@cp bin/Release/$(COMP_IMPL_NAME) build.tmp
 	@cp src/$(COMP_NAME).uno.rdb build.tmp
 	@cd build.tmp ; zip -m -r ../$@ .
@@ -160,6 +160,7 @@ tgz: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 	@cp AUTHORS $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
 	@cp configure.ac $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
 	@cp *.in $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
+	@cp description.txt $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@
 
 	@mkdir -p $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/src
 	@cp -R src/* $(TMPDIR)/@PACKAGE@-@PACKAGE_VERSION@/src
@@ -183,6 +184,7 @@ clean:
 	@rm -fr src/inc
 	@rm -fr build.tmp
 	@rm -f @PACKAGE@-@PACKAGE_VERSION@.tar.gz
+	@rm -fr build.tmp
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
