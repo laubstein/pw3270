@@ -31,7 +31,7 @@ DLLEXT=".so"
 OS_CFLAGS="-DUNX -DGCC -DLINUX=1"
 OS_DLLFLAGS="-shared -Wl,-soname,\$(@F)"
 OO_LIBS="-luno_cppu"
-CPPUENV=gcc3
+CPPUENV="gcc3"
 
 case "$host" in
     *-mingw32)
