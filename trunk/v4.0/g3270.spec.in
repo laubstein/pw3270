@@ -1,6 +1,10 @@
 %define _rexx	%(which oorexx-config > /dev/null 2>&1; if [ "$?" = "0" ]; then echo 1; else echo 0; fi)
 
-%define _rel	0
+%define _uno	1
+%define	        ooo_prefix	%_libdir
+%define	        ooo_home	ooo3
+
+%define _rel	@PACKAGE_RELEASE@
 
 %define _fedora		%(if [ -f /etc/fedora-release ]; then echo 1; else echo 0; fi)
 %define _redhat		%(if [ -f /etc/redhat-release ]; then echo 1; else echo 0; fi)
@@ -76,21 +80,55 @@ Plugin to add Rexx support in %{name}
 
 %endif
 
+
+%if 0%{?_uno}
+%package OpenOffice
+Provides:	%{name}-OpenOffice
+Group:		Productivity/Office/Suite
+Summary:	3270 calls for OpenOffice/StarBasic.
+Requires:	%{name}-lib = @PACKAGE_VERSION@ OpenOffice_org-libs-core
+BuildRequires:	autoconf sed pkgconfig zip OpenOffice_org-ure-devel
+
+%description OpenOffice
+Uno/OpenOffice library allowing 3270 access from StarBasic
+
+%endif
+
+
 %prep
 
 %setup -q -n %{name}-%{version}
 autoconf
-%configure --disable-trace --with-release=%{release}
+%configure --disable-trace --with-release=@PACKAGE_RELEASE@
+
+%if 0%{?_uno}
+cd %{_builddir}/%{name}-%{version}/src/extensions/uno
+
+autoconf
+
+G3270_CFLAGS="-DV337=1 -I%{_builddir}/%{name}-%{version}/src/include" \
+G3270_LIBS="-L%{_builddir}/%{name}-%{version}/bin/Release -l3270" \
+./configure
+
+cd %{_builddir}/%{name}-%{version}
+%endif
 
 %build
 make clean
 make Release
+
+%if 0%{?_uno}
+make -C src/extensions/uno Release
+%endif
+
 make src/g3270/g3270.@LOGOEXT@
 strip bin/Release/g3270
 strip bin/Release/lib3270.so
 
+
 %install
 rm -rf $RPM_BUILD_ROOT
+cd %{_builddir}/%{name}-%{version}
 %makeinstall
 
 # Desktop menu entry
@@ -124,6 +162,12 @@ install -m 644 ui/rexx.xml %{buildroot}%{_datadir}/%{name}/ui/rexx.xml
 ln -s %{_libdir}/%{name}/plugins/rx3270.so %{buildroot}%{_libdir}/librx3270.so
 %endif
 
+%if 0%{?_uno}
+mkdir -p $RPM_BUILD_ROOT/%ooo_prefix/%ooo_home/share/extension/install/
+install -m 644 src/extensions/uno/g3270-openoffice.oxt $RPM_BUILD_ROOT/%ooo_prefix/%ooo_home/share/extension/install/%{name}-openoffice.oxt
+%endif
+
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -145,11 +189,20 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/ldconfig
 /usr/bin/update-mime-database /usr/share/mime >/dev/null
 
+%if 0%{?_uno}
+%post OpenOffice
+unopkg add --shared %{name}-openoffice.oxt
+
+%preun OpenOffice
+unopkg remove --shared %{name}-openoffice.oxt
+%endif
+
 %files lib
 %defattr(-,root,root)
 %{_libdir}/lib3270.so
 
 %files devel
+%defattr(-,root,root)
 %{_includedir}/lib3270
 %{_libdir}/pkgconfig
 %{_datadir}/%{name}/ui/debug.xml
@@ -160,6 +213,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/%{name}/plugins/rx3270.so
 %{_datadir}/%{name}/ui/rexx.xml
 %{_libdir}/librx3270.so
+%endif
+
+%if 0%{?_uno}
+%files OpenOffice
+%defattr(-,root,root)
+%ooo_prefix/%ooo_home/share/extension/install/*.oxt
 %endif
 
 
