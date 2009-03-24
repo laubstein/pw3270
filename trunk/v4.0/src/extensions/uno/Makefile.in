@@ -71,17 +71,17 @@ REGCOMP ?= @REGCOMP@
 
 Release: @PACKAGE@.oxt
 
-obj/Release/@SRCDIR@%.o: @SRCDIR@%.cxx @SRCDIR@*.hpp @SRCDIR@inc/$(OWNER_PATH)/$(INTF_NAME).hpp
+@OBJRLSDIR@%.o: %.cxx @SRCDIR@*.hpp @SRCDIR@inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CXX) -DNDEBUG=1 $(CXXFLAGS) $(OO_CXXFLAGS) $(G3270_CFLAGS) -o $@ -c $<
 
-bin/Release/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Release/@SRCDIR@$(basename $(OBJ)).o)
+@BINRLSDIR@$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), @OBJRLSDIR@@SRCDIR@$(basename $(OBJ)).o)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CXX) $(OO_LDFLAGS) $(G3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^
 
-%.oxt: bin/Release/$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb description.xml manifest.xml
+%.oxt: @BINRLSDIR@$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb description.xml manifest.xml
 	@echo $@
 	@rm -fr build.tmp
 	@mkdir -p build.tmp/META-INF
@@ -89,38 +89,38 @@ bin/Release/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Release/@SRCDIR@
 	@cp description.xml build.tmp
 	@cp description.txt build.tmp
 	@cp uno3270.png build.tmp
-	@cp bin/Release/$(COMP_IMPL_NAME) build.tmp
+	@cp @BINRLSDIR@$(COMP_IMPL_NAME) build.tmp
 	@cp @SRCDIR@$(COMP_NAME).uno.rdb build.tmp
 	@cd build.tmp ; zip -m -r ../$@ .
 	@echo $@ Ok.
 
 #---[ Debug Rules ]------------------------------------------------------------------------------------------------
 
-Debug: bin/Debug/$(COMP_NAME)@EXEEXT@
+Debug: @BINDBGDIR@$(COMP_NAME)@EXEEXT@
 
-install-debug: bin/Debug/$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb
-	@cp -f bin/Debug/$(COMP_IMPL_NAME) $(DESTDIR)/$(OO_PROGRAM_DIR)
+install-debug: @BINDBGDIR@$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb
+	@cp -f @BINDBGDIR@$(COMP_IMPL_NAME) $(DESTDIR)/$(OO_PROGRAM_DIR)
 	@cp -f @SRCDIR@$(COMP_NAME).uno.rdb $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb
 	@$(REGCOMP) -register -r $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb -c $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_IMPL_NAME)
-	@echo "bin/Debug/$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb -> $(OO_PROGRAM_DIR)"
+	@echo "@BINDBGDIR@$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb -> $(OO_PROGRAM_DIR)"
 
-bin/Debug/$(COMP_NAME)@EXEEXT@: obj/Debug/@SRCDIR@test_program.o bin/Debug/$(COMP_IMPL_NAME)
+@BINDBGDIR@$(COMP_NAME)@EXEEXT@: @OBJDBGDIR@@SRCDIR@test_program.o @BINDBGDIR@$(COMP_IMPL_NAME)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	$(CXX) $(OO_LDFLAGS) -L$(OO_SDK_HOME)/lib -luno_cppuhelpergcc3 -L./bin/Debug bin/Debug/$(COMP_IMPL_NAME) -o $@ obj/Debug/@SRCDIR@test_program.o
+	$(CXX) $(OO_LDFLAGS) -L$(OO_SDK_HOME)/lib -luno_cppuhelpergcc3 -L./bin/Debug @BINDBGDIR@$(COMP_IMPL_NAME) -o $@ @OBJDBGDIR@@SRCDIR@test_program.o
 
-obj/Debug/@SRCDIR@%.o: @SRCDIR@%.cxx @SRCDIR@*.hpp @SRCDIR@inc/$(OWNER_PATH)/$(INTF_NAME).hpp
+@OBJDBGDIR@%.o: %.cxx @SRCDIR@*.hpp @SRCDIR@inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CXX) -DDEBUG=1 $(CXXFLAGS) $(OO_CXXFLAGS) $(G3270_CFLAGS) -ggdb -o $@ -c $<
 
-bin/Debug/$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), obj/Debug/@SRCDIR@$(basename $(OBJ)).o)
+@BINDBGDIR@$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), @OBJDBGDIR@@SRCDIR@$(basename $(OBJ)).o)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CXX)  $(G3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^ $(OO_LDFLAGS)
 
-run: bin/Debug/$(COMP_NAME)@EXEEXT@
-	@LD_LIBRARY_PATH=$(OO_SDK_HOME)/ure/lib:$(OFFICE_HOME)/ure/lib:bin/Debug bin/Debug/$(COMP_NAME)
+run: @BINDBGDIR@$(COMP_NAME)@EXEEXT@
+	@LD_LIBRARY_PATH=$(OO_SDK_HOME)/ure/lib:$(OFFICE_HOME)/ure/lib:bin/Debug @BINDBGDIR@$(COMP_NAME)
 
 test: install-debug
 	$(OFFICE_PROGRAM)
