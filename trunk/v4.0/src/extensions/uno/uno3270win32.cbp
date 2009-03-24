@@ -54,12 +54,13 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="/MD" />
 			<Add option="/DWNT=1" />
 			<Add option="/DWIN32=1" />
 			<Add option='/DLANGUAGE_BINDING_NAME=\&quot;MSC\&quot;' />
-			<Add directory="H:\BrOffice.org.win32.sdk\sdk\include" />
 			<Add directory=".\src\inc" />
 			<Add directory="C:\Arquivos de programas\g3270\sdk\include" />
+			<Add directory="C:\Arquivos de programas\BrOffice.org 3\Basis\sdk\include" />
 		</Compiler>
 		<Linker>
 			<Add library="h:\BrOffice.org.win32.sdk\sdk\lib\isal.lib" />
