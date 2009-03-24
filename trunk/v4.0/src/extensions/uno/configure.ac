@@ -46,13 +46,6 @@ case "$host" in
 		OO_LIBS="-lisal -lcppu3"
 		;;
 
-    *-msvc)
-		DLLEXT=".dll"
-		OS_CFLAGS=""
-		OS_DLLFLAGS=""
-		OO_LIBS=""
-		SRCDIR="src\\\\"
-		;;
 esac
 
 # Optional

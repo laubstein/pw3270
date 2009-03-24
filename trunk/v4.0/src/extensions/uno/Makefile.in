@@ -104,7 +104,7 @@ install-debug: @BINDBGDIR@$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb
 	@$(REGCOMP) -register -r $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_NAME).uno.rdb -c $(DESTDIR)/$(OO_PROGRAM_DIR)/$(COMP_IMPL_NAME)
 	@echo "@BINDBGDIR@$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb -> $(OO_PROGRAM_DIR)"
 
-@BINDBGDIR@$(COMP_NAME)@EXEEXT@: @OBJDBGDIR@@SRCDIR@test_program.o @BINDBGDIR@$(COMP_IMPL_NAME)
+@BINDBGDIR@$(COMP_NAME)@EXEEXT@: @BINDBGDIR@$(COMP_IMPL_NAME) @OBJDBGDIR@@SRCDIR@test_program.o
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	$(CXX) $(OO_LDFLAGS) -L$(OO_SDK_HOME)/lib -luno_cppuhelpergcc3 -L./bin/Debug @BINDBGDIR@$(COMP_IMPL_NAME) -o $@ @OBJDBGDIR@@SRCDIR@test_program.o
