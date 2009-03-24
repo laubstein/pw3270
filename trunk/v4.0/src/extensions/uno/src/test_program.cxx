@@ -1,6 +1,9 @@
 
 #include <stdio.h>
-#include <unistd.h>
+
+#ifndef WIN32
+    #include <unistd.h>
+#endif
 
 #include <rtl/ustring.hxx>
 

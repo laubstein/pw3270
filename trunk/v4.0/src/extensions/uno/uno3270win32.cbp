@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="uno3270win32" />
+		<Option platforms="Windows;" />
+		<Option makefile="Makefile.win32" />
+		<Option pch_mode="2" />
+		<Option compiler="msvc8" />
+		<Build>
+			<Target title="Debug">
+				<Option platforms="Windows;" />
+				<Option output="bin\windbg\Ooo3270" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\windbg\" />
+				<Option type="3" />
+				<Option compiler="msvc8" />
+				<Compiler>
+					<Add option="/MDd" />
+					<Add option="/Zi /D_DEBUG" />
+					<Add option="/Zi" />
+					<Add option="/DBUILD_DLL" />
+					<Add option="/D_DEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="/DEBUG" />
+					<Add option="/INCREMENTAL:NO" />
+					<Add library="user32" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='mt.exe /nologo /manifest &quot;bin\windbg\Ooo3270.dll.manifest&quot; /outputresource:&quot;bin\windbg\Ooo3270.dll&quot;;2' />
+				</ExtraCommands>
+			</Target>
+			<Target title="Release">
+				<Option output="bin\winrls\Ooo3270" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\winrls\" />
+				<Option type="3" />
+				<Option compiler="msvc8" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="/W3" />
+					<Add option="/DBUILD_DLL" />
+					<Add option="/Ox" />
+					<Add option="/DNDEBUG" />
+					<Add option="/MD" />
+				</Compiler>
+				<Linker>
+					<Add option="/INCREMENTAL:NO" />
+					<Add library="user32" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='mt.exe /nologo /manifest &quot;bin\winrls\uno3270win32.dll.manifest&quot; /outputresource:&quot;bin\winrls\uno3270win32.dll&quot;;2' />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="/DWNT=1" />
+			<Add option="/DWIN32=1" />
+			<Add option='/DLANGUAGE_BINDING_NAME=\&quot;MSC\&quot;' />
+			<Add directory="H:\BrOffice.org.win32.sdk\sdk\include" />
+			<Add directory=".\src\inc" />
+			<Add directory="C:\Arquivos de programas\g3270\sdk\include" />
+		</Compiler>
+		<Linker>
+			<Add library="h:\BrOffice.org.win32.sdk\sdk\lib\isal.lib" />
+			<Add library="H:\BrOffice.org.win32.sdk\sdk\lib\icppuhelper.lib" />
+			<Add library="H:\BrOffice.org.win32.sdk\sdk\lib\icppu.lib" />
+			<Add library="C:\Arquivos de programas\g3270\sdk\lib\lib3270.lib" />
+		</Linker>
+		<Unit filename="src\Ooo3270.idl" />
+		<Unit filename="src\actions.cxx" />
+		<Unit filename="src\config.hpp.in" />
+		<Unit filename="src\connection.cxx" />
+		<Unit filename="src\main.cxx" />
+		<Unit filename="src\ooo3270.hpp" />
+		<Unit filename="src\screen.cxx" />
+		<Unit filename="src\test_program.cxx" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
