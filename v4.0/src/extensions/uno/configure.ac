@@ -33,6 +33,10 @@ OS_DLLFLAGS="-shared -Wl,-soname,\$(@F)"
 OO_LIBS="-luno_cppu"
 CPPUENV="gcc3"
 SRCDIR="src/"
+OBJDBGDIR="obj/Debug/"
+OBJRLSDIR="obj/Release/"
+BINDBGDIR="bin/Debug/"
+BINRLSDIR="bin/Release/"
 
 case "$host" in
     *-mingw32)
@@ -180,6 +184,10 @@ AC_SUBST(OS_DLLFLAGS)
 AC_SUBST(OO_LIBS)
 AC_SUBST(CPPUENV)
 AC_SUBST(SRCDIR)
+AC_SUBST(OBJDBGDIR)
+AC_SUBST(OBJRLSDIR)
+AC_SUBST(BINDBGDIR)
+AC_SUBST(BINRLSDIR)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
