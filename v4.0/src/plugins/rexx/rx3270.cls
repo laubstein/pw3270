@@ -1,7 +1,7 @@
 /*-- REXX -----------------------------------------------------------------------*/
 /*                                                                               */
 /* "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270 */
-/* (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a */ 
+/* (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a */
 /* aplicativos mainframe.                                                        */
 /*                                                                               */
 /* Copyright (C) <2008> <Banco do Brasil S.A.>                                   */
@@ -45,11 +45,10 @@ end
 ::method init
 	if arg() > 0
 		then raise syntax 40.4 array ('INIT', 0)
-
 return
 
 ::method uninit
-
+	ok = rx3270Disconnect()
 return
 
 ::method Connect
@@ -66,7 +65,7 @@ return rx3270QueryCState()
 return getConnectionState() = "CONNECTED_TN3270E"
 
 ::method waitForEvents
-return rx3270UpdateScreen()
+return rx3270WaitForEvents()
 
 ::method getScreenContentAt
 	use arg row, col, size
@@ -75,33 +74,20 @@ return rx3270ReadScreen(row,col,size)
 ::method getScreenContent
 return rx3270ReadScreen()
 
-::method waitForReset
-
-TODO
-
-	use arg timeout
-
 ::method waitForStringAt
-
-TODO
-
 	use arg row, col, key, timeout
+return rx3270WaitForStringAt(row,col,key,timeout)
 
 ::method queryStringAt
 	use arg row, col, key
 return getScreenContentAt(row,col,length(key)) == key
 
-
 ::method isTerminalReady
-
-TODO
+return rx3270IsTerminalReady()
 
 ::method waitForTerminalReady
-
 	use arg timeout
-
-TODO
-
+return rx3270WaitForTerminalReady(timeout)
 
 ::method setStringAt
 	use arg row, col, str

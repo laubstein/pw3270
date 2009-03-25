@@ -160,7 +160,9 @@ install -m 644 %{name}.pc %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
 install -m 644 ui/debug.xml %{buildroot}%{_datadir}/%{name}/ui/debug.xml
 
 %if 0%{?_rexx}
+install -m 644 src/plugins/rexx/rx3270.cls %{buildroot}%{_bindir}/rx3270.cls
 install -m 644 ui/rexx.xml %{buildroot}%{_datadir}/%{name}/ui/rexx.xml
+
 ln -s %{_libdir}/%{name}/plugins/rx3270.so %{buildroot}%{_libdir}/librx3270.so
 %endif
 
@@ -215,6 +217,7 @@ unopkg remove --shared %{name}-openoffice.oxt
 %{_libdir}/%{name}/plugins/rx3270.so
 %{_datadir}/%{name}/ui/rexx.xml
 %{_libdir}/librx3270.so
+%{_bindir}/rx3270.cls
 %endif
 
 %if 0%{?_uno}
