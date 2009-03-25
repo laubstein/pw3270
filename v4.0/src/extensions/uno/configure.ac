@@ -43,7 +43,7 @@ case "$host" in
 		DLLEXT=".dll"
 		OS_CFLAGS="-DWNT -mms-bitfields"
 		OS_DLLFLAGS="-Wl,--add-stdcall-alias -Wl,--enable-auto-import -shared -Wl,-soname,\$(@F)"
-		OO_LIBS="-lisal -lcppu3"
+		OO_LIBS="-lisal -licppuhelper -licppu"
 		;;
 
 esac
