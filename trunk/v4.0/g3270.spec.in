@@ -193,7 +193,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %if 0%{?_uno}
 %post OpenOffice
-unopkg add --shared %{name}-openoffice.oxt
+unopkg add --shared %ooo_prefix/%ooo_home/share/extension/install/%{name}-openoffice.oxt
 
 %preun OpenOffice
 unopkg remove --shared %{name}-openoffice.oxt
