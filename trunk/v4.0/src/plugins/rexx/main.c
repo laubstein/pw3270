@@ -70,7 +70,7 @@
 	EXPORT_REXX_FUNCTION( rx3270Toggled				    ),
 	EXPORT_REXX_FUNCTION( rx3270Log					    ),
 	EXPORT_REXX_FUNCTION( rx3270QueryCState			    ),
-	EXPORT_REXX_FUNCTION( rx3270UpdateScreen		    ),
+	EXPORT_REXX_FUNCTION( rx3270WaitForEvents		    ),
 	EXPORT_REXX_FUNCTION( rx3270Sleep				    ),
 	EXPORT_REXX_FUNCTION( rx3270InputString			    ),
 	EXPORT_REXX_FUNCTION( rx3270FindFieldAttribute	    ),
@@ -82,6 +82,10 @@
 	EXPORT_REXX_FUNCTION( rx3270WaitForChanges		    ),
 	EXPORT_REXX_FUNCTION( rx3270SendENTERKey			),
 	EXPORT_REXX_FUNCTION( rx3270WaitForString			),
+	EXPORT_REXX_FUNCTION( rx3270WaitForStringAt			),
+	EXPORT_REXX_FUNCTION( rx3270IsTerminalReady			),
+	EXPORT_REXX_FUNCTION( rx3270WaitForTerminalReady	),
+
  };
 
  static const struct entrypoint plugin_entrypoint[] =

@@ -222,6 +222,108 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
+/* Rexx External Function: rx3270WaitForStringAt                              */
+/*                                                                            */
+/* Description: Wait for desired string at position                           */
+/*                                                                            */
+/* Rexx Args:	NONE to read the entire screen                                */
+/*                                                                            */
+/* Rexx Args:   Number of chars to read from cursor position                  */
+/*                                                                            */
+/* Rexx Args:   row                                                           */
+/*				Col													  		  */
+/*              string                                       				  */
+/*				timeout (seconds)											  */
+/*                                                                            */
+/* Rexx Args:   row                                                           */
+/*				Col													  		  */
+/*              string                                       				  */
+/*                                                                            */
+/* Rexx Args:   string                                                        */
+/*                                                                            */
+/* Rexx Args:   string                                                        */
+/*              timeout                                                       */
+/*                                                                            */
+/* Returns:	    0 if the string is in the screen or error code                */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270WaitForStringAt(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	int start, sz, rows, cols, row, col, end = time(0), rc;
+ 	const char *key;
+ 	char *buffer;
+
+	screen_size(&rows,&cols);
+
+	switch(Argc)
+	{
+	case 1:	// 1 parameter, search for string in the entire screen with 1 second timeout
+		row = col = 0;
+		key = Argv[0].strptr;
+		end++;
+		sz = (rows*cols)+1;
+		break;
+
+	case 2:	// 2 parameters, search for string in the entire screen with supplied timeout
+		row = col = 0;
+		key = Argv[0].strptr;
+		end += atoi(Argv[1].strptr);
+		sz = (rows*cols)+1;
+		break;
+
+	case 3:	// 3 parameters assume timeout of 1 second
+		row = atoi(Argv[0].strptr)-1;
+		col = atoi(Argv[1].strptr)-1;
+		key = Argv[2].strptr;
+		sz = strlen(key);
+		end++;
+		break;
+
+	case 4:	// All parameters
+		row = atoi(Argv[0].strptr)-1;
+		col = atoi(Argv[1].strptr)-1;
+		key = Argv[2].strptr;
+		sz = strlen(key);
+		end += atoi(Argv[3].strptr);
+		break;
+
+	default:
+		return RXFUNC_BADCALL;
+	}
+
+	if(row < 0 || row > rows || col < 0 || col > cols)
+	{
+		ReturnValue(EINVAL);
+	}
+
+	start = ((row) * cols) + col;
+	rc = ETIMEDOUT;
+
+	buffer = malloc(sz);
+
+	while( (rc == ETIMEDOUT) && (time(0) <= end) )
+	{
+		if(!CONNECTED)
+		{
+			rc = ENOTCONN;
+		}
+		else
+		{
+			RunPendingEvents(1);
+			screen_read(buffer,start,sz);
+			if(!strstr(buffer,key))
+				rc = 0;
+		}
+	}
+
+	free(buffer);
+
+	ReturnValue(rc);
+
+ }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
 /* Rexx External Function: rx3270ReadScreen                                   */
 /*                                                                            */
 /* Description: Read screen contents.                                         */
@@ -536,3 +638,73 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 
 	ReturnValue(rc);
  }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270IsTerminalReady                              */
+/*                                                                            */
+/* Description: Check if the terminal is ready                                */
+/*                                                                            */
+/* Rexx Args:   None                                                          */
+/*                                                                            */
+/* Returns:	    Non zero if terminal is ready                                 */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ULONG APIENTRY rx3270IsTerminalReady(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+{
+    if(Argc)
+		return RXFUNC_BADCALL;
+
+	if(!CONNECTED || query_3270_terminal_status() != STATUS_CODE_BLANK)
+	{
+		ReturnValue(0);
+	}
+
+	ReturnValue(1);
+}
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270WaitForTerminalReady                         */
+/*                                                                            */
+/* Description: Wait for terminal status is ready                             */
+/*                                                                            */
+/* Rexx Args:	timeout                                                       */
+/*                                                                            */
+/* Rexx Args:	None for 1 second timeout.                                    */
+/*                                                                            */
+/* Returns:	    0 if ok or error code                                         */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270WaitForTerminalReady(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	int end = time(0);
+ 	int rc = ETIMEDOUT;
+
+ 	switch(Argc)
+ 	{
+	case 0:
+		end++;
+		break;
+
+	case 1:
+		end += atoi(Argv[0].strptr);
+		break;
+
+	default:
+		return RXFUNC_BADCALL;
+ 	}
+
+	while( (rc == ETIMEDOUT) && (time(0) <= end) )
+	{
+		RunPendingEvents(TRUE);
+
+		if(!CONNECTED)
+            rc = ENOTCONN;
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
+			rc = 0;
+	}
+
+	ReturnValue(rc);
+ }
+

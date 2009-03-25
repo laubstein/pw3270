@@ -78,12 +78,32 @@ ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename,
  }
 
 
- ULONG APIENTRY rx3270UpdateScreen(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270WaitForEvents                                */
+/*                                                                            */
+/* Description: Wait for network/screen events                                */
+/*                                                                            */
+/* Rexx Args:   non zero to wait.                                             */
+/*                                                                            */
+/* Returns:	    None                                                          */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270WaitForEvents(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
-	if(Argc)
-		return RXFUNC_BADCALL;
+ 	switch(Argc)
+ 	{
+	case 0:
+		RunPendingEvents(0);
+		break;
 
-	RunPendingEvents(0);
+	case 1:
+		RunPendingEvents(atoi(Argv[0].strptr));
+		break;
+
+	default:
+		return RXFUNC_BADCALL;
+ 	}
 
 	return RetValue(Retstr,0);
  }

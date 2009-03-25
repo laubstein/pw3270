@@ -277,6 +277,7 @@
 		<Unit filename="src/plugins/rexx/network.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/plugins/rexx/rx3270.cls" />
 		<Unit filename="src/plugins/rexx/rx3270.h" />
 		<Unit filename="src/plugins/rexx/screen.c">
 			<Option compilerVar="CC" />
