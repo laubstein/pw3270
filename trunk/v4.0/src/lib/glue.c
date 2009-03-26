@@ -257,6 +257,8 @@ int lib3270_init(const char *program_path)
 	printer_init();
 #endif
 
+	Trace("%s finished",__FUNCTION__);
+
 	return 0;
 }
 
@@ -266,6 +268,8 @@ int lib3270_init(const char *program_path)
 static void initialize(void)
 {
 	memset(&appres,0,sizeof(appres));
+
+	Trace("%s","Initializing library");
 
 	initialize_toggles();
 
@@ -387,8 +391,8 @@ static void initialize(void)
 BOOL WINAPI DllMain(HANDLE hinst, DWORD dwcallpurpose, LPVOID lpvResvd)
 {
 
-    if (dwcallpurpose == DLL_PROCESS_ATTACH)
-		initialize();
+    if(dwcallpurpose == DLL_PROCESS_ATTACH)
+	initialize();
 
     return TRUE;
 }

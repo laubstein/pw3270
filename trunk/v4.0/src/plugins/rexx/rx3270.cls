@@ -21,11 +21,11 @@
 /*                                                                               */
 /* Contatos:                                                                     */
 /*                                                                               */
-/* perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)               */
-/* erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)                     */
-/* licinio@bb.com.br		(Licínio Luis Branco)                            */
-/* kraucer@bb.com.br		(Kraucer Fernandes Mazuco)                       */
-/* macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)                   */
+/* perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)                   */
+/* erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)                         */
+/* licinio@bb.com.br		(Licínio Luis Branco)                                */
+/* kraucer@bb.com.br		(Kraucer Fernandes Mazuco)                           */
+/* macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)                       */
 /*                                                                               */
 /*-------------------------------------------------------------------------------*/
 
