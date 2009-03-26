@@ -84,7 +84,7 @@ int SAL_CALL main(int argc, char **argv)
 		Reference< XInterface > xx ;
 		xx = xMgr->createInstanceWithContext(OUString::createFromAscii(IMPLNAME), xContext);
 
-        Trace("Instance: %p",xx);
+        Trace("Instance: %p",&xx);
 
 		Reference< I3270 > srv( xx, UNO_QUERY );
 
