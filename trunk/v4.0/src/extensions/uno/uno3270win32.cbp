@@ -8,27 +8,6 @@
 		<Option pch_mode="2" />
 		<Option compiler="msvc8" />
 		<Build>
-			<Target title="Debug">
-				<Option platforms="Windows;" />
-				<Option output="bin\windbg\Ooo3270" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\windbg\" />
-				<Option type="1" />
-				<Option compiler="msvc8" />
-				<Compiler>
-					<Add option="/MDd" />
-					<Add option="/Zi /D_DEBUG" />
-					<Add option="/Zi" />
-					<Add option="/EHsc" />
-					<Add option="/DBUILD_DLL" />
-					<Add option="/D_DEBUG" />
-					<Add option="/DDEBUG" />
-				</Compiler>
-				<Linker>
-					<Add option="/DEBUG" />
-					<Add option="/INCREMENTAL:NO" />
-					<Add library="user32" />
-				</Linker>
-			</Target>
 			<Target title="Release">
 				<Option output="bin\winrls\Ooo3270" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\winrls\" />
@@ -51,6 +30,50 @@
 					<Add after='mt.exe /nologo /manifest &quot;bin\winrls\uno3270win32.dll.manifest&quot; /outputresource:&quot;bin\winrls\uno3270win32.dll&quot;;2' />
 				</ExtraCommands>
 			</Target>
+			<Target title="Debug DLL">
+				<Option platforms="Windows;" />
+				<Option output="bin\windbg\Ooo3270.uno" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin\windbg" />
+				<Option object_output="obj\windbg\" />
+				<Option external_deps="src\Ooo3270.uno.rdb;" />
+				<Option type="3" />
+				<Option compiler="msvc8" />
+				<Compiler>
+					<Add option="/MDd" />
+					<Add option="/Zi /D_DEBUG" />
+					<Add option="/Zi" />
+					<Add option="/EHsc" />
+					<Add option="/DBUILD_DLL" />
+					<Add option="/D_DEBUG" />
+					<Add option="/DDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="/DEBUG" />
+					<Add option="/INCREMENTAL:NO" />
+					<Add library="user32" />
+				</Linker>
+			</Target>
+			<Target title="Test Program">
+				<Option platforms="Windows;" />
+				<Option output="bin\windbg\test_program" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\windbg\" />
+				<Option external_deps="bin\windbg\Ooo3270.uno.dll;" />
+				<Option type="1" />
+				<Option compiler="msvc8" />
+				<Compiler>
+					<Add option="/MDd" />
+					<Add option="/Zi /D_DEBUG" />
+					<Add option="/Zi" />
+					<Add option="/EHsc" />
+					<Add option="/D_DEBUG" />
+					<Add option="/DDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="/DEBUG" />
+					<Add option="/INCREMENTAL:NO" />
+					<Add library="user32" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="/MD" />
@@ -67,15 +90,36 @@
 			<Add library="H:\BrOffice.org.win32.sdk\sdk\lib\icppu.lib" />
 			<Add library="C:\Arquivos de programas\g3270\sdk\lib\lib3270.lib" />
 		</Linker>
-		<Unit filename="src\Ooo3270.idl" />
-		<Unit filename="src\actions.cxx" />
-		<Unit filename="src\config.hpp.in" />
-		<Unit filename="src\connection.cxx" />
-		<Unit filename="src\main.cxx" />
-		<Unit filename="src\ooo3270.hpp" />
-		<Unit filename="src\screen.cxx" />
+		<Unit filename="src\Ooo3270.idl">
+			<Option target="Debug DLL" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src\actions.cxx">
+			<Option target="Debug DLL" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src\config.hpp.in">
+			<Option target="Debug DLL" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src\connection.cxx">
+			<Option target="Debug DLL" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src\main.cxx">
+			<Option target="Debug DLL" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src\ooo3270.hpp">
+			<Option target="Debug DLL" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src\screen.cxx">
+			<Option target="Debug DLL" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src\test_program.cxx">
-			<Option target="Debug" />
+			<Option target="Test Program" />
 		</Unit>
 		<Extensions>
 			<code_completion />

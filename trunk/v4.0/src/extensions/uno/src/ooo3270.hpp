@@ -3,11 +3,13 @@
 #include "config.hpp"
 #include <stdio.h>
 
+/*
 #if defined( DEBUG )
 	#define Trace( fmt, ... )		fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr)
 #else
-	#define Trace( fmt, ... )		/* __VA_ARGS__ */
+	#define Trace( fmt, ... )		// __VA_ARGS__
 #endif
+*/
 
 #include <cppuhelper/implbase3.hxx> // "3" implementing three interfaces
 #include <cppuhelper/factory.hxx>

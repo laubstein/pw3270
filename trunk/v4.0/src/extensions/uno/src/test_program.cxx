@@ -32,7 +32,6 @@ using namespace ::rtl;
 	#define Trace( fmt, ... )		fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr)
 #endif
 
-
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
 int SAL_CALL main(int argc, char **argv)
@@ -65,20 +64,18 @@ int SAL_CALL main(int argc, char **argv)
 
 	if (xImplReg.is())
 	{
-		xImplReg->registerImplementation(
-			OUString::createFromAscii("com.sun.star.loader.SharedLibrary"), // loader for component
+#if defined( WIN32 )
+        const char *libname = "bin\\windbg\\Ooo3270.uno.dll";
+#else
+        const char *libname = "bin/Debug/Ooo3270.uno.so";
+#endif
+        Trace("Loading %s",libname);
 
-#ifdef UNX
-#ifdef MACOSX
-			OUString::createFromAscii("Ooo3270.uno.so.dylib"),		// component location
-#else
-			OUString::createFromAscii("bin/Debug/Ooo3270.uno.so"),		// component location
-#endif
-#else
-			OUString::createFromAscii("Ooo3270.uno.dll"),		// component location
-#endif
-			Reference< XSimpleRegistry >()	 // registry omitted,
-						 // defaulting to service manager registry used
+		xImplReg->registerImplementation(
+                OUString::createFromAscii("com.sun.star.loader.SharedLibrary"), // loader for component
+                OUString::createFromAscii(libname),		// component location
+                Reference< XSimpleRegistry >()	        // registry omitted,
+                                                        // defaulting to service manager registry used
 			);
 
 		// get an object instance
@@ -86,6 +83,8 @@ int SAL_CALL main(int argc, char **argv)
 
 		Reference< XInterface > xx ;
 		xx = xMgr->createInstanceWithContext(OUString::createFromAscii(IMPLNAME), xContext);
+
+        Trace("Instance: %p",xx);
 
 		Reference< I3270 > srv( xx, UNO_QUERY );
 
