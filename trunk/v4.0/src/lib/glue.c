@@ -89,7 +89,9 @@
 	int lib3270_unloaded(void) __attribute__((destructor));
 #endif
 
-
+#ifdef DEBUG
+	static int init_calls = 0;
+#endif
 
 // extern void usage(char *);
 
@@ -187,11 +189,16 @@ int lib3270_init(const char *program_path)
 
 	(void) get_version_info();
 
+	Trace("%s (init_calls: %d)",__FUNCTION__,init_calls);
+
 	rc = save_dirs(program_path);
 	if(rc)
 		return rc;
-#endif
+#else
 
+	Trace("%s (init_calls: %d)",__FUNCTION__,init_calls);
+
+#endif
 
 	/*
 	 * Sort out model and color modes, based on the model number resource.
@@ -269,7 +276,10 @@ static void initialize(void)
 {
 	memset(&appres,0,sizeof(appres));
 
-	Trace("%s","Initializing library");
+#ifdef DEBUG
+	init_calls++;
+	Trace("Initializing library (calls: %d)",init_calls);
+#endif
 
 	initialize_toggles();
 
@@ -390,9 +400,10 @@ static void initialize(void)
 
 BOOL WINAPI DllMain(HANDLE hinst, DWORD dwcallpurpose, LPVOID lpvResvd)
 {
+	Trace("%s - Library loaded",__FUNCTION__);
 
     if(dwcallpurpose == DLL_PROCESS_ATTACH)
-	initialize();
+		initialize();
 
     return TRUE;
 }
@@ -401,6 +412,9 @@ BOOL WINAPI DllMain(HANDLE hinst, DWORD dwcallpurpose, LPVOID lpvResvd)
 
 int lib3270_loaded(void)
 {
+
+	Trace("%s - Library loaded",__FUNCTION__);
+
 	initialize();
     return 0;
 }
