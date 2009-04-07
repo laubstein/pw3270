@@ -108,8 +108,8 @@ cd %{_builddir}/%{name}-%{version}/src/extensions/uno
 
 autoconf
 
-PW3270_CFLAGS="-DV337=1 -I%{_builddir}/%{name}-%{version}/src/include" \
-PW3270_LIBS="-L%{_builddir}/%{name}-%{version}/bin/Release -l3270" \
+LIB3270_CFLAGS="-DV337=1 -I%{_builddir}/%{name}-%{version}/src/include" \
+LIB3270_LIBS="-L%{_builddir}/%{name}-%{version}/bin/Release -l3270" \
 ./configure --with-office-sdk-home="%{ooo_sdk_home}" --with-office-home="%{ooo_prefix}/%{ooo_home}"
 
 cd %{_builddir}/%{name}-%{version}
@@ -142,7 +142,7 @@ Name=3270 Terminal
 Name[pt_BR]=Terminal 3270
 Comment=IBM 3270 Terminal emulator
 Exec=%{_bindir}/%{name}
-Icon=%{_datadir}/%{name}/%{name}.jpg
+Icon=%{_datadir}/%{name}/%{name}.@LOGOEXT@
 Terminal=false
 Type=Application
 EOF
@@ -156,7 +156,7 @@ desktop-file-install    --vendor %{_build_vendor} \
 
 
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
-install -m 644 %{name}.pc %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
+install -m 644 lib3270.pc %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
 install -m 644 ui/debug.xml %{buildroot}%{_datadir}/%{name}/ui/debug.xml
 
 %if 0%{?_rexx}
@@ -180,8 +180,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/%{name}
 %{_datadir}/applications/*.desktop
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
-%{_datadir}/%{name}/ui/%{name}.xml
-%{_datadir}/%{name}/ui/%{name}.act
+%{_datadir}/%{name}/ui/default.xml
+%{_datadir}/%{name}/ui/default.act
 %{_datadir}/%{name}/%{name}.@LOGOEXT@
 %{_datadir}/%{name}/colors.conf
 

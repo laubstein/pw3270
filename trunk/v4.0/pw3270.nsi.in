@@ -42,17 +42,17 @@ SubSection "@PROGRAM_NAME@" SecMain
 		createShortCut "$DESKTOP\@PROGRAM_NAME@.lnk" "$INSTDIR\@PROGRAM_NAME@.exe"
 
 		# Binary files
-		file "/oname=$INSTDIR\@PROGRAM_NAME@.exe"	"bin\Release\@PACKAGE@.exe"
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.exe"	"bin\Release\@PROGRAM_NAME@.exe"
 
 		# Configuration files
 		file "/oname=$INSTDIR\@PROGRAM_NAME@.jpg"	"bin\Release\@PACKAGE@.jpg"
 		file "/oname=$INSTDIR\@PROGRAM_NAME@.ico"	"bin\Release\@PACKAGE@.ico"
-		file "/oname=$INSTDIR\colors.conf"		src\g3270\colors.conf
+		file "/oname=$INSTDIR\colors.conf"		src\gui\colors.conf
 
 		# UI definition files
 		CreateDirectory "$INSTDIR\ui"
-		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.xml" ui\g3270.xml
-		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.act" ui\g3270.act
+		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.xml" ui\default.xml
+		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.act" ui\default.act
 
 		# Locale files
 		CreateDirectory "$INSTDIR\@localedir@\pt_BR\LC_MESSAGES"
