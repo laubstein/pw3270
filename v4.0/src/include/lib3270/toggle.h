@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como @@FILENAME@@ e possui @@LINES@@ linhas de código.
+ * Este programa está nomeado como toggle.h e possui 77 linhas de código.
  *
  * Contatos:
  *
@@ -65,12 +65,12 @@
 	extern void				initialize_toggles(void);
 	extern void				shutdown_toggles(void);
 
-	G3270_EXPORT int 			register_tchange(int ix, void (*callback)(int value, int reason));
-	G3270_EXPORT int			do_toggle(int ix);
-	G3270_EXPORT int			set_toggle(int ix, int value);
+	LIB3270_EXPORT int 			register_tchange(int ix, void (*callback)(int value, int reason));
+	LIB3270_EXPORT int			do_toggle(int ix);
+	LIB3270_EXPORT int			set_toggle(int ix, int value);
 
-	G3270_EXPORT const char	*get_toggle_name(int ix);
-	G3270_EXPORT int			get_toggle_by_name(const char *name);
+	LIB3270_EXPORT const char	*get_toggle_name(int ix);
+	LIB3270_EXPORT int			get_toggle_by_name(const char *name);
 
 
 

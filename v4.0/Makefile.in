@@ -1,5 +1,5 @@
 #
-# "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+# "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
 # (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
 # aplicativos mainframe.
 #
@@ -50,7 +50,7 @@ WINDRES = @WINDRES@
 # Set compile/link parameters
 ####################################################################################################
 
-CFLAGS = @OS_CFLAGS@ -g -Wall -O -DG3270 -DLIBDIR=\"$(LIBDIR)\" -DDATAROOTDIR=\"$(datarootdir)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
+CFLAGS = @OS_CFLAGS@ -g -Wall -O -Dpw3270 -DLIBDIR=\"$(LIBDIR)\" -DDATAROOTDIR=\"$(datarootdir)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
 API_CFLAGS=@LIBSSL_CFLAGS@ @API_CFLAGS@
 
 APP_CFLAGS=@GTK_CFLAGS@ @LIBGNOME_CFLAGS@ @APP_CFLAGS@
@@ -61,41 +61,41 @@ APP_LDFLAGS=@GTK_LIBS@ @LIBGNOME_LIBS@ @OS_LFLAGS@
 # Sources
 ####################################################################################################
 
-APP_SRCS =	g3270.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
-			clipboard.c print.c config.c colors.c keypad.c plugin.c filetransfer.c \
-			version.c @OS_APPSRCS@
+APP_SRCS =	main.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
+		clipboard.c print.c config.c colors.c keypad.c plugin.c filetransfer.c \
+		version.c @OS_APPSRCS@
 
 API_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
-			ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c idle.c kybd.c \
-			macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
-			sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
-			xio.c keymap.c resolver.c log.c @OS_APISRCS@
+		ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c idle.c kybd.c \
+		macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
+		sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
+		xio.c keymap.c resolver.c log.c @OS_APISRCS@
 
 ####################################################################################################
 # Targets
 ####################################################################################################
 
 Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
-		src/g3270/$(PACKAGE).@LOGOEXT@ \
-		src/g3270/$(PACKAGE).ico \
+		src/gui/$(PACKAGE).@LOGOEXT@ \
+		src/gui/$(PACKAGE).ico \
 		$(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN)@DLLEXT@)
-	@install --mode=644 src/g3270/$(PACKAGE).@LOGOEXT@ bin/Release/$(PACKAGE).@LOGOEXT@
-	@cp src/g3270/$(PACKAGE).ico bin/Release/$(PACKAGE).ico
+	@install --mode=644 src/gui/$(PACKAGE).@LOGOEXT@ bin/Release/$(PACKAGE).@LOGOEXT@
+	@cp src/gui/$(PACKAGE).ico bin/Release/$(PACKAGE).ico
 	@msgfmt -c -v -o bin/Release/pt_BR.mo po/pt_BR.po
 	@rm -f bin/Release/gtk-runtime
 	@ln -s "@GTKRUNTIME@" bin/Release/gtk-runtime
 	@echo @PACKAGE@ Ok!
 
-Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
+Debug: $(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/gui/$(PACKAGE).@LOGOEXT@
 
-run: bin/Debug/g3270@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/g3270/$(PACKAGE).@LOGOEXT@
-	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
-	@cd bin/Debug ; LD_LIBRARY_PATH=. ./g3270 --program-data="../../"
+run: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/gui/$(PACKAGE).@LOGOEXT@
+	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
+	@cd bin/Debug ; LD_LIBRARY_PATH=. ./@PROGRAM_NAME@ --program-data="../../"
 
 rpm: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 	mkdir -p `rpm --eval="%{u2p:%{_sourcedir}}"`
 	cp @PACKAGE@-@PACKAGE_VERSION@.tar.gz `rpm --eval="%{u2p:%{_sourcedir}}"`
-	rpmbuild -ba g3270.spec
+	rpmbuild -ba pw3270.spec
 
 
 ####################################################################################################
@@ -113,14 +113,14 @@ obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(API_CFLAGS) $(CFLAGS) -ggdb -o $@ -c $<
 
-obj/Debug/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
+obj/Debug/src/gui/%.o: src/gui/%.c src/gui/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) $(APP_CFLAGS) -ggdb -o $@ -c $<
 
-obj/Debug/src/g3270/resources.o: src/g3270/resources.rc src/g3270/$(PACKAGE).ico Makefile
+obj/Debug/src/gui/resources.o: src/gui/resources.rc src/gui/$(PACKAGE).ico Makefile
 	@echo $< ...
-	@$(WINDRES) --include-dir=src/g3270 -i $< -o $@
+	@$(WINDRES) --include-dir=src/gui -i $< -o $@
 
 obj/Debug/version.o: src/version.c
 	@echo $< ...
@@ -136,14 +136,14 @@ obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) -Werror $(API_CFLAGS) $(CFLAGS) -o $@ -c $<
 
-obj/Release/src/g3270/%.o: src/g3270/%.c src/g3270/*.h $(GLOBAL_DEPENDS)
+obj/Release/src/gui/%.o: src/gui/%.c src/gui/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) $(APP_CFLAGS) -o $@ -c $<
 
-obj/Release/src/g3270/resources.o: src/g3270/resources.rc src/g3270/$(PACKAGE).ico Makefile
+obj/Release/src/gui/resources.o: src/gui/resources.rc src/gui/$(PACKAGE).ico Makefile
 	@echo $< ...
-	@$(WINDRES) --include-dir=src/g3270 -i $< -o $@
+	@$(WINDRES) --include-dir=src/gui -i $< -o $@
 
 obj/Release/version.o: src/version.c
 	@echo $< ...
@@ -154,7 +154,7 @@ obj/Release/version.o: src/version.c
 # Release Targets
 ####################################################################################################
 
-bin/Release/@PACKAGE_NAME@@EXEEXT@: bin/Release/lib3270@DLLEXT@ $(foreach SRC, $(basename $(APP_SRCS)), obj/Release/src/g3270/$(SRC).@OBJEXT@)
+bin/Release/@PROGRAM_NAME@@EXEEXT@: bin/Release/lib3270@DLLEXT@ $(foreach SRC, $(basename $(APP_SRCS)), obj/Release/src/gui/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) @OS_EXECOPT@ @LD_RLSFLAGS@ -o $@ $^ $(APP_LDFLAGS)
@@ -170,7 +170,7 @@ bin/Release/lib3270@DLLEXT@: obj/Release/version.o obj/Release/src/lib/fallbacks
 # Debug Targets
 ####################################################################################################
 
-bin/Debug/@PACKAGE_NAME@@EXEEXT@: bin/Debug/lib3270@DLLEXT@ $(foreach SRC, $(basename $(APP_SRCS)), obj/Debug/src/g3270/$(SRC).@OBJEXT@)
+bin/Debug/@PROGRAM_NAME@@EXEEXT@: bin/Debug/lib3270@DLLEXT@ $(foreach SRC, $(basename $(APP_SRCS)), obj/Debug/src/gui/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) @OS_EXECOPT@ -o $@ $^ -Lbin/Debug -l3270 $(APP_LDFLAGS)
@@ -196,10 +196,10 @@ bin/Debug/plugins/rx3270@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
 # Misc Targets
 ####################################################################################################
 
-src/g3270/$(PACKAGE).ico: @ICONFILE@
+src/gui/$(PACKAGE).ico: @ICONFILE@
 	@cp @ICONFILE@ $@
 
-src/g3270/$(PACKAGE).@LOGOEXT@: @LOGOFILE@
+src/gui/$(PACKAGE).@LOGOEXT@: @LOGOFILE@
 	@convert @LOGOFILE@ $@
 
 src/lib/fallbacks.c:  src/lib/X3270.xad
@@ -208,9 +208,9 @@ src/lib/fallbacks.c:  src/lib/X3270.xad
 src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@src/mkversion.sh
 
-sources.lst: Makefile src/g3270/*.c src/plugins/rexx/*.c Makefile
+sources.lst: Makefile src/gui/*.c src/plugins/rexx/*.c Makefile
 	@rm -f $@
-	@for i in src/g3270/*.c; do echo $$i >> $@; done
+	@for i in src/gui/*.c; do echo $$i >> $@; done
 	@for i in src/plugins/rexx/*.c; do echo $$i >> $@; done
 
 $(PACKAGE).pot: sources.lst
@@ -233,28 +233,25 @@ install: Release po/pt_BR.po
 	@for i in $(TARGETS); do install --mode=755 bin/Release/$$i $(DESTDIR)/$(bindir); done
 	@for i in $(PLUGINS); do install --mode=755 bin/Release/plugins/$$i@DLLEXT@ $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins; done
 	@install --mode=755 bin/Release/lib3270.so $(DESTDIR)/$(LIBDIR)
-	@install --mode=644 ui/g3270.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
-	@install --mode=644 ui/g3270.act $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
-	@install --mode=644 src/g3270/$(PACKAGE).@LOGOEXT@ $(DESTDIR)/$(datarootdir)/$(PACKAGE)
-	@install --mode=644 src/g3270/colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+	@install --mode=644 ui/default.act $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+	@install --mode=644 src/gui/$(PACKAGE).@LOGOEXT@ $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 src/gui/colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
 
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES
-	@msgfmt -c -v -o $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/g3270.mo po/pt_BR.po
+	@msgfmt -c -v -o $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo po/pt_BR.po
 
 $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 
 	@rm -fr $(TMPDIR)/$(PACKAGE).tmp
 
 	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
-	@cp g3270.cbp $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp pw3270.cbp $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp aclocal.m4 $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp AUTHORS $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp configure.ac $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
-	@cp g3270.nsi.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
-	@cp g3270.pc.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
-	@cp g3270.spec.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
-	@cp Makefile.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp *.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 
 	mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
 	cp -r image/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
@@ -292,8 +289,8 @@ clean:
 	@rm -f *.lnk
 	@rm -fr locale
 	@rm -f *.nsi
-	@rm -f src/g3270/$(PACKAGE).ico
-	@rm -f src/g3270/$(PACKAGE).@LOGOEXT@
+	@rm -f src/gui/$(PACKAGE).ico
+	@rm -f src/gui/$(PACKAGE).@LOGOEXT@
 
 	@if [ -e src/plugins/rexx/Makefile ]; then make -C src/plugins/rexx clean; fi
 	@if [ -e src/extensions/uno/Makefile ]; then make -C src/extensions/uno clean; fi

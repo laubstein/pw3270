@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -37,7 +37,7 @@
  #include <lib3270/config.h>
  #include <globals.h>
 
- #include "g3270.h"
+ #include "gui.h"
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
 
@@ -213,7 +213,7 @@
 gboolean StartPlugins(const gchar *startup_script)
 {
 #ifdef HAVE_PLUGINS
- 	struct call_parameter p = { "g3270_plugin_startup", startup_script };
+ 	struct call_parameter p = { "pw3270_plugin_startup", startup_script };
 
 	Trace("Starting plugins with \"%s\"...",startup_script);
 
@@ -455,7 +455,7 @@ gboolean StartPlugins(const gchar *startup_script)
 						struct external_action arg;
 
 						memset(&arg,0,sizeof(arg));
-						g_snprintf(arg.name,0xFF,"G3270Action_%s",parm[3]);
+						g_snprintf(arg.name,0xFF,"pw3270Action_%s",parm[3]);
 
 						g_slist_foreach(plugins,(GFunc) findaction, &arg);
 

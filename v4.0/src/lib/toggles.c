@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como toggles.c e possui 255 linhas de código.
+ * Este programa está nomeado como toggles.c e possui 253 linhas de código.
  *
  * Contatos:
  *
@@ -63,7 +63,7 @@ static void no_callback(int value, int reason)
 }
 
 /* Register a callback to monitor toggle changes */
-G3270_EXPORT int register_tchange(int ix, void (*callback)(int value, int reason))
+LIB3270_EXPORT int register_tchange(int ix, void (*callback)(int value, int reason))
 {
 	struct toggle *t;
 
@@ -118,7 +118,7 @@ do_toggle_reason(int ix, enum toggle_type reason)
 
 }
 
-G3270_EXPORT int set_toggle(int ix, int value)
+LIB3270_EXPORT int set_toggle(int ix, int value)
 {
 	Boolean v = ((Boolean) (value != 0)); // Convert int in Boolean
 
@@ -137,7 +137,7 @@ G3270_EXPORT int set_toggle(int ix, int value)
 	return 0;
 }
 
-G3270_EXPORT int do_toggle(int ix)
+LIB3270_EXPORT int do_toggle(int ix)
 {
 	if(ix < 0 || ix >= N_TOGGLES)
 		return EINVAL;
@@ -231,14 +231,14 @@ shutdown_toggles(void)
 #endif /*]*/
 }
 
-G3270_EXPORT const char *get_toggle_name(int ix)
+LIB3270_EXPORT const char *get_toggle_name(int ix)
 {
 	if(ix < N_TOGGLES)
 		return toggle_names[ix];
 	return "";
 }
 
-G3270_EXPORT int get_toggle_by_name(const char *name)
+LIB3270_EXPORT int get_toggle_by_name(const char *name)
 {
 	int f;
 

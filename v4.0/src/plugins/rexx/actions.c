@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -43,7 +43,7 @@
  {
 	gchar 		*ptr;
 	GtkWidget 	*dialog = gtk_file_chooser_dialog_new(	_( "Select Rexx script to run" ),
-														GTK_WINDOW(g3270_topwindow),
+														GTK_WINDOW(program_window),
 														GTK_FILE_CHOOSER_ACTION_OPEN,
 														GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
 														GTK_STOCK_EXECUTE,	GTK_RESPONSE_ACCEPT,

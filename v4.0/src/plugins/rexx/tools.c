@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como tools.c e possui 152 linhas de código.
+ * Este programa está nomeado como tools.c e possui 172 linhas de código.
  *
  * Contatos:
  *
@@ -42,11 +42,11 @@
 /*                                                                            */
 /* Rexx External Function: rx3270Log                                          */
 /*                                                                            */
-/* Description: Send string to g3270's log file                               */
+/* Description: Send string to program's log file                             */
 /*                                                                            */
 /* Rexx Args:   String to log                                                 */
 /*                                                                            */
-/* Returns:	    None                                                          */
+/* Returns:	    None                                                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270Log(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)

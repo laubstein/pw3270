@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -30,7 +30,7 @@
  *
  */
 
- #include "g3270.h"
+ #include "gui.h"
  #include <globals.h>
  #include <lib3270/kybdc.h>
  #include <string.h>

@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como main.c e possui 347 linhas de código.
+ * Este programa está nomeado como main.c e possui 351 linhas de código.
  *
  * Contatos:
  *
@@ -46,7 +46,7 @@
 
 /*---[ Globals ]----------------------------------------------------------------------------------*/
 
- GtkWidget 	*g3270_topwindow	= NULL;
+ GtkWidget 	*program_window	= NULL;
 
 /*---[ Rexx entry points ]------------------------------------------------------------------------*/
 
@@ -185,11 +185,11 @@
  }
 */
 
- void g3270_plugin_startup(GtkWidget *topwindow, const gchar *script)
+ void pw3270_plugin_startup(GtkWidget *topwindow, const gchar *script)
  {
 	int	 f;
 
-	g3270_topwindow = topwindow;
+	program_window = topwindow;
 
  	// Load common functions
  	Trace("Loading %d common calls",G_N_ELEMENTS(common_entrypoint));
@@ -230,7 +230,7 @@ ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuena
 {
 	int	 f;
 
-	g3270_topwindow = 0;
+	program_window = 0;
 
  	// Load common functions
  	Trace("Loading %d common calls",G_N_ELEMENTS(common_entrypoint));

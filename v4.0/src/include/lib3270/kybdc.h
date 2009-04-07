@@ -147,6 +147,6 @@ extern void kybd_scroll_lock(Boolean lock);
 extern Boolean run_ta(void);
 extern int state_from_keymap(char keymap[32]);
 
-G3270_EXPORT int emulate_input(char *s, int len, int pasting);
+LIB3270_EXPORT int emulate_input(char *s, int len, int pasting);
 
 #endif /* KYBDC_H_INCLUDED */

@@ -8,6 +8,10 @@
 			</menu>
 		</menu>
 
+		<menu action='EditMenu' />
+		<menu action='ScriptsMenu' />
+		<menu action='NetworkMenu'/>
+
 		<menu action='SettingsMenu'>
 			<menu action='OptionsMenu'>
 			</menu>

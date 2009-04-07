@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como actions.c e possui 1093 linhas de código.
+ * Este programa está nomeado como actions.c e possui 1088 linhas de código.
  *
  * Contatos:
  *
@@ -32,7 +32,7 @@
 
  #include <lib3270/config.h>
 
- #include "g3270.h"
+ #include "gui.h"
  #include <gdk/gdkkeysyms.h>
  #include <errno.h>
 
@@ -57,7 +57,7 @@
  static void action_Tab(GtkWidget *w, gpointer user_data);
  static void action_BackTab(GtkWidget *w, gpointer user_data);
  static void action_Connect(GtkWidget *w, gpointer user_data);
- static void g3270_action_Enter(GtkWidget *w, gpointer user_data);
+ static void action_enter(GtkWidget *w, gpointer user_data);
  static void action_Disconnect(GtkWidget *w, gpointer user_data);
  static void action_PrintScreen(GtkWidget *w, gpointer user_data);
  static void action_PrintSelected(GtkWidget *w, gpointer user_data);
@@ -94,9 +94,9 @@
 /*---[ Callback tables ]----------------------------------------------------------------------------------------*/
 
  #ifdef DEBUG
-	#define G3270_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action, 0, #action }
+	#define INTERNAL_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action, 0, #action }
  #else
-	#define G3270_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action, 0 }
+	#define INTERNAL_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action, 0 }
  #endif
 
  struct WindowActions
@@ -232,8 +232,8 @@
  	{	"Save",				GTK_STOCK_SAVE,			N_( "Save" ),				NULL,				NULL,	NULL								},
 
 	/* Terminal Actions */
-	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",			NULL,	G_CALLBACK(g3270_action_Enter)		},
-	{ 	"Enter",			NULL,					N_( "Enter" ),				"KP_Enter",			NULL,	G_CALLBACK(g3270_action_Enter)			},
+	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",			NULL,	G_CALLBACK(action_enter)		},
+	{ 	"Enter",			NULL,					N_( "Enter" ),				"KP_Enter",			NULL,	G_CALLBACK(action_enter)			},
  };
 
 
@@ -318,7 +318,7 @@
  	host_reconnect(0);
  }
 
- void g3270_action_Enter(GtkWidget *w, gpointer user_data)
+ void action_enter(GtkWidget *w, gpointer user_data)
  {
  	action_ClearSelection();
  	if(PCONNECTED)
@@ -345,7 +345,7 @@
  static void action_Quit(void)
  {
  	action_Save();
- 	g3270_quit();
+ 	program_quit();
  }
 
  static void action_About(GtkWidget *w, gpointer user_data)
@@ -811,19 +811,19 @@
  	// TODO (perry#2#): Put all keyboard actions as accelerators.
  	static const struct WindowActions keyproc[] =
  	{
-		G3270_ACTION(	GDK_Left,			0,					action_Left),
-		G3270_ACTION(	GDK_Up,				0,					action_Up),
-		G3270_ACTION(	GDK_Right,			0,					action_Right),
-		G3270_ACTION(	GDK_Down,			0,					action_Down),
+		INTERNAL_ACTION(	GDK_Left,		0,			action_Left),
+		INTERNAL_ACTION(	GDK_Up,			0,			action_Up),
+		INTERNAL_ACTION(	GDK_Right,		0,			action_Right),
+		INTERNAL_ACTION(	GDK_Down,		0,			action_Down),
 
-		G3270_ACTION(	GDK_KP_Left,		0,					action_Left),
-		G3270_ACTION(	GDK_KP_Up,			0,					action_Up),
-		G3270_ACTION(	GDK_KP_Right,		0,					action_Right),
-		G3270_ACTION(	GDK_KP_Down,		0,					action_Down),
+		INTERNAL_ACTION(	GDK_KP_Left,		0,			action_Left),
+		INTERNAL_ACTION(	GDK_KP_Up,		0,			action_Up),
+		INTERNAL_ACTION(	GDK_KP_Right,		0,			action_Right),
+		INTERNAL_ACTION(	GDK_KP_Down,		0,			action_Down),
 
-		G3270_ACTION(	GDK_ISO_Left_Tab,	0,					action_BackTab),
-		G3270_ACTION(	GDK_Tab,			0,					action_Tab),
-		G3270_ACTION(	GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab),
+		INTERNAL_ACTION(	GDK_ISO_Left_Tab,	0,			action_BackTab),
+		INTERNAL_ACTION(	GDK_Tab,		0,			action_Tab),
+		INTERNAL_ACTION(	GDK_KP_Add,		GDK_NUMLOCK_MASK,	action_Tab),
 
  	};
 

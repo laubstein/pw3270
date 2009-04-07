@@ -10,7 +10,7 @@ AC_PREREQ(2.59)
 
 dnl Initialise automake with the package name, version and
 dnl bug-reporting address.
-AC_INIT([g3270-OpenOffice], [0.1], [perry.werneck@gmail.com])
+AC_INIT([pw3270-OpenOffice], [0.1], [perry.werneck@gmail.com])
 
 dnl Place auxilliary scripts here.
 AC_CONFIG_AUX_DIR([scripts])
@@ -54,7 +54,7 @@ AC_ARG_WITH([service-name],
 [
 	o3270_cv_srvname="$withval"
 ],[
-	o3270_cv_srvname="br.com.bb.g3270"
+	o3270_cv_srvname="br.com.bb.pw3270"
 ])
 
 AC_ARG_WITH([interface-name],
@@ -148,9 +148,9 @@ AC_ARG_WITH([office-ure-lib],
 
 # Checks for libraries.
 PKG_CHECK_EXISTS
-PKG_CHECK_MODULES( [G3270], [g3270 >= 4.0], AC_DEFINE(G3270) )
-AC_SUBST(G3270_LIBS)
-AC_SUBST(G3270_CFLAGS)
+PKG_CHECK_MODULES( [LIB3270], [lib3270 >= 4.0], AC_DEFINE(LIB3270) )
+AC_SUBST(LIB3270_LIBS)
+AC_SUBST(LIB3270_CFLAGS)
 AC_SUBST(EXEEXT)
 
 AC_SUBST(OFFICE_HOME,$o3270_cv_oohome)
