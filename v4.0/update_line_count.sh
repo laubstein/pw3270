@@ -18,9 +18,9 @@ do
 	echo " *** $NAME ***" >> $OUTPUT
 	echo "---------------------------------------------------------------------------------" >> $OUTPUT
 
-	SED_COMMAND="s# * aplicativos mainframe.* # * aplicativos mainframe. Registro no INPI sob o nome G3270.#;s#@@FILENAME@@#`basename $FILENAME`#;s#e possui .* linhas de código#e possui $LINES linhas de código#"
+	SED_COMMAND="s#aplicativos mainframe.#aplicativos mainframe. Registro no INPI sob o nome G3270.#1;s#@@FILENAME@@#`basename $FILENAME`#;s#e possui .* linhas de código#e possui $LINES linhas de código#"
 
-	sed -e "$SED_COMMAND"  $FILENAME >> $OUTPUT
+	sed "$SED_COMMAND"  $FILENAME >> $OUTPUT
 	if [ "$?" != "0" ]; then
 		echo "Erro ao ajustar contagem de linhas em $FILENAME"
 		exit -1
@@ -33,7 +33,7 @@ do
 		exit -1
 	fi
 
-	sed -e "$SED_COMMAND" $TEMPSOURCE > $FILENAME
+	sed "$SED_COMMAND" $TEMPSOURCE > $FILENAME
 	if [ "$?" != "0" ]; then
 		echo "Erro ao atualizar contagem de linhas em $FILENAME"
 		exit -1
