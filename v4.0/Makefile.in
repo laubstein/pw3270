@@ -37,7 +37,7 @@ datarootdir=@datarootdir@
 LOCALEDIR=@localedir@
 PLUGINS=@SELECTED_PLUGINS@
 
-TARGETS = $(PACKAGE)@EXEEXT@
+TARGETS = @PROGRAM_NAME@@EXEEXT@
 
 # Set command paths and mkfb (which has to run locally)
 MKFB = mkfb
