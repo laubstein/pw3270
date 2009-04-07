@@ -108,8 +108,8 @@ cd %{_builddir}/%{name}-%{version}/src/extensions/uno
 
 autoconf
 
-G3270_CFLAGS="-DV337=1 -I%{_builddir}/%{name}-%{version}/src/include" \
-G3270_LIBS="-L%{_builddir}/%{name}-%{version}/bin/Release -l3270" \
+PW3270_CFLAGS="-DV337=1 -I%{_builddir}/%{name}-%{version}/src/include" \
+PW3270_LIBS="-L%{_builddir}/%{name}-%{version}/bin/Release -l3270" \
 ./configure --with-office-sdk-home="%{ooo_sdk_home}" --with-office-home="%{ooo_prefix}/%{ooo_home}"
 
 cd %{_builddir}/%{name}-%{version}
@@ -120,11 +120,11 @@ make clean
 make Release
 
 %if 0%{?_uno}
-make -C src/extensions/uno Release
+make -C src/extensions/uno %{name}.oxt
 %endif
 
-make src/g3270/g3270.@LOGOEXT@
-strip bin/Release/g3270
+make src/gui/@PACKAGE@.@LOGOEXT@
+strip bin/Release/@PACKAGE@
 strip bin/Release/lib3270.so
 
 
@@ -168,7 +168,7 @@ ln -s %{_libdir}/%{name}/plugins/rx3270.so %{buildroot}%{_libdir}/librx3270.so
 
 %if 0%{?_uno}
 mkdir -p $RPM_BUILD_ROOT/%ooo_prefix/%ooo_home/share/extension/install/
-install -m 644 src/extensions/uno/g3270-openoffice.oxt $RPM_BUILD_ROOT/%ooo_prefix/%ooo_home/share/extension/install/%{name}-openoffice.oxt
+install -m 644 src/extensions/uno/%{name}.oxt $RPM_BUILD_ROOT/%ooo_prefix/%ooo_home/share/extension/install/%{name}.oxt
 %endif
 
 
@@ -195,10 +195,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %if 0%{?_uno}
 %post OpenOffice
-unopkg add --shared %ooo_prefix/%ooo_home/share/extension/install/%{name}-openoffice.oxt
+unopkg add --shared %ooo_prefix/%ooo_home/share/extension/install/%{name}.oxt
 
 %preun OpenOffice
-unopkg remove --shared %{name}-openoffice.oxt
+unopkg remove --shared %{name}.oxt
 %endif
 
 %files lib

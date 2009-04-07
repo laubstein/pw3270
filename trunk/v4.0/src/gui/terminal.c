@@ -1,5 +1,5 @@
 /* 
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  * 
@@ -30,7 +30,7 @@
  *
  */
 
-#include "g3270.h"
+#include "gui.h"
 #include <lib3270/toggle.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
@@ -169,7 +169,7 @@
 	// Default font sizes from http://svn.gnome.org/svn/gtk+/trunk/gtk/gtkfontsel.c
 	conf = GetString("Terminal","FontSizes","6,7,8,9,10,11,12,13,14,16,18,20,22,24,26,28,32,36,40,48,56,64,72");
 
-	if(conf && *conf && *conf != '*') // "*" in g3270.conf reverts to default behavior of "all" font sizes
+	if(conf && *conf && *conf != '*') // "*" in .conf reverts to default behavior of "all" font sizes
 	{
 		Trace("Font sizes: %s",conf);
 		ptr = g_strsplit(conf,",",MAX_FONT_SIZES);

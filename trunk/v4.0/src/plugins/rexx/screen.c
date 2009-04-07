@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como screen.c e possui 537 linhas de código.
+ * Este programa está nomeado como screen.c e possui 710 linhas de código.
  *
  * Contatos:
  *
@@ -514,7 +514,7 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 /*                                                                            */
 /* Rexx External Function: rx3270SetVisible		                              */
 /*                                                                            */
-/* Description: Set visibility state of g3270 main window                     */
+/* Description: Set visibility state of pw3270 main window                     */
 /*                                                                            */
 /* Rexx Args:	0 to hide window, now zero to show		                      */
 /*                                                                            */
@@ -528,13 +528,13 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 	if(Argc != 1)
 		return RXFUNC_BADCALL;
 
-	if(g3270_topwindow)
+	if(program_window)
 	{
 		rc = 0;
 		if(atoi(Argv[0].strptr))
-			gtk_widget_show(g3270_topwindow);
+			gtk_widget_show(program_window);
 		else
-			gtk_widget_hide(g3270_topwindow);
+			gtk_widget_hide(program_window);
 	}
 
 	ReturnValue(rc);

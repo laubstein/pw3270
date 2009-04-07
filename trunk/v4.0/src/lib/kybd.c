@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como kybd.c e possui 4333 linhas de código.
+ * Este programa está nomeado como kybd.c e possui 4414 linhas de código.
  *
  * Contatos:
  *
@@ -475,7 +475,7 @@ PF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 		key_AID(pf_xlate[k-1]);
 }
 
-G3270_EXPORT int action_PFKey(int key)
+LIB3270_EXPORT int action_PFKey(int key)
 {
 	char buffer[10];
 
@@ -500,7 +500,7 @@ PA_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 	action_PAKey(atoi(params[0]));
 }
 
-G3270_EXPORT int action_PAKey(int key)
+LIB3270_EXPORT int action_PAKey(int key)
 {
 	char buffer[10];
 
@@ -1353,7 +1353,7 @@ Tab_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 	action_NextField();
 }
 
-G3270_EXPORT int action_NextField(void)
+LIB3270_EXPORT int action_NextField(void)
 {
 	reset_idle_timer();
 	if (kybdlock) {
@@ -1385,7 +1385,7 @@ void BackTab_action(Widget w unused, XEvent *event, String *params,Cardinal *num
 	action_PreviousField();
 }
 
-G3270_EXPORT int action_PreviousField(void)
+LIB3270_EXPORT int action_PreviousField(void)
 {
 	register int	baddr, nbaddr;
 	int		sbaddr;
@@ -1518,7 +1518,7 @@ Reset_action(Widget w unused, XEvent *event, String *params,
 	action_Reset();
 }
 
-G3270_EXPORT int action_Reset(void)
+LIB3270_EXPORT int action_Reset(void)
 {
 	reset_idle_timer();
 	do_reset(True);
@@ -1535,7 +1535,7 @@ void Home_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 	action_FirstField();
 }
 
-G3270_EXPORT int action_FirstField(void)
+LIB3270_EXPORT int action_FirstField(void)
 {
 	reset_idle_timer();
 	if (kybdlock) {
@@ -1580,7 +1580,7 @@ void Left_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 	action_CursorLeft();
 }
 
-G3270_EXPORT int action_CursorLeft(void)
+LIB3270_EXPORT int action_CursorLeft(void)
 {
 //	action_debug(Left_action, event, params, num_params);
 	reset_idle_timer();
@@ -1709,7 +1709,7 @@ Delete_action(Widget w unused, XEvent *event, String *params,
 	action_Delete();
 }
 
-G3270_EXPORT int action_Delete(void)
+LIB3270_EXPORT int action_Delete(void)
 {
 	reset_idle_timer();
 	if (kybdlock) {
@@ -1838,7 +1838,7 @@ Erase_action(Widget w unused, XEvent *event, String *params,
 	action_Erase();
 }
 
-G3270_EXPORT int action_Erase(void)
+LIB3270_EXPORT int action_Erase(void)
 {
 	reset_idle_timer();
 	if (kybdlock) {
@@ -1864,7 +1864,7 @@ void Right_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 /**
  * Cursor right 1 position.
  */
-G3270_EXPORT int action_CursorRight(void)
+LIB3270_EXPORT int action_CursorRight(void)
 {
 	register int	baddr;
 	enum dbcs_state d;
@@ -2179,7 +2179,7 @@ void Up_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
  * @return 0
  *
  */
-G3270_EXPORT int action_CursorUp(void)
+LIB3270_EXPORT int action_CursorUp(void)
 {
 	register int	baddr;
 
@@ -2226,7 +2226,7 @@ Down_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params
  * @return 0
  *
  */
-G3270_EXPORT int action_CursorDown(void)
+LIB3270_EXPORT int action_CursorDown(void)
 {
 	register int	baddr;
 
@@ -2348,7 +2348,7 @@ void Enter_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
  * @return 0 if ok, -1 if the action can't be performed.
  *
  */
-G3270_EXPORT int action_Enter(void)
+LIB3270_EXPORT int action_Enter(void)
 {
 	reset_idle_timer();
 
@@ -2372,7 +2372,7 @@ SysReq_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 	action_SysReq();
 }
 
-G3270_EXPORT int action_SysReq(void)
+LIB3270_EXPORT int action_SysReq(void)
 {
 	reset_idle_timer();
 	if (IN_ANSI)
@@ -2403,7 +2403,7 @@ void Clear_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 		action_ClearFields();
 }
 
-G3270_EXPORT int action_ClearFields(void)
+LIB3270_EXPORT int action_ClearFields(void)
 {
 	reset_idle_timer();
 	if (kybdlock & KL_OIA_MINUS)
@@ -2566,7 +2566,7 @@ EraseEOF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 	action_EraseEOF();
 }
 
-G3270_EXPORT int action_EraseEOF(void)
+LIB3270_EXPORT int action_EraseEOF(void)
 {
 	register int	baddr;
 	register unsigned char	fa;
@@ -2626,7 +2626,7 @@ void EraseInput_action(Widget w unused, XEvent *event, String *params, Cardinal 
 	action_EraseInput();
 }
 
-G3270_EXPORT int action_EraseInput(void)
+LIB3270_EXPORT int action_EraseInput(void)
 {
 	register int	baddr, sbaddr;
 	unsigned char	fa;
@@ -2697,7 +2697,7 @@ DeleteWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
 	action_DeleteWord();
 }
 
-G3270_EXPORT int action_DeleteWord(void)
+LIB3270_EXPORT int action_DeleteWord(void)
 {
 	register int baddr;
 	register unsigned char	fa;
@@ -2770,7 +2770,7 @@ DeleteField_action(Widget w unused, XEvent *event, String *params, Cardinal *num
 	action_DeleteField();
 }
 
-G3270_EXPORT int action_DeleteField(void)
+LIB3270_EXPORT int action_DeleteField(void)
 {
 	register int	baddr;
 	register unsigned char	fa;
@@ -3323,7 +3323,7 @@ remargin(int lmargin)
  *
  * @Returns the number of unprocessed characters.
  */
-G3270_EXPORT int emulate_input(char *s, int len, int pasting)
+LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 {
 	enum {
 	    BASE, BACKSLASH, BACKX, BACKP, BACKPA, BACKPF, OCTAL, HEX, XGE

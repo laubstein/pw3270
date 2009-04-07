@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como g3270.c e possui 502 linhas de código.
+ * Este programa está nomeado como main.c e possui 502 linhas de código.
  *
  * Contatos:
  *
@@ -30,7 +30,7 @@
  *
  */
 
-#include "g3270.h"
+#include "gui.h"
 
 #include <stdio.h>
 #include <gtk/gtk.h>
@@ -154,7 +154,7 @@ static gboolean trylog(gchar *path)
 	return rc;
 }
 
-static int g3270_init(const gchar *program)
+static int program_init(const gchar *program)
 {
 	static const gchar	*logname	= PROGRAM_NAME ".log";
 	gboolean				has_log		= FALSE;
@@ -193,14 +193,14 @@ static int g3270_init(const gchar *program)
 	OpenConfigFile();
 
 	Trace("%s","Opening configuration file");
-	if(Register3270IOCallbacks(&g3270_io_callbacks))
+	if(Register3270IOCallbacks(&program_io_callbacks))
 	{
 		PopupAnError( N_( "Can't register into lib3270 I/O callback table." ) );
 		return -1;
 	}
 
 	Trace("%s","Setting screen callbacks");
-	if(Register3270ScreenCallbacks(&g3270_screen_callbacks))
+	if(Register3270ScreenCallbacks(&program_screen_callbacks))
 	{
 		PopupAnError( N_( "Can't register into lib3270 screen callback table." ) );
 		return -1;
@@ -272,7 +272,7 @@ static void load_options(GOptionContext *context)
 {
 	static GOptionEntry entries[] =
 	{
-		{ "config-file",	 	'c', 0, G_OPTION_ARG_FILENAME, 	&g3270_config_filename, N_( "Path to the configuration file" ), 					NULL },
+		{ "config-file",	 	'c', 0, G_OPTION_ARG_FILENAME, 	&program_config_filename, N_( "Path to the configuration file" ), 					NULL },
 		{ "host",				'h', 0, G_OPTION_ARG_STRING,	&cl_hostname,			N_( "Host identifier" ),									NULL },
 		{ "startup-script", 	's', 0, G_OPTION_ARG_FILENAME, 	&startup_script,		N_( "Run script on startup (if available)" ),				NULL },
 		{ "program-data",	 	'd', 0, G_OPTION_ARG_STRING, 	&program_data,			N_( "Path to search for data and configuration files" ),	NULL },
@@ -411,7 +411,7 @@ int main(int argc, char *argv[])
 
 #endif
 
-	if(g3270_init(argv[0]))
+	if(program_init(argv[0]))
 		return -1;
 
 	Trace("%s","Loading plugins");

@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -86,7 +86,7 @@ static int net_sock = -1;
 static void save_recent(const char *);
 #endif
 
-#if defined(X3270_DISPLAY) || defined(G3270)
+#if defined(X3270_DISPLAY) || defined(LIB3270)
 static void try_reconnect(void);
 #endif /*]*/
 
@@ -693,7 +693,7 @@ int host_connect(const char *n, int wait)
 
 
 
-#if defined(X3270_DISPLAY) || defined(G3270) /*[*/
+#if defined(X3270_DISPLAY) || defined(LIB3270) /*[*/
 /*
  * Called from timer to attempt an automatic reconnection.
  */
@@ -711,7 +711,7 @@ void host_disconnect(int failed)
 		x_remove_input();
 		net_disconnect();
 		net_sock = -1;
-#if defined(G3270)
+#if defined(LIB3270)
 		Trace("Disconnected (Failed: %d Reconnect: %d in_progress: %d)",failed,toggled(RECONNECT),auto_reconnect_inprogress);
 		if (toggled(RECONNECT) && !auto_reconnect_inprogress)
 		{
@@ -1030,9 +1030,9 @@ Connect_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 }
 */
 
-#if defined(X3270_MENUS) || defined(G3270) /*[*/
+#if defined(X3270_MENUS) || defined(LIB3270) /*[*/
 
-int host_reconnect(int wait)
+LIB3270_EXPORT int host_reconnect(int wait)
 {
 	int rc;
 

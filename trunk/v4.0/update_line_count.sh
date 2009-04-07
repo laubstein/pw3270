@@ -5,7 +5,8 @@ OUTPUT="sources.txt"
 rm -f $OUTPUT
 
 TEMPFILE=`mktemp`
-find . -name *.c | sort > $TEMPFILE
+find . -name *.c  > $TEMPFILE
+find . -name *.h  >> $TEMPFILE
 
 while read FILENAME
 do
@@ -17,7 +18,9 @@ do
 	echo " *** $NAME ***" >> $OUTPUT
 	echo "---------------------------------------------------------------------------------" >> $OUTPUT
 
-	sed -e "s#@@FILENAME@@#`basename $FILENAME`#;s#e possui .* linhas de código#e possui $LINES linhas de código#" $FILENAME >> $OUTPUT
+	SED_COMMAND="s# * aplicativos mainframe.* # * aplicativos mainframe. Registro no INPI sob o nome G3270.#;s#@@FILENAME@@#`basename $FILENAME`#;s#e possui .* linhas de código#e possui $LINES linhas de código#"
+
+	sed -e "$SED_COMMAND"  $FILENAME >> $OUTPUT
 	if [ "$?" != "0" ]; then
 		echo "Erro ao ajustar contagem de linhas em $FILENAME"
 		exit -1
@@ -30,7 +33,7 @@ do
 		exit -1
 	fi
 
-	sed -e "s#@@FILENAME@@#`basename $FILENAME`#;s#e possui .* linhas de código#e possui $LINES linhas de código#" $TEMPSOURCE > $FILENAME
+	sed -e "$SED_COMMAND" $TEMPSOURCE > $FILENAME
 	if [ "$?" != "0" ]; then
 		echo "Erro ao atualizar contagem de linhas em $FILENAME"
 		exit -1

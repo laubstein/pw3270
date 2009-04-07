@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="g3270" />
+		<Option platforms="Windows;Unix;" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/pw3270" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/g3270" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Makefile.in" />
+		<Unit filename="configure.ac" />
+		<Unit filename="rexx/sample.rex" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/Ambiguous.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/Defaulted.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/GetDirectPropertyTolerantResult.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/GetPropertyTolerantResult.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/IllegalTypeException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/IntrospectionException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/MethodConcept.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/NamedValue.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/NotRemoveableException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/Optional.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/Pair.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/Property.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/PropertyAttribute.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/PropertyChangeEvent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/PropertyConcept.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/PropertyExistException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/PropertySetInfoChange.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/PropertySetInfoChangeEvent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/PropertyState.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/PropertyStateChangeEvent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/PropertyValue.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/PropertyValues.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/PropertyVetoException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/SetPropertyTolerantFailed.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/StringPair.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/TolerantPropertySetResultType.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/UnknownPropertyException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XExactName.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XFastPropertySet.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XHierarchicalPropertySet.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XHierarchicalPropertySetInfo.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XIntroTest.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XIntrospection.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XIntrospectionAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XMaterialHolder.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XMultiHierarchicalPropertySet.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XMultiPropertySet.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XMultiPropertyStates.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertiesChangeListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertiesChangeNotifier.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XProperty.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertyAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertyChangeListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertyContainer.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertySet.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertySetInfo.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertySetInfoChangeListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertySetInfoChangeNotifier.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertyState.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertyStateChangeListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XPropertyWithState.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XTolerantMultiPropertySet.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/beans/XVetoableChangeListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/connection/Acceptor.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/connection/AlreadyAcceptingException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/connection/ConnectionSetupException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/connection/Connector.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/connection/NoConnectException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/connection/SocketPermission.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/connection/XAcceptor.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/connection/XConnection.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/connection/XConnection2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/connection/XConnectionBroadcaster.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/connection/XConnector.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/ContainerEvent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/ElementExistException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/NoSuchElementException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XChild.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XComponentEnumeration.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XComponentEnumerationAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XContainer.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XContainerApproveBroadcaster.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XContainerApproveListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XContainerListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XContainerQuery.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XContentEnumerationAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XElementAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XEnumeration.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XEnumerationAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XHierarchicalName.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XHierarchicalNameAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XHierarchicalNameContainer.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XHierarchicalNameReplace.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XIdentifierAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XIdentifierContainer.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XIdentifierReplace.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XImplicitIDAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XImplicitIDContainer.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XImplicitIDReplace.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XIndexAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XIndexContainer.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XIndexReplace.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XNameAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XNameContainer.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XNameReplace.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XNamed.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XSet.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XStringKeyMap.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/container/XUniqueIDAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/CorbaString8.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/CorbaUnion.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/LogicalThreadID.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/ObjectKey.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/ObjectSystemID.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/OneThreadID.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/OpaqueData.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/TCKind.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/ThreadIDs.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/CancelRequestHeader.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/FragmentHeader_1_2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/IORAddressingInfo.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/LocateReplyHeader_1_2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/LocateRequestHeader_1_0.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/LocateRequestHeader_1_1.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/LocateStatusType_1_2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/MessageHeader_1_0.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/MessageHeader_1_1.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/MessageHeader_1_2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/MsgType_1_1.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/ReplyHeader_1_2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/ReplyStatusType_1_2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/RequestHeader_1_0.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/RequestHeader_1_1.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/RequestHeader_1_2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/SystemExceptionReplyBody.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/TargetAddress.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/TargetAddressGroup.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/giop/Version.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iiop/BiDirIIOPServiceContext.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iiop/ListenPoint.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iiop/ListenPointList.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iiop/ProfileBody_1_0.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iiop/ProfileBody_1_1.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iiop/Version.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iop/ComponentId.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iop/IOR.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iop/MultipleComponentProfile.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iop/ProfileId.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iop/ProfileIdGroup.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iop/ServiceContext.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iop/ServiceContextList.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iop/ServiceId.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iop/ServiceIdGroup.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iop/TaggedComponent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/corba/iop/TaggedProfile.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/AlreadyConnectedException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/BufferSizeExceededException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/ConnectException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/DataTransferEvent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/FilePermission.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/IOException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/NoRouteToHostException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/NotConnectedException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/SequenceInputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/SequenceOutputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/SocketException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/TempFile.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/UnexpectedEOFException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/UnknownHostException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/WrongFormatException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XActiveDataControl.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XActiveDataSink.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XActiveDataSource.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XActiveDataStreamer.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XAsyncOutputMonitor.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XConnectable.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XDataExporter.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XDataImporter.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XDataInputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XDataOutputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XDataTransferEventListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XInputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XInputStreamProvider.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XMarkableStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XObjectInputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XObjectOutputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XOutputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XPersist.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XPersistObject.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XSeekable.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XSeekableInputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XSequenceOutputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XStreamListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XTempFile.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XTextInputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XTextOutputStream.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XTruncate.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/io/XXMLExtractor.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/ArrayIndexOutOfBoundsException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/ClassNotFoundException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/DisposedException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/EventObject.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/IllegalAccessException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/IllegalArgumentException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/IndexOutOfBoundsException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/InvalidListenerException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/ListenerExistException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/Locale.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/NoSuchFieldException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/NoSuchMethodException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/NoSupportException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/NotInitializedException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/NullPointerException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/ServiceNotRegisteredException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/SystemDependent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/WrappedTargetException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/WrappedTargetRuntimeException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XComponent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XConnectionPoint.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XConnectionPointContainer.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XEventListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XInitialization.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XLocalizable.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XMain.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XMultiComponentFactory.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XMultiServiceFactory.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XServiceDisplayName.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XServiceInfo.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XServiceName.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XSingleComponentFactory.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XSingleServiceFactory.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XTypeProvider.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/lang/XUnoTunnel.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/loader/CannotActivateFactoryException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/loader/XImplementationLoader.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/FieldAccessMode.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/InvocationTargetException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/MethodMode.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/ParamInfo.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/ParamMode.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/XIdlArray.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/XIdlClass.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/XIdlField.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/XIdlMember.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/XIdlMethod.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/XMethodParameter.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/reflection/XPublished.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/registry/CannotRegisterImplementationException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/registry/InvalidRegistryException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/registry/InvalidValueException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/registry/MergeConflictException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/registry/RegistryKeyType.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/registry/RegistryValueType.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/registry/XImplementationRegistration.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/registry/XImplementationRegistration2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/registry/XRegistryKey.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/registry/XSimpleRegistry.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/AllEventObject.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/ArrayWrapper.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/BasicErrorException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/CannotConvertException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/CannotCreateAdapterException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/ContextInformation.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/FailReason.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/FinishEngineEvent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/FinishReason.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/InterruptEngineEvent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/InterruptReason.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/InvocationInfo.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/MemberType.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/ScriptEvent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/ScriptEventDescriptor.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XAllListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XAllListenerAdapterService.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XDebugging.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XDefaultMethod.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XDefaultProperty.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XEngine.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XEngineListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XEventAttacher.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XEventAttacherManager.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XInvocation.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XInvocation2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XInvocationAdapterFactory.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XInvocationAdapterFactory2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XLibraryAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XScriptEventsAttacher.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XScriptEventsSupplier.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XScriptListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XStarBasicAccess.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XStarBasicDialogInfo.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XStarBasicLibraryInfo.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XStarBasicModuleInfo.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/script/XTypeConverter.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/security/AccessControlException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/security/AllPermission.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/security/RuntimePermission.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/security/XAccessControlContext.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/security/XAccessController.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/security/XAction.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/security/XPolicy.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/TestEvent.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/XSimpleTest.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/XTest.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/XTestListener.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/bridge/TestData.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/bridge/TestDataElements.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/bridge/TestElement.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/bridge/TestEnum.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/bridge/TestSimple.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/bridge/XBridgeTest.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/bridge/XBridgeTest2.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/bridge/XBridgeTestBase.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/bridge/XRecursiveCall.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/performance/ComplexTypes.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/performance/SimpleTypes.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/test/performance/XPerformanceTest.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/DeploymentException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/Exception.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/RuntimeException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/SecurityException.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/TypeClass.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/Uik.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/XAdapter.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/XAggregation.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/XComponentContext.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/XCurrentContext.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/XInterface.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/XNamingService.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/XReference.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/XUnloadingPreference.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/uno/XWeak.hpp" />
+		<Unit filename="src/extensions/uno/com/sun/star/util/XVeto.hpp" />
+		<Unit filename="src/extensions/uno/src/actions.cxx" />
+		<Unit filename="src/extensions/uno/src/config.hpp" />
+		<Unit filename="src/extensions/uno/src/connection.cxx" />
+		<Unit filename="src/extensions/uno/src/main.cxx" />
+		<Unit filename="src/extensions/uno/src/ooo3270.hpp" />
+		<Unit filename="src/extensions/uno/src/screen.cxx" />
+		<Unit filename="src/extensions/uno/src/test_program.cxx" />
+		<Unit filename="src/gui/actions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/clipboard.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/colors.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/config.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/filetransfer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/gui.h" />
+		<Unit filename="src/gui/iocallback.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/keypad.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/mouse.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/plugin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/print.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/resources.rc" />
+		<Unit filename="src/gui/screen.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/terminal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/topwindow.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/version.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/include/X11/keysym.h" />
+		<Unit filename="src/include/globals.h" />
+		<Unit filename="src/include/lib3270.h" />
+		<Unit filename="src/include/lib3270/3270ds.h" />
+		<Unit filename="src/include/lib3270/actionsc.h" />
+		<Unit filename="src/include/lib3270/api.h" />
+		<Unit filename="src/include/lib3270/config.h" />
+		<Unit filename="src/include/lib3270/config.h.in" />
+		<Unit filename="src/include/lib3270/kybdc.h" />
+		<Unit filename="src/include/lib3270/localdefs.h" />
+		<Unit filename="src/include/lib3270/plugins.h" />
+		<Unit filename="src/include/lib3270/statusc.h" />
+		<Unit filename="src/include/lib3270/toggle.h" />
+		<Unit filename="src/lib/XtGlue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/actions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ansi.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ansic.h" />
+		<Unit filename="src/lib/apl.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/aplc.h" />
+		<Unit filename="src/lib/appres.h" />
+		<Unit filename="src/lib/arpa_telnet.h" />
+		<Unit filename="src/lib/cg.h" />
+		<Unit filename="src/lib/charset.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/charsetc.h" />
+		<Unit filename="src/lib/childc.h" />
+		<Unit filename="src/lib/ctlr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ctlr.h" />
+		<Unit filename="src/lib/ctlrc.h" />
+		<Unit filename="src/lib/dialogc.h" />
+		<Unit filename="src/lib/fallbacks.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ft.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ft_cut.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ft_cut_ds.h" />
+		<Unit filename="src/lib/ft_cutc.h" />
+		<Unit filename="src/lib/ft_dft.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ft_dft_ds.h" />
+		<Unit filename="src/lib/ft_dftc.h" />
+		<Unit filename="src/lib/ftc.h" />
+		<Unit filename="src/lib/glue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/gluec.h" />
+		<Unit filename="src/lib/host.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/hostc.h" />
+		<Unit filename="src/lib/icmd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/icmdc.h" />
+		<Unit filename="src/lib/idle.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/idlec.h" />
+		<Unit filename="src/lib/keymap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/keymapc.h" />
+		<Unit filename="src/lib/keypadc.h" />
+		<Unit filename="src/lib/kybd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/log.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/macros.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/macrosc.h" />
+		<Unit filename="src/lib/menubarc.h" />
+		<Unit filename="src/lib/mkfb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/objects.h" />
+		<Unit filename="src/lib/popupsc.h" />
+		<Unit filename="src/lib/print.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/printc.h" />
+		<Unit filename="src/lib/printer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/printerc.h" />
+		<Unit filename="src/lib/proxy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/proxyc.h" />
+		<Unit filename="src/lib/resolver.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/resolverc.h" />
+		<Unit filename="src/lib/resources.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/resources.h" />
+		<Unit filename="src/lib/rpq.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/savec.h" />
+		<Unit filename="src/lib/screen.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/screen.h" />
+		<Unit filename="src/lib/screenc.h" />
+		<Unit filename="src/lib/scrollc.h" />
+		<Unit filename="src/lib/see.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/seec.h" />
+		<Unit filename="src/lib/selectc.h" />
+		<Unit filename="src/lib/sf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/sfc.h" />
+		<Unit filename="src/lib/shlobj_missing.h" />
+		<Unit filename="src/lib/shortcutc.h" />
+		<Unit filename="src/lib/tables.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/tablesc.h" />
+		<Unit filename="src/lib/telnet.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/telnetc.h" />
+		<Unit filename="src/lib/tn3270e.h" />
+		<Unit filename="src/lib/toggles.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/togglesc.h" />
+		<Unit filename="src/lib/trace_ds.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/trace_dsc.h" />
+		<Unit filename="src/lib/utf8.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/utf8c.h" />
+		<Unit filename="src/lib/util.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/utilc.h" />
+		<Unit filename="src/lib/w3misc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/w3miscc.h" />
+		<Unit filename="src/lib/wide.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/widec.h" />
+		<Unit filename="src/lib/windirs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/windirsc.h" />
+		<Unit filename="src/lib/winvers.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/winversc.h" />
+		<Unit filename="src/lib/xio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/xioc.h" />
+		<Unit filename="src/lib/xl.h" />
+		<Unit filename="src/plugins/rexx/Makefile.in" />
+		<Unit filename="src/plugins/rexx/actions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/gui.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/init.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/network.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/rx3270.cls" />
+		<Unit filename="src/plugins/rexx/rx3270.h" />
+		<Unit filename="src/plugins/rexx/screen.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/toggle.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugins/rexx/tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/version.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ui/debug.xml" />
+		<Unit filename="ui/g3270.xml" />
+		<Unit filename="ui/rexx.xml" />
+		<Unit filename="win32.sh">
+			<Option target="Release" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

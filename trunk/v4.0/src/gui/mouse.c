@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como mouse.c e possui 920 linhas de código.
+ * Este programa está nomeado como mouse.c e possui 914 linhas de código.
  *
  * Contatos:
  *
@@ -31,7 +31,7 @@
  */
 
 
- #include "g3270.h"
+ #include "gui.h"
 
  #include <globals.h>
  #include <lib3270/kybdc.h>

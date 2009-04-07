@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como topwindow.c e possui 512 linhas de código.
+ * Este programa está nomeado como topwindow.c e possui 508 linhas de código.
  *
  * Contatos:
  *
@@ -30,7 +30,7 @@
  *
  */
 
- #include "g3270.h"
+ #include "gui.h"
  #include <gdk/gdkkeysyms.h>
  #include <lib3270/config.h>
 
@@ -48,7 +48,7 @@
  gchar		*program_logo	= NULL;
 
 #ifdef MOUSE_POINTER_CHANGE
- GdkCursor	*wCursor[CURSOR_MODE_G3270];
+ GdkCursor	*wCursor[CURSOR_MODE_3270];
 #endif
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
@@ -63,7 +63,7 @@
  static void destroy( GtkWidget *widget, gpointer   data )
  {
  	topwindow = NULL;
-	g3270_quit();
+	program_quit();
  }
 
  static void set_widget_flags(GtkWidget *widget, gpointer data)
@@ -324,7 +324,7 @@
   { "uparrow", IDC_UPARROW },
   { "wait", IDC_WAIT }
 */
-		static const gchar *cr[CURSOR_MODE_G3270] = {	"arrow",
+		static const gchar *cr[CURSOR_MODE_3270] = {	"arrow",
 														"wait",
 														"arrow",
 
@@ -342,7 +342,7 @@
 
 	#else
 
-		static int 		cr[CURSOR_MODE_G3270] = { 	GDK_XTERM,
+		static int 		cr[CURSOR_MODE_3270] = { 	GDK_XTERM,
 														GDK_WATCH,
 														GDK_X_CURSOR,
 
@@ -381,10 +381,10 @@
 #ifdef MOUSE_POINTER_CHANGE
 
 	#ifdef WIN32
-		for(f=0;f<CURSOR_MODE_G3270;f++)
+		for(f=0;f<CURSOR_MODE_3270;f++)
 			wCursor[f] = gdk_cursor_new_from_name(gdk_display_get_default(), cr[f]);
 	#else
-		for(f=0;f<CURSOR_MODE_G3270;f++)
+		for(f=0;f<CURSOR_MODE_3270;f++)
 			wCursor[f] = gdk_cursor_new(cr[f]);
 	#endif
 
@@ -458,11 +458,7 @@
 
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 
-#ifdef PACKAGE_NAME
 	gtk_window_set_role(GTK_WINDOW(topwindow), PACKAGE_NAME "_TOP" );
-#else
-	gtk_window_set_role(GTK_WINDOW(topwindow), "G3270_TOP" );
-#endif
 
 	action_ClearSelection();
 	ClearClipboard();
@@ -505,7 +501,7 @@
 	return 0;
  }
 
- void g3270_quit(void)
+ void program_quit(void)
  {
  	host_disconnect(0);
 	gtk_main_quit();

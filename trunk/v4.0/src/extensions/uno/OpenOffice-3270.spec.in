@@ -38,7 +38,7 @@ Group:          Productivity/Office/Suite
 Summary:        3270 calls for StarBasic.
 Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-Requires:       g3270-lib >= 4.0 OpenOffice_org-libs-core
+Requires:       pw3270-lib >= 4.0 OpenOffice_org-libs-core
 BuildRequires:  autoconf sed pkgconfig zip OpenOffice_org-ure-devel
 
 %description

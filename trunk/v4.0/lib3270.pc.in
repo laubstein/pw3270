@@ -5,8 +5,8 @@ includedir=@includedir@
 target=x11
 version=@PACKAGE_VERSION@
 
-Name: @PACKAGE@
-Description: GTK-3270 Terminal Emulator
+Name: lib3270
+Description: TN3270E Library calls used by @PACKAGE@
 Version: @PACKAGE_VERSION@
 Libs: -L\@libdir@ -l3270
 Cflags: -I@includedir@ -DV337=1

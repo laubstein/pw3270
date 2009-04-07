@@ -1,28 +1,32 @@
 /*
-* Copyright 2008, Banco do Brasil S.A.
-*
-* This file is part of g3270
-*
-* This program file is free software; you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by the
-* Free Software Foundation; version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-* for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program in a file named COPYING; if not, write to the
-* Free Software Foundation, Inc.,
-* 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA
-*
-* Authors:
-*
-* Perry Werneck<perry.werneck@gmail.com>
-*
-*/
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
+ * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+ * aplicativos mainframe.
+ *
+ * Copyright (C) <2008> <Banco do Brasil S.A.>
+ *
+ * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+ * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+ * Free Software Foundation.
+ *
+ * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+ * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+ * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+ * obter mais detalhes.
+ *
+ * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+ * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA, 02111-1307, USA
+ *
+ * Contatos:
+ *
+ * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+ * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
+ * licinio@bb.com.br		(Licínio Luis Branco)
+ * kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+ * macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+ *
+ */
 
 #ifndef RX3270_H_INCLUDED
 
@@ -53,7 +57,7 @@
 	#include <errno.h>
 
 	/* include the lib3270 stuff */
-	#define G3270_MODULE_NAME "rexx"
+	#define LIB3270_MODULE_NAME "rexx"
 	#include <lib3270/config.h>
 	#include <lib3270/api.h>
 	#include <lib3270/plugins.h>
@@ -119,7 +123,7 @@
 	ULONG APIENTRY rx3270SendENTERKey(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 
 	/* Globals */
-	extern GtkWidget *g3270_topwindow;
+	extern GtkWidget *program_window;
 
 #endif // RX3270_H_INCLUDED
 

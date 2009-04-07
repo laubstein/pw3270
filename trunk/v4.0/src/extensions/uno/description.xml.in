@@ -5,7 +5,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink">
 
   <version value="@PACKAGE_VERSION@" />
 
-  <identifier value="g3270" />
+  <identifier value="pw3270" />
 
   <platform value="linux_x86" />
 

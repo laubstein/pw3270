@@ -1,5 +1,5 @@
 /* 
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  * 
@@ -74,7 +74,7 @@
 	}
 
 
- 	dialog = gtk_message_dialog_new(	GTK_WINDOW(g3270_topwindow),
+ 	dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
 										GTK_DIALOG_DESTROY_WITH_PARENT,
 										type,
 										GTK_BUTTONS_CLOSE,

@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -42,24 +42,24 @@
 
 #include <stdio.h>
 #include <glib.h>
-#include "g3270.h"
+#include "gui.h"
 
 #ifdef G_THREADS_ENABLED
-	static int g3270_CallAndWait(int(*callback)(void *), void *parm);
+	static int static_CallAndWait(int(*callback)(void *), void *parm);
 #endif
 
-static unsigned long	g3270_AddInput(int source, void (*fn)(void));
-static void			g3270_RemoveSource(unsigned long id);
+static unsigned long	static_AddInput(int source, void (*fn)(void));
+static void		static_RemoveSource(unsigned long id);
 
 #if !defined(_WIN32) /*[*/
-static unsigned long	g3270_AddOutput(int source, void (*fn)(void));
+static unsigned long	static_AddOutput(int source, void (*fn)(void));
 #endif
 
-static unsigned long	g3270_AddExcept(int source, void (*fn)(void));
-static unsigned long	g3270_AddTimeOut(unsigned long interval_ms, void (*proc)(void));
-static void 			g3270_RemoveTimeOut(unsigned long timer);
-static int				g3270_Sleep(int seconds);
-static int 			g3270_RunPendingEvents(int wait);
+static unsigned long	static_AddExcept(int source, void (*fn)(void));
+static unsigned long	static_AddTimeOut(unsigned long interval_ms, void (*proc)(void));
+static void 		static_RemoveTimeOut(unsigned long timer);
+static int		static_Sleep(int seconds);
+static int 		static_RunPendingEvents(int wait);
 
 static gboolean 		IO_prepare(GSource *source, gint *timeout);
 static gboolean 		IO_check(GSource *source);
@@ -83,30 +83,30 @@ typedef struct _timer
 	void (*fn)(void);
 } TIMER;
 
-const struct lib3270_io_callbacks g3270_io_callbacks =
+const struct lib3270_io_callbacks program_io_callbacks =
 {
 	sizeof(struct lib3270_io_callbacks),
 
-	g3270_AddTimeOut,
-	g3270_RemoveTimeOut,
+	static_AddTimeOut,
+	static_RemoveTimeOut,
 
-	g3270_AddInput,
-	g3270_RemoveSource,
+	static_AddInput,
+	static_RemoveSource,
 
-	g3270_AddExcept,
+	static_AddExcept,
 
 #if !defined(_WIN32) /*[*/
-	g3270_AddOutput,
+	static_AddOutput,
 #endif /*]*/
 
 #ifdef G_THREADS_ENABLED
-	g3270_CallAndWait,
+	static_CallAndWait,
 #else
 	NULL,	// int (*CallAndWait)(int(*callback)(void *), void *parm);
 #endif
 
-	g3270_Sleep,
-	g3270_RunPendingEvents,
+	static_Sleep,
+	static_RunPendingEvents,
 
 };
 
@@ -137,13 +137,13 @@ static unsigned long AddSource(int source, gushort events, void (*fn)(void))
 	return (unsigned long) src;
 }
 
-static unsigned long g3270_AddInput(int source, void (*fn)(void))
+static unsigned long static_AddInput(int source, void (*fn)(void))
 {
 	Trace("Adding Input handle %08x",source);
 	return AddSource(source,G_IO_IN|G_IO_HUP|G_IO_ERR,fn);
 }
 
-static void g3270_RemoveSource(unsigned long id)
+static void static_RemoveSource(unsigned long id)
 {
 	if(id)
 	{
@@ -153,14 +153,14 @@ static void g3270_RemoveSource(unsigned long id)
 }
 
 #if !defined(_WIN32) /*[*/
-static unsigned long g3270_AddOutput(int source, void (*fn)(void))
+static unsigned long static_AddOutput(int source, void (*fn)(void))
 {
 	Trace("Adding Output handle %08x",source);
 	return AddSource(source,G_IO_OUT|G_IO_HUP|G_IO_ERR,fn);
 }
 #endif /*]*/
 
-static unsigned long g3270_AddExcept(int source, void (*fn)(void))
+static unsigned long static_AddExcept(int source, void (*fn)(void))
 {
 #if defined(_WIN32) /*[*/
 	return 0;
@@ -177,7 +177,7 @@ static gboolean do_timer(TIMER *t)
 	return FALSE;
 }
 
-static unsigned long g3270_AddTimeOut(unsigned long interval, void (*proc)(void))
+static unsigned long static_AddTimeOut(unsigned long interval, void (*proc)(void))
 {
 	TIMER *t = g_malloc(sizeof(TIMER));
 
@@ -191,7 +191,7 @@ static unsigned long g3270_AddTimeOut(unsigned long interval, void (*proc)(void)
 	return (unsigned long) t;
 }
 
-static void g3270_RemoveTimeOut(unsigned long timer)
+static void static_RemoveTimeOut(unsigned long timer)
 {
 	// FIXME (perry#2#): It this really necessary? The timeout is removed as soon as it ticks.
 	Trace("Removing timer %p",((TIMER *) timer));
@@ -303,7 +303,7 @@ static gboolean BgCallTimer(struct bgParameter *p)
 	return TRUE;
 }
 
-static int g3270_CallAndWait(int(*callback)(void *), void *parm)
+static int static_CallAndWait(int(*callback)(void *), void *parm)
 {
 	struct bgParameter p = { 3, -1, callback, parm };
 	GThread	*thread;
@@ -329,7 +329,7 @@ static int g3270_CallAndWait(int(*callback)(void *), void *parm)
 }
 #endif
 
-static int g3270_Sleep(int seconds)
+static int static_Sleep(int seconds)
 {
 	time_t end = time(0) + seconds;
 
@@ -339,7 +339,7 @@ static int g3270_Sleep(int seconds)
 	return 0;
 }
 
-static int g3270_RunPendingEvents(int wait)
+static int static_RunPendingEvents(int wait)
 {
 	int rc = 0;
 	while(gtk_events_pending())

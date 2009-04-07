@@ -6,10 +6,10 @@ CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@
 LDFLAGS=@LDFLAGS@
 
-#---[ G3270 ]------------------------------------------------------------------------------------------------------
+#---[ PW3270 ]-----------------------------------------------------------------------------------------------------
 
-G3270_CFLAGS ?= @G3270_CFLAGS@
-G3270_LFLAGS ?= @G3270_LIBS@
+LIB3270_CFLAGS ?= @LIB3270_CFLAGS@
+LIB3270_LFLAGS ?= @LIB3270_LIBS@
 
 #---[ Component Data ]---------------------------------------------------------------------------------------------
 
@@ -74,12 +74,12 @@ Release: @PACKAGE@.oxt
 @OBJRLSDIR@%.o: %.cxx @SRCDIR@*.hpp @SRCDIR@inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CXX) -DNDEBUG=1 $(CXXFLAGS) $(OO_CXXFLAGS) $(G3270_CFLAGS) -o $@ -c $<
+	@$(CXX) -DNDEBUG=1 $(CXXFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -o $@ -c $<
 
 @BINRLSDIR@$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), @OBJRLSDIR@@SRCDIR@$(basename $(OBJ)).o)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CXX) $(OO_LDFLAGS) $(G3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^
+	@$(CXX) $(OO_LDFLAGS) $(LIB3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^
 
 %.oxt: @BINRLSDIR@$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb description.xml manifest.xml
 	@echo $@
@@ -112,12 +112,12 @@ install-debug: @BINDBGDIR@$(COMP_IMPL_NAME) @SRCDIR@$(COMP_NAME).uno.rdb
 @OBJDBGDIR@%.o: %.cxx @SRCDIR@*.hpp @SRCDIR@inc/$(OWNER_PATH)/$(INTF_NAME).hpp
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CXX) -DDEBUG=1 $(CXXFLAGS) $(OO_CXXFLAGS) $(G3270_CFLAGS) -ggdb -o $@ -c $<
+	@$(CXX) -DDEBUG=1 $(CXXFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -ggdb -o $@ -c $<
 
 @BINDBGDIR@$(COMP_IMPL_NAME): $(foreach OBJ, $(CXX_FILES), @OBJDBGDIR@@SRCDIR@$(basename $(OBJ)).o)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CXX)  $(G3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^ $(OO_LDFLAGS)
+	@$(CXX)  $(LIB3270_LFLAGS) @OS_DLLFLAGS@ -o $@ $^ $(OO_LDFLAGS)
 
 run: @BINDBGDIR@$(COMP_NAME)@EXEEXT@
 	@LD_LIBRARY_PATH=$(OO_SDK_HOME)/ure/lib:$(OFFICE_HOME)/ure/lib:bin/Debug @BINDBGDIR@$(COMP_NAME)
@@ -186,7 +186,7 @@ clean:
 	@rm -fr @SRCDIR@inc
 	@rm -fr build.tmp
 	@rm -f @PACKAGE@-@PACKAGE_VERSION@.tar.gz
-	@rm -f @PACKAGE@.oxt
+	@rm -f *.oxt
 	@rm -fr build.tmp
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;

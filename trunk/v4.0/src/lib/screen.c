@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como screen.c e possui 900 linhas de código.
+ * Este programa está nomeado como screen.c e possui 894 linhas de código.
  *
  * Contatos:
  *
@@ -578,7 +578,7 @@ status_reset(void)
 
 }
 
-G3270_EXPORT void status_reverse_mode(int on)
+LIB3270_EXPORT void status_reverse_mode(int on)
 {
 	set(OIA_FLAG_REVERSE,on);
 }
@@ -592,12 +592,12 @@ static STATUS_CODE current_status_code = -1;
  *
  * @see STATUS_CODE
  */
-G3270_EXPORT STATUS_CODE query_3270_terminal_status(void)
+LIB3270_EXPORT STATUS_CODE query_3270_terminal_status(void)
 {
 	return current_status_code;
 }
 
-G3270_EXPORT void status_changed(STATUS_CODE id)
+LIB3270_EXPORT void status_changed(STATUS_CODE id)
 {
 	if(id == current_status_code)
 		return;
@@ -616,18 +616,18 @@ status_syswait(void)
 }
 */
 
-G3270_EXPORT void status_twait(void)
+LIB3270_EXPORT void status_twait(void)
 {
 	set(OIA_FLAG_UNDERA,False);
 	status_changed(STATUS_CODE_TWAIT);
 }
 
-G3270_EXPORT void status_typeahead(int on)
+LIB3270_EXPORT void status_typeahead(int on)
 {
 	set(OIA_FLAG_TYPEAHEAD,on);
 }
 
-G3270_EXPORT void status_compose(int on, unsigned char c, enum keytype keytype)
+LIB3270_EXPORT void status_compose(int on, unsigned char c, enum keytype keytype)
 {
 	if(callbacks && callbacks->compose)
 		callbacks->compose(on,c,keytype);
@@ -683,7 +683,7 @@ static void status_printer(int on)
 	set(OIA_FLAG_PRINTER,on);
 }
 
-G3270_EXPORT void status_script(int on)
+LIB3270_EXPORT void status_script(int on)
 {
 	set(OIA_FLAG_SCRIPT,on);
 }
@@ -871,7 +871,7 @@ extern void popup_an_error(const char *fmt, ...)
 
 }
 
-G3270_EXPORT int set_device_buffer(struct ea *src, int el)
+LIB3270_EXPORT int set_device_buffer(struct ea *src, int el)
 {
 	if(el > (maxROWS * maxCOLS))
 		return EINVAL;
@@ -883,7 +883,7 @@ G3270_EXPORT int set_device_buffer(struct ea *src, int el)
 	return 0;
 }
 
-G3270_EXPORT struct ea * copy_device_buffer(int *el)
+LIB3270_EXPORT struct ea * copy_device_buffer(int *el)
 {
 	int			sz		=  sizeof(struct ea) * (maxROWS * maxCOLS);
 	struct ea	*ret	=  malloc(sz);

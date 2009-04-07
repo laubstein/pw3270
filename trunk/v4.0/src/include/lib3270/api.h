@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software PW3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como @@FILENAME@@ e possui @@LINES@@ linhas de código.
+ * Este programa está nomeado como api.h e possui 444 linhas de código.
  *
  * Contatos:
  *
@@ -44,11 +44,11 @@
 		#if defined(_WIN32)
 			#include <windows.h>
 
-			#define G3270_EXPORT __declspec (dllexport)
+			#define LIB3270_EXPORT __declspec (dllexport)
 
 		#else
 			#include <stdarg.h>
-			#define G3270_EXPORT
+			#define LIB3270_EXPORT
 
 		#endif
 
@@ -76,12 +76,12 @@
 		#endif
 
 
-		G3270_EXPORT int Set3270Log(const char *filename);
-		G3270_EXPORT int WriteLog(const char *module, const char *fmt, ...);
-		G3270_EXPORT int WriteRCLog(const char *module, int rc, const char *fmt, ...);
+		LIB3270_EXPORT int Set3270Log(const char *filename);
+		LIB3270_EXPORT int WriteLog(const char *module, const char *fmt, ...);
+		LIB3270_EXPORT int WriteRCLog(const char *module, int rc, const char *fmt, ...);
 
-		#ifdef G3270_MODULE_NAME
-			#define Log(fmt, ...)		WriteLog(G3270_MODULE_NAME,fmt,__VA_ARGS__)
+		#ifdef LIB3270_MODULE_NAME
+			#define Log(fmt, ...)		WriteLog(LIB3270_MODULE_NAME,fmt,__VA_ARGS__)
 		#else
 			#define Log(fmt, ...)		WriteLog("MSG",fmt,__VA_ARGS__)
 		#endif
@@ -136,12 +136,12 @@
 		/**
 		 * Return a "malloced" copy of the device buffer, set number of elements
 		 */
-		G3270_EXPORT struct ea * copy_device_buffer(int *el);
+		LIB3270_EXPORT struct ea * copy_device_buffer(int *el);
 
 		/**
 		 * Set the contents of the device buffer for debugging purposes
 		 */
-		G3270_EXPORT int set_device_buffer(struct ea *src, int el);
+		LIB3270_EXPORT int set_device_buffer(struct ea *src, int el);
 
 		/* File transfer */
 		#define FT_FLAG_RECEIVE					0x0001
@@ -170,7 +170,7 @@
 			FT_ABORT_SENT	/**< Abort sent; awaiting response */
 		};
 
-		G3270_EXPORT int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft);
+		LIB3270_EXPORT int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft);
 
 		struct filetransfer_callbacks
 		{
@@ -184,7 +184,7 @@
 
 		};
 
-		G3270_EXPORT int RegisterFTCallbacks(const struct filetransfer_callbacks *cbk);
+		LIB3270_EXPORT int RegisterFTCallbacks(const struct filetransfer_callbacks *cbk);
 
 		/* Library internals */
 		#ifdef LIB3270
@@ -193,8 +193,8 @@
 
 		#else
 
-			G3270_EXPORT enum cstate 	QueryCstate(void);
-			G3270_EXPORT enum ft_state	QueryFTstate(void);
+			LIB3270_EXPORT enum cstate 	QueryCstate(void);
+			LIB3270_EXPORT enum ft_state	QueryFTstate(void);
 
 			#define PCONNECTED	((int) QueryCstate() >= (int)RESOLVING)
 			#define HALF_CONNECTED	(QueryCstate() == RESOLVING || QueryCstate() == PENDING)
@@ -233,7 +233,7 @@
 
 		};
 
-		G3270_EXPORT int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk);
+		LIB3270_EXPORT int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk);
 
 		/* Screen processing */
 		typedef enum _CURSOR_MODE
@@ -288,11 +288,11 @@
 			COUNTER_ID_USER
 		} COUNTER_ID;
 
-		G3270_EXPORT int query_counter(COUNTER_ID id);
+		LIB3270_EXPORT int query_counter(COUNTER_ID id);
 
 		#define	query_screen_change_counter() query_counter(COUNTER_ID_SCREEN_CHANGED)
 
-		enum g3270_action_groups
+		enum lib3270_action_groups
 		{
 			ACTION_GROUP_COMMON,
 			ACTION_GROUP_ONLINE,
@@ -362,79 +362,79 @@
 			const char		*description;
 		};
 
-		G3270_EXPORT int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
+		LIB3270_EXPORT int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
 
-		G3270_EXPORT int lib3270_init(const char *program_path);
+		LIB3270_EXPORT int lib3270_init(const char *program_path);
 
-		G3270_EXPORT const struct lib3270_option * get_3270_option_table(int sz);
+		LIB3270_EXPORT const struct lib3270_option * get_3270_option_table(int sz);
 
-		G3270_EXPORT void Error(const char *fmt, ...);
-		G3270_EXPORT void Warning(const char *fmt, ...);
+		LIB3270_EXPORT void Error(const char *fmt, ...);
+		LIB3270_EXPORT void Warning(const char *fmt, ...);
 
 		/* Set/Get screen contents */
-		G3270_EXPORT int find_field_attribute(int baddr);
-		G3270_EXPORT int find_field_length(int baddr);
-		G3270_EXPORT unsigned char get_field_attribute(int baddr);
-		G3270_EXPORT int screen_read(char *dest, int baddr, int count);
-		G3270_EXPORT void Input_String(const unsigned char *str);
-		G3270_EXPORT void screen_size(int *rows, int *cols);
-		G3270_EXPORT int query_secure_connection(void);
+		LIB3270_EXPORT int find_field_attribute(int baddr);
+		LIB3270_EXPORT int find_field_length(int baddr);
+		LIB3270_EXPORT unsigned char get_field_attribute(int baddr);
+		LIB3270_EXPORT int screen_read(char *dest, int baddr, int count);
+		LIB3270_EXPORT void Input_String(const unsigned char *str);
+		LIB3270_EXPORT void screen_size(int *rows, int *cols);
+		LIB3270_EXPORT int query_secure_connection(void);
 
         /* Misc calls */
-		G3270_EXPORT int Get3270Socket(void);
-		G3270_EXPORT void popup_an_error(const char *fmt, ...);
-		G3270_EXPORT STATUS_CODE query_3270_terminal_status(void);
+		LIB3270_EXPORT int Get3270Socket(void);
+		LIB3270_EXPORT void popup_an_error(const char *fmt, ...);
+		LIB3270_EXPORT STATUS_CODE query_3270_terminal_status(void);
 
-		G3270_EXPORT int Toggled(int ix);
+		LIB3270_EXPORT int Toggled(int ix);
 
-		G3270_EXPORT int CallAndWait(int(*callback)(void *), void *parm);
-		G3270_EXPORT void RunPendingEvents(int wait);
-		G3270_EXPORT int Wait(int seconds);
+		LIB3270_EXPORT int CallAndWait(int(*callback)(void *), void *parm);
+		LIB3270_EXPORT void RunPendingEvents(int wait);
+		LIB3270_EXPORT int Wait(int seconds);
 
-		G3270_EXPORT void ctlr_erase(int alt);
-		G3270_EXPORT void ctlr_set_rows_cols(int mn, int ovc, int ovr);
-        G3270_EXPORT int ctlr_get_cols(void);
-        G3270_EXPORT int ctlr_get_rows(void);
+		LIB3270_EXPORT void ctlr_erase(int alt);
+		LIB3270_EXPORT void ctlr_set_rows_cols(int mn, int ovc, int ovr);
+        LIB3270_EXPORT int ctlr_get_cols(void);
+        LIB3270_EXPORT int ctlr_get_rows(void);
 
         /* Screen calls */
-		G3270_EXPORT void screen_resume(void);
-		G3270_EXPORT void screen_suspend(void);
-		G3270_EXPORT void screen_disp(void);
+		LIB3270_EXPORT void screen_resume(void);
+		LIB3270_EXPORT void screen_suspend(void);
+		LIB3270_EXPORT void screen_disp(void);
 
         /* Cursor calls */
-		G3270_EXPORT int cursor_get_addr(void);
-        G3270_EXPORT int cursor_set_addr(int baddr);
+		LIB3270_EXPORT int cursor_get_addr(void);
+        LIB3270_EXPORT int cursor_set_addr(int baddr);
 		#define cursor_move(x) cursor_set_addr(x)
 
 		/* Actions */
-		G3270_EXPORT int action_Enter(void);
-		G3270_EXPORT int action_PFKey(int key);
-		G3270_EXPORT int action_PAKey(int key);
-		G3270_EXPORT int action_NextField(void);
-		G3270_EXPORT int action_PreviousField(void);
-		G3270_EXPORT int action_FirstField(void);
-		G3270_EXPORT int action_Reset(void);
+		LIB3270_EXPORT int action_Enter(void);
+		LIB3270_EXPORT int action_PFKey(int key);
+		LIB3270_EXPORT int action_PAKey(int key);
+		LIB3270_EXPORT int action_NextField(void);
+		LIB3270_EXPORT int action_PreviousField(void);
+		LIB3270_EXPORT int action_FirstField(void);
+		LIB3270_EXPORT int action_Reset(void);
 
-		G3270_EXPORT int action_CursorUp(void);
-		G3270_EXPORT int action_CursorDown(void);
-		G3270_EXPORT int action_CursorLeft(void);
-		G3270_EXPORT int action_CursorRight(void);
+		LIB3270_EXPORT int action_CursorUp(void);
+		LIB3270_EXPORT int action_CursorDown(void);
+		LIB3270_EXPORT int action_CursorLeft(void);
+		LIB3270_EXPORT int action_CursorRight(void);
 
-		G3270_EXPORT int action_EraseInput(void);
-		G3270_EXPORT int action_ClearFields(void);
+		LIB3270_EXPORT int action_EraseInput(void);
+		LIB3270_EXPORT int action_ClearFields(void);
 
-		G3270_EXPORT int action_EraseEOF(void);
-		G3270_EXPORT int action_DeleteWord(void);
-		G3270_EXPORT int action_DeleteField(void);
-		G3270_EXPORT int action_Delete(void);
-		G3270_EXPORT int action_Erase(void);
-		G3270_EXPORT int action_SysReq(void);
+		LIB3270_EXPORT int action_EraseEOF(void);
+		LIB3270_EXPORT int action_DeleteWord(void);
+		LIB3270_EXPORT int action_DeleteField(void);
+		LIB3270_EXPORT int action_Delete(void);
+		LIB3270_EXPORT int action_Erase(void);
+		LIB3270_EXPORT int action_SysReq(void);
 
 		/* Host connect/disconnect and state change. */
-		G3270_EXPORT int host_connect(const char *n, int wait);
-		G3270_EXPORT int host_reconnect(int wait);
-		G3270_EXPORT void host_disconnect(int disable);
-		G3270_EXPORT void register_schange(int tx, void (*func)(int));
+		LIB3270_EXPORT int host_connect(const char *n, int wait);
+		LIB3270_EXPORT int host_reconnect(int wait);
+		LIB3270_EXPORT void host_disconnect(int disable);
+		LIB3270_EXPORT void register_schange(int tx, void (*func)(int));
 
 
 #ifdef __cplusplus

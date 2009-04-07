@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe.
  *
@@ -30,7 +30,7 @@
  *
  */
 
- #include "g3270.h"
+ #include "gui.h"
 
  #include <lib3270/config.h>
  #include <globals.h>
@@ -45,8 +45,8 @@
  static int doPrint(GtkPrintOperation *prt, GtkPrintContext *context,cairo_t *cr,gint page)
  {
  	gchar					**text;
-	PangoFontDescription	*FontDescr	= (PangoFontDescription *) g_object_get_data(G_OBJECT(prt),"g3270_FontDescr");
-	PangoLayout				*FontLayout	= (PangoLayout *) g_object_get_data(G_OBJECT(prt),"g3270_FontLayout");
+	PangoFontDescription	*FontDescr	= (PangoFontDescription *) g_object_get_data(G_OBJECT(prt),"3270FontDescr");
+	PangoLayout				*FontLayout	= (PangoLayout *) g_object_get_data(G_OBJECT(prt),"3270FontLayout");
 	int						pg			= 0;
 	gdouble					maxHeight 	= gtk_print_context_get_height(context);
 	gdouble					current		= 0;
@@ -54,19 +54,19 @@
 
 	if(!FontDescr)
 	{
-		FontDescr = pango_font_description_from_string(g_object_get_data(G_OBJECT(prt),"g3270_FontName"));
-		g_object_set_data_full(G_OBJECT(prt),"g3270_FontDescr",FontDescr,(void (*)(gpointer)) pango_font_description_free);
+		FontDescr = pango_font_description_from_string(g_object_get_data(G_OBJECT(prt),"3270FontName"));
+		g_object_set_data_full(G_OBJECT(prt),"3270FontDescr",FontDescr,(void (*)(gpointer)) pango_font_description_free);
 	}
 
 	if(!FontLayout)
 	{
 		Trace("Creating FontLayout to context %p",context);
 		FontLayout = gtk_print_context_create_pango_layout(context);
-		g_object_set_data_full(G_OBJECT(prt),"g3270_FontLayout",FontLayout,(void (*)(gpointer)) g_object_unref);
+		g_object_set_data_full(G_OBJECT(prt),"3270FontLayout",FontLayout,(void (*)(gpointer)) g_object_unref);
 		pango_layout_set_font_description(FontLayout,FontDescr);
 	}
 
-	for(text = g_object_get_data(G_OBJECT(prt),"g3270_text");*text;text++)
+	for(text = g_object_get_data(G_OBJECT(prt),"3270Text");*text;text++)
 	{
 		gint width, height;
 
@@ -119,12 +119,12 @@
  {
  	gchar *font = gtk_font_selection_get_font_name(GTK_FONT_SELECTION(font_dialog));
 	if(font)
-		g_object_set_data_full(G_OBJECT(prt),"g3270_FontName",font,g_free);
+		g_object_set_data_full(G_OBJECT(prt),"3270FontName",font,g_free);
  }
 
  static void load_font(GtkWidget *widget, GtkPrintOperation *prt)
  {
-	gtk_font_selection_set_font_name(GTK_FONT_SELECTION(widget),g_object_get_data(G_OBJECT(prt),"g3270_FontName"));
+	gtk_font_selection_set_font_name(GTK_FONT_SELECTION(widget),g_object_get_data(G_OBJECT(prt),"3270FontName"));
  }
 
  static GObject * create_custom_widget(GtkPrintOperation *prt, gpointer user_data)
@@ -153,7 +153,7 @@
 #endif
 	GtkPrintSettings		*settings	= gtk_print_operation_get_print_settings(prt);
 #ifdef HAVE_PRINT_FONT_DIALOG
-	PangoFontDescription	*FontDescr	= (PangoFontDescription *) g_object_get_data(G_OBJECT(prt),"g3270_FontDescr");
+	PangoFontDescription	*FontDescr	= (PangoFontDescription *) g_object_get_data(G_OBJECT(prt),"3270FontDescr");
 #endif
 	GtkPageSetup			*setup		= gtk_print_operation_get_default_page_setup(prt);
 
@@ -210,8 +210,8 @@
  		return -1;
 
 	// Set job parameters
-	g_object_set_data_full(G_OBJECT(prt),"g3270_text",g_strsplit(g_strchomp(text),"\n",-1),(void (*)(gpointer)) g_strfreev);
-	g_object_set_data_full(G_OBJECT(prt),"g3270_FontName",g_strdup(GetString("Print","Font","Courier 10")),g_free);
+	g_object_set_data_full(G_OBJECT(prt),"3270Text",g_strsplit(g_strchomp(text),"\n",-1),(void (*)(gpointer)) g_strfreev);
+	g_object_set_data_full(G_OBJECT(prt),"3270FontName",g_strdup(GetString("Print","Font","Courier 10")),g_free);
 
 	// Configure print operation
 	gtk_print_operation_set_job_name(prt,name);
