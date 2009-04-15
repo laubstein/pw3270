@@ -48,7 +48,6 @@ end
 return
 
 ::method uninit
-	ok = rx3270Disconnect()
 return
 
 ::method Connect
@@ -93,11 +92,25 @@ return rx3270WaitForTerminalReady(timeout)
 	use arg row, col, str
 return rx3270InputString(row,col,str)
 
-::method sendEnterKey()
+::method sendEnterKey
 return rx3270SendENTERKey()
 
 ::method sendPFKey
 	use arg key
 return rx3270SendPFKey(key)
 
+::class DialogBox public subclass object
 
+::method init
+	self~widget = 0
+return
+
+::method uninit
+	self~widget = 0
+return
+
+::method run
+	if self~widget = 0
+		then return -22
+
+return 0

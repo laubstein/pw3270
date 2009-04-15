@@ -307,6 +307,10 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 		{
 			rc = ENOTCONN;
 		}
+		else if(query_3270_terminal_status() != STATUS_CODE_BLANK)
+		{
+			RunPendingEvents(1);
+		}
 		else
 		{
 			RunPendingEvents(1);
