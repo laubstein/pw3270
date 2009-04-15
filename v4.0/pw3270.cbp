@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="g3270" />
+		<Option title="3270" />
 		<Option platforms="Windows;Unix;" />
 		<Option makefile_is_custom="1" />
 		<Option pch_mode="2" />
@@ -623,15 +623,9 @@
 		<Unit filename="src/plugins/rexx/tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/version.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="ui/debug.xml" />
 		<Unit filename="ui/g3270.xml" />
 		<Unit filename="ui/rexx.xml" />
-		<Unit filename="win32.sh">
-			<Option target="Release" />
-		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />

@@ -57,9 +57,9 @@
 	{ "Sticky",		GDK_WINDOW_STATE_STICKY,		gtk_window_stick                }
  };
 
- static GKeyFile	* program_config	= NULL;
-
- gchar				* program_config_filename = NULL;
+ static GKeyFile	* program_config = NULL;
+ gchar				* program_config_file = PROGRAM_NAME ".conf";
+ gchar				* program_config_filename_and_path = NULL;
  gchar				* program_data = NULL;
 
 
@@ -67,74 +67,86 @@
 
  static gchar * FindConfigFile(void)
  {
- 	static const gchar 	*name = PROGRAM_NAME ".conf";
+// 	static const gchar 	*name = program_config_file;
 	const gchar * const	*list;
  	gchar					*filename;
  	const gchar			*fixed[] = { g_get_user_config_dir(), g_get_home_dir()  };
  	int						f;
 
 	// Check for pre-defined name
-	if(program_config_filename)
-	{
-		return program_config_filename;
-	}
-	else
-	{
-		// Search user config dir; if found set fixed filename to value found
-
-		filename = g_build_filename( g_get_user_config_dir(),name,NULL );
-		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
-		{
-			program_config_filename = filename;
-			return filename;
-		}
-		g_free(filename);
-
-		filename = g_build_filename( g_get_user_config_dir(),PROGRAM_NAME,name,NULL );
-		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
-		{
-			program_config_filename = filename;
-			return filename;
-		}
-		g_free(filename);
-
-		filename = g_build_filename( g_get_user_config_dir(),PACKAGE_NAME,name,NULL );
-		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
-		{
-			program_config_filename = filename;
-			return filename;
-		}
-		g_free(filename);
-
-	}
+	if(program_config_filename_and_path)
+		return program_config_filename_and_path;
 
 	/*
-	 * Can't find user's defined configuration file, search on system paths
+	 * Search for user's configuration file.
+	 */
+	filename = g_build_filename( g_get_user_config_dir(),program_config_file,NULL );
+	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+	{
+		program_config_filename_and_path = filename;
+		return filename;
+	}
+	g_free(filename);
+
+	filename = g_build_filename( g_get_user_config_dir(),PROGRAM_NAME,program_config_file,NULL );
+	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+	{
+		program_config_filename_and_path = filename;
+		return filename;
+	}
+	g_free(filename);
+
+
+	filename = g_build_filename( g_get_user_config_dir(),PACKAGE_NAME,program_config_file,NULL );
+	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+	{
+		program_config_filename_and_path = filename;
+		return filename;
+	}
+	g_free(filename);
+
+	/*
+	 * Can't find user's configuration file, check program_data for default one
+	 */
+	if(program_data)
+	{
+		filename = g_build_filename(program_data, program_config_file,NULL);
+		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+		{
+			program_config_filename_and_path = filename;
+			return filename;
+		}
+		g_free(filename);
+	}
+
+
+	/*
+	 * Can't find user's configuration file, search on system paths
 	 */
 	for(f=0; f < (sizeof(fixed)/sizeof(const gchar *)); f++)
 	{
-		CHECK_FILENAME(fixed[f],name);
-		CHECK_FILENAME(fixed[f],PROGRAM_NAME,name);
-		CHECK_FILENAME(fixed[f],PACKAGE_NAME,name);
+		CHECK_FILENAME(fixed[f],program_config_file);
+		CHECK_FILENAME(fixed[f],PROGRAM_NAME,program_config_file);
+		CHECK_FILENAME(fixed[f],PACKAGE_NAME,program_config_file);
 	}
 
 	// Search system config path
 	list =  g_get_system_config_dirs();
  	for(f=0;list[f];f++)
  	{
-		CHECK_FILENAME(list[f],PROGRAM_NAME,name);
-		CHECK_FILENAME(list[f],PACKAGE_NAME,name);
+		CHECK_FILENAME(list[f],PROGRAM_NAME,program_config_file);
+		CHECK_FILENAME(list[f],PACKAGE_NAME,program_config_file);
  	}
 
 #ifdef DATAROOTDIR
 	// Search DATADIR
-	CHECK_FILENAME(DATAROOTDIR,PROGRAM_NAME,name);
-	CHECK_FILENAME(DATAROOTDIR,PACKAGE_NAME,name);
+	CHECK_FILENAME(DATAROOTDIR,PROGRAM_NAME,program_config_file);
+	CHECK_FILENAME(DATAROOTDIR,PACKAGE_NAME,program_config_file);
 #endif
 
 	// Check if the file is available in current directory
-	if(g_file_test(name,G_FILE_TEST_IS_REGULAR))
-		return g_strdup(name);
+	if(g_file_test(program_config_file,G_FILE_TEST_IS_REGULAR))
+		return g_strdup(program_config_file);
 
 	return 0;
  }
@@ -206,15 +218,15 @@
 
 		for(buffer = ptr;*ptr && isspace(*ptr);ptr++);
 
-		if(program_config_filename)
+		if(program_config_filename_and_path)
 		{
 			// Save on fixed file
-			g_file_set_contents(program_config_filename,ptr,-1,NULL);
+			g_file_set_contents(program_config_filename_and_path,ptr,-1,NULL);
 		}
 		else
 		{
 			// Save the buffer contents
-			filename = g_build_filename( g_get_user_config_dir(), PACKAGE_NAME ".conf", NULL);
+			filename = g_build_filename( g_get_user_config_dir(), program_config_file, NULL);
 			Trace("Saving %s...",filename);
 			g_file_set_contents(filename,ptr,-1,NULL);
 			g_free(filename);

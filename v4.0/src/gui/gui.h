@@ -201,10 +201,12 @@
 	extern gboolean 				WaitingForChanges;
 	extern char					*charset;
 	extern gchar 					*window_title;
+	extern gboolean				drawing_enabled;
+
 	extern gchar					*program_data;
 	extern gchar					*program_logo;
-	extern gboolean				drawing_enabled;
-	extern gchar					*program_config_filename;
+	extern gchar					*program_config_file;
+	extern gchar					*program_config_filename_and_path;
 
 #ifdef HAVE_PLUGINS
 	extern gchar					*plugin_list;
