@@ -21,11 +21,11 @@
 /*                                                                               */
 /* Contatos:                                                                     */
 /*                                                                               */
-/* perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)               */
-/* erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)                     */
-/* licinio@bb.com.br		(Licínio Luis Branco)                            */
-/* kraucer@bb.com.br		(Kraucer Fernandes Mazuco)                       */
-/* macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)                   */
+/* perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)                   */
+/* erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)                         */
+/* licinio@bb.com.br		(Licínio Luis Branco)                                */
+/* kraucer@bb.com.br		(Kraucer Fernandes Mazuco)                           */
+/* macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)                       */
 /*                                                                               */
 /*-------------------------------------------------------------------------------*/
 
@@ -40,6 +40,9 @@ if rxfuncquery('rx3270LoadFuncs') then do
 end
 
 
+/*-------------------------------------------------------------------------------*/
+/* 3270 class                                                                    */
+/*-------------------------------------------------------------------------------*/
 ::class rx3270 public subclass object
 
 ::method init
@@ -61,7 +64,7 @@ return rx3270Disconnect()
 return rx3270QueryCState()
 
 ::method isConnected
-return getConnectionState() = "CONNECTED_TN3270E"
+return self~getConnectionState() = "CONNECTED_TN3270E"
 
 ::method waitForEvents
 return rx3270WaitForEvents()
@@ -75,11 +78,13 @@ return rx3270ReadScreen()
 
 ::method waitForStringAt
 	use arg row, col, key, timeout
+	if datatype(timeout) <> "NUM"
+		then timeout = 60
 return rx3270WaitForStringAt(row,col,key,timeout)
 
 ::method queryStringAt
 	use arg row, col, key
-return getScreenContentAt(row,col,length(key)) == key
+return self~getScreenContentAt(row,col,length(key)) == key
 
 ::method isTerminalReady
 return rx3270IsTerminalReady()
@@ -99,6 +104,13 @@ return rx3270SendENTERKey()
 	use arg key
 return rx3270SendPFKey(key)
 
+::method setCursorPosition
+	use arg row, col
+return rx3270SetCursorPosition(row,col)
+
+/*-------------------------------------------------------------------------------*/
+/* Common dialog box class                                                       */
+/*-------------------------------------------------------------------------------*/
 ::class DialogBox public subclass object
 
 ::method init
@@ -106,11 +118,42 @@ return rx3270SendPFKey(key)
 return
 
 ::method uninit
-	self~widget = 0
+	ok = self~destroy()
+return
+
+::method destroy
+	if self~widget <> 0
+		then ok = rx3270DestroyDialog(self~widget)
+	self~widget = 0;
 return
 
 ::method run
 	if self~widget = 0
 		then return -22
+return rx3270runDialog(self~widget)
 
-return 0
+::method widget
+	expose widget
+return widget
+
+::method 'widget=' private
+	expose widget
+	use arg ptr
+	widget = ptr
+return
+
+
+/*-------------------------------------------------------------------------------*/
+/* File selection dialog box                                                     */
+/*-------------------------------------------------------------------------------*/
+::class FileChooserDialog public subclass DialogBox
+
+::method init
+	use arg type, title
+	self~widget = rx3270FileChooserNew(type,title)
+return
+
+::method filename
+return rx3270FileChooserGetFilename(self~widget)
+
+
