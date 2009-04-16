@@ -75,8 +75,8 @@
 	EXPORT_REXX_FUNCTION( rx3270InputString			    ),
 	EXPORT_REXX_FUNCTION( rx3270FindFieldAttribute	    ),
 	EXPORT_REXX_FUNCTION( rx3270FindFieldLength		    ),
-	EXPORT_REXX_FUNCTION( rx3270MoveCursor			    ),
 	EXPORT_REXX_FUNCTION( rx3270GetCursorPosition	    ),
+	EXPORT_REXX_FUNCTION( rx3270SetCursorPosition		),
 	EXPORT_REXX_FUNCTION( rx3270ReadScreen			    ),
 	EXPORT_REXX_FUNCTION( rx3270SendPFKey			    ),
 	EXPORT_REXX_FUNCTION( rx3270WaitForChanges		    ),
@@ -94,6 +94,12 @@
 	EXPORT_REXX_FUNCTION( rx3270Actions				    ),
 	EXPORT_REXX_FUNCTION( rx3270Quit					),
 	EXPORT_REXX_FUNCTION( rx3270SetVisible				),
+	EXPORT_REXX_FUNCTION( rx3270Popup					),
+	EXPORT_REXX_FUNCTION( rx3270runDialog				),
+	EXPORT_REXX_FUNCTION( rx3270DestroyDialog			),
+	EXPORT_REXX_FUNCTION( rx3270FileChooserNew			),
+	EXPORT_REXX_FUNCTION( rx3270FileChooserGetFilename	),
+
  };
 
  static const struct entrypoint standalone_entrypoint[] =
@@ -349,3 +355,9 @@ ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuena
  }
 
 
+ULONG RetPointer(PRXSTRING Retstr, gpointer value)
+{
+	g_snprintf(Retstr->strptr,RXAUTOBUFLEN-1,"%p",value);
+    Retstr->strlength = strlen(Retstr->strptr);
+    return RXFUNC_OK;
+}

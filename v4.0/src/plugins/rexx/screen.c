@@ -66,6 +66,8 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270InputString(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
+	Trace("Status: %d",query_3270_terminal_status());
+
  	if(!PCONNECTED)
  	{
 		return RetValue(Retstr,ENOTCONN);
@@ -95,7 +97,9 @@
 		return RXFUNC_BADCALL;
 	}
 
-	return RetValue(Retstr,0);
+	Trace("Status: %d",query_3270_terminal_status());
+
+	return RetValue(Retstr,query_3270_terminal_status() == STATUS_CODE_BLANK ? 0 : EINVAL);
  }
 
  ULONG APIENTRY rx3270FindFieldAttribute(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
@@ -116,7 +120,7 @@
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
-/* Rexx External Function: rx3270MoveCursor                                   */
+/* Rexx External Function: rx3270SetCursorPosition                            */
 /*                                                                            */
 /* Description: Set cursor position.                                          */
 /*                                                                            */
@@ -128,7 +132,7 @@
 /* Returns:	    Original cursor position                                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-ULONG APIENTRY rx3270MoveCursor(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ULONG APIENTRY rx3270SetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
 {
     int rc = -1;
 
@@ -218,7 +222,7 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 		return RXFUNC_BADCALL;
 
 	ReturnValue(cursor_get_addr());
- }
+}
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
@@ -249,7 +253,8 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270WaitForStringAt(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	int start, sz, rows, cols, row, col, end = time(0), rc;
+ 	int start, sz, rows, cols, row, col, rc;
+ 	time_t end = time(0);
  	const char *key;
  	char *buffer;
 
@@ -271,12 +276,12 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 		sz = (rows*cols)+1;
 		break;
 
-	case 3:	// 3 parameters assume timeout of 1 second
+	case 3:	// 3 parameters assume default timeout
 		row = atoi(Argv[0].strptr)-1;
 		col = atoi(Argv[1].strptr)-1;
 		key = Argv[2].strptr;
 		sz = strlen(key);
-		end++;
+		end += RX3270_DEFAULT_TIMEOUT;
 		break;
 
 	case 4:	// All parameters
@@ -285,6 +290,7 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 		key = Argv[2].strptr;
 		sz = strlen(key);
 		end += atoi(Argv[3].strptr);
+		Trace("Timeout: %d",atoi(Argv[3].strptr));
 		break;
 
 	default:
@@ -301,24 +307,33 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 
 	buffer = malloc(sz);
 
+	Trace("Waiting for %ld seconds (Default: %d)", (end-time(0)),RX3270_DEFAULT_TIMEOUT);
+
+	RunPendingEvents(0);
+
 	while( (rc == ETIMEDOUT) && (time(0) <= end) )
 	{
 		if(!CONNECTED)
 		{
 			rc = ENOTCONN;
 		}
-		else if(query_3270_terminal_status() != STATUS_CODE_BLANK)
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 		{
-			RunPendingEvents(1);
-		}
-		else
-		{
-			RunPendingEvents(1);
 			screen_read(buffer,start,sz);
-			if(!strstr(buffer,key))
+
+			Trace("Aguardando \"%s\", achei \"%s\", %p",key,buffer, strstr(buffer,key));
+
+			if(strstr(buffer,key))
 				rc = 0;
 		}
+
+		Trace("Aguardando eventos: Status=%d rc=%d",query_3270_terminal_status(),rc);
+		RunPendingEvents(1);
+		Trace("Status=%d Time: %ld End: %ld",query_3270_terminal_status(),time(0),end);
+
 	}
+
+	Trace("Waitforstring(%s) exits with %d (%s) (Status: %d)",key,rc,strerror(rc),query_3270_terminal_status());
 
 	free(buffer);
 
@@ -437,10 +452,12 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 	if(Argc != 0)
 		return RXFUNC_BADCALL;
 
-	if(PCONNECTED)
-		rc = action_Enter();
-	else
+	if(!PCONNECTED)
 		rc = ENOTCONN;
+	else if(query_3270_terminal_status() != STATUS_CODE_BLANK)
+		rc = EINVAL;
+	else
+		rc = action_Enter();
 
 	ReturnValue(rc);
  }
