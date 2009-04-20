@@ -57,6 +57,7 @@
  }
 
  #define DECLARE_WIDGET_ARG( widget ) GtkWidget *widget = getWidget(Argc,Argv); if(!widget) return RXFUNC_BADCALL;
+ #define CHECK_WIDGET_ARGS( a, widget ) GtkWidget *widget = getWidget(Argc,Argv); if(!( widget && Argc == a)) return RXFUNC_BADCALL;
 
  static ULONG RetGtkResponse(PRXSTRING Retstr, GtkResponseType type)
  {
@@ -102,7 +103,7 @@
 /*                                                                            */
 /* Rexx Args:   Message Type ( "INFO", "WARNING", "QUESTION", "ERROR"         */
 /*				Text for popup           							  		  */
-/*              string                                       				  */
+/*              Window title	                            				  */
 /*                                                                            */
 /* Returns:	    Dialog result                                                 */
 /*                                                                            */
@@ -182,6 +183,27 @@
  {
 	DECLARE_WIDGET_ARG( widget );
 	return RetGtkResponse(Retstr,gtk_dialog_run(GTK_DIALOG(widget)));
+ }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270SetDialogTitle                               */
+/*                                                                            */
+/* Description: Set dialog title                                              */
+/*                                                                            */
+/* Rexx Args:   Dialog handle                                                 */
+/*              String with dialog title                                      */
+/*                                                                            */
+/* Returns:	    None                                                          */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270SetDialogTitle(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+	CHECK_WIDGET_ARGS( 2, widget );
+
+	gtk_window_set_title(GTK_WINDOW(widget),Argv[0].strptr);
+
+	return RetValue(Retstr,EINVAL);
  }
 
 /*----------------------------------------------------------------------------*/

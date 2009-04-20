@@ -89,8 +89,8 @@ SubSection "@PROGRAM_NAME@" SecMain
 			CreateDirectory "$INSTDIR\plugins"
 			file "/oname=$INSTDIR\plugins\rx3270.dll" bin\Release\plugins\rx3270.dll
 			file "/oname=$INSTDIR\ui\rexx.xml" ui\rexx.xml
+			file "/oname=$INSTDIR" src\plugins\rexx\rx3270.cls
 		sectionEnd
-
 
 	SubSectionEnd
 
@@ -142,6 +142,7 @@ SubSection "Extras" SecExtra
 
 		setOutPath $PROGRAMFILES\ooRexx
 		file bin\Release\plugins\rx3270.dll
+		file src\plugins\rexx\rx3270.cls
 
 	SectionEnd
 
