@@ -142,6 +142,10 @@ return widget
 	widget = ptr
 return
 
+::method 'title='
+	expose widget
+	use arg ptr
+return rx3270SetDialogTitle(self~widget,ptr)
 
 /*-------------------------------------------------------------------------------*/
 /* File selection dialog box                                                     */

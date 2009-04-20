@@ -29,7 +29,11 @@
 
 
 MODULE_NAME ?= rx3270
-SOURCES = main.c actions.c gui.c screen.c toggle.c tools.c init.c network.c
+
+COMMON_SRC=main.c actions.c screen.c toggle.c tools.c init.c network.c
+PLUGIN_SRC=gui.c
+
+SOURCES=$(COMMON_SRC) $(PLUGIN_SRC)
 
 BINROOT ?= ../../../bin
 OBJDEBUG ?= ../../../obj/Debug/src/plugins/rexx

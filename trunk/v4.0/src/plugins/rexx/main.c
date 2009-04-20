@@ -99,6 +99,7 @@
 	EXPORT_REXX_FUNCTION( rx3270DestroyDialog			),
 	EXPORT_REXX_FUNCTION( rx3270FileChooserNew			),
 	EXPORT_REXX_FUNCTION( rx3270FileChooserGetFilename	),
+	EXPORT_REXX_FUNCTION( rx3270SetDialogTitle			),
 
  };
 
@@ -176,6 +177,39 @@
 	}
 
 	Trace("Call of \"%s\" ends",prg);
+
+ 	if(rc)
+ 	{
+		gchar *name = g_path_get_basename(prg);
+		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_OK,
+													_( "\"%s\" failed (rc=%d)" ),
+													name, rc );
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx script failed" ));
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+        g_free(name);
+ 	}
+ 	else if(return_code)
+ 	{
+		gchar *name = g_path_get_basename(prg);
+		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_OK,
+													_( "Can't start \"%s\" (rc=%d)" ),
+													name, (int) return_code );
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Can't start rexx script" ));
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+        g_free(name);
+ 	}
 
 	return (int) rc;
  }
@@ -258,9 +292,9 @@ ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuena
 
  static void activate_script(GtkMenuItem *menuitem, const gchar *path)
  {
- 	Trace("-- \"%s\" --",path);
+ 	Trace("\n-- \"%s\" --\n",path);
 	call_rexx(path,path);
- 	Trace("-- \"%s\" --",path);
+ 	Trace("\n-- \"%s\" --\n",path);
  }
 
  void AddPluginUI(GtkUIManager *ui)
