@@ -158,6 +158,23 @@ static int program_init(const gchar *program)
 {
 	static const gchar	*logname	= PROGRAM_NAME ".log";
 	gboolean				has_log		= FALSE;
+	const gchar			*msg		= gtk_check_version(GTK_MAJOR_VERSION, GTK_MINOR_VERSION, GTK_MICRO_VERSION);
+
+	if(msg)
+	{
+		// Invalid GTK version, notify user and exit
+		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CLOSE,
+													_( "This program requires GTK version %d.%d.%d\n(%s)" ),GTK_MAJOR_VERSION,GTK_MINOR_VERSION,GTK_MICRO_VERSION,
+													msg );
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+		return EINVAL;
+	}
+
 
 	/* If running on win32 changes to program path */
 #if defined(_WIN32) || defined( DEBUG ) /*[*/
