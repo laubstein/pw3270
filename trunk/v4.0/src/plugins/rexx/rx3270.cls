@@ -148,6 +148,16 @@ return
 return rx3270SetDialogTitle(self~widget,ptr)
 
 /*-------------------------------------------------------------------------------*/
+/* Message dialog                                                                */
+/*-------------------------------------------------------------------------------*/
+::class MessageDialog public subclass DialogBox
+
+::method init
+	use arg type, message
+	self~widget = rx3270FileChooserNew(type,title)
+return
+
+/*-------------------------------------------------------------------------------*/
 /* File selection dialog box                                                     */
 /*-------------------------------------------------------------------------------*/
 ::class FileChooserDialog public subclass DialogBox

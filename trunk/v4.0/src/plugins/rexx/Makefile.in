@@ -31,7 +31,7 @@
 MODULE_NAME ?= rx3270
 
 COMMON_SRC=main.c actions.c screen.c toggle.c tools.c init.c network.c
-PLUGIN_SRC=gui.c
+PLUGIN_SRC=plg_start.c gui.c
 
 SOURCES=$(COMMON_SRC) $(PLUGIN_SRC)
 

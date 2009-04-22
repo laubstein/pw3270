@@ -38,14 +38,14 @@
  {
  	GtkWidget *widget = NULL;
 
- 	if(Argc == 0)
+	Trace("%s: %d arguments",__FUNCTION__,(int) Argc);
+
+	Trace("%s(%s)",__FUNCTION__,Argv[Argc].strptr);
+
+	if(sscanf(Argv[Argc].strptr, "%p", &widget) != 1)
 		return NULL;
 
-	if(strncmp(Argv[0].strptr,"0x",2))
-		return NULL;
-
-	if(sscanf(Argv[0].strptr, "%p", &widget) != 1)
-		return NULL;
+	Trace("Widget: %p (is widget: %s)",widget,GTK_IS_WIDGET(widget) ? "yes" : "no");
 
 	if(!widget)
 		return NULL;
@@ -56,8 +56,39 @@
 	return widget;
  }
 
- #define DECLARE_WIDGET_ARG( widget ) GtkWidget *widget = getWidget(Argc,Argv); if(!widget) return RXFUNC_BADCALL;
- #define CHECK_WIDGET_ARGS( a, widget ) GtkWidget *widget = getWidget(Argc,Argv); if(!( widget && Argc == a)) return RXFUNC_BADCALL;
+ #define GET_WIDGET_ARG(w, a) w = getWidget(a,Argv); if(!w) return RXFUNC_BADCALL;
+
+ #define CHECK_SINGLE_WIDGET_ARG(w)	GtkWidget *w = NULL; \
+									if(Argc == 1) w = getWidget(0,Argv); \
+									if(!w) return RXFUNC_BADCALL;
+
+
+static GtkMessageType getMessageDialogType(const char *arg)
+{
+ 	static const struct _msgtype
+ 	{
+ 		const gchar 	*name;
+ 		GtkMessageType type;
+ 	} msgtype[] =
+ 	{
+		{ "INFO",		GTK_MESSAGE_INFO		},
+		{ "WARNING",	GTK_MESSAGE_WARNING		},
+		{ "QUESTION",	GTK_MESSAGE_QUESTION	},
+		{ "ERROR",		GTK_MESSAGE_ERROR		}
+ 	};
+
+ 	int f;
+
+	for(f = 0; f < G_N_ELEMENTS(msgtype); f++)
+	{
+		if(!g_ascii_strncasecmp(msgtype[f].name,arg,strlen(msgtype[f].name)))
+		{
+			Trace("Messagetype: %s (%d)",msgtype[f].name,(int) msgtype[f].type);
+			return msgtype[f].type;
+		}
+	}
+	return GTK_MESSAGE_OTHER;
+ }
 
  static ULONG RetGtkResponse(PRXSTRING Retstr, GtkResponseType type)
  {
@@ -110,22 +141,10 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270Popup(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	static const struct _msgtype
- 	{
- 		const gchar 	*name;
- 		GtkMessageType type;
- 	} msgtype[] =
- 	{
-		{ "INFO",		GTK_MESSAGE_INFO		},
-		{ "WARNING",	GTK_MESSAGE_WARNING		},
-		{ "QUESTION",	GTK_MESSAGE_QUESTION	},
-		{ "ERROR",		GTK_MESSAGE_ERROR		}
- 	};
-
-	int				f;
  	GtkMessageType	type = GTK_MESSAGE_ERROR;
  	GtkWidget		*dialog;
  	const gchar	*text = "";
+ 	const gchar	*title = _( "Rexx message" );
  	int				rc = 0;
 
 	Trace("Argc: %d",(int) Argc);
@@ -137,18 +156,14 @@
 		break;
 
 	case 2:
-
+		type = getMessageDialogType(Argv[0].strptr);
 		text = Argv[1].strptr;
-		type = GTK_MESSAGE_OTHER;
+		break;
 
-		for(f = 0; f < G_N_ELEMENTS(msgtype) && type == GTK_MESSAGE_OTHER; f++)
-		{
-			if(!g_ascii_strncasecmp(msgtype[f].name,Argv[0].strptr,strlen(msgtype[f].name)))
-			{
-				type = msgtype[f].type;
-				Trace("Messagetype: %s (%d)",msgtype[f].name,(int) type);
-			}
-		}
+	case 3:
+		type = getMessageDialogType(Argv[0].strptr);
+		text = Argv[1].strptr;
+		title = Argv[2].strptr;
 		break;
 
 	default:
@@ -160,7 +175,9 @@
 										GTK_DIALOG_DESTROY_WITH_PARENT,
 										type,
 										GTK_BUTTONS_CLOSE,
-										"%s",Argv[0].strptr );
+										"%s",text );
+
+	gtk_window_set_title(GTK_WINDOW(dialog),title);
 
 	rc = gtk_dialog_run(GTK_DIALOG (dialog));
 	gtk_widget_destroy(dialog);
@@ -181,7 +198,7 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270runDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
-	DECLARE_WIDGET_ARG( widget );
+ 	CHECK_SINGLE_WIDGET_ARG(widget);
 	return RetGtkResponse(Retstr,gtk_dialog_run(GTK_DIALOG(widget)));
  }
 
@@ -199,7 +216,9 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270SetDialogTitle(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
-	CHECK_WIDGET_ARGS( 2, widget );
+	GtkWidget *widget;
+
+	GET_WIDGET_ARG(widget,2);
 
 	gtk_window_set_title(GTK_WINDOW(widget),Argv[0].strptr);
 
@@ -219,24 +238,8 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270DestroyDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	GtkWidget *widget = NULL;
+	CHECK_SINGLE_WIDGET_ARG(widget);
 
- 	if(Argc == 0)
-		return RetValue(Retstr,EINVAL);
-
-	if(strncmp(Argv[0].strptr,"0x",2))
-		return RetValue(Retstr,EINVAL);
-
-	if(sscanf(Argv[0].strptr, "%p", &widget) != 1)
-		return RetValue(Retstr,EINVAL);
-
-	if(!widget)
-		return RetValue(Retstr,EINVAL);
-
-	if(!GTK_IS_WIDGET(widget))
-		return RetValue(Retstr,EINVAL);
-
-	Trace("Widget %p destroyed",widget);
 	gtk_widget_destroy(widget);
 
 	return RetValue(Retstr,0);
@@ -259,7 +262,9 @@
  {
  	GtkWidget *widget;
 
- 	if(Argc != 2)
+	Trace("%s called with %d arguments",__FUNCTION__,(int) Argc);
+
+ 	if(Argc < 2)
 		return RXFUNC_BADCALL;
 
 
@@ -288,6 +293,11 @@
 	}
 
 
+	Trace("%s: %p",__FUNCTION__,widget);
+
+	if(Argc == 3)
+		gtk_window_set_title(GTK_WINDOW(widget),Argv[2].strptr);
+
 	ReturnPointer(widget);
  }
 
@@ -304,6 +314,53 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270FileChooserGetFilename(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
-	DECLARE_WIDGET_ARG( widget );
+	CHECK_SINGLE_WIDGET_ARG(widget);
 	return RetString(Retstr,gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(widget)));
+ }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270MessageDialogNew                             */
+/*                                                                            */
+/* Description: Create a new message dialog                                   */
+/*                                                                            */
+/* Rexx Args:   Text for error popup                                          */
+/*                                                                            */
+/* Rexx Args:   Message Type ( "INFO", "WARNING", "QUESTION", "ERROR"         */
+/*				Text for popup           							  		  */
+/*                                                                            */
+/* Returns:	    Dialog handle                                                 */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270MessageDialogNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	GtkMessageType	type = GTK_MESSAGE_ERROR;
+ 	GtkWidget		*dialog;
+ 	const gchar	*text = "";
+
+	Trace("Argc: %d",(int) Argc);
+
+	switch(Argc)
+	{
+	case 1:
+		text = Argv[0].strptr;
+		break;
+
+	case 2:
+		text = Argv[1].strptr;
+		type = getMessageDialogType(Argv[0].strptr);
+		break;
+
+	default:
+		return RXFUNC_BADCALL;
+
+	}
+
+ 	dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
+										GTK_DIALOG_DESTROY_WITH_PARENT,
+										type,
+										GTK_BUTTONS_CLOSE,
+										"%s",text );
+
+	ReturnPointer(dialog);
  }
