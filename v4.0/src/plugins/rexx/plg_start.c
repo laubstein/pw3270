@@ -30,7 +30,7 @@
  *
  */
 
-
+ #define INCL_RXSYSEXIT
  #include "rx3270.h"
 
  #include <gmodule.h>
@@ -39,7 +39,13 @@
 
 /*---[ Prototipes ]-------------------------------------------------------------------------------*/
 
-RexxExitHandler SysExit;          /* Exit handler for macro                  */
+ RexxExitHandler SysExit_SIO;	// Handler for screen I/O
+
+ static RXSYSEXIT ExitArray[] =
+ {
+   { "SysExit_SIO",	RXSIO 		},
+   { NULL, 			RXENDLST 	}
+ };
 
 /*---[ Structs ]----------------------------------------------------------------------------------*/
 
@@ -52,69 +58,7 @@ RexxExitHandler SysExit;          /* Exit handler for macro                  */
 /*---[ Globals ]----------------------------------------------------------------------------------*/
 
  GtkWidget 	*program_window	= NULL;
-
-/*---[ Rexx entry points ]------------------------------------------------------------------------*/
-
- #define EXPORT_REXX_FUNCTION(x) 		{ #x, (PFN) x }
-
- struct entrypoint
- {
- 	const char 	*name;
- 	PFN				call;
- };
-
- static const struct entrypoint common_entrypoint[] =
- {
-	EXPORT_REXX_FUNCTION( rx3270Version				    ),
-	EXPORT_REXX_FUNCTION( rx3270Connect				    ),
-	EXPORT_REXX_FUNCTION( rx3270Disconnect				),
-	EXPORT_REXX_FUNCTION( rx3270QueryScreenAttribute    ),
-	EXPORT_REXX_FUNCTION( rx3270ToggleON			    ),
-	EXPORT_REXX_FUNCTION( rx3270ToggleOFF			    ),
-	EXPORT_REXX_FUNCTION( rx3270Toggle				    ),
-	EXPORT_REXX_FUNCTION( rx3270Toggled				    ),
-	EXPORT_REXX_FUNCTION( rx3270Log					    ),
-	EXPORT_REXX_FUNCTION( rx3270QueryCState			    ),
-	EXPORT_REXX_FUNCTION( rx3270WaitForEvents		    ),
-	EXPORT_REXX_FUNCTION( rx3270Sleep				    ),
-	EXPORT_REXX_FUNCTION( rx3270InputString			    ),
-	EXPORT_REXX_FUNCTION( rx3270FindFieldAttribute	    ),
-	EXPORT_REXX_FUNCTION( rx3270FindFieldLength		    ),
-	EXPORT_REXX_FUNCTION( rx3270GetCursorPosition	    ),
-	EXPORT_REXX_FUNCTION( rx3270SetCursorPosition		),
-	EXPORT_REXX_FUNCTION( rx3270ReadScreen			    ),
-	EXPORT_REXX_FUNCTION( rx3270SendPFKey			    ),
-	EXPORT_REXX_FUNCTION( rx3270WaitForChanges		    ),
-	EXPORT_REXX_FUNCTION( rx3270SendENTERKey			),
-	EXPORT_REXX_FUNCTION( rx3270WaitForString			),
-	EXPORT_REXX_FUNCTION( rx3270WaitForStringAt			),
-	EXPORT_REXX_FUNCTION( rx3270IsTerminalReady			),
-	EXPORT_REXX_FUNCTION( rx3270WaitForTerminalReady	),
-
- };
-
- static const struct entrypoint plugin_entrypoint[] =
- {
-	EXPORT_REXX_FUNCTION( rx3270Popup 				    ),
-	EXPORT_REXX_FUNCTION( rx3270Actions				    ),
-	EXPORT_REXX_FUNCTION( rx3270Quit					),
-	EXPORT_REXX_FUNCTION( rx3270SetVisible				),
-	EXPORT_REXX_FUNCTION( rx3270Popup					),
-	EXPORT_REXX_FUNCTION( rx3270runDialog				),
-	EXPORT_REXX_FUNCTION( rx3270DestroyDialog			),
-	EXPORT_REXX_FUNCTION( rx3270FileChooserNew			),
-	EXPORT_REXX_FUNCTION( rx3270FileChooserGetFilename	),
-	EXPORT_REXX_FUNCTION( rx3270SetDialogTitle			),
-	EXPORT_REXX_FUNCTION( rx3270MessageDialogNew		),
-
- };
-
- static const struct entrypoint standalone_entrypoint[] =
- {
-	EXPORT_REXX_FUNCTION( rx3270LoadFuncs				),
-	EXPORT_REXX_FUNCTION( rx3270Init				    )
- };
-
+ GtkWidget	*trace_window = NULL;
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
@@ -139,7 +83,9 @@ RexxExitHandler SysExit;          /* Exit handler for macro                  */
 	RXSTRING  			retstr;                      	// program return value
 	SHORT     			rc		= 0;                   	// converted return code
 	CHAR      			return_buffer[RXAUTOBUFLEN];	// returned buffer
-	struct blinker		*blink	= g_malloc0(sizeof(struct blinker));
+	struct blinker		*blink;
+
+	blink = g_malloc0(sizeof(struct blinker));
 
 	blink->enabled = TRUE;
 	status_script(TRUE);
@@ -166,7 +112,7 @@ RexxExitHandler SysExit;          /* Exit handler for macro                  */
 								NULL,			// use disk version
 								"",				// default address name
 								RXCOMMAND,		// calling as a subcommand
-								NULL,			// no exits used
+								ExitArray,		// EXITs for this call
 								&rc,			// converted return code
 								&retstr);		// returned result
 
@@ -228,21 +174,25 @@ RexxExitHandler SysExit;          /* Exit handler for macro                  */
 
 	program_window = topwindow;
 
+	// Register Exit calls
+	RexxRegisterExitExe( "SysExit_SIO", (PFN) SysExit_SIO, NULL );
+
  	// Load common functions
- 	Trace("Loading %d common calls",G_N_ELEMENTS(common_entrypoint));
-	for(f=0;f < G_N_ELEMENTS(common_entrypoint); f++)
-		RexxRegisterFunctionExe((char *) common_entrypoint[f].name,common_entrypoint[f].call);
+ 	Trace("Loading %d common calls",rexx_common_calls_count);
+	for(f=0;f < rexx_common_calls_count; f++)
+		RexxRegisterFunctionExe((char *) rexx_common_calls[f].name,rexx_common_calls[f].call);
 
  	// Load plugin functions
- 	Trace("Loading %d plugin calls",G_N_ELEMENTS(plugin_entrypoint));
-	for(f=0;f < G_N_ELEMENTS(plugin_entrypoint); f++)
-		RexxRegisterFunctionExe((char *) plugin_entrypoint[f].name,plugin_entrypoint[f].call);
+ 	Trace("Loading %d plugin calls",rexx_plugin_calls_count);
+	for(f=0;f < rexx_plugin_calls_count; f++)
+		RexxRegisterFunctionExe((char *) rexx_plugin_calls[f].name,rexx_plugin_calls[f].call);
 
+/*
 	// Disable standalone functions
- 	Trace("Disabling %d standalone calls",G_N_ELEMENTS(standalone_entrypoint));
-	for(f=0;f < G_N_ELEMENTS(standalone_entrypoint); f++)
-		RexxRegisterFunctionExe((char *) standalone_entrypoint[f].name,(PFN) rx3270Dunno);
-
+ 	Trace("Disabling %d standalone calls",rexx_standalone_calls_count);
+	for(f=0;f < rexx_standalone_calls_count; f++)
+		RexxRegisterFunctionExe((char *) rexx_standalone_calls[f].name,(PFN) rx3270Dunno);
+*/
 
  	// Check for startup script
  	if(!(script && g_str_has_suffix(script,".rex")))
@@ -251,41 +201,6 @@ RexxExitHandler SysExit;          /* Exit handler for macro                  */
  	Trace("Calling %s",script);
 	call_rexx(script,"");
  }
-
-
-
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/* Rexx External Function: rx3270LoadFuncs                                    */
-/*                                                                            */
-/* Description: Register all functions in this library.                       */
-/*                                                                            */
-/* Rexx Args:   None                                                          */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
-ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuename, PRXSTRING Retstr)
-{
-	int	 f;
-
-	program_window = 0;
-
- 	// Load common functions
- 	Trace("Loading %d common calls",G_N_ELEMENTS(common_entrypoint));
-	for(f=0;f < G_N_ELEMENTS(common_entrypoint); f++)
-		RexxRegisterFunctionExe((char *) common_entrypoint[f].name,common_entrypoint[f].call);
-
- 	// Disable plugin functions
- 	Trace("Disabing %d plugin calls",G_N_ELEMENTS(plugin_entrypoint));
-	for(f=0;f < G_N_ELEMENTS(plugin_entrypoint); f++)
-		RexxRegisterFunctionExe((char *) plugin_entrypoint[f].name,(PFN) rx3270Dunno);
-
-	// Load standalone functions
- 	Trace("Loading %d standalone calls",G_N_ELEMENTS(standalone_entrypoint));
-	for(f=0;f < G_N_ELEMENTS(standalone_entrypoint); f++)
-		RexxRegisterFunctionExe((char *) standalone_entrypoint[f].name,standalone_entrypoint[f].call);
-
-	return RetValue(Retstr,-1);
-}
 
  static void activate_script(GtkMenuItem *menuitem, const gchar *path)
  {
@@ -358,37 +273,113 @@ ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuena
 
  }
 
- ULONG RetValue(PRXSTRING Retstr, int value)
+ static void destroy_trace(GtkWidget *widget,gpointer data)
  {
-	g_snprintf(Retstr->strptr,RXAUTOBUFLEN-1,"%d",value);
-    Retstr->strlength = strlen(Retstr->strptr);
-    return RXFUNC_OK;
+ 	Trace("%s","Rexx trace destroyed");
+ 	trace_window = 0;
  }
 
- ULONG RetString(PRXSTRING Retstr, const char *value)
+ static GtkWidget * getTraceWindow(void)
  {
- 	if(!value)
- 	{
- 		strcpy(Retstr->strptr,"");
- 	}
- 	else if(strlen(value) > (RXAUTOBUFLEN-1))
- 	{
- 		Retstr->strptr = RexxAllocateMemory(strlen(value)+1);
- 		strcpy(Retstr->strptr,value);
- 	}
- 	else
- 	{
-		g_snprintf(Retstr->strptr,RXAUTOBUFLEN-1,"%s",value);
- 	}
+ 	GtkWidget *widget;
+ 	GtkWidget *view;
 
-    Retstr->strlength = strlen(Retstr->strptr);
-    return RXFUNC_OK;
+ 	if(trace_window)
+		return trace_window;
+
+	// Create a new trace window
+	trace_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	g_signal_connect(G_OBJECT(trace_window),"destroy",G_CALLBACK(destroy_trace),0);
+	gtk_window_set_transient_for(GTK_WINDOW(trace_window),GTK_WINDOW(program_window));
+	gtk_window_set_destroy_with_parent(GTK_WINDOW(trace_window),TRUE);
+	gtk_window_set_title(GTK_WINDOW(trace_window),_( "Rexx trace" ));
+
+	// Create text box
+	widget = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),GTK_POLICY_AUTOMATIC,GTK_POLICY_AUTOMATIC);
+
+	view = gtk_text_view_new();
+	g_object_set_data(G_OBJECT(trace_window),"TextBuffer",gtk_text_view_get_buffer(GTK_TEXT_VIEW(view)));
+	gtk_text_view_set_editable(GTK_TEXT_VIEW(view), FALSE);
+	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(widget),view);
+
+	gtk_container_add(GTK_CONTAINER(trace_window),widget);
+
+	// Show dialog
+
+
+	Trace("Trace window %p created",trace_window);
+	gtk_window_set_default_size(GTK_WINDOW(trace_window),590,430);
+	gtk_widget_show_all(trace_window);
+	return trace_window;
  }
 
+ static void showtracemessage(const gchar *msg)
+ {
+ 	GtkWidget *widget = getTraceWindow();
+ 	GtkTextBuffer *buffer;
+ 	GtkTextIter itr;
 
-ULONG RetPointer(PRXSTRING Retstr, gpointer value)
-{
-	g_snprintf(Retstr->strptr,RXAUTOBUFLEN-1,"%p",value);
-    Retstr->strlength = strlen(Retstr->strptr);
-    return RXFUNC_OK;
-}
+ 	Trace("%s (Tracewindow: %p)",msg,widget);
+
+ 	if(!widget)
+		return;
+
+	buffer = (GtkTextBuffer *) g_object_get_data(G_OBJECT(widget),"TextBuffer");
+
+	Trace("Textbuffer: %p",buffer);
+
+	if(!buffer)
+		return;
+
+	gtk_text_buffer_get_end_iter(buffer,&itr);
+	gtk_text_buffer_insert(buffer,&itr,msg,strlen(msg));
+
+	gtk_text_buffer_get_end_iter(buffer,&itr);
+	gtk_text_buffer_insert(buffer,&itr,"\n",1);
+
+	Trace("%s","Texto incluido no buffer");
+
+ }
+
+ LONG APIENTRY SysExit_SIO(LONG ExitNumber, LONG  Subfunction, PEXIT ParmBlock)
+ {
+ 	GtkWidget *dialog;
+
+ 	Trace("%s call with ExitNumber: %d Subfunction: %d",__FUNCTION__,(int) ExitNumber, (int) Subfunction);
+
+	switch(Subfunction)
+	{
+	case RXSIOSAY:	// SAY a line to STDOUT
+		 dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
+											GTK_DIALOG_DESTROY_WITH_PARENT,
+											GTK_MESSAGE_INFO,
+											GTK_BUTTONS_OK,
+											"%s", (((RXSIOSAY_PARM *) ParmBlock)->rxsio_string).strptr );
+
+		if(trace_window)
+			showtracemessage((((RXSIOSAY_PARM *) ParmBlock)->rxsio_string).strptr);
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx message" ));
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+		break;
+
+	case RXSIOTRC:	// Trace output
+		showtracemessage((((RXSIOTRC_PARM *) ParmBlock)->rxsio_string).strptr);
+		break;
+
+	case RXSIOTRD:	// Read from char stream
+		return RXEXIT_NOT_HANDLED;
+
+	case RXSIODTR:	// DEBUG read from char stream
+		// TODO (perry#1#): Get line from trace window.
+		return RXEXIT_NOT_HANDLED;
+
+	case RXSIOTLL:	// Return linelength(N/A OS/2)
+		return RXEXIT_NOT_HANDLED;
+	}
+
+	return RXEXIT_HANDLED;
+ }

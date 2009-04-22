@@ -73,6 +73,24 @@
 		#define ENOTCONN -1
 	#endif
 
+	/* Entrypoints */
+	#define EXPORTED_REXX_CALL_ENTRY(x) 		{ #x, (PFN) x }
+
+	typedef struct _exported_rexx_calls
+	{
+		const char 	*name;
+		PFN				call;
+	} EXPORTED_CALL_ENTRY;
+
+	extern const EXPORTED_CALL_ENTRY rexx_common_calls[];
+	extern const EXPORTED_CALL_ENTRY rexx_standalone_calls[];
+	extern const EXPORTED_CALL_ENTRY rexx_plugin_calls[];
+
+	extern int rexx_common_calls_count;
+	extern int rexx_standalone_calls_count;
+	extern int rexx_plugin_calls_count;
+
+
 	/* Tools */
 	int		call_rexx(const gchar *prg, const gchar *arg);
 	ULONG	RetString(PRXSTRING Retstr, const char *value);
