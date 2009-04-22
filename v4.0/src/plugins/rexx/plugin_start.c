@@ -35,6 +35,11 @@
 
  #include <gmodule.h>
 
+// http://www.howzatt.demon.co.uk/articles/29dec94.html
+
+/*---[ Prototipes ]-------------------------------------------------------------------------------*/
+
+RexxExitHandler SysExit;          /* Exit handler for macro                  */
 
 /*---[ Structs ]----------------------------------------------------------------------------------*/
 
@@ -100,6 +105,7 @@
 	EXPORT_REXX_FUNCTION( rx3270FileChooserNew			),
 	EXPORT_REXX_FUNCTION( rx3270FileChooserGetFilename	),
 	EXPORT_REXX_FUNCTION( rx3270SetDialogTitle			),
+	EXPORT_REXX_FUNCTION( rx3270MessageDialogNew		),
 
  };
 
@@ -153,7 +159,8 @@
 	RunPendingEvents(0);
 
 	Trace("Starting %s",prg);
-	return_code = RexxStart(	1,				// No argument
+
+	return_code = RexxStart(	1,				// argument count
 								&argv,			// argument array
 								(char *) prg,	// REXX procedure name
 								NULL,			// use disk version
@@ -185,10 +192,10 @@
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
 													GTK_BUTTONS_OK,
-													_( "\"%s\" failed (rc=%d)" ),
-													name, rc );
+													_(  "script %s failed" ), name);
 
-		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx script failed" ));
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Script failed" ));
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Return code was %d" ), rc);
 
         gtk_dialog_run(GTK_DIALOG (dialog));
         gtk_widget_destroy(dialog);
@@ -201,10 +208,11 @@
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
 													GTK_BUTTONS_OK,
-													_( "Can't start \"%s\" (rc=%d)" ),
-													name, (int) return_code );
+													_( "Can't start \"%s\"" ),
+													name );
 
-		gtk_window_set_title(GTK_WINDOW(dialog),_( "Can't start rexx script" ));
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Can't start script" ));
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Return code was %d" ), (int) return_code );
 
         gtk_dialog_run(GTK_DIALOG (dialog));
         gtk_widget_destroy(dialog);
@@ -213,17 +221,6 @@
 
 	return (int) rc;
  }
-
- /*
-  * If a module contains a function named g_module_check_init() it is called automatically
-  * when the module is loaded. It is passed the GModule structure and should return NULL
-  * on success or a string describing the initialization error.
-  */ /*
- const gchar * g_module_check_init(GModule *module)
- {
- 	return NULL;
- }
-*/
 
  void pw3270_plugin_startup(GtkWidget *topwindow, const gchar *script)
  {
