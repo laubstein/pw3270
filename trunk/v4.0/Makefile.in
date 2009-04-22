@@ -186,11 +186,18 @@ bin/Debug/lib3270@DLLEXT@: obj/Debug/version.o obj/Release/src/lib/fallbacks.o $
 # Plugins
 ####################################################################################################
 
-bin/Release/plugins/rx3270@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
+bin/Release/plugins/rx3270@DLLEXT@: bin/Release/lib3270@DLLEXT@ src/plugins/rexx/*.c src/plugins/rexx/Makefile
 	make -C src/plugins/rexx ../../../$@
 
-bin/Debug/plugins/rx3270@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
+bin/Debug/plugins/rx3270@DLLEXT@: bin/Debug/lib3270@DLLEXT@ src/plugins/rexx/*.c src/plugins/rexx/Makefile
 	make -C src/plugins/rexx ../../../$@
+
+bin/Release/librx3270@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
+	make -C src/plugins/rexx ../../../$@
+
+bin/Debug/librx3270@DLLEXT@: src/plugins/rexx/*.c src/plugins/rexx/Makefile
+	make -C src/plugins/rexx ../../../$@
+
 
 ####################################################################################################
 # Misc Targets

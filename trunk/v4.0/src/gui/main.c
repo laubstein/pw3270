@@ -163,18 +163,24 @@ static int program_init(const gchar *program)
 	if(msg)
 	{
 		// Invalid GTK version, notify user and exit
+		int rc;
 		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
 													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_CLOSE,
-													_( "This program requires GTK version %d.%d.%d\n(%s)" ),GTK_MAJOR_VERSION,GTK_MINOR_VERSION,GTK_MICRO_VERSION,
-													msg );
+													GTK_MESSAGE_WARNING,
+													GTK_BUTTONS_OK_CANCEL,
+													_( "This program requires GTK version %d.%d.%d" ),GTK_MAJOR_VERSION,GTK_MINOR_VERSION,GTK_MICRO_VERSION );
 
-        gtk_dialog_run(GTK_DIALOG (dialog));
+
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s",msg);
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "GTK Version mismatch" ));
+		gtk_window_set_deletable(GTK_WINDOW(dialog),FALSE);
+
+        rc = gtk_dialog_run(GTK_DIALOG (dialog));
         gtk_widget_destroy(dialog);
-		return EINVAL;
-	}
 
+        if(rc != GTK_RESPONSE_OK)
+			return EINVAL;
+	}
 
 	/* If running on win32 changes to program path */
 #if defined(_WIN32) || defined( DEBUG ) /*[*/

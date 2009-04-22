@@ -30,16 +30,21 @@
 
 MODULE_NAME ?= rx3270
 
-COMMON_SRC=main.c actions.c screen.c toggle.c tools.c init.c network.c
-PLUGIN_SRC=plg_start.c gui.c
+COMMON_SRC=common_start.c actions.c screen.c toggle.c tools.c init.c network.c
+STD_SRC=std_start.c
+PLG_SRC=plg_start.c gui.c
 
-SOURCES=$(COMMON_SRC) $(PLUGIN_SRC)
+# SOURCES=$(PLG_SRC) $(COMMON_SRC)
 
 BINROOT ?= ../../../bin
 OBJDEBUG ?= ../../../obj/Debug/src/plugins/rexx
-BINDEBUG ?= $(BINROOT)/Debug/plugins
 OBJRELEASE ?= ../../../obj/Release/src/plugins/rexx
+
+BINDEBUG ?= $(BINROOT)/Debug/plugins
 BINRELEASE ?= $(BINROOT)/Release/plugins
+
+STDDEBUG ?= $(BINROOT)/Debug
+STDRELEASE ?= $(BINROOT)/Release
 
 CC = @CC@
 LD = @LD@
@@ -65,13 +70,22 @@ $(OBJRELEASE)/%.o: %.c Makefile
 	@$(CC) -DNDEBUG=1 $(CFLAGS) -ggdb -o $@ -c $<
 
 # Targets
-
-$(BINDEBUG)/$(MODULE_NAME)$(DLLEXT): $(foreach SRC, $(SOURCES), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
+$(BINDEBUG)/$(MODULE_NAME)$(DLLEXT): $(foreach SRC, $(PLG_SRC) $(COMMON_SRC), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) -o $@ $^ -L$(BINROOT)/Debug -l3270 $(DLLFLAGS)
 
-$(BINRELEASE)/$(MODULE_NAME)$(DLLEXT): $(foreach SRC, $(SOURCES), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
+$(BINRELEASE)/$(MODULE_NAME)$(DLLEXT): $(foreach SRC, $(PLG_SRC) $(COMMON_SRC), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) @LD_RLSFLAGS@ -o $@ $^ -L$(BINROOT)/Release -l3270 $(DLLFLAGS)
+
+$(STDDEBUG)/lib$(MODULE_NAME)$(DLLEXT): $(foreach SRC, $(STD_SRC) $(COMMON_SRC), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) -o $@ $^ -L$(BINROOT)/Debug -l3270 $(DLLFLAGS)
+
+$(STDRELEASE)/lib$(MODULE_NAME)$(DLLEXT): $(foreach SRC, $(STD_SRC) $(COMMON_SRC), $(OBJDEBUG)/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(LD) @LD_RLSFLAGS@ -o $@ $^ -L$(BINROOT)/Release -l3270 $(DLLFLAGS)

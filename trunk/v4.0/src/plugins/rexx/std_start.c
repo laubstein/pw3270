@@ -37,10 +37,6 @@
 
 // http://www.howzatt.demon.co.uk/articles/29dec94.html
 
-/*---[ Prototipes ]-------------------------------------------------------------------------------*/
-
-RexxExitHandler SysExit;          /* Exit handler for macro                  */
-
 /*---[ Structs ]----------------------------------------------------------------------------------*/
 
  struct blinker
@@ -109,12 +105,13 @@ RexxExitHandler SysExit;          /* Exit handler for macro                  */
 
  };
 
+/*
  static const struct entrypoint standalone_entrypoint[] =
  {
 	EXPORT_REXX_FUNCTION( rx3270LoadFuncs				),
 	EXPORT_REXX_FUNCTION( rx3270Init				    )
  };
-
+*/
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
@@ -239,6 +236,7 @@ RexxExitHandler SysExit;          /* Exit handler for macro                  */
 		RexxRegisterFunctionExe((char *) plugin_entrypoint[f].name,plugin_entrypoint[f].call);
 
 	// Disable standalone functions
+
  	Trace("Disabling %d standalone calls",G_N_ELEMENTS(standalone_entrypoint));
 	for(f=0;f < G_N_ELEMENTS(standalone_entrypoint); f++)
 		RexxRegisterFunctionExe((char *) standalone_entrypoint[f].name,(PFN) rx3270Dunno);
