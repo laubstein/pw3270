@@ -37,17 +37,17 @@
 
 // http://www.howzatt.demon.co.uk/articles/29dec94.html
 
-/*---[ Prototipes ]-------------------------------------------------------------------------------*/
-
- RexxExitHandler SysExit_SIO;	// Handler for screen I/O
-
- static RXSYSEXIT ExitArray[] =
- {
-   { "SysExit_SIO",	RXSIO 		},
-   { NULL, 			RXENDLST 	}
- };
-
 /*---[ Structs ]----------------------------------------------------------------------------------*/
+
+ struct trace_window_data
+ {
+ 	gboolean		waiting;
+ 	GtkWidget 		*entry;
+ 	GtkWidget 		*button;
+ 	GtkTextBuffer	*text;
+	GtkAdjustment	*scroll;
+
+ };
 
  struct blinker
  {
@@ -55,7 +55,19 @@
  	gboolean status;
  };
 
+/*---[ Prototipes ]-------------------------------------------------------------------------------*/
+
+ RexxExitHandler SysExit_SIO;	// Handler for screen I/O
+ static struct trace_window_data * getTraceWindow(void);
+
 /*---[ Globals ]----------------------------------------------------------------------------------*/
+
+ static RXSYSEXIT ExitArray[] =
+ {
+   { "SysExit_SIO",	RXSIO 		},
+   { NULL, 			RXENDLST 	}
+ };
+
 
  GtkWidget 	*program_window	= NULL;
  GtkWidget	*trace_window = NULL;
@@ -279,67 +291,120 @@
  	trace_window = 0;
  }
 
- static GtkWidget * getTraceWindow(void)
+ void entry_ok(GtkButton *button,struct trace_window_data *data)
  {
+ 	data->waiting = FALSE;
+ }
+
+ static struct trace_window_data * getTraceWindow(void)
+ {
+ 	struct trace_window_data *data;
+
  	GtkWidget *widget;
  	GtkWidget *view;
+ 	GtkWidget *vbox;
+ 	GtkWidget *hbox;
 
  	if(trace_window)
-		return trace_window;
+		return (struct trace_window_data *) g_object_get_data(G_OBJECT(trace_window),"window_data");
 
 	// Create a new trace window
 	trace_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	g_signal_connect(G_OBJECT(trace_window),"destroy",G_CALLBACK(destroy_trace),0);
+
+	data = g_malloc0(sizeof(struct trace_window_data));
+	g_object_set_data_full(G_OBJECT(trace_window),"window_data",data,g_free);
+
 	gtk_window_set_transient_for(GTK_WINDOW(trace_window),GTK_WINDOW(program_window));
 	gtk_window_set_destroy_with_parent(GTK_WINDOW(trace_window),TRUE);
+
 	gtk_window_set_title(GTK_WINDOW(trace_window),_( "Rexx trace" ));
+
+	vbox = gtk_vbox_new(FALSE,2);
 
 	// Create text box
 	widget = gtk_scrolled_window_new(NULL, NULL);
+	data->scroll = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(widget));
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),GTK_POLICY_AUTOMATIC,GTK_POLICY_AUTOMATIC);
 
 	view = gtk_text_view_new();
-	g_object_set_data(G_OBJECT(trace_window),"TextBuffer",gtk_text_view_get_buffer(GTK_TEXT_VIEW(view)));
+
+ 	data->text = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(view), FALSE);
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(widget),view);
 
-	gtk_container_add(GTK_CONTAINER(trace_window),widget);
+	gtk_box_pack_start(GTK_BOX(vbox),widget,TRUE,TRUE,0);
+
+	// Entry line
+	hbox = gtk_hbox_new(FALSE,0);
+	gtk_box_pack_start(GTK_BOX(hbox),gtk_label_new( _( "Command:" ) ),FALSE,TRUE,4);
+
+	data->entry = gtk_entry_new();
+	gtk_box_pack_start(GTK_BOX(hbox),data->entry,TRUE,TRUE,4);
+	gtk_widget_set_sensitive(data->entry,FALSE);
+	g_signal_connect(G_OBJECT(data->entry),"activate",G_CALLBACK(entry_ok),data);
+
+	data->button = gtk_button_new_from_stock(GTK_STOCK_OK);
+	gtk_box_pack_end(GTK_BOX(hbox),data->button,FALSE,FALSE,4);
+	gtk_widget_set_sensitive(data->button,FALSE);
+	g_signal_connect(G_OBJECT(data->button),"clicked",G_CALLBACK(entry_ok),data);
+	gtk_button_set_focus_on_click(GTK_BUTTON(data->button),FALSE);
+
+	gtk_box_pack_end(GTK_BOX(vbox),hbox,FALSE,TRUE,0);
 
 	// Show dialog
-
-
-	Trace("Trace window %p created",trace_window);
+	g_signal_connect(G_OBJECT(trace_window),"activate-default",G_CALLBACK(entry_ok),data);
+	gtk_container_add(GTK_CONTAINER(trace_window),vbox);
 	gtk_window_set_default_size(GTK_WINDOW(trace_window),590,430);
 	gtk_widget_show_all(trace_window);
-	return trace_window;
+
+	return data;
  }
 
  static void showtracemessage(const gchar *msg)
  {
- 	GtkWidget *widget = getTraceWindow();
- 	GtkTextBuffer *buffer;
+ 	struct trace_window_data *data = getTraceWindow();
  	GtkTextIter itr;
 
- 	Trace("%s (Tracewindow: %p)",msg,widget);
-
- 	if(!widget)
+	if(!data)
 		return;
 
-	buffer = (GtkTextBuffer *) g_object_get_data(G_OBJECT(widget),"TextBuffer");
+	gtk_text_buffer_get_end_iter(data->text,&itr);
+	gtk_text_buffer_insert(data->text,&itr,msg,strlen(msg));
 
-	Trace("Textbuffer: %p",buffer);
+	gtk_text_buffer_get_end_iter(data->text,&itr);
+	gtk_text_buffer_insert(data->text,&itr,"\n",1);
 
-	if(!buffer)
+	gtk_adjustment_set_value(data->scroll,gtk_adjustment_get_upper(data->scroll));
+ }
+
+ static void gettracecommand(PRXSTRING str)
+ {
+ 	struct trace_window_data *data = getTraceWindow();
+
+ 	data->waiting = TRUE;
+
+	gtk_window_present(GTK_WINDOW(trace_window));
+
+	gtk_widget_set_sensitive(data->entry,TRUE);
+	gtk_widget_set_sensitive(data->button,TRUE);
+
+	gtk_widget_grab_focus(data->entry);
+
+	while(trace_window && data->waiting)
+	{
+		RunPendingEvents(1);
+	}
+
+	if(trace_window)
+	{
+		RetString(str,gtk_entry_get_text(GTK_ENTRY(data->entry)));
+		gtk_entry_set_text(GTK_ENTRY(data->entry),"");
+		gtk_widget_set_sensitive(data->entry,FALSE);
+		gtk_widget_set_sensitive(data->button,FALSE);
 		return;
-
-	gtk_text_buffer_get_end_iter(buffer,&itr);
-	gtk_text_buffer_insert(buffer,&itr,msg,strlen(msg));
-
-	gtk_text_buffer_get_end_iter(buffer,&itr);
-	gtk_text_buffer_insert(buffer,&itr,"\n",1);
-
-	Trace("%s","Texto incluido no buffer");
-
+	}
+	RetString(str,NULL);
  }
 
  LONG APIENTRY SysExit_SIO(LONG ExitNumber, LONG  Subfunction, PEXIT ParmBlock)
@@ -360,7 +425,7 @@
 		if(trace_window)
 			showtracemessage((((RXSIOSAY_PARM *) ParmBlock)->rxsio_string).strptr);
 
-		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx message" ));
+		gtk_window_set_title(GTK_WINDOW(dialog), _( "Script message" ) );
 
         gtk_dialog_run(GTK_DIALOG (dialog));
         gtk_widget_destroy(dialog);
@@ -371,11 +436,12 @@
 		break;
 
 	case RXSIOTRD:	// Read from char stream
-		return RXEXIT_NOT_HANDLED;
+		gettracecommand( & (((RXSIOTRD_PARM *) ParmBlock)->rxsiotrd_retc) );
+		break;
 
 	case RXSIODTR:	// DEBUG read from char stream
-		// TODO (perry#1#): Get line from trace window.
-		return RXEXIT_NOT_HANDLED;
+		gettracecommand( & (((RXSIODTR_PARM *) ParmBlock)->rxsiodtr_retc) );
+		break;
 
 	case RXSIOTLL:	// Return linelength(N/A OS/2)
 		return RXEXIT_NOT_HANDLED;
