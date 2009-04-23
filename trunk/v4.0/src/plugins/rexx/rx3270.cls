@@ -143,9 +143,20 @@ return widget
 return
 
 ::method 'title='
-	expose widget
 	use arg ptr
 return rx3270SetDialogTitle(self~widget,ptr)
+
+::method set
+	parse arg name, value
+	if self~widget = 0
+		then return -22
+return rx3270SetWidgetData(self~widget,name,value)
+
+::method get
+	parse arg name
+	if self~widget = 0
+		then return -22
+return rx3270GetWidgetData(self~widget,name)
 
 /*-------------------------------------------------------------------------------*/
 /* Message dialog                                                                */
@@ -170,4 +181,20 @@ return
 ::method filename
 return rx3270FileChooserGetFilename(self~widget)
 
+/*-------------------------------------------------------------------------------*/
+/* Progress dialog                                                               */
+/*-------------------------------------------------------------------------------*/
+::class ProgressBarDialog public subclass DialogBox
 
+::method init
+	use arg title, message
+	self~widget = rx3270ProgressDialogNew(title,message)
+return
+
+::method 'count='
+	use arg value
+return rx3270ProgressDialogSetTotal(self~widget,value)
+
+::method 'current='
+	use arg value
+return rx3270ProgressDialogSetCurrent(self~widget,value)

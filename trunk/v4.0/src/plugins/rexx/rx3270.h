@@ -48,7 +48,10 @@
 	// #define INCL_RXSHV		/* Rexx shared variable pool support */
 	#define INCL_RXFUNC	/* Rexx external function support */
 	// #define INCL_RXSYSEXIT	/* Rexx system exit support */
-	// #define INCL_RXARI		/* Rexx asynchronous Trace/Halt support */
+	#define INCL_RXARI		/* Rexx asynchronous Trace/Halt support */
+
+	#define TID long
+
 	#include <rexx.h>
 
 	/* include the "C" stuff */
@@ -102,6 +105,13 @@
 	#define ReturnPointer(x)	return RetPointer(Retstr,x)
 	#define ReturnOk()			strcpy(Retstr->strptr,"0"); Retstr->strlength = 1; return RXFUNC_OK;
 
+	#define GET_WIDGET_ARG(w, a) w = getWidget(a,Argv); if(!w) return RXFUNC_BADCALL;
+
+	#define CHECK_SINGLE_WIDGET_ARG(w)	GtkWidget *w = NULL; \
+										if(Argc == 1) w = getWidget(0,Argv); \
+										if(!w) return RXFUNC_BADCALL;
+
+
 	/* Rexx entry points */
 
 	ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
@@ -146,15 +156,25 @@
 
 	// GUI
 	ULONG APIENTRY rx3270Popup(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270SetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270GetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270runDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270DestroyDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270FileChooserNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270FileChooserGetFilename(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270SetDialogTitle(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270MessageDialogNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270ProgressDialogNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270ProgressDialogSetCurrent(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270ProgressDialogSetTotal(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+
+	GtkWidget *getWidget(LONG Argc, RXSTRING Argv[]);
+	GtkMessageType getMessageDialogType(const char *arg);
+	ULONG RetGtkResponse(PRXSTRING Retstr, GtkResponseType type);
 
 	/* Globals */
 	extern GtkWidget *program_window;
+
 
 #endif // RX3270_H_INCLUDED
 
