@@ -103,22 +103,7 @@ SubSectionEnd
 Section "GTK+ Runtime" SecGTK
 
 	setOutPath $INSTDIR
-	file "bin\Release\gtk-runtime\lib\*.*"
-
-	setOutPath $INSTDIR\lib\gtk-2.0
-	file /r "bin\Release\gtk-runtime\lib\gtk-2.0\*.*"
-
-	SetOutPath $INSTDIR\share
-	file /r "bin\Release\gtk-runtime\share\*.*"
-
-	SetOutPath $INSTDIR\etc
-	file /r "bin\Release\gtk-runtime\etc\*.*"
-
-	SetOutPath $INSTDIR
-	file /r "bin\Release\gtk-runtime\bin\*.*"
-
-	SetOutPath $INSTDIR\gtk2-runtime
-	file /r "bin\Release\gtk-runtime\gtk2-runtime\*.*"
+	file /r "bin\Release\gtk-runtime\*.*"
 
 SectionEnd
 
