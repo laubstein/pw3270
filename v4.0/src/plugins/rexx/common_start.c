@@ -37,18 +37,22 @@
 
  const EXPORTED_CALL_ENTRY rexx_plugin_calls[] =
  {
-	EXPORTED_REXX_CALL_ENTRY( rx3270Popup 				    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Actions				    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Quit					),
-	EXPORTED_REXX_CALL_ENTRY( rx3270SetVisible				),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Popup					),
-	EXPORTED_REXX_CALL_ENTRY( rx3270runDialog				),
-	EXPORTED_REXX_CALL_ENTRY( rx3270DestroyDialog			),
-	EXPORTED_REXX_CALL_ENTRY( rx3270FileChooserNew			),
-	EXPORTED_REXX_CALL_ENTRY( rx3270FileChooserGetFilename	),
-	EXPORTED_REXX_CALL_ENTRY( rx3270SetDialogTitle			),
-	EXPORTED_REXX_CALL_ENTRY( rx3270MessageDialogNew		),
-
+	EXPORTED_REXX_CALL_ENTRY( rx3270SetWidgetData				),
+	EXPORTED_REXX_CALL_ENTRY( rx3270GetWidgetData				),
+	EXPORTED_REXX_CALL_ENTRY( rx3270Popup 				    	),
+	EXPORTED_REXX_CALL_ENTRY( rx3270Actions				    	),
+	EXPORTED_REXX_CALL_ENTRY( rx3270Quit						),
+	EXPORTED_REXX_CALL_ENTRY( rx3270SetVisible					),
+	EXPORTED_REXX_CALL_ENTRY( rx3270Popup						),
+	EXPORTED_REXX_CALL_ENTRY( rx3270runDialog					),
+	EXPORTED_REXX_CALL_ENTRY( rx3270DestroyDialog				),
+	EXPORTED_REXX_CALL_ENTRY( rx3270FileChooserNew				),
+	EXPORTED_REXX_CALL_ENTRY( rx3270FileChooserGetFilename		),
+	EXPORTED_REXX_CALL_ENTRY( rx3270SetDialogTitle				),
+	EXPORTED_REXX_CALL_ENTRY( rx3270MessageDialogNew			),
+	EXPORTED_REXX_CALL_ENTRY( rx3270ProgressDialogNew			),
+	EXPORTED_REXX_CALL_ENTRY( rx3270ProgressDialogSetCurrent	),
+	EXPORTED_REXX_CALL_ENTRY( rx3270ProgressDialogSetTotal		),
  };
 
  const EXPORTED_CALL_ENTRY rexx_standalone_calls[] =

@@ -146,7 +146,7 @@
  	if(rc)
  	{
 		gchar *name = g_path_get_basename(prg);
-		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
 													GTK_BUTTONS_OK,
@@ -162,7 +162,7 @@
  	else if(return_code)
  	{
 		gchar *name = g_path_get_basename(prg);
-		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
 													GTK_BUTTONS_OK,

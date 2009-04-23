@@ -604,6 +604,9 @@
 		<Unit filename="src/plugins/rexx/common_start.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/plugins/rexx/dialogs.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/plugins/rexx/gui.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -631,7 +634,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ui/debug.xml" />
-		<Unit filename="ui/g3270.xml" />
 		<Unit filename="ui/rexx.xml" />
 		<Extensions>
 			<code_completion />

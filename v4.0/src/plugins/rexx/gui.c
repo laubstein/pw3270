@@ -34,7 +34,7 @@
 
 /*---[ Statics ]----------------------------------------------------------------------------------*/
 
- static GtkWidget *getWidget(LONG Argc, RXSTRING Argv[])
+ GtkWidget *getWidget(LONG Argc, RXSTRING Argv[])
  {
  	GtkWidget *widget = NULL;
 
@@ -56,14 +56,7 @@
 	return widget;
  }
 
- #define GET_WIDGET_ARG(w, a) w = getWidget(a,Argv); if(!w) return RXFUNC_BADCALL;
-
- #define CHECK_SINGLE_WIDGET_ARG(w)	GtkWidget *w = NULL; \
-									if(Argc == 1) w = getWidget(0,Argv); \
-									if(!w) return RXFUNC_BADCALL;
-
-
-static GtkMessageType getMessageDialogType(const char *arg)
+GtkMessageType getMessageDialogType(const char *arg)
 {
  	static const struct _msgtype
  	{
@@ -90,7 +83,7 @@ static GtkMessageType getMessageDialogType(const char *arg)
 	return GTK_MESSAGE_OTHER;
  }
 
- static ULONG RetGtkResponse(PRXSTRING Retstr, GtkResponseType type)
+ ULONG RetGtkResponse(PRXSTRING Retstr, GtkResponseType type)
  {
  	static const struct _rsptype
  	{
@@ -184,183 +177,53 @@ static GtkMessageType getMessageDialogType(const char *arg)
 	return RetValue(Retstr,rc);
  }
 
-
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
-/* Rexx External Function: rx3270runDialog                                    */
+/* Rexx External Function: rx3270SetWidgetData	                              */
 /*                                                                            */
-/* Description: Run Dialog box                                                */
+/* Description: Set widget data                                               */
 /*                                                                            */
-/* Rexx Args:   Dialog handle                                                 */
-/*                                                                            */
-/* Returns:	    Dialog result                                                 */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270runDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
- {
- 	CHECK_SINGLE_WIDGET_ARG(widget);
-	return RetGtkResponse(Retstr,gtk_dialog_run(GTK_DIALOG(widget)));
- }
-
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/* Rexx External Function: rx3270SetDialogTitle                               */
-/*                                                                            */
-/* Description: Set dialog title                                              */
-/*                                                                            */
-/* Rexx Args:   Dialog handle                                                 */
-/*              String with dialog title                                      */
+/* Rexx Args:   Widget handle                                                 */
+/*              Parameter name                                                */
+/*              Parameter value                                               */
 /*                                                                            */
 /* Returns:	    None                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270SetDialogTitle(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
- {
+ULONG APIENTRY rx3270SetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+{
 	GtkWidget *widget;
 
-	GET_WIDGET_ARG(widget,2);
+	if(Argc != 3)
+		return RXFUNC_BADCALL;
 
-	gtk_window_set_title(GTK_WINDOW(widget),Argv[0].strptr);
+	GET_WIDGET_ARG(widget,0);
 
-	return RetValue(Retstr,EINVAL);
- }
-
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/* Rexx External Function: rx3270DestroyDialog                                */
-/*                                                                            */
-/* Description: Destroy dialog widget                                         */
-/*                                                                            */
-/* Rexx Args:   Dialog handle                                                 */
-/*                                                                            */
-/* Returns:	    0 if ok, or error code                                        */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270DestroyDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
- {
-	CHECK_SINGLE_WIDGET_ARG(widget);
-
-	gtk_widget_destroy(widget);
+	g_object_set_data_full(G_OBJECT(widget),Argv[1].strptr,g_strdup(Argv[2].strptr),g_free);
 
 	return RetValue(Retstr,0);
-
- }
+}
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
-/* Rexx External Function: rx3270FileChooserNew                               */
+/* Rexx External Function: rx3270GetWidgetData	                              */
 /*                                                                            */
-/* Description: Create a new file chooser dialog                              */
+/* Description: Get widget data                                               */
 /*                                                                            */
-/* Rexx Args:   Dialog type (OPEN/SAVE)                                       */
-/*				Dialog title												  */
-/*																			  */
-/* Returns:	    Widget handle                                                 */
+/* Rexx Args:   Widget handle                                                 */
+/*              Parameter name                                                */
+/*                                                                            */
+/* Returns:	    Parameter value                                               */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270FileChooserNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
- {
- 	GtkWidget *widget;
+ULONG APIENTRY rx3270GetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+{
+	GtkWidget *widget;
 
-	Trace("%s called with %d arguments",__FUNCTION__,(int) Argc);
-
- 	if(Argc < 2)
+	if(Argc != 2)
 		return RXFUNC_BADCALL;
 
+	GET_WIDGET_ARG(widget,0);
 
-	if(!strcmp(Argv[0].strptr,"OPEN"))
-	{
-		widget = gtk_file_chooser_dialog_new( Argv[1].strptr,
-											  GTK_WINDOW(program_window),
-											  GTK_FILE_CHOOSER_ACTION_OPEN,
-											  GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-											  GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-										 	  NULL);
-
-	}
-	else if(!strcmp(Argv[0].strptr,"SAVE"))
-	{
-		widget = gtk_file_chooser_dialog_new( Argv[1].strptr,
-											  GTK_WINDOW(program_window),
-											  GTK_FILE_CHOOSER_ACTION_SAVE,
-											  GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-											  GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
-											  NULL);
-	}
-	else
-	{
-		return RXFUNC_BADCALL;
-	}
-
-
-	Trace("%s: %p",__FUNCTION__,widget);
-
-	if(Argc == 3)
-		gtk_window_set_title(GTK_WINDOW(widget),Argv[2].strptr);
-
-	ReturnPointer(widget);
- }
-
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/* Rexx External Function: rx3270FileChooserGetFilename                       */
-/*                                                                            */
-/* Description: Gets the filename for the currently selected file in the file selector.  */
-/*                                                                            */
-/* Rexx Args:   File Chooser handle                                           */
-/*																			  */
-/* Returns:	    Selected file                                                 */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270FileChooserGetFilename(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
- {
-	CHECK_SINGLE_WIDGET_ARG(widget);
-	return RetString(Retstr,gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(widget)));
- }
-
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/* Rexx External Function: rx3270MessageDialogNew                             */
-/*                                                                            */
-/* Description: Create a new message dialog                                   */
-/*                                                                            */
-/* Rexx Args:   Text for error popup                                          */
-/*                                                                            */
-/* Rexx Args:   Message Type ( "INFO", "WARNING", "QUESTION", "ERROR"         */
-/*				Text for popup           							  		  */
-/*                                                                            */
-/* Returns:	    Dialog handle                                                 */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270MessageDialogNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
- {
- 	GtkMessageType	type = GTK_MESSAGE_ERROR;
- 	GtkWidget		*dialog;
- 	const gchar	*text = "";
-
-	Trace("Argc: %d",(int) Argc);
-
-	switch(Argc)
-	{
-	case 1:
-		text = Argv[0].strptr;
-		break;
-
-	case 2:
-		text = Argv[1].strptr;
-		type = getMessageDialogType(Argv[0].strptr);
-		break;
-
-	default:
-		return RXFUNC_BADCALL;
-
-	}
-
- 	dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
-										GTK_DIALOG_DESTROY_WITH_PARENT,
-										type,
-										GTK_BUTTONS_CLOSE,
-										"%s",text );
-
-	ReturnPointer(dialog);
- }
+	return RetString(Retstr,g_object_get_data(G_OBJECT(widget),Argv[1].strptr));
+}
