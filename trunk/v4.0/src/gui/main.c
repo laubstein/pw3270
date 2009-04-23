@@ -66,11 +66,12 @@
 
 /* Globals */
 #ifdef HAVE_LIBGNOME
-GnomeClient *client = 0;
+static GnomeClient *client = 0;
 #endif
 
 static const char	*cl_hostname	= NULL;
 static const char	*startup_script = NULL;
+static gchar 		*gtk_theme = NULL;
 
 /* Callback for connection state changes. */
 #ifdef 	X3270_FT
@@ -159,6 +160,7 @@ static int program_init(const gchar *program)
 	static const gchar	*logname	= PROGRAM_NAME ".log";
 	gboolean				has_log		= FALSE;
 	const gchar			*msg		= gtk_check_version(GTK_MAJOR_VERSION, GTK_MINOR_VERSION, GTK_MICRO_VERSION);
+	gchar					*ptr;
 
 	if(msg)
 	{
@@ -209,11 +211,25 @@ static int program_init(const gchar *program)
 
 	g_log_set_default_handler(log_callback,"GLog");
 
-	gtk_rc_parse("etc/gtk-2.0/gtkrc");
-
 	/* Start */
 	Trace("%s","Opening configuration file");
 	OpenConfigFile();
+
+	if(gtk_theme)
+		ptr = g_strdup(gtk_theme);
+	else
+#ifdef WIN32
+		ptr = GetString( "gtk", "theme", "themes/MS-Windows/gtk-2.0/gtkrc");
+#else
+		ptr = GetString( "gtk", "theme", "");
+#endif
+
+	if(ptr)
+	{
+		if(*ptr && g_file_test(ptr,G_FILE_TEST_IS_REGULAR))
+			gtk_rc_parse(ptr);
+		g_free(ptr);
+	}
 
 	Trace("%s","Opening configuration file");
 	if(Register3270IOCallbacks(&program_io_callbacks))
@@ -302,6 +318,7 @@ static void load_options(GOptionContext *context)
 		{ "program-data",	 	'd', 0, G_OPTION_ARG_STRING, 	&program_data,						N_( "Path to search for data and configuration files" ),				NULL },
 		{ "icon",	 			'i', 0, G_OPTION_ARG_FILENAME, 	&program_logo,						N_( "Path to an image file for program icon" ),							NULL },
 		{ "window-title",	 	't', 0, G_OPTION_ARG_STRING, 	&window_title,						N_( "Main window title" ),												PROGRAM_NAME },
+		{ "theme",				'T', 0, G_OPTION_ARG_FILENAME,	&gtk_theme,							N_( "Theme file (gtkrc)" ),												NULL },
 
 #ifdef HAVE_PLUGINS
 		{ "plugins",	 		'p', 0, G_OPTION_ARG_STRING, 	&plugin_list,						N_( "Full path of plugins to load" ),									NULL },

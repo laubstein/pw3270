@@ -118,6 +118,7 @@ cd %{_builddir}/%{name}-%{version}
 %build
 make clean
 make Release
+strip bin/Release/lib3270.so
 
 %if 0%{?_uno}
 make -C src/extensions/uno %{name}.oxt
@@ -125,8 +126,11 @@ make -C src/extensions/uno %{name}.oxt
 
 make src/gui/@PACKAGE@.@LOGOEXT@
 strip bin/Release/@PACKAGE@
-strip bin/Release/lib3270.so
 
+%if 0%{?_rexx}
+make bin/Release/plugins/rx3270.so
+# make bin/Release/librx3270.so
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -162,8 +166,7 @@ install -m 644 ui/debug.xml %{buildroot}%{_datadir}/%{name}/ui/debug.xml
 %if 0%{?_rexx}
 install -m 644 src/plugins/rexx/rx3270.cls %{buildroot}%{_bindir}/rx3270.cls
 install -m 644 ui/rexx.xml %{buildroot}%{_datadir}/%{name}/ui/rexx.xml
-
-ln -s %{_libdir}/%{name}/plugins/rx3270.so %{buildroot}%{_libdir}/librx3270.so
+# install -m 644 bin/Release/librx3270.so %{_libdir}/librx3270.so
 %endif
 
 %if 0%{?_uno}
@@ -216,7 +219,7 @@ unopkg remove --shared %{name}.oxt
 %defattr(-,root,root)
 %{_libdir}/%{name}/plugins/rx3270.so
 %{_datadir}/%{name}/ui/rexx.xml
-%{_libdir}/librx3270.so
+# %{_libdir}/librx3270.so
 %{_bindir}/rx3270.cls
 %endif
 

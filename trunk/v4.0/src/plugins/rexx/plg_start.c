@@ -199,12 +199,9 @@
 	for(f=0;f < rexx_plugin_calls_count; f++)
 		RexxRegisterFunctionExe((char *) rexx_plugin_calls[f].name,rexx_plugin_calls[f].call);
 
-/*
 	// Disable standalone functions
- 	Trace("Disabling %d standalone calls",rexx_standalone_calls_count);
-	for(f=0;f < rexx_standalone_calls_count; f++)
-		RexxRegisterFunctionExe((char *) rexx_standalone_calls[f].name,(PFN) rx3270Dunno);
-*/
+	RexxRegisterFunctionExe((char *) "rx3270LoadFuncs",(PFN) rx3270Dunno);
+	RexxRegisterFunctionExe((char *) "rx3270Init",(PFN) rx3270Dunno);
 
  	// Check for startup script
  	if(!(script && g_str_has_suffix(script,".rex")))

@@ -125,7 +125,7 @@ return
 	if self~widget <> 0
 		then ok = rx3270DestroyDialog(self~widget)
 	self~widget = 0;
-return
+return 0
 
 ::method run
 	if self~widget = 0
@@ -154,7 +154,7 @@ return rx3270SetDialogTitle(self~widget,ptr)
 
 ::method init
 	use arg type, message
-	self~widget = rx3270FileChooserNew(type,title)
+	self~widget = rx3270MessageDialogNew(type,message)
 return
 
 /*-------------------------------------------------------------------------------*/
