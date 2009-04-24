@@ -146,6 +146,10 @@ return
 	use arg ptr
 return rx3270SetDialogTitle(self~widget,ptr)
 
+::method Resize
+	use arg width, height
+return rx3270SetWindowSize(self~widget,width,height)
+
 ::method set
 	parse arg name, value
 	if self~widget = 0
@@ -157,6 +161,9 @@ return rx3270SetWidgetData(self~widget,name,value)
 	if self~widget = 0
 		then return -22
 return rx3270GetWidgetData(self~widget,name)
+
+::method show
+return rx3270SetWidgetVisibleState(self~widget,1)
 
 /*-------------------------------------------------------------------------------*/
 /* Message dialog                                                                */
@@ -198,3 +205,8 @@ return rx3270ProgressDialogSetTotal(self~widget,value)
 ::method 'current='
 	use arg value
 return rx3270ProgressDialogSetCurrent(self~widget,value)
+
+::method 'text='
+	use arg value
+return rx3270ProgressDialogSetText(self~widget,value)
+

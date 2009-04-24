@@ -601,6 +601,7 @@
 		<Unit filename="src/plugins/rexx/actions.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/plugins/rexx/calls.h" />
 		<Unit filename="src/plugins/rexx/common_start.c">
 			<Option compilerVar="CC" />
 		</Unit>

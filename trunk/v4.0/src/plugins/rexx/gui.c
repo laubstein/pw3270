@@ -38,8 +38,6 @@
  {
  	GtkWidget *widget = NULL;
 
-	Trace("%s: %d arguments",__FUNCTION__,(int) Argc);
-
 	Trace("%s(%s)",__FUNCTION__,Argv[Argc].strptr);
 
 	if(sscanf(Argv[Argc].strptr, "%p", &widget) != 1)
@@ -227,3 +225,32 @@ ULONG APIENTRY rx3270GetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queu
 
 	return RetString(Retstr,g_object_get_data(G_OBJECT(widget),Argv[1].strptr));
 }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270SetWidgetVisibleState                        */
+/*                                                                            */
+/* Description: Causes the given text to appear superimposed on the progress bar. */
+/*                                                                            */
+/* Rexx Args:   Widget hangle                                                 */
+/*              0 to hide widget, non zero to show it                         */
+/*                                                                            */
+/* Returns:	    none                                                          */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270SetWidgetVisibleState(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	GtkWidget *widget;
+
+	if(Argc != 2)
+		return RXFUNC_BADCALL;
+
+	GET_WIDGET_ARG(widget,0);
+
+	if(atoi(Argv[1].strptr))
+		gtk_widget_show(widget);
+	else
+		gtk_widget_hide(widget);
+
+	return RetValue(Retstr,0);
+ }

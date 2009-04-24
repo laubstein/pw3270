@@ -33,65 +33,6 @@
 
  #include "rx3270.h"
 
-/*---[ Rexx entry points ]------------------------------------------------------------------------*/
-
- const EXPORTED_CALL_ENTRY rexx_exported_calls[] =
- {
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270SetWidgetData				),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270GetWidgetData				),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270Popup 				   	),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270Actions				   	),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270Quit						),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270SetVisible				),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270Popup						),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270runDialog					),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270DestroyDialog				),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270FileChooserNew			),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270FileChooserGetFilename	),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270SetDialogTitle			),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270MessageDialogNew			),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270ProgressDialogNew			),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270ProgressDialogSetCurrent	),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270ProgressDialogSetTotal	),
-	EXPORTED_PLUGIN_REXX_ENTRY( rx3270SetWindowDefaultSize		),
-
-/*
-	EXPORTED_STANDALONE_REXX_ENTRY( rx3270LoadFuncs				),
-	EXPORTED_STANDALONE_REXX_ENTRY( rx3270Init				    )
-*/
-
-	EXPORTED_COMMON_REXX_ENTRY( rx3270Version				    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270Connect				    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270Disconnect				),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270QueryScreenAttribute    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270ToggleON			    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270ToggleOFF			    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270Toggle				    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270Toggled				    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270Log					    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270QueryCState			    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270WaitForEvents		    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270Sleep				    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270InputString			    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270FindFieldAttribute	    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270FindFieldLength		    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270GetCursorPosition	    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270SetCursorPosition		),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270ReadScreen			    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270SendPFKey			    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270WaitForChanges		    ),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270SendENTERKey			),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270WaitForString			),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270WaitForStringAt			),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270IsTerminalReady			),
-	EXPORTED_COMMON_REXX_ENTRY( rx3270WaitForTerminalReady	),
-
- };
-
- int rexx_common_calls_count		= (sizeof(rexx_common_calls) / sizeof(EXPORTED_CALL_ENTRY));
- int rexx_standalone_calls_count 	= (sizeof(rexx_standalone_calls) / sizeof(EXPORTED_CALL_ENTRY));
- int rexx_plugin_calls_count		= (sizeof(rexx_plugin_calls) / sizeof(EXPORTED_CALL_ENTRY));
-
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
  ULONG RetValue(PRXSTRING Retstr, int value)
