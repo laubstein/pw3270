@@ -30,7 +30,10 @@
  *
  */
 
+// http://www-01.ibm.com/support/docview.wss?rs=22&context=SS8PLL&dc=DB520&dc=DB560&uid=swg21140958&loc=en_US&cs=UTF-8&lang=en&rss=ct22other
+
  #define INCL_RXSYSEXIT
+ #define INCL_RXARI
  #include "rx3270.h"
 
  #include <gmodule.h>
@@ -152,7 +155,7 @@
 													GTK_BUTTONS_OK,
 													_(  "script %s failed" ), name);
 
-		gtk_window_set_title(GTK_WINDOW(dialog),_( "Script failed" ));
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx script failed" ));
 		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Return code was %d" ), rc);
 
         gtk_dialog_run(GTK_DIALOG (dialog));
@@ -166,10 +169,10 @@
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
 													GTK_BUTTONS_OK,
-													_( "Can't start \"%s\"" ),
+													_( "Script %s aborted" ),
 													name );
 
-		gtk_window_set_title(GTK_WINDOW(dialog),_( "Can't start script" ));
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx script failed" ));
 		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Return code was %d" ), (int) return_code );
 
         gtk_dialog_run(GTK_DIALOG (dialog));
@@ -406,7 +409,8 @@
 
  LONG APIENTRY SysExit_SIO(LONG ExitNumber, LONG  Subfunction, PEXIT ParmBlock)
  {
- 	GtkWidget *dialog;
+ 	LONG		retcode = RXEXIT_HANDLED;
+ 	GtkWidget	*dialog;
 
  	Trace("%s call with ExitNumber: %d Subfunction: %d",__FUNCTION__,(int) ExitNumber, (int) Subfunction);
 
@@ -416,7 +420,7 @@
 		 dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
 											GTK_DIALOG_DESTROY_WITH_PARENT,
 											GTK_MESSAGE_INFO,
-											GTK_BUTTONS_OK,
+											GTK_BUTTONS_OK_CANCEL,
 											"%s", (((RXSIOSAY_PARM *) ParmBlock)->rxsio_string).strptr );
 
 		if(trace_window)
@@ -424,7 +428,11 @@
 
 		gtk_window_set_title(GTK_WINDOW(dialog), _( "Script message" ) );
 
-        gtk_dialog_run(GTK_DIALOG (dialog));
+        if(gtk_dialog_run(GTK_DIALOG (dialog)) == GTK_RESPONSE_CANCEL)
+        {
+			if(RaiseHaltSignal() != RXARI_OK)
+				retcode = RXEXIT_RAISE_ERROR;
+        }
         gtk_widget_destroy(dialog);
 		break;
 
@@ -444,5 +452,5 @@
 		return RXEXIT_NOT_HANDLED;
 	}
 
-	return RXEXIT_HANDLED;
+	return retcode;
  }
