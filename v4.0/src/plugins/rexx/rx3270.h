@@ -77,7 +77,9 @@
 	#endif
 
 	/* Entrypoints */
-	#define EXPORTED_REXX_CALL_ENTRY(x) 		{ #x, (PFN) x }
+	#define EXPORTED_COMMON_REXX_ENTRY(x) 		{ #x, (PFN) x }
+	#define EXPORTED_PLUGIN_REXX_ENTRY(x) 		{ #x, (PFN) x }
+	#define EXPORTED_STANDALONE_REXX_ENTRY(x) 	{ #x, (PFN) x }
 
 	typedef struct _exported_rexx_calls
 	{
@@ -85,13 +87,9 @@
 		PFN				call;
 	} EXPORTED_CALL_ENTRY;
 
-	extern const EXPORTED_CALL_ENTRY rexx_common_calls[];
-	extern const EXPORTED_CALL_ENTRY rexx_standalone_calls[];
-	extern const EXPORTED_CALL_ENTRY rexx_plugin_calls[];
+	extern const EXPORTED_CALL_ENTRY rexx_exported_calls[];
 
-	extern int rexx_common_calls_count;
-	extern int rexx_standalone_calls_count;
-	extern int rexx_plugin_calls_count;
+	extern int rexx_exported_calls_count;
 
 
 	/* Tools */
@@ -111,6 +109,12 @@
 										if(Argc == 1) w = getWidget(0,Argv); \
 										if(!w) return RXFUNC_BADCALL;
 
+
+#ifdef WIN32
+	#error Como pego a thread atual em windows??
+#else
+	#define RaiseHaltSignal() RexxSetHalt(getpid(),pthread_self())
+#endif
 
 	/* Rexx entry points */
 

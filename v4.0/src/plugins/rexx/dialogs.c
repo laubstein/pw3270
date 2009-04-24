@@ -55,6 +55,23 @@
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
+/* Rexx External Function: rx3270SetWindowDefaultSize                         */
+/*                                                                            */
+/* Description: Run Dialog box                                                */
+/*                                                                            */
+/* Rexx Args:   Dialog handle                                                 */
+/*                                                                            */
+/* Returns:	    Dialog result                                                 */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270runDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	CHECK_SINGLE_WIDGET_ARG(widget);
+	return RetGtkResponse(Retstr,gtk_dialog_run(GTK_DIALOG(widget)));
+ }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
 /* Rexx External Function: rx3270SetDialogTitle                               */
 /*                                                                            */
 /* Description: Set dialog title                                              */
@@ -89,12 +106,14 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270DestroyDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
-	CHECK_SINGLE_WIDGET_ARG(widget);
+	GtkWidget *widget = getWidget(0,Argv);
+
+	if(!widget)
+		return RetValue(Retstr,EINVAL);
 
 	gtk_widget_destroy(widget);
 
 	return RetValue(Retstr,0);
-
  }
 
 /*----------------------------------------------------------------------------*/
@@ -230,13 +249,18 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
+ void cancel_clicked(GtkButton *button, gpointer user_data)
+ {
+ 	RaiseHaltSignal();
+ }
+
  ULONG APIENTRY rx3270ProgressDialogNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	GtkWidget		*dialog;
  	GtkWidget		*widget;
  	GtkWidget		*box;
  	const gchar	*text  = "";
- 	const gchar	*title = _( "Please wait" );
+ 	const gchar	*title = _( "Processing data..." );
 
 	switch(Argc)
 	{
@@ -259,21 +283,33 @@
 
 	dialog = gtk_dialog_new();
 	gtk_window_set_deletable(GTK_WINDOW(dialog),FALSE);
-	gtk_window_set_title(GTK_WINDOW(dialog),title);
+	gtk_window_set_title(GTK_WINDOW(dialog),_( "Please wait" ) );
 	gtk_window_set_resizable(GTK_WINDOW(dialog),FALSE);
 	gtk_window_set_transient_for(GTK_WINDOW(dialog),GTK_WINDOW(program_window));
 	gtk_window_set_destroy_with_parent(GTK_WINDOW(dialog),TRUE);
 
 	box = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
+	/* Cria label com o sub-titulo */
+	widget = gtk_label_new(title);
+	g_object_set_data(G_OBJECT(dialog),"LabelWidget",widget);
+	gtk_box_pack_start(GTK_BOX(box),widget,TRUE,TRUE,5);
+
+	/* Cria barra de progresso */
 	widget = gtk_progress_bar_new();
 
 	if(text && *text)
 		gtk_progress_bar_set_text(GTK_PROGRESS_BAR(widget),text);
 
 	g_object_set_data(G_OBJECT(dialog),"ProgressBarWidget",widget);
-
 	gtk_box_pack_start(GTK_BOX(box),widget,TRUE,TRUE,5);
+
+	/* Cria botao "cancelar" */
+	box = gtk_dialog_get_action_area(GTK_DIALOG(dialog));
+	widget = gtk_button_new_from_stock(GTK_STOCK_CANCEL);
+	g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(cancel_clicked),(gpointer) dialog);
+
+	gtk_box_pack_end(GTK_BOX(box),widget,FALSE,FALSE,5);
 
 	gtk_widget_show_all(dialog);
  	ReturnPointer(dialog);

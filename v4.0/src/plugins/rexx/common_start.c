@@ -35,61 +35,56 @@
 
 /*---[ Rexx entry points ]------------------------------------------------------------------------*/
 
- const EXPORTED_CALL_ENTRY rexx_plugin_calls[] =
+ const EXPORTED_CALL_ENTRY rexx_exported_calls[] =
  {
-	EXPORTED_REXX_CALL_ENTRY( rx3270SetWidgetData				),
-	EXPORTED_REXX_CALL_ENTRY( rx3270GetWidgetData				),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Popup 				    	),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Actions				    	),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Quit						),
-	EXPORTED_REXX_CALL_ENTRY( rx3270SetVisible					),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Popup						),
-	EXPORTED_REXX_CALL_ENTRY( rx3270runDialog					),
-	EXPORTED_REXX_CALL_ENTRY( rx3270DestroyDialog				),
-	EXPORTED_REXX_CALL_ENTRY( rx3270FileChooserNew				),
-	EXPORTED_REXX_CALL_ENTRY( rx3270FileChooserGetFilename		),
-	EXPORTED_REXX_CALL_ENTRY( rx3270SetDialogTitle				),
-	EXPORTED_REXX_CALL_ENTRY( rx3270MessageDialogNew			),
-	EXPORTED_REXX_CALL_ENTRY( rx3270ProgressDialogNew			),
-	EXPORTED_REXX_CALL_ENTRY( rx3270ProgressDialogSetCurrent	),
-	EXPORTED_REXX_CALL_ENTRY( rx3270ProgressDialogSetTotal		),
- };
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270SetWidgetData				),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270GetWidgetData				),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270Popup 				   	),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270Actions				   	),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270Quit						),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270SetVisible				),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270Popup						),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270runDialog					),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270DestroyDialog				),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270FileChooserNew			),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270FileChooserGetFilename	),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270SetDialogTitle			),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270MessageDialogNew			),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270ProgressDialogNew			),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270ProgressDialogSetCurrent	),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270ProgressDialogSetTotal	),
+	EXPORTED_PLUGIN_REXX_ENTRY( rx3270SetWindowDefaultSize		),
 
- const EXPORTED_CALL_ENTRY rexx_standalone_calls[] =
- {
 /*
-	EXPORTED_REXX_CALL_ENTRY( rx3270LoadFuncs				),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Init				    )
+	EXPORTED_STANDALONE_REXX_ENTRY( rx3270LoadFuncs				),
+	EXPORTED_STANDALONE_REXX_ENTRY( rx3270Init				    )
 */
- };
 
- const EXPORTED_CALL_ENTRY rexx_common_calls[] =
- {
-	EXPORTED_REXX_CALL_ENTRY( rx3270Version				    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Connect				    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Disconnect				),
-	EXPORTED_REXX_CALL_ENTRY( rx3270QueryScreenAttribute    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270ToggleON			    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270ToggleOFF			    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Toggle				    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Toggled				    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Log					    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270QueryCState			    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270WaitForEvents		    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270Sleep				    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270InputString			    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270FindFieldAttribute	    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270FindFieldLength		    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270GetCursorPosition	    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270SetCursorPosition		),
-	EXPORTED_REXX_CALL_ENTRY( rx3270ReadScreen			    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270SendPFKey			    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270WaitForChanges		    ),
-	EXPORTED_REXX_CALL_ENTRY( rx3270SendENTERKey			),
-	EXPORTED_REXX_CALL_ENTRY( rx3270WaitForString			),
-	EXPORTED_REXX_CALL_ENTRY( rx3270WaitForStringAt			),
-	EXPORTED_REXX_CALL_ENTRY( rx3270IsTerminalReady			),
-	EXPORTED_REXX_CALL_ENTRY( rx3270WaitForTerminalReady	),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270Version				    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270Connect				    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270Disconnect				),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270QueryScreenAttribute    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270ToggleON			    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270ToggleOFF			    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270Toggle				    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270Toggled				    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270Log					    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270QueryCState			    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270WaitForEvents		    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270Sleep				    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270InputString			    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270FindFieldAttribute	    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270FindFieldLength		    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270GetCursorPosition	    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270SetCursorPosition		),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270ReadScreen			    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270SendPFKey			    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270WaitForChanges		    ),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270SendENTERKey			),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270WaitForString			),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270WaitForStringAt			),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270IsTerminalReady			),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270WaitForTerminalReady	),
 
  };
 
