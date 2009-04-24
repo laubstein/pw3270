@@ -9,23 +9,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-20 10:39-0300\n"
-"PO-Revision-Date: 2009-04-20 10:39-0300\n"
+"POT-Creation-Date: 2009-04-24 15:50-0300\n"
+"PO-Revision-Date: 2009-04-24 15:53-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
 
-#: src/gui/main.c:421
+#: src/gui/main.c:444
 msgid "- 3270 Emulator for GTK+"
 msgstr "- Emulador 3270 para GTK+"
 
-#: src/gui/main.c:400
+#: src/gui/main.c:423
 msgid "- 3270 Emulator for Gnome"
 msgstr "- Emulador 3270 para Gnome"
 
-#: src/gui/main.c:409
+#: src/gui/main.c:432
 msgid "3270 Emulator"
 msgstr "Emulador 3270"
 
@@ -37,7 +37,7 @@ msgstr "Emulador 3270 para GTK"
 msgid "3270 Terminal emulator for Gnome."
 msgstr "Emulador de terminal 3270 para Gnome"
 
-#: src/gui/main.c:317
+#: src/gui/main.c:340
 msgid "3270 options"
 msgstr "Opções do 3270"
 
@@ -187,15 +187,15 @@ msgstr "Não foi possível carregar %s: %s"
 msgid "Can't receive \"%s\""
 msgstr "Não foi possível receber \"%s\""
 
-#: src/gui/main.c:215
+#: src/gui/main.c:237
 msgid "Can't register into lib3270 I/O callback table."
 msgstr "Não foi possível efetuar o registro na tabela de I/O 3270."
 
-#: src/gui/main.c:230
+#: src/gui/main.c:252
 msgid "Can't register into lib3270 file-transfer callback table."
 msgstr "Não foi possível fazer o registro das funções de transferência de arquivo na biblioteca 3270"
 
-#: src/gui/main.c:222
+#: src/gui/main.c:244
 msgid "Can't register into lib3270 screen callback table."
 msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 
@@ -208,6 +208,15 @@ msgstr "Não foi possível enviar arquivo \"%s\""
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
+#: src/plugins/rexx/std_start.c:208
+#, c-format
+msgid "Can't start \"%s\""
+msgstr "Não foi possível iniciar %s"
+
+#: src/plugins/rexx/std_start.c:211
+msgid "Can't start script"
+msgstr "Não foi possível iniciar script"
+
 #: src/gui/keypad.c:143
 msgid "Clear"
 msgstr "Limpar"
@@ -219,6 +228,10 @@ msgstr "Configuração de cores"
 #: src/gui/actions.c:229
 msgid "Colors"
 msgstr "Cores"
+
+#: src/plugins/rexx/plg_start.c:334
+msgid "Command:"
+msgstr ""
 
 #: src/gui/actions.c:189
 msgid "Copy"
@@ -386,9 +399,9 @@ msgstr ""
 msgid "Fixed"
 msgstr "Fixo"
 
-#: src/gui/main.c:292
+#: src/gui/main.c:314
 msgid "Fixed path and filename for load/save the configuration data"
-msgstr ""
+msgstr "Caminho e nome do arquivo para ler/gravar dados de configuração"
 
 #: src/gui/print.c:221
 msgid "Font"
@@ -402,13 +415,17 @@ msgstr "Frente"
 msgid "Full Screen"
 msgstr "Tela-cheia"
 
-#: src/gui/main.c:301
+#: src/gui/main.c:324
 msgid "Full path of plugins to load"
 msgstr "Caminho completo dos plugins a carregas"
 
 #: src/gui/actions.c:445
 msgid "Fullscreen"
 msgstr "Tela-cheia"
+
+#: src/gui/main.c:177
+msgid "GTK Version mismatch"
+msgstr "Divergência na versão do GTK"
 
 #: src/gui/colors.c:387
 msgid "Gray"
@@ -426,7 +443,7 @@ msgstr "Ajuda"
 msgid "Host file name:"
 msgstr "Nome do arquivo remoto:"
 
-#: src/gui/main.c:294
+#: src/gui/main.c:316
 msgid "Host identifier"
 msgstr "Identificador do host"
 
@@ -487,7 +504,7 @@ msgstr "Nome do arquivo local:"
 msgid "Locked status"
 msgstr "Bloqueada"
 
-#: src/gui/main.c:298
+#: src/gui/main.c:320
 msgid "Main window title"
 msgstr "Título da janela principal"
 
@@ -499,11 +516,11 @@ msgstr "Só maiúsculas"
 msgid "Mustard"
 msgstr "Mostarda"
 
-#: src/gui/main.c:293
+#: src/gui/main.c:315
 msgid "Name of configuration file (auto-search)"
-msgstr ""
+msgstr "Nome do arquivo de configuração (pesquisa automática)"
 
-#: src/gui/main.c:492
+#: src/gui/main.c:515
 #, c-format
 msgid "Negotiation with %s failed!"
 msgstr "Negociação com %s falhou!"
@@ -536,7 +553,7 @@ msgstr "Normal/Desprotegido"
 msgid "OIA"
 msgstr ""
 
-#: src/gui/main.c:279
+#: src/gui/main.c:301
 #, c-format
 msgid "Option parsing failed: %s\n"
 msgstr "Tratamento de opções falho: %s\n"
@@ -561,17 +578,21 @@ msgstr "Colar arquivo texto"
 msgid "Paste with left margin"
 msgstr "Colar com margem"
 
-#: src/gui/main.c:297
+#: src/gui/main.c:319
 msgid "Path to an image file for program icon"
 msgstr "Caminho para arquivo de imagem contendo o ícone do programa"
 
-#: src/gui/main.c:296
+#: src/gui/main.c:318
 msgid "Path to search for data and configuration files"
 msgstr "Caminho dos arquivos de dados e configuração"
 
 #: src/gui/colors.c:375
 msgid "Pink"
 msgstr "Rosa"
+
+#: src/plugins/rexx/dialogs.c:300
+msgid "Please wait"
+msgstr "Por favor, aguarde"
 
 #: src/gui/actions.c:1015
 msgid "Port:"
@@ -596,6 +617,10 @@ msgstr "Imprimir cópia"
 #: src/gui/actions.c:190
 msgid "Print selected"
 msgstr "Imprimir seleção"
+
+#: src/plugins/rexx/dialogs.c:277
+msgid "Processing data..."
+msgstr "Processando informações..."
 
 #: src/gui/actions.c:224
 msgid "Properties"
@@ -641,15 +666,33 @@ msgstr ""
 msgid "Return"
 msgstr ""
 
+#: src/plugins/rexx/plg_start.c:163 src/plugins/rexx/plg_start.c:180
+#: src/plugins/rexx/std_start.c:195 src/plugins/rexx/std_start.c:212
+#, c-format
+msgid "Return code was %d"
+msgstr "Código de saída foi %d"
+
+#: src/plugins/rexx/gui.c:138
+msgid "Rexx message"
+msgstr "Mensagem Rexx"
+
+#: src/plugins/rexx/plg_start.c:162 src/plugins/rexx/plg_start.c:179
+msgid "Rexx script failed"
+msgstr "Script Rexx falhou"
+
 #: src/plugins/rexx/actions.c:99
 msgid "Rexx scripts"
 msgstr "Scripts Rexx"
+
+#: src/plugins/rexx/plg_start.c:315
+msgid "Rexx trace"
+msgstr ""
 
 #: src/gui/actions.c:155
 msgid "Right"
 msgstr "Direita"
 
-#: src/gui/main.c:295
+#: src/gui/main.c:317
 msgid "Run script on startup (if available)"
 msgstr "Executa script na inicialização (Se disponível)"
 
@@ -683,6 +726,19 @@ msgstr "Salvar texto selecionado"
 
 #: src/gui/actions.c:468
 msgid "Screen Trace"
+msgstr ""
+
+#: src/plugins/rexx/plg_start.c:176
+#, c-format
+msgid "Script %s aborted"
+msgstr "Script %s foi abortado"
+
+#: src/plugins/rexx/std_start.c:194
+msgid "Script failed"
+msgstr ""
+
+#: src/plugins/rexx/plg_start.c:423
+msgid "Script message"
 msgstr ""
 
 #: src/gui/actions.c:215
@@ -793,7 +849,7 @@ msgstr "Mudar servidor"
 msgid "Settings"
 msgstr "Configuração"
 
-#: src/gui/main.c:317
+#: src/gui/main.c:340
 msgid "Show lib3270 options"
 msgstr "Mostra opções da biblioteca 3270"
 
@@ -821,6 +877,10 @@ msgstr ""
 msgid "Text file"
 msgstr "Arquivo texto"
 
+#: src/gui/main.c:321
+msgid "Theme file (gtkrc)"
+msgstr "Arquivo de tema (gtkrc)"
+
 #: src/gui/actions.c:360
 msgid ""
 "This program is free software; you can redistribute it and/or modify it "
@@ -838,13 +898,10 @@ msgid ""
 "Franklin St, Fifth Floor, Boston, MA 02111-1307 USA"
 msgstr ""
 
-#: src/gui/main.c:170
+#: src/gui/main.c:173
 #, c-format
-msgid ""
-"This program requires GTK version %d.%d.%d\n"
-"(%s)"
-msgstr "Este programa precisa da biblioteca GTK versão·%d.%d.%d\n"
-"(%s)"
+msgid "This program requires GTK version %d.%d.%d"
+msgstr "Este programa precisa do GTK versão %d.%d.%d"
 
 #: src/gui/actions.c:463
 msgid "Track Cursor"
@@ -975,4 +1032,9 @@ msgstr "_Opções"
 #: src/gui/actions.c:228
 msgid "_Quit"
 msgstr "_Sair"
+
+#: src/plugins/rexx/plg_start.c:160 src/plugins/rexx/std_start.c:192
+#, c-format
+msgid "script %s failed"
+msgstr "script %s falhou"
 

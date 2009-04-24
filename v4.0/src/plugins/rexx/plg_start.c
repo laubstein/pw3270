@@ -448,3 +448,33 @@
 
 	return retcode;
  }
+
+ ULONG RetConvertedString(PRXSTRING Retstr, const char *value)
+ {
+ 	if(!value)
+ 	{
+ 		// Empty string doesn't need to be converted
+ 		strcpy(Retstr->strptr,"");
+ 	}
+ 	else
+ 	{
+ 		// Convert received string to UTF-8
+ 		gchar *str = g_convert(value, -1, REXX_CHARSET, CHARSET, NULL, NULL, NULL);
+
+		if(strlen(str) > (RXAUTOBUFLEN-1))
+		{
+			Retstr->strptr = RexxAllocateMemory(strlen(str)+1);
+			strcpy(Retstr->strptr,str);
+		}
+		else
+		{
+			g_snprintf(Retstr->strptr,RXAUTOBUFLEN-1,"%s",str);
+		}
+
+		g_free(str);
+ 	}
+
+    Retstr->strlength = strlen(Retstr->strptr);
+    return RXFUNC_OK;
+ }
+

@@ -210,3 +210,5 @@ return rx3270ProgressDialogSetCurrent(self~widget,value)
 	use arg value
 return rx3270ProgressDialogSetText(self~widget,value)
 
+::method pulse
+return rx3270ProgressDialogPulse(self~widget)
