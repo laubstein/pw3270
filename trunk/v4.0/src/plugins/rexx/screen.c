@@ -364,31 +364,33 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
  ULONG APIENTRY rx3270ReadScreen(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	int start, qtd, rows, cols, row, col;
+ 	char *buffer;
 
 	switch(Argc)
 	{
 	case 0:	// Get entire screen
 		screen_size(&rows,&cols);
 		qtd = (rows*(cols+1)+1);
-		Retstr->strptr = RexxAllocateMemory(qtd);
+		buffer = malloc(qtd);
 
 		Trace("Screen buffer size: %d (%dx%d)",qtd,rows,cols);
 
-		memset(Retstr->strptr,0,qtd);
+		memset(buffer,0,qtd);
 		start = qtd = 0;
 		for(row = 0; row < rows;row++)
 		{
-			screen_read(Retstr->strptr+qtd,start,cols);
+			screen_read(buffer+qtd,start,cols);
 			qtd += cols;
 			start += cols;
 			Retstr->strptr[qtd++] = '\n';
 		}
-		Retstr->strptr[qtd] = 0;
+		buffer[qtd] = 0;
 
 		Trace("Bytes read: %d",qtd);
 
-		Retstr->strlength = strlen(Retstr->strptr);
+		RetConvertedString(Retstr,buffer);
 
+		free(buffer);
 		return RXFUNC_OK;
 
 	case 1:	// Just size, get current cursor position
@@ -424,13 +426,15 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 	if(qtd < 1)
 		return RXFUNC_BADCALL;
 
-	if(qtd > (RXAUTOBUFLEN-1))
- 		Retstr->strptr = RexxAllocateMemory(qtd+1);
+	buffer = malloc(qtd+1);
+	screen_read(buffer, start, qtd);
 
-	screen_read(Retstr->strptr, start, qtd);
+	RetConvertedString(Retstr,buffer);
 
-    Retstr->strlength = strlen(Retstr->strptr);
+	free(buffer);
+
     return RXFUNC_OK;
+
  }
 
 
@@ -475,12 +479,17 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270SendPFKey(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	int rc;
+ 	int rc = 0;
 
 	if(Argc != 1)
 		return RXFUNC_BADCALL;
 
-	rc = action_PFKey(atoi(Argv[0].strptr));
+	if(!PCONNECTED)
+		rc = ENOTCONN;
+	else if(query_3270_terminal_status() != STATUS_CODE_BLANK)
+		rc = EINVAL;
+	else
+		rc = action_PFKey(atoi(Argv[0].strptr));
 
 	ReturnValue(rc);
  }

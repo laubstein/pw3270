@@ -39,6 +39,9 @@
 	#include <libintl.h>
 	#include <glib/gi18n.h>
 
+	#define CHARSET			"ISO-8859-1" /* FIXME (perry#8#): Get correct encoding from lib3270. */
+	#define REXX_CHARSET	"UTF-8"
+
 	#define RX3270_DEFAULT_TIMEOUT 60
 
 	/* include the REXX stuff */
@@ -81,6 +84,7 @@
 	ULONG	RetString(PRXSTRING Retstr, const char *value);
 	ULONG	RetValue(PRXSTRING Retstr, int value);
 	ULONG 	RetPointer(PRXSTRING Retstr, gpointer value);
+	ULONG	RetConvertedString(PRXSTRING Retstr, const char *value);
 
 	#define ReturnValue(x)  	return RetValue(Retstr,x)
 	#define ReturnString(x)		return RetString(Retstr,x)
@@ -159,6 +163,7 @@
 	ULONG APIENTRY rx3270ProgressDialogSetTotal(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270SetWindowSize(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270ProgressDialogSetText(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270ProgressDialogPulse(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 
 	GtkWidget *getWidget(LONG Argc, RXSTRING Argv[]);
 	GtkMessageType getMessageDialogType(const char *arg);

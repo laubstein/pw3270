@@ -423,3 +423,27 @@
 	gtk_progress_bar_set_text(GTK_PROGRESS_BAR(widget),Argv[1].strptr);
 	return RetValue(Retstr,0);
  }
+
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Rexx External Function: rx3270ProgressDialogPulse                          */
+/*                                                                            */
+/* Description: Indicates that some progress is made, but you don't know how much. */
+/*                                                                            */
+/* Rexx Args:   Dialog handle                                                 */
+/*                                                                            */
+/* Returns:	    none                                                          */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+ ULONG APIENTRY rx3270ProgressDialogPulse(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+	CHECK_SINGLE_WIDGET_ARG(widget);
+
+	widget = (GtkWidget *) g_object_get_data(G_OBJECT(widget),"ProgressBarWidget");
+	Trace("Progressbar: %p",widget);
+	if(!widget)
+		return RetValue(Retstr,EINVAL);
+
+	gtk_progress_bar_pulse(GTK_PROGRESS_BAR(widget));
+	return RetValue(Retstr,0);
+ }
