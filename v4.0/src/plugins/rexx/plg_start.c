@@ -32,6 +32,8 @@
 
 // http://www-01.ibm.com/support/docview.wss?rs=22&context=SS8PLL&dc=DB520&dc=DB560&uid=swg21140958&loc=en_US&cs=UTF-8&lang=en&rss=ct22other
 
+ #define BUILDING_AS_PLUGIN 1
+
  #define INCL_RXSYSEXIT
  #define INCL_RXARI
  #include "rx3270.h"
@@ -76,6 +78,8 @@
  GtkWidget	*trace_window = NULL;
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
+
+ #include "calls.h"
 
  static gboolean do_blink(struct blinker *blink)
  {
@@ -192,19 +196,9 @@
 	// Register Exit calls
 	RexxRegisterExitExe( "SysExit_SIO", (PFN) SysExit_SIO, NULL );
 
- 	// Load common functions
- 	Trace("Loading %d common calls",rexx_common_calls_count);
-	for(f=0;f < rexx_common_calls_count; f++)
-		RexxRegisterFunctionExe((char *) rexx_common_calls[f].name,rexx_common_calls[f].call);
-
- 	// Load plugin functions
- 	Trace("Loading %d plugin calls",rexx_plugin_calls_count);
-	for(f=0;f < rexx_plugin_calls_count; f++)
-		RexxRegisterFunctionExe((char *) rexx_plugin_calls[f].name,rexx_plugin_calls[f].call);
-
-	// Disable standalone functions
-	RexxRegisterFunctionExe((char *) "rx3270LoadFuncs",(PFN) rx3270Dunno);
-	RexxRegisterFunctionExe((char *) "rx3270Init",(PFN) rx3270Dunno);
+ 	// Load rexx calls
+	for(f=0; f < G_N_ELEMENTS(rexx_exported_calls); f++)
+		RexxRegisterFunctionExe((char *) rexx_exported_calls[f].name,rexx_exported_calls[f].call);
 
  	// Check for startup script
  	if(!(script && g_str_has_suffix(script,".rex")))

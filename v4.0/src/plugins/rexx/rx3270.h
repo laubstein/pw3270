@@ -76,22 +76,6 @@
 		#define ENOTCONN -1
 	#endif
 
-	/* Entrypoints */
-	#define EXPORTED_COMMON_REXX_ENTRY(x) 		{ #x, (PFN) x }
-	#define EXPORTED_PLUGIN_REXX_ENTRY(x) 		{ #x, (PFN) x }
-	#define EXPORTED_STANDALONE_REXX_ENTRY(x) 	{ #x, (PFN) x }
-
-	typedef struct _exported_rexx_calls
-	{
-		const char 	*name;
-		PFN				call;
-	} EXPORTED_CALL_ENTRY;
-
-	extern const EXPORTED_CALL_ENTRY rexx_exported_calls[];
-
-	extern int rexx_exported_calls_count;
-
-
 	/* Tools */
 	int		call_rexx(const gchar *prg, const gchar *arg);
 	ULONG	RetString(PRXSTRING Retstr, const char *value);
@@ -133,6 +117,7 @@
 	ULONG APIENTRY rx3270WaitForChanges(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270Quit(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270SetVisible(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270Sleep(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 
 	ULONG APIENTRY rx3270Dunno(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 
@@ -162,6 +147,7 @@
 	ULONG APIENTRY rx3270Popup(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270SetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270GetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270SetWidgetVisibleState(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270runDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270DestroyDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270FileChooserNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
@@ -171,6 +157,8 @@
 	ULONG APIENTRY rx3270ProgressDialogNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270ProgressDialogSetCurrent(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270ProgressDialogSetTotal(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270SetWindowSize(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270ProgressDialogSetText(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 
 	GtkWidget *getWidget(LONG Argc, RXSTRING Argv[]);
 	GtkMessageType getMessageDialogType(const char *arg);

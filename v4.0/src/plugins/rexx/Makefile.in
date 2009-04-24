@@ -61,11 +61,11 @@ CFLAGS = -g -Wall @REXX_CFLAGS@ @GTK_CFLAGS@ @OS_CFLAGS@ -O -I../../include
 
 # Rules
 
-$(OBJDEBUG)/%.o: %.c Makefile
+$(OBJDEBUG)/%.o: %.c *.h Makefile
 	@mkdir -p `dirname $@`
 	@$(CC) -DDEBUG=1 $(CFLAGS) -ggdb -o $@ -c $<
 
-$(OBJRELEASE)/%.o: %.c Makefile
+$(OBJRELEASE)/%.o: %.c *.h Makefile
 	@mkdir -p `dirname $@`
 	@$(CC) -DNDEBUG=1 $(CFLAGS) -ggdb -o $@ -c $<
 
