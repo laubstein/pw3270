@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-24 15:50-0300\n"
-"PO-Revision-Date: 2009-04-24 15:53-0300\n"
+"POT-Creation-Date: 2009-04-27 15:37-0300\n"
+"PO-Revision-Date: 2009-04-27 15:39-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -208,15 +208,6 @@ msgstr "Não foi possível enviar arquivo \"%s\""
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
-#: src/plugins/rexx/std_start.c:208
-#, c-format
-msgid "Can't start \"%s\""
-msgstr "Não foi possível iniciar %s"
-
-#: src/plugins/rexx/std_start.c:211
-msgid "Can't start script"
-msgstr "Não foi possível iniciar script"
-
 #: src/gui/keypad.c:143
 msgid "Clear"
 msgstr "Limpar"
@@ -229,7 +220,7 @@ msgstr "Configuração de cores"
 msgid "Colors"
 msgstr "Cores"
 
-#: src/plugins/rexx/plg_start.c:334
+#: src/plugins/rexx/plg_start.c:337
 msgid "Command:"
 msgstr ""
 
@@ -590,7 +581,7 @@ msgstr "Caminho dos arquivos de dados e configuração"
 msgid "Pink"
 msgstr "Rosa"
 
-#: src/plugins/rexx/dialogs.c:300
+#: src/plugins/rexx/dialogs.c:302
 msgid "Please wait"
 msgstr "Por favor, aguarde"
 
@@ -618,7 +609,7 @@ msgstr "Imprimir cópia"
 msgid "Print selected"
 msgstr "Imprimir seleção"
 
-#: src/plugins/rexx/dialogs.c:277
+#: src/plugins/rexx/dialogs.c:279
 msgid "Processing data..."
 msgstr "Processando informações..."
 
@@ -666,8 +657,7 @@ msgstr ""
 msgid "Return"
 msgstr ""
 
-#: src/plugins/rexx/plg_start.c:163 src/plugins/rexx/plg_start.c:180
-#: src/plugins/rexx/std_start.c:195 src/plugins/rexx/std_start.c:212
+#: src/plugins/rexx/plg_start.c:165 src/plugins/rexx/plg_start.c:182
 #, c-format
 msgid "Return code was %d"
 msgstr "Código de saída foi %d"
@@ -676,7 +666,7 @@ msgstr "Código de saída foi %d"
 msgid "Rexx message"
 msgstr "Mensagem Rexx"
 
-#: src/plugins/rexx/plg_start.c:162 src/plugins/rexx/plg_start.c:179
+#: src/plugins/rexx/plg_start.c:164 src/plugins/rexx/plg_start.c:181
 msgid "Rexx script failed"
 msgstr "Script Rexx falhou"
 
@@ -684,7 +674,7 @@ msgstr "Script Rexx falhou"
 msgid "Rexx scripts"
 msgstr "Scripts Rexx"
 
-#: src/plugins/rexx/plg_start.c:315
+#: src/plugins/rexx/plg_start.c:318
 msgid "Rexx trace"
 msgstr ""
 
@@ -728,18 +718,14 @@ msgstr "Salvar texto selecionado"
 msgid "Screen Trace"
 msgstr ""
 
-#: src/plugins/rexx/plg_start.c:176
+#: src/plugins/rexx/plg_start.c:178
 #, c-format
 msgid "Script %s aborted"
 msgstr "Script %s foi abortado"
 
-#: src/plugins/rexx/std_start.c:194
-msgid "Script failed"
-msgstr ""
-
-#: src/plugins/rexx/plg_start.c:423
+#: src/plugins/rexx/plg_start.c:426
 msgid "Script message"
-msgstr ""
+msgstr "Mensagem do script"
 
 #: src/gui/actions.c:215
 msgid "Scripts"
@@ -1033,7 +1019,7 @@ msgstr "_Opções"
 msgid "_Quit"
 msgstr "_Sair"
 
-#: src/plugins/rexx/plg_start.c:160 src/plugins/rexx/std_start.c:192
+#: src/plugins/rexx/plg_start.c:162
 #, c-format
 msgid "script %s failed"
 msgstr "script %s falhou"
