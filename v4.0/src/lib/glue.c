@@ -400,7 +400,7 @@ static void initialize(void)
 
 BOOL WINAPI DllMain(HANDLE hinst, DWORD dwcallpurpose, LPVOID lpvResvd)
 {
-	Trace("%s - Library loaded",__FUNCTION__);
+	Trace("%s - Library %s",__FUNCTION__,(dwcallpurpose == DLL_PROCESS_ATTACH) ? "Loaded" : "Unloaded");
 
     if(dwcallpurpose == DLL_PROCESS_ATTACH)
 		initialize();

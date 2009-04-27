@@ -99,7 +99,7 @@
 
 
 #ifdef WIN32
-	#error Como pego a thread atual em windows??
+	#define RaiseHaltSignal() RexxSetHalt(getpid(),GetCurrentThreadId())
 #else
 	#define RaiseHaltSignal() RexxSetHalt(getpid(),pthread_self())
 #endif

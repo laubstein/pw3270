@@ -30,9 +30,9 @@
 
 MODULE_NAME ?= rx3270
 
-COMMON_SRC=common_start.c actions.c screen.c toggle.c tools.c init.c network.c
+COMMON_SRC=common_start.c screen.c toggle.c tools.c init.c network.c
 STD_SRC=std_start.c
-PLG_SRC=plg_start.c gui.c dialogs.c
+PLG_SRC=plg_start.c gui.c dialogs.c actions.c
 
 # SOURCES=$(PLG_SRC) $(COMMON_SRC)
 
