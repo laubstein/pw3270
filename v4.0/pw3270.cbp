@@ -45,6 +45,7 @@
 		<Unit filename="Makefile.in" />
 		<Unit filename="configure.ac" />
 		<Unit filename="pw3270.nsi.in" />
+		<Unit filename="pw3270.spec.in" />
 		<Unit filename="rexx/sample.rex" />
 		<Unit filename="src/extensions/uno/com/sun/star/beans/Ambiguous.hpp" />
 		<Unit filename="src/extensions/uno/com/sun/star/beans/Defaulted.hpp" />

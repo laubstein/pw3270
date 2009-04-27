@@ -69,3 +69,6 @@ ULONG RetPointer(PRXSTRING Retstr, gpointer value)
     Retstr->strlength = strlen(Retstr->strptr);
     return RXFUNC_OK;
 }
+
+
+

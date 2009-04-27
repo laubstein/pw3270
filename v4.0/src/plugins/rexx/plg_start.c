@@ -30,7 +30,13 @@
  *
  */
 
-// http://www-01.ibm.com/support/docview.wss?rs=22&context=SS8PLL&dc=DB520&dc=DB560&uid=swg21140958&loc=en_US&cs=UTF-8&lang=en&rss=ct22other
+/*
+ * References:
+ *
+ * http://www.howzatt.demon.co.uk/articles/29dec94.html
+ * http://www-01.ibm.com/support/docview.wss?rs=22&context=SS8PLL&dc=DB520&dc=DB560&uid=swg21140958&loc=en_US&cs=UTF-8&lang=en&rss=ct22other
+ *
+ */
 
  #define BUILDING_AS_PLUGIN 1
 
@@ -39,8 +45,6 @@
  #include "rx3270.h"
 
  #include <gmodule.h>
-
-// http://www.howzatt.demon.co.uk/articles/29dec94.html
 
 /*---[ Structs ]----------------------------------------------------------------------------------*/
 
@@ -77,6 +81,8 @@
  GtkWidget 	*program_window	= NULL;
  GtkWidget	*trace_window = NULL;
 
+ static int halt = 0;
+
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
  #include "calls.h"
@@ -101,7 +107,6 @@
 	RXSTRING  			argv;           	          	// program argument string
 	RXSTRING  			retstr;                      	// program return value
 	SHORT     			rc		= 0;                   	// converted return code
-	CHAR      			return_buffer[RXAUTOBUFLEN];	// returned buffer
 	struct blinker		*blink;
 
 	blink = g_malloc0(sizeof(struct blinker));
@@ -116,20 +121,20 @@
 	MAKERXSTRING(argv, arg, strlen(arg));
 
 	// set up default return
-	*return_buffer = 0;
 	memset(&retstr,0,sizeof(retstr));
-	MAKERXSTRING(retstr, return_buffer, sizeof(RXAUTOBUFLEN));
 
 	Trace("%s","Running pending events");
 	RunPendingEvents(0);
 
 	Trace("Starting %s",prg);
 
+	halt = 0;
+
 	return_code = RexxStart(	1,				// argument count
 								&argv,			// argument array
 								(char *) prg,	// REXX procedure name
 								NULL,			// use disk version
-								"",				// default address name
+								PACKAGE_NAME,	// default address name
 								RXCOMMAND,		// calling as a subcommand
 								ExitArray,		// EXITs for this call
 								&rc,			// converted return code
@@ -142,13 +147,10 @@
 
 	blink->enabled = FALSE;
 
-	if(RXSTRPTR(retstr) && RXSTRPTR(retstr) != return_buffer)
-	{
-		Trace("Releasing %p (expected %p)",RXSTRPTR(retstr),return_buffer);
+	if(RXSTRPTR(retstr))
 		RexxFreeMemory(RXSTRPTR(retstr));
-	}
 
-	Trace("Call of \"%s\" ends (rc=%d return_code=%d)",prg,rc,return_code);
+	Trace("Call of \"%s\" ends (rc=%d return_code=%d)",prg,rc,(int) return_code);
 
  	if(rc)
  	{
@@ -479,3 +481,21 @@
     return RXFUNC_OK;
  }
 
+ int IsHalted(void)
+ {
+ 	return halt;
+ }
+
+ ULONG RaiseHaltSignal(void)
+ {
+	halt++;
+
+	Trace("Halt: %d",halt);
+
+#ifdef WIN32
+	return RexxSetHalt(getpid(),GetCurrentThreadId());
+#else
+	return RexxSetHalt(getpid(),pthread_self());
+#endif
+
+ }

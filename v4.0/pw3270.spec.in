@@ -1,5 +1,5 @@
-%define	        ooo_prefix	%_libdir
-%define	        ooo_home	ooo3
+%define	    ooo_prefix		%_libdir
+%define	    ooo_home		ooo3
 %define		ooo_sdk_home	%_libdir/ooo3/solver
 
 %define _rel	@PACKAGE_RELEASE@
@@ -129,7 +129,7 @@ strip bin/Release/@PACKAGE@
 
 %if 0%{?_rexx}
 make bin/Release/plugins/rx3270.so
-# make bin/Release/librx3270.so
+make bin/Release/librx3270.so
 %endif
 
 %install
@@ -166,7 +166,7 @@ install -m 644 ui/debug.xml %{buildroot}%{_datadir}/%{name}/ui/debug.xml
 %if 0%{?_rexx}
 install -m 644 src/plugins/rexx/rx3270.cls %{buildroot}%{_bindir}/rx3270.cls
 install -m 644 ui/rexx.xml %{buildroot}%{_datadir}/%{name}/ui/rexx.xml
-# install -m 644 bin/Release/librx3270.so %{_libdir}/librx3270.so
+install -m 644 bin/Release/librx3270.so %{buildroot}%{_libdir}/librx3270.so
 %endif
 
 %if 0%{?_uno}
@@ -219,7 +219,7 @@ unopkg remove --shared %{name}.oxt
 %defattr(-,root,root)
 %{_libdir}/%{name}/plugins/rx3270.so
 %{_datadir}/%{name}/ui/rexx.xml
-# %{_libdir}/librx3270.so
+%{_libdir}/librx3270.so
 %{_bindir}/rx3270.cls
 %endif
 

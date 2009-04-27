@@ -97,13 +97,6 @@
 										if(Argc == 1) w = getWidget(0,Argv); \
 										if(!w) return RXFUNC_BADCALL;
 
-
-#ifdef WIN32
-	#define RaiseHaltSignal() RexxSetHalt(getpid(),GetCurrentThreadId())
-#else
-	#define RaiseHaltSignal() RexxSetHalt(getpid(),pthread_self())
-#endif
-
 	/* Rexx entry points */
 
 	ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
@@ -168,9 +161,11 @@
 	GtkWidget *getWidget(LONG Argc, RXSTRING Argv[]);
 	GtkMessageType getMessageDialogType(const char *arg);
 	ULONG RetGtkResponse(PRXSTRING Retstr, GtkResponseType type);
+	ULONG RaiseHaltSignal(void);
+	int IsHalted(void);
 
 	/* Globals */
-	extern GtkWidget *program_window;
+	extern GtkWidget 	*program_window;
 
 
 #endif // RX3270_H_INCLUDED
