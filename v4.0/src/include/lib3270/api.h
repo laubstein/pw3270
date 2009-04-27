@@ -57,6 +57,10 @@
 			#define ETIMEDOUT -1238
 		#endif
 
+		#ifndef ECANCELED
+			#define ECANCELED -1125
+		#endif
+
 		#ifndef ENOTCONN
 			#define ENOTCONN -1107
 		#endif

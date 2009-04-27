@@ -70,6 +70,8 @@ LOGOEXT="png"
 LD_APIFLAGS=""
 LD_RLSFLAGS="-Wl,--strip-all"
 LD=$CC
+PLUGINS=""
+EXTENSIONS=""
 
 case "$host" in
 	*-mingw32)
@@ -245,12 +247,14 @@ if test "$pw3270_cv_rexx" == "yes"; then
 	AC_DEFINE(HAVE_REXX)
 	REXX_CFLAGS="`$REXX_CONFIG --cflags`"
 	REXX_LIBS="`$REXX_CONFIG --libs`"
-	SELECTED_PLUGINS="rx3270 $SELECTED_PLUGINS"
+	PLUGINS="rx3270 $PLUGINS"
+	EXTENSIONS="librx3270 $EXTENSIONS"
 elif test "$pw3270_cv_rexx" != "no"; then
 	AC_DEFINE(HAVE_REXX)
 	REXX_CFLAGS="-I$pw3270_cv_rexx/api"
 	REXX_LIBS="-L$pw3270_cv_rexx/api -lrexx -lrexxapi"
-	SELECTED_PLUGINS="rx3270 $SELECTED_PLUGINS"
+	PLUGINS="rx3270 $SELECTED_PLUGINS"
+	EXTENSIONS="librx3270 $EXTENSIONS"
 fi
 
 AC_SUBST(REXX_LIBS)
@@ -265,6 +269,7 @@ fi
 
 if test "$pw3270_cv_plugins" == "yes"; then
 	AC_DEFINE([HAVE_PLUGINS])
+	AC_SUBST(PLUGINS)
 fi
 
 if test "$pw3270_cv_print_font" == "yes"; then
@@ -319,9 +324,8 @@ AC_SUBST(DLLEXT)
 AC_SUBST(EXEEXT)
 
 AC_SUBST(LOGOEXT)
-AC_SUBST(EXTRA_TARGETS)
+AC_SUBST(EXTENSIONS)
 AC_SUBST(WINDRES)
-AC_SUBST(SELECTED_PLUGINS)
 AC_SUBST(libdir)
 AC_SUBST(OS_APPSRCS)
 AC_SUBST(OS_APISRCS)
