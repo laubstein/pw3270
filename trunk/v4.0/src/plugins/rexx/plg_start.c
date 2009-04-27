@@ -148,7 +148,7 @@
 		RexxFreeMemory(RXSTRPTR(retstr));
 	}
 
-	Trace("Call of \"%s\" ends",prg);
+	Trace("Call of \"%s\" ends (rc=%d return_code=%d)",prg,rc,return_code);
 
  	if(rc)
  	{
@@ -184,6 +184,7 @@
         g_free(name);
  	}
 
+	Trace("%s exits with rc=%d",__FUNCTION__,rc);
 	return (int) rc;
  }
 

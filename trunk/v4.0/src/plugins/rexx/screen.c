@@ -315,25 +315,24 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 	{
 		if(!CONNECTED)
 		{
+			Trace("Disconnected when waiting for \"%s\"",key);
 			rc = ENOTCONN;
 		}
 		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 		{
 			screen_read(buffer,start,sz);
 
-			Trace("Aguardando \"%s\", achei \"%s\", %p",key,buffer, strstr(buffer,key));
+			Trace("Waiting \"%s\", found \"%s\", %p",key,buffer, strstr(buffer,key));
 
 			if(strstr(buffer,key))
 				rc = 0;
 		}
 
-		Trace("Aguardando eventos: Status=%d rc=%d",query_3270_terminal_status(),rc);
 		RunPendingEvents(1);
-		Trace("Status=%d Time: %ld End: %ld",query_3270_terminal_status(),time(0),end);
 
 	}
 
-	Trace("Waitforstring(%s) exits with %d (%s) (Status: %d)",key,rc,strerror(rc),query_3270_terminal_status());
+	Trace("Waitforstring(%s) exits with %d (%s) (Status: %d)",key,rc,rc == ETIMEDOUT ? "TIMEOUT" : strerror(rc),query_3270_terminal_status());
 
 	free(buffer);
 
@@ -484,12 +483,16 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 	if(Argc != 1)
 		return RXFUNC_BADCALL;
 
+	Trace("%s: Status: %d Key: %s",__FUNCTION__,query_3270_terminal_status(),Argv[0].strptr);
+
 	if(!PCONNECTED)
 		rc = ENOTCONN;
 	else if(query_3270_terminal_status() != STATUS_CODE_BLANK)
 		rc = EINVAL;
 	else
 		rc = action_PFKey(atoi(Argv[0].strptr));
+
+	Trace("%s: Key: %s rc: %d",__FUNCTION__,Argv[0].strptr,rc);
 
 	ReturnValue(rc);
  }
@@ -593,11 +596,10 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
  	int			pos = -1;
  	const char	*str;
  	int			sz;
- 	int			rc = -1;
+ 	int			rc = ETIMEDOUT;
  	int			rows,cols,row,col;
- 	int 		last;
- 	int			current;
  	char		*buffer;
+	time_t 	end = time(0)+RX3270_DEFAULT_TIMEOUT;
 
 	screen_size(&rows,&cols);
 
@@ -639,29 +641,24 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 		ReturnValue(ENOMEM);
 	}
 
-	last = query_screen_change_counter();
+	RunPendingEvents(0);
 
-	while(rc == -1)
+	while(rc == ETIMEDOUT  && (time(0) <= end))
 	{
-		RunPendingEvents(TRUE);
-
 		if(!CONNECTED)
 		{
             rc = ENOTCONN;
 		}
-		else
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 		{
-			current = query_screen_change_counter();
-
-			if(current != last)
-			{
-				last = current;
-				screen_read(buffer,pos,sz);
-				*(buffer+(sz+1)) = 0;
-				if(strstr(buffer,str))
-					rc = 0;
-			}
+			screen_read(buffer,pos,sz);
+			*(buffer+(sz+1)) = 0;
+			if(strstr(buffer,str))
+				rc = 0;
 		}
+
+		RunPendingEvents(1);
+
 	}
 
 	free(buffer);
@@ -725,6 +722,8 @@ ULONG APIENTRY rx3270IsTerminalReady(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Qu
 		return RXFUNC_BADCALL;
  	}
 
+	Trace("%s waiting for %d seconds",__FUNCTION__,(int) (end - time(0)));
+
 	while( (rc == ETIMEDOUT) && (time(0) <= end) )
 	{
 		RunPendingEvents(TRUE);
@@ -734,6 +733,8 @@ ULONG APIENTRY rx3270IsTerminalReady(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Qu
 		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 			rc = 0;
 	}
+
+	Trace("%s exits with rc=%d",__FUNCTION__,rc);
 
 	ReturnValue(rc);
  }

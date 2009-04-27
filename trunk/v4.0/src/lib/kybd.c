@@ -1449,6 +1449,9 @@ do_reset(Boolean explicit)
 	 * If explicit (from the keyboard) and there is typeahead or
 	 * a half-composed key, simply flush it.
 	 */
+
+	Trace("%s",__FUNCTION__);
+
 	if (explicit
 #if defined(X3270_FT) /*[*/
 	    || ft_state != FT_NONE

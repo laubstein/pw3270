@@ -118,12 +118,11 @@ return rx3270SetCursorPosition(row,col)
 return
 
 ::method uninit
-	ok = self~destroy()
+	ok = rx3270DestroyDialog(self~widget)
 return
 
 ::method destroy
-	if self~widget <> 0
-		then ok = rx3270DestroyDialog(self~widget)
+	ok = rx3270DestroyDialog(self~widget)
 	self~widget = 0;
 return 0
 

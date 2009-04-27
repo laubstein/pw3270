@@ -122,6 +122,8 @@
  {
 	GtkWidget *widget = getWidget(0,Argv);
 
+	Trace("%s widget: %p",__FUNCTION__,widget);
+
 	if(!widget)
 		return RetValue(Retstr,EINVAL);
 
@@ -419,6 +421,8 @@
 	Trace("Progressbar: %p",widget);
 	if(!widget)
 		return RetValue(Retstr,EINVAL);
+
+	Trace("%s: text=\"%s\" is_progress_bar: %s",__FUNCTION__,Argv[1].strptr,GTK_IS_PROGRESS_BAR(widget) ? "Yes" : "No");
 
 	gtk_progress_bar_set_text(GTK_PROGRESS_BAR(widget),Argv[1].strptr);
 	return RetValue(Retstr,0);
