@@ -535,6 +535,8 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 	{
 		if(!CONNECTED)
 			rc = ENOTCONN;
+		else if(IsHalted())
+			rc = ECANCELED;
 		else if(time(0) > end)
 			rc = ETIMEDOUT;
 		RunPendingEvents(1);
@@ -649,6 +651,10 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 		{
             rc = ENOTCONN;
 		}
+		else if(IsHalted())
+		{
+			rc = ECANCELED;
+		}
 		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 		{
 			screen_read(buffer,pos,sz);
@@ -730,6 +736,8 @@ ULONG APIENTRY rx3270IsTerminalReady(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Qu
 
 		if(!CONNECTED)
             rc = ENOTCONN;
+		else if(IsHalted())
+			rc = ECANCELED;
 		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 			rc = 0;
 	}

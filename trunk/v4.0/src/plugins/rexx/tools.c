@@ -142,6 +142,8 @@ ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename,
 	while(time(0) < end)
 	{
 		RunPendingEvents(1);
+		if(IsHalted())
+			return RetValue(Retstr,ECANCELED);
 	}
 
 	Trace("Sleep ended (clock: %ld)",(long) time(0));

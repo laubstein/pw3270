@@ -94,3 +94,18 @@ ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuena
     Retstr->strlength = strlen(Retstr->strptr);
     return RXFUNC_OK;
  }
+
+ ULONG RaiseHaltSignal(void)
+ {
+#ifdef WIN32
+	return RexxSetHalt(getpid(),GetCurrentThreadId());
+#else
+	return RexxSetHalt(getpid(),pthread_self());
+#endif
+
+ }
+
+ int IsHalted(void)
+ {
+ 	return 0;
+ }
