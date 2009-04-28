@@ -75,10 +75,6 @@
 
 	#define CONFIG_GROUP "Rexx"
 
-	#ifndef ENOTCONN
-		#define ENOTCONN -1
-	#endif
-
 	/* Tools */
 	int		call_rexx(const gchar *prg, const gchar *arg);
 	ULONG	RetString(PRXSTRING Retstr, const char *value);

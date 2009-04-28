@@ -81,7 +81,12 @@
  GtkWidget 	*program_window	= NULL;
  GtkWidget	*trace_window = NULL;
 
- static int halt = 0;
+ static enum _script_state
+ {
+	SCRIPT_STATE_STOPPED,
+	SCRIPT_STATE_RUNNING,
+	SCRIPT_STATE_HALTED
+ } script_state = SCRIPT_STATE_STOPPED;
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
@@ -109,6 +114,25 @@
 	SHORT     			rc		= 0;                   	// converted return code
 	struct blinker		*blink;
 
+	if(script_state != SCRIPT_STATE_STOPPED)
+	{
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CANCEL,
+													"%s", _(  "Can't start script" ));
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "System busy" ));
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s",_( "Please, try again in a few moments" ));
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+
+		return EBUSY;
+	}
+
+	script_state = SCRIPT_STATE_RUNNING;
+
 	blink = g_malloc0(sizeof(struct blinker));
 
 	blink->enabled = TRUE;
@@ -127,8 +151,6 @@
 	RunPendingEvents(0);
 
 	Trace("Starting %s",prg);
-
-	halt = 0;
 
 	return_code = RexxStart(	1,				// argument count
 								&argv,			// argument array
@@ -152,7 +174,12 @@
 
 	Trace("Call of \"%s\" ends (rc=%d return_code=%d)",prg,rc,(int) return_code);
 
- 	if(rc)
+	if(script_state == SCRIPT_STATE_HALTED)
+	{
+		// Interrupted by user, no dialog
+		rc = ECANCELED;
+	}
+ 	else if(rc)
  	{
 		gchar *name = g_path_get_basename(prg);
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
@@ -185,6 +212,8 @@
         gtk_widget_destroy(dialog);
         g_free(name);
  	}
+
+	script_state = SCRIPT_STATE_STOPPED;
 
 	Trace("%s exits with rc=%d",__FUNCTION__,rc);
 	return (int) rc;
@@ -305,6 +334,9 @@
  	if(trace_window)
 		return (struct trace_window_data *) g_object_get_data(G_OBJECT(trace_window),"window_data");
 
+	if(script_state == SCRIPT_STATE_HALTED)
+		return NULL;
+
 	// Create a new trace window
 	trace_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	g_signal_connect(G_OBJECT(trace_window),"destroy",G_CALLBACK(destroy_trace),0);
@@ -378,6 +410,12 @@
  static void gettracecommand(PRXSTRING str)
  {
  	struct trace_window_data *data = getTraceWindow();
+
+	if(!data)
+	{
+		RetString(str,NULL);
+		return;
+	}
 
  	data->waiting = TRUE;
 
@@ -483,14 +521,12 @@
 
  int IsHalted(void)
  {
- 	return halt;
+ 	return script_state != SCRIPT_STATE_RUNNING;
  }
 
  ULONG RaiseHaltSignal(void)
  {
-	halt++;
-
-	Trace("Halt: %d",halt);
+	script_state = SCRIPT_STATE_HALTED;
 
 #ifdef WIN32
 	return RexxSetHalt(getpid(),GetCurrentThreadId());

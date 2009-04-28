@@ -58,7 +58,11 @@
 		#endif
 
 		#ifndef ECANCELED
-			#define ECANCELED -1125
+			#ifdef EINTR
+				#define ECANCELED EINTR
+			#else
+				#define ECANCELED -1125
+			#endif
 		#endif
 
 		#ifndef ENOTCONN
