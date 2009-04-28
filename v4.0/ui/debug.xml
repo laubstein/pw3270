@@ -18,6 +18,7 @@
 		</menu>
 
 		<menu action='DebugMenu'>
+			<menuitem action='Redraw'/>
 			<menuitem action='DumpScreen'/>
 			<menuitem action='LoadScreenDump'/>
 			<menuitem action='ToggleDSTrace'/>

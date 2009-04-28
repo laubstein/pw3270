@@ -67,12 +67,6 @@
 		DRAG_TYPE_NONE
 	};
 
-	#define SELECTION_BOX			0x01
-	#define SELECTION_BOX_LEFT		0x10
-	#define SELECTION_BOX_RIGHT		0x20
-	#define SELECTION_BOX_TOP		0x40
-	#define SELECTION_BOX_BOTTOM	0x80
-
 	extern int 			drag_type;
 	extern CURSOR_MODE		cursor_mode;
 
@@ -83,7 +77,20 @@
 		unsigned short	fg;
 		unsigned short	bg;
 		unsigned short	extended;
-		unsigned char		selected;
+
+		#define SELECTION_BOX_LEFT			0x10
+		#define SELECTION_BOX_RIGHT			0x20
+		#define SELECTION_BOX_TOP			0x40
+		#define SELECTION_BOX_BOTTOM		0x80
+
+		#define ELEMENT_STATUS_SELECTED		0x08
+
+		#define ELEMENT_STATUS_NORMAL 		0x00
+		#define ELEMENT_STATUS_FIELD_MARKER	0x01
+		#define ELEMENT_STATUS_FIELD_MASK	0x07
+
+		unsigned char		status;
+
 	} ELEMENT;
 	extern ELEMENT *screen;
 
