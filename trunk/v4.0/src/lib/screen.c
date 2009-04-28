@@ -107,16 +107,6 @@ addch(int row, int col, int c, int attr)
 {
 	if(callbacks && callbacks->addch)
 		callbacks->addch(row, col, c, attr);
-
-	// Increment and wrap.
-	/*
-	if (++cur_col >= maxCOLS)
-	{
-		cur_col = 0;
-		if (++cur_row >= maxROWS)
-			cur_row = 0;
-	}
-	*/
 }
 
 /* Initialize the screen. */
@@ -400,7 +390,7 @@ void screen_disp(void)
 			    	fa_addr = baddr;
 				fa = ea_buf[baddr].fa;
 				a = calc_attrs(baddr, baddr, fa);
-				addch(row,col,' ',attr = defattr);
+				addch(row,col,' ',(attr = defattr)|CHAR_ATTR_MARKER);
 			} else if (FA_IS_ZERO(fa)) {
 			    	/* Blank. */
 				addch(row,col,' ',attr=a);

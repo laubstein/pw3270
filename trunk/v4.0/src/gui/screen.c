@@ -334,7 +334,12 @@
 	// Get element entry in the buffer, update ONLY if changed
  	el = screen + pos;
 
-	in.selected = el->selected;
+	in.status = el->status;
+
+	if(attr & CHAR_ATTR_MARKER)
+		in.status |= ELEMENT_STATUS_FIELD_MARKER;
+	else
+		in.status &= ~ELEMENT_STATUS_FIELD_MARKER;
 
 	if(!memcmp(&in,el,sizeof(ELEMENT)))
 		return 0;
@@ -380,12 +385,16 @@
 		terminal_cols = cols;
 	}
 
+
  	Trace("Terminal set to %d rows with %d cols, screen set to %p",rows,cols,screen);
 
  }
 
  void action_Redraw(void)
  {
+#ifdef DEBUG
+ 	screen_disp();
+#endif
  	DrawScreen(terminal,color,pixmap);
 	DrawOIA(terminal,color,pixmap);
 	gtk_widget_queue_draw(terminal);
@@ -406,15 +415,14 @@
 
 	if(screen)
 	{
-		gboolean selected;
+		unsigned char status;
 
-//		memset(screen,0,szScreen);
 		for(f=0;f<szScreen;f++)
 		{
-			selected		= screen[f].selected;
+			status				= screen[f].status & ~ELEMENT_STATUS_FIELD_MARKER;
 			memset(screen+f,0,sizeof(ELEMENT));
 			screen[f].ch[0]		= ' ';
-			screen[f].selected	= selected;
+			screen[f].status	= status;
 		}
 	}
 
@@ -995,7 +1003,7 @@
  	if(!(gc && draw && layout && el))
 		return;
 
-	if(el->selected & SELECTION_BOX)
+	if(el->status & ELEMENT_STATUS_SELECTED)
 	{
 		fg = TERMINAL_COLOR_SELECTED_FG;
 		bg = TERMINAL_COLOR_SELECTED_BG;
@@ -1005,6 +1013,16 @@
 		fg = (el->fg & 0xFF);
 		bg = (el->bg & 0xFF);
 	}
+
+/*
+#ifdef DEBUG
+		if(el->status & ELEMENT_STATUS_FIELD_MARKER)
+		{
+			fg = TERMINAL_COLOR_SELECTED_FG;
+			bg = TERMINAL_COLOR_SELECTED_BORDER;
+		}
+#endif
+*/
 
 	if(TOGGLED_UNDERLINE)
 	{
@@ -1134,25 +1152,23 @@
 		}
 	}
 
-	if(el->selected & 0xF0)
+	if(el->status & ELEMENT_STATUS_SELECTED)
 	{
 		gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_SELECTED_BORDER);
 
-		if(el->selected & SELECTION_BOX_TOP)
+		if(el->status & SELECTION_BOX_TOP)
 			gdk_draw_line(draw,gc,x,y,x+fWidth,y);
 
-		if(el->selected & SELECTION_BOX_LEFT)
+		if(el->status & SELECTION_BOX_LEFT)
 			gdk_draw_line(draw,gc,x,y,x,y+(fHeight-1));
 
-		if(el->selected & SELECTION_BOX_BOTTOM)
+		if(el->status & SELECTION_BOX_BOTTOM)
 			gdk_draw_line(draw,gc,x,y+(fHeight-1),x+fWidth,y+(fHeight-1));
 
-		if(el->selected & SELECTION_BOX_RIGHT)
+		if(el->status & SELECTION_BOX_RIGHT)
 			gdk_draw_line(draw,gc,x+(fWidth-1),y,x+(fWidth-1),y+(fHeight-1));
 
 	}
-
-
  }
 
  void UpdateKeyboardState(guint state)
@@ -1177,7 +1193,7 @@
 		*line = 0;
 		for(col = 0; col < terminal_cols;col++)
 		{
-			if(all || screen[pos].selected)
+			if(all || (screen[pos].status & ELEMENT_STATUS_SELECTED))
 			{
 				sel = TRUE;
 				g_strlcat(line,*screen[pos].ch ? screen[pos].ch : " ",max);

@@ -118,10 +118,10 @@
 
 	for(pos = 0; pos < (terminal_rows * terminal_cols);pos++)
 	{
-		if(screen[pos].selected)
+		if(screen[pos].status & ELEMENT_STATUS_SELECTED)
 		{
 			redraw = TRUE;
-			screen[pos].selected = FALSE;
+			screen[pos].status &= ~ELEMENT_STATUS_SELECTED;
 		}
 	}
 
@@ -168,18 +168,25 @@
 
  static void SetSelection(gboolean selected)
  {
- 	int 		pos;
- 	gboolean	redraw	= FALSE;
+ 	int 			pos;
+ 	gboolean		redraw	= FALSE;
+	unsigned char	status;
 
 	if(!screen)
 		return;
 
+
 	for(pos = 0; pos < (terminal_rows * terminal_cols);pos++)
 	{
-		if(screen[pos].selected != selected)
+		if(selected)
+			status = screen[pos].status | ELEMENT_STATUS_SELECTED;
+		else
+			status = screen[pos].status & ~ELEMENT_STATUS_SELECTED;
+
+		if(screen[pos].status != status)
 		{
 			redraw = TRUE;
-			screen[pos].selected = selected;
+			screen[pos].status = status;
 		}
 	}
 
@@ -421,29 +428,29 @@
 		x = left_margin;
 		for(col = 0; col < terminal_cols;col++)
 		{
-			unsigned char selected = 0;
+			unsigned char status = screen[pos].status & ELEMENT_STATUS_FIELD_MASK;
 
 			if(col >= left && col <= right && row >= top && row <= bottom)
 			{
-				selected = SELECTION_BOX;
+				status |= ELEMENT_STATUS_SELECTED;
 
 				if(col == left)
-					selected |= SELECTION_BOX_LEFT;
+					status |= SELECTION_BOX_LEFT;
 
 				if(col == right)
-					selected |= SELECTION_BOX_RIGHT;
+					status |= SELECTION_BOX_RIGHT;
 
 				if(row == top)
-					selected |= SELECTION_BOX_TOP;
+					status |= SELECTION_BOX_TOP;
 
 				if(row == bottom)
-					selected |= SELECTION_BOX_BOTTOM;
+					status |= SELECTION_BOX_BOTTOM;
 			}
 
-			if(screen[pos].selected != selected)
+			if(screen[pos].status != status)
 			{
 				// Changed, mark to update
-				screen[pos].selected = selected;
+				screen[pos].status = status;
 				DrawElement(pixmap,color,gc,layout,x,y,screen+pos);
 				gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
 			}
@@ -496,27 +503,29 @@
 		x = left_margin;
 		for(col = 0; col < terminal_cols;col++)
 		{
-			unsigned char selected = (pos >= start && pos <= end) ? SELECTION_BOX : 0;
+			unsigned char status = screen[pos].status & ELEMENT_STATUS_FIELD_MASK;
 
-			if(selected)
+			if (pos >= start && pos <= end)
 			{
-				if(!(row && screen[pos-terminal_cols].selected))
-					selected |= SELECTION_BOX_TOP;
+				status |= ELEMENT_STATUS_SELECTED;
 
-				if(!(pos && col && screen[pos-1].selected))
-					selected |= SELECTION_BOX_LEFT;
+				if(!(row && (screen[pos-terminal_cols].status) & ELEMENT_STATUS_SELECTED))
+					status |= SELECTION_BOX_TOP;
+
+				if(!(pos && col && (screen[pos-1].status) & ELEMENT_STATUS_SELECTED))
+					status |= SELECTION_BOX_LEFT;
 
 				if(pos+1 > end || col == (terminal_cols-1))
-					selected |= SELECTION_BOX_RIGHT;
+					status |= SELECTION_BOX_RIGHT;
 
 				if((pos+terminal_cols) > end)
-					selected |= SELECTION_BOX_BOTTOM;
+					status |= SELECTION_BOX_BOTTOM;
 			}
 
-			if(screen[pos].selected != selected)
+			if(screen[pos].status != status)
 			{
 				// Changed, mark to update
-				screen[pos].selected = selected;
+				screen[pos].status = status;
 				DrawElement(pixmap,color,gc,layout,x,y,screen+pos);
 				gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
 			}
