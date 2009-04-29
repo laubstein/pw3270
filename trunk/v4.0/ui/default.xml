@@ -16,6 +16,7 @@
 
 		<menu action='EditMenu'>
 			<menuitem action='Copy'/>
+			<menuitem action='CopyAsTable'/>
 			<menuitem action='Append'/>
 			<menuitem action='Paste'/>
 			<menuitem action='PasteNext'/>

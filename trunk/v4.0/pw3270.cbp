@@ -645,6 +645,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ui/debug.xml" />
+		<Unit filename="ui/default.xml" />
 		<Unit filename="ui/rexx.xml" />
 		<Extensions>
 			<code_completion />
