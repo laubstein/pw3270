@@ -1229,24 +1229,6 @@
 	g_free(msg);
  }
 
-/*
- void WarningPopup(const char *fmt, ...)
- {
-	va_list 	args;
-	va_start(args, fmt);
-	warning(fmt,args);
-    va_end(args);
- }
-
- void PopupAnError(const char *fmt, ...)
- {
-	va_list 	args;
-	va_start(args, fmt);
-	error(fmt,args);
-    va_end(args);
- }
-*/
-
  static void error(const char *fmt, va_list arg)
  {
  	gchar		*msg	= g_strdup_vprintf(gettext(fmt),arg);

@@ -187,6 +187,7 @@
  	{	"Append",			GTK_STOCK_ADD,			N_( "Add to copy" ),		"<Shift><Ctrl>c",	NULL,	G_CALLBACK(action_Append)			},
  	{	"Unselect",			NULL,					N_( "Unselect" ),			"<Shift><Ctrl>u",	NULL,	G_CALLBACK(action_ClearSelection)	},
  	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),				NULL,				NULL,	G_CALLBACK(action_Copy)				},
+ 	{	"CopyAsTable",		NULL,					N_( "Copy as table" ),		"<Shift>T",			NULL,	G_CALLBACK(action_CopyAsTable)		},
  	{	"PrintSelected",	NULL,					N_( "Print selected" ),		NULL,				NULL,	G_CALLBACK(action_PrintSelected)	},
 	{	"SaveSelected",		NULL,					N_( "Save selected" ),		NULL,				NULL,	G_CALLBACK(action_SaveSelected)		},
  };
@@ -916,6 +917,14 @@
 			sz /= sizeof(struct ea);
 			if(set_device_buffer(buffer,sz))
 				Warning( N_( "Can't set device buffer contents" ) );
+
+			gtk_widget_set_sensitive(terminal,TRUE);
+			gtk_action_group_set_sensitive(online_actions,TRUE);
+			gtk_action_group_set_sensitive(offline_actions,TRUE);
+
+			gtk_widget_queue_draw(terminal);
+			gtk_widget_grab_focus(terminal);
+
 		}
 
 		g_free(buffer);
