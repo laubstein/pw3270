@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como terminal.c e possui 636 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -591,7 +591,6 @@
  {
 	ELEMENT 	el;
 	GdkGC   	*gc;
-	PangoLayout *layout;
 
 	if(!terminal->window)
 		return;
@@ -607,10 +606,8 @@
 	el.bg = TERMINAL_COLOR_CURSOR;
 
 	gc = gdk_gc_new(pCursor);
-	layout = gtk_widget_create_pango_layout(terminal,el.ch);
-	DrawElement(pCursor, color, gc, layout, 0, 0, &el);
+	DrawElement(pCursor, color, gc, 0, 0, &el);
 	gdk_gc_destroy(gc);
-	g_object_unref(layout);
 
 	// Set cursor position
 	rCursor.x 		= left_margin + (cCol * fWidth);

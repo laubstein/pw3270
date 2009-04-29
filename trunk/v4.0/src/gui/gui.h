@@ -301,7 +301,7 @@
 
 	int 			LoadColors(void);
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
-	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el);
+	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);
 	void			UpdateKeyboardState(guint state);
 	int				PrintText(const char *name, gchar *text);
 	gchar 			*FindSystemConfigFile(const gchar *name);
