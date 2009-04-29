@@ -88,13 +88,24 @@
 	return 0;
  }
 
+ static GtkAction *reselect = NULL;
+ static GtkAction *copyastable = NULL;
+
  void SetSelectionMode(int m)
  {
  	if(m == select_mode)
 		return;
 
 	if(m == SELECT_MODE_NONE && select_mode != SELECT_MODE_INVALID)
-		gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"Reselect"),TRUE);
+	{
+		if(!reselect)
+			reselect = gtk_action_group_get_action(online_actions,"Reselect");
+		gtk_action_set_sensitive(reselect,TRUE);
+	}
+
+	if(!copyastable)
+		copyastable = gtk_action_group_get_action(selection_actions,"CopyAsTable");
+	gtk_action_set_sensitive(copyastable,m == SELECT_MODE_RECTANGLE);
 
 	select_mode = m;
 

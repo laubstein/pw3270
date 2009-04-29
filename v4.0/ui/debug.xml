@@ -9,7 +9,6 @@
 		</menu>
 
 		<menu action='EditMenu' >
-			<menuitem action='CopyAsTable'/>
 		</menu>
 		<menu action='ScriptsMenu' />
 		<menu action='NetworkMenu'/>
