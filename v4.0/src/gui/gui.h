@@ -284,6 +284,7 @@
 
 	void 			action_Append(void);
 	void 			action_Copy(void);
+	void 			action_CopyAsTable(void);
 	void 			action_SelectField(void);
 	void			action_ClearSelection(void);
 	void 			action_Save(void);
@@ -345,6 +346,8 @@
 	};
 
 	void	SetSelectionMode(int m);
+	int 	GetSelectedRectangle(GdkRectangle *rect);
+
 	void	set_monocase(int value, int reason);
 	int 	LoadPlugins(void);
 	int		UnloadPlugins(void);

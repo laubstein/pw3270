@@ -74,6 +74,20 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
+ int GetSelectedRectangle(GdkRectangle *rect)
+ {
+	// FIXME (perry#3#): First check if the selection area isn't rectangular.
+ 	if(!Toggled(RECTANGLE_SELECT))
+		return EINVAL;
+
+	rect->x			= startCol;
+	rect->y			= startRow;
+	rect->width		= (endCol - startCol)+1;
+	rect->height	= (endRow - startRow)+1;
+
+	return 0;
+ }
+
  void SetSelectionMode(int m)
  {
  	if(m == select_mode)

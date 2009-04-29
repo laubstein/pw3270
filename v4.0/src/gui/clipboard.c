@@ -37,43 +37,46 @@
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
- static gchar *contents = NULL;
+ static gchar *clipboard_data = NULL;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
  gchar * GetClipboard(void)
  {
-	return g_strdup(contents ? contents : "");
+	return g_strdup(clipboard_data ? clipboard_data : "");
  }
 
- static void setClipboardcontents(void)
+ static void setClipboardcontents(gchar *new_data)
  {
- 	if(!(contents && terminal))
+ 	if(clipboard_data)
+	{
+		g_free(clipboard_data);
+		clipboard_data = NULL;
+	}
+
+ 	if(!(new_data && terminal))
  	{
 		gtk_action_group_set_sensitive(clipboard_actions,FALSE);
 		return;
  	}
 
-	Trace("Clipboard set to:\n%s",contents);
-	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),contents,-1);
+	clipboard_data = new_data;
+
+	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_data,-1);
 	gtk_action_group_set_sensitive(clipboard_actions,TRUE);
 
  }
 
  void action_Copy(void)
  {
- 	if(contents)
-		g_free(contents);
-	contents = GetSelection();
-	setClipboardcontents();
+	setClipboardcontents(GetSelection());
  }
 
  void action_Append(void)
  {
  	gchar *sel;
- 	gchar *last = contents;
 
- 	if(!last)
+ 	if(!clipboard_data)
  	{
 		action_Copy();
 		return;
@@ -83,12 +86,8 @@
 	if(!sel)
 		return;
 
-	contents = g_strconcat(last,"\n",sel,NULL);
-
+	setClipboardcontents(g_strconcat(clipboard_data,"\n",sel,NULL));
 	g_free(sel);
-	g_free(last);
-
-	setClipboardcontents();
  }
 
  static void paste_string(gchar *str)
@@ -98,8 +97,8 @@
 
  	if(!str)
  	{
- 		g_free(contents);
- 		contents = NULL;
+ 		g_free(clipboard_data);
+ 		clipboard_data = NULL;
 		return;
  	}
 
@@ -135,13 +134,13 @@
 		remaining = emulate_input(str,-1,True);
 	}
 
-	saved = contents;
+	saved = clipboard_data;
     if(remaining > 0)
-		contents = g_strdup(str+(strlen(str)-(remaining+1)));
+		clipboard_data = g_strdup(str+(strlen(str)-(remaining+1)));
 	else
-		contents = NULL;
+		clipboard_data = NULL;
 
-	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"PasteNext"),contents != NULL);
+	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"PasteNext"),clipboard_data != NULL);
 
 	g_free(saved);
 
@@ -266,20 +265,97 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 
  void action_PasteNext(void)
  {
- 	if(contents)
-		paste_string(contents);
+ 	if(clipboard_data)
+		paste_string(clipboard_data);
 	else
 		action_Paste();
  }
 
  void ClearClipboard(void)
  {
-	gtk_action_group_set_sensitive(clipboard_actions,FALSE);
- 	if(contents)
- 	{
- 		g_free(contents);
- 		contents = NULL;
- 	}
+ 	setClipboardcontents(NULL);
  }
 
+ void action_CopyAsTable(void)
+ {
+	GdkRectangle 	rect;
+	gboolean		*cols;
+	int				row, col;
+	ELEMENT			*el;
+	GString			*buffer;
+
+ 	if(GetSelectedRectangle(&rect))
+ 	{
+ 		// FIXME (perry#3#): First check if the selection area isn't rectangular.
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CANCEL,
+													"%s", _(  "Invalid action" ));
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Can't copy non rectangular area" ));
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s",_( "Activate rectangle select option and try again." ));
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+ 		return;
+ 	}
+
+ 	// Find column delimiters
+ 	cols = g_malloc0(rect.width * sizeof(gboolean));
+ 	for(row=0;row < rect.height;row++)
+ 	{
+		el = screen+(((row+rect.y) * terminal_cols)+rect.x);
+		for(col = 0;col < rect.width;col++)
+		{
+			if(*el->ch && !g_ascii_isspace(*el->ch))
+				cols[col] = TRUE;
+
+			el++;
+		}
+ 	}
+
+	// Read screen contents
+	buffer = g_string_sized_new(rect.height * rect.width);
+
+ 	for(row=0;row < rect.height;row++)
+ 	{
+		el = screen+(((row+rect.y) * terminal_cols)+rect.x);
+		col = 0;
+		while(col < rect.width)
+		{
+			// if isn't the first column add column delimiter
+			if(col)
+				g_string_append_c(buffer,'\t');
+
+			// Find column start
+			while(!cols[col] && col < rect.width)
+			{
+				col++;
+				el++;
+			}
+
+			// Copy column content
+			while(cols[col] && col < rect.width)
+			{
+				g_string_append(buffer,*el->ch ? el->ch : " ");
+				col++;
+				el++;
+			}
+
+		}
+
+		// Add row delimiter
+		g_string_append_c(buffer,'\n');
+
+ 	}
+
+	Trace("Tabela lida:\n%s\n",buffer->str);
+
+	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),buffer->str,-1);
+
+	g_string_free(buffer,TRUE);
+ 	g_free(cols);
+ 	setClipboardcontents(NULL);
+ }
 

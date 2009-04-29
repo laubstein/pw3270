@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-28 08:43-0300\n"
-"PO-Revision-Date: 2009-04-28 08:45-0300\n"
+"POT-Creation-Date: 2009-04-29 10:08-0300\n"
+"PO-Revision-Date: 2009-04-29 10:10-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -29,11 +29,11 @@ msgstr "- Emulador 3270 para Gnome"
 msgid "3270 Emulator"
 msgstr "Emulador 3270"
 
-#: src/gui/actions.c:387
+#: src/gui/actions.c:388
 msgid "3270 Terminal emulator for GTK."
 msgstr "Emulador 3270 para GTK"
 
-#: src/gui/actions.c:385
+#: src/gui/actions.c:386
 msgid "3270 Terminal emulator for Gnome."
 msgstr "Emulador de terminal 3270 para Gnome"
 
@@ -41,37 +41,41 @@ msgstr "Emulador de terminal 3270 para Gnome"
 msgid "3270 options"
 msgstr "Opções do 3270"
 
-#: src/gui/actions.c:596
+#: src/gui/actions.c:597
 msgid "<Ctrl>r"
 msgstr ""
 
-#: src/gui/actions.c:629
+#: src/gui/actions.c:630
 msgid "<Ctrl>u"
 msgstr ""
 
-#: src/gui/actions.c:623
+#: src/gui/actions.c:624
 msgid "<Ctrl>w"
 msgstr ""
 
-#: src/gui/actions.c:475
+#: src/gui/actions.c:476
 msgid "<alt>Home"
 msgstr ""
 
-#: src/gui/actions.c:478
+#: src/gui/actions.c:479
 msgid "<alt>K"
 msgstr ""
 
-#: src/gui/actions.c:471
+#: src/gui/actions.c:472
 msgid "<alt>S"
 msgstr ""
 
-#: src/gui/actions.c:472
+#: src/gui/actions.c:473
 msgid "<alt>X"
 msgstr ""
 
-#: src/gui/actions.c:227
+#: src/gui/actions.c:228
 msgid "About"
 msgstr "Sobre"
+
+#: src/gui/clipboard.c:297
+msgid "Activate rectangle select option and try again."
+msgstr "Ative a opção \"Selecionar como retângulo\" e tente novamente"
 
 #: src/gui/actions.c:187
 msgid "Add to copy"
@@ -81,11 +85,11 @@ msgstr "Copiar anexando"
 msgid "Add/Remove CR at end of line"
 msgstr "Inserir/Remover CR no final da linha"
 
-#: src/gui/actions.c:474
+#: src/gui/actions.c:475
 msgid "Aid wait"
 msgstr ""
 
-#: src/gui/actions.c:460
+#: src/gui/actions.c:461
 msgid "Alt Cursor"
 msgstr ""
 
@@ -93,7 +97,7 @@ msgstr ""
 msgid "Append"
 msgstr "Adicionar"
 
-#: src/gui/actions.c:476
+#: src/gui/actions.c:477
 msgid "Auto-Reconnect"
 msgstr "Reconexão automática"
 
@@ -109,7 +113,7 @@ msgstr ""
 msgid "Background"
 msgstr "Fundo"
 
-#: src/gui/actions.c:637
+#: src/gui/actions.c:638
 msgid "Backspace"
 msgstr ""
 
@@ -121,11 +125,11 @@ msgstr "Atributos básicos"
 msgid "Black"
 msgstr "Preto"
 
-#: src/gui/actions.c:467
+#: src/gui/actions.c:468
 msgid "Blank Fill"
 msgstr ""
 
-#: src/gui/actions.c:461
+#: src/gui/actions.c:462
 msgid "Blinking Cursor"
 msgstr "Cursor piscante"
 
@@ -145,10 +149,14 @@ msgstr "Borda"
 msgid "Browse"
 msgstr "Procurar"
 
-#: src/gui/clipboard.c:165
+#: src/gui/clipboard.c:164
 #, c-format
 msgid "Can't convert clipboard string to charset %s"
 msgstr "Não foi possível converter informação na área de transferencia para %s"
+
+#: src/gui/clipboard.c:296
+msgid "Can't copy non rectangular area"
+msgstr "Não é possível copiar áreas não retangulares"
 
 #: src/gui/plugin.c:275
 #, c-format
@@ -157,7 +165,7 @@ msgid ""
 "%s"
 msgstr "Não foi possível criar arquivo temporário:\n%s"
 
-#: src/gui/actions.c:754
+#: src/gui/actions.c:755
 #, c-format
 msgid ""
 "Can't find UI definitions in\n"
@@ -165,19 +173,19 @@ msgid ""
 msgstr "Não encontrei definições de interface em\n"
 "%s"
 
-#: src/gui/actions.c:772
+#: src/gui/actions.c:773
 #, c-format
 msgid "Can't load %s"
 msgstr "Não foi possível carregar %s"
 
-#: src/gui/clipboard.c:235
+#: src/gui/clipboard.c:234
 #, c-format
 msgid ""
 "Can't load %s\n"
 "%s"
 msgstr "Não foi possível carregar %s\n%s"
 
-#: src/gui/actions.c:770
+#: src/gui/actions.c:771
 #, c-format
 msgid "Can't load %s: %s"
 msgstr "Não foi possível carregar %s: %s"
@@ -204,7 +212,7 @@ msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 msgid "Can't send \"%s\""
 msgstr "Não foi possível enviar arquivo \"%s\""
 
-#: src/gui/actions.c:918
+#: src/gui/actions.c:919
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
@@ -220,7 +228,7 @@ msgstr "Limpar"
 msgid "Color setup"
 msgstr "Configuração de cores"
 
-#: src/gui/actions.c:229
+#: src/gui/actions.c:230
 msgid "Colors"
 msgstr "Cores"
 
@@ -232,7 +240,11 @@ msgstr "Comando:"
 msgid "Copy"
 msgstr "Copiar"
 
-#: src/gui/actions.c:472
+#: src/gui/actions.c:190
+msgid "Copy as table"
+msgstr "Copiar como tabela"
+
+#: src/gui/actions.c:473
 msgid "Cross Hair Cursor"
 msgstr "Régua"
 
@@ -256,7 +268,7 @@ msgstr ""
 msgid "DFT Buffer size:"
 msgstr ""
 
-#: src/gui/actions.c:464
+#: src/gui/actions.c:465
 msgid "DS Trace"
 msgstr ""
 
@@ -268,11 +280,11 @@ msgstr "Azul escuro"
 msgid "Dark Green"
 msgstr "Verde escuro"
 
-#: src/gui/actions.c:216
+#: src/gui/actions.c:217
 msgid "Debug"
 msgstr ""
 
-#: src/gui/actions.c:485
+#: src/gui/actions.c:486
 msgid "Debug screen updates"
 msgstr "Depurar atualizações da tela"
 
@@ -288,11 +300,11 @@ msgstr "Esquema de cores padrão 2"
 msgid "Default Color set 1"
 msgstr "Esquema de cores padrão 1"
 
-#: src/gui/actions.c:631
+#: src/gui/actions.c:632
 msgid "Delete Char"
 msgstr ""
 
-#: src/gui/actions.c:619
+#: src/gui/actions.c:620
 msgid "Delete Word"
 msgstr "Apagar palavra"
 
@@ -304,11 +316,11 @@ msgstr ""
 msgid "Dump screen"
 msgstr "Salvar captura de tela"
 
-#: src/gui/actions.c:932
+#: src/gui/actions.c:941
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
-#: src/gui/actions.c:236
+#: src/gui/actions.c:237
 msgid "Enter"
 msgstr ""
 
@@ -326,11 +338,11 @@ msgid ""
 msgstr "Apagar\n"
 "campos"
 
-#: src/gui/actions.c:607
+#: src/gui/actions.c:608
 msgid "Erase EOF"
 msgstr "Apagar campo"
 
-#: src/gui/actions.c:625
+#: src/gui/actions.c:626
 msgid "Erase Field"
 msgstr "Apagar campo"
 
@@ -338,11 +350,11 @@ msgstr "Apagar campo"
 msgid "Erase input"
 msgstr "Apagar campos"
 
-#: src/gui/actions.c:608
+#: src/gui/actions.c:609
 msgid "Erase to the end of the field"
 msgstr "Apagar até o final do campo"
 
-#: src/gui/actions.c:911 src/gui/topwindow.c:188
+#: src/gui/actions.c:912 src/gui/topwindow.c:188
 #, c-format
 msgid ""
 "Error loading %s\n"
@@ -350,7 +362,7 @@ msgid ""
 msgstr "Erro lendo %s\n"
 "%s"
 
-#: src/gui/actions.c:870 src/gui/actions.c:958
+#: src/gui/actions.c:871 src/gui/actions.c:967
 #, c-format
 msgid ""
 "Error saving %s\n"
@@ -366,11 +378,11 @@ msgid ""
 msgstr "Erro iniciando %s\n"
 "%s"
 
-#: src/gui/actions.c:598
+#: src/gui/actions.c:599
 msgid "Escape"
 msgstr ""
 
-#: src/gui/actions.c:469
+#: src/gui/actions.c:470
 msgid "Event Trace"
 msgstr ""
 
@@ -386,7 +398,7 @@ msgstr "Transferência de arquivo"
 msgid "File transfer failed"
 msgstr "Transferência de arquivo falhou"
 
-#: src/gui/actions.c:613
+#: src/gui/actions.c:614
 msgid "First Field"
 msgstr ""
 
@@ -406,7 +418,7 @@ msgstr "Fonte"
 msgid "Foreground"
 msgstr "Frente"
 
-#: src/gui/actions.c:475
+#: src/gui/actions.c:476
 msgid "Full Screen"
 msgstr "Tela-cheia"
 
@@ -414,7 +426,7 @@ msgstr "Tela-cheia"
 msgid "Full path of plugins to load"
 msgstr "Caminho completo dos plugins a carregas"
 
-#: src/gui/actions.c:445
+#: src/gui/actions.c:446
 msgid "Fullscreen"
 msgstr "Tela-cheia"
 
@@ -430,7 +442,7 @@ msgstr "Cinza"
 msgid "Green"
 msgstr "Verde"
 
-#: src/gui/actions.c:211
+#: src/gui/actions.c:212
 msgid "Help"
 msgstr "Ajuda"
 
@@ -446,11 +458,11 @@ msgstr "Identificador do host"
 msgid "Host is TSO"
 msgstr ""
 
-#: src/gui/actions.c:1012
+#: src/gui/actions.c:1021
 msgid "Hostname:"
 msgstr "Endereço do servidor:"
 
-#: src/gui/actions.c:477
+#: src/gui/actions.c:478
 msgid "Insert"
 msgstr ""
 
@@ -462,6 +474,10 @@ msgstr "Intensificado/Protegido"
 msgid "Intensified/Unprotected"
 msgstr "Intensificado/Desprotegido"
 
+#: src/gui/clipboard.c:294
+msgid "Invalid action"
+msgstr "Ação inválida"
+
 #: src/gui/plugin.c:471
 #, c-format
 msgid "Invalid action \"%s\" when loading %s"
@@ -471,7 +487,7 @@ msgstr "Ação \"%s\" inválida ao carregar %s"
 msgid "Keep selected"
 msgstr "Manter selecionado"
 
-#: src/gui/actions.c:478
+#: src/gui/actions.c:479
 msgid "Keypad"
 msgstr "Teclado de funções"
 
@@ -483,11 +499,11 @@ msgstr ""
 msgid "Left"
 msgstr "Esquerda"
 
-#: src/gui/actions.c:466
+#: src/gui/actions.c:467
 msgid "Line Wrap"
 msgstr ""
 
-#: src/gui/actions.c:181 src/gui/actions.c:885
+#: src/gui/actions.c:181 src/gui/actions.c:886
 msgid "Load screen dump"
 msgstr "Carregar captura de tela"
 
@@ -503,7 +519,7 @@ msgstr "Bloqueada"
 msgid "Main window title"
 msgstr "Título da janela principal"
 
-#: src/gui/actions.c:459
+#: src/gui/actions.c:460
 msgid "Monocase"
 msgstr "Só maiúsculas"
 
@@ -520,11 +536,11 @@ msgstr "Nome do arquivo de configuração (pesquisa automática)"
 msgid "Negotiation with %s failed!"
 msgstr "Negociação com %s falhou!"
 
-#: src/gui/actions.c:223
+#: src/gui/actions.c:224
 msgid "Network"
 msgstr "Rede"
 
-#: src/gui/actions.c:643
+#: src/gui/actions.c:644
 msgid "Next field"
 msgstr "Próximo campo"
 
@@ -557,7 +573,7 @@ msgstr "Tratamento de opções falho: %s\n"
 msgid "Orange"
 msgstr "Laranja"
 
-#: src/gui/actions.c:203
+#: src/gui/actions.c:204
 msgid "Paste"
 msgstr "Colar"
 
@@ -565,11 +581,11 @@ msgstr "Colar"
 msgid "Paste next"
 msgstr "Colar próximo"
 
-#: src/gui/actions.c:162 src/gui/clipboard.c:204
+#: src/gui/actions.c:162 src/gui/clipboard.c:203
 msgid "Paste text file"
 msgstr "Colar arquivo texto"
 
-#: src/gui/actions.c:470
+#: src/gui/actions.c:471
 msgid "Paste with left margin"
 msgstr "Colar com margem"
 
@@ -593,11 +609,11 @@ msgstr "Por favor, aguarde"
 msgid "Please, try again in a few moments"
 msgstr "Por favor, tente novamente em alguns instantes"
 
-#: src/gui/actions.c:1015
+#: src/gui/actions.c:1024
 msgid "Port:"
 msgstr "Porta:"
 
-#: src/gui/actions.c:222
+#: src/gui/actions.c:223
 msgid "Preferences"
 msgstr "Preferências"
 
@@ -609,11 +625,11 @@ msgstr ""
 msgid "Print"
 msgstr "Imprimir"
 
-#: src/gui/actions.c:196
+#: src/gui/actions.c:197
 msgid "Print copy"
 msgstr "Imprimir cópia"
 
-#: src/gui/actions.c:190
+#: src/gui/actions.c:191
 msgid "Print selected"
 msgstr "Imprimir seleção"
 
@@ -621,7 +637,7 @@ msgstr "Imprimir seleção"
 msgid "Processing data..."
 msgstr "Processando informações..."
 
-#: src/gui/actions.c:224
+#: src/gui/actions.c:225
 msgid "Properties"
 msgstr "Propriedades"
 
@@ -657,11 +673,11 @@ msgstr ""
 msgid "Reselect"
 msgstr "Reselecionar"
 
-#: src/gui/actions.c:592 src/gui/keypad.c:144
+#: src/gui/actions.c:593 src/gui/keypad.c:144
 msgid "Reset"
 msgstr ""
 
-#: src/gui/actions.c:235
+#: src/gui/actions.c:236
 msgid "Return"
 msgstr ""
 
@@ -694,15 +710,15 @@ msgstr "Direita"
 msgid "Run script on startup (if available)"
 msgstr "Executa script na inicialização (Se disponível)"
 
-#: src/gui/actions.c:232
+#: src/gui/actions.c:233
 msgid "Save"
 msgstr "Salvar"
 
-#: src/gui/actions.c:979
+#: src/gui/actions.c:988
 msgid "Save clipboard contents"
 msgstr "Salvar área de transferência"
 
-#: src/gui/actions.c:197
+#: src/gui/actions.c:198
 msgid "Save copy"
 msgstr "Salvar cópia"
 
@@ -710,19 +726,19 @@ msgstr "Salvar cópia"
 msgid "Save screen"
 msgstr "Salvar tela"
 
-#: src/gui/actions.c:969
+#: src/gui/actions.c:978
 msgid "Save screen contents"
 msgstr "Salvar conteúdo da tela"
 
-#: src/gui/actions.c:191
+#: src/gui/actions.c:192
 msgid "Save selected"
 msgstr "Salvar seleção"
 
-#: src/gui/actions.c:974
+#: src/gui/actions.c:983
 msgid "Save selected text"
 msgstr "Salvar texto selecionado"
 
-#: src/gui/actions.c:468
+#: src/gui/actions.c:469
 msgid "Screen Trace"
 msgstr ""
 
@@ -735,11 +751,11 @@ msgstr "Script %s foi abortado"
 msgid "Script message"
 msgstr "Mensagem do script"
 
-#: src/gui/actions.c:215
+#: src/gui/actions.c:216
 msgid "Scripts"
 msgstr ""
 
-#: src/gui/actions.c:465
+#: src/gui/actions.c:466
 msgid "Scroll bar"
 msgstr ""
 
@@ -747,7 +763,7 @@ msgstr ""
 msgid "Secondary space:"
 msgstr ""
 
-#: src/gui/actions.c:997
+#: src/gui/actions.c:1006
 msgid "Secure connection"
 msgstr "Conexão segura"
 
@@ -779,7 +795,7 @@ msgstr ""
 msgid "Select all"
 msgstr "Selecionar tudo"
 
-#: src/gui/actions.c:471
+#: src/gui/actions.c:472
 msgid "Select by rectangles"
 msgstr "Seleção retangular"
 
@@ -791,11 +807,11 @@ msgstr "Selecione arquivo a receber"
 msgid "Select file to send"
 msgstr "Selecione arquivo a enviar"
 
-#: src/gui/actions.c:219
+#: src/gui/actions.c:220
 msgid "Select font"
 msgstr "Selecionar fonte"
 
-#: src/gui/actions.c:998
+#: src/gui/actions.c:1007
 msgid "Select hostname"
 msgstr "Selecionar servidor"
 
@@ -839,7 +855,7 @@ msgstr "Separador"
 msgid "Set hostname"
 msgstr "Mudar servidor"
 
-#: src/gui/actions.c:214
+#: src/gui/actions.c:215
 msgid "Settings"
 msgstr "Configuração"
 
@@ -847,7 +863,7 @@ msgstr "Configuração"
 msgid "Show lib3270 options"
 msgstr "Mostra opções da biblioteca 3270"
 
-#: src/gui/actions.c:462
+#: src/gui/actions.c:463
 msgid "Show timing"
 msgstr "Mostrar tempo"
 
@@ -859,13 +875,13 @@ msgstr "Colar inteligente"
 msgid "Space allocation units"
 msgstr ""
 
-#: src/gui/actions.c:649
+#: src/gui/actions.c:650
 msgid "Sys Req"
 msgstr ""
 
 #: src/plugins/rexx/plg_start.c:125
 msgid "System busy"
-msgstr ""
+msgstr "Sistema ocupado"
 
 #: src/gui/colors.c:362
 msgid "Terminal"
@@ -879,7 +895,7 @@ msgstr "Arquivo texto"
 msgid "Theme file (gtkrc)"
 msgstr "Arquivo de tema (gtkrc)"
 
-#: src/gui/actions.c:360
+#: src/gui/actions.c:361
 msgid ""
 "This program is free software; you can redistribute it and/or modify it "
 "under the terms of the GNU General Public License as published by the Free "
@@ -901,7 +917,7 @@ msgstr ""
 msgid "This program requires GTK version %d.%d.%d"
 msgstr "Este programa precisa do GTK versão %d.%d.%d"
 
-#: src/gui/actions.c:463
+#: src/gui/actions.c:464
 msgid "Track Cursor"
 msgstr "Mostrar posição do cursor"
 
@@ -925,8 +941,8 @@ msgstr "Indefinido"
 msgid "Underline"
 msgstr "Sublinhado"
 
-#: src/gui/actions.c:870 src/gui/actions.c:911 src/gui/actions.c:958
-#: src/gui/clipboard.c:235 src/gui/plugin.c:275 src/gui/plugin.c:302
+#: src/gui/actions.c:871 src/gui/actions.c:912 src/gui/actions.c:967
+#: src/gui/clipboard.c:234 src/gui/plugin.c:275 src/gui/plugin.c:302
 #: src/gui/topwindow.c:188
 msgid "Unexpected error"
 msgstr "Erro inesperado"
@@ -943,7 +959,7 @@ msgstr ""
 msgid "Variable"
 msgstr "Variável"
 
-#: src/gui/actions.c:473
+#: src/gui/actions.c:474
 msgid "Visible Control chars"
 msgstr ""
 
@@ -951,51 +967,51 @@ msgstr ""
 msgid "White"
 msgstr "Branco"
 
-#: src/gui/actions.c:446
+#: src/gui/actions.c:447
 msgid "Window"
 msgstr "Janela"
 
-#: src/gui/screen.c:777 src/gui/screen.c:805
+#: src/gui/screen.c:785 src/gui/screen.c:813
 msgid "X"
 msgstr ""
 
-#: src/gui/screen.c:781
+#: src/gui/screen.c:789
 msgid "X -f"
 msgstr ""
 
-#: src/gui/screen.c:813
+#: src/gui/screen.c:821
 msgid "X Connecting"
 msgstr "X Conectando"
 
-#: src/gui/screen.c:797
+#: src/gui/screen.c:805
 msgid "X Inhibit"
 msgstr "X Inibido"
 
-#: src/gui/screen.c:773
+#: src/gui/screen.c:781
 msgid "X Not Connected"
 msgstr "X Não conectado"
 
-#: src/gui/screen.c:789
+#: src/gui/screen.c:797
 msgid "X Numeric"
 msgstr "X Numérico"
 
-#: src/gui/screen.c:793
+#: src/gui/screen.c:801
 msgid "X Overflow"
 msgstr "X Estouro"
 
-#: src/gui/screen.c:785
+#: src/gui/screen.c:793
 msgid "X Protected"
 msgstr "X Protegido"
 
-#: src/gui/screen.c:809
+#: src/gui/screen.c:817
 msgid "X Resolving"
 msgstr "X Resolvendo"
 
-#: src/gui/screen.c:761
+#: src/gui/screen.c:769
 msgid "X System"
 msgstr "X Sistema"
 
-#: src/gui/screen.c:765
+#: src/gui/screen.c:773
 msgid "X Wait"
 msgstr "X Aguarde"
 
@@ -1011,23 +1027,23 @@ msgstr "_Conectar"
 msgid "_Disconnect"
 msgstr "_Desconectar"
 
-#: src/gui/actions.c:212
+#: src/gui/actions.c:213
 msgid "_Edit"
 msgstr "_Editar"
 
-#: src/gui/actions.c:209
+#: src/gui/actions.c:210
 msgid "_File"
 msgstr "_Arquivo"
 
-#: src/gui/actions.c:210
+#: src/gui/actions.c:211
 msgid "_Network"
 msgstr "_Rede"
 
-#: src/gui/actions.c:213
+#: src/gui/actions.c:214
 msgid "_Options"
 msgstr "_Opções"
 
-#: src/gui/actions.c:228
+#: src/gui/actions.c:229
 msgid "_Quit"
 msgstr "_Sair"
 
