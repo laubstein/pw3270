@@ -152,7 +152,7 @@ static gboolean trylog(gchar *path)
 #endif
 
 	g_free(path);
-	return rc;
+	return rc == 0;
 }
 
 static int program_init(const gchar *program)

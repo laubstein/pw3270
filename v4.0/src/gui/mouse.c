@@ -476,7 +476,7 @@
 			{
 				// Changed, mark to update
 				screen[pos].status = status;
-				DrawElement(pixmap,color,gc,layout,x,y,screen+pos);
+				DrawElement(pixmap,color,gc,x,y,screen+pos);
 				gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
 			}
 			pos++;
@@ -504,7 +504,6 @@
  	int			pos		= 0;
  	int			x,y,row,col;
 	GdkGC		*gc		= NULL;
-	PangoLayout *layout	= NULL;
 
 	if(!(screen && terminal))
 		return;
@@ -518,9 +517,6 @@
 
 	if(pixmap)
 		gc = gdk_gc_new(pixmap);
-
-	if(terminal)
-		layout = gtk_widget_create_pango_layout(terminal," ");
 
 	y = top_margin;
 	for(row = 0; row < terminal_rows;row++)
@@ -551,7 +547,7 @@
 			{
 				// Changed, mark to update
 				screen[pos].status = status;
-				DrawElement(pixmap,color,gc,layout,x,y,screen+pos);
+				DrawElement(pixmap,color,gc,x,y,screen+pos);
 				gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
 			}
 			pos++;
@@ -559,9 +555,6 @@
 		}
 		y += fHeight;
 	}
-
-	if(layout)
-		g_object_unref(layout);
 
 	if(gc)
 		gdk_gc_destroy(gc);

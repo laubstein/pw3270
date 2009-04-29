@@ -167,9 +167,18 @@
 
  static gchar 						*(*convert_charset)(int c, gsize *sz) = convert_regular;
  static gboolean					oia_flag[OIA_FLAG_USER];
-
+ static PangoLayout 				*layout_terminal = NULL;
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
+
+ static PangoLayout * getPangoLayout(void)
+ {
+ 	if(!layout_terminal)
+		layout_terminal = gtk_widget_create_pango_layout(terminal,"");
+
+	return layout_terminal;
+ }
+
 
  static void changed(int bstart, int bend)
  {
@@ -349,18 +358,15 @@
 	if(drawing_enabled && terminal && pixmap)
 	{
 		// Update pixmap, queue screen redraw.
-		gint 	x, y;
-	 	GdkGC	*gc		= gdk_gc_new(pixmap);
-
-		PangoLayout *layout = gtk_widget_create_pango_layout(terminal,el->ch);
+		gint 		x, y;
+	 	GdkGC		*gc		= gdk_gc_new(pixmap);
 
 		x = left_margin + (col * fWidth);
 		y = top_margin + (row * fHeight);
 
-		DrawElement(pixmap,color,gc,layout,x,y,el);
+		DrawElement(pixmap,color,gc,x,y,el);
 
 		gdk_gc_destroy(gc);
-		g_object_unref(layout);
 
 		gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
 
@@ -459,8 +465,10 @@
 
  }
 
- static void DrawStatus(PangoLayout *layout, GdkGC *gc, GdkColor *clr, GdkDrawable *draw)
+ static void DrawStatus(GdkGC *gc, GdkColor *clr, GdkDrawable *draw)
  {
+ 	PangoLayout *layout = getPangoLayout();
+
  	int col = left_margin+(fWidth << 3);
 
 	gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_OIA_BACKGROUND);
@@ -601,7 +609,7 @@
 	}
 
 	// 8...       message area
-	DrawStatus(layout, gc, clr, draw);
+	DrawStatus(gc, clr, draw);
 
 	memset(str,' ',10);
 
@@ -730,7 +738,7 @@
 		x = left_margin;
 		for(col = 0; col < terminal_cols;col++)
 		{
-			DrawElement(draw,clr,gc,layout,x,y,el);
+			DrawElement(draw,clr,gc,x,y,el);
 			el++;
 			x += fWidth;
 		}
@@ -851,17 +859,17 @@
 
 		if(terminal && pixmap)
 		{
-			GdkGC		*gc		= gdk_gc_new(pixmap);
-			PangoLayout *layout = gtk_widget_create_pango_layout(terminal,"");
+			GdkGC *gc = gdk_gc_new(pixmap);
 
-			DrawStatus(layout, gc, color, pixmap);
+			DrawStatus(gc, color, pixmap);
 
-			g_object_unref(layout);
+			Trace("Destroying gc %p",gc);
 			gdk_gc_destroy(gc);
 
 			gtk_widget_queue_draw_area(terminal,left_margin+(fWidth << 3),OIAROW,fWidth << 4,fHeight+1);
 		}
 
+		Trace("%s","Status updated");
 	}
 
  }
@@ -992,13 +1000,14 @@
 	gdk_draw_lines(drawable,gc,points,3);
  }
 
- void DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, PangoLayout *layout, int x, int y, ELEMENT *el)
+ void DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el)
  {
  	// http://www.guntherkrauss.de/computer/xml/daten/edicode.html
 	short			fg;
 	short 			bg;
 	PangoAttribute	*attr;
 	PangoAttrList 	*attrlist;
+	PangoLayout 	*layout = getPangoLayout();
 
  	if(!(gc && draw && layout && el))
 		return;
