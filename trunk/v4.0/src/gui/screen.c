@@ -698,7 +698,6 @@
  {
 	GdkGC			*gc;
 	ELEMENT			*el			= screen;
-	PangoRectangle	rect;
 	int				x;
 	int				y;
 	int				row;
@@ -719,10 +718,7 @@
 
 	// Draw screen contens
 	pango_layout_set_text(layout,"A",1);
-
-	pango_layout_get_extents(layout,&rect,NULL);
-	fWidth = PANGO_PIXELS(rect.width);
-	fHeight = PANGO_PIXELS(rect.height);
+	pango_layout_get_pixel_size(layout,&fWidth,&fHeight);
 
 	// FIXME (perry#1#): Find a faster way to draw text
 	y = top_margin;
