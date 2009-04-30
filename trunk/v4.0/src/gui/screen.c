@@ -167,18 +167,7 @@
 
  static gchar 						*(*convert_charset)(int c, gsize *sz) = convert_regular;
  static gboolean					oia_flag[OIA_FLAG_USER];
- static PangoLayout 				*layout_terminal = NULL;
-
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
-
- static PangoLayout * getPangoLayout(void)
- {
- 	if(!layout_terminal)
-		layout_terminal = gtk_widget_create_pango_layout(terminal,"");
-
-	return layout_terminal;
- }
-
 
  static void changed(int bstart, int bend)
  {
@@ -205,7 +194,7 @@
  	drawing_enabled = TRUE;
  	if(terminal && pixmap)
  	{
-		DrawScreen(terminal, color, pixmap);
+		DrawScreen(getPangoLayout(), color, pixmap);
 		DrawOIA(terminal,color,pixmap);
 		RedrawCursor();
 		if(Toggled(CURSOR_POS))
@@ -401,7 +390,7 @@
 #ifdef DEBUG
  	screen_disp();
 #endif
- 	DrawScreen(terminal,color,pixmap);
+ 	DrawScreen(getPangoLayout(),color,pixmap);
 	DrawOIA(terminal,color,pixmap);
 	gtk_widget_queue_draw(terminal);
  }
@@ -705,19 +694,19 @@
   * @param	draw	The image destination.
   *
   */
- int DrawScreen(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw)
+ int DrawScreen(PangoLayout *layout, GdkColor *clr, GdkDrawable *draw)
  {
-	GdkGC		*gc;
-	PangoLayout *layout;
-	ELEMENT		*el			= screen;
-	int			x;
-	int			y;
-	int			row;
-	int			col;
-	int			width;
-	int			height;
+	GdkGC			*gc;
+	ELEMENT			*el			= screen;
+	PangoRectangle	rect;
+	int				x;
+	int				y;
+	int				row;
+	int				col;
+	int				width;
+	int				height;
 
-	if(!(el && draw && widget))
+	if(!(el && draw && layout))
 		return -1;
 
 	gc = gdk_gc_new(draw);
@@ -729,9 +718,13 @@
 	gdk_draw_rectangle(draw,gc,1,0,0,width,height);
 
 	// Draw screen contens
-	layout = gtk_widget_create_pango_layout(widget," ");
-	pango_layout_get_pixel_size(layout,&fWidth,&fHeight);
+	pango_layout_set_text(layout,"A",1);
 
+	pango_layout_get_extents(layout,&rect,NULL);
+	fWidth = PANGO_PIXELS(rect.width);
+	fHeight = PANGO_PIXELS(rect.height);
+
+	// FIXME (perry#1#): Find a faster way to draw text
 	y = top_margin;
 	for(row = 0; row < terminal_rows;row++)
 	{
@@ -745,7 +738,6 @@
 		y += fHeight;
 	}
 
-	g_object_unref(layout);
 	gdk_gc_destroy(gc);
 
 	RedrawCursor();

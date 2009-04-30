@@ -143,12 +143,15 @@
     	{
 			const gchar 	*name = pango_font_family_get_name (families[i]);
 			GtkWidget		*item = gtk_radio_menu_item_new_with_label(group,name);
+			gchar			*ptr;
 
 //			Trace("Adding font %s",name);
 
 			// FIXME (perry#2#): the user_data isn't being freed!
 			group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
-			g_signal_connect(G_OBJECT(item),"toggled",G_CALLBACK(activate_font),g_strdup(name));
+			ptr = g_strdup(name);
+			g_object_set_data_full(G_OBJECT(item),"FontName",ptr,g_free);
+			g_signal_connect(G_OBJECT(item),"toggled",G_CALLBACK(activate_font),ptr);
 			gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
 
 			if(!strcmp(name,selected))
@@ -157,6 +160,8 @@
     	}
     }
 
+	g_free(families);
+
 	gtk_widget_show_all(menu);
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item),menu);
 
@@ -164,22 +169,26 @@
 
  static void LoadFontMenu(GtkWidget *widget, GtkWidget *menu_item)
  {
-	gchar			*filename	= NULL;
-	GError			*error		= NULL;
-	gchar			*text		= NULL;
-	const gchar	*selected	= GetString("Terminal","Font","Courier");
-	gchar			**ln;
+	gchar	*filename	= NULL;
+	GError	*error		= NULL;
+	gchar	*text		= NULL;
+	gchar	*selected	= GetString("Terminal","Font","Courier");
+	gchar	**ln;
 
 
 	Trace("Selected font: \"%s\"",selected);
 
 	if(!menu_item)
+	{
+		g_free(selected);
 		return;
+	}
 
 	filename = FindSystemConfigFile("fonts.conf");
 	if(!filename)
 	{
 		LoadSystemFonts(widget, menu_item, selected);
+		g_free(selected);
 		return;
 	}
 
@@ -189,6 +198,7 @@
 		g_error_free(error);
 		g_free(filename);
 		g_free(text);
+		g_free(selected);
 		return;
 	}
 
@@ -234,6 +244,7 @@
 
 	}
 
+	g_free(selected);
 	g_free(text);
 	g_free(filename);
  }
@@ -368,6 +379,7 @@
  	GtkWidget				*hbox;
 	GtkUIManager			*ui_manager;
 	GdkPixbuf				*pix;
+	gchar 					*ptr;
 
 	topwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	pix = LoadLogo();
@@ -492,7 +504,9 @@
 #endif
 
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
-	settitle(GetString("TopWindow","Title",""));
+	ptr = GetString("TopWindow","Title","");
+	settitle(ptr);
+	g_free(ptr);
 
 	action_Restore();
 

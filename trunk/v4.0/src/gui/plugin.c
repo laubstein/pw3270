@@ -440,7 +440,7 @@ gboolean StartPlugins(const gchar *startup_script)
 					}
 
 					if(!parm[0])
-						parm[0] = group[f];
+						parm[0] = g_strdup(group[f]);
 
 					for(p=0;p<G_N_ELEMENTS(call) && !run;p++)
 					{
@@ -479,8 +479,9 @@ gboolean StartPlugins(const gchar *startup_script)
 
 						if(action)
 						{
-							// FIXME (perry#1#): Add a closure function to g_free the allocated string.
-							g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(run),g_strdup(parm[4]));
+							gchar *ptr = g_strdup(parm[4]);
+							g_object_set_data_full(G_OBJECT(action),"Arg",ptr,g_free);
+							g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(run),ptr);
 
 							if(parm[5])
 								gtk_action_group_add_action_with_accel(groups[0],action,parm[5]);
@@ -488,6 +489,10 @@ gboolean StartPlugins(const gchar *startup_script)
 								gtk_action_group_add_action(groups[0],action);
 						}
 					}
+
+					for(p=0;p<G_N_ELEMENTS(name);p++)
+						g_free(parm[p]);
+
 				}
 				g_strfreev(group);
 			}

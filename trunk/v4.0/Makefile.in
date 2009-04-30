@@ -95,6 +95,10 @@ run: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugi
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
 	@cd bin/Debug ; LD_LIBRARY_PATH=. ./@PROGRAM_NAME@ --program-data="../../"
 
+memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)@DLLEXT@) src/gui/$(PACKAGE).@LOGOEXT@
+	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
+	@cd bin/Debug ; LD_LIBRARY_PATH=. valgrind --leak-check=full ./@PROGRAM_NAME@ --program-data="../../"
+
 rpm: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 	mkdir -p `rpm --eval="%{u2p:%{_sourcedir}}"`
 	cp @PACKAGE@-@PACKAGE_VERSION@.tar.gz `rpm --eval="%{u2p:%{_sourcedir}}"`

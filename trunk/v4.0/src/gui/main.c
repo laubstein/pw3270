@@ -186,7 +186,9 @@ static int program_init(const gchar *program)
 
 	/* If running on win32 changes to program path */
 #if defined(_WIN32) || defined( DEBUG ) /*[*/
-	has_log = trylog(g_build_filename(G_DIR_SEPARATOR_S, g_get_current_dir(),logname,NULL));
+	ptr = g_get_current_dir();
+	has_log = trylog(g_build_filename(G_DIR_SEPARATOR_S, ptr,logname,NULL));
+	g_free(ptr);
 #endif
 
 	/* Init Log system */
