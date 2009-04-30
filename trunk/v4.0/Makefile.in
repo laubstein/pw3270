@@ -65,7 +65,7 @@ APP_LDFLAGS=@GTK_LIBS@ @LIBGNOME_LIBS@ @OS_LFLAGS@
 
 APP_SRCS =	main.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
 		clipboard.c print.c config.c colors.c keypad.c plugin.c filetransfer.c \
-		version.c @OS_APPSRCS@
+		version.c draw.c @OS_APPSRCS@
 
 API_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 		ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c idle.c kybd.c \
