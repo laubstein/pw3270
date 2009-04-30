@@ -165,7 +165,7 @@
 	#define CURSOR_MODE_CROSS 	0x02
 	#define CURSOR_MODE_BASE	0x04
 
-	#define OIAROW				(top_margin+1+(fHeight*terminal_rows))
+	#define OIAROW				(top_margin+1+(fontHeight*terminal_rows))
 	#define CHARSET 			charset ? charset : "ISO-8859-1"
 	#define IS_FUNCTION_KEY(event)   (event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(event->state & (GDK_MOD1_MASK|GDK_CONTROL_MASK)))
 
@@ -201,8 +201,10 @@
 	extern int				 		terminal_cols;
 	extern int						left_margin;
 	extern int						top_margin;
-	extern int 					fWidth;
-	extern int 					fHeight;
+
+	extern gint					fontWidth;
+	extern gint					fontHeight;
+
 	extern gint					cCol;
 	extern gint					cRow;
 	extern gboolean 				WaitingForChanges;
@@ -238,8 +240,6 @@
 	GtkWidget 	*CreateTerminalWindow(void);
 
 	gboolean 	StartPlugins(const gchar *startup_script);
-
-	void 		getFontMetrics(int *width, int *height);
 
 	int 		DrawScreen(GdkColor *clr, GdkDrawable *draw);
 	void 		DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);
@@ -360,5 +360,10 @@
 
 	PangoLayout * getPangoLayout(void);
 
+	#ifdef USE_FONT_CACHE
+		void clear_font_cache(void);
+	#else
+		#define clear_font_cache() /* */
+	#endif
 
 #endif // GUI_H_INCLUDED

@@ -150,8 +150,6 @@
  int								left_margin		= 0;
  int								top_margin		= 0;
 
- int								fWidth			= 0;
- int								fHeight			= 0;
  ELEMENT							*screen			= NULL;
  char								*charset		= NULL;
  char								*window_title	= PROGRAM_NAME;
@@ -350,14 +348,14 @@
 		gint 		x, y;
 	 	GdkGC		*gc		= gdk_gc_new(pixmap);
 
-		x = left_margin + (col * fWidth);
-		y = top_margin + (row * fHeight);
+		x = left_margin + (col * fontWidth);
+		y = top_margin + (row * fontHeight);
 
 		DrawElement(pixmap,color,gc,x,y,el);
 
 		gdk_gc_destroy(gc);
 
-		gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
+		gtk_widget_queue_draw_area(terminal,x,y,fontWidth,fontHeight);
 
 		if(row == cRow && col == cCol)
 			RedrawCursor();
@@ -449,7 +447,7 @@
 	if(terminal && pixmap)
 	{
 		DrawOIA(terminal,color,pixmap);
-		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);
+		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
 	}
 
  }
@@ -458,27 +456,27 @@
  {
  	PangoLayout *layout = getPangoLayout();
 
- 	int col = left_margin+(fWidth << 3);
+ 	int col = left_margin+(fontWidth << 3);
 
 	gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_OIA_BACKGROUND);
-	gdk_draw_rectangle(draw,gc,1,col,OIAROW+1,fWidth << 4,fHeight+1);
+	gdk_draw_rectangle(draw,gc,1,col,OIAROW+1,fontWidth << 4,fontHeight+1);
 
 	if(sts_data && status_msg && *status_msg)
 	{
 		if(*status_msg == 'X')
 		{
 			int f;
-			int cols = (fWidth/3)+1;
+			int cols = (fontWidth/3)+1;
 
 			gdk_gc_set_foreground(gc,clr+sts_data->clr);
 
 			for(f=0;f<cols;f++)
 			{
-				gdk_draw_line(draw,gc,col,OIAROW+f+3, col+(fWidth-1),(OIAROW+(fHeight-2)+f)-cols);
-				gdk_draw_line(draw,gc,col+(fWidth-1),OIAROW+f+3, col,(OIAROW+(fHeight-2)+f)-cols);
+				gdk_draw_line(draw,gc,col,OIAROW+f+3, col+(fontWidth-1),(OIAROW+(fontHeight-2)+f)-cols);
+				gdk_draw_line(draw,gc,col+(fontWidth-1),OIAROW+f+3, col,(OIAROW+(fontHeight-2)+f)-cols);
 			}
 
-			col += fWidth;
+			col += fontWidth;
 			pango_layout_set_text(layout,status_msg+1,-1);
 		}
 		else
@@ -534,7 +532,7 @@
 	GdkGC 			*gc;
 	PangoLayout 	*layout;
 	int   			row		= OIAROW;
-	int				width	= (fWidth*terminal_cols);
+	int				width	= (fontWidth*terminal_cols);
 	GdkColor		*bg		= clr+TERMINAL_COLOR_OIA_BACKGROUND;
 	GdkColor		*fg		= clr+TERMINAL_COLOR_OIA;
 	int				col		= left_margin;
@@ -546,7 +544,7 @@
 	gc = gdk_gc_new(draw);
 
 	gdk_gc_set_foreground(gc,bg);
-	gdk_draw_rectangle(draw,gc,1,left_margin,row,width,fHeight+1);
+	gdk_draw_rectangle(draw,gc,1,left_margin,row,width,fontHeight+1);
 
 	gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_OIA_SEPARATOR);
 	gdk_draw_line(draw,gc,left_margin,row,left_margin+width,row);
@@ -559,9 +557,9 @@
 	//  0          "4" in a square
 //	pango_layout_set_text(layout,"4",-1);
 //	gdk_draw_layout_with_colors(draw,gc,col,row,layout,bg,fg);
-	DrawImageByWidth(draw,gc,3,col,row,fWidth,fHeight);
+	DrawImageByWidth(draw,gc,3,col,row,fontWidth,fontHeight);
 
-	col += fWidth;
+	col += fontWidth;
 
 	//  1          "A" underlined
 	if(oia_flag[OIA_FLAG_UNDERA])
@@ -571,7 +569,7 @@
 		gdk_gc_set_foreground(gc,fg);
 	}
 
-	col += fWidth;
+	col += fontWidth;
 
 	// 2          solid box if connected, "?" in a box if not
 	if(IN_ANSI)
@@ -582,7 +580,7 @@
 	else if(oia_flag[OIA_FLAG_BOXSOLID])
 	{
 		gdk_gc_set_foreground(gc,fg);
-		gdk_draw_rectangle(draw,gc,1,col,row,fWidth-1,fHeight+1);
+		gdk_draw_rectangle(draw,gc,1,col,row,fontWidth-1,fontHeight+1);
 	}
 	else if(IN_SSCP)
 	{
@@ -594,7 +592,7 @@
 		gdk_gc_set_foreground(gc,fg);
 		pango_layout_set_text(layout,"?",-1);
 		gdk_draw_layout_with_colors(draw,gc,col,row,layout,fg,bg);
-		gdk_draw_rectangle(draw,gc,0,col,row,fWidth-1,fHeight+1);
+		gdk_draw_rectangle(draw,gc,0,col,row,fontWidth-1,fontHeight+1);
 	}
 
 	// 8...       message area
@@ -603,7 +601,7 @@
 	memset(str,' ',10);
 
     // M-36...35	Compose indication ("C" or blank)
-	col = left_margin+(fWidth*(terminal_cols-36));
+	col = left_margin+(fontWidth*(terminal_cols-36));
 
 	if(compose)
 	{
@@ -639,23 +637,23 @@
 
 	//	M-39       Shift indication (Special symbol/"^" or blank)
 	if(kbrd_state & GDK_SHIFT_MASK)
-		DrawImage(draw,gc,2,left_margin+(fWidth*(terminal_cols-39)),row,fWidth<<1,fHeight);
+		DrawImage(draw,gc,2,left_margin+(fontWidth*(terminal_cols-39)),row,fontWidth<<1,fontHeight);
 
 	// Draw SSL indicator (M-43)
-	DrawImage(draw,gc,oia_flag[OIA_FLAG_SECURE] ? 0 : 1 ,left_margin+(fWidth*(terminal_cols-43)),row+1,fWidth<<1,fHeight);
+	DrawImage(draw,gc,oia_flag[OIA_FLAG_SECURE] ? 0 : 1 ,left_margin+(fontWidth*(terminal_cols-43)),row+1,fontWidth<<1,fontHeight);
 
 	// M-25 LU Name
 	if(luname)
 	{
 		pango_layout_set_text(layout,luname,-1);
-		gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-25)),row,layout,clr+TERMINAL_COLOR_OIA_LU,bg);
+		gdk_draw_layout_with_colors(draw,gc,left_margin+(fontWidth*(terminal_cols-25)),row,layout,clr+TERMINAL_COLOR_OIA_LU,bg);
 	}
 
 	//	M-15..M-9	command timing (Clock symbol and m:ss, or blank)
 	if(*timer)
 	{
 		pango_layout_set_text(layout,timer,-1);
-		gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-15)),row,layout,clr+TERMINAL_COLOR_OIA_TIMER,bg);
+		gdk_draw_layout_with_colors(draw,gc,left_margin+(fontWidth*(terminal_cols-15)),row,layout,clr+TERMINAL_COLOR_OIA_TIMER,bg);
 	}
 
 	//  M-7..M     cursor position (rrr/ccc or blank)
@@ -663,7 +661,7 @@
 	{
 		g_snprintf(str,8,"%03d/%03d",cRow+1,cCol+1);
 		pango_layout_set_text(layout,str,-1);
-		gdk_draw_layout_with_colors(draw,gc,left_margin+(fWidth*(terminal_cols-7)),row,layout,clr+TERMINAL_COLOR_OIA_CURSOR,bg);
+		gdk_draw_layout_with_colors(draw,gc,left_margin+(fontWidth*(terminal_cols-7)),row,layout,clr+TERMINAL_COLOR_OIA_CURSOR,bg);
 	}
 
 	g_object_unref(layout);
@@ -681,7 +679,7 @@
  	if(terminal && pixmap)
  	{
 		DrawOIA(terminal,color,pixmap);
-		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);
+		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
  	}
  }
 
@@ -796,7 +794,7 @@
 			Trace("Destroying gc %p",gc);
 			gdk_gc_destroy(gc);
 
-			gtk_widget_queue_draw_area(terminal,left_margin+(fWidth << 3),OIAROW,fWidth << 4,fHeight+1);
+			gtk_widget_queue_draw_area(terminal,left_margin+(fontWidth << 3),OIAROW,fontWidth << 4,fontHeight+1);
 		}
 
 		Trace("%s","Status updated");
@@ -1046,6 +1044,6 @@
 		DrawOIA(terminal,color,pixmap);
  	}
 
-	gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fWidth*terminal_cols,fHeight+1);
+	gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
 
  }
