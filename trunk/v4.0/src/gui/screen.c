@@ -194,7 +194,7 @@
  	drawing_enabled = TRUE;
  	if(terminal && pixmap)
  	{
-		DrawScreen(getPangoLayout(), color, pixmap);
+		DrawScreen(color, pixmap);
 		DrawOIA(terminal,color,pixmap);
 		RedrawCursor();
 		if(Toggled(CURSOR_POS))
@@ -390,7 +390,7 @@
 #ifdef DEBUG
  	screen_disp();
 #endif
- 	DrawScreen(getPangoLayout(),color,pixmap);
+ 	DrawScreen(color,pixmap);
 	DrawOIA(terminal,color,pixmap);
 	gtk_widget_queue_draw(terminal);
  }
@@ -694,7 +694,7 @@
   * @param	draw	The image destination.
   *
   */
- int DrawScreen(PangoLayout *layout, GdkColor *clr, GdkDrawable *draw)
+ int DrawScreen(GdkColor *clr, GdkDrawable *draw)
  {
 	GdkGC			*gc;
 	ELEMENT			*el			= screen;
@@ -704,6 +704,7 @@
 	int				col;
 	int				width;
 	int				height;
+	PangoLayout 	*layout		= getPangoLayout();
 
 	if(!(el && draw && layout))
 		return -1;
@@ -717,8 +718,7 @@
 	gdk_draw_rectangle(draw,gc,1,0,0,width,height);
 
 	// Draw screen contens
-	pango_layout_set_text(layout,"A",1);
-	pango_layout_get_pixel_size(layout,&fWidth,&fHeight);
+	getFontMetrics(&fWidth,&fHeight);
 
 	// FIXME (perry#1#): Find a faster way to draw text
 	y = top_margin;

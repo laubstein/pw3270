@@ -239,7 +239,9 @@
 
 	gboolean 	StartPlugins(const gchar *startup_script);
 
-	int 		DrawScreen(PangoLayout *layout, GdkColor *clr, GdkDrawable *draw);
+	void 		getFontMetrics(int *width, int *height);
+
+	int 		DrawScreen(GdkColor *clr, GdkDrawable *draw);
 	void 		DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
 
 	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
