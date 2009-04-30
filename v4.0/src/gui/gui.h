@@ -239,7 +239,7 @@
 
 	gboolean 	StartPlugins(const gchar *startup_script);
 
-	int 		DrawScreen(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
+	int 		DrawScreen(PangoLayout *layout, GdkColor *clr, GdkDrawable *draw);
 	void 		DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
 
 	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
@@ -354,5 +354,8 @@
 	void	CallPlugins(const gchar *name, const gchar *arg);
 
 	void 	SetHostname(const gchar *hostname);
+
+	PangoLayout * getPangoLayout(void);
+
 
 #endif // GUI_H_INCLUDED

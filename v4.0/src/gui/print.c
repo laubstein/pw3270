@@ -69,9 +69,13 @@
 	for(text = g_object_get_data(G_OBJECT(prt),"3270Text");*text;text++)
 	{
 		gint width, height;
+		PangoRectangle	rect;
 
 		pango_layout_set_text(FontLayout,*text,-1);
-		pango_layout_get_pixel_size(FontLayout,&width,&height);
+
+		pango_layout_get_extents(FontLayout,&rect,NULL);
+		width = rect.width / PANGO_SCALE;
+		height = rect.height / PANGO_SCALE;
 
 		pos = current;
 

@@ -69,6 +69,7 @@
 
  static GtkIMContext			*im;
 
+ static PangoLayout 			*layout			= NULL;
  static PangoFontDescription	*font_descr		= NULL;
  static int					szFonts			= MAX_FONT_SIZES;
  static FONTSIZE				fsize[MAX_FONT_SIZES];
@@ -97,7 +98,7 @@
 
 	gdk_drawable_get_size(widget->window,&sWidth,&sHeight);
 	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
-	DrawScreen(widget, color, pix);
+	DrawScreen(getPangoLayout(), color, pix);
 	DrawOIA(widget,color,pix);
 	RedrawCursor();
 	return pix;
@@ -147,22 +148,30 @@
 
  static void UpdateFontData(int sel)
  {
-	PangoLayout *layout;
+	PangoLayout 		*layout;
+	PangoRectangle		rect;
 
 	pango_font_description_set_size(font_descr,fsize[sel].size);
 	gtk_widget_modify_font(terminal,font_descr);
-	layout = gtk_widget_create_pango_layout(terminal,"A");
-	pango_layout_get_pixel_size(layout,&fsize[sel].width,&fsize[sel].height);
-	g_object_unref(layout);
+
+
+	// FIXME (perry#1#): Is there any better way to get the font size in pixels?
+	layout = getPangoLayout();
+	pango_layout_set_text(layout,"A",1);
+
+	pango_layout_get_extents(layout,&rect,NULL);
+
+	fsize[sel].width  = PANGO_PIXELS(rect.width);
+	fsize[sel].height = PANGO_PIXELS(rect.height);
 
  }
 
  static void LoadFontSizes(void)
  {
 	/* Load all font sizes */
-	const gchar	*conf;
-	gchar			**ptr;
-	int 			f;
+	gchar	*conf;
+	gchar	**ptr;
+	int 	f;
 
 	memset(fsize,0,MAX_FONT_SIZES * sizeof(FONTSIZE));
 
@@ -194,6 +203,8 @@
 //			Trace("Font %d fits on %dx%d",f,terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
 		}
 	}
+
+	g_free(conf);
  }
 
  static void ResizeTerminal(GtkWidget *widget, gint width, gint height)
@@ -292,6 +303,19 @@
 		gdk_pixmap_unref(pixmap);
 		pixmap = NULL;
 	}
+
+	if(layout)
+	{
+		g_object_unref(layout);
+		layout = NULL;
+	}
+
+ 	if(font_descr)
+ 	{
+		pango_font_description_free(font_descr);
+		font_descr = NULL;
+ 	}
+
  }
 
  static void realize(GtkWidget *widget, void *t)
@@ -422,10 +446,12 @@
 
  void FontChanged(void)
  {
- 	gchar vlr[1024];
+ 	gchar	*font = GetString("Terminal","Font","Courier");
+ 	gchar 	vlr[1024];
 
-	g_snprintf(vlr,1023,"%s%s",	GetString("Terminal","Font","Courier"),
-								TOGGLED_BOLD ? " Bold" : "" );
+	g_snprintf(vlr,1023,"%s%s",	font, TOGGLED_BOLD ? " Bold" : "" );
+
+	g_free(font);
 
 	SetTerminalFont(vlr);
 
@@ -630,4 +656,16 @@
 	gtk_im_context_set_cursor_location(im,&rCursor);
 	InvalidateCursor();
  }
+
+ PangoLayout * getPangoLayout(void)
+ {
+ 	if(!terminal)
+		return NULL;
+
+ 	if(!layout)
+		layout = gtk_widget_create_pango_layout(terminal,"");
+
+	return layout;
+ }
+
 

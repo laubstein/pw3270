@@ -288,14 +288,19 @@
 
 		if(g_str_has_suffix(filename,"rex"))
 		{
- 			GtkWidget *item = gtk_menu_item_new_with_label(name);
+ 			GtkWidget 	*item = gtk_menu_item_new_with_label(name);
  			Trace("Appending script %s (item: %p)",name,item);
-			g_signal_connect(G_OBJECT(item),"activate",G_CALLBACK(activate_script),g_strdup(filename));
+
+ 			g_object_set_data_full(G_OBJECT(item),"filename",filename,g_free);
+			g_signal_connect(G_OBJECT(item),"activate",G_CALLBACK(activate_script),filename);
 			gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
 			qtd++;
 		}
+		else
+		{
+			g_free(filename);
+		}
 
-		g_free(filename);
 		name = g_dir_read_name(dir);
 	}
 	g_dir_close(dir);
