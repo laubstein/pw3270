@@ -242,6 +242,7 @@
 	void 		getFontMetrics(int *width, int *height);
 
 	int 		DrawScreen(GdkColor *clr, GdkDrawable *draw);
+	void 		DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);
 	void 		DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
 
 	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
