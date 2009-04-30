@@ -64,6 +64,9 @@
  static int 					lHeight 		= -1;
  static int 					lFont 			= -1;
 
+ static gint					fontWidth		= 0;
+ static gint					fontHeight		= 0;
+
  static gint					sWidth			= 0;
  static gint					sHeight			= 0;
 
@@ -98,7 +101,7 @@
 
 	gdk_drawable_get_size(widget->window,&sWidth,&sHeight);
 	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
-	DrawScreen(getPangoLayout(), color, pix);
+	DrawScreen(color, pix);
 	DrawOIA(widget,color,pix);
 	RedrawCursor();
 	return pix;
@@ -148,26 +151,21 @@
 
  void getFontMetrics(int *width, int *height)
  {
-	PangoLayout *layout = getPangoLayout();
-
-	// FIXME (perry#1#): Is there any better way to get the font size in pixels?
-	pango_layout_set_text(layout,"A",1);
-	pango_layout_get_pixel_size(layout,width,height);
-
+ 	*width = fontWidth;
+ 	*height = fontHeight;
  }
 
  static void UpdateFontData(int sel)
  {
-	PangoLayout 		*layout;
-	PangoRectangle		rect;
-
 	pango_font_description_set_size(font_descr,fsize[sel].size);
+
+	Trace("Updating font data (sel: %d)",sel);
 	gtk_widget_modify_font(terminal,font_descr);
 
-	// FIXME (perry#1#): Is there any better way to get the font size in pixels?
-	layout = getPangoLayout();
-	pango_layout_set_text(layout,"A",1);
-	pango_layout_get_pixel_size(layout,&fsize[sel].width, &fsize[sel].height);
+ 	fsize[sel].width = fontWidth;
+ 	fsize[sel].height = fontHeight;
+
+	Trace("Font(%d): Width=%d Height: %d",sel,fontWidth,fontHeight);
 
  }
 
@@ -183,6 +181,9 @@
 	// Default font sizes from http://svn.gnome.org/svn/gtk+/trunk/gtk/gtkfontsel.c
 	conf = GetString("Terminal","FontSizes","6,7,8,9,10,11,12,13,14,16,18,20,22,24,26,28,32,36,40,48,56,64,72");
 
+	// Force a new layout to get the proper font sizes
+	getPangoLayout();
+
 	if(conf && *conf && *conf != '*') // "*" in .conf reverts to default behavior of "all" font sizes
 	{
 		Trace("Font sizes: %s",conf);
@@ -191,7 +192,6 @@
 		{
 			fsize[f].size = atoi(ptr[f]) * PANGO_SCALE;
 			UpdateFontData(f);
-//			Trace("Font %d (%s) fits on %dx%d",f,ptr[f],terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
 		}
 		szFonts = f;
 		g_strfreev(ptr);
@@ -205,7 +205,6 @@
 		{
 			fsize[f].size = (f+1) * PANGO_SCALE;
 			UpdateFontData(f);
-//			Trace("Font %d fits on %dx%d",f,terminal_rows*fsize[f].height,terminal_cols*fsize[f].width);
 		}
 	}
 
@@ -241,33 +240,22 @@
 	else if(f > 0)
 		f--;
 
+	Trace("LastFont: %d NEwFont: %d",lFont,f);
+
 	if(f != lFont)
 	{
 		Trace("Font size changes from %d to %d (%dx%d)",lFont,f,terminal_cols*fsize[f].width,terminal_rows*fsize[f].height);
 		lFont = f;
 		pango_font_description_set_size(font_descr,fsize[f].size);
 		gtk_widget_modify_font(terminal,font_descr);
-
-		if(pixmap)
-		{
-			/* Font size changed, invalidate entire image */
-			gdk_pixmap_unref(pixmap);
-			pixmap = NULL;
-		}
-
-		if(pCursor)
-		{
-			gdk_pixmap_unref(pCursor);
-			pCursor = NULL;
-		}
 	}
 
 	/* Center image */
-	left_margin = (width >> 1) - ((terminal_cols * fsize[f].width) >> 1);
+	left_margin = (width >> 1) - ((terminal_cols * fontWidth) >> 1);
 	if(left_margin < 0)
 		left_margin = 0;
 
-	top_margin = (height >> 1) - (((terminal_rows+1) * fsize[f].height) >> 1);
+	top_margin = (height >> 1) - (((terminal_rows+1) * fontHeight) >> 1);
 	if(top_margin < 0)
 		top_margin = 0;
 
@@ -482,16 +470,41 @@
 
  }
 
+ static void update_font_layout(void)
+ {
+ 	// Font context changed, invalidate cached info
+	if(pixmap)
+	{
+		gdk_pixmap_unref(pixmap);
+		pixmap = NULL;
+	}
+
+	if(pCursor)
+	{
+		gdk_pixmap_unref(pCursor);
+		pCursor = NULL;
+	}
+
+	// Update metrics
+ 	if(layout)
+ 	{
+		pango_layout_context_changed(layout);
+
+		// FIXME (perry#1#): Is there any better way to get the font size in pixels?
+		pango_layout_set_text(layout,"A",1);
+		pango_layout_get_pixel_size(layout,&fontWidth,&fontHeight);
+ 	}
+
+ }
+
  static void direction_changed(GtkWidget *widget, GtkTextDirection previous_direction, gpointer user_data)
  {
- 	if(layout)
-		pango_layout_context_changed(layout);
+ 	update_font_layout();
  }
 
  static void style_set(GtkWidget *widget, GtkStyle  *previous_style, gpointer user_data)
  {
- 	if(layout)
-		pango_layout_context_changed(layout);
+ 	update_font_layout();
  }
 
  GtkWidget *CreateTerminalWindow(void)
