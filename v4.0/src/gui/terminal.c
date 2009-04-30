@@ -146,6 +146,16 @@
 	return 0;
  }
 
+ void getFontMetrics(int *width, int *height)
+ {
+	PangoLayout *layout = getPangoLayout();
+
+	// FIXME (perry#1#): Is there any better way to get the font size in pixels?
+	pango_layout_set_text(layout,"A",1);
+	pango_layout_get_pixel_size(layout,width,height);
+
+ }
+
  static void UpdateFontData(int sel)
  {
 	PangoLayout 		*layout;
@@ -154,15 +164,10 @@
 	pango_font_description_set_size(font_descr,fsize[sel].size);
 	gtk_widget_modify_font(terminal,font_descr);
 
-
 	// FIXME (perry#1#): Is there any better way to get the font size in pixels?
 	layout = getPangoLayout();
 	pango_layout_set_text(layout,"A",1);
-
-	pango_layout_get_extents(layout,&rect,NULL);
-
-	fsize[sel].width  = PANGO_PIXELS(rect.width);
-	fsize[sel].height = PANGO_PIXELS(rect.height);
+	pango_layout_get_pixel_size(layout,&fsize[sel].width, &fsize[sel].height);
 
  }
 
@@ -477,6 +482,18 @@
 
  }
 
+ static void direction_changed(GtkWidget *widget, GtkTextDirection previous_direction, gpointer user_data)
+ {
+ 	if(layout)
+		pango_layout_context_changed(layout);
+ }
+
+ static void style_set(GtkWidget *widget, GtkStyle  *previous_style, gpointer user_data)
+ {
+ 	if(layout)
+		pango_layout_context_changed(layout);
+ }
+
  GtkWidget *CreateTerminalWindow(void)
  {
 	memset(fsize,0,MAX_FONT_SIZES * sizeof(FONTSIZE));
@@ -491,7 +508,9 @@
 	gtk_widget_set_app_paintable(terminal,TRUE);
 	gtk_widget_set_redraw_on_allocate(terminal,TRUE);
 
-	g_signal_connect(G_OBJECT(terminal), "destroy", G_CALLBACK(destroy), NULL);
+	g_signal_connect(G_OBJECT(terminal), "destroy", 			G_CALLBACK(destroy), NULL);
+	g_signal_connect(G_OBJECT(terminal), "direction-changed",	G_CALLBACK(direction_changed), NULL);
+	g_signal_connect(G_OBJECT(terminal), "style-set",			G_CALLBACK(style_set), NULL);
 
 	// Configure terminal widget
     GTK_WIDGET_SET_FLAGS(terminal, GTK_CAN_DEFAULT|GTK_CAN_FOCUS);
