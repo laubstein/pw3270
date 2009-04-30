@@ -234,14 +234,14 @@
  		*col = 0;
  		rc = -1;
  	}
-	else if(x > (left_margin+(terminal_cols * fWidth)))
+	else if(x > (left_margin+(terminal_cols * fontWidth)))
 	{
 		*col = terminal_cols-1;
 		rc = -1;
 	}
 	else
 	{
-		*col = ((((unsigned long) x) - left_margin)/fWidth);
+		*col = ((((unsigned long) x) - left_margin)/fontWidth);
 	}
 
 	if(y < top_margin)
@@ -249,14 +249,14 @@
 		*row = 0;
 		rc = -1;
 	}
-	else if(y > (top_margin+(terminal_rows * fHeight)))
+	else if(y > (top_margin+(terminal_rows * fontHeight)))
 	{
 		*row = terminal_rows-1;
 		rc = -1;
 	}
 	else
 	{
-		*row = ((((unsigned long) y) - top_margin)/fHeight);
+		*row = ((((unsigned long) y) - top_margin)/fontHeight);
 	}
 
 	return rc;
@@ -477,12 +477,12 @@
 				// Changed, mark to update
 				screen[pos].status = status;
 				DrawElement(pixmap,color,gc,x,y,screen+pos);
-				gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
+				gtk_widget_queue_draw_area(terminal,x,y,fontWidth,fontHeight);
 			}
 			pos++;
-			x += fWidth;
+			x += fontWidth;
 		}
-		y += fHeight;
+		y += fontHeight;
 	}
 
 	if(layout)
@@ -548,12 +548,12 @@
 				// Changed, mark to update
 				screen[pos].status = status;
 				DrawElement(pixmap,color,gc,x,y,screen+pos);
-				gtk_widget_queue_draw_area(terminal,x,y,fWidth,fHeight);
+				gtk_widget_queue_draw_area(terminal,x,y,fontWidth,fontHeight);
 			}
 			pos++;
-			x += fWidth;
+			x += fontWidth;
 		}
-		y += fHeight;
+		y += fontHeight;
 	}
 
 	if(gc)

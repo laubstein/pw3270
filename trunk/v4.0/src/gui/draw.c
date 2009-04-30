@@ -41,14 +41,11 @@
 	#include <windows.h>
 #endif
 
-/*---[ Structures ]----------------------------------------------------------------------------------------*/
-
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
-/*---[ Globals ]-------------------------------------------------------------------------------------------*/
+/*---[ Statics ]-------------------------------------------------------------------------------------------*/
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
-
 
  /**
   * Draw entire buffer.
@@ -81,9 +78,6 @@
 	gdk_gc_set_foreground(gc,color);
 	gdk_draw_rectangle(draw,gc,1,0,0,width,height);
 
-	// Draw screen contens
-	getFontMetrics(&fWidth,&fHeight);
-
 	// FIXME (perry#1#): Find a faster way to draw text
 	y = top_margin;
 	for(row = 0; row < terminal_rows;row++)
@@ -93,9 +87,9 @@
 		{
 			DrawElement(draw,clr,gc,x,y,el);
 			el++;
-			x += fWidth;
+			x += fontWidth;
 		}
-		y += fHeight;
+		y += fontHeight;
 	}
 
 	gdk_gc_destroy(gc);
@@ -122,57 +116,57 @@
 //		break;
 
 	case 0xd4: // CG 0xac, LR corner
-		DrawCorner(draw, gc, x, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y);
+		DrawCorner(draw, gc, x, y+(fontHeight >> 1), x+(fontWidth >> 1), y+(fontHeight >> 1), x+(fontWidth >> 1), y);
 		break;
 
 	case 0xd5: // CG 0xad, UR corner
-		DrawCorner(draw, gc, x, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y+fHeight);
+		DrawCorner(draw, gc, x, y+(fontHeight >> 1), x+(fontWidth >> 1), y+(fontHeight >> 1), x+(fontWidth >> 1), y+fontHeight);
 		break;
 
 	case 0xc5: // CG 0xa4, UL corner
-		DrawCorner(draw, gc, x+fWidth, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y+fHeight);
+		DrawCorner(draw, gc, x+fontWidth, y+(fontHeight >> 1), x+(fontWidth >> 1), y+(fontHeight >> 1), x+(fontWidth >> 1), y+fontHeight);
 		break;
 
 	case 0xc4: // CG 0xa3, LL corner
-		DrawCorner(draw, gc, x+fWidth, y+(fHeight >> 1), x+(fWidth >> 1), y+(fHeight >> 1), x+(fWidth >> 1), y);
+		DrawCorner(draw, gc, x+fontWidth, y+(fontHeight >> 1), x+(fontWidth >> 1), y+(fontHeight >> 1), x+(fontWidth >> 1), y);
 		break;
 
 	case 0xd3: // CG 0xab, plus
-		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
+		gdk_draw_line(draw,gc,x,y+(fontHeight >> 1),x+fontWidth,y+(fontHeight >> 1));
+		gdk_draw_line(draw,gc,x+(fontWidth >> 1),y,x+(fontWidth >> 1),y+fontHeight);
 		break;
 
 	case 0xa2: // CG 0x92, horizontal line
-		y += (fHeight >> 1);
-		gdk_draw_line(draw,gc,x,y,x+fWidth,y);
+		y += (fontHeight >> 1);
+		gdk_draw_line(draw,gc,x,y,x+fontWidth,y);
 		break;
 
 	case 0xc6: // CG 0xa5, left tee
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
+		gdk_draw_line(draw,gc,x+(fontWidth >> 1),y+(fontHeight >> 1),x+fontWidth,y+(fontHeight >> 1));
+		gdk_draw_line(draw,gc,x+(fontWidth >> 1),y,x+(fontWidth >> 1),y+fontHeight);
 		break;
 
 	case 0xd6: // CG 0xae, right tee
-		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+(fWidth >> 1),y+(fHeight >> 1));
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+fHeight);
+		gdk_draw_line(draw,gc,x,y+(fontHeight >> 1),x+(fontWidth >> 1),y+(fontHeight >> 1));
+		gdk_draw_line(draw,gc,x+(fontWidth >> 1),y,x+(fontWidth >> 1),y+fontHeight);
 		break;
 
 	case 0xc7: // CG 0xa6, bottom tee
-		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y,x+(fWidth >> 1),y+(fHeight>>1));
+		gdk_draw_line(draw,gc,x,y+(fontHeight >> 1),x+fontWidth,y+(fontHeight >> 1));
+		gdk_draw_line(draw,gc,x+(fontWidth >> 1),y,x+(fontWidth >> 1),y+(fontHeight>>1));
 		break;
 
 	case 0xd7: // CG 0xaf, top tee
-		gdk_draw_line(draw,gc,x,y+(fHeight >> 1),x+fWidth,y+(fHeight >> 1));
-		gdk_draw_line(draw,gc,x+(fWidth >> 1),y+(fHeight >> 1),x+(fWidth >> 1),y+fHeight);
+		gdk_draw_line(draw,gc,x,y+(fontHeight >> 1),x+fontWidth,y+(fontHeight >> 1));
+		gdk_draw_line(draw,gc,x+(fontWidth >> 1),y+(fontHeight >> 1),x+(fontWidth >> 1),y+fontHeight);
 		break;
 
 //		case 0xbf: // CG 0x15b, stile
 //			break;
 
 	case 0x85: // CG 0x184, vertical line
-		x += (fWidth >> 1);
-		gdk_draw_line(draw,gc,x,y,x,y+fHeight);
+		x += (fontWidth >> 1);
+		gdk_draw_line(draw,gc,x,y,x,y+fontHeight);
 		break;
 
 //	case 0x8c: // CG 0xf7, less or equal
@@ -252,12 +246,11 @@
 			pango_layout_set_text(layout," ",-1);
 
 		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
-
 	}
 	else
 	{
 		gdk_gc_set_foreground(gc,clr+bg);
-		gdk_draw_rectangle(draw,gc,TRUE,x,y,fWidth,fHeight);
+		gdk_draw_rectangle(draw,gc,TRUE,x,y,fontWidth,fontHeight);
 		DrawExtendedChar(draw, clr+fg, clr+bg, gc, x, y, el);
 	}
 
@@ -266,16 +259,16 @@
 		gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_SELECTED_BORDER);
 
 		if(el->status & SELECTION_BOX_TOP)
-			gdk_draw_line(draw,gc,x,y,x+fWidth,y);
+			gdk_draw_line(draw,gc,x,y,x+fontWidth,y);
 
 		if(el->status & SELECTION_BOX_LEFT)
-			gdk_draw_line(draw,gc,x,y,x,y+(fHeight-1));
+			gdk_draw_line(draw,gc,x,y,x,y+(fontHeight-1));
 
 		if(el->status & SELECTION_BOX_BOTTOM)
-			gdk_draw_line(draw,gc,x,y+(fHeight-1),x+fWidth,y+(fHeight-1));
+			gdk_draw_line(draw,gc,x,y+(fontHeight-1),x+fontWidth,y+(fontHeight-1));
 
 		if(el->status & SELECTION_BOX_RIGHT)
-			gdk_draw_line(draw,gc,x+(fWidth-1),y,x+(fWidth-1),y+(fHeight-1));
+			gdk_draw_line(draw,gc,x+(fontWidth-1),y,x+(fontWidth-1),y+(fontHeight-1));
 
 	}
  }

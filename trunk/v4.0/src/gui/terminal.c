@@ -64,9 +64,6 @@
  static int 					lHeight 		= -1;
  static int 					lFont 			= -1;
 
- static gint					fontWidth		= 0;
- static gint					fontHeight		= 0;
-
  static gint					sWidth			= 0;
  static gint					sHeight			= 0;
 
@@ -76,6 +73,8 @@
  static PangoFontDescription	*font_descr		= NULL;
  static int					szFonts			= MAX_FONT_SIZES;
  static FONTSIZE				fsize[MAX_FONT_SIZES];
+ gint							fontWidth		= 0;
+ gint							fontHeight		= 0;
 
  // Cursor info
  gint							cMode			= CURSOR_MODE_ENABLED|CURSOR_MODE_BASE|CURSOR_MODE_SHOW;
@@ -100,6 +99,9 @@
 		return NULL;
 
 	gdk_drawable_get_size(widget->window,&sWidth,&sHeight);
+
+	Trace("Creating pixmap with %dx%d",sWidth,sHeight);
+
 	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
 	DrawScreen(color, pix);
 	DrawOIA(widget,color,pix);
@@ -130,7 +132,7 @@
 			// Draw cross-hair cursor
 			gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CROSS_HAIR);
 			gdk_draw_line(widget->window,gc,rCursor.x,0,rCursor.x,OIAROW-1);
-			gdk_draw_line(widget->window,gc,0,rCursor.y+fHeight,sWidth,rCursor.y+fHeight);
+			gdk_draw_line(widget->window,gc,0,rCursor.y+fontHeight,sWidth,rCursor.y+fontHeight);
 		}
 
 		if( (cMode & (CURSOR_MODE_BASE|CURSOR_MODE_SHOW)) == (CURSOR_MODE_BASE|CURSOR_MODE_SHOW) )
@@ -140,19 +142,13 @@
 									GDK_DRAWABLE(pCursor),
 									0,rCursor.height,
 									rCursor.x,rCursor.y+rCursor.height,
-									rCursor.width,fHeight-rCursor.height);
+									rCursor.width,fontHeight-rCursor.height);
 
 		}
 	}
 
 	gdk_gc_destroy(gc);
 	return 0;
- }
-
- void getFontMetrics(int *width, int *height)
- {
- 	*width = fontWidth;
- 	*height = fontHeight;
  }
 
  static void UpdateFontData(int sel)
@@ -180,9 +176,6 @@
 
 	// Default font sizes from http://svn.gnome.org/svn/gtk+/trunk/gtk/gtkfontsel.c
 	conf = GetString("Terminal","FontSizes","6,7,8,9,10,11,12,13,14,16,18,20,22,24,26,28,32,36,40,48,56,64,72");
-
-	// Force a new layout to get the proper font sizes
-	getPangoLayout();
 
 	if(conf && *conf && *conf != '*') // "*" in .conf reverts to default behavior of "all" font sizes
 	{
@@ -486,14 +479,17 @@
 	}
 
 	// Update metrics
- 	if(layout)
- 	{
+	if(layout)
 		pango_layout_context_changed(layout);
+	else
+		getPangoLayout();
 
-		// FIXME (perry#1#): Is there any better way to get the font size in pixels?
-		pango_layout_set_text(layout,"A",1);
-		pango_layout_get_pixel_size(layout,&fontWidth,&fontHeight);
- 	}
+
+	// FIXME (perry#1#): Is there any better way to get the font size in pixels?
+	pango_layout_set_text(layout,"A",1);
+	pango_layout_get_pixel_size(layout,&fontWidth,&fontHeight);
+
+	Trace("Font size changes to %dx%d",fontWidth,fontHeight);
 
  }
 
@@ -559,11 +555,11 @@
 
  void InvalidateCursor(void)
  {
-	gtk_widget_queue_draw_area(terminal,rCursor.x,rCursor.y+rCursor.height,rCursor.width,fHeight-rCursor.height);
+	gtk_widget_queue_draw_area(terminal,rCursor.x,rCursor.y+rCursor.height,rCursor.width,fontHeight-rCursor.height);
 	if(cMode & CURSOR_MODE_CROSS)
 	{
 		gtk_widget_queue_draw_area(terminal,rCursor.x,0,rCursor.x,OIAROW-1);
-		gtk_widget_queue_draw_area(terminal,0,rCursor.y+fHeight,sWidth,rCursor.y+fHeight);
+		gtk_widget_queue_draw_area(terminal,0,rCursor.y+fontHeight,sWidth,rCursor.y+fontHeight);
 	}
  }
 
@@ -571,11 +567,11 @@
  {
 	GdkGC 		*gc		= gdk_gc_new(terminal->window);
 	PangoLayout *layout;
-	int			x		= left_margin+(fWidth*(terminal_cols-7));
+	int			x		= left_margin+(fontWidth*(terminal_cols-7));
 	char		buffer[10];
 
 	gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
-	gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fWidth*7,fHeight);
+	gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fontWidth*7,fontHeight);
 
 	layout = gtk_widget_create_pango_layout(terminal,"4");
 
@@ -589,7 +585,7 @@
 
 	g_object_unref(layout);
 	gdk_gc_destroy(gc);
-	gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fWidth*7,fHeight);
+	gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fontWidth*7,fontHeight);
 
  }
 
@@ -605,13 +601,13 @@
 	else
 	{
 		GdkGC *gc	= gdk_gc_new(terminal->window);
-		int   x		= left_margin+(fWidth*(terminal_cols-7));
+		int   x		= left_margin+(fontWidth*(terminal_cols-7));
 
 		gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
-		gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fWidth*7,fHeight);
+		gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fontWidth*7,fontHeight);
 
 		gdk_gc_destroy(gc);
-		gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fWidth*7,fHeight);
+		gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fontWidth*7,fontHeight);
 
 	}
 
@@ -657,7 +653,7 @@
 
 	// Draw cursor pixmap
 	if(!pCursor)
-		pCursor = gdk_pixmap_new(terminal->window,fWidth,fHeight,-1);
+		pCursor = gdk_pixmap_new(terminal->window,fontWidth,fontHeight,-1);
 
 	memcpy(&el,screen + (cRow*terminal_cols)+cCol,sizeof(ELEMENT));
 	el.fg = 0;
@@ -668,9 +664,9 @@
 	gdk_gc_destroy(gc);
 
 	// Set cursor position
-	rCursor.x 		= left_margin + (cCol * fWidth);
-	rCursor.y 		= top_margin + (cRow * fHeight);
-	rCursor.width 	= fWidth;
+	rCursor.x 		= left_margin + (cCol * fontWidth);
+	rCursor.y 		= top_margin + (cRow * fontHeight);
+	rCursor.width 	= fontWidth;
 
 	if(Toggled(INSERT))
 	{
@@ -678,7 +674,7 @@
 	}
 	else
 	{
-		rCursor.height =fHeight - (fHeight/4);
+		rCursor.height =fontHeight - (fontHeight/4);
 
 		if(rCursor.height < 1)
 			rCursor.height = 1;
