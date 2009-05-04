@@ -409,7 +409,11 @@
 	gtk_text_buffer_get_end_iter(data->text,&itr);
 	gtk_text_buffer_insert(data->text,&itr,"\n",1);
 
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 14
 	gtk_adjustment_set_value(data->scroll,gtk_adjustment_get_upper(data->scroll));
+#else
+	gtk_adjustment_set_value(data->scroll,(GTK_ADJUSTMENT(data->scroll))->upper);
+#endif
  }
 
  static void gettracecommand(PRXSTRING str)
