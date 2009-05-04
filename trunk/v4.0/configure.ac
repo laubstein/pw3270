@@ -347,9 +347,5 @@ case "$host" in
 	;;
 esac
 
-if test "$pw3270_cv_rexx" != "no"; then
-	AC_OUTPUT(src/plugins/rexx/Makefile)
-fi
-
 dnl Output the generated config.status script.
 AC_OUTPUT
