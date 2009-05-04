@@ -210,7 +210,7 @@
 	extern gboolean 				WaitingForChanges;
 	extern char					*charset;
 	extern gchar 					*window_title;
-	extern gboolean				drawing_enabled;
+	extern gboolean				screen_suspended;
 
 	extern gchar					*program_data;
 	extern gchar					*program_logo;
@@ -243,7 +243,7 @@
 
 	int 		DrawScreen(GdkColor *clr, GdkDrawable *draw);
 	void 		DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);
-	void 		DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw);
+	void 		DrawOIA(GdkDrawable *draw, GdkColor *clr);
 
 	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 	void 		ParseInput(const gchar *string);

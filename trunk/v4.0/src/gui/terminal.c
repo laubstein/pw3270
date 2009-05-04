@@ -94,6 +94,7 @@
  static GdkPixmap * GetPixmap(GtkWidget *widget)
  {
 	GdkPixmap	*pix;
+	GdkGC		*gc;
 
 	if(!widget->window)
 		return NULL;
@@ -103,8 +104,12 @@
 	Trace("Creating pixmap with %dx%d",sWidth,sHeight);
 
 	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
+
+	gc = gdk_gc_new(pix);
+	g_object_set_data_full(G_OBJECT(pix),"CachedGC",gc,g_object_unref);
+
 	DrawScreen(color, pix);
-	DrawOIA(widget,color,pix);
+	DrawOIA(pix,color);
 	RedrawCursor();
 	return pix;
  }
@@ -415,11 +420,11 @@
 
  static void set_insert(int value, int reason)
  {
- 	if(terminal && pixmap)
- 	{
-		DrawOIA(terminal,color,pixmap);
+	DrawOIA(pixmap,color);
+
+	if(terminal)
 		gtk_widget_queue_draw(terminal);
- 	}
+
  	RedrawCursor();
  }
 
@@ -621,7 +626,7 @@
 
 	gtk_im_context_reset(im);
 
- 	if(drawing_enabled)
+ 	if(!screen_suspended)
  	{
 		InvalidateCursor();
 

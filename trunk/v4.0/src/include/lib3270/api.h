@@ -338,8 +338,7 @@
 			void	(*ring_bell)(void);
 			void	(*redraw)(void);
 			void	(*move_cursor)(int row, int col);
-			void	(*suspend)(void);
-			void	(*resume)(void);
+			int		(*set_suspended)(int state);
 			void	(*reset)(int lock);
 			void	(*status)(STATUS_CODE id);
 			void	(*compose)(int on, unsigned char c, int keytype);

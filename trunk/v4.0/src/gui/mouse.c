@@ -157,7 +157,7 @@
 	if(redraw && terminal && pixmap)
 	{
 		DrawScreen(color,pixmap);
-		DrawOIA(terminal,color,pixmap);
+		DrawOIA(pixmap,color);
 		gtk_widget_queue_draw(terminal);
 	}
 
@@ -218,7 +218,7 @@
 	if(redraw && terminal && pixmap)
 	{
 		DrawScreen(color,pixmap);
-		DrawOIA(terminal,color,pixmap);
+		DrawOIA(pixmap,color);
 		gtk_widget_queue_draw(terminal);
 	}
  }

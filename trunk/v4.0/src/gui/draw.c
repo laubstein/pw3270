@@ -201,7 +201,7 @@
 		pango_layout_set_text(getPangoLayout(),"?",-1);
 		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
 	}
-}
+ }
 
  void DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el)
  {
@@ -215,6 +215,17 @@
  	if(!(gc && draw && layout && el))
 		return;
 
+	if(TOGGLED_UNDERLINE)
+	{
+		attrlist = pango_layout_get_attributes(layout);
+		if(!attrlist)
+			attrlist = pango_attr_list_new();
+
+		attr = pango_attr_underline_new((el->fg & COLOR_ATTR_UNDERLINE) ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE);
+		pango_attr_list_change(attrlist,attr);
+		pango_layout_set_attributes(layout,attrlist);
+	}
+
 	if(el->status & ELEMENT_STATUS_SELECTED)
 	{
 		fg = TERMINAL_COLOR_SELECTED_FG;
@@ -224,17 +235,6 @@
 	{
 		fg = (el->fg & 0xFF);
 		bg = (el->bg & 0xFF);
-	}
-
-	if(TOGGLED_UNDERLINE)
-	{
-		attrlist = pango_layout_get_attributes(layout);
-		if(!attrlist)
-			attrlist = pango_attr_list_new();
-
-		attr = pango_attr_underline_new((fg & COLOR_ATTR_UNDERLINE) ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE);
-		pango_attr_list_change(attrlist,attr);
-		pango_layout_set_attributes(layout,attrlist);
 	}
 
 	if(!el->extended)

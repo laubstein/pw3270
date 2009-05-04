@@ -105,7 +105,7 @@ static void connect_main(int status)
 	if(terminal)
 	{
 		gtk_widget_set_sensitive(terminal,online);
-		DrawOIA(terminal,color,pixmap);
+		DrawOIA(pixmap,color);
 		gtk_widget_queue_draw(terminal);
 		gtk_widget_grab_focus(terminal);
 	}

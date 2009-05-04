@@ -322,8 +322,6 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 		{
 			screen_read(buffer,start,sz);
 
-			Trace("Waiting \"%s\", found \"%s\", %p",key,buffer, strstr(buffer,key));
-
 			if(strstr(buffer,key))
 				rc = 0;
 		}
