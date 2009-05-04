@@ -515,8 +515,9 @@
 	/* Toggle actions */
  	for(f=0;f<N_TOGGLES;f++)
  	{
- 		char buffer[20] = "Toggle";
+ 		char buffer[21];
 
+		strcpy(buffer,"Toggle");
 		strncat(buffer,get_toggle_name(f),20);
 
 		GtkToggleAction *action = gtk_toggle_action_new(	buffer,
@@ -536,7 +537,7 @@
  	for(f=0;f< G_N_ELEMENTS(toggle_list);f++)
  	{
  		int		id = toggle_list[f].toggle;
- 		char	buffer[20];
+ 		char	buffer[21];
 
  		strcpy(buffer,toggle_list[f].set ? "Set" : "Reset" );
 
