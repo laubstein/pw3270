@@ -144,8 +144,12 @@ http://www.suggestsoft.com/images/medieval-software/medieval-bluetooth-obex-file
 
 	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	{
-		g_key_file_set_string(conf,info->group_name,"uri",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
-		gtk_entry_set_text(GTK_ENTRY(info->file[0]),gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)));
+		gchar *uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
+		gchar *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+		g_key_file_set_string(conf,info->group_name,"uri",uri);
+		gtk_entry_set_text(GTK_ENTRY(info->file[0]),filename);
+		g_free(uri);
+		g_free(filename);
 	}
 
 	gtk_widget_destroy(dialog);
