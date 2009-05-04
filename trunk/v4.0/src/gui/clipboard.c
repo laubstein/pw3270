@@ -225,7 +225,9 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 		gtk_widget_set_sensitive(dialog,FALSE);
 		gtk_widget_set_sensitive(topwindow,FALSE);
 
-		g_key_file_set_string(conf,"uri","PasteTextFile",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
+		buffer = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
+		g_key_file_set_string(conf,"uri","PasteTextFile",buffer);
+		g_free(buffer);
 
 		Trace("Loading %s",filename);
 
@@ -239,6 +241,7 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 			process_text_received(buffer);
 		}
 
+		g_free(filename);
 		g_free(buffer);
 
 		gtk_widget_set_sensitive(topwindow,TRUE);

@@ -871,6 +871,8 @@
 			Warning( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
+
+		g_free(filename);
 	}
 
 	gtk_widget_destroy(dialog);
@@ -904,8 +906,11 @@
 		gchar		*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 		gsize		sz;
 		struct ea	*buffer	= NULL;
+		gchar		*ptr;
 
-		g_key_file_set_string(conf,"uri","ScreenDump",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
+		ptr = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
+		g_key_file_set_string(conf,"uri","ScreenDump",ptr);
+		g_free(ptr);
 
 		if(!g_file_get_contents(filename, (gchar **) &buffer, &sz, &error))
 		{
@@ -926,7 +931,7 @@
 			gtk_widget_grab_focus(terminal);
 
 		}
-
+		g_free(filename);
 		g_free(buffer);
 	}
 
@@ -960,13 +965,16 @@
 		int			sz;
 		struct ea	*buffer = copy_device_buffer(&sz);
 
-		g_key_file_set_string(conf,"uri","ScreenDump",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
+		ptr = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
+		g_key_file_set_string(conf,"uri","ScreenDump",ptr);
+		g_free(ptr);
 
 		if(!g_file_set_contents(filename,(gchar *) buffer,sz*sizeof(struct ea),&error))
 		{
 			Warning( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);
 		}
+		g_free(filename);
 		free(buffer);
 	}
 

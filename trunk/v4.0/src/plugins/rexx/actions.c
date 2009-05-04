@@ -61,9 +61,13 @@
 
 	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	{
+		gchar *uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
+		gchar *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 		gtk_widget_hide(dialog);
-		g_key_file_set_string(conf,"uri","RexxScript",gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog)));
-		call_rexx(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)),"");
+		g_key_file_set_string(conf,"uri","RexxScript",uri);
+		call_rexx(filename,"");
+		g_free(uri);
+		g_free(filename);
 	}
 
 	gtk_widget_destroy(dialog);

@@ -200,8 +200,14 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270FileChooserGetFilename(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
+ 	ULONG rc;
+ 	gchar *filename;
 	CHECK_SINGLE_WIDGET_ARG(widget);
-	return RetString(Retstr,gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(widget)));
+
+	filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(widget));
+	rc = RetString(Retstr,filename);
+	g_free(filename);
+	return rc;
  }
 
 /*----------------------------------------------------------------------------*/

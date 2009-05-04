@@ -538,6 +538,9 @@ int main(int argc, char *argv[])
 
 	UnloadPlugins();
 	CloseConfigFile();
+
+	Trace("%s finished",argv[0]);
+	gtk_exit(0);
 	return 0;
 }
 
