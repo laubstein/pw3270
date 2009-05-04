@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como screen.c e possui 1301 linhas de código.
+ * Este programa está nomeado como draw.c e possui 1301 linhas de código.
  *
  * Contatos:
  *
@@ -108,6 +108,8 @@
 
  static void DrawExtendedChar(GdkDrawable *draw, GdkColor *fg, GdkColor *bg, GdkGC *gc, int x, int y, ELEMENT *el)
  {
+	gdk_gc_set_foreground(gc,bg);
+	gdk_draw_rectangle(draw,gc,TRUE,x,y,fontWidth,fontHeight);
 	gdk_gc_set_foreground(gc,fg);
 
 	switch(el->extended)
@@ -203,17 +205,11 @@
 	}
  }
 
- void DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el)
+ static void DrawTextChar(GdkDrawable *draw, GdkColor *fg, GdkColor *bg, GdkGC *gc, int x, int y, ELEMENT *el)
  {
- 	// http://www.guntherkrauss.de/computer/xml/daten/edicode.html
-	short			fg;
-	short 			bg;
 	PangoAttribute	*attr;
 	PangoAttrList 	*attrlist;
 	PangoLayout 	*layout = getPangoLayout();
-
- 	if(!(gc && draw && layout && el))
-		return;
 
 	if(TOGGLED_UNDERLINE)
 	{
@@ -225,6 +221,35 @@
 		pango_attr_list_change(attrlist,attr);
 		pango_layout_set_attributes(layout,attrlist);
 	}
+
+	if(el->ch && *el->ch != ' ' && *el->ch)
+	{
+		// Non space
+		pango_layout_set_text(layout,el->ch,-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,layout,fg,bg);
+	}
+	else if(el->fg & COLOR_ATTR_UNDERLINE)
+	{
+		// It's underlined, use pango
+		pango_layout_set_text(layout," ",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,layout,fg,bg);
+	}
+	else
+	{
+		// Empty space, just clear it
+		gdk_gc_set_foreground(gc,bg);
+		gdk_draw_rectangle(draw,gc,TRUE,x,y,fontWidth,fontHeight);
+	}
+ }
+
+ void DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el)
+ {
+ 	// http://www.guntherkrauss.de/computer/xml/daten/edicode.html
+	short			fg;
+	short 			bg;
+
+ 	if(!draw)
+		return;
 
 	if(el->status & ELEMENT_STATUS_SELECTED)
 	{
@@ -240,17 +265,10 @@
 	if(!el->extended)
 	{
 		// Standard char or empty space, draw directly
-		if(el->ch && *el->ch != ' ' && *el->ch)
-			pango_layout_set_text(layout,el->ch,-1);
-		else
-			pango_layout_set_text(layout," ",-1);
-
-		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
+		DrawTextChar(draw, clr+fg, clr+bg, gc, x, y, el);
 	}
 	else
 	{
-		gdk_gc_set_foreground(gc,clr+bg);
-		gdk_draw_rectangle(draw,gc,TRUE,x,y,fontWidth,fontHeight);
 		DrawExtendedChar(draw, clr+fg, clr+bg, gc, x, y, el);
 	}
 
