@@ -1008,8 +1008,9 @@
  void update_toggle(int ix, int value, int reason, const char *name)
  {
  	GtkAction	*action;
-	char		buffer[20] = "Toggle";
+	char		buffer[21];
 
+	strcpy(buffer,"Toggle");
 	strncat(buffer,name,20);
 
 	action = gtk_action_group_get_action(common_actions,buffer);

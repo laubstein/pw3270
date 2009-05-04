@@ -309,7 +309,11 @@
 	gtk_window_set_transient_for(GTK_WINDOW(dialog),GTK_WINDOW(program_window));
 	gtk_window_set_destroy_with_parent(GTK_WINDOW(dialog),TRUE);
 
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 14
 	box = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+#else
+	box = (GTK_DIALOG(dialog))->vbox;
+#endif
 
 	/* Cria label com o sub-titulo */
 	widget = gtk_label_new(title);
@@ -328,7 +332,11 @@
 	gtk_widget_show_all(box);
 
 	/* Cria botao "cancelar" */
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 14
 	box = gtk_dialog_get_action_area(GTK_DIALOG(dialog));
+#else
+	box = (GTK_DIALOG(dialog))->action_area;
+#endif
 	widget = gtk_button_new_from_stock(GTK_STOCK_CANCEL);
 	g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(cancel_clicked),(gpointer) dialog);
 

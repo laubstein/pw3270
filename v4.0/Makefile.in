@@ -42,6 +42,8 @@ DLLEXT=@DLLEXT@
 
 TARGETS = @PROGRAM_NAME@@EXEEXT@
 
+TMPDIR ?= /tmp
+
 # Set command paths and mkfb (which has to run locally)
 MKFB = mkfb
 CC = @CC@
