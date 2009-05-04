@@ -41,6 +41,9 @@
 
 #ifdef WIN32
 	#include <windows.h>
+#else
+	#include <unistd.h>
+	#include <stdlib.h>
 #endif
 
 #include "locked.bm"
@@ -50,11 +53,14 @@
 
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
 
-#ifdef DEBUG
+ #ifdef DEBUG
  	#define STATUS_CODE_DESCRIPTION(x,c,y) { #x, c, y }
-#else
+ #else
  	#define STATUS_CODE_DESCRIPTION(x,c,y) { c, y }
-#endif
+ #endif
+
+ #define GET_CACHED_GC(x) ((GdkGC *) g_object_get_data(G_OBJECT(x),"CachedGC"))
+
 
  struct status_code
  {
@@ -72,8 +78,7 @@
  static int  	addch(int row, int col, int c, unsigned short attr);
  static void	set_charset(char *dcs);
  static void	erase(void);
- static void	suspend(void);
- static void	resume(void);
+ static int	SetSuspended(int state);
  static void	set_cursor(CURSOR_MODE mode);
  static void	set_oia(OIA_FLAG id, int on);
  static void	set_compose(int on, unsigned char c, int keytype);
@@ -95,28 +100,27 @@
  {
 	sizeof(struct lib3270_screen_callbacks),
 
-	init,			// int (*init)(void);
-	error,			// void (*Error)(const char *fmt, va_list arg);
-	warning,		// void (*Warning)(const char *fmt, va_list arg);
-	setsize,		// void (*setsize)(int rows, int cols);
-	addch,			// void (*addch)(int row, int col, int c, int attr);
-	set_charset,	// void (*charset)(char *dcs);
-	settitle,		// void (*title)(char *text);
-	changed,		// void (*changed)(int bstart, int bend);
-	gdk_beep,		// void (*ring_bell)(void);
-	action_Redraw,	// void (*redraw)(void);
-	MoveCursor,		// void (*move_cursor)(int row, int col);
-	suspend,		// void (*suspend)(void);
-	resume,			// void (*resume)(void);
-	NULL,			// void (*reset)(int lock);
-	SetStatusCode,	// void (*status)(STATUS_CODE id);
-	set_compose,	// void (*compose)(int on, unsigned char c, int keytype);
-	set_cursor,		// void (*cursor)(CURSOR_MODE mode);
-	set_lu,			// void (*lu)(const char *lu);
-	set_oia,		// void (*set)(OIA_FLAG id, int on);
-	erase,			// void (*erase)(void);
-	update_toggle,	// void (*toggle_changed)(int ix, int value, int reason, const char *name);
-	show_timer,		// void	(*show_timer)(long seconds);
+	init,				// int (*init)(void);
+	error,				// void (*Error)(const char *fmt, va_list arg);
+	warning,			// void (*Warning)(const char *fmt, va_list arg);
+	setsize,			// void (*setsize)(int rows, int cols);
+	addch,				// void (*addch)(int row, int col, int c, int attr);
+	set_charset,		// void (*charset)(char *dcs);
+	settitle,			// void (*title)(char *text);
+	changed,			// void (*changed)(int bstart, int bend);
+	gdk_beep,			// void (*ring_bell)(void);
+	action_Redraw,		// void (*redraw)(void);
+	MoveCursor,			// void (*move_cursor)(int row, int col);
+	SetSuspended,		// int	(*set_suspended)(int state);
+	NULL,				// void (*reset)(int lock);
+	SetStatusCode,		// void (*status)(STATUS_CODE id);
+	set_compose,		// void (*compose)(int on, unsigned char c, int keytype);
+	set_cursor,			// void (*cursor)(CURSOR_MODE mode);
+	set_lu,				// void (*lu)(const char *lu);
+	set_oia,			// void (*set)(OIA_FLAG id, int on);
+	erase,				// void (*erase)(void);
+	update_toggle,		// void (*toggle_changed)(int ix, int value, int reason, const char *name);
+	show_timer,			// void	(*show_timer)(long seconds);
 
  };
 
@@ -153,7 +157,7 @@
  ELEMENT							*screen			= NULL;
  char								*charset		= NULL;
  char								*window_title	= PROGRAM_NAME;
- gboolean							drawing_enabled	= FALSE;
+ int								screen_suspended = 0;
 
  static int						szScreen		= 0;
  static const struct status_code	*sts_data		= NULL;
@@ -180,26 +184,25 @@
 		compose = 0;
  }
 
- static void suspend(void)
+ static int SetSuspended(int state)
  {
- 	Trace("Screen suspend! (draw=%s)", drawing_enabled ? "Yes" : "No");
- 	drawing_enabled = FALSE;
- }
+ 	int rc = screen_suspended;
+ 	screen_suspended = state;
+	Trace("%s state: %d",__FUNCTION__,state);
 
- static void resume(void)
- {
- 	Trace("Screen resume! (draw=%s)", drawing_enabled ? "Yes" : "No");
- 	drawing_enabled = TRUE;
- 	if(terminal && pixmap)
+	if(!screen_suspended && terminal && pixmap)
  	{
-		DrawScreen(color, pixmap);
-		DrawOIA(terminal,color,pixmap);
+		DrawScreen(color,pixmap);
+		DrawOIA(pixmap,color);
 		RedrawCursor();
 		if(Toggled(CURSOR_POS))
 			DrawCursorPosition();
 		gtk_widget_queue_draw(terminal);
  	}
+
+ 	return rc;
  }
+
 
  void settitle(char *text)
  {
@@ -342,7 +345,7 @@
 
 	memcpy(el,&in,sizeof(ELEMENT));
 
-	if(drawing_enabled && terminal && pixmap)
+	if(!screen_suspended && terminal && pixmap)
 	{
 		// Update pixmap, queue screen redraw.
 		gint 		x, y;
@@ -389,7 +392,7 @@
  	screen_disp();
 #endif
  	DrawScreen(color,pixmap);
-	DrawOIA(terminal,color,pixmap);
+	DrawOIA(pixmap,color);
 	gtk_widget_queue_draw(terminal);
  }
 
@@ -419,15 +422,14 @@
 		}
 	}
 
-	if(terminal && pixmap)
+	if(pixmap)
 	{
-		gc = gdk_gc_new(pixmap);
+		gc = GET_CACHED_GC(pixmap);
 		gdk_drawable_get_size(pixmap,&width,&height);
 		gdk_gc_set_foreground(gc,color);
 		gdk_draw_rectangle(pixmap,gc,1,0,0,width,height);
-		DrawOIA(terminal,color,pixmap);
+		DrawOIA(pixmap,color);
 		gtk_widget_queue_draw(terminal);
-		gdk_gc_destroy(gc);
 	}
  }
 
@@ -444,11 +446,10 @@
 
 	CallPlugins("SetLUname",luname);
 
-	if(terminal && pixmap)
-	{
-		DrawOIA(terminal,color,pixmap);
+	DrawOIA(pixmap,color);
+
+	if(terminal)
 		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
-	}
 
  }
 
@@ -499,7 +500,7 @@
 #endif
  }
 
- void DrawOIA(GtkWidget *widget, GdkColor *clr, GdkDrawable *draw)
+ void DrawOIA(GdkDrawable *draw, GdkColor *clr)
  {
     /*
      * The status line is laid out thusly (M is maxCOLS):
@@ -541,7 +542,17 @@
 	if(!draw)
 		return;
 
-	gc = gdk_gc_new(draw);
+	gc = GET_CACHED_GC(draw);
+
+#ifdef DEBUG
+
+	if(!GDK_IS_GC(gc))
+	{
+		Trace("Invalid GC for pixmap %p: %p",draw,gc);
+		exit(-1);
+	}
+
+#endif
 
 	gdk_gc_set_foreground(gc,bg);
 	gdk_draw_rectangle(draw,gc,1,left_margin,row,width,fontHeight+1);
@@ -550,7 +561,7 @@
 	gdk_draw_line(draw,gc,left_margin,row,left_margin+width,row);
 	row++;
 
-	layout = gtk_widget_create_pango_layout(widget,"");
+	layout = getPangoLayout();
 
 	gdk_gc_set_foreground(gc,fg);
 
@@ -664,9 +675,6 @@
 		gdk_draw_layout_with_colors(draw,gc,left_margin+(fontWidth*(terminal_cols-7)),row,layout,clr+TERMINAL_COLOR_OIA_CURSOR,bg);
 	}
 
-	g_object_unref(layout);
-	gdk_gc_destroy(gc);
-
  }
 
  static void set_oia(OIA_FLAG id, int on)
@@ -676,11 +684,10 @@
 
  	oia_flag[id] = on;
 
- 	if(terminal && pixmap)
- 	{
-		DrawOIA(terminal,color,pixmap);
+	DrawOIA(pixmap,color);
+
+	if(terminal)
 		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
- 	}
  }
 
  static void set_charset(char *dcs)
@@ -785,17 +792,11 @@
 		if(id == STATUS_CODE_BLANK)
 			set_cursor(CURSOR_MODE_NORMAL);
 
-		if(terminal && pixmap)
-		{
-			GdkGC *gc = gdk_gc_new(pixmap);
+		if(pixmap)
+			DrawStatus(GET_CACHED_GC(pixmap), color, pixmap);
 
-			DrawStatus(gc, color, pixmap);
-
-			Trace("Destroying gc %p",gc);
-			gdk_gc_destroy(gc);
-
+		if(terminal)
 			gtk_widget_queue_draw_area(terminal,left_margin+(fontWidth << 3),OIAROW,fontWidth << 4,fontHeight+1);
-		}
 
 		Trace("%s","Status updated");
 	}
@@ -1036,12 +1037,12 @@
  	{
 		Trace("Timer: %d seconds",(int) seconds);
 		g_snprintf(timer,6,"%02d:%02d",(int) (seconds/60),(int) (seconds % 60));
-		DrawOIA(terminal,color,pixmap);
+		DrawOIA(pixmap,color);
  	}
  	else if(*timer)
  	{
  		*timer = 0;
-		DrawOIA(terminal,color,pixmap);
+		DrawOIA(pixmap,color);
  	}
 
 	gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);

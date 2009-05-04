@@ -377,6 +377,8 @@ void screen_disp(void)
 #endif /*]*/
 	int fa_addr;
 
+	Trace("%s starts",__FUNCTION__);
+
 	fa = get_field_attribute(0);
 	a = color_from_fa(fa);
 	fa_addr = find_field_attribute(0); /* may be -1, that's okay */
@@ -410,6 +412,9 @@ void screen_disp(void)
 					attr = b = calc_attrs(baddr, fa_addr, fa);
 				}
 #if defined(X3270_DBCS) /*[*/
+
+				#warning Is it working?
+
 				d = ctlr_dbcs_state(baddr);
 				if (IS_LEFT(d)) {
 					int xaddr = baddr;
@@ -447,23 +452,24 @@ void screen_disp(void)
 			}
 		}
 	}
-//	attrset(defattr);
+
+	Trace("%s ends",__FUNCTION__);
 
 	screen_has_changes = 0;
 }
 
 void screen_suspend(void)
 {
-	if(callbacks && callbacks->suspend)
-		callbacks->suspend();
+	if(callbacks && callbacks->set_suspended)
+		callbacks->set_suspended(1);
 }
 
 void screen_resume(void)
 {
 	screen_disp();
 
-	if(callbacks && callbacks->resume)
-		callbacks->resume();
+	if(callbacks && callbacks->set_suspended)
+		callbacks->set_suspended(0);
 
 }
 
@@ -564,7 +570,10 @@ status_reset(void)
 		screen_disp();
 
 	if(callbacks && callbacks->reset)
+	{
+		Trace("%s calling reset",__FUNCTION__);
 		callbacks->reset(kybdlock);
+	}
 
 }
 
