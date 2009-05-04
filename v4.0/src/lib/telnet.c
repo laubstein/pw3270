@@ -317,27 +317,29 @@ static void output_possible(void);
 #endif /*]*/
 
 #if defined(_WIN32) /*[*/
-#define socket_errno()	WSAGetLastError()
-#define SE_EWOULDBLOCK	WSAEWOULDBLOCK
-#define SE_ECONNRESET	WSAECONNRESET
-#define SE_EINTR	WSAEINTR
-#define SE_EAGAIN	WSAEINPROGRESS
-#define SE_EPIPE	WSAECONNABORTED
-#define SE_EINPROGRESS	WSAEINPROGRESS
-#define SOCK_CLOSE(s)	closesocket(s)
-#define SOCK_IOCTL(s, f, v)	ioctlsocket(s, f, (DWORD *)v)
+	#define socket_errno()	WSAGetLastError()
+	#define SE_EWOULDBLOCK	WSAEWOULDBLOCK
+	#define SE_ECONNRESET	WSAECONNRESET
+	#define SE_EINTR	WSAEINTR
+	#define SE_EAGAIN	WSAEINPROGRESS
+	#define SE_EPIPE	WSAECONNABORTED
+	#define SE_EINPROGRESS	WSAEINPROGRESS
+	#define SOCK_CLOSE(s)	closesocket(s)
+	#define SOCK_IOCTL(s, f, v)	ioctlsocket(s, f, (void *)v)
 #else /*][*/
-#define socket_errno()	errno
-#define SE_EWOULDBLOCK	EWOULDBLOCK
-#define SE_ECONNRESET	ECONNRESET
-#define SE_EINTR	EINTR
-#define SE_EAGAIN	EAGAIN
-#define SE_EPIPE	EPIPE
-#if defined(EINPROGRESS) /*[*/
-#define SE_EINPROGRESS	EINPROGRESS
-#endif /*]*/
-#define SOCK_CLOSE(s)	close(s)
-#define SOCK_IOCTL	ioctl
+	#define socket_errno()	errno
+	#define SE_EWOULDBLOCK	EWOULDBLOCK
+	#define SE_ECONNRESET	ECONNRESET
+	#define SE_EINTR	EINTR
+	#define SE_EAGAIN	EAGAIN
+	#define SE_EPIPE	EPIPE
+
+	#if defined(EINPROGRESS) /*[*/
+		#define SE_EINPROGRESS	EINPROGRESS
+	#endif /*]*/
+
+	#define SOCK_CLOSE(s)	close(s)
+	#define SOCK_IOCTL	ioctl
 #endif /*]*/
 
 
@@ -3151,7 +3153,7 @@ non_blocking(Boolean on)
 # if defined(FIONBIO) /*[*/
 	int i = on ? 1 : 0;
 
-	if (SOCK_IOCTL(sock, FIONBIO, &i) < 0) {
+	if (SOCK_IOCTL(sock, FIONBIO, (int *) &i) < 0) {
 		popup_a_sockerr("ioctl(FIONBIO)");
 		return -1;
 	}
