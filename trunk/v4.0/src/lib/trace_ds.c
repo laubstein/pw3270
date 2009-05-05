@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270. Registro no INPI sob o nome G3270.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como trace_ds.c e possui 1089 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -722,6 +722,9 @@ tracefile_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 
 #if defined(_WIN32) /*[*/
 	/* Start the monitor window. */
+
+	#warning Find a better way
+
 	if (tracef != stdout && appres.trace_monitor) {
 		STARTUPINFO startupinfo;
 		PROCESS_INFORMATION process_information;
@@ -733,8 +736,8 @@ tracefile_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 		startupinfo.lpTitle = tfn;
 		(void) memset(&process_information, '\0',
 			      sizeof(PROCESS_INFORMATION));
-		path = xs_buffer("%scatf.exe", instdir);
-		args = xs_buffer("\"%scatf.exe\" \"%s\"", instdir, tfn);
+		path = xs_buffer("%scatf.exe", PROGRAM_BIN);
+		args = xs_buffer("\"%scatf.exe\" \"%s\"", PROGRAM_BIN, tfn);
 		if (CreateProcess(
 		    path,
 		    args,
@@ -811,7 +814,7 @@ tracefile_on(int reason, enum toggle_type tt)
 	else
 	{
 #if defined(_WIN32) /*[*/
-		tracefile_buf = xs_buffer("%sx3trc.%u.txt", myappdata,getpid());
+		tracefile_buf = xs_buffer("%sx3trc.%u.txt", PROGRAM_DATA,getpid());
 #else /*][*/
 
         if(appres.trace_dir)
@@ -1047,7 +1050,7 @@ toggle_screenTrace(struct toggle *t unused, enum toggle_type tt)
 			tracefile = appres.screentrace_file;
 		else {
 #if defined(_WIN32) /*[*/
-			tracefile_buf = xs_buffer("%sx3scr.%u.txt",myappdata, getpid());
+			tracefile_buf = xs_buffer("%sx3scr.%u.txt",PROGRAM_DATA, getpid());
 #else /*][*/
             if(appres.trace_dir)
                 tracefile_buf = xs_buffer("%s/x3scr.%u",appres.trace_dir, getpid());

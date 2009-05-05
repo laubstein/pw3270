@@ -417,14 +417,14 @@ printer_start(const char *lu)
 	    !strcasecmp(subcommand, "wpr3287")) {
 	    	char *pc;
 
-	    	pc = xs_buffer("%s%s", instdir, subcommand);
+	    	pc = xs_buffer("%s%s", PROGRAM_BIN, subcommand);
 		Free(subcommand);
 		subcommand = pc;
 
 		if (space)
 			pc = xs_buffer("\"%s\" %s", subcommand, space + 1);
 		else
-			pc = xs_buffer("\"%s%s\"", instdir, cmd_text);
+			pc = xs_buffer("\"%s%s\"", PROGRAM_BIN, cmd_text);
 		Free(cmd_text);
 		cmd_text = pc;
 	}

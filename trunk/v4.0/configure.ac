@@ -87,7 +87,7 @@ case "$host" in
 
 		OS_EXECOPT="-mwindows"
 		OS_LFLAGS="-lws2_32"
-		OS_APISRCS="w3misc.c winvers.c windirs.c"
+		OS_APISRCS="w3misc.c winvers.c"
 		OS_APPSRCS="resources.rc"
 		LOGOEXT="jpg"
 		localedir="locale"

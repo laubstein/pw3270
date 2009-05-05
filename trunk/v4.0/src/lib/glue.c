@@ -77,7 +77,6 @@
 
 #if defined(_WIN32) /*[*/
 #include "winversc.h"
-#include "windirsc.h"
 #endif /*]*/
 
 #include <lib3270/api.h>
@@ -149,51 +148,18 @@ const char *toggle_names[N_TOGGLES] =
 	"Keypad"
 };
 
-#if defined(_WIN32) /*[*/
-/*
- * Figure out the install directory and our data directory.
- */
-
-char *instdir = NULL;
-char myappdata[MAX_PATH];
-
-static int save_dirs(const char *argv0)
-{
-	char *bsl;
-
-	/* Extract the installation directory from argv[0]. */
-	bsl = strrchr(argv0, '\\');
-	if (bsl != NULL) {
-	instdir = NewString(argv0);
-	instdir[(bsl - argv0) + 1] = '\0';
-	} else
-	instdir = "";
-
-	/* Figure out the application data directory. */
-	if (get_dirs(NULL, myappdata) < 0)
-		return -1;
-
-	return 0;
-}
-
-#endif // _WIN32
-
-int lib3270_init(const char *program_path)
+int lib3270_init(void)
 {
 	int 	ovc, ovr;
 	int 	model_number;
 	char	junk;
 
 #if defined(_WIN32)
-	int		rc;
 
 	(void) get_version_info();
 
 	Trace("%s (init_calls: %d)",__FUNCTION__,init_calls);
 
-	rc = save_dirs(program_path);
-	if(rc)
-		return rc;
 #else
 
 	Trace("%s (init_calls: %d)",__FUNCTION__,init_calls);

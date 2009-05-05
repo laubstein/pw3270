@@ -200,7 +200,7 @@ uno_impl::uno_impl( const Reference< XComponentContext > & xContext )
 	{
 		started = true;
 		Trace("Initializing library with %s",OFFICE_PROGRAM);
-		lib3270_init(OFFICE_PROGRAM);
+		lib3270_init();
 	}
 
 }

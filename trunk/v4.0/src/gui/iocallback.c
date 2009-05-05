@@ -32,8 +32,6 @@
 
 #if defined(_WIN32) /*[*/
 	#include <windows.h>
-	#include "winversc.h"
-	#include "windirsc.h"
 #else
 	#include <poll.h>
 	#include <malloc.h>

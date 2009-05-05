@@ -49,20 +49,14 @@
 #endif /*]*/
 
 #include <errno.h>
-#include <lib3270/3270ds.h>
+// #include <lib3270/3270ds.h>
 #include <lib3270/toggle.h>
-#include "ftc.h"
-#include "macrosc.h"
-// #include "printerc.h"
-#include "togglesc.h"
-#include "utilc.h"
-#include "xioc.h"
+// #include "ftc.h"
+// #include "macrosc.h"
+// #include "togglesc.h"
+// #include "utilc.h"
+// #include "xioc.h"
 
-#if defined(_WIN32) /*[*/
-#include <windows.h>
-#include "winversc.h"
-#include "windirsc.h"
-#endif /*]*/
 
 /* Globals */
 #ifdef HAVE_LIBGNOME
@@ -300,7 +294,18 @@ static int parse_option_context(GOptionContext *context, int *argc, char ***argv
 
 	if(!g_option_context_parse( context, argc, argv, &error ))
     {
-		g_print ( _( "Option parsing failed: %s\n" ), error->message);
+		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CANCEL,
+													"%s", _(  "Option parsing failed." ));
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Parse error" ));
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s", error->message);
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+
 		return -1;
     }
 
@@ -387,6 +392,7 @@ static void load_options(GOptionContext *context)
 int main(int argc, char *argv[])
 {
 	static GOptionContext	*context;
+	int rc = 0;
 
 #ifdef HAVE_LIBGNOME
 
@@ -461,11 +467,39 @@ int main(int argc, char *argv[])
 	LoadPlugins();
 
 	Trace("Initializing library with %s...",argv[0]);
-	if(lib3270_init(argv[0]))
-		return -1;
+	rc = lib3270_init();
+
+	if(rc)
+	{
+		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CANCEL,
+													"%s", _(  "3270 library failed to start" ));
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Can't start" ));
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), _( "Return code was %d" ), rc);
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+
+		return rc;
+	}
 
 	if(CreateTopWindow())
+	{
+		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CANCEL,
+													"%s", _(  "Top window failed to start" ));
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Can't start" ));
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
 		return -1;
+	}
 
 	connect_main(0);
 
@@ -535,13 +569,27 @@ int main(int argc, char *argv[])
 		// Run main loop
 		gtk_main();
 	}
+	else
+	{
+		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CANCEL,
+													"%s", _(  "Program window was destroyed" ));
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Program aborted" ));
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+		return -1;
+	}
 
 	UnloadPlugins();
 	CloseConfigFile();
 
-	Trace("%s finished",argv[0]);
-	gtk_exit(0);
-	return 0;
+	Trace("%s finished (rc=%d)",argv[0],rc);
+	gtk_exit(rc);
+	return rc;
 }
 
 

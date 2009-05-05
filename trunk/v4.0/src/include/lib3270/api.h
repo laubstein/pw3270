@@ -372,7 +372,7 @@
 
 		LIB3270_EXPORT int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
 
-		LIB3270_EXPORT int lib3270_init(const char *program_path);
+		LIB3270_EXPORT int lib3270_init(void);
 
 		LIB3270_EXPORT const struct lib3270_option * get_3270_option_table(int sz);
 

@@ -48,6 +48,14 @@
 		#define LIBX3270DIR "."
 	#endif
 
+	#ifndef PROGRAM_BIN
+		#define PROGRAM_BIN "."
+	#endif
+
+	#ifndef PROGRAM_DATA
+		#define PROGRAM_DATA "."
+	#endif
+
 	/* Optional parts. */
 	#undef X3270_TRACE
 	#undef X3270_TN3270E
