@@ -72,7 +72,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
 			         "NoRepair" "1"
 		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
-			         "DisplayVersion" "@PACKAGE_VERSION@"
+			         "DisplayVersion" "@PACKAGE_VERSION@ (Rev: @PACKAGE_REVISION@)"
 
 		# Save instalation dir
 		WriteRegStr HKCU "Software\@PROGRAM_NAME@" "" $INSTDIR
