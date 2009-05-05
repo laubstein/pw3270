@@ -36,6 +36,9 @@ dnl Process this file with autoconf to produce a configure script.
 dnl The minimum version of autoconf required.
 AC_PREREQ(2.59)
 
+dnl Load svn revision file info
+m4_include([revision.m4])
+
 dnl Initialise automake with the package name, version and
 dnl bug-reporting address.
 AC_INIT([pw3270], [4.0], [perry.werneck@gmail.com])
@@ -80,7 +83,7 @@ case "$host" in
 		OS_DLLFLAGS="-mno-cygwin -shared -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
 
 		# http://oldwiki.mingw.org/index.php/MSVC-MinGW-DLL
-		LD_APIFLAGS="-Wl,--warn-duplicate-exports,--output-def,\$(basename \$(@F)).def,--out-implib,\$(basename \$(@F)).a"		
+		LD_APIFLAGS="-Wl,--warn-duplicate-exports,--output-def,\$(basename \$(@F)).def,--out-implib,\$(basename \$(@F)).a"
 
 		OS_EXECOPT="-mwindows"
 		OS_LFLAGS="-lws2_32"
@@ -300,7 +303,7 @@ AC_DEFINE([X3270_APL])
 AC_DEFINE([X3270_FT])
 AC_DEFINE([X3270_PRINTER])
 
-
+AC_DEFINE(PACKAGE_REVISION,"SVN_REV")
 AC_SUBST(PACKAGE_RELEASE,$pw3270_cv_release)
 AC_SUBST(ICONFILE,$pw3270_cv_icon)
 AC_SUBST(LOGOFILE,$pw3270_cv_logo)
