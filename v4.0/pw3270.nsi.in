@@ -46,7 +46,6 @@ SubSection "@PROGRAM_NAME@" SecMain
 
 		# Configuration files
 		file "/oname=$INSTDIR\@PROGRAM_NAME@.jpg"	"bin\Release\@PACKAGE@.jpg"
-		file "/oname=$INSTDIR\@PROGRAM_NAME@.ico"	"bin\Release\@PACKAGE@.ico"
 		file "/oname=$INSTDIR\colors.conf"		src\gui\colors.conf
 
 		# UI definition files
@@ -151,7 +150,6 @@ section "Uninstall"
 	delete $INSTDIR\actions.conf
 	delete $INSTDIR\ui.xml
 	delete $INSTDIR\@PROGRAM_NAME@.jpg
-	delete $INSTDIR\@PROGRAM_NAME@.ico
 	delete $INSTDIR\@PROGRAM_NAME@.log
 	delete $SMPROGRAMS\@PROGRAM_NAME@.lnk
 	delete $DESKTOP\@PROGRAM_NAME@.lnk

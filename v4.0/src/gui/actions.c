@@ -913,7 +913,7 @@
 		g_key_file_set_string(conf,"uri","ScreenDump",ptr);
 		g_free(ptr);
 
-		if(!g_file_get_contents(filename, (gchar **) &buffer, &sz, &error))
+		if(!g_file_get_contents(filename, (gchar **) ((void *) &buffer), &sz, &error))
 		{
 			Warning( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
 			g_error_free(error);

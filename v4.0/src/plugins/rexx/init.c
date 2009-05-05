@@ -56,7 +56,7 @@
 	if(Argc < 1)
 		return RXFUNC_BADCALL;
 
-	rc = lib3270_init(Argv[0].strptr);
+	rc = lib3270_init();
 
 	return RetValue(Retstr,rc);
 
