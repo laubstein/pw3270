@@ -342,6 +342,7 @@ AC_OUTPUT(src/gui/version.c)
 case "$host" in
 	*-mingw32)
 		AC_OUTPUT(pw3270.nsi)
+		AC_OUTPUT(src/gui/resources.rc)
 	;;
 
 	*)

@@ -68,10 +68,8 @@
  {
 	Trace("Status: %d",query_3270_terminal_status());
 
- 	if(!PCONNECTED)
- 	{
-		return RetValue(Retstr,ENOTCONN);
- 	}
+ 	if(query_3270_terminal_status() != STATUS_CODE_BLANK)
+		return RetValue(Retstr,EINVAL);
 
 	switch(Argc)
 	{
