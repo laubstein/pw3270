@@ -134,8 +134,6 @@
 	// process return value
 	Trace("Return value: \"%s\"",retstr.strptr);
 
-	status_script(FALSE);
-
 	if(RXSTRPTR(retstr))
 		RexxFreeMemory(RXSTRPTR(retstr));
 
@@ -180,7 +178,7 @@
         g_free(name);
  	}
 
-	script_state = status_script(SCRIPT_STATE_HALTED);
+	script_state = status_script(SCRIPT_STATE_NONE);
 
 	Trace("%s exits with rc=%d",__FUNCTION__,rc);
 	return (int) rc;
