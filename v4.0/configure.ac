@@ -65,7 +65,6 @@ API_CFLAGS="-DLIB3270=1 -Isrc/lib -Isrc/include/lib3270"
 APP_CFLAGS="-Isrc/lib"
 
 OS_DLLFLAGS="-shared -Wl,-soname,\$(@F)"
-OS_EXECOPT=""
 OS_LFLAGS=""
 OS_SRCS=""
 OS_APPSRCS=""
@@ -85,7 +84,7 @@ case "$host" in
 		# http://oldwiki.mingw.org/index.php/MSVC-MinGW-DLL
 		LD_APIFLAGS="-Wl,--warn-duplicate-exports,--output-def,\$(basename \$(@F)).def,--out-implib,\$(basename \$(@F)).a"
 
-		OS_EXECOPT="-mwindows"
+		LD_RLSFLAGS="-mwindows $LD_RLSFLAGS"
 		OS_LFLAGS="-lws2_32"
 		OS_APISRCS="w3misc.c winvers.c"
 		OS_APPSRCS="resources.rc"
@@ -96,11 +95,11 @@ esac
 
 # Optional
 AC_ARG_ENABLE([trace],
-	[AS_HELP_STRING([--disable-trace], [disable trace])],
+	[AS_HELP_STRING([--enable-trace], [enable trace])],
 [
 	pw3270_cv_trace="$enableval"
 ],[
-	pw3270_cv_trace="yes"
+	pw3270_cv_trace="no"
 ])
 
 AC_ARG_ENABLE([plugins],
@@ -256,7 +255,7 @@ elif test "$pw3270_cv_rexx" != "no"; then
 	AC_DEFINE(HAVE_REXX)
 	REXX_CFLAGS="-I$pw3270_cv_rexx/api"
 	REXX_LIBS="-L$pw3270_cv_rexx/api -lrexx -lrexxapi"
-	PLUGINS="rx3270 $SELECTED_PLUGINS"
+	PLUGINS="rx3270 $PLUGINS"
 	EXTENSIONS="librx3270 $EXTENSIONS"
 fi
 
@@ -322,7 +321,6 @@ AC_SUBST(APP_CFLAGS)
 AC_SUBST(OS_DLLFLAGS)
 AC_SUBST(LD_APIFLAGS)
 AC_SUBST(LD_RLSFLAGS)
-AC_SUBST(OS_EXECOPT)
 AC_SUBST(OS_SRCS)
 AC_SUBST(DLLEXT)
 AC_SUBST(EXEEXT)

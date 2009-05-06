@@ -303,12 +303,16 @@ static void initialize(void)
 	appres.termname = CN;
 	appres.macros = CN;
 
-#if defined(X3270_TRACE) && !defined(_WIN32) /*[*/
+#if defined(X3270_TRACE) /*[*/
+
+#if !defined(_WIN32) /*[*/
 	appres.trace_dir = "/tmp";
 #endif /*]*/
 
-#if defined(WC3270) /*[*/
+#if defined(X3270_DISPLAY) || defined(WC3270) /*[*/
 	appres.trace_monitor = True;
+#endif /*]*/
+
 #endif /*]*/
 
 	appres.oversize = CN;
@@ -366,7 +370,7 @@ static void initialize(void)
 
 BOOL WINAPI DllMain(HANDLE hinst, DWORD dwcallpurpose, LPVOID lpvResvd)
 {
-	Trace("%s - Library %s",__FUNCTION__,(dwcallpurpose == DLL_PROCESS_ATTACH) ? "Loaded" : "Unloaded");
+//	Trace("%s - Library %s",__FUNCTION__,(dwcallpurpose == DLL_PROCESS_ATTACH) ? "Loaded" : "Unloaded");
 
     if(dwcallpurpose == DLL_PROCESS_ATTACH)
 		initialize();
@@ -378,9 +382,7 @@ BOOL WINAPI DllMain(HANDLE hinst, DWORD dwcallpurpose, LPVOID lpvResvd)
 
 int lib3270_loaded(void)
 {
-
-	Trace("%s - Library loaded",__FUNCTION__);
-
+//	Trace("%s - Library loaded",__FUNCTION__);
 	initialize();
     return 0;
 }

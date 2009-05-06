@@ -74,11 +74,9 @@
 		#endif
 
 		/* Debug & log */
-		#if defined( DEBUG ) && defined( linux )
+		#if defined( DEBUG )
 			#define Trace( fmt, ... )		fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr); \
 											WriteLog("TRACE", "%s(%d) " fmt , __FILE__, __LINE__, __VA_ARGS__ )
-		#elif defined( DEBUG )
-			#define Trace( fmt, ... )		WriteLog("TRACE", "%s(%d) " fmt, __FILE__, __LINE__, __VA_ARGS__ )
 		#else
 			#define Trace( fmt, ... )	/* __VA_ARGS__ */
 		#endif
@@ -274,6 +272,15 @@
 			STATUS_CODE_USER
 		} STATUS_CODE;
 
+		typedef enum _SCRIPT_STATE
+		{
+			SCRIPT_STATE_NONE,
+			SCRIPT_STATE_RUNNING,
+			SCRIPT_STATE_HALTED,
+
+			SCRIPT_STATE_USER
+		} SCRIPT_STATE;
+
 		typedef enum _OIA_FLAG
 		{
 			OIA_FLAG_BOXSOLID,
@@ -282,7 +289,6 @@
 			OIA_FLAG_TYPEAHEAD,
 			OIA_FLAG_PRINTER,
 			OIA_FLAG_REVERSE,
-			OIA_FLAG_SCRIPT,
 
 			OIA_FLAG_USER
 		} OIA_FLAG;
@@ -339,6 +345,7 @@
 			void	(*redraw)(void);
 			void	(*move_cursor)(int row, int col);
 			int		(*set_suspended)(int state);
+			void	(*set_script)(SCRIPT_STATE state);
 			void	(*reset)(int lock);
 			void	(*status)(STATUS_CODE id);
 			void	(*compose)(int on, unsigned char c, int keytype);

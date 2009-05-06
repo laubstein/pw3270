@@ -472,9 +472,6 @@
 		<Unit filename="src/lib/ctlr.h" />
 		<Unit filename="src/lib/ctlrc.h" />
 		<Unit filename="src/lib/dialogc.h" />
-		<Unit filename="src/lib/fallbacks.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/lib/ft.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -303,7 +303,7 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 	start = ((row) * cols) + col;
 	rc = ETIMEDOUT;
 
-	buffer = malloc(sz);
+	buffer = malloc(sz+2);
 
 	Trace("Waiting for %ld seconds (Default: %d)", (end-time(0)),RX3270_DEFAULT_TIMEOUT);
 
@@ -316,9 +316,14 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 			Trace("Disconnected when waiting for \"%s\"",key);
 			rc = ENOTCONN;
 		}
+		else if(IsHalted())
+		{
+			rc = ECANCELED;
+		}
 		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 		{
 			screen_read(buffer,start,sz);
+			*(buffer+sz) = 0;
 
 			if(strstr(buffer,key))
 				rc = 0;
@@ -366,11 +371,11 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 	case 0:	// Get entire screen
 		screen_size(&rows,&cols);
 		qtd = (rows*(cols+1)+1);
-		buffer = malloc(qtd);
+		buffer = malloc(qtd+2);
 
 		Trace("Screen buffer size: %d (%dx%d)",qtd,rows,cols);
 
-		memset(buffer,0,qtd);
+		memset(buffer,0,qtd+1);
 		start = qtd = 0;
 		for(row = 0; row < rows;row++)
 		{
@@ -641,6 +646,8 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 
 	RunPendingEvents(0);
 
+	Trace("%s waiting for \"%s\"",__FUNCTION__,str);
+
 	while(rc == ETIMEDOUT  && (time(0) <= end))
 	{
 		if(!CONNECTED)
@@ -662,6 +669,8 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 		RunPendingEvents(1);
 
 	}
+
+	Trace("%s returns %d",__FUNCTION__,rc);
 
 	free(buffer);
 

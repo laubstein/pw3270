@@ -79,6 +79,7 @@
  static void	set_charset(char *dcs);
  static void	erase(void);
  static int	SetSuspended(int state);
+ static void	SetScript(SCRIPT_STATE state);
  static void	set_cursor(CURSOR_MODE mode);
  static void	set_oia(OIA_FLAG id, int on);
  static void	set_compose(int on, unsigned char c, int keytype);
@@ -112,6 +113,7 @@
 	action_Redraw,		// void (*redraw)(void);
 	MoveCursor,			// void (*move_cursor)(int row, int col);
 	SetSuspended,		// int	(*set_suspended)(int state);
+	SetScript,			// void	(*set_script)(SCRIPT_STATE state);
 	NULL,				// void (*reset)(int lock);
 	SetStatusCode,		// void (*status)(STATUS_CODE id);
 	set_compose,		// void (*compose)(int on, unsigned char c, int keytype);
@@ -169,6 +171,8 @@
 
  static gchar 						*(*convert_charset)(int c, gsize *sz) = convert_regular;
  static gboolean					oia_flag[OIA_FLAG_USER];
+ static SCRIPT_STATE 				script_state = SCRIPT_STATE_NONE;
+
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
  static void changed(int bstart, int bend)
@@ -639,7 +643,7 @@
 	str[8] = oia_flag[OIA_FLAG_PRINTER]	? 'P' : ' ';
 
     //   M-27		Script indication ("S" or blank)
-	str[9] = oia_flag[OIA_FLAG_SCRIPT] ? 'S' : ' ';
+	str[9] = (script_state != SCRIPT_STATE_NONE) ? 'S' : ' ';
 
 	str[10] = 0;
 
@@ -1047,5 +1051,32 @@
  	}
 
 	gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
+
+ }
+
+ static gboolean script_timer(gpointer dunno)
+ {
+	// TODO (perry#9#): Blink script indicator according current state
+ 	return script_state != SCRIPT_STATE_NONE;
+ }
+
+ static void SetScript(SCRIPT_STATE state)
+ {
+ 	if(state == script_state)
+		return;
+
+	if(script_state == SCRIPT_STATE_NONE)
+	{
+		// No script. Start timer
+		script_state = state;
+		g_timeout_add((guint) 10, (GSourceFunc) script_timer, 0);
+		return;
+	}
+
+	// Update OIA
+	script_state = state;
+	DrawOIA(pixmap,color);
+	if(terminal)
+		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
 
  }

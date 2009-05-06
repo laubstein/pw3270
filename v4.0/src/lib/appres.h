@@ -200,9 +200,9 @@ typedef struct {
 	char	*trace_file;
 	char	*screentrace_file;
 	char	*trace_file_size;
-# if defined(X3270_DISPLAY) || defined(WC3270) /*[*/
+#if defined(X3270_DISPLAY) || defined(WC3270) /*[*/
 	char	trace_monitor;
-# endif /*]*/
+#endif /*]*/
 #endif /*]*/
 	char	*oversize;
 #if defined(X3270_FT) /*[*/
