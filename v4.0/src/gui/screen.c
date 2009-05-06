@@ -1062,9 +1062,6 @@
 
  static void SetScript(SCRIPT_STATE state)
  {
- 	if(state == script_state)
-		return;
-
 	if(script_state == SCRIPT_STATE_NONE)
 	{
 		// No script. Start timer

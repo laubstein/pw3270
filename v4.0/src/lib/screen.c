@@ -682,11 +682,13 @@ static void status_printer(int on)
 	set(OIA_FLAG_PRINTER,on);
 }
 
+static SCRIPT_STATE script_state = SCRIPT_STATE_NONE;
+
 LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state)
 {
-	if(callbacks && callbacks->set_script)
+	if(state != script_state && callbacks && callbacks->set_script)
 		callbacks->set_script(state);
-	return state;
+	return script_state = state;
 }
 
 void status_timing(struct timeval *t0, struct timeval *t1)
