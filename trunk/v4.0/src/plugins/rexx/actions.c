@@ -63,15 +63,23 @@
 	{
 		gchar *uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
 		gchar *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-		gtk_widget_hide(dialog);
+
 		g_key_file_set_string(conf,"uri","RexxScript",uri);
-		call_rexx(filename,"");
 		g_free(uri);
+
+		Trace("Destroying dialog %p",dialog);
+		gtk_widget_destroy(dialog);
+
+		call_rexx(filename,"");
+
 		g_free(filename);
 	}
+	else
+	{
+		gtk_widget_destroy(dialog);
+	}
 
-	gtk_widget_destroy(dialog);
-
+	Trace("%s ends",__FUNCTION__);
  }
 
  void G3270Action_Rexx(GtkAction *action, gpointer cmd)

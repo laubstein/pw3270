@@ -128,9 +128,7 @@ memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/
 	@cd bin/Debug ; LD_LIBRARY_PATH=. valgrind --leak-check=full ./@PROGRAM_NAME@ --program-data="../../"
 
 rpm: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
-	mkdir -p `rpm --eval="%{u2p:%{_sourcedir}}"`
-	cp @PACKAGE@-@PACKAGE_VERSION@.tar.gz `rpm --eval="%{u2p:%{_sourcedir}}"`
-	rpmbuild -ba pw3270.spec
+	rpmbuild -tb @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 
 
 ####################################################################################################
@@ -192,7 +190,7 @@ obj/Release/version.o: src/version.c
 bin/Release/@PROGRAM_NAME@@EXEEXT@: bin/Release/lib3270$(DLLEXT) $(foreach SRC, $(basename $(APP_SRCS)), obj/Release/src/gui/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_EXECOPT@ @LD_RLSFLAGS@ -o $@ $^ $(APP_LDFLAGS) $(GUI_LDFLAGS)
+	@$(CC) @LD_RLSFLAGS@ -o $@ $^ $(APP_LDFLAGS) $(GUI_LDFLAGS)
 
 bin/Release/lib3270$(DLLEXT): obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
@@ -208,7 +206,7 @@ bin/Release/lib3270$(DLLEXT): obj/Release/version.o obj/Release/src/lib/fallback
 bin/Debug/@PROGRAM_NAME@@EXEEXT@: bin/Debug/lib3270$(DLLEXT) $(foreach SRC, $(basename $(APP_SRCS)), obj/Debug/src/gui/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_EXECOPT@ -o $@ $^ -Lbin/Debug -l3270 $(APP_LDFLAGS) $(GUI_LDFLAGS)
+	@$(CC) -o $@ $^ -Lbin/Debug -l3270 $(APP_LDFLAGS) $(GUI_LDFLAGS)
 
 bin/Debug/lib3270$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
@@ -231,7 +229,7 @@ bin/Debug/plugins/rx3270$(DLLEXT): 	bin/Debug/lib3270$(DLLEXT) \
 					$(foreach SRC, $(REXX_PLG_SRC) $(REXX_COMMON_SRC), obj/Debug/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(GUI_LDFLAGS) $(REXX_LDFLAGS) 
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(GUI_LDFLAGS) $(REXX_LDFLAGS)
 
 bin/Debug/librx3270$(DLLEXT): 		bin/Debug/lib3270$(DLLEXT) \
 					$(foreach SRC, $(REXX_STD_SRC) $(REXX_COMMON_SRC), obj/Debug/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
@@ -312,6 +310,7 @@ $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 	@rm -fr $(TMPDIR)/$(PACKAGE).tmp
 
 	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp *.spec $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp pw3270.cbp $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp *.m4 $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp AUTHORS $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)

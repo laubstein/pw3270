@@ -15,23 +15,21 @@
 
 #include <lib3270/api.h>
 
-LIB3270_EXPORT void status_compose(int on, unsigned char c, enum keytype keytype);
-LIB3270_EXPORT void status_ctlr_done(void);
-LIB3270_EXPORT void status_script(int on);
-LIB3270_EXPORT void status_script(int on);
+LIB3270_EXPORT void 		status_compose(int on, unsigned char c, enum keytype keytype);
+LIB3270_EXPORT void 		status_ctlr_done(void);
+LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state);
 
+LIB3270_EXPORT void 		status_timing(struct timeval *t0, struct timeval *t1);
+LIB3270_EXPORT void 		status_untiming(void);
 
-LIB3270_EXPORT void status_timing(struct timeval *t0, struct timeval *t1);
-LIB3270_EXPORT void status_untiming(void);
+LIB3270_EXPORT void 		status_lu(const char *);
+LIB3270_EXPORT void 		status_oerr(int error_type);
+LIB3270_EXPORT void 		status_reset(void);
+LIB3270_EXPORT void 		status_reverse_mode(int on);
+LIB3270_EXPORT void 		status_twait(void);
+LIB3270_EXPORT void 		status_typeahead(int on);
 
-LIB3270_EXPORT void status_lu(const char *);
-LIB3270_EXPORT void status_oerr(int error_type);
-LIB3270_EXPORT void status_reset(void);
-LIB3270_EXPORT void status_reverse_mode(int on);
-LIB3270_EXPORT void status_twait(void);
-LIB3270_EXPORT void status_typeahead(int on);
-
-LIB3270_EXPORT void status_changed(STATUS_CODE id);
+LIB3270_EXPORT void 		status_changed(STATUS_CODE id);
 
 #define status_kybdlock() status_changed(STATUS_CODE_KYBDLOCK)
 #define status_syswait() status_changed(STATUS_CODE_SYSWAIT)

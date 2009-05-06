@@ -58,12 +58,6 @@
 
  };
 
- struct blinker
- {
- 	gboolean enabled;
- 	gboolean status;
- };
-
 /*---[ Prototipes ]-------------------------------------------------------------------------------*/
 
  RexxExitHandler SysExit_SIO;	// Handler for screen I/O
@@ -81,40 +75,20 @@
  GtkWidget 	*program_window	= NULL;
  GtkWidget	*trace_window = NULL;
 
- static enum _script_state
- {
-	SCRIPT_STATE_STOPPED,
-	SCRIPT_STATE_RUNNING,
-	SCRIPT_STATE_HALTED
- } script_state = SCRIPT_STATE_STOPPED;
+ static SCRIPT_STATE script_state = SCRIPT_STATE_NONE;
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
  #include "calls.h"
 
- static gboolean do_blink(struct blinker *blink)
- {
- 	if(!blink->enabled)
- 	{
-		status_script(FALSE);
-		return FALSE;
- 	}
-
-	status_script(blink->status);
- 	blink->status = !blink->status;
-
-	return TRUE;
- }
-
- int call_rexx(const gchar *prg, const gchar *arg)
+  int call_rexx(const gchar *prg, const gchar *arg)
  {
 	LONG      			return_code;                 	// interpreter return code
 	RXSTRING  			argv;           	          	// program argument string
 	RXSTRING  			retstr;                      	// program return value
 	SHORT     			rc		= 0;                   	// converted return code
-	struct blinker		*blink;
 
-	if(script_state != SCRIPT_STATE_STOPPED)
+	if(script_state != SCRIPT_STATE_NONE)
 	{
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -131,14 +105,7 @@
 		return EBUSY;
 	}
 
-	script_state = SCRIPT_STATE_RUNNING;
-
-	blink = g_malloc0(sizeof(struct blinker));
-
-	blink->enabled = TRUE;
-	status_script(TRUE);
-
-	g_timeout_add_full(G_PRIORITY_DEFAULT, (guint) 600, (GSourceFunc) do_blink, blink, g_free);
+	script_state = status_script(SCRIPT_STATE_RUNNING);
 
 	// build the argument string
 	memset(&argv,0,sizeof(argv));
@@ -167,7 +134,7 @@
 	// process return value
 	Trace("Return value: \"%s\"",retstr.strptr);
 
-	blink->enabled = FALSE;
+	status_script(FALSE);
 
 	if(RXSTRPTR(retstr))
 		RexxFreeMemory(RXSTRPTR(retstr));
@@ -213,7 +180,7 @@
         g_free(name);
  	}
 
-	script_state = SCRIPT_STATE_STOPPED;
+	script_state = status_script(SCRIPT_STATE_HALTED);
 
 	Trace("%s exits with rc=%d",__FUNCTION__,rc);
 	return (int) rc;
