@@ -45,7 +45,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 		file "/oname=$INSTDIR\@PROGRAM_NAME@.exe"	"bin\Release\@PROGRAM_NAME@.exe"
 
 		# Configuration files
-		file "/oname=$INSTDIR\@PROGRAM_NAME@.jpg"	"bin\Release\@PACKAGE@.jpg"
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.@LOGOEXT@"	"bin\Release\@PACKAGE@.@LOGOEXT@"
 		file "/oname=$INSTDIR\colors.conf"		src\gui\colors.conf
 
 		# UI definition files
