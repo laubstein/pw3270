@@ -95,6 +95,13 @@ ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuena
     return RXFUNC_OK;
  }
 
+ ULONG APIENTRY rx3270QueryRunMode(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	strncpy(Retstr->strptr,"STANDALONE",RXAUTOBUFLEN-1);
+    Retstr->strlength = strlen(Retstr->strptr);
+    return RXFUNC_OK;
+ }
+
  ULONG RaiseHaltSignal(void)
  {
 #ifdef WIN32
