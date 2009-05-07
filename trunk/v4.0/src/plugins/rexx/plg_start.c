@@ -212,7 +212,7 @@
  	Trace("\n-- \"%s\" --\n",path);
  }
 
- void AddPluginUI(GtkUIManager *ui)
+ void AddPluginUI(GtkUIManager *ui, const gchar *program_data)
  {
 	gchar			*path;
 	gchar			*filename;
@@ -227,13 +227,7 @@
  	if(!top)
  		return;
 
-#if defined( DEBUG )
-	path = g_build_filename("..","..","rexx",NULL);
-#elif defined( DATAROOTDIR )
-	path = g_build_filename(DATAROOTDIR,PACKAGE_NAME,"rexx",NULL);
-#else
-	path = g_build_filename(".","rexx",NULL);
-#endif
+	path = g_build_filename(program_data,"rexx",NULL);
 
     dir = g_dir_open(path,0,NULL);
 

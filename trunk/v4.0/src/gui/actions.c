@@ -784,7 +784,7 @@
 	g_free(path);
 
 	gtk_ui_manager_ensure_update(ui_manager);
-	AddPluginUI(ui_manager);
+	AddPluginUI(ui_manager,program_data);
 
 	gtk_ui_manager_ensure_update(ui_manager);
 	return ui_manager;
