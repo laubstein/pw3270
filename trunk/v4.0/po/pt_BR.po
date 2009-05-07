@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-05-05 17:59-0300\n"
-"PO-Revision-Date: 2009-05-05 18:03-0300\n"
+"POT-Creation-Date: 2009-05-07 12:58-0300\n"
+"PO-Revision-Date: 2009-05-07 12:59-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -224,7 +224,7 @@ msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 msgid "Can't start"
 msgstr "Não foi possível iniciar"
 
-#: src/plugins/rexx/plg_start.c:123
+#: src/plugins/rexx/plg_start.c:97
 msgid "Can't start script"
 msgstr "Não foi possível iniciar o script"
 
@@ -240,7 +240,7 @@ msgstr "Configuração de cores"
 msgid "Colors"
 msgstr "Cores"
 
-#: src/plugins/rexx/plg_start.c:374
+#: src/plugins/rexx/plg_start.c:333
 msgid "Command:"
 msgstr "Comando:"
 
@@ -394,7 +394,7 @@ msgstr ""
 msgid "Event Trace"
 msgstr ""
 
-#: src/plugins/rexx/actions.c:102
+#: src/plugins/rexx/actions.c:110
 msgid "External rexx script"
 msgstr "Script rexx externo"
 
@@ -616,7 +616,7 @@ msgstr "Rosa"
 msgid "Please wait"
 msgstr "Por favor, aguarde"
 
-#: src/plugins/rexx/plg_start.c:126
+#: src/plugins/rexx/plg_start.c:100
 msgid "Please, try again in a few moments"
 msgstr "Por favor, tente novamente em alguns instantes"
 
@@ -700,8 +700,8 @@ msgstr ""
 msgid "Return"
 msgstr ""
 
-#: src/gui/main.c:481 src/plugins/rexx/plg_start.c:192
-#: src/plugins/rexx/plg_start.c:209
+#: src/gui/main.c:481 src/plugins/rexx/plg_start.c:157
+#: src/plugins/rexx/plg_start.c:174
 #, c-format
 msgid "Return code was %d"
 msgstr "Código de saída foi %d"
@@ -710,15 +710,15 @@ msgstr "Código de saída foi %d"
 msgid "Rexx message"
 msgstr "Mensagem Rexx"
 
-#: src/plugins/rexx/plg_start.c:191 src/plugins/rexx/plg_start.c:208
+#: src/plugins/rexx/plg_start.c:156 src/plugins/rexx/plg_start.c:173
 msgid "Rexx script failed"
 msgstr "Script Rexx falhou"
 
-#: src/plugins/rexx/actions.c:103
+#: src/plugins/rexx/actions.c:111
 msgid "Rexx scripts"
 msgstr "Scripts Rexx"
 
-#: src/plugins/rexx/plg_start.c:355
+#: src/plugins/rexx/plg_start.c:314
 msgid "Rexx trace"
 msgstr ""
 
@@ -762,12 +762,12 @@ msgstr "Salvar texto selecionado"
 msgid "Screen Trace"
 msgstr ""
 
-#: src/plugins/rexx/plg_start.c:205
+#: src/plugins/rexx/plg_start.c:170
 #, c-format
 msgid "Script %s aborted"
 msgstr "Script %s foi abortado"
 
-#: src/plugins/rexx/plg_start.c:473
+#: src/plugins/rexx/plg_start.c:432
 msgid "Script message"
 msgstr "Mensagem do script"
 
@@ -899,7 +899,7 @@ msgstr ""
 msgid "Sys Req"
 msgstr ""
 
-#: src/plugins/rexx/plg_start.c:125
+#: src/plugins/rexx/plg_start.c:99
 msgid "System busy"
 msgstr "Sistema ocupado"
 
@@ -995,47 +995,47 @@ msgstr "Branco"
 msgid "Window"
 msgstr "Janela"
 
-#: src/gui/screen.c:728 src/gui/screen.c:756
+#: src/gui/screen.c:732 src/gui/screen.c:760
 msgid "X"
 msgstr ""
 
-#: src/gui/screen.c:732
+#: src/gui/screen.c:736
 msgid "X -f"
 msgstr ""
 
-#: src/gui/screen.c:764
+#: src/gui/screen.c:768
 msgid "X Connecting"
 msgstr "X Conectando"
 
-#: src/gui/screen.c:748
+#: src/gui/screen.c:752
 msgid "X Inhibit"
 msgstr "X Inibido"
 
-#: src/gui/screen.c:724
+#: src/gui/screen.c:728
 msgid "X Not Connected"
 msgstr "X Não conectado"
 
-#: src/gui/screen.c:740
+#: src/gui/screen.c:744
 msgid "X Numeric"
 msgstr "X Numérico"
 
-#: src/gui/screen.c:744
+#: src/gui/screen.c:748
 msgid "X Overflow"
 msgstr "X Estouro"
 
-#: src/gui/screen.c:736
+#: src/gui/screen.c:740
 msgid "X Protected"
 msgstr "X Protegido"
 
-#: src/gui/screen.c:760
+#: src/gui/screen.c:764
 msgid "X Resolving"
 msgstr "X Resolvendo"
 
-#: src/gui/screen.c:712
+#: src/gui/screen.c:716
 msgid "X System"
 msgstr "X Sistema"
 
-#: src/gui/screen.c:716
+#: src/gui/screen.c:720
 msgid "X Wait"
 msgstr "X Aguarde"
 
@@ -1071,7 +1071,7 @@ msgstr "_Opções"
 msgid "_Quit"
 msgstr "_Sair"
 
-#: src/plugins/rexx/plg_start.c:189
+#: src/plugins/rexx/plg_start.c:154
 #, c-format
 msgid "script %s failed"
 msgstr "script %s falhou"
