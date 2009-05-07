@@ -99,7 +99,7 @@ Uno/OpenOffice library allowing 3270 access from StarBasic
 %prep
 
 %setup -q -n %{name}-%{version}
-
+aclocal
 autoconf
 %configure --disable-trace --with-release=@PACKAGE_RELEASE@
 
