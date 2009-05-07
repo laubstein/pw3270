@@ -70,7 +70,7 @@
 /* Returns:	    String with the version information                           */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	strncpy(Retstr->strptr,PACKAGE_VERSION,RXAUTOBUFLEN-1);
     Retstr->strlength = strlen(Retstr->strptr);

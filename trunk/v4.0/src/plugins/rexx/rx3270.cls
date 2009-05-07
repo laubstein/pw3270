@@ -108,6 +108,9 @@ return rx3270SendPFKey(key)
 	use arg row, col
 return rx3270SetCursorPosition(row,col)
 
+::method RunMode
+return rx3270QueryRunMode()
+
 /*-------------------------------------------------------------------------------*/
 /* Common dialog box class                                                       */
 /*-------------------------------------------------------------------------------*/

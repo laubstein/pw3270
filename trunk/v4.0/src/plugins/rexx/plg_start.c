@@ -139,6 +139,7 @@
 
 	Trace("Call of \"%s\" ends (rc=%d return_code=%d)",prg,rc,(int) return_code);
 
+	// Check script state
 	if(script_state == SCRIPT_STATE_HALTED)
 	{
 		// Interrupted by user, no dialog
@@ -170,7 +171,7 @@
 													_( "Script %s aborted" ),
 													name );
 
-		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx script failed" ));
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx script error" ));
 		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Return code was %d" ), (int) return_code );
 
         gtk_dialog_run(GTK_DIALOG (dialog));
@@ -502,4 +503,11 @@
 	return RexxSetHalt(getpid(),pthread_self());
 #endif
 
+ }
+
+ ULONG APIENTRY rx3270QueryRunMode(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+ 	strncpy(Retstr->strptr,"PLUGIN",RXAUTOBUFLEN-1);
+    Retstr->strlength = strlen(Retstr->strptr);
+    return RXFUNC_OK;
  }
