@@ -88,7 +88,7 @@ case "$host" in
 		OS_LFLAGS="-lws2_32"
 		OS_APISRCS="w3misc.c winvers.c"
 		OS_APPSRCS="resources.rc"
-		LOGOEXT="jpg"
+		LOGOEXT="gif"
 		localedir="locale"
 
 esac
