@@ -196,9 +196,9 @@
 
  static void addui(GModule *handle, GtkUIManager *ui)
  {
-	void (*ptr)(GtkUIManager *ui) = NULL;
+	void (*ptr)(GtkUIManager *ui, const gchar *data) = NULL;
 	if(g_module_symbol(handle, "AddPluginUI", (gpointer) &ptr))
-		ptr(ui);
+		ptr(ui,program_data);
  }
 
  static void start_plugin(GModule *handle, struct call_parameter *arg)
@@ -234,7 +234,7 @@ gboolean StartPlugins(const gchar *startup_script)
 #endif
  }
 
-  void AddPluginUI(GtkUIManager *ui)
+  void AddPluginUI(GtkUIManager *ui, const gchar *dunno)
  {
 #ifdef HAVE_PLUGINS
  	if(plugins)
