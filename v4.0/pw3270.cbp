@@ -371,6 +371,7 @@
 		<Unit filename="src/extensions/uno/com/sun/star/uno/XUnloadingPreference.hpp" />
 		<Unit filename="src/extensions/uno/com/sun/star/uno/XWeak.hpp" />
 		<Unit filename="src/extensions/uno/com/sun/star/util/XVeto.hpp" />
+		<Unit filename="src/extensions/uno/src/Ooo3270.idl" />
 		<Unit filename="src/extensions/uno/src/actions.cxx" />
 		<Unit filename="src/extensions/uno/src/config.hpp" />
 		<Unit filename="src/extensions/uno/src/connection.cxx" />

@@ -131,16 +131,19 @@
 
 	Trace("Waiting for \"%s\" at %d",str.getStr(),start);
 
+	RunPendingEvents(0);
+
 	while( (rc == ETIMEDOUT) && (time(0) <= end) )
 	{
 		if(!CONNECTED)
 		{
+			// Disconnected, return
 			rc = ENOTCONN;
 		}
-		else
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 		{
+			// Screen contents are ok. Check.
 			Trace("Waiting (last=%d)...",last);
-			RunPendingEvents(1);
 			Trace("%d",query_screen_change_counter());
 
 			if(last != query_screen_change_counter())
@@ -149,9 +152,14 @@
 				screen_read(buffer,start,sz);
 				Trace("Found \"%s\"",buffer);
 				if(!strncmp(buffer,str.getStr(),sz))
-					rc = 0;
+				{
+					free(buffer);
+					return 0;
+				}
 			}
 		}
+
+		RunPendingEvents(1);
 	}
 
 	free(buffer);
