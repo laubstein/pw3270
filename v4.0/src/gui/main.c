@@ -149,7 +149,7 @@ static gboolean trylog(gchar *path)
 	return rc == 0;
 }
 
-static int program_init(const gchar *program)
+static int program_init(void)
 {
 	static const gchar	*logname	= PROGRAM_NAME ".log";
 	gboolean				has_log		= FALSE;
@@ -180,9 +180,7 @@ static int program_init(const gchar *program)
 
 	/* If running on win32 changes to program path */
 #if defined(_WIN32) || defined( DEBUG ) /*[*/
-	ptr = g_get_current_dir();
-	has_log = trylog(g_build_filename(G_DIR_SEPARATOR_S, ptr,logname,NULL));
-	g_free(ptr);
+	has_log = trylog(g_build_filename(program_data, G_DIR_SEPARATOR_S, logname, NULL));
 #endif
 
 	/* Init Log system */
@@ -400,14 +398,6 @@ int main(int argc, char *argv[])
 
 #endif
 
-#if defined(_WIN32)
-	{
-		gchar *ptr = g_strdup(argv[0]);
-		g_chdir(g_path_get_dirname(ptr));
-		g_free(ptr);
-	}
-#endif
-
 	setlocale( LC_ALL, "" );
 
 #if defined( LOCALEDIR )
@@ -460,7 +450,30 @@ int main(int argc, char *argv[])
 
 #endif
 
-	if(program_init(argv[0]))
+	if(!program_data)
+	{
+#if defined( WIN32 )
+
+		gchar *ptr = g_path_get_dirname(argv[0]);
+		g_chdir(ptr);
+		g_free(ptr);
+		program_data = g_get_current_dir();
+
+#elif defined( DATAROOTDIR )
+
+		program_data = DATAROOTDIR;
+		g_chdir(program_data);
+
+#else
+
+		#error DATAROOTDIR is undefined
+
+#endif
+	}
+
+	Trace("Program data: \"%s\"",program_data);
+
+	if(program_init())
 		return -1;
 
 	Trace("%s","Loading plugins");

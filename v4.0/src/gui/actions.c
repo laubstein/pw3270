@@ -732,20 +732,7 @@
 	for(f=0;f < ACTION_GROUP_MAX; f++)
 		gtk_ui_manager_insert_action_group(ui_manager,action_group[f], 0);
 
-	if(program_data)
-	{
-		path = g_build_filename(program_data,"ui",NULL);
-	}
-	else
-	{
-#if defined(_WIN32)
-		path = g_build_filename(".","ui",NULL);
-#elif defined( DATAROOTDIR )
-		path = g_build_filename(DATAROOTDIR,PACKAGE_NAME,"ui",NULL);
-#else
-		path = g_build_filename(".","ui",NULL);
-#endif
-	}
+	path = g_build_filename(program_data,"ui",NULL);
 
     dir = g_dir_open(path,0,NULL);
 

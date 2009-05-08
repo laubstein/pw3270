@@ -343,56 +343,6 @@
 	}
  }
 
-static int filetest(const gchar *filename)
-{
-	Trace("Searching for %s (%d)",filename,(int) g_file_test(filename,G_FILE_TEST_IS_REGULAR));
-	return g_file_test(filename,G_FILE_TEST_IS_REGULAR);
-}
-
-gchar * FindSystemConfigFile(const gchar *name)
-{
-	const gchar * const	*list =  g_get_system_config_dirs();
- 	gchar					*filename;
- 	int						f;
-
-	if(program_data)
-	{
-		filename = g_build_filename(program_data,name,NULL);
-		if(filetest(filename))
-			return filename;
-		g_free(filename);
-	}
-
-#ifdef DATAROOTDIR
-	filename = g_build_filename(DATAROOTDIR,PACKAGE_NAME,name,NULL);
-	if(filetest(filename))
-		return filename;
-	g_free(filename);
-#endif
-
-	// Search for the file in gtk's system config path
- 	for(f=0;list[f];f++)
- 	{
-		filename = g_build_filename(list[f],PACKAGE_NAME,name,NULL);
-		if(filetest(filename))
-			return filename;
-		g_free(filename);
- 	}
-
-	// Check if the file is available in current directory
-	if(filetest(name))
-		return g_strdup(name);
-
-#ifdef DEBUG
-	filename = g_build_filename(G_DIR_SEPARATOR_S,"usr","share",PACKAGE_NAME,name,NULL);
-	if(filetest(filename))
-		return filename;
-	g_free(filename);
-#endif
-
-	return 0;
-}
-
 GKeyFile *GetConf(void)
 {
 	if(!program_config)

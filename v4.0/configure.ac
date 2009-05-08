@@ -191,7 +191,7 @@ AC_ARG_WITH([logo],
 	AC_DEFINE_UNQUOTED(PROGRAM_LOGO,"$pw3270_cv_logo")
 
 ],[
-	pw3270_cv_logo="image/default.jpg"
+	pw3270_cv_logo="image/default.png"
 ])
 
 AC_ARG_WITH([release],
