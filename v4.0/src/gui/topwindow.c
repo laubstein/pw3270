@@ -186,25 +186,19 @@
 
  GdkPixbuf * LoadLogo(void)
  {
- 	static const gchar *ext[] = { "png", "gif", "jpg", "ico" };
 	GdkPixbuf	*pix = NULL;
 	gchar		*filename;
-	int			f;
 
 	if(program_logo && g_file_test(program_logo,G_FILE_TEST_IS_REGULAR))
 		return gdk_pixbuf_new_from_file(program_logo,NULL);
 
+	filename = g_strdup_printf("%s%c%s.%s", program_data, G_DIR_SEPARATOR, PROGRAM_NAME, LOGOEXT);
 
-	for(f=0;f<G_N_ELEMENTS(ext) && !pix;f++)
-	{
-		filename = g_strdup_printf("%s%c%s.%s", program_data, G_DIR_SEPARATOR, PROGRAM_NAME, ext[f]);
+	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+		pix = gdk_pixbuf_new_from_file(filename, NULL);
 
-		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
-			pix = gdk_pixbuf_new_from_file(filename, NULL);
-
-		Trace("pixbuf(%s): %p",filename,pix);
-		g_free(filename);
-	}
+	Trace("pixbuf(%s): %p",filename,pix);
+	g_free(filename);
 
 	return pix;
  }

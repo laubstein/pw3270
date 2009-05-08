@@ -371,8 +371,24 @@
 		"Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02111-1307 "
 		"USA" );
 
-	GdkPixbuf	*logo = LoadLogo();
+	GdkPixbuf	*logo = NULL;
+	gchar		*filename;
 
+	/* Load image logo */
+	if(program_logo && g_file_test(program_logo,G_FILE_TEST_IS_REGULAR))
+		 logo = gdk_pixbuf_new_from_file(program_logo,NULL);
+
+	if(!logo)
+	{
+		filename = g_strdup_printf("%s%c%s.%s", program_data, G_DIR_SEPARATOR, PROGRAM_NAME, LOGOEXT);
+
+		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+			logo = gdk_pixbuf_new_from_file(filename, NULL);
+
+		g_free(filename);
+	}
+
+	/* Build and show about dialog */
  	gtk_show_about_dialog(	GTK_WINDOW(topwindow),
 #if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
 							"program-name",    		program_name,
