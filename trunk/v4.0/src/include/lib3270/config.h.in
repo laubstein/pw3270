@@ -77,8 +77,7 @@
 	#define TOGGLE_CURSOR_POS
 
 	/* Filenames */
-	/* #undef PROGRAM_ICON */
-	/* #undef PROGRAM_LOGO */
+	#undef LOGOEXT
 
 	/* Program name */
 	#undef PROGRAM_NAME
