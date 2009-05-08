@@ -81,12 +81,15 @@
 
  #include "calls.h"
 
-  int call_rexx(const gchar *prg, const gchar *arg)
+  int call_rexx(const gchar *filename, const gchar *arg)
  {
 	LONG      			return_code;                 	// interpreter return code
 	RXSTRING  			argv;           	          	// program argument string
 	RXSTRING  			retstr;                      	// program return value
+	RXSTRING			prg[2];							// Program data
 	SHORT     			rc		= 0;                   	// converted return code
+	GError				*error	= NULL;
+	gsize				sz;
 
 	if(script_state != SCRIPT_STATE_NONE)
 	{
@@ -117,27 +120,57 @@
 	Trace("%s","Running pending events");
 	RunPendingEvents(0);
 
-	Trace("Starting %s",prg);
+	/* Preload script file contents */
+	Trace("Loading %s",filename);
+
+	memset(prg,0,2*sizeof(RXSTRING));
+
+	if(!g_file_get_contents(filename, (gchar **) (&prg[0].strptr), &sz, &error))
+	{
+		gchar *name = g_path_get_basename(filename);
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_OK,
+													_(  "Can't load %s" ), name);
+
+		gtk_window_set_title(GTK_WINDOW(dialog), _( "File error" ) );
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s", error->message ? error->message : N_( "Unexpected error" ));
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+        g_free(name);
+
+		g_error_free(error);
+		return -1;
+	}
+
+	prg[0].strlength = strlen(prg[0].strptr);
 
 	return_code = RexxStart(	1,				// argument count
 								&argv,			// argument array
-								(char *) prg,	// REXX procedure name
-								NULL,			// use disk version
+								NULL,			// REXX procedure name
+								prg,			// program
 								PACKAGE_NAME,	// default address name
 								RXCOMMAND,		// calling as a subcommand
 								ExitArray,		// EXITs for this call
 								&rc,			// converted return code
 								&retstr);		// returned result
 
-	Trace("RexxStart(%s): %d",prg,(int) return_code);
+	Trace("RexxStart(%s): %d",filename,(int) return_code);
+
+	g_free(prg[0].strptr);
 
 	// process return value
 	Trace("Return value: \"%s\"",retstr.strptr);
 
+	if(RXSTRPTR(prg[1]))
+		RexxFreeMemory(RXSTRPTR(prg[1]));
+
 	if(RXSTRPTR(retstr))
 		RexxFreeMemory(RXSTRPTR(retstr));
 
-	Trace("Call of \"%s\" ends (rc=%d return_code=%d)",prg,rc,(int) return_code);
+	Trace("Call of \"%s\" ends (rc=%d return_code=%d)",filename,rc,(int) return_code);
 
 	// Check script state
 	if(script_state == SCRIPT_STATE_HALTED)
@@ -147,7 +180,7 @@
 	}
  	else if(rc)
  	{
-		gchar *name = g_path_get_basename(prg);
+		gchar *name = g_path_get_basename(filename);
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
@@ -163,7 +196,7 @@
  	}
  	else if(return_code)
  	{
-		gchar *name = g_path_get_basename(prg);
+		gchar *name = g_path_get_basename(filename);
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
