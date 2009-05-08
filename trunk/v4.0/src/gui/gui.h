@@ -307,7 +307,6 @@
 	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);
 	void			UpdateKeyboardState(guint state);
 	int				PrintText(const char *name, gchar *text);
-	gchar 			*FindSystemConfigFile(const gchar *name);
 	void 			RestoreWindowSize(const gchar *group, GtkWidget *widget);
 	void 			SaveWindowSize(const gchar *group, GtkWidget *widget);
 	int 			GetFunctionKey(GdkEventKey *event);

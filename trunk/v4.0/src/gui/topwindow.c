@@ -169,12 +169,7 @@
 
  static void LoadFontMenu(GtkWidget *widget, GtkWidget *menu_item)
  {
-	gchar	*filename	= NULL;
-	GError	*error		= NULL;
-	gchar	*text		= NULL;
 	gchar	*selected	= GetString("Terminal","Font","Courier");
-	gchar	**ln;
-
 
 	Trace("Selected font: \"%s\"",selected);
 
@@ -184,107 +179,34 @@
 		return;
 	}
 
-	filename = FindSystemConfigFile("fonts.conf");
-	if(!filename)
-	{
-		LoadSystemFonts(widget, menu_item, selected);
-		g_free(selected);
-		return;
-	}
-
-	if(!g_file_get_contents(filename,&text,NULL,&error))
-	{
-		Warning( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
-		g_error_free(error);
-		g_free(filename);
-		g_free(text);
-		g_free(selected);
-		return;
-	}
-
-	if(*filename)
-	{
-		ln = g_strsplit(text,"\n",0);
-
-		if(ln)
-		{
-		 	GtkWidget	*menu	= gtk_menu_new();
-		 	int 		f;
-		 	GSList 		*group	= NULL;
-
-		 	for(f=0;ln[f];f++)
-		 	{
-		 		ln[f] = g_strstrip(ln[f]);
-
-		 		if(*ln[f])
-		 		{
-		 			GtkWidget 	*item;
-		 			gchar		*arg	= g_strdup(ln[f]);
-		 			char		*ptr	= strchr(ln[f],',');
-
-		 			if(ptr)
-						*ptr = 0;
-
-					item = gtk_radio_menu_item_new_with_label(group,ln[f]);
-
-		 			// FIXME (perry#2#): the user_data isn't being freed!
-		 			group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
-					g_signal_connect(G_OBJECT(item),"toggled",G_CALLBACK(activate_font),arg);
-					gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
-
-					if(!strcmp(arg,selected))
-						gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),TRUE);
-		 		}
-		 	}
-
-			gtk_widget_show_all(menu);
-			gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item),menu);
-			g_strfreev(ln);
-		}
-
-	}
-
+	LoadSystemFonts(widget, menu_item, selected);
 	g_free(selected);
-	g_free(text);
-	g_free(filename);
+	return;
  }
 
  GdkPixbuf * LoadLogo(void)
  {
-	GdkPixbuf	*pix;
-	gchar 		*file;
+ 	static const gchar *ext[] = { "png", "gif", "jpg", "ico" };
+	GdkPixbuf	*pix = NULL;
+	gchar		*filename;
+	int			f;
 
 	if(program_logo && g_file_test(program_logo,G_FILE_TEST_IS_REGULAR))
 		return gdk_pixbuf_new_from_file(program_logo,NULL);
 
-	file = FindSystemConfigFile(PROGRAM_NAME ".png");
-	if(file)
+
+	for(f=0;f<G_N_ELEMENTS(ext) && !pix;f++)
 	{
-		Trace("Loading %s",file);
-		pix = gdk_pixbuf_new_from_file(file, NULL);
-		g_free(file);
-		return pix;
+		filename = g_strdup_printf("%s%c%s.%s", program_data, G_DIR_SEPARATOR, PROGRAM_NAME, ext[f]);
+
+		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+			pix = gdk_pixbuf_new_from_file(filename, NULL);
+
+		Trace("pixbuf(%s): %p",filename,pix);
+		g_free(filename);
 	}
 
-	file = FindSystemConfigFile(PROGRAM_NAME ".jpg");
-	if(file)
-	{
-		Trace("Loading %s",file);
-		pix = gdk_pixbuf_new_from_file(file, NULL);
-		g_free(file);
-		return pix;
-	}
-
-	file = FindSystemConfigFile(PROGRAM_NAME ".ico");
-	if(file)
-	{
-		Trace("Loading %s",file);
-		pix = gdk_pixbuf_new_from_file(file, NULL);
-		g_free(file);
-		return pix;
-	}
-
-	return NULL;
+	return pix;
  }
 
 #ifdef USE_PRIMARY_SELECTION

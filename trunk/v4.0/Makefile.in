@@ -106,10 +106,10 @@ REXX_PLG_SRC =		plg_start.c gui.c dialogs.c actions.c
 ####################################################################################################
 
 Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
-		src/gui/$(PACKAGE).@LOGOEXT@ \
+		$(PACKAGE).@LOGOEXT@ \
 		$(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN)$(DLLEXT)) \
 		$(foreach BIN, $(EXTENSIONS), bin/Release/$(BIN)$(DLLEXT))
-	@install --mode=644 src/gui/$(PACKAGE).@LOGOEXT@ bin/Release/$(PACKAGE).@LOGOEXT@
+	@install --mode=644 $(PACKAGE).@LOGOEXT@ bin/Release/$(PACKAGE).@LOGOEXT@
 	@msgfmt -c -v -o bin/Release/pt_BR.mo po/pt_BR.po
 	@rm -f bin/Release/gtk-runtime
 	@if [ -d "@GTKRUNTIME@" ]; then ln -s "@GTKRUNTIME@" bin/Release/gtk-runtime ;fi
@@ -117,13 +117,13 @@ Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
 
 Debug:		$(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) \
 		$(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) \
-		src/gui/$(PACKAGE).@LOGOEXT@
+		$(PACKAGE).@LOGOEXT@
 
-run: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) src/gui/$(PACKAGE).@LOGOEXT@
+run: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(PACKAGE).@LOGOEXT@
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
 	@cd bin/Debug ; LD_LIBRARY_PATH=. ./@PROGRAM_NAME@ --program-data="../../"
 
-memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) src/gui/$(PACKAGE).@LOGOEXT@
+memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(PACKAGE).@LOGOEXT@
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
 	@cd bin/Debug ; LD_LIBRARY_PATH=. valgrind --leak-check=full ./@PROGRAM_NAME@ --program-data="../../"
 
@@ -151,9 +151,9 @@ obj/Debug/src/gui/%.o: src/gui/%.c src/gui/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(APP_CFLAGS) $(GUI_CFLAGS) -o $@ -c $<
 
-obj/Debug/src/gui/resources.o: src/gui/resources.rc src/gui/$(PACKAGE).ico Makefile
+obj/Debug/src/gui/resources.o: src/gui/resources.rc $(PACKAGE).ico Makefile
 	@echo $< ...
-	@$(WINDRES) --include-dir=src/gui -i $< -o $@
+	@$(WINDRES) --include-dir=. -i $< -o $@
 
 obj/Debug/version.o: src/version.c
 	@echo $< ...
@@ -174,7 +174,7 @@ obj/Release/src/gui/%.o: src/gui/%.c src/gui/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) $(APP_CFLAGS) $(GUI_CFLAGS) -o $@ -c $<
 
-obj/Release/src/gui/resources.o: src/gui/resources.rc src/gui/$(PACKAGE).ico Makefile
+obj/Release/src/gui/resources.o: src/gui/resources.rc $(PACKAGE).ico Makefile
 	@echo $< ...
 	@$(WINDRES) --include-dir=src/gui -i $< -o $@
 
@@ -259,10 +259,10 @@ bin/Release/librx3270$(DLLEXT): 		bin/Release/lib3270$(DLLEXT) \
 # Misc Targets
 ####################################################################################################
 
-src/gui/$(PACKAGE).ico: @ICONFILE@
+$(PACKAGE).ico: @ICONFILE@
 	@cp @ICONFILE@ $@
 
-src/gui/$(PACKAGE).@LOGOEXT@: @LOGOFILE@
+$(PACKAGE).@LOGOEXT@: @LOGOFILE@
 	@convert @LOGOFILE@ $@
 
 src/lib/fallbacks.c:  src/lib/X3270.xad
@@ -298,7 +298,7 @@ install: Release po/pt_BR.po
 	@install --mode=755 bin/Release/lib3270.so $(DESTDIR)/$(LIBDIR)
 	@install --mode=644 ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/default.act $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
-	@install --mode=644 src/gui/$(PACKAGE).@LOGOEXT@ $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 $(PACKAGE).@LOGOEXT@ $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 src/gui/colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
 
@@ -353,8 +353,8 @@ clean:
 	@rm -f *.lnk
 	@rm -fr locale
 	@rm -f *.nsi
-	@rm -f src/gui/$(PACKAGE).ico
-	@rm -f src/gui/$(PACKAGE).@LOGOEXT@
+	@rm -f $(PACKAGE).ico
+	@rm -f $(PACKAGE).@LOGOEXT@
 
 	@if [ -e src/plugins/rexx/Makefile ]; then make -C src/plugins/rexx clean; fi
 	@if [ -e src/extensions/uno/Makefile ]; then make -C src/extensions/uno clean; fi

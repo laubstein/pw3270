@@ -150,7 +150,7 @@
 		scan_for_plugins(path);
 		g_free(path);
 #elif defined(_WIN32)
-		path = g_build_filename(".","plugins",NULL);
+		path = g_build_filename(program_data,"plugins",NULL);
 		scan_for_plugins(path);
 		g_free(path);
 #elif defined( LIBDIR )
@@ -158,7 +158,7 @@
 		scan_for_plugins(path);
 		g_free(path);
 #else
-		path = g_build_filename(".","plugins",NULL);
+		path = g_build_filename(program_data,"plugins",NULL);
 		scan_for_plugins(path);
 		g_free(path);
 #endif
@@ -520,20 +520,7 @@ gboolean StartPlugins(const gchar *startup_script)
 
 #endif
 
-	if(program_data)
-	{
-		path = g_build_filename(program_data,"ui",NULL);
-	}
-	else
-	{
-#if defined(_WIN32)
-		path = g_build_filename(".","ui",NULL);
-#elif defined( DATAROOTDIR )
-		path = g_build_filename(DATAROOTDIR,PACKAGE_NAME,"ui",NULL);
-#else
-		path = g_build_filename(".","ui",NULL);
-#endif
-	}
+	path = g_build_filename(program_data,"ui",NULL);
 
 	scan_for_actions(path,groups);
 	g_free(path);
