@@ -115,15 +115,19 @@
 		while(remaining > 0 && addr < max)
 		{
 			screen_read(buffer, addr, 1);
-			if(*buffer != *str)
+			if(*buffer != *str || *str == '\n')
 			{
 				// Changed, move and insert
 				cursor_set_addr(addr);
 				if(emulate_input(str,1,True) < 0)
 					remaining = 0;
+				addr = cursor_get_addr();
+			}
+			else
+			{
+				addr++;
 			}
 			remaining--;
-			addr++;
 			str++;
 		}
 
@@ -150,20 +154,35 @@
 
  static void process_text_received(const gchar *text)
  {
- 	gchar *buffer;
- 	gchar *ptr;
+ 	gchar 	*buffer;
+ 	gchar 	*ptr;
+ 	GError	*error = NULL;
 
  	if(!text)
 		return;
 
-	buffer = g_convert(text, -1, CHARSET, "UTF-8", NULL, NULL, NULL);
+	buffer = g_convert(text, -1, CHARSET, "UTF-8", NULL, NULL, &error);
 
     if(!buffer)
     {
-    	// TODO (perry#3#): Notify user!
-        Warning( N_( "Can't convert clipboard string to charset %s" ),CHARSET);
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_OK,
+													_(  "Can't convert clipboard charset to %s" ), CHARSET);
+
+		gtk_window_set_title(GTK_WINDOW(dialog), _( "Charset error" ) );
+		if(error)
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s", error->message ? error->message : N_( "Unexpected error" ));
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+
         return;
     }
+
+	if(error)
+		g_error_free(error);
 
     /* Remove TABS */
     for(ptr = buffer;*ptr;ptr++)
@@ -171,6 +190,8 @@
 		if(*ptr == '\t')
 			*ptr = ' ';
     }
+
+	Trace("Received text:\n%s\n",buffer);
 
 	paste_string(buffer);
 	g_free(buffer);

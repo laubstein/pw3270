@@ -59,9 +59,6 @@
  	#define STATUS_CODE_DESCRIPTION(x,c,y) { c, y }
  #endif
 
- #define GET_CACHED_GC(x) ((GdkGC *) g_object_get_data(G_OBJECT(x),"CachedGC"))
-
-
  struct status_code
  {
 #ifdef DEBUG
@@ -186,6 +183,17 @@
  		compose = c;
 	else
 		compose = 0;
+ }
+
+ static GdkGC * getCachedGC(GdkDrawable *draw)
+ {
+ 	GdkGC *gc = ((GdkGC *) g_object_get_data(G_OBJECT(draw),"CachedGC"));
+ 	if(gc)
+		return gc;
+
+	gc = gdk_gc_new(draw);
+	g_object_set_data_full(G_OBJECT(pix),"CachedGC",gc,g_object_unref);
+	return gc;
  }
 
  static int SetSuspended(int state)
@@ -428,7 +436,7 @@
 
 	if(pixmap && terminal)
 	{
-		gc = GET_CACHED_GC(pixmap);
+		gc = getCachedGC(pixmap);
 		gdk_drawable_get_size(pixmap,&width,&height);
 		gdk_gc_set_foreground(gc,color);
 		gdk_draw_rectangle(pixmap,gc,1,0,0,width,height);
@@ -546,17 +554,7 @@
 	if(!draw)
 		return;
 
-	gc = GET_CACHED_GC(draw);
-
-#ifdef DEBUG
-
-	if(!GDK_IS_GC(gc))
-	{
-		Trace("Invalid GC for pixmap %p: %p",draw,gc);
-		exit(-1);
-	}
-
-#endif
+	gc = getCachedGC(draw);
 
 	gdk_gc_set_foreground(gc,bg);
 	gdk_draw_rectangle(draw,gc,1,left_margin,row,width,fontHeight+1);
@@ -797,7 +795,7 @@
 			set_cursor(CURSOR_MODE_NORMAL);
 
 		if(pixmap)
-			DrawStatus(GET_CACHED_GC(pixmap), color, pixmap);
+			DrawStatus(getCachedGC(pixmap), color, pixmap);
 
 		if(terminal)
 			gtk_widget_queue_draw_area(terminal,left_margin+(fontWidth << 3),OIAROW,fontWidth << 4,fontHeight+1);
@@ -933,38 +931,38 @@
 
  gchar * GetScreenContents(gboolean all)
  {
- 	gchar 	*buffer;
  	gsize	max = terminal_rows*terminal_cols*MAX_CHR_LENGTH;
+ 	GString	*str = g_string_sized_new(max);
  	int		row,col;
  	int		pos	= 0;
 
-	buffer = g_malloc(max);
-	*buffer = 0;
 	for(row = 0; row < terminal_rows;row++)
 	{
-		gchar		line[terminal_cols*MAX_CHR_LENGTH];
-		gboolean 	sel = FALSE;
+		gchar		line[max];
 
 		*line = 0;
 		for(col = 0; col < terminal_cols;col++)
 		{
 			if(all || (screen[pos].status & ELEMENT_STATUS_SELECTED))
 			{
-				sel = TRUE;
+				if(!*line)
+				{
+					if(*str->str)
+						g_string_append_c(str,'\n');
+				}
 				g_strlcat(line,*screen[pos].ch ? screen[pos].ch : " ",max);
 			}
 			pos++;
 		}
-		if(sel)
-		{
-			g_strlcat(buffer,g_strchomp(line),max);
-			g_strlcat(buffer,"\n",max);
-		}
+
+		if(*line)
+			g_string_append(str,g_strchomp(line));
 
 	}
 
-	g_strchomp(buffer);
-	return g_realloc(buffer,strlen(buffer)+1);
+	Trace("Screen-read:\n%s<---\n",str->str);
+
+	return g_string_free(str,FALSE);
  }
 
  static void warning(const char *fmt, va_list arg)
