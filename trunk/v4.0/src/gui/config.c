@@ -34,6 +34,7 @@
  #include <lib3270/config.h>
  #include "gui.h"
  #include <ctype.h>
+ #include <sys/stat.h>
  #include <string.h>
  #include <lib3270/toggle.h>
 
@@ -68,85 +69,32 @@
  static gchar * FindConfigFile(void)
  {
 // 	static const gchar 	*name = program_config_file;
-	const gchar * const	*list;
  	gchar					*filename;
- 	const gchar			*fixed[] = { g_get_user_config_dir(), g_get_home_dir()  };
- 	int						f;
 
 	// Check for pre-defined name
 	if(program_config_filename_and_path)
 		return program_config_filename_and_path;
 
-	/*
-	 * Search for user's configuration file.
-	 */
+	// Search for user's configuration file.
 	filename = g_build_filename( g_get_user_config_dir(),program_config_file,NULL );
+	Trace("Checking for %s",filename);
 	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
-	{
-		program_config_filename_and_path = filename;
-		return filename;
-	}
+		return program_config_filename_and_path = filename;
 	g_free(filename);
 
-	filename = g_build_filename( g_get_user_config_dir(),PROGRAM_NAME,program_config_file,NULL );
+	filename = g_strdup_printf("%s%c.%s", g_get_home_dir(), G_DIR_SEPARATOR, program_config_file);
+	Trace("Checking for %s",filename);
 	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
-	{
-		program_config_filename_and_path = filename;
-		return filename;
-	}
+		return program_config_filename_and_path = filename;
 	g_free(filename);
 
 
-	filename = g_build_filename( g_get_user_config_dir(),PACKAGE_NAME,program_config_file,NULL );
+	// Can't find user's configuration file, check program_data for default one
+	filename = g_build_filename(program_data, program_config_file,NULL);
 	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
-	{
-		program_config_filename_and_path = filename;
-		return filename;
-	}
+		return program_config_filename_and_path = filename;
 	g_free(filename);
 
-	/*
-	 * Can't find user's configuration file, check program_data for default one
-	 */
-	if(program_data)
-	{
-		filename = g_build_filename(program_data, program_config_file,NULL);
-		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
-		{
-			program_config_filename_and_path = filename;
-			return filename;
-		}
-		g_free(filename);
-	}
-
-
-	/*
-	 * Can't find user's configuration file, search on system paths
-	 */
-	for(f=0; f < (sizeof(fixed)/sizeof(const gchar *)); f++)
-	{
-		CHECK_FILENAME(fixed[f],program_config_file);
-		CHECK_FILENAME(fixed[f],PROGRAM_NAME,program_config_file);
-		CHECK_FILENAME(fixed[f],PACKAGE_NAME,program_config_file);
-	}
-
-	// Search system config path
-	list =  g_get_system_config_dirs();
- 	for(f=0;list[f];f++)
- 	{
-		CHECK_FILENAME(list[f],PROGRAM_NAME,program_config_file);
-		CHECK_FILENAME(list[f],PACKAGE_NAME,program_config_file);
- 	}
-
-#ifdef DATAROOTDIR
-	// Search DATADIR
-	CHECK_FILENAME(DATAROOTDIR,PROGRAM_NAME,program_config_file);
-	CHECK_FILENAME(DATAROOTDIR,PACKAGE_NAME,program_config_file);
-#endif
-
-	// Check if the file is available in current directory
-	if(g_file_test(program_config_file,G_FILE_TEST_IS_REGULAR))
-		return g_strdup(program_config_file);
 
 	return 0;
  }
@@ -218,24 +166,77 @@
 
 		for(buffer = ptr;*ptr && isspace(*ptr);ptr++);
 
+		// Try pre-defined file
 		if(program_config_filename_and_path)
 		{
-			// Save on fixed file
-			g_file_set_contents(program_config_filename_and_path,ptr,-1,NULL);
-		}
-		else
-		{
-			// Save the buffer contents
-			filename = g_build_filename( g_get_user_config_dir(), program_config_file, NULL);
-			Trace("Saving %s...",filename);
-			g_file_set_contents(filename,ptr,-1,NULL);
-			g_free(filename);
+			if(g_file_set_contents(program_config_filename_and_path,ptr,-1,NULL))
+			{
+				Trace("Configuration data saved on %s",program_config_filename_and_path);
+				g_free(buffer);
+				return 0;
+			}
 		}
 
-		// Release buffer
+		g_free(program_config_filename_and_path);
+		program_config_filename_and_path = NULL;
+
+		// Try user configuration dir
+		filename = g_build_filename( g_get_user_config_dir(), program_config_file, NULL);
+		if(g_file_set_contents(filename,ptr,-1,NULL))
+		{
+			program_config_filename_and_path = filename;
+			Trace("Configuration data saved on %s",program_config_filename_and_path);
+			g_free(buffer);
+			return 0;
+		}
+
+#ifndef WIN32
+		Trace("Creating %s",g_get_user_config_dir());
+		g_mkdir_with_parents(g_get_user_config_dir(),S_IRUSR|S_IWUSR);
+		if(g_file_set_contents(filename,ptr,-1,NULL))
+		{
+			program_config_filename_and_path = filename;
+			Trace("Configuration data saved on %s",program_config_filename_and_path);
+			g_free(buffer);
+			return 0;
+		}
+#endif
+		g_free(filename);
+
+		// Try user home dir
+		filename = g_strdup_printf("%s%c.%s", g_get_home_dir(), G_DIR_SEPARATOR, program_config_file);
+		if(g_file_set_contents(filename,ptr,-1,NULL))
+		{
+			program_config_filename_and_path = filename;
+			Trace("Configuration data saved on %s",program_config_filename_and_path);
+			g_free(buffer);
+			return 0;
+		}
+		g_free(filename);
+
 		g_free(buffer);
+
+		Trace("Can't save, showing error dialog (topwindow: %p program_config_file: %p)",topwindow,program_config_file);
+
+		if(topwindow)
+		{
+			GtkWidget *dialog;
+
+			// Can't save configuration data, notify user
+			dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+												GTK_DIALOG_DESTROY_WITH_PARENT,
+												GTK_MESSAGE_ERROR,
+												GTK_BUTTONS_OK,
+												_(  "Can't save %s" ), program_config_file);
+
+			gtk_window_set_title(GTK_WINDOW(dialog), _( "Error saving file" ) );
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), _( "Unable to save configuration data in %s" ), g_get_user_config_dir());
+
+			gtk_dialog_run(GTK_DIALOG (dialog));
+			gtk_widget_destroy(dialog);
+		}
 	}
-	return 0;
+	return -1;
  }
 
  int CloseConfigFile(void)

@@ -289,6 +289,9 @@
 
  static void destroy( GtkWidget *widget, gpointer data)
  {
+ 	Trace("%s","Destroying terminal");
+ 	terminal = NULL;
+
 	if(pixmap)
 	{
 		gdk_pixmap_unref(pixmap);
@@ -306,6 +309,8 @@
 		pango_font_description_free(font_descr);
 		font_descr = NULL;
  	}
+
+ 	Trace("%s","Terminal destroyed");
 
  }
 

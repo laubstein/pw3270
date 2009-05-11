@@ -55,15 +55,19 @@
 
  static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer data )
  {
+ 	Trace("%s","Destroying top-window");
  	action_Save();
  	gtk_main_quit();
+ 	Trace("%s","Ok");
     return FALSE;
  }
 
  static void destroy( GtkWidget *widget, gpointer   data )
  {
+ 	Trace("%s","Destroying top-window");
  	topwindow = NULL;
 	program_quit();
+ 	Trace("%s","Ok");
  }
 
  static void set_widget_flags(GtkWidget *widget, gpointer data)

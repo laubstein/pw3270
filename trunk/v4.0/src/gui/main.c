@@ -597,7 +597,10 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
+	Trace("%s","Unloading");
 	UnloadPlugins();
+
+	Trace("%s","Releasing config");
 	CloseConfigFile();
 
 	Trace("%s finished (rc=%d)",argv[0],rc);
