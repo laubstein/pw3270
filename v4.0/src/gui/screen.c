@@ -411,7 +411,7 @@
 	int			height;
 	int			f;
 
-	Trace("Erasing screen! (pixmap: %p screen: %p)",pixmap,screen);
+	Trace("Erasing screen! (pixmap: %p screen: %p terminal: %p)",pixmap,screen,terminal);
 
 	if(screen)
 	{
@@ -426,7 +426,7 @@
 		}
 	}
 
-	if(pixmap)
+	if(pixmap && terminal)
 	{
 		gc = GET_CACHED_GC(pixmap);
 		gdk_drawable_get_size(pixmap,&width,&height);
