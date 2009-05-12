@@ -115,7 +115,7 @@
 		while(remaining > 0 && addr < max)
 		{
 			screen_read(buffer, addr, 1);
-			if(*buffer != *str || *str == '\n')
+			if(*buffer != *str)
 			{
 				// Changed, move and insert
 				cursor_set_addr(addr);

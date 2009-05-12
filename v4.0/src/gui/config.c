@@ -160,6 +160,8 @@
 
  	ptr = g_key_file_to_data(program_config,NULL,NULL);
 
+	Trace("Configuration data: %p",ptr);
+
 	if(ptr)
 	{
 		gchar *buffer;

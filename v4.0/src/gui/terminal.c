@@ -94,7 +94,6 @@
  static GdkPixmap * GetPixmap(GtkWidget *widget)
  {
 	GdkPixmap	*pix;
-	GdkGC		*gc;
 
 	if(!widget->window)
 		return NULL;
@@ -105,8 +104,7 @@
 
 	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
 
-	gc = gdk_gc_new(pix);
-	g_object_set_data_full(G_OBJECT(pix),"CachedGC",gc,g_object_unref);
+	getCachedGC(pix);
 
 	DrawScreen(color, pix);
 	DrawOIA(pix,color);
@@ -117,7 +115,12 @@
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
-	GdkGC *gc = gdk_gc_new(widget->window);
+	GdkGC *gc;
+
+	if(!widget->window)
+		return 0;
+
+	gc = getCachedGC(widget->window);
 
     if(!pixmap)
 		pixmap = GetPixmap(widget); // No pixmap, get a new one
@@ -152,7 +155,6 @@
 		}
 	}
 
-	gdk_gc_destroy(gc);
 	return 0;
  }
 
@@ -263,7 +265,7 @@
 
 	/* Font size hasn't changed, rebuild pixmap using the saved image */
 	pix = gdk_pixmap_new(widget->window,sWidth = width,sHeight = height,-1);
-	gc = gdk_gc_new(pix);
+	gc = getCachedGC(pix);
 
 	gdk_gc_set_foreground(gc,color);
 	gdk_draw_rectangle(pix,gc,1,0,0,width,height);
@@ -272,8 +274,6 @@
 								left,top,
 								left_margin,top_margin,
 								(terminal_cols * fsize[lFont].width),OIAROW+1+fsize[lFont].height);
-
-	gdk_gc_destroy(gc);
 
 	/* Set the new pixmap */
 	gdk_pixmap_unref(pixmap);
@@ -575,15 +575,20 @@
 
  void DrawCursorPosition(void)
  {
-	GdkGC 		*gc		= gdk_gc_new(terminal->window);
+	GdkGC 		*gc;
 	PangoLayout *layout;
 	int			x		= left_margin+(fontWidth*(terminal_cols-7));
 	char		buffer[10];
 
+	if(!pixmap)
+		return;
+
+	gc = getCachedGC(pixmap);
+
 	gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
 	gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fontWidth*7,fontHeight);
 
-	layout = gtk_widget_create_pango_layout(terminal,"4");
+	layout = getPangoLayout();
 
 	sprintf(buffer,"%03d/%03d",cRow+1,cCol+1);
 	pango_layout_set_text(layout,buffer,-1);
@@ -593,8 +598,6 @@
 						layout,
 						color+TERMINAL_COLOR_OIA_CURSOR,color+TERMINAL_COLOR_OIA_BACKGROUND);
 
-	g_object_unref(layout);
-	gdk_gc_destroy(gc);
 	gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fontWidth*7,fontHeight);
 
  }
@@ -610,13 +613,12 @@
 	}
 	else
 	{
-		GdkGC *gc	= gdk_gc_new(terminal->window);
+		GdkGC *gc	= getCachedGC(terminal->window);
 		int   x		= left_margin+(fontWidth*(terminal_cols-7));
 
 		gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
 		gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fontWidth*7,fontHeight);
 
-		gdk_gc_destroy(gc);
 		gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fontWidth*7,fontHeight);
 
 	}

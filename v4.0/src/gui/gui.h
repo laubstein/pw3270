@@ -312,6 +312,7 @@
 	int 			GetFunctionKey(GdkEventKey *event);
 	int 			wait4negotiations(const char *cl_hostname);
 	GdkPixbuf 		*LoadLogo(void);
+	GdkGC 			*getCachedGC(GdkDrawable *draw);
 
 	void			FontChanged(void);
 
