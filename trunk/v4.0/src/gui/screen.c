@@ -185,14 +185,23 @@
 		compose = 0;
  }
 
- static GdkGC * getCachedGC(GdkDrawable *draw)
+ GdkGC * getCachedGC(GdkDrawable *draw)
  {
- 	GdkGC *gc = ((GdkGC *) g_object_get_data(G_OBJECT(draw),"CachedGC"));
+ 	GdkGC *gc;
+
+#ifdef DEBUG
+	if(!draw)
+	{
+		Trace("Error: Called %s with null object",__FUNCTION__);
+	}
+#endif
+
+ 	gc = ((GdkGC *) g_object_get_data(G_OBJECT(draw),"CachedGC"));
  	if(gc)
 		return gc;
 
 	gc = gdk_gc_new(draw);
-	g_object_set_data_full(G_OBJECT(pix),"CachedGC",gc,g_object_unref);
+	g_object_set_data_full(G_OBJECT(draw),"CachedGC",gc,g_object_unref);
 	return gc;
  }
 
@@ -465,9 +474,10 @@
 
  }
 
- static void DrawStatus(GdkGC *gc, GdkColor *clr, GdkDrawable *draw)
+ static void DrawStatus(GdkDrawable *draw, GdkColor *clr)
  {
  	PangoLayout *layout = getPangoLayout();
+	GdkGC 		*gc = getCachedGC(draw);
 
  	int col = left_margin+(fontWidth << 3);
 
@@ -609,7 +619,7 @@
 	}
 
 	// 8...       message area
-	DrawStatus(gc, clr, draw);
+	DrawStatus(draw, clr);
 
 	memset(str,' ',10);
 
@@ -795,7 +805,7 @@
 			set_cursor(CURSOR_MODE_NORMAL);
 
 		if(pixmap)
-			DrawStatus(getCachedGC(pixmap), color, pixmap);
+			DrawStatus(pixmap, color);
 
 		if(terminal)
 			gtk_widget_queue_draw_area(terminal,left_margin+(fontWidth << 3),OIAROW,fontWidth << 4,fontHeight+1);
