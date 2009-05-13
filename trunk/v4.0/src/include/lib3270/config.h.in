@@ -73,8 +73,8 @@
 	#undef USE_SELECTIONS
 
 	/* Default toggles */
-	#define TOGGLE_RECTANGLE_SELECT
-	#define TOGGLE_CURSOR_POS
+	#define DEFAULT_TOGGLE_RECTANGLE_SELECT
+	#define DEFAULT_TOGGLE_CURSOR_POS
 
 	/* Filenames */
 	#undef LOGOEXT

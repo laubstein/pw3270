@@ -86,15 +86,15 @@ endif
 # Sources
 ####################################################################################################
 
-APP_SRCS =		main.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
+APP_SRCS =	main.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
 			clipboard.c print.c config.c colors.c keypad.c plugin.c filetransfer.c \
 			version.c draw.c @OS_APPSRCS@
 
-API_SRCS = 		XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
+API_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 			ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c idle.c kybd.c \
 			macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
 			sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
-			xio.c keymap.c resolver.c log.c @OS_APISRCS@
+			xio.c keymap.c resolver.c log.c paste.c @OS_APISRCS@
 
 REXX_COMMON_SRC =	common_start.c screen.c toggle.c tools.c init.c network.c
 REXX_STD_SRC =		std_start.c

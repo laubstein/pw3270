@@ -33,6 +33,7 @@
  #include "gui.h"
  #include <globals.h>
  #include <lib3270/kybdc.h>
+ #include <lib3270/toggle.h>
  #include <string.h>
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
@@ -92,7 +93,7 @@
 
  static void paste_string(gchar *str)
  {
- 	int			remaining = -1;
+ 	int			sz;
  	gchar		*saved;
 
  	if(!str)
@@ -102,47 +103,31 @@
 		return;
  	}
 
-	screen_suspend();
-
-	if(TOGGLED_SMART_PASTE)
+	sz = lib3270_paste_string((unsigned char *) str);
+	Trace("Paste returned %d (string has %d bytes)",sz,strlen(str));
+	if(sz < 1)
 	{
-		int 	addr = cursor_get_addr();
-		int		max  = ((terminal_rows-1)*terminal_cols);
-		char	buffer[2];
-
-		remaining = strlen(str);
-
-		while(remaining > 0 && addr < max)
-		{
-			screen_read(buffer, addr, 1);
-			if(*buffer != *str)
-			{
-				// Changed, move and insert
-				cursor_set_addr(addr);
-				if(emulate_input(str,1,True) < 0)
-					remaining = 0;
-				addr = cursor_get_addr();
-			}
-			else
-			{
-				addr++;
-			}
-			remaining--;
-			str++;
-		}
-
-	}
-	else
-	{
-		Trace("Paste buffer:\n%s",str);
-		remaining = emulate_input(str,-1,True);
+		#warning Paste failed - notify user
+		return;
 	}
 
 	saved = clipboard_data;
-    if(remaining > 0)
-		clipboard_data = g_strdup(str+(strlen(str)-(remaining+1)));
+
+	if(*(str+sz))
+		clipboard_data = g_strdup(str+sz);
 	else
 		clipboard_data = NULL;
+
+#ifdef DEBUG
+	if(clipboard_data)
+	{
+		Trace("%d bytes remains on clipboard",strlen(clipboard_data));
+	}
+	else
+	{
+		Trace("%s","Clipboard is empty");
+	}
+#endif
 
 	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"PasteNext"),clipboard_data != NULL);
 

@@ -37,6 +37,8 @@ extern unsigned int kybdlock;
 #define KL_SCROLLED		0x0400
 #define KL_OIA_MINUS		0x0800
 
+void key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause, Boolean *skipped);
+
 /* actions */
 extern void AltCursor_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);

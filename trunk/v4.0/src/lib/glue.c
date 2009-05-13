@@ -145,7 +145,8 @@ const char *toggle_names[N_TOGGLES] =
 	"FullScreen",
 	"Reconnect",
 	"Insert",
-	"Keypad"
+	"Keypad",
+	"SmartPaste"
 };
 
 int lib3270_init(void)
