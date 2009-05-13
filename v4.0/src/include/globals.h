@@ -115,6 +115,16 @@ extern char *strtok_r(char *str, const char *sep, char **last);
 /* Stop conflicting with curses' COLS, even if we don't link with it. */
 #define COLS cCOLS
 
+
+/* types of internal actions */
+enum iaction {
+	IA_STRING, IA_PASTE, IA_REDRAW,
+	IA_KEYPAD, IA_DEFAULT, IA_KEY,
+	IA_MACRO, IA_SCRIPT, IA_PEEK,
+	IA_TYPEAHEAD, IA_FT, IA_COMMAND, IA_KEYMAP,
+	IA_IDLE
+};
+
 /* Simple global variables */
 
 extern int		COLS;

@@ -394,6 +394,7 @@
 		LIB3270_EXPORT void Input_String(const unsigned char *str);
 		LIB3270_EXPORT void screen_size(int *rows, int *cols);
 		LIB3270_EXPORT int query_secure_connection(void);
+		LIB3270_EXPORT int lib3270_paste_string(unsigned char *str);
 
         /* Misc calls */
 		LIB3270_EXPORT int Get3270Socket(void);

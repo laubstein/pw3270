@@ -56,6 +56,7 @@
 		RECONNECT,
 		INSERT,
 		KEYPAD,
+		SMART_PASTE,
 
 		N_TOGGLES
 	};

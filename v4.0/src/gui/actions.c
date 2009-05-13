@@ -85,7 +85,6 @@
  {
     { "Bold", 			N_( "Bold" ),			NULL,	NULL,	NULL	},
     { "KeepSelected", 	N_( "Keep selected" ),	NULL,	NULL,	NULL	},
-    { "SmartPaste",		N_( "Smart paste" ),	NULL,   NULL,   NULL    },
     { "Underline",		N_( "Underline" ),		NULL,   NULL,   NULL    }
  };
 
@@ -493,6 +492,8 @@
 		{ N_( "Auto-Reconnect" ),				NULL,	NULL,	NULL				},
 		{ N_( "Insert" ),						NULL,	NULL,	"Insert"			},
 		{ N_( "Keypad" ),						NULL,	NULL,	N_( "<alt>K" )		},
+		{ N_( "Smart paste" ),					NULL,   NULL,   NULL    			},
+
 	};
 
  	int f;
@@ -506,16 +507,21 @@
 	/* Internal toggles */
  	for(f=0;f< GUI_TOGGLE_COUNT;f++)
  	{
- 		char buffer[40];
+ 		gchar *name = g_strconcat("Toggle",gui_toggle_info[f].name,NULL);
 
- 		g_snprintf(buffer,29,"Toggle%s",gui_toggle_info[f].name);
-
-		GtkToggleAction *action = gtk_toggle_action_new(	buffer,
+#ifdef DEBUG
+		if(!gui_toggle_info[f].name)
+		{
+			Trace("No description for toggle %d",f);
+			exit(-1);
+		}
+#endif
+		GtkToggleAction *action = gtk_toggle_action_new(	name,
 															gettext(gui_toggle_info[f].label),
 															gettext(gui_toggle_info[f].tooltip),
 															gui_toggle_info[f].stock_id );
 
-		Trace("%s: %p",buffer,action);
+		Trace("%s: %p",name,action);
 
         gui_toggle[f] = GetBoolean("Toggles",gui_toggle_info[f].name,FALSE);
 
@@ -526,17 +532,24 @@
 			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(gui_toggle_info[f].accelerator));
 		else
 			gtk_action_group_add_action(actions,(GtkAction *) action);
+
+		g_free(name);
  	}
 
 	/* Toggle actions */
  	for(f=0;f<N_TOGGLES;f++)
  	{
- 		char buffer[21];
+ 		gchar *name = g_strconcat("Toggle",get_toggle_name(f),NULL);
 
-		strcpy(buffer,"Toggle");
-		strncat(buffer,get_toggle_name(f),20);
+#ifdef DEBUG
+		if(!toggle_info[f].label)
+		{
+			Trace("No description for toggle %d",f);
+			exit(-1);
+		}
+#endif
 
-		GtkToggleAction *action = gtk_toggle_action_new(	buffer,
+		GtkToggleAction *action = gtk_toggle_action_new(	name,
 															gettext(toggle_info[f].label),
 															gettext(toggle_info[f].tooltip),
 															toggle_info[f].stock_id );
@@ -547,21 +560,19 @@
 			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(toggle_info[f].accelerator));
 		else
 			gtk_action_group_add_action(actions,(GtkAction *) action);
+
+		g_free(name);
  	}
 
 	/* Set/Reset actions */
  	for(f=0;f< G_N_ELEMENTS(toggle_list);f++)
  	{
  		int		id = toggle_list[f].toggle;
- 		char	buffer[21];
+ 		gchar	*name = g_strconcat((toggle_list[f].set ? "Set" : "Reset" ),get_toggle_name(id),NULL);
 
- 		strcpy(buffer,toggle_list[f].set ? "Set" : "Reset" );
+		Trace("Creating action \"%s\"",name);
 
-		strncat(buffer,get_toggle_name(id),20);
-
-		Trace("Creating action \"%s\"",buffer);
-
-		GtkAction *action = gtk_action_new(	buffer,
+		GtkAction *action = gtk_action_new(	name,
 											gettext(toggle_list[f].label),
 											gettext(toggle_list[f].tooltip),
 											toggle_list[f].stock_id );
@@ -580,17 +591,12 @@
 		}
 
 		gtk_action_group_add_action(actions,action);
+
+		g_free(name);
  	}
 
 
  }
-
-/*
- static void call3270(GtkAction *action, int (*XtActionProc call)
- {
- 	action_internal(call, IA_DEFAULT, CN, CN);
- }
-*/
 
  static void Load3270Actions(GtkActionGroup *actions)
  {

@@ -196,11 +196,11 @@ initialize_toggles(void)
 		    TT_INITIAL);
 #endif /*]*/
 
-#if defined(TOGGLE_CURSOR_POS)
+#if defined(DEFAULT_TOGGLE_CURSOR_POS)
 	appres.toggle[CURSOR_POS].value = True;
 #endif /*]*/
 
-#if defined(TOGGLE_RECTANGLE_SELECT)
+#if defined(DEFAULT_TOGGLE_RECTANGLE_SELECT)
 	appres.toggle[RECTANGLE_SELECT].value = True;
 #endif
 

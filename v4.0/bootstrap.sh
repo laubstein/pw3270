@@ -1,5 +1,7 @@
 #!/bin/bash
 
+RELEASE=1
+
 svn update
 if [ "$?" == "0" ]; then
 
@@ -18,6 +20,7 @@ if [ "$?" == "0" ]; then
 
 	echo "m4_define([SVN_REV], $REV)" > $REV_FILE
 	echo "m4_define([SVN_DATE], $LCD)" >> $REV_FILE
+	echo "m4_define([SVN_RELEASE], $RELEASE)" >> $REV_FILE
 
 fi
 

@@ -17,14 +17,6 @@
  *		Global declarations for actions.c.
  */
 
-/* types of internal actions */
-enum iaction {
-	IA_STRING, IA_PASTE, IA_REDRAW,
-	IA_KEYPAD, IA_DEFAULT, IA_KEY,
-	IA_MACRO, IA_SCRIPT, IA_PEEK,
-	IA_TYPEAHEAD, IA_FT, IA_COMMAND, IA_KEYMAP,
-	IA_IDLE
-};
 extern enum iaction ia_cause;
 
 extern int              actioncount;
@@ -45,3 +37,5 @@ extern const char *action_name(XtActionProc action);
 extern int check_usage(XtActionProc action, Cardinal nargs, Cardinal nargs_min,
     Cardinal nargs_max);
 extern Boolean event_is_meta(int state);
+
+

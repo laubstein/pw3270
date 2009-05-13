@@ -523,6 +523,11 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/lib/objects.h" />
+		<Unit filename="src/lib/paste.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/lib/popupsc.h" />
 		<Unit filename="src/lib/print.c">
 			<Option compilerVar="CC" />
@@ -564,7 +569,6 @@
 		</Unit>
 		<Unit filename="src/lib/sfc.h" />
 		<Unit filename="src/lib/shlobj_missing.h" />
-		<Unit filename="src/lib/shortcutc.h" />
 		<Unit filename="src/lib/tables.c">
 			<Option compilerVar="CC" />
 		</Unit>

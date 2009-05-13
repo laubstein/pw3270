@@ -194,14 +194,6 @@ AC_ARG_WITH([logo],
 	pw3270_cv_logo="image/default.png"
 ])
 
-AC_ARG_WITH([release],
-	[AS_HELP_STRING([--with-release], [set program release])],
-[
-	pw3270_cv_release="$withval"
-],[
-	pw3270_cv_release="`date +%y%m%d`"
-])
-
 AC_ARG_WITH([gtk-runtime],
 	[AS_HELP_STRING([--with-gtk-runtime], [GTK runtime path (For windows installer)])],
 [
@@ -304,7 +296,10 @@ AC_DEFINE([X3270_PRINTER])
 
 AC_DEFINE(PACKAGE_REVISION,"SVN_REV")
 AC_SUBST(PACKAGE_REVISION, "SVN_REV")
-AC_SUBST(PACKAGE_RELEASE,$pw3270_cv_release)
+
+AC_DEFINE(PACKAGE_RELEASE,"SVN_RELEASE")
+AC_SUBST(PACKAGE_RELEASE, "SVN_RELEASE")
+
 AC_SUBST(ICONFILE,$pw3270_cv_icon)
 AC_SUBST(LOGOFILE,$pw3270_cv_logo)
 
