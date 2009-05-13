@@ -174,6 +174,9 @@ LIB3270_EXPORT int lib3270_paste_string(unsigned char *str)
 	int faddr;
 	unsigned char fa;
 
+	if(kybdlock)
+		return -EINVAL;
+
 	screen_suspend();
 
 	while(*str && last && !kybdlock && cursor_addr >= data.orig_addr)

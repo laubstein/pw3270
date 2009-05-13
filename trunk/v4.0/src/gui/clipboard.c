@@ -107,7 +107,18 @@
 	Trace("Paste returned %d (string has %d bytes)",sz,strlen(str));
 	if(sz < 1)
 	{
-		#warning Paste failed - notify user
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_OK,
+													"%s", _(  "Unable to paste clipboard string" ));
+
+		gtk_window_set_title(GTK_WINDOW(dialog), _( "Action failed" ) );
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s", sz == -EINVAL ? _( "Keyboard is locked" ) : _( "Unexpected error" ) );
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+
 		return;
 	}
 
