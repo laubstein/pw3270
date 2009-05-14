@@ -78,7 +78,7 @@
 	gdk_gc_set_foreground(gc,color);
 	gdk_draw_rectangle(draw,gc,1,0,0,width,height);
 
-	// FIXME (perry#1#): Find a faster way to draw text
+	// TODO (perry#1#): Find a faster way to draw text
 	y = top_margin;
 	for(row = 0; row < terminal_rows;row++)
 	{
@@ -163,28 +163,31 @@
 		gdk_draw_line(draw,gc,x+(fontWidth >> 1),y+(fontHeight >> 1),x+(fontWidth >> 1),y+fontHeight);
 		break;
 
-//		case 0xbf: // CG 0x15b, stile
-//			break;
+//	case 0xbf: // CG 0x15b, stile
+//		pango_layout_set_text(getPangoLayout(),"\u2352",-1);
+//		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
+//		break;
 
 	case 0x85: // CG 0x184, vertical line
+	case 0xbf:
 		x += (fontWidth >> 1);
 		gdk_draw_line(draw,gc,x,y,x,y+fontHeight);
 		break;
 
-//	case 0x8c: // CG 0xf7, less or equal
-//		pango_layout_set_text(layout,"≤",-1);
-//		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
-//		break;
+	case 0x8c: // CG 0xf7, less or equal
+		pango_layout_set_text(getPangoLayout(),"≤",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
+		break;
 
-//	case 0xae: // CG 0xd9, greater or equal
-//		pango_layout_set_text(layout,"≥",-1);
-//		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
-//		break;
+	case 0xae: // CG 0xd9, greater or equal
+		pango_layout_set_text(getPangoLayout(),"≥",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
+		break;
 
-//	case 0xbe: // CG 0x3e, not equal
-//		pango_layout_set_text(layout,"≠",-1);
-//		gdk_draw_layout_with_colors(draw,gc,x,y,layout,clr+fg,clr+bg);
-//		break;
+	case 0xbe: // CG 0x3e, not equal
+		pango_layout_set_text(getPangoLayout(),"≠",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
+		break;
 
 //	case 0xa3: // CG 0x93, bullet
 //		break;
@@ -200,6 +203,7 @@
 		break;
 
 	default:	// Unknown char, draw "?"
+		Trace("Unexpected extended char: %02x",el->extended);
 		pango_layout_set_text(getPangoLayout(),"?",-1);
 		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
 	}
