@@ -217,7 +217,7 @@
 
 #endif
 
-#ifdef USE_SELECTIONS
+#if defined( USE_SELECTIONS ) && !defined(WIN32)
 
  static void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
@@ -408,7 +408,7 @@
 	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"Reselect"),FALSE);
 	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"PasteNext"),FALSE);
 
-#ifdef USE_SELECTIONS
+#if defined( USE_SELECTIONS ) && !defined( WIN32 )
 
 	gtk_action_group_set_sensitive(paste_actions,FALSE);
 
