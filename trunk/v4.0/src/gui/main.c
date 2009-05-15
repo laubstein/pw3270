@@ -461,7 +461,7 @@ int main(int argc, char *argv[])
 
 #elif defined( DATAROOTDIR )
 
-		program_data = DATAROOTDIR;
+		program_data = DATAROOTDIR G_DIR_SEPARATOR_S PROGRAM_NAME;
 		g_chdir(program_data);
 
 #else
