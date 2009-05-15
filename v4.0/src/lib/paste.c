@@ -146,9 +146,10 @@
 
  	if(BA_TO_ROW(cursor_addr) != data->row)
  	{
- 		data->row++;
+ 		Trace("Row changed from %d to %d",data->row,BA_TO_ROW(cursor_addr));
 		if(!remargin(data->orig_col))
 			return 0;
+		data->row = BA_TO_ROW(cursor_addr);
  		return '\n';
  	}
 
@@ -198,13 +199,16 @@ LIB3270_EXPORT int lib3270_paste_string(unsigned char *str)
 					cursor_move(baddr);
 				else
 					cursor_move(next_unprotected(baddr));
+				data.row = BA_TO_ROW(cursor_addr);
 			}
 			last = ' ';
 			data.qtd++;
 			break;
 
 		default:
+			Trace("Pasting %c at %d,%d",*str,BA_TO_ROW(cursor_addr),BA_TO_COL(cursor_addr));
 			last = paste_char(&data, *str);
+			Trace("Last: %d",last);
 
 		}
 		str++;
