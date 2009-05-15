@@ -112,7 +112,7 @@
 	gdk_draw_rectangle(draw,gc,TRUE,x,y,fontWidth,fontHeight);
 	gdk_gc_set_foreground(gc,fg);
 
-	switch(el->extended)
+	switch(el->cg)
 	{
 //	case 0xaf: // CG 0xd1, degree
 //		break;
@@ -203,7 +203,7 @@
 		break;
 
 	default:	// Unknown char, draw "?"
-		Trace("Unexpected extended char: %02x",el->extended);
+		Trace("Unexpected extended char: %02x",el->cg);
 		pango_layout_set_text(getPangoLayout(),"?",-1);
 		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
 	}
@@ -266,7 +266,7 @@
 		bg = (el->bg & 0xFF);
 	}
 
-	if(!el->extended)
+	if(!el->cg)
 	{
 		// Standard char or empty space, draw directly
 		DrawTextChar(draw, clr+fg, clr+bg, gc, x, y, el);

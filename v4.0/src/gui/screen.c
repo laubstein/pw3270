@@ -283,34 +283,6 @@
 	screen_disp();
  }
 
- static void convertchar(ELEMENT *el, unsigned short c)
- {
- 	static const struct _xlat
- 	{
- 		unsigned short 	cg;
- 		const gchar		*chr;
- 	} xlat[] =
- 	{	{ 0x8c, "≤"	},	// CG 0xf7, less or equal
-		{ 0xae, "≥"	},	// CG 0xd9, greater or equal
-		{ 0xbe,	"≠"	}	// 0x3e, not equal
- 	};
-
- 	int f;
-
-	for(f=0;f<G_N_ELEMENTS(xlat);f++)
-	{
-		if(c == xlat[f].cg)
-		{
-			g_strlcpy(el->ch,xlat[f].chr,MAX_CHR_LENGTH);
-			return;
-		}
-	}
-
-	el->extended	= (unsigned short) c;
-	*el->ch			= ' ';
-
- }
-
  static int addch(int row, int col, int c, unsigned short attr)
  {
  	ELEMENT in;
@@ -327,9 +299,10 @@
 
 	if(c)
 	{
-		if(attr & CHAR_ATTR_UNCONVERTED)
+		if(attr & CHAR_ATTR_CG)
 		{
-			convertchar(&in,(unsigned short) c);
+			in.cg	= (unsigned short) c;
+			*in.ch			= ' ';
 		}
 		else
 		{
