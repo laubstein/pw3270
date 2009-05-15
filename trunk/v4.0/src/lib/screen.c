@@ -437,7 +437,7 @@ void screen_disp(void)
 					}
 					else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
 					{
-						addch(row,col,ea_buf[baddr].cc,attr|CHAR_ATTR_UNCONVERTED);
+						addch(row,col,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
 					}
 					else
 					{

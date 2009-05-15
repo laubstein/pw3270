@@ -602,9 +602,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/lib/widec.h" />
-		<Unit filename="src/lib/windirs.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/lib/windirsc.h" />
 		<Unit filename="src/lib/winvers.c">
 			<Option compilerVar="CC" />

@@ -326,8 +326,10 @@
 		#define COLOR_ATTR_UNDERLINE	0x0400
 		#define COLOR_ATTR_INTENSIFY	0x0800
 
-		#define CHAR_ATTR_UNCONVERTED	0x1000
+		#define CHAR_ATTR_CG			0x1000
 		#define CHAR_ATTR_MARKER		0x2000
+
+		#define CHAR_ATTR_UNCONVERTED	CHAR_ATTR_CG
 
 		struct lib3270_screen_callbacks
 		{

@@ -73,10 +73,11 @@
 	#define MAX_CHR_LENGTH 3
 	typedef struct _element
 	{
-		gchar				ch[MAX_CHR_LENGTH];
-		unsigned short	fg;
-		unsigned short	bg;
-		unsigned short	extended;
+		gchar				ch[MAX_CHR_LENGTH];	/**< UTF-8 string */
+		unsigned short	fg;					/**< Foreground color */
+		unsigned short	bg;					/**< Background color */
+
+		unsigned short	cg;					/**< CG character */
 
 		#define SELECTION_BOX_LEFT			0x10
 		#define SELECTION_BOX_RIGHT			0x20
