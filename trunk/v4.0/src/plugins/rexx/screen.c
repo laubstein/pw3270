@@ -463,6 +463,16 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 	else
 		rc = action_Enter();
 
+	if(!rc)
+	{
+		// Enter was sent, wait for screen changes
+		int last = query_screen_change_counter();
+		time_t tm = time(0)+1;
+
+		while(last == query_screen_change_counter() && time(0) < tm)
+			RunPendingEvents(1);
+	}
+
 	ReturnValue(rc);
  }
 
@@ -493,7 +503,15 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 	else
 		rc = action_PFKey(atoi(Argv[0].strptr));
 
-	Trace("%s: Key: %s rc: %d",__FUNCTION__,Argv[0].strptr,rc);
+	if(!rc)
+	{
+		// Key was sent, wait for screen changes
+		int last = query_screen_change_counter();
+		time_t tm = time(0)+1;
+
+		while(last == query_screen_change_counter() && time(0) < tm)
+			RunPendingEvents(1);
+	}
 
 	ReturnValue(rc);
  }
