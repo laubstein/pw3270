@@ -299,7 +299,7 @@ install: Release po/pt_BR.po
 	@install --mode=644 ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/default.act $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 $(PACKAGE).@LOGOEXT@ $(DESTDIR)/$(datarootdir)/$(PACKAGE)
-	@install --mode=644 src/gui/colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
 
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES
@@ -316,6 +316,7 @@ $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 	@cp AUTHORS $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp configure.ac $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp *.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp *.conf $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 
 	mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
 	cp -r image/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
