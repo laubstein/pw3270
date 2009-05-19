@@ -287,7 +287,7 @@ static void initialize(void)
 	appres.compose_map = "latin1";
 #endif /*]*/
 
-	appres.model = "4";
+	appres.model = "2";
 	appres.hostsfile = CN;
 	appres.port = "telnet";
 
