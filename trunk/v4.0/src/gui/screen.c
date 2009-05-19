@@ -984,9 +984,6 @@
 
  static int init(void)
  {
-	// TODO (perry#1#): Get screen size from configuration file
-	ctlr_set_rows_cols(2, 80, 24);
-
 	return 0;
  }
 

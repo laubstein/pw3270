@@ -128,11 +128,6 @@ screen_init(void)
 			x3270_exit(1);
 		}
 	}
-	else
-	{
-		// FIXME (perry#1#): Do it in the right way (command-line parameter or configuration file).
-		set_rows_cols(2, 80, 24);
-	}
 
 	if(callbacks && callbacks->setsize)
 		callbacks->setsize(maxROWS,maxCOLS);
