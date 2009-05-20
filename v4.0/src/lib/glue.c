@@ -188,10 +188,10 @@ int lib3270_init(void)
 #endif
 	}
 #if defined(C3270) && !defined(_WIN32)
-	if (appres.mono)
+	if(appres.mono)
 		appres.m3279 = False;
 #endif
-	if (!appres.extended)
+	if(!appres.extended)
 		appres.oversize = CN;
 
 #if defined(RESTRICT_3279)
