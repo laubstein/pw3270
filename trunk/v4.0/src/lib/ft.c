@@ -243,6 +243,8 @@ static const struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to m
 		return -1;
 	}
 
+	Trace("Command: \"%s\"",buffer);
+
 	(void) emulate_input(buffer, strlen(buffer), False);
 
 	// Get this thing started.

@@ -85,6 +85,12 @@
 		x = left_margin;
 		for(col = 0; col < terminal_cols;col++)
 		{
+#ifdef DEBUG
+			if(row == 4)
+			{
+				Trace("Element at %d,%d Status: %04x Char: %s fg: %04xd bg:%04x",row,col,(int) el->status,el->ch,el->fg,el->bg);
+			}
+#endif
 			DrawElement(draw,clr,gc,x,y,el);
 			el++;
 			x += fontWidth;
