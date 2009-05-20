@@ -525,22 +525,22 @@ http://www.suggestsoft.com/images/medieval-software/medieval-bluetooth-obex-file
 
  static void ft_begin(unsigned short flags, const char *local, const char *remote)
  {
-	Trace("%s",__FUNCTION__);
+	Trace("%s Flags: %04x local: \"%s\" remote: \"%s\"",__FUNCTION__,flags,local,remote);
  }
 
  static void ft_complete(const char *errmsg)
  {
-	Trace("%s",__FUNCTION__);
+	Trace("%s: msg: \"%s\"",__FUNCTION__,errmsg);
  }
 
  static void ft_update(unsigned long length)
  {
-	Trace("%s",__FUNCTION__);
+	Trace("%s: length=%ld",__FUNCTION__,length);
  }
 
  static void ft_running(int is_cut)
  {
-	Trace("%s",__FUNCTION__);
+	Trace("%s: is_cut: %d",__FUNCTION__,is_cut);
  }
 
  static void ft_aborting(void)
