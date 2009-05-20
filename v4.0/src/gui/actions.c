@@ -991,7 +991,7 @@
 	gtk_widget_destroy(dialog);
  }
 
- static void action_SaveScreen(void)
+  static void action_SaveScreen(void)
  {
 	SaveText(N_( "Save screen contents" ), GetScreenContents(TRUE));
  }

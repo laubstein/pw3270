@@ -334,6 +334,9 @@
 	else
 		in.status &= ~ELEMENT_STATUS_FIELD_MARKER;
 
+	if(attr & COLOR_ATTR_UNDERLINE)
+		in.fg |= COLOR_ATTR_UNDERLINE;
+
 	if(!memcmp(&in,el,sizeof(ELEMENT)))
 		return 0;
 

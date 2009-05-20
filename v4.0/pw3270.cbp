@@ -428,6 +428,11 @@
 		<Unit filename="src/gui/topwindow.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/gui/tracewindow.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/gui/version.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -384,7 +384,7 @@ void screen_disp(void)
 			baddr = row*cCOLS+col;
 			if (ea_buf[baddr].fa) {
 			    	/* Field attribute. */
-			    	fa_addr = baddr;
+				fa_addr = baddr;
 				fa = ea_buf[baddr].fa;
 				a = calc_attrs(baddr, baddr, fa);
 				addch(row,col,' ',(attr = defattr)|CHAR_ATTR_MARKER);

@@ -244,6 +244,7 @@
 	int 		DrawScreen(GdkColor *clr, GdkDrawable *draw);
 	void 		DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);
 	void 		DrawOIA(GdkDrawable *draw, GdkColor *clr);
+	void 		PrintConsole(const gchar *fmt, ...);
 
 	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 	void 		ParseInput(const gchar *string);
