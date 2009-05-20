@@ -109,6 +109,7 @@ static Boolean ft_is_cut;				// File transfer is CUT-style
 static const struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to main application
 
 #define snconcat(x,s,fmt,...) snprintf(x+strlen(x),s-strlen(x),fmt,__VA_ARGS__)
+
 #define set_ft_state(x) ft_state = x
 
 /*---[ Implement ]-------------------------------------------------------------------------------------------------------*/
