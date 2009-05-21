@@ -39,6 +39,7 @@
 	#undef PACKAGE_REVISION
 
 	#undef HAVE_LIBSSL
+	#undef HAVE_ICONV
 	#undef HAVE_PLUGINS
 	#undef HAVE_LIBGNOME
 	#undef HAVE_REXX

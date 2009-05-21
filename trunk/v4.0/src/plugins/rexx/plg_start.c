@@ -75,7 +75,8 @@
  GtkWidget 	*program_window	= NULL;
  GtkWidget	*trace_window = NULL;
 
- static SCRIPT_STATE script_state = SCRIPT_STATE_NONE;
+ static SCRIPT_STATE	script_state	= SCRIPT_STATE_NONE;
+ static gchar 			*rexx_charset	= NULL;
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
@@ -501,8 +502,8 @@
  	}
  	else
  	{
- 		// Convert received string to UTF-8
- 		gchar *str = g_convert(value, -1, REXX_CHARSET, CHARSET, NULL, NULL, NULL);
+ 		// Convert received string to rexx charset
+ 		gchar *str = g_convert(value, -1, rexx_charset ? rexx_charset : REXX_DEFAULT_CHARSET, CHARSET, NULL, NULL, NULL);
 
 		if(strlen(str) > (RXAUTOBUFLEN-1))
 		{
@@ -538,9 +539,37 @@
 
  }
 
+ char *GetStringArg(PRXSTRING arg)
+ {
+ 	if(!(arg->strptr && *arg->strptr))
+		return strdup("");
+
+	// Convert received string to lib3270 charset
+	return (char *) g_convert(arg->strptr, arg->strlength, CHARSET, rexx_charset ? rexx_charset : REXX_DEFAULT_CHARSET, NULL, NULL, NULL);
+
+ }
+
+ void ReleaseStringArg(char *str)
+ {
+ 	g_free(str);
+ }
+
  ULONG APIENTRY rx3270QueryRunMode(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	strncpy(Retstr->strptr,"PLUGIN",RXAUTOBUFLEN-1);
     Retstr->strlength = strlen(Retstr->strptr);
     return RXFUNC_OK;
+ }
+
+
+ ULONG APIENTRY rx3270SetCharset(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ {
+	if(!Argc)
+		return RXFUNC_BADCALL;
+
+	g_free(rexx_charset);
+
+	rexx_charset = g_strdup(Argv->strptr);
+
+    return RetValue(Retstr,0);
  }
