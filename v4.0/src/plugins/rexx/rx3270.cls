@@ -111,6 +111,11 @@ return rx3270SetCursorPosition(row,col)
 ::method RunMode
 return rx3270QueryRunMode()
 
+::method 'encoding='
+	use arg ptr
+return rx3270SetCharset(ptr)
+
+
 /*-------------------------------------------------------------------------------*/
 /* Common dialog box class                                                       */
 /*-------------------------------------------------------------------------------*/

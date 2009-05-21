@@ -66,6 +66,8 @@
 /*----------------------------------------------------------------------------*/
  ULONG APIENTRY rx3270InputString(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
+ 	char *str = 0;
+
 	Trace("Status: %d",query_3270_terminal_status());
 
  	if(query_3270_terminal_status() != STATUS_CODE_BLANK)
@@ -78,21 +80,27 @@
 		break;
 
     case 1:
-		Input_String((const unsigned char *) Argv[0].strptr);
+		str = GetStringArg(Argv);
 		break;
 
 	case 2:
         cursor_set_addr(atoi(Argv[0].strptr));
-		Input_String((const unsigned char *) Argv[1].strptr);
+		str = GetStringArg(Argv+1);
         break;
 
     case 3:
         cursor_set_addr((atoi(Argv[0].strptr)-1) * ctlr_get_cols() + (atoi(Argv[1].strptr)-1));
-		Input_String((const unsigned char *) Argv[2].strptr);
+		str = GetStringArg(Argv+2);
         break;
 
 	default:
 		return RXFUNC_BADCALL;
+	}
+
+	if(str)
+	{
+		Input_String((unsigned char *) str);
+		ReleaseStringArg(str);
 	}
 
 	Trace("Status: %d",query_3270_terminal_status());
@@ -615,7 +623,7 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
  ULONG APIENTRY rx3270WaitForString(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	int			pos = -1;
- 	const char	*str;
+ 	char		*str;
  	int			sz;
  	int			rc = ETIMEDOUT;
  	int			rows,cols,row,col;
@@ -627,13 +635,13 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
  	switch(Argc)
  	{
 	case 1:	// Only string in any position
-		str = Argv[0].strptr;
+		str = GetStringArg(Argv);
 		sz = (rows*cols);
 		break;
 
 	case 2:	// Just buffer position
 		pos = atoi(Argv[0].strptr);
-		str = Argv[1].strptr;
+		str = GetStringArg(Argv+1);
 		sz  = strlen(str);
 		break;
 
@@ -648,7 +656,7 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 		}
 
 		pos = (row * cols) + col;
-		str = Argv[2].strptr;
+		str = GetStringArg(Argv+2);
 		sz	= strlen(str);
 		break;
 
@@ -690,6 +698,7 @@ ULONG APIENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ 
 
 	Trace("%s returns %d",__FUNCTION__,rc);
 
+	ReleaseStringArg(str);
 	free(buffer);
 
 	ReturnValue(rc);

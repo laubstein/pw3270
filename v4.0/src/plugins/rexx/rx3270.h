@@ -40,7 +40,12 @@
 	#include <glib/gi18n.h>
 
 	#define CHARSET			"ISO-8859-1" /* FIXME (perry#8#): Get correct encoding from lib3270. */
-	#define REXX_CHARSET	"UTF-8"
+
+	#ifdef WIN32
+		#define REXX_DEFAULT_CHARSET "CP1252"
+	#else
+		#define REXX_DEFAULT_CHARSET "UTF-8"
+	#endif
 
 	#define RX3270_DEFAULT_TIMEOUT 60
 
@@ -82,6 +87,9 @@
 	ULONG 	RetPointer(PRXSTRING Retstr, gpointer value);
 	ULONG	RetConvertedString(PRXSTRING Retstr, const char *value);
 
+	char   *GetStringArg(PRXSTRING arg);
+	void	ReleaseStringArg(char *str);
+
 	#define ReturnValue(x)  	return RetValue(Retstr,x)
 	#define ReturnString(x)		return RetString(Retstr,x)
 	#define ReturnPointer(x)	return RetPointer(Retstr,x)
@@ -112,6 +120,7 @@
 	ULONG APIENTRY rx3270SetVisible(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270Sleep(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	ULONG APIENTRY rx3270QueryRunMode(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	ULONG APIENTRY rx3270SetCharset(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 
 	ULONG APIENTRY rx3270Dunno(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 
@@ -163,7 +172,6 @@
 
 	/* Globals */
 	extern GtkWidget 	*program_window;
-
 
 #endif // RX3270_H_INCLUDED
 

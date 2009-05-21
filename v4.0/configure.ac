@@ -93,6 +93,9 @@ case "$host" in
 
 esac
 
+# Check for iconv
+AM_ICONV
+
 # Optional
 AC_ARG_ENABLE([trace],
 	[AS_HELP_STRING([--enable-trace], [enable trace])],
