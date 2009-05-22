@@ -49,6 +49,8 @@ BuildRequires:  autoconf sed pkgconfig gtk2-devel libgnome-devel libgnomeui-deve
 IBM 3270 terminal emulator gtk. It can be used to communicate with
 any IBM host that supports 3270-style connections over TELNET.
 
+Revision: @PACKAGE_REVISION@
+
 %package lib
 Provides:	%{name}-lib
 Summary:	3270 Communication library for %{name}
@@ -59,6 +61,8 @@ BuildRequires:  autoconf openssl-devel sed pkgconfig
 %description lib
 tn3270 protocol library for %{name}
 
+Revision: @PACKAGE_REVISION@
+
 %package devel
 Provides:	%{name}-devel
 Summary:	Devel for 3270 Communication library for %{name}
@@ -67,6 +71,8 @@ Requires:	%{name}-lib = @PACKAGE_VERSION@
 
 %description devel
 devel for tn3270 protocol library for %{name}
+
+Revision: @PACKAGE_REVISION@
 
 %if 0%{?_rexx}
 %package rexx
@@ -78,6 +84,8 @@ BuildRequires:  ooRexx >= 3.2.0
 
 %description rexx
 Plugin to add Rexx support in %{name}
+
+Revision: @PACKAGE_REVISION@
 
 %endif
 
@@ -92,6 +100,8 @@ BuildRequires:	autoconf sed pkgconfig zip OpenOffice_org-ure-devel
 
 %description OpenOffice
 Uno/OpenOffice library allowing 3270 access from StarBasic
+
+Revision: @PACKAGE_REVISION@
 
 %endif
 
