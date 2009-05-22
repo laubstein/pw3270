@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-05-13 14:45-0300\n"
-"PO-Revision-Date: 2009-05-13 14:47-0300\n"
+"POT-Creation-Date: 2009-05-22 10:06-0300\n"
+"PO-Revision-Date: 2009-05-22 10:06-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -181,7 +181,7 @@ msgid ""
 msgstr "Não encontrei definições de interface em\n"
 "%s"
 
-#: src/gui/actions.c:783 src/plugins/rexx/plg_start.c:135
+#: src/gui/actions.c:783 src/plugins/rexx/plg_start.c:136
 #, c-format
 msgid "Can't load %s"
 msgstr "Não foi possível carregar %s"
@@ -233,7 +233,7 @@ msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 msgid "Can't start"
 msgstr "Não foi possível iniciar"
 
-#: src/plugins/rexx/plg_start.c:100
+#: src/plugins/rexx/plg_start.c:101
 msgid "Can't start script"
 msgstr "Não foi possível iniciar o script"
 
@@ -253,9 +253,13 @@ msgstr "Configuração de cores"
 msgid "Colors"
 msgstr "Cores"
 
-#: src/plugins/rexx/plg_start.c:367
+#: src/gui/tracewindow.c:110 src/plugins/rexx/plg_start.c:368
 msgid "Command:"
 msgstr "Comando:"
+
+#: src/gui/tracewindow.c:91
+msgid "Console"
+msgstr ""
 
 #: src/gui/actions.c:188
 msgid "Copy"
@@ -419,7 +423,7 @@ msgstr "Script rexx externo"
 msgid "File Transfer"
 msgstr "Transferência de arquivo"
 
-#: src/plugins/rexx/plg_start.c:137
+#: src/plugins/rexx/plg_start.c:138
 msgid "File error"
 msgstr ""
 
@@ -641,7 +645,7 @@ msgstr "Rosa"
 msgid "Please wait"
 msgstr "Por favor, aguarde"
 
-#: src/plugins/rexx/plg_start.c:103
+#: src/plugins/rexx/plg_start.c:104
 msgid "Please, try again in a few moments"
 msgstr "Por favor, tente novamente em alguns instantes"
 
@@ -725,8 +729,8 @@ msgstr ""
 msgid "Return"
 msgstr ""
 
-#: src/gui/main.c:494 src/plugins/rexx/plg_start.c:191
-#: src/plugins/rexx/plg_start.c:208
+#: src/gui/main.c:494 src/plugins/rexx/plg_start.c:192
+#: src/plugins/rexx/plg_start.c:209
 #, c-format
 msgid "Return code was %d"
 msgstr "Código de saída foi %d"
@@ -735,11 +739,11 @@ msgstr "Código de saída foi %d"
 msgid "Rexx message"
 msgstr "Mensagem Rexx"
 
-#: src/plugins/rexx/plg_start.c:207
+#: src/plugins/rexx/plg_start.c:208
 msgid "Rexx script error"
 msgstr "Erro no script rexx"
 
-#: src/plugins/rexx/plg_start.c:190
+#: src/plugins/rexx/plg_start.c:191
 msgid "Rexx script failed"
 msgstr "Script Rexx falhou"
 
@@ -747,7 +751,7 @@ msgstr "Script Rexx falhou"
 msgid "Rexx scripts"
 msgstr "Scripts Rexx"
 
-#: src/plugins/rexx/plg_start.c:348
+#: src/plugins/rexx/plg_start.c:349
 msgid "Rexx trace"
 msgstr "Trace Rexx"
 
@@ -791,12 +795,12 @@ msgstr "Salvar texto selecionado"
 msgid "Screen Trace"
 msgstr ""
 
-#: src/plugins/rexx/plg_start.c:204
+#: src/plugins/rexx/plg_start.c:205
 #, c-format
 msgid "Script %s aborted"
 msgstr "Script %s foi abortado"
 
-#: src/plugins/rexx/plg_start.c:466
+#: src/plugins/rexx/plg_start.c:467
 msgid "Script message"
 msgstr "Mensagem do script"
 
@@ -908,6 +912,10 @@ msgstr "Mudar servidor"
 msgid "Settings"
 msgstr "Configuração"
 
+#: src/gui/actions.c:88
+msgid "Show Underline"
+msgstr "Mostrar sublinhado"
+
 #: src/gui/main.c:345
 msgid "Show lib3270 options"
 msgstr "Mostra opções da biblioteca 3270"
@@ -928,7 +936,7 @@ msgstr "Unidade de alocação de espaço"
 msgid "Sys Req"
 msgstr ""
 
-#: src/plugins/rexx/plg_start.c:102
+#: src/plugins/rexx/plg_start.c:103
 msgid "System busy"
 msgstr "Sistema ocupado"
 
@@ -999,13 +1007,9 @@ msgstr "Não foi possível salvar a configuração em %s"
 msgid "Undefined"
 msgstr "Indefinido"
 
-#: src/gui/actions.c:88
-msgid "Underline"
-msgstr "Sublinhado"
-
 #: src/gui/actions.c:881 src/gui/actions.c:927 src/gui/actions.c:984
 #: src/gui/clipboard.c:117 src/gui/clipboard.c:172 src/gui/clipboard.c:253
-#: src/gui/plugin.c:275 src/gui/plugin.c:302 src/plugins/rexx/plg_start.c:138
+#: src/gui/plugin.c:275 src/gui/plugin.c:302 src/plugins/rexx/plg_start.c:139
 msgid "Unexpected error"
 msgstr "Erro inesperado"
 
@@ -1033,47 +1037,47 @@ msgstr "Branco"
 msgid "Window"
 msgstr "Janela"
 
-#: src/gui/screen.c:740 src/gui/screen.c:768
+#: src/gui/screen.c:716 src/gui/screen.c:744
 msgid "X"
 msgstr ""
 
-#: src/gui/screen.c:744
+#: src/gui/screen.c:720
 msgid "X -f"
 msgstr ""
 
-#: src/gui/screen.c:776
+#: src/gui/screen.c:752
 msgid "X Connecting"
 msgstr "X Conectando"
 
-#: src/gui/screen.c:760
+#: src/gui/screen.c:736
 msgid "X Inhibit"
 msgstr "X Inibido"
 
-#: src/gui/screen.c:736
+#: src/gui/screen.c:712
 msgid "X Not Connected"
 msgstr "X Não conectado"
 
-#: src/gui/screen.c:752
+#: src/gui/screen.c:728
 msgid "X Numeric"
 msgstr "X Numérico"
 
-#: src/gui/screen.c:756
+#: src/gui/screen.c:732
 msgid "X Overflow"
 msgstr "X Estouro"
 
-#: src/gui/screen.c:748
+#: src/gui/screen.c:724
 msgid "X Protected"
 msgstr "X Protegido"
 
-#: src/gui/screen.c:772
+#: src/gui/screen.c:748
 msgid "X Resolving"
 msgstr "X Resolvendo"
 
-#: src/gui/screen.c:724
+#: src/gui/screen.c:700
 msgid "X System"
 msgstr "X Sistema"
 
-#: src/gui/screen.c:728
+#: src/gui/screen.c:704
 msgid "X Wait"
 msgstr "X Aguarde"
 
@@ -1109,7 +1113,7 @@ msgstr "_Opções"
 msgid "_Quit"
 msgstr "_Sair"
 
-#: src/plugins/rexx/plg_start.c:188
+#: src/plugins/rexx/plg_start.c:189
 #, c-format
 msgid "script %s failed"
 msgstr "script %s falhou"

@@ -85,7 +85,7 @@
  {
     { "Bold", 			N_( "Bold" ),			NULL,	NULL,	NULL	},
     { "KeepSelected", 	N_( "Keep selected" ),	NULL,	NULL,	NULL	},
-    { "Underline",		N_( "Underline" ),		NULL,   NULL,   NULL    }
+    { "Underline",		N_( "Show Underline" ),	NULL,   NULL,   NULL    }
  };
 
  gboolean gui_toggle[GUI_TOGGLE_COUNT] = { 0 };
