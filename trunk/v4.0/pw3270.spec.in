@@ -4,30 +4,31 @@
 
 %define _rel	@PACKAGE_RELEASE@
 
-%define _fedora		%(if [ -f /etc/fedora-release ]; then echo 1; else echo 0; fi)
-%define _redhat		%(if [ -f /etc/redhat-release ]; then echo 1; else echo 0; fi)
-%define _mandrake	%(if [ -f /etc/mandrake-release ]; then echo 1; else echo 0; fi)
-
 %define _release	%{_rel}
+%define _distro		Linux
 
 %if 0%{?suse_version}
 	%define _release %{_rel}.suse%{suse_version}
+	%define _distro SuSE Linux %{suse_version}
 %endif
 
 %if 0%{?mandriva_version}
 	%define _release %{_rel}.mdk%{mandrake_version}
 	%define _redhat 0
+	%define _distro Mandriva Linux %{mandrake_version}
 %endif
 
 %if 0%{?fedora_version}
 	%define _release %{_rel}.fc%{fedora_version}
 	%define _redhat 0
+	%define _distro Fedora %{fedora_version}
 %endif
 
 %if 0%{?_redhat}
 	%define _redhat_prefix      %(grep -q "Red Hat Linux" /etc/redhat-release && echo rhl || echo el)
 	%define _redhat_vernum      %(rpm -qf --queryformat %{VERSION} /etc/redhat-release|tr -d '.')
 	%define _release          	%{_rel}.%{_redhat_prefix}%{_redhat_vernum}
+	%define _distro %{_redhat_prefix} %{_redhat_vernum}
 %endif
 
 %define _uno	%(if [ -f %{ooo_sdk_home}/bin/idlc ]; then echo 1; else echo 0; fi)
@@ -43,6 +44,7 @@ Summary:        IBM 3270 Terminal emulator for gtk.
 Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Requires:       openssl shared-mime-info libgnome libgnomeui %{name}-lib = @PACKAGE_VERSION@
+Distribution:    %_distro
 BuildRequires:  autoconf sed pkgconfig gtk2-devel libgnome-devel libgnomeui-devel ImageMagick
 
 %description
