@@ -40,6 +40,13 @@
 
  static GString *clipboard_contents = NULL;
 
+ static enum _clipboard_mode
+ {
+ 	CLIPBOARD_MODE_NONE,	/**< No data in clipboard */
+ 	CLIPBOARD_MODE_TEXT,	/**< Clipboard contains a text string */
+ 	CLIPBOARD_MODE_TABLE,	/**< Clipboard contains a table */
+ } clipboard_mode = CLIPBOARD_MODE_NONE;
+
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
  gchar * GetClipboard(void)
@@ -50,7 +57,7 @@
 	return g_strdup(clipboard_contents->str);
  }
 
- static void UpdateClipboardString(gboolean append, gchar *str)
+ static void UpdateClipboardString(enum _clipboard_mode mode, gboolean append, gchar *str)
  {
  	if(!str)
  	{
@@ -76,27 +83,16 @@
 
  	if(!(clipboard_contents->len > 0 && terminal))
  	{
+ 		Trace("Clipboard is empty: \"%s\"",clipboard_contents->str);
+ 		clipboard_mode = CLIPBOARD_MODE_NONE;
 		gtk_action_group_set_sensitive(clipboard_actions,FALSE);
 		return;
  	}
 
+	clipboard_mode = mode;
 	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_contents->str,-1);
 	gtk_action_group_set_sensitive(clipboard_actions,TRUE);
 
- }
-
- void action_Copy(void)
- {
- 	gchar *str = GetSelection();
- 	UpdateClipboardString(FALSE,str);
- 	g_free(str);
- }
-
- void action_Append(void)
- {
- 	gchar *str = GetSelection();
- 	UpdateClipboardString(TRUE,str);
- 	g_free(str);
  }
 
  static void paste_string(gchar *str)
@@ -105,7 +101,7 @@
 
  	if(!str)
  	{
-		UpdateClipboardString(FALSE,NULL);
+		UpdateClipboardString(CLIPBOARD_MODE_NONE,FALSE,NULL);
 		return;
  	}
 
@@ -130,9 +126,9 @@
 	}
 
 	if(*(str+sz))
-		UpdateClipboardString(FALSE,str+sz);
+		UpdateClipboardString(CLIPBOARD_MODE_TEXT,FALSE,str+sz);
 	else
-		UpdateClipboardString(FALSE,NULL);
+		UpdateClipboardString(CLIPBOARD_MODE_NONE,FALSE,NULL);
 
 	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"PasteNext"),clipboard_contents->len > 0);
 
@@ -285,16 +281,26 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 
  void ClearClipboard(void)
  {
-	UpdateClipboardString(FALSE,NULL);
+	UpdateClipboardString(CLIPBOARD_MODE_NONE,FALSE,NULL);
  }
 
- void action_CopyAsTable(void)
+ static void CopyAsText(gboolean append)
+ {
+	gchar *str = GetSelection();
+	Trace("%s (append: %s mode: %d)",__FUNCTION__,append ? "Yes" : "No",(int) clipboard_mode);
+	UpdateClipboardString(CLIPBOARD_MODE_TEXT,append,str);
+	g_free(str);
+ }
+
+ static void CopyAsTable(gboolean append)
  {
 	GdkRectangle 	rect;
 	gboolean		*cols;
 	int				row, col;
 	ELEMENT			*el;
 	GString			*buffer;
+
+	Trace("%s (append: %s mode: %d)",__FUNCTION__,append ? "Yes" : "No",(int) clipboard_mode);
 
  	if(GetSelectedRectangle(&rect))
  	{
@@ -364,9 +370,27 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 
 	Trace("Tabela lida:\n%s\n",buffer->str);
 
-	UpdateClipboardString(FALSE,buffer->str);
+	UpdateClipboardString(CLIPBOARD_MODE_TABLE,append,buffer->str);
 
 	g_string_free(buffer,TRUE);
  	g_free(cols);
+ }
+
+ void action_CopyAsTable(void)
+ {
+ 	CopyAsTable(FALSE);
+ }
+
+ void action_Copy(void)
+ {
+ 	CopyAsText(FALSE);
+ }
+
+ void action_Append(void)
+ {
+ 	if(clipboard_mode == CLIPBOARD_MODE_TABLE)
+ 		CopyAsTable(TRUE);
+ 	else
+ 		CopyAsText(TRUE);
  }
 
