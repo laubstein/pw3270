@@ -69,7 +69,8 @@
 
  static GtkIMContext			*im;
 
- static PangoLayout 			*layout			= NULL;
+ static const gchar 			*layout_name[] = { "PangoLayout_normal", "PangoLayout_underline" };
+
  static PangoFontDescription	*font_descr		= NULL;
  static int					szFonts			= MAX_FONT_SIZES;
  static FONTSIZE				fsize[MAX_FONT_SIZES];
@@ -298,12 +299,6 @@
 		pixmap = NULL;
 	}
 
-	if(layout)
-	{
-		g_object_unref(layout);
-		layout = NULL;
-	}
-
  	if(font_descr)
  	{
 		pango_font_description_free(font_descr);
@@ -475,6 +470,8 @@
 
  static void update_font_layout(void)
  {
+ 	PangoLayout *layout;
+
  	// Font context changed, invalidate cached info
 	if(pixmap)
 	{
@@ -489,11 +486,11 @@
 	}
 
 	// Update metrics
-	if(layout)
-		pango_layout_context_changed(layout);
-	else
-		getPangoLayout();
+	layout = getPangoLayout(TEXT_LAYOUT_UNDERLINE);
+	pango_layout_context_changed(layout);
 
+	layout = getPangoLayout(TEXT_LAYOUT_NORMAL);
+	pango_layout_context_changed(layout);
 
 	// FIXME (perry#1#): Is there any better way to get the font size in pixels?
 	pango_layout_set_text(layout,"A",1);
@@ -588,7 +585,7 @@
 	gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
 	gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fontWidth*7,fontHeight);
 
-	layout = getPangoLayout();
+	layout = getPangoLayout(0);
 
 	sprintf(buffer,"%03d/%03d",cRow+1,cCol+1);
 	pango_layout_set_text(layout,buffer,-1);
@@ -697,15 +694,37 @@
 	InvalidateCursor();
  }
 
- PangoLayout * getPangoLayout(void)
+ PangoLayout * getPangoLayout(enum text_layout id)
  {
+	PangoAttribute	*attr;
+	PangoAttrList 	*attrlist;
+ 	PangoLayout		*rc;
+
  	if(!terminal)
 		return NULL;
 
- 	if(!layout)
-		layout = gtk_widget_create_pango_layout(terminal,"");
+	rc = (PangoLayout *) g_object_get_data(G_OBJECT(terminal),layout_name[id]);
 
-	return layout;
+ 	if(!rc)
+ 	{
+		rc = gtk_widget_create_pango_layout(terminal,"");
+
+		if(id == TEXT_LAYOUT_UNDERLINE)
+		{
+			attrlist = pango_layout_get_attributes(rc);
+			if(!attrlist)
+				attrlist = pango_attr_list_new();
+
+			attr = pango_attr_underline_new(PANGO_UNDERLINE_SINGLE);
+			pango_attr_list_change(attrlist,attr);
+			pango_layout_set_attributes(rc,attrlist);
+		}
+
+		g_object_set_data_full(G_OBJECT(terminal),layout_name[id],rc,g_object_unref);
+
+ 	}
+
+	return rc;
  }
 
 

@@ -65,9 +65,8 @@
 	int				col;
 	int				width;
 	int				height;
-	PangoLayout 	*layout		= getPangoLayout();
 
-	if(!(el && draw && layout))
+	if(!(el && draw))
 		return -1;
 
 	gc = gdk_gc_new(draw);
@@ -181,56 +180,48 @@
 		break;
 
 	case 0x8c: // CG 0xf7, less or equal
-		pango_layout_set_text(getPangoLayout(),"≤",-1);
-		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
+		pango_layout_set_text(getPangoLayout(TEXT_LAYOUT_NORMAL),"≤",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(TEXT_LAYOUT_NORMAL),fg,bg);
 		break;
 
 	case 0xae: // CG 0xd9, greater or equal
-		pango_layout_set_text(getPangoLayout(),"≥",-1);
-		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
+		pango_layout_set_text(getPangoLayout(TEXT_LAYOUT_NORMAL),"≥",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(TEXT_LAYOUT_NORMAL),fg,bg);
 		break;
 
 	case 0xbe: // CG 0x3e, not equal
-		pango_layout_set_text(getPangoLayout(),"≠",-1);
-		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
+		pango_layout_set_text(getPangoLayout(TEXT_LAYOUT_NORMAL),"≠",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(TEXT_LAYOUT_NORMAL),fg,bg);
 		break;
 
 //	case 0xa3: // CG 0x93, bullet
 //		break;
 
 	case 0xad:
-		pango_layout_set_text(getPangoLayout(),"[",-1);
-		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
+		pango_layout_set_text(getPangoLayout(TEXT_LAYOUT_NORMAL),"[",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(TEXT_LAYOUT_NORMAL),fg,bg);
 		break;
 
 	case 0xbd:
-		pango_layout_set_text(getPangoLayout(),"]",-1);
-		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
+		pango_layout_set_text(getPangoLayout(TEXT_LAYOUT_NORMAL),"]",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(TEXT_LAYOUT_NORMAL),fg,bg);
 		break;
 
 	default:	// Unknown char, draw "?"
 		Trace("Unexpected extended char: %02x",el->cg);
-		pango_layout_set_text(getPangoLayout(),"?",-1);
-		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(),fg,bg);
+		pango_layout_set_text(getPangoLayout(TEXT_LAYOUT_NORMAL),"?",-1);
+		gdk_draw_layout_with_colors(draw,gc,x,y,getPangoLayout(TEXT_LAYOUT_NORMAL),fg,bg);
 	}
  }
 
  static void DrawTextChar(GdkDrawable *draw, GdkColor *fg, GdkColor *bg, GdkGC *gc, int x, int y, ELEMENT *el)
  {
-	PangoAttribute	*attr;
-	PangoAttrList 	*attrlist;
-	PangoLayout 	*layout = getPangoLayout();
+	PangoLayout *layout;
 
-	if(TOGGLED_UNDERLINE)
-	{
-		attrlist = pango_layout_get_attributes(layout);
-		if(!attrlist)
-			attrlist = pango_attr_list_new();
-
-		attr = pango_attr_underline_new((el->fg & COLOR_ATTR_UNDERLINE) ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE);
-		pango_attr_list_change(attrlist,attr);
-		pango_layout_set_attributes(layout,attrlist);
-	}
+	if(TOGGLED_UNDERLINE && (el->fg & COLOR_ATTR_UNDERLINE))
+		layout = getPangoLayout(TEXT_LAYOUT_UNDERLINE);
+	else
+		layout = getPangoLayout(TEXT_LAYOUT_NORMAL);
 
 	if(el->ch && *el->ch != ' ' && *el->ch)
 	{

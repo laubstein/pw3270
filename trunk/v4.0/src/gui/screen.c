@@ -324,6 +324,9 @@
 	else
 		in.fg = (attr & 0x0F);
 
+	if(attr & COLOR_ATTR_UNDERLINE)
+		in.fg |= COLOR_ATTR_UNDERLINE;
+
 	// Get element entry in the buffer, update ONLY if changed
  	el = screen + pos;
 
@@ -333,9 +336,6 @@
 		in.status |= ELEMENT_STATUS_FIELD_MARKER;
 	else
 		in.status &= ~ELEMENT_STATUS_FIELD_MARKER;
-
-	if(attr & COLOR_ATTR_UNDERLINE)
-		in.fg |= COLOR_ATTR_UNDERLINE;
 
 	if(!memcmp(&in,el,sizeof(ELEMENT)))
 		return 0;
@@ -452,7 +452,7 @@
 
  static void DrawStatus(GdkDrawable *draw, GdkColor *clr)
  {
- 	PangoLayout *layout = getPangoLayout();
+ 	PangoLayout *layout = getPangoLayout(TEXT_LAYOUT_OIA);
 	GdkGC 		*gc = getCachedGC(draw);
 
  	int col = left_margin+(fontWidth << 3);
@@ -549,7 +549,7 @@
 	gdk_draw_line(draw,gc,left_margin,row,left_margin+width,row);
 	row++;
 
-	layout = getPangoLayout();
+	layout = getPangoLayout(TEXT_LAYOUT_OIA);
 
 	gdk_gc_set_foreground(gc,fg);
 

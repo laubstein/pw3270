@@ -359,7 +359,15 @@
 
 	void 	SetHostname(const gchar *hostname);
 
-	PangoLayout * getPangoLayout(void);
+	enum text_layout
+	{
+		TEXT_LAYOUT_NORMAL,
+		TEXT_LAYOUT_UNDERLINE
+	};
+
+	#define TEXT_LAYOUT_OIA TEXT_LAYOUT_NORMAL
+
+	PangoLayout * getPangoLayout(enum text_layout id);
 
 	#ifdef USE_FONT_CACHE
 		void clear_font_cache(void);
