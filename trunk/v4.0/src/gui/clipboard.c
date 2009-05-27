@@ -38,68 +38,74 @@
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
- static gchar *clipboard_data = NULL;
+ static GString *clipboard_contents = NULL;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
  gchar * GetClipboard(void)
  {
-	return g_strdup(clipboard_data ? clipboard_data : "");
+ 	if(!clipboard_contents)
+		return g_strdup("");
+
+	return g_strdup(clipboard_contents->str);
  }
 
- static void setClipboardcontents(gchar *new_data)
+ static void UpdateClipboardString(gboolean append, gchar *str)
  {
- 	if(clipboard_data)
+ 	if(!str)
+ 	{
+		if(clipboard_contents)
+			g_string_truncate(clipboard_contents,0);
+		else
+			clipboard_contents = g_string_new("");
+ 	}
+ 	else if(!clipboard_contents)
+ 	{
+		clipboard_contents = g_string_new(str);
+ 	}
+	else if(append)
 	{
-		g_free(clipboard_data);
-		clipboard_data = NULL;
+		g_string_append_c(clipboard_contents,'\n');
+		g_string_append(clipboard_contents,str);
+	}
+	else
+	{
+		g_string_overwrite(clipboard_contents,0,str);
+		g_string_truncate(clipboard_contents,strlen(str));
 	}
 
- 	if(!(new_data && terminal))
+ 	if(!(clipboard_contents->len > 0 && terminal))
  	{
 		gtk_action_group_set_sensitive(clipboard_actions,FALSE);
 		return;
  	}
 
-	clipboard_data = new_data;
-
-	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_data,-1);
+	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_contents->str,-1);
 	gtk_action_group_set_sensitive(clipboard_actions,TRUE);
 
  }
 
  void action_Copy(void)
  {
-	setClipboardcontents(GetSelection());
+ 	gchar *str = GetSelection();
+ 	UpdateClipboardString(FALSE,str);
+ 	g_free(str);
  }
 
  void action_Append(void)
  {
- 	gchar *sel;
-
- 	if(!clipboard_data)
- 	{
-		action_Copy();
-		return;
- 	}
-
-	sel = GetSelection();
-	if(!sel)
-		return;
-
-	setClipboardcontents(g_strconcat(clipboard_data,"\n",sel,NULL));
-	g_free(sel);
+ 	gchar *str = GetSelection();
+ 	UpdateClipboardString(TRUE,str);
+ 	g_free(str);
  }
 
  static void paste_string(gchar *str)
  {
- 	int			sz;
- 	gchar		*saved;
+ 	int sz;
 
  	if(!str)
  	{
- 		g_free(clipboard_data);
- 		clipboard_data = NULL;
+		UpdateClipboardString(FALSE,NULL);
 		return;
  	}
 
@@ -119,30 +125,16 @@
         gtk_dialog_run(GTK_DIALOG (dialog));
         gtk_widget_destroy(dialog);
 
+
 		return;
 	}
 
-	saved = clipboard_data;
-
 	if(*(str+sz))
-		clipboard_data = g_strdup(str+sz);
+		UpdateClipboardString(FALSE,str+sz);
 	else
-		clipboard_data = NULL;
+		UpdateClipboardString(FALSE,NULL);
 
-#ifdef DEBUG
-	if(clipboard_data)
-	{
-		Trace("%d bytes remains on clipboard",strlen(clipboard_data));
-	}
-	else
-	{
-		Trace("%s","Clipboard is empty");
-	}
-#endif
-
-	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"PasteNext"),clipboard_data != NULL);
-
-	g_free(saved);
+	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"PasteNext"),clipboard_contents->len > 0);
 
 	screen_resume();
 
@@ -285,15 +277,15 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 
  void action_PasteNext(void)
  {
- 	if(clipboard_data)
-		paste_string(clipboard_data);
+ 	if(clipboard_contents && clipboard_contents->len > 0)
+		paste_string(clipboard_contents->str);
 	else
 		action_Paste();
  }
 
  void ClearClipboard(void)
  {
- 	setClipboardcontents(NULL);
+	UpdateClipboardString(FALSE,NULL);
  }
 
  void action_CopyAsTable(void)
@@ -372,10 +364,9 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 
 	Trace("Tabela lida:\n%s\n",buffer->str);
 
-	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),buffer->str,-1);
+	UpdateClipboardString(FALSE,buffer->str);
 
 	g_string_free(buffer,TRUE);
  	g_free(cols);
- 	setClipboardcontents(NULL);
  }
 
