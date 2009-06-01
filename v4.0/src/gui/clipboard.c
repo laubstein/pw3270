@@ -338,6 +338,10 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 
  	for(row=0;row < rect.height;row++)
  	{
+		// Add row delimiter
+		if(buffer->len > 0)
+			g_string_append_c(buffer,'\n');
+
 		el = screen+(((row+rect.y) * terminal_cols)+rect.x);
 		col = 0;
 		while(col < rect.width)
@@ -362,10 +366,6 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 			}
 
 		}
-
-		// Add row delimiter
-		g_string_append_c(buffer,'\n');
-
  	}
 
 	Trace("Tabela lida:\n%s\n",buffer->str);
