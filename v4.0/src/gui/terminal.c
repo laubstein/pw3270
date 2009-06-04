@@ -585,7 +585,7 @@
 	gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
 	gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fontWidth*7,fontHeight);
 
-	layout = getPangoLayout(0);
+	layout = getPangoLayout(TEXT_LAYOUT_OIA);
 
 	sprintf(buffer,"%03d/%03d",cRow+1,cCol+1);
 	pango_layout_set_text(layout,buffer,-1);

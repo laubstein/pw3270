@@ -68,25 +68,25 @@
 
 	for(text = g_object_get_data(G_OBJECT(prt),"3270Text");*text;text++)
 	{
-		gint width, height;
+		gdouble width, height;
 		PangoRectangle	rect;
 
 		pango_layout_set_text(FontLayout,*text,-1);
 
-		pango_layout_get_extents(FontLayout,&rect,NULL);
+		pango_layout_get_extents(FontLayout,NULL,&rect);
 		width = rect.width / PANGO_SCALE;
 		height = rect.height / PANGO_SCALE;
 
 		pos = current;
 
-		if( (current+ ((gdouble) height)) > maxHeight)
+		if( (current+height) > maxHeight)
 		{
 			pg++;
 			current = 0;
 		}
 		else
 		{
-			current += ((gdouble) height);
+			current += height;
 		}
 
 		if(cr && page == pg)
@@ -161,24 +161,18 @@
 #endif
 	GtkPageSetup			*setup		= gtk_print_operation_get_default_page_setup(prt);
 
+
 	if(!conf)
 		return;
 
-	if(settings)
-	{
+	Trace("Settings: %p Conf: %p",settings,conf);
 #if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
-		gtk_print_settings_to_key_file(settings,conf,"PrintSettings");
+	gtk_print_settings_to_key_file(settings,conf,NULL);
+	gtk_page_setup_to_key_file(setup,conf,NULL);
 #else
-		gtk_print_settings_foreach(settings,(GtkPrintSettingsFunc) SavePrintSetting,conf);
+	gtk_print_settings_foreach(settings,(GtkPrintSettingsFunc) SavePrintSetting,conf);
 #endif
-	}
 
-	if(setup)
-	{
-#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
-		gtk_page_setup_to_key_file(setup,NULL,NULL);
-#endif
-	}
 
 #ifdef HAVE_PRINT_FONT_DIALOG
 	if(FontDescr)
@@ -234,7 +228,7 @@
 	if(conf)
 	{
 #if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
-		gtk_print_operation_set_print_settings(prt,gtk_print_settings_new_from_key_file(conf,"PrintSettings",NULL));
+		gtk_print_operation_set_print_settings(prt,gtk_print_settings_new_from_key_file(conf,NULL,NULL));
 		gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new_from_key_file(conf,NULL,NULL));
 #else
 		settings = gtk_print_settings_new();
