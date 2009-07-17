@@ -136,7 +136,6 @@ strip bin/Release/lib3270.so
 make -C src/extensions/uno %{name}.oxt
 %endif
 
-make src/gui/@PACKAGE@.@LOGOEXT@
 strip bin/Release/@PACKAGE@
 
 %if 0%{?_rexx}
