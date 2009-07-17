@@ -151,20 +151,29 @@
 
     if(!buffer)
     {
-		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
-													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_OK,
-													_(  "Can't convert clipboard charset to %s" ), CHARSET);
+    	/* Falhou ao converter - Reajusta e tenta de novo ( Ver ticket #77 ) */
 
-		gtk_window_set_title(GTK_WINDOW(dialog), _( "Charset error" ) );
-		if(error)
-			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s", error->message ? error->message : N_( "Unexpected error" ));
 
-        gtk_dialog_run(GTK_DIALOG (dialog));
-        gtk_widget_destroy(dialog);
+		// TODO (perry#1#): Substituir caracteres com problema.
 
-        return;
+
+    	if(!buffer)
+    	{
+			GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+														GTK_DIALOG_DESTROY_WITH_PARENT,
+														GTK_MESSAGE_ERROR,
+														GTK_BUTTONS_OK,
+														_(  "Can't convert clipboard charset to %s" ), CHARSET);
+
+			gtk_window_set_title(GTK_WINDOW(dialog), _( "Charset error" ) );
+			if(error)
+				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s", error->message ? error->message : N_( "Unexpected error" ));
+
+			gtk_dialog_run(GTK_DIALOG (dialog));
+			gtk_widget_destroy(dialog);
+
+			return;
+    	}
     }
 
 	if(error)
