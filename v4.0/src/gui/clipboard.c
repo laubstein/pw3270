@@ -145,6 +145,8 @@
  	if(!text)
 		return;
 
+ 	Trace("%s",__FUNCTION__);
+
 	buffer = g_convert(text, -1, CHARSET, "UTF-8", NULL, NULL, &error);
 
     if(!buffer)
@@ -184,6 +186,7 @@
 
  static void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
+ 	Trace("%s",__FUNCTION__);
 	process_text_received(text);
  }
 
@@ -259,6 +262,7 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 
  void action_Paste(void)
  {
+ 	Trace("%s",__FUNCTION__);
 	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_text_received,(gpointer) 0);
  }
 
