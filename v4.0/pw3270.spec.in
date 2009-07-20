@@ -45,7 +45,7 @@ Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Requires:       openssl shared-mime-info libgnome libgnomeui %{name}-lib = @PACKAGE_VERSION@
 Distribution:    %_distro
-BuildRequires:  autoconf sed pkgconfig gtk2-devel libgnome-devel libgnomeui-devel ImageMagick
+BuildRequires:  autoconf automake gcc-c++ sed pkgconfig gtk2-devel libgnome-devel libgnomeui-devel ImageMagick gettext-tools
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
