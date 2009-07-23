@@ -22,7 +22,7 @@ dnl Perry Werneck<perry.werneck@gmail.com>
 dnl
 
 AC_PREREQ(2.60)
-AC_INIT(g3270,3.3.4)
+AC_INIT(pw3270,3.3.4)
 AC_CONFIG_HEADER(src/config.h)
 
 # Checks for programs.

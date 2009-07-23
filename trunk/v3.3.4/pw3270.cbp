@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="g3270" />
+		<Option title="pw3270" />
 		<Option makefile_is_custom="1" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
@@ -38,10 +38,11 @@
 		</Linker>
 		<Unit filename="Makefile.in" />
 		<Unit filename="aclocal.m4" />
+		<Unit filename="build.sh" />
 		<Unit filename="configure.ac" />
-		<Unit filename="g3270.spec" />
 		<Unit filename="license.txt" />
 		<Unit filename="menu.conf" />
+		<Unit filename="pw3270.spec" />
 		<Unit filename="src/actions.c">
 			<Option compilerVar="CC" />
 		</Unit>
