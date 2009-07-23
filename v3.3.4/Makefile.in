@@ -103,11 +103,5 @@ clean:
 	@find . -name "*.log" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "leak.out" -exec mv -f {} $(TMPDIR) \;
 
-tgz: @PACKAGE_TARNAME@.tar.gz
-
-@PACKAGE_TARNAME@.tar.gz: clean
-	@rm -f $@
-	@tar --create --gzip --verbose --directory .. --file=$@ `basename $(PWD)`
-
 
 
