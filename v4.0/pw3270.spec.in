@@ -36,7 +36,7 @@
 
 
 Name:           @PACKAGE@
-License:        GPL
+License:        LGPL
 Group:          System/X11/Terminals
 Version:        @PACKAGE_VERSION@
 Release:        %_release
@@ -217,6 +217,7 @@ unopkg remove --shared %{name}.oxt
 
 %files lib
 %defattr(-,root,root)
+%doc LICENÇA AUTHORS
 %{_libdir}/lib3270.so
 
 %files devel
