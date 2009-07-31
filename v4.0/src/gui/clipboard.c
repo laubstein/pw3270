@@ -77,8 +77,13 @@
 	}
 	else
 	{
+#if GTK_CHECK_VERSION(2,14,0)
 		g_string_overwrite(clipboard_contents,0,str);
 		g_string_truncate(clipboard_contents,strlen(str));
+#else
+		g_string_truncate(clipboard_contents,0);
+		g_string_append(clipboard_contents,str);
+#endif
 	}
 
  	if(!(clipboard_contents->len > 0 && terminal))

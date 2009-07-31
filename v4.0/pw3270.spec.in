@@ -45,7 +45,7 @@ Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Requires:       openssl shared-mime-info libgnome libgnomeui %{name}-lib = @PACKAGE_VERSION@
 Distribution:    %_distro
-BuildRequires:  autoconf automake gcc-c++ sed pkgconfig gtk2-devel libgnome-devel libgnomeui-devel ImageMagick gettext-tools
+BuildRequires:  autoconf automake gcc-c++ sed pkgconfig gtk2-devel libgnome-devel libgnomeui-devel ImageMagick gettext-devel
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
@@ -113,7 +113,7 @@ Revision: @PACKAGE_REVISION@
 %setup -q -n %{name}-%{version}
 aclocal
 autoconf
-%configure --disable-trace --with-release=@PACKAGE_RELEASE@
+%configure --disable-trace
 
 %if 0%{?_uno}
 cd %{_builddir}/%{name}-%{version}/src/extensions/uno
