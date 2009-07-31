@@ -1,6 +1,5 @@
 %define _rel 23
 
-
 %define _fedora		%(if [ -f /etc/fedora-release ]; then echo 1; else echo 0; fi)
 %define _redhat		%(if [ -f /etc/redhat-release ]; then echo 1; else echo 0; fi)
 %define _mandrake	%(if [ -f /etc/mandrake-release ]; then echo 1; else echo 0; fi)
