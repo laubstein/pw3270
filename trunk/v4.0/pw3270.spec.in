@@ -185,6 +185,10 @@ mkdir -p $RPM_BUILD_ROOT/%ooo_prefix/%ooo_home/share/extension/install/
 install -m 644 src/extensions/uno/%{name}.oxt $RPM_BUILD_ROOT/%ooo_prefix/%ooo_home/share/extension/install/%{name}.oxt
 %endif
 
+mkdir -p $RPM_BUILD_ROOT/%{_docdir}/%{name}
+install -m 644 LICENÇA $RPM_BUILD_ROOT/%{_docdir}/%{name}
+install -m 644 LICENSE $RPM_BUILD_ROOT/%{_docdir}/%{name}
+install -m 644 AUTHORS $RPM_BUILD_ROOT/%{_docdir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -217,7 +221,7 @@ unopkg remove --shared %{name}.oxt
 
 %files lib
 %defattr(-,root,root)
-%doc LICENÇA AUTHORS
+%{_docdir}/%{name}
 %{_libdir}/lib3270.so
 
 %files devel
