@@ -960,7 +960,7 @@
 													GTK_BUTTONS_CLOSE,
 													"%s",msg );
 
- 	g_warning(msg);
+ 	g_warning("%s",msg);
 
 	gtk_dialog_run(GTK_DIALOG (dialog));
 	gtk_widget_destroy(dialog);
@@ -977,7 +977,7 @@
 													GTK_BUTTONS_CLOSE,
 													"%s",msg );
 
- 	g_warning(msg);
+ 	g_warning("%s",msg);
 
 	gtk_dialog_run(GTK_DIALOG (dialog));
 	gtk_widget_destroy(dialog);
