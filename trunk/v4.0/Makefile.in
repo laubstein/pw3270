@@ -27,14 +27,14 @@
 # macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
 #
 
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-bindir=@bindir@
-LIBDIR=@libdir@
-PACKAGE=@PACKAGE@
-PACKAGE_VERSION=@PACKAGE_VERSION@
-datarootdir=@datarootdir@
-LOCALEDIR=@localedir@
+prefix ?= @prefix@
+exec_prefix ?= @exec_prefix@
+bindir ?= @bindir@
+LIBDIR ?= @libdir@
+PACKAGE ?= @PACKAGE@
+PACKAGE_VERSION ?= @PACKAGE_VERSION@
+datarootdir ?= @datarootdir@
+LOCALEDIR ?= @localedir@
 
 PLUGINS=@PLUGINS@
 EXTENSIONS=@EXTENSIONS@

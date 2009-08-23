@@ -12,11 +12,12 @@
 	%define _distro SuSE Linux %{suse_version}
 %endif
 
-%if 0%{?mandriva_version}
-	%define _release %{_rel}.mdk%{mandrake_version}
+%if 0%{?mdkversion}
+	%define _release %{_rel}.mdv%{mandriva_release}
 	%define _redhat 0
-	%define _distro Mandriva Linux %{mandrake_version}
+	%define _distro Mandriva Linux %{mandriva_release}
 %endif
+
 
 %if 0%{?fedora_version}
 	%define _release %{_rel}.fc%{fedora_version}
@@ -45,7 +46,7 @@ Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Requires:       openssl shared-mime-info libgnome libgnomeui %{name}-lib = @PACKAGE_VERSION@
 Distribution:    %_distro
-BuildRequires:  autoconf automake gcc-c++ sed pkgconfig gtk2-devel libgnome-devel libgnomeui-devel ImageMagick gettext-devel
+BuildRequires:  autoconf automake gcc-c++ sed pkgconfig gtk2-devel libgnome-devel ImageMagick gettext-devel
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
@@ -146,7 +147,7 @@ make bin/Release/librx3270.so
 %install
 rm -rf $RPM_BUILD_ROOT
 cd %{_builddir}/%{name}-%{version}
-%makeinstall
+make DESTDIR=$RPM_BUILD_ROOT install
 
 # Desktop menu entry
 cat > %{name}.desktop << EOF
