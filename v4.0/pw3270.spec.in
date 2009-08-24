@@ -18,7 +18,6 @@
 	%define _distro Mandriva Linux %{mandriva_release}
 %endif
 
-
 %if 0%{?fedora_version}
 	%define _release %{_rel}.fc%{fedora_version}
 	%define _redhat 0
@@ -150,6 +149,8 @@ cd %{_builddir}/%{name}-%{version}
 make DESTDIR=$RPM_BUILD_ROOT install
 
 # Desktop menu entry
+mkdir -p %{buildroot}%{_datadir}/pixmaps/
+install -m 644 image/icon.svg %{buildroot}%{_datadir}/pixmaps/%{name}.svg
 cat > %{name}.desktop << EOF
 [Desktop Entry]
 Encoding=UTF-8
@@ -158,7 +159,7 @@ Name=3270 Terminal
 Name[pt_BR]=Terminal 3270
 Comment=IBM 3270 Terminal emulator
 Exec=%{_bindir}/%{name}
-Icon=%{_datadir}/%{name}/%{name}.@LOGOEXT@
+Icon=%{_datadir}/pixmaps/%{name}.svg
 Terminal=false
 Type=Application
 EOF
@@ -203,6 +204,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}/ui/default.act
 %{_datadir}/%{name}/%{name}.@LOGOEXT@
 %{_datadir}/%{name}/colors.conf
+%{_datadir}/pixmaps/%{name}.svg
 
 %post
 /sbin/ldconfig

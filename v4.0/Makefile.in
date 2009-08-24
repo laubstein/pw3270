@@ -259,6 +259,19 @@ bin/Release/librx3270$(DLLEXT): 		bin/Release/lib3270$(DLLEXT) \
 # Misc Targets
 ####################################################################################################
 
+$(PACKAGE).desktop: Makefile
+	@rm -f $@
+	@echo "[Desktop Entry]" > $@
+	@echo "Encoding=UTF-8" >> $@
+	@echo "GenericName=$(PACKAGE)" >> $@
+	@echo "Name=3270 Terminal" >> $@
+	@echo "Name[pt_BR]=Terminal 3270" >> $@
+	@echo "Comment=IBM 3270 Terminal emulator" >> $@
+	@echo "Exec=$(bindir)/$(PACKAGE)" >> $@
+	@echo "Icon=$(datarootdir)/$(PACKAGE)/$(PACKAGE).@LOGOEXT@" >> $@
+	@echo "Terminal=false" >> $@
+	@echo "Type=Application" >> $@
+
 $(PACKAGE).ico: @ICONFILE@
 	@cp @ICONFILE@ $@
 
@@ -287,7 +300,7 @@ $(PACKAGE).po: $(PACKAGE).pot
 
 tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 
-install: Release po/pt_BR.po
+install: Release po/pt_BR.po $(PACKAGE).desktop
 	@mkdir -p $(DESTDIR)/$(bindir)
 	@mkdir -p $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
@@ -301,6 +314,9 @@ install: Release po/pt_BR.po
 	@install --mode=644 $(PACKAGE).@LOGOEXT@ $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
+
+	@mkdir -p $(DESTDIR)/$(datarootdir)/applications/
+	@install --mode=644 $(PACKAGE).desktop $(DESTDIR)/$(datarootdir)/applications/$(PACKAGE).desktop
 
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES
 	@msgfmt -c -v -o $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo po/pt_BR.po
