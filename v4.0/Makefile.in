@@ -30,15 +30,17 @@
 prefix ?= @prefix@
 exec_prefix ?= @exec_prefix@
 bindir ?= @bindir@
+docdir ?= @docdir@
 LIBDIR ?= @libdir@
 PACKAGE ?= @PACKAGE@
+PACKAGE_TARNAME ?= @PACKAGE_TARNAME@
 PACKAGE_VERSION ?= @PACKAGE_VERSION@
 datarootdir ?= @datarootdir@
 LOCALEDIR ?= @localedir@
 
-PLUGINS=@PLUGINS@
-EXTENSIONS=@EXTENSIONS@
-DLLEXT=@DLLEXT@
+PLUGINS ?= @PLUGINS@
+EXTENSIONS ?= @EXTENSIONS@
+DLLEXT ?= @DLLEXT@
 
 TARGETS = @PROGRAM_NAME@@EXEEXT@
 
@@ -301,13 +303,16 @@ $(PACKAGE).po: $(PACKAGE).pot
 tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 
 install: Release po/pt_BR.po $(PACKAGE).desktop
+
 	@mkdir -p $(DESTDIR)/$(bindir)
 	@mkdir -p $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
 	@mkdir -p $(DESTDIR)/@includedir@/lib3270
+
 	@for i in $(TARGETS); do install --mode=755 bin/Release/$$i $(DESTDIR)/$(bindir); done
 	@for i in $(PLUGINS); do install --mode=755 bin/Release/plugins/$$i$(DLLEXT) $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins; done
+
 	@install --mode=755 bin/Release/lib3270.so $(DESTDIR)/$(LIBDIR)
 	@install --mode=644 ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/default.act $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
@@ -320,6 +325,12 @@ install: Release po/pt_BR.po $(PACKAGE).desktop
 
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES
 	@msgfmt -c -v -o $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo po/pt_BR.po
+
+	@mkdir -p $(DESTDIR)/$(docdir)
+	@install --mode=644 LICENÇA $(DESTDIR)/$(docdir)
+	@install --mode=644 LICENSE $(DESTDIR)/$(docdir)
+	@install --mode=644 AUTHORS $(DESTDIR)/$(docdir)
+
 
 $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 
