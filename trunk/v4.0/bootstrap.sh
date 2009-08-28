@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RELEASE=1
+RELEASE=2
 
 svn update
 if [ "$?" == "0" ]; then

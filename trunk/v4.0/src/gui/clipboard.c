@@ -157,10 +157,43 @@
     if(!buffer)
     {
     	/* Falhou ao converter - Reajusta e tenta de novo ( Ver ticket #77 ) */
+    	int f;
 
+    	static const struct _xlat
+    	{
+    		const gchar *from;
+    		const gchar *to;
+    	} xlat[] =
+    	{
+    		{ "–", "-" }
+    	};
 
-		// TODO (perry#1#): Substituir caracteres com problema.
+		gchar *string = g_strdup(text);
 
+		if(error)
+		{
+			g_error_free(error);
+			error = NULL;
+		}
+
+		// FIXME (perry#1#): Is there any better way for a "sed" here?
+		for(f=0;f<G_N_ELEMENTS(xlat);f++)
+		{
+			gchar *ptr = g_strstr_len(string,-1,xlat[f].from);
+
+			if(ptr)
+			{
+				gchar *old = string;
+				gchar **tmp = g_strsplit(old,xlat[f].from,-1);
+				string = g_strjoinv(xlat[f].to,tmp);
+				g_strfreev(tmp);
+				g_free(old);
+			}
+		}
+
+		buffer = g_convert(string, -1, CHARSET, "UTF-8", NULL, NULL, &error);
+
+		g_free(string);
 
     	if(!buffer)
     	{
