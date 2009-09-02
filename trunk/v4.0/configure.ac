@@ -213,6 +213,33 @@ AC_ARG_WITH([program-name],
 	pw3270_cv_progname="$PACKAGE_NAME"
 ])
 
+#
+# Check for OpenOffice.org
+#
+AC_ARG_WITH([office-home],
+	[AS_HELP_STRING([--with-office-home], [Define OpenOffice.org program home])],
+[
+	oo_home="$withval"
+],[
+	AC_CHECK_FILE("/usr/lib/ooo3/program/soffice.bin",oo_home="/usr/lib/ooo3",oo_home="none")
+])
+
+AC_ARG_WITH([office-sdk-home],
+	[AS_HELP_STRING([--with-office-sdk-home], [Define Open-Office sdk home])],
+[
+	oo_sdk_home="$withval"
+],[
+	AC_CHECK_FILE("/opt/openoffice.org/basis3.1/sdk/config.sub",oo_sdk_home="/opt/openoffice.org/basis3.1/sdk",oo_sdk_home="none")
+])
+
+AC_PATH_PROG([IDLC], idlc, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
+AC_PATH_PROG([CPPUMAKER], cppumaker, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
+AC_PATH_PROG([REGMERGE], regmerge, "no", [$PATH$PATH_SEPARATOR$oo_home/ure/bin])
+AC_PATH_PROG([REGCOMP], regcomp, "no", [$PATH$PATH_SEPARATOR$oo_home/ure/bin])
+
+AC_SUBST(OO_SDK_HOME,$oo_sdk_home)
+AC_SUBST(OO_HOME,$oo_home)
+
 
 # Checks for libraries.
 PKG_CHECK_EXISTS

@@ -78,7 +78,7 @@ AC_ARG_WITH([office-sdk-home],
 [
 	o3270_cv_sdkhome="$withval"
 ],[
-	o3270_cv_sdkhome="/usr/lib/ooo3/solver"
+	o3270_cv_sdkhome="/opt/openoffice.org/basis3.1/sdk"
 ])
 
 AC_ARG_WITH([office-program],
@@ -126,7 +126,7 @@ AC_ARG_WITH([types.rdb],
 [
 	o3270_cv_types_rdb="$withval"
 ],[
-	o3270_cv_types_rdb="\$(OO_SDK_HOME)/bin/types.rdb"
+	o3270_cv_types_rdb="/opt/openoffice.org/ure/share/misc/types.rdb"
 ])
 
 AC_ARG_WITH([office-include-path],

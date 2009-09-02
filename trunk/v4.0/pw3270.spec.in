@@ -1,6 +1,6 @@
-%define	    ooo_prefix		%_libdir
-%define	    ooo_home		ooo3
-%define		ooo_sdk_home	%_libdir/ooo3/solver
+%define	ooo_prefix	%_libdir
+%define	ooo_home	%{_libdir}/ooo3
+%define	ooo_sdk_home	/opt/openoffice.org/basis3.1/sdk
 
 %define _rel	@PACKAGE_RELEASE@
 
@@ -98,7 +98,7 @@ Provides:	%{name}-OpenOffice
 Group:		Productivity/Office/Suite
 Summary:	3270 calls for OpenOffice/StarBasic.
 Requires:	%{name}-lib = @PACKAGE_VERSION@ OpenOffice_org-libs-core
-BuildRequires:	autoconf sed pkgconfig zip OpenOffice_org-ure-devel
+BuildRequires:	autoconf sed pkgconfig zip ooobasis3.1-sdk OpenOffice_org-ure-devel
 
 %description OpenOffice
 Uno/OpenOffice library allowing 3270 access from StarBasic
@@ -106,7 +106,6 @@ Uno/OpenOffice library allowing 3270 access from StarBasic
 Revision: @PACKAGE_REVISION@
 
 %endif
-
 
 %prep
 

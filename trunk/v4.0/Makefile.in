@@ -30,12 +30,14 @@
 prefix ?= @prefix@
 exec_prefix ?= @exec_prefix@
 bindir ?= @bindir@
-docdir ?= @docdir@
 LIBDIR ?= @libdir@
 PACKAGE ?= @PACKAGE@
 PACKAGE_TARNAME ?= @PACKAGE_TARNAME@
 PACKAGE_VERSION ?= @PACKAGE_VERSION@
+
 datarootdir ?= @datarootdir@
+docdir ?= @docdir@
+
 LOCALEDIR ?= @localedir@
 
 PLUGINS ?= @PLUGINS@
@@ -52,6 +54,16 @@ CC = @CC@
 LD = @LD@
 NATIVECC = @HOST_CC@
 WINDRES = @WINDRES@
+
+####################################################################################################
+# OpenOffice.org stuff        
+####################################################################################################
+OO_SDK_HOME ?= @OO_SDK_HOME@
+OO_HOME ?= @OO_HOME@
+IDLC ?= @IDLC@
+CPPUMAKER ?= @CPPUMAKER@
+REGMERGE ?= @REGMERGE@
+REGCOMP ?= @REGCOMP@
 
 ####################################################################################################
 # Set compile/link parameters
