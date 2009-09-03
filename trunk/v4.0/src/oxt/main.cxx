@@ -1,12 +1,12 @@
 
-#include "ooo3270.hpp"
-// #include <rtl/uuid.h>
+#include "globals.hpp"
+#include <rtl/uuid.h>
 #include <com/sun/star/registry/XRegistryKey.hpp>
 #include <com/sun/star/lang/XSingleComponentFactory.hpp>
 
-// #include <comphelper/componentmodule.hxx>
+#include "ooo3270.hpp"
 
-#include <lib3270/api.h>
+// #include <comphelper/componentmodule.hxx>
 
 // http://wiki.services.openoffice.org/wiki/Documentation/DevGuide/WritingUNO/C%2B%2B/C%2B%2B_Component
 // http://wiki.services.openoffice.org/wiki/Documentation/DevGuide/WritingUNO/C%2B%2B/Providing_a_Single_Factory_Using_a_Helper_Method
@@ -16,7 +16,7 @@ using namespace com::sun::star::lang; // for XSingleComponentFactory
 
 /*---[ Statics ]-------------------------------------------------------------------------------------------*/
 
-static Sequence< OUString > getSupportedServiceNames_g3270()
+static Sequence< OUString > getSupportedServiceNames()
 {
 	Sequence<OUString> names(1);
 
@@ -26,19 +26,19 @@ static Sequence< OUString > getSupportedServiceNames_g3270()
 	return names;
 }
 
-static OUString getImplementationName_g3270()
+/*
+static OUString getImplementationName()
 {
 	Trace("%s returns: %s",__FUNCTION__, IMPLNAME);
 
 	return OUString( RTL_CONSTASCII_USTRINGPARAM(IMPLNAME) );
 }
+*/
 
-
-static Reference< XInterface > SAL_CALL CreateInstance_g3270( const Reference< XComponentContext > & xContext )
+static Reference< XInterface > SAL_CALL CreateInstance( const Reference< XComponentContext > & xContext )
 {
-	return static_cast< lang::XTypeProvider * >( new g3270::uno_impl( xContext ) );
+  return static_cast< XTypeProvider * >( new pw3270::uno_impl( xContext ) );
 }
-
 
 /*---[ Implement exported calls ]--------------------------------------------------------------------------*/
 
@@ -100,7 +100,7 @@ extern "C" sal_Bool SAL_CALL component_writeInfo(void * pServiceManager, void * 
 				reinterpret_cast< XRegistryKey * >( pRegistryKey )->createKey(
 					OUString( RTL_CONSTASCII_USTRINGPARAM("/" IMPLNAME "/UNO/SERVICES") ) ) );
 
-			const Sequence< OUString > & rSNL = getSupportedServiceNames_g3270();
+			const Sequence< OUString > & rSNL = getSupportedServiceNames();
 			const OUString * pArray = rSNL.getConstArray();
 
 			for ( sal_Int32 nPos = rSNL.getLength(); nPos--; )
@@ -146,7 +146,7 @@ extern "C" void * SAL_CALL component_getFactory(const sal_Char * pImplName, void
 	if(pServiceManager && rtl_str_compare( pImplName, IMPLNAME ) == 0)
 	{
 		Reference< XSingleComponentFactory > xFactory( ::cppu::createSingleComponentFactory(
-					CreateInstance_g3270, OUString::createFromAscii( IMPLNAME ), getSupportedServiceNames_g3270() ));
+					CreateInstance, OUString::createFromAscii( IMPLNAME ), getSupportedServiceNames() ));
 
 
 		if (xFactory.is())
@@ -161,38 +161,35 @@ extern "C" void * SAL_CALL component_getFactory(const sal_Char * pImplName, void
 
 /*---[ Implement XInitialization ]-------------------------------------------------------------------------*/
 
-void SAL_CALL g3270::uno_impl::initialize( Sequence< Any > const & args ) throw (Exception)
+void SAL_CALL pw3270::uno_impl::initialize( Sequence< Any > const & args ) throw (Exception)
 {
 	Trace("%s",__FUNCTION__);
 }
 
 /*---[ Implement XServiceInfo ]----------------------------------------------------------------------------*/
 
-OUString SAL_CALL g3270::uno_impl::getImplementationName(  ) throw(RuntimeException)
+OUString SAL_CALL pw3270::uno_impl::getImplementationName(  ) throw(RuntimeException)
 {
 	Trace("%s",__FUNCTION__);
 	return OUString( RTL_CONSTASCII_USTRINGPARAM(IMPLNAME) );
 }
 
-sal_Bool SAL_CALL g3270::uno_impl::supportsService( const OUString& ServiceName ) throw(RuntimeException)
+sal_Bool SAL_CALL pw3270::uno_impl::supportsService( const OUString& ServiceName ) throw(RuntimeException)
 {
 	Trace("%s",__FUNCTION__);
 	return ServiceName.equalsAsciiL( RTL_CONSTASCII_STRINGPARAM("IMPLNAME") );
 }
 
-Sequence< OUString > g3270::uno_impl::getSupportedServiceNames() throw (RuntimeException)
+Sequence< OUString > pw3270::uno_impl::getSupportedServiceNames() throw (RuntimeException)
 {
-	return getSupportedServiceNames_g3270();
+	return getSupportedServiceNames();
 }
 
-/*---[ Implement I3270 ]-----------------------------------------------------------------------------------*/
-
-namespace g3270
-{
+/*---[ Implement pw3270 ]----------------------------------------------------------------------------------*/
 
 static bool started = false;
 
-uno_impl::uno_impl( const Reference< XComponentContext > & xContext )
+pw3270::uno_impl::uno_impl( const Reference< XComponentContext > & xContext )
 {
 	Trace("Object created %s",__FUNCTION__);
 
@@ -205,15 +202,14 @@ uno_impl::uno_impl( const Reference< XComponentContext > & xContext )
 
 }
 
-uno_impl::~uno_impl()
+pw3270::uno_impl::~uno_impl()
 {
 	Trace("Object deleted %s",__FUNCTION__);
 }
 
 
-OUString SAL_CALL uno_impl::getVersion() throw (RuntimeException)
+OUString SAL_CALL pw3270::uno_impl::getVersion() throw (RuntimeException)
 {
 	return OUString( RTL_CONSTASCII_USTRINGPARAM( PACKAGE_VERSION ) );
 }
 
-};

@@ -41,7 +41,7 @@
 			<Target title="oooDebug">
 				<Option output="bin/Debug/unotest" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
-				<Option type="0" />
+				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
@@ -629,7 +629,19 @@
 		</Unit>
 		<Unit filename="src/lib/xioc.h" />
 		<Unit filename="src/lib/xl.h" />
+		<Unit filename="src/oxt/globals.hpp">
+			<Option target="Release" />
+			<Option target="oooDebug" />
+		</Unit>
+		<Unit filename="src/oxt/ooo3270.hpp">
+			<Option target="Release" />
+			<Option target="oooDebug" />
+		</Unit>
 		<Unit filename="src/oxt/pw3270.idl">
+			<Option target="Release" />
+			<Option target="oooDebug" />
+		</Unit>
+		<Unit filename="src/oxt/testprogram.cxx">
 			<Option target="Release" />
 			<Option target="oooDebug" />
 		</Unit>
