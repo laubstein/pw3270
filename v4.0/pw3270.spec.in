@@ -1,6 +1,6 @@
-%define	ooo_prefix	%_libdir
-%define	ooo_home	%{_libdir}/ooo3
-%define	ooo_sdk_home	/opt/openoffice.org/basis3.1/sdk
+%define	ooo_home	@OO_HOME@
+%define ooo_ure_home	@OO_URE_HOME@
+%define	ooo_sdk_home	@OO_SDK_HOME@
 
 %define _rel	@PACKAGE_RELEASE@
 
@@ -112,18 +112,11 @@ Revision: @PACKAGE_REVISION@
 %setup -q -n %{name}-%{version}
 aclocal
 autoconf
-%configure --disable-trace
 
 %if 0%{?_uno}
-cd %{_builddir}/%{name}-%{version}/src/extensions/uno
-
-autoconf
-
-LIB3270_CFLAGS="-DV337=1 -I%{_builddir}/%{name}-%{version}/src/include" \
-LIB3270_LIBS="-L%{_builddir}/%{name}-%{version}/bin/Release -l3270" \
-./configure --with-office-sdk-home="%{ooo_sdk_home}" --with-office-home="%{ooo_prefix}/%{ooo_home}"
-
-cd %{_builddir}/%{name}-%{version}
+	%configure --disable-trace --with-office-sdk-home="%{ooo_sdk_home}" --with-office-home="%{ooo_home}" --with-office-ure-home="%{ooo_ure_home}"
+%else
+	%configure --disable-trace
 %endif
 
 %build
@@ -132,7 +125,7 @@ make Release
 strip bin/Release/lib3270.so
 
 %if 0%{?_uno}
-make -C src/extensions/uno %{name}.oxt
+make %{name}.oxt
 %endif
 
 strip bin/Release/@PACKAGE@
@@ -184,8 +177,8 @@ install -m 644 bin/Release/librx3270.so %{buildroot}%{_libdir}/librx3270.so
 %endif
 
 %if 0%{?_uno}
-mkdir -p $RPM_BUILD_ROOT/%ooo_prefix/%ooo_home/share/extension/install/
-install -m 644 src/extensions/uno/%{name}.oxt $RPM_BUILD_ROOT/%ooo_prefix/%ooo_home/share/extension/install/%{name}.oxt
+mkdir -p $RPM_BUILD_ROOT/%ooo_home/share/extension/install/
+install -m 644 %{name}.oxt $RPM_BUILD_ROOT/%ooo_home/share/extension/install/%{name}.oxt
 %endif
 
 %clean
@@ -212,7 +205,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %if 0%{?_uno}
 %post OpenOffice
-unopkg add --shared %ooo_prefix/%ooo_home/share/extension/install/%{name}.oxt
+unopkg add --shared %ooo_home/share/extension/install/%{name}.oxt
 
 %preun OpenOffice
 unopkg remove --shared %{name}.oxt
@@ -241,7 +234,7 @@ unopkg remove --shared %{name}.oxt
 %if 0%{?_uno}
 %files OpenOffice
 %defattr(-,root,root)
-%ooo_prefix/%ooo_home/share/extension/install/*.oxt
+%ooo_home/share/extension/install/*.oxt
 %endif
 
 
