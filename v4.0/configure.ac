@@ -241,6 +241,15 @@ AC_ARG_WITH([office-sdk-home],
 	AC_CHECK_FILE("/opt/openoffice.org/basis3.1/sdk/config.sub",oo_sdk_home="/opt/openoffice.org/basis3.1/sdk",oo_sdk_home="none")
 ])
 
+AC_ARG_WITH([office-ure-home],
+	[AS_HELP_STRING([--with-office-ure-home], [Define Open-Office ure home])],
+[
+	oo_ure_home="$withval"
+],[
+	AC_CHECK_FILE("/opt/openoffice.org/ure/lib/unorc",oo_ure_home="/opt/openoffice.org/ure",oo_ure_home="none")
+])
+
+
 AC_ARG_WITH([office-types],
 	[AS_HELP_STRING([--with-office-types], [Define Open-Office types.rdb file])],
 [
@@ -256,6 +265,7 @@ AC_PATH_PROG([REGMERGE], regmerge, "no", [$PATH$PATH_SEPARATOR$oo_home/ure/bin])
 AC_PATH_PROG([REGCOMP], regcomp, "no", [$PATH$PATH_SEPARATOR$oo_home/ure/bin])
 
 AC_SUBST(OO_SDK_HOME,$oo_sdk_home)
+AC_SUBST(OO_URE_HOME,$oo_ure_home)
 AC_SUBST(OO_HOME,$oo_home)
 AC_SUBST(TYPES_RDB,$types_rdb)
 AC_SUBST(CPPUENV)

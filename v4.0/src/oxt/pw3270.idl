@@ -17,7 +17,7 @@ module br { module com { module bb {
      * http://wiki.services.openoffice.org/wiki/Documentation/DevGuide/ProUNO/Bridge/Default_Mappings
      *
      */
-    interface pw3270 : com::sun::star::uno::XInterface
+    interface pw3270intf : com::sun::star::uno::XInterface
     {
 		string	getVersion();
 
@@ -41,10 +41,10 @@ module br { module com { module bb {
 
     };
 
-    service srv3270
+    service pw3270
     {
         // exported interfaces:
-        interface pw3270;
+        interface pw3270intf;
     };
 
 }; }; };

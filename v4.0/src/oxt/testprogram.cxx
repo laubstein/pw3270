@@ -1,36 +1,5 @@
 
-#include <stdio.h>
-
-#ifndef WIN32
-    #include <unistd.h>
-#endif
-
-#include <rtl/ustring.hxx>
-
-#include <osl/diagnose.h>
-
-#include <cppuhelper/bootstrap.hxx>
-
-// generated c++ interfaces
-#include <com/sun/star/lang/XComponent.hpp>
-#include <com/sun/star/lang/XMultiComponentFactory.hpp>
-#include <com/sun/star/registry/XImplementationRegistration.hpp>
-#include <br/com/bb/I3270.hpp>
-
-#include "config.hpp"
-
-using namespace br::com::bb;
-using namespace cppu;
-using namespace com::sun::star::uno;
-using namespace com::sun::star::lang;
-using namespace com::sun::star::registry;
-
-using namespace ::rtl;
-
-
-#ifndef Trace
-	#define Trace( fmt, ... )		fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr)
-#endif
+#include "globals.hpp"
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
@@ -41,11 +10,10 @@ int SAL_CALL main(int argc, char **argv)
 	Reference< XSimpleRegistry > xReg = createSimpleRegistry();
 	OSL_ENSURE( xReg.is(), "### cannot get service instance of \"com.sun.star.regiystry.SimpleRegistry\"!" );
 
-//	printf("%s(%d)\n",__FILE__,__LINE__);
-//	xReg->open(OUString::createFromAscii("Ooo3270.uno.rdb"), sal_False, sal_False);
-	xReg->open(OUString::createFromAscii("src/Ooo3270.uno.rdb"), sal_False, sal_False);
+	printf("%s(%d)\n",__FILE__,__LINE__);
+	xReg->open(OUString::createFromAscii("uno/pw3270.uno.rdb"), sal_False, sal_False);
 
-	OSL_ENSURE( xReg->isValid(), "### cannot open test registry \"Ooo3270.uno.rdb\"!" );
+	OSL_ENSURE( xReg->isValid(), "### cannot open test registry \"pw3270.uno.rdb\"!" );
 
 	Trace("Calling %s","bootstrap_InitialComponentContext");
 	Reference< XComponentContext > xContext = bootstrap_InitialComponentContext(xReg);
@@ -65,9 +33,9 @@ int SAL_CALL main(int argc, char **argv)
 	if (xImplReg.is())
 	{
 #if defined( WIN32 )
-        const char *libname = "bin\\windbg\\Ooo3270.uno.dll";
+        const char *libname = "bin\\Debug\\pw3270.uno.dll";
 #else
-        const char *libname = "bin/Debug/Ooo3270.uno.so";
+        const char *libname = "bin/Debug/pw3270.uno.so";
 #endif
         Trace("Loading %s",libname);
 
@@ -86,7 +54,7 @@ int SAL_CALL main(int argc, char **argv)
 
         Trace("Instance: %p",&xx);
 
-		Reference< I3270 > srv( xx, UNO_QUERY );
+		Reference< pw3270intf > srv( xx, UNO_QUERY );
 
 		OSL_ENSURE( srv.is(), "### cannot get service instance!");
 

@@ -10,14 +10,14 @@
 
 /*---[ Connection related calls ]--------------------------------------------------------------------------*/
 
-sal_Int16 SAL_CALL g3270::uno_impl::getConnectionState() throw (RuntimeException)
+sal_Int16 SAL_CALL pw3270::uno_impl::getConnectionState() throw (RuntimeException)
 {
 	Trace("%s",__FUNCTION__);
 
 	return (sal_Int16) QueryCstate();
 }
 
-sal_Int16 SAL_CALL g3270::uno_impl::Connect( const OUString& hostinfo, ::sal_Int16 wait) throw (RuntimeException)
+sal_Int16 SAL_CALL pw3270::uno_impl::Connect( const OUString& hostinfo, ::sal_Int16 wait) throw (RuntimeException)
 {
 	int		rc;
 	OString str = rtl::OUStringToOString( hostinfo , RTL_TEXTENCODING_ASCII_US );
@@ -34,7 +34,7 @@ sal_Int16 SAL_CALL g3270::uno_impl::Connect( const OUString& hostinfo, ::sal_Int
 	return rc;
 }
 
-sal_Int16 SAL_CALL g3270::uno_impl::Disconnect() throw (RuntimeException)
+sal_Int16 SAL_CALL pw3270::uno_impl::Disconnect() throw (RuntimeException)
 {
 	Trace("%s",__FUNCTION__);
 
@@ -46,12 +46,12 @@ sal_Int16 SAL_CALL g3270::uno_impl::Disconnect() throw (RuntimeException)
 	return 0;
 }
 
-::sal_Bool SAL_CALL g3270::uno_impl::isConnected(  ) throw (::com::sun::star::uno::RuntimeException)
+::sal_Bool SAL_CALL pw3270::uno_impl::isConnected(  ) throw (::com::sun::star::uno::RuntimeException)
 {
 	return (CONNECTED) ? true : false;
 }
 
-::sal_Int16 SAL_CALL g3270::uno_impl::waitForEvents( ) throw (::com::sun::star::uno::RuntimeException)
+::sal_Int16 SAL_CALL pw3270::uno_impl::waitForEvents( ) throw (::com::sun::star::uno::RuntimeException)
 {
 	if(QueryCstate() == NOT_CONNECTED)
 		return EINVAL;

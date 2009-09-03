@@ -63,6 +63,7 @@ WINDRES = @WINDRES@
 # OpenOffice.org stuff
 ####################################################################################################
 OO_SDK_HOME ?= @OO_SDK_HOME@
+OO_URE_HOME ?= @OO_URE_HOME@
 OO_HOME ?= @OO_HOME@
 IDLC ?= @IDLC@
 CPPUMAKER ?= @CPPUMAKER@
@@ -70,6 +71,9 @@ REGMERGE ?= @REGMERGE@
 REGCOMP ?= @REGCOMP@
 TYPES_RDB ?= @TYPES_RDB@
 CPPUENV ?= @CPPUENV@
+
+OO_LDFLAGS ?= -L$(OO_HOME)/ure/lib -L$(OO_SDK_HOME)/lib -L$(OO_URE_HOME)/lib -Wl,-rpath-link=$(OO_URE_HOME)/lib -luno_cppu -luno_cppuhelpergcc3
+OO_CXXFLAGS ?= -Wno-strict-aliasing -DCPPU_ENV=$(CPPUENV) -DLANGUAGE_BINDING_NAME=\"$(CPPUENV)\" -Iuno/include -I$(OO_SDK_HOME)/include
 
 ####################################################################################################
 # Set compile/link parameters
@@ -90,10 +94,6 @@ APP_LDFLAGS=@OS_LFLAGS@
 # Library parameters
 API_CFLAGS=@LIBSSL_CFLAGS@ @API_CFLAGS@
 API_LDFLAGS=@LIBSSL_LIBS@ @OS_LFLAGS@
-
-# OpenOffice.org parameters
-OO_CXXFLAGS ?= -DCPPU_ENV=$(CPPUENV) -DLANGUAGE_BINDING_NAME=\"$(CPPUENV)\" -Iuno/include -I$(OO_SDK_HOME)/include
-# -I$(OO_INCLUDE_PATH) -I$(OO_CXX_INCLUDE_PATH) -I@SRCDIR@inc
 
 # Rexx parameters
 REXX_CFLAGS = @REXX_CFLAGS@
@@ -184,12 +184,6 @@ obj/Debug/version.o: src/version.c
 	@mkdir -p `dirname $@`
 	@$(CC) $(DBG_CFLAGS) $(CFLAGS) -Isrc/lib -o $@ -c $<
 
-obj/Debug/src/oxt/%.o: src/oxt/%.cxx $(GLOBAL_DEPENDS) uno/include/br/com/bb/$(PACKAGE).hpp
-	@echo $< ...
-	@mkdir -p `dirname $@`
-	$(CXX) $(DBG_CFLAGS) $(CFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -Iuno/include -o $@ -c $<
-
-
 ####################################################################################################
 # Release Rules
 ####################################################################################################
@@ -249,9 +243,24 @@ bin/Debug/lib3270$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o 
 # OpenOffice.org extension
 ####################################################################################################
 
-oooDebug:
+oooDebug: bin/Debug/unotest
 
-uno/%.urd: src/oxt/%.idl Makefile
+obj/Debug/src/oxt/%.o: src/oxt/%.cxx src/oxt/*.hpp $(GLOBAL_DEPENDS) uno/include/br/com/bb/$(PACKAGE).hpp
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CXX) $(DBG_CFLAGS) $(CFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -Iuno/include -o $@ -c $<
+
+bin/Debug/unotest: bin/Debug/@PROGRAM_NAME@.uno@DLLEXT@ obj/Debug/src/oxt/testprogram.@OBJEXT@
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	$(CXX) -o $@ obj/Debug/src/oxt/testprogram.@OBJEXT@ -Lbin/Debug -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
+
+bin/Debug/@PROGRAM_NAME@.uno@DLLEXT@: bin/Debug/lib3270$(DLLEXT) $(foreach SRC, $(basename $(OOO_SRCS)), obj/Debug/src/oxt/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	$(CXX) @OS_DLLFLAGS@ -o $@ $(foreach SRC, $(basename $(OOO_SRCS)), obj/Debug/src/oxt/$(SRC).@OBJEXT@) -Lbin/Debug -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
+
+uno/%.urd: src/oxt/%.idl
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(IDLC) -C -I$(OO_SDK_HOME)/idl -O`dirname $@` $<
@@ -259,14 +268,15 @@ uno/%.urd: src/oxt/%.idl Makefile
 uno/%.uno.rdb : uno/%.urd
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(REGMERGE) $@ / $(TYPES_RDB)
-	@$(REGMERGE) $@ /UCR $<
-	@$(REGMERGE) $@ / $<
+	@rm -f $@
+	@$(REGMERGE) --verbose $@ / $(TYPES_RDB)
+	@$(REGMERGE) --verbose $@ /UCR $<
+	@$(REGMERGE) --verbose $@ / $<
 
 uno/include/br/com/bb/$(PACKAGE).hpp: uno/$(PACKAGE).uno.rdb
 	@echo $< ...
-	@rm -fr uno/include
-	@mkdir uno/include
+	@rm -fr ./uno/include
+	@mkdir ./uno/include
 	@$(CPPUMAKER) -O./uno/include -Gc -L -BUCR $<
 
 ####################################################################################################

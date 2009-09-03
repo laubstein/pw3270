@@ -81,6 +81,14 @@ AC_ARG_WITH([office-sdk-home],
 	o3270_cv_sdkhome="/opt/openoffice.org/basis3.1/sdk"
 ])
 
+AC_ARG_WITH([office-ure-home],
+	[AS_HELP_STRING([--with-office-ure-home], [Define Open-Office ure home])],
+[
+	o3270_cv_urehome="$withval"
+],[
+	o3270_cv_urehome="/opt/openoffice.org/ure"
+])
+
 AC_ARG_WITH([office-program],
 	[AS_HELP_STRING([--with-office-program], [Define Open-Office main program])],
 [
@@ -145,7 +153,6 @@ AC_ARG_WITH([office-ure-lib],
 	o3270_cv_oourelib="\$(OFFICE_HOME)/ure/lib"
 ])
 
-
 # Checks for libraries.
 PKG_CHECK_EXISTS
 PKG_CHECK_MODULES( [LIB3270], [lib3270 >= 4.0], AC_DEFINE(LIB3270) )
@@ -157,6 +164,7 @@ AC_SUBST(OFFICE_HOME,$o3270_cv_oohome)
 AC_SUBST(OO_SDK_HOME,$o3270_cv_sdkhome)
 AC_SUBST(OFFICE_PROGRAM,$o3270_cv_ooprogram)
 AC_SUBST(OO_URE_LIB,$o3270_cv_oourelib)
+AC_SUBST(OO_URE_HOME,$o3270_cv_urehome)
 
 AC_SUBST(IDLC,$o3270_cv_idlc)
 AC_SUBST(CPPUMAKER,$o3270_cv_cppumaker)
