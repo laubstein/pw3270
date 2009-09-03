@@ -83,4 +83,11 @@
 	/* Program name */
 	#undef PROGRAM_NAME
 
+	/* OpenOffice.org stuff */
+	/* #undef SERVICENAME */
+	/* #undef IMPLNAME */
+	#undef OFFICE_HOME
+	#undef OFFICE_PROGRAM
+
+
 #endif /* CONFIG_H_INCLUDED */

@@ -17,7 +17,7 @@ module br { module com { module bb {
      * http://wiki.services.openoffice.org/wiki/Documentation/DevGuide/ProUNO/Bridge/Default_Mappings
      *
      */
-    interface I3270 : com::sun::star::uno::XInterface
+    interface pw3270 : com::sun::star::uno::XInterface
     {
 		string	getVersion();
 
@@ -39,26 +39,12 @@ module br { module com { module bb {
 		short 	setStringAt([in] short row, [in] short col, [in] string str);
 		short	sendPFKey([in] short key);
 
-        /*
-
-        setToggle()
-        getToggle()
-
-		getCursorRow()
-		getCursorCol()
-
-		setCursorPosition()
-
-		sendPFKey()
-
-        */
-
     };
 
-    service g3270
+    service srv3270
     {
         // exported interfaces:
-        interface I3270;
+        interface pw3270;
     };
 
 }; }; };
