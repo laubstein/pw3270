@@ -255,7 +255,7 @@ oooDebug: bin/Debug/unotest
 	@cp image/default.png uno/oxt.tmp/@PROGRAM_NAME@.png
 	@cp bin/Release/@PROGRAM_NAME@.uno@DLLEXT@ uno/oxt.tmp
 	@cp uno/@PROGRAM_NAME@.uno.rdb uno/oxt.tmp
-	@cd uno/oxt.tmp ; zip -m -r ../@PROGRAM_NAME@.oxt .
+	@cd uno/oxt.tmp ; zip -m -r ../../@PROGRAM_NAME@.oxt .
 	@echo $@ Ok.
 
 obj/Debug/src/oxt/%.o: src/oxt/%.cxx src/oxt/*.hpp $(GLOBAL_DEPENDS) uno/include/br/com/bb/$(PACKAGE).hpp
@@ -472,6 +472,7 @@ clean:
 	@rm -f *.nsi
 	@rm -f $(PACKAGE).ico
 	@rm -f $(PACKAGE).@LOGOEXT@
+	@rm -f @PROGRAM_NAME@.oxt
 
 	@if [ -e src/plugins/rexx/Makefile ]; then make -C src/plugins/rexx clean; fi
 	@if [ -e src/extensions/uno/Makefile ]; then make -C src/extensions/uno clean; fi
