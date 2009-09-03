@@ -74,6 +74,7 @@ LD_RLSFLAGS="-Wl,--strip-all"
 LD=$CC
 PLUGINS=""
 EXTENSIONS=""
+CPPUENV="gcc3"
 
 case "$host" in
 	*-mingw32)
@@ -224,6 +225,14 @@ AC_ARG_WITH([office-home],
 	AC_CHECK_FILE("/usr/lib/ooo3/program/soffice.bin",oo_home="/usr/lib/ooo3",oo_home="none")
 ])
 
+AC_ARG_WITH([office-program],
+	[AS_HELP_STRING([--with-office-program], [Define OpenOffice.org main program])],
+[
+	oo_program="$withval"
+],[
+	oo_program="$oo_home/program/soffice.bin"
+])
+
 AC_ARG_WITH([office-sdk-home],
 	[AS_HELP_STRING([--with-office-sdk-home], [Define Open-Office sdk home])],
 [
@@ -232,6 +241,15 @@ AC_ARG_WITH([office-sdk-home],
 	AC_CHECK_FILE("/opt/openoffice.org/basis3.1/sdk/config.sub",oo_sdk_home="/opt/openoffice.org/basis3.1/sdk",oo_sdk_home="none")
 ])
 
+AC_ARG_WITH([office-types],
+	[AS_HELP_STRING([--with-office-types], [Define Open-Office types.rdb file])],
+[
+	types_rdb="$withval"
+],[
+	AC_CHECK_FILE("$oo_home/solver/bin/types.rdb", types_rdb=$oo_home/solver/bin/types.rdb,types_rdb="no")
+])
+
+
 AC_PATH_PROG([IDLC], idlc, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
 AC_PATH_PROG([CPPUMAKER], cppumaker, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
 AC_PATH_PROG([REGMERGE], regmerge, "no", [$PATH$PATH_SEPARATOR$oo_home/ure/bin])
@@ -239,7 +257,11 @@ AC_PATH_PROG([REGCOMP], regcomp, "no", [$PATH$PATH_SEPARATOR$oo_home/ure/bin])
 
 AC_SUBST(OO_SDK_HOME,$oo_sdk_home)
 AC_SUBST(OO_HOME,$oo_home)
+AC_SUBST(TYPES_RDB,$types_rdb)
+AC_SUBST(CPPUENV)
 
+AC_DEFINE_UNQUOTED(OFFICE_HOME,"$oo_home")
+AC_DEFINE_UNQUOTED(OFFICE_PROGRAM,"$oo_program")
 
 # Checks for libraries.
 PKG_CHECK_EXISTS
