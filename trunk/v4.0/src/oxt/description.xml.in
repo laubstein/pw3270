@@ -5,7 +5,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink">
 
   <version value="@PACKAGE_VERSION@" />
 
-  <identifier value="pw3270" />
+  <identifier value="@PACKAGE_NAME@" />
 
   <platform value="linux_x86" />
 
@@ -18,7 +18,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink">
   </display-name>
 
   <icon>
-    <default xlink:href="uno3270.png" />
+    <default xlink:href="@PACKAGE_NAME@.png" />
   </icon>
 
   <extension-description>
