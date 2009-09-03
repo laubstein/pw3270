@@ -245,20 +245,43 @@ bin/Debug/lib3270$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o 
 
 oooDebug: bin/Debug/unotest
 
+@PROGRAM_NAME@.oxt: bin/Release/@PROGRAM_NAME@.uno@DLLEXT@ uno/@PROGRAM_NAME@.uno.rdb src/oxt/description.xml src/oxt/manifest.xml src/oxt/description.txt
+	@echo $@ ...
+	@rm -fr uno/oxt.tmp
+	@mkdir -p uno/oxt.tmp/META-INF
+	@cp src/oxt/manifest.xml uno/oxt.tmp/META-INF
+	@cp src/oxt/description.xml uno/oxt.tmp
+	@cp src/oxt/description.txt uno/oxt.tmp
+	@cp image/default.png uno/oxt.tmp/@PROGRAM_NAME@.png
+	@cp bin/Release/@PROGRAM_NAME@.uno@DLLEXT@ uno/oxt.tmp
+	@cp uno/@PROGRAM_NAME@.uno.rdb uno/oxt.tmp
+	@cd uno/oxt.tmp ; zip -m -r ../@PROGRAM_NAME@.oxt .
+	@echo $@ Ok.
+
 obj/Debug/src/oxt/%.o: src/oxt/%.cxx src/oxt/*.hpp $(GLOBAL_DEPENDS) uno/include/br/com/bb/$(PACKAGE).hpp
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CXX) $(DBG_CFLAGS) $(CFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -Iuno/include -o $@ -c $<
 
+obj/Release/src/oxt/%.o: src/oxt/%.cxx src/oxt/*.hpp $(GLOBAL_DEPENDS) uno/include/br/com/bb/$(PACKAGE).hpp
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CXX) $(CFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -Iuno/include -o $@ -c $<
+
 bin/Debug/unotest: bin/Debug/@PROGRAM_NAME@.uno@DLLEXT@ obj/Debug/src/oxt/testprogram.@OBJEXT@
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	$(CXX) -o $@ obj/Debug/src/oxt/testprogram.@OBJEXT@ -Lbin/Debug -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
+	@$(CXX) -o $@ obj/Debug/src/oxt/testprogram.@OBJEXT@ -Lbin/Debug -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
+
+bin/Release/@PROGRAM_NAME@.uno@DLLEXT@: bin/Release/lib3270$(DLLEXT) $(foreach SRC, $(basename $(OOO_SRCS)), obj/Release/src/oxt/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CXX) @OS_DLLFLAGS@ -o $@ $(foreach SRC, $(basename $(OOO_SRCS)), obj/Release/src/oxt/$(SRC).@OBJEXT@) -Lbin/Release -Wl,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
 
 bin/Debug/@PROGRAM_NAME@.uno@DLLEXT@: bin/Debug/lib3270$(DLLEXT) $(foreach SRC, $(basename $(OOO_SRCS)), obj/Debug/src/oxt/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	$(CXX) @OS_DLLFLAGS@ -o $@ $(foreach SRC, $(basename $(OOO_SRCS)), obj/Debug/src/oxt/$(SRC).@OBJEXT@) -Lbin/Debug -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
+	@$(CXX) @OS_DLLFLAGS@ -o $@ $(foreach SRC, $(basename $(OOO_SRCS)), obj/Debug/src/oxt/$(SRC).@OBJEXT@) -Lbin/Debug -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
 
 uno/%.urd: src/oxt/%.idl
 	@echo $< ...

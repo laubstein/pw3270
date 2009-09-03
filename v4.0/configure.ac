@@ -395,6 +395,8 @@ AC_SUBST(GTKRUNTIME,$pw3270_cv_gtkruntime)
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
 AC_OUTPUT(src/gui/version.c)
+AC_OUTPUT(src/oxt/description.xml)
+AC_OUTPUT(src/oxt/manifest.xml)
 
 case "$host" in
 	*-mingw32)
