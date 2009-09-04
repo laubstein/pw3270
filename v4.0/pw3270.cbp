@@ -629,7 +629,31 @@
 		</Unit>
 		<Unit filename="src/lib/xioc.h" />
 		<Unit filename="src/lib/xl.h" />
+		<Unit filename="src/oxt/actions.cxx">
+			<Option target="Release" />
+			<Option target="oooDebug" />
+		</Unit>
+		<Unit filename="src/oxt/connection.cxx">
+			<Option target="Release" />
+			<Option target="oooDebug" />
+		</Unit>
+		<Unit filename="src/oxt/description.txt">
+			<Option target="Release" />
+			<Option target="oooDebug" />
+		</Unit>
+		<Unit filename="src/oxt/description.xml.in">
+			<Option target="Release" />
+			<Option target="oooDebug" />
+		</Unit>
 		<Unit filename="src/oxt/globals.hpp">
+			<Option target="Release" />
+			<Option target="oooDebug" />
+		</Unit>
+		<Unit filename="src/oxt/main.cxx">
+			<Option target="Release" />
+			<Option target="oooDebug" />
+		</Unit>
+		<Unit filename="src/oxt/manifest.xml.in">
 			<Option target="Release" />
 			<Option target="oooDebug" />
 		</Unit>
@@ -638,6 +662,10 @@
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/pw3270.idl">
+			<Option target="Release" />
+			<Option target="oooDebug" />
+		</Unit>
+		<Unit filename="src/oxt/screen.cxx">
 			<Option target="Release" />
 			<Option target="oooDebug" />
 		</Unit>
