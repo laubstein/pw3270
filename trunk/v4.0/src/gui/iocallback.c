@@ -318,8 +318,33 @@ static int static_CallAndWait(int(*callback)(void *), void *parm)
 
 	g_timeout_add((guint) 100, (GSourceFunc) BgCallTimer, &p);
 
-	while(p.status)
-		gtk_main_iteration();
+	if(topwindow)
+	{
+
+#ifdef MOUSE_POINTER_CHANGE
+		if(terminal && terminal->window)
+			gdk_window_set_cursor(terminal->window,wCursor[CURSOR_MODE_WAITING]);
+#endif
+
+		while(p.status && topwindow)
+			gtk_main_iteration();
+
+#ifdef MOUSE_POINTER_CHANGE
+		if(terminal && terminal->window && drag_type == DRAG_TYPE_NONE && cursor_mode != -1)
+			gdk_window_set_cursor(terminal->window,wCursor[cursor_mode]);
+#endif
+
+	}
+
+	if(p.status)
+	{
+		Log("Waiting for background thread %p",thread);
+
+		while(p.status)
+			g_thread_yield();
+
+		Log("Thread %p ends",thread);
+	}
 
 	Trace("Auxiliary thread for callback %p finished (rc=%d)",callback,p.rc);
 
