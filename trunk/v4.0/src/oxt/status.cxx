@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como actions.cxx e possui - linhas de código.
+ * Este programa está nomeado como status.cxx e possui - linhas de código.
  *
  * Contatos:
  *
@@ -30,53 +30,39 @@
  *
  */
 
-
 #include "ooo3270.hpp"
 #include <time.h>
 #include <lib3270/api.h>
 
-/*---[ Macros ]--------------------------------------------------------------------------------------------*/
+/*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
- #define CHECK_FOR_TERMINAL_STATUS	if(!PCONNECTED) \
-										return ENOTCONN; \
-									else if(query_3270_terminal_status() != STATUS_CODE_BLANK) \
-										return EINVAL;
-
-/*---[ Action related calls ]------------------------------------------------------------------------------*/
-
-::sal_Int16 SAL_CALL pw3270::uno_impl::sendEnterKey() throw (::com::sun::star::uno::RuntimeException)
+::sal_Bool SAL_CALL pw3270::uno_impl::isTerminalReady(  ) throw (::com::sun::star::uno::RuntimeException)
 {
-	CHECK_FOR_TERMINAL_STATUS
-
-	return action_Enter();
+	if(!CONNECTED || query_3270_terminal_status() != STATUS_CODE_BLANK)
+		return false;
+	return true;
 }
 
-::sal_Int16 SAL_CALL pw3270::uno_impl::setStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& str ) throw (::com::sun::star::uno::RuntimeException)
+::sal_Int16 SAL_CALL pw3270::uno_impl::waitForTerminalReady( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
 {
-//	int		rc;
-	OString vlr = rtl::OUStringToOString( str , RTL_TEXTENCODING_ASCII_US );
+	time_t	end = time(0)+timeout;
 
-	if(!PCONNECTED)
-		return ENOTCONN;
+	Trace("Waiting for terminal ready (timeout: %d)",timeout);
 
-	if(row < 1 || col < 1)
-		return EINVAL;
+	while(time(0) < end)
+	{
+		if(!CONNECTED)
+		{
+			Trace("%s","Connection lost");
+			return ENOTCONN;
+		}
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
+		{
+			return 0;
+		}
 
-	row--;
-	col--;
+		yeld();
+	}
 
-	Trace("Inserting \"%s\" at %d,%d",vlr.getStr(),row,col);
-
-	cursor_set_addr((row * ctlr_get_cols()) + col);
-
-	Input_String((unsigned char *) vlr.getStr());
-
-	return 0;
-}
-
-::sal_Int16 SAL_CALL pw3270::uno_impl::sendPFKey( ::sal_Int16 key ) throw (::com::sun::star::uno::RuntimeException)
-{
-	CHECK_FOR_TERMINAL_STATUS
-
-	return action_PFKey(key);
+	return ETIMEDOUT;
 }

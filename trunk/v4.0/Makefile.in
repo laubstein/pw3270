@@ -123,7 +123,7 @@ REXX_COMMON_SRC =	common_start.c screen.c toggle.c tools.c init.c network.c
 REXX_STD_SRC =		std_start.c
 REXX_PLG_SRC =		plg_start.c gui.c dialogs.c actions.c
 
-OOO_SRCS = 			main.cxx connection.cxx screen.cxx actions.cxx
+OOO_SRCS = 			main.cxx connection.cxx screen.cxx actions.cxx status.cxx
 
 ####################################################################################################
 # Targets
