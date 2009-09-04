@@ -288,7 +288,7 @@ uno/%.urd: src/oxt/%.idl
 	@mkdir -p `dirname $@`
 	@$(IDLC) -C -I$(OO_SDK_HOME)/idl -O`dirname $@` $<
 
-uno/%.uno.rdb : uno/%.urd
+%.uno.rdb : %.urd
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@rm -f $@
@@ -301,6 +301,7 @@ uno/include/br/com/bb/$(PACKAGE).hpp: uno/$(PACKAGE).uno.rdb
 	@rm -fr ./uno/include
 	@mkdir ./uno/include
 	@$(CPPUMAKER) -O./uno/include -Gc -L -BUCR $<
+	@touch $@
 
 ####################################################################################################
 # Rexx plugin/extension
