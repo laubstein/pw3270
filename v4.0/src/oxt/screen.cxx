@@ -1,6 +1,36 @@
+/*
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
+ * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+ * aplicativos mainframe. Registro no INPI sob o nome G3270.
+ *
+ * Copyright (C) <2008> <Banco do Brasil S.A.>
+ *
+ * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+ * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+ * Free Software Foundation.
+ *
+ * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+ * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+ * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+ * obter mais detalhes.
+ *
+ * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+ * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA, 02111-1307, USA
+ *
+ * Este programa está nomeado como screen.cxx e possui - linhas de código.
+ *
+ * Contatos:
+ *
+ * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+ * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
+ * licinio@bb.com.br		(Licínio Luis Branco)
+ * kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+ * macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+ *
+ */
 
 #include "ooo3270.hpp"
-// #include <osl/thread.h>
 #include <errno.h>
 #include <string.h>
 #include <time.h>
@@ -76,41 +106,6 @@
 
 }
 
-::sal_Bool SAL_CALL pw3270::uno_impl::isTerminalReady(  ) throw (::com::sun::star::uno::RuntimeException)
-{
-	if(!CONNECTED || query_3270_terminal_status() != STATUS_CODE_BLANK)
-		return false;
-
-	return true;
-}
-
-::sal_Int16 SAL_CALL pw3270::uno_impl::waitForReset( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
-{
-//	int		rc = 0;
-	time_t	end = time(0)+timeout;
-	int		last = query_counter(COUNTER_ID_RESET);
-
-	Trace("Waiting for termnal reset (timeout: %d counter: %d)",timeout,last);
-
-	while(time(0) < end)
-	{
-		if(!CONNECTED)
-		{
-			Trace("%s","Connection lost");
-			return ENOTCONN;
-		}
-		else if(query_3270_terminal_status() == STATUS_CODE_BLANK && last != query_counter(COUNTER_ID_RESET))
-		{
-			Trace("Screen updated, counter: %d",query_counter(COUNTER_ID_RESET));
-			return 0;
-		}
-
-		RunPendingEvents(1);
-	}
-
-	return ETIMEDOUT;
-}
-
 ::sal_Int16 SAL_CALL pw3270::uno_impl::waitForStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key, ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
 {
 	OString str = rtl::OUStringToOString( key , RTL_TEXTENCODING_ASCII_US );
@@ -131,7 +126,7 @@
 
 	Trace("Waiting for \"%s\" at %d",str.getStr(),start);
 
-	RunPendingEvents(0);
+	wait();
 
 	while( (rc == ETIMEDOUT) && (time(0) <= end) )
 	{
@@ -159,7 +154,7 @@
 			}
 		}
 
-		RunPendingEvents(1);
+		wait();
 	}
 
 	free(buffer);
@@ -172,7 +167,6 @@
 	OString str = rtl::OUStringToOString( key , RTL_TEXTENCODING_ASCII_US );
 	int 	sz, rows, cols, start;
 	char 	*buffer;
-//	int 	last = -1;
 	bool	rc;
 
 	screen_size(&rows,&cols);
@@ -193,28 +187,4 @@
 	return rc;
 }
 
-::sal_Int16 SAL_CALL pw3270::uno_impl::waitForTerminalReady( ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
-{
-//	int		rc = 0;
-	time_t	end = time(0)+timeout;
-
-	Trace("Waiting for terminal ready (timeout: %d)",timeout);
-
-	while(time(0) < end)
-	{
-		if(!CONNECTED)
-		{
-			Trace("%s","Connection lost");
-			return ENOTCONN;
-		}
-		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
-		{
-			return 0;
-		}
-
-		RunPendingEvents(1);
-	}
-
-	return ETIMEDOUT;
-}
 

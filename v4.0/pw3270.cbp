@@ -669,6 +669,10 @@
 			<Option target="Release" />
 			<Option target="oooDebug" />
 		</Unit>
+		<Unit filename="src/oxt/status.cxx">
+			<Option target="Release" />
+			<Option target="oooDebug" />
+		</Unit>
 		<Unit filename="src/oxt/testprogram.cxx">
 			<Option target="Release" />
 			<Option target="oooDebug" />
