@@ -46,6 +46,7 @@ public:
 
 	// pw3270 implementation - Main
 	virtual OUString SAL_CALL getVersion() throw (RuntimeException);
+	virtual OUString SAL_CALL getRevision() throw (RuntimeException);
 
 	// pw3270 implementation - Connect/Disconnect
 	virtual sal_Int16 SAL_CALL getConnectionState() throw (RuntimeException);

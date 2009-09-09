@@ -50,7 +50,9 @@ module br { module com { module bb {
      */
     interface pw3270intf : com::sun::star::uno::XInterface
     {
+		/* Get library/extension info */
 		string	getVersion();
+		string	getRevision();
 
 		/* Connect/Disconnect */
         short	Connect( [in] string hostinfo, [in] short timeout );

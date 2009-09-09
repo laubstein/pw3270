@@ -241,9 +241,12 @@ pw3270::uno_impl::~uno_impl()
 	Trace("Object deleted %s (instances: %d)",__FUNCTION__,instances);
 }
 
+OUString SAL_CALL pw3270::uno_impl::getRevision() throw (RuntimeException)
+{
+	return OUString( RTL_CONSTASCII_USTRINGPARAM( PACKAGE_REVISION ) );
+}
 
 OUString SAL_CALL pw3270::uno_impl::getVersion() throw (RuntimeException)
 {
 	return OUString( RTL_CONSTASCII_USTRINGPARAM( PACKAGE_VERSION ) );
 }
-
