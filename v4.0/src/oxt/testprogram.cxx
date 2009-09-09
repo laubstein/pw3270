@@ -94,12 +94,17 @@ int SAL_CALL main(int argc, char **argv)
 		if(srv.is())
 		{
 			// Wait for commands
+			OString	str;
 /*
 			char	buffer[80];
-			OString	str;
-
 			Trace("getConnectionState: %d", srv->getConnectionState());
 */
+			str = OUStringToOString( srv->getVersion(),RTL_TEXTENCODING_UTF8);
+			Trace("Version:\t%s",str.pData->buffer);
+
+			str = OUStringToOString( srv->getRevision(),RTL_TEXTENCODING_UTF8);
+			Trace("Revision:\t%s",str.pData->buffer);
+
 			Trace("Connect(): %d" , srv->Connect(OUString::createFromAscii("L:3270.df.bb:9023"),10));
 
 			sleep(5);
