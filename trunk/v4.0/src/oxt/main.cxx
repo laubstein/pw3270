@@ -223,6 +223,9 @@ static int instances = 0;
 
 pw3270::uno_impl::uno_impl( const Reference< XComponentContext > & xContext )
 {
+	hThread = NULL;
+	hostinfo = NULL;
+
 	instances++;
 	Trace("********************* Object created %s (instances: %d)",__FUNCTION__,instances);
 
@@ -237,6 +240,11 @@ pw3270::uno_impl::uno_impl( const Reference< XComponentContext > & xContext )
 
 pw3270::uno_impl::~uno_impl()
 {
+	Disconnect();
+
+	if(hostinfo)
+		free(hostinfo);
+
 	instances--;
 	Trace("Object deleted %s (instances: %d)",__FUNCTION__,instances);
 }

@@ -63,7 +63,7 @@
 
 	Trace("Read\n%s\n",buffer);
 
-	ret = OUString(buffer,strlen(buffer), RTL_TEXTENCODING_ISO_8859_1, RTL_TEXTTOUNICODE_FLAGS_UNDEFINED_IGNORE);
+	ret = OUString(buffer,strlen(buffer), getEncoding(), RTL_TEXTTOUNICODE_FLAGS_UNDEFINED_IGNORE);
 
 	free(buffer);
 
@@ -98,7 +98,7 @@
 
 	Trace("Read\n%s\n",buffer);
 
-	ret = OUString(buffer,strlen(buffer), RTL_TEXTENCODING_ISO_8859_1, RTL_TEXTTOUNICODE_FLAGS_UNDEFINED_IGNORE);
+	ret = OUString(buffer, strlen(buffer), getEncoding(), RTL_TEXTTOUNICODE_FLAGS_UNDEFINED_IGNORE);
 
 	free(buffer);
 
@@ -108,7 +108,7 @@
 
 ::sal_Int16 SAL_CALL pw3270::uno_impl::waitForStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key, ::sal_Int16 timeout ) throw (::com::sun::star::uno::RuntimeException)
 {
-	OString str = rtl::OUStringToOString( key , RTL_TEXTENCODING_ASCII_US );
+	OString str = rtl::OUStringToOString( key , getEncoding() );
 	int 	rc = ETIMEDOUT;
 	int 	end = time(0)+timeout;
 	int 	sz, rows, cols, start;
@@ -164,7 +164,7 @@
 
 ::sal_Bool SAL_CALL pw3270::uno_impl::queryStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& key ) throw (::com::sun::star::uno::RuntimeException)
 {
-	OString str = rtl::OUStringToOString( key , RTL_TEXTENCODING_ASCII_US );
+	OString str = rtl::OUStringToOString( key , getEncoding() );
 	int 	sz, rows, cols, start;
 	char 	*buffer;
 	bool	rc;

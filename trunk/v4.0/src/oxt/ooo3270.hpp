@@ -25,7 +25,7 @@ class uno_impl : public ::cppu::WeakImplHelper3< br::com::bb::pw3270intf, lang::
 public:
 
 	uno_impl( const Reference< XComponentContext > & xContext );
-	~uno_impl();
+	virtual ~uno_impl();
 
 	// XInitialization will be called upon createInstanceWithArguments[AndContext]()
 	virtual void SAL_CALL initialize( Sequence< Any > const & args ) throw (Exception);
@@ -68,6 +68,15 @@ public:
     virtual ::sal_Int16 SAL_CALL sendPFKey( ::sal_Int16 key ) throw (::com::sun::star::uno::RuntimeException);
 
 private:
+
+	void network_loop(void);
+	static void start_thread(uno_impl *obj);
+
+	rtl_TextEncoding getEncoding()
+	{
+		return RTL_TEXTENCODING_ISO_8859_1;
+	}
+
 	void yeld()
 	{
 		osl_yieldThread();
@@ -77,6 +86,10 @@ private:
 	{
 		osl_yieldThread();
 	}
+
+	oslThread	hThread;
+	char		*hostinfo;
+
 //	sal_Int32 m_nRefCount;
 
 };

@@ -40,7 +40,7 @@
  #define CHECK_FOR_TERMINAL_STATUS	if(!PCONNECTED) \
 										return ENOTCONN; \
 									else if(query_3270_terminal_status() != STATUS_CODE_BLANK) \
-										return EINVAL;
+										return EBUSY;
 
 /*---[ Action related calls ]------------------------------------------------------------------------------*/
 
@@ -54,10 +54,9 @@
 ::sal_Int16 SAL_CALL pw3270::uno_impl::setStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& str ) throw (::com::sun::star::uno::RuntimeException)
 {
 //	int		rc;
-	OString vlr = rtl::OUStringToOString( str , RTL_TEXTENCODING_ASCII_US );
+	OString vlr = rtl::OUStringToOString( str , getEncoding() );
 
-	if(!PCONNECTED)
-		return ENOTCONN;
+	CHECK_FOR_TERMINAL_STATUS
 
 	if(row < 1 || col < 1)
 		return EINVAL;
