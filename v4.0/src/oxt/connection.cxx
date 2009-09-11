@@ -40,7 +40,10 @@
 
 /*---[ Conection Thread ]----------------------------------------------------------------------------------*/
 
- static oslThread hThread = NULL;
+ void pw3270::uno_impl::start_thread(pw3270::uno_impl::uno_impl *obj)
+ {
+ 	obj->network_loop();
+ }
 
 /**
  * Network threads.
@@ -49,9 +52,9 @@
  * "hangs" on user interface.
  *
  */
- void network_thread(char *hostinfo)
+ void pw3270::uno_impl::network_loop(void)
  {
- 	Trace("%s starts",__FUNCTION__);
+ 	Trace("%s starts on %p)",__FUNCTION__,this);
 
 	if(!host_connect(hostinfo,1))
 	{
@@ -59,10 +62,8 @@
 			RunPendingEvents(1);
 	}
 
-	free(hostinfo);
-
+ 	Trace("%s ends on %p)",__FUNCTION__,this);
 	hThread = NULL;
- 	Trace("%s ends",__FUNCTION__);
  }
 
 /*---[ Connection related calls ]--------------------------------------------------------------------------*/
@@ -76,10 +77,9 @@ sal_Int16 SAL_CALL pw3270::uno_impl::getConnectionState() throw (RuntimeExceptio
 
 sal_Int16 SAL_CALL pw3270::uno_impl::Connect( const OUString& hostinfo, ::sal_Int16 timeout) throw (RuntimeException)
 {
-	char *ptr;
 	time_t end;
 
-	OString str = rtl::OUStringToOString( hostinfo , RTL_TEXTENCODING_ASCII_US );
+	OString str = rtl::OUStringToOString( hostinfo , getEncoding() );
 
 	if(hThread)
 		return EBUSY;
@@ -89,15 +89,18 @@ sal_Int16 SAL_CALL pw3270::uno_impl::Connect( const OUString& hostinfo, ::sal_In
 	if(QueryCstate() != NOT_CONNECTED)
 		return EINVAL;
 
+	if(this->hostinfo)
+		free(this->hostinfo);
 
-	ptr = strdup(str.getStr());
-	hThread = osl_createThread((oslWorkerFunction) network_thread, ptr);
+	this->hostinfo = strdup(str.getStr());
+	hThread = osl_createThread((oslWorkerFunction) pw3270::uno_impl::start_thread, this);
+
+	yeld();
 
 	if(!hThread)
-	{
-		free(ptr);
 		return -1;
-	}
+
+	yeld();
 
 	if(timeout < 1)
 		return 0;
@@ -114,7 +117,7 @@ sal_Int16 SAL_CALL pw3270::uno_impl::Connect( const OUString& hostinfo, ::sal_In
 			return 0;
 		}
 
-		yeld();
+		wait();
 	}
 
 	return ETIMEDOUT;
@@ -127,7 +130,11 @@ sal_Int16 SAL_CALL pw3270::uno_impl::Disconnect() throw (RuntimeException)
 	if(QueryCstate() <= NOT_CONNECTED)
 		return EINVAL;
 
+	yeld();
+
 	host_disconnect(0);
+
+	yeld();
 
 	return 0;
 }
