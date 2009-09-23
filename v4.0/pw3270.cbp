@@ -38,6 +38,15 @@
 					<Add option="-g" />
 				</Compiler>
 			</Target>
+			<Target title="unoDebug">
+				<Option output="bin/Debug/unotest" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
 			<Target title="oooDebug">
 				<Option output="bin/Debug/unotest" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
@@ -404,6 +413,7 @@
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/gui/filetransfer.c">
@@ -442,6 +452,7 @@
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/gui/version.c">
@@ -543,6 +554,7 @@
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/lib/popupsc.h" />
@@ -631,50 +643,62 @@
 		<Unit filename="src/lib/xl.h" />
 		<Unit filename="src/oxt/actions.cxx">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/connection.cxx">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/description.txt">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/description.xml.in">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/globals.hpp">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/main.cxx">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/manifest.xml.in">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/ooo3270.hpp">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/pw3270.idl">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/screen.cxx">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/status.cxx">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/oxt/testprogram.cxx">
 			<Option target="Release" />
+			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/plugins/rexx/actions.c">
