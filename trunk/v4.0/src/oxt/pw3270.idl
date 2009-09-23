@@ -66,7 +66,6 @@ module br { module com { module bb {
 		/* Get/Query Screen contents */
         string	getScreenContentAt([in] short row, [in] short col, [in] short size);
         string	getScreenContent();
-        short	waitForStringAt([in] short row, [in] short col, [in] string key, [in] short timeout);
 		boolean	queryStringAt([in] short row, [in] short col, [in] string key);
 
 		/* Actions/Screen changes */
@@ -76,6 +75,7 @@ module br { module com { module bb {
 
 		/* Waiting */
 		short	waitForTerminalReady([in] short timeout);
+        short	waitForStringAt([in] short row, [in] short col, [in] string key, [in] short timeout);
 
     };
 
