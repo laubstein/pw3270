@@ -152,7 +152,7 @@ memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/
 	@cd bin/Debug ; LD_LIBRARY_PATH=. valgrind --leak-check=full ./@PROGRAM_NAME@ --program-data="../../"
 
 rpm: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
-	rpmbuild -tb @PACKAGE@-@PACKAGE_VERSION@.tar.gz
+	rpmbuild -ta @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 
 
 ####################################################################################################
