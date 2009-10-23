@@ -30,12 +30,14 @@
  *
  */
 
-#ifndef WIN32
-    #define UNX 1
-    #define GCC 1
-    #define LINUX 1
+#ifdef _WIN32
+	#define SAL_W32
+#else
+	#define UNX 1
+	#define GCC 1
+	#define LINUX 1
 	#include <stdio.h>
-    #include <unistd.h>
+	#include <unistd.h>
 #endif
 
 #define IMPLNAME "br.com.bb.pw3270intf"

@@ -222,6 +222,8 @@ bin/Release/lib3270$(DLLEXT): obj/Release/version.o obj/Release/src/lib/fallback
 	@rm -f $(basename \$(@F)).a
 	@rm -f $(basename \$(@F)).def
 	@$(LD) @OS_DLLFLAGS@ @LD_APIFLAGS@ @LD_RLSFLAGS@ -o $@ $^ $(API_LDFLAGS)
+	@if [ -f $(basename \$(@F)).def ]; then mv -f $(basename \$(@F)).def `dirname $@` ; fi
+	@if [ -f $(basename \$(@F)).a ]; then mv -f $(basename \$(@F)).a `dirname $@` ; fi
 
 ####################################################################################################
 # Debug Targets
@@ -458,6 +460,8 @@ clean:
 	@rm -fr obj
 	@rm -fr uno
 	@rm -fr bin
+	@rm -fr src/oxt/br
+	@rm -fr src/oxt/com
 	@rm -f	src/lib/fallbacks.c
 	@rm -f	src/lib/version.o
 	@rm -f	src/lib/mkfb.exe
@@ -478,7 +482,10 @@ clean:
 	@if [ -e src/plugins/rexx/Makefile ]; then make -C src/plugins/rexx clean; fi
 	@if [ -e src/extensions/uno/Makefile ]; then make -C src/extensions/uno clean; fi
 
+	@find . -name "*.obj" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.map" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.def" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.lnk" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.a" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
