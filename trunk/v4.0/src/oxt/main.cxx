@@ -35,6 +35,10 @@
 #include <com/sun/star/registry/XRegistryKey.hpp>
 #include <com/sun/star/lang/XSingleComponentFactory.hpp>
 
+#include <stdio.h>
+
+#define TRACE( fmt, ... ) fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr);
+
 #include "ooo3270.hpp"
 
 // #include <comphelper/componentmodule.hxx>
@@ -51,7 +55,7 @@ static Sequence< OUString > getSupportedServiceNames()
 {
 	Sequence<OUString> names(1);
 
-	Trace("%s returns: %s",__FUNCTION__, SERVICENAME);
+	TRACE("%s returns: %s",__FUNCTION__, SERVICENAME);
 	names[0] = OUString( RTL_CONSTASCII_USTRINGPARAM( SERVICENAME ) );
 
 	return names;
@@ -60,7 +64,7 @@ static Sequence< OUString > getSupportedServiceNames()
 /*
 static OUString getImplementationName()
 {
-	Trace("%s returns: %s",__FUNCTION__, IMPLNAME);
+	TRACE("%s returns: %s",__FUNCTION__, IMPLNAME);
 
 	return OUString( RTL_CONSTASCII_USTRINGPARAM(IMPLNAME) );
 }
@@ -88,7 +92,7 @@ static Reference< XInterface > SAL_CALL CreateInstance( const Reference< XCompon
  */
 extern "C" void SAL_CALL component_getImplementationEnvironment(const sal_Char ** ppEnvTypeName, uno_Environment ** ppEnv)
 {
-	Trace("%s set envtype to %s",__FUNCTION__,LANGUAGE_BINDING_NAME);
+	printf("%s set envtype to %s\n",__FUNCTION__,LANGUAGE_BINDING_NAME);
 	*ppEnvTypeName = LANGUAGE_BINDING_NAME;
 }
 
@@ -119,7 +123,7 @@ extern "C" void SAL_CALL component_getImplementationEnvironment(const sal_Char *
  */
 extern "C" sal_Bool SAL_CALL component_writeInfo(void * pServiceManager, void * pRegistryKey)
 {
-	Trace("%s",__FUNCTION__);
+	TRACE("%s",__FUNCTION__);
 
 	sal_Bool result = sal_False;
 
@@ -172,7 +176,7 @@ extern "C" void * SAL_CALL component_getFactory(const sal_Char * pImplName, void
 {
 	void * pRet = 0;
 
-	Trace("%s",__FUNCTION__);
+	TRACE("%s",__FUNCTION__);
 
 	if(pServiceManager && rtl_str_compare( pImplName, IMPLNAME ) == 0)
 	{
@@ -194,20 +198,20 @@ extern "C" void * SAL_CALL component_getFactory(const sal_Char * pImplName, void
 
 void SAL_CALL pw3270::uno_impl::initialize( Sequence< Any > const & args ) throw (Exception)
 {
-	Trace("%s",__FUNCTION__);
+	TRACE("%s",__FUNCTION__);
 }
 
 /*---[ Implement XServiceInfo ]----------------------------------------------------------------------------*/
 
 OUString SAL_CALL pw3270::uno_impl::getImplementationName(  ) throw(RuntimeException)
 {
-	Trace("%s",__FUNCTION__);
+	TRACE("%s",__FUNCTION__);
 	return OUString( RTL_CONSTASCII_USTRINGPARAM(IMPLNAME) );
 }
 
 sal_Bool SAL_CALL pw3270::uno_impl::supportsService( const OUString& ServiceName ) throw(RuntimeException)
 {
-	Trace("%s",__FUNCTION__);
+	TRACE("%s",__FUNCTION__);
 	return ServiceName.equalsAsciiL( RTL_CONSTASCII_STRINGPARAM("IMPLNAME") );
 }
 
@@ -227,12 +231,12 @@ pw3270::uno_impl::uno_impl( const Reference< XComponentContext > & xContext )
 	hostinfo = NULL;
 
 	instances++;
-	Trace("********************* Object created %s (instances: %d)",__FUNCTION__,instances);
+	TRACE("********************* Object created %s (instances: %d)",__FUNCTION__,instances);
 
 	if(!started)
 	{
 		started = true;
-		Trace("Initializing library with %s",OFFICE_PROGRAM);
+		TRACE("Initializing library with %s",OFFICE_PROGRAM);
 		lib3270_init();
 	}
 
@@ -246,7 +250,7 @@ pw3270::uno_impl::~uno_impl()
 		free(hostinfo);
 
 	instances--;
-	Trace("Object deleted %s (instances: %d)",__FUNCTION__,instances);
+	TRACE("Object deleted %s (instances: %d)",__FUNCTION__,instances);
 }
 
 OUString SAL_CALL pw3270::uno_impl::getRevision() throw (RuntimeException)

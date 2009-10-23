@@ -30,45 +30,53 @@
  *
  */
 
+#include <stdio.h>
+#ifdef WIN32
+	#include <windows.h>
+	#define sleep(x) Sleep(x)
+#endif
+
+#define TRACE( fmt, ... ) fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr);
+
 #include "globals.hpp"
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
 int SAL_CALL main(int argc, char **argv)
 {
-	Trace("Calling %s","createSimpleRegistry");
-	printf("%s(%d)\n",__FILE__,__LINE__);
+	TRACE("%s","createSimpleRegistry");
 	Reference< XSimpleRegistry > xReg = createSimpleRegistry();
+	TRACE("SimpleRegistry: %p",xReg);
+
 	OSL_ENSURE( xReg.is(), "### cannot get service instance of \"com.sun.star.regiystry.SimpleRegistry\"!" );
 
-	printf("%s(%d)\n",__FILE__,__LINE__);
-	xReg->open(OUString::createFromAscii("uno/pw3270.uno.rdb"), sal_False, sal_False);
+	xReg->open(OUString::createFromAscii("pw3270.uno.rdb"), sal_False, sal_False);
 
 	OSL_ENSURE( xReg->isValid(), "### cannot open test registry \"pw3270.uno.rdb\"!" );
 
-	Trace("Calling %s","bootstrap_InitialComponentContext");
+	TRACE("%s","Calling bootstrap_InitialComponentContext");
 	Reference< XComponentContext > xContext = bootstrap_InitialComponentContext(xReg);
 	OSL_ENSURE( xContext.is(), "### cannot creage intial component context!" );
 
-	Trace("Calling %s","getServiceManager");
+	TRACE("%s","Calling getServiceManager\n");
 	Reference< XMultiComponentFactory > xMgr = xContext->getServiceManager();
 	OSL_ENSURE( xMgr.is(), "### cannot get initial service manager!" );
 
 	// register my component
-	Trace("Calling %s","createInstanceWithContext");
+	TRACE("%s","Calling createInstanceWithContext");
 
 	Reference< XImplementationRegistration > xImplReg(
-		xMgr->createInstanceWithContext(OUString::createFromAscii("com.sun.star.registry.ImplementationRegistration"), xContext), UNO_QUERY);
+	xMgr->createInstanceWithContext(OUString::createFromAscii("com.sun.star.registry.ImplementationRegistration"), xContext), UNO_QUERY);
 	OSL_ENSURE( xImplReg.is(), "### cannot get service instance of \"com.sun.star.registry.ImplementationRegistration\"!" );
 
 	if (xImplReg.is())
 	{
 #if defined( WIN32 )
-        const char *libname = "bin\\Debug\\pw3270.uno.dll";
+        const char *libname = "pw3270.uno.dll";
 #else
         const char *libname = "bin/Debug/pw3270.uno.so";
 #endif
-        Trace("Loading %s",libname);
+        TRACE("Loading %s\n",libname);
 
 		xImplReg->registerImplementation(
                 OUString::createFromAscii("com.sun.star.loader.SharedLibrary"), // loader for component
@@ -78,33 +86,33 @@ int SAL_CALL main(int argc, char **argv)
 			);
 
 		// get an object instance
-		Trace("Calling createInstanceWithContext(%s)",IMPLNAME);
+		printf("Calling createInstanceWithContext(%s)\n",IMPLNAME);
 
 		Reference< XInterface > xx ;
 		xx = xMgr->createInstanceWithContext(OUString::createFromAscii(IMPLNAME), xContext);
 
-        Trace("Instance: %p",&xx);
+        printf("Instance: %p\n",&xx);
 
 		Reference< pw3270intf > srv( xx, UNO_QUERY );
 
 		OSL_ENSURE( srv.is(), "### cannot get service instance!");
 
-		Trace("object.is(): %d",srv.is());
+		printf("object.is(): %d\n",srv.is());
 
 		if(srv.is())
 		{
 			// Wait for commands
 			OString	str;
 			char	buffer[80];
-			Trace("getConnectionState: %d", srv->getConnectionState());
+			printf("getConnectionState: %d\n", srv->getConnectionState());
 
 			str = OUStringToOString( srv->getVersion(),RTL_TEXTENCODING_UTF8);
-			Trace("Version:\t%s",str.pData->buffer);
+			printf("Version:\t%s\n",str.pData->buffer);
 
 			str = OUStringToOString( srv->getRevision(),RTL_TEXTENCODING_UTF8);
-			Trace("Revision:\t%s",str.pData->buffer);
+			printf("Revision:\t%s\n",str.pData->buffer);
 
-			Trace("Connect(): %d" , srv->Connect(OUString::createFromAscii("L:3270.df.bb:9023"),10));
+			printf("Connect(): %d\n" , srv->Connect(OUString::createFromAscii("L:3270.df.bb:9023"),10));
 
 			sleep(5);
 
@@ -122,6 +130,7 @@ int SAL_CALL main(int argc, char **argv)
 			fgets(buffer,80,stdin);
 
 			Trace("Disconnect(): %d" , srv->Disconnect());
+
 			sleep(5);
 
 		}
@@ -129,5 +138,6 @@ int SAL_CALL main(int argc, char **argv)
 
 
 	Reference< XComponent >::query( xContext )->dispose();
+
 	return 0;
 }

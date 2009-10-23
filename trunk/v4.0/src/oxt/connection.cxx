@@ -40,7 +40,7 @@
 
 /*---[ Conection Thread ]----------------------------------------------------------------------------------*/
 
- void pw3270::uno_impl::start_thread(pw3270::uno_impl::uno_impl *obj)
+ void pw3270::uno_impl::start_thread(pw3270::uno_impl *obj)
  {
  	obj->network_loop();
  }
