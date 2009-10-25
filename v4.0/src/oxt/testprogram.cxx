@@ -76,7 +76,7 @@ int SAL_CALL main(int argc, char **argv)
 #else
         const char *libname = "bin/Debug/pw3270.uno.so";
 #endif
-        TRACE("Loading %s\n",libname);
+        TRACE("Loading %s",libname);
 
 		xImplReg->registerImplementation(
                 OUString::createFromAscii("com.sun.star.loader.SharedLibrary"), // loader for component
@@ -118,18 +118,18 @@ int SAL_CALL main(int argc, char **argv)
 
 			//str	=  OUStringToOString( srv->getScreenContentAt(20,39,5),RTL_TEXTENCODING_UTF8);
 			//Trace("ContentsAt(20,39): \"%s\"",str.pData->buffer);
-			Trace("waitForStringAt(SISBB) returned %d",srv->waitForStringAt(20,39,OUString::createFromAscii("SISBB"),20));
-			Trace("sendEnterKey() returned %d",srv->sendEnterKey());
-			Trace("waitForStringAt(Senha) returned %d",srv->waitForStringAt(14,2,OUString::createFromAscii("Senha"),20));
-			Trace("setStringAt returned %d",srv->setStringAt(13,21,OUString::createFromAscii("c1103788")));
+			printf("waitForStringAt(SISBB) returned %d\n",srv->waitForStringAt(20,39,OUString::createFromAscii("SISBB"),20));
+			printf("sendEnterKey() returned %d\n",srv->sendEnterKey());
+			printf("waitForStringAt(Senha) returned %d\n",srv->waitForStringAt(14,2,OUString::createFromAscii("Senha"),20));
+			printf("setStringAt returned %d\n",srv->setStringAt(13,21,OUString::createFromAscii("c1103788")));
 
 			str	=  OUStringToOString( srv->getScreenContent(),RTL_TEXTENCODING_UTF8);
-			Trace("Entire screen:\n%s\n",str.pData->buffer);
+			printf("Entire screen:\n%s\n",str.pData->buffer);
 
 			printf("Enter to exit...\n");
 			fgets(buffer,80,stdin);
 
-			Trace("Disconnect(): %d" , srv->Disconnect());
+			printf("Disconnect(): %d\n" , srv->Disconnect());
 
 			sleep(5);
 

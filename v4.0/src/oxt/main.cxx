@@ -37,7 +37,9 @@
 
 #include <stdio.h>
 
-#define TRACE( fmt, ... ) fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr);
+
+#define TRACE( fmt, ... ) /* fmt __VA_ARGS__ */
+// #define TRACE( fmt, ... ) fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr);
 
 #include "ooo3270.hpp"
 
@@ -92,8 +94,13 @@ static Reference< XInterface > SAL_CALL CreateInstance( const Reference< XCompon
  */
 extern "C" void SAL_CALL component_getImplementationEnvironment(const sal_Char ** ppEnvTypeName, uno_Environment ** ppEnv)
 {
-	printf("%s set envtype to %s\n",__FUNCTION__,LANGUAGE_BINDING_NAME);
+#ifdef LANGUAGE_BINDING_NAME
+	TRACE("%s set envtype to %s\n",__FUNCTION__,LANGUAGE_BINDING_NAME);
 	*ppEnvTypeName = LANGUAGE_BINDING_NAME;
+#else
+	TRACE("%s set envtype to %s\n",__FUNCTION__,"msci");
+	*ppEnvTypeName = "msci";
+#endif
 }
 
 /************************************************************
@@ -123,9 +130,9 @@ extern "C" void SAL_CALL component_getImplementationEnvironment(const sal_Char *
  */
 extern "C" sal_Bool SAL_CALL component_writeInfo(void * pServiceManager, void * pRegistryKey)
 {
-	TRACE("%s",__FUNCTION__);
-
 	sal_Bool result = sal_False;
+
+	TRACE("%s",__FUNCTION__);
 
 	if (pRegistryKey)
 	{
@@ -148,6 +155,7 @@ extern "C" sal_Bool SAL_CALL component_writeInfo(void * pServiceManager, void * 
 			// we should not ignore exceptions
 		}
 	}
+
 	return result;
 }
 

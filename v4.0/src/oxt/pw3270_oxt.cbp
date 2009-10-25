@@ -69,6 +69,8 @@
 		<Unit filename="manifest.xml">
 			<Option target="pw3270.uno.dll" />
 		</Unit>
+		<Unit filename="mkmanifest.cxx" />
+		<Unit filename="mkmanifest.obj" />
 		<Unit filename="ooo3270.hpp">
 			<Option target="pw3270.uno.dll" />
 		</Unit>
