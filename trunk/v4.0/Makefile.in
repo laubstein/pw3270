@@ -490,6 +490,7 @@ clean:
 	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.exe" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.log" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "leak.out" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.tmp" -exec mv -f {} $(TMPDIR) \;
