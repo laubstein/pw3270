@@ -1,8 +1,29 @@
-%define	ooo_home		@OO_HOME@
-%define ooo_ure_home	@OO_URE_HOME@
-%define	ooo_sdk_home	@OO_SDK_HOME@
-
 %define _rel	@PACKAGE_RELEASE@
+
+#---[ Check for distro ]----------------------------------------------------------------------------------------------
+
+%if 0%(if [ -x @OO_SDK_HOME@/bin/idlc ]; then echo 1; else echo 0; fi)
+	%define _uno		1
+	%define	ooo_home	@OO_HOME@
+	%define ooo_ure_home	@OO_URE_HOME@
+	%define	ooo_sdk_home	@OO_SDK_HOME@
+%endif
+
+%if 0%(if [ -x /opt/openoffice.org/basis3.1/sdk/bin/idlc ]; then echo 1; else echo 0; fi)
+	%define _uno		1
+	%define	ooo_home	/usr/lib/ooo3
+	%define ooo_ure_home	/opt/openoffice.org/ure
+	%define	ooo_sdk_home	/opt/openoffice.org/basis3.1/sdk
+%endif
+
+%if 0%(if [ -x /opt/openoffice.org/basis3.0/sdk/bin/idlc ]; then echo 1; else echo 0; fi)
+	%define _uno		1
+	%define ooo_home	/opt/openoffice.org
+	%define ooo_ure_home	/opt/openoffice.org/ure
+	%define ooo_sdk_home	/opt/openoffice.org/basis3.0/sdk
+%endif
+
+#---[ Check for distro ]----------------------------------------------------------------------------------------------
 
 %define _release	%{_rel}
 %define _distro		Linux
@@ -31,7 +52,6 @@
 	%define _distro %{_redhat_prefix} %{_redhat_vernum}
 %endif
 
-%define _uno	%(if [ -f %{ooo_sdk_home}/bin/idlc ]; then echo 1; else echo 0; fi)
 %define _rexx	%(which oorexx-config > /dev/null 2>&1; if [ "$?" = "0" ]; then echo 1; else echo 0; fi)
 
 
@@ -205,10 +225,18 @@ rm -rf $RPM_BUILD_ROOT
 
 %if 0%{?_uno}
 %post OpenOffice
-unopkg add --shared %ooo_home/share/extension/install/%{name}.oxt
+if [ -x /opt/broffice.org3/program/unopkg ] then
+	/opt/broffice.org3/program/unopkg add --shared %ooo_home/share/extension/install/%{name}.oxt
+else
+	@UNOPKG@ add --shared %ooo_home/share/extension/install/%{name}.oxt
+fi
 
 %preun OpenOffice
-unopkg remove --shared %{name}.oxt
+if [ -x /opt/broffice.org3/program/unopkg ] then
+	/opt/broffice.org3/program/unopkg remove --shared %{name}.oxt
+else
+	@UNOPKG@ remove --shared %{name}.oxt
+fi
 %endif
 
 %files lib
