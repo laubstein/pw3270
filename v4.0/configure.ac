@@ -265,6 +265,7 @@ AC_ARG_WITH([office-types],
 ] )
 
 
+AC_PATH_PROG([UNOPKG], unopkg, [$oo_home/program/unopkg] )
 AC_PATH_PROG([IDLC], idlc, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
 AC_PATH_PROG([CPPUMAKER], cppumaker, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
 AC_PATH_PROG([REGMERGE], regmerge, "no", [$PATH$PATH_SEPARATOR$oo_home/ure/bin$PATH_SEPARATOR$oo_ure_home/bin])
