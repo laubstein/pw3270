@@ -341,6 +341,13 @@ gboolean StartPlugins(const gchar *startup_script)
 	action_PFKey(atoi(cmd));
  }
 
+ static void ExecPAKey(GtkAction *action, gpointer cmd)
+ {
+	if(!TOGGLED_KEEP_SELECTED)
+		action_ClearSelection();
+	action_PAKey(atoi(cmd));
+ }
+
 #ifdef HAVE_PLUGINS
 
  static void loadaction(GModule *handle, struct custom_action_call *arg)
@@ -383,7 +390,8 @@ gboolean StartPlugins(const gchar *startup_script)
  		{ "ExecWithScreen", 	ExecWithScreen		},
  		{ "ExecWithCopy",		ExecWithCopy		},
  		{ "ExecWithSelection",	ExecWithSelection	},
- 		{ "PFKey",				ExecPFKey			}
+ 		{ "PFKey",				ExecPFKey			},
+ 		{ "PAKey",				ExecPAKey			}
  	};
 
 	GDir			*dir;
