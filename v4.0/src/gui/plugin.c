@@ -476,6 +476,12 @@ gboolean StartPlugins(const gchar *startup_script)
 
 					if(!run)
 					{
+						// Search for internal action
+						run = (void (*)(GtkAction *action, gpointer cmd)) get_action_callback_by_name(parm[3]);
+					}
+
+					if(!run)
+					{
 						WarningPopup( N_( "Invalid action \"%s\" when loading %s" ),parm[3],filename);
 						Log("Invalid action %s in %s",parm[3],filename);
 					}
@@ -495,6 +501,10 @@ gboolean StartPlugins(const gchar *startup_script)
 								gtk_action_group_add_action_with_accel(groups[0],action,parm[5]);
 							else
 								gtk_action_group_add_action(groups[0],action);
+						}
+						else
+						{
+							WarningPopup( N_( "Can't create action \"%s\"(\"%s\",\"%s\",\"%s\") when loading %s" ),parm[3],parm[0],parm[1],parm[2],filename);
 						}
 					}
 
