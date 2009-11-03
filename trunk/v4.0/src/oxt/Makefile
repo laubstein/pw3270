@@ -152,9 +152,9 @@ testprogram$(EXEEXT): testprogram.obj $(PACKAGE).uno$(DLLEXT)
 	@echo $@ ...
 	@link /WX /NOLOGO /LIBPATH:"$(OO_SDK_HOME)\lib" /LIBPATH:"$(VCINSTALLDIR)\lib" /DEFAULTLIB:icppu.lib /DEFAULTLIB:icppuhelper.lib /DEFAULTLIB:ireg.lib /DEFAULTLIB:irmcxt.lib /DEFAULTLIB:isal.lib /DEFAULTLIB:isalhelper.lib /DEFAULTLIB:istore.lib /DEFAULTLIB:stlport_vc71.lib /out:$@ testprogram.obj
 
-mkmanifest$(EXEEXT): mkmanifest.obj
+mkwinfiles$(EXEEXT): mkwinfiles.obj
 	@echo $@ ...
-	@link /WX /NOLOGO /out:$@ mkmanifest.obj
+	@link /WX /NOLOGO /out:$@ mkwinfiles.obj
 
 $(PACKAGE).uno$(DLLEXT): $(PW3270_SDK_LIB)\lib3270.lib $(PACKAGE).uno.lnk $(PACKAGE).hpp $(PACKAGE).uno.rdb $(foreach SRC, $(basename $(OOO_SRCS)), $(SRC).obj)
 	@echo $< ...
@@ -164,8 +164,7 @@ $(PACKAGE).oxt: $(PACKAGE).uno$(DLLEXT) mkmanifest$(EXEEXT) $(PACKAGE).uno.rdb d
 	@echo $@ ...
 	@md oxt.tmp
 	@md oxt.tmp\META-INF
-	@mkmanifest$(EXEEXT) "oxt.tmp\META-INF\manifest.xml"
-	@copy description.xml oxt.tmp
+	@mkwinfiles$(EXEEXT) "oxt.tmp\META-INF\manifest.xml" "oxt.tmp\description.xml"
 	@copy description.txt oxt.tmp
 	@copy $(PW3270_ICON) oxt.tmp\pw3270.png
 	@mkdir oxt.tmp\windows
