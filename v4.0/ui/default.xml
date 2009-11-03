@@ -27,7 +27,7 @@
 			<menuitem action='Unselect'/>
 			<menuitem action='Reselect'/>
 			<separator/>
-			<menuitem action='Clear'/>
+			<menuitem action='EraseInput'/>
 			<menuitem action='EraseField' />
 		</menu>
 
@@ -71,7 +71,7 @@
 		<toolitem name='SelectAll' action='SelectAll' />
 		<toolitem name='Copy' action='Copy' />
 		<toolitem name='Paste' action='Paste' />
-		<toolitem name='Clear' action='Clear' />
+		<toolitem name='EraseInput' action='EraseInput' />
 		<separator/>
 		<toolitem name='Connect' action='Connect' />
 		<toolitem name='Disconnect' action='Disconnect' />

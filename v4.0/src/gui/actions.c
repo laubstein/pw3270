@@ -49,7 +49,11 @@
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
- static void action_Clear(GtkWidget *w, gpointer user_data);
+// static void action_Clear(GtkWidget *w, gpointer user_data);
+
+ static void erase_input_action(void);
+ static void clear_fields_action(void);
+
  static void action_Up(GtkWidget *w, gpointer user_data);
  static void action_Down(GtkWidget *w, gpointer user_data);
  static void action_Left(GtkWidget *w, gpointer user_data);
@@ -161,8 +165,8 @@
  	{	"PasteTextFile",	NULL,					N_( "Paste text file" ),	NULL,				NULL,	G_CALLBACK(action_PasteTextFile)	},
  	{	"Reselect",			NULL,					N_( "Reselect" ),			"<Shift><Ctrl>r",	NULL,	G_CALLBACK(Reselect)				},
  	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
- 	{	"Clear",			GTK_STOCK_CLEAR,		N_( "Erase input" ),		"Clear",			NULL,	G_CALLBACK(action_Clear)			},
-
+ 	{	"EraseInput",		GTK_STOCK_CLEAR,		N_( "Erase input" ),		NULL,				NULL,	G_CALLBACK(erase_input_action)		},
+ 	{	"ClearFields",		NULL,					N_( "Clear" ),				NULL,				NULL,	G_CALLBACK(clear_fields_action)		},
  };
 
  static const GtkActionEntry ft_action_entries[] =
@@ -280,7 +284,12 @@
  	call();
  }
 
- void action_Clear(GtkWidget *w, gpointer user_data)
+ static void clear_fields_action(void)
+ {
+ 	clear_and_call(0,action_ClearFields);
+ }
+
+ static void erase_input_action(void)
  {
  	clear_and_call(0,action_EraseInput);
  }
