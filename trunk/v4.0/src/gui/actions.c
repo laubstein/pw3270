@@ -232,7 +232,7 @@
  	{	"Save",				GTK_STOCK_SAVE,			N_( "Save" ),				NULL,				NULL,	NULL								},
 
 	/* Terminal Actions */
-	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",			NULL,	G_CALLBACK(action_enter)		},
+	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",			NULL,	G_CALLBACK(action_enter)			},
 	{ 	"Enter",			NULL,					N_( "Enter" ),				"KP_Enter",			NULL,	G_CALLBACK(action_enter)			},
  };
 
@@ -241,6 +241,38 @@
 
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
+
+ GCallback get_action_callback_by_name(const gchar *name)
+ {
+	// TODO (perry#8#): Find a better way (search all registered actions by name?)
+	static const struct _list
+	{
+		const GtkActionEntry *action;
+		int sz;
+	} list[] =
+	{
+		{ online_action_entries,	G_N_ELEMENTS(online_action_entries)		},
+		{ ft_action_entries,		G_N_ELEMENTS(ft_action_entries)			},
+		{ offline_action_entries,	G_N_ELEMENTS(offline_action_entries)	},
+		{ selection_action_entries, G_N_ELEMENTS(selection_action_entries)	},
+		{ clipboard_action_entries, G_N_ELEMENTS(clipboard_action_entries)	},
+		{ paste_action_entries,		G_N_ELEMENTS(paste_action_entries)		},
+		{ common_action_entries,	G_N_ELEMENTS(common_action_entries)		}
+	};
+
+	int f, i;
+
+	for(f=0;f<G_N_ELEMENTS(list);f++)
+	{
+		for(i=0;i<list[f].sz;i++)
+		{
+			if(!strcmp(name,list[f].action[i].name))
+				return list[f].action[i].callback;
+		}
+	}
+
+ 	return NULL;
+ }
 
  static void clear_and_call(GtkAction *action, int (*call)(void))
  {
