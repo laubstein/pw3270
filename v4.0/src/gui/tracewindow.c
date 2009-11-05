@@ -36,60 +36,59 @@
 
 /*---[ Structs ]----------------------------------------------------------------------------------*/
 
- struct trace_window_data
+ struct console_window_data
  {
  	gboolean		waiting;
+ 	gboolean		active;
  	GtkWidget 		*entry;
  	GtkWidget 		*button;
  	GtkTextBuffer	*text;
 	GtkAdjustment	*scroll;
-
  };
 
 /*---[ Prototipes ]-------------------------------------------------------------------------------*/
 
- static struct trace_window_data * getTraceWindow(void);
-
 /*---[ Globals ]----------------------------------------------------------------------------------*/
-
- static GtkWidget	*trace_window = NULL;
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
- static void destroy_trace(GtkWidget *widget,gpointer data)
- {
- 	Trace("%s","Trace window destroyed");
- 	trace_window = 0;
- }
-
- void entry_ok(GtkButton *button,struct trace_window_data *data)
+ static void entry_ok(GtkButton *button,struct console_window_data *data)
  {
  	data->waiting = FALSE;
  }
 
- static struct trace_window_data * getTraceWindow(void)
+ static void destroy(struct console_window_data *data)
  {
- 	struct trace_window_data *data;
+ 	if(data->waiting)
+ 	{
+ 		// Waiting for user action, release flags
+ 		data->active = data->waiting = FALSE;
+ 		return;
+ 	}
 
+ 	g_free(data);
+ }
+
+ GtkWidget * console_window_new(const gchar *title, const gchar *label)
+ {
+ 	struct console_window_data *data;
+
+	GtkWidget *trace_window;
  	GtkWidget *widget;
  	GtkWidget *view;
  	GtkWidget *vbox;
  	GtkWidget *hbox;
 
- 	if(trace_window)
-		return (struct trace_window_data *) g_object_get_data(G_OBJECT(trace_window),"window_data");
-
 	// Create a new trace window
 	trace_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	g_signal_connect(G_OBJECT(trace_window),"destroy",G_CALLBACK(destroy_trace),0);
 
-	data = g_malloc0(sizeof(struct trace_window_data));
-	g_object_set_data_full(G_OBJECT(trace_window),"window_data",data,g_free);
+	data = g_malloc0(sizeof(struct console_window_data));
+	g_object_set_data_full(G_OBJECT(trace_window),"window_data",data,(void (*)(void *)) destroy );
 
 	gtk_window_set_transient_for(GTK_WINDOW(trace_window),GTK_WINDOW(topwindow));
 	gtk_window_set_destroy_with_parent(GTK_WINDOW(trace_window),TRUE);
 
-	gtk_window_set_title(GTK_WINDOW(trace_window),_( "Console" ));
+	gtk_window_set_title(GTK_WINDOW(trace_window),title ? title : _( "Console" ));
 
 	vbox = gtk_vbox_new(FALSE,2);
 
@@ -108,7 +107,7 @@
 
 	// Entry line
 	hbox = gtk_hbox_new(FALSE,0);
-	gtk_box_pack_start(GTK_BOX(hbox),gtk_label_new( _( "Command:" ) ),FALSE,TRUE,4);
+	gtk_box_pack_start(GTK_BOX(hbox),gtk_label_new( label ? label : _( "Command:" ) ),FALSE,TRUE,4);
 
 	data->entry = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(hbox),data->entry,TRUE,TRUE,4);
@@ -129,18 +128,23 @@
 	gtk_window_set_default_size(GTK_WINDOW(trace_window),590,430);
 	gtk_widget_show_all(trace_window);
 
-	return data;
+	return trace_window;
  }
 
- void PrintConsole(const gchar *fmt, ...)
+ int console_window_append(GtkWidget *trace_window, const gchar *fmt, ...)
  {
- 	struct trace_window_data *data = getTraceWindow();
+ 	struct console_window_data *data;
  	GtkTextIter itr;
  	gchar		*msg;
     va_list 	args;
 
+	if(!trace_window)
+		return EINVAL;
+
+	data = g_object_get_data(G_OBJECT(trace_window),"window_data");
+
 	if(!data)
-		return;
+		return EINVAL;
 
 	gtk_text_buffer_get_end_iter(data->text,&itr);
 
@@ -158,17 +162,26 @@
 #else
 	gtk_adjustment_set_value(data->scroll,(GTK_ADJUSTMENT(data->scroll))->upper);
 #endif
+
+	return 0;
  }
 
-/*
- static void gettracecommand(PRXSTRING str)
+ char * console_window_get_entry(GtkWidget *trace_window)
  {
- 	struct trace_window_data *data = getTraceWindow();
+ 	struct console_window_data *data;
+
+	if(!trace_window)
+	{
+		errno = EINVAL;
+		return NULL;
+	}
+
+	data = g_object_get_data(G_OBJECT(trace_window),"window_data");
 
 	if(!data)
 	{
-		RetString(str,NULL);
-		return;
+		errno = EINVAL;
+		return NULL;
 	}
 
  	data->waiting = TRUE;
@@ -177,24 +190,25 @@
 
 	gtk_widget_set_sensitive(data->entry,TRUE);
 	gtk_widget_set_sensitive(data->button,TRUE);
-
 	gtk_widget_grab_focus(data->entry);
 
-	while(trace_window && data->waiting)
+	while(data->waiting && data->active)
 	{
 		RunPendingEvents(1);
 	}
 
-	if(trace_window)
+	if(data->active)
 	{
-		RetString(str,gtk_entry_get_text(GTK_ENTRY(data->entry)));
+		char *ret = strdup(gtk_entry_get_text(GTK_ENTRY(data->entry)));
 		gtk_entry_set_text(GTK_ENTRY(data->entry),"");
 		gtk_widget_set_sensitive(data->entry,FALSE);
 		gtk_widget_set_sensitive(data->button,FALSE);
-		return;
+		return ret;
 	}
-	RetString(str,NULL);
+
+	g_free(data);
+	errno = ENOENT;
+	return NULL;
  }
-*/
 
 
