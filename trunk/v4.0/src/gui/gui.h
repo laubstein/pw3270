@@ -377,4 +377,10 @@
 		#define clear_font_cache() /* */
 	#endif
 
+
+	// Console/Trace window
+	GtkWidget	* console_window_new(const gchar *title, const gchar *label);
+	char		* console_window_get_entry(GtkWidget *trace_window);
+	int			  console_window_append(GtkWidget *trace_window, const gchar *fmt, ...);
+
 #endif // GUI_H_INCLUDED
