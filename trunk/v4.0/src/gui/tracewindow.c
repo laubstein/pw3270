@@ -30,20 +30,26 @@
  *
  */
 
+ struct _console;
+ #define HCONSOLE struct _console *
+
  #include "gui.h"
  #include <stdarg.h>
  #include <string.h>
 
 /*---[ Structs ]----------------------------------------------------------------------------------*/
 
- struct console_window_data
+ struct _console
  {
+ 	unsigned short	sz;
  	gboolean		waiting;
- 	gboolean		active;
+ 	GtkWidget		*window;
  	GtkWidget 		*entry;
  	GtkWidget 		*button;
  	GtkTextBuffer	*text;
 	GtkAdjustment	*scroll;
+	gchar			*title;
+	gchar			*label;
  };
 
 /*---[ Prototipes ]-------------------------------------------------------------------------------*/
@@ -52,54 +58,70 @@
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
- static void entry_ok(GtkButton *button,struct console_window_data *data)
+ static void entry_ok(GtkButton *button,HCONSOLE hwnd)
  {
- 	data->waiting = FALSE;
+ 	hwnd->waiting = FALSE;
  }
 
- static void destroy(struct console_window_data *data)
+ HCONSOLE gui_console_window_new(const char *title, const char *label)
  {
- 	if(data->waiting)
- 	{
- 		// Waiting for user action, release flags
- 		data->active = data->waiting = FALSE;
- 		return;
- 	}
+	HCONSOLE hwnd = (HCONSOLE) g_malloc0(sizeof(struct _console));
 
- 	g_free(data);
+	hwnd->sz 	= sizeof(struct _console);
+	hwnd->title = g_strdup(title  ? title : _( "Console" ));
+	hwnd->label = g_strdup(label ? label : _( "Command:" ));
+
+	return hwnd;
  }
 
- GtkWidget * console_window_new(const gchar *title, const gchar *label)
+ void gui_console_window_delete(HCONSOLE hwnd)
  {
- 	struct console_window_data *data;
+ 	hwnd->sz = 0;
+ 	if(hwnd->window)
+		g_object_unref(hwnd->window);
 
-	GtkWidget *trace_window;
+ 	g_free(hwnd->title);
+ 	g_free(hwnd->label);
+
+ 	g_free(hwnd);
+ }
+
+ static void destroy(GtkWidget *widget,HCONSOLE hwnd)
+ {
+ 	Trace("Console \"%s\" destroyed",hwnd->title);
+ 	hwnd->window = 0;
+ }
+
+ static GtkWidget * console_window_get(HCONSOLE hwnd)
+ {
  	GtkWidget *widget;
  	GtkWidget *view;
  	GtkWidget *vbox;
  	GtkWidget *hbox;
 
+	if(hwnd->window)
+		return hwnd->window;
+
 	// Create a new trace window
-	trace_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	hwnd->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	g_signal_connect(G_OBJECT(hwnd->window),"destroy",G_CALLBACK(destroy),hwnd);
+//	g_object_set_data(G_OBJECT(hwnd->window),"window_data",hwnd);
 
-	data = g_malloc0(sizeof(struct console_window_data));
-	g_object_set_data_full(G_OBJECT(trace_window),"window_data",data,(void (*)(void *)) destroy );
+	gtk_window_set_transient_for(GTK_WINDOW(hwnd->window),GTK_WINDOW(topwindow));
+	gtk_window_set_destroy_with_parent(GTK_WINDOW(hwnd->window),TRUE);
 
-	gtk_window_set_transient_for(GTK_WINDOW(trace_window),GTK_WINDOW(topwindow));
-	gtk_window_set_destroy_with_parent(GTK_WINDOW(trace_window),TRUE);
-
-	gtk_window_set_title(GTK_WINDOW(trace_window),title ? title : _( "Console" ));
+	gtk_window_set_title(GTK_WINDOW(hwnd->window),hwnd->title);
 
 	vbox = gtk_vbox_new(FALSE,2);
 
 	// Create text box
 	widget = gtk_scrolled_window_new(NULL, NULL);
-	data->scroll = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(widget));
+	hwnd->scroll = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(widget));
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),GTK_POLICY_AUTOMATIC,GTK_POLICY_AUTOMATIC);
 
 	view = gtk_text_view_new();
 
- 	data->text = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
+ 	hwnd->text = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(view), FALSE);
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(widget),view);
 
@@ -107,106 +129,90 @@
 
 	// Entry line
 	hbox = gtk_hbox_new(FALSE,0);
-	gtk_box_pack_start(GTK_BOX(hbox),gtk_label_new( label ? label : _( "Command:" ) ),FALSE,TRUE,4);
+	gtk_box_pack_start(GTK_BOX(hbox),gtk_label_new( hwnd->label ),FALSE,TRUE,4);
 
-	data->entry = gtk_entry_new();
-	gtk_box_pack_start(GTK_BOX(hbox),data->entry,TRUE,TRUE,4);
-	gtk_widget_set_sensitive(data->entry,FALSE);
-	g_signal_connect(G_OBJECT(data->entry),"activate",G_CALLBACK(entry_ok),data);
+	hwnd->entry = gtk_entry_new();
+	gtk_box_pack_start(GTK_BOX(hbox),hwnd->entry,TRUE,TRUE,4);
+	gtk_widget_set_sensitive(hwnd->entry,FALSE);
+	g_signal_connect(G_OBJECT(hwnd->entry),"activate",G_CALLBACK(entry_ok),hwnd);
 
-	data->button = gtk_button_new_from_stock(GTK_STOCK_OK);
-	gtk_box_pack_end(GTK_BOX(hbox),data->button,FALSE,FALSE,4);
-	gtk_widget_set_sensitive(data->button,FALSE);
-	g_signal_connect(G_OBJECT(data->button),"clicked",G_CALLBACK(entry_ok),data);
-	gtk_button_set_focus_on_click(GTK_BUTTON(data->button),FALSE);
+	hwnd->button = gtk_button_new_from_stock(GTK_STOCK_OK);
+	gtk_box_pack_end(GTK_BOX(hbox),hwnd->button,FALSE,FALSE,4);
+	gtk_widget_set_sensitive(hwnd->button,FALSE);
+	g_signal_connect(G_OBJECT(hwnd->button),"clicked",G_CALLBACK(entry_ok),hwnd);
+	gtk_button_set_focus_on_click(GTK_BUTTON(hwnd->button),FALSE);
 
 	gtk_box_pack_end(GTK_BOX(vbox),hbox,FALSE,TRUE,0);
 
 	// Show dialog
-	g_signal_connect(G_OBJECT(trace_window),"activate-default",G_CALLBACK(entry_ok),data);
-	gtk_container_add(GTK_CONTAINER(trace_window),vbox);
-	gtk_window_set_default_size(GTK_WINDOW(trace_window),590,430);
-	gtk_widget_show_all(trace_window);
+	g_signal_connect(G_OBJECT(hwnd->window),"activate-default",G_CALLBACK(entry_ok),hwnd);
+	gtk_container_add(GTK_CONTAINER(hwnd->window),vbox);
+	gtk_window_set_default_size(GTK_WINDOW(hwnd->window),590,430);
+	gtk_widget_show_all(hwnd->window);
 
-	return trace_window;
+	return hwnd->window;
  }
 
- int console_window_append(GtkWidget *trace_window, const gchar *fmt, ...)
+ int gui_console_window_append(HCONSOLE hwnd, const char *fmt, ...)
  {
- 	struct console_window_data *data;
  	GtkTextIter itr;
  	gchar		*msg;
     va_list 	args;
 
-	if(!trace_window)
+	if(!console_window_get(hwnd))
 		return EINVAL;
 
-	data = g_object_get_data(G_OBJECT(trace_window),"window_data");
-
-	if(!data)
-		return EINVAL;
-
-	gtk_text_buffer_get_end_iter(data->text,&itr);
+	gtk_text_buffer_get_end_iter(hwnd->text,&itr);
 
     va_start(args, fmt);
 	msg = g_strdup_vprintf(fmt,args);
     va_end(args);
-	gtk_text_buffer_insert(data->text,&itr,msg,strlen(msg));
+	gtk_text_buffer_insert(hwnd->text,&itr,msg,strlen(msg));
 	g_free(msg);
 
-	gtk_text_buffer_get_end_iter(data->text,&itr);
-	gtk_text_buffer_insert(data->text,&itr,"\n",1);
+	gtk_text_buffer_get_end_iter(hwnd->text,&itr);
+	gtk_text_buffer_insert(hwnd->text,&itr,"\n",1);
 
 #if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 14
-	gtk_adjustment_set_value(data->scroll,gtk_adjustment_get_upper(data->scroll));
+	gtk_adjustment_set_value(hwnd->scroll,gtk_adjustment_get_upper(hwnd->scroll));
 #else
-	gtk_adjustment_set_value(data->scroll,(GTK_ADJUSTMENT(data->scroll))->upper);
+	gtk_adjustment_set_value(hwnd->scroll,(GTK_ADJUSTMENT(hwnd->scroll))->upper);
 #endif
 
 	return 0;
  }
 
- char * console_window_get_entry(GtkWidget *trace_window)
+ char * gui_console_window_wait_for_user_entry(HCONSOLE hwnd)
  {
- 	struct console_window_data *data;
 
-	if(!trace_window)
+	if(!console_window_get(hwnd))
 	{
 		errno = EINVAL;
 		return NULL;
 	}
 
-	data = g_object_get_data(G_OBJECT(trace_window),"window_data");
+ 	hwnd->waiting = TRUE;
 
-	if(!data)
-	{
-		errno = EINVAL;
-		return NULL;
-	}
+	gtk_window_present(GTK_WINDOW(hwnd->window));
 
- 	data->waiting = TRUE;
+	gtk_widget_set_sensitive(hwnd->entry,TRUE);
+	gtk_widget_set_sensitive(hwnd->button,TRUE);
+	gtk_widget_grab_focus(hwnd->entry);
 
-	gtk_window_present(GTK_WINDOW(trace_window));
-
-	gtk_widget_set_sensitive(data->entry,TRUE);
-	gtk_widget_set_sensitive(data->button,TRUE);
-	gtk_widget_grab_focus(data->entry);
-
-	while(data->waiting && data->active)
+	while(hwnd->waiting && hwnd->window)
 	{
 		RunPendingEvents(1);
 	}
 
-	if(data->active)
+	if(hwnd->window)
 	{
-		char *ret = strdup(gtk_entry_get_text(GTK_ENTRY(data->entry)));
-		gtk_entry_set_text(GTK_ENTRY(data->entry),"");
-		gtk_widget_set_sensitive(data->entry,FALSE);
-		gtk_widget_set_sensitive(data->button,FALSE);
+		char *ret = strdup(gtk_entry_get_text(GTK_ENTRY(hwnd->entry)));
+		gtk_entry_set_text(GTK_ENTRY(hwnd->entry),"");
+		gtk_widget_set_sensitive(hwnd->entry,FALSE);
+		gtk_widget_set_sensitive(hwnd->button,FALSE);
 		return ret;
 	}
 
-	g_free(data);
 	errno = ENOENT;
 	return NULL;
  }
