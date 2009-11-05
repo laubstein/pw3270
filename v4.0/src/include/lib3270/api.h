@@ -52,6 +52,9 @@
 
 		#endif
 
+		#ifndef HCONSOLE
+			#define HCONSOLE void *
+		#endif
 
 		#ifndef ETIMEDOUT
 			#define ETIMEDOUT -1238
@@ -236,7 +239,6 @@
 			int				(*Wait)(int seconds);
 			int 			(*RunPendingEvents)(int wait);
 
-
 		};
 
 		LIB3270_EXPORT int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk);
@@ -358,6 +360,12 @@
 			void	(*toggle_changed)(int ix, int value, int reason, const char *name);
 			void	(*show_timer)(long seconds);
 
+			// Console/Trace window
+			HCONSOLE	(*console_new)(const char *title, const char *label);
+			void		(*console_delete)(HCONSOLE hwnd);
+			int			(*console_append)(HCONSOLE hwnd, const char *fmt, ...);
+			char *		(*console_entry)(HCONSOLE hwnd);
+
 		};
 
 		struct lib3270_option
@@ -418,6 +426,12 @@
 		LIB3270_EXPORT void screen_resume(void);
 		LIB3270_EXPORT void screen_suspend(void);
 		LIB3270_EXPORT void screen_disp(void);
+
+       /* Console calls */
+		LIB3270_EXPORT HCONSOLE	  console_window_new(const char *title, const char *label);
+		LIB3270_EXPORT void		  console_window_delete(HCONSOLE hwnd);
+		LIB3270_EXPORT int		  console_window_append(HCONSOLE hwnd, const char *fmt, ...);
+		LIB3270_EXPORT char		* console_window_wait_for_user_entry(HCONSOLE hwnd);
 
         /* Cursor calls */
 		LIB3270_EXPORT int cursor_get_addr(void);

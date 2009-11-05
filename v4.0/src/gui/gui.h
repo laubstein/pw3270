@@ -379,8 +379,9 @@
 
 
 	// Console/Trace window
-	GtkWidget	* console_window_new(const gchar *title, const gchar *label);
-	char		* console_window_get_entry(GtkWidget *trace_window);
-	int			  console_window_append(GtkWidget *trace_window, const gchar *fmt, ...);
+	HCONSOLE	  gui_console_window_new(const char *title, const char *label);
+	void		  gui_console_window_delete(HCONSOLE hwnd);
+	int			  gui_console_window_append(HCONSOLE hwnd, const char *fmt, ...);
+	char 		* gui_console_window_wait_for_user_entry(HCONSOLE hwnd);
 
 #endif // GUI_H_INCLUDED

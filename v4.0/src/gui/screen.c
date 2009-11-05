@@ -121,6 +121,11 @@
 	update_toggle,		// void (*toggle_changed)(int ix, int value, int reason, const char *name);
 	show_timer,			// void	(*show_timer)(long seconds);
 
+	gui_console_window_new,						// HCONSOLE	(*console_new)(const char *title, const char *label);
+	gui_console_window_delete,					// void		(*console_delete)(HCONSOLE hwnd);
+	gui_console_window_append,					// int		(*console_append)(HCONSOLE hwnd, const char *fmt, ...);
+	gui_console_window_wait_for_user_entry,		// char *	(*console_entry)(HCONSOLE hwnd);
+
  };
 
  static const struct _imagedata
