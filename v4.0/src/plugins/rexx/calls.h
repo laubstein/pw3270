@@ -32,22 +32,22 @@
 
  #ifdef BUILDING_AS_PLUGIN
 
-	#define EXPORTED_COMMON_REXX_ENTRY(x) 		{ #x, (PFN) x }
-	#define EXPORTED_PLUGIN_REXX_ENTRY(x) 		{ #x, (PFN) x }
-	#define EXPORTED_STANDALONE_REXX_ENTRY(x) 	{ #x, (PFN) rx3270Dunno }
+	#define EXPORTED_COMMON_REXX_ENTRY(x) 		{ #x, (REXXPFN) x }
+	#define EXPORTED_PLUGIN_REXX_ENTRY(x) 		{ #x, (REXXPFN) x }
+	#define EXPORTED_STANDALONE_REXX_ENTRY(x) 	{ #x, (REXXPFN) rx3270Dunno }
 
  #else
 
-	#define EXPORTED_COMMON_REXX_ENTRY(x) 		{ #x, (PFN) x }
-	#define EXPORTED_PLUGIN_REXX_ENTRY(x) 		{ #x, (PFN) rx3270Dunno }
-	#define EXPORTED_STANDALONE_REXX_ENTRY(x) 	{ #x, (PFN) x }
+	#define EXPORTED_COMMON_REXX_ENTRY(x) 		{ #x, (REXXPFN) x }
+	#define EXPORTED_PLUGIN_REXX_ENTRY(x) 		{ #x, (REXXPFN) rx3270Dunno }
+	#define EXPORTED_STANDALONE_REXX_ENTRY(x) 	{ #x, (REXXPFN) x }
 
  #endif
 
  typedef struct _exported_rexx_calls
  {
 	const char 	*name;
-	PFN				call;
+	REXXPFN		call;
  } EXPORTED_CALL_ENTRY;
 
 /*---[ Rexx entry points ]------------------------------------------------------------------------*/

@@ -37,14 +37,14 @@
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
- ULONG RetValue(PRXSTRING Retstr, int value)
+ RexxReturnCode RetValue(PRXSTRING Retstr, int value)
  {
 	g_snprintf(Retstr->strptr,RXAUTOBUFLEN-1,"%d",value);
     Retstr->strlength = strlen(Retstr->strptr);
     return RXFUNC_OK;
  }
 
- ULONG RetString(PRXSTRING Retstr, const char *value)
+ RexxReturnCode RetString(PRXSTRING Retstr, const char *value)
  {
  	if(!value)
  	{
@@ -65,7 +65,7 @@
  }
 
 
-ULONG RetPointer(PRXSTRING Retstr, gpointer value)
+RexxReturnCode RetPointer(PRXSTRING Retstr, gpointer value)
 {
 	g_snprintf(Retstr->strptr,RXAUTOBUFLEN-1,"%p",value);
     Retstr->strlength = strlen(Retstr->strptr);

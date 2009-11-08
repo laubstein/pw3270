@@ -49,7 +49,7 @@
 /* Returns:	    None                                                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270Log(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270Log(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	if(Argc != 1)
 		return RXFUNC_BADCALL;
@@ -70,7 +70,7 @@
 /* Returns:	    String with the version information                           */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270Version(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	strncpy(Retstr->strptr,PACKAGE_VERSION,RXAUTOBUFLEN-1);
     Retstr->strlength = strlen(Retstr->strptr);
@@ -89,7 +89,7 @@
 /* Returns:	    None                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270WaitForEvents(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270WaitForEvents(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	switch(Argc)
  	{
@@ -119,7 +119,7 @@
 /* Returns:	    0 if ok, error code if not ok                                 */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270Sleep(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270Sleep(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	time_t end = time(0);
 
@@ -151,7 +151,7 @@
 	return RetValue(Retstr,0);
  }
 
- ULONG APIENTRY rx3270Dunno(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270Dunno(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	return RetValue(Retstr,0);
  }
@@ -167,7 +167,7 @@
 /* Returns:	    None                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270Quit(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270Quit(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	gtk_main_quit();
 	return RetValue(Retstr,0);

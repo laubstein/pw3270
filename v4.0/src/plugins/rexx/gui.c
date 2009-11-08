@@ -81,7 +81,7 @@ GtkMessageType getMessageDialogType(const char *arg)
 	return GTK_MESSAGE_OTHER;
  }
 
- ULONG RetGtkResponse(PRXSTRING Retstr, GtkResponseType type)
+ RexxReturnCode RetGtkResponse(PRXSTRING Retstr, GtkResponseType type)
  {
  	static const struct _rsptype
  	{
@@ -130,7 +130,7 @@ GtkMessageType getMessageDialogType(const char *arg)
 /* Returns:	    Dialog result                                                 */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270Popup(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270Popup(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	GtkMessageType	type = GTK_MESSAGE_ERROR;
  	GtkWidget		*dialog;
@@ -188,7 +188,7 @@ GtkMessageType getMessageDialogType(const char *arg)
 /* Returns:	    None                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-ULONG APIENTRY rx3270SetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+RexxReturnCode REXXENTRY rx3270SetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
 {
 	GtkWidget *widget;
 
@@ -214,7 +214,7 @@ ULONG APIENTRY rx3270SetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queu
 /* Returns:	    Parameter value                                               */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-ULONG APIENTRY rx3270GetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+RexxReturnCode REXXENTRY rx3270GetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
 {
 	GtkWidget *widget;
 
@@ -238,7 +238,7 @@ ULONG APIENTRY rx3270GetWidgetData(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queu
 /* Returns:	    none                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270SetWidgetVisibleState(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270SetWidgetVisibleState(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	GtkWidget *widget;
 

@@ -47,7 +47,7 @@
 /* Returns:	    Dialog result                                                 */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270runDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270runDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	CHECK_SINGLE_WIDGET_ARG(widget);
 	return RetGtkResponse(Retstr,gtk_dialog_run(GTK_DIALOG(widget)));
@@ -66,7 +66,7 @@
 /* Returns:	    none                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270SetWindowSize(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270SetWindowSize(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	GtkWidget *widget;
 
@@ -93,7 +93,7 @@
 /* Returns:	    None                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270SetDialogTitle(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270SetDialogTitle(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	GtkWidget *widget;
 
@@ -118,7 +118,7 @@
 /* Returns:	    0 if ok, or error code                                        */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270DestroyDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270DestroyDialog(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	GtkWidget *widget = getWidget(0,Argv);
 
@@ -144,7 +144,7 @@
 /* Returns:	    Widget handle                                                 */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270FileChooserNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270FileChooserNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	GtkWidget *widget;
 
@@ -198,9 +198,9 @@
 /* Returns:	    Selected file                                                 */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270FileChooserGetFilename(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270FileChooserGetFilename(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	ULONG rc;
+ 	RexxReturnCode rc;
  	gchar *filename;
 	CHECK_SINGLE_WIDGET_ARG(widget);
 
@@ -224,7 +224,7 @@
 /* Returns:	    Dialog handle                                                 */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270MessageDialogNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270MessageDialogNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	GtkMessageType	type = GTK_MESSAGE_ERROR;
  	GtkWidget		*dialog;
@@ -276,7 +276,7 @@
  	RaiseHaltSignal();
  }
 
- ULONG APIENTRY rx3270ProgressDialogNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270ProgressDialogNew(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	GtkWidget		*dialog;
  	GtkWidget		*widget;
@@ -358,7 +358,7 @@
 /* Returns:	    none                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270ProgressDialogSetCurrent(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270ProgressDialogSetCurrent(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	GtkWidget 	*widget;
  	gdouble		total;
@@ -396,7 +396,7 @@
 /* Returns:	    none                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270ProgressDialogSetTotal(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270ProgressDialogSetTotal(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	GtkWidget *widget;
 
@@ -422,7 +422,7 @@
 /* Returns:	    none                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270ProgressDialogSetText(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270ProgressDialogSetText(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	GtkWidget *widget;
 
@@ -453,7 +453,7 @@
 /* Returns:	    none                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270ProgressDialogPulse(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270ProgressDialogPulse(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	CHECK_SINGLE_WIDGET_ARG(widget);
 

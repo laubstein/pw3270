@@ -46,7 +46,7 @@
 /* Returns:	    0 if ok, error code if not ok                                 */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270Connect(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270Connect(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	int rc = 0;
  	int wait = 1;
@@ -83,7 +83,7 @@
 /*              CONNECTED_TN3270E                                             */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270QueryCState(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270QueryCState(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	#define DECLARE_XLAT_STATE( x ) { x, #x }
 
@@ -138,7 +138,7 @@
 /* Returns:	    0 if ok, error code if not ok                                 */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
- ULONG APIENTRY rx3270Disconnect(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270Disconnect(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	if(!PCONNECTED)
 	{
