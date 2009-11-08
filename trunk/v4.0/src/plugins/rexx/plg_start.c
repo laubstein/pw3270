@@ -75,7 +75,7 @@
 	RXSTRING  			argv;           	          	// program argument string
 	RXSTRING  			retstr;                      	// program return value
 	RXSTRING			prg[2];							// Program data
-	SHORT     			rc		= 0;                   	// converted return code
+	short     			rc		= 0;                   	// converted return code
 	GError				*error	= NULL;
 	gsize				sz;
 
@@ -213,7 +213,7 @@
 	program_window = topwindow;
 
 	// Register Exit calls
-	RexxRegisterExitExe( "SysExit_SIO", (PFN) SysExit_SIO, NULL );
+	RexxRegisterExitExe( "SysExit_SIO", (REXXPFN) SysExit_SIO, NULL );
 
  	// Load rexx calls
 	for(f=0; f < G_N_ELEMENTS(rexx_exported_calls); f++)
@@ -327,9 +327,9 @@
 
  }
 
- LONG APIENTRY SysExit_SIO(LONG ExitNumber, LONG  Subfunction, PEXIT ParmBlock)
+ RexxReturnCode REXXENTRY SysExit_SIO(int ExitNumber, int  Subfunction, PEXIT ParmBlock)
  {
- 	LONG		retcode = RXEXIT_HANDLED;
+ 	int			retcode = RXEXIT_HANDLED;
  	GtkWidget	*dialog;
 
  	Trace("%s call with ExitNumber: %d Subfunction: %d",__FUNCTION__,(int) ExitNumber, (int) Subfunction);
@@ -375,7 +375,7 @@
 	return retcode;
  }
 
- ULONG RetConvertedString(PRXSTRING Retstr, const char *value)
+ RexxReturnCode RetConvertedString(PRXSTRING Retstr, const char *value)
  {
  	if(!value)
  	{
@@ -409,7 +409,7 @@
  	return script_state != SCRIPT_STATE_RUNNING;
  }
 
- ULONG RaiseHaltSignal(void)
+ RexxReturnCode RaiseHaltSignal(void)
  {
 	script_state = SCRIPT_STATE_HALTED;
 
@@ -436,7 +436,7 @@
  	g_free(str);
  }
 
- ULONG APIENTRY rx3270QueryRunMode(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270QueryRunMode(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	strncpy(Retstr->strptr,"PLUGIN",RXAUTOBUFLEN-1);
     Retstr->strlength = strlen(Retstr->strptr);
@@ -444,7 +444,7 @@
  }
 
 
- ULONG APIENTRY rx3270SetCharset(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270SetCharset(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	if(!Argc)
 		return RXFUNC_BADCALL;
