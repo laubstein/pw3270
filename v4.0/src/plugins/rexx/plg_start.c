@@ -46,22 +46,10 @@
 
  #include <gmodule.h>
 
-/*---[ Structs ]----------------------------------------------------------------------------------*/
-
- struct trace_window_data
- {
- 	gboolean		waiting;
- 	GtkWidget 		*entry;
- 	GtkWidget 		*button;
- 	GtkTextBuffer	*text;
-	GtkAdjustment	*scroll;
-
- };
-
 /*---[ Prototipes ]-------------------------------------------------------------------------------*/
 
  RexxExitHandler SysExit_SIO;	// Handler for screen I/O
- static struct trace_window_data * getTraceWindow(void);
+ static HCONSOLE * getTraceWindow(void);
 
 /*---[ Globals ]----------------------------------------------------------------------------------*/
 
@@ -71,9 +59,8 @@
    { NULL, 			RXENDLST 	}
  };
 
-
  GtkWidget 	*program_window	= NULL;
- GtkWidget	*trace_window = NULL;
+ HCONSOLE	console_window	= NULL;
 
  static SCRIPT_STATE	script_state	= SCRIPT_STATE_NONE;
  static gchar 			*rexx_charset	= NULL;
@@ -310,139 +297,34 @@
 
  }
 
- static void destroy_trace(GtkWidget *widget,gpointer data)
+ static HCONSOLE * getTraceWindow(void)
  {
- 	Trace("%s","Rexx trace destroyed");
- 	trace_window = 0;
- }
-
- void entry_ok(GtkButton *button,struct trace_window_data *data)
- {
- 	data->waiting = FALSE;
- }
-
- static struct trace_window_data * getTraceWindow(void)
- {
- 	struct trace_window_data *data;
-
- 	GtkWidget *widget;
- 	GtkWidget *view;
- 	GtkWidget *vbox;
- 	GtkWidget *hbox;
-
- 	if(trace_window)
-		return (struct trace_window_data *) g_object_get_data(G_OBJECT(trace_window),"window_data");
-
-	if(script_state == SCRIPT_STATE_HALTED)
-		return NULL;
-
-	// Create a new trace window
-	trace_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	g_signal_connect(G_OBJECT(trace_window),"destroy",G_CALLBACK(destroy_trace),0);
-
-	data = g_malloc0(sizeof(struct trace_window_data));
-	g_object_set_data_full(G_OBJECT(trace_window),"window_data",data,g_free);
-
-	gtk_window_set_transient_for(GTK_WINDOW(trace_window),GTK_WINDOW(program_window));
-	gtk_window_set_destroy_with_parent(GTK_WINDOW(trace_window),TRUE);
-
-	gtk_window_set_title(GTK_WINDOW(trace_window),_( "Rexx trace" ));
-
-	vbox = gtk_vbox_new(FALSE,2);
-
-	// Create text box
-	widget = gtk_scrolled_window_new(NULL, NULL);
-	data->scroll = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(widget));
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),GTK_POLICY_AUTOMATIC,GTK_POLICY_AUTOMATIC);
-
-	view = gtk_text_view_new();
-
- 	data->text = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
-	gtk_text_view_set_editable(GTK_TEXT_VIEW(view), FALSE);
-	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(widget),view);
-
-	gtk_box_pack_start(GTK_BOX(vbox),widget,TRUE,TRUE,0);
-
-	// Entry line
-	hbox = gtk_hbox_new(FALSE,0);
-	gtk_box_pack_start(GTK_BOX(hbox),gtk_label_new( _( "Command:" ) ),FALSE,TRUE,4);
-
-	data->entry = gtk_entry_new();
-	gtk_box_pack_start(GTK_BOX(hbox),data->entry,TRUE,TRUE,4);
-	gtk_widget_set_sensitive(data->entry,FALSE);
-	g_signal_connect(G_OBJECT(data->entry),"activate",G_CALLBACK(entry_ok),data);
-
-	data->button = gtk_button_new_from_stock(GTK_STOCK_OK);
-	gtk_box_pack_end(GTK_BOX(hbox),data->button,FALSE,FALSE,4);
-	gtk_widget_set_sensitive(data->button,FALSE);
-	g_signal_connect(G_OBJECT(data->button),"clicked",G_CALLBACK(entry_ok),data);
-	gtk_button_set_focus_on_click(GTK_BUTTON(data->button),FALSE);
-
-	gtk_box_pack_end(GTK_BOX(vbox),hbox,FALSE,TRUE,0);
-
-	// Show dialog
-	g_signal_connect(G_OBJECT(trace_window),"activate-default",G_CALLBACK(entry_ok),data);
-	gtk_container_add(GTK_CONTAINER(trace_window),vbox);
-	gtk_window_set_default_size(GTK_WINDOW(trace_window),590,430);
-	gtk_widget_show_all(trace_window);
-
-	return data;
+ 	if(!console_window)
+		console_window = console_window_new(_( "Rexx trace" ), _( "Command:" ));
+	return console_window;
  }
 
  static void showtracemessage(const gchar *msg)
  {
- 	struct trace_window_data *data = getTraceWindow();
- 	GtkTextIter itr;
-
-	if(!data)
-		return;
-
-	gtk_text_buffer_get_end_iter(data->text,&itr);
-	gtk_text_buffer_insert(data->text,&itr,msg,strlen(msg));
-
-	gtk_text_buffer_get_end_iter(data->text,&itr);
-	gtk_text_buffer_insert(data->text,&itr,"\n",1);
-
-#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 14
-	gtk_adjustment_set_value(data->scroll,gtk_adjustment_get_upper(data->scroll));
-#else
-	gtk_adjustment_set_value(data->scroll,(GTK_ADJUSTMENT(data->scroll))->upper);
-#endif
+	console_window_append(getTraceWindow(),"%s",msg);
  }
 
  static void gettracecommand(PRXSTRING str)
  {
- 	struct trace_window_data *data = getTraceWindow();
+ 	char *cmd;
+ 	HCONSOLE hwnd = getTraceWindow();
 
-	if(!data)
+	if(!hwnd)
 	{
 		RetString(str,NULL);
 		return;
 	}
 
- 	data->waiting = TRUE;
-
-	gtk_window_present(GTK_WINDOW(trace_window));
-
-	gtk_widget_set_sensitive(data->entry,TRUE);
-	gtk_widget_set_sensitive(data->button,TRUE);
-
-	gtk_widget_grab_focus(data->entry);
-
-	while(trace_window && data->waiting)
-	{
-		RunPendingEvents(1);
-	}
-
-	if(trace_window)
-	{
-		RetString(str,gtk_entry_get_text(GTK_ENTRY(data->entry)));
-		gtk_entry_set_text(GTK_ENTRY(data->entry),"");
-		gtk_widget_set_sensitive(data->entry,FALSE);
-		gtk_widget_set_sensitive(data->button,FALSE);
-		return;
-	}
+	cmd = console_window_wait_for_user_entry(hwnd);
 	RetString(str,NULL);
+
+	free(cmd);
+
  }
 
  LONG APIENTRY SysExit_SIO(LONG ExitNumber, LONG  Subfunction, PEXIT ParmBlock)
@@ -461,7 +343,7 @@
 											GTK_BUTTONS_OK_CANCEL,
 											"%s", (((RXSIOSAY_PARM *) ParmBlock)->rxsio_string).strptr );
 
-		if(trace_window)
+		if(console_window)
 			showtracemessage((((RXSIOSAY_PARM *) ParmBlock)->rxsio_string).strptr);
 
 		gtk_window_set_title(GTK_WINDOW(dialog), _( "Script message" ) );

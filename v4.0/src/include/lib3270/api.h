@@ -363,7 +363,7 @@
 			// Console/Trace window
 			HCONSOLE	(*console_new)(const char *title, const char *label);
 			void		(*console_delete)(HCONSOLE hwnd);
-			int			(*console_append)(HCONSOLE hwnd, const char *fmt, ...);
+			int			(*console_append)(HCONSOLE hwnd, const char *fmt, va_list 	args);
 			char *		(*console_entry)(HCONSOLE hwnd);
 
 		};
@@ -468,6 +468,11 @@
 		LIB3270_EXPORT void host_disconnect(int disable);
 		LIB3270_EXPORT void register_schange(int tx, void (*func)(int));
 
+		/* Console/Trace window */
+		LIB3270_EXPORT HCONSOLE	  console_window_new(const char *title, const char *label);
+		LIB3270_EXPORT void	  console_window_delete(HCONSOLE hwnd);
+		LIB3270_EXPORT int		  console_window_append(HCONSOLE hwnd, const char *fmt, ...);
+		LIB3270_EXPORT char	* console_window_wait_for_user_entry(HCONSOLE hwnd);
 
 #ifdef __cplusplus
 	}
