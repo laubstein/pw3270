@@ -381,7 +381,7 @@
 	// Console/Trace window
 	HCONSOLE	  gui_console_window_new(const char *title, const char *label);
 	void		  gui_console_window_delete(HCONSOLE hwnd);
-	int			  gui_console_window_append(HCONSOLE hwnd, const char *fmt, ...);
+	int			  gui_console_window_append(HCONSOLE hwnd, const char *fmt, va_list args);
 	char 		* gui_console_window_wait_for_user_entry(HCONSOLE hwnd);
 
 #endif // GUI_H_INCLUDED

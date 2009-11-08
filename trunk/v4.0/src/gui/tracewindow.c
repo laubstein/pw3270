@@ -88,7 +88,7 @@
 
  static void destroy(GtkWidget *widget,HCONSOLE hwnd)
  {
- 	Trace("Console \"%s\" destroyed",hwnd->title);
+ 	Trace("Console \"%s\" destroyed (%p)",hwnd->title,hwnd);
  	hwnd->window = 0;
  }
 
@@ -101,6 +101,8 @@
 
 	if(hwnd->window)
 		return hwnd->window;
+
+ 	Trace("Console \"%s\" created (%p)",hwnd->title,hwnd);
 
 	// Create a new trace window
 	hwnd->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -153,20 +155,18 @@
 	return hwnd->window;
  }
 
- int gui_console_window_append(HCONSOLE hwnd, const char *fmt, ...)
+ int gui_console_window_append(HCONSOLE hwnd, const char *fmt, va_list args)
  {
  	GtkTextIter itr;
  	gchar		*msg;
-    va_list 	args;
 
 	if(!console_window_get(hwnd))
 		return EINVAL;
 
 	gtk_text_buffer_get_end_iter(hwnd->text,&itr);
 
-    va_start(args, fmt);
 	msg = g_strdup_vprintf(fmt,args);
-    va_end(args);
+
 	gtk_text_buffer_insert(hwnd->text,&itr,msg,strlen(msg));
 	g_free(msg);
 

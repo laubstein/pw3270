@@ -890,3 +890,38 @@ LIB3270_EXPORT struct ea * copy_device_buffer(int *el)
 		*el = (maxROWS * maxCOLS);
 	return ret;
 }
+
+LIB3270_EXPORT HCONSOLE console_window_new(const char *title, const char *label)
+{
+	if(callbacks && callbacks->console_new )
+		return callbacks->console_new(title,label);
+
+	return NULL;
+}
+
+LIB3270_EXPORT void console_window_delete(HCONSOLE hwnd)
+{
+	if(callbacks && callbacks->console_delete )
+		callbacks->console_delete(hwnd);
+}
+
+LIB3270_EXPORT int console_window_append(HCONSOLE hwnd, const char *fmt, ...)
+{
+	va_list args;
+
+	if(callbacks && callbacks->console_append)
+	{
+		va_start(args, fmt);
+		callbacks->console_append(hwnd, fmt, args);
+		va_end(args);
+	}
+
+	return 0;
+}
+
+LIB3270_EXPORT char * console_window_wait_for_user_entry(HCONSOLE hwnd)
+{
+	if(callbacks && callbacks->console_entry )
+		return callbacks->console_entry(hwnd);
+	return NULL;
+}
