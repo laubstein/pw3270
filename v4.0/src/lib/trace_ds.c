@@ -88,11 +88,15 @@
 
 /* Statics */
 static int      dscnt = 0;
-#if !defined(_WIN32) /*[*/
-static int      tracewindow_pid = -1;
+
+#if defined (LIB3270)
+	HCONSOLE		tracewindow_handle = 0;
+#elif defined(_WIN32) /*[*/
+	static HANDLE	tracewindow_handle = NULL;
 #else /*][*/
-static HANDLE	tracewindow_handle = NULL;
+	static int		tracewindow_pid = -1;
 #endif /*]*/
+
 static FILE    *tracef = NULL;
 static FILE    *tracef_pipe = NULL;
 static char    *tracef_bufptr = CN;
@@ -234,9 +238,29 @@ trace_dsn(const char *fmt, ...)
  * This is the only function that actually does output to the trace file --
  * all others are wrappers around this function.
  */
-static void
-vwtrace(const char *fmt, va_list args)
+static void vwtrace(const char *fmt, va_list args)
 {
+
+#if defined (LIB3270)
+
+	char buf[16384];
+
+	vsnprintf(buf,16384,fmt,args);
+
+	if(!tracewindow_handle)
+		tracewindow_handle = console_window_new( "Trace Window", NULL );
+
+	if(tracewindow_handle)
+		console_window_append(tracewindow_handle,"%s",buf);
+
+	if(tracef != NULL)
+	{
+		if(fwrite(buf,strlen(buf),1,tracef) != 1)
+			popup_an_errno(errno,"Write to trace file failed");
+	}
+
+#else
+
 	if (tracef_bufptr != CN) {
 		tracef_bufptr += vsprintf(tracef_bufptr, fmt, args);
 	} else if (tracef != NULL) {
@@ -275,6 +299,9 @@ vwtrace(const char *fmt, va_list args)
 			}
 		}
 	}
+
+#endif
+
 }
 
 /* Write to the trace file. */
@@ -600,7 +627,8 @@ tracefile_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 		tfn = XawDialogGetValueString((Widget)client_data);
 	else
 #endif /*]*/
-		tfn = (char *)client_data;
+
+	tfn = (char *)client_data;
 	tfn = do_subst(tfn, True, True);
 	if (strchr(tfn, '\'') ||
 	    ((int)strlen(tfn) > 0 && tfn[strlen(tfn)-1] == '\\')) {
@@ -720,7 +748,15 @@ tracefile_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 	}
 #endif /*]*/
 
-#if defined(_WIN32) /*[*/
+#if defined (LIB3270)
+
+	/* Open pw3270's console window */
+
+	if(!tracewindow_handle)
+		tracewindow_handle = console_window_new( "Trace Window", NULL );
+
+#elif defined(_WIN32) /*[*/
+
 	/* Start the monitor window. */
 
 	#warning Find a better way
@@ -859,32 +895,45 @@ tracefile_on(int reason, enum toggle_type tt)
 }
 
 /* Close the trace file. */
-static void
-tracefile_off(void)
+static void tracefile_off(void)
 {
 	time_t clk;
 
 	clk = time((time_t *)0);
 	wtrace("Trace stopped %s", ctime(&clk));
-#if !defined(_WIN32) /*[*/
+
+#if defined (LIB3270)
+
+	if(tracewindow_handle != NULL)
+	{
+		console_window_delete(tracewindow_handle);
+		tracewindow_handle = NULL;
+	}
+
+#elif !defined(_WIN32) /*[*/
+
 	if (tracewindow_pid != -1)
 		(void) kill(tracewindow_pid, SIGKILL);
 	tracewindow_pid = -1;
+
 #else /*][*/
-	if (tracewindow_handle != NULL) {
-	    	TerminateProcess(tracewindow_handle, 0);
+
+	if (tracewindow_handle != NULL)
+	{
+	   	TerminateProcess(tracewindow_handle, 0);
 		CloseHandle(tracewindow_handle);
 		tracewindow_handle = NULL;
 	}
 
 #endif /*]*/
+
 	stop_tracing();
 }
 
-void
-toggle_dsTrace(struct toggle *t unused, enum toggle_type tt)
+void toggle_dsTrace(struct toggle *t unused, enum toggle_type tt)
 {
 	/* If turning on trace and no trace file, open one. */
+
 	if (toggled(DS_TRACE) && tracef == NULL)
 		tracefile_on(DS_TRACE, tt);
 
