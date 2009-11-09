@@ -306,7 +306,7 @@
 
  static void showtracemessage(const gchar *msg)
  {
-	console_window_append(getTraceWindow(),"%s",msg);
+	console_window_append(getTraceWindow(),"%s\n",msg);
  }
 
  static void gettracecommand(PRXSTRING str)
@@ -328,7 +328,7 @@
  }
 
 #ifdef REXXV3
- LONG SysExit_SIO(LONG ExitNumber, LONG  Subfunction, PEXIT ParmBlock)
+ LONG APIENTRY SysExit_SIO(LONG ExitNumber, LONG  Subfunction, PEXIT ParmBlock)
 #else
  RexxReturnCode REXXENTRY SysExit_SIO(int ExitNumber, int  Subfunction, PEXIT ParmBlock)
 #endif

@@ -454,6 +454,7 @@
 
  static void toggle_action(GtkToggleAction *action, int id)
  {
+ 	Trace("%s(%d)",__FUNCTION__,id);
  	set_toggle(id,gtk_toggle_action_get_active(action));
  }
 
@@ -594,8 +595,17 @@
 															gettext(toggle_info[f].label),
 															gettext(toggle_info[f].tooltip),
 															toggle_info[f].stock_id );
+
+		Trace("Toggle(%d): %s",f,name);
 		gtk_toggle_action_set_active(action,Toggled(f));
 		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_action),(gpointer) f);
+
+#ifndef X3270_TRACE
+
+		if(f == DS_TRACE || f == SCREEN_TRACE || f == EVENT_TRACE)
+			gtk_action_set_sensitive((GtkAction *) action,FALSE);
+
+#endif
 
 		if(toggle_info[f].accelerator)
 			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(toggle_info[f].accelerator));

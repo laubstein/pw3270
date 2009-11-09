@@ -163,13 +163,13 @@
  {
 	pango_font_description_set_size(font_descr,fsize[sel].size);
 
-	Trace("Updating font data (sel: %d)",sel);
+//	Trace("Updating font data (sel: %d)",sel);
 	gtk_widget_modify_font(terminal,font_descr);
 
  	fsize[sel].width = fontWidth;
  	fsize[sel].height = fontHeight;
 
-	Trace("Font(%d): Width=%d Height: %d",sel,fontWidth,fontHeight);
+//	Trace("Font(%d): Width=%d Height: %d",sel,fontWidth,fontHeight);
 
  }
 
@@ -496,7 +496,7 @@
 	pango_layout_set_text(layout,"A",1);
 	pango_layout_get_pixel_size(layout,&fontWidth,&fontHeight);
 
-	Trace("Font size changes to %dx%d",fontWidth,fontHeight);
+//	Trace("Font size changes to %dx%d",fontWidth,fontHeight);
 
  }
 

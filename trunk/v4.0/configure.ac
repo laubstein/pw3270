@@ -113,11 +113,11 @@ AM_ICONV
 
 # Optional
 AC_ARG_ENABLE([trace],
-	[AS_HELP_STRING([--enable-trace], [enable trace])],
+	[AS_HELP_STRING([--disable-trace], [disable trace])],
 [
 	pw3270_cv_trace="$enableval"
 ],[
-	pw3270_cv_trace="no"
+	pw3270_cv_trace="yes"
 ])
 
 AC_ARG_ENABLE([plugins],

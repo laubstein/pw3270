@@ -50,7 +50,6 @@
 	#define RX3270_DEFAULT_TIMEOUT 60
 
 	/* include the REXX stuff */
-	#define RXFUNC_BADCALL 40
 	// #define INCL_REXXSAA	/* Complete Rexx support */
 	// #define INCL_RXSUBCOM	/* Rexx subcommand handler support */
 	// #define INCL_RXSHV		/* Rexx shared variable pool support */
@@ -58,7 +57,9 @@
 	// #define INCL_RXSYSEXIT	/* Rexx system exit support */
 	#define INCL_RXARI		/* Rexx asynchronous Trace/Halt support */
 
-	#define TID long
+	#ifdef linux
+		#define tid_t pthread_t
+	#endif
 
 	#include <rexx.h>
 
@@ -77,6 +78,10 @@
 		typedef char *PSZ;
 		typedef long LONG;
 
+	#endif
+
+	#ifndef RXFUNC_BADCALL
+		#define RXFUNC_BADCALL 40
 	#endif
 
 	/* include the "C" stuff */

@@ -171,7 +171,6 @@
 	g_free(msg);
 
 	gtk_text_buffer_get_end_iter(hwnd->text,&itr);
-	gtk_text_buffer_insert(hwnd->text,&itr,"\n",1);
 
 #if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 14
 	gtk_adjustment_set_value(hwnd->scroll,gtk_adjustment_get_upper(hwnd->scroll));
