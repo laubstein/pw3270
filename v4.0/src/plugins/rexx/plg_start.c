@@ -327,7 +327,11 @@
 
  }
 
+#ifdef REXXV3
+ LONG SysExit_SIO(LONG ExitNumber, LONG  Subfunction, PEXIT ParmBlock)
+#else
  RexxReturnCode REXXENTRY SysExit_SIO(int ExitNumber, int  Subfunction, PEXIT ParmBlock)
+#endif
  {
  	int			retcode = RXEXIT_HANDLED;
  	GtkWidget	*dialog;

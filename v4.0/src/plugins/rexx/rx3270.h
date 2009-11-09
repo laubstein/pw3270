@@ -66,6 +66,7 @@
 	#ifndef REXXENTRY
 
 		/* Rexx V3 */
+		#define REXXV3
 		#define REXXENTRY 		APIENTRY
 		#define RexxReturnCode	ULONG
 		typedef void *REXXPFN;
