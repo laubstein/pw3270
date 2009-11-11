@@ -127,7 +127,7 @@ BOOL WINAPI DllMain(HANDLE hinst, DWORD dwcallpurpose, LPVOID lpvResvd)
 /* Rexx Args:   None                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-ULONG APIENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuename, PRXSTRING Retstr)
+RexxReturnCode REXXENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuename, PRXSTRING Retstr)
 {
 	int	 f;
 
@@ -203,7 +203,7 @@ static void setString(PRXSTRING rx, const char *str)
  }
 
 
-ULONG RetConvertedString(PRXSTRING Retstr, const char *str)
+RexxReturnCode RetConvertedString(PRXSTRING Retstr, const char *str)
 {
 
  	if(!str)
@@ -246,14 +246,14 @@ ULONG RetConvertedString(PRXSTRING Retstr, const char *str)
     return RXFUNC_OK;
 }
 
- ULONG APIENTRY rx3270QueryRunMode(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270QueryRunMode(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	strncpy(Retstr->strptr,"STANDALONE",RXAUTOBUFLEN-1);
     Retstr->strlength = strlen(Retstr->strptr);
     return RXFUNC_OK;
  }
 
- ULONG RaiseHaltSignal(void)
+ RexxReturnCode RaiseHaltSignal(void)
  {
 #ifdef WIN32
 	return RexxSetHalt(getpid(),GetCurrentThreadId());
@@ -268,7 +268,7 @@ ULONG RetConvertedString(PRXSTRING Retstr, const char *str)
  	return 0;
  }
 
- ULONG APIENTRY rx3270SetCharset(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270SetCharset(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	if(!Argc)
 		return RXFUNC_BADCALL;

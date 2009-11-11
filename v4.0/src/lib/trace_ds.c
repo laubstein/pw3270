@@ -950,6 +950,7 @@ void
 toggle_eventTrace(struct toggle *t unused, enum toggle_type tt)
 {
 	/* If turning on event debug, and no trace file, open one. */
+
 	if (toggled(EVENT_TRACE) && tracef == NULL)
 		tracefile_on(EVENT_TRACE, tt);
 
