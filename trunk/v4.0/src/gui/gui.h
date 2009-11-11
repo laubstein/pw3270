@@ -188,7 +188,7 @@
 	extern GtkWidget				*SelectionPopup;
 	extern GtkWidget				*DefaultPopup;
 	extern GtkWidget				*terminal;
-	extern GdkColor				color[TERMINAL_COLOR_COUNT+1];
+	extern GdkColor					color[TERMINAL_COLOR_COUNT+1];
 
 #ifdef MOUSE_POINTER_CHANGE
 	extern GdkCursor        		*wCursor[CURSOR_MODE_3270];

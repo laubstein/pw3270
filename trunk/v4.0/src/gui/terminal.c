@@ -56,8 +56,9 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
- GtkWidget						*terminal		= NULL;
- GdkPixmap						*pixmap			= NULL;
+ GtkWidget						*terminal					= NULL;
+ GdkPixmap						*pixmap						= NULL;
+
  GdkColor						color[TERMINAL_COLOR_COUNT+1];
 
  static int 					lWidth 			= -1;
@@ -67,11 +68,12 @@
  static gint					sWidth			= 0;
  static gint					sHeight			= 0;
 
+ static PangoFontDescription	*terminal_font_descr		= NULL;
+
  static GtkIMContext			*im;
 
  static const gchar 			*layout_name[] = { "PangoLayout_normal", "PangoLayout_underline" };
 
- static PangoFontDescription	*font_descr		= NULL;
  static int					szFonts			= MAX_FONT_SIZES;
  static FONTSIZE				fsize[MAX_FONT_SIZES];
  gint							fontWidth		= 0;
@@ -161,10 +163,10 @@
 
  static void UpdateFontData(int sel)
  {
-	pango_font_description_set_size(font_descr,fsize[sel].size);
+	pango_font_description_set_size(terminal_font_descr,fsize[sel].size);
 
 //	Trace("Updating font data (sel: %d)",sel);
-	gtk_widget_modify_font(terminal,font_descr);
+	gtk_widget_modify_font(terminal,terminal_font_descr);
 
  	fsize[sel].width = fontWidth;
  	fsize[sel].height = fontHeight;
@@ -247,8 +249,8 @@
 	{
 		Trace("Font size changes from %d to %d (%dx%d)",lFont,f,terminal_cols*fsize[f].width,terminal_rows*fsize[f].height);
 		lFont = f;
-		pango_font_description_set_size(font_descr,fsize[f].size);
-		gtk_widget_modify_font(terminal,font_descr);
+		pango_font_description_set_size(terminal_font_descr,fsize[f].size);
+		gtk_widget_modify_font(terminal,terminal_font_descr);
 	}
 
 	/* Center image */
@@ -299,10 +301,10 @@
 		pixmap = NULL;
 	}
 
- 	if(font_descr)
+ 	if(terminal_font_descr)
  	{
-		pango_font_description_free(font_descr);
-		font_descr = NULL;
+		pango_font_description_free(terminal_font_descr);
+		terminal_font_descr = NULL;
  	}
 
  	Trace("%s","Terminal destroyed");
@@ -450,14 +452,14 @@
 
  void SetTerminalFont(const gchar *fontname)
  {
- 	Trace("Selected font: %s (last: %p)",fontname,font_descr);
+ 	Trace("Selected font: %s (last: %p)",fontname,terminal_font_descr);
 
 	lFont = -1;
 
- 	if(font_descr)
-		pango_font_description_free(font_descr);
+ 	if(terminal_font_descr)
+		pango_font_description_free(terminal_font_descr);
 
-	font_descr = pango_font_description_from_string(fontname);
+	terminal_font_descr = pango_font_description_from_string(fontname);
 
 	if(terminal && terminal->window)
 	{

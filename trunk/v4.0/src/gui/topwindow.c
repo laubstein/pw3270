@@ -238,23 +238,6 @@
 
 	#ifdef WIN32
 
-/*
-  { "appstarting", IDC_APPSTARTING },
-  { "arrow", IDC_ARROW },
-  { "cross", IDC_CROSS },
-#ifdef IDC_HAND
-  { "hand",  IDC_HAND },
-#endif
-  { "help",  IDC_HELP },
-  { "ibeam", IDC_IBEAM },
-  { "sizeall", IDC_SIZEALL },
-  { "sizenesw", IDC_SIZENESW },
-  { "sizens", IDC_SIZENS },
-  { "sizenwse", IDC_SIZENWSE },
-  { "sizewe", IDC_SIZEWE },
-  { "uparrow", IDC_UPARROW },
-  { "wait", IDC_WAIT }
-*/
 		static const gchar *cr[CURSOR_MODE_3270] = {	"arrow",
 														"wait",
 														"arrow",

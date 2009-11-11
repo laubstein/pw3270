@@ -94,10 +94,12 @@
 
  static GtkWidget * console_window_get(HCONSOLE hwnd)
  {
- 	GtkWidget *widget;
- 	GtkWidget *view;
- 	GtkWidget *vbox;
- 	GtkWidget *hbox;
+ 	GtkWidget				*widget;
+ 	GtkWidget				*view;
+ 	GtkWidget				*vbox;
+ 	GtkWidget				*hbox;
+ 	gchar					*font;
+	PangoFontDescription	*descr;
 
 	if(hwnd->window)
 		return hwnd->window;
@@ -122,6 +124,17 @@
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(widget),GTK_POLICY_AUTOMATIC,GTK_POLICY_AUTOMATIC);
 
 	view = gtk_text_view_new();
+
+ 	font = GetString("Trace","Font","");
+ 	if(!*font)
+		font = GetString("Terminal","Font","Courier");
+
+	if(*font)
+	{
+		descr = pango_font_description_from_string(font);
+		g_object_set_data_full(G_OBJECT(view),"FontDescription",descr,(GDestroyNotify) pango_font_description_free);
+		gtk_widget_modify_font(view,descr);
+	}
 
  	hwnd->text = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(view), FALSE);
