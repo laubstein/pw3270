@@ -34,6 +34,7 @@ LIBDIR ?= @libdir@
 PACKAGE ?= @PACKAGE@
 PACKAGE_TARNAME ?= @PACKAGE_TARNAME@
 PACKAGE_VERSION ?= @PACKAGE_VERSION@
+PACKAGE_MANAGER ?= @PACKAGE_MANAGER@
 
 datarootdir ?= @datarootdir@
 docdir ?= @docdir@
@@ -151,9 +152,26 @@ memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
 	@cd bin/Debug ; LD_LIBRARY_PATH=. valgrind --leak-check=full ./@PROGRAM_NAME@ --program-data="../../"
 
+####################################################################################################
+# Install packages
+####################################################################################################
+
+install-package: $(PACKAGE_MANAGER)
+
+ifeq ($(PACKAGE_MANAGER),rpm)
+
 rpm: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 	rpmbuild -ta @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 
+endif
+
+ifeq ($(PACKAGE_MANAGER),nsi)
+
+nsi: Release
+	wine "$(HOME)/.wine/drive_c/Arquivos de programas/NSIS/makensis.exe" "$(PACKAGE).nsi"
+
+
+endif
 
 ####################################################################################################
 # Rules

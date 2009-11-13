@@ -76,9 +76,12 @@ PLUGINS=""
 EXTENSIONS=""
 CPPUENV="gcc3"
 
+AC_CHECK_PROG(PACKAGE_MANAGER, "rpmbuild", "rpm")
+
 case "$host" in
 	*-mingw32)
 		DLLEXT=".dll"
+		PACKAGE_MANAGER="nsi"
 		OS_CFLAGS="-mno-cygwin -mms-bitfields -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500"
 		OS_DLLFLAGS="-mno-cygwin -shared -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
 
@@ -276,6 +279,7 @@ AC_SUBST(OO_URE_HOME,$oo_ure_home)
 AC_SUBST(OO_HOME,$oo_home)
 AC_SUBST(TYPES_RDB,$types_rdb)
 AC_SUBST(CPPUENV)
+AC_SUBST(PACKAGE_MANAGER)
 
 AC_DEFINE_UNQUOTED(OFFICE_HOME,"$oo_home")
 AC_DEFINE_UNQUOTED(OFFICE_PROGRAM,"$oo_program")
