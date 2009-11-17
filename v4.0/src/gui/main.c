@@ -549,26 +549,8 @@ int main(int argc, char *argv[])
 	else
 		cl_hostname = GetString("Network","Hostname",CN);
 
-	if(cl_hostname == CN)
-	{
-		action_SetHostname();
-	}
-	else
-	{
-		DisableNetworkActions();
-		gtk_widget_set_sensitive(topwindow,FALSE);
-		RunPendingEvents(0);
-
-		if(host_connect(cl_hostname,1) == ENOTCONN)
-		{
-			Warning( N_( "Negotiation with %s failed!" ),cl_hostname);
-		}
-
-		gtk_widget_set_sensitive(topwindow,TRUE);
-		gtk_widget_grab_focus(terminal);
-
-		RunPendingEvents(0);
-	}
+    if(TOGGLED_CONNECT_ON_STARTUP)
+        action_Connect();
 
 	if(topwindow)
 	{

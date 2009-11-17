@@ -15,6 +15,7 @@
 
 		<menu action='SettingsMenu'>
 			<menu action='OptionsMenu'>
+				<menuitem action='ToggleAutoConnect' />
 			</menu>
 		</menu>
 

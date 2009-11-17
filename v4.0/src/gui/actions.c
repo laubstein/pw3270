@@ -60,7 +60,6 @@
  static void action_Right(GtkWidget *w, gpointer user_data);
  static void action_Tab(GtkWidget *w, gpointer user_data);
  static void action_BackTab(GtkWidget *w, gpointer user_data);
- static void action_Connect(GtkWidget *w, gpointer user_data);
  static void action_enter(GtkWidget *w, gpointer user_data);
  static void action_Disconnect(GtkWidget *w, gpointer user_data);
  static void action_PrintScreen(GtkWidget *w, gpointer user_data);
@@ -80,16 +79,18 @@
 
  static const struct _gui_toggle_info
  {
-    const gchar *name;
-    const gchar *label;
-    const gchar *tooltip;
-    const gchar *stock_id;
-    const gchar *accelerator;
+    const gchar     *name;
+    const gchar     *label;
+    const gchar     *tooltip;
+    const gchar     *stock_id;
+    const gchar     *accelerator;
+    const gboolean  def;
  } gui_toggle_info[GUI_TOGGLE_COUNT] =
  {
-    { "Bold", 			N_( "Bold" ),			NULL,	NULL,	NULL	},
-    { "KeepSelected", 	N_( "Keep selected" ),	NULL,	NULL,	NULL	},
-    { "Underline",		N_( "Show Underline" ),	NULL,   NULL,   NULL    }
+    { "Bold", 			    N_( "Bold" ),			    NULL,	NULL,	NULL, FALSE	},
+    { "KeepSelected", 	    N_( "Keep selected" ),	    NULL,	NULL,	NULL, FALSE	},
+    { "Underline",		    N_( "Show Underline" ), 	NULL,   NULL,   NULL, FALSE },
+    { "AutoConnect",    	N_( "Connect on startup" ),	NULL,   NULL,   NULL, TRUE  }
  };
 
  gboolean gui_toggle[GUI_TOGGLE_COUNT] = { 0 };
@@ -343,20 +344,46 @@
  }
 
 
- static void action_Connect(GtkWidget *w, gpointer user_data)
+ void action_Connect(void)
  {
- 	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
+    const gchar *host;
+
+ 	Trace("%s Connected:%d",__FUNCTION__,PCONNECTED);
 
  	if(PCONNECTED)
  		return;
 
+ 	action_ClearSelection();
+
+	host = GetString("Network","Hostname",CN);
+
+    if(host == CN)
+    {
+        action_SetHostname();
+    }
+    else
+    {
+        DisableNetworkActions();
+        gtk_widget_set_sensitive(topwindow,FALSE);
+        RunPendingEvents(0);
+
+        if(host_connect(host,1) == ENOTCONN)
+        {
+            Warning( N_( "Negotiation with %s failed!" ),host);
+        }
+
+        gtk_widget_set_sensitive(topwindow,TRUE);
+        gtk_widget_grab_focus(terminal);
+
+    }
+
+/*
 	// TODO (perry#5#): If there's no previous server ask for it.
 
-	DisableNetworkActions();
- 	action_ClearSelection();
 
 	Trace("Calling %s","host_reconnect");
  	host_reconnect(0);
+*/
  }
 
  void action_enter(GtkWidget *w, gpointer user_data)
@@ -365,7 +392,7 @@
  	if(PCONNECTED)
 		action_Enter();
 	else
-		action_Connect(w,user_data);
+		action_Connect();
  }
 
  static void action_PrintScreen(GtkWidget *w, gpointer user_data)
@@ -565,7 +592,7 @@
 
 		Trace("%s: %p",name,action);
 
-        gui_toggle[f] = GetBoolean("Toggles",gui_toggle_info[f].name,FALSE);
+        gui_toggle[f] = GetBoolean("Toggles",gui_toggle_info[f].name,gui_toggle_info[f].def);
 
 		gtk_toggle_action_set_active(action,gui_toggle[f]);
 		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_gui),(gpointer) f);

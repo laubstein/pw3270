@@ -100,14 +100,16 @@
         GUI_TOGGLE_BOLD,
         GUI_TOGGLE_KEEP_SELECTED,
         GUI_TOGGLE_UNDERLINE,
+        GUI_TOGGLE_CONNECT_ON_STARTUP,
 
         GUI_TOGGLE_COUNT
     };
 
-    #define TOGGLED_BOLD			gui_toggle[GUI_TOGGLE_BOLD]
-    #define TOGGLED_KEEP_SELECTED	gui_toggle[GUI_TOGGLE_KEEP_SELECTED]
-    #define TOGGLED_SMART_PASTE		gui_toggle[GUI_TOGGLE_SMART_PASTE]
-    #define TOGGLED_UNDERLINE		gui_toggle[GUI_TOGGLE_UNDERLINE]
+    #define TOGGLED_BOLD			    gui_toggle[GUI_TOGGLE_BOLD]
+    #define TOGGLED_KEEP_SELECTED	    gui_toggle[GUI_TOGGLE_KEEP_SELECTED]
+    #define TOGGLED_SMART_PASTE		    gui_toggle[GUI_TOGGLE_SMART_PASTE]
+    #define TOGGLED_UNDERLINE		    gui_toggle[GUI_TOGGLE_UNDERLINE]
+    #define TOGGLED_CONNECT_ON_STARTUP  gui_toggle[GUI_TOGGLE_CONNECT_ON_STARTUP]
 
     extern gboolean gui_toggle[GUI_TOGGLE_COUNT];
 
@@ -286,6 +288,7 @@
 	void		action_SelectionRight(GtkWidget *w, gpointer user_data);
 	void		action_SelectionDown(GtkWidget *w, gpointer user_data);
 
+    void            action_Connect(void);
 	void 			action_Append(void);
 	void 			action_Copy(void);
 	void 			action_CopyAsTable(void);
