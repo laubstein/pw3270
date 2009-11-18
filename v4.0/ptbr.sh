@@ -15,7 +15,7 @@ if [ "$?" != "0" ]; then
 	exit -1
 fi
 
-cp locale/pt_BR/LC_MESSAGES/$NAME.mo /usr/share/locale/pt_BR/LC_MESSAGES/pw3270.mo
+cp locale/pt_BR/LC_MESSAGES/$NAME.mo /usr/local/share/locale/pt_BR/LC_MESSAGES/pw3270.mo
 if [ "$?" != "0" ]; then
 	exit -1
 fi
