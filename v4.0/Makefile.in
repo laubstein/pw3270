@@ -146,7 +146,7 @@ Debug:		$(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) \
 
 run: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(PACKAGE).@LOGOEXT@
 #	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
-	@cd bin/Debug ; LD_LIBRARY_PATH=. ./@PROGRAM_NAME@ --program-data="../../"
+	@bin/Debug/@PROGRAM_NAME@ --program-data="."
 
 memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(PACKAGE).@LOGOEXT@
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
@@ -250,7 +250,7 @@ bin/Release/lib3270$(DLLEXT): obj/Release/version.o obj/Release/src/lib/fallback
 bin/Debug/@PROGRAM_NAME@@EXEEXT@: bin/Debug/lib3270$(DLLEXT) $(foreach SRC, $(basename $(APP_SRCS)), obj/Debug/src/gui/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) -o $@ $^ -Lbin/Debug -l3270 $(APP_LDFLAGS) $(GUI_LDFLAGS)
+	@$(CC) -o $@ $^ -Lbin/Debug -l3270 -Wl,-rpath,bin/Debug $(APP_LDFLAGS) $(GUI_LDFLAGS)
 
 bin/Debug/lib3270$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
