@@ -98,9 +98,9 @@
 /*---[ Callback tables ]----------------------------------------------------------------------------------------*/
 
  #ifdef DEBUG
-	#define INTERNAL_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(GtkWidget *, gpointer)) action, 0, #action }
+	#define INTERNAL_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(void)) action, #action }
  #else
-	#define INTERNAL_ACTION(key,state,action) { key, state, (void (*)(GtkWidget *, gpointer)) action, 0 }
+	#define INTERNAL_ACTION(key,state,action) { key, state, (void (*)(void)) action }
  #endif
 
  struct WindowActions
@@ -112,9 +112,7 @@
 	const char	*trace;
 #endif
 
-
-	void (*callback)(GtkWidget *w, gpointer data);
-	const gpointer user_data;
+	void (*callback)(void);
 
 #ifdef DEBUG
 	const char	 *action_trace;
@@ -889,6 +887,8 @@
 
  gboolean PFKey(int key)
  {
+ 	// TODO (perry#2#): Make it configurable
+
 	if(!TOGGLED_KEEP_SELECTED)
 		action_ClearSelection();
  	action_PFKey(key);
@@ -917,7 +917,6 @@
  	};
 
  	int		f;
-// 	char	buffer[10];
 
 	/* Is function key? */
 	if(IS_FUNCTION_KEY(event))
@@ -929,7 +928,7 @@
 		if(keyproc[f].keyval == event->keyval && (event->state & keyproc[f].state) == keyproc[f].state)
 		{
 			Trace("Key: %s\tAction: %s",keyproc[f].trace,keyproc[f].action_trace);
-			keyproc[f].callback(widget,keyproc[f].user_data);
+			keyproc[f].callback();
 			return TRUE;
 		}
 	}
