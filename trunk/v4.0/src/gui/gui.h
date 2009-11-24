@@ -265,7 +265,7 @@
 	int 		initft(void);
 #endif
 
-	gboolean	PFKey(int key);
+	gboolean	PFKey(guint key);
 	void 		DrawCursorPosition(void);
 
 	#define		GetSelection() GetScreenContents(0)

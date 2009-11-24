@@ -86,21 +86,30 @@
  static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
  	// http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-key-press-event
+/*
     if(IS_FUNCTION_KEY(event))
 		return(PFKey(GetFunctionKey(event)));
     return FALSE;
+
+*/
+	if(KeyboardAction(widget,event,user_data))
+		return TRUE;
+
+	return FALSE;
+
  }
 
  static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+/*
 
     if(IS_FUNCTION_KEY(event))
     {
     	GetFunctionKey(event);
     	return TRUE;
     }
-
- 	return 0;
+*/
+ 	return FALSE;
  }
 
  static void activate_font(GtkCheckMenuItem *item, gchar *text)

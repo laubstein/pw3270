@@ -29,6 +29,7 @@
 			<separator/>
 			<menuitem action='EraseInput'/>
 			<menuitem action='EraseField' />
+
 		</menu>
 
 		<menu action='ScriptsMenu' />
@@ -105,6 +106,7 @@
 		<menuitem action='PrintClipboard'/>
 
 		<separator/>
+		<menuitem action='PreviousField' />
 		<menuitem action='NextField'/>
 		<menuitem action='Return'/>
 
@@ -139,6 +141,9 @@
 	<accelerator action='CursorLeft' />
 	<accelerator action='CursorUp' />
 	<accelerator action='CursorDown' />
+
+	<accelerator action='PreviousField' />
+	<accelerator action='NextField'/>
 
 	<accelerator action='ShiftPageUP' />
 	<accelerator action='ShiftPageDown' />

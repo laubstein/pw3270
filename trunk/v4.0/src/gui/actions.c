@@ -58,8 +58,8 @@
  static void action_Down(GtkWidget *w, gpointer user_data);
  static void action_Left(GtkWidget *w, gpointer user_data);
  static void action_Right(GtkWidget *w, gpointer user_data);
- static void action_Tab(GtkWidget *w, gpointer user_data);
- static void action_BackTab(GtkWidget *w, gpointer user_data);
+ static void action_Tab(void);
+ static void action_BackTab(void);
  static void action_enter(GtkWidget *w, gpointer user_data);
  static void action_Disconnect(GtkWidget *w, gpointer user_data);
  static void action_PrintScreen(GtkWidget *w, gpointer user_data);
@@ -95,29 +95,47 @@
 
  gboolean gui_toggle[GUI_TOGGLE_COUNT] = { 0 };
 
-/*---[ Callback tables ]----------------------------------------------------------------------------------------*/
-
- #ifdef DEBUG
-	#define INTERNAL_ACTION(key,state,action) { key, state, #key " (" #state ")", (void (*)(void)) action, #action }
- #else
-	#define INTERNAL_ACTION(key,state,action) { key, state, (void (*)(void)) action }
- #endif
+/*---[ Keyboard action ]----------------------------------------------------------------------------------------*/
 
  struct WindowActions
  {
-	guint	keyval;
-	guint	state;
-
-#ifdef DEBUG
-	const char	*trace;
-#endif
-
-	void (*callback)(void);
-
-#ifdef DEBUG
-	const char	 *action_trace;
-#endif
+	guint			keyval;
+	GdkModifierType	state;
+	void (*callback)(guint arg);
+	guint			arg;
  };
+
+#ifdef CONFIGURABLE_KEYBOARD_ACTIONS
+
+	static struct WindowActions	*keyproc_table 		= NULL;
+	static int 					keyproc_table_size	= 0;
+
+#else
+
+	#define INTERNAL_ACTION(key,state,action) { key, state, (void (*)(guint)) action, 0 }
+
+ 	static const struct WindowActions keyproc_table[] =
+ 	{
+		INTERNAL_ACTION(	GDK_Left,			0,					action_Left),
+		INTERNAL_ACTION(	GDK_Up,				0,					action_Up),
+		INTERNAL_ACTION(	GDK_Right,			0,					action_Right),
+		INTERNAL_ACTION(	GDK_Down,			0,					action_Down),
+
+		INTERNAL_ACTION(	GDK_KP_Left,		0,					action_Left),
+		INTERNAL_ACTION(	GDK_KP_Up,			0,					action_Up),
+		INTERNAL_ACTION(	GDK_KP_Right,		0,					action_Right),
+		INTERNAL_ACTION(	GDK_KP_Down,		0,					action_Down),
+
+		INTERNAL_ACTION(	GDK_ISO_Left_Tab,	0,					action_BackTab),
+		INTERNAL_ACTION(	GDK_Tab,			0,					action_Tab),
+		INTERNAL_ACTION(	GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab),
+
+ 	};
+
+ 	static const int keyproc_table_size = (sizeof(keyproc_table)/sizeof(struct WindowActions));
+
+
+#endif
 
 /*---[ Action tables ]------------------------------------------------------------------------------------------*/
 
@@ -159,11 +177,18 @@
 	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),					"Up",				NULL,	G_CALLBACK(action_Up)				},
 	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),				"Down",				NULL,	G_CALLBACK(action_Down)				},
 
+	{	"NextField",		GTK_STOCK_GOTO_LAST,	N_( "Next field" ),			"Tab",				NULL,	G_CALLBACK(action_Tab)				},
+	{	"PreviousField",	GTK_STOCK_GOTO_FIRST,	N_( "Previous field" ),		"<Shift>Tab",		NULL,	G_CALLBACK(action_BackTab)			},
+
  	/* Edit actions */
  	{	"PasteNext",		NULL,					N_( "Paste next" ),			"<Shift><Ctrl>v",	NULL,	G_CALLBACK(action_PasteNext)		},
  	{	"PasteTextFile",	NULL,					N_( "Paste text file" ),	NULL,				NULL,	G_CALLBACK(action_PasteTextFile)	},
  	{	"Reselect",			NULL,					N_( "Reselect" ),			"<Shift><Ctrl>r",	NULL,	G_CALLBACK(Reselect)				},
+#ifdef GTK_STOCK_SELECT_ALL
  	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
+#else
+ 	{	"SelectAll",		NULL,	N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
+#endif
  	{	"EraseInput",		GTK_STOCK_CLEAR,		N_( "Erase input" ),		NULL,				NULL,	G_CALLBACK(erase_input_action)		},
  	{	"ClearFields",		NULL,					N_( "Clear" ),				NULL,				NULL,	G_CALLBACK(clear_fields_action)		},
  };
@@ -274,6 +299,8 @@
 		}
 	}
 
+	Trace("Can't find action \"%s\"",name);
+
  	return NULL;
  }
 
@@ -313,12 +340,12 @@
  	clear_and_call(0,action_CursorRight);
  }
 
- void action_Tab(GtkWidget *w, gpointer user_data)
+ void action_Tab(void)
  {
  	action_NextField();
  }
 
- void action_BackTab(GtkWidget *w, gpointer user_data)
+ void action_BackTab(void)
  {
  	action_PreviousField();
  }
@@ -740,12 +767,6 @@
 							action_Erase,
 							"BackSpace" },
 
-		{ "NextField",		N_( "Next field" ),
-							NULL,
-							GTK_STOCK_GOTO_LAST,
-							action_NextField,
-							"Tab" },
-
 		{ "SysREQ",			N_( "Sys Req" ),
 							NULL,
 							NULL,
@@ -789,6 +810,176 @@
  	}
  }
 
+#ifdef CONFIGURABLE_KEYBOARD_ACTIONS
+
+ static int InsertKeyboardAction(guint keyval, GdkModifierType state, const gchar *action_name)
+ {
+ 	int f;
+ 	struct WindowActions *act = NULL;
+
+	if(keyproc_table)
+	{
+		for(f=0;!act && f < keyproc_table_size;f++)
+		{
+			if(keyproc_table[f].keyval == keyval && keyproc_table[f].state == state)
+				act = keyproc_table+f;
+		}
+	}
+
+ 	if(!act)
+ 	{
+		if(!keyproc_table)
+		{
+			keyproc_table_size = 0;
+			keyproc_table = g_new(struct WindowActions,keyproc_table_size+1);
+
+			Trace("Keyproc_table: %p",keyproc_table);
+		}
+		else
+		{
+			keyproc_table = g_renew(struct WindowActions,keyproc_table,keyproc_table_size+1);
+		}
+
+		act = keyproc_table + keyproc_table_size;
+
+		keyproc_table_size++;
+
+		Trace("New action created (total: %d)",keyproc_table_size);
+ 	}
+
+	act->keyval = keyval;
+	act->state = state;
+
+	if(g_strncasecmp(action_name,"pf",2))
+	{
+		act->callback = (void (*)(guint arg)) get_action_callback_by_name(action_name);
+	}
+	else
+	{
+		act->arg = atoi(action_name+2);
+		Trace("Adding PF%02d action",act->arg);
+		if(act->arg > 0 && act->arg < 25)
+			act->callback = (void (*)(guint arg)) PFKey;
+	}
+
+	Trace("Keyval: %08d State: %08d Action: %s Callback: %p",keyval,state,action_name,act->callback);
+
+	return act->callback ? 0 : ENOENT;
+ }
+
+ static void LoadKeyboardActions(void)
+ {
+ 	static const struct _default_key
+ 	{
+		guint keyval;
+		GdkModifierType state;
+		const gchar *action_name;
+ 	} default_key[] =
+ 	{
+		{	GDK_Left,			0, "CursorLeft"		},
+		{	GDK_Up,				0, "CursorUp"		},
+		{	GDK_Right,			0, "CursorRight"	},
+		{	GDK_Down,			0, "CursorDown"		},
+		{	GDK_KP_Left,		0, "CursorLeft"		},
+		{	GDK_KP_Up,			0, "CursorUp"		},
+		{	GDK_KP_Right,		0, "CursorRight"	},
+		{	GDK_KP_Down,		0, "CursorDown"		},
+		{	GDK_ISO_Left_Tab,	0, "PreviousField"	},
+		{	GDK_Tab, 			0, "NextField"		},
+ 	};
+
+	GDir	*dir;
+	gchar	*path = g_build_filename(program_data,"ui",NULL);
+	int		f;
+
+	// Load default keys
+	for(f=0;f<G_N_ELEMENTS(default_key);f++)
+		InsertKeyboardAction(default_key[f].keyval, default_key[f].state, default_key[f].action_name);
+
+	for(f=0;f<12;f++)
+	{
+		gchar *ptr;
+
+		ptr = g_strdup_printf("pf%d",f+1);
+		InsertKeyboardAction(GDK_F1+f, 0, ptr);
+		g_free(ptr);
+
+		ptr = g_strdup_printf("pf%d",f+13);
+		InsertKeyboardAction(GDK_F1+f, GDK_SHIFT_MASK, ptr);
+		g_free(ptr);
+
+	}
+
+	// Load configurable ones
+	dir = g_dir_open(path,0,NULL);
+	if(dir)
+	{
+		const gchar *name = g_dir_read_name(dir);
+		while(name)
+		{
+			if(g_str_has_suffix(name,"key"))
+			{
+				gchar	*contents;
+				gchar	*filename = g_build_filename(path,name,NULL);
+
+				Trace("\n\n\nLoading %s",filename);
+
+				// TODO (perry#2#): Notify user if the file loading fails.
+				if(g_file_get_contents(filename,&contents,NULL,NULL))
+				{
+					gchar	**line 	= g_strsplit(contents,"\n",-1);
+
+					for(f=0;line[f];f++)
+					{
+						char *key = line[f];
+						char *val;
+
+						for(val=key;*val && *val != '\r';val++);
+						*val = 0;
+
+						key = g_strstrip(key);
+
+						if(*key && *key != ';' && *key != '#')
+						{
+
+							val = strchr(key,'=');
+
+							if(val)
+							{
+								guint			keyval;
+								GdkModifierType	state;
+
+								*(val++) = 0;
+								key = g_strstrip(key);
+								val = g_strstrip(val);
+
+								Trace("\"%s\" = \"%s\"",key,val);
+
+								gtk_accelerator_parse(key,&keyval,&state);
+
+								if(!keyval)
+									Log("Invalid accelerator id \"%s\" in %s",key,filename);
+								else
+									InsertKeyboardAction(keyval,state,val);
+							}
+						}
+					}
+
+					g_strfreev(line);
+					g_free(contents);
+				}
+
+				g_free(filename);
+			}
+			name = g_dir_read_name(dir);
+		}
+		g_dir_close(dir);
+	}
+
+	g_free(path);
+ }
+#endif
+
  GtkUIManager * LoadApplicationUI(GtkWidget *widget)
  {
  	static const struct _group
@@ -825,6 +1016,10 @@
 	Load3270Actions(online_actions);
 	LoadToggleActions(common_actions);
 	LoadCustomActions(ui_manager,action_group,ACTION_GROUP_MAX,GetConf());
+
+#ifdef CONFIGURABLE_KEYBOARD_ACTIONS
+	LoadKeyboardActions();
+#endif
 
 	// Add actions and load UI
 	for(f=0;f < ACTION_GROUP_MAX; f++)
@@ -885,9 +1080,11 @@
 	return rc;
  }
 
- gboolean PFKey(int key)
+ gboolean PFKey(guint key)
  {
  	// TODO (perry#2#): Make it configurable
+
+	Trace("Running PF %d",key);
 
 	if(!TOGGLED_KEEP_SELECTED)
 		action_ClearSelection();
@@ -897,42 +1094,32 @@
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
- 	// TODO (perry#2#): Put all keyboard actions as accelerators.
- 	static const struct WindowActions keyproc[] =
- 	{
-		INTERNAL_ACTION(	GDK_Left,		0,			action_Left),
-		INTERNAL_ACTION(	GDK_Up,			0,			action_Up),
-		INTERNAL_ACTION(	GDK_Right,		0,			action_Right),
-		INTERNAL_ACTION(	GDK_Down,		0,			action_Down),
-
-		INTERNAL_ACTION(	GDK_KP_Left,		0,			action_Left),
-		INTERNAL_ACTION(	GDK_KP_Up,		0,			action_Up),
-		INTERNAL_ACTION(	GDK_KP_Right,		0,			action_Right),
-		INTERNAL_ACTION(	GDK_KP_Down,		0,			action_Down),
-
-		INTERNAL_ACTION(	GDK_ISO_Left_Tab,	0,			action_BackTab),
-		INTERNAL_ACTION(	GDK_Tab,		0,			action_Tab),
-		INTERNAL_ACTION(	GDK_KP_Add,		GDK_NUMLOCK_MASK,	action_Tab),
-
- 	};
 
  	int		f;
 
 	/* Is function key? */
+
+#ifndef CONFIGURABLE_KEYBOARD_ACTIONS
+
 	if(IS_FUNCTION_KEY(event))
-		return(PFKey(GetFunctionKey(event)));
+	{
+		Trace("PF%d",GetFunctionKey(event));
+		PFKey(GetFunctionKey(event));
+		return TRUE;
+	}
+
+#endif
 
     /* Check for special keyproc actions */
-	for(f=0; f < (sizeof(keyproc)/sizeof(struct WindowActions));f++)
+	for(f=0; f < keyproc_table_size;f++)
 	{
-		if(keyproc[f].keyval == event->keyval && (event->state & keyproc[f].state) == keyproc[f].state)
+		if(keyproc_table[f].keyval == event->keyval && (event->state & (GDK_SHIFT_MASK|GDK_CONTROL_MASK|GDK_ALT_MASK)) == keyproc_table[f].state && keyproc_table[f].callback)
 		{
-			Trace("Key: %s\tAction: %s",keyproc[f].trace,keyproc[f].action_trace);
-			keyproc[f].callback();
+			Trace("%p(%d)",keyproc_table[f].callback,keyproc_table[f].arg);
+			keyproc_table[f].callback(keyproc_table[f].arg);
 			return TRUE;
 		}
 	}
-
 
 	return FALSE;
  }

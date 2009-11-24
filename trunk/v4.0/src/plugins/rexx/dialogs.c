@@ -304,7 +304,11 @@
 	}
 
 	dialog = gtk_dialog_new();
+
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 10
 	gtk_window_set_deletable(GTK_WINDOW(dialog),FALSE);
+#endif
+
 	gtk_window_set_title(GTK_WINDOW(dialog),_( "Please wait" ) );
 	gtk_window_set_transient_for(GTK_WINDOW(dialog),GTK_WINDOW(program_window));
 	gtk_window_set_destroy_with_parent(GTK_WINDOW(dialog),TRUE);
