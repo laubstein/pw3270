@@ -249,7 +249,7 @@ gboolean StartPlugins(const gchar *startup_script)
  	g_free(tempfile);
  }
 
- static void RunCommand(const gchar *cmd, const gchar *str)
+ void RunExternalProgramWithText(const gchar *cmd, const gchar *str)
  {
 	GError	*error		= NULL;
 	gchar	*filename	= NULL;
@@ -315,7 +315,7 @@ gboolean StartPlugins(const gchar *startup_script)
  static void ExecWithScreen(GtkAction *action, gpointer cmd)
  {
  	gchar *screen = GetScreenContents(TRUE);
- 	RunCommand(cmd,screen);
+ 	RunExternalProgramWithText(cmd,screen);
  	g_free(screen);
 
  }
@@ -323,14 +323,14 @@ gboolean StartPlugins(const gchar *startup_script)
  static void ExecWithCopy(GtkAction *action, gpointer cmd)
  {
  	gchar *text = GetClipboard();
- 	RunCommand(cmd,text);
+ 	RunExternalProgramWithText(cmd,text);
  	g_free(text);
  }
 
  static void ExecWithSelection(GtkAction *action, gpointer cmd)
  {
  	gchar *screen = GetScreenContents(FALSE);
- 	RunCommand(cmd,screen);
+ 	RunExternalProgramWithText(cmd,screen);
  	g_free(screen);
  }
 

@@ -267,7 +267,10 @@
 
  int PrintText(const char *name, gchar *text)
  {
- 	return -1;
+	gchar *command = GetString("Print", "Command", "lpr");
+	RunExternalProgramWithText(command,text);
+	g_free(command);
+	return 0;
  }
 
 #endif // GTK_PRINT_OPERATION
