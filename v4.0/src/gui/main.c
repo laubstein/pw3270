@@ -169,7 +169,10 @@ static int program_init(void)
 
 		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s",msg);
 		gtk_window_set_title(GTK_WINDOW(dialog),_( "GTK Version mismatch" ));
+
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 10
 		gtk_window_set_deletable(GTK_WINDOW(dialog),FALSE);
+#endif
 
         rc = gtk_dialog_run(GTK_DIALOG (dialog));
         gtk_widget_destroy(dialog);

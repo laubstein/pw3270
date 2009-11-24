@@ -42,6 +42,8 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
+#ifdef GTK_PRINT_OPERATION
+
  static int doPrint(GtkPrintOperation *prt, GtkPrintContext *context,cairo_t *cr,gint page)
  {
  	gchar					**text;
@@ -115,6 +117,7 @@
 		}
 		gtk_print_operation_set_n_pages(prt,pages);
  }
+
 
 #ifdef HAVE_PRINT_FONT_DIALOG
 /*---[ Begin font selection dialog ]------------------------------------------------------------------------------*/
@@ -260,4 +263,11 @@
     return 0;
  }
 
+#else // GTK_PRINT_OPERATION
 
+ int PrintText(const char *name, gchar *text)
+ {
+ 	return -1;
+ }
+
+#endif // GTK_PRINT_OPERATION
