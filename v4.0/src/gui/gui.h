@@ -339,6 +339,9 @@
 	void			settitle(char *text);
 	GKeyFile 		*GetConf(void);
 
+	void 			RunExternalProgramWithText(const gchar *cmd, const gchar *str);
+
+
 	void			program_quit(void);
 
 	enum _SELECT_MODE
