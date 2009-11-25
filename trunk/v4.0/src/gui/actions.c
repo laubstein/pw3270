@@ -536,6 +536,17 @@
 
  }
 
+ static void toggle_toolbar(GtkToggleAction *action, int id)
+ {
+    gboolean toggle = gtk_toggle_action_get_active(action);
+
+	SetBoolean("Toggles","Toolbar",toggle);
+
+	if(toolbar_widget)
+		gtk_widget_set_visible(toolbar_widget,toggle);
+
+ }
+
  static void action_ToggleGDKDebug(GtkToggleAction *action, gpointer user_data)
  {
 	gdk_window_set_debug_updates(gtk_toggle_action_get_active(action));
@@ -630,6 +641,12 @@
 
 		g_free(name);
  	}
+
+	/* Toolbar toggle */
+	action = gtk_toggle_action_new("ToggleToolbar", _( "Toolbar"), NULL, NULL);
+	gtk_toggle_action_set_active(action,GetBoolean("Toggles","Toolbar",TRUE));
+	g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_toolbar),0);
+	gtk_action_group_add_action(common_actions,(GtkAction *) action);
 
 	/* Toggle actions */
  	for(f=0;f<N_TOGGLES;f++)
@@ -922,8 +939,6 @@
 			{
 				gchar	*contents;
 				gchar	*filename = g_build_filename(path,name,NULL);
-
-				Trace("\n\n\nLoading %s",filename);
 
 				// TODO (perry#2#): Notify user if the file loading fails.
 				if(g_file_get_contents(filename,&contents,NULL,NULL))
