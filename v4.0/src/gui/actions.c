@@ -241,6 +241,7 @@
  	{	"OptionsMenu",		NULL,					N_( "_Options" ),			NULL,				NULL,	NULL								},
  	{	"SettingsMenu",		NULL,					N_( "Settings" ),			NULL,				NULL,	NULL								},
  	{	"ScriptsMenu",		NULL,					N_( "Scripts" ),			NULL,				NULL,	NULL								},
+ 	{	"ViewMenu",			NULL,					N_( "_View" ),				NULL,				NULL,	NULL								},
  	{	"DebugMenu",		NULL,					N_( "Debug" ),				NULL,				NULL,	NULL								},
 
 	/* Sub menus */

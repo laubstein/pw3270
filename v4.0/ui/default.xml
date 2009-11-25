@@ -32,6 +32,10 @@
 
 		</menu>
 
+		<menu action='ViewMenu' >
+			<menuitem action='ToggleKeypad'  />
+		</menu>
+
 		<menu action='ScriptsMenu' />
 
 		<menu action='NetworkMenu'>
@@ -53,7 +57,6 @@
 				<menuitem action='ToggleCrossHair'  />
 				<menuitem action='ToggleRectSelect'  />
 				<menuitem action='ToggleReconnect'  />
-				<menuitem action='ToggleKeypad'  />
 				<menuitem action='ToggleBold'  />
 				<menuitem action='ToggleUnderline'  />
 				<menuitem action='ToggleKeepSelected' />
