@@ -186,6 +186,7 @@
 
 	extern GtkWidget				*topwindow;
 	extern GtkWidget				*keypad;
+	extern GtkWidget				*toolbar_widget;
 	extern GdkPixmap				*pixmap;
 	extern GtkWidget				*SelectionPopup;
 	extern GtkWidget				*DefaultPopup;

@@ -46,6 +46,7 @@
  GtkWidget	*topwindow 		= NULL;
  GList 		*main_icon		= NULL;
  gchar		*program_logo	= NULL;
+ GtkWidget	*toolbar_widget	= NULL;
 
 #ifdef MOUSE_POINTER_CHANGE
  GdkCursor	*wCursor[CURSOR_MODE_3270];
@@ -352,8 +353,6 @@
 				gtk_box_pack_start(GTK_BOX(vbox),widget,FALSE,FALSE,0);
 		}
 
-		set_widget_flags(gtk_ui_manager_get_widget(ui_manager,"/MainToolbar"),0);
-
 		for(f=0;f < G_N_ELEMENTS(popup);f++)
 		{
 			*popup[f].widget =  gtk_ui_manager_get_widget(ui_manager, popup[f].name);
@@ -364,12 +363,22 @@
 		}
 
 		LoadFontMenu(topwindow,gtk_ui_manager_get_widget(ui_manager,"/MainMenubar/SettingsMenu/FontSettings"));
+
+		toolbar_widget = gtk_ui_manager_get_widget(ui_manager,"/MainToolbar");
+
 		g_object_unref(ui_manager);
 	}
 
 	FontChanged();
 
 	gtk_widget_show_all(vbox);
+
+	if(toolbar_widget)
+	{
+		set_widget_flags(toolbar_widget,0);
+		gtk_widget_set_visible(toolbar_widget,GetBoolean("Toggles","Toolbar",TRUE));
+	}
+
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);
 
     hbox = gtk_hbox_new(FALSE,0);
