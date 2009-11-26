@@ -217,7 +217,7 @@ int lib3270_init(void)
 		(void) charset_init(CN);
 	}
 
-	action_init();
+//	action_init();
 	screen_init();
 	kybd_init();
 	idle_init();
