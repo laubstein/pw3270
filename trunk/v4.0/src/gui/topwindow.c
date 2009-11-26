@@ -376,7 +376,16 @@
 	if(toolbar_widget)
 	{
 		set_widget_flags(toolbar_widget,0);
+
+#if GTK_CHECK_VERSION(2,18,0)
 		gtk_widget_set_visible(toolbar_widget,GetBoolean("Toggles","Toolbar",TRUE));
+#else
+		if(GetBoolean("Toggles","Toolbar",TRUE))
+			gtk_widget_show(toolbar_widget);
+		else
+			gtk_widget_hide(toolbar_widget);
+#endif
+
 	}
 
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);
