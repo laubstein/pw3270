@@ -543,7 +543,16 @@
 	SetBoolean("Toggles","Toolbar",toggle);
 
 	if(toolbar_widget)
+	{
+#if GTK_CHECK_VERSION(2,18,0)
 		gtk_widget_set_visible(toolbar_widget,toggle);
+#else
+		if(toggle)
+			gtk_widget_show(toolbar_widget);
+		else
+			gtk_widget_hide(toolbar_widget);
+#endif
+	}
 
  }
 
