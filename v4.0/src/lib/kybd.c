@@ -2561,13 +2561,13 @@ MouseSelect_action(Widget w, XEvent *event, String *params,
 
 /*
  * Erase End Of Field Key.
- */
 void
 EraseEOF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(EraseEOF_action, event, params, num_params);
 	action_EraseEOF();
 }
+ */
 
 LIB3270_EXPORT int action_EraseEOF(void)
 {
@@ -2577,8 +2577,9 @@ LIB3270_EXPORT int action_EraseEOF(void)
 	enum dbcs_why why = DBCS_FIELD;
 
 	reset_idle_timer();
-	if (kybdlock) {
-		enq_ta(EraseEOF_action, CN, CN);
+	if (kybdlock)
+	{
+		enq_ta((void (*)(Widget, XEvent *, String *, Cardinal *)) action_EraseEOF, CN, CN);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -2622,12 +2623,12 @@ LIB3270_EXPORT int action_EraseEOF(void)
 
 /*
  * Erase all Input Key.
- */
 void EraseInput_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(EraseInput_action, event, params, num_params);
 	action_EraseInput();
 }
+ */
 
 LIB3270_EXPORT int action_EraseInput(void)
 {
@@ -2637,7 +2638,7 @@ LIB3270_EXPORT int action_EraseInput(void)
 
 	reset_idle_timer();
 	if (kybdlock) {
-		enq_ta(EraseInput_action, CN, CN);
+		enq_ta((void (*)(Widget, XEvent *, String *, Cardinal *)) action_EraseInput, CN, CN);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/

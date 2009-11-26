@@ -91,17 +91,18 @@ static struct {
 static Boolean know_mods = False;
 #endif /*]*/
 
+/*
 XtActionsRec all_actions[] = {
-#if defined(C3270) && defined(X3270_SCRIPT) /*[*/
+#if defined(C3270) && defined(X3270_SCRIPT)
 	{ "Abort",		Abort_action },
-#endif /*]*/
-#if defined(X3270_DISPLAY) /*[*/
+#endif
+#if defined(X3270_DISPLAY)
 	{ "AltCursor",  	AltCursor_action },
-#endif /*]*/
-#if defined(X3270_DISPLAY) || defined(C3270) /*[*/
+#endif
+#if defined(X3270_DISPLAY) || defined(C3270)
 	{ "Compose",		Compose_action },
-#endif /*]*/
-#if defined(X3270_DISPLAY) /*[*/
+#endif
+#if defined(X3270_DISPLAY)
 	{ "Cut",		Cut_action },
 	{ "Default",		Default_action },
 	{ "HandleMenu",		HandleMenu_action },
@@ -111,38 +112,38 @@ XtActionsRec all_actions[] = {
 	{ "Keymap",		TemporaryKeymap_action },
 	{ PA_PFX "ConfigureNotify", PA_ConfigureNotify_action },
 	{ PA_END,		PA_End_action },
-#endif /*]*/
-#if defined(C3270) /*[*/
+#endif
+#if defined(C3270)
 	{ "Escape",		Escape_action },
-#endif /*]*/
-#if defined(X3270_DISPLAY) /*[*/
+#endif
+#if defined(X3270_DISPLAY)
 	{ PA_PFX "EnterLeave",	PA_EnterLeave_action },
 	{ PA_PFX "Expose",	PA_Expose_action },
 	{ PA_PFX "Focus",	PA_Focus_action },
 	{ PA_PFX "GraphicsExpose", PA_GraphicsExpose_action },
 	{ PA_PFX "KeymapNotify", PA_KeymapNotify_action },
-# if defined(X3270_TRACE) /*[*/
+# if defined(X3270_TRACE)
 	{ PA_KEYMAP_TRACE,	PA_KeymapTrace_action },
-# endif /*]*/
+# endif
 	{ PA_PFX "Shift",	PA_Shift_action },
 	{ PA_PFX "StateChanged", PA_StateChanged_action },
 	{ PA_PFX "VisibilityNotify",PA_VisibilityNotify_action },
 	{ PA_PFX "WMProtocols",	PA_WMProtocols_action },
 	{ PA_PFX "confirm",	PA_confirm_action },
 	{ "PrintWindow",	PrintWindow_action },
-#endif /*]*/
+#endif
 	{ "PrintText",		PrintText_action },
-#if defined(X3270_DISPLAY) || defined(C3270) /*[*/
+#if defined(X3270_DISPLAY) || defined(C3270)
 	{ "Flip",		Flip_action },
 	{ "Redraw",		Redraw_action },
-#endif /*]*/
-#if defined(X3270_DISPLAY) /*[*/
+#endif
+#if defined(X3270_DISPLAY)
 	{ "SetFont",		SetFont_action },
 	{ "TemporaryKeymap",	TemporaryKeymap_action },
-# if defined(X3270_FT) && defined(X3270_MENUS) /*[*/
+# if defined(X3270_FT) && defined(X3270_MENUS)
 	{ PA_PFX "dialog-next",	PA_dialog_next_action },
 	{ PA_PFX "dialog-focus", PA_dialog_focus_action },
-# endif /*]*/
+# endif
 	{ "insert-selection",	insert_selection_action },
 	{ "move-select",	move_select_action },
 	{ "select-end",		select_end_action },
@@ -150,30 +151,30 @@ XtActionsRec all_actions[] = {
 	{ "select-start",	select_start_action },
 	{ "set-select",		set_select_action },
 	{ "start-extend",	start_extend_action },
-#endif /*]*/
-#if defined(X3270_SCRIPT) /*[*/
+#endif
+#if defined(X3270_SCRIPT)
 	{ "AnsiText",		AnsiText_action },
-#endif /*]*/
+#endif
 	{ "Ascii",		Ascii_action },
 	{ "AsciiField",		AsciiField_action },
 	{ "Attn",		Attn_action },
 	{ "BackSpace",		BackSpace_action },
 	{ "BackTab",		BackTab_action },
-#if defined(X3270_SCRIPT) && (defined(X3270_DISPLAY) || defined(C3270)) /*[*/
+#if defined(X3270_SCRIPT) && (defined(X3270_DISPLAY) || defined(C3270))
 	{ "Bell",		Bell_action },
-#endif /*]*/
+#endif
 	{ "CircumNot",		CircumNot_action },
 	{ "Clear",		Clear_action },
-#if defined(C3270) /*[*/
+#if defined(C3270)
 //	{ "Close",		Disconnect_action },
-#endif /*]*/
-#if defined(X3270_SCRIPT) /*[*/
+#endif
+#if defined(X3270_SCRIPT)
 	{ "CloseScript",	CloseScript_action },
-#endif /*]*/
+#endif
 //	{ "Connect",		Connect_action },
-#if defined(X3270_SCRIPT) /*[*/
+#if defined(X3270_SCRIPT)
 	{ "ContinueScript",	ContinueScript_action },
-#endif /*]*/
+#endif
 	{ "CursorSelect",	CursorSelect_action },
 	{ "Delete", 		Delete_action },
 	{ "DeleteField",	DeleteField_action },
@@ -187,125 +188,128 @@ XtActionsRec all_actions[] = {
 	{ "Erase",		Erase_action },
 	{ "EraseEOF",		EraseEOF_action },
 	{ "EraseInput",		EraseInput_action },
-#if defined(X3270_SCRIPT) /*[*/
+#if defined(X3270_SCRIPT)
 	{ "Execute",		Execute_action },
-#endif /*]*/
-#if defined(C3270) || defined(WC3270) /*[*/
+#endif
+#if defined(C3270) || defined(WC3270)
 	{ "Exit",		Quit_action },
-#endif /*]*/
-#if defined(X3270_SCRIPT) /*[*/
+#endif
+#if defined(X3270_SCRIPT)
 	{ "Expect",		Expect_action },
-#endif /*]*/
+#endif
 	{ "FieldEnd",		FieldEnd_action },
 	{ "FieldMark",		FieldMark_action },
 	{ "HexString",		HexString_action},
-// #if defined(C3270) || defined(WC3270) /*[*/
+// #if defined(C3270) || defined(WC3270)
 //	{ "Help",		Help_action},
-// #endif/*]*/
-#if defined(X3270_SCRIPT) /*[*/
+// #endif
+#if defined(X3270_SCRIPT)
 	{ "Plugin",		Plugin_action},
-#endif/*]*/
+#endif
 	{ "Home",		Home_action },
 	{ "Insert",		Insert_action },
 	{ "Interrupt",		Interrupt_action },
 	{ "Key",		Key_action },
-#if defined(X3270_DISPLAY) /*[*/
+#if defined(X3270_DISPLAY)
 	{ "KybdSelect",		KybdSelect_action },
-#endif /*]*/
+#endif
 	{ "Left",		Left_action },
 	{ "Left2", 		Left2_action },
-#if defined(X3270_SCRIPT) /*[*/
+#if defined(X3270_SCRIPT)
 	{ "Macro", 		Macro_action },
-#endif /*]*/
+#endif
 	{ "MonoCase",		MonoCase_action },
-#if defined(X3270_DISPLAY) /*[*/
+#if defined(X3270_DISPLAY)
 	{ "MouseSelect",	MouseSelect_action },
-#endif /*]*/
+#endif
 	{ "MoveCursor",		MoveCursor_action },
 	{ "Newline",		Newline_action },
 	{ "NextWord",		NextWord_action },
-#if defined(C3270) || defined(WC3270) /*[*/
+#if defined(C3270) || defined(WC3270)
 //	{ "Open",		Connect_action },
-#endif /*]*/
+#endif
 	{ "PA",			PA_action },
 	{ "PF",			PF_action },
-// #if defined(WC3270) /*[*/
+// #if defined(WC3270)
 //	{ "Paste",		Paste_action },
-// #endif /*]*/
-#if defined(X3270_SCRIPT) /*[*/
+// #endif
+#if defined(X3270_SCRIPT)
 	{ "PauseScript",	PauseScript_action },
-#endif /*]*/
+#endif
 	{ "PreviousWord",	PreviousWord_action },
-#if defined(X3270_PRINTER) /*[*/
+#if defined(X3270_PRINTER)
 	{ "Printer",		Printer_action },
-#endif /*]*/
-#if defined(X3270_SCRIPT) /*[*/
+#endif
+#if defined(X3270_SCRIPT)
 	{ "Query",		Query_action },
-#endif /*]*/
+#endif
 	{ "Quit",		Quit_action },
-#if defined(X3270_SCRIPT) || defined(TCL3270) /*[*/
+#if defined(X3270_SCRIPT) || defined(TCL3270)
 	{ "ReadBuffer",		ReadBuffer_action },
-#endif /*]*/
-#if defined(X3270_MENUS) /*[*/
+#endif
+#if defined(X3270_MENUS)
 	{ "Reconnect",		Reconnect_action },
-#endif /*]*/
+#endif
 	{ "Reset",		Reset_action },
 	{ "Right",		Right_action },
 	{ "Right2",		Right2_action },
-#if defined(X3270_DISPLAY) /*[*/
+#if defined(X3270_DISPLAY)
 	{ "SelectAll",		SelectAll_action },
 	{ "SelectDown",		SelectDown_action },
 	{ "SelectMotion",	SelectMotion_action },
 	{ "SelectUp",		SelectUp_action },
-#endif /*]*/
-#if defined(X3270_SCRIPT) /*[*/
+#endif
+#if defined(X3270_SCRIPT)
 	{ "Script",		Script_action },
-#endif /*]*/
-#if defined(C3270) /*[*/
+#endif
+#if defined(C3270)
 	{ "Show",		Show_action },
-#endif/*]*/
-#if defined(X3270_SCRIPT) || defined(TCL3270) /*[*/
+#endif
+#if defined(X3270_SCRIPT) || defined(TCL3270)
 	{ "Snap",		Snap_action },
-#endif /*]*/
-#if defined(TCL3270) /*[*/
+#endif
+#if defined(TCL3270)
 	{ "Status",		Status_action },
-#endif /*]*/
+#endif
 	{ "String",		String_action },
 	{ "SysReq",		SysReq_action },
 	{ "Tab",		Tab_action },
-#if defined(X3270_DISPLAY) || defined(WC3270) /*[*/
+#if defined(X3270_DISPLAY) || defined(WC3270)
 	{ "Title",		Title_action },
-#endif /*]*/
+#endif
 //	{ "Toggle",		Toggle_action },
 	{ "ToggleInsert",	ToggleInsert_action },
 	{ "ToggleReverse",	ToggleReverse_action },
-#if defined(C3270) && defined(X3270_TRACE) /*[*/
+#if defined(C3270) && defined(X3270_TRACE)
 	{ "Trace",		Trace_action },
-#endif/*]*/
-#if defined(X3270_FT) /*[*/
+#endif
+#if defined(X3270_FT)
 //	{ "Transfer",		Transfer_action },
-#endif /*]*/
-#if defined(X3270_DISPLAY) /*[*/
+#endif
+#if defined(X3270_DISPLAY)
 	{ "Unselect",		Unselect_action },
-#endif /*]*/
+#endif
 	{ "Up",			Up_action },
-#if defined(X3270_SCRIPT) || defined(TCL3270) /*[*/
+#if defined(X3270_SCRIPT) || defined(TCL3270)
 	{ "Wait",		Wait_action },
-#endif /*]*/
-#if defined(X3270_DISPLAY) /*[*/
+#endif
+#if defined(X3270_DISPLAY)
 	{ "WindowState",	WindowState_action },
-#endif /*]*/
+#endif
 	{ "ignore",		ignore_action }
 };
 
 int actioncount = XtNumber(all_actions);
 XtActionsRec *actions = NULL;
 
+*/
+
 /* Actions that are aliases for other actions. */
+/*
 static char *aliased_actions[] = {
 	"Close", "HardPrint", "Open", NULL
 };
-
+*/
 enum iaction ia_cause;
 const char *ia_name[] = {
 	"String", "Paste", "Screen redraw", "Keypad", "Default", "Key",
@@ -313,16 +317,16 @@ const char *ia_name[] = {
 	"Keymap", "Idle"
 };
 
-/* No-op action for suppressed actions. */
+/* No-op action for suppressed actions. */ /*
 static void
 suppressed_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(suppressed_action, event, params, num_params);
 }
-
+*/
 /* Look up an action name in the suppressed actions resource. */
-static Boolean
-action_suppressed(String name, char *suppress)
+/*
+static Boolean action_suppressed(String name, char *suppress)
 {
 	char *s = suppress;
 	char *t;
@@ -342,25 +346,25 @@ action_suppressed(String name, char *suppress)
 	}
 	return False;
 }
+*/
 
 /*
  * Action table initialization.
  * Uses the suppressActions resource to prune the actions table.
- */
-void
-action_init(void)
+ */ /*
+void action_init(void)
 {
 	char *suppress;
 	int i;
 
-	/* See if there are any filters at all. */
+	// See if there are any filters at all.
 	suppress = get_resource(ResSuppressActions);
 	if (suppress == CN) {
 		actions = all_actions;
 		return;
 	}
 
-	/* Yes, we'll need to copy the table and prune it. */
+	// Yes, we'll need to copy the table and prune it.
 	actions = (XtActionsRec *)Malloc(sizeof(all_actions));
 	memcpy(actions, all_actions, sizeof(all_actions));
 	for (i = 0; i < actioncount; i++) {
@@ -368,6 +372,7 @@ action_init(void)
 			actions[i].proc = suppressed_action;
 	}
 }
+*/
 
 /*
  * Return a name for an action.
@@ -375,12 +380,14 @@ action_init(void)
 const char *
 action_name(XtActionProc action)
 {
+	// TODO (perry#1#): Remove all calls to action_name; move all action processing to main program.
+
+	return "Action";
+/*
 	register int i;
 
-	/*
-	 * XXX: It would be better if the real name could be displayed, with a
-	 * message indicating it is suppressed.
-	 */
+	// XXX: It would be better if the real name could be displayed, with a
+	// message indicating it is suppressed.
 	if (action == suppressed_action)
 		return "(suppressed)";
 
@@ -400,6 +407,7 @@ action_name(XtActionProc action)
 				return actions[i].string;
 		}
 	return "(unknown)";
+*/
 }
 
 #if defined(X3270_DISPLAY) /*[*/
@@ -622,6 +630,7 @@ key_state(unsigned int state)
  *
  * Returns 0 if the argument count is correct, -1 otherwise.
  */
+
 int
 check_usage(XtActionProc action, Cardinal nargs, Cardinal nargs_min,
     Cardinal nargs_max)
@@ -629,11 +638,9 @@ check_usage(XtActionProc action, Cardinal nargs, Cardinal nargs_min,
 	if (nargs >= nargs_min && nargs <= nargs_max)
 		return 0;
 	if (nargs_min == nargs_max)
-		popup_an_error("%s requires %d argument%s",
-		    action_name(action), nargs_min, nargs_min == 1 ? "" : "s");
+		popup_an_error("Action requires %d argument%s",action, nargs_min, nargs_min == 1 ? "" : "s");
 	else
-		popup_an_error("%s requires %d or %d arguments",
-		    action_name(action), nargs_min, nargs_max);
+		popup_an_error("Action requires %d or %d arguments",nargs_min, nargs_max);
 	cancel_if_idle_command();
 	return -1;
 }
@@ -805,7 +812,7 @@ action_debug(XtActionProc action, XEvent *event, String *params,
 		    action_name(action));
 	else
 #endif /*]*/
-		trace_event(" -> %s(", action_name(action));
+		trace_event(" -> Action %d(", (int) action);
 	for (i = 0; i < *num_params; i++) {
 		trace_event("%s\"%s\"",
 		    i ? ", " : "",

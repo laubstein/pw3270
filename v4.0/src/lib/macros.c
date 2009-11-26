@@ -216,12 +216,14 @@ static void wait_timed_out(void);
     (IN_ANSI && !(kybdlock & KL_AWAITING_FIRST)) \
 )
 
+/*
 static unsigned char ldtoasc[] = {
 	0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0xad,
 	0x3e, 0x3c, 0x5b, 0x5d, 0x29, 0x28, 0x7d, 0x7b,
 	0x20, 0x3d, 0x27, 0x22, 0x2f, 0x5c, 0x7c, 0xa6,
 	0x3f, 0x21, 0x24, 0xa2, 0xa3, 0xa5, 0xb6
 };
+*/
 
 #if defined(X3270_SCRIPT) && defined(X3270_PLUGIN) /*[*/
 static int plugin_pid = 0;		/* process ID if running, or 0 */
@@ -705,19 +707,20 @@ enum em_stat { EM_CONTINUE, EM_PAUSE, EM_ERROR };
 static enum em_stat
 execute_command(enum iaction cause, char *s, char **np)
 {
+/*
 	enum {
-		ME_GND,		/* before action name */
-		ME_FUNCTION,	/* within action name */
-		ME_FUNCTIONx,	/* saw whitespace after action name */
-		ME_LPAREN,	/* saw left paren */
-		ME_P_PARM,	/* paren: within unquoted parameter */
-		ME_P_QPARM,	/* paren: within quoted parameter */
-		ME_P_BSL,	/* paren: after backslash in quoted parameter */
-		ME_P_PARMx,	/* paren: saw whitespace after parameter */
-		ME_S_PARM,	/* space: within unquoted parameter */
-		ME_S_QPARM,	/* space: within quoted parameter */
-		ME_S_BSL,	/* space: after backslash in quoted parameter */
-		ME_S_PARMx	/* space: saw whitespace after parameter */
+		ME_GND,		// before action name
+		ME_FUNCTION,	// within action name
+		ME_FUNCTIONx,	// saw whitespace after action name
+		ME_LPAREN,	// saw left paren
+		ME_P_PARM,	// paren: within unquoted parameter
+		ME_P_QPARM,	// paren: within quoted parameter
+		ME_P_BSL,	// paren: after backslash in quoted parameter
+		ME_P_PARMx,	// paren: saw whitespace after parameter
+		ME_S_PARM,	// space: within unquoted parameter
+		ME_S_QPARM,	// space: within quoted parameter
+		ME_S_BSL,	// space: after backslash in quoted parameter
+		ME_S_PARMx	// space: saw whitespace after parameter
 	} state = ME_GND;
 	char c;
 	char aname[64+1];
@@ -729,11 +732,11 @@ execute_command(enum iaction cause, char *s, char **np)
 	int failreason = 0;
 	Boolean saw_paren = False;
 	static const char *fail_text[] = {
-		/*1*/ "Action name must begin with an alphanumeric character",
-		/*2*/ "Syntax error in action name",
-		/*3*/ "Syntax error: \")\" or \",\" expected",
-		/*4*/ "Extra data after parameters",
-		/*5*/ "Syntax error: \")\" expected"
+		"Action name must begin with an alphanumeric character",
+		"Syntax error in action name",
+		"Syntax error: \")\" or \",\" expected",
+		"Extra data after parameters",
+		"Syntax error: \")\" expected"
 	};
 #define fail(n) { failreason = n; goto failure; }
 #define free_params() { \
@@ -759,7 +762,7 @@ execute_command(enum iaction cause, char *s, char **np)
 		} else
 			fail(1);
 		break;
-	    case ME_FUNCTION:	/* within function name */
+	    case ME_FUNCTION:	// within function name
 		if (c == '(' || isspace(c)) {
 			aname[nx] = '\0';
 			if (c == '(') {
@@ -775,7 +778,7 @@ execute_command(enum iaction cause, char *s, char **np)
 			fail(2);
 		}
 		break;
-	    case ME_FUNCTIONx:	/* space after function name */
+	    case ME_FUNCTIONx:	// space after function name
 		if (isspace(c))
 			continue;
 		else if (c == '(') {
@@ -897,20 +900,20 @@ execute_command(enum iaction cause, char *s, char **np)
 		break;
 	}
 
-	/* Terminal state. */
+	// Terminal state.
 	switch (state) {
-	    case ME_FUNCTION:	/* mid-function-name */
+	    case ME_FUNCTION:	// mid-function-name
 		aname[nx] = '\0';
 		break;
-	    case ME_FUNCTIONx:	/* space after function */
+	    case ME_FUNCTIONx:	// space after function
 		break;
-	    case ME_GND:	/* nothing */
+	    case ME_GND:	// nothing
 		if (np)
 			*np = s - 1;
 		return EM_CONTINUE;
-	    case ME_S_PARMx:	/* space after space-style parameter */
+	    case ME_S_PARMx:	// space after space-style parameter
 		break;
-	    case ME_S_PARM:	/* mid space-style parameter */
+	    case ME_S_PARM:	// mid space-style parameter
 		parm[nx++] = '\0';
 		params[++count] = &parm[nx];
 		break;
@@ -932,7 +935,7 @@ execute_command(enum iaction cause, char *s, char **np)
 	} else if (np)
 		*np = s-1;
 
-	/* If it's a macro, do variable substitutions. */
+	// If it's a macro, do variable substitutions.
 	if (cause == IA_MACRO || cause == IA_KEYMAP ||
 	    cause == IA_COMMAND || cause == IA_IDLE) {
 		Cardinal j;
@@ -941,7 +944,7 @@ execute_command(enum iaction cause, char *s, char **np)
 			params[j] = do_subst(params[j], True, False);
 	}
 
-	/* Search the action list. */
+	// Search the action list.
 	if (!strncasecmp(aname, PA_PFX, strlen(PA_PFX))) {
 		popup_an_error("Invalid action: %s", aname);
 		free_params();
@@ -983,10 +986,10 @@ execute_command(enum iaction cause, char *s, char **np)
 		return EM_ERROR;
 	}
 
-#if defined(X3270_FT) /*[*/
+#if defined(X3270_FT)
 	if (ft_state != FT_NONE)
 		sms->state = SS_FT_WAIT;
-#endif /*]*/
+#endif
 	if (CKBWAIT)
 		return EM_PAUSE;
 	else
@@ -994,9 +997,11 @@ execute_command(enum iaction cause, char *s, char **np)
 
     failure:
 	popup_an_error(fail_text[failreason-1]);
-	return EM_ERROR;
+
 #undef fail
 #undef free_params
+*/
+	return EM_ERROR;
 }
 
 /* Run the string at the top of the stack. */
@@ -1599,7 +1604,7 @@ sms_in_macro(void)
 /*
  * Macro- and script-specific actions.
  */
-
+/*
 static void
 dump_range(int first, int len, Boolean in_ascii, struct ea *buf,
     int rel_rows unused, int rel_cols)
@@ -1613,12 +1618,10 @@ dump_range(int first, int len, Boolean in_ascii, struct ea *buf,
 	linebuf = Malloc(maxCOLS * 4 + 1);
 	s = linebuf;
 
-	/*
-	 * If the client has looked at the live screen, then if they later
-	 * execute 'Wait(output)', they will need to wait for output from the
-	 * host.  output_wait_needed is cleared by sms_host_output,
-	 * which is called from the write logic in ctlr.c.
-	 */
+	// If the client has looked at the live screen, then if they later
+	// execute 'Wait(output)', they will need to wait for output from the
+	// host.  output_wait_needed is cleared by sms_host_output,
+	// which is called from the write logic in ctlr.c.
 	if (sms != SN && buf == ea_buf)
 		sms->output_wait_needed = True;
 
@@ -1640,7 +1643,7 @@ dump_range(int first, int len, Boolean in_ascii, struct ea *buf,
 			} else if (is_zero)
 				c = ' ';
 			else
-#if defined(X3270_DBCS) /*[*/
+#if defined(X3270_DBCS)
 			if (IS_LEFT(ctlr_dbcs_state(first + i))) {
 				int len;
 				char mb[16];
@@ -1656,7 +1659,7 @@ dump_range(int first, int len, Boolean in_ascii, struct ea *buf,
 			} else if (IS_RIGHT(ctlr_dbcs_state(first + i))) {
 				continue;
 			} else
-#endif /*]*/
+#endif
 			{
 				switch (buf[first + i].cs) {
 				case CS_BASE:
@@ -1694,6 +1697,9 @@ dump_range(int first, int len, Boolean in_ascii, struct ea *buf,
 	}
 	Free(linebuf);
 }
+*/
+
+/*
 
 static void
 dump_fixed(String params[], Cardinal count, const char *name, Boolean in_ascii,
@@ -1702,22 +1708,22 @@ dump_fixed(String params[], Cardinal count, const char *name, Boolean in_ascii,
 	int row, col, len, rows = 0, cols = 0;
 
 	switch (count) {
-	    case 0:	/* everything */
+	    case 0:	// everything
 		row = 0;
 		col = 0;
 		len = rel_rows*rel_cols;
 		break;
-	    case 1:	/* from cursor, for n */
+	    case 1:	// from cursor, for n
 		row = caddr / rel_cols;
 		col = caddr % rel_cols;
 		len = atoi(params[0]);
 		break;
-	    case 3:	/* from (row,col), for n */
+	    case 3:	// from (row,col), for n
 		row = atoi(params[0]);
 		col = atoi(params[1]);
 		len = atoi(params[2]);
 		break;
-	    case 4:	/* from (row,col), for rows x cols */
+	    case 4:	// from (row,col), for rows x cols
 		row = atoi(params[0]);
 		col = atoi(params[1]);
 		rows = atoi(params[2]);
@@ -1749,7 +1755,8 @@ dump_fixed(String params[], Cardinal count, const char *name, Boolean in_ascii,
 			    buf, rel_rows, rel_cols);
 	}
 }
-
+*/
+/*
 static void
 dump_field(Cardinal count, const char *name, Boolean in_ascii)
 {
@@ -1779,13 +1786,15 @@ dump_field(Cardinal count, const char *name, Boolean in_ascii)
 	} while (baddr != start);
 	dump_range(start, len, in_ascii, ea_buf, ROWS, COLS);
 }
+*/
 
+/*
 void
 Ascii_action(Widget w unused, XEvent *event unused, String *params,
     Cardinal *num_params)
 {
 	dump_fixed(params, *num_params, action_name(Ascii_action), True,
-		ea_buf, ROWS, COLS, cursor_addr);
+	ea_buf, ROWS, COLS, cursor_addr);
 }
 
 void
@@ -1809,6 +1818,7 @@ EbcdicField_action(Widget w unused, XEvent *event unused,
 {
 	dump_field(*num_params, action_name(EbcdicField_action), False);
 }
+*/
 
 static unsigned char
 calc_cs(unsigned char cs)
@@ -2179,7 +2189,7 @@ snap_save(void)
  *	runs the named command
  *  Snap Wait [tmo] Output
  *      wait for the screen to change, then do a Snap Save
- */
+ */ /*
 void
 Snap_action(Widget w unused, XEvent *event unused, String *params,
     Cardinal *num_params)
@@ -2195,7 +2205,7 @@ Snap_action(Widget w unused, XEvent *event unused, String *params,
 		return;
 	}
 
-	/* Handle 'Snap Wait' separately. */
+	// Handle 'Snap Wait' separately.
 	if (!strcasecmp(params[0], action_name(Wait_action))) {
 		long tmo = -1;
 		char *ptr;
@@ -2229,26 +2239,24 @@ Snap_action(Widget w unused, XEvent *event unused, String *params,
 			    return;
 		}
 
-		/* Must be connected. */
+		// Must be connected.
 		if (!(CONNECTED || HALF_CONNECTED)) {
 			popup_an_error("%s: Not connected",
 			    action_name(Snap_action));
 			return;
 		}
 
-		/*
-		 * Make sure we need to wait.
-		 * If we don't, then Snap(Wait) is equivalent to Snap().
-		 */
+		// Make sure we need to wait.
+		// If we don't, then Snap(Wait) is equivalent to Snap().
 		if (!sms->output_wait_needed) {
 			snap_save();
 			return;
 		}
 
-		/* Set the new state. */
+		// Set the new state.
 		sms->state = SS_SWAIT_OUTPUT;
 
-		/* Set up a timeout, if they want one. */
+		// Set up a timeout, if they want one.
 		if (tmo >= 0)
 			sms->wait_id = AddTimeOut(tmo? (tmo * 1000): 1,
 					wait_timed_out);
@@ -2323,6 +2331,7 @@ Snap_action(Widget w unused, XEvent *event unused, String *params,
 		    action_name(ReadBuffer_action));
 	}
 }
+*/
 
 /*
  * Wait for various conditions.
