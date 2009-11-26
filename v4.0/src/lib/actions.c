@@ -864,6 +864,7 @@ action_internal(XtActionProc action, enum iaction cause, const char *parm1,
 }
 
 /* Break to the command prompt. */
+/*
 void Escape_action(Widget w unused, XEvent *event unused, String *params unused, Cardinal *num_params unused)
 {
 	action_debug(Escape_action, event, params, num_params);
@@ -881,4 +882,5 @@ void Trace_action(Widget w unused, XEvent *event unused, String *params, Cardina
 {
 	// TODO (perry#1#): How to implement the same action as did in c3270?
 }
+*/
 
