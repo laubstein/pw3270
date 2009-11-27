@@ -139,8 +139,18 @@ static int n_composites = 0;
 #define ak_eq(k1, k2)	(((k1).keysym  == (k2).keysym) && \
 			 ((k1).keytype == (k2).keytype))
 
-static struct ta {
-	struct ta *next;
+static struct ta
+{
+	struct ta 		*next;
+
+	enum _ta_type
+	{
+		TA_TYPE_DEFAULT,
+		TA_TYPE_KEY_AID,
+
+		TA_TYPE_USER
+	} type;
+
 	XtActionProc fn;
 	char *parm1;
 	char *parm2;
@@ -156,41 +166,91 @@ extern Widget *screen;
 
 
 /*
- * Put an action on the typeahead queue.
+ * Check if the typeahead queue is available
  */
-static void
-enq_ta(XtActionProc fn, char *parm1, char *parm2)
+static int enq_chk(void)
 {
-	struct ta *ta;
-
 	/* If no connection, forget it. */
-	if (!CONNECTED) {
+	if (!CONNECTED)
+	{
 		trace_event("  dropped (not connected)\n");
-		return;
+		return -1;
 	}
 
 	/* If operator error, complain and drop it. */
-	if (kybdlock & KL_OERR_MASK) {
+	if (kybdlock & KL_OERR_MASK)
+	{
 		ring_bell();
 		trace_event("  dropped (operator error)\n");
-		return;
+		return -1;
 	}
 
 	/* If scroll lock, complain and drop it. */
-	if (kybdlock & KL_SCROLLED) {
+	if (kybdlock & KL_SCROLLED)
+	{
 		ring_bell();
 		trace_event("  dropped (scrolled)\n");
-		return;
+		return -1;
 	}
 
 	/* If typeahead disabled, complain and drop it. */
-	if (!appres.typeahead) {
+	if (!appres.typeahead)
+	{
 		trace_event("  dropped (no typeahead)\n");
-		return;
+		return -1;
 	}
+
+	return 0;
+}
+
+/*
+ * Put a "Key-aid" on the typeahead queue
+ */
+ static void enq_key(unsigned char *xlate, int k)
+ {
+ 	if(enq_chk())
+		return;
+
+	struct ta *ta;
+
+ 	if(enq_chk())
+		return;
+
+	ta = (struct ta *) Malloc(sizeof(*ta));
+	memset(ta,0,sizeof(struct ta));
+
+	ta->next = (struct ta *) NULL;
+	ta->type = TA_TYPE_KEY_AID;
+	ta->parm1 = (char *) xlate;
+	ta->parm2 = (char *) k;
+
+	if (ta_head)
+	{
+		ta_tail->next = ta;
+	}
+	else
+	{
+		ta_head = ta;
+		status_typeahead(True);
+	}
+	ta_tail = ta;
+
+	trace_event("  Key-aid queued (kybdlock 0x%x)\n", kybdlock);
+ }
+
+/*
+ * Put an action on the typeahead queue.
+ */
+static void enq_ta(XtActionProc fn, char *parm1, char *parm2)
+{
+	struct ta *ta;
+
+ 	if(enq_chk())
+		return;
 
 	ta = (struct ta *) Malloc(sizeof(*ta));
 	ta->next = (struct ta *) NULL;
+	ta->type = TA_TYPE_DEFAULT;
 	ta->fn = fn;
 	ta->parm1 = ta->parm2 = CN;
 	if (parm1) {
@@ -212,8 +272,7 @@ enq_ta(XtActionProc fn, char *parm1, char *parm2)
 /*
  * Execute an action from the typeahead queue.
  */
-Boolean
-run_ta(void)
+Boolean run_ta(void)
 {
 	struct ta *ta;
 
@@ -225,10 +284,36 @@ run_ta(void)
 		status_typeahead(False);
 	}
 
-	action_internal(ta->fn, IA_TYPEAHEAD, ta->parm1, ta->parm2);
-	Free(ta->parm1);
-	Free(ta->parm2);
-	Free(ta);
+	switch(ta->type)
+	{
+	case TA_TYPE_DEFAULT:
+		action_internal(ta->fn, IA_TYPEAHEAD, ta->parm1, ta->parm2);
+		Free(ta->parm1);
+		Free(ta->parm2);
+		Free(ta);
+		break;
+
+	case TA_TYPE_KEY_AID:
+		key_AID( ((char *) ta->parm1)[(int) ta->parm2]);
+		break;
+/*
+	enum _ta_type
+	{
+		TA_TYPE_DEFAULT,
+		,
+
+		TA_TYPE_USER
+	} type;
+
+	XtActionProc fn;
+	char *parm1;
+	char *parm2;
+*/
+
+	default:
+		popup_an_error( _( "Unexpected type %d in typeahead queue" ), ta->type);
+
+	}
 
 	return True;
 }
@@ -449,6 +534,7 @@ key_AID(unsigned char aid_code)
 	status_ctlr_done();
 }
 
+/*
 void
 PF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -487,8 +573,27 @@ LIB3270_EXPORT int action_PFKey(int key)
 
 	return 0;
 }
+*/
 
+LIB3270_EXPORT int action_PFKey(int k)
+{
 
+	if (k < 1 || k > PF_SZ)
+		return EINVAL;
+
+	reset_idle_timer();
+
+	if (kybdlock & KL_OIA_MINUS)
+		return -1;
+	else if (kybdlock)
+		enq_key(pf_xlate,k-1);
+	else
+		key_AID(pf_xlate[k-1]);
+
+	return 0;
+}
+
+/*
 void
 PA_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -499,11 +604,10 @@ PA_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 
 	action_PAKey(atoi(params[0]));
 }
+*/
 
 LIB3270_EXPORT int action_PAKey(int key)
 {
-	char buffer[10];
-
 	if (key < 1 || key > PA_SZ)
 	{
 		cancel_if_idle_command();
@@ -511,18 +615,11 @@ LIB3270_EXPORT int action_PAKey(int key)
 	}
 	reset_idle_timer();
 	if (kybdlock & KL_OIA_MINUS)
-	{
-		return 0;
-	}
+		return -1;
 	else if (kybdlock)
-	{
-		snprintf(buffer,9,"%d",key);
-		enq_ta(PA_action, buffer, CN);
-	}
+		enq_key(pa_xlate,key-1);
 	else
-	{
 		key_AID(pa_xlate[key-1]);
-	}
 
 	return 0;
 }
@@ -3229,10 +3326,11 @@ static void
 do_pa(unsigned n)
 {
 	if (n < 1 || n > PA_SZ) {
-		popup_an_error("Unknown PA key %d", n);
+		popup_an_error( _( "Unknown PA key %d" ), n);
 		cancel_if_idle_command();
 		return;
 	}
+/*
 	if (kybdlock) {
 		char nn[3];
 
@@ -3241,17 +3339,21 @@ do_pa(unsigned n)
 		return;
 	}
 	key_AID(pa_xlate[n-1]);
+*/
+	action_PAKey(n);
+
 }
 
 /* PF key action for String actions */
-static void
-do_pf(unsigned n)
+static void do_pf(unsigned n)
 {
 	if (n < 1 || n > PF_SZ) {
-		popup_an_error("Unknown PF key %d", n);
+		popup_an_error( _( "Unknown PF key %d" ), n);
 		cancel_if_idle_command();
 		return;
 	}
+	action_PFKey(n);
+/*
 	if (kybdlock) {
 		char nn[3];
 
@@ -3260,6 +3362,7 @@ do_pf(unsigned n)
 		return;
 	}
 	key_AID(pf_xlate[n-1]);
+*/
 }
 
 /*
