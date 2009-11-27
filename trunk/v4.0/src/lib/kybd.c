@@ -157,6 +157,8 @@ static struct ta
 } *ta_head = (struct ta *) NULL,
   *ta_tail = (struct ta *) NULL;
 
+#define ENQUEUE_ACTION(x) enq_ta((XtActionProc) x, CN, CN)
+
 static char dxl[] = "0123456789abcdef";
 #define FROM_HEX(c)	(strchr(dxl, tolower(c)) - dxl)
 
@@ -503,6 +505,7 @@ key_AID(unsigned char aid_code)
 		return;
 	}
 #endif /*]*/
+
 #if defined(X3270_PLUGIN) /*[*/
 	plugin_aid(aid_code);
 #endif /*]*/
@@ -1417,6 +1420,7 @@ AltCursor_action(Widget w unused, XEvent *event, String *params,
 }
 #endif /*]*/
 
+/*
 void
 MonoCase_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -1425,6 +1429,7 @@ MonoCase_action(Widget w unused, XEvent *event, String *params,
 	reset_idle_timer();
 	do_toggle(MONOCASE);
 }
+*/
 
 /*
  * Flip the display left-to-right
@@ -1443,6 +1448,7 @@ Flip_action(Widget w unused, XEvent *event, String *params,
 /*
  * Tab forward to next field.
  */
+
 void
 Tab_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -1610,6 +1616,7 @@ do_reset(Boolean explicit)
 
 }
 
+/*
 void
 Reset_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -1617,6 +1624,7 @@ Reset_action(Widget w unused, XEvent *event, String *params,
 	action_debug(Reset_action, event, params, num_params);
 	action_Reset();
 }
+*/
 
 LIB3270_EXPORT int action_Reset(void)
 {
@@ -1629,6 +1637,7 @@ LIB3270_EXPORT int action_Reset(void)
 /*
  * Move to first unprotected field on screen.
  */
+
 void Home_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(Home_action, event, params, num_params);
@@ -1675,10 +1684,12 @@ do_left(void)
 	cursor_move(baddr);
 }
 
+/*
 void Left_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_CursorLeft();
 }
+*/
 
 LIB3270_EXPORT int action_CursorLeft(void)
 {
@@ -1693,7 +1704,7 @@ LIB3270_EXPORT int action_CursorLeft(void)
 		}
 		else
 		{
-			enq_ta(Left_action, CN, CN);
+			ENQUEUE_ACTION(action_CursorLeft);
 			return 0;
 		}
 	}
@@ -1801,6 +1812,7 @@ do_delete(void)
 	return True;
 }
 
+/*
 void
 Delete_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -1808,12 +1820,14 @@ Delete_action(Widget w unused, XEvent *event, String *params,
 	action_debug(Delete_action, event, params, num_params);
 	action_Delete();
 }
+*/
 
 LIB3270_EXPORT int action_Delete(void)
 {
 	reset_idle_timer();
 	if (kybdlock) {
-		enq_ta(Delete_action, CN, CN);
+		ENQUEUE_ACTION(action_Delete);
+//		enq_ta(Delete_action, CN, CN);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -1930,6 +1944,7 @@ do_erase(void)
 	screen_disp();
 }
 
+/*
 void
 Erase_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -1937,12 +1952,14 @@ Erase_action(Widget w unused, XEvent *event, String *params,
 	action_debug(Erase_action, event, params, num_params);
 	action_Erase();
 }
+*/
 
 LIB3270_EXPORT int action_Erase(void)
 {
 	reset_idle_timer();
 	if (kybdlock) {
-		enq_ta(Erase_action, CN, CN);
+		ENQUEUE_ACTION(action_Erase);
+//		enq_ta(Erase_action, CN, CN);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -1956,10 +1973,12 @@ LIB3270_EXPORT int action_Erase(void)
 }
 
 
+/*
 void Right_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_CursorRight();
 }
+*/
 
 /**
  * Cursor right 1 position.
@@ -1980,7 +1999,8 @@ LIB3270_EXPORT int action_CursorRight(void)
 		}
 		else
 		{
-			enq_ta(Right_action, CN, CN);
+			ENQUEUE_ACTION(action_CursorRight);
+//			enq_ta(Right_action, CN, CN);
 			return 0;
 		}
 	}
@@ -2267,11 +2287,12 @@ NextWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 
 /*
  * Cursor up 1 position.
- */
+ */ /*
 void Up_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_CursorUp();
 }
+*/
 
 /**
  * Cursor up 1 position.
@@ -2293,7 +2314,8 @@ LIB3270_EXPORT int action_CursorUp(void)
 		}
 		else
 		{
-			enq_ta(Up_action, CN, CN);
+			ENQUEUE_ACTION(action_CursorUp);
+//			enq_ta(Up_action, CN, CN);
 			return 0;
 		}
 	}
@@ -2313,12 +2335,13 @@ LIB3270_EXPORT int action_CursorUp(void)
 
 /*
  * Cursor down 1 position.
- */
+ */ /*
 void
 Down_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_CursorDown();
 }
+*/
 
 /**
  * Cursor down 1 position.
@@ -2340,7 +2363,8 @@ LIB3270_EXPORT int action_CursorDown(void)
 			status_reset();
 		} else
 		{
-			enq_ta(Down_action, CN, CN);
+			ENQUEUE_ACTION(action_CursorDown);
+//			enq_ta(Down_action, CN, CN);
 			return 0;
 		}
 	}
@@ -2433,13 +2457,13 @@ FieldMark_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 /*
  * Vanilla AID keys.
  */
-
+/*
 void Enter_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(Enter_action, event, params, num_params);
 	action_Enter();
 }
-
+*/
 /**
  * Send an "Enter" action.
  *
@@ -2457,7 +2481,8 @@ LIB3270_EXPORT int action_Enter(void)
 	if (kybdlock & KL_OIA_MINUS)
 		return -1;
 	else if (kybdlock)
-		enq_ta(Enter_action, CN, CN);
+		ENQUEUE_ACTION(action_Enter);
+//		enq_ta(Enter_action, CN, CN);
 	else
 		key_AID(AID_ENTER);
 
@@ -3509,7 +3534,8 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 		    case BASE:
 			switch (c) {
 			    case '\b':
-				action_internal(Left_action, ia, CN, CN);
+			    action_CursorLeft();
+//				action_internal(Left_action, ia, CN, CN);
 				skipped = False;
 				break;
 			    case '\f':
@@ -3531,8 +3557,8 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 								ia, CN, CN);
 					skipped = False;
 				} else {
-					action_internal(Enter_action, ia, CN,
-							CN);
+					action_Enter();
+//					action_internal(Enter_action, ia, CN,CN);
 					skipped = False;
 					if (IN_3270)
 						return len-1;
@@ -3607,7 +3633,8 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				state = BASE;
 				break;
 			    case 'b':
-				action_internal(Left_action, ia, CN, CN);
+				action_CursorLeft();
+//				action_internal(Left_action, ia, CN, CN);
 				skipped = False;
 				state = BASE;
 				break;
@@ -3620,8 +3647,9 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				else
 					break;
 			    case 'n':
-				action_internal(Enter_action, ia, CN, CN);
-				skipped = False;
+//				action_internal(Enter_action, ia, CN, CN);
+				action_Enter();
+ 				skipped = False;
 				state = BASE;
 				if (IN_3270)
 					return len-1;
@@ -4268,8 +4296,8 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 				    CN, CN);
 				break;
 			    case '\r':
-				action_internal(Enter_action, IA_DEFAULT, CN,
-				    CN);
+				action_Enter();
+//				action_internal(Enter_action, IA_DEFAULT, CN, CN);
 				break;
 			    case '\n':
 				action_internal(Newline_action, IA_DEFAULT, CN,
@@ -4379,7 +4407,8 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 			    CN);
 			break;
 		    case XK_3270_Enter:
-			action_internal(Enter_action, IA_DEFAULT, CN, CN);
+			action_Enter();
+//			action_internal(Enter_action, IA_DEFAULT, CN, CN);
 			break;
 #endif /*]*/
 
