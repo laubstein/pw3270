@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -f pw3270.pot
 make pw3270.pot
 cp pw3270.pot po/pt_BR.po
 gtranslator --auto-translate=po/pt_BR.po > /dev/null 2>&1

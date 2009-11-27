@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-27 10:21-0200\n"
-"PO-Revision-Date: 2009-11-27 10:21-0200\n"
+"POT-Creation-Date: 2009-11-27 17:24-0200\n"
+"PO-Revision-Date: 2009-11-27 17:24-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -989,7 +989,7 @@ msgstr "Este programa precisa do GTK versão %d.%d.%d"
 
 #: src/gui/actions.c:655
 msgid "Toolbar"
-msgstr ""
+msgstr "Barra de ferramentas"
 
 #: src/gui/main.c:511
 msgid "Top window failed to start"
