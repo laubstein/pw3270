@@ -427,7 +427,9 @@ cut_data_request(void)
 	trace_ds("> FT DATA %u\n", from6(seq));
 	ft_update_length();
 	expanded_length += count;
-	action_internal(Enter_action, IA_FT, CN, CN);
+
+	action_Enter();
+//	action_internal(Enter_action, IA_FT, CN, CN);
 }
 
 /*
@@ -513,7 +515,8 @@ static void
 cut_ack(void)
 {
 	trace_ds("> FT ACK\n");
-	action_internal(Enter_action, IA_FT, CN, CN);
+	action_Enter();
+//	action_internal(Enter_action, IA_FT, CN, CN);
 }
 
 /*
