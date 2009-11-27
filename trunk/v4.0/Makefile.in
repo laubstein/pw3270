@@ -474,6 +474,8 @@ $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 	@tar --create --gzip --verbose --directory $(TMPDIR)/$(PACKAGE).tmp --exclude=.svn --file=$@ $(PACKAGE)-$(PACKAGE_VERSION)
 	@echo $@
 
+distclean: clean
+
 clean:
 	@rm -fr obj
 	@rm -fr uno
