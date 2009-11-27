@@ -51,7 +51,7 @@ int main(int numpar, char *param[])
 
 	fclose(out);
 
-	FILE *out = fopen(param[2],"w");
+	out = fopen(param[2],"w");
 
 	if(!out)
 		return -1;
@@ -61,7 +61,7 @@ int main(int numpar, char *param[])
 	fprintf(out,"xmlns:d=\"http://openoffice.org/extensions/description/2006\"\n");
 	fprintf(out,"xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n");
 
-	fprintf(out,"  <version value="4.0" />\n");
+	fprintf(out,"  <version value=\"4.0\" />\n");
 
 	fprintf(out,"  <identifier value=\"pw3270\" />\n");
 

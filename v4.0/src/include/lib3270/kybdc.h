@@ -112,8 +112,9 @@ extern void PA_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 extern void PA_Shift_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern void PF_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params);
+
+//extern void PF_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
+
 extern void PreviousWord_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 extern void Reset_action(Widget w, XEvent *event, String *params,

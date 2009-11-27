@@ -160,7 +160,7 @@ $(PACKAGE).uno$(DLLEXT): $(PW3270_SDK_LIB)\lib3270.lib $(PACKAGE).uno.lnk $(PACK
 	@echo $< ...
 	@link $(LIBRARY_LINK_FLAGS) /NOLOGO /out:$@ /def:"$(OO_SDK_HOME)\settings\component.uno.def" /map:$(basename $@).map @$(PACKAGE).uno.lnk
 
-$(PACKAGE).oxt: $(PACKAGE).uno$(DLLEXT) mkmanifest$(EXEEXT) $(PACKAGE).uno.rdb description.xml manifest.xml description.txt
+$(PACKAGE).oxt: $(PACKAGE).uno$(DLLEXT) mkwinfiles$(EXEEXT) $(PACKAGE).uno.rdb description.xml manifest.xml description.txt
 	@echo $@ ...
 	@md oxt.tmp
 	@md oxt.tmp\META-INF

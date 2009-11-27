@@ -531,7 +531,10 @@ cut_abort(const char *s, unsigned short reason)
 	ctlr_add(RO_REASON_CODE, HIGH8(reason), 0);
 	ctlr_add(RO_REASON_CODE+1, LOW8(reason), 0);
 	trace_ds("> FT CONTROL_CODE ABORT\n");
-	action_internal(PF_action, IA_FT, "2", CN);
+
+//	action_internal(PF_action, IA_FT, "2", CN);
+	action_PFKey(2);
+
 
 	/* Update the in-progress pop-up. */
 	ft_aborting();
