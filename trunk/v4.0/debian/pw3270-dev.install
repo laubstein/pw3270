@@ -1,0 +1,10 @@
+usr/include/lib3270/statusc.h
+usr/include/lib3270/config.h
+usr/include/lib3270/kybdc.h
+usr/include/lib3270/3270ds.h
+usr/include/lib3270/api.h
+usr/include/lib3270/localdefs.h
+usr/include/lib3270/actionsc.h
+usr/include/lib3270/plugins.h
+usr/include/lib3270/toggle.h
+
