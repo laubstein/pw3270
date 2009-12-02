@@ -345,6 +345,7 @@ gboolean StartPlugins(const gchar *startup_script)
  {
 	if(!TOGGLED_KEEP_SELECTED)
 		action_ClearSelection();
+	Trace("%s(%d)",__FUNCTION__,atoi(cmd));
 	action_PAKey(atoi(cmd));
  }
 
