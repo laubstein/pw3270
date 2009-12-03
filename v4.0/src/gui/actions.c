@@ -184,10 +184,10 @@
  	{	"PasteNext",		NULL,					N_( "Paste next" ),			"<Shift><Ctrl>v",	NULL,	G_CALLBACK(action_PasteNext)		},
  	{	"PasteTextFile",	NULL,					N_( "Paste text file" ),	NULL,				NULL,	G_CALLBACK(action_PasteTextFile)	},
  	{	"Reselect",			NULL,					N_( "Reselect" ),			"<Shift><Ctrl>r",	NULL,	G_CALLBACK(Reselect)				},
-#ifdef GTK_STOCK_SELECT_ALL
+#if defined( GTK_STOCK_SELECT_ALL )
  	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
 #else
- 	{	"SelectAll",		NULL,	N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
+ 	{	"SelectAll",		NULL,					N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
 #endif
  	{	"EraseInput",		GTK_STOCK_CLEAR,		N_( "Erase input" ),		NULL,				NULL,	G_CALLBACK(erase_input_action)		},
  	{	"ClearFields",		NULL,					N_( "Clear" ),				NULL,				NULL,	G_CALLBACK(clear_fields_action)		},
