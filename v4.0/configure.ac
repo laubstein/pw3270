@@ -286,7 +286,7 @@ AC_DEFINE_UNQUOTED(OFFICE_PROGRAM,"$oo_program")
 
 # Checks for libraries.
 PKG_CHECK_EXISTS
-PKG_CHECK_MODULES( [GTK], [glib-2.0 gtk+-2.0 >= 2.10 gthread-2.0 gthread-2.0 gmodule-2.0], AC_DEFINE(HAVE_GTK) )
+PKG_CHECK_MODULES( [GTK], [glib-2.0 gtk+-2.0 >= 2.8 gthread-2.0 gthread-2.0 gmodule-2.0], AC_DEFINE(HAVE_GTK) )
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
 
