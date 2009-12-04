@@ -145,7 +145,7 @@
 
 #endif
 
-#if !(GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12)
+#if GTK_CHECK_VERSION(2,12,0)
  static void SavePrintSetting(const gchar *key, const gchar *value, GKeyFile *cfg)
  {
  	 g_key_file_set_string(cfg, "PrintSettings", key, value);
@@ -251,7 +251,6 @@
 
 			if(uri)
 			{
-				Trace("********************************* \"%s\"",uri);
 				g_key_file_set_string(conf,"Print Settings","output-uri",uri);
 				g_free(uri);
 			}

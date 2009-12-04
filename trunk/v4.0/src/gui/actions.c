@@ -768,7 +768,7 @@
 							N_( "Erase to the end of the field or line" ),
 							NULL,
 							lib3270_EraseEOL,
-							"End" },
+							NULL },
 
 		{ "Home",			N_( "First Field" ),
 							NULL,
