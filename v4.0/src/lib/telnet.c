@@ -3470,7 +3470,11 @@ net_proxy_port(void)
 
 int query_secure_connection(void)
 {
+#if defined(HAVE_LIBSSL)
         return (int) secure_connection;
+#else
+		return 0;
+#endif
 }
 
 int Get3270Socket(void)

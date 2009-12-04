@@ -169,7 +169,7 @@
 		return;
 
 	Trace("Settings: %p Conf: %p",settings,conf);
-#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
+#if GTK_CHECK_VERSION(2,12,0)
 	gtk_print_settings_to_key_file(settings,conf,NULL);
 	gtk_page_setup_to_key_file(setup,conf,NULL);
 #else
@@ -193,12 +193,6 @@
 
  int PrintText(const char *name, gchar *text)
  {
-#if !(GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12)
-	gchar 				**list;
-	GtkPrintSettings	*settings;
-	int 				f;
-#endif
-
 	GKeyFile			*conf	= GetConf();
  	GtkPrintOperation	*prt;
 
@@ -230,13 +224,49 @@
 
 	if(conf)
 	{
-#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
+#if GTK_CHECK_VERSION(2,12,0)
+		gchar *ptr = g_key_file_get_string(conf,"Print Settings","output-uri",NULL);
+		if(ptr)
+		{
+			gchar *uri = NULL;
+
+			switch(*(ptr++))
+			{
+			case '$':
+				if(g_str_has_prefix(ptr,"home/"))
+					uri = g_strdup_printf("file:///%s/%s",g_get_home_dir(),ptr+5);
+#if GTK_CHECK_VERSION(2,14,0)
+				else if(g_str_has_prefix(ptr,"documents/"))
+					uri = g_strdup_printf("file:///%s/%s",g_get_user_special_dir(G_USER_DIRECTORY_DOCUMENTS),ptr+10);
+				else if(g_str_has_prefix(ptr,"desktop/"))
+					uri = g_strdup_printf("file:///%s/%s",g_get_user_special_dir(G_USER_DIRECTORY_DESKTOP),ptr+8);
+#endif
+				break;
+
+			case '~':
+				uri = g_strdup_printf("file:///%s/%s",g_get_home_dir(),ptr);
+				break;
+
+			}
+
+			if(uri)
+			{
+				Trace("********************************* \"%s\"",uri);
+				g_key_file_set_string(conf,"Print Settings","output-uri",uri);
+				g_free(uri);
+			}
+		}
+
 		gtk_print_operation_set_print_settings(prt,gtk_print_settings_new_from_key_file(conf,NULL,NULL));
 		gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new_from_key_file(conf,NULL,NULL));
 #else
 		settings = gtk_print_settings_new();
 		if(settings)
 		{
+			gchar 				**list;
+			GtkPrintSettings	*settings;
+			int 				f;
+
 			list = g_key_file_get_keys(conf,"PrintSettings",NULL,NULL);
 			if(list)
 			{
