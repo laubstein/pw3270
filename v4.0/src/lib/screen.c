@@ -372,7 +372,7 @@ void screen_disp(void)
 #endif /*]*/
 	int fa_addr;
 
-	Trace("%s starts",__FUNCTION__);
+//	Trace("%s starts",__FUNCTION__);
 
 	fa = get_field_attribute(0);
 	a = color_from_fa(fa);
@@ -448,7 +448,7 @@ void screen_disp(void)
 		}
 	}
 
-	Trace("%s ends",__FUNCTION__);
+//	Trace("%s ends",__FUNCTION__);
 
 	screen_has_changes = 0;
 }

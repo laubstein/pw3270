@@ -455,12 +455,15 @@
 		LIB3270_EXPORT int action_EraseInput(void);
 		LIB3270_EXPORT int action_ClearFields(void);
 
-		LIB3270_EXPORT int action_EraseEOF(void);
 		LIB3270_EXPORT int action_DeleteWord(void);
 		LIB3270_EXPORT int action_DeleteField(void);
 		LIB3270_EXPORT int action_Delete(void);
 		LIB3270_EXPORT int action_Erase(void);
 		LIB3270_EXPORT int action_SysReq(void);
+
+		/* Keyboard actions */
+		LIB3270_EXPORT int lib3270_EraseEOF(void);
+		LIB3270_EXPORT int lib3270_EraseEOL(void);
 
 		/* Host connect/disconnect and state change. */
 		LIB3270_EXPORT int host_connect(const char *n, int wait);

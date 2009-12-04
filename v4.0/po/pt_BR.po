@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-27 17:24-0200\n"
-"PO-Revision-Date: 2009-11-27 17:24-0200\n"
+"POT-Creation-Date: 2009-12-04 15:50-0200\n"
+"PO-Revision-Date: 2009-12-04 15:51-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -49,11 +49,11 @@ msgstr "Opções do 3270"
 msgid "<Ctrl>r"
 msgstr ""
 
-#: src/gui/actions.c:783
+#: src/gui/actions.c:789
 msgid "<Ctrl>u"
 msgstr ""
 
-#: src/gui/actions.c:777
+#: src/gui/actions.c:783
 msgid "<Ctrl>w"
 msgstr ""
 
@@ -121,7 +121,7 @@ msgstr ""
 msgid "Background"
 msgstr "Fundo"
 
-#: src/gui/actions.c:791
+#: src/gui/actions.c:797
 msgid "Backspace"
 msgstr ""
 
@@ -166,7 +166,7 @@ msgstr "Não foi possível converter o código de página da área de trabalho p
 msgid "Can't copy non rectangular area"
 msgstr "Não é possível copiar áreas não retangulares"
 
-#: src/gui/plugin.c:507
+#: src/gui/plugin.c:508
 #, c-format
 msgid "Can't create action \"%s\"(\"%s\",\"%s\",\"%s\") when loading %s"
 msgstr "Não foi possível criar ação·\"%s\"(\"%s\",\"%s\",\"%s\")·ao carregar·%s"
@@ -178,7 +178,7 @@ msgid ""
 "%s"
 msgstr "Não foi possível criar arquivo temporário:\n%s"
 
-#: src/gui/actions.c:1061
+#: src/gui/actions.c:1067
 #, c-format
 msgid ""
 "Can't find UI definitions in\n"
@@ -186,7 +186,7 @@ msgid ""
 msgstr "Não encontrei definições de interface em\n"
 "%s"
 
-#: src/gui/actions.c:1079 src/plugins/rexx/plg_start.c:123
+#: src/gui/actions.c:1085 src/plugins/rexx/plg_start.c:123
 #, c-format
 msgid "Can't load %s"
 msgstr "Não foi possível carregar %s"
@@ -198,7 +198,7 @@ msgid ""
 "%s"
 msgstr "Não foi possível carregar %s\n%s"
 
-#: src/gui/actions.c:1077
+#: src/gui/actions.c:1083
 #, c-format
 msgid "Can't load %s: %s"
 msgstr "Não foi possível carregar %s: %s"
@@ -230,7 +230,7 @@ msgstr "Não foi possível gravar %s"
 msgid "Can't send \"%s\""
 msgstr "Não foi possível enviar arquivo \"%s\""
 
-#: src/gui/actions.c:1223
+#: src/gui/actions.c:1229
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
@@ -334,11 +334,11 @@ msgstr "Esquema de cores padrão 2"
 msgid "Default Color set 1"
 msgstr "Esquema de cores padrão 1"
 
-#: src/gui/actions.c:785
+#: src/gui/actions.c:791
 msgid "Delete Char"
 msgstr ""
 
-#: src/gui/actions.c:773
+#: src/gui/actions.c:779
 msgid "Delete Word"
 msgstr "Apagar palavra"
 
@@ -350,7 +350,7 @@ msgstr ""
 msgid "Dump screen"
 msgstr "Salvar captura de tela"
 
-#: src/gui/actions.c:1245
+#: src/gui/actions.c:1251
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
@@ -376,7 +376,11 @@ msgstr "Apagar\n"
 msgid "Erase EOF"
 msgstr "Apagar campo"
 
-#: src/gui/actions.c:779
+#: src/gui/actions.c:767
+msgid "Erase EOL"
+msgstr ""
+
+#: src/gui/actions.c:785
 msgid "Erase Field"
 msgstr "Apagar campo"
 
@@ -388,7 +392,11 @@ msgstr "Apagar campos"
 msgid "Erase to the end of the field"
 msgstr "Apagar até o final do campo"
 
-#: src/gui/actions.c:1216
+#: src/gui/actions.c:768
+msgid "Erase to the end of the field or line"
+msgstr "Apaga até o final da linha ou campo"
+
+#: src/gui/actions.c:1222
 #, c-format
 msgid ""
 "Error loading %s\n"
@@ -396,7 +404,7 @@ msgid ""
 msgstr "Erro lendo %s\n"
 "%s"
 
-#: src/gui/actions.c:1170 src/gui/actions.c:1273
+#: src/gui/actions.c:1176 src/gui/actions.c:1279
 #, c-format
 msgid ""
 "Error saving %s\n"
@@ -440,7 +448,7 @@ msgstr ""
 msgid "File transfer failed"
 msgstr "Transferência de arquivo falhou"
 
-#: src/gui/actions.c:767
+#: src/gui/actions.c:773
 msgid "First Field"
 msgstr ""
 
@@ -452,7 +460,7 @@ msgstr "Fixo"
 msgid "Fixed path and filename for load/save the configuration data"
 msgstr "Caminho e nome do arquivo para ler/gravar dados de configuração"
 
-#: src/gui/print.c:222
+#: src/gui/print.c:216
 msgid "Font"
 msgstr "Fonte"
 
@@ -500,7 +508,7 @@ msgstr "Identificador do host"
 msgid "Host is TSO"
 msgstr ""
 
-#: src/gui/actions.c:1328
+#: src/gui/actions.c:1334
 msgid "Hostname:"
 msgstr "Endereço do servidor:"
 
@@ -520,7 +528,7 @@ msgstr "Intensificado/Desprotegido"
 msgid "Invalid action"
 msgstr "Ação inválida"
 
-#: src/gui/plugin.c:485
+#: src/gui/plugin.c:486
 #, c-format
 msgid "Invalid action \"%s\" when loading %s"
 msgstr "Ação \"%s\" inválida ao carregar %s"
@@ -549,7 +557,7 @@ msgstr "Esquerda"
 msgid "Line Wrap"
 msgstr ""
 
-#: src/gui/actions.c:208 src/gui/actions.c:1187
+#: src/gui/actions.c:208 src/gui/actions.c:1193
 msgid "Load screen dump"
 msgstr "Carregar captura de tela"
 
@@ -658,7 +666,7 @@ msgstr "Por favor, aguarde"
 msgid "Please, try again in a few moments"
 msgstr "Por favor, tente novamente em alguns instantes"
 
-#: src/gui/actions.c:1331
+#: src/gui/actions.c:1337
 msgid "Port:"
 msgstr "Porta:"
 
@@ -780,7 +788,7 @@ msgstr "Executa script na inicialização (Se disponível)"
 msgid "Save"
 msgstr "Salvar"
 
-#: src/gui/actions.c:1295
+#: src/gui/actions.c:1301
 msgid "Save clipboard contents"
 msgstr "Salvar área de transferência"
 
@@ -792,7 +800,7 @@ msgstr "Salvar cópia"
 msgid "Save screen"
 msgstr "Salvar tela"
 
-#: src/gui/actions.c:1285
+#: src/gui/actions.c:1291
 msgid "Save screen contents"
 msgstr "Salvar conteúdo da tela"
 
@@ -800,7 +808,7 @@ msgstr "Salvar conteúdo da tela"
 msgid "Save selected"
 msgstr "Salvar seleção"
 
-#: src/gui/actions.c:1290
+#: src/gui/actions.c:1296
 msgid "Save selected text"
 msgstr "Salvar texto selecionado"
 
@@ -829,7 +837,7 @@ msgstr ""
 msgid "Secondary space:"
 msgstr ""
 
-#: src/gui/actions.c:1313
+#: src/gui/actions.c:1319
 msgid "Secure connection"
 msgstr "Conexão segura"
 
@@ -877,7 +885,7 @@ msgstr "Selecione arquivo a enviar"
 msgid "Select font"
 msgstr "Selecionar fonte"
 
-#: src/gui/actions.c:1314
+#: src/gui/actions.c:1320
 msgid "Select hostname"
 msgstr "Selecionar servidor"
 
@@ -945,7 +953,7 @@ msgstr "Colar inteligente"
 msgid "Space allocation units"
 msgstr "Unidade de alocação de espaço"
 
-#: src/gui/actions.c:797
+#: src/gui/actions.c:803
 msgid "Sys Req"
 msgstr ""
 
@@ -1024,7 +1032,7 @@ msgstr "Não foi possível salvar a configuração em %s"
 msgid "Undefined"
 msgstr "Indefinido"
 
-#: src/gui/actions.c:1170 src/gui/actions.c:1216 src/gui/actions.c:1273
+#: src/gui/actions.c:1176 src/gui/actions.c:1222 src/gui/actions.c:1279
 #: src/gui/clipboard.c:124 src/gui/clipboard.c:214 src/gui/clipboard.c:297
 #: src/gui/plugin.c:275 src/gui/plugin.c:302 src/plugins/rexx/plg_start.c:126
 msgid "Unexpected error"
