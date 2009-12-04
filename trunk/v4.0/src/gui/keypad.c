@@ -142,7 +142,7 @@
 	LARGE_BUTTON(GTK_STOCK_GOTO_LAST,action_NextField,1,8);
 	LARGE_TEXT_BUTTON( _( "Clear" ), action_ClearFields, 0, 9);
 	LARGE_TEXT_BUTTON( _( "Reset" ), action_Reset, 1, 9);
-	LARGE_TEXT_BUTTON( _( "Erase\nEOF" ), action_EraseEOF, 0, 10);
+	LARGE_TEXT_BUTTON( _( "Erase\nEOF" ), lib3270_EraseEOF, 0, 10);
 	LARGE_TEXT_BUTTON( _( "Erase\nInput" ), action_EraseInput, 1, 10);
 
 

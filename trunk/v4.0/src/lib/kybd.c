@@ -2691,7 +2691,11 @@ EraseEOF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 }
  */
 
-LIB3270_EXPORT int action_EraseEOF(void)
+/**
+ * Erase End Of Line Key.
+ *
+ */
+LIB3270_EXPORT int lib3270_EraseEOL(void)
 {
 	register int	baddr;
 	register unsigned char	fa;
@@ -2701,7 +2705,73 @@ LIB3270_EXPORT int action_EraseEOF(void)
 	reset_idle_timer();
 	if (kybdlock)
 	{
-		enq_ta((void (*)(Widget, XEvent *, String *, Cardinal *)) action_EraseEOF, CN, CN);
+		enq_ta((void (*)(Widget, XEvent *, String *, Cardinal *)) lib3270_EraseEOL, CN, CN);
+		return 0;
+	}
+#if defined(X3270_ANSI) /*[*/
+	if (IN_ANSI)
+		return 0;
+#endif /*]*/
+
+	baddr = cursor_addr;
+	fa = get_field_attribute(baddr);
+	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa)
+	{
+		operator_error(KL_OERR_PROTECTED);
+		return -1;
+	}
+
+	if (formatted)
+	{
+		/* erase to next field attribute or current line */
+		do
+		{
+			ctlr_add(baddr, EBC_null, 0);
+			INC_BA(baddr);
+		} while (!ea_buf[baddr].fa && BA_TO_COL(baddr) > 0);
+
+		mdt_set(cursor_addr);
+	}
+	else
+	{
+		/* erase to end of current line */
+		do
+		{
+			ctlr_add(baddr, EBC_null, 0);
+			INC_BA(baddr);
+		} while(baddr != 0 && BA_TO_COL(baddr) > 0);
+	}
+
+	/* If the cursor was in a DBCS subfield, re-create the SI. */
+	d = ctlr_lookleft_state(cursor_addr, &why);
+	if (IS_DBCS(d) && why == DBCS_SUBFIELD) {
+		if (d == DBCS_RIGHT) {
+			baddr = cursor_addr;
+			DEC_BA(baddr);
+			ea_buf[baddr].cc = EBC_si;
+		} else
+			ea_buf[cursor_addr].cc = EBC_si;
+	}
+	(void) ctlr_dbcs_postprocess();
+	screen_disp();
+	return 0;
+}
+
+/**
+ * Erase End Of Field Key.
+ *
+ */
+LIB3270_EXPORT int lib3270_EraseEOF(void)
+{
+	register int	baddr;
+	register unsigned char	fa;
+	enum dbcs_state d;
+	enum dbcs_why why = DBCS_FIELD;
+
+	reset_idle_timer();
+	if (kybdlock)
+	{
+		enq_ta((void (*)(Widget, XEvent *, String *, Cardinal *)) lib3270_EraseEOF, CN, CN);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
