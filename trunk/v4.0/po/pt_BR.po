@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-04 15:50-0200\n"
-"PO-Revision-Date: 2009-12-04 15:51-0200\n"
+"POT-Creation-Date: 2009-12-07 15:24-0200\n"
+"PO-Revision-Date: 2009-12-07 15:24-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -372,14 +372,6 @@ msgid ""
 msgstr "Apagar\n"
 "campos"
 
-#: src/gui/actions.c:761
-msgid "Erase EOF"
-msgstr "Apagar campo"
-
-#: src/gui/actions.c:767
-msgid "Erase EOL"
-msgstr ""
-
 #: src/gui/actions.c:785
 msgid "Erase Field"
 msgstr "Apagar campo"
@@ -387,6 +379,14 @@ msgstr "Apagar campo"
 #: src/gui/actions.c:192
 msgid "Erase input"
 msgstr "Apagar campos"
+
+#: src/gui/actions.c:761
+msgid "Erase to end of field"
+msgstr "Limpar até o final do campo"
+
+#: src/gui/actions.c:767
+msgid "Erase to end of line"
+msgstr "Limpar até o final da linha"
 
 #: src/gui/actions.c:762
 msgid "Erase to the end of the field"
@@ -460,7 +460,7 @@ msgstr "Fixo"
 msgid "Fixed path and filename for load/save the configuration data"
 msgstr "Caminho e nome do arquivo para ler/gravar dados de configuração"
 
-#: src/gui/print.c:216
+#: src/gui/print.c:217
 msgid "Font"
 msgstr "Fonte"
 

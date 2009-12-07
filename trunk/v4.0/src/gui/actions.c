@@ -758,13 +758,13 @@
 
  	static const struct call_3270 action_info[] =
 	{
-		{ "EraseEOF",		N_( "Erase EOF" ),
+		{ "EraseEOF",		N_( "Erase to end of field" ),
 							N_( "Erase to the end of the field" ),
 							NULL,
 							lib3270_EraseEOF,
 							"End" },
 
-		{ "EraseEOL",		N_( "Erase EOL" ),
+		{ "EraseEOL",		N_( "Erase to end of line" ),
 							N_( "Erase to the end of the field or line" ),
 							NULL,
 							lib3270_EraseEOL,

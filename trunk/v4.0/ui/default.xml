@@ -40,13 +40,13 @@
 		<menu action='ScriptsMenu' />
 
 		<menu action='NetworkMenu'>
+			<menuitem action='SetHostname' />
 			<menuitem action='Connect' />
 			<menuitem action='Disconnect' />
 		</menu>
 
 		<menu action='SettingsMenu'>
 			<menuitem action='SelectColors' />
-			<menuitem action='SetHostname' />
 			<menuitem action='FontSettings' />
 
 			<menu action='OptionsMenu'>
