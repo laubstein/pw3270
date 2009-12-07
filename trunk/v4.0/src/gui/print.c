@@ -200,6 +200,7 @@
  {
 	GKeyFile			*conf	= GetConf();
  	GtkPrintOperation	*prt;
+ 	const gchar			*font;
 
  	if(!text)
 		return -EINVAL;
@@ -211,7 +212,15 @@
 
 	// Set job parameters
 	g_object_set_data_full(G_OBJECT(prt),"3270Text",g_strsplit(g_strchomp(text),"\n",-1),(void (*)(gpointer)) g_strfreev);
-	g_object_set_data_full(G_OBJECT(prt),"3270FontName",g_strdup(GetString("Print","Font","Courier 10")),g_free);
+
+	// Set print
+	font = GetString("Print","Font","");
+	if(!*font)
+		font = GetString("Terminal","Font","Courier");
+
+	Trace("Fonte para impressao: \"%s\"",font);
+
+	g_object_set_data_full(G_OBJECT(prt),"3270FontName",g_strdup(font),g_free);
 
 	// Configure print operation
 	gtk_print_operation_set_job_name(prt,name);
