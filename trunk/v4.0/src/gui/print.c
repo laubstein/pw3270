@@ -146,7 +146,6 @@
 #endif
 
 #if ! GTK_CHECK_VERSION(2,12,0)
-
  static void SavePrintSetting(const gchar *key, const gchar *value, GKeyFile *cfg)
  {
  	 g_key_file_set_string(cfg, "PrintSettings", key, value);
@@ -156,15 +155,20 @@
  static void print_done(GtkPrintOperation *prt, GtkPrintOperationResult result, gpointer user_data)
  {
 	GKeyFile 				*conf		= GetConf();
+
 #ifdef HAVE_PRINT_FONT_DIALOG
 	gchar					*ptr;
 #endif
+
 	GtkPrintSettings		*settings	= gtk_print_operation_get_print_settings(prt);
+
 #ifdef HAVE_PRINT_FONT_DIALOG
 	PangoFontDescription	*FontDescr	= (PangoFontDescription *) g_object_get_data(G_OBJECT(prt),"3270FontDescr");
 #endif
-	GtkPageSetup			*setup		= gtk_print_operation_get_default_page_setup(prt);
 
+#if GTK_CHECK_VERSION(2,12,0)
+	GtkPageSetup			*setup		= gtk_print_operation_get_default_page_setup(prt);
+#endif
 
 	if(!conf)
 		return;
@@ -259,24 +263,25 @@
 
 		gtk_print_operation_set_print_settings(prt,gtk_print_settings_new_from_key_file(conf,NULL,NULL));
 		gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new_from_key_file(conf,NULL,NULL));
-#else
-		settings = gtk_print_settings_new();
-		if(settings)
+#else // GTK_CHECK_VERSION(2,12,0)
 		{
-			gchar 				**list;
-			GtkPrintSettings	*settings;
-			int 				f;
-
-			list = g_key_file_get_keys(conf,"PrintSettings",NULL,NULL);
-			if(list)
+			GtkPrintSettings *settings = gtk_print_settings_new();
+			if(settings)
 			{
-				for(f=0;list[f];f++)
-					gtk_print_settings_set(settings,list[f],g_key_file_get_string(conf,"PrintSettings",list[f],NULL));
-				g_strfreev(list);
+				gchar 				**list;
+				int 				f;
+
+				list = g_key_file_get_keys(conf,"PrintSettings",NULL,NULL);
+				if(list)
+				{
+					for(f=0;list[f];f++)
+						gtk_print_settings_set(settings,list[f],g_key_file_get_string(conf,"PrintSettings",list[f],NULL));
+					g_strfreev(list);
+				}
 			}
+			gtk_print_operation_set_print_settings(prt,settings);
+			gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new());
 		}
-		gtk_print_operation_set_print_settings(prt,settings);
-		gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new());
 #endif
 	}
 	else
