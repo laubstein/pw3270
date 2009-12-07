@@ -145,7 +145,8 @@
 
 #endif
 
-#if GTK_CHECK_VERSION(2,12,0)
+#if ! GTK_CHECK_VERSION(2,12,0)
+
  static void SavePrintSetting(const gchar *key, const gchar *value, GKeyFile *cfg)
  {
  	 g_key_file_set_string(cfg, "PrintSettings", key, value);

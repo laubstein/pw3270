@@ -9,6 +9,8 @@
 		</menu>
 
 		<menu action='EditMenu' >
+			<menuitem action='EraseEOF'/>
+			<menuitem action='EraseEOL'/>
 		</menu>
 
 		<menu action='ViewMenu' >
