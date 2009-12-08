@@ -402,7 +402,9 @@ int main(int argc, char *argv[])
 
 #endif
 
+#ifdef LC_ALL
 	setlocale( LC_ALL, "" );
+#endif
 
 #if defined( LOCALEDIR )
 
