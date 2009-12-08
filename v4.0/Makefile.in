@@ -146,7 +146,7 @@ Debug:		$(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) \
 
 run: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(PACKAGE).@LOGOEXT@
 #	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
-	@bin/Debug/@PROGRAM_NAME@ --program-data="."
+	@bin/Debug/@PROGRAM_NAME@ --program-data="." --plugin-path=./bin/Debug/plugins
 
 memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(PACKAGE).@LOGOEXT@
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
