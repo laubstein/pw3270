@@ -221,6 +221,7 @@
 	extern gchar					*program_config_filename_and_path;
 
 #ifdef HAVE_PLUGINS
+	extern gchar					*plugin_path;
 	extern gchar					*plugin_list;
 #endif
 

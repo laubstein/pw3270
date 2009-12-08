@@ -330,6 +330,7 @@ static void load_options(GOptionContext *context)
 
 #ifdef HAVE_PLUGINS
 		{ "plugins",	 		'p', 0, G_OPTION_ARG_STRING, 	&plugin_list,						N_( "Full path of plugins to load" ),									NULL },
+		{ "plugin-path",	 	'P', 0, G_OPTION_ARG_STRING, 	&plugin_path,						N_( "Path to search for plugins" ),										NULL },
 #endif
 
 		{ NULL }

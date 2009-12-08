@@ -64,6 +64,7 @@
 #ifdef HAVE_PLUGINS
  static GSList *plugins		= NULL;
  gchar			*plugin_list	= NULL;
+ gchar			*plugin_path	= NULL;
 #endif
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
@@ -145,23 +146,30 @@
 	else
 	{
 		// Scan for all available plugins
+		if(plugin_path)
+		{
+			scan_for_plugins(plugin_path);
+		}
+		else
+		{
 #if defined( DEBUG )
-		path = g_build_filename(".","plugins",NULL);
-		scan_for_plugins(path);
-		g_free(path);
+			path = g_build_filename(".","plugins",NULL);
+			scan_for_plugins(path);
+			g_free(path);
 #elif defined(_WIN32)
-		path = g_build_filename(program_data,"plugins",NULL);
-		scan_for_plugins(path);
-		g_free(path);
+			path = g_build_filename(program_data,"plugins",NULL);
+			scan_for_plugins(path);
+			g_free(path);
 #elif defined( LIBDIR )
-		path = g_build_filename(LIBDIR,PACKAGE_NAME,"plugins",NULL);
-		scan_for_plugins(path);
-		g_free(path);
+			path = g_build_filename(LIBDIR,PACKAGE_NAME,"plugins",NULL);
+			scan_for_plugins(path);
+			g_free(path);
 #else
-		path = g_build_filename(program_data,"plugins",NULL);
-		scan_for_plugins(path);
-		g_free(path);
+			path = g_build_filename(program_data,"plugins",NULL);
+			scan_for_plugins(path);
+			g_free(path);
 #endif
+		}
 	}
 
 #endif
