@@ -172,6 +172,9 @@ return rx3270GetWidgetData(self~widget,name)
 ::method show
 return rx3270SetWidgetVisibleState(self~widget,1)
 
+::method hide
+return rx3270SetWidgetVisibleState(self~widget,0)
+
 /*-------------------------------------------------------------------------------*/
 /* Message dialog                                                                */
 /*-------------------------------------------------------------------------------*/
