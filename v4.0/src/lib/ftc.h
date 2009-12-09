@@ -20,20 +20,19 @@
 
 #if defined(X3270_FT) /*[*/
 
-extern Boolean ascii_flag;
-extern Boolean cr_flag;
-extern unsigned long ft_length;
-extern FILE *ft_local_file;
-extern char *ft_local_filename;
+LIB3270_INTERNAL Boolean ascii_flag;
+LIB3270_INTERNAL Boolean cr_flag;
+LIB3270_INTERNAL unsigned long ft_length;
+LIB3270_INTERNAL FILE *ft_local_file;
+LIB3270_INTERNAL char *ft_local_filename;
 
-extern Boolean ft_last_cr;
-extern Boolean remap_flag;
+LIB3270_INTERNAL Boolean ft_last_cr;
+LIB3270_INTERNAL Boolean remap_flag;
 
-extern void ft_aborting(void);
-extern void ft_complete(const char *errmsg);
-// extern void ft_init(void);
-extern void ft_running(Boolean is_cut);
-extern void ft_update_length(void);
+LIB3270_INTERNAL void ft_aborting(void);
+LIB3270_INTERNAL void ft_complete(const char *errmsg);
+LIB3270_INTERNAL void ft_running(Boolean is_cut);
+LIB3270_INTERNAL void ft_update_length(void);
 
 /*
 extern void PA_dialog_focus_action(Widget w, XEvent *event, String *parms,

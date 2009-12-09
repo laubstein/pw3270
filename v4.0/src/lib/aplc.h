@@ -17,4 +17,4 @@
  *		Global declarations for apl.c.
  */
 
-extern KeySym APLStringToKeysym(char *s, int *is_gep);
+LIB3270_INTERNAL KeySym APLStringToKeysym(char *s, int *is_gep);

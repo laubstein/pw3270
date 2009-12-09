@@ -14,5 +14,5 @@
 
 /* Non-display version of popupsc.h */
 
-extern void popup_an_errno(int errn, const char *fmt, ...);
-extern void action_output(const char *fmt, ...);
+LIB3270_INTERNAL void popup_an_errno(int errn, const char *fmt, ...);
+LIB3270_INTERNAL void action_output(const char *fmt, ...);

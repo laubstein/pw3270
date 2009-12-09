@@ -35,9 +35,9 @@
 	extern void Disconnect_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
 */
 
-	extern void st_changed(int tx, int mode);
-	extern void hostfile_init(void);
-	extern void host_connected(void);
-	extern void host_in3270(enum cstate);
+	LIB3270_INTERNAL void st_changed(int tx, int mode);
+	LIB3270_INTERNAL void hostfile_init(void);
+	LIB3270_INTERNAL void host_connected(void);
+	LIB3270_INTERNAL void host_in3270(enum cstate);
 
 

@@ -19,19 +19,19 @@
 
 #if defined(X3270_MENUS) /*[*/
 
-extern void HandleMenu_action(Widget w, XEvent *event, String *params,
+LIB3270_INTERNAL void HandleMenu_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 #if defined(X3270_SCRIPT) /*[*/
-extern void menubar_as_set(Boolean sensitive);
+LIB3270_INTERNAL void menubar_as_set(Boolean sensitive);
 #else /*][*/
 #define menubar_as_set(n)
 #endif /*]*/
-extern void menubar_init(Widget container, Dimension overall_width,
+LIB3270_INTERNAL void menubar_init(Widget container, Dimension overall_width,
     Dimension current_width);
-extern void menubar_keypad_changed(void);
-extern Dimension menubar_qheight(Dimension container_width);
-extern void menubar_resize(Dimension width);
-extern void menubar_retoggle(struct toggle *t);
+LIB3270_INTERNAL void menubar_keypad_changed(void);
+LIB3270_INTERNAL Dimension menubar_qheight(Dimension container_width);
+LIB3270_INTERNAL void menubar_resize(Dimension width);
+LIB3270_INTERNAL void menubar_retoggle(struct toggle *t);
 
 #else /*][*/
 

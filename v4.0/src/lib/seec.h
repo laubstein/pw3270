@@ -20,14 +20,14 @@
 
 #if defined(X3270_TRACE) /*[*/
 
-extern const char *see_aid(unsigned char code);
-extern const char *see_attr(unsigned char fa);
-extern const char *see_color(unsigned char setting);
-extern const char *see_ebc(unsigned char ch);
-extern const char *see_efa(unsigned char efa, unsigned char value);
-extern const char *see_efa_only(unsigned char efa);
-extern const char *see_qcode(unsigned char id);
-extern const char *unknown(unsigned char value);
+LIB3270_INTERNAL const char *see_aid(unsigned char code);
+LIB3270_INTERNAL const char *see_attr(unsigned char fa);
+LIB3270_INTERNAL const char *see_color(unsigned char setting);
+LIB3270_INTERNAL const char *see_ebc(unsigned char ch);
+LIB3270_INTERNAL const char *see_efa(unsigned char efa, unsigned char value);
+LIB3270_INTERNAL const char *see_efa_only(unsigned char efa);
+LIB3270_INTERNAL const char *see_qcode(unsigned char id);
+LIB3270_INTERNAL const char *unknown(unsigned char value);
 
 #else /*][*/
 

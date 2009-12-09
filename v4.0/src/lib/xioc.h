@@ -17,11 +17,11 @@
  *		Global declarations for xio.c.
  */
 
-extern void Quit_action(Widget w, XEvent *event, String *params,
+LIB3270_INTERNAL void Quit_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern void x3270_exit(int n);
-extern void x_add_input(int net_sock);
-extern void x_except_off(void);
-extern void x_except_on(int net_sock);
-extern void x_remove_input(void);
+LIB3270_INTERNAL void x3270_exit(int n);
+LIB3270_INTERNAL void x_add_input(int net_sock);
+LIB3270_INTERNAL void x_except_off(void);
+LIB3270_INTERNAL void x_except_on(int net_sock);
+LIB3270_INTERNAL void x_remove_input(void);
 

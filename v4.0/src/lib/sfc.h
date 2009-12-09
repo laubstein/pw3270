@@ -17,4 +17,4 @@
  *		Global declarations for sf.c.
  */
 
-extern enum pds write_structured_field(unsigned char buf[], int buflen);
+LIB3270_INTERNAL enum pds write_structured_field(unsigned char buf[], int buflen);

@@ -20,7 +20,7 @@
  */
 
 /* Output buffer. */
-extern unsigned char *obuf, *obptr;
+LIB3270_INTERNAL unsigned char *obuf, *obptr;
 
 /* Spelled-out tty control character. */
 struct ctl_char {
@@ -28,35 +28,35 @@ struct ctl_char {
 	char value[3];
 };
 
-extern void net_abort(void);
-extern Boolean net_add_dummy_tn3270e(void);
-extern void net_add_eor(unsigned char *buf, int len);
-extern void net_break(void);
-extern void net_charmode(void);
-extern int net_connect(const char *, char *, Boolean, Boolean *, Boolean *);
-extern void net_disconnect(void);
-extern void net_exception(void);
-extern int net_getsockname(void *buf, int *len);
-extern void net_hexansi_out(unsigned char *buf, int len);
-extern void net_input(void);
-extern void net_interrupt(void);
-extern void net_linemode(void);
-extern struct ctl_char *net_linemode_chars(void);
-extern void net_output(void);
-extern const char *net_query_bind_plu_name(void);
-extern const char *net_query_connection_state(void);
-extern const char *net_query_host(void);
-extern const char *net_query_lu_name(void);
-extern void net_sendc(char c);
-extern void net_sends(const char *s);
-extern void net_send_erase(void);
-extern void net_send_kill(void);
-extern void net_send_werase(void);
-extern Boolean net_snap_options(void);
-extern void space3270out(int n);
-extern const char *tn3270e_current_opts(void);
-extern void trace_netdata(char direction, unsigned const char *buf, int len);
-extern void popup_a_sockerr(char *fmt, ...) printflike(1, 2);
-extern char *net_proxy_type(void);
-extern char *net_proxy_host(void);
-extern char *net_proxy_port(void);
+LIB3270_INTERNAL void net_abort(void);
+LIB3270_INTERNAL Boolean net_add_dummy_tn3270e(void);
+LIB3270_INTERNAL void net_add_eor(unsigned char *buf, int len);
+LIB3270_INTERNAL void net_break(void);
+LIB3270_INTERNAL void net_charmode(void);
+LIB3270_INTERNAL int net_connect(const char *, char *, Boolean, Boolean *, Boolean *);
+LIB3270_INTERNAL void net_disconnect(void);
+LIB3270_INTERNAL void net_exception(void);
+LIB3270_INTERNAL int net_getsockname(void *buf, int *len);
+LIB3270_INTERNAL void net_hexansi_out(unsigned char *buf, int len);
+LIB3270_INTERNAL void net_input(void);
+LIB3270_INTERNAL void net_interrupt(void);
+LIB3270_INTERNAL void net_linemode(void);
+LIB3270_INTERNAL struct ctl_char *net_linemode_chars(void);
+LIB3270_INTERNAL void net_output(void);
+LIB3270_INTERNAL const char *net_query_bind_plu_name(void);
+LIB3270_INTERNAL const char *net_query_connection_state(void);
+LIB3270_INTERNAL const char *net_query_host(void);
+LIB3270_INTERNAL const char *net_query_lu_name(void);
+LIB3270_INTERNAL void net_sendc(char c);
+LIB3270_INTERNAL void net_sends(const char *s);
+LIB3270_INTERNAL void net_send_erase(void);
+LIB3270_INTERNAL void net_send_kill(void);
+LIB3270_INTERNAL void net_send_werase(void);
+LIB3270_INTERNAL Boolean net_snap_options(void);
+LIB3270_INTERNAL void space3270out(int n);
+LIB3270_INTERNAL const char *tn3270e_current_opts(void);
+LIB3270_INTERNAL void trace_netdata(char direction, unsigned const char *buf, int len);
+LIB3270_INTERNAL void popup_a_sockerr(char *fmt, ...) printflike(1, 2);
+LIB3270_INTERNAL char *net_proxy_type(void);
+LIB3270_INTERNAL char *net_proxy_host(void);
+LIB3270_INTERNAL char *net_proxy_port(void);

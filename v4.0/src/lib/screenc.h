@@ -21,38 +21,38 @@
 #define screen_obscured()	False
 #define screen_scroll()
 
-extern void ring_bell(void);
-extern void screen_132(void);
-extern void screen_80(void);
-extern void screen_erase(void);
-extern void screen_init(void);
-extern void screen_flip(void);
-extern FILE *start_pager(void);
-extern Boolean screen_new_display_charsets(char *cslist, char *csname);
-extern void mcursor_locked();
-extern void mcursor_normal();
-extern void mcursor_waiting();
-extern void notify_toggle_changed(int ix, int value, int reason);
+LIB3270_INTERNAL void ring_bell(void);
+LIB3270_INTERNAL void screen_132(void);
+LIB3270_INTERNAL void screen_80(void);
+LIB3270_INTERNAL void screen_erase(void);
+LIB3270_INTERNAL void screen_init(void);
+LIB3270_INTERNAL void screen_flip(void);
+LIB3270_INTERNAL FILE *start_pager(void);
+LIB3270_INTERNAL Boolean screen_new_display_charsets(char *cslist, char *csname);
+LIB3270_INTERNAL void mcursor_locked();
+LIB3270_INTERNAL void mcursor_normal();
+LIB3270_INTERNAL void mcursor_waiting();
+LIB3270_INTERNAL void notify_toggle_changed(int ix, int value, int reason);
 
-extern Boolean escaped;
+LIB3270_INTERNAL Boolean escaped;
 
-extern void Escape_action(Widget w, XEvent *event, String *params,
+LIB3270_INTERNAL void Escape_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern void Help_action(Widget w, XEvent *event, String *params,
+LIB3270_INTERNAL void Help_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern void Redraw_action(Widget w, XEvent *event, String *params,
+LIB3270_INTERNAL void Redraw_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern void Trace_action(Widget w, XEvent *event, String *params,
+LIB3270_INTERNAL void Trace_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern void Show_action(Widget w, XEvent *event, String *params,
+LIB3270_INTERNAL void Show_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 
 #if defined(WC3270) /*[*/
-extern void Paste_action(Widget w, XEvent *event, String *params,
+LIB3270_INTERNAL void Paste_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern void Title_action(Widget w, XEvent *event, String *params,
+LIB3270_INTERNAL void Title_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern int windows_cp;
+LIB3270_INTERNAL int windows_cp;
 #endif /*]*/
 
-extern void screen_title(char *text);
+LIB3270_INTERNAL void screen_title(char *text);

@@ -1,6 +1,6 @@
 /* IShellLinkDataList, missing from mingw's <shlobj.h>. */
 
-extern const GUID IID_IShellLinkDataList;
+LIB3270_INTERNAL const GUID IID_IShellLinkDataList;
 
 #define INTERFACE IShellLinkDataList
 DECLARE_INTERFACE_(IShellLinkDataList, IUnknown)

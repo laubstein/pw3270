@@ -20,12 +20,12 @@
 /* glue.c */
 // extern int parse_command_line(int argc, const char **argv, const char **cl_hostname);
 // extern int parse_program_parameters(int argc, const char **argv);
-extern void parse_xrm(const char *arg, const char *where);
+LIB3270_INTERNAL void parse_xrm(const char *arg, const char *where);
 
 
 /* XtGlue.c */
-extern void (*Warning_redirect)(const char *);
+LIB3270_INTERNAL void (*Warning_redirect)(const char *);
+
 #if !defined(_WIN32) /*[*/
-extern int select_setup(int *nfds, fd_set *readfds, fd_set *writefds,
-    fd_set *exceptfds, struct timeval **timeout, struct timeval *timebuf);
+LIB3270_INTERNAL int select_setup(int *nfds, fd_set *readfds, fd_set *writefds,fd_set *exceptfds, struct timeval **timeout, struct timeval *timebuf);
 #endif /*]*/

@@ -17,6 +17,6 @@
  *		Declarations for proxy.c.
  */
 
-extern int proxy_setup(char **phost, char **pport);
-extern int proxy_negotiate(int type, int fd, char *host, unsigned short port);
-extern char *proxy_type_name(int type);
+LIB3270_INTERNAL int proxy_setup(char **phost, char **pport);
+LIB3270_INTERNAL int proxy_negotiate(int type, int fd, char *host, unsigned short port);
+LIB3270_INTERNAL char *proxy_type_name(int type);

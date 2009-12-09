@@ -17,14 +17,14 @@
  *		Global declarations for print.c.
  */
 
-extern Boolean fprint_screen(FILE *f, Boolean even_if_empty, Boolean use_html);
-extern void PrintText_action(Widget w, XEvent *event, String *params,
+LIB3270_INTERNAL Boolean fprint_screen(FILE *f, Boolean even_if_empty, Boolean use_html);
+LIB3270_INTERNAL void PrintText_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern void PrintWindow_action(Widget w, XEvent *event, String *params,
+LIB3270_INTERNAL void PrintWindow_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-extern void print_text_option(Widget w, XtPointer client_data,
+LIB3270_INTERNAL void print_text_option(Widget w, XtPointer client_data,
     XtPointer call_data);
-extern void print_window_option(Widget w, XtPointer client_data,
+LIB3270_INTERNAL void print_window_option(Widget w, XtPointer client_data,
     XtPointer call_data);
-extern void save_text_option(Widget w, XtPointer client_data,
+LIB3270_INTERNAL void save_text_option(Widget w, XtPointer client_data,
     XtPointer call_data);
