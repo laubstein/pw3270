@@ -460,11 +460,11 @@ $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 	@cp LICENSE $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp LICENÇA $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 
-	mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
-	cp -r image/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
+	@cp -r image/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
 
-	mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/ui
-	cp -r ui/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/ui
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/ui
+	@cp -r ui/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/ui
 
 	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/po
 	@cp -r po/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/po
@@ -475,6 +475,10 @@ $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/scripts
 	@cp -r scripts/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/scripts
 
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/debian
+	@cp -r debian/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/debian
+
+	@rm -f $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/debian/control
 	@rm -f $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/Makefile
 	@rm -f $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/*.layout
 	@tar --create --gzip --verbose --directory $(TMPDIR)/$(PACKAGE).tmp --exclude=.svn --file=$@ $(PACKAGE)-$(PACKAGE_VERSION)
