@@ -24,42 +24,44 @@ enum pds {
 	PDS_BAD_ADDR = -2	/* command contained a bad address */
 };
 
-void ctlr_aclear(int baddr, int count, int clear_ea);
-void ctlr_add(int baddr, unsigned char c, unsigned char cs);
-void ctlr_add_bg(int baddr, unsigned char color);
-void ctlr_add_cs(int baddr, unsigned char cs);
-void ctlr_add_fa(int baddr, unsigned char fa, unsigned char cs);
-void ctlr_add_fg(int baddr, unsigned char color);
-void ctlr_add_gr(int baddr, unsigned char gr);
-void ctlr_altbuffer(Boolean alt);
-Boolean ctlr_any_data(void);
-void ctlr_bcopy(int baddr_from, int baddr_to, int count, int move_ea);
-void ctlr_changed(int bstart, int bend);
-void ctlr_clear(Boolean can_snap);
-void ctlr_erase_all_unprotected(void);
-void ctlr_init(unsigned cmask);
-void ctlr_read_buffer(unsigned char aid_byte);
-void ctlr_read_modified(unsigned char aid_byte, Boolean all);
-void ctlr_reinit(unsigned cmask);
-void ctlr_scroll(void);
-void ctlr_shrink(void);
-void ctlr_snap_buffer(void);
-Boolean ctlr_snap_modes(void);
-void ctlr_wrapping_memmove(int baddr_to, int baddr_from, int count);
-enum pds ctlr_write(unsigned char buf[], int buflen, Boolean erase);
-void ctlr_write_sscp_lu(unsigned char buf[], int buflen);
-struct ea *fa2ea(int baddr);
+LIB3270_INTERNAL void ctlr_aclear(int baddr, int count, int clear_ea);
+LIB3270_INTERNAL void ctlr_add(int baddr, unsigned char c, unsigned char cs);
+LIB3270_INTERNAL void ctlr_add_bg(int baddr, unsigned char color);
+LIB3270_INTERNAL void ctlr_add_cs(int baddr, unsigned char cs);
+LIB3270_INTERNAL void ctlr_add_fa(int baddr, unsigned char fa, unsigned char cs);
+LIB3270_INTERNAL void ctlr_add_fg(int baddr, unsigned char color);
+LIB3270_INTERNAL void ctlr_add_gr(int baddr, unsigned char gr);
+LIB3270_INTERNAL void ctlr_altbuffer(Boolean alt);
+LIB3270_INTERNAL Boolean ctlr_any_data(void);
+LIB3270_INTERNAL void ctlr_bcopy(int baddr_from, int baddr_to, int count, int move_ea);
+LIB3270_INTERNAL void ctlr_changed(int bstart, int bend);
+LIB3270_INTERNAL void ctlr_clear(Boolean can_snap);
+LIB3270_INTERNAL void ctlr_erase_all_unprotected(void);
+LIB3270_INTERNAL void ctlr_init(unsigned cmask);
+LIB3270_INTERNAL void ctlr_read_buffer(unsigned char aid_byte);
+LIB3270_INTERNAL void ctlr_read_modified(unsigned char aid_byte, Boolean all);
+LIB3270_INTERNAL void ctlr_reinit(unsigned cmask);
+LIB3270_INTERNAL void ctlr_scroll(void);
+LIB3270_INTERNAL void ctlr_shrink(void);
+LIB3270_INTERNAL void ctlr_snap_buffer(void);
+LIB3270_INTERNAL Boolean ctlr_snap_modes(void);
+LIB3270_INTERNAL void ctlr_wrapping_memmove(int baddr_to, int baddr_from, int count);
+LIB3270_INTERNAL enum pds ctlr_write(unsigned char buf[], int buflen, Boolean erase);
+LIB3270_INTERNAL void ctlr_write_sscp_lu(unsigned char buf[], int buflen);
+LIB3270_INTERNAL struct ea *fa2ea(int baddr);
 
-Boolean get_bounded_field_attribute(register int baddr, register int bound, unsigned char *fa_out);
-void mdt_clear(int baddr);
-void mdt_set(int baddr);
-int next_unprotected(int baddr0);
-enum pds process_ds(unsigned char *buf, int buflen);
-void ps_process(void);
+LIB3270_INTERNAL Boolean get_bounded_field_attribute(register int baddr, register int bound, unsigned char *fa_out);
+LIB3270_INTERNAL void mdt_clear(int baddr);
+LIB3270_INTERNAL void mdt_set(int baddr);
+LIB3270_INTERNAL int next_unprotected(int baddr0);
+LIB3270_INTERNAL enum pds process_ds(unsigned char *buf, int buflen);
+LIB3270_INTERNAL void ps_process(void);
+
 #define set_rows_cols(mn,ovc,ovr) ctlr_set_rows_cols(mn,ovc,ovr)
-void ticking_start(Boolean anyway);
-void toggle_nop(struct toggle *t, enum toggle_type tt);
-void toggle_showTiming(struct toggle *t, enum toggle_type tt);
+
+LIB3270_INTERNAL void ticking_start(Boolean anyway);
+LIB3270_INTERNAL void toggle_nop(struct toggle *t, enum toggle_type tt);
+LIB3270_INTERNAL void toggle_showTiming(struct toggle *t, enum toggle_type tt);
 
 enum dbcs_state {
 	DBCS_NONE = 0,		/* position is not DBCS */
@@ -91,9 +93,9 @@ enum dbcs_state {
 enum dbcs_why { DBCS_FIELD, DBCS_SUBFIELD, DBCS_ATTRIBUTE };
 
 #if defined(X3270_DBCS) /*[*/
-enum dbcs_state ctlr_dbcs_state(int baddr);
-extern enum dbcs_state ctlr_lookleft_state(int baddr, enum dbcs_why *why);
-int ctlr_dbcs_postprocess(void);
+LIB3270_INTERNAL enum dbcs_state ctlr_dbcs_state(int baddr);
+LIB3270_INTERNAL enum dbcs_state ctlr_lookleft_state(int baddr, enum dbcs_why *why);
+LIB3270_INTERNAL int ctlr_dbcs_postprocess(void);
 #else /*][*/
 #define ctlr_dbcs_state(b)		DBCS_NONE
 #define ctlr_lookleft_state(b, w)	DBCS_NONE

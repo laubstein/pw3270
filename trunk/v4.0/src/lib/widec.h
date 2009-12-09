@@ -19,16 +19,16 @@
 #if defined(X3270_DBCS) /*[*/
 #include <unicode/ucnv.h>
 
-extern int wide_init(char *dbcs_converters, char *local_name);
-extern void dbcs_to_display(unsigned char ebc1, unsigned char ebc2,
+LIB3270_INTERNAL int wide_init(char *dbcs_converters, char *local_name);
+LIB3270_INTERNAL void dbcs_to_display(unsigned char ebc1, unsigned char ebc2,
     unsigned char c[]);
-extern void dbcs_to_unicode16(unsigned char ebc1, unsigned char ebc2,
+LIB3270_INTERNAL void dbcs_to_unicode16(unsigned char ebc1, unsigned char ebc2,
     unsigned char c[]);
 
-extern int dbcs_to_mb(unsigned char ebc1, unsigned char ebc2, char *mb);
-extern int sbcs_to_mb(unsigned char ebc, char *mb);
-extern int mb_to_unicode(char *mb, int mblen, UChar *u, int ulen,
+LIB3270_INTERNAL int dbcs_to_mb(unsigned char ebc1, unsigned char ebc2, char *mb);
+LIB3270_INTERNAL int sbcs_to_mb(unsigned char ebc, char *mb);
+LIB3270_INTERNAL int mb_to_unicode(char *mb, int mblen, UChar *u, int ulen,
     UErrorCode *err);
-extern int dbcs_map8(UChar, unsigned char *);
-extern int dbcs_map16(UChar, unsigned char *);
+LIB3270_INTERNAL int dbcs_map8(UChar, unsigned char *);
+LIB3270_INTERNAL int dbcs_map16(UChar, unsigned char *);
 #endif /*]*/

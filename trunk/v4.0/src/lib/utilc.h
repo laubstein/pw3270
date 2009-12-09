@@ -18,33 +18,33 @@
  *		Global declarations for util.c.
  */
 
-extern void add_resource(const char *name, const char *value);
-extern char *ctl_see(int c);
-extern char *do_subst(const char *s, Boolean do_vars, Boolean do_tilde);
-extern void fcatv(FILE *f, char *s);
-extern const char *get_message(const char *key);
-extern char *get_fresource(const char *fmt, ...) printflike(1, 2);
-extern char *get_resource(const char *name);
-extern char *scatv(const char *s, char *buf, size_t len);
-extern int split_dbcs_resource(const char *value, char sep, char **part1,
+LIB3270_INTERNAL void add_resource(const char *name, const char *value);
+LIB3270_INTERNAL char *ctl_see(int c);
+LIB3270_INTERNAL char *do_subst(const char *s, Boolean do_vars, Boolean do_tilde);
+LIB3270_INTERNAL void fcatv(FILE *f, char *s);
+LIB3270_INTERNAL const char *get_message(const char *key);
+LIB3270_INTERNAL char *get_fresource(const char *fmt, ...) printflike(1, 2);
+LIB3270_INTERNAL char *get_resource(const char *name);
+LIB3270_INTERNAL char *scatv(const char *s, char *buf, size_t len);
+LIB3270_INTERNAL int split_dbcs_resource(const char *value, char sep, char **part1,
     char **part2);
-extern int split_dresource(char **st, char **left, char **right);
-extern int split_lresource(char **st, char **value);
-extern char *strip_whitespace(const char *s);
-extern char *xs_buffer(const char *fmt, ...) printflike(1, 2);
-extern void xs_error(const char *fmt, ...) printflike(1, 2);
-extern void xs_warning(const char *fmt, ...) printflike(1, 2);
+LIB3270_INTERNAL int split_dresource(char **st, char **left, char **right);
+LIB3270_INTERNAL int split_lresource(char **st, char **value);
+LIB3270_INTERNAL char *strip_whitespace(const char *s);
+LIB3270_INTERNAL char *xs_buffer(const char *fmt, ...) printflike(1, 2);
+LIB3270_INTERNAL void xs_error(const char *fmt, ...) printflike(1, 2);
+LIB3270_INTERNAL void xs_warning(const char *fmt, ...) printflike(1, 2);
 
-extern unsigned long AddInput(int, void (*)(void));
-extern unsigned long AddExcept(int, void (*)(void));
-extern unsigned long AddOutput(int, void (*)(void));
-extern void RemoveInput(unsigned long);
-extern unsigned long AddTimeOut(unsigned long msec, void (*fn)(void));
-extern void RemoveTimeOut(unsigned long cookie);
-extern KeySym StringToKeysym(char *s);
-extern char *KeysymToString(KeySym k);
-extern int read_resource_file(const char *filename, Boolean fatal);
-extern Boolean split_hier(char *label, char **base, char ***parents);
+LIB3270_INTERNAL unsigned long AddInput(int, void (*)(void));
+LIB3270_INTERNAL unsigned long AddExcept(int, void (*)(void));
+LIB3270_INTERNAL unsigned long AddOutput(int, void (*)(void));
+LIB3270_INTERNAL void RemoveInput(unsigned long);
+LIB3270_INTERNAL unsigned long AddTimeOut(unsigned long msec, void (*fn)(void));
+LIB3270_INTERNAL void RemoveTimeOut(unsigned long cookie);
+LIB3270_INTERNAL KeySym StringToKeysym(char *s);
+LIB3270_INTERNAL char *KeysymToString(KeySym k);
+LIB3270_INTERNAL int read_resource_file(const char *filename, Boolean fatal);
+LIB3270_INTERNAL Boolean split_hier(char *label, char **base, char ***parents);
 
 typedef struct {
 	char *buf;
@@ -52,7 +52,7 @@ typedef struct {
 	int cur_len;
 } rpf_t;
 
-extern void rpf_init(rpf_t *r);
-extern void rpf_reset(rpf_t *r);
-extern void rpf(rpf_t *r, char *fmt, ...) printflike(2, 3);
-extern void rpf_free(rpf_t *r);
+LIB3270_INTERNAL void rpf_init(rpf_t *r);
+LIB3270_INTERNAL void rpf_reset(rpf_t *r);
+LIB3270_INTERNAL void rpf(rpf_t *r, char *fmt, ...) printflike(2, 3);
+LIB3270_INTERNAL void rpf_free(rpf_t *r);

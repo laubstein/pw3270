@@ -12,4 +12,4 @@
  * for more details.
  */
 
-extern void ft_cut_data(void);
+LIB3270_INTERNAL void ft_cut_data(void);

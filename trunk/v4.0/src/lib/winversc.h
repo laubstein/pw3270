@@ -11,7 +11,7 @@
  * FOR A PARTICULAR PURPOSE.  See the file LICENSE for more details.
  */
 
-extern int is_nt;
-extern int has_ipv6;
+LIB3270_INTERNAL int is_nt;
+LIB3270_INTERNAL int has_ipv6;
 
-extern int get_version_info(void);
+LIB3270_INTERNAL int get_version_info(void);

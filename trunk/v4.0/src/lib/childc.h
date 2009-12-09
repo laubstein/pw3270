@@ -18,8 +18,8 @@
  */
 
 #if defined(X3270_DISPLAY) || defined(C3270) /*[*/
-extern int fork_child(void);
-extern void child_ignore_output(void);
+LIB3270_INTERNAL int fork_child(void);
+LIB3270_INTERNAL void child_ignore_output(void);
 #else /*][*/
 #define fork_child()	fork()
 #define child_ignore_output()

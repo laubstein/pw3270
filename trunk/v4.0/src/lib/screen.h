@@ -15,11 +15,11 @@
 /* Non-display version of screen.h */
 
 #define SELECTED(baddr)	False
-extern int *char_width, *char_height;
-extern Boolean screen_has_changes;
+LIB3270_INTERNAL int *char_width, *char_height;
+LIB3270_INTERNAL Boolean screen_has_changes;
 
-void screen_changed(int bstart, int bend);
+LIB3270_INTERNAL void screen_changed(int bstart, int bend);
 
-extern void status_connecting(Boolean on);
-extern void status_resolving(Boolean on);
+LIB3270_INTERNAL void status_connecting(Boolean on);
+LIB3270_INTERNAL void status_resolving(Boolean on);
 

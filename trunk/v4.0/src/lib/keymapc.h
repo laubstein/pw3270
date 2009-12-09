@@ -21,8 +21,8 @@
 #define KM_RALT		0x0010
 #define KM_ALT		(KM_LALT | KM_RALT)
 
-extern void keymap_init(void);
-extern char *lookup_key(unsigned long xk, unsigned long state);
-extern void keymap_dump(void);
-extern const char *decode_key(int k, int hint, char *buf);
-extern const char *lookup_cname(unsigned long ccode, Boolean special_only);
+LIB3270_INTERNAL void keymap_init(void);
+LIB3270_INTERNAL char *lookup_key(unsigned long xk, unsigned long state);
+LIB3270_INTERNAL void keymap_dump(void);
+LIB3270_INTERNAL const char *decode_key(int k, int hint, char *buf);
+LIB3270_INTERNAL const char *lookup_cname(unsigned long ccode, Boolean special_only);

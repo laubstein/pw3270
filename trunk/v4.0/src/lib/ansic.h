@@ -19,17 +19,17 @@
 
 #if defined(X3270_ANSI) /*[*/
 
-extern void ansi_init(void);
-extern void ansi_process(unsigned int c);
-extern void ansi_send_clear(void);
-extern void ansi_send_down(void);
-extern void ansi_send_home(void);
-extern void ansi_send_left(void);
-extern void ansi_send_pa(int nn);
-extern void ansi_send_pf(int nn);
-extern void ansi_send_right(void);
-extern void ansi_send_up(void);
-extern void toggle_lineWrap(struct toggle *t, enum toggle_type type);
+LIB3270_INTERNAL void ansi_init(void);
+LIB3270_INTERNAL void ansi_process(unsigned int c);
+LIB3270_INTERNAL void ansi_send_clear(void);
+LIB3270_INTERNAL void ansi_send_down(void);
+LIB3270_INTERNAL void ansi_send_home(void);
+LIB3270_INTERNAL void ansi_send_left(void);
+LIB3270_INTERNAL void ansi_send_pa(int nn);
+LIB3270_INTERNAL void ansi_send_pf(int nn);
+LIB3270_INTERNAL void ansi_send_right(void);
+LIB3270_INTERNAL void ansi_send_up(void);
+LIB3270_INTERNAL void toggle_lineWrap(struct toggle *t, enum toggle_type type);
 
 #else /*][*/
 

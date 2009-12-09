@@ -35,7 +35,7 @@
  *		Hostname resolution.
  */
 
-
+#include "globals.h"
 
 #if defined(W3N4) || defined(W3N46) /*[*/
 	#error Deprecated

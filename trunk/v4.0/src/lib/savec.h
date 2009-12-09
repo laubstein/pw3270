@@ -16,4 +16,4 @@
 
 #define save_yourself()
 
-extern char *command_string;
+LIB3270_INTERNAL char *command_string;
