@@ -38,6 +38,8 @@
 	#undef PACKAGE_VERSION
 	#undef PACKAGE_REVISION
 
+	#undef HAVE_GNUC_VISIBILITY
+
 	#undef HAVE_LIBSSL
 	#undef HAVE_ICONV
 	#undef HAVE_PLUGINS
@@ -90,6 +92,5 @@
 	/* #undef IMPLNAME */
 	#undef OFFICE_HOME
 	#undef OFFICE_PROGRAM
-
 
 #endif /* CONFIG_H_INCLUDED */

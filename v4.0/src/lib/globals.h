@@ -32,11 +32,23 @@
 
 /* Autoconf settings. */
 #include <lib3270/config.h>			/* autoconf settings */
+
+/* From glibconfig.h */
+#if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
+	#define LIB3270_INTERNAL __hidden extern
+#elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
+	#define LIB3270_INTERNAL __attribute__((visibility("hidden"))) extern
+#else
+	#define LIB3270_INTERNAL
+	#warning Exporting internal calls
+#endif
+
 #if defined(X3270_TN3270E) && !defined(X3270_ANSI) /*[*/
-#define X3270_ANSI	1	/* RFC2355 requires NVT mode */
+		#define X3270_ANSI	1	/* RFC2355 requires NVT mode */
 #endif /*]*/
+
 #if defined(HAVE_VASPRINTF) && !defined(_GNU_SOURCE) /*[*/
-#define _GNU_SOURCE		/* vasprintf isn't POSIX */
+	#define _GNU_SOURCE		/* vasprintf isn't POSIX */
 #endif /*]*/
 
 /*
@@ -49,11 +61,11 @@
  *   Use only blocking sockets.
  */
 #if defined(sco) /*[*/
-#define BLOCKING_CONNECT_ONLY	1
+	#define BLOCKING_CONNECT_ONLY	1
 #endif /*]*/
 
 #if defined(apollo) /*[*/
-#define BLOCKING_CONNECT_ONLY	1
+	#define BLOCKING_CONNECT_ONLY	1
 #endif /*]*/
 
 /*
@@ -62,11 +74,11 @@
 
 /* 'unused' explicitly flags an unused parameter */
 #if defined(__GNUC__) /*[*/
-#define unused __attribute__((__unused__))
-#define printflike(s,f) __attribute__ ((__format__ (__printf__, s, f)))
+	#define unused __attribute__((__unused__))
+	#define printflike(s,f) __attribute__ ((__format__ (__printf__, s, f)))
 #else /*][*/
-#define unused /* nothing */
-#define printflike(s, f) /* nothing */
+	#define unused /* nothing */
+	#define printflike(s, f) /* nothing */
 #endif /*]*/
 
 
@@ -88,28 +100,31 @@
  * Cancel out contradictory parts.
  */
 #if !defined(X3270_DISPLAY) /*[*/
-#undef X3270_KEYPAD
-#undef X3270_MENUS
+	#undef X3270_KEYPAD
+	#undef X3270_MENUS
 #endif /*]*/
 
 /* Local process (-e) header files. */
 #if defined(X3270_LOCAL_PROCESS) && defined(HAVE_LIBUTIL) /*[*/
-#define LOCAL_PROCESS	1
-#include <termios.h>
-#if defined(HAVE_PTY_H) /*[*/
-#include <pty.h>
-#endif /*]*/
-#if defined(HAVE_LIBUTIL_H) /*[*/
-#include <libutil.h>
-#endif /*]*/
-#if defined(HAVE_UTIL_H) /*[*/
-#include <util.h>
-#endif /*]*/
+	#define LOCAL_PROCESS	1
+	#include <termios.h>
+
+	#if defined(HAVE_PTY_H) /*[*/
+		#include <pty.h>
+	#endif /*]*/
+
+	#if defined(HAVE_LIBUTIL_H) /*[*/
+		#include <libutil.h>
+	#endif /*]*/
+
+	#if defined(HAVE_UTIL_H) /*[*/
+		#include <util.h>
+	#endif /*]*/
 #endif /*]*/
 
 /* Functions we may need to supply. */
 #if defined(NEED_STRTOK_R) /*[*/
-extern char *strtok_r(char *str, const char *sep, char **last);
+	extern char *strtok_r(char *str, const char *sep, char **last);
 #endif /*]*/
 
 /* Stop conflicting with curses' COLS, even if we don't link with it. */
@@ -127,89 +142,108 @@ enum iaction {
 
 /* Simple global variables */
 
-extern int		COLS;
-extern int		ROWS;
-#if defined(X3270_DISPLAY) /*[*/
-extern Atom		a_3270, a_registry, a_encoding;
-extern XtAppContext	appcontext;
-#endif /*]*/
-extern const char	*build;
-extern const char	*build_rpq_timestamp;
-extern const char 	*build_rpq_version;
-extern int		children;
-extern char		*connected_lu;
-extern char		*connected_type;
-extern char		*current_host;
-extern unsigned short	current_port;
-#if defined(X3270_DBCS) /*[*/
-extern Boolean		dbcs;
-#endif /*]*/
-#if defined(X3270_FT) /*[*/
-extern int		dft_buffersize;
-#endif /*]*/
-extern char		*efontname;
-extern Boolean		ever_3270;
-extern Boolean		exiting;
-#if defined(X3270_DISPLAY) /*[*/
-extern Boolean		*extended_3270font;
-extern Font		*fid;
-extern Boolean		*font_8bit;
-#endif /*]*/
-extern Boolean		flipped;
-extern char		*full_current_host;
-extern char		*full_efontname;
-#if defined(X3270_DBCS) /*[*/
-extern char		*full_efontname_dbcs;
-#endif /*]*/
-extern char		full_model_name[];
-extern char		*funky_font;
-extern char		*hostname;
-#if defined(X3270_DBCS) /*[*/
-extern char		*local_encoding;
-#if defined(X3270_DISPLAY) /*[*/
-extern char		*locale_name;
-#endif /*]*/
-#endif /*]*/
-extern char		luname[];
-#if defined(LOCAL_PROCESS) /*[*/
-extern Boolean		local_process;
-#endif /*]*/
-extern int		maxCOLS;
-extern int		maxROWS;
-extern char		*model_name;
-extern int		model_num;
-extern Boolean		no_login_host;
-extern Boolean		non_tn3270e_host;
-extern int		ov_cols, ov_rows;
-extern Boolean		passthru_host;
-extern const char	*programname;
-extern char		*qualified_host;
-extern char		*reconnect_host;
-extern int		screen_depth;
-extern Boolean		scroll_initted;
-#if defined(HAVE_LIBSSL) /*[*/
-extern Boolean		secure_connection;
-#endif /*]*/
-extern Boolean		shifted;
-extern Boolean		ssl_host;
-extern Boolean		*standard_font;
-extern Boolean		std_ds_host;
-extern char		*termtype;
-extern Widget		toplevel;
-extern Boolean		visible_control;
-extern int		*xtra_width;
+LIB3270_INTERNAL int		COLS;
+LIB3270_INTERNAL int		ROWS;
 
 #if defined(X3270_DISPLAY) /*[*/
-extern Atom		a_delete_me;
-extern Atom		a_save_yourself;
-extern Atom		a_state;
-extern Display		*display;
-extern Pixmap		gray;
-extern Pixel		keypadbg_pixel;
-extern XrmDatabase	rdb;
-extern Window		root_window;
-extern char		*user_title;
-extern unsigned char	xk_selector;
+	LIB3270_INTERNAL Atom		a_3270, a_registry, a_encoding;
+	LIB3270_INTERNAL XtAppContext	appcontext;
+#endif /*]*/
+
+LIB3270_INTERNAL const char		*build;
+LIB3270_INTERNAL const char		*build_rpq_timestamp;
+LIB3270_INTERNAL const char 		*build_rpq_version;
+LIB3270_INTERNAL int				children;
+LIB3270_INTERNAL char				*connected_lu;
+LIB3270_INTERNAL char				*connected_type;
+LIB3270_INTERNAL char				*current_host;
+LIB3270_INTERNAL unsigned short	current_port;
+
+#if defined(X3270_DBCS) /*[*/
+	LIB3270_INTERNAL Boolean		dbcs;
+#endif /*]*/
+
+#if defined(X3270_FT) /*[*/
+	LIB3270_INTERNAL int		dft_buffersize;
+#endif /*]*/
+
+LIB3270_INTERNAL char			*efontname;
+LIB3270_INTERNAL Boolean		ever_3270;
+LIB3270_INTERNAL Boolean		exiting;
+
+#if defined(X3270_DISPLAY) /*[*/
+	LIB3270_INTERNAL Boolean		*extended_3270font;
+	LIB3270_INTERNAL Font			*fid;
+	LIB3270_INTERNAL Boolean		*font_8bit;
+#endif /*]*/
+
+LIB3270_INTERNAL Boolean	flipped;
+LIB3270_INTERNAL char		*full_current_host;
+LIB3270_INTERNAL char		*full_efontname;
+
+#if defined(X3270_DBCS) /*[*/
+	LIB3270_INTERNAL char	*full_efontname_dbcs;
+#endif /*]*/
+
+#define FULL_MODEL_NAME_SIZE 13
+LIB3270_INTERNAL char		full_model_name[FULL_MODEL_NAME_SIZE];
+LIB3270_INTERNAL char		*funky_font;
+LIB3270_INTERNAL char		*hostname;
+
+#if defined(X3270_DBCS) /*[*/
+	LIB3270_INTERNAL char	*local_encoding;
+
+	#if defined(X3270_DISPLAY) /*[*/
+		LIB3270_INTERNAL char	*locale_name;
+	#endif /*]*/
+
+#endif /*]*/
+
+#define         LUNAME_SIZE     16
+LIB3270_INTERNAL char		luname[LUNAME_SIZE+1];
+
+#if defined(LOCAL_PROCESS) /*[*/
+	LIB3270_INTERNAL Boolean	local_process;
+#endif /*]*/
+
+LIB3270_INTERNAL int			maxCOLS;
+LIB3270_INTERNAL int			maxROWS;
+LIB3270_INTERNAL char			*model_name;
+LIB3270_INTERNAL int			model_num;
+LIB3270_INTERNAL Boolean		no_login_host;
+LIB3270_INTERNAL Boolean		non_tn3270e_host;
+LIB3270_INTERNAL int			ov_cols, ov_rows;
+LIB3270_INTERNAL Boolean		passthru_host;
+LIB3270_INTERNAL const char	*programname;
+LIB3270_INTERNAL char			*qualified_host;
+LIB3270_INTERNAL char			*reconnect_host;
+LIB3270_INTERNAL int			screen_depth;
+LIB3270_INTERNAL Boolean		scroll_initted;
+
+#if defined(HAVE_LIBSSL) /*[*/
+	LIB3270_INTERNAL Boolean	secure_connection;
+#endif /*]*/
+
+LIB3270_INTERNAL Boolean		shifted;
+LIB3270_INTERNAL Boolean		ssl_host;
+LIB3270_INTERNAL Boolean		*standard_font;
+LIB3270_INTERNAL Boolean		std_ds_host;
+LIB3270_INTERNAL char			*termtype;
+LIB3270_INTERNAL Widget			toplevel;
+LIB3270_INTERNAL Boolean		visible_control;
+LIB3270_INTERNAL int			*xtra_width;
+
+#if defined(X3270_DISPLAY) /*[*/
+	LIB3270_INTERNAL Atom				a_delete_me;
+	LIB3270_INTERNAL Atom				a_save_yourself;
+	LIB3270_INTERNAL Atom				a_state;
+	LIB3270_INTERNAL Display			*display;
+	LIB3270_INTERNAL Pixmap				gray;
+	LIB3270_INTERNAL Pixel				keypadbg_pixel;
+	LIB3270_INTERNAL XrmDatabase		rdb;
+	LIB3270_INTERNAL Window				root_window;
+	LIB3270_INTERNAL char				*user_title;
+	LIB3270_INTERNAL unsigned char	xk_selector;
 #endif /*]*/
 
 /* Data types and complex global variables */
@@ -250,7 +284,7 @@ struct trans_list {
 	Boolean			from_server;
 	struct trans_list	*next;
 };
-extern struct trans_list *trans_list;
+LIB3270_INTERNAL struct trans_list *trans_list;
 
 /*   input key type */
 // enum keytype { KT_STD, KT_GE };
@@ -294,27 +328,27 @@ enum state_change
 /*   Equivalent of setlinebuf */
 
 #if defined(_IOLBF) /*[*/
-#define SETLINEBUF(s)	setvbuf(s, (char *)NULL, _IOLBF, BUFSIZ)
+	#define SETLINEBUF(s)	setvbuf(s, (char *)NULL, _IOLBF, BUFSIZ)
 #else /*][*/
-#define SETLINEBUF(s)	setlinebuf(s)
+	#define SETLINEBUF(s)	setlinebuf(s)
 #endif /*]*/
 
 /*   Motorola version of gettimeofday */
 
 #if defined(MOTOROLA)
-#define gettimeofday(tp,tz)	gettimeofday(tp)
+	#define gettimeofday(tp,tz)	gettimeofday(tp)
 #endif
 
 /* Default DFT file transfer buffer size. */
 #if defined(X3270_FT) && !defined(DFT_BUF) /*[*/
-#define DFT_BUF		(4 * 1024)
+	#define DFT_BUF		(4 * 1024)
 #endif /*]*/
 
 /* DBCS Preedit Types */
 #if defined(X3270_DBCS) /*[*/
-#define PT_ROOT			"Root"
-#define PT_OVER_THE_SPOT	"OverTheSpot"
-#define PT_OFF_THE_SPOT		"OffTheSpot"
-#define PT_ON_THE_SPOT		"OnTheSpot"
+	#define PT_ROOT			"Root"
+	#define PT_OVER_THE_SPOT	"OverTheSpot"
+	#define PT_OFF_THE_SPOT		"OffTheSpot"
+	#define PT_ON_THE_SPOT		"OnTheSpot"
 #endif /*]*/
 

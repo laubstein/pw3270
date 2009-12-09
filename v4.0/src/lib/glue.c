@@ -111,7 +111,7 @@ static int parse_model_number(char *m);
 
 /* Globals */
 const char		*programname;
-char			full_model_name[13] = "IBM-";
+char			full_model_name[FULL_MODEL_NAME_SIZE] = "IBM-";
 char			*model_name = &full_model_name[4];
 AppRes			appres;
 int				children = 0;
