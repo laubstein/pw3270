@@ -1,6 +1,7 @@
 #!/bin/bash
 
-RELEASE=2
+PACKAGE_VERSION=4.0
+PACKAGE_RELEASE=3
 
 svn update
 if [ "$?" == "0" ]; then
@@ -24,6 +25,10 @@ if [ "$?" == "0" ]; then
 
 fi
 
+if [ -e "debian/control.in" ]; then
+	sed "s/@PACKAGE_VERSION@/$PACKAGE_VERSION/g;s/@PACKAGE_RELEASE@/$PACKAGE_RELEASE/g" "debian/control.in" > "debian/control"
+fi
+
 aclocal
 if [ "$?" != "0" ]; then
 	exit -1
@@ -33,5 +38,8 @@ autoconf
 if [ "$?" != "0" ]; then
 	exit -1
 fi
+
+echo "pw3270 $PACKAGE_VERSION-$PACKAGE_RELEASE"
+
 
 
