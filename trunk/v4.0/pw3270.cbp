@@ -461,7 +461,6 @@
 		</Unit>
 		<Unit filename="src/gui/version.c.in" />
 		<Unit filename="src/include/X11/keysym.h" />
-		<Unit filename="src/include/globals.h" />
 		<Unit filename="src/include/lib3270.h" />
 		<Unit filename="src/include/lib3270/3270ds.h" />
 		<Unit filename="src/include/lib3270/actionsc.h" />
@@ -515,6 +514,10 @@
 		<Unit filename="src/lib/ft_dft_ds.h" />
 		<Unit filename="src/lib/ft_dftc.h" />
 		<Unit filename="src/lib/ftc.h" />
+		<Unit filename="src/lib/globals.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/lib/glue.c">
 			<Option compilerVar="CC" />
 		</Unit>
