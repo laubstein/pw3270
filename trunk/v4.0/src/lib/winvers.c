@@ -40,6 +40,7 @@
 #include <windows.h>
 #include <stdio.h>
 
+#include "globals.h"
 #include "winversc.h"
 
 int is_nt = 1;
