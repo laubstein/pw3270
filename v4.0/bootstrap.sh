@@ -21,7 +21,7 @@ if [ "$?" == "0" ]; then
 
 	echo "m4_define([SVN_REV], $REV)" > $REV_FILE
 	echo "m4_define([SVN_DATE], $LCD)" >> $REV_FILE
-	echo "m4_define([SVN_RELEASE], $RELEASE)" >> $REV_FILE
+	echo "m4_define([SVN_RELEASE], $PACKAGE_RELEASE)" >> $REV_FILE
 
 fi
 
