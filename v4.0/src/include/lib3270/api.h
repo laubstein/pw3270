@@ -44,10 +44,21 @@
 		#if defined(_WIN32)
 			#include <windows.h>
 
-			#define LIB3270_EXPORT __declspec (dllexport)
+			#define LIB3270_EXPORT	__declspec (dllexport)
+			#define LOCAL_EXTERN	extern
 
 		#else
 			#include <stdarg.h>
+
+			// http://gcc.gnu.org/wiki/Visibility
+			#if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
+					#define LOCAL_EXTERN __hidden extern
+			#elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
+					#define LOCAL_EXTERN __attribute__((visibility("hidden"))) extern
+			#else
+					#define LOCAL_EXTERN extern
+			#endif
+
 			#define LIB3270_EXPORT
 
 		#endif

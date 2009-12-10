@@ -93,7 +93,6 @@
 
 	/* include the lib3270 stuff */
 	#define LIB3270_MODULE_NAME "rexx"
-	#include <lib3270/config.h>
 	#include <lib3270/api.h>
 	#include <lib3270/plugins.h>
 	#include <lib3270/localdefs.h>
@@ -103,14 +102,14 @@
 	#define CONFIG_GROUP "Rexx"
 
 	/* Tools */
-	int				call_rexx(const gchar *prg, const gchar *arg);
-	RexxReturnCode	RetString(PRXSTRING Retstr, const char *value);
-	RexxReturnCode	RetValue(PRXSTRING Retstr, int value);
-	RexxReturnCode 	RetPointer(PRXSTRING Retstr, gpointer value);
-	RexxReturnCode	RetConvertedString(PRXSTRING Retstr, const char *value);
+	LOCAL_EXTERN int				  call_rexx(const gchar *prg, const gchar *arg);
+	LOCAL_EXTERN RexxReturnCode		  RetString(PRXSTRING Retstr, const char *value);
+	LOCAL_EXTERN RexxReturnCode		  RetValue(PRXSTRING Retstr, int value);
+	LOCAL_EXTERN RexxReturnCode 	  RetPointer(PRXSTRING Retstr, gpointer value);
+	LOCAL_EXTERN RexxReturnCode		  RetConvertedString(PRXSTRING Retstr, const char *value);
 
-	char   *GetStringArg(PRXSTRING arg);
-	void	ReleaseStringArg(char *str);
+	LOCAL_EXTERN char   			* GetStringArg(PRXSTRING arg);
+	LOCAL_EXTERN void				  ReleaseStringArg(char *str);
 
 	#define ReturnValue(x)  	return RetValue(Retstr,x)
 	#define ReturnString(x)		return RetString(Retstr,x)
@@ -186,14 +185,14 @@
 	RexxReturnCode REXXENTRY rx3270ProgressDialogSetText(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	RexxReturnCode REXXENTRY rx3270ProgressDialogPulse(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 
-	GtkWidget *getWidget(LONG Argc, RXSTRING Argv[]);
-	GtkMessageType getMessageDialogType(const char *arg);
-	RexxReturnCode RetGtkResponse(PRXSTRING Retstr, GtkResponseType type);
-	RexxReturnCode RaiseHaltSignal(void);
-	int IsHalted(void);
+	LOCAL_EXTERN GtkWidget 		* getWidget(LONG Argc, RXSTRING Argv[]);
+	LOCAL_EXTERN GtkMessageType	  getMessageDialogType(const char *arg);
+	LOCAL_EXTERN RexxReturnCode	  RetGtkResponse(PRXSTRING Retstr, GtkResponseType type);
+	LOCAL_EXTERN RexxReturnCode	  RaiseHaltSignal(void);
+	LOCAL_EXTERN int			  IsHalted(void);
 
 	/* Globals */
-	extern GtkWidget 	*program_window;
+	LOCAL_EXTERN GtkWidget		* program_window;
 
 #endif // RX3270_H_INCLUDED
 
