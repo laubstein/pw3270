@@ -167,21 +167,20 @@ if test x$g_have_gnuc_visibility = xyes; then
   AC_DEFINE(HAVE_GNUC_VISIBILITY, 1, [supports GCC visibility attributes])
 fi
 
-#
-#AC_MSG_CHECKING(whether $CC accepts -fvisibility=hidden)
-#AC_CACHE_VAL(pw3270_cv_fvisibility_ok,
-#[ac_save_cc="$CC"
-#CC="$CC -fvisibility=hidden"
-#AC_TRY_RUN([int main() { return 0; }],
-#  pw3270_cv_fvisibility_ok=yes,
-#  pw3270_cv_fvisibility_ok=no,
-#  pw3270_cv_fvisibility_ok=no)
-#CC="$ac_save_cc"])
-#AC_MSG_RESULT($pw3270_cv_fvisibility_ok)
-#if test $pw3270_cv_fvisibility_ok = yes; then
-#  CFLAGS="$CFLAGS -fvisibility=hidden"
-#fi
-#
+# Check for compiler visibility flag
+AC_MSG_CHECKING(whether $CC accepts -fvisibility=hidden)
+AC_CACHE_VAL(pw3270_cv_fvisibility_ok,
+[ac_save_cc="$CC"
+CC="$CC -fvisibility=hidden"
+AC_TRY_RUN([int main() { return 0; }],
+  pw3270_cv_fvisibility_ok=yes,
+  pw3270_cv_fvisibility_ok=no,
+  pw3270_cv_fvisibility_ok=no)
+CC="$ac_save_cc"])
+AC_MSG_RESULT($pw3270_cv_fvisibility_ok)
+if test $pw3270_cv_fvisibility_ok = yes; then
+  APP_CFLAGS="$APP_CFLAGS -fvisibility=hidden"
+fi
 
 # Optional
 AC_ARG_ENABLE([trace],
