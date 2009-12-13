@@ -106,6 +106,8 @@ Boolean remap_flag = True;				// Remap ASCII<->EBCDIC
 unsigned long ft_length = 0;			// Length of transfer
 static Boolean ft_is_cut;				// File transfer is CUT-style
 
+static struct timeval starting_time;	// Starting time
+
 static const struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to main application
 
 #define snconcat(x,s,fmt,...) snprintf(x+strlen(x),s-strlen(x),fmt,__VA_ARGS__)
@@ -129,7 +131,33 @@ static const struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to m
 	return 0;
  }
 
- int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft)
+ static int cant_start(int errcode, const char *errmsg)
+ {
+	if(callbacks && callbacks->complete)
+		callbacks->complete(errmsg,0,0,"");
+ 	return errcode;
+ }
+
+ LIB3270_EXPORT int CancelFileTransfer(int force)
+ {
+	if (ft_state == FT_RUNNING)
+	{
+		set_ft_state(FT_ABORT_WAIT);
+		if(callbacks && callbacks->aborting)
+			callbacks->aborting();
+		return 0;
+	}
+
+	if(!force)
+		return EBUSY;
+
+	// Impatient user or hung host -- just clean up.
+	ft_complete( _("Cancelled by user") );
+
+	return ECANCELED;
+ }
+
+ LIB3270_EXPORT int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft)
  {
  	static const char	*rec	= "fvu";
  	static const char	*un[]	= { "tracks", "cylinders", "avblock" };
@@ -145,20 +173,17 @@ static const struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to m
 	Trace("%s(%s)",__FUNCTION__,local);
 
 	if(ft_local_file)
-		return EBUSY;
+		return cant_start(EBUSY,_( "File transfer is busy"));
 
 	// Check remote file
 	if(!*remote)
-	{
-		Trace("Invalid host file: \"%s\"",remote);
-		return EINVAL;
-	}
+		return cant_start(EINVAL,_( "Invalid host file"));
 
 	// Open local file
 	ft_local_file = fopen(local,(flags & FT_FLAG_RECEIVE) ? ((flags & FT_FLAG_APPEND) ? "a" : "w") : "r");
 
 	if(!ft_local_file)
-		return errno;
+		return cant_start(errno,_( "Can't open local file"));
 
 	// Set options
 	dft_buffersize = dft;
@@ -241,7 +266,7 @@ static const struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to m
 		Log("Unable to send command \"%s\"",buffer);
 		fclose(ft_local_file);
 		ft_local_file = NULL;
-		return -1;
+		return cant_start(-1,_( "Unable to send file-transfer request"));
 	}
 
 	Trace("Command: \"%s\"",buffer);
@@ -1620,6 +1645,14 @@ overwrite_popdown(Widget w unused, XtPointer client_data unused,
 void
 ft_complete(const char *errmsg)
 {
+	double kbytes_sec = 0;
+	struct timeval	t1;
+
+	(void) gettimeofday(&t1, (struct timezone *)NULL);
+	kbytes_sec = (double)ft_length / 1024.0 /
+		((double)(t1.tv_sec - starting_time.tv_sec) +
+		 (double)(t1.tv_usec - starting_time.tv_usec) / 1.0e6);
+
 	Trace("%s",__FUNCTION__);
 
 	// Close the local file.
@@ -1636,8 +1669,10 @@ ft_complete(const char *errmsg)
 	// Clean up the state.
 	set_ft_state(FT_NONE);
 
+	ft_update_length();
+
 	if(callbacks && callbacks->complete)
-		callbacks->complete(errmsg);
+		callbacks->complete(errmsg,ft_length,kbytes_sec,ft_is_cut ? "CUT" : "DFT");
 
 /*
 #if defined(X3270_DISPLAY) && defined(X3270_MENUS)
@@ -1690,10 +1725,22 @@ ft_complete(const char *errmsg)
 void
 ft_update_length(void)
 {
+	double kbytes_sec = 0;
+
+	if(ft_length > 1024.0)
+	{
+		struct timeval	t1;
+
+		(void) gettimeofday(&t1, (struct timezone *)NULL);
+		kbytes_sec = (double)ft_length / 1024.0 /
+			((double)(t1.tv_sec - starting_time.tv_sec) +
+			 (double)(t1.tv_usec - starting_time.tv_usec) / 1.0e6);
+	}
+
 	Trace("%s",__FUNCTION__);
 
 	if(callbacks && callbacks->update)
-		callbacks->update(ft_length);
+		callbacks->update(ft_length,kbytes_sec);
 
 /*
 #if defined(X3270_DISPLAY) && defined(X3270_MENUS)
@@ -1719,11 +1766,15 @@ ft_running(Boolean is_cut)
 	ft_is_cut = is_cut;
 	ft_length = 0;
 
+	(void) gettimeofday(&starting_time, (struct timezone *)NULL);
+
 	if (ft_state == FT_AWAIT_ACK)
 		set_ft_state(FT_RUNNING);
 
 	if(callbacks && callbacks->running)
 		callbacks->running(is_cut);
+
+	ft_update_length();
 
 /*
 	(void) gettimeofday(&t0, (struct timezone *)NULL);

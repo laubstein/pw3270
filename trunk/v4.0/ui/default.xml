@@ -10,7 +10,10 @@
 			<menuitem action='PrintSelected'/>
 			<menuitem action='PrintClipboard'/>
 			<separator/>
-			<menu action='SendReceive'/>
+			<menu action='SendReceive'>
+				<menuitem action='Download'/>
+				<menuitem action='Upload'/>
+			</menu>
 			<menuitem action='Quit'/>
 		</menu>
 
