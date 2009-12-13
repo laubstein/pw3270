@@ -265,6 +265,8 @@
 
 #ifdef X3270_FT
 	int 		initft(void);
+	int 		create_ft_progress_dialog(void);
+
 #endif
 
 	gboolean	PFKey(guint key);

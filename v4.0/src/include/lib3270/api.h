@@ -191,14 +191,16 @@
 		};
 
 		LIB3270_EXPORT int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft);
+		LIB3270_EXPORT int CancelFileTransfer(int force);
 
 		struct filetransfer_callbacks
 		{
 			unsigned short sz;
 
 			void (*begin)(unsigned short flags, const char *local, const char *remote);
-			void (*complete)(const char *errmsg);
-			void (*update)(unsigned long length);
+			void (*complete)(const char *errmsg,unsigned long length,double kbytes_sec,const char *mode);
+			void (*setlength)(unsigned long length);
+			void (*update)(unsigned long length,double kbytes_sec);
 			void (*running)(int is_cut);
 			void (*aborting)(void);
 
