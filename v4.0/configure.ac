@@ -73,6 +73,7 @@ LD_APIFLAGS=""
 LD_RLSFLAGS="-Wl,--strip-all"
 LD=$CC
 PLUGINS=""
+PLUGINS_UI=""
 EXTENSIONS=""
 CPPUENV="gcc3"
 
@@ -383,12 +384,14 @@ if test "$pw3270_cv_rexx" == "yes"; then
 	REXX_CFLAGS="`$REXX_CONFIG --cflags`"
 	REXX_LIBS="`$REXX_CONFIG --libs`"
 	PLUGINS="rx3270 $PLUGINS"
+	PLUGINS_UI="rexx.xml $PLUGINS_UI"
 	EXTENSIONS="librx3270 $EXTENSIONS"
 elif test "$pw3270_cv_rexx" != "no"; then
 	AC_DEFINE(HAVE_REXX)
 	REXX_CFLAGS="-I$pw3270_cv_rexx/api"
 	REXX_LIBS="-L$pw3270_cv_rexx/api -lrexx -lrexxapi"
 	PLUGINS="rx3270 $PLUGINS"
+	PLUGINS_UI="rexx.xml $PLUGINS_UI"
 	EXTENSIONS="librx3270 $EXTENSIONS"
 fi
 
@@ -405,6 +408,8 @@ fi
 if test "$pw3270_cv_plugins" == "yes"; then
 	AC_DEFINE([HAVE_PLUGINS])
 	AC_SUBST(PLUGINS)
+	AC_SUBST(PLUGINS_UI)
+
 fi
 
 if test "$pw3270_cv_print_font" == "yes"; then

@@ -42,6 +42,7 @@ docdir ?= @docdir@
 LOCALEDIR ?= @localedir@
 
 PLUGINS ?= @PLUGINS@
+PLUGINS_UI ?= @PLUGINS_UI@
 EXTENSIONS ?= @EXTENSIONS@
 DLLEXT ?= @DLLEXT@
 
@@ -97,7 +98,7 @@ API_CFLAGS=@LIBSSL_CFLAGS@ @API_CFLAGS@
 API_LDFLAGS=@LIBSSL_LIBS@ @OS_LFLAGS@
 
 # Rexx parameters
-REXX_CFLAGS = @REXX_CFLAGS@
+REXX_CFLAGS ?= @REXX_CFLAGS@
 
 ifeq  ($(DLLEXT),.dll)
 	REXX_LDFLAGS = @REXX_LIBS@ @GTK_LIBS@ @OS_DLLFLAGS@ @LIBICONV@ -Wl,--exclude-symbols,REXXAPI_NULL_THUNK_DATA -Wl,--exclude-symbols,rexx_NULL_THUNK_DATA
@@ -418,9 +419,11 @@ install: Release po/pt_BR.po $(PACKAGE).desktop
 	@mkdir -p $(DESTDIR)/@includedir@/lib3270
 
 	@for i in $(TARGETS); do install --mode=755 bin/Release/$$i $(DESTDIR)/$(bindir); done
-	@for i in $(PLUGINS); do install --mode=755 bin/Release/plugins/$$i$(DLLEXT) $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins; done
 
-	@install --mode=755 bin/Release/lib3270.so $(DESTDIR)/$(LIBDIR)
+	@for i in $(PLUGINS); do install --mode=755 bin/Release/plugins/$$i$(DLLEXT) $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins; done
+	@for i in $(PLUGINS_UI); do install --mode=644 ui/$$i $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui; done
+
+	@install --mode=755 bin/Release/lib3270$(DLLEXT) $(DESTDIR)/$(LIBDIR)
 
 	@install --mode=644 ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/debug.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
