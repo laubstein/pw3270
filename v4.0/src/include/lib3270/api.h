@@ -458,7 +458,7 @@
 		LIB3270_EXPORT int action_NextField(void);
 		LIB3270_EXPORT int action_PreviousField(void);
 		LIB3270_EXPORT int action_FirstField(void);
-		LIB3270_EXPORT int action_Reset(void);
+		LIB3270_EXPORT int lib3270_Reset(void);
 
 		LIB3270_EXPORT int action_CursorUp(void);
 		LIB3270_EXPORT int action_CursorDown(void);
