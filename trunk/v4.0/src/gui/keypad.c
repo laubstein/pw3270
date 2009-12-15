@@ -44,16 +44,7 @@
 
  GtkWidget *keypad = NULL;
 
-/*---[ Implement ]----------------------------------------------------------------------------------------------*/
-
- static void set_visible(int visible, int reason)
- {
- 	if(visible)
-		gtk_widget_show(keypad);
-	else
-		gtk_widget_hide(keypad);
-
- }
+/*---[ Implement common calls ]---------------------------------------------------------------------------------*/
 
  static void pf_button(GtkButton *button, int key)
  {
@@ -65,33 +56,87 @@
  	action_PAKey(key);
  }
 
+ static void set_button_action(GtkWidget *widget, const gchar *action_name)
+ {
+#if GTK_CHECK_VERSION(2,16,0)
+	/* Find action by name, associate it with the button */
+	GtkAction *action = get_action_by_name(action_name);
+
+	Trace("Action(\"%s\")=%p",action_name,action);
+
+	if(action)
+	{
+		gtk_activatable_set_related_action(GTK_ACTIVATABLE(widget),action);
+	}
+	else
+	{
+		Log("Error loading keypad: action \"%s\" is undefined",action_name);
+		gtk_widget_set_sensitive(widget,FALSE);
+	}
+#else
+	/* Find action callback by name, associate it with "clicked" signal */
+	GCallback callback = get_action_callback_by_name(action_name);
+
+	Trace("Action(\"%s\")=%p",action_name,callback);
+
+	if(callback)
+	{
+		g_signal_connect(G_OBJECT(widget),"clicked",callback,0);
+	}
+	else
+	{
+		Log("Error loading keypad: action \"%s\" is undefined",action_name);
+		gtk_widget_set_sensitive(widget,FALSE);
+	}
+#endif
+
+ }
+
+/*---[ Implement Configurable keypad ]--------------------------------------------------------------------------*/
+
+
+
+
+/*---[ Implement Fixed Keypad ]---------------------------------------------------------------------------------*/
+
+ static void set_visible(int visible, int reason)
+ {
+ 	if(visible)
+		gtk_widget_show(keypad);
+	else
+		gtk_widget_hide(keypad);
+
+ }
+
+/*
  static void clear_and_call(GtkButton *button, int (*call)(void))
  {
  	action_ClearSelection();
  	if(call)
 		call();
  }
+*/
 
- static GtkWidget * image_button(const gchar *stock, int (*call)(void))
+ static GtkWidget * image_button(const gchar *stock, const gchar *action_name)
  {
  	GtkWidget *widget = gtk_button_new();
  	gtk_container_add(GTK_CONTAINER(widget),gtk_image_new_from_stock(stock,GTK_ICON_SIZE_SMALL_TOOLBAR));
 
-	g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(clear_and_call),call);
+	set_button_action(widget,action_name);
 	return widget;
  }
 
  GtkWidget *CreateKeypadWindow(void)
  {
 
-	#define SMALL_BUTTON(stock,call,col,row)		widget = image_button(stock,call); \
+	#define SMALL_BUTTON(stock,action,col,row)		widget = image_button(stock,action); \
 													gtk_table_attach_defaults(GTK_TABLE(table),widget,col,col+2,row,row+1);
 
-	#define LARGE_BUTTON(stock,call,col,row)		widget = image_button(stock,call); \
+	#define LARGE_BUTTON(stock,action,col,row)		widget = image_button(stock,action); \
 													gtk_table_attach_defaults(GTK_TABLE(table),widget,(3*col),(3*col)+3,row,row+1);
 
-	#define LARGE_TEXT_BUTTON(label,call,col,row)	widget = gtk_button_new_with_label(label); \
-													g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(clear_and_call),call); \
+	#define LARGE_TEXT_BUTTON(label,action,col,row)	widget = gtk_button_new_with_label(label); \
+													set_button_action(widget,action); \
 													gtk_table_attach_defaults(GTK_TABLE(table),widget,(3*col),(3*col)+3,row,row+1);
 
  	int			row 	= 0;
@@ -109,9 +154,7 @@
 	{
 		g_snprintf(label,9,"PF%d",f+1);
 		widget = gtk_button_new_with_label(label);
-
 		g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(pf_button),(gpointer) (f+1));
-
 		gtk_table_attach_defaults(GTK_TABLE(table),widget,col,col+2,row,row+1);
 		col += 2;
 		if(col > 5)
@@ -122,11 +165,11 @@
 	}
 
 	/* Create movement buttons */
-	SMALL_BUTTON(GTK_STOCK_GO_UP,action_CursorUp,2,4);
-	SMALL_BUTTON(GTK_STOCK_GO_BACK,action_CursorLeft,0,5);
-	SMALL_BUTTON(GTK_STOCK_GOTO_TOP,action_FirstField,2,5);
-	SMALL_BUTTON(GTK_STOCK_GO_FORWARD,action_CursorRight,4,5);
-	SMALL_BUTTON(GTK_STOCK_GO_DOWN,action_CursorDown,2,6);
+	SMALL_BUTTON(GTK_STOCK_GO_UP,"CursorUp",2,4);
+	SMALL_BUTTON(GTK_STOCK_GO_BACK,"CursorLeft",0,5);
+	SMALL_BUTTON(GTK_STOCK_GOTO_TOP,"Home",2,5);
+	SMALL_BUTTON(GTK_STOCK_GO_FORWARD,"CursorRight",4,5);
+	SMALL_BUTTON(GTK_STOCK_GO_DOWN,"CursorDown",2,6);
 
 	/* Create PA Buttons */
 	for(f=0;f<3;f++)
@@ -138,16 +181,16 @@
 	}
 
 	/* Create extra buttons */
-	LARGE_BUTTON(GTK_STOCK_GOTO_FIRST,action_PreviousField,0,8);
-	LARGE_BUTTON(GTK_STOCK_GOTO_LAST,action_NextField,1,8);
-	LARGE_TEXT_BUTTON( _( "Clear" ), action_ClearFields, 0, 9);
-	LARGE_TEXT_BUTTON( _( "Reset" ), action_Reset, 1, 9);
-	LARGE_TEXT_BUTTON( _( "Erase\nEOF" ), lib3270_EraseEOF, 0, 10);
-	LARGE_TEXT_BUTTON( _( "Erase\nInput" ), action_EraseInput, 1, 10);
+	LARGE_BUTTON(GTK_STOCK_GOTO_FIRST,"PreviousField",0,8);
+	LARGE_BUTTON(GTK_STOCK_GOTO_LAST,"NextField",1,8);
+	LARGE_TEXT_BUTTON( _( "Clear" ), "ClearFields", 0, 9);
+	LARGE_TEXT_BUTTON( _( "Reset" ), "Reset", 1, 9);
+	LARGE_TEXT_BUTTON( _( "Erase\nEOF" ), "EraseEOF", 0, 10);
+	LARGE_TEXT_BUTTON( _( "Erase\nInput" ), "EraseInput", 1, 10);
 
 
 	/* "Enter" Button */
-	widget = image_button(GTK_STOCK_OK,action_Enter);
+	widget = image_button(GTK_STOCK_OK,"Enter");
 	gtk_table_attach_defaults(GTK_TABLE(table),widget,0,6,11,12);
 
 	/* Buttons ok, add table */

@@ -1626,7 +1626,7 @@ Reset_action(Widget w unused, XEvent *event, String *params,
 }
 */
 
-LIB3270_EXPORT int action_Reset(void)
+LIB3270_EXPORT int lib3270_Reset(void)
 {
 	reset_idle_timer();
 	do_reset(True);

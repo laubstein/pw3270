@@ -53,6 +53,7 @@
 
  static void erase_input_action(void);
  static void clear_fields_action(void);
+ static void action_Reset(void);
 
  static void action_Up(GtkWidget *w, gpointer user_data);
  static void action_Down(GtkWidget *w, gpointer user_data);
@@ -139,6 +140,67 @@
 
 /*---[ Action tables ]------------------------------------------------------------------------------------------*/
 
+	// TODO (perry#9#): Add tooltips
+ static const struct call_3270
+ {
+ 	const gchar *name;
+ 	const gchar *label;
+ 	const gchar *tooltip;
+ 	const gchar *stock_id;
+ 	int			 (*call)(void);
+ 	const gchar *accelerator;
+ } action_3270_info[] =
+ {
+		{ "EraseEOF",		N_( "Erase to end of field" ),
+							N_( "Erase to the end of the field" ),
+							NULL,
+							lib3270_EraseEOF,
+							"End" },
+
+		{ "EraseEOL",		N_( "Erase to end of line" ),
+							N_( "Erase to the end of the field or line" ),
+							NULL,
+							lib3270_EraseEOL,
+							NULL },
+
+		{ "Home",			N_( "First Field" ),
+							NULL,
+							NULL,
+							action_FirstField,
+							"Home" },
+
+		{ "DeleteWord",		N_( "Delete Word" ),
+							NULL,
+							NULL,
+							action_DeleteWord,
+							N_( "<Ctrl>w" )	},
+
+		{ "EraseField",		N_( "Erase Field" ),
+							NULL,
+							NULL,
+							action_DeleteField,
+							N_( "<Ctrl>u" ) },
+
+		{ "Delete",			N_( "Delete Char" ),
+							NULL,
+							NULL,
+							action_Delete,
+							"Delete" },
+
+		{ "Erase",			N_( "Backspace" ),
+							NULL,
+							NULL,
+							action_Erase,
+							"BackSpace" },
+
+		{ "SysREQ",			N_( "Sys Req" ),
+							NULL,
+							NULL,
+							action_SysReq,
+							"Sys_Req" },
+
+ };
+
 /*
 	The name of the action.
 	The stock id for the action, or the name of an icon from the icon theme.
@@ -191,6 +253,9 @@
 #endif
  	{	"EraseInput",		GTK_STOCK_CLEAR,		N_( "Erase input" ),		NULL,				NULL,	G_CALLBACK(erase_input_action)		},
  	{	"ClearFields",		NULL,					N_( "Clear" ),				NULL,				NULL,	G_CALLBACK(clear_fields_action)		},
+
+ 	{	"Reset",			NULL,					N_( "Reset" ),				"<Ctrl>r",			NULL,	G_CALLBACK(action_Reset)			},
+ 	{	"Escape",			NULL,					N_( "Escape" ),				"Escape",			NULL,	G_CALLBACK(action_Reset)			},
  };
 
  static const GtkActionEntry ft_action_entries[] =
@@ -266,10 +331,21 @@
  };
 
 
- GtkActionGroup		*action_group[ACTION_GROUP_MAX] = { NULL };
+ GtkActionGroup	*action_group[ACTION_GROUP_MAX] = { NULL };
 
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
+
+ GtkAction * get_action_by_name(const gchar *name)
+ {
+	int			p;
+	GtkAction	*rc = NULL;
+
+	for(p = 0; p < ACTION_GROUP_MAX && !rc; p++)
+		rc = gtk_action_group_get_action(action_group[p],name);
+
+	return rc;
+ }
 
  GCallback get_action_callback_by_name(const gchar *name)
  {
@@ -300,6 +376,12 @@
 		}
 	}
 
+ 	for(f=0;f<G_N_ELEMENTS(action_3270_info);f++)
+ 	{
+		if(!strcmp(name,action_3270_info[f].name))
+			return G_CALLBACK(action_3270_info[f].call);
+ 	}
+
 	Trace("Can't find action \"%s\"",name);
 
  	return NULL;
@@ -309,6 +391,11 @@
  {
  	action_ClearSelection();
  	call();
+ }
+
+ static void action_Reset(void)
+ {
+ 	clear_and_call(0,lib3270_Reset);
  }
 
  static void clear_fields_action(void)
@@ -730,113 +817,19 @@
 
  static void Load3270Actions(GtkActionGroup *actions)
  {
- 	struct call_3270
- 	{
- 		const gchar *name;
- 		const gchar *label;
- 		const gchar *tooltip;
- 		const gchar *stock_id;
- 		int			 (*call)(void);
- 		const gchar *accelerator;
-	};
-
-	// TODO (perry#9#): Add tooltips
- 	static const struct call_3270 action_clear[] =
-	{
-		{ "Reset",			N_( "Reset" ),
-							NULL,
-							NULL,
-							action_Reset,
-							N_( "<Ctrl>r" ) },
-
-		{ "Escape",			N_( "Escape" ),
-							NULL,
-							NULL,
-							action_Reset,
-							"Escape" }
-	};
-
- 	static const struct call_3270 action_info[] =
-	{
-		{ "EraseEOF",		N_( "Erase to end of field" ),
-							N_( "Erase to the end of the field" ),
-							NULL,
-							lib3270_EraseEOF,
-							"End" },
-
-		{ "EraseEOL",		N_( "Erase to end of line" ),
-							N_( "Erase to the end of the field or line" ),
-							NULL,
-							lib3270_EraseEOL,
-							NULL },
-
-		{ "Home",			N_( "First Field" ),
-							NULL,
-							NULL,
-							action_FirstField,
-							"Home" },
-
-		{ "DeleteWord",		N_( "Delete Word" ),
-							NULL,
-							NULL,
-							action_DeleteWord,
-							N_( "<Ctrl>w" )	},
-
-		{ "EraseField",		N_( "Erase Field" ),
-							NULL,
-							NULL,
-							action_DeleteField,
-							N_( "<Ctrl>u" ) },
-
-		{ "Delete",			N_( "Delete Char" ),
-							NULL,
-							NULL,
-							action_Delete,
-							"Delete" },
-
-		{ "Erase",			N_( "Backspace" ),
-							NULL,
-							NULL,
-							action_Erase,
-							"BackSpace" },
-
-		{ "SysREQ",			N_( "Sys Req" ),
-							NULL,
-							NULL,
-							action_SysReq,
-							"Sys_Req" },
-
-	};
-
 	int f;
 
- 	for(f=0;f<G_N_ELEMENTS(action_info);f++)
+ 	for(f=0;f<G_N_ELEMENTS(action_3270_info);f++)
  	{
-		GtkAction *action = gtk_action_new(	action_info[f].name,
-											gettext(action_info[f].label),
-											gettext(action_info[f].tooltip),
-											action_info[f].stock_id );
+		GtkAction *action = gtk_action_new(	action_3270_info[f].name,
+											gettext(action_3270_info[f].label),
+											gettext(action_3270_info[f].tooltip),
+											action_3270_info[f].stock_id );
 
-		g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(action_info[f].call),0 );
+		g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(action_3270_info[f].call),0 );
 
-		if(action_info[f].accelerator)
-			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(action_info[f].accelerator));
-		else
-			gtk_action_group_add_action(actions,(GtkAction *) action);
-
- 	}
-
- 	for(f=0;f<G_N_ELEMENTS(action_clear);f++)
- 	{
-		GtkAction *action = gtk_action_new(	action_clear[f].name,
-											gettext(action_clear[f].label),
-											gettext(action_clear[f].tooltip),
-											action_clear[f].stock_id );
-
-		g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(clear_and_call),(gpointer) action_clear[f].call);
-
-		if(action_info[f].accelerator)
-			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(action_clear[f].accelerator));
+		if(action_3270_info[f].accelerator)
+			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(action_3270_info[f].accelerator));
 		else
 			gtk_action_group_add_action(actions,(GtkAction *) action);
 

@@ -327,7 +327,8 @@
 	int 			CloseConfigFile(void);
 	int				OpenConfigFile(void);
 
-	GCallback 		get_action_callback_by_name(const gchar *name);
+	LOCAL_EXTERN	GCallback 		  get_action_callback_by_name(const gchar *name);
+	LOCAL_EXTERN	GtkAction 		* get_action_by_name(const gchar *name);
 
 	gchar 			*GetString(const gchar *group, const gchar *key, const gchar *def);
 	void 			SetString(const gchar *group, const gchar *key, const gchar *val);
