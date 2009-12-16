@@ -239,8 +239,8 @@
 	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),					"Up",				NULL,	G_CALLBACK(action_Up)				},
 	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),				"Down",				NULL,	G_CALLBACK(action_Down)				},
 
-	{	"NextField",		GTK_STOCK_GOTO_LAST,	N_( "Next field" ),			"Tab",				NULL,	G_CALLBACK(action_Tab)				},
-	{	"PreviousField",	GTK_STOCK_GOTO_FIRST,	N_( "Previous field" ),		"<Shift>Tab",		NULL,	G_CALLBACK(action_BackTab)			},
+	{	"NextField",		GTK_STOCK_GOTO_LAST,	N_( "Next field" ),			"Tab",					NULL,	G_CALLBACK(action_Tab)				},
+	{	"PreviousField",	GTK_STOCK_GOTO_FIRST,	N_( "Previous field" ),		"<Shift>ISO_Left_Tab",	NULL,	G_CALLBACK(action_BackTab)			},
 
  	/* Edit actions */
  	{	"PasteNext",		NULL,					N_( "Paste next" ),			"<Shift><Ctrl>v",	NULL,	G_CALLBACK(action_PasteNext)		},
@@ -902,16 +902,16 @@
 		const gchar *action_name;
  	} default_key[] =
  	{
-		{	GDK_Left,			0, "CursorLeft"		},
-		{	GDK_Up,				0, "CursorUp"		},
-		{	GDK_Right,			0, "CursorRight"	},
-		{	GDK_Down,			0, "CursorDown"		},
-		{	GDK_KP_Left,		0, "CursorLeft"		},
-		{	GDK_KP_Up,			0, "CursorUp"		},
-		{	GDK_KP_Right,		0, "CursorRight"	},
-		{	GDK_KP_Down,		0, "CursorDown"		},
-		{	GDK_ISO_Left_Tab,	0, "PreviousField"	},
-		{	GDK_Tab, 			0, "NextField"		},
+		{	GDK_Left,			0,				"CursorLeft"			},
+		{	GDK_Up,				0,				"CursorUp"				},
+		{	GDK_Right,			0,				"CursorRight"			},
+		{	GDK_Down,			0,				"CursorDown"			},
+		{	GDK_KP_Left,		0,				"CursorLeft"			},
+		{	GDK_KP_Up,			0,				"CursorUp"				},
+		{	GDK_KP_Right,		0,				"CursorRight"			},
+		{	GDK_KP_Down,		0,				"CursorDown"			},
+		{	GDK_Tab, 			0, 				"NextField"				},
+		{	GDK_ISO_Left_Tab,	GDK_SHIFT_MASK,	"PreviousField"			},
  	};
 
 	GDir	*dir;
@@ -1133,6 +1133,8 @@
 	}
 
 #endif
+
+	Trace("Key action: %s %s",gdk_keyval_name(event->keyval),event->state & GDK_SHIFT_MASK ? "Shift " : "");
 
     /* Check for special keyproc actions */
 	for(f=0; f < keyproc_table_size;f++)
