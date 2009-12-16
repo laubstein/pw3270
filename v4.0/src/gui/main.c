@@ -31,6 +31,7 @@
  */
 
 #include "gui.h"
+#include "keypad.h"
 
 #include <stdio.h>
 #include <gtk/gtk.h>
@@ -107,9 +108,7 @@ static void connect_main(int status)
 	gtk_action_group_set_sensitive(online_actions,online);
 	gtk_action_group_set_sensitive(offline_actions,!online);
 
-	if(keypad)
-		gtk_widget_set_sensitive(keypad,online);
-
+	SetKeypadSensitive(online);
 
 }
 

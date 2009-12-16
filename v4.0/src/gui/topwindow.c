@@ -31,6 +31,8 @@
  */
 
  #include "gui.h"
+ #include "keypad.h"
+
  #include <gdk/gdkkeysyms.h>
  #include <lib3270/config.h>
 
@@ -394,9 +396,11 @@
 	gtk_box_pack_start(GTK_BOX(hbox), terminal, TRUE, TRUE, 0);
 	gtk_widget_show_all(hbox);
 
-	keypad = CreateKeypadWindow();
+#ifndef CONFIGURABLE_KEYPAD
+	keypad = CreateKeypadWidget();
 	set_widget_flags(keypad,0);
 	gtk_box_pack_end(GTK_BOX(hbox), keypad, FALSE, FALSE, 0);
+#endif
 
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 

@@ -185,7 +185,6 @@
  	extern const gchar *program_fullversion;
 
 	extern GtkWidget				*topwindow;
-	extern GtkWidget				*keypad;
 	extern GtkWidget				*toolbar_widget;
 	extern GdkPixmap				*pixmap;
 	extern GtkWidget				*SelectionPopup;
@@ -239,7 +238,6 @@
 	extern const struct lib3270_screen_callbacks program_screen_callbacks;
 
 	int			CreateTopWindow(void);
-	GtkWidget	*CreateKeypadWindow(void);
 
 	GtkWidget 	*CreateTerminalWindow(void);
 
