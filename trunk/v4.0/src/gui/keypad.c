@@ -31,6 +31,7 @@
  */
 
  #include "gui.h"
+ #include "keypad.h"
 
  #include <lib3270/config.h>
  #include <globals.h>
@@ -99,6 +100,12 @@
 
 /*---[ Implement Fixed Keypad ]---------------------------------------------------------------------------------*/
 
+void SetKeypadSensitive(gboolean state)
+{
+	if(keypad)
+		gtk_widget_set_sensitive(keypad,state);
+}
+
  static void set_visible(int visible, int reason)
  {
  	if(visible)
@@ -107,15 +114,6 @@
 		gtk_widget_hide(keypad);
 
  }
-
-/*
- static void clear_and_call(GtkButton *button, int (*call)(void))
- {
- 	action_ClearSelection();
- 	if(call)
-		call();
- }
-*/
 
  static GtkWidget * image_button(const gchar *stock, const gchar *action_name)
  {
@@ -126,7 +124,7 @@
 	return widget;
  }
 
- GtkWidget *CreateKeypadWindow(void)
+ GtkWidget *CreateKeypadWidget(void)
  {
 
 	#define SMALL_BUTTON(stock,action,col,row)		widget = image_button(stock,action); \

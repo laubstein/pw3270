@@ -427,6 +427,10 @@
 		<Unit filename="src/gui/keypad.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/gui/keypad.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/gui/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
