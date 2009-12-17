@@ -83,3 +83,5 @@
 #endif // CONFIGURABLE_KEYPAD
 
 	LOCAL_EXTERN void	  	  SetKeypadSensitive(gboolean state);
+	LOCAL_EXTERN void		  keypad_set_flags(GtkWidget *widget);
+
