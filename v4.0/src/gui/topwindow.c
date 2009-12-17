@@ -73,19 +73,6 @@
  	Trace("%s","Ok");
  }
 
- static void set_widget_flags(GtkWidget *widget, gpointer data)
- {
- 	if(!widget)
-		return;
-
-	GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_FOCUS);
-	GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_DEFAULT);
-
-	if(GTK_IS_CONTAINER(widget))
-		gtk_container_foreach(GTK_CONTAINER(widget),set_widget_flags,0);
-
- }
-
  static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
  	// http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-key-press-event
@@ -382,7 +369,7 @@
 
 	if(toolbar_widget)
 	{
-		set_widget_flags(toolbar_widget,0);
+		keypad_set_flags(toolbar_widget);
 
 #if GTK_CHECK_VERSION(2,18,0)
 		gtk_widget_set_visible(toolbar_widget,GetBoolean("Toggles","Toolbar",TRUE));
@@ -415,7 +402,6 @@
 
 #ifndef CONFIGURABLE_KEYPAD
 	keypad = CreateKeypadWidget();
-	set_widget_flags(keypad,0);
 	gtk_box_pack_end(GTK_BOX(hbox), keypad, FALSE, FALSE, 0);
 #endif
 

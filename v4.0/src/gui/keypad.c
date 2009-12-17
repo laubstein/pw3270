@@ -125,6 +125,19 @@
 
  }
 
+ void keypad_set_flags(GtkWidget *widget)
+ {
+ 	if(!widget)
+		return;
+
+	GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_FOCUS);
+	GTK_WIDGET_UNSET_FLAGS(widget,GTK_CAN_DEFAULT);
+
+	if(GTK_IS_CONTAINER(widget))
+		gtk_container_foreach(GTK_CONTAINER(widget),(GtkCallback) keypad_set_flags,0);
+
+ }
+
 /*---[ Implement Configurable keypad ]--------------------------------------------------------------------------*/
 #ifdef CONFIGURABLE_KEYPAD
 
@@ -211,6 +224,8 @@
 				button->widget = gtk_button_new_with_label( gettext(action) );
 			}
 
+			gtk_button_set_focus_on_click(GTK_BUTTON(button->widget),FALSE);
+			gtk_button_set_relief(GTK_BUTTON(button->widget),GTK_RELIEF_HALF);
 			set_button_action(button->widget, action);
 		}
 
@@ -355,6 +370,8 @@
 	name = g_strdup_printf("keypad_%s",keypad->name);
 	gtk_widget_set_name(widget,name);
 	g_free(name);
+
+	keypad_set_flags(widget);
 
 	gtk_widget_show_all(widget);
 	return widget;
@@ -516,7 +533,9 @@
 
 	register_tchange(KEYPAD,set_visible);
 
-	gtk_widget_set_name(keypad,"KeyPAD");
+	gtk_widget_set_name(keypad,"keypad_default");
+	set_widget_flags(keypad,0);
+
  	return keypad;
  }
 
