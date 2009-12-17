@@ -290,6 +290,11 @@
 
 #endif
 
+
+#ifdef CONFIGURABLE_KEYPAD
+	struct keypad			*keypad	= NULL;
+#endif
+
  	GtkWidget				*vbox;
  	GtkWidget				*hbox;
 	GtkUIManager			*ui_manager;
@@ -389,12 +394,24 @@
 #endif
 
 	}
-
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);
 
+#ifdef CONFIGURABLE_KEYPAD
+	// Load keypads
+	keypad = keypad_load();
+	keypad_pack(GTK_BOX(vbox), keypad, KEYPAD_POSITION_TOP);
+#endif
+
     hbox = gtk_hbox_new(FALSE,0);
+#ifdef CONFIGURABLE_KEYPAD
+	keypad_pack(GTK_BOX(hbox), keypad, KEYPAD_POSITION_LEFT);
+#endif
 	gtk_box_pack_start(GTK_BOX(hbox), terminal, TRUE, TRUE, 0);
-	gtk_widget_show_all(hbox);
+	gtk_widget_show(terminal);
+#ifdef CONFIGURABLE_KEYPAD
+	keypad_pack(GTK_BOX(hbox), keypad, KEYPAD_POSITION_RIGHT);
+#endif
+	gtk_widget_show(hbox);
 
 #ifndef CONFIGURABLE_KEYPAD
 	keypad = CreateKeypadWidget();
@@ -403,6 +420,12 @@
 #endif
 
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+
+#ifdef CONFIGURABLE_KEYPAD
+	keypad_pack(GTK_BOX(hbox), keypad, KEYPAD_POSITION_BOTTOM);
+#endif
+
+	gtk_widget_show(vbox);
 
 	gtk_window_set_role(GTK_WINDOW(topwindow), PACKAGE_NAME "_TOP" );
 
@@ -435,6 +458,10 @@
 
 	gtk_action_group_set_sensitive(paste_actions,TRUE);
 
+#endif
+
+#ifdef CONFIGURABLE_KEYPAD
+	keypad_free(keypad);
 #endif
 
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);

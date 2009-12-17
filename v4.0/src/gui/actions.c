@@ -382,7 +382,7 @@
 			return G_CALLBACK(action_3270_info[f].call);
  	}
 
-	Trace("Can't find action \"%s\"",name);
+//	Trace("Can't find action \"%s\"",name);
 
  	return NULL;
  }
@@ -859,7 +859,7 @@
 			keyproc_table_size = 0;
 			keyproc_table = g_new(struct WindowActions,keyproc_table_size+1);
 
-			Trace("Keyproc_table: %p",keyproc_table);
+//			Trace("Keyproc_table: %p",keyproc_table);
 		}
 		else
 		{
@@ -870,7 +870,7 @@
 
 		keyproc_table_size++;
 
-		Trace("New action created (total: %d)",keyproc_table_size);
+//		Trace("New action created (total: %d)",keyproc_table_size);
  	}
 
 	act->keyval = keyval;
@@ -883,12 +883,12 @@
 	else
 	{
 		act->arg = atoi(action_name+2);
-		Trace("Adding PF%02d action",act->arg);
+//		Trace("Adding PF%02d action",act->arg);
 		if(act->arg > 0 && act->arg < 25)
 			act->callback = (void (*)(guint arg)) PFKey;
 	}
 
-	Trace("Keyval: %08d State: %08d Action: %s Callback: %p",keyval,state,action_name,act->callback);
+//	Trace("Keyval: %08d State: %08d Action: %s Callback: %p",keyval,state,action_name,act->callback);
 
 	return act->callback ? 0 : ENOENT;
  }

@@ -63,6 +63,10 @@
 		</Compiler>
 		<Unit filename="Makefile.in" />
 		<Unit filename="configure.ac" />
+		<Unit filename="keypad.xml">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="pw3270.nsi.in" />
 		<Unit filename="pw3270.spec.in" />
 		<Unit filename="rexx/sample.rex" />
