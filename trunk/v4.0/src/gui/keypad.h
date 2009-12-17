@@ -30,9 +30,50 @@
  *
  */
 
-// #define CONFIGURABLE_KEYPAD 1
-
 #ifdef CONFIGURABLE_KEYPAD
+
+	enum KEYPAD_POSITION
+	{
+		KEYPAD_POSITION_RIGHT,
+		KEYPAD_POSITION_LEFT,
+		KEYPAD_POSITION_TOP,
+		KEYPAD_POSITION_BOTTOM
+	};
+
+	struct keypad_button
+	{
+		struct keypad_button	*next;
+		GtkWidget 				*widget;
+	};
+
+	struct keypad_row
+	{
+		struct keypad_row	*next;
+		int					cols;
+
+		struct keypad_button *first_button;
+		struct keypad_button *last_button;
+	};
+
+	struct keypad
+	{
+		struct 				keypad *next;
+		int						rows;
+		int						cols;
+
+		enum KEYPAD_POSITION	position;
+
+		struct 				keypad_row *first_row;
+		struct 				keypad_row *last_row;
+
+		GtkWidget				*widget;
+
+		char 	name[1];
+	};
+
+	LOCAL_EXTERN struct keypad	* keypad_load(void);
+	LOCAL_EXTERN void			  keypad_free(struct keypad *keypad);
+	LOCAL_EXTERN void 			  keypad_pack(GtkBox *box, struct keypad *keypad, enum KEYPAD_POSITION position);
 
 #else
 

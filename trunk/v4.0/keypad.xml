@@ -1,0 +1,71 @@
+<keypad_description>
+
+	<keypad name="Keypad" position="Right">
+
+		<row>
+			<keypadbutton action="PF1" />
+			<keypadbutton action="PF2" />
+			<keypadbutton action="PF3" />
+		</row>
+		<row>
+			<keypadbutton action="PF4" />
+			<keypadbutton action="PF5" />
+			<keypadbutton action="PF6" />
+		</row>
+		<row>
+			<keypadbutton action="PF7" />
+			<keypadbutton action="PF8" />
+			<keypadbutton action="PF9" />
+		</row>
+		<row>
+			<keypadbutton action="PF10" />
+			<keypadbutton action="PF11" />
+			<keypadbutton action="PF12" />
+		</row>
+
+		<row>
+			<keypadbutton />
+			<keypadbutton action="CursorUp" icon="go-up" />
+			<keypadbutton />
+		</row>
+
+		<row>
+			<keypadbutton action="CursorLeft" icon="go-back" />
+			<keypadbutton action="Home" icon="goto-top" />
+			<keypadbutton action="CursorRight" icon="go-forward" />
+		</row>
+
+		<row>
+			<keypadbutton />
+			<keypadbutton action="CursorDown" icon="go-down"/>
+			<keypadbutton />
+		</row>
+
+		<row>
+			<keypadbutton action="PA1" />
+			<keypadbutton action="PA2" />
+			<keypadbutton action="PA3" />
+		</row>
+
+		<row>
+			<keypadbutton action='PreviousField' icon="goto-first" />
+			<keypadbutton action='NextField' icon="goto-last" />
+		</row>
+
+		<row>
+			<keypadbutton action='Erase' label="Clear" />
+			<keypadbutton action='Reset' label="Reset" />
+		</row>
+
+		<row>
+			<keypadbutton action='EraseEOF' label="Erase\nEOF" />
+			<keypadbutton action='EraseInput' label="Erase\nInput" />
+		</row>
+
+		<row>
+			<keypadbutton action='Enter' icon="ok" />
+		</row>
+
+	</keypad>
+
+</keypad_description>
