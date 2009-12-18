@@ -70,8 +70,6 @@
 
  static void set_sensitive(GtkWidget *widget, gpointer state)
  {
- 	Trace("Widget \"%s\" %d",gtk_widget_get_name(widget),(int) g_str_has_prefix(gtk_widget_get_name(widget),widget_name_prefix));
-
 	if(g_str_has_prefix(gtk_widget_get_name(widget),widget_name_prefix))
 		gtk_widget_set_sensitive(widget,state == 0 ? FALSE : TRUE);
 	else if(GTK_IS_CONTAINER(widget))
