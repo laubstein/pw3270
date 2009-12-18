@@ -48,7 +48,7 @@
  GtkWidget	*topwindow 		= NULL;
  GList 		*main_icon		= NULL;
  gchar		*program_logo	= NULL;
- GtkWidget	*toolbar_widget	= NULL;
+// GtkWidget	*toolbar_widget	= NULL;
 
 #ifdef MOUSE_POINTER_CHANGE
  GdkCursor	*wCursor[CURSOR_MODE_3270];
@@ -280,11 +280,14 @@
 
 #ifdef CONFIGURABLE_KEYPAD
 	struct keypad			*keypad	= NULL;
+#else
+	GtkWidget				*keypad = NULL;
 #endif
 
  	GtkWidget				*vbox;
  	GtkWidget				*hbox;
  	GtkWidget				*toolbar_menu = NULL;
+ 	GtkWidget				*toolbar_widget = NULL;
 	GtkUIManager			*ui_manager;
 	GdkPixbuf				*pix;
 	gchar 					*ptr;
@@ -361,6 +364,8 @@
 
 		toolbar_widget = gtk_ui_manager_get_widget(ui_manager,"/MainToolbar");
 		toolbar_menu = gtk_ui_manager_get_widget(ui_manager,"/MainMenubar/ViewMenu/ToolbarMenu");
+		if(!toolbar_menu)
+			toolbar_menu = gtk_ui_manager_get_widget(ui_manager,"/MainMenubar/ViewMenu");
 
 		g_object_unref(ui_manager);
 	}
@@ -373,8 +378,10 @@
 
 	if(toolbar_widget)
 	{
+		gtk_widget_set_name(toolbar_widget,"Toolbar");
 		keypad_set_flags(toolbar_widget);
-
+		configure_toolbar(toolbar_widget,toolbar_menu, N_( "Button bar"));
+/*
 #if GTK_CHECK_VERSION(2,18,0)
 		gtk_widget_set_visible(toolbar_widget,GetBoolean("Toggles","Toolbar",TRUE));
 #else
@@ -383,8 +390,10 @@
 		else
 			gtk_widget_hide(toolbar_widget);
 #endif
+*/
 
 	}
+
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);
 
 #ifdef CONFIGURABLE_KEYPAD
@@ -407,6 +416,7 @@
 #ifndef CONFIGURABLE_KEYPAD
 	keypad = CreateKeypadWidget();
 	gtk_box_pack_end(GTK_BOX(hbox), keypad, FALSE, FALSE, 0);
+	configure_toolbar(keypad, toolbar_menu, N_( "Keypad"));
 #endif
 
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);

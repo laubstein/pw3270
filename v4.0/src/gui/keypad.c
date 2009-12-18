@@ -52,11 +52,9 @@
 
  };
 
-#else
-
- GtkWidget *keypad = NULL;
-
 #endif
+
+ static const char *widget_name_prefix = "keypad_";
 
 /*---[ Implement common calls ]---------------------------------------------------------------------------------*/
 
@@ -68,6 +66,22 @@
  static void pa_button(GtkButton *button, int key)
  {
  	action_PAKey(key);
+ }
+
+ static void set_sensitive(GtkWidget *widget, gpointer state)
+ {
+ 	Trace("Widget \"%s\" %d",gtk_widget_get_name(widget),(int) g_str_has_prefix(gtk_widget_get_name(widget),widget_name_prefix));
+
+	if(g_str_has_prefix(gtk_widget_get_name(widget),widget_name_prefix))
+		gtk_widget_set_sensitive(widget,state == 0 ? FALSE : TRUE);
+	else if(GTK_IS_CONTAINER(widget))
+		gtk_container_foreach(GTK_CONTAINER(widget),set_sensitive,state);
+
+ }
+
+ void SetKeypadSensitive(gboolean state)
+ {
+	gtk_container_foreach(GTK_CONTAINER(topwindow),set_sensitive,(gpointer) ( state ? -1 : 0 ));
  }
 
  static void set_button_action(GtkWidget *widget, const gchar *action_name)
@@ -138,14 +152,52 @@
 
  }
 
+ static void toggle_toolbar(GtkCheckMenuItem *item, GtkWidget *keypad)
+ {
+ 	gboolean state = gtk_check_menu_item_get_active(item);
+ 	if(state)
+		gtk_widget_show(keypad);
+ 	else
+		gtk_widget_hide(keypad);
+
+ 	SetBoolean("Toggles", gtk_widget_get_name(keypad), state);
+ }
+
+ void configure_toolbar(GtkWidget *toolbar, GtkWidget *parent, const gchar *label)
+ {
+ 	GtkWidget *menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(parent));
+	gboolean isVisible = GetBoolean("Toggles", gtk_widget_get_name(toolbar), TRUE);
+
+	if(!menu)
+	{
+		menu = gtk_menu_new();
+		gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent),menu);
+	}
+
+	Trace("Submenu: %p",menu);
+	if(menu)
+	{
+		GtkWidget *item = gtk_check_menu_item_new_with_label(gettext(label));
+		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),isVisible);
+		gtk_widget_show(item);
+		g_signal_connect(G_OBJECT(item), "toggled", G_CALLBACK(toggle_toolbar), toolbar);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
+		gtk_widget_show(menu);
+	}
+
+	if(isVisible)
+		gtk_widget_show(toolbar);
+	else
+		gtk_widget_hide(toolbar);
+
+	gtk_widget_show(parent);
+
+ }
+
 /*---[ Implement Configurable keypad ]--------------------------------------------------------------------------*/
 #ifdef CONFIGURABLE_KEYPAD
 
  #define APPEND_CHILD_ELEMENT(parent,first,last,child) if( parent->last) { parent->last->next = child; parent->last = child; } else { parent->first = parent->last = child; }
-
- void SetKeypadSensitive(gboolean state)
- {
- }
 
  static const gchar * get_attribute(const gchar **names, const gchar **values, const gchar *key)
  {
@@ -295,39 +347,6 @@
 	g_free(keypad);
  }
 
- static void toggle_keypad(GtkCheckMenuItem *item, GtkWidget *keypad)
- {
- 	gboolean state = gtk_check_menu_item_get_active(item);
- 	if(state)
-		gtk_widget_show(keypad);
- 	else
-		gtk_widget_hide(keypad);
-
- 	SetBoolean("Toggles", gtk_widget_get_name(keypad), state);
- }
-
- static void build_keypad_menu(GtkWidget *keypad, GtkWidget *menu, const gchar *label)
- {
-	gboolean isVisible = GetBoolean("Toggles", gtk_widget_get_name(keypad), TRUE);
-
-	menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(menu));
-	Trace("Submenu: %p",menu);
-	if(menu)
-	{
-		GtkWidget *item = gtk_check_menu_item_new_with_label(gettext(label));
-		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),isVisible);
-		gtk_widget_show(item);
-		g_signal_connect(G_OBJECT(item), "toggled", G_CALLBACK(toggle_keypad), keypad);
-		gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
-	}
-
-	if(isVisible)
-		gtk_widget_show(keypad);
-	else
-		gtk_widget_hide(keypad);
-
- }
-
  void keypad_pack(GtkBox *box, GtkWidget *menu, struct keypad *keypad, enum KEYPAD_POSITION position)
  {
 	while(keypad)
@@ -339,7 +358,7 @@
 			gtk_box_pack_start(GTK_BOX(box), keypad->widget, FALSE, FALSE, 0);
 
 			if(menu)
-				build_keypad_menu(keypad->widget,menu,keypad->label);
+				configure_toolbar(keypad->widget,menu,keypad->label);
 		}
 		keypad = keypad->next;
 	}
@@ -417,7 +436,7 @@
 	gtk_handle_box_set_shadow_type(GTK_HANDLE_BOX(widget),GTK_SHADOW_ETCHED_IN);
     gtk_container_add(GTK_CONTAINER(widget),box);
 
-	name = g_strdup_printf("keypad_%s",keypad->name);
+	name = g_strdup_printf("%s%s",widget_name_prefix,keypad->name);
 	gtk_widget_set_name(widget,name);
 	g_free(name);
 
@@ -476,12 +495,7 @@
 /*---[ Implement Fixed Keypad ]---------------------------------------------------------------------------------*/
 #else // CONFIGURABLE_KEYPAD
 
- void SetKeypadSensitive(gboolean state)
- {
-	if(keypad)
-		gtk_widget_set_sensitive(keypad,state);
- }
-
+/*
  static void set_visible(int visible, int reason)
  {
  	if(visible)
@@ -490,6 +504,7 @@
 		gtk_widget_hide(keypad);
 
  }
+*/
 
  static GtkWidget * image_button(const gchar *stock, const gchar *action_name)
  {
@@ -518,6 +533,7 @@
  	int			f;
  	GtkWidget	*table 	= gtk_table_new(4,6,FALSE);
  	GtkWidget	*widget;
+ 	GtkWidget	*keypad;
  	GtkWidget	*vbox 	= gtk_vbox_new(FALSE,0);
  	gchar		label[10];
 
@@ -578,13 +594,15 @@
 
     gtk_container_add(GTK_CONTAINER(keypad),vbox);
 
+/*
 	if(Toggled(KEYPAD))
 		gtk_widget_show(keypad);
 
 	register_tchange(KEYPAD,set_visible);
+*/
 
 	gtk_widget_set_name(keypad,"keypad_default");
-	set_widget_flags(keypad,0);
+	keypad_set_flags(keypad);
 
  	return keypad;
  }

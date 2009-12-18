@@ -624,6 +624,7 @@
 
  }
 
+/*
  static void toggle_toolbar(GtkToggleAction *action, int id)
  {
     gboolean toggle = gtk_toggle_action_get_active(action);
@@ -643,6 +644,7 @@
 	}
 
  }
+*/
 
  static void action_ToggleGDKDebug(GtkToggleAction *action, gpointer user_data)
  {
@@ -740,10 +742,12 @@
  	}
 
 	/* Toolbar toggle */
+	/*
 	action = gtk_toggle_action_new("ToggleToolbar", _( "Button bar"), NULL, NULL);
 	gtk_toggle_action_set_active(action,GetBoolean("Toggles","Toolbar",TRUE));
 	g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_toolbar),0);
 	gtk_action_group_add_action(common_actions,(GtkAction *) action);
+	*/
 
 	/* Toggle actions */
  	for(f=0;f<N_TOGGLES;f++)
