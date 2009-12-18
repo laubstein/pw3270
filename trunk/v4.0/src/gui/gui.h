@@ -185,7 +185,6 @@
  	extern const gchar *program_fullversion;
 
 	extern GtkWidget				*topwindow;
-	extern GtkWidget				*toolbar_widget;
 	extern GdkPixmap				*pixmap;
 	extern GtkWidget				*SelectionPopup;
 	extern GtkWidget				*DefaultPopup;
@@ -386,11 +385,13 @@
 		#define clear_font_cache() /* */
 	#endif
 
+	// Toolbar
+	LOCAL_EXTERN void 		  configure_toolbar(GtkWidget *toolbar, GtkWidget *menu, const gchar *label);
 
 	// Console/Trace window
-	HCONSOLE	  gui_console_window_new(const char *title, const char *label);
-	void		  gui_console_window_delete(HCONSOLE hwnd);
-	int			  gui_console_window_append(HCONSOLE hwnd, const char *fmt, va_list args);
-	char 		* gui_console_window_wait_for_user_entry(HCONSOLE hwnd);
+	LOCAL_EXTERN HCONSOLE	  gui_console_window_new(const char *title, const char *label);
+	LOCAL_EXTERN void		  gui_console_window_delete(HCONSOLE hwnd);
+	LOCAL_EXTERN int		  gui_console_window_append(HCONSOLE hwnd, const char *fmt, va_list args);
+	LOCAL_EXTERN char 		* gui_console_window_wait_for_user_entry(HCONSOLE hwnd);
 
 #endif // GUI_H_INCLUDED

@@ -36,10 +36,9 @@
 		</menu>
 
 		<menu action='ViewMenu' >
-			<menu action='ToolbarMenu' >
-				<menuitem action='ToggleToolbar' />
-				<menuitem action='ToggleKeypad' />
-			</menu>
+<!---
+			<menuitem action='ToolbarMenu' />
+--->
 		</menu>
 
 		<menu action='ScriptsMenu' />
