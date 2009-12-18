@@ -307,6 +307,7 @@
  	{	"SettingsMenu",		NULL,					N_( "Settings" ),			NULL,				NULL,	NULL								},
  	{	"ScriptsMenu",		NULL,					N_( "Scripts" ),			NULL,				NULL,	NULL								},
  	{	"ViewMenu",			NULL,					N_( "_View" ),				NULL,				NULL,	NULL								},
+ 	{	"ToolbarMenu",		NULL,					N_( "Toolbars" ),			NULL,				NULL,	NULL								},
  	{	"DebugMenu",		NULL,					N_( "Debug" ),				NULL,				NULL,	NULL								},
 
 	/* Sub menus */
@@ -739,7 +740,7 @@
  	}
 
 	/* Toolbar toggle */
-	action = gtk_toggle_action_new("ToggleToolbar", _( "Toolbar"), NULL, NULL);
+	action = gtk_toggle_action_new("ToggleToolbar", _( "Button bar"), NULL, NULL);
 	gtk_toggle_action_set_active(action,GetBoolean("Toggles","Toolbar",TRUE));
 	g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_toolbar),0);
 	gtk_action_group_add_action(common_actions,(GtkAction *) action);

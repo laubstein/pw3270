@@ -67,13 +67,14 @@
 		struct 				keypad_row *last_row;
 
 		GtkWidget				*widget;
+		gchar					*label;
 
 		char 	name[1];
 	};
 
 	LOCAL_EXTERN struct keypad	* keypad_load(void);
 	LOCAL_EXTERN void			  keypad_free(struct keypad *keypad);
-	LOCAL_EXTERN void 			  keypad_pack(GtkBox *box, struct keypad *keypad, enum KEYPAD_POSITION position);
+	LOCAL_EXTERN void 			  keypad_pack(GtkBox *box, GtkWidget *menu, struct keypad *keypad, enum KEYPAD_POSITION position);
 
 #else
 

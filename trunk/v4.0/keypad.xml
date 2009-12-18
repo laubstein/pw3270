@@ -1,6 +1,6 @@
 <keypad_description>
 
-	<keypad name="default" position="Right">
+	<keypad name="default" label="Keypad" position="Right">
 
 		<row>
 			<keypadbutton action="PF1" />

@@ -167,15 +167,25 @@
 	if(!strcmp(element_name,"keypad"))
 	{
 		// Alocate a new keypad
-		const gchar *name = get_attribute(attribute_names,attribute_values,"name");
+		const gchar *name 	= get_attribute(attribute_names,attribute_values,"name");
+		const gchar *label = get_attribute(attribute_names,attribute_values,"label");
 
 		if(*name)
 		{
-			struct keypad *keypad = g_malloc0(sizeof(struct keypad)+strlen(name));
+			struct keypad *keypad;
+
+			if(!(label && *label))
+				label = name;
+
+			keypad = g_malloc0(sizeof(struct keypad)+strlen(name)+strlen(label)+2);
 
 			strcpy(keypad->name,name);
+
+			keypad->label = keypad->name+(strlen(keypad->name)+1);
+			strcpy(keypad->label,label);
+
 			keypad->position = KEYPAD_POSITION_RIGHT;
-			Trace("Loading keypad \"%s\" first: %p last: %p",keypad->name,data->first_keypad,data->last_keypad);
+			Trace("\n\n\nLoading keypad \"%s\" (\"%s\") first: %p last: %p",keypad->name,keypad->label,data->first_keypad,data->last_keypad);
 
 			APPEND_CHILD_ELEMENT(data,first_keypad,last_keypad,keypad);
 		}
@@ -285,12 +295,52 @@
 	g_free(keypad);
  }
 
- void keypad_pack(GtkBox *box, struct keypad *keypad, enum KEYPAD_POSITION position)
+ static void toggle_keypad(GtkCheckMenuItem *item, GtkWidget *keypad)
+ {
+ 	gboolean state = gtk_check_menu_item_get_active(item);
+ 	if(state)
+		gtk_widget_show(keypad);
+ 	else
+		gtk_widget_hide(keypad);
+
+ 	SetBoolean("Toggles", gtk_widget_get_name(keypad), state);
+ }
+
+ static void build_keypad_menu(GtkWidget *keypad, GtkWidget *menu, const gchar *label)
+ {
+	gboolean isVisible = GetBoolean("Toggles", gtk_widget_get_name(keypad), TRUE);
+
+	menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(menu));
+	Trace("Submenu: %p",menu);
+	if(menu)
+	{
+		GtkWidget *item = gtk_check_menu_item_new_with_label(gettext(label));
+		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),isVisible);
+		gtk_widget_show(item);
+		g_signal_connect(G_OBJECT(item), "toggled", G_CALLBACK(toggle_keypad), keypad);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
+	}
+
+	if(isVisible)
+		gtk_widget_show(keypad);
+	else
+		gtk_widget_hide(keypad);
+
+ }
+
+ void keypad_pack(GtkBox *box, GtkWidget *menu, struct keypad *keypad, enum KEYPAD_POSITION position)
  {
 	while(keypad)
 	{
 		if(keypad->position == position && keypad->widget)
+		{
+			Trace("\n\n\nInserting keypad %s (%s) into menu %p",gtk_widget_get_name(keypad->widget),keypad->label,menu);
+
 			gtk_box_pack_start(GTK_BOX(box), keypad->widget, FALSE, FALSE, 0);
+
+			if(menu)
+				build_keypad_menu(keypad->widget,menu,keypad->label);
+		}
 		keypad = keypad->next;
 	}
  }

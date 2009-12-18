@@ -284,6 +284,7 @@
 
  	GtkWidget				*vbox;
  	GtkWidget				*hbox;
+ 	GtkWidget				*toolbar_menu = NULL;
 	GtkUIManager			*ui_manager;
 	GdkPixbuf				*pix;
 	gchar 					*ptr;
@@ -359,11 +360,14 @@
 		LoadFontMenu(topwindow,gtk_ui_manager_get_widget(ui_manager,"/MainMenubar/SettingsMenu/FontSettings"));
 
 		toolbar_widget = gtk_ui_manager_get_widget(ui_manager,"/MainToolbar");
+		toolbar_menu = gtk_ui_manager_get_widget(ui_manager,"/MainMenubar/ViewMenu/ToolbarMenu");
 
 		g_object_unref(ui_manager);
 	}
 
 	FontChanged();
+
+	Trace("Toolbar menu: %p",toolbar_menu);
 
 	gtk_widget_show_all(vbox);
 
@@ -386,17 +390,17 @@
 #ifdef CONFIGURABLE_KEYPAD
 	// Load keypads
 	keypad = keypad_load();
-	keypad_pack(GTK_BOX(vbox), keypad, KEYPAD_POSITION_TOP);
+	keypad_pack(GTK_BOX(vbox), toolbar_menu, keypad, KEYPAD_POSITION_TOP);
 #endif
 
     hbox = gtk_hbox_new(FALSE,0);
 #ifdef CONFIGURABLE_KEYPAD
-	keypad_pack(GTK_BOX(hbox), keypad, KEYPAD_POSITION_LEFT);
+	keypad_pack(GTK_BOX(hbox), toolbar_menu, keypad, KEYPAD_POSITION_LEFT);
 #endif
 	gtk_box_pack_start(GTK_BOX(hbox), terminal, TRUE, TRUE, 0);
 	gtk_widget_show(terminal);
 #ifdef CONFIGURABLE_KEYPAD
-	keypad_pack(GTK_BOX(hbox), keypad, KEYPAD_POSITION_RIGHT);
+	keypad_pack(GTK_BOX(hbox), toolbar_menu, keypad, KEYPAD_POSITION_RIGHT);
 #endif
 	gtk_widget_show(hbox);
 
@@ -408,7 +412,7 @@
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 
 #ifdef CONFIGURABLE_KEYPAD
-	keypad_pack(GTK_BOX(hbox), keypad, KEYPAD_POSITION_BOTTOM);
+	keypad_pack(GTK_BOX(hbox), toolbar_menu, keypad, KEYPAD_POSITION_BOTTOM);
 #endif
 
 	gtk_widget_show(vbox);
