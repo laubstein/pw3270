@@ -278,7 +278,7 @@
 #endif
 
 
-#ifdef CONFIGURABLE_KEYPAD
+#ifdef ENABLE_LOADABLE_KEYPAD
 	struct keypad			*keypad	= NULL;
 #else
 	GtkWidget				*keypad = NULL;
@@ -396,24 +396,24 @@
 
     gtk_container_add(GTK_CONTAINER(topwindow),vbox);
 
-#ifdef CONFIGURABLE_KEYPAD
+#ifdef ENABLE_LOADABLE_KEYPAD
 	// Load keypads
 	keypad = keypad_load();
 	keypad_pack(GTK_BOX(vbox), toolbar_menu, keypad, KEYPAD_POSITION_TOP);
 #endif
 
     hbox = gtk_hbox_new(FALSE,0);
-#ifdef CONFIGURABLE_KEYPAD
+#ifdef ENABLE_LOADABLE_KEYPAD
 	keypad_pack(GTK_BOX(hbox), toolbar_menu, keypad, KEYPAD_POSITION_LEFT);
 #endif
 	gtk_box_pack_start(GTK_BOX(hbox), terminal, TRUE, TRUE, 0);
 	gtk_widget_show(terminal);
-#ifdef CONFIGURABLE_KEYPAD
+#ifdef ENABLE_LOADABLE_KEYPAD
 	keypad_pack(GTK_BOX(hbox), toolbar_menu, keypad, KEYPAD_POSITION_RIGHT);
 #endif
 	gtk_widget_show(hbox);
 
-#ifndef CONFIGURABLE_KEYPAD
+#ifndef ENABLE_LOADABLE_KEYPAD
 	keypad = CreateKeypadWidget();
 	gtk_box_pack_end(GTK_BOX(hbox), keypad, FALSE, FALSE, 0);
 	configure_toolbar(keypad, toolbar_menu, N_( "Keypad"));
@@ -421,7 +421,7 @@
 
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 
-#ifdef CONFIGURABLE_KEYPAD
+#ifdef ENABLE_LOADABLE_KEYPAD
 	keypad_pack(GTK_BOX(hbox), toolbar_menu, keypad, KEYPAD_POSITION_BOTTOM);
 #endif
 
@@ -460,7 +460,7 @@
 
 #endif
 
-#ifdef CONFIGURABLE_KEYPAD
+#ifdef ENABLE_LOADABLE_KEYPAD
 	keypad_free(keypad);
 #endif
 

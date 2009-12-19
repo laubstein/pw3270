@@ -30,7 +30,7 @@
  *
  */
 
-#ifdef CONFIGURABLE_KEYPAD
+#ifdef ENABLE_LOADABLE_KEYPAD
 
 	enum KEYPAD_POSITION
 	{
@@ -76,12 +76,12 @@
 	LOCAL_EXTERN void			  keypad_free(struct keypad *keypad);
 	LOCAL_EXTERN void 			  keypad_pack(GtkBox *box, GtkWidget *menu, struct keypad *keypad, enum KEYPAD_POSITION position);
 
-#else
+#else // ENABLE_LOADABLE_KEYPAD
 
 	LOCAL_EXTERN GtkWidget	* keypad;
 	LOCAL_EXTERN GtkWidget	* CreateKeypadWidget(void);
 
-#endif // CONFIGURABLE_KEYPAD
+#endif // ENABLE_LOADABLE_KEYPAD
 
 	LOCAL_EXTERN void	  	  SetKeypadSensitive(gboolean state);
 	LOCAL_EXTERN void		  keypad_set_flags(GtkWidget *widget);
