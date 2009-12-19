@@ -43,7 +43,7 @@
 
 /*---[ Internals ]----------------------------------------------------------------------------------------------*/
 
-#ifdef CONFIGURABLE_KEYPAD
+#ifdef ENABLE_LOADABLE_KEYPAD
 
  struct build_data
  {
@@ -84,18 +84,6 @@
 
  static void set_button_action(GtkWidget *widget, const gchar *action_name)
  {
-#if GTK_CHECK_VERSION(2,16,0)
-	/* Find action by name, associate it with the button */
-	GtkAction *action = get_action_by_name(action_name);
-
-	Trace("Action(\"%s\")=%p",action_name,action);
-
-	if(action)
-	{
-		gtk_activatable_set_related_action(GTK_ACTIVATABLE(widget),action);
-		return;
-	}
-#else
 	/* Find action callback by name, associate it with "clicked" signal */
 	GCallback callback = get_action_callback_by_name(action_name);
 
@@ -107,7 +95,6 @@
 		return;
 
 	}
-#endif
 
 	if(g_str_has_prefix(action_name,"pf") || g_str_has_prefix(action_name,"PF"))
 	{
@@ -192,8 +179,8 @@
 
  }
 
-/*---[ Implement Configurable keypad ]--------------------------------------------------------------------------*/
-#ifdef CONFIGURABLE_KEYPAD
+/*---[ Implement loadable keypad ]--------------------------------------------------------------------------*/
+#ifdef ENABLE_LOADABLE_KEYPAD
 
  #define APPEND_CHILD_ELEMENT(parent,first,last,child) if( parent->last) { parent->last->next = child; parent->last = child; } else { parent->first = parent->last = child; }
 
@@ -219,6 +206,7 @@
 		// Alocate a new keypad
 		const gchar *name 	= get_attribute(attribute_names,attribute_values,"name");
 		const gchar *label = get_attribute(attribute_names,attribute_values,"label");
+		const gchar *position = get_attribute(attribute_names,attribute_values,"position");
 
 		if(*name)
 		{
@@ -234,7 +222,15 @@
 			keypad->label = keypad->name+(strlen(keypad->name)+1);
 			strcpy(keypad->label,label);
 
-			keypad->position = KEYPAD_POSITION_RIGHT;
+			if(!g_strncasecmp(position,"top",3))
+				keypad->position = KEYPAD_POSITION_TOP;
+			else if(!g_strncasecmp(position,"left",4))
+				keypad->position = KEYPAD_POSITION_LEFT;
+			else if(!g_strncasecmp(position,"bottom",6))
+				keypad->position = KEYPAD_POSITION_BOTTOM;
+			else
+				keypad->position = KEYPAD_POSITION_RIGHT;
+
 			Trace("\n\n\nLoading keypad \"%s\" (\"%s\") first: %p last: %p",keypad->name,keypad->label,data->first_keypad,data->last_keypad);
 
 			APPEND_CHILD_ELEMENT(data,first_keypad,last_keypad,keypad);
@@ -491,18 +487,7 @@
  }
 
 /*---[ Implement Fixed Keypad ]---------------------------------------------------------------------------------*/
-#else // CONFIGURABLE_KEYPAD
-
-/*
- static void set_visible(int visible, int reason)
- {
- 	if(visible)
-		gtk_widget_show(keypad);
-	else
-		gtk_widget_hide(keypad);
-
- }
-*/
+#else // ENABLE_LOADABLE_KEYPAD
 
  static GtkWidget * image_button(const gchar *stock, const gchar *action_name)
  {
@@ -576,7 +561,6 @@
 	LARGE_TEXT_BUTTON( _( "Erase\nEOF" ), "EraseEOF", 0, 10);
 	LARGE_TEXT_BUTTON( _( "Erase\nInput" ), "EraseInput", 1, 10);
 
-
 	/* "Enter" Button */
 	widget = image_button(GTK_STOCK_OK,"Enter");
 	gtk_table_attach_defaults(GTK_TABLE(table),widget,0,6,11,12);
@@ -592,17 +576,10 @@
 
     gtk_container_add(GTK_CONTAINER(keypad),vbox);
 
-/*
-	if(Toggled(KEYPAD))
-		gtk_widget_show(keypad);
-
-	register_tchange(KEYPAD,set_visible);
-*/
-
 	gtk_widget_set_name(keypad,"keypad_default");
 	keypad_set_flags(keypad);
 
  	return keypad;
  }
 
-#endif // CONFIGURABLE_KEYPAD
+#endif // ENABLE_LOADABLE_KEYPAD
