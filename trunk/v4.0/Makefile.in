@@ -436,7 +436,10 @@ install: Release po/pt_BR.po $(PACKAGE).desktop
 	@install --mode=644 lib3270.pc $(DESTDIR)/$(LIBDIR)/pkgconfig/$(PACKAGE).pc
 
 	@mkdir -p $(DESTDIR)/$(datarootdir)/applications/
-	@install --mode=644 $(PACKAGE).desktop $(DESTDIR)/$(datarootdir)/applications/$(PACKAGE).desktop
+	@desktop-file-install	--mode 644 \
+				--dir $(DESTDIR)/$(datarootdir)/applications \
+				--add-category TerminalEmulator \
+				$(PACKAGE).desktop
 
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES
 	@msgfmt -c -v -o $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo po/pt_BR.po
