@@ -444,16 +444,38 @@
  {
  	struct build_data 	info;
  	struct keypad		*keypad;
+
  	GMarkupParseContext *context;
- 	gchar				*contents = NULL;
- 	gchar				*filename =  g_build_filename(program_data,"keypad.xml",NULL);
+
+	GError  			*error		= NULL;
+ 	gchar				*contents	= NULL;
+ 	gchar				*filename	=  g_build_filename(program_data,"keypad.xml",NULL);
 
 	//
 	// Parse XML file creating data structures
 	//
 	Trace("Loading \"%s\"",filename);
-	if(!g_file_get_contents(filename,&contents,NULL,NULL))
+	if(!g_file_get_contents(filename,&contents,NULL,&error))
 	{
+		GtkWidget *dialog;
+
+		// Can't save configuration data, notify user
+		dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+											GTK_DIALOG_DESTROY_WITH_PARENT,
+											GTK_MESSAGE_WARNING,
+											GTK_BUTTONS_OK,
+											_(  "Can't load %s" ), filename);
+
+		gtk_window_set_title(GTK_WINDOW(dialog), _( "Error loading keypad" ) );
+
+		if(error && error->message)
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), error->message);
+
+		g_error_free(error);
+
+		gtk_dialog_run(GTK_DIALOG (dialog));
+		gtk_widget_destroy(dialog);
+
 		g_free(filename);
 		return NULL;
 	}
@@ -462,8 +484,27 @@
 
 	context = g_markup_parse_context_new(&parser,G_MARKUP_TREAT_CDATA_AS_TEXT,&info,NULL);
 
-	if(!g_markup_parse_context_parse(context,contents,strlen(contents),NULL))
+	if(!g_markup_parse_context_parse(context,contents,strlen(contents),&error))
 	{
+		GtkWidget *dialog;
+
+		// Can't save configuration data, notify user
+		dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+											GTK_DIALOG_DESTROY_WITH_PARENT,
+											GTK_MESSAGE_WARNING,
+											GTK_BUTTONS_OK,
+											_(  "Can't parse keypad description" ) );
+
+		gtk_window_set_title(GTK_WINDOW(dialog), _( "Error loading keypad" ) );
+
+		if(error && error->message)
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), error->message);
+
+		g_error_free(error);
+
+		gtk_dialog_run(GTK_DIALOG (dialog));
+		gtk_widget_destroy(dialog);
+
 		Log("Error loading \"%s\"",filename);
 	}
 #ifdef DEBUG
