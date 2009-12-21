@@ -50,6 +50,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 
 		# UI definition files
 		CreateDirectory "$INSTDIR\ui"
+		file "/oname=$INSTDIR\keypad.xml" keypad.xml
 		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.xml" ui\default.xml
 		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.act" ui\default.act
 
