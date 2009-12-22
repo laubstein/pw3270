@@ -239,8 +239,8 @@
 	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),					"Up",				NULL,	G_CALLBACK(action_Up)				},
 	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),				"Down",				NULL,	G_CALLBACK(action_Down)				},
 
-	{	"NextField",		GTK_STOCK_GOTO_LAST,	N_( "Next field" ),			"Tab",					NULL,	G_CALLBACK(action_Tab)				},
-	{	"PreviousField",	GTK_STOCK_GOTO_FIRST,	N_( "Previous field" ),		"<Shift>ISO_Left_Tab",	NULL,	G_CALLBACK(action_BackTab)			},
+	{	"NextField",		GTK_STOCK_GOTO_LAST,	N_( "Next field" ),			"Tab",				NULL,	G_CALLBACK(action_Tab)				},
+	{	"PreviousField",	GTK_STOCK_GOTO_FIRST,	N_( "Previous field" ),		"ISO_Left_Tab",		NULL,	G_CALLBACK(action_BackTab)			},
 
  	/* Edit actions */
  	{	"PasteNext",		NULL,					N_( "Paste next" ),			"<Shift><Ctrl>v",	NULL,	G_CALLBACK(action_PasteNext)		},
@@ -916,7 +916,7 @@
 		{	GDK_KP_Right,		0,				"CursorRight"			},
 		{	GDK_KP_Down,		0,				"CursorDown"			},
 		{	GDK_Tab, 			0, 				"NextField"				},
-		{	GDK_ISO_Left_Tab,	GDK_SHIFT_MASK,	"PreviousField"			},
+//		{	GDK_ISO_Left_Tab,	GDK_SHIFT_MASK,	"PreviousField"			},
  	};
 
 	GDir	*dir;
