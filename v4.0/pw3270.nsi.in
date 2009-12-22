@@ -78,7 +78,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 		WriteRegStr HKCU "Software\@PROGRAM_NAME@" "" $INSTDIR
 
 		# Main library
-		file "/oname=C:\WINDOWS\system32\lib3270.dll" bin\Release\lib3270.dll
+		file "/oname=$SYSDIR\lib3270.dll" bin\Release\lib3270.dll
 
 	sectionEnd
 
@@ -169,7 +169,7 @@ section "Uninstall"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@"
 
 	# Delete System libraries
-	delete C:\WINDOWS\system32\lib3270.dll
+	delete $SYSDIR\lib3270.dll
 
 	# Delete extension libraries
 	delete $PROGRAMFILES\ooRexx\rx3270.dll
