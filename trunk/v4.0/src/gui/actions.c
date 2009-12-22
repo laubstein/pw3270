@@ -916,7 +916,9 @@
 		{	GDK_KP_Right,		0,				"CursorRight"			},
 		{	GDK_KP_Down,		0,				"CursorDown"			},
 		{	GDK_Tab, 			0, 				"NextField"				},
-//		{	GDK_ISO_Left_Tab,	GDK_SHIFT_MASK,	"PreviousField"			},
+#ifdef WIN32
+		{	GDK_ISO_Left_Tab,	GDK_SHIFT_MASK,	"PreviousField"			},
+#endif
  	};
 
 	GDir	*dir;
