@@ -430,7 +430,7 @@ static const struct lib3270_option options[] =
 #if defined(X3270_DBCS) /*[*/
     { OptLocalEncoding,OPT_STRING,False,ResLocalEncoding,offset(local_encoding), NULL },
 #endif /*]*/
-    { OptModel,    OPT_STRING,  False, ResKeymap,    offset(model), NULL },
+    { OptModel,    OPT_STRING,  False, ResKeymap,    offset(model), N_( "Set terminal model (screen size)" ) },
 #if defined(C3270) && !defined(_WIN32) /*[*/
     { OptMono,     OPT_BOOLEAN, True,  ResMono,      offset(mono), NULL },
 #endif /*]*/
