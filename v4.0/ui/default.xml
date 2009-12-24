@@ -54,6 +54,7 @@
 			<menuitem action='FontSettings' />
 
 			<menu action='OptionsMenu'>
+				<menuitem action='ToggleAutoConnect' />
 				<menuitem action='ToggleCursorBlink' />
 				<menuitem action='ToggleMonocase' />
 				<menuitem action='ToggleCursorPos'  />
