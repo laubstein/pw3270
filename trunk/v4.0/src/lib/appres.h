@@ -264,4 +264,5 @@ typedef struct {
 LIB3270_INTERNAL AppRes appres;
 
 #define _( x ) x	// FIXME (perry#2#): Check for right implementation
+#define N_( x ) x	// FIXME (perry#2#): Check for right implementation
 

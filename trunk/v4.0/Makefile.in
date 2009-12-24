@@ -396,6 +396,7 @@ src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 sources.lst: Makefile src/gui/*.c src/plugins/rexx/*.c Makefile
 	@rm -f $@
 	@for i in src/gui/*.c; do echo $$i >> $@; done
+	@for i in src/lib/*.c; do echo $$i >> $@; done
 	@for i in src/plugins/rexx/*.c; do echo $$i >> $@; done
 
 $(PACKAGE).pot: sources.lst

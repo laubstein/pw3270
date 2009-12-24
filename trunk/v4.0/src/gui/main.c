@@ -343,7 +343,7 @@ static void load_options(GOptionContext *context)
 
 	g_option_context_add_main_entries(context, entries, NULL);
 
-	Trace("%s","Setting default options");
+//	Trace("%s","Setting default options");
 
 	group = g_option_group_new( "lib3270", N_( "3270 options" ), N_( "Show lib3270 options" ), NULL, NULL);
 
@@ -380,7 +380,7 @@ static void load_options(GOptionContext *context)
 				entry->long_name++;
 
 			entry->arg_data = opt[f].aoff;
-			entry->description = opt[f].description;
+			entry->description = gettext( opt[f].description );
 			// entry->arg_description;
 			g_option_group_add_entries(group, entry);
 
