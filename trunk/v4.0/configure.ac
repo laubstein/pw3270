@@ -270,7 +270,7 @@ AC_ARG_ENABLE([loadable-keypad],
 [
 	pw3270_cv_loadable_keypad="$enableval"
 ],[
-	pw3270_cv_loadable_keypad="no"
+	pw3270_cv_loadable_keypad="yes"
 ])
 
 AC_ARG_WITH([icon],
