@@ -20,7 +20,7 @@
 
 		<menu action='SettingsMenu'>
 			<menu action='OptionsMenu'>
-				<menuitem action='ToggleAutoConnect' />
+				<menuitem action='ToggleBlankFill' />
 			</menu>
 		</menu>
 
