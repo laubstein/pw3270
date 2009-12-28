@@ -61,6 +61,7 @@ AC_PROG_CC
 DLLEXT=".so"
 
 OS_CFLAGS=""
+DLL_CFLAGS=""
 API_CFLAGS="-DLIB3270=1 -Isrc/lib -Isrc/include/lib3270"
 APP_CFLAGS="-Isrc/lib"
 
@@ -308,6 +309,14 @@ AC_ARG_WITH([program-name],
 	pw3270_cv_progname="$PACKAGE_NAME"
 ])
 
+AC_ARG_WITH([pic],
+	[AS_HELP_STRING([--with-pic], [enable support for PIC libraries (required to compile PW3270 on some systems)])],
+[
+	pw3270_cv_pic="$withval"
+],[
+	pw3270_cv_pic="no"
+])
+
 #
 # Check for OpenOffice.org
 #
@@ -380,6 +389,12 @@ AC_SUBST(LIBGNOME_CFLAGS)
 if test "$pw3270_cv_loadable_keypad" == "yes"; then
   AC_DEFINE(ENABLE_LOADABLE_KEYPAD)
 fi
+
+# Check for pic
+if test "$pw3270_cv_pic" == "yes"; then
+	DLL_CFLAGS="$DLL_CFLAGS -fPIC"
+fi
+AC_SUBST(DLL_CFLAGS)
 
 # Check for libssl
 if test "$pw3270_cv_ssl" == "yes"; then
