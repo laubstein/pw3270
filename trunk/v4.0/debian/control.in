@@ -2,14 +2,14 @@ Source: pw3270
 Section: unknown
 Priority: extra
 Maintainer: Perry Werneck <perry.werneck@gmail.com>
-Build-Depends: debhelper (>= 7), autotools-dev
+Build-Depends: debhelper (>= 7), autotools-dev, autoconf, libgtk2.0-dev, gettext, imagemagick, libssl-dev, libgnome2-dev, libgnomeui-dev, 
 Standards-Version: @PACKAGE_VERSION@.@PACKAGE_RELEASE@
 Homepage: http://www.softwarepublico.gov.br/dotlrn/clubs/pw3270/
 
 Package: pw3270
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, lib3270 (= ${binary:Version})
-Description: IBM 3270 Terminal emulator for gtk.
+Description: IBM 3270 Terminal emulator for gtk. (Rev. @PACKAGE_REVISION@)
  IBM 3270 terminal emulator gtk. It can be used to communicate with
  any IBM host that supports 3270-style connections over TELNET.
 
@@ -17,13 +17,13 @@ Package: lib3270
 Architecture: any
 Section: libs
 Depends: ${shlibs:Depends}, ${misc:Depends}, binutils (>= 2.14.90.0.7)
-Description: pw3270 shared libraries.
+Description: pw3270 shared libraries. (Rev. @PACKAGE_REVISION@)
  This package contains the pw3270 shared library for the core application.
 
 Package: lib3270-dev
 Architecture: any
 Section: libdevel
 Depends: ${misc:Depends}, lib3270 (= ${binary:Version})
-Description: pw3270 shared libraries.
- This package contains the pw3270 shared library for the core application.
+Description: pw3270 development files. (Rev. @PACKAGE_REVISION@)
+ This package contains the files needed for development of pw3270 plugins & extensions.
 
