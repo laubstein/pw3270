@@ -38,6 +38,8 @@
  */
 
 #include "globals.h"
+#include <errno.h>
+
 #if defined(_WIN32) /*[*/
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -382,16 +384,17 @@ static union {
 socklen_t ha_len = sizeof(haddr);
 
 #if defined(_WIN32) /*[*/
-void
-popup_a_sockerr(char *fmt, ...)
+void popup_a_sockerr(char *fmt, ...)
 {
 	va_list args;
 	char buffer[4096];
 
-	 va_start(args, fmt);
-	 vsprintf(buffer, fmt, args);
-	 va_end(args);
-	 popup_an_error("%s: %s", buffer, win32_strerror(socket_errno()));
+	va_start(args, fmt);
+	vsprintf(buffer, fmt, args);
+	va_end(args);
+
+	popup_system_error( N_( "Network error" ), buffer, win32_strerror(socket_errno()));
+
 }
 #else /*][*/
 void
@@ -400,10 +403,12 @@ popup_a_sockerr(char *fmt, ...)
 	va_list args;
 	char buffer[4096];
 
-	 va_start(args, fmt);
-	 vsprintf(buffer, fmt, args);
-	 va_end(args);
-	 popup_an_errno(errno, buffer);
+	va_start(args, fmt);
+	vsprintf(buffer, fmt, args);
+	va_end(args);
+
+	popup_system_error( N_( "Network error" ), buffer, strerror(errno));
+
 }
 #endif /*]*/
 
@@ -585,25 +590,25 @@ net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving,
 #endif /*]*/
 		/* create the socket */
 		if ((sock = socket(haddr.sa.sa_family, SOCK_STREAM, 0)) == -1) {
-			popup_a_sockerr("socket");
+			popup_a_sockerr( N_( "socket" ) );
 			return -1;
 		}
 
 		/* set options for inline out-of-band data and keepalives */
 		if (setsockopt(sock, SOL_SOCKET, SO_OOBINLINE, (char *)&on,
 			    sizeof(on)) < 0) {
-			popup_a_sockerr("setsockopt(SO_OOBINLINE)");
+			popup_a_sockerr( N_( "setsockopt(%s)" ), "SO_OOBINLINE");
 			close_fail;
 		}
 		if (setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (char *)&on,
 			    sizeof(on)) < 0) {
-			popup_a_sockerr("setsockopt(SO_KEEPALIVE)");
+			popup_a_sockerr( N_( "setsockopt(%s)" ), "SO_KEEPALIVE");
 			close_fail;
 		}
 #if defined(OMTU) /*[*/
 		if (setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char *)&mtu,
 			    sizeof(mtu)) < 0) {
-			popup_a_sockerr("setsockopt(SO_SNDBUF)");
+			popup_a_sockerr( N_( "setsockopt(%s)" ), "SO_SNDBUF");
 			close_fail;
 		}
 #endif /*]*/
@@ -640,7 +645,7 @@ net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving,
 				output_id = AddOutput(sock, output_possible);
 #endif /*]*/
 			} else {
-				popup_a_sockerr("%s:%d",hostname, current_port);
+				popup_a_sockerr( N_( "Can't connect to %s:%d" ),hostname, current_port);
 				close_fail;
 			}
 		} else {
@@ -998,9 +1003,9 @@ net_input(void)
 #endif /*]*/
 			trace_dsn("RCVD socket error %d\n", errno);
 			if (HALF_CONNECTED) {
-				popup_a_sockerr("%s:%d",hostname, current_port);
+				popup_a_sockerr( N_( "%s:%d" ),hostname, current_port);
 			} else if (socket_errno() != SE_ECONNRESET) {
-				popup_a_sockerr("Socket read");
+				popup_a_sockerr( N_( "Socket read error" ) );
 			}
 			host_disconnect(True);
 			return;
@@ -2005,7 +2010,7 @@ net_rawout(unsigned const char *buf, int len)
 			} else if (socket_errno() == SE_EINTR) {
 				goto bot;
 			} else {
-				popup_a_sockerr("Socket write");
+				popup_a_sockerr( N_( "Socket write error" ) );
 				host_disconnect(True);
 				return;
 			}
@@ -3154,14 +3159,14 @@ non_blocking(Boolean on)
 	int i = on ? 1 : 0;
 
 	if (SOCK_IOCTL(sock, FIONBIO, (int *) &i) < 0) {
-		popup_a_sockerr("ioctl(FIONBIO)");
+		popup_a_sockerr( N_( "ioctl(%s)" ), "FIONBIO");
 		return -1;
 	}
 # else /*][*/
 	int f;
 
 	if ((f = fcntl(sock, F_GETFL, 0)) == -1) {
-		popup_an_errno(errno, "fcntl(F_GETFL)");
+		popup_an_errno(errno, N_( "fcntl(%s)" ), "F_GETFL" );
 		return -1;
 	}
 	if (on)
@@ -3169,7 +3174,7 @@ non_blocking(Boolean on)
 	else
 		f &= ~O_NDELAY;
 	if (fcntl(sock, F_SETFL, f) < 0) {
-		popup_an_errno(errno, "fcntl(F_SETFL)");
+		popup_an_errno(errno, N_( "fcntl(%s)" ), "F_GETFL");
 		return -1;
 	}
 # endif /*]*/

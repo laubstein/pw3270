@@ -1,7 +1,7 @@
 # Portuguese/Brazil translation of pw3270.
-# Copyright (C) 2009 THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2010 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Perry Werneck <perry.werneck@gmail.com>, 2009.
+# Perry Werneck <perry.werneck@gmail.com>, 2010.
 # , fuzzy
 # 
 # 
@@ -9,13 +9,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-24 09:22-0200\n"
-"PO-Revision-Date: 2009-12-24 09:23-0200\n"
+"POT-Creation-Date: 2010-01-04 14:37-0200\n"
+"PO-Revision-Date: 2010-01-04 14:39-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
+
+#: src/lib/telnet.c:1006
+#, c-format
+msgid "%s:%d"
+msgstr ""
 
 #: src/gui/main.c:447
 msgid "- 3270 Emulator for GTK+"
@@ -160,6 +165,11 @@ msgstr "Procurar"
 #: src/gui/topwindow.c:383
 msgid "Button bar"
 msgstr "Barra de botões"
+
+#: src/lib/telnet.c:648
+#, c-format
+msgid "Can't connect to %s:%d"
+msgstr "Não foi possível conectar a %s:%d"
 
 #: src/gui/clipboard.c:210
 #, c-format
@@ -380,7 +390,7 @@ msgstr "Salvar captura de tela"
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
-#: src/lib/telnet.c:1220
+#: src/lib/telnet.c:1225
 msgid "EOR received when not in 3270 mode, ignored."
 msgstr ""
 
@@ -651,6 +661,10 @@ msgstr "Negociação com %s falhou!"
 #: src/gui/actions.c:318
 msgid "Network"
 msgstr "Rede"
+
+#: src/lib/telnet.c:396 src/lib/telnet.c:410
+msgid "Network error"
+msgstr "Erro de comunicação"
 
 #: src/gui/actions.c:242
 msgid "Next field"
@@ -1031,6 +1045,14 @@ msgstr "Mostrar tempo"
 msgid "Smart paste"
 msgstr "Colar inteligente"
 
+#: src/lib/telnet.c:1008
+msgid "Socket read error"
+msgstr "Erro ao receber dados"
+
+#: src/lib/telnet.c:2013
+msgid "Socket write error"
+msgstr "Erro ao enviar dados"
+
 #: src/gui/filetransfer.c:550
 msgid "Space allocation units"
 msgstr "Unidade de alocação de espaço"
@@ -1045,6 +1067,10 @@ msgstr "Situação:"
 
 #: src/gui/actions.c:196
 msgid "Sys Req"
+msgstr ""
+
+#: src/gui/screen.c:974
+msgid "System Error"
 msgstr ""
 
 #: src/plugins/rexx/plg_start.c:90
@@ -1196,47 +1222,47 @@ msgstr "Branco"
 msgid "Window"
 msgstr "Janela"
 
-#: src/gui/screen.c:721 src/gui/screen.c:749
+#: src/gui/screen.c:723 src/gui/screen.c:751
 msgid "X"
 msgstr ""
 
-#: src/gui/screen.c:725
+#: src/gui/screen.c:727
 msgid "X -f"
 msgstr ""
 
-#: src/gui/screen.c:757
+#: src/gui/screen.c:759
 msgid "X Connecting"
 msgstr "X Conectando"
 
-#: src/gui/screen.c:741
+#: src/gui/screen.c:743
 msgid "X Inhibit"
 msgstr "X Inibido"
 
-#: src/gui/screen.c:717
+#: src/gui/screen.c:719
 msgid "X Not Connected"
 msgstr "X Não conectado"
 
-#: src/gui/screen.c:733
+#: src/gui/screen.c:735
 msgid "X Numeric"
 msgstr "X Numérico"
 
-#: src/gui/screen.c:737
+#: src/gui/screen.c:739
 msgid "X Overflow"
 msgstr "X Estouro"
 
-#: src/gui/screen.c:729
+#: src/gui/screen.c:731
 msgid "X Protected"
 msgstr "X Protegido"
 
-#: src/gui/screen.c:753
+#: src/gui/screen.c:755
 msgid "X Resolving"
 msgstr "X Resolvendo"
 
-#: src/gui/screen.c:705
+#: src/gui/screen.c:707
 msgid "X System"
 msgstr "X Sistema"
 
-#: src/gui/screen.c:709
+#: src/gui/screen.c:711
 msgid "X Wait"
 msgstr "X Aguarde"
 
@@ -1276,8 +1302,27 @@ msgstr "_Sair"
 msgid "_View"
 msgstr "E_xibir"
 
+#: src/lib/telnet.c:3169 src/lib/telnet.c:3177
+#, c-format
+msgid "fcntl(%s)"
+msgstr ""
+
+#: src/lib/telnet.c:3162
+#, c-format
+msgid "ioctl(%s)"
+msgstr ""
+
 #: src/plugins/rexx/plg_start.c:176
 #, c-format
 msgid "script %s failed"
 msgstr "script %s falhou"
+
+#: src/lib/telnet.c:600 src/lib/telnet.c:605 src/lib/telnet.c:611
+#, c-format
+msgid "setsockopt(%s)"
+msgstr ""
+
+#: src/lib/telnet.c:593
+msgid "socket"
+msgstr ""
 

@@ -84,6 +84,7 @@
  static void	changed(int bstart, int bend);
  static void	error(const char *fmt, va_list arg);
  static void 	warning(const char *fmt, va_list arg);
+ static void	syserror(const char *title, const char *message, const char *system);
  static int	init(void);
  static void 	update_toggle(int ix, int value, int reason, const char *name);
  static void	show_timer(long seconds);
@@ -101,6 +102,7 @@
 	init,				// int (*init)(void);
 	error,				// void (*Error)(const char *fmt, va_list arg);
 	warning,			// void (*Warning)(const char *fmt, va_list arg);
+	syserror,			// void	(*SysError)(const char *title, const char *message, const char *system);
 	setsize,			// void (*setsize)(int rows, int cols);
 	addch,				// void (*addch)(int row, int col, int c, int attr);
 	set_charset,		// void (*charset)(char *dcs);
@@ -956,6 +958,47 @@
 	return g_string_free(str,FALSE);
  }
 
+ static void syserror(const char *title, const char *message, const char *system)
+ {
+ 	GtkWidget 	*dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CLOSE,
+													"%s",gettext( message ) );
+
+ 	g_warning("%s",message);
+
+	if(title)
+		gtk_window_set_title(GTK_WINDOW(dialog), gettext(title));
+	else
+		gtk_window_set_title(GTK_WINDOW(dialog), _( "System Error" ) );
+
+	if(system)
+	{
+		// Reencode and show secondary message
+#ifdef WIN32
+		gsize	bytes_written;
+		gchar	*ptr = g_locale_to_utf8(system, -1, NULL, &bytes_written, NULL);
+
+		if(ptr)
+		{
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), ptr);
+			g_free(ptr);
+		}
+		else
+		{
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), system);
+		}
+#else
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), system);
+#endif
+	}
+
+	gtk_dialog_run(GTK_DIALOG (dialog));
+	gtk_widget_destroy(dialog);
+
+ }
+
  static void warning(const char *fmt, va_list arg)
  {
  	gchar		*msg	= g_strdup_vprintf(gettext(fmt),arg);
@@ -978,7 +1021,7 @@
  	gchar		*msg	= g_strdup_vprintf(gettext(fmt),arg);
  	GtkWidget 	*dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_WARNING,
+													GTK_MESSAGE_ERROR,
 													GTK_BUTTONS_CLOSE,
 													"%s",msg );
 

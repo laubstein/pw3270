@@ -348,11 +348,12 @@
 
 		struct lib3270_screen_callbacks
 		{
-			unsigned short sz;
+			unsigned short	sz;
 
 			int		(*init)(void);
 			void	(*Error)(const char *fmt, va_list arg);
 			void	(*Warning)(const char *fmt, va_list arg);
+			void	(*SysError)(const char *title, const char *message, const char *system);
 			void	(*setsize)(int rows, int cols);
 			int		(*addch)(int row, int col, int c, unsigned short attr);
 			void	(*charset)(char *dcs);
@@ -420,9 +421,10 @@
 		LIB3270_EXPORT int lib3270_paste_string(unsigned char *str);
 
         /* Misc calls */
-		LIB3270_EXPORT int Get3270Socket(void);
-		LIB3270_EXPORT void popup_an_error(const char *fmt, ...);
-		LIB3270_EXPORT STATUS_CODE query_3270_terminal_status(void);
+		LIB3270_EXPORT int 			  Get3270Socket(void);
+		LIB3270_EXPORT void 		  popup_an_error(const char *fmt, ...);
+		LIB3270_EXPORT void 		  popup_system_error(const char *title, const char *message, const char *system);
+		LIB3270_EXPORT STATUS_CODE	  query_3270_terminal_status(void);
 
 		LIB3270_EXPORT int Toggled(int ix);
 
