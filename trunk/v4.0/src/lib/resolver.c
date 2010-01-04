@@ -181,68 +181,6 @@ int resolve_host_and_port(const char *host, char *portname, unsigned short *ppor
 	int rc;
 	struct parms p = { sizeof(struct parms), host, portname, pport, sa, sa_len, errmsg, em_len };
 
-/*
-#if defined(_WIN32)
-
-	// Win32 version: Use the right DLL.
-
-	static int loaded = FALSE;
-	static FARPROC call = NULL;
-
-	if (!loaded) {
-		OSVERSIONINFO info;
-		HMODULE handle;
-		char *dllname;
-
-		// Figure out if we are pre- or post XP.
-		memset(&info, '\0', sizeof(info));
-		info.dwOSVersionInfoSize = sizeof(info);
-
-		if (GetVersionEx(&info) == 0) {
-			snprintf(errmsg, em_len,
-				"Can't retrieve OS version: %s",
-				win32_strerror(GetLastError()));
-			return -1;
-		}
-
-		 // For pre-XP, load the IPv4-only DLL.
-		 // For XP and later, use the IPv4/IPv6 DLL.
-		if (info.dwMajorVersion < 5 ||
-		    (info.dwMajorVersion == 5 && info.dwMinorVersion < 1))
-		    	dllname = "w3n4.dll";
-		else
-		    	dllname = "w3n46.dll";
-
-		Trace("Loading %s",dllname);
-
-		handle = LoadLibrary(dllname);
-		if (handle == NULL) {
-			snprintf(errmsg, em_len, "Can't load %s: %s",
-				dllname, win32_strerror(GetLastError()));
-			return -1;
-		}
-
-		// Look up the entry point we need.
-		call = GetProcAddress(handle, DLL_RESOLVER_NAME);
-		Trace("Entry point for %s is %p",DLL_RESOLVER_NAME,call);
-		if (call == NULL) {
-			snprintf(errmsg, em_len,
-				"Can't resolve " DLL_RESOLVER_NAME
-				" in %s: %s", dllname,
-				win32_strerror(GetLastError()));
-		    	return -1;
-		}
-
-		loaded = TRUE;
-	}
-
-#else
-
-	int	 (*call)(struct parms *p) = &cresolve_host_and_port;
-
-
-#endif
-*/
 	Trace("Calling resolver for %s", p.host);
 
 	rc = CallAndWait((int (*)(void *)) cresolve_host_and_port,&p);

@@ -869,6 +869,17 @@ extern void popup_an_error(const char *fmt, ...)
 
 }
 
+LIB3270_EXPORT void popup_system_error(const char *title, const char *message, const char *system)
+{
+	if(callbacks && callbacks->SysError)
+	{
+		callbacks->SysError(title,message,system);
+		return;
+	}
+
+	popup_an_error("%s\n%s\n%s",title,message,system);
+}
+
 LIB3270_EXPORT int set_device_buffer(struct ea *src, int el)
 {
 	if(el > (maxROWS * maxCOLS))
