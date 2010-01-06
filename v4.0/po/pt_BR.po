@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-04 14:37-0200\n"
-"PO-Revision-Date: 2010-01-04 14:39-0200\n"
+"POT-Creation-Date: 2010-01-06 12:51-0200\n"
+"PO-Revision-Date: 2010-01-06 12:52-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -1300,7 +1300,7 @@ msgstr "_Sair"
 
 #: src/gui/actions.c:309
 msgid "_View"
-msgstr "E_xibir"
+msgstr "Exibir"
 
 #: src/lib/telnet.c:3169 src/lib/telnet.c:3177
 #, c-format
