@@ -418,9 +418,7 @@ popup_a_sockerr(char *fmt, ...)
  *	Called only once and is responsible for setting up the telnet
  *	variables.  Returns the file descriptor of the connected socket.
  */
-int
-net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving,
-    Boolean *pending)
+int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving, Boolean *pending)
 {
 	struct servent	*sp;
 	struct hostent	*hp;
@@ -633,6 +631,7 @@ net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving,
 #endif /*]*/
 
 		/* connect */
+		status_connecting(1);
 		if (connect(sock, &haddr.sa, ha_len) == -1) {
 			if (socket_errno() == SE_EWOULDBLOCK
 #if defined(SE_EINPROGRESS) /*[*/
