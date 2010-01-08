@@ -263,6 +263,13 @@ typedef struct {
 
 LIB3270_INTERNAL AppRes appres;
 
-#define _( x ) x	// FIXME (perry#2#): Check for right implementation
-#define N_( x ) x	// FIXME (perry#2#): Check for right implementation
-
+// FIXME (perry#2#): Check for right implementation
+#if defined(LIB3270)
+	#define _( x ) x
+	#define N_( x ) x
+	#define MSG_( c, s )	s
+#else
+	#define _( x ) x
+	#define N_( x ) x
+	#define MSG_( c, s )	get_message(c)
+#endif

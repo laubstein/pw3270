@@ -173,11 +173,11 @@ static const struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to m
 	Trace("%s(%s)",__FUNCTION__,local);
 
 	if(ft_local_file)
-		return cant_start(EBUSY,_( "File transfer is busy"));
+		return cant_start(EBUSY,_( "File transfer is already active"));
 
 	// Check remote file
 	if(!*remote)
-		return cant_start(EINVAL,_( "Invalid host file"));
+		return cant_start(EINVAL,_( "The remote file name is invalid"));
 
 	// Open local file
 	ft_local_file = fopen(local,(flags & FT_FLAG_RECEIVE) ? ((flags & FT_FLAG_APPEND) ? "a" : "w") : "r");
