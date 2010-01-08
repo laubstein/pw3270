@@ -75,6 +75,10 @@
 #include "idlec.h"
 #include "printerc.h"
 
+#if defined(X3270_FT)
+	#include "ftc.h"
+#endif
+
 #if defined(_WIN32) /*[*/
 #include "winversc.h"
 #endif /*]*/
@@ -226,6 +230,10 @@ int lib3270_init(void)
 	hostfile_init();
 	ansi_init();
 	sms_init();
+
+#if defined(X3270_FT)
+	ft_init();
+#endif
 
 #if defined(X3270_PRINTER)
 	printer_init();

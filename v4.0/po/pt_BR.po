@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-08 08:55-0200\n"
-"PO-Revision-Date: 2010-01-08 08:58-0200\n"
+"POT-Creation-Date: 2010-01-08 14:59-0200\n"
+"PO-Revision-Date: 2010-01-08 14:59-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -222,7 +222,7 @@ msgstr "Não foi possível carregar %s\n%s"
 msgid "Can't load %s: %s"
 msgstr "Não foi possível carregar %s: %s"
 
-#: src/lib/ft.c:186
+#: src/lib/ft.c:172
 msgid "Can't open local file"
 msgstr "Não foi possível abrir arquivo local"
 
@@ -269,11 +269,11 @@ msgstr "Não foi possível iniciar"
 msgid "Can't start script"
 msgstr "Não foi possível iniciar o script"
 
-#: src/lib/ft.c:155
+#: src/lib/ft.c:141
 msgid "Cancelled by user"
 msgstr "Cancelado pelo usuário"
 
-#: src/lib/glue.c:216
+#: src/lib/glue.c:220
 #, c-format
 msgid "Cannot find charset \"%s\", using defaults"
 msgstr "Não encontrei codificação para \"%s\", usando padrão"
@@ -508,7 +508,7 @@ msgstr "Transferência de arquivo"
 msgid "File transfer failed"
 msgstr "Transferência de arquivo falhou"
 
-#: src/lib/ft.c:176
+#: src/lib/ft.c:162
 msgid "File transfer is already active"
 msgstr "Transferência de arquivos já está ativa"
 
@@ -563,6 +563,10 @@ msgstr "Verde"
 #: src/gui/actions.c:304
 msgid "Help"
 msgstr "Ajuda"
+
+#: src/lib/ft.c:373
+msgid "Host disconnected, transfer cancelled"
+msgstr ""
 
 #: src/gui/filetransfer.c:397
 msgid "Host file name:"
@@ -693,6 +697,10 @@ msgstr "Normal/Protegido"
 #: src/gui/colors.c:389
 msgid "Normal/Unprotected"
 msgstr "Normal/Desprotegido"
+
+#: src/lib/ft.c:380
+msgid "Not in 3270 mode, transfer cancelled"
+msgstr ""
 
 #: src/gui/colors.c:366
 msgid "OIA"
@@ -1029,7 +1037,7 @@ msgstr "Separador"
 msgid "Set hostname"
 msgstr "Mudar servidor"
 
-#: src/lib/glue.c:433
+#: src/lib/glue.c:441
 msgid "Set terminal model (screen size)"
 msgstr "Define o modelo do terminal (tamanho da tela)"
 
@@ -1093,7 +1101,7 @@ msgstr ""
 msgid "Text file"
 msgstr "Arquivo texto"
 
-#: src/lib/ft.c:180
+#: src/lib/ft.c:166
 msgid "The remote file name is invalid"
 msgstr "O nome do arquivo remoto não é válido"
 
@@ -1182,7 +1190,7 @@ msgstr "Não foi possível colar texto da área de trabalho"
 msgid "Unable to save configuration data in %s"
 msgstr "Não foi possível salvar a configuração em %s"
 
-#: src/lib/ft.c:269
+#: src/lib/ft.c:255
 msgid "Unable to send file-transfer request"
 msgstr "Incapaz de enviar o pedido de transferência de arquivos"
 
