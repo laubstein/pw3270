@@ -160,7 +160,7 @@ upload_convert(unsigned char *buf, int len)
 					break;
 			}
 			if (quadrant >= NQ) {
-				cut_abort(get_message("ftCutConversionError"),
+				cut_abort(MSG_("ftCutConversionError","Data conversion error"),
 				    SC_ABORT_XMIT);
 				return -1;
 			}
@@ -169,7 +169,7 @@ upload_convert(unsigned char *buf, int len)
 
 		/* Make sure it's in a valid range. */
 		if (c < 0x40 || c > 0xf9) {
-			cut_abort(get_message("ftCutConversionError"),
+			cut_abort(MSG_("ftCutConversionError","Data conversion error"),
 			    SC_ABORT_XMIT);
 			return -1;
 		}
@@ -291,7 +291,7 @@ ft_cut_data(void)
 		break;
 	    default:
 		trace_ds("< FT unknown 0x%02x\n", ea_buf[O_FRAME_TYPE].cc);
-		cut_abort(get_message("ftCutUnknownFrame"), SC_ABORT_XMIT);
+		cut_abort(MSG_("ftCutUnknownFrame"," Unknown frame type from host"), SC_ABORT_XMIT);
 		break;
 	}
 }
@@ -347,14 +347,14 @@ cut_control_code(void)
 			while (bp >= buf && *bp == ' ')
 				*bp-- = '\0';
 			if (!*buf)
-				strcpy(buf, get_message("ftHostCancel"));
+				strcpy(buf, MSG_("ftHostCancel","Transfer cancelled by host"));
 		}
 		ft_complete(buf);
 		Free(buf);
 		break;
 	    default:
 		trace_ds("unknown 0x%04x\n", code);
-		cut_abort(get_message("ftCutUnknownControl"), SC_ABORT_XMIT);
+		cut_abort(MSG_("ftCutUnknownControl","Unknown FT control code from host"), SC_ABORT_XMIT);
 		break;
 	}
 }
@@ -374,7 +374,7 @@ cut_data_request(void)
 
 	trace_ds("< FT DATA_REQUEST %u\n", from6(seq));
 	if (ft_state == FT_ABORT_WAIT) {
-		cut_abort(get_message("ftUserCancel"), SC_ABORT_FILE);
+		cut_abort(MSG_("ftUserCancel","Transfer cancelled by user"), SC_ABORT_FILE);
 		return;
 	}
 
@@ -439,7 +439,7 @@ static void
 cut_retransmit(void)
 {
 	trace_ds("< FT RETRANSMIT\n");
-	cut_abort(get_message("ftCutRetransmit"), SC_ABORT_XMIT);
+	cut_abort(MSG_("ftCutRetransmit","Transmission error"), SC_ABORT_XMIT);
 }
 
 /*
@@ -470,7 +470,7 @@ cut_data(void)
 
 	trace_ds("< FT DATA\n");
 	if (ft_state == FT_ABORT_WAIT) {
-		cut_abort(get_message("ftUserCancel"), SC_ABORT_FILE);
+		cut_abort(MSG_("ftUserCancel","Transfer cancelled by user"), SC_ABORT_FILE);
 		return;
 	}
 
@@ -478,7 +478,7 @@ cut_data(void)
 	raw_length = from6(ea_buf[O_DT_LEN].cc) << 6 |
 		     from6(ea_buf[O_DT_LEN + 1].cc);
 	if ((int)raw_length > O_RESPONSE - O_DT_DATA) {
-		cut_abort(get_message("ftCutOversize"), SC_ABORT_XMIT);
+		cut_abort(MSG_("ftCutOversize","Illegal frame length"), SC_ABORT_XMIT);
 		return;
 	}
 	for (i = 0; i < (int)raw_length; i++)

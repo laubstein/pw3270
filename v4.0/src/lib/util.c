@@ -388,6 +388,9 @@ split_lresource(char **st, char **value)
 }
 #endif /*]*/
 
+
+#if !defined(LIB3270)
+
 const char *
 get_message(const char *key)
 {
@@ -402,6 +405,8 @@ get_message(const char *key)
 		return namebuf;
 	}
 }
+
+#endif
 
 #define ex_getenv getenv
 

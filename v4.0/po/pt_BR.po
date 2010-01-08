@@ -9,15 +9,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-06 12:51-0200\n"
-"PO-Revision-Date: 2010-01-06 12:52-0200\n"
+"POT-Creation-Date: 2010-01-08 08:55-0200\n"
+"PO-Revision-Date: 2010-01-08 08:58-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
 
-#: src/lib/telnet.c:1006
+#: src/lib/ft_cut.c:294
+msgid " Unknown frame type from host"
+msgstr ""
+
+#: src/lib/telnet.c:1005
 #, c-format
 msgid "%s:%d"
 msgstr ""
@@ -166,7 +170,7 @@ msgstr "Procurar"
 msgid "Button bar"
 msgstr "Barra de botões"
 
-#: src/lib/telnet.c:648
+#: src/lib/telnet.c:647
 #, c-format
 msgid "Can't connect to %s:%d"
 msgstr "Não foi possível conectar a %s:%d"
@@ -350,6 +354,10 @@ msgstr "Azul escuro"
 msgid "Dark Green"
 msgstr "Verde escuro"
 
+#: src/lib/ft_cut.c:163 src/lib/ft_cut.c:172
+msgid "Data conversion error"
+msgstr "Erro na conversão de dados"
+
 #: src/gui/actions.c:311
 msgid "Debug"
 msgstr ""
@@ -390,9 +398,9 @@ msgstr "Salvar captura de tela"
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
-#: src/lib/telnet.c:1225
+#: src/lib/telnet.c:1224
 msgid "EOR received when not in 3270 mode, ignored."
-msgstr ""
+msgstr "\"EOR\" recebido fora do modo 3270, ignorado"
 
 #: src/gui/filetransfer.c:151
 msgid "ETA:"
@@ -501,8 +509,8 @@ msgid "File transfer failed"
 msgstr "Transferência de arquivo falhou"
 
 #: src/lib/ft.c:176
-msgid "File transfer is busy"
-msgstr ""
+msgid "File transfer is already active"
+msgstr "Transferência de arquivos já está ativa"
 
 #: src/gui/actions.c:166
 msgid "First Field"
@@ -572,6 +580,10 @@ msgstr ""
 msgid "Hostname:"
 msgstr "Endereço do servidor:"
 
+#: src/lib/ft_cut.c:481
+msgid "Illegal frame length"
+msgstr ""
+
 #: src/gui/filetransfer.c:185
 msgid "Informations"
 msgstr "Informações"
@@ -596,10 +608,6 @@ msgstr "Ação inválida"
 #, c-format
 msgid "Invalid action \"%s\" when loading %s"
 msgstr "Ação \"%s\" inválida ao carregar %s"
-
-#: src/lib/ft.c:180
-msgid "Invalid host file"
-msgstr ""
 
 #: src/gui/actions.c:92
 msgid "Keep selected"
@@ -1045,11 +1053,11 @@ msgstr "Mostrar tempo"
 msgid "Smart paste"
 msgstr "Colar inteligente"
 
-#: src/lib/telnet.c:1008
+#: src/lib/telnet.c:1007
 msgid "Socket read error"
 msgstr "Erro ao receber dados"
 
-#: src/lib/telnet.c:2013
+#: src/lib/telnet.c:2012
 msgid "Socket write error"
 msgstr "Erro ao enviar dados"
 
@@ -1071,7 +1079,7 @@ msgstr ""
 
 #: src/gui/screen.c:974
 msgid "System Error"
-msgstr ""
+msgstr "Erro de sistema"
 
 #: src/plugins/rexx/plg_start.c:90
 msgid "System busy"
@@ -1084,6 +1092,10 @@ msgstr ""
 #: src/gui/filetransfer.c:389
 msgid "Text file"
 msgstr "Arquivo texto"
+
+#: src/lib/ft.c:180
+msgid "The remote file name is invalid"
+msgstr "O nome do arquivo remoto não é válido"
 
 #: src/gui/main.c:328
 msgid "Theme file (gtkrc)"
@@ -1135,6 +1147,15 @@ msgstr "Mostrar posição do cursor"
 msgid "Tracks"
 msgstr "Trilhas"
 
+#: src/lib/ft_cut.c:350
+msgid "Transfer cancelled by host"
+msgstr "Transferência cancelada pelo host"
+
+#: src/lib/ft_cut.c:377 src/lib/ft_cut.c:473 src/lib/ft_dft.c:218
+#: src/lib/ft_dft.c:355
+msgid "Transfer cancelled by user"
+msgstr "Transferência cancelada pelo usuário"
+
 #: src/gui/filetransfer.c:739
 #, c-format
 msgid "Transfer complete, %ld bytes transferred %.2lg Kbytes/sec in %s mode"
@@ -1143,6 +1164,10 @@ msgstr "Transferência completa,·%ld·bytes·transferidos·%.2lg·Kbytes/sec·e
 #: src/gui/filetransfer.c:501
 msgid "Transfer options"
 msgstr "Opções de transferência"
+
+#: src/lib/ft_cut.c:442
+msgid "Transmission error"
+msgstr "Erro de transmissão"
 
 #: src/gui/colors.c:377 src/gui/colors.c:385
 msgid "Turquoise"
@@ -1159,7 +1184,7 @@ msgstr "Não foi possível salvar a configuração em %s"
 
 #: src/lib/ft.c:269
 msgid "Unable to send file-transfer request"
-msgstr ""
+msgstr "Incapaz de enviar o pedido de transferência de arquivos"
 
 #: src/gui/filetransfer.c:403
 msgid "Undefined"
@@ -1174,6 +1199,10 @@ msgstr "Erro inesperado"
 #: src/lib/kybd.c:316
 #, c-format
 msgid "Unexpected type %d in typeahead queue"
+msgstr ""
+
+#: src/lib/ft_cut.c:357
+msgid "Unknown FT control code from host"
 msgstr ""
 
 #: src/lib/kybd.c:3424
@@ -1302,12 +1331,16 @@ msgstr "_Sair"
 msgid "_View"
 msgstr "Exibir"
 
-#: src/lib/telnet.c:3169 src/lib/telnet.c:3177
+#: src/lib/telnet.c:3168 src/lib/telnet.c:3176
 #, c-format
 msgid "fcntl(%s)"
 msgstr ""
 
-#: src/lib/telnet.c:3162
+#: src/lib/ft_dft.c:165
+msgid "ftDftUknownOpen"
+msgstr ""
+
+#: src/lib/telnet.c:3161
 #, c-format
 msgid "ioctl(%s)"
 msgstr ""
@@ -1317,12 +1350,12 @@ msgstr ""
 msgid "script %s failed"
 msgstr "script %s falhou"
 
-#: src/lib/telnet.c:600 src/lib/telnet.c:605 src/lib/telnet.c:611
+#: src/lib/telnet.c:598 src/lib/telnet.c:603 src/lib/telnet.c:609
 #, c-format
 msgid "setsockopt(%s)"
 msgstr ""
 
-#: src/lib/telnet.c:593
+#: src/lib/telnet.c:591
 msgid "socket"
 msgstr ""
 
