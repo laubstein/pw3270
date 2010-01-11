@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-08 14:59-0200\n"
-"PO-Revision-Date: 2010-01-08 14:59-0200\n"
+"POT-Creation-Date: 2010-01-11 12:00-0200\n"
+"PO-Revision-Date: 2010-01-11 12:00-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -144,7 +144,7 @@ msgstr "Preto"
 
 #: src/gui/actions.c:688
 msgid "Blank Fill"
-msgstr ""
+msgstr "Completar com espaços"
 
 #: src/gui/actions.c:682
 msgid "Blinking Cursor"
