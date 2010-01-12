@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-11 12:00-0200\n"
-"PO-Revision-Date: 2010-01-11 12:00-0200\n"
+"POT-Creation-Date: 2010-01-12 09:47-0200\n"
+"PO-Revision-Date: 2010-01-12 09:51-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -566,7 +566,7 @@ msgstr "Ajuda"
 
 #: src/lib/ft.c:373
 msgid "Host disconnected, transfer cancelled"
-msgstr ""
+msgstr "Servidor desconectou, transferência cancelada"
 
 #: src/gui/filetransfer.c:397
 msgid "Host file name:"
@@ -1207,33 +1207,34 @@ msgstr "Erro inesperado"
 #: src/lib/kybd.c:316
 #, c-format
 msgid "Unexpected type %d in typeahead queue"
-msgstr ""
+msgstr "Tipo inesperado %d na fila de teclado"
 
 #: src/lib/ft_cut.c:357
 msgid "Unknown FT control code from host"
-msgstr ""
+msgstr "Recebi código FT desconhecido"
 
 #: src/lib/kybd.c:3424
 #, c-format
 msgid "Unknown PA key %d"
-msgstr ""
+msgstr "Tecla desconhecida: PA%02d"
 
 #: src/lib/kybd.c:3446
 #, c-format
 msgid "Unknown PF key %d"
-msgstr ""
+msgstr "Tecla desconhecida: PF%02d"
 
 #: src/lib/resolver.c:162
 #, c-format
 msgid ""
 "Unknown host:\n"
 "%s"
-msgstr ""
+msgstr "Servidor desconhecido:\n"
+"%s"
 
 #: src/lib/resolver.c:143
 #, c-format
 msgid "Unknown port number or service: %s"
-msgstr ""
+msgstr "Número de porta ou serviço desconhecido: %s"
 
 #: src/gui/actions.c:280
 msgid "Unselect"
