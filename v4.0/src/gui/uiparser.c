@@ -1035,24 +1035,28 @@
 		box 	= gtk_vbox_new(FALSE,0);
 		gtk_box_pack_start(GTK_BOX(box),table,FALSE,FALSE,0);
 		gtk_handle_box_set_handle_position(GTK_HANDLE_BOX(keypad->widget),GTK_POS_RIGHT);
+		gtk_handle_box_set_snap_edge(GTK_HANDLE_BOX(keypad->widget),GTK_POS_LEFT);
 		break;
 
 	case KEYPAD_POSITION_TOP:
 		box 	= gtk_vbox_new(FALSE,0);
 		gtk_box_pack_start(GTK_BOX(box),table,FALSE,FALSE,0);
 		gtk_handle_box_set_handle_position(GTK_HANDLE_BOX(keypad->widget),GTK_POS_BOTTOM);
+		gtk_handle_box_set_snap_edge(GTK_HANDLE_BOX(keypad->widget),GTK_POS_TOP);
 		break;
 
 	case KEYPAD_POSITION_BOTTOM:
 		box 	= gtk_vbox_new(FALSE,0);
 		gtk_box_pack_start(GTK_BOX(box),table,FALSE,FALSE,0);
 		gtk_handle_box_set_handle_position(GTK_HANDLE_BOX(keypad->widget),GTK_POS_TOP);
+		gtk_handle_box_set_snap_edge(GTK_HANDLE_BOX(keypad->widget),GTK_POS_BOTTOM);
 		break;
 
 	default:	// KEYPAD_POSITION_RIGHT
 		box 	= gtk_vbox_new(FALSE,0);
 		gtk_box_pack_start(GTK_BOX(box),table,FALSE,FALSE,0);
 		gtk_handle_box_set_handle_position(GTK_HANDLE_BOX(keypad->widget),GTK_POS_LEFT);
+		gtk_handle_box_set_snap_edge(GTK_HANDLE_BOX(keypad->widget),GTK_POS_RIGHT);
 
 	}
 
