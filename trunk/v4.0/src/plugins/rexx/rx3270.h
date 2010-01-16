@@ -101,6 +101,14 @@
 
 	#define CONFIG_GROUP "Rexx"
 
+	/* Script states */
+	LOCAL_EXTERN SCRIPT_STATE 		  rexx_script_state;
+	LOCAL_EXTERN RXSYSEXIT 			  rexx_exit_array[2];
+
+	LOCAL_EXTERN int 				  unlock_rexx_script_engine(GtkWidget *window, const gchar *name, int rc, int return_code);
+	LOCAL_EXTERN int				  lock_rexx_script_engine(GtkWidget *window);
+	LOCAL_EXTERN int 				  load_rexx_script(const gchar *filename, PRXSTRING str);
+
 	/* Tools */
 	LOCAL_EXTERN int				  call_rexx(const gchar *prg, const gchar *arg);
 	LOCAL_EXTERN RexxReturnCode		  RetString(PRXSTRING Retstr, const char *value);

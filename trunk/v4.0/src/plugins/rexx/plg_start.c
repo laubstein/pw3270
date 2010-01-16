@@ -53,35 +53,26 @@
 
 /*---[ Globals ]----------------------------------------------------------------------------------*/
 
- static RXSYSEXIT ExitArray[] =
+ RXSYSEXIT rexx_exit_array[2] =
  {
    { "SysExit_SIO",	RXSIO 		},
    { NULL, 			RXENDLST 	}
  };
 
- GtkWidget 	*program_window	= NULL;
- HCONSOLE	console_window	= NULL;
-
- static SCRIPT_STATE	script_state	= SCRIPT_STATE_NONE;
- static gchar 			*rexx_charset	= NULL;
+ GtkWidget			* program_window	= NULL;
+ HCONSOLE			  console_window	= NULL;
+ SCRIPT_STATE		  rexx_script_state	= SCRIPT_STATE_NONE;
+ static gchar 		* rexx_charset		= NULL;
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
  #include "calls.h"
 
-  int call_rexx(const gchar *filename, const gchar *arg)
+ int lock_rexx_script_engine(GtkWidget *window)
  {
-	LONG      			return_code;                 	// interpreter return code
-	RXSTRING  			argv;           	          	// program argument string
-	RXSTRING  			retstr;                      	// program return value
-	RXSTRING			prg[2];							// Program data
-	short     			rc		= 0;                   	// converted return code
-	GError				*error	= NULL;
-	gsize				sz;
-
-	if(script_state != SCRIPT_STATE_NONE)
+	if(rexx_script_state != SCRIPT_STATE_NONE)
 	{
-		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
 													GTK_BUTTONS_CANCEL,
@@ -96,31 +87,74 @@
 		return EBUSY;
 	}
 
-	script_state = status_script(SCRIPT_STATE_RUNNING);
+	rexx_script_state = status_script(SCRIPT_STATE_RUNNING);
 
-	// build the argument string
-	memset(&argv,0,sizeof(argv));
-	MAKERXSTRING(argv, arg, strlen(arg));
+	return 0;
+ }
 
-	// set up default return
-	memset(&retstr,0,sizeof(retstr));
-
-	Trace("%s","Running pending events");
-	RunPendingEvents(0);
-
-	/* Preload script file contents */
-	Trace("Loading %s",filename);
-
-	memset(prg,0,2*sizeof(RXSTRING));
-
-	if(!g_file_get_contents(filename, (gchar **) (&prg[0].strptr), &sz, &error))
+ int unlock_rexx_script_engine(GtkWidget *window, const gchar *name, int rc, int return_code)
+ {
+	if(rexx_script_state == SCRIPT_STATE_HALTED)
 	{
-		gchar *name = g_path_get_basename(filename);
-		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
+		// Interrupted by user, no dialog
+		rc = ECANCELED;
+	}
+ 	else if(rc)
+ 	{
+//		gchar *name = g_path_get_basename(filename);
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
 													GTK_BUTTONS_OK,
-													_(  "Can't load %s" ), name);
+													_(  "script %s failed" ), name);
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx script failed" ));
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Return code was %d" ), rc);
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+//        g_free(name);
+ 	}
+ 	else if(return_code)
+ 	{
+//		gchar *name = g_path_get_basename(filename);
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_OK,
+													_( "Script %s aborted" ),
+													name );
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx script error" ));
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Return code was %d" ), (int) return_code );
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+//        g_free(name);
+ 	}
+
+	rexx_script_state = status_script(SCRIPT_STATE_NONE);
+
+	return 0;
+ }
+
+ int load_rexx_script(const gchar *filename, PRXSTRING str)
+ {
+	GError	*error	= NULL;
+	gsize	sz;
+
+	Trace("Loading %s",filename);
+
+	if(!g_file_get_contents(filename, (gchar **) (&str->strptr), &sz, &error))
+	{
+		GtkWidget	*dialog;
+		gchar		*name		= g_path_get_basename(filename);
+
+		dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
+											GTK_DIALOG_DESTROY_WITH_PARENT,
+											GTK_MESSAGE_ERROR,
+											GTK_BUTTONS_OK,
+											_(  "Can't load %s" ), name);
 
 		gtk_window_set_title(GTK_WINDOW(dialog), _( "File error" ) );
 		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s", error->message ? error->message : N_( "Unexpected error" ));
@@ -133,17 +167,48 @@
 		return -1;
 	}
 
-	prg[0].strlength = strlen(prg[0].strptr);
+	str->strlength = strlen(str->strptr);
 
-	return_code = RexxStart(	1,				// argument count
-								&argv,			// argument array
-								NULL,			// REXX procedure name
-								prg,			// program
-								PACKAGE_NAME,	// default address name
-								RXCOMMAND,		// calling as a subcommand
-								ExitArray,		// EXITs for this call
-								&rc,			// converted return code
-								&retstr);		// returned result
+
+	return 0;
+ }
+
+ int call_rexx(const gchar *filename, const gchar *arg)
+ {
+	LONG      			return_code;                 	// interpreter return code
+	CONSTRXSTRING		argv;           	          	// program argument string
+	RXSTRING			retstr;                      	// program return value
+	RXSTRING			prg[2];							// Program data
+	short     			rc		= 0;                   	// converted return code
+
+	if(lock_rexx_script_engine(program_window))
+		return EBUSY;
+
+	// build the argument string
+	memset(&argv,0,sizeof(argv));
+	MAKERXSTRING(argv, arg, strlen(arg));
+
+	// set up default return
+	memset(&retstr,0,sizeof(retstr));
+
+	Trace("%s","Running pending events");
+	RunPendingEvents(0);
+
+	/* Preload script file contents */
+	memset(prg,0,2*sizeof(RXSTRING));
+
+	if(load_rexx_script(filename,prg))
+		return -1;
+
+	return_code = RexxStart(	1,					// argument count
+								&argv,				// argument array
+								NULL,				// REXX procedure name
+								prg,				// program
+								PACKAGE_NAME,		// default address name
+								RXCOMMAND,			// calling as a subcommand
+								rexx_exit_array,	// EXITs for this call
+								&rc,				// converted return code
+								&retstr);			// returned result
 
 	Trace("RexxStart(%s): %d",filename,(int) return_code);
 
@@ -161,52 +226,13 @@
 	Trace("Call of \"%s\" ends (rc=%d return_code=%d)",filename,rc,(int) return_code);
 
 	// Check script state
-	if(script_state == SCRIPT_STATE_HALTED)
-	{
-		// Interrupted by user, no dialog
-		rc = ECANCELED;
-	}
- 	else if(rc)
- 	{
-		gchar *name = g_path_get_basename(filename);
-		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
-													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_OK,
-													_(  "script %s failed" ), name);
-
-		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx script failed" ));
-		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Return code was %d" ), rc);
-
-        gtk_dialog_run(GTK_DIALOG (dialog));
-        gtk_widget_destroy(dialog);
-        g_free(name);
- 	}
- 	else if(return_code)
- 	{
-		gchar *name = g_path_get_basename(filename);
-		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(program_window),
-													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_OK,
-													_( "Script %s aborted" ),
-													name );
-
-		gtk_window_set_title(GTK_WINDOW(dialog),_( "Rexx script error" ));
-		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Return code was %d" ), (int) return_code );
-
-        gtk_dialog_run(GTK_DIALOG (dialog));
-        gtk_widget_destroy(dialog);
-        g_free(name);
- 	}
-
-	script_state = status_script(SCRIPT_STATE_NONE);
+	rc = unlock_rexx_script_engine(program_window, filename, rc, return_code);
 
 	Trace("%s exits with rc=%d",__FUNCTION__,rc);
 	return (int) rc;
  }
 
- void pw3270_plugin_startup(GtkWidget *topwindow, const gchar *script)
+ PW3270_PLUGIN_ENTRY void pw3270_plugin_startup(GtkWidget *topwindow, const gchar *script)
  {
 	int	 f;
 
@@ -225,76 +251,6 @@
 
  	Trace("Calling %s",script);
 	call_rexx(script,"");
- }
-
- static void activate_script(GtkMenuItem *menuitem, const gchar *path)
- {
- 	Trace("\n-- \"%s\" --\n",path);
-	call_rexx(path,path);
- 	Trace("\n-- \"%s\" --\n",path);
- }
-
- void AddPluginUI(GtkUIManager *ui, const gchar *program_data)
- {
-	gchar			*path;
-	gchar			*filename;
- 	GDir			*dir;
- 	const gchar 	*name;
- 	int				qtd		= 0;
- 	GtkWidget 		*top	= gtk_ui_manager_get_widget(ui,"/MainMenubar/ScriptsMenu/RexxScripts");
- 	GtkWidget		*menu;
-
-	Trace("Rexx scripts menu: %p",top);
-
- 	if(!top)
- 		return;
-
-	path = g_build_filename(program_data,"rexx",NULL);
-
-    dir = g_dir_open(path,0,NULL);
-
-    if(!dir)
-    {
-   		gtk_widget_hide(top);
-    	g_free(path);
-		return;
-    }
-
-	menu = gtk_menu_new();
-	name = g_dir_read_name(dir);
-
-	while(name)
-	{
-		filename = g_build_filename(path,name,NULL);
-
-		if(g_str_has_suffix(filename,"rex"))
-		{
- 			GtkWidget 	*item = gtk_menu_item_new_with_label(name);
- 			Trace("Appending script %s (item: %p)",name,item);
-
- 			g_object_set_data_full(G_OBJECT(item),"filename",filename,g_free);
-			g_signal_connect(G_OBJECT(item),"activate",G_CALLBACK(activate_script),filename);
-			gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
-			qtd++;
-		}
-		else
-		{
-			g_free(filename);
-		}
-
-		name = g_dir_read_name(dir);
-	}
-	g_dir_close(dir);
-
-	if(qtd)
-		gtk_widget_show_all(menu);
-	else
-   		gtk_widget_hide(top);
-
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM(top),menu);
-
-	g_free(path);
-
  }
 
  static HCONSOLE * getTraceWindow(void)
@@ -410,12 +366,12 @@
 
  int IsHalted(void)
  {
- 	return script_state != SCRIPT_STATE_RUNNING;
+ 	return rexx_script_state != SCRIPT_STATE_RUNNING;
  }
 
  RexxReturnCode RaiseHaltSignal(void)
  {
-	script_state = SCRIPT_STATE_HALTED;
+	rexx_script_state = status_script(SCRIPT_STATE_HALTED);
 
 #ifdef WIN32
 	return RexxSetHalt(getpid(),GetCurrentThreadId());

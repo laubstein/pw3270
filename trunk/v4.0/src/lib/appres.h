@@ -64,7 +64,6 @@
 
 /* Toggles */
 
-enum toggle_type { TT_INITIAL, TT_INTERACTIVE, TT_ACTION, TT_FINAL };
 struct toggle {
 	char	value;		/* toggle value */
 	char	changed;	/* has the value changed since init */
@@ -73,7 +72,7 @@ struct toggle {
 	void (*upcall)(struct toggle *, enum toggle_type); /* change value */
 
 #if defined(LIB3270)
-	void (*callback)(int value, int reason);
+	void (*callback)(int, enum toggle_type);
 #endif
 
 };

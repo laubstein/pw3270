@@ -321,19 +321,6 @@
 
 		#define	query_screen_change_counter() query_counter(COUNTER_ID_SCREEN_CHANGED)
 
-		enum lib3270_action_groups
-		{
-			ACTION_GROUP_COMMON,
-			ACTION_GROUP_ONLINE,
-			ACTION_GROUP_OFFLINE,
-			ACTION_GROUP_SELECTION,
-			ACTION_GROUP_CLIPBOARD,
-			ACTION_GROUP_PASTE,
-			ACTION_GROUP_FT,
-
-			ACTION_GROUP_MAX
-		};
-
 
 		#define COLOR_ATTR_NONE			0x0000
 		#define COLOR_ATTR_FIELD		0x0100

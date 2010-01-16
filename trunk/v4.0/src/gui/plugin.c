@@ -51,6 +51,7 @@
  	const gchar *arg;
  };
 
+/*
  struct custom_action_call
  {
 	GtkUIManager	*ui;
@@ -58,6 +59,7 @@
 	guint			n_groups;
 	GKeyFile 		*conf;
  } custom_action_call;
+*/
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
@@ -202,12 +204,14 @@
 		ptr(arg->arg);
  }
 
+/*
  static void addui(GModule *handle, GtkUIManager *ui)
  {
 	void (*ptr)(GtkUIManager *ui, const gchar *data) = NULL;
 	if(g_module_symbol(handle, "AddPluginUI", (gpointer) &ptr))
 		ptr(ui,program_data);
  }
+*/
 
  static void start_plugin(GModule *handle, struct call_parameter *arg)
  {
@@ -242,14 +246,7 @@ gboolean StartPlugins(const gchar *startup_script)
 #endif
  }
 
-  void AddPluginUI(GtkUIManager *ui, const gchar *dunno)
- {
-#ifdef HAVE_PLUGINS
- 	if(plugins)
- 	 	g_slist_foreach(plugins,(GFunc) addui,ui);
-#endif
- }
-
+/*
  static void process_ended(GPid pid,gint status,gchar *tempfile)
  {
  	Trace("Process %d ended with status %d",(int) pid, status);
@@ -319,7 +316,9 @@ gboolean StartPlugins(const gchar *startup_script)
 
 	g_child_watch_add(pid,(GChildWatchFunc) process_ended,filename);
  }
+*/
 
+/*
  static void ExecWithScreen(GtkAction *action, gpointer cmd)
  {
  	gchar *screen = GetScreenContents(TRUE);
@@ -356,202 +355,61 @@ gboolean StartPlugins(const gchar *startup_script)
 	Trace("%s(%d)",__FUNCTION__,atoi(cmd));
 	action_PAKey(atoi(cmd));
  }
+*/
 
+ gboolean get_symbol_by_name(GModule *module, gpointer *pointer, const gchar *fmt, ...)
+ {
+ 	gboolean ret = FALSE;
 #ifdef HAVE_PLUGINS
+	gchar 	*symbol_name;
+	va_list	arg;
 
- static void loadaction(GModule *handle, struct custom_action_call *arg)
- {
-	void (*ptr)(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf) = NULL;
+	va_start(arg, fmt);
+	symbol_name = g_strdup_vprintf(fmt,arg);
+	va_end(arg);
 
-	Trace("Searching for custom actions in %p",handle);
-
-	if(g_module_symbol(handle, "LoadCustomActions", (gpointer) &ptr))
-		ptr(arg->ui,arg->groups,arg->n_groups,arg->conf);
-
- }
-
- struct external_action
- {
- 	gchar 	name[0x0100];
- 	void 	(*exec)(GtkAction *action, gpointer cmd);
- };
-
- static void findaction(GModule *handle, struct external_action *arg)
- {
- 	if(arg->exec)
-		return;
-
-	if(!g_module_symbol(handle,arg->name,(gpointer) &arg->exec))
-		arg->exec = NULL;
-
- }
-
-#endif
-
- static int scan_for_actions(const gchar *path, GtkActionGroup **groups)
- {
- 	static const struct _call
- 	{
- 		const gchar *name;
-		void 	(*run)(GtkAction *action, gpointer cmd);
- 	} call[] =
- 	{
- 		{ "ExecWithScreen", 	ExecWithScreen		},
- 		{ "ExecWithCopy",		ExecWithCopy		},
- 		{ "ExecWithSelection",	ExecWithSelection	},
- 		{ "PFKey",				ExecPFKey			},
- 		{ "PAKey",				ExecPAKey			}
- 	};
-
-	GDir			*dir;
-	const gchar	*name;
-
-	/* Load custom action files */
-
-	Trace("Loading actions in \"%s\"",path);
-
-	dir = g_dir_open(path,0,NULL);
-	if(!dir)
-		return ENOENT;
-
-	name = g_dir_read_name(dir);
-	while(name)
+	if(module)
 	{
-		if(g_str_has_suffix(name,"act"))
+		ret = g_module_symbol(module,symbol_name,pointer);
+	}
+	else
+	{
+		GSList *el = plugins;
+		while(el && !ret)
 		{
-			GKeyFile 	*conf;
-			gchar		*filename = g_build_filename(path,name,NULL);
-
-			Trace("Loading %s",filename);
-
-			// Load custom actions
-			conf = g_key_file_new();
-
-			if(g_key_file_load_from_file(conf,filename,G_KEY_FILE_NONE,NULL))
-			{
-				int f;
-				gchar **group = g_key_file_get_groups(conf,NULL);
-
-				for(f=0;group[f];f++)
-				{
-					static const gchar *name[] = {	"label", 		// 0
-														"tooltip",		// 1
-														"stock_id",		// 2
-														"action",		// 3
-														"value",		// 4
-														"accelerator" 	// 5
-													};
-
-					int			p;
-					GtkAction 	*action;
-					gchar		*parm[G_N_ELEMENTS(name)];
-					void 		(*run)(GtkAction *action, gpointer cmd)	= NULL;
-
-					Trace("Custom action(%d): %s",f,group[f]);
-
-					for(p=0;p<G_N_ELEMENTS(name);p++)
-					{
-						parm[p] = g_key_file_get_locale_string(conf,group[f],name[p],NULL,NULL);
-						if(!parm[p])
-							parm[p] = g_key_file_get_string(conf,group[f],name[p],NULL);
-					}
-
-					if(!parm[0])
-						parm[0] = g_strdup(group[f]);
-
-					for(p=0;p<G_N_ELEMENTS(call) && !run;p++)
-					{
-						if(!strcmp(parm[3],call[p].name))
-							run = call[p].run;
-					}
-
-#ifdef HAVE_PLUGINS
-					if(!run && plugins)
-					{
-						// Search for plugin exported actions
-						struct external_action arg;
-
-						memset(&arg,0,sizeof(arg));
-						g_snprintf(arg.name,0xFF,"pw3270Action_%s",parm[3]);
-
-						g_slist_foreach(plugins,(GFunc) findaction, &arg);
-
-						Trace("%s: %p",arg.name,arg.exec);
-
-						run = arg.exec;
-
-					}
-#endif
-
-					if(!run)
-					{
-						// Search for internal action
-						run = (void (*)(GtkAction *action, gpointer cmd)) get_action_callback_by_name(parm[3]);
-					}
-
-					if(!run)
-					{
-						WarningPopup( N_( "Invalid action \"%s\" when loading %s" ),parm[3],filename);
-						Log("Invalid action %s in %s",parm[3],filename);
-					}
-					else
-					{
-						action = gtk_action_new(group[f],parm[0],parm[1],parm[2]);
-
-						Trace("gtk_action_new(%s,%s,%s,%s): %p",group[f],parm[0],parm[1],parm[2],action);
-
-						if(action)
-						{
-							gchar *ptr = g_strdup(parm[4]);
-							g_object_set_data_full(G_OBJECT(action),"Arg",ptr,g_free);
-							g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(run),ptr);
-
-							if(parm[5])
-								gtk_action_group_add_action_with_accel(groups[0],action,parm[5]);
-							else
-								gtk_action_group_add_action(groups[0],action);
-						}
-						else
-						{
-							WarningPopup( N_( "Can't create action \"%s\"(\"%s\",\"%s\",\"%s\") when loading %s" ),parm[3],parm[0],parm[1],parm[2],filename);
-						}
-					}
-
-					for(p=0;p<G_N_ELEMENTS(name);p++)
-						g_free(parm[p]);
-
-				}
-				g_strfreev(group);
-			}
-
-			g_key_file_free(conf);
-			g_free(filename);
+			ret = g_module_symbol((GModule *)el->data,symbol_name,pointer);
+			el = el->next;
 		}
-		name = g_dir_read_name(dir);
 	}
 
-	g_dir_close(dir);
+	Trace("Symbol %s: %p",symbol_name,*pointer);
 
-	return 0;
- }
-
- void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf)
- {
-	gchar *path;
-
-#ifdef HAVE_PLUGINS
-	struct custom_action_call arg = { ui, groups, n_actions, conf };
-
- 	if(plugins)
- 	 	g_slist_foreach(plugins,(GFunc) loadaction,&arg);
-
+	g_free(symbol_name);
 #endif
-
-	path = g_build_filename(program_data,"ui",NULL);
-
-	scan_for_actions(path,groups);
-	g_free(path);
-
+	return ret;
  }
 
+ GModule * get_plugin_by_name(const gchar *plugin_name)
+ {
+ 	GModule *ret = NULL;
+#ifdef HAVE_PLUGINS
+	GSList *el = plugins;
 
+	while(el && !ret)
+	{
+		GModule *module	= (GModule *) el->data;
+		gchar	*name	= g_path_get_basename(g_module_name(module));
+		gchar 	*ptr	= strchr(name,'.');
+		if(ptr)
+			*ptr = 0;
+
+		if(!g_ascii_strcasecmp(plugin_name,name))
+			ret = module;
+
+		g_free(name);
+
+		el = el->next;
+	}
+#endif
+	return ret;
+ }

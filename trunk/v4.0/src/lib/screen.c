@@ -59,6 +59,7 @@
 #include "screen.h"
 #include "errno.h"
 #include "statusc.h"
+#include "togglesc.h"
 #include <lib3270/api.h>
 
 #if defined(_WIN32)
@@ -824,6 +825,18 @@ void notify_toggle_changed(int ix, int value, int reason)
 	if(callbacks && callbacks->toggle_changed)
 		callbacks->toggle_changed(ix,value,reason,toggle_names[ix]);
 }
+
+LIB3270_EXPORT void	update_toggle_actions(void)
+{
+	int f;
+
+	if(callbacks && callbacks->toggle_changed)
+	{
+		for(f=0;f< N_TOGGLES;f++)
+			callbacks->toggle_changed(f,appres.toggle[f].value,TT_UPDATE,toggle_names[f]);
+	}
+}
+
 #endif
 
 void Warning(const char *fmt, ...)

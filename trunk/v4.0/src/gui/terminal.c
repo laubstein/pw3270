@@ -89,8 +89,8 @@
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
- static void set_showcursor(int value, int reason);
- static void set_blink(int value, int reason);
+ static void set_showcursor(int value, enum toggle_type reason);
+ static void set_blink(int value, enum toggle_type reason);
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -378,7 +378,7 @@
 	return FALSE;
  }
 
- static void set_crosshair(int value, int reason)
+ static void set_crosshair(int value, enum toggle_type reason)
  {
  	if(value)
 		cMode |= CURSOR_MODE_CROSS;
@@ -404,7 +404,7 @@
  }
 
 
- static void set_blink(int value, int reason)
+ static void set_blink(int value, enum toggle_type reason)
  {
  	if(value == blink_enabled)
 		return;
@@ -420,7 +420,7 @@
 	gtk_widget_queue_draw(terminal);
  }
 
- static void set_insert(int value, int reason)
+ static void set_insert(int value, enum toggle_type reason)
  {
 	DrawOIA(pixmap,color);
 
@@ -601,7 +601,7 @@
 
  }
 
- static void set_showcursor(int value, int reason)
+ static void set_showcursor(int value, enum toggle_type reason)
  {
  	if(!(terminal && pixmap))
 		return;

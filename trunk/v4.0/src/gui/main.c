@@ -50,13 +50,7 @@
 #endif /*]*/
 
 #include <errno.h>
-// #include <lib3270/3270ds.h>
 #include <lib3270/toggle.h>
-// #include "ftc.h"
-// #include "macrosc.h"
-// #include "togglesc.h"
-// #include "utilc.h"
-// #include "xioc.h"
 
 
 /* Globals */
@@ -69,13 +63,6 @@ static const char	*startup_script = NULL;
 static gchar 		*gtk_theme = NULL;
 
 /* Callback for connection state changes. */
-#ifdef 	X3270_FT
-static void connect_3270(int status)
-{
-	gtk_action_group_set_sensitive(ft_actions,status);
-}
-#endif
-
 static void connect_main(int status)
 {
 	gboolean online = (CONNECTED) ? TRUE : FALSE;
@@ -93,7 +80,7 @@ static void connect_main(int status)
 		ctlr_erase(True);
 		online = FALSE;
 #ifdef 	X3270_FT
-		connect_3270(status);
+		set_action_group_sensitive_state(ACTION_GROUP_FT,status);
 #endif
 	}
 
@@ -105,10 +92,11 @@ static void connect_main(int status)
 		gtk_widget_grab_focus(terminal);
 	}
 
-	gtk_action_group_set_sensitive(online_actions,online);
-	gtk_action_group_set_sensitive(offline_actions,!online);
+	set_action_group_sensitive_state(ACTION_GROUP_ONLINE,online);
+	set_action_group_sensitive_state(ACTION_GROUP_OFFLINE,!online);
 
-	SetKeypadSensitive(online);
+	keypad_set_sensitive(topwindow,online);
+//	SetKeypadSensitive(online);
 
 }
 
@@ -118,7 +106,7 @@ static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, cons
 	Trace("%s %s", log_domain, message);
 }
 
-static void set_fullscreen(int value, int reason)
+static void set_fullscreen(int value, enum toggle_type reason)
 {
  	Trace("Fullscren mode toggled (value: %d",value);
 
@@ -523,14 +511,13 @@ int main(int argc, char *argv[])
 
 	register_schange(ST_CONNECT, connect_main);
 
-#ifdef 	X3270_FT
-	connect_3270(0);
-	register_schange(ST_3270_MODE, connect_3270);
-#else
-	gtk_action_group_set_sensitive(ft_actions,FALSE);
-#endif
+//	Trace("Topwindow: %p (%d) terminal: %p (%d)",topwindow,GTK_IS_WIDGET(topwindow),terminal,GTK_IS_WIDGET(terminal));
 
-	Trace("Topwindow: %p (%d) terminal: %p (%d)",topwindow,GTK_IS_WIDGET(topwindow),terminal,GTK_IS_WIDGET(terminal));
+	register_tchange(FULL_SCREEN,set_fullscreen);
+	register_tchange(MONOCASE,set_monocase);
+
+	update_toggle_actions();
+	init_gui_toggles();
 
 	if(!startup_script)
 	{
@@ -539,9 +526,6 @@ int main(int argc, char *argv[])
 		gtk_widget_grab_focus(terminal);
 		gtk_widget_grab_default(terminal);
 	}
-
-	register_tchange(FULL_SCREEN,set_fullscreen);
-	register_tchange(MONOCASE,set_monocase);
 
 	while(gtk_events_pending())
 		gtk_main_iteration();

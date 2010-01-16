@@ -23,4 +23,5 @@
  *		Global declarations for toggles.c.
  */
 
-// extern void Toggle_action(Widget, XEvent *, String *, Cardinal *);
+ extern const char *toggle_names[N_TOGGLES];
+

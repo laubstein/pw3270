@@ -36,10 +36,33 @@
 
 	#include <gtk/gtk.h>
 
+	#if defined(_WIN32)
+		#include <windows.h>
+
+		#define PW3270_PLUGIN_ENTRY	__declspec (dllexport)
+		#define LOCAL_EXTERN		extern
+
+	#else
+		#include <stdarg.h>
+
+		// http://gcc.gnu.org/wiki/Visibility
+		#if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
+				#define LOCAL_EXTERN __hidden extern
+		#elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
+				#define LOCAL_EXTERN __attribute__((visibility("hidden"))) extern
+		#else
+				#define LOCAL_EXTERN extern
+		#endif
+
+		#define PW3270_PLUGIN_ENTRY
+
+	#endif
+
+
+/*
 	void SetHostname(const gchar *hostname);
 	void SetLUname(const gchar *luname);
-	void AddPluginUI(GtkUIManager *ui, const gchar *data);
-	void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf);
+*/
 
 #endif // PLUGINS_H_INCLUDED
 

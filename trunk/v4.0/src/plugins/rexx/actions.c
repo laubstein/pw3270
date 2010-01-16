@@ -33,15 +33,148 @@
 
  #include "rx3270.h"
 
-/*---[ Statics ]----------------------------------------------------------------------------------*/
-
- static GtkActionGroup *action_groups[ACTION_GROUP_MAX] = { 0 };
-
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
- static void RunExternalRexx(GtkAction *action, GKeyFile *conf)
+ PW3270_PLUGIN_ENTRY void script_rexx_activated(GtkWidget *widget, GtkWidget *window)
+ {
+ 	struct rexx_translated_data
+ 	{
+		size_t  strlength;
+		char	strptr[1];
+ 	};
+
+ 	struct rexx_translated_data	*rexx_data = g_object_get_data(G_OBJECT(widget),"rexx_translated_data");
+
+	LONG      		return_code;                 	// interpreter return code
+	CONSTRXSTRING	argv;           	          	// program argument string
+	RXSTRING		retstr;                      	// program return value
+	RXSTRING		prg[2];							// Program data
+	gchar			*name;
+	short			rc;
+ 	const gchar 	*filename	= g_object_get_data(G_OBJECT(widget),"script_filename");
+
+	// Clear structues
+	memset(&retstr,0,sizeof(retstr));
+	memset(prg,0,2*sizeof(RXSTRING));
+
+	// Lock engine and load script
+	if(lock_rexx_script_engine(window))
+		return;
+
+	if(load_rexx_script(filename,prg))
+		return;
+
+	// Get script arguments
+	argv.strptr = g_object_get_data(G_OBJECT(widget),"script_arguments");
+	if(!argv.strptr)
+		argv.strptr = "";
+	argv.strlength = strlen(argv.strptr);
+
+	// Check for translated image and save it in prg
+	if(rexx_data)
+	{
+		Trace("Using translated data with %d bytes",rexx_data->strlength);
+		prg[1].strptr		= rexx_data->strptr;
+		prg[1].strlength	= rexx_data->strlength;
+	}
+
+	RunPendingEvents(0);
+
+	// Run rexx script
+	Trace("Starting script \"%s\"",filename);
+	return_code = RexxStart(	1,					// argument count
+								&argv,				// argument array
+								NULL,				// REXX procedure name
+								prg,				// program
+								PACKAGE_NAME,		// default address name
+								RXCOMMAND,			// calling as a subcommand
+								rexx_exit_array,	// EXITs for this call
+								&rc,				// converted return code
+								&retstr);			// returned result
+
+	g_free(prg->strptr);
+
+	Trace("RexxStart exits with %d and translated code in %p",(int) return_code,prg[1].strptr);
+
+	if(prg[1].strptr)
+	{
+		if(!rexx_data)
+		{
+			Trace("Saving translated data with %d bytes",prg[1].strlength);
+			rexx_data = g_malloc0(sizeof(struct rexx_translated_data)+prg[1].strlength);
+			rexx_data->strlength = prg[1].strlength;
+			memcpy(rexx_data->strptr,prg[1].strptr,prg[1].strlength);
+			g_object_set_data_full(G_OBJECT(widget),"rexx_translated_data",rexx_data,g_free);
+		}
+
+		if(prg[1].strptr != rexx_data->strptr)
+		{
+			RexxFreeMemory(prg[1].strptr);
+		}
+
+	}
+
+	Trace("Retstr exits with %p",retstr.strptr);
+	if(retstr.strptr)
+		RexxFreeMemory(retstr.strptr);
+
+	Trace("rc=%d return_code=%d",rc,(int) return_code);
+
+	// Check script state
+	name = g_path_get_basename(filename);
+
+	rc = unlock_rexx_script_engine(window, name, rc, return_code);
+
+	g_free(name);
+
+ }
+
+ PW3270_PLUGIN_ENTRY int load_menu_scripts(GtkMenu *menu, GtkWidget *program_window)
+ {
+	gchar		*path = g_build_filename((const gchar *) g_object_get_data(G_OBJECT(program_window),"pw3270_dpath"),"rexx",NULL);
+	const gchar	*name;
+ 	GDir		*dir;
+
+    dir = g_dir_open(path,0,NULL);
+
+    if(!dir)
+    {
+    	g_free(path);
+		return ENOENT;
+    }
+
+	name = g_dir_read_name(dir);
+
+	while(name)
+	{
+		gchar *filename = g_build_filename(path,name,NULL);
+
+		if(g_str_has_suffix(filename,"rex"))
+		{
+ 			GtkWidget 	*item = gtk_menu_item_new_with_label(name);
+ 			Trace("Appending script %s (item: %p)",name,item);
+
+ 			g_object_set_data_full(G_OBJECT(item),"script_filename",filename,g_free);
+			g_signal_connect(G_OBJECT(item),"activate",G_CALLBACK(script_rexx_activated),program_window);
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
+			gtk_widget_show(item);
+		}
+		else
+		{
+			g_free(filename);
+		}
+
+		name = g_dir_read_name(dir);
+	}
+	g_dir_close(dir);
+
+	return 0;
+ }
+
+ PW3270_PLUGIN_ENTRY void action_select_activated(GtkAction *action, GtkWidget *program_window)
  {
 	gchar 		*ptr;
+ 	GKeyFile 	*conf	= (GKeyFile *) g_object_get_data(G_OBJECT(program_window),"pw3270_config");
 	GtkWidget 	*dialog = gtk_file_chooser_dialog_new(	_( "Select Rexx script to run" ),
 														GTK_WINDOW(program_window),
 														GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -49,6 +182,8 @@
 														GTK_STOCK_EXECUTE,	GTK_RESPONSE_ACCEPT,
 														NULL );
 
+
+	Trace("%s starts",__FUNCTION__);
 
 	gtk_file_chooser_set_show_hidden(GTK_FILE_CHOOSER(dialog),FALSE);
 
@@ -82,68 +217,13 @@
 	Trace("%s ends",__FUNCTION__);
  }
 
- void G3270Action_Rexx(GtkAction *action, gpointer cmd)
- {
- 	gchar *script 	= g_strdup(cmd);
- 	gchar *arg		= strchr(script,' ');
-
-	if(arg)
-		*(arg++) = 0;
-	else
-		arg = "";
-
-	call_rexx(script,g_strstrip(arg));
-
-	g_free(script);
- }
-
- void LoadCustomActions(GtkUIManager *ui, GtkActionGroup **groups, guint n_actions, GKeyFile *conf)
- {
- 	static const struct _action_info
- 	{
- 		const gchar *name;
- 		const gchar *label;
- 		const gchar *tooltip;
- 		void (*call)(GtkAction *action, GKeyFile *conf);
- 	} action_info[] =
- 	{
- 		{ "RunExternalRexx",	N_( "External rexx script" ), 	NULL, 	RunExternalRexx	},
- 		{ "RexxScripts",		N_( "Rexx scripts" ),			NULL,	NULL			},
- 	};
-
-	int f;
-
- 	if(n_actions != ACTION_GROUP_MAX)
- 	{
- 		Log( "Unexpected number of actions (expected: %d received: %d)",ACTION_GROUP_MAX,n_actions);
- 		return;
- 	}
-
-	Trace("Loading %d rexx actions",G_N_ELEMENTS(action_info));
-
-	for(f=0;f < ACTION_GROUP_MAX;f++)
-		action_groups[f] = groups[f];
-
-	for(f=0;f<G_N_ELEMENTS(action_info);f++)
-	{
-		GtkAction *action = gtk_action_new(	action_info[f].name,
-											dgettext(GETTEXT_PACKAGE,action_info[f].label),
-											dgettext(GETTEXT_PACKAGE,action_info[f].tooltip),
-											NULL );
-
-		if(action_info[f].call)
-			g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(action_info[f].call),(gpointer) conf);
-		gtk_action_group_add_action(groups[0],action);
-	}
- }
-
  RexxReturnCode REXXENTRY rx3270Actions(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
  	int f;
+ 	GtkActionGroup **action_group = (GtkActionGroup **) g_object_get_data(G_OBJECT(program_window),"ActionGroups");
 
-	if(!action_groups[0])
+	if(!action_group)
 		return RetValue(Retstr,EINVAL);
-
 
  	for(f=0;f<Argc;f++)
  	{
@@ -152,11 +232,11 @@
 
  		Trace("Searching action %s",Argv[f].strptr);
 
-		for(p = 0; p < ACTION_GROUP_MAX && !action; p++)
-			action = gtk_action_group_get_action(action_groups[p],Argv[f].strptr);
+		for(p = 0; action_group[p] && !action; p++)
+			action = gtk_action_group_get_action(action_group[p],Argv[f].strptr);
 
 		if(!action)
-			return RXFUNC_BADCALL;
+			return RetValue(Retstr,ENOENT);
 
  		Trace("Running action %s: %p",Argv[f].strptr,action);
 
@@ -166,5 +246,4 @@
 
 	return RetValue(Retstr,0);
  }
-
 

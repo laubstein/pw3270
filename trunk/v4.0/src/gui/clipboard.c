@@ -88,25 +88,25 @@
 
  	if(!(clipboard_contents->len > 0 && terminal))
  	{
- 		Trace("Clipboard is empty: \"%s\"",clipboard_contents->str);
  		clipboard_mode = CLIPBOARD_MODE_NONE;
-		gtk_action_group_set_sensitive(clipboard_actions,FALSE);
+		set_action_group_sensitive_state(ACTION_GROUP_CLIPBOARD,FALSE);
 		return;
  	}
 
 	clipboard_mode = mode;
 	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_contents->str,-1);
-	gtk_action_group_set_sensitive(clipboard_actions,TRUE);
+	set_action_group_sensitive_state(ACTION_GROUP_CLIPBOARD,TRUE);
 
  }
 
  static void paste_string(gchar *str)
  {
- 	int sz;
+ 	int 		sz;
 
  	if(!str)
  	{
 		UpdateClipboardString(CLIPBOARD_MODE_NONE,FALSE,NULL);
+		Trace("%s",__FUNCTION__);
 		return;
  	}
 
@@ -135,7 +135,7 @@
 	else
 		UpdateClipboardString(CLIPBOARD_MODE_NONE,FALSE,NULL);
 
-	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"PasteNext"),clipboard_contents->len > 0);
+	set_action_sensitive_by_name("PasteNext",clipboard_contents->len > 0);
 
 	screen_resume();
 
