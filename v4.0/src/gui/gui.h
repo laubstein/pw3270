@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como main.c e possui 346 linhas de código.
+ * Este programa está nomeado como gui.h e possui - linhas de código.
  *
  * Contatos:
  *
@@ -50,6 +50,8 @@
 	#include <glib.h>
 
 	#include <lib3270/api.h>
+	#include <lib3270/toggle.h>
+
  	#define CURSOR_MODE_3270 (CURSOR_MODE_USER+9)
 
 	enum _drag_type
@@ -223,15 +225,20 @@
 	extern gchar					*plugin_list;
 #endif
 
-	extern GtkActionGroup			*action_group[ACTION_GROUP_MAX];
+	enum _action_groups
+	{
+		ACTION_GROUP_DEFAULT,
+		ACTION_GROUP_ONLINE,
+		ACTION_GROUP_OFFLINE,
+		ACTION_GROUP_SELECTION,
+		ACTION_GROUP_CLIPBOARD,
+		ACTION_GROUP_PASTE,
+		ACTION_GROUP_FT,
 
-	#define common_actions		action_group[ACTION_GROUP_COMMON]
-	#define online_actions		action_group[ACTION_GROUP_ONLINE]
-	#define offline_actions		action_group[ACTION_GROUP_OFFLINE]
-	#define selection_actions	action_group[ACTION_GROUP_SELECTION]
-	#define clipboard_actions	action_group[ACTION_GROUP_CLIPBOARD]
-	#define paste_actions		action_group[ACTION_GROUP_PASTE]
-	#define ft_actions			action_group[ACTION_GROUP_FT]
+		ACTION_GROUP_MAX
+	};
+
+	LOCAL_EXTERN void 	init_actions(GtkWidget *widget);
 
 	extern const struct lib3270_io_callbacks program_io_callbacks;
 	extern const struct lib3270_screen_callbacks program_screen_callbacks;
@@ -255,10 +262,16 @@
 	void 		InvalidatePixmaps(GdkDrawable *drawable, GdkGC *gc);
 	void 		ReloadPixmaps(void);
 	void 		Reselect(void);
-	void 		set_rectangle_select(int value, int reason);
+	void 		set_rectangle_select(int value, enum toggle_type reason);
 	void 		SetStatusCode(STATUS_CODE id);
 	void 		SetTerminalFont(const gchar *fontname);
 	void 		RedrawCursor(void);
+
+	void		init_gui_toggles(void);
+	GtkWidget * widget_from_action_name(const gchar *name);
+
+	LOCAL_EXTERN void 	set_action_sensitive_by_name(const gchar *name,gboolean sensitive);
+	LOCAL_EXTERN void	set_action_group_sensitive_state(int id, gboolean status);
 
 #ifdef X3270_FT
 	int 		initft(void);
@@ -362,7 +375,12 @@
 	void	SetSelectionMode(int m);
 	int 	GetSelectedRectangle(GdkRectangle *rect);
 
-	void	set_monocase(int value, int reason);
+	void	set_monocase(int value, enum toggle_type reason);
+
+	// Plugins
+	LOCAL_EXTERN GModule	* get_plugin_by_name(const gchar *plugin_name);
+	LOCAL_EXTERN gboolean 	  get_symbol_by_name(GModule *module, gpointer *pointer, const gchar *fmt, ...);
+
 	int 	LoadPlugins(void);
 	int		UnloadPlugins(void);
 	void	CallPlugins(const gchar *name, const gchar *arg);
@@ -385,8 +403,9 @@
 		#define clear_font_cache() /* */
 	#endif
 
-	// Toolbar
-	LOCAL_EXTERN void 		  configure_toolbar(GtkWidget *toolbar, GtkWidget *menu, const gchar *label);
+	// Toolbar & Keypad
+	// LOCAL_EXTERN void 		  configure_toolbar(GtkWidget *toolbar, GtkWidget *menu, const gchar *label);
+	LOCAL_EXTERN void		  keypad_set_sensitive(GtkWidget *window, gboolean state);
 
 	// Console/Trace window
 	LOCAL_EXTERN HCONSOLE	  gui_console_window_new(const char *title, const char *label);

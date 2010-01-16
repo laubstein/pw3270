@@ -67,7 +67,6 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
- gboolean	WaitingForChanges 	= TRUE;
  GtkWidget	*SelectionPopup		= 0;
  GtkWidget	*DefaultPopup		= 0;
  int 		drag_type			= DRAG_TYPE_NONE;
@@ -88,8 +87,8 @@
 	return 0;
  }
 
- static GtkAction *reselect = NULL;
- static GtkAction *copyastable = NULL;
+// static GtkAction *reselect = NULL;
+// static GtkAction *copyastable = NULL;
 
  void SetSelectionMode(int m)
  {
@@ -97,6 +96,8 @@
 		return;
 
 	if(m == SELECT_MODE_NONE && select_mode != SELECT_MODE_INVALID)
+		set_action_sensitive_by_name("Reselect",TRUE);
+/*
 	{
 		if(!reselect)
 			reselect = gtk_action_group_get_action(online_actions,"Reselect");
@@ -106,10 +107,13 @@
 	if(!copyastable)
 		copyastable = gtk_action_group_get_action(selection_actions,"CopyAsTable");
 	gtk_action_set_sensitive(copyastable,m == SELECT_MODE_RECTANGLE);
+*/
+
+	set_action_sensitive_by_name("CopyAsTable",m == SELECT_MODE_RECTANGLE);
 
 	select_mode = m;
 
-	gtk_action_group_set_sensitive(selection_actions,(select_mode == SELECT_MODE_NONE) ? FALSE : TRUE );
+	set_action_group_sensitive_state(ACTION_GROUP_SELECTION,(select_mode == SELECT_MODE_NONE) ? FALSE : TRUE );
 
  }
 
@@ -564,7 +568,7 @@
 
  }
 
- void set_rectangle_select(int value, int reason)
+ void set_rectangle_select(int value, enum toggle_type reason)
  {
  	if(select_mode != SELECT_MODE_RECTANGLE && select_mode != SELECT_MODE_TEXT)
 		return;
@@ -789,26 +793,6 @@
 	}
 
     return 0;
- }
-
- gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
- {
- 	static const int pfkey[]			= { 7,8 };
- 	static const gchar *action_name[]	= { "ScrollUP", "ScrollDown" };
-
-    if(event->direction < 2 && event->direction >= 0 && !WaitingForChanges)
- 	{
-		GtkAction *action = gtk_action_group_get_action(common_actions,action_name[event->direction]);
-
-		WaitingForChanges = TRUE;
-
-		if(action)
-			gtk_action_activate(action);
-		else
-			action_PFKey(pfkey[event->direction]);
-	}
-
- 	return 0;
  }
 
  void action_ClearSelection(void)

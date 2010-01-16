@@ -33,6 +33,7 @@
  #include <lib3270/config.h>
 
  #include "gui.h"
+ #include "uiparser.h"
  #include <gdk/gdkkeysyms.h>
  #include <errno.h>
 
@@ -49,32 +50,13 @@
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
-// static void action_Clear(GtkWidget *w, gpointer user_data);
-
- static void erase_input_action(void);
- static void clear_fields_action(void);
- static void action_Reset(void);
-
  static void action_Up(GtkWidget *w, gpointer user_data);
  static void action_Down(GtkWidget *w, gpointer user_data);
  static void action_Left(GtkWidget *w, gpointer user_data);
  static void action_Right(GtkWidget *w, gpointer user_data);
- static void action_Tab(void);
- static void action_BackTab(void);
- static void action_enter(GtkWidget *w, gpointer user_data);
- static void action_Disconnect(GtkWidget *w, gpointer user_data);
- static void action_PrintScreen(GtkWidget *w, gpointer user_data);
- static void action_PrintSelected(GtkWidget *w, gpointer user_data);
- static void action_PrintClipboard(GtkWidget *w, gpointer user_data);
- static void action_Quit(void);
- static void action_About(GtkWidget *w, gpointer user_data);
 
- static void action_ToggleGDKDebug(GtkToggleAction *action, gpointer user_data);
- static void action_SaveScreen(void);
- static void action_SaveSelected(void);
- static void action_SaveClipboard(void);
- static void action_DumpScreen(void);
- static void action_LoadScreenDump(void);
+ static void action_pfkey(GtkAction *action,gpointer id);
+ static void action_pakey(GtkAction *action,gpointer id);
 
 /*---[ Gui toggles ]--------------------------------------------------------------------------------------------*/
 
@@ -82,258 +64,67 @@
  {
     const gchar     *name;
     const gchar     *label;
-    const gchar     *tooltip;
-    const gchar     *stock_id;
-    const gchar     *accelerator;
     const gboolean  def;
  } gui_toggle_info[GUI_TOGGLE_COUNT] =
  {
-    { "Bold", 			    N_( "Bold" ),			    NULL,	NULL,	NULL, FALSE	},
-    { "KeepSelected", 	    N_( "Keep selected" ),	    NULL,	NULL,	NULL, FALSE	},
-    { "Underline",		    N_( "Show Underline" ), 	NULL,   NULL,   NULL, FALSE },
-    { "AutoConnect",    	N_( "Connect on startup" ),	NULL,   NULL,   NULL, TRUE  }
+    { "Bold", 			    N_( "Bold" ),				FALSE	},
+    { "KeepSelected", 	    N_( "Keep selected" ),		FALSE	},
+    { "Underline",		    N_( "Show Underline" ), 	TRUE	},
+    { "AutoConnect",    	N_( "Connect on startup" ),	TRUE	}
  };
 
  gboolean gui_toggle[GUI_TOGGLE_COUNT] = { 0 };
 
-/*---[ Keyboard action ]----------------------------------------------------------------------------------------*/
-
- struct WindowActions
- {
-	guint			keyval;
-	GdkModifierType	state;
-	void (*callback)(guint arg);
-	guint			arg;
- };
-
-#ifdef CONFIGURABLE_KEYBOARD_ACTIONS
-
-	static struct WindowActions	*keyproc_table 		= NULL;
-	static int 					keyproc_table_size	= 0;
-
-#else
-
-	#define INTERNAL_ACTION(key,state,action) { key, state, (void (*)(guint)) action, 0 }
-
- 	static const struct WindowActions keyproc_table[] =
- 	{
-		INTERNAL_ACTION(	GDK_Left,			0,					action_Left),
-		INTERNAL_ACTION(	GDK_Up,				0,					action_Up),
-		INTERNAL_ACTION(	GDK_Right,			0,					action_Right),
-		INTERNAL_ACTION(	GDK_Down,			0,					action_Down),
-
-		INTERNAL_ACTION(	GDK_KP_Left,		0,					action_Left),
-		INTERNAL_ACTION(	GDK_KP_Up,			0,					action_Up),
-		INTERNAL_ACTION(	GDK_KP_Right,		0,					action_Right),
-		INTERNAL_ACTION(	GDK_KP_Down,		0,					action_Down),
-
-		INTERNAL_ACTION(	GDK_ISO_Left_Tab,	0,					action_BackTab),
-		INTERNAL_ACTION(	GDK_Tab,			0,					action_Tab),
-		INTERNAL_ACTION(	GDK_KP_Add,			GDK_NUMLOCK_MASK,	action_Tab),
-
- 	};
-
- 	static const int keyproc_table_size = (sizeof(keyproc_table)/sizeof(struct WindowActions));
-
-
-#endif
 
 /*---[ Action tables ]------------------------------------------------------------------------------------------*/
 
-	// TODO (perry#9#): Add tooltips
- static const struct call_3270
+ GtkActionGroup 		**action_group		= NULL;
+ static GtkAction 		*scroll_action[]	= { NULL, NULL, NULL, NULL };
+
+ static struct _keyboard_action
  {
- 	const gchar *name;
- 	const gchar *label;
- 	const gchar *tooltip;
- 	const gchar *stock_id;
- 	int			 (*call)(void);
- 	const gchar *accelerator;
- } action_3270_info[] =
+	guint			keyval;
+	GdkModifierType	state;
+	GtkAction		*action;
+	GCallback		def;
+ } keyboard_action[] =
  {
-		{ "EraseEOF",		N_( "Erase to end of field" ),
-							N_( "Erase to the end of the field" ),
-							NULL,
-							lib3270_EraseEOF,
-							"End" },
+	{ GDK_Left,				0,					NULL,	G_CALLBACK(action_Left)				},
+	{ GDK_Up,				0,					NULL,	G_CALLBACK(action_Up)				},
+	{ GDK_Right,			0,					NULL,	G_CALLBACK(action_Right)			},
+	{ GDK_Down,				0,					NULL,	G_CALLBACK(action_Down)				},
+	{ GDK_Tab,				0,					NULL,	G_CALLBACK(action_NextField)		},
 
-		{ "EraseEOL",		N_( "Erase to end of line" ),
-							N_( "Erase to the end of the field or line" ),
-							NULL,
-							lib3270_EraseEOL,
-							NULL },
-
-		{ "Home",			N_( "First Field" ),
-							NULL,
-							NULL,
-							action_FirstField,
-							"Home" },
-
-		{ "DeleteWord",		N_( "Delete Word" ),
-							NULL,
-							NULL,
-							action_DeleteWord,
-							N_( "<Ctrl>w" )	},
-
-		{ "EraseField",		N_( "Erase Field" ),
-							NULL,
-							NULL,
-							action_DeleteField,
-							N_( "<Ctrl>u" ) },
-
-		{ "Delete",			N_( "Delete Char" ),
-							NULL,
-							NULL,
-							action_Delete,
-							"Delete" },
-
-		{ "Erase",			N_( "Backspace" ),
-							NULL,
-							NULL,
-							action_Erase,
-							"BackSpace" },
-
-		{ "SysREQ",			N_( "Sys Req" ),
-							NULL,
-							NULL,
-							action_SysReq,
-							"Sys_Req" },
-
- };
-
-/*
-	The name of the action.
-	The stock id for the action, or the name of an icon from the icon theme.
-	The label for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain(). If label is NULL, the label of the stock item with id stock_id is used.
-	The accelerator for the action, in the format understood by gtk_accelerator_parse().
-	The tooltip for the action. This field should typically be marked for translation, see gtk_action_group_set_translation_domain().
-	The function to call when the action is activated.
-
-	http://library.gnome.org/devel/gtk/stable/gtk-Stock-Items.html
-
- */
- static const GtkActionEntry online_action_entries[] =
- {
-	{	"Redraw",			NULL,					N_( "Redraw screen" ),		NULL,				NULL,	G_CALLBACK(action_Redraw)			},
-	{	"SaveScreen",		NULL,					N_( "Save screen" ),		NULL,				NULL,	G_CALLBACK(action_SaveScreen)		},
-	{	"PrintScreen",		GTK_STOCK_PRINT,		N_( "Print" ),				"Print",			NULL,	G_CALLBACK(action_PrintScreen)		},
-	{	"DumpScreen",		NULL,					N_( "Dump screen" ),		"<Alt>D",			NULL,	G_CALLBACK(action_DumpScreen)		},
- 	{	"Disconnect",		GTK_STOCK_DISCONNECT,	N_( "_Disconnect" ),		NULL,				NULL,	G_CALLBACK(action_Disconnect)		},
-
-	/* Select actions */
-	{	"SelectField",		NULL,					N_( "Select Field" ),		"<Ctrl>f",			NULL,	G_CALLBACK(action_SelectField)		},
-
-	{ 	"SelectRight",		NULL,					N_( "Select Right" ),		"<Shift>Right",		NULL,	G_CALLBACK(action_SelectRight)		},
-	{ 	"SelectLeft",		NULL,					N_( "Select Left" ),		"<Shift>Left",		NULL,	G_CALLBACK(action_SelectLeft)		},
-	{ 	"SelectUp",			NULL,					N_( "Select Up" ),			"<Shift>Up",		NULL,	G_CALLBACK(action_SelectUp)			},
-	{ 	"SelectDown",		NULL,					N_( "Select Down" ),		"<Shift>Down",		NULL,	G_CALLBACK(action_SelectDown)		},
-
-	{	"SelectionRight",	NULL,					N_( "Selection Right" ),	"<Alt>Right",		NULL,	G_CALLBACK(action_SelectionRight)	},
-	{	"SelectionLeft",	NULL,					N_( "Selection Left" ),		"<Alt>Left",		NULL,	G_CALLBACK(action_SelectionLeft)	},
-	{	"SelectionUp",		NULL,					N_( "Selection Up" ),		"<Alt>Up",			NULL,	G_CALLBACK(action_SelectionUp)		},
-	{	"SelectionDown",	NULL,					N_( "Selection Down" ),		"<Alt>Down",		NULL,	G_CALLBACK(action_SelectionDown)	},
-
-	/* Cursor Movement */
-	{ 	"CursorRight",		GTK_STOCK_GO_FORWARD,	N_( "Right" ),				"Right",			NULL,	G_CALLBACK(action_Right)			},
-	{ 	"CursorLeft",		GTK_STOCK_GO_BACK,		N_( "Left" ),				"Left",				NULL,	G_CALLBACK(action_Left)				},
-	{ 	"CursorUp",			GTK_STOCK_GO_UP,		N_( "Up" ),					"Up",				NULL,	G_CALLBACK(action_Up)				},
-	{ 	"CursorDown",		GTK_STOCK_GO_DOWN,		N_( "Down" ),				"Down",				NULL,	G_CALLBACK(action_Down)				},
-
-	{	"NextField",		GTK_STOCK_GOTO_LAST,	N_( "Next field" ),			"Tab",				NULL,	G_CALLBACK(action_Tab)				},
-	{	"PreviousField",	GTK_STOCK_GOTO_FIRST,	N_( "Previous field" ),		"ISO_Left_Tab",		NULL,	G_CALLBACK(action_BackTab)			},
-
- 	/* Edit actions */
- 	{	"PasteNext",		NULL,					N_( "Paste next" ),			"<Shift><Ctrl>v",	NULL,	G_CALLBACK(action_PasteNext)		},
- 	{	"PasteTextFile",	NULL,					N_( "Paste text file" ),	NULL,				NULL,	G_CALLBACK(action_PasteTextFile)	},
- 	{	"Reselect",			NULL,					N_( "Reselect" ),			"<Shift><Ctrl>r",	NULL,	G_CALLBACK(Reselect)				},
-#if defined( GTK_STOCK_SELECT_ALL )
- 	{	"SelectAll",		GTK_STOCK_SELECT_ALL,	N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
-#else
- 	{	"SelectAll",		NULL,					N_( "Select all" ),			"<Ctrl>a",			NULL,	G_CALLBACK(action_SelectAll)		},
+#ifdef WIN32
+	{ GDK_ISO_Left_Tab,		GDK_SHIFT_MASK,		NULL,	G_CALLBACK(action_PreviousField)	},
 #endif
- 	{	"EraseInput",		GTK_STOCK_CLEAR,		N_( "Erase input" ),		NULL,				NULL,	G_CALLBACK(erase_input_action)		},
- 	{	"ClearFields",		NULL,					N_( "Clear" ),				NULL,				NULL,	G_CALLBACK(clear_fields_action)		},
 
- 	{	"Reset",			NULL,					N_( "Reset" ),				"<Ctrl>r",			NULL,	G_CALLBACK(action_Reset)			},
- 	{	"Escape",			NULL,					N_( "Escape" ),				"Escape",			NULL,	G_CALLBACK(action_Reset)			},
+	{ GDK_KP_Left,			0,					NULL,	G_CALLBACK(action_Left)				},
+	{ GDK_KP_Up,			0,					NULL,	G_CALLBACK(action_Up)				},
+	{ GDK_KP_Right,			0,					NULL,	G_CALLBACK(action_Right)			},
+	{ GDK_KP_Down,			0,					NULL,	G_CALLBACK(action_Down)				},
+	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(action_NextField)		},
  };
 
- static const GtkActionEntry ft_action_entries[] =
+ static struct _pf_action
  {
-	/* File-transfer actions */
- 	{	"FTMenu",   		NULL,					N_( "File Transfer" ),		NULL,				NULL,	NULL								},
-	{   "SendReceive",		NULL,					N_( "Send/Receive" ),		NULL,				NULL,	NULL								},
- 	{	"Download",			GTK_STOCK_SAVE,			N_( "Receive file" ),		"<Alt>d",			NULL,	G_CALLBACK(action_Download)			},
- 	{	"Upload",   		GTK_STOCK_OPEN,			N_( "Send file" ),   		"<Alt>u",			NULL,	G_CALLBACK(action_Upload)			},
- };
-
- static const GtkActionEntry offline_action_entries[] =
+	GtkAction 	*normal;
+	GtkAction	*shift;
+ } pf_action[12] =
  {
- 	{	"Connect",			GTK_STOCK_CONNECT,		N_( "_Connect" ),			NULL,				NULL,	G_CALLBACK(action_Connect)			},
-	{	"LoadScreenDump",	NULL,					N_( "Load screen dump" ),	"<Alt>R",			NULL,	G_CALLBACK(action_LoadScreenDump)	},
-	{ 	"SetHostname",		GTK_STOCK_HOME,			N_( "Set hostname" ),		NULL,				NULL,	G_CALLBACK(action_SetHostname)		},
+ 	{ NULL,	NULL }, 	// PF01
+ 	{ NULL,	NULL }, 	// PF02
+ 	{ NULL,	NULL }, 	// PF03
+ 	{ NULL,	NULL }, 	// PF04
+ 	{ NULL,	NULL }, 	// PF05
+ 	{ NULL,	NULL }, 	// PF06
+ 	{ NULL,	NULL }, 	// PF07
+ 	{ NULL,	NULL }, 	// PF08
+ 	{ NULL,	NULL }, 	// PF09
+ 	{ NULL,	NULL }, 	// PF10
+ 	{ NULL,	NULL }, 	// PF11
+ 	{ NULL,	NULL }, 	// PF12
  };
-
- static const GtkActionEntry selection_action_entries[] =
- {
- 	{	"Append",			GTK_STOCK_ADD,			N_( "Add to copy" ),		"<Shift><Ctrl>c",	NULL,	G_CALLBACK(action_Append)			},
- 	{	"Unselect",			NULL,					N_( "Unselect" ),			"<Shift><Ctrl>u",	NULL,	G_CALLBACK(action_ClearSelection)	},
- 	{	"Copy",				GTK_STOCK_COPY,			N_( "Copy" ),				NULL,				NULL,	G_CALLBACK(action_Copy)				},
- 	{	"CopyAsTable",		NULL,					N_( "Copy as table" ),		"<Shift>T",			NULL,	G_CALLBACK(action_CopyAsTable)		},
- 	{	"PrintSelected",	NULL,					N_( "Print selected" ),		NULL,				NULL,	G_CALLBACK(action_PrintSelected)	},
-	{	"SaveSelected",		NULL,					N_( "Save selected" ),		NULL,				NULL,	G_CALLBACK(action_SaveSelected)		},
- };
-
- static const GtkActionEntry clipboard_action_entries[] =
- {
-	{	"PrintClipboard",	NULL,					N_( "Print copy" ),			NULL,				NULL,	G_CALLBACK(action_PrintClipboard)	},
-	{	"SaveClipboard",	NULL,					N_( "Save copy" ),			NULL,				NULL,	G_CALLBACK(action_SaveClipboard)	},
-
- };
-
- static const GtkActionEntry paste_action_entries[] =
- {
- 	{	"Paste",			GTK_STOCK_PASTE,		N_( "Paste" ),				NULL,				NULL,	G_CALLBACK(action_Paste)			},
- };
-
- static const GtkActionEntry common_action_entries[] =
- {
- 	/* Top menus */
- 	{	"FileMenu",			NULL,					N_( "_File" ),				NULL,				NULL,	NULL								},
- 	{	"NetworkMenu",		NULL,					N_( "_Network" ),			NULL,				NULL,	NULL								},
- 	{	"HelpMenu",			NULL,					N_( "Help" ),				NULL,				NULL,	NULL								},
- 	{	"EditMenu",			NULL,					N_( "_Edit" ),				NULL,				NULL,	NULL								},
- 	{	"OptionsMenu",		NULL,					N_( "_Options" ),			NULL,				NULL,	NULL								},
- 	{	"SettingsMenu",		NULL,					N_( "Settings" ),			NULL,				NULL,	NULL								},
- 	{	"ScriptsMenu",		NULL,					N_( "Scripts" ),			NULL,				NULL,	NULL								},
- 	{	"ViewMenu",			NULL,					N_( "_View" ),				NULL,				NULL,	NULL								},
- 	{	"ToolbarMenu",		NULL,					N_( "Toolbars" ),			NULL,				NULL,	NULL								},
- 	{	"DebugMenu",		NULL,					N_( "Debug" ),				NULL,				NULL,	NULL								},
-
-	/* Sub menus */
-	{	"FontSettings",		GTK_STOCK_SELECT_FONT,	N_( "Select font" ),		NULL,				NULL,	NULL								},
-
- 	/* Stock menus */
- 	{	"Preferences",		GTK_STOCK_PREFERENCES,	N_( "Preferences" ),		NULL,				NULL,	NULL								},
- 	{	"Network",			GTK_STOCK_NETWORK,		N_( "Network" ),			NULL,				NULL,	NULL								},
- 	{	"Properties",		GTK_STOCK_PROPERTIES,	N_( "Properties" ),			NULL,				NULL,	NULL								},
-
-	/* Misc actions */
- 	{	"About",			GTK_STOCK_ABOUT,		N_( "About" ),				NULL,				NULL,	G_CALLBACK(action_About)			},
- 	{	"Quit",				GTK_STOCK_QUIT,			N_( "_Quit" ),				NULL,				NULL,	G_CALLBACK(action_Quit)				},
- 	{	"SelectColors",		GTK_STOCK_SELECT_COLOR,	N_( "Colors" ),				NULL,				NULL,	G_CALLBACK(action_SelectColors)		},
-
- 	/* Save actions */
- 	{	"Save",				GTK_STOCK_SAVE,			N_( "Save" ),				NULL,				NULL,	NULL								},
-
-	/* Terminal Actions */
-	{ 	"Return",			GTK_STOCK_APPLY,		N_( "Return" ),				"Return",			NULL,	G_CALLBACK(action_enter)			},
-	{ 	"Enter",			NULL,					N_( "Enter" ),				"KP_Enter",			NULL,	G_CALLBACK(action_enter)			},
- };
-
-
- GtkActionGroup	*action_group[ACTION_GROUP_MAX] = { NULL };
-
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -342,50 +133,29 @@
 	int			p;
 	GtkAction	*rc = NULL;
 
-	for(p = 0; p < ACTION_GROUP_MAX && !rc; p++)
+	for(p = 0; action_group[p] && !rc; p++)
 		rc = gtk_action_group_get_action(action_group[p],name);
 
 	return rc;
  }
 
- GCallback get_action_callback_by_name(const gchar *name)
+ void set_action_sensitive_by_name(const gchar *name,gboolean sensitive)
  {
-	// TODO (perry#8#): Find a better way (search all registered actions by name?)
-	static const struct _list
-	{
-		const GtkActionEntry *action;
-		int sz;
-	} list[] =
-	{
-		{ online_action_entries,	G_N_ELEMENTS(online_action_entries)		},
-		{ ft_action_entries,		G_N_ELEMENTS(ft_action_entries)			},
-		{ offline_action_entries,	G_N_ELEMENTS(offline_action_entries)	},
-		{ selection_action_entries, G_N_ELEMENTS(selection_action_entries)	},
-		{ clipboard_action_entries, G_N_ELEMENTS(clipboard_action_entries)	},
-		{ paste_action_entries,		G_N_ELEMENTS(paste_action_entries)		},
-		{ common_action_entries,	G_N_ELEMENTS(common_action_entries)		}
-	};
+	int p;
 
-	int f, i;
-
-	for(f=0;f<G_N_ELEMENTS(list);f++)
+	for(p = 0; action_group[p]; p++)
 	{
-		for(i=0;i<list[f].sz;i++)
+		GtkAction *act = gtk_action_group_get_action(action_group[p],name);
+		if(act)
 		{
-			if(!strcmp(name,list[f].action[i].name))
-				return list[f].action[i].callback;
+			Trace("%s: %s(%s)",__FUNCTION__,name,sensitive ? "sensitive" : "insensitive");
+			gtk_action_set_sensitive(act,sensitive);
+			return;
 		}
 	}
 
- 	for(f=0;f<G_N_ELEMENTS(action_3270_info);f++)
- 	{
-		if(!strcmp(name,action_3270_info[f].name))
-			return G_CALLBACK(action_3270_info[f].call);
- 	}
+	Trace("%s: %s isn't available",__FUNCTION__,name);
 
-//	Trace("Can't find action \"%s\"",name);
-
- 	return NULL;
  }
 
  static void clear_and_call(GtkAction *action, int (*call)(void))
@@ -429,20 +199,10 @@
  	clear_and_call(0,action_CursorRight);
  }
 
- void action_Tab(void)
- {
- 	action_NextField();
- }
-
- void action_BackTab(void)
- {
- 	action_PreviousField();
- }
-
  void DisableNetworkActions(void)
  {
-	gtk_action_group_set_sensitive(online_actions,FALSE);
-	gtk_action_group_set_sensitive(offline_actions,FALSE);
+	set_action_group_sensitive_state(ACTION_GROUP_ONLINE,FALSE);
+	set_action_group_sensitive_state(ACTION_GROUP_OFFLINE,FALSE);
  }
 
  static void action_Disconnect(GtkWidget *w, gpointer user_data)
@@ -491,13 +251,6 @@
 
     }
 
-/*
-	// TODO (perry#5#): If there's no previous server ask for it.
-
-
-	Trace("Calling %s","host_reconnect");
- 	host_reconnect(0);
-*/
  }
 
  void action_enter(GtkWidget *w, gpointer user_data)
@@ -571,7 +324,7 @@
 
 	/* Build and show about dialog */
  	gtk_show_about_dialog(	GTK_WINDOW(topwindow),
-#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 12
+#if GTK_CHECK_VERSION(2,12,0)
 							"program-name",    		program_name,
 #else
 							"name",    				program_name,
@@ -593,18 +346,18 @@
 		gdk_pixbuf_unref(logo);
  }
 
- static void toggle_action(GtkToggleAction *action, int id)
+ static void toggle_action(GtkToggleAction *action, gpointer id)
  {
- 	Trace("%s(%d)",__FUNCTION__,id);
- 	set_toggle(id,gtk_toggle_action_get_active(action));
+ 	Trace("%s(%d)",__FUNCTION__,(int) id);
+ 	set_toggle((int) id,gtk_toggle_action_get_active(action));
  }
 
- static void toggle_set(GtkAction *action,int id)
+ static void toggle_set_action(GtkAction *action,int id)
  {
  	set_toggle(id,TRUE);
  }
 
- static void toggle_reset(GtkAction *action,int id)
+ static void toggle_reset_action(GtkAction *action,int id)
  {
  	set_toggle(id,FALSE);
  }
@@ -624,537 +377,154 @@
 
  }
 
-/*
- static void toggle_toolbar(GtkToggleAction *action, int id)
+ void init_gui_toggles(void)
  {
-    gboolean toggle = gtk_toggle_action_get_active(action);
+ 	int 		f;
+ 	gchar 		*name;
+ 	GtkAction	*action;
 
-	SetBoolean("Toggles","Toolbar",toggle);
-
-	if(toolbar_widget)
-	{
-#if GTK_CHECK_VERSION(2,18,0)
-		gtk_widget_set_visible(toolbar_widget,toggle);
-#else
-		if(toggle)
-			gtk_widget_show(toolbar_widget);
-		else
-			gtk_widget_hide(toolbar_widget);
-#endif
-	}
+ 	for(f=0;f<GUI_TOGGLE_COUNT;f++)
+ 	{
+ 		gui_toggle[f] = GetBoolean("Toggles", gui_toggle_info[f].name, gui_toggle_info[f].def);
+		name = g_strconcat("Toggle",gui_toggle_info[f].name,NULL);
+		action = get_action_by_name(name);
+		if(action)
+			gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),gui_toggle[f]);
+		g_free(name);
+ 	}
 
  }
-*/
+
+/*
 
  static void action_ToggleGDKDebug(GtkToggleAction *action, gpointer user_data)
  {
 	gdk_window_set_debug_updates(gtk_toggle_action_get_active(action));
  }
 
- static void LoadToggleActions(GtkActionGroup *actions)
+*/
+
+ static void action_pfkey(GtkAction *action, gpointer id)
  {
-	// TODO (perry#9#): Add tooltips
- 	static const struct _toggle_list
- 	{
- 		gboolean		set;
- 		int				toggle;
-		const gchar	*label;
-		const gchar	*tooltip;
-		const gchar	*stock_id;
-	} toggle_list[] =
-	{
-		{ TRUE,		FULL_SCREEN,	N_( "Fullscreen" ),	NULL,	GTK_STOCK_FULLSCREEN		},
-		{ FALSE,	FULL_SCREEN,	N_( "Window"),		NULL,	GTK_STOCK_LEAVE_FULLSCREEN	},
-	};
-
-	// TODO (perry#9#): Add tooltips
- 	static const struct _toggle_info
- 	{
- 		const gchar *label;
- 		const gchar *tooltip;
- 		const gchar *stock_id;
- 		const gchar *accelerator;
-	}
-	toggle_info[N_TOGGLES] =
-	{
-		{ N_( "Monocase" ),						NULL,	NULL,	NULL				},
-		{ N_( "Alt Cursor" ),					NULL,	NULL,	NULL				},
-		{ N_( "Blinking Cursor" ),				NULL,	NULL,	NULL				},
-		{ N_( "Show timing" ),					NULL,	NULL,	NULL				},
-		{ N_( "Track Cursor" ),					NULL,	NULL,	NULL				},
-		{ N_( "DS Trace" ),						NULL,	NULL,	NULL				},
-		{ N_( "Scroll bar" ),					NULL,	NULL,	NULL				},
-		{ N_( "Line Wrap" ),					NULL,	NULL,	NULL				},
-		{ N_( "Blank Fill" ),					NULL,	NULL,	NULL				},
-		{ N_( "Screen Trace" ),					NULL,	NULL,	NULL				},
-		{ N_( "Event Trace" ),					NULL,	NULL,	NULL				},
-		{ N_( "Paste with left margin" ),		NULL,	NULL,	NULL				},
-		{ N_( "Select by rectangles" ),			NULL,	NULL,	N_( "<alt>S" )		},
-		{ N_( "Cross Hair Cursor" ),			NULL,	NULL,	N_( "<alt>X" )		},
-		{ N_( "Visible Control chars" ),		NULL,	NULL,	NULL				},
-		{ N_( "Aid wait" ),						NULL,	NULL,	NULL				},
-		{ N_( "Full Screen" ),					NULL,	NULL,	N_( "<alt>Home" )	},
-		{ N_( "Auto-Reconnect" ),				NULL,	NULL,	NULL				},
-		{ N_( "Insert" ),						NULL,	NULL,	"Insert"			},
-		{ N_( "Keypad" ),						NULL,	NULL,	N_( "<alt>K" )		},
-		{ N_( "Smart paste" ),					NULL,   NULL,   NULL    			},
-
-	};
-
- 	int f;
- 	GtkToggleAction *action;
-
-	/* Debug toggles */
-	action = gtk_toggle_action_new(	"ToggleGDKDebug", _( "Debug screen updates"), NULL,NULL);
-	g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(action_ToggleGDKDebug),0);
-	gtk_action_group_add_action(actions,(GtkAction *) action);
-
-	/* Internal toggles */
- 	for(f=0;f< GUI_TOGGLE_COUNT;f++)
- 	{
- 		gchar *name = g_strconcat("Toggle",gui_toggle_info[f].name,NULL);
-
-#ifdef DEBUG
-		if(!gui_toggle_info[f].name)
-		{
-			Trace("No description for toggle %d",f);
-			exit(-1);
-		}
-#endif
-		GtkToggleAction *action = gtk_toggle_action_new(	name,
-															gettext(gui_toggle_info[f].label),
-															gettext(gui_toggle_info[f].tooltip),
-															gui_toggle_info[f].stock_id );
-
-		Trace("%s: %p",name,action);
-
-        gui_toggle[f] = GetBoolean("Toggles",gui_toggle_info[f].name,gui_toggle_info[f].def);
-
-		gtk_toggle_action_set_active(action,gui_toggle[f]);
-		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_gui),(gpointer) f);
-
-		if(gui_toggle_info[f].accelerator)
-			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(gui_toggle_info[f].accelerator));
-		else
-			gtk_action_group_add_action(actions,(GtkAction *) action);
-
-		g_free(name);
- 	}
-
-	/* Toolbar toggle */
-	/*
-	action = gtk_toggle_action_new("ToggleToolbar", _( "Button bar"), NULL, NULL);
-	gtk_toggle_action_set_active(action,GetBoolean("Toggles","Toolbar",TRUE));
-	g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_toolbar),0);
-	gtk_action_group_add_action(common_actions,(GtkAction *) action);
-	*/
-
-	/* Toggle actions */
- 	for(f=0;f<N_TOGGLES;f++)
- 	{
- 		gchar *name = g_strconcat("Toggle",get_toggle_name(f),NULL);
-
-#ifdef DEBUG
-		if(!toggle_info[f].label)
-		{
-			Trace("No description for toggle %d",f);
-			exit(-1);
-		}
-#endif
-
-		GtkToggleAction *action = gtk_toggle_action_new(	name,
-															gettext(toggle_info[f].label),
-															gettext(toggle_info[f].tooltip),
-															toggle_info[f].stock_id );
-
-		Trace("Toggle(%d): %s",f,name);
-		gtk_toggle_action_set_active(action,Toggled(f));
-		g_signal_connect(G_OBJECT(action),"toggled", G_CALLBACK(toggle_action),(gpointer) f);
-
-#ifndef X3270_TRACE
-
-		if(f == DS_TRACE || f == SCREEN_TRACE || f == EVENT_TRACE)
-			gtk_action_set_sensitive((GtkAction *) action,FALSE);
-
-#endif
-
-		if(toggle_info[f].accelerator)
-			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(toggle_info[f].accelerator));
-		else
-			gtk_action_group_add_action(actions,(GtkAction *) action);
-
-		g_free(name);
- 	}
-
-	/* Set/Reset actions */
- 	for(f=0;f< G_N_ELEMENTS(toggle_list);f++)
- 	{
- 		int		id = toggle_list[f].toggle;
- 		gchar	*name = g_strconcat((toggle_list[f].set ? "Set" : "Reset" ),get_toggle_name(id),NULL);
-
-		Trace("Creating action \"%s\"",name);
-
-		GtkAction *action = gtk_action_new(	name,
-											gettext(toggle_list[f].label),
-											gettext(toggle_list[f].tooltip),
-											toggle_list[f].stock_id );
-
-		if(toggle_list[f].set)
-		{
-			g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(toggle_set),(gpointer) id);
-			if(Toggled(id))
-				gtk_action_set_visible(action,FALSE);
-		}
-		else
-		{
-			g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(toggle_reset),(gpointer) id);
-			if(!Toggled(id))
-				gtk_action_set_visible(action,FALSE);
-		}
-
-		gtk_action_group_add_action(actions,action);
-
-		g_free(name);
- 	}
-
-
- }
-
- static void Load3270Actions(GtkActionGroup *actions)
- {
-	int f;
-
- 	for(f=0;f<G_N_ELEMENTS(action_3270_info);f++)
- 	{
-		GtkAction *action = gtk_action_new(	action_3270_info[f].name,
-											gettext(action_3270_info[f].label),
-											gettext(action_3270_info[f].tooltip),
-											action_3270_info[f].stock_id );
-
-		g_signal_connect(G_OBJECT(action),"activate", G_CALLBACK(action_3270_info[f].call),0 );
-
-		if(action_3270_info[f].accelerator)
-			gtk_action_group_add_action_with_accel(actions,(GtkAction *) action, gettext(action_3270_info[f].accelerator));
-		else
-			gtk_action_group_add_action(actions,(GtkAction *) action);
-
- 	}
- }
-
-#ifdef CONFIGURABLE_KEYBOARD_ACTIONS
-
- static int InsertKeyboardAction(guint keyval, GdkModifierType state, const gchar *action_name)
- {
- 	int f;
- 	struct WindowActions *act = NULL;
-
-	if(keyproc_table)
-	{
-		for(f=0;!act && f < keyproc_table_size;f++)
-		{
-			if(keyproc_table[f].keyval == keyval && keyproc_table[f].state == state)
-				act = keyproc_table+f;
-		}
-	}
-
- 	if(!act)
- 	{
-		if(!keyproc_table)
-		{
-			keyproc_table_size = 0;
-			keyproc_table = g_new(struct WindowActions,keyproc_table_size+1);
-
-//			Trace("Keyproc_table: %p",keyproc_table);
-		}
-		else
-		{
-			keyproc_table = g_renew(struct WindowActions,keyproc_table,keyproc_table_size+1);
-		}
-
-		act = keyproc_table + keyproc_table_size;
-
-		keyproc_table_size++;
-
-//		Trace("New action created (total: %d)",keyproc_table_size);
- 	}
-
-	act->keyval = keyval;
-	act->state = state;
-
-	if(g_strncasecmp(action_name,"pf",2))
-	{
-		act->callback = (void (*)(guint arg)) get_action_callback_by_name(action_name);
-	}
-	else
-	{
-		act->arg = atoi(action_name+2);
-//		Trace("Adding PF%02d action",act->arg);
-		if(act->arg > 0 && act->arg < 25)
-			act->callback = (void (*)(guint arg)) PFKey;
-	}
-
-//	Trace("Keyval: %08d State: %08d Action: %s Callback: %p",keyval,state,action_name,act->callback);
-
-	return act->callback ? 0 : ENOENT;
- }
-
- static void LoadKeyboardActions(void)
- {
- 	static const struct _default_key
- 	{
-		guint keyval;
-		GdkModifierType state;
-		const gchar *action_name;
- 	} default_key[] =
- 	{
-		{	GDK_Left,			0,				"CursorLeft"			},
-		{	GDK_Up,				0,				"CursorUp"				},
-		{	GDK_Right,			0,				"CursorRight"			},
-		{	GDK_Down,			0,				"CursorDown"			},
-		{	GDK_KP_Left,		0,				"CursorLeft"			},
-		{	GDK_KP_Up,			0,				"CursorUp"				},
-		{	GDK_KP_Right,		0,				"CursorRight"			},
-		{	GDK_KP_Down,		0,				"CursorDown"			},
-		{	GDK_Tab, 			0, 				"NextField"				},
-#ifdef WIN32
-		{	GDK_ISO_Left_Tab,	GDK_SHIFT_MASK,	"PreviousField"			},
-#endif
- 	};
-
-	GDir	*dir;
-	gchar	*path = g_build_filename(program_data,"ui",NULL);
-	int		f;
-
-	// Load default keys
-	for(f=0;f<G_N_ELEMENTS(default_key);f++)
-		InsertKeyboardAction(default_key[f].keyval, default_key[f].state, default_key[f].action_name);
-
-	for(f=0;f<12;f++)
-	{
-		gchar *ptr;
-
-		ptr = g_strdup_printf("pf%d",f+1);
-		InsertKeyboardAction(GDK_F1+f, 0, ptr);
-		g_free(ptr);
-
-		ptr = g_strdup_printf("pf%d",f+13);
-		InsertKeyboardAction(GDK_F1+f, GDK_SHIFT_MASK, ptr);
-		g_free(ptr);
-
-	}
-
-	// Load configurable ones
-	dir = g_dir_open(path,0,NULL);
-	if(dir)
-	{
-		const gchar *name = g_dir_read_name(dir);
-		while(name)
-		{
-			if(g_str_has_suffix(name,"key"))
-			{
-				gchar	*contents;
-				gchar	*filename = g_build_filename(path,name,NULL);
-
-				// TODO (perry#2#): Notify user if the file loading fails.
-				if(g_file_get_contents(filename,&contents,NULL,NULL))
-				{
-					gchar	**line 	= g_strsplit(contents,"\n",-1);
-
-					for(f=0;line[f];f++)
-					{
-						char *key = line[f];
-						char *val;
-
-						for(val=key;*val && *val != '\r';val++);
-						*val = 0;
-
-						key = g_strstrip(key);
-
-						if(*key && *key != ';' && *key != '#')
-						{
-
-							val = strchr(key,'=');
-
-							if(val)
-							{
-								guint			keyval;
-								GdkModifierType	state;
-
-								*(val++) = 0;
-								key = g_strstrip(key);
-								val = g_strstrip(val);
-
-								Trace("\"%s\" = \"%s\"",key,val);
-
-								gtk_accelerator_parse(key,&keyval,&state);
-
-								if(!keyval)
-									Log("Invalid accelerator id \"%s\" in %s",key,filename);
-								else
-									InsertKeyboardAction(keyval,state,val);
-							}
-						}
-					}
-
-					g_strfreev(line);
-					g_free(contents);
-				}
-
-				g_free(filename);
-			}
-			name = g_dir_read_name(dir);
-		}
-		g_dir_close(dir);
-	}
-
-	g_free(path);
- }
-#endif
-
- GtkUIManager * LoadApplicationUI(GtkWidget *widget)
- {
- 	static const struct _group
- 	{
-		gchar 					*name;
-		const GtkActionEntry 	*entries;
-		guint 					n_entries;
-	} group[ACTION_GROUP_MAX] =
- 	{
-		{ "Common",				common_action_entries,		G_N_ELEMENTS(common_action_entries)		},
-		{ "Online",				online_action_entries,		G_N_ELEMENTS(online_action_entries)		},
-		{ "Offline",			offline_action_entries,		G_N_ELEMENTS(offline_action_entries)	},
-		{ "Selection",			selection_action_entries,	G_N_ELEMENTS(selection_action_entries)	},
-		{ "Clipboard",			clipboard_action_entries,	G_N_ELEMENTS(clipboard_action_entries)	},
-		{ "Paste",				paste_action_entries,		G_N_ELEMENTS(paste_action_entries)		},
-		{ "FileTransfer",		ft_action_entries,			G_N_ELEMENTS(ft_action_entries)			},
-	};
-
-	GtkUIManager 	*ui_manager = gtk_ui_manager_new(); // http://library.gnome.org/devel/gtk/stable/GtkUIManager.html
-	GError			*error = NULL;
-	int				f;
-	gchar			*path;
-	gchar			*filename;
- 	GDir			*dir;
-
-	// Load actions
-	for(f=0;f < ACTION_GROUP_MAX; f++)
-	{
-		action_group[f] = gtk_action_group_new(group[f].name);
-		gtk_action_group_set_translation_domain(action_group[f], PACKAGE_NAME);
-		gtk_action_group_add_actions(action_group[f],group[f].entries, group[f].n_entries, topwindow);
-	}
-
-	Load3270Actions(online_actions);
-	LoadToggleActions(common_actions);
-	LoadCustomActions(ui_manager,action_group,ACTION_GROUP_MAX,GetConf());
-
-#ifdef CONFIGURABLE_KEYBOARD_ACTIONS
-	LoadKeyboardActions();
-#endif
-
-	// Add actions and load UI
-	for(f=0;f < ACTION_GROUP_MAX; f++)
-		gtk_ui_manager_insert_action_group(ui_manager,action_group[f], 0);
-
-	path = g_build_filename(program_data,"ui",NULL);
-
-    dir = g_dir_open(path,0,NULL);
-
-	Trace("Searching for UI definitions in %s (dir: %p)",path,dir);
-
-    if(!dir)
-    {
-		WarningPopup( _( "Can't find UI definitions in\n%s" ), path);
-    }
-    else
-    {
-		const gchar *name = g_dir_read_name(dir);
-		while(name)
-		{
-			filename = g_build_filename(path,name,NULL);
-
-			if(g_str_has_suffix(filename,"xml"))
-			{
-				Trace("Loading %s",filename);
-
-				if(!gtk_ui_manager_add_ui_from_file(ui_manager,filename,&error))
-				{
-					if(error && error->message)
-						Warning( _( "Can't load %s: %s" ),filename,error->message);
-					else
-						Warning( _( "Can't load %s" ), filename);
-				}
-			}
-
-			g_free(filename);
-			name = g_dir_read_name(dir);
-		}
-		g_dir_close(dir);
-    }
-
-	g_free(path);
-
-	gtk_ui_manager_ensure_update(ui_manager);
-	AddPluginUI(ui_manager,program_data);
-
-	gtk_ui_manager_ensure_update(ui_manager);
-	return ui_manager;
- }
-
- int GetFunctionKey(GdkEventKey *event)
- {
- 	int rc = (event->keyval - GDK_F1)+1;
-
- 	if(event->state & GDK_SHIFT_MASK)
- 	   rc += 12;
-
-	return rc;
- }
-
- gboolean PFKey(guint key)
- {
- 	// TODO (perry#2#): Make it configurable
-
-	Trace("Running PF %d",key);
+	Trace("Running PF %d",(int) id);
 
 	if(!TOGGLED_KEEP_SELECTED)
 		action_ClearSelection();
- 	action_PFKey(key);
-	return TRUE;
+ 	action_PFKey((int) id);
+ }
+
+ static void action_pakey(GtkAction *action, gpointer id)
+ {
+	Trace("Running PA %d",(int) id);
+
+	if(!TOGGLED_KEEP_SELECTED)
+		action_ClearSelection();
+ 	action_PAKey((int) id);
  }
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+ 	int f;
+ 	int	state = event->state & (GDK_SHIFT_MASK|GDK_CONTROL_MASK|GDK_ALT_MASK);
 
- 	int		f;
-
-	/* Is function key? */
-
-#ifndef CONFIGURABLE_KEYBOARD_ACTIONS
-
-	if(IS_FUNCTION_KEY(event))
+	// Check for PF keys
+	if(event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(state & (GDK_CONTROL_MASK|GDK_ALT_MASK)))
 	{
-		Trace("PF%d",GetFunctionKey(event));
-		PFKey(GetFunctionKey(event));
+		GtkAction *action;
+
+		f = (event->keyval - GDK_F1);
+
+		action = (state & GDK_SHIFT_MASK) ? pf_action[f].shift : pf_action[f].normal;
+
+		Trace("PF%02d: %s %s action: %p",f+1,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "",action);
+
+		if(action)
+			gtk_action_activate(action);
+		else
+			action_pfkey(NULL, (gpointer) (f + ((state & GDK_SHIFT_MASK) ? 13 : 1)));
+
 		return TRUE;
 	}
 
-#endif
+	Trace("Key action%04x: %s %s",event->keyval,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "");
 
-	Trace("Key action: %s %s",gdk_keyval_name(event->keyval),event->state & GDK_SHIFT_MASK ? "Shift " : "");
-
-    /* Check for special keyproc actions */
-	for(f=0; f < keyproc_table_size;f++)
+    // Check for special keyproc actions
+	for(f=0; f < G_N_ELEMENTS(keyboard_action);f++)
 	{
-		if(keyproc_table[f].keyval == event->keyval && (event->state & (GDK_SHIFT_MASK|GDK_CONTROL_MASK|GDK_ALT_MASK)) == keyproc_table[f].state && keyproc_table[f].callback)
+		if(keyboard_action[f].keyval == event->keyval && state == keyboard_action[f].state)
 		{
-			Trace("%p(%d)",keyproc_table[f].callback,keyproc_table[f].arg);
-			keyproc_table[f].callback(keyproc_table[f].arg);
+			if(keyboard_action[f].action)
+				gtk_action_activate(keyboard_action[f].action);
+			else
+				keyboard_action[f].def();
 			return TRUE;
 		}
 	}
 
 	return FALSE;
+ }
+
+ GtkAction * create_action_by_descriptor(const gchar *name, struct action_descriptor *data)
+ {
+	int			state		= data->attr.key_state & (GDK_SHIFT_MASK|GDK_CONTROL_MASK|GDK_ALT_MASK);
+	int			f;
+
+//	Trace("%s(%s), callback: %p",__FUNCTION__,name,data->callback);
+
+	switch(data->ui_type)
+	{
+	case UI_CALLBACK_TYPE_TOGGLE:
+		data->action = GTK_ACTION(gtk_toggle_action_new(name, gettext(data->attr.label ? data->attr.label : data->name), gettext(data->attr.tooltip), data->attr.stock_id));
+		break;
+
+	case UI_CALLBACK_TYPE_DEFAULT:
+		data->action = gtk_action_new(name, gettext(data->attr.label ? data->attr.label : data->name), gettext(data->attr.tooltip),data->attr.stock_id);
+		break;
+
+	case UI_CALLBACK_TYPE_SCROLL:
+		if(data->sub >= 0 && data->sub <= G_N_ELEMENTS(scroll_action))
+			scroll_action[data->sub] = data->action = gtk_action_new(name, gettext(data->attr.label ? data->attr.label : data->name), gettext(data->attr.tooltip),data->attr.stock_id);
+		break;
+
+	default:
+		Trace("Invalid action type %d in %s",data->ui_type,data->name);
+		return NULL;
+	}
+
+	if(data->callback)
+		g_signal_connect(G_OBJECT(data->action),data->ui_type == UI_CALLBACK_TYPE_TOGGLE ? "toggled" : "activate",G_CALLBACK(data->callback),data->user_data);
+
+	// Check for special keyboard action
+	for(f=0;f<G_N_ELEMENTS(keyboard_action);f++)
+	{
+		if(data->attr.key_value == keyboard_action[f].keyval && (state == keyboard_action[f].state))
+		{
+			keyboard_action[f].action = data->action;
+			gtk_action_group_add_action(action_group[data->group],data->action);
+			return data->action;
+		}
+	}
+
+	// Check for PF actions
+	if(data->attr.key_value >= GDK_F1 && data->attr.key_value <= GDK_F12 && !(state & (GDK_CONTROL_MASK|GDK_ALT_MASK)))
+	{
+		f = data->attr.key_value - GDK_F1;
+
+		if(state&GDK_SHIFT_MASK)
+			pf_action[f].shift = data->action;
+		else
+			pf_action[f].normal = data->action;
+		gtk_action_group_add_action(action_group[data->group],data->action);
+		return data->action;
+	}
+
+	// Register action
+	if(data->attr.accel)
+		gtk_action_group_add_action_with_accel(action_group[data->group],data->action,data->attr.accel);
+	else
+		gtk_action_group_add_action(action_group[data->group],data->action);
+
+	return data->action;
  }
 
  static int SaveText(const char *title, gchar *text)
@@ -1191,6 +561,8 @@
  {
  	gchar		*ptr;
 	GKeyFile	*conf   = GetConf();
+
+	// TODO (perry#1#): Show an error message if online
 
 	GtkWidget 	*dialog = gtk_file_chooser_dialog_new( _( "Load screen dump" ),
 														GTK_WINDOW(topwindow),
@@ -1231,8 +603,8 @@
 				Warning( N_( "Can't set device buffer contents" ) );
 
 			gtk_widget_set_sensitive(terminal,TRUE);
-			gtk_action_group_set_sensitive(online_actions,TRUE);
-			gtk_action_group_set_sensitive(offline_actions,TRUE);
+			set_action_group_sensitive_state(ACTION_GROUP_ONLINE,TRUE);
+			set_action_group_sensitive_state(ACTION_GROUP_OFFLINE,TRUE);
 
 			gtk_widget_queue_draw(terminal);
 			gtk_widget_grab_focus(terminal);
@@ -1249,6 +621,8 @@
  {
  	gchar		*ptr;
 	GKeyFile	*conf   = GetConf();
+
+	// TODO (perry#1#): Show an error message if offline
 
 	GtkWidget 	*dialog = gtk_file_chooser_dialog_new( _( "Dump screen contents" ),
 														 GTK_WINDOW(topwindow),
@@ -1410,3 +784,360 @@
 	gtk_widget_destroy(dialog);
 
  }
+
+ LOCAL_EXTERN int get_action_info_by_name(const gchar *key, const gchar **names, const gchar **values, gchar **name, UI_CALLBACK *info)
+ {
+	static const struct _action
+	{
+		const gchar	* name;			/**< Name of the action */
+		const gchar	* label;		/**< Default action label */
+		GCallback	  callback;		/**< Callback for "activated/toggled" signal */
+	}
+	action[] =
+	{
+		// Offline actions
+		{	"Connect",			N_( "_Connect" ),				G_CALLBACK(action_Connect)			},
+		{	"LoadScreenDump",	N_( "Load screen dump" ),		G_CALLBACK(action_LoadScreenDump)	},
+		{ 	"SetHostname",		N_( "Set hostname" ),			G_CALLBACK(action_SetHostname)		},
+
+		// Online actions
+		{	"Redraw",			N_( "Redraw screen" ),			G_CALLBACK(action_Redraw)			},
+		{	"SaveScreen",		N_( "Save screen" ),			G_CALLBACK(action_SaveScreen)		},
+		{	"PrintScreen",		N_( "Print" ),					G_CALLBACK(action_PrintScreen)		},
+		{	"DumpScreen",		N_( "Dump screen" ),			G_CALLBACK(action_DumpScreen)		},
+		{	"Disconnect",		N_( "_Disconnect" ),			G_CALLBACK(action_Disconnect)		},
+
+		// Select actions
+		{	"SelectField",		N_( "Select Field" ),			G_CALLBACK(action_SelectField)		},
+
+		{ 	"SelectRight",		N_( "Select Right" ),			G_CALLBACK(action_SelectRight)		},
+		{ 	"SelectLeft",		N_( "Select Left" ),			G_CALLBACK(action_SelectLeft)		},
+		{ 	"SelectUp",			N_( "Select Up" ),				G_CALLBACK(action_SelectUp)			},
+		{ 	"SelectDown",		N_( "Select Down" ),			G_CALLBACK(action_SelectDown)		},
+
+		{	"SelectionRight",	N_( "Selection Right" ),		G_CALLBACK(action_SelectionRight)	},
+		{	"SelectionLeft",	N_( "Selection Left" ),			G_CALLBACK(action_SelectionLeft)	},
+		{	"SelectionUp",		N_( "Selection Up" ),			G_CALLBACK(action_SelectionUp)		},
+		{	"SelectionDown",	N_( "Selection Down" ),			G_CALLBACK(action_SelectionDown)	},
+
+		// Cursor Movement
+		{ 	"CursorRight",		N_( "Right" ),					G_CALLBACK(action_Right)			},
+		{ 	"CursorLeft",		N_( "Left" ),					G_CALLBACK(action_Left)				},
+		{ 	"CursorUp",			N_( "Up" ),						G_CALLBACK(action_Up)				},
+		{ 	"CursorDown",		N_( "Down" ),					G_CALLBACK(action_Down)				},
+
+		{	"NextField",		N_( "Next field" ),				G_CALLBACK(action_NextField)		},
+		{	"PreviousField",	N_( "Previous field" ),			G_CALLBACK(action_PreviousField)	},
+
+		// Edit actions
+		{	"PasteNext",		N_( "Paste next" ),				G_CALLBACK(action_PasteNext)		},
+		{	"PasteTextFile",	N_( "Paste text file" ),		G_CALLBACK(action_PasteTextFile)	},
+		{	"Reselect",			N_( "Reselect" ),				G_CALLBACK(Reselect)				},
+		{	"SelectAll",		N_( "Select all" ),				G_CALLBACK(action_SelectAll)		},
+		{	"EraseInput",		N_( "Erase input" ),			G_CALLBACK(erase_input_action)		},
+		{	"ClearFields",		N_( "Clear" ),					G_CALLBACK(clear_fields_action)		},
+
+		{	"Reset",			N_( "Reset" ),					G_CALLBACK(action_Reset)			},
+		{	"Escape",			N_( "Escape" ),					G_CALLBACK(action_Reset)			},
+
+		// File-transfer actions
+		{	"Download",			N_( "Receive file" ),			G_CALLBACK(action_Download)			},
+		{	"Upload",   		N_( "Send file" ),   			G_CALLBACK(action_Upload)			},
+
+		// Selection actions
+		{	"Append",			N_( "Add to copy" ),			G_CALLBACK(action_Append)			},
+		{	"Unselect",			N_( "Unselect" ),				G_CALLBACK(action_ClearSelection)	},
+		{	"Copy",				N_( "Copy" ),					G_CALLBACK(action_Copy)				},
+		{	"CopyAsTable",		N_( "Copy as table" ),			G_CALLBACK(action_CopyAsTable)		},
+		{	"PrintSelected",	N_( "Print selected" ),			G_CALLBACK(action_PrintSelected)	},
+		{	"SaveSelected",		N_( "Save selected" ),			G_CALLBACK(action_SaveSelected)		},
+
+		{	"PrintClipboard",	N_( "Print copy" ),				G_CALLBACK(action_PrintClipboard)	},
+		{	"SaveClipboard",	N_( "Save copy" ),				G_CALLBACK(action_SaveClipboard)	},
+		{	"Paste",			N_( "Paste" ),					G_CALLBACK(action_Paste)			},
+
+		{	"FileMenu",			N_( "_File" ),					NULL								},
+		{	"FTMenu",			N_( "Send/Receive" ),			NULL								},
+		{	"NetworkMenu",		N_( "_Network" ),				NULL								},
+		{	"HelpMenu",			N_( "Help" ),					NULL								},
+		{	"EditMenu",			N_( "_Edit" ),					NULL								},
+		{	"OptionsMenu",		N_( "_Options" ),				NULL								},
+		{	"SettingsMenu",		N_( "Settings" ),				NULL								},
+		{	"ScriptsMenu",		N_( "Scripts" ),				NULL								},
+		{	"ViewMenu",			N_( "_View" ),					NULL								},
+		{	"ToolbarMenu",		N_( "Toolbars" ),				NULL								},
+		{	"DebugMenu",		N_( "Debug" ),					NULL								},
+		{	"FontSettings",		N_( "Select font" ),			NULL								},
+		{	"Preferences",		N_( "Preferences" ),			NULL								},
+		{	"Network",			N_( "Network" ),				NULL								},
+		{	"Properties",		N_( "Properties" ),				NULL								},
+
+		{	"About",			N_( "About" ),					G_CALLBACK(action_About)			},
+		{	"Quit",				N_( "_Quit" ),					G_CALLBACK(action_Quit)				},
+		{	"SelectColors",		N_( "Colors" ),					G_CALLBACK(action_SelectColors)		},
+
+		{	"Save",				N_( "Save" ),					NULL								},
+
+		{ 	"Return",			N_( "Return" ),					G_CALLBACK(action_enter)			},
+		{ 	"Enter",			N_( "Enter" ),					G_CALLBACK(action_enter)			},
+
+		// Lib3270 calls
+		{ "EraseEOF",			N_( "Erase to end of field" ),	G_CALLBACK(lib3270_EraseEOF)		},
+		{ "EraseEOL",			N_( "Erase to end of line" ),	G_CALLBACK(lib3270_EraseEOL)		},
+		{ "Home",				N_( "First Field" ),			G_CALLBACK(action_FirstField)		},
+		{ "DeleteWord",			N_( "Delete Word" ),			G_CALLBACK(action_DeleteWord)		},
+		{ "EraseField",			N_( "Erase Field" ),			G_CALLBACK(action_DeleteField)		},
+		{ "Delete",				N_( "Delete Char" ),			G_CALLBACK(action_Delete)			},
+		{ "Erase",				N_( "Backspace" ),				G_CALLBACK(action_Erase)			},
+		{ "SysREQ",				N_( "Sys Req" ),				G_CALLBACK(action_SysReq)			},
+	};
+
+	static const struct _toggle_info
+	{
+		const gchar *do_label;
+		const gchar *set_label;
+		const gchar *reset_label;
+	} toggle_info[N_TOGGLES] =
+	{
+		{ N_( "Monocase" ),					NULL,		NULL				},
+		{ N_( "Alt Cursor" ),				NULL,		NULL				},
+		{ N_( "Blinking Cursor" ),			NULL,		NULL				},
+		{ N_( "Show timing" ),				NULL,		NULL				},
+		{ N_( "Track Cursor" ),				NULL,		NULL				},
+		{ N_( "DS Trace" ),					NULL,		NULL				},
+		{ N_( "Scroll bar" ),				NULL,		NULL				},
+		{ N_( "Line Wrap" ),				NULL,		NULL				},
+		{ N_( "Blank Fill" ),				NULL,		NULL				},
+		{ N_( "Screen Trace" ),				NULL,		NULL				},
+		{ N_( "Event Trace" ),				NULL,		NULL				},
+		{ N_( "Paste with left margin" ),	NULL,		NULL				},
+		{ N_( "Select by rectangles" ),		NULL,		NULL				},
+		{ N_( "Cross Hair Cursor" ),		NULL,		NULL				},
+		{ N_( "Visible Control chars" ),	NULL,		NULL				},
+		{ N_( "Aid wait" ),					NULL,		NULL				},
+		{ N_( "Full Screen" ),				NULL,		N_( "Window" )		},
+		{ N_( "Auto-Reconnect" ),			NULL,		NULL				},
+		{ N_( "Insert" ),					NULL,		N_( "Overwrite")	},
+		{ N_( "Keypad" ),					NULL,		NULL				},
+		{ N_( "Smart paste" ),				NULL,		NULL				},
+	};
+
+	int			f;
+
+	if(name)
+		*name = NULL;
+
+	memset(info,0,sizeof(UI_CALLBACK));
+
+	if(!g_ascii_strcasecmp(key,"pfkey"))
+	{
+		info->type 		= UI_CALLBACK_TYPE_DEFAULT;
+		info->label		= "pfkey";
+		info->callback	= G_CALLBACK(action_pfkey);
+		info->user_data = (gpointer) atoi(get_xml_attribute(names, values, "id"));
+		if(name)
+			*name = g_strdup_printf("pf%02d",(int) info->user_data);
+		return 0;
+	}
+
+	if(!g_ascii_strcasecmp(key,"pakey"))
+	{
+		info->type 		= UI_CALLBACK_TYPE_DEFAULT;
+		info->label		= "pakey";
+		info->callback	= G_CALLBACK(action_pakey);
+		info->user_data = (gpointer) atoi(get_xml_attribute(names, values, "id"));
+		if(name)
+			*name = g_strdup_printf("pa%02d",(int) info->user_data);
+		return 0;
+	}
+
+	if(!g_ascii_strcasecmp(key,"toggle"))
+	{
+		// Check for lib3270 toggles
+		const gchar *id = get_xml_attribute(names, values, "id");
+
+		for(f=0;f<N_TOGGLES;f++)
+		{
+			if(!g_ascii_strcasecmp(id,get_toggle_name(f)))
+			{
+				info->type 		= UI_CALLBACK_TYPE_TOGGLE;
+				info->label		= toggle_info[f].do_label;
+				info->callback	= G_CALLBACK(toggle_action);
+				info->user_data = (gpointer) f;
+				if(name)
+					*name = g_strconcat("Toggle",get_toggle_name(f),NULL);
+				return 0;
+			}
+		}
+
+		// Check for GUI toggles
+		for(f=0;f<G_N_ELEMENTS(gui_toggle_info);f++)
+		{
+			if(!g_ascii_strcasecmp(id,gui_toggle_info[f].name))
+			{
+				info->type 		= UI_CALLBACK_TYPE_TOGGLE;
+				info->label		= gui_toggle_info[f].label;
+				info->callback	= G_CALLBACK(toggle_gui);
+				info->user_data = (gpointer) f;
+				if(name)
+					*name = g_strconcat("Toggle",gui_toggle_info[f].name,NULL);
+				return 0;
+			}
+		}
+
+		return EINVAL;
+	}
+
+	if(!g_ascii_strcasecmp(key,"toggleset"))
+	{
+		const gchar *id = get_xml_attribute(names, values, "id");
+
+		for(f=0;f<N_TOGGLES;f++)
+		{
+			if(!g_ascii_strcasecmp(id,get_toggle_name(f)))
+			{
+				info->type 		= UI_CALLBACK_TYPE_DEFAULT;
+				info->label		= toggle_info[f].set_label ? toggle_info[f].set_label : toggle_info[f].do_label;
+				info->callback	= G_CALLBACK(toggle_set_action);
+				info->user_data = (gpointer) f;
+				if(name)
+					*name = g_strconcat("ToggleSet",get_toggle_name(f),NULL);
+				return 0;
+			}
+		}
+		return EINVAL;
+	}
+
+	if(!g_ascii_strcasecmp(key,"togglereset"))
+	{
+		const gchar *id = get_xml_attribute(names, values, "id");
+
+		for(f=0;f<N_TOGGLES;f++)
+		{
+			if(!g_ascii_strcasecmp(id,get_toggle_name(f)))
+			{
+				info->type 		= UI_CALLBACK_TYPE_DEFAULT;
+				info->label		= toggle_info[f].reset_label ? toggle_info[f].reset_label : toggle_info[f].do_label;
+				info->callback	= G_CALLBACK(toggle_reset_action);
+				info->user_data = (gpointer) f;
+				if(name)
+					*name = g_strconcat("ToggleReset",get_toggle_name(f),NULL);
+				return 0;
+			}
+		}
+		return EINVAL;
+	}
+
+	// Search internal actions
+	for(f=0;f<G_N_ELEMENTS(action);f++)
+	{
+		if(!g_ascii_strcasecmp(key,action[f].name))
+		{
+			info->type = UI_CALLBACK_TYPE_DEFAULT;
+			info->label = action[f].label;
+			info->callback = action[f].callback;
+			return 0;
+		}
+	}
+
+	// Search for plugin actions
+	if(strchr(key,'.'))
+	{
+		gchar	*plugin_name = g_strdup(key);
+		gchar	*entry_name	 = strchr(plugin_name,'.');
+		GModule *plugin;
+
+		*(entry_name++) = 0;
+
+		plugin = get_plugin_by_name(plugin_name);
+		if(plugin)
+		{
+			gpointer cbk;
+
+			if(get_symbol_by_name(plugin,&cbk,"action_%s_activated",entry_name))
+			{
+				info->type 		= UI_CALLBACK_TYPE_DEFAULT;
+				info->callback	= (GCallback) cbk;
+				info->user_data	= (gpointer) topwindow;
+
+			}
+			else if(get_symbol_by_name(plugin,&cbk,"action_%s_toggled",entry_name))
+			{
+				info->type		= UI_CALLBACK_TYPE_TOGGLE;
+				info->callback	= (GCallback) cbk;
+				info->user_data	= (gpointer) topwindow;
+
+			}
+		}
+
+		g_free(plugin_name);
+		if(info->callback)
+			return 0;
+	}
+
+	// Check if it's an external program action
+	if(!g_ascii_strncasecmp(key,"call",4) && strlen(key) > 5 && g_ascii_isspace(*(key+4)))
+	{
+
+	}
+
+	return ENOENT;
+ }
+
+ gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
+ {
+	if(query_3270_terminal_status() != STATUS_CODE_BLANK || event->direction < 0 || event->direction > G_N_ELEMENTS(scroll_action))
+		return 0;
+
+	Trace("Scroll: %d Action: %p",event->direction,scroll_action[event->direction]);
+
+	if(scroll_action[event->direction])
+		gtk_action_activate(scroll_action[event->direction]);
+
+ 	return 0;
+ }
+
+
+ void set_action_group_sensitive_state(int id, gboolean status)
+ {
+	gtk_action_group_set_sensitive(action_group[id],status);
+ }
+
+ static void set_ft_action_state(int state)
+ {
+	gtk_action_group_set_sensitive(action_group[ACTION_GROUP_FT],state);
+ }
+
+ void init_actions(GtkWidget *widget)
+ {
+	static const gchar	*group_name[]	= { "default", "online", "offline", "selection", "clipboard", "paste", "filetransfer" };
+ 	GtkActionGroup		**group			= g_malloc0((G_N_ELEMENTS(group_name)+1)*sizeof(GtkActionGroup *));
+	int					f;
+
+	for(f=0;f<G_N_ELEMENTS(group_name);f++)
+	{
+		group[f] = gtk_action_group_new(group_name[f]);
+		gtk_action_group_set_translation_domain(group[f], PACKAGE_NAME);
+	}
+
+	action_group = group;
+
+#ifdef DEBUG
+	if(f != ACTION_GROUP_MAX)
+	{
+		Trace("Unexpected action_group size, found %d, expecting %d",f,ACTION_GROUP_MAX);
+		exit(-1);
+	}
+#endif
+
+	g_object_set_data_full(G_OBJECT(widget),"ActionGroups",group,g_free);
+
+#ifdef 	X3270_FT
+	set_ft_action_state(0);
+	register_schange(ST_3270_MODE, set_ft_action_state);
+#else
+	gtk_action_group_set_sensitive(ft_actions,FALSE);
+#endif
+
+ }
+

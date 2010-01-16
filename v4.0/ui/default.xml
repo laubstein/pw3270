@@ -1,103 +1,141 @@
+<!-----------------------------------------------------------------------------
+
+ "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
+ (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+ aplicativos mainframe. Registro no INPI sob o nome G3270.
+
+  Copyright (C) <2008> <Banco do Brasil S.A.>
+
+ Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+ os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+ Free Software Foundation.
+
+ Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+ GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+ A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+ obter mais detalhes.
+
+ Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+ programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+ Place, Suite 330, Boston, MA, 02111-1307, USA
+
+ Contatos:
+
+ perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+ erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
+ licinio@bb.com.br			(Licínio Luis Branco)
+ kraucer@bb.com.br			(Kraucer Fernandes Mazuco)
+ macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+
+------------------------------------------------------------------------------>
+
 <ui>
-	<menubar name='MainMenubar'>
+	<menubar name='topmenu'>
 
-		<menu action='FileMenu'>
-			<menuitem action='SaveScreen'/>
-			<menuitem action='SaveSelected'/>
-			<menuitem action='SaveClipboard'/>
+		<menu name='FileMenu'>
+			<menuitem action='SaveScreen' group='online'/>
+			<menuitem action='SaveSelected' group='selection' />
+			<menuitem action='SaveClipboard' group='clipboard' />
 			<separator/>
-			<menuitem action='PrintScreen'/>
-			<menuitem action='PrintSelected'/>
-			<menuitem action='PrintClipboard'/>
+			<menuitem action='PrintScreen' key='Print' icon='print' group='online' />
+			<menuitem action='PrintSelected' group='selection' />
+			<menuitem action='PrintClipboard' group='clipboard' />
 			<separator/>
-			<menu action='SendReceive'>
-				<menuitem action='Download'/>
-				<menuitem action='Upload'/>
+			<menu action='FTMenu' group='filetransfer' >
+				<menuitem action='Download' key='<alt>d' group='filetransfer' />
+				<menuitem action='Upload' key='<alt>u' group='filetransfer' />
 			</menu>
-			<menuitem action='Quit'/>
+			<menuitem action='Quit' key='<ctrl>q' icon="quit" />
 		</menu>
 
-		<menu action='EditMenu'>
-			<menuitem action='Copy'/>
-			<menuitem action='CopyAsTable'/>
-			<menuitem action='Append'/>
-			<menuitem action='Paste'/>
-			<menuitem action='PasteNext'/>
-			<menuitem action='PasteTextFile'/>
+		<menu name='EditMenu'>
+			<menuitem action='Copy' key='<ctrl>c' icon='copy' group='selection' />
+			<menuitem action='CopyAsTable' key='<ctrl><alt>c' group='selection' />
+			<menuitem action='Append' key='<shift><ctrl>c' group='selection' />
+			<menuitem action='Paste' key='<ctrl>v' icon='paste' group='paste' />
+			<menuitem action='PasteNext' key='<shift><ctrl>v' />
+			<menuitem action='PasteTextFile' group='online' />
+
 			<separator/>
-			<menuitem action='SelectAll'/>
-			<menuitem action='SelectField'/>
-			<menuitem action='Unselect'/>
-			<menuitem action='Reselect'/>
+			<menuitem action='SelectAll' key='<ctrl>a' icon='select-all' group='online' />
+
+			<menuitem action='SelectField' key='<Ctrl>f' group='online' />
+			<menuitem action='Unselect' group='online'/>
+			<menuitem action='Reselect' group='online'/>
+
 			<separator/>
-			<menuitem action='EraseInput'/>
-			<menuitem action='EraseField' />
-
+			<menuitem action='EraseInput' icon='clear' group='online' />
+<!---			<menuitem action='EraseField' key='<Ctrl>u' group='online' /> -->
+			<menuitem action='EraseEOF' group='online' />
+			<menuitem action='EraseEOL' group='online'/>
 		</menu>
 
-		<menu action='ViewMenu' >
-<!---
-			<menuitem action='ToolbarMenu' />
---->
+		<!--- Special action - View menu will be populated with labeled toolbars, menubars and keypads --->
+		<menu name='View' label='_View' />
+
+		<menu name='ScriptsMenu' />
+
+		<menu name='NetworkMenu'>
+			<menuitem action='SetHostname' icon='home' group='offline' />
+			<menuitem action='Connect' icon='connect' group='offline' />
+			<menuitem action='Disconnect' icon='disconnect' group='online' />
 		</menu>
 
-		<menu action='ScriptsMenu' />
+		<menu name='SettingsMenu'>
+			<menuitem action='SelectColors' icon='select-color' />
 
-		<menu action='NetworkMenu'>
-			<menuitem action='SetHostname' />
-			<menuitem action='Connect' />
-			<menuitem action='Disconnect' />
-		</menu>
-
-		<menu action='SettingsMenu'>
-			<menuitem action='SelectColors' />
-			<menuitem action='FontSettings' />
+			<!--- Special action - The fontselect menu will be populated with all available monospaced fonts --->
+			<menu name='fontselect' icon='select-font' />
 
 			<menu action='OptionsMenu'>
-				<menuitem action='ToggleAutoConnect' />
-				<menuitem action='ToggleCursorBlink' />
-				<menuitem action='ToggleMonocase' />
-				<menuitem action='ToggleCursorPos'  />
-				<menuitem action='ToggleFullScreen'  />
-				<menuitem action='ToggleMarginedPaste'  />
-				<menuitem action='ToggleCrossHair'  />
-				<menuitem action='ToggleRectSelect'  />
-				<menuitem action='ToggleReconnect'  />
-				<menuitem action='ToggleBold'  />
-				<menuitem action='ToggleUnderline'  />
-				<menuitem action='ToggleKeepSelected' />
-				<menuitem action='ToggleSmartPaste' />
+				<menuitem action='Toggle' id='AutoConnect' />
+				<menuitem action='Toggle' id='CursorBlink' />
+				<menuitem action='Toggle' id='Monocase' />
+				<menuitem action='Toggle' id='CursorPos'  />
+				<menuitem action='Toggle' id='FullScreen' key='<alt>Home' />
+				<menuitem action='Toggle' id='MarginedPaste'  />
+				<menuitem action='Toggle' id='CrossHair' key='<alt>x' />
+				<menuitem action='Toggle' id='BlankFill' />
+				<menuitem action='Toggle' id='RectSelect'  />
+				<menuitem action='Toggle' id='Reconnect'  />
+				<menuitem action='Toggle' id='Bold'  />
+				<menuitem action='Toggle' id='Underline'  />
+				<menuitem action='Toggle' id='KeepSelected' />
+				<menuitem action='Toggle' id='SmartPaste' />
 			</menu>
 
 		</menu>
 
-		<menu action='HelpMenu'>
-			<menuitem action='About' />
+		<menu name='HelpMenu'>
+			<menuitem action='About' icon='about' />
 		</menu>
 
 	</menubar>
 
-	<toolbar action='MainToolbar'>
-		<toolitem name='SelectAll' action='SelectAll' />
-		<toolitem name='Copy' action='Copy' />
-		<toolitem name='Paste' action='Paste' />
-		<toolitem name='EraseInput' action='EraseInput' />
+	<toolbar name='toolbar.default' label='Toolbar' key='<alt>t' >
+		<toolitem action='SelectAll' />
+		<toolitem action='Copy' />
+		<toolitem action='Paste' />
+		<toolitem action='EraseInput' />
+
 		<separator/>
-		<toolitem name='Connect' action='Connect' />
-		<toolitem name='Disconnect' action='Disconnect' />
+		<toolitem action='Connect' />
+		<toolitem action='Disconnect' />
+
 		<separator/>
-		<toolitem name='SetFullScreen' action='SetFullScreen' />
-		<toolitem name='ResetFullScreen' action='ResetFullScreen' />
-		<toolitem name='SelectColors' action='SelectColors' />
-		<toolitem name='PrintScreen' action='PrintScreen' />
-		<toolitem name='Quit' action='Quit' />
+		<toolitem action='ToggleSet' id='FullScreen' icon='fullscreen' />
+		<toolitem action='ToggleReset' id='FullScreen' icon='leave-fullscreen' />
+		<toolitem action='SelectColors' />
+		<toolitem action='PrintScreen' />
+		<toolitem action='Quit' />
 	</toolbar>
 
-	<popup action='SelectionPopup'>
+	<popup name='selectionpopup'>
 		<menuitem action='Copy'/>
 		<menuitem action='Append'/>
 		<menuitem action='Unselect'/>
 		<menuitem action='SelectAll'/>
+
 		<separator/>
 		<menuitem action='PrintScreen'/>
 		<menuitem action='PrintSelected'/>
@@ -107,7 +145,7 @@
 		<menuitem action='Quit'/>
 	</popup>
 
-	<popup action='DefaultPopup'>
+	<popup name='defaultpopup'>
 		<menuitem action='Paste'/>
 		<menuitem action='PasteNext'/>
 		<menuitem action='SelectAll'/>
@@ -123,38 +161,51 @@
 		<menuitem action='Quit'/>
 	</popup>
 
-	<accelerator action='ToggleInsert' />
-	<accelerator action='Home'/>
-	<accelerator action='Reset'/>
-	<accelerator action='Return'/>
-	<accelerator action='Enter'/>
-	<accelerator action='Escape' />
-	<accelerator action='DeleteWord'/>
-	<accelerator action='Delete' />
-	<accelerator action='Erase' />
-	<accelerator action='EraseEOF' />
-	<accelerator action='PageUP' />
-	<accelerator action='PageDown' />
-	<accelerator action='NextField' />
-	<accelerator action='SysREQ'/>
-	<accelerator action='SelectRight' />
-	<accelerator action='SelectLeft' />
-	<accelerator action='SelectUp' />
-	<accelerator action='SelectDown' />
-	<accelerator action='SelectionRight' />
-	<accelerator action='SelectionLeft' />
-	<accelerator action='SelectionUp' />
-	<accelerator action='SelectionDown' />
+	<accelerator action='Toggle' id='Insert' key='Insert' group='online' />
 
-	<accelerator action='CursorRight' />
-	<accelerator action='CursorLeft' />
-	<accelerator action='CursorUp' />
-	<accelerator action='CursorDown' />
+	<accelerator action='Home' key='Home' group='online' />
+	<accelerator action='Reset' key='<Ctrl>r' group='online' />
+	<accelerator action='Return' key='Return' />
+	<accelerator action='Enter' key='KP_Enter' />
+	<accelerator action='Escape' key='Escape' group='online' />
+	<accelerator action='DeleteWord' key='<Ctrl>w' group='online' />
+	<accelerator action='Delete' key='Delete' group='online' />
+	<accelerator action='Erase' key='BackSpace' group='online' />
+	<accelerator action='EraseEOF' key='End' group='online' />
+	<accelerator action='SysREQ' key='Sys_Req' group='online' />
 
-	<accelerator action='PreviousField' />
-	<accelerator action='NextField'/>
+	<accelerator action='SelectRight' key='<Shift>Right' group='online' />
+	<accelerator action='SelectLeft' key='<Shift>Left' group='online' />
+	<accelerator action='SelectUp' key='<Shift>Up' group='online' />
+	<accelerator action='SelectDown' key='<Shift>Down' group='online' />
 
-	<accelerator action='ShiftPageUP' />
-	<accelerator action='ShiftPageDown' />
+	<accelerator action='SelectionRight' key='<alt>Right' />
+	<accelerator action='SelectionLeft' key='<alt>Left' />
+	<accelerator action='SelectionUp' key='<alt>Up' />
+	<accelerator action='SelectionDown' key='<alt>Down' />
+
+	<accelerator action='CursorRight' key='Right' group='online' />
+	<accelerator action='CursorLeft' key='Left' group='online' />
+	<accelerator action='CursorUp' key='Up' group='online' />
+	<accelerator action='CursorDown' key='Down' group='online' />
+
+	<accelerator action='PreviousField' key='ISO_Left_Tab' group='online' />
+	<accelerator action='NextField' key='Tab' group='online' />
+
+	<!--- Mouse actions --->
+	<scroll direction='up' action='pfkey' id='7' />
+	<scroll direction='down' action='pfkey' id='8' />
+
+	<!---
+	<scroll direction='left' />
+	<scroll direction='right' />
+	--->
+
+	<!--- From default.act --->
+	<accelerator action='PageDown' group='online' />
+	<accelerator action='ShiftPageDown' group='online' />
+
+	<accelerator action='PageUP' group='online' />
+	<accelerator action='ShiftPageUP' group='online' />
 
 </ui>

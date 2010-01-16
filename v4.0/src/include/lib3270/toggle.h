@@ -32,7 +32,11 @@
 
 #ifndef TOGGLE3270_H_INCLUDED
 
+	#define TOGGLE3270_H_INCLUDED 1
+
 	#include <lib3270/api.h>
+
+	enum toggle_type { TT_INITIAL, TT_INTERACTIVE, TT_ACTION, TT_FINAL, TT_UPDATE };
 
 	enum _toggle
 	{
@@ -61,18 +65,16 @@
 		N_TOGGLES
 	};
 
-	extern const char *toggle_names[N_TOGGLES];
+	extern void					initialize_toggles(void);
+	extern void					shutdown_toggles(void);
 
-	extern void				initialize_toggles(void);
-	extern void				shutdown_toggles(void);
-
-	LIB3270_EXPORT int 			register_tchange(int ix, void (*callback)(int value, int reason));
+	LIB3270_EXPORT int 			register_tchange(int ix, void (*callback)(int value, enum toggle_type reason));
 	LIB3270_EXPORT int			do_toggle(int ix);
 	LIB3270_EXPORT int			set_toggle(int ix, int value);
 
 	LIB3270_EXPORT const char	*get_toggle_name(int ix);
 	LIB3270_EXPORT int			get_toggle_by_name(const char *name);
 
-
+	LIB3270_EXPORT void			update_toggle_actions(void);
 
 #endif /* TOGGLE3270_H_INCLUDED */

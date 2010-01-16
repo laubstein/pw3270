@@ -75,7 +75,7 @@
  static int  	addch(int row, int col, int c, unsigned short attr);
  static void	set_charset(char *dcs);
  static void	erase(void);
- static int	SetSuspended(int state);
+ static int		SetSuspended(int state);
  static void	SetScript(SCRIPT_STATE state);
  static void	set_cursor(CURSOR_MODE mode);
  static void	set_oia(OIA_FLAG id, int on);
@@ -85,7 +85,7 @@
  static void	error(const char *fmt, va_list arg);
  static void 	warning(const char *fmt, va_list arg);
  static void	syserror(const char *title, const char *message, const char *system);
- static int	init(void);
+ static int		init(void);
  static void 	update_toggle(int ix, int value, int reason, const char *name);
  static void	show_timer(long seconds);
  static void	DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
@@ -165,11 +165,11 @@
  char								*window_title	= PROGRAM_NAME;
  int								screen_suspended = 0;
 
- static int						szScreen		= 0;
+ static int							szScreen		= 0;
  static const struct status_code	*sts_data		= NULL;
- static unsigned char			compose			= 0;
+ static unsigned char				compose			= 0;
  static gchar						*luname			= 0;
- static const gchar				*status_msg		= NULL;
+ static const gchar					*status_msg		= NULL;
  static guint						kbrd_state		= 0;
  static char 						timer[9]		= "";
 
@@ -181,7 +181,6 @@
 
  static void changed(int bstart, int bend)
  {
- 	WaitingForChanges = FALSE;
  }
 
  static void set_compose(int on, unsigned char c, int keytype)
@@ -284,7 +283,7 @@
  	return g_convert(in, -1, "UTF-8", CHARSET, NULL, sz, NULL);
  }
 
- void set_monocase(int value, int reason)
+ void set_monocase(int value, enum toggle_type reason)
  {
 	convert_charset = value ? convert_monocase : convert_regular;
 	screen_disp();
@@ -1041,25 +1040,27 @@
  void update_toggle(int ix, int value, int reason, const char *name)
  {
  	GtkAction	*action;
-	char		buffer[21];
+ 	gchar		*ptr;
 
-	strcpy(buffer,"Toggle");
-	strncat(buffer,name,20);
-
-	action = gtk_action_group_get_action(common_actions,buffer);
+	ptr = g_strconcat("Toggle",name,NULL);
+	action = get_action_by_name(ptr);
+	g_free(ptr);
 
 	// Update toggle buttons
 	if(action)
 		gtk_toggle_action_set_active((GtkToggleAction *) action,value);
 
 	// Update toolbar items
-	g_snprintf(buffer,19,"Reset%s", name);
-	action = gtk_action_group_get_action(common_actions,buffer);
+	ptr = g_strconcat("ToggleReset",name,NULL);
+	action = get_action_by_name(ptr);
+	g_free(ptr);
+
 	if(action)
 		gtk_action_set_visible(action,value ? TRUE : FALSE);
 
-	g_snprintf(buffer,19,"Set%s", name);
-	action = gtk_action_group_get_action(common_actions,buffer);
+	ptr = g_strconcat("ToggleSet",name,NULL);
+	action = get_action_by_name(ptr);
+	g_free(ptr);
 	if(action)
 		gtk_action_set_visible(action,value ? FALSE : TRUE);
 

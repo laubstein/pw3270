@@ -63,10 +63,6 @@
 		</Compiler>
 		<Unit filename="Makefile.in" />
 		<Unit filename="configure.ac" />
-		<Unit filename="keypad.xml">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
 		<Unit filename="pw3270.nsi.in" />
 		<Unit filename="pw3270.spec.in" />
 		<Unit filename="rexx/sample.rex" />
@@ -464,6 +460,15 @@
 			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
+		<Unit filename="src/gui/uiparser.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gui/uiparser.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/gui/version.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -753,11 +758,15 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="ui/default.key">
+		<Unit filename="ui/default.xml" />
+		<Unit filename="ui/functions.xml">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="ui/default.xml" />
+		<Unit filename="ui/keypad.xml">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="ui/rexx.xml" />
 		<Extensions>
 			<code_completion />

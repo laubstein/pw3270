@@ -31,6 +31,7 @@
  */
 
  #include "gui.h"
+ #include "uiparser.h"
  #include "keypad.h"
 
  #include <gdk/gdkkeysyms.h>
@@ -48,7 +49,6 @@
  GtkWidget	*topwindow 		= NULL;
  GList 		*main_icon		= NULL;
  gchar		*program_logo	= NULL;
-// GtkWidget	*toolbar_widget	= NULL;
 
 #ifdef MOUSE_POINTER_CHANGE
  GdkCursor	*wCursor[CURSOR_MODE_3270];
@@ -127,9 +127,9 @@
 	}
  }
 
- static void LoadSystemFonts(GtkWidget *widget, GtkWidget *menu_item, const gchar *selected)
+ static void LoadSystemFonts(GtkWidget *widget, GtkWidget *topmenu, const gchar *selected)
  {
- 	// Stolen from http://svn.gnome.org/svn/gtk+/trunk/gtk/gtkfontsel.c
+	// Stolen from http://svn.gnome.org/svn/gtk+/trunk/gtk/gtkfontsel.c
 	PangoFontFamily **families;
 	gint 			n_families, i;
 
@@ -148,13 +148,12 @@
 			GtkWidget		*item = gtk_radio_menu_item_new_with_label(group,name);
 			gchar			*ptr;
 
-//			Trace("Adding font %s",name);
-
-			// FIXME (perry#2#): the user_data isn't being freed!
 			group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
 			ptr = g_strdup(name);
 			g_object_set_data_full(G_OBJECT(item),"FontName",ptr,g_free);
 			g_signal_connect(G_OBJECT(item),"toggled",G_CALLBACK(activate_font),ptr);
+
+			gtk_widget_show(item);
 			gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
 
 			if(!strcmp(name,selected))
@@ -166,23 +165,27 @@
 	g_free(families);
 
 	gtk_widget_show_all(menu);
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item),menu);
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(topmenu),menu);
 
  }
+// static void LoadFontMenu(GtkWidget *widget, GtkWidget *menu_item)
 
- static void LoadFontMenu(GtkWidget *widget, GtkWidget *menu_item)
+ GtkWidget * widget_from_action_name(const gchar *name)
  {
-	gchar	*selected	= GetString("Terminal","Font","Courier");
+ 	GtkAction *action = get_action_by_name(name);
 
-	Trace("Selected font: \"%s\"",selected);
+	if(action)
+		return g_object_get_data(G_OBJECT(action),"ui_widget");
 
-	if(!menu_item)
-	{
-		g_free(selected);
-		return;
-	}
+	return NULL;
+ }
 
-	LoadSystemFonts(widget, menu_item, selected);
+ static void LoadFontMenu(void)
+ {
+	gchar		*selected;
+	GtkWidget	*menu = widget_from_action_name("fontselect");
+	selected = GetString("Terminal","Font","Courier");
+	LoadSystemFonts(topwindow, menu, selected);
 	g_free(selected);
 	return;
  }
@@ -220,7 +223,7 @@
 
  static void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
-	gtk_action_group_set_sensitive(paste_actions,text ? TRUE : FALSE);
+ 	set_action_group_sensitive_state(ACTION_GROUP_PASTE,text ? TRUE : FALSE);
  }
 
  static void clipboard_owner_changed(GtkClipboard *clipboard, GdkEventOwnerChange *event, gpointer user_data)
@@ -278,21 +281,19 @@
 #endif
 
 
-#ifdef ENABLE_LOADABLE_KEYPAD
-	struct keypad			*keypad	= NULL;
-#else
-	GtkWidget				*keypad = NULL;
-#endif
-
+	GtkWidget				*toolbar;
  	GtkWidget				*vbox;
  	GtkWidget				*hbox;
- 	GtkWidget				*toolbar_menu = NULL;
- 	GtkWidget				*toolbar_widget = NULL;
-	GtkUIManager			*ui_manager;
+	GtkUIManager			*manager;
 	GdkPixbuf				*pix;
 	gchar 					*ptr;
 
 	topwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	g_object_set_data(G_OBJECT(topwindow),"pw3270_config",	(gpointer) GetConf());
+	g_object_set_data(G_OBJECT(topwindow),"pw3270_dpath",	(gpointer) program_data);
+
+	init_actions(topwindow);
+
 	pix = LoadLogo();
 
 	if(pix)
@@ -318,113 +319,56 @@
     g_signal_connect(G_OBJECT(topwindow),	"key-press-event",		G_CALLBACK(key_press_event),		0);
     g_signal_connect(G_OBJECT(topwindow), 	"key-release-event",	G_CALLBACK(key_release_event),		0);
 
-    vbox = gtk_vbox_new(FALSE,0);
-
 	/* Create terminal window */
 	if(!CreateTerminalWindow())
 		return -1;
 
 	/* Create UI elements */
-	ui_manager = LoadApplicationUI(topwindow);
-	if(ui_manager)
-	{
-		static const char *toolbar[] = { "/MainMenubar", "/MainToolbar" };
+	toolbar = gtk_vbox_new(FALSE,0);
+    vbox = gtk_vbox_new(FALSE,0);
+    hbox = gtk_hbox_new(FALSE,0);
 
+	manager = load_application_ui(topwindow, GTK_BOX(toolbar), GTK_BOX(vbox), GTK_BOX(hbox));
+	if(manager)
+	{
 		static const struct _popup
 		{
 			const char 	*name;
 			GtkWidget		**widget;
 		} popup[] =
 		{
-			{ "/DefaultPopup",		&DefaultPopup	},
-			{ "/SelectionPopup",	&SelectionPopup	}
+			{ "defaultpopup",	&DefaultPopup	},
+			{ "selectionpopup",	&SelectionPopup	}
 		};
 
 		int f;
 
-		gtk_window_add_accel_group(GTK_WINDOW(topwindow),gtk_ui_manager_get_accel_group(ui_manager));
-
-		for(f=0;f < G_N_ELEMENTS(toolbar);f++)
-		{
-			GtkWidget *widget = gtk_ui_manager_get_widget(ui_manager, toolbar[f]);
-			if(widget)
-				gtk_box_pack_start(GTK_BOX(vbox),widget,FALSE,FALSE,0);
-		}
-
 		for(f=0;f < G_N_ELEMENTS(popup);f++)
 		{
-			*popup[f].widget =  gtk_ui_manager_get_widget(ui_manager, popup[f].name);
+			*popup[f].widget = widget_from_action_name(popup[f].name);
 			if(*popup[f].widget)
 			{
 				g_object_ref(*popup[f].widget);
 			}
 		}
 
-		LoadFontMenu(topwindow,gtk_ui_manager_get_widget(ui_manager,"/MainMenubar/SettingsMenu/FontSettings"));
+		LoadFontMenu();
 
-		toolbar_widget = gtk_ui_manager_get_widget(ui_manager,"/MainToolbar");
-		toolbar_menu = gtk_ui_manager_get_widget(ui_manager,"/MainMenubar/ViewMenu/ToolbarMenu");
-		if(!toolbar_menu)
-			toolbar_menu = gtk_ui_manager_get_widget(ui_manager,"/MainMenubar/ViewMenu");
-
-		g_object_unref(ui_manager);
+		g_object_unref(manager);
 	}
 
 	FontChanged();
 
-	Trace("Toolbar menu: %p",toolbar_menu);
+	gtk_box_pack_start(GTK_BOX(vbox), terminal, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), vbox,TRUE,TRUE,0);
 
-	gtk_widget_show_all(vbox);
+	gtk_box_pack_start(GTK_BOX(toolbar), hbox, TRUE, TRUE, 0);
 
-	if(toolbar_widget)
-	{
-		gtk_widget_set_name(toolbar_widget,"Toolbar");
-		keypad_set_flags(toolbar_widget);
-		configure_toolbar(toolbar_widget,toolbar_menu, N_( "Button bar"));
-/*
-#if GTK_CHECK_VERSION(2,18,0)
-		gtk_widget_set_visible(toolbar_widget,GetBoolean("Toggles","Toolbar",TRUE));
-#else
-		if(GetBoolean("Toggles","Toolbar",TRUE))
-			gtk_widget_show(toolbar_widget);
-		else
-			gtk_widget_hide(toolbar_widget);
-#endif
-*/
+    gtk_container_add(GTK_CONTAINER(topwindow),toolbar);
 
-	}
-
-    gtk_container_add(GTK_CONTAINER(topwindow),vbox);
-
-#ifdef ENABLE_LOADABLE_KEYPAD
-	// Load keypads
-	keypad = keypad_load();
-	keypad_pack(GTK_BOX(vbox), toolbar_menu, keypad, KEYPAD_POSITION_TOP);
-#endif
-
-    hbox = gtk_hbox_new(FALSE,0);
-#ifdef ENABLE_LOADABLE_KEYPAD
-	keypad_pack(GTK_BOX(hbox), toolbar_menu, keypad, KEYPAD_POSITION_LEFT);
-#endif
-	gtk_box_pack_start(GTK_BOX(hbox), terminal, TRUE, TRUE, 0);
 	gtk_widget_show(terminal);
-#ifdef ENABLE_LOADABLE_KEYPAD
-	keypad_pack(GTK_BOX(hbox), toolbar_menu, keypad, KEYPAD_POSITION_RIGHT);
-#endif
+	gtk_widget_show(toolbar);
 	gtk_widget_show(hbox);
-
-#ifndef ENABLE_LOADABLE_KEYPAD
-	keypad = CreateKeypadWidget();
-	gtk_box_pack_end(GTK_BOX(hbox), keypad, FALSE, FALSE, 0);
-	configure_toolbar(keypad, toolbar_menu, N_( "Keypad"));
-#endif
-
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
-
-#ifdef ENABLE_LOADABLE_KEYPAD
-	keypad_pack(GTK_BOX(hbox), toolbar_menu, keypad, KEYPAD_POSITION_BOTTOM);
-#endif
-
 	gtk_widget_show(vbox);
 
 	gtk_window_set_role(GTK_WINDOW(topwindow), PACKAGE_NAME "_TOP" );
@@ -439,15 +383,16 @@
 
 #endif
 
-	gtk_action_group_set_sensitive(online_actions,FALSE);
-	gtk_action_group_set_sensitive(offline_actions,TRUE);
-	gtk_action_group_set_sensitive(clipboard_actions,FALSE);
-	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"Reselect"),FALSE);
-	gtk_action_set_sensitive(gtk_action_group_get_action(online_actions,"PasteNext"),FALSE);
+	set_action_group_sensitive_state(ACTION_GROUP_ONLINE,FALSE);
+	set_action_group_sensitive_state(ACTION_GROUP_OFFLINE,TRUE);
+	set_action_group_sensitive_state(ACTION_GROUP_CLIPBOARD,FALSE);
+
+	set_action_sensitive_by_name("Reselect",FALSE);
+	set_action_sensitive_by_name("PasteNext",FALSE);
 
 #if defined( USE_SELECTIONS ) && !defined( WIN32 )
 
-	gtk_action_group_set_sensitive(paste_actions,FALSE);
+	set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
 
 	g_signal_connect(	G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_NONE)),
 						"owner-change",G_CALLBACK(clipboard_owner_changed),0 );
@@ -458,10 +403,6 @@
 
 	gtk_action_group_set_sensitive(paste_actions,TRUE);
 
-#endif
-
-#ifdef ENABLE_LOADABLE_KEYPAD
-	keypad_free(keypad);
 #endif
 
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);

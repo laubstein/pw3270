@@ -58,12 +58,12 @@
 
 #if defined(LIB3270)
 
-static void no_callback(int value, int reason)
+static void no_callback(int value, enum toggle_type reason)
 {
 }
 
 /* Register a callback to monitor toggle changes */
-LIB3270_EXPORT int register_tchange(int ix, void (*callback)(int value, int reason))
+LIB3270_EXPORT int register_tchange(int ix, void (*callback)(int value, enum toggle_type reason))
 {
 	struct toggle *t;
 

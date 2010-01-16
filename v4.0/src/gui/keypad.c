@@ -85,6 +85,11 @@
  static void set_button_action(GtkWidget *widget, const gchar *action_name)
  {
 	/* Find action callback by name, associate it with "clicked" signal */
+
+	#warning Ajustar ao novo processamento de acoes
+
+	/*
+
 	GCallback callback = get_action_callback_by_name(action_name);
 
 //	Trace("Action(\"%s\")=%p",action_name,callback);
@@ -119,6 +124,7 @@
 
 	Trace("\n\nError loading keypad: action \"%s\" is undefined",action_name);
 	Log("Error loading keypad: action \"%s\" is undefined",action_name);
+*/
 	gtk_widget_set_sensitive(widget,FALSE);
 
 
@@ -179,9 +185,6 @@
 
  }
 
-/*---[ Implement loadable keypad ]--------------------------------------------------------------------------*/
-#ifdef ENABLE_LOADABLE_KEYPAD
-
  #define APPEND_CHILD_ELEMENT(parent,first,last,child) if( parent->last) { parent->last->next = child; parent->last = child; } else { parent->first = parent->last = child; }
 
  static const gchar * get_attribute(const gchar **names, const gchar **values, const gchar *key)
@@ -199,14 +202,14 @@
  {
  	struct build_data *data = ((struct build_data *) user_data);
 
-	Trace("Starting \"%s\"",element_name);
+//	Trace("Starting \"%s\"",element_name);
 
 	if(!strcmp(element_name,"keypad"))
 	{
 		// Alocate a new keypad
-		const gchar *name 	= get_attribute(attribute_names,attribute_values,"name");
-		const gchar *label = get_attribute(attribute_names,attribute_values,"label");
-		const gchar *position = get_attribute(attribute_names,attribute_values,"position");
+		const gchar *name 	= get_xml_attribute(attribute_names,attribute_values,"name");
+		const gchar *label = get_xml_attribute(attribute_names,attribute_values,"label");
+		const gchar *position = get_xml_attribute(attribute_names,attribute_values,"position");
 
 		if(*name)
 		{
@@ -231,7 +234,7 @@
 			else
 				keypad->position = KEYPAD_POSITION_RIGHT;
 
-			Trace("\n\n\nLoading keypad \"%s\" (\"%s\") first: %p last: %p",keypad->name,keypad->label,data->first_keypad,data->last_keypad);
+//			Trace("\n\n\nLoading keypad \"%s\" (\"%s\") first: %p last: %p",keypad->name,keypad->label,data->first_keypad,data->last_keypad);
 
 			APPEND_CHILD_ELEMENT(data,first_keypad,last_keypad,keypad);
 		}
@@ -347,7 +350,7 @@
 	{
 		if(keypad->position == position && keypad->widget)
 		{
-			Trace("\n\n\nInserting keypad %s (%s) into menu %p",gtk_widget_get_name(keypad->widget),keypad->label,menu);
+//			Trace("\n\n\nInserting keypad %s (%s) into menu %p",gtk_widget_get_name(keypad->widget),keypad->label,menu);
 
 			gtk_box_pack_start(GTK_BOX(box), keypad->widget, FALSE, FALSE, 0);
 
@@ -376,7 +379,7 @@
 		struct keypad_row *next_row = keypad->first_row->next;
 		int step = keypad->cols / keypad->first_row->cols;
 
-		Trace("Colunas na linha: %d  Colunas na tabela: %d   Step: %d",keypad->first_row->cols,keypad->cols,step);
+//		Trace("Colunas na linha: %d  Colunas na tabela: %d   Step: %d",keypad->first_row->cols,keypad->cols,step);
 
 		col = 0;
 		while(keypad->first_row->first_button)
@@ -527,100 +530,3 @@
 	return info.first_keypad;
  }
 
-/*---[ Implement Fixed Keypad ]---------------------------------------------------------------------------------*/
-#else // ENABLE_LOADABLE_KEYPAD
-
- static GtkWidget * image_button(const gchar *stock, const gchar *action_name)
- {
- 	GtkWidget *widget = gtk_button_new();
- 	gtk_container_add(GTK_CONTAINER(widget),gtk_image_new_from_stock(stock,GTK_ICON_SIZE_SMALL_TOOLBAR));
-
-	set_button_action(widget,action_name);
-	return widget;
- }
-
- GtkWidget *CreateKeypadWidget(void)
- {
-
-	#define SMALL_BUTTON(stock,action,col,row)		widget = image_button(stock,action); \
-													gtk_table_attach_defaults(GTK_TABLE(table),widget,col,col+2,row,row+1);
-
-	#define LARGE_BUTTON(stock,action,col,row)		widget = image_button(stock,action); \
-													gtk_table_attach_defaults(GTK_TABLE(table),widget,(3*col),(3*col)+3,row,row+1);
-
-	#define LARGE_TEXT_BUTTON(label,action,col,row)	widget = gtk_button_new_with_label(label); \
-													set_button_action(widget,action); \
-													gtk_table_attach_defaults(GTK_TABLE(table),widget,(3*col),(3*col)+3,row,row+1);
-
- 	int			row 	= 0;
- 	int			col		= 0;
- 	int			f;
- 	GtkWidget	*table 	= gtk_table_new(4,6,FALSE);
- 	GtkWidget	*widget;
- 	GtkWidget	*keypad;
- 	GtkWidget	*vbox 	= gtk_vbox_new(FALSE,0);
- 	gchar		label[10];
-
-	gtk_container_set_border_width(GTK_CONTAINER(table),3);
-
-	/* Create PF Buttons */
-	for(f=0;f<12;f++)
-	{
-		g_snprintf(label,9,"PF%d",f+1);
-		widget = gtk_button_new_with_label(label);
-		g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(pf_button),(gpointer) (f+1));
-		gtk_table_attach_defaults(GTK_TABLE(table),widget,col,col+2,row,row+1);
-		col += 2;
-		if(col > 5)
-		{
-			col = 0;
-			row++;
-		}
-	}
-
-	/* Create movement buttons */
-	SMALL_BUTTON(GTK_STOCK_GO_UP,"CursorUp",2,4);
-	SMALL_BUTTON(GTK_STOCK_GO_BACK,"CursorLeft",0,5);
-	SMALL_BUTTON(GTK_STOCK_GOTO_TOP,"Home",2,5);
-	SMALL_BUTTON(GTK_STOCK_GO_FORWARD,"CursorRight",4,5);
-	SMALL_BUTTON(GTK_STOCK_GO_DOWN,"CursorDown",2,6);
-
-	/* Create PA Buttons */
-	for(f=0;f<3;f++)
-	{
-		g_snprintf(label,9,"PA%d",f+1);
-		widget = gtk_button_new_with_label(label);
-		g_signal_connect(G_OBJECT(widget),"clicked",G_CALLBACK(pa_button),(gpointer) (f+1));
-		gtk_table_attach_defaults(GTK_TABLE(table),widget,(f<<1),(f<<1)+2,7,8);
-	}
-
-	/* Create extra buttons */
-	LARGE_BUTTON(GTK_STOCK_GOTO_FIRST,"PreviousField",0,8);
-	LARGE_BUTTON(GTK_STOCK_GOTO_LAST,"NextField",1,8);
-	LARGE_TEXT_BUTTON( _( "Clear" ), "ClearFields", 0, 9);
-	LARGE_TEXT_BUTTON( _( "Reset" ), "Reset", 1, 9);
-	LARGE_TEXT_BUTTON( _( "Erase\nEOF" ), "EraseEOF", 0, 10);
-	LARGE_TEXT_BUTTON( _( "Erase\nInput" ), "EraseInput", 1, 10);
-
-	/* "Enter" Button */
-	widget = image_button(GTK_STOCK_OK,"Enter");
-	gtk_table_attach_defaults(GTK_TABLE(table),widget,0,6,11,12);
-
-	/* Buttons ok, add table */
-	gtk_box_pack_start(GTK_BOX(vbox),table,FALSE,FALSE,0);
-	gtk_widget_show_all(vbox);
-
-	keypad = gtk_handle_box_new();
-
-	gtk_handle_box_set_handle_position(GTK_HANDLE_BOX(keypad),GTK_POS_LEFT);
-	gtk_handle_box_set_shadow_type(GTK_HANDLE_BOX(keypad),GTK_SHADOW_ETCHED_IN);
-
-    gtk_container_add(GTK_CONTAINER(keypad),vbox);
-
-	gtk_widget_set_name(keypad,"keypad_default");
-	keypad_set_flags(keypad);
-
- 	return keypad;
- }
-
-#endif // ENABLE_LOADABLE_KEYPAD

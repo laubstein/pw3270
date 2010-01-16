@@ -1,7 +1,7 @@
 #!/bin/bash
 
-PACKAGE_VERSION=4.0
-PACKAGE_RELEASE=3
+PACKAGE_VERSION=4.1
+PACKAGE_RELEASE=0
 
 svn update
 if [ "$?" == "0" ]; then
