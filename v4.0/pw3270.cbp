@@ -753,6 +753,11 @@
 		<Unit filename="src/plugins/rexx/tools.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/xml2pot.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="ui/debug.xml" />
 		<Unit filename="ui/default.act">
 			<Option target="Debug" />
