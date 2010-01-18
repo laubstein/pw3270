@@ -50,7 +50,6 @@ SubSection "@PROGRAM_NAME@" SecMain
 
 		# UI definition files
 		CreateDirectory "$INSTDIR\ui"
-		file "/oname=$INSTDIR\keypad.xml" keypad.xml
 		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.xml" ui\default.xml
 		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.act" ui\default.act
 
@@ -109,6 +108,14 @@ Section "GTK+ Runtime" SecGTK
 SectionEnd
 
 SubSection "Extras" SecExtra
+
+	Section "Right keypad" RKeypad
+		file "/oname=$INSTDIR\ui\keypad.xml" "ui\keypad.xml"
+	SectionEnd
+
+	Section /o "Function bar" FBar
+		file "/oname=$INSTDIR\ui\functions.xml" "ui\functions.xml"
+	SectionEnd
 
 	Section /o "Software Development Kit" SecSDK
 

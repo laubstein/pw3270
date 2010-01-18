@@ -262,6 +262,22 @@ bin/Debug/lib3270$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o 
 	@$(LD) @OS_DLLFLAGS@ -o $@ $^ $(API_LDFLAGS)
 
 ####################################################################################################
+# Translation Rules
+####################################################################################################
+
+pot/%.pot: src/%.c Makefile
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@xgettext	--default-domain=$(PACKAGE) --language=C \
+			--keyword=_ --keyword=N_ --keyword=MSG_:2 --output=$@ $<
+	@touch $@
+
+pot/%.pot: src/%.rc Makefile
+	@echo $@ ...
+	@touch $@
+
+
+####################################################################################################
 # OpenOffice.org extension
 ####################################################################################################
 
@@ -394,21 +410,17 @@ src/lib/fallbacks.c:  src/lib/X3270.xad
 src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@src/mkversion.sh
 
-sources.lst: Makefile src/gui/*.c src/lib/*.c src/plugins/rexx/*.c Makefile
+pot/$(PACKAGE).pot:	$(foreach SRC, $(basename $(APP_SRCS)), pot/gui/$(SRC).pot) \
+			$(foreach SRC, $(basename $(API_SRCS)), pot/lib/$(SRC).pot) \
+			$(foreach SRC, $(basename $(REXX_COMMON_SRC)), pot/plugins/rexx/$(SRC).pot) \
+			$(foreach SRC, $(basename $(REXX_STD_SRC)), pot/plugins/rexx/$(SRC).pot) \
+			$(foreach SRC, $(basename $(REXX_PLG_SRC)), pot/plugins/rexx/$(SRC).pot)
+
 	@rm -f $@
-	@for i in src/gui/*.c; do echo $$i >> $@; done
-	@for i in src/lib/*.c; do echo $$i >> $@; done
-	@for i in src/plugins/rexx/*.c; do echo $$i >> $@; done
+	@msgcat --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
 
-$(PACKAGE).pot: sources.lst
-	@echo $@ ...
-	@xgettext	--files-from=sources.lst \
-			--default-domain=$(PACKAGE) --language=C \
-			--keyword=_ --keyword=N_ --keyword=MSG_:2 --sort-output --output=- \
-	| sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
-
-$(PACKAGE).po: $(PACKAGE).pot
-	@msginit --no-translator -o $(PACKAGE).po -i $(PACKAGE).pot
+$(PACKAGE).po: pot/$(PACKAGE).pot
+	@msginit --no-translator -o $@ -i $^
 
 tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 
@@ -432,6 +444,10 @@ install: Release po/pt_BR.po $(PACKAGE).desktop
 	@install --mode=644 ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/debug.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/default.act $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+
+	@install --mode=644 ui/keypad.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+	@install --mode=644 ui/functions.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+
 	@install --mode=644 $(PACKAGE).@LOGOEXT@ $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 
@@ -501,6 +517,7 @@ clean:
 	@rm -fr obj
 	@rm -fr uno
 	@rm -fr bin
+	@rm -fr pot
 	@rm -fr src/oxt/br
 	@rm -fr src/oxt/com
 	@rm -f	src/lib/fallbacks.c
