@@ -110,12 +110,32 @@
 
  int main (int argc, char *argv[])
  {
+	static const char * header=	"# SOME DESCRIPTIVE TITLE.\n"
+					"# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER\n"
+					"# This file is distributed under the same license as the PACKAGE package.\n"
+					"# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.\n"
+					"#\n"
+					"#, fuzzy\n"
+					"msgid \"\"\n"
+					"msgstr \"\"\n"
+					"\"Project-Id-Version: PACKAGE VERSION\\n\"\n"
+					"\"Report-Msgid-Bugs-To: \\n\"\n"
+					"\"POT-Creation-Date: 2010-01-18 17:12-0200\\n\"\n"
+					"\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n\"\n"
+					"\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n\"\n"
+					"\"Language-Team: LANGUAGE <LL@li.org>\\n\"\n"
+					"\"MIME-Version: 1.0\\n\"\n"
+					"\"Content-Type: text/plain; charset=CHARSET\\n\"\n"
+					"\"Content-Transfer-Encoding: 8bit\\n\"\n\n";
+
  	int rc = 0;
  	int f;
 
 	GMarkupParseContext *context = g_markup_parse_context_new(&parser,G_MARKUP_TREAT_CDATA_AS_TEXT,NULL,NULL);
 
 	out = stdout;
+
+	fprintf(out,"%s",header);
 
 	for(f=1;f<argc;f++)
 	{
