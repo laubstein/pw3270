@@ -228,7 +228,6 @@
 
  static void clipboard_owner_changed(GtkClipboard *clipboard, GdkEventOwnerChange *event, gpointer user_data)
  {
- 	Trace("Clipboard %p changed Reason: %d",clipboard,(int) event->reason);
 	gtk_clipboard_request_text(clipboard,clipboard_text_received,0);
  }
 
@@ -394,14 +393,14 @@
 
 	set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
 
-	g_signal_connect(	G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_NONE)),
-						"owner-change",G_CALLBACK(clipboard_owner_changed),0 );
+	g_signal_connect(	G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_NONE)),"owner-change",G_CALLBACK(clipboard_owner_changed),0 );
 
+	// TODO (perry#1#): Request clipboard only when online to avoid enabling paste options when offline.
 	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_text_received,0);
 
 #else
 
-	gtk_action_group_set_sensitive(paste_actions,TRUE);
+	set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
 
 #endif
 
