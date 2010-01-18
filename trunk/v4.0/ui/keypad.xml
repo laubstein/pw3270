@@ -31,7 +31,7 @@
 
 <ui>
 
-	<keypad name="keypad.right" label="Keypad" position="right" key='<alt>k' >
+	<keypad name="keypad.right" label="Lateral keypad" position="right" key='<alt>k' >
 
 		<row>
 			<button action='pfkey' id='1' label='PF1' />

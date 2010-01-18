@@ -858,6 +858,8 @@
 
 #else
 
+	SetBoolean("UIToggles",gtk_widget_get_name(widget),show);
+
 	if(show)
 		gtk_widget_show(widget);
 	else
