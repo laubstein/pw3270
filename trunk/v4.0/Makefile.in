@@ -47,6 +47,7 @@ EXTENSIONS ?= @EXTENSIONS@
 DLLEXT ?= @DLLEXT@
 
 TARGETS = @PROGRAM_NAME@@EXEEXT@
+UI_XML_FILES = default.xml functions.xml keypad.xml rexx.xml
 
 TMPDIR ?= /tmp
 
@@ -86,8 +87,10 @@ DBG_CFLAGS=-DDEBUG=1 -ggdb
 CFLAGS = @CFLAGS@ @OS_CFLAGS@ -g -Wall -DLIBDIR=\"$(LIBDIR)\" -DDATAROOTDIR=\"$(datarootdir)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
 
 # Gtk/Gnome parameters
-GUI_CFLAGS = @GTK_CFLAGS@ @LIBGNOME_CFLAGS@
-GUI_LDFLAGS = @GTK_LIBS@ @LIBGNOME_LIBS@
+GTK_CFLAGS = @GTK_CFLAGS@ 
+GTK_LIBS = @GTK_LIBS@
+GUI_CFLAGS = $(GTK_CFLAGS) @LIBGNOME_CFLAGS@
+GUI_LDFLAGS = $(GTK_LIBS) @LIBGNOME_LIBS@
 
 # Application parameters
 APP_CFLAGS=@APP_CFLAGS@
@@ -262,7 +265,7 @@ bin/Debug/lib3270$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o 
 	@$(LD) @OS_DLLFLAGS@ -o $@ $^ $(API_LDFLAGS)
 
 ####################################################################################################
-# Translation Rules
+# gettext Rules
 ####################################################################################################
 
 pot/%.pot: src/%.c Makefile
@@ -276,6 +279,10 @@ pot/%.pot: src/%.rc Makefile
 	@echo $@ ...
 	@touch $@
 
+pot/%.pot: %.xml bin/xml2pot
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@bin/xml2pot "$<" > "$@"
 
 ####################################################################################################
 # OpenOffice.org extension
@@ -384,6 +391,10 @@ bin/Release/librx3270$(DLLEXT): 		bin/Release/lib3270$(DLLEXT) \
 ####################################################################################################
 # Misc Targets
 ####################################################################################################
+
+bin/xml2pot: src/xml2pot.c
+	@echo $< ...
+	@$(CC) $(GTK_CFLAGS) $(GTK_LIBS) -o $@ $<
 
 $(PACKAGE).desktop: Makefile
 	@rm -f $@

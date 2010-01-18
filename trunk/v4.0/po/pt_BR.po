@@ -7,10 +7,10 @@
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: pw3270 4.0\n"
+"Project-Id-Version: pw3270 4.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-18 08:39-0200\n"
-"PO-Revision-Date: 2010-01-18 08:39-0200\n"
+"POT-Creation-Date: 2010-01-18 17:12-0200\n"
+"PO-Revision-Date: 2010-01-18 17:31-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -169,8 +169,7 @@ msgstr "Não é possível copiar áreas não retangulares"
 msgid "Can't find UI definitions in %s"
 msgstr ""
 
-#: src/gui/keypad.c:470 src/gui/uiparser.c:753
-#: src/plugins/rexx/plg_start.c:157
+#: src/gui/uiparser.c:753 src/plugins/rexx/plg_start.c:157
 #, c-format
 msgid "Can't load %s"
 msgstr "Não foi possível carregar %s"
@@ -198,10 +197,6 @@ msgstr ""
 #, c-format
 msgid "Can't parse accelerator \"%s\""
 msgstr ""
-
-#: src/gui/keypad.c:499
-msgid "Can't parse keypad description"
-msgstr "Não foi possível carregar descrição da barra de botões"
 
 #: src/gui/uiparser.c:779
 #, c-format
@@ -260,7 +255,7 @@ msgstr "Não encontrei codificação para \"%s\", usando padrão"
 msgid "Charset error"
 msgstr "Erro no código de página"
 
-#: src/gui/actions.c:838
+#: src/gui/actions.c:838 ui/keypad.xml:81
 msgid "Clear"
 msgstr "Limpar"
 
@@ -384,6 +379,18 @@ msgstr ""
 msgid "Enter"
 msgstr ""
 
+#: ui/keypad.xml:85
+msgid "Erase\nEOF"
+msgstr "Apagar"
+"Campos"
+
+#: ui/keypad.xml:86
+msgid ""
+"Erase\n"
+"Input"
+msgstr "Limpar\n"
+"Campos"
+
 #: src/gui/actions.c:889
 msgid "Erase Field"
 msgstr "Apagar campo"
@@ -408,10 +415,6 @@ msgid ""
 msgstr "Erro lendo %s\n"
 "%s"
 
-#: src/gui/keypad.c:472 src/gui/keypad.c:501
-msgid "Error loading keypad"
-msgstr "Erro ao ler a barra de botões"
-
 #: src/gui/uiparser.c:214
 #, c-format
 msgid "Error parsing %s"
@@ -435,6 +438,10 @@ msgstr ""
 
 #: src/gui/actions.c:912
 msgid "Event Trace"
+msgstr ""
+
+#: ui/rexx.xml:37
+msgid "External Rexx script"
 msgstr ""
 
 #: src/plugins/rexx/plg_start.c:159
@@ -484,6 +491,10 @@ msgstr "Tela-cheia"
 #: src/gui/main.c:319
 msgid "Full path of plugins to load"
 msgstr "Caminho completo dos plugins a carregar"
+
+#: ui/functions.xml:35
+msgid "Function bar"
+msgstr ""
 
 #: src/gui/main.c:158
 msgid "GTK Version mismatch"
@@ -559,6 +570,10 @@ msgstr "Teclado de funções"
 
 #: src/gui/filetransfer.c:406
 msgid "LRECL:"
+msgstr ""
+
+#: ui/keypad.xml:35
+msgid "Lateral keypad"
 msgstr ""
 
 #: src/gui/actions.c:825
@@ -648,6 +663,114 @@ msgstr "Laranja"
 
 #: src/gui/actions.c:920
 msgid "Overwrite"
+msgstr ""
+
+#: ui/keypad.xml:72
+msgid "PA1"
+msgstr ""
+
+#: ui/keypad.xml:73
+msgid "PA2"
+msgstr ""
+
+#: ui/keypad.xml:74
+msgid "PA3"
+msgstr ""
+
+#: ui/functions.xml:36 ui/keypad.xml:37
+msgid "PF1"
+msgstr ""
+
+#: ui/functions.xml:45 ui/keypad.xml:52
+msgid "PF10"
+msgstr ""
+
+#: ui/functions.xml:46 ui/keypad.xml:53
+msgid "PF11"
+msgstr ""
+
+#: ui/functions.xml:47 ui/keypad.xml:54
+msgid "PF12"
+msgstr ""
+
+#: ui/functions.xml:50
+msgid "PF13"
+msgstr ""
+
+#: ui/functions.xml:51
+msgid "PF14"
+msgstr ""
+
+#: ui/functions.xml:52
+msgid "PF15"
+msgstr ""
+
+#: ui/functions.xml:53
+msgid "PF16"
+msgstr ""
+
+#: ui/functions.xml:54
+msgid "PF17"
+msgstr ""
+
+#: ui/functions.xml:55
+msgid "PF18"
+msgstr ""
+
+#: ui/functions.xml:56
+msgid "PF19"
+msgstr ""
+
+#: ui/functions.xml:37 ui/keypad.xml:38
+msgid "PF2"
+msgstr ""
+
+#: ui/functions.xml:57
+msgid "PF20"
+msgstr ""
+
+#: ui/functions.xml:58
+msgid "PF21"
+msgstr ""
+
+#: ui/functions.xml:59
+msgid "PF22"
+msgstr ""
+
+#: ui/functions.xml:60
+msgid "PF23"
+msgstr ""
+
+#: ui/functions.xml:61
+msgid "PF24"
+msgstr ""
+
+#: ui/functions.xml:38 ui/keypad.xml:39
+msgid "PF3"
+msgstr ""
+
+#: ui/functions.xml:39 ui/keypad.xml:42
+msgid "PF4"
+msgstr ""
+
+#: ui/functions.xml:40 ui/keypad.xml:43
+msgid "PF5"
+msgstr ""
+
+#: ui/functions.xml:41 ui/keypad.xml:44
+msgid "PF6"
+msgstr ""
+
+#: ui/functions.xml:42 ui/keypad.xml:47
+msgid "PF7"
+msgstr ""
+
+#: ui/functions.xml:43 ui/keypad.xml:48
+msgid "PF8"
+msgstr ""
+
+#: ui/functions.xml:44 ui/keypad.xml:49
+msgid "PF9"
 msgstr ""
 
 #: src/gui/main.c:291
@@ -778,7 +901,7 @@ msgstr ""
 msgid "Reselect"
 msgstr "Reselecionar"
 
-#: src/gui/actions.c:840
+#: src/gui/actions.c:840 ui/keypad.xml:82
 msgid "Reset"
 msgstr ""
 
@@ -803,6 +926,10 @@ msgstr "Erro no script rexx"
 #: src/plugins/rexx/plg_start.c:111
 msgid "Rexx script failed"
 msgstr "Script Rexx falhou"
+
+#: ui/rexx.xml:38
+msgid "Rexx scripts"
+msgstr ""
 
 #: src/plugins/rexx/plg_start.c:263
 msgid "Rexx trace"
@@ -1067,6 +1194,10 @@ msgstr "Este programa precisa do GTK versão %d.%d.%d"
 msgid "To:"
 msgstr "Para:"
 
+#: ui/default.xml:116
+msgid "Toolbar"
+msgstr ""
+
 #: src/gui/actions.c:868
 msgid "Toolbars"
 msgstr "Barras de ferramentas"
@@ -1268,7 +1399,7 @@ msgstr "_Opções"
 msgid "_Quit"
 msgstr "_Sair"
 
-#: src/gui/actions.c:867
+#: src/gui/actions.c:867 ui/default.xml:74
 msgid "_View"
 msgstr "Exibir"
 
