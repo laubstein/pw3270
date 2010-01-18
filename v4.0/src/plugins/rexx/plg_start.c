@@ -176,7 +176,11 @@
  int call_rexx(const gchar *filename, const gchar *arg)
  {
 	LONG      			return_code;                 	// interpreter return code
+#ifdef CONSTRXSTRING
 	CONSTRXSTRING		argv;           	          	// program argument string
+#else
+	RXSTRING			argv;           	          	// program argument string
+#endif
 	RXSTRING			retstr;                      	// program return value
 	RXSTRING			prg[2];							// Program data
 	short     			rc		= 0;                   	// converted return code
