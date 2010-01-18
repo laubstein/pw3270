@@ -46,7 +46,11 @@
  	struct rexx_translated_data	*rexx_data = g_object_get_data(G_OBJECT(widget),"rexx_translated_data");
 
 	LONG      		return_code;                 	// interpreter return code
+#ifdef CONSTRXSTRING
 	CONSTRXSTRING	argv;           	          	// program argument string
+#else
+	RXSTRING		argv;           	          	// program argument string
+#endif
 	RXSTRING		retstr;                      	// program return value
 	RXSTRING		prg[2];							// Program data
 	gchar			*name;
@@ -100,7 +104,7 @@
 	{
 		if(!rexx_data)
 		{
-			Trace("Saving translated data with %d bytes",prg[1].strlength);
+			Trace("Saving translated data with %d bytes",(int) prg[1].strlength);
 			rexx_data = g_malloc0(sizeof(struct rexx_translated_data)+prg[1].strlength);
 			rexx_data->strlength = prg[1].strlength;
 			memcpy(rexx_data->strptr,prg[1].strptr,prg[1].strlength);

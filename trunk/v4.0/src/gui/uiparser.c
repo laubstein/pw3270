@@ -848,11 +848,23 @@
  {
  	gboolean show = gtk_toggle_action_get_active(action);
 
+#if GTK_CHECK_VERSION(2,18,0)
+
  	if(gtk_widget_get_visible(widget) != show)
  	{
 		gtk_widget_set_visible(widget,show);
 		SetBoolean("UIToggles",gtk_widget_get_name(widget),show);
  	}
+
+#else
+
+	if(show)
+		gtk_widget_show(widget);
+	else
+		gtk_widget_hide(widget);
+
+#endif
+
  }
 
  static void create_view_actions(struct parse_data *info, GtkUIManagerItemType type)
@@ -897,7 +909,15 @@
 				gtk_box_pack_start(box,widget,FALSE,FALSE,0);
 
 				gtk_toggle_action_set_active(element->view_action,visible);
+
+#if GTK_CHECK_VERSION(2,18,0)
 				gtk_widget_set_visible(widget,visible);
+#else
+				if(visible)
+					gtk_widget_show(widget);
+				else
+					gtk_widget_hide(widget);
+#endif
 				g_signal_connect(G_OBJECT(element->view_action),"toggled",G_CALLBACK(element_toggle_show),widget);
 			}
 
@@ -921,7 +941,13 @@
  	if(element->view_action)
  	{
 		const gchar *name = gtk_action_get_name(GTK_ACTION(element->view_action));
+
+#if GTK_CHECK_VERSION(2,18,0)
 		const gchar *label = gtk_action_get_label(GTK_ACTION(element->view_action));
+#else
+		const gchar *label = NULL;
+		g_object_get(G_OBJECT(element->view_action),"label",&label,NULL);
+#endif
 
 		Trace("Incluindo %s/%s",data->path,name);
 
@@ -962,7 +988,14 @@
 		if(element->view_action)
 		{
 			const gchar *name = gtk_action_get_name(GTK_ACTION(element->view_action));
+
+#if GTK_CHECK_VERSION(2,18,0)
 			const gchar *label = gtk_action_get_label(GTK_ACTION(element->view_action));
+#else
+			const gchar *label = NULL;
+			g_object_get(G_OBJECT(element->view_action),"label",&label,NULL);
+#endif
+
 			Trace("Incluindo %s/%s",data.path,name);
 			if(label && *label)
 				gtk_ui_manager_add_ui(data.manager,data.merge_id,data.path,name,name,GTK_UI_MANAGER_MENUITEM,FALSE);
@@ -1084,7 +1117,20 @@
 		gboolean visible = GetBoolean("UIToggles",gtk_widget_get_name(keypad->widget),TRUE);
 
 		gtk_toggle_action_set_active(keypad->view_action,visible);
+
+#if GTK_CHECK_VERSION(2,18,0)
+
 		gtk_widget_set_visible(keypad->widget,visible);
+
+#else
+
+		if(visible)
+			gtk_widget_show(keypad->widget);
+		else
+			gtk_widget_hide(keypad->widget);
+
+#endif
+
 		g_signal_connect(G_OBJECT(keypad->view_action),"toggled",G_CALLBACK(element_toggle_show),keypad->widget);
 	}
 
