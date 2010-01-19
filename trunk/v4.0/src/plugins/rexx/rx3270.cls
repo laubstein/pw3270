@@ -115,6 +115,24 @@ return rx3270QueryRunMode()
 	use arg ptr
 return rx3270SetCharset(ptr)
 
+::method sendfile
+	use arg from, to
+
+	status = rx3270BeginFileSend(from,to)
+	if status <> 0
+		then return status
+
+return rx3270WaitForFTComplete()
+
+::method recvfile
+	use arg from, to
+
+	status = rx3270BeginFileRecv(from,to)
+	if status <> 0
+		then return status
+
+return rx3270WaitForFTComplete()
+
 
 /*-------------------------------------------------------------------------------*/
 /* Common dialog box class                                                       */
