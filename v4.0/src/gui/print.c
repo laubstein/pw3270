@@ -309,11 +309,82 @@
 
 #else // GTK_PRINT_OPERATION
 
- int PrintText(const char *name, gchar *text)
+ static void print_finished(GPid pid,gint status,gchar *tempfile)
  {
-	gchar *command = GetString("Print", "Command", "lpr");
-	RunExternalProgramWithText(command,text);
-	g_free(command);
+ 	Trace("Process %d ended with status %d",(int) pid, status);
+ 	remove(tempfile);
+ 	g_free(tempfile);
+ }
+
+//  void RunExternalProgramWithText(const gchar *cmd, const gchar *str)
+ int PrintText(const char *name, gchar *str)
+ {
+	gchar	*cmd		= GetString("Print", "Command", "lpr");
+	GError	*error		= NULL;
+	gchar	*filename	= NULL;
+	GPid 	pid			= 0;
+	gchar	*argv[3];
+	gchar	tmpname[20];
+
+	Trace("Running comand %s\n%s",cmd,str);
+
+	do
+	{
+		g_free(filename);
+		g_snprintf(tmpname,19,"%08lx.tmp",rand() ^ ((unsigned long) time(0)));
+		filename = g_build_filename(g_get_tmp_dir(),tmpname,NULL);
+	} while(g_file_test(filename,G_FILE_TEST_EXISTS));
+
+	Trace("Temporary file: %s",filename);
+
+	if(!g_file_set_contents(filename,str,-1,&error))
+	{
+		if(error)
+		{
+			Warning( N_( "Can't create temporary file:\n%s" ), error->message ? error->message : N_( "Unexpected error" ));
+			g_error_free(error);
+		}
+		remove(filename);
+		g_free(filename);
+		g_error_free(error);
+		g_free(cmd);
+		return -1;
+	}
+
+	argv[0] = (gchar *) cmd;
+	argv[1] = filename;
+	argv[2] = NULL;
+
+	Trace("Spawning %s %s",cmd,filename);
+
+	error = NULL;
+
+	if(!g_spawn_async(	NULL,											// const gchar *working_directory,
+						argv,											// gchar **argv,
+						NULL,											// gchar **envp,
+						G_SPAWN_SEARCH_PATH|G_SPAWN_DO_NOT_REAP_CHILD,	// GSpawnFlags flags,
+						NULL,											// GSpawnChildSetupFunc child_setup,
+						NULL,											// gpointer user_data,
+						&pid,											// GPid *child_pid,
+						&error ))										// GError **error);
+	{
+		if(error)
+		{
+			Warning( N_( "Error spawning %s\n%s" ), argv[0], error->message ? error->message : N_( "Unexpected error" ));
+			g_error_free(error);
+		}
+		remove(filename);
+		g_free(filename);
+		g_free(cmd);
+		return -1;
+	}
+
+	g_free(cmd);
+
+	Trace("pid %d",(int) pid);
+
+	g_child_watch_add(pid,(GChildWatchFunc) print_finished,filename);
+
 	return 0;
  }
 
