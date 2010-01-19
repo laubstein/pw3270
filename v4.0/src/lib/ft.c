@@ -124,6 +124,11 @@ static const struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to m
  	return errcode;
  }
 
+ LIB3270_EXPORT enum ft_state GetFileTransferState(void)
+ {
+	return ft_state;
+ }
+
  LIB3270_EXPORT int CancelFileTransfer(int force)
  {
 	if (ft_state == FT_RUNNING)

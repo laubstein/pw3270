@@ -190,8 +190,9 @@
 			FT_ABORT_SENT	/**< Abort sent; awaiting response */
 		};
 
-		LIB3270_EXPORT int BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft);
-		LIB3270_EXPORT int CancelFileTransfer(int force);
+		LIB3270_EXPORT int 				BeginFileTransfer(unsigned short flags, const char *local, const char *remote, int lrecl, int blksize, int primspace, int secspace, int dft);
+		LIB3270_EXPORT int 				CancelFileTransfer(int force);
+		LIB3270_EXPORT enum ft_state	GetFileTransferState(void);
 
 		struct filetransfer_callbacks
 		{

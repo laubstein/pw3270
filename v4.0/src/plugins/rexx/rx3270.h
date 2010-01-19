@@ -193,6 +193,12 @@
 	RexxReturnCode REXXENTRY rx3270ProgressDialogSetText(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	RexxReturnCode REXXENTRY rx3270ProgressDialogPulse(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 
+	// File transfer
+	RexxReturnCode REXXENTRY rx3270BeginFileSend(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	RexxReturnCode REXXENTRY rx3270BeginFileRecv(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	RexxReturnCode REXXENTRY rx3270GetFTState(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuename, PRXSTRING Retstr);
+	RexxReturnCode REXXENTRY rx3270WaitForFTComplete(PSZ Name, LONG Argc, RXSTRING Argv[], PSZ Queuename, PRXSTRING Retstr);
+
 	LOCAL_EXTERN GtkWidget 		* getWidget(LONG Argc, RXSTRING Argv[]);
 	LOCAL_EXTERN GtkMessageType	  getMessageDialogType(const char *arg);
 	LOCAL_EXTERN RexxReturnCode	  RetGtkResponse(PRXSTRING Retstr, GtkResponseType type);

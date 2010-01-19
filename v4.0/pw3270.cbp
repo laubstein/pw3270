@@ -727,6 +727,12 @@
 		<Unit filename="src/plugins/rexx/dialogs.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/plugins/rexx/filetransfer.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="DBGRexx" />
+		</Unit>
 		<Unit filename="src/plugins/rexx/gui.c">
 			<Option compilerVar="CC" />
 		</Unit>

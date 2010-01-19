@@ -107,5 +107,9 @@
 	EXPORTED_COMMON_REXX_ENTRY( rx3270Sleep						),
 	EXPORTED_COMMON_REXX_ENTRY( rx3270QueryRunMode				),
 
+	// FT actions
+	EXPORTED_COMMON_REXX_ENTRY( rx3270BeginFileSend				),
+	EXPORTED_COMMON_REXX_ENTRY( rx3270BeginFileRecv				),
+
  };
 
