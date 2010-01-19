@@ -266,14 +266,6 @@ AC_ARG_WITH([gnome],
 	pw3270_cv_gnome="yes"
 ])
 
-AC_ARG_ENABLE([loadable-keypad],
-	[AS_HELP_STRING([--enable-loadable-keypad], [Load keypad description from xml file])],
-[
-	pw3270_cv_loadable_keypad="$enableval"
-],[
-	pw3270_cv_loadable_keypad="yes"
-])
-
 AC_ARG_WITH([icon],
 	[AS_HELP_STRING([--with-icon], [set icon filename])],
 [
@@ -384,11 +376,6 @@ if test "$pw3270_cv_gnome" == "yes"; then
 fi
 AC_SUBST(LIBGNOME_LIBS)
 AC_SUBST(LIBGNOME_CFLAGS)
-
-# Check for loadable keypad
-if test "$pw3270_cv_loadable_keypad" == "yes"; then
-  AC_DEFINE(ENABLE_LOADABLE_KEYPAD)
-fi
 
 # Check for pic
 if test "$pw3270_cv_pic" == "yes"; then
