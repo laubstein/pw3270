@@ -33,6 +33,7 @@
 	<menubar name='topmenu'>
 		<menu action='FileMenu' />
 		<menu action='EditMenu' />
+		<menu name='View' />
 		<menu action='ScriptsMenu'>
 			<menuitem action='rx3270.select' label='External Rexx script'/>
 			<menu name='rx3270.scripts' label='Rexx scripts' />

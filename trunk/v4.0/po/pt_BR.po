@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-18 17:12-0200\n"
-"PO-Revision-Date: 2010-01-18 17:31-0200\n"
+"POT-Creation-Date: 2010-01-19 08:45-0200\n"
+"PO-Revision-Date: 2010-01-19 08:55-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -56,11 +56,11 @@ msgstr "Opções do 3270"
 
 #: src/gui/uiparser.c:666
 msgid "<button> element should be used only inside <keypad><row>"
-msgstr ""
+msgstr "Elemento <button> só deve ser usado dentro de <keypad><row>"
 
 #: src/gui/uiparser.c:659
 msgid "<row> element should be used only inside <keypad>"
-msgstr ""
+msgstr "Elemento <row> só deve ser usado dentro de <keypad>"
 
 #: src/gui/filetransfer.c:785
 msgid "Aborting..."
@@ -167,9 +167,9 @@ msgstr "Não é possível copiar áreas não retangulares"
 #: src/gui/uiparser.c:1187
 #, c-format
 msgid "Can't find UI definitions in %s"
-msgstr ""
+msgstr "Não encontrei definição de interface em %s"
 
-#: src/gui/uiparser.c:753 src/plugins/rexx/plg_start.c:157
+#: src/gui/uiparser.c:753
 #, c-format
 msgid "Can't load %s"
 msgstr "Não foi possível carregar %s"
@@ -183,7 +183,7 @@ msgstr "Não foi possível carregar %s\n%s"
 
 #: src/gui/uiparser.c:1189
 msgid "Can't load UI"
-msgstr ""
+msgstr "Não foi possível ler a interface"
 
 #: src/lib/ft.c:172
 msgid "Can't open local file"
@@ -191,17 +191,17 @@ msgstr "Não foi possível abrir arquivo local"
 
 #: src/gui/uiparser.c:216 src/gui/uiparser.c:755 src/gui/uiparser.c:781
 msgid "Can't parse UI"
-msgstr ""
+msgstr "Erro no processamento da interface"
 
 #: src/gui/uiparser.c:217
 #, c-format
 msgid "Can't parse accelerator \"%s\""
-msgstr ""
+msgstr "Não foi possível converter tecla \"%s\""
 
 #: src/gui/uiparser.c:779
 #, c-format
 msgid "Can't parse ui in %s"
-msgstr ""
+msgstr "Não foi possível processar interface em %s"
 
 #: src/gui/filetransfer.c:682
 #, c-format
@@ -255,7 +255,7 @@ msgstr "Não encontrei codificação para \"%s\", usando padrão"
 msgid "Charset error"
 msgstr "Erro no código de página"
 
-#: src/gui/actions.c:838 ui/keypad.xml:81
+#: src/gui/actions.c:838
 msgid "Clear"
 msgstr "Limpar"
 
@@ -267,7 +267,7 @@ msgstr "Configuração de cores"
 msgid "Colors"
 msgstr "Cores"
 
-#: src/gui/tracewindow.c:72 src/plugins/rexx/plg_start.c:263
+#: src/gui/tracewindow.c:72
 msgid "Command:"
 msgstr "Comando:"
 
@@ -380,15 +380,17 @@ msgid "Enter"
 msgstr ""
 
 #: ui/keypad.xml:85
-msgid "Erase\nEOF"
-msgstr "Apagar"
-"Campos"
+msgid ""
+"Erase\n"
+"EOF"
+msgstr "Apagar\n"
+"Campo"
 
 #: ui/keypad.xml:86
 msgid ""
 "Erase\n"
 "Input"
-msgstr "Limpar\n"
+msgstr "Apagar\n"
 "Campos"
 
 #: src/gui/actions.c:889
@@ -418,7 +420,7 @@ msgstr "Erro lendo %s\n"
 #: src/gui/uiparser.c:214
 #, c-format
 msgid "Error parsing %s"
-msgstr ""
+msgstr "Erro ao processar %s"
 
 #: src/gui/actions.c:548 src/gui/actions.c:655
 #, c-format
@@ -440,9 +442,9 @@ msgstr ""
 msgid "Event Trace"
 msgstr ""
 
-#: ui/rexx.xml:37
+#: ui/rexx.xml:38
 msgid "External Rexx script"
-msgstr ""
+msgstr "Script rexx externo"
 
 #: src/plugins/rexx/plg_start.c:159
 msgid "File error"
@@ -494,7 +496,7 @@ msgstr "Caminho completo dos plugins a carregar"
 
 #: ui/functions.xml:35
 msgid "Function bar"
-msgstr ""
+msgstr "Barra de funções"
 
 #: src/gui/main.c:158
 msgid "GTK Version mismatch"
@@ -574,7 +576,7 @@ msgstr ""
 
 #: ui/keypad.xml:35
 msgid "Lateral keypad"
-msgstr ""
+msgstr "Barra lateral"
 
 #: src/gui/actions.c:825
 msgid "Left"
@@ -647,7 +649,7 @@ msgstr "Normal/Desprotegido"
 
 #: src/lib/ft.c:380
 msgid "Not in 3270 mode, transfer cancelled"
-msgstr ""
+msgstr "Fora do modo 3270, transferência cancelada"
 
 #: src/gui/colors.c:366
 msgid "OIA"
@@ -677,19 +679,19 @@ msgstr ""
 msgid "PA3"
 msgstr ""
 
-#: ui/functions.xml:36 ui/keypad.xml:37
+#: ui/functions.xml:36
 msgid "PF1"
 msgstr ""
 
-#: ui/functions.xml:45 ui/keypad.xml:52
+#: ui/functions.xml:45
 msgid "PF10"
 msgstr ""
 
-#: ui/functions.xml:46 ui/keypad.xml:53
+#: ui/functions.xml:46
 msgid "PF11"
 msgstr ""
 
-#: ui/functions.xml:47 ui/keypad.xml:54
+#: ui/functions.xml:47
 msgid "PF12"
 msgstr ""
 
@@ -721,7 +723,7 @@ msgstr ""
 msgid "PF19"
 msgstr ""
 
-#: ui/functions.xml:37 ui/keypad.xml:38
+#: ui/functions.xml:37
 msgid "PF2"
 msgstr ""
 
@@ -745,31 +747,31 @@ msgstr ""
 msgid "PF24"
 msgstr ""
 
-#: ui/functions.xml:38 ui/keypad.xml:39
+#: ui/functions.xml:38
 msgid "PF3"
 msgstr ""
 
-#: ui/functions.xml:39 ui/keypad.xml:42
+#: ui/functions.xml:39
 msgid "PF4"
 msgstr ""
 
-#: ui/functions.xml:40 ui/keypad.xml:43
+#: ui/functions.xml:40
 msgid "PF5"
 msgstr ""
 
-#: ui/functions.xml:41 ui/keypad.xml:44
+#: ui/functions.xml:41
 msgid "PF6"
 msgstr ""
 
-#: ui/functions.xml:42 ui/keypad.xml:47
+#: ui/functions.xml:42
 msgid "PF7"
 msgstr ""
 
-#: ui/functions.xml:43 ui/keypad.xml:48
+#: ui/functions.xml:43
 msgid "PF8"
 msgstr ""
 
-#: ui/functions.xml:44 ui/keypad.xml:49
+#: ui/functions.xml:44
 msgid "PF9"
 msgstr ""
 
@@ -785,7 +787,7 @@ msgstr "Colar"
 msgid "Paste next"
 msgstr "Colar próximo"
 
-#: src/gui/actions.c:834 src/gui/clipboard.c:264
+#: src/gui/actions.c:834
 msgid "Paste text file"
 msgstr "Colar arquivo texto"
 
@@ -901,7 +903,7 @@ msgstr ""
 msgid "Reselect"
 msgstr "Reselecionar"
 
-#: src/gui/actions.c:840 ui/keypad.xml:82
+#: src/gui/actions.c:840
 msgid "Reset"
 msgstr ""
 
@@ -909,8 +911,7 @@ msgstr ""
 msgid "Return"
 msgstr ""
 
-#: src/gui/main.c:487 src/plugins/rexx/plg_start.c:112
-#: src/plugins/rexx/plg_start.c:129
+#: src/gui/main.c:487
 #, c-format
 msgid "Return code was %d"
 msgstr "Código de saída foi %d"
@@ -927,7 +928,7 @@ msgstr "Erro no script rexx"
 msgid "Rexx script failed"
 msgstr "Script Rexx falhou"
 
-#: ui/rexx.xml:38
+#: ui/rexx.xml:39
 msgid "Rexx scripts"
 msgstr ""
 
@@ -1196,7 +1197,7 @@ msgstr "Para:"
 
 #: ui/default.xml:116
 msgid "Toolbar"
-msgstr ""
+msgstr "Barra de ferramentas"
 
 #: src/gui/actions.c:868
 msgid "Toolbars"
@@ -1222,8 +1223,7 @@ msgstr "Trilhas"
 msgid "Transfer cancelled by host"
 msgstr "Transferência cancelada pelo host"
 
-#: src/lib/ft_cut.c:377 src/lib/ft_cut.c:473 src/lib/ft_dft.c:218
-#: src/lib/ft_dft.c:355
+#: src/lib/ft_cut.c:377 src/lib/ft_cut.c:473
 msgid "Transfer cancelled by user"
 msgstr "Transferência cancelada pelo usuário"
 
@@ -1262,8 +1262,6 @@ msgid "Undefined"
 msgstr "Indefinido"
 
 #: src/gui/actions.c:548 src/gui/actions.c:596 src/gui/actions.c:655
-#: src/gui/clipboard.c:124 src/gui/clipboard.c:214 src/gui/clipboard.c:297
-#: src/plugins/rexx/plg_start.c:160
 msgid "Unexpected error"
 msgstr "Erro inesperado"
 
@@ -1399,7 +1397,7 @@ msgstr "_Opções"
 msgid "_Quit"
 msgstr "_Sair"
 
-#: src/gui/actions.c:867 ui/default.xml:74
+#: src/gui/actions.c:867
 msgid "_View"
 msgstr "Exibir"
 
