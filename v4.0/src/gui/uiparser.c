@@ -569,7 +569,7 @@
 			attr = get_xml_attribute(names,values,"label");
 			if(attr && *attr)
 			{
-				gtk_button_set_label(GTK_BUTTON(widget),g_strcompress(gettext(attr)));
+				gtk_button_set_label(GTK_BUTTON(widget),gettext(g_strcompress(attr)));
 			}
 			else
 			{
