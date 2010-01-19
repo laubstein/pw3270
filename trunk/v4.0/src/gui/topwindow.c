@@ -32,7 +32,6 @@
 
  #include "gui.h"
  #include "uiparser.h"
- #include "keypad.h"
 
  #include <gdk/gdkkeysyms.h>
  #include <lib3270/config.h>
@@ -41,7 +40,6 @@
  #include <lib3270/kybdc.h>
  #include <lib3270/actionsc.h>
  #include <lib3270/toggle.h>
-// #include <lib3270/hostc.h>
  #include <lib3270/plugins.h>
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
