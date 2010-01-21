@@ -136,7 +136,7 @@
 
 	pango_context_list_families(gtk_widget_get_pango_context(widget),&families, &n_families);
 
-	Trace("Font families: %d",n_families);
+	Trace("Font families: %d menu: %p topmenu: %p",n_families,menu,topmenu);
 
 	for(i=0; i<n_families; i++)
     {
@@ -166,7 +166,6 @@
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(topmenu),menu);
 
  }
-// static void LoadFontMenu(GtkWidget *widget, GtkWidget *menu_item)
 
  GtkWidget * widget_from_action_name(const gchar *name)
  {
@@ -182,9 +181,20 @@
  {
 	gchar		*selected;
 	GtkWidget	*menu = widget_from_action_name("fontselect");
-	selected = GetString("Terminal","Font","Courier");
-	LoadSystemFonts(topwindow, menu, selected);
-	g_free(selected);
+
+	if(menu)
+	{
+		selected = GetString("Terminal","Font","Courier");
+		LoadSystemFonts(topwindow, menu, selected);
+		g_free(selected);
+	}
+#ifdef DEBUG
+	else
+	{
+		Trace("*** %s","No fontselect menu");
+	}
+#endif
+
 	return;
  }
 

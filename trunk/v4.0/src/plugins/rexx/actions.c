@@ -135,12 +135,13 @@
 
  PW3270_PLUGIN_ENTRY int load_menu_scripts(GtkMenu *menu, GtkWidget *program_window)
  {
-	gchar		*path = g_build_filename((const gchar *) g_object_get_data(G_OBJECT(program_window),"pw3270_dpath"),"rexx",NULL);
+	gchar			*path = g_build_filename((const gchar *) g_object_get_data(G_OBJECT(program_window),"pw3270_dpath"),"rexx",NULL);
 	const gchar	*name;
- 	GDir		*dir;
+ 	GDir			*dir;
 
     dir = g_dir_open(path,0,NULL);
 
+	Trace("\n\n\n%s: %p",path,dir);
     if(!dir)
     {
     	g_free(path);
@@ -156,7 +157,7 @@
 		if(g_str_has_suffix(filename,"rex"))
 		{
  			GtkWidget 	*item = gtk_menu_item_new_with_label(name);
- 			Trace("Appending script %s (item: %p)",name,item);
+ 			Trace("Appending script %s (item: %p menu: %p)",name,item,menu);
 
  			g_object_set_data_full(G_OBJECT(item),"script_filename",filename,g_free);
 			g_signal_connect(G_OBJECT(item),"activate",G_CALLBACK(script_rexx_activated),program_window);
@@ -171,6 +172,8 @@
 		name = g_dir_read_name(dir);
 	}
 	g_dir_close(dir);
+
+	gtk_widget_show_all(GTK_WIDGET(menu));
 
 	return 0;
  }

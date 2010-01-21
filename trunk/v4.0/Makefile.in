@@ -47,7 +47,7 @@ EXTENSIONS ?= @EXTENSIONS@
 DLLEXT ?= @DLLEXT@
 
 TARGETS = @PROGRAM_NAME@@EXEEXT@
-UI_XML_FILES = default.xml functions.xml keypad.xml rexx.xml
+UI_XML_FILES = default.xml functions.xml keypad.xml $(PLUGINS_UI)
 
 TMPDIR ?= /tmp
 
@@ -150,8 +150,7 @@ Debug:		$(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) \
 		$(PACKAGE).@LOGOEXT@
 
 run: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(PACKAGE).@LOGOEXT@
-#	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
-	@bin/Debug/@PROGRAM_NAME@ --program-data="." --plugin-path=./bin/Debug/plugins
+	@bin/Debug/@PROGRAM_NAME@ --program-data="$(PWD)" --plugin-path=./bin/Debug/plugins
 
 memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(PACKAGE).@LOGOEXT@
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
@@ -425,7 +424,8 @@ pot/$(PACKAGE).pot:	$(foreach SRC, $(basename $(APP_SRCS)), pot/gui/$(SRC).pot) 
 			$(foreach SRC, $(basename $(API_SRCS)), pot/lib/$(SRC).pot) \
 			$(foreach SRC, $(basename $(REXX_COMMON_SRC)), pot/plugins/rexx/$(SRC).pot) \
 			$(foreach SRC, $(basename $(REXX_STD_SRC)), pot/plugins/rexx/$(SRC).pot) \
-			$(foreach SRC, $(basename $(REXX_PLG_SRC)), pot/plugins/rexx/$(SRC).pot)
+			$(foreach SRC, $(basename $(REXX_PLG_SRC)), pot/plugins/rexx/$(SRC).pot) \
+			$(foreach SRC, $(basename $(UI_XML_FILES)), pot/ui/$(SRC).pot)
 
 	@rm -f $@
 	@msgcat --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@

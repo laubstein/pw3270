@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pw3270 4.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-19 08:45-0200\n"
-"PO-Revision-Date: 2010-01-19 08:55-0200\n"
+"POT-Creation-Date: 2010-01-18 17:12-0200\n"
+"PO-Revision-Date: 2010-01-21 16:32-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -26,15 +26,15 @@ msgstr ""
 msgid "%s:%d"
 msgstr ""
 
-#: src/gui/main.c:435
+#: src/gui/main.c:434
 msgid "- 3270 Emulator for GTK+"
 msgstr "- Emulador 3270 para GTK+"
 
-#: src/gui/main.c:414
+#: src/gui/main.c:413
 msgid "- 3270 Emulator for Gnome"
 msgstr "- Emulador 3270 para Gnome"
 
-#: src/gui/main.c:423
+#: src/gui/main.c:422
 msgid "3270 Emulator"
 msgstr "Emulador 3270"
 
@@ -46,11 +46,11 @@ msgstr "Emulador 3270 para GTK"
 msgid "3270 Terminal emulator for Gnome."
 msgstr "Emulador de terminal 3270 para Gnome"
 
-#: src/gui/main.c:484
+#: src/gui/main.c:483
 msgid "3270 library failed to start"
 msgstr "Biblioteca 3270 falhou ao iniciar"
 
-#: src/gui/main.c:336
+#: src/gui/main.c:335
 msgid "3270 options"
 msgstr "Opções do 3270"
 
@@ -164,12 +164,20 @@ msgstr "Não foi possível converter o código de página da área de trabalho p
 msgid "Can't copy non rectangular area"
 msgstr "Não é possível copiar áreas não retangulares"
 
+#: src/gui/print.c:343
+#, c-format
+msgid ""
+"Can't create temporary file:\n"
+"%s"
+msgstr "Não foi possível criar arquivo temporário:\n"
+"%s"
+
 #: src/gui/uiparser.c:1187
 #, c-format
 msgid "Can't find UI definitions in %s"
 msgstr "Não encontrei definição de interface em %s"
 
-#: src/gui/uiparser.c:753
+#: src/gui/uiparser.c:753 src/plugins/rexx/plg_start.c:157
 #, c-format
 msgid "Can't load %s"
 msgstr "Não foi possível carregar %s"
@@ -185,7 +193,7 @@ msgstr "Não foi possível carregar %s\n%s"
 msgid "Can't load UI"
 msgstr "Não foi possível ler a interface"
 
-#: src/lib/ft.c:172
+#: src/lib/ft.c:177
 msgid "Can't open local file"
 msgstr "Não foi possível abrir arquivo local"
 
@@ -208,15 +216,15 @@ msgstr "Não foi possível processar interface em %s"
 msgid "Can't receive \"%s\""
 msgstr "Não foi possível receber \"%s\""
 
-#: src/gui/main.c:221
+#: src/gui/main.c:220
 msgid "Can't register into lib3270 I/O callback table."
 msgstr "Não foi possível efetuar o registro na tabela de I/O 3270."
 
-#: src/gui/main.c:236
+#: src/gui/main.c:235
 msgid "Can't register into lib3270 file-transfer callback table."
 msgstr "Não foi possível fazer o registro das funções de transferência de arquivo na biblioteca 3270"
 
-#: src/gui/main.c:228
+#: src/gui/main.c:227
 msgid "Can't register into lib3270 screen callback table."
 msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 
@@ -234,7 +242,7 @@ msgstr "Não foi possível enviar arquivo \"%s\""
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
-#: src/gui/main.c:486 src/gui/main.c:503
+#: src/gui/main.c:485 src/gui/main.c:502
 msgid "Can't start"
 msgstr "Não foi possível iniciar"
 
@@ -242,7 +250,7 @@ msgstr "Não foi possível iniciar"
 msgid "Can't start script"
 msgstr "Não foi possível iniciar o script"
 
-#: src/lib/ft.c:141
+#: src/lib/ft.c:146
 msgid "Cancelled by user"
 msgstr "Cancelado pelo usuário"
 
@@ -255,7 +263,7 @@ msgstr "Não encontrei codificação para \"%s\", usando padrão"
 msgid "Charset error"
 msgstr "Erro no código de página"
 
-#: src/gui/actions.c:838
+#: src/gui/actions.c:838 ui/keypad.xml:81
 msgid "Clear"
 msgstr "Limpar"
 
@@ -267,7 +275,7 @@ msgstr "Configuração de cores"
 msgid "Colors"
 msgstr "Cores"
 
-#: src/gui/tracewindow.c:72
+#: src/gui/tracewindow.c:72 src/plugins/rexx/plg_start.c:263
 msgid "Command:"
 msgstr "Comando:"
 
@@ -434,6 +442,13 @@ msgstr "Erro salvando %s\n"
 msgid "Error saving file"
 msgstr "Erro ao gravar arquivo"
 
+#: src/gui/print.c:372
+#, c-format
+msgid ""
+"Error spawning %s\n"
+"%s"
+msgstr ""
+
 #: src/gui/actions.c:841
 msgid "Escape"
 msgstr ""
@@ -458,7 +473,7 @@ msgstr "Transferência de arquivo"
 msgid "File transfer failed"
 msgstr "Transferência de arquivo falhou"
 
-#: src/lib/ft.c:162
+#: src/lib/ft.c:167
 msgid "File transfer is already active"
 msgstr "Transferência de arquivos já está ativa"
 
@@ -470,7 +485,7 @@ msgstr ""
 msgid "Fixed"
 msgstr "Fixo"
 
-#: src/gui/main.c:309
+#: src/gui/main.c:308
 msgid "Fixed path and filename for load/save the configuration data"
 msgstr "Caminho e nome do arquivo para ler/gravar dados de configuração"
 
@@ -490,7 +505,7 @@ msgstr "De:"
 msgid "Full Screen"
 msgstr "Tela-cheia"
 
-#: src/gui/main.c:319
+#: src/gui/main.c:318
 msgid "Full path of plugins to load"
 msgstr "Caminho completo dos plugins a carregar"
 
@@ -498,7 +513,7 @@ msgstr "Caminho completo dos plugins a carregar"
 msgid "Function bar"
 msgstr "Barra de funções"
 
-#: src/gui/main.c:158
+#: src/gui/main.c:157
 msgid "GTK Version mismatch"
 msgstr "Divergência na versão do GTK"
 
@@ -514,7 +529,7 @@ msgstr "Verde"
 msgid "Help"
 msgstr "Ajuda"
 
-#: src/lib/ft.c:373
+#: src/lib/ft.c:378
 msgid "Host disconnected, transfer cancelled"
 msgstr "Servidor desconectou, transferência cancelada"
 
@@ -522,7 +537,7 @@ msgstr "Servidor desconectou, transferência cancelada"
 msgid "Host file name:"
 msgstr "Nome do arquivo remoto:"
 
-#: src/gui/main.c:311
+#: src/gui/main.c:310
 msgid "Host identifier"
 msgstr "Identificador do host"
 
@@ -598,7 +613,7 @@ msgstr "Nome do arquivo local:"
 msgid "Locked status"
 msgstr "Bloqueada"
 
-#: src/gui/main.c:315
+#: src/gui/main.c:314
 msgid "Main window title"
 msgstr "Título da janela principal"
 
@@ -610,7 +625,7 @@ msgstr "Só maiúsculas"
 msgid "Mustard"
 msgstr "Mostarda"
 
-#: src/gui/main.c:310
+#: src/gui/main.c:309
 msgid "Name of configuration file (auto-search)"
 msgstr "Nome do arquivo de configuração (pesquisa automática)"
 
@@ -647,7 +662,7 @@ msgstr "Normal/Protegido"
 msgid "Normal/Unprotected"
 msgstr "Normal/Desprotegido"
 
-#: src/lib/ft.c:380
+#: src/lib/ft.c:385
 msgid "Not in 3270 mode, transfer cancelled"
 msgstr "Fora do modo 3270, transferência cancelada"
 
@@ -655,7 +670,7 @@ msgstr "Fora do modo 3270, transferência cancelada"
 msgid "OIA"
 msgstr ""
 
-#: src/gui/main.c:289
+#: src/gui/main.c:288
 msgid "Option parsing failed."
 msgstr "Tratamento de opções falhou"
 
@@ -679,19 +694,19 @@ msgstr ""
 msgid "PA3"
 msgstr ""
 
-#: ui/functions.xml:36
+#: ui/functions.xml:36 ui/keypad.xml:37
 msgid "PF1"
 msgstr ""
 
-#: ui/functions.xml:45
+#: ui/functions.xml:45 ui/keypad.xml:52
 msgid "PF10"
 msgstr ""
 
-#: ui/functions.xml:46
+#: ui/functions.xml:46 ui/keypad.xml:53
 msgid "PF11"
 msgstr ""
 
-#: ui/functions.xml:47
+#: ui/functions.xml:47 ui/keypad.xml:54
 msgid "PF12"
 msgstr ""
 
@@ -723,7 +738,7 @@ msgstr ""
 msgid "PF19"
 msgstr ""
 
-#: ui/functions.xml:37
+#: ui/functions.xml:37 ui/keypad.xml:38
 msgid "PF2"
 msgstr ""
 
@@ -747,35 +762,35 @@ msgstr ""
 msgid "PF24"
 msgstr ""
 
-#: ui/functions.xml:38
+#: ui/functions.xml:38 ui/keypad.xml:39
 msgid "PF3"
 msgstr ""
 
-#: ui/functions.xml:39
+#: ui/functions.xml:39 ui/keypad.xml:42
 msgid "PF4"
 msgstr ""
 
-#: ui/functions.xml:40
+#: ui/functions.xml:40 ui/keypad.xml:43
 msgid "PF5"
 msgstr ""
 
-#: ui/functions.xml:41
+#: ui/functions.xml:41 ui/keypad.xml:44
 msgid "PF6"
 msgstr ""
 
-#: ui/functions.xml:42
+#: ui/functions.xml:42 ui/keypad.xml:47
 msgid "PF7"
 msgstr ""
 
-#: ui/functions.xml:43
+#: ui/functions.xml:43 ui/keypad.xml:48
 msgid "PF8"
 msgstr ""
 
-#: ui/functions.xml:44
+#: ui/functions.xml:44 ui/keypad.xml:49
 msgid "PF9"
 msgstr ""
 
-#: src/gui/main.c:291
+#: src/gui/main.c:290
 msgid "Parse error"
 msgstr "Erro na passagem de parâmetros"
 
@@ -787,7 +802,7 @@ msgstr "Colar"
 msgid "Paste next"
 msgstr "Colar próximo"
 
-#: src/gui/actions.c:834
+#: src/gui/actions.c:834 src/gui/clipboard.c:264
 msgid "Paste text file"
 msgstr "Colar arquivo texto"
 
@@ -795,15 +810,15 @@ msgstr "Colar arquivo texto"
 msgid "Paste with left margin"
 msgstr "Colar com margem"
 
-#: src/gui/main.c:314
+#: src/gui/main.c:313
 msgid "Path to an image file for program icon"
 msgstr "Caminho para arquivo de imagem contendo o ícone do programa"
 
-#: src/gui/main.c:313
+#: src/gui/main.c:312
 msgid "Path to search for data and configuration files"
 msgstr "Caminho dos arquivos de dados e configuração"
 
-#: src/gui/main.c:320
+#: src/gui/main.c:319
 msgid "Path to search for plugins"
 msgstr "Caminho a pesquisar por plugins"
 
@@ -851,11 +866,11 @@ msgstr "Imprimir seleção"
 msgid "Processing data..."
 msgstr "Processando informações..."
 
-#: src/gui/main.c:564
+#: src/gui/main.c:563
 msgid "Program aborted"
 msgstr "Programa cancelado"
 
-#: src/gui/main.c:562
+#: src/gui/main.c:561
 msgid "Program window was destroyed"
 msgstr "Janela principal foi destruida"
 
@@ -903,7 +918,7 @@ msgstr ""
 msgid "Reselect"
 msgstr "Reselecionar"
 
-#: src/gui/actions.c:840
+#: src/gui/actions.c:840 ui/keypad.xml:82
 msgid "Reset"
 msgstr ""
 
@@ -911,7 +926,8 @@ msgstr ""
 msgid "Return"
 msgstr ""
 
-#: src/gui/main.c:487
+#: src/gui/main.c:486 src/plugins/rexx/plg_start.c:112
+#: src/plugins/rexx/plg_start.c:129
 #, c-format
 msgid "Return code was %d"
 msgstr "Código de saída foi %d"
@@ -930,7 +946,7 @@ msgstr "Script Rexx falhou"
 
 #: ui/rexx.xml:39
 msgid "Rexx scripts"
-msgstr ""
+msgstr "Scripts rexx"
 
 #: src/plugins/rexx/plg_start.c:263
 msgid "Rexx trace"
@@ -940,7 +956,7 @@ msgstr "Trace Rexx"
 msgid "Right"
 msgstr "Direita"
 
-#: src/gui/main.c:312
+#: src/gui/main.c:311
 msgid "Run script on startup (if available)"
 msgstr "Executa script na inicialização (Se disponível)"
 
@@ -1017,7 +1033,7 @@ msgstr "Selecionar campo"
 msgid "Select Left"
 msgstr ""
 
-#: src/plugins/rexx/actions.c:182
+#: src/plugins/rexx/actions.c:185
 msgid "Select Rexx script to run"
 msgstr "Selecione script rexx a executar"
 
@@ -1045,7 +1061,7 @@ msgstr "Selecione arquivo a receber"
 msgid "Select file to send"
 msgstr "Selecione arquivo a enviar"
 
-#: src/gui/actions.c:870
+#: src/gui/actions.c:870 ui/default.xml:88
 msgid "Select font"
 msgstr "Selecionar fonte"
 
@@ -1109,7 +1125,7 @@ msgstr "Configuração"
 msgid "Show Underline"
 msgstr "Mostrar sublinhado"
 
-#: src/gui/main.c:336
+#: src/gui/main.c:335
 msgid "Show lib3270 options"
 msgstr "Mostra opções da biblioteca 3270"
 
@@ -1161,11 +1177,11 @@ msgstr ""
 msgid "Text file"
 msgstr "Arquivo texto"
 
-#: src/lib/ft.c:166
+#: src/lib/ft.c:171
 msgid "The remote file name is invalid"
 msgstr "O nome do arquivo remoto não é válido"
 
-#: src/gui/main.c:316
+#: src/gui/main.c:315
 msgid "Theme file (gtkrc)"
 msgstr "Arquivo de tema (gtkrc)"
 
@@ -1186,7 +1202,7 @@ msgid ""
 "Franklin St, Fifth Floor, Boston, MA 02111-1307 USA"
 msgstr ""
 
-#: src/gui/main.c:154
+#: src/gui/main.c:153
 #, c-format
 msgid "This program requires GTK version %d.%d.%d"
 msgstr "Este programa precisa do GTK versão %d.%d.%d"
@@ -1203,7 +1219,7 @@ msgstr "Barra de ferramentas"
 msgid "Toolbars"
 msgstr "Barras de ferramentas"
 
-#: src/gui/main.c:501
+#: src/gui/main.c:500
 msgid "Top window failed to start"
 msgstr "Janela principal não iniciou"
 
@@ -1223,7 +1239,8 @@ msgstr "Trilhas"
 msgid "Transfer cancelled by host"
 msgstr "Transferência cancelada pelo host"
 
-#: src/lib/ft_cut.c:377 src/lib/ft_cut.c:473
+#: src/lib/ft_cut.c:377 src/lib/ft_cut.c:473 src/lib/ft_dft.c:218
+#: src/lib/ft_dft.c:355
 msgid "Transfer cancelled by user"
 msgstr "Transferência cancelada pelo usuário"
 
@@ -1253,7 +1270,7 @@ msgstr "Não foi possível colar texto da área de trabalho"
 msgid "Unable to save configuration data in %s"
 msgstr "Não foi possível salvar a configuração em %s"
 
-#: src/lib/ft.c:255
+#: src/lib/ft.c:260
 msgid "Unable to send file-transfer request"
 msgstr "Incapaz de enviar o pedido de transferência de arquivos"
 
@@ -1262,6 +1279,8 @@ msgid "Undefined"
 msgstr "Indefinido"
 
 #: src/gui/actions.c:548 src/gui/actions.c:596 src/gui/actions.c:655
+#: src/gui/clipboard.c:124 src/gui/clipboard.c:214 src/gui/clipboard.c:297
+#: src/gui/print.c:343 src/gui/print.c:372 src/plugins/rexx/plg_start.c:160
 msgid "Unexpected error"
 msgstr "Erro inesperado"
 
@@ -1397,7 +1416,7 @@ msgstr "_Opções"
 msgid "_Quit"
 msgstr "_Sair"
 
-#: src/gui/actions.c:867
+#: src/gui/actions.c:867 ui/default.xml:74
 msgid "_View"
 msgstr "Exibir"
 

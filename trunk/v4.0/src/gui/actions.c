@@ -469,8 +469,6 @@
 	int			state		= data->attr.key_state & (GDK_SHIFT_MASK|GDK_CONTROL_MASK|GDK_ALT_MASK);
 	int			f;
 
-//	Trace("%s(%s), callback: %p",__FUNCTION__,name,data->callback);
-
 	switch(data->ui_type)
 	{
 	case UI_CALLBACK_TYPE_TOGGLE:
@@ -490,6 +488,8 @@
 		Trace("Invalid action type %d in %s",data->ui_type,data->name);
 		return NULL;
 	}
+
+	Trace("%s(%s), callback: %p action: %p",__FUNCTION__,name,data->callback,data->action);
 
 	if(data->callback)
 		g_signal_connect(G_OBJECT(data->action),data->ui_type == UI_CALLBACK_TYPE_TOGGLE ? "toggled" : "activate",G_CALLBACK(data->callback),data->user_data);
