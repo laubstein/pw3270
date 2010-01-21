@@ -1237,43 +1237,41 @@
 
 	for(element = info.first_element;element;element = element->next)
 	{
-		if(element->type == GTK_UI_MANAGER_MENUBAR || element->type == GTK_UI_MANAGER_MENU || element->type == GTK_UI_MANAGER_TOOLBAR || element->type == GTK_UI_MANAGER_POPUP)
+		// UI widgets in the action
+		gchar						*path	= g_strconcat(element->path,"/",element->name,NULL);
+		GtkWidget					*widget	= gtk_ui_manager_get_widget(info.manager,path);
+		struct action_descriptor	*data	= g_hash_table_lookup(info.actions,element->name);
+
+		if(!widget && path[1] == '/')
+			widget = gtk_ui_manager_get_widget(info.manager,path+1);
+
+//			Trace("%s = %p",path,widget);
+		if(data && widget && data->action)
+			g_object_set_data(G_OBJECT(data->action),"ui_widget",(gpointer) widget);
+
+		g_free(path);
+
+		if(widget && element->type == GTK_UI_MANAGER_MENUITEM && strchr(element->name,'.'))
 		{
-			// Save menu & popup widgets in the action widget
-			gchar						*path	= g_strconcat(element->path,"/",element->name,NULL);
-			GtkWidget					*widget	= gtk_ui_manager_get_widget(info.manager,path);
-			struct action_descriptor	*data	= g_hash_table_lookup(info.actions,element->name);
+			// Populate plugin menu
+			GModule *plugin;
+			gchar *plugin_name		= g_strdup(element->name);
+			gchar *entry_name		= strchr(plugin_name,'.');
+			int (*populate)(GtkMenu *menu, GtkWidget *program_window);
+			*(entry_name)++ = 0;
 
-			if(!widget && path[1] == '/')
-				widget = gtk_ui_manager_get_widget(info.manager,path+1);
+			plugin = get_plugin_by_name(plugin_name);
 
-			Trace("%s = %p",path,widget);
-			if(data && widget && data->action)
-				g_object_set_data(G_OBJECT(data->action),"ui_widget",(gpointer) widget);
-
-			g_free(path);
-
-			if(widget && element->type == GTK_UI_MANAGER_MENU && strchr(element->name,'.'))
+			if(plugin && get_symbol_by_name(plugin, (gpointer *) &populate, "load_menu_%s",entry_name))
 			{
-				// Populate plugin menu
-				GModule *plugin;
-				gchar *plugin_name		= g_strdup(element->name);
-				gchar *entry_name		= strchr(plugin_name,'.');
-				int (*populate)(GtkMenu *menu, GtkWidget *program_window);
-				*(entry_name)++ = 0;
-
-				plugin = get_plugin_by_name(plugin_name);
-
-				if(plugin && get_symbol_by_name(plugin, (gpointer *) &populate, "load_menu_%s",entry_name))
-				{
-					GtkWidget *menu	= gtk_menu_new();
-					populate(GTK_MENU(menu),topwindow);
-					gtk_menu_item_set_submenu(GTK_MENU_ITEM(widget),menu);
-					gtk_widget_show_all(widget);
-				}
-
-				g_free(plugin_name);
+				GtkWidget *menu	= gtk_menu_new();
+				Trace("Populating menu %p",menu);
+				populate(GTK_MENU(menu),topwindow);
+				gtk_menu_item_set_submenu(GTK_MENU_ITEM(widget),menu);
+				gtk_widget_show_all(widget);
 			}
+
+			g_free(plugin_name);
 
 		}
 	}

@@ -85,7 +85,7 @@
 			<menuitem action='SelectColors' icon='select-color' />
 
 			<!--- Special action - The fontselect menu will be populated with all available monospaced fonts --->
-			<menu name='fontselect' icon='select-font' />
+			<menuitem name='fontselect' icon='select-font' label='Select font' />
 
 			<menu action='OptionsMenu'>
 				<menuitem action='Toggle' id='AutoConnect' />

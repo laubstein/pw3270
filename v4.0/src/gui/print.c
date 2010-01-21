@@ -316,7 +316,6 @@
  	g_free(tempfile);
  }
 
-//  void RunExternalProgramWithText(const gchar *cmd, const gchar *str)
  int PrintText(const char *name, gchar *str)
  {
 	gchar	*cmd		= GetString("Print", "Command", "lpr");

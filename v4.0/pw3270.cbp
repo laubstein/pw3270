@@ -13,7 +13,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters="--program-data=." />
+				<Option parameters="--program-data=.  --plugin-path=./bin/Debug/plugins" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -422,9 +422,6 @@
 		</Unit>
 		<Unit filename="src/gui/gui.h" />
 		<Unit filename="src/gui/iocallback.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/keypad.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/gui/keypad.h">
