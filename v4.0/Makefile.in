@@ -451,10 +451,9 @@ install: Release po/pt_BR.po $(PACKAGE).desktop
 
 	@install --mode=755 bin/Release/lib3270$(DLLEXT) $(DESTDIR)/$(LIBDIR)
 
-	@install --mode=644 *.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/debug.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
-	@install --mode=644 ui/default.act $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+	@install --mode=644 ui/functions.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 
 	@install --mode=644 ui/keypad.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/functions.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
@@ -492,7 +491,6 @@ $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 	@cp configure.ac $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp *.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp *.conf $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
-	@cp *.xml $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 
 	@cp AUTHORS $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp LICENSE $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
