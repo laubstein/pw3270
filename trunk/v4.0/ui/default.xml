@@ -201,11 +201,11 @@
 	<scroll direction='right' />
 	--->
 
-	<!--- From default.act --->
-	<accelerator action='PageDown' group='online' />
-	<accelerator action='ShiftPageDown' group='online' />
+	<accelerator name='PageDown' action='pfkey' id='8' group='online' key='Page_Down' />
+	<accelerator name='ShiftPageDown' action='pfkey' id='24' group='online' key='<Shift>Page_Down' />
 
-	<accelerator action='PageUP' group='online' />
-	<accelerator action='ShiftPageUP' group='online' />
+	<accelerator name='PageUP' action='pfkey' id='7' group='online' key='Page_Up' />
+	<accelerator name='ShiftPageUP' action='pfkey' id='23' group='online' key='<Shift>Page_Up' />
 
 </ui>
+

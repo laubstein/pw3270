@@ -202,9 +202,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/%{name}
 %{_datadir}/applications/*.desktop
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
-%{_datadir}/%{name}/*.xml
 %{_datadir}/%{name}/ui/default.xml
-%{_datadir}/%{name}/ui/default.act
+%{_datadir}/%{name}/ui/keypad.xml
+%{_datadir}/%{name}/ui/functions.xml
 %{_datadir}/%{name}/%{name}.@LOGOEXT@
 %{_datadir}/%{name}/colors.conf
 %{_datadir}/pixmaps/%{name}.svg
