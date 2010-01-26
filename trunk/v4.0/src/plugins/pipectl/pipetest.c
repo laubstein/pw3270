@@ -87,10 +87,7 @@
 
 	*(buffer+((int) cbRead)) = 0;
 
-	printf("query(\"%s\"): \"%s\"\n",query,buffer);
-
-
-
+	printf("%s= %s\n",query,buffer);
 
  }
 
@@ -100,26 +97,33 @@
 
 	static const LPTSTR lpszRequest	= TEXT( "\\\\.\\pipe\\pw3270" );
 
-	if (!WaitNamedPipe(lpszRequest, NMPWAIT_WAIT_FOREVER))
-		return show_lasterror("WaitNamedPipe(%s)",lpszRequest);
+	while(--numpar > 0)
+	{
+		param++;
 
-	hPipe = CreateFile(	lpszRequest,   						// pipe name
-						GENERIC_WRITE|GENERIC_READ,			// Read/Write access
-						0,              					// no sharing
-						NULL,           					// default security attributes
-						OPEN_EXISTING,  					// opens existing pipe
-						0,									// Attributes
-						NULL);          					// no template file
+		if (!WaitNamedPipe(lpszRequest, NMPWAIT_WAIT_FOREVER))
+			return show_lasterror("WaitNamedPipe(%s)",lpszRequest);
 
-	if(hPipe == INVALID_HANDLE_VALUE)
-		return show_lasterror("CreateFile(%s)",lpszRequest);
+		hPipe = CreateFile(	lpszRequest,   						// pipe name
+							GENERIC_WRITE|GENERIC_READ,			// Read/Write access
+							0,              					// no sharing
+							NULL,           					// default security attributes
+							OPEN_EXISTING,  					// opens existing pipe
+							0,									// Attributes
+							NULL);          					// no template file
 
-	if(!SetNamedPipeHandleState(hPipe,&dwMode,NULL,NULL))
-		return show_lasterror("SetNamedPipeHandleState(%s)",lpszRequest);
+		if(hPipe == INVALID_HANDLE_VALUE)
+			return show_lasterror("CreateFile(%s)",lpszRequest);
 
-	run_query(hPipe, "status");
+		if(!SetNamedPipeHandleState(hPipe,&dwMode,NULL,NULL))
+			return show_lasterror("SetNamedPipeHandleState(%s)",lpszRequest);
 
-	CloseHandle(hPipe);
+		run_query(hPipe, *param);
+
+		CloseHandle(hPipe);
+
+	}
+
 	return 0;
  }
 
