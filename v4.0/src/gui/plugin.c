@@ -204,20 +204,21 @@
 		ptr(arg->arg);
  }
 
-/*
- static void addui(GModule *handle, GtkUIManager *ui)
- {
-	void (*ptr)(GtkUIManager *ui, const gchar *data) = NULL;
-	if(g_module_symbol(handle, "AddPluginUI", (gpointer) &ptr))
-		ptr(ui,program_data);
- }
-*/
-
  static void start_plugin(GModule *handle, struct call_parameter *arg)
  {
 	void (*ptr)(GtkWidget *widget, const gchar *arg) = NULL;
+
+//	Trace("%s::%s: %d",g_module_name(handle),arg->name,g_module_symbol(handle, arg->name, (gpointer) &ptr));
+
 	if(g_module_symbol(handle, arg->name, (gpointer) &ptr))
 		ptr(topwindow,arg->arg);
+ }
+
+ static void stop_plugin(GModule *handle, gpointer dunno)
+ {
+	void (*ptr)(GtkWidget *widget) = NULL;
+	if(g_module_symbol(handle, "pw3270_plugin_stop", (gpointer) &ptr))
+		ptr(topwindow);
  }
 
 #endif
@@ -225,12 +226,23 @@
 gboolean StartPlugins(const gchar *startup_script)
 {
 #ifdef HAVE_PLUGINS
- 	struct call_parameter p = { "pw3270_plugin_startup", startup_script };
+ 	struct call_parameter p = { "pw3270_plugin_start", startup_script };
 
 	Trace("Starting plugins with \"%s\"...",startup_script);
 
  	if(plugins)
  	 	g_slist_foreach(plugins,(GFunc) start_plugin,&p);
+
+#endif
+	return FALSE;
+}
+
+gboolean StopPlugins(void)
+{
+#ifdef HAVE_PLUGINS
+
+ 	if(plugins)
+ 	 	g_slist_foreach(plugins,(GFunc) stop_plugin,0);
 
 #endif
 	return FALSE;

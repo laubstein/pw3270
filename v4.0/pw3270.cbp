@@ -57,12 +57,38 @@
 					<Add option="-g" />
 				</Compiler>
 			</Target>
+			<Target title="pipetest">
+				<Option output="bin/Debug/pipetest" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Option parameters="--program-data=.  --plugin-path=./bin/Debug/plugins" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="Makefile.in" />
 		<Unit filename="configure.ac" />
+		<Unit filename="debian/control.in">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="debian/lib3270-dev.install">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="debian/lib3270.install">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="debian/pw3270-plugin-rexx.install">
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="debian/pw3270.install">
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="pw3270.nsi.in" />
 		<Unit filename="pw3270.spec.in" />
 		<Unit filename="rexx/sample.rex" />
@@ -416,6 +442,7 @@
 			<Option target="Release" />
 			<Option target="unoDebug" />
 			<Option target="oooDebug" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="src/gui/filetransfer.c">
 			<Option compilerVar="CC" />
@@ -427,6 +454,7 @@
 		<Unit filename="src/gui/keypad.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="src/gui/main.c">
 			<Option compilerVar="CC" />
@@ -456,15 +484,18 @@
 			<Option target="Release" />
 			<Option target="unoDebug" />
 			<Option target="oooDebug" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="src/gui/uiparser.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="src/gui/uiparser.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="src/gui/version.c">
 			<Option compilerVar="CC" />
@@ -527,6 +558,7 @@
 		<Unit filename="src/lib/globals.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="src/lib/glue.c">
 			<Option compilerVar="CC" />
@@ -570,6 +602,7 @@
 			<Option target="Release" />
 			<Option target="unoDebug" />
 			<Option target="oooDebug" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="src/lib/popupsc.h" />
 		<Unit filename="src/lib/print.c">
@@ -714,6 +747,26 @@
 			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
+		<Unit filename="src/plugins/pipectl/commands.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/plugins/pipectl/init.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="pipetest" />
+		</Unit>
+		<Unit filename="src/plugins/pipectl/pipectl.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="pipetest" />
+		</Unit>
+		<Unit filename="src/plugins/pipectl/pipetest.c">
+			<Option compilerVar="CC" />
+			<Option target="pipetest" />
+		</Unit>
 		<Unit filename="src/plugins/rexx/actions.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -729,6 +782,7 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="DBGRexx" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="src/plugins/rexx/gui.c">
 			<Option compilerVar="CC" />
@@ -760,20 +814,24 @@
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="ui/debug.xml" />
 		<Unit filename="ui/default.act">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="ui/default.xml" />
 		<Unit filename="ui/functions.xml">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="ui/keypad.xml">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="pipetest" />
 		</Unit>
 		<Unit filename="ui/rexx.xml" />
 		<Extensions>

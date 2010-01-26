@@ -1,6 +1,6 @@
 %define _rel	@PACKAGE_RELEASE@
 
-#---[ Check for distro ]----------------------------------------------------------------------------------------------
+#---[ Check for OpenOffice ]------------------------------------------------------------------------------------------
 
 %if 0%(if [ -x @OO_SDK_HOME@/bin/idlc ]; then echo 1; else echo 0; fi)
 	%define _uno		1
@@ -52,8 +52,11 @@
 	%define _distro %{_redhat_prefix} %{_redhat_vernum}
 %endif
 
+#---[ Check for extras ]----------------------------------------------------------------------------------------------
+
 %define _rexx	%(which oorexx-config > /dev/null 2>&1; if [ "$?" = "0" ]; then echo 1; else echo 0; fi)
 
+#---[ Packaging ]-----------------------------------------------------------------------------------------------------
 
 Name:           @PACKAGE@
 License:        LGPL

@@ -414,6 +414,10 @@
 		LIB3270_EXPORT void 		  popup_system_error(const char *title, const char *message, const char *system);
 		LIB3270_EXPORT STATUS_CODE	  query_3270_terminal_status(void);
 
+		/* Get connection info */
+		LIB3270_EXPORT const char	* get_connected_lu(void);
+		LIB3270_EXPORT const char	* get_current_host(void);
+
 		LIB3270_EXPORT int Toggled(int ix);
 
 		LIB3270_EXPORT int CallAndWait(int(*callback)(void *), void *parm);

@@ -84,6 +84,7 @@ case "$host" in
 	*-mingw32)
 		DLLEXT=".dll"
 		PACKAGE_MANAGER="nsi"
+		PLUGINS="pipectl $PLUGINS"
 		OS_CFLAGS="-mno-cygwin -mms-bitfields -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500"
 		OS_DLLFLAGS="-mno-cygwin -shared -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
 

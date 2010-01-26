@@ -95,6 +95,14 @@ SubSection "@PROGRAM_NAME@" SecMain
 
 		sectionEnd
 
+		Section /o "Pipe control" PipePlugin
+			setOutPath $INSTDIR
+
+			CreateDirectory "$INSTDIR\plugins"
+			file "/oname=$INSTDIR\plugins\pipectl.dll" bin\Release\plugins\pipectl.dll
+
+		sectionEnd
+
 	SubSectionEnd
 
 
