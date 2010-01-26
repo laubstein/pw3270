@@ -105,7 +105,6 @@ SubSection "@PROGRAM_NAME@" SecMain
 
 	SubSectionEnd
 
-
 SubSectionEnd
 
 Section "GTK+ Runtime" SecGTK
@@ -140,7 +139,6 @@ SubSection "Extras" SecExtra
 		file "/oname=$INSTDIR\sdk\lib\lib3270.a" "bin\Release\lib3270.a"
 
 	SectionEnd
-
 
 	Section /o "Rexx extension library" SecRexxLib
 
