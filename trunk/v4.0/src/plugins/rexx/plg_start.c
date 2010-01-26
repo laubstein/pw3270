@@ -236,7 +236,7 @@
 	return (int) rc;
  }
 
- PW3270_PLUGIN_ENTRY void pw3270_plugin_startup(GtkWidget *topwindow, const gchar *script)
+ PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow, const gchar *script)
  {
 	int	 f;
 

@@ -567,6 +567,9 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
+	Trace("%s","Stopping");
+	StopPlugins();
+
 	Trace("%s","Unloading");
 	UnloadPlugins();
 

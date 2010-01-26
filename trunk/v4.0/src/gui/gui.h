@@ -248,6 +248,7 @@
 	GtkWidget 	*CreateTerminalWindow(void);
 
 	gboolean 	StartPlugins(const gchar *startup_script);
+	gboolean 	StopPlugins(void);
 
 	int 		DrawScreen(GdkColor *clr, GdkDrawable *draw);
 	void 		DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);

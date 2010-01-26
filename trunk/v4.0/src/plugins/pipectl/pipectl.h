@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270.
  *
@@ -18,54 +18,30 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como plugins.h e possui 45 linhas de código.
- *
  * Contatos:
  *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
- * erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+ * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
  * kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
  * macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
  *
  */
 
-#ifndef PLUGINS_H_INCLUDED
+#ifndef PIPECTL_H_INCLUDED
 
-	#define PLUGINS_H_INCLUDED 1
+	#define PIPECTL_H_INCLUDED 1
 
-	#include <gtk/gtk.h>
+	#include <lib3270/config.h>
+	#define ENABLE_NLS
+	#define GETTEXT_PACKAGE PACKAGE_NAME
 
-	#if defined(_WIN32)
-		#include <windows.h>
+	#include <libintl.h>
+	#include <glib/gi18n.h>
 
-		#define PW3270_PLUGIN_ENTRY	__declspec (dllexport)
-		#define LOCAL_EXTERN		extern
+	#include <lib3270/plugins.h>
+	#include <lib3270/api.h>
 
-	#else
-		#include <stdarg.h>
+	gchar *run_commands(const gchar *scr);
 
-		// http://gcc.gnu.org/wiki/Visibility
-		#if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
-				#define LOCAL_EXTERN __hidden extern
-		#elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
-				#define LOCAL_EXTERN __attribute__((visibility("hidden"))) extern
-		#else
-				#define LOCAL_EXTERN extern
-		#endif
-
-		#define PW3270_PLUGIN_ENTRY
-
-	#endif
-
-
-	PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow, const gchar *script);
-	PW3270_PLUGIN_ENTRY void pw3270_plugin_stop(GtkWidget *topwindow);
-
-/*
-	void SetHostname(const gchar *hostname);
-	void SetLUname(const gchar *luname);
-*/
-
-#endif // PLUGINS_H_INCLUDED
-
+#endif // PIPECTL_H_INCLUDED

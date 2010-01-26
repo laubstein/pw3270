@@ -489,7 +489,7 @@
 		return NULL;
 	}
 
-	Trace("%s(%s), callback: %p action: %p",__FUNCTION__,name,data->callback,data->action);
+//	Trace("%s(%s), callback: %p action: %p",__FUNCTION__,name,data->callback,data->action);
 
 	if(data->callback)
 		g_signal_connect(G_OBJECT(data->action),data->ui_type == UI_CALLBACK_TYPE_TOGGLE ? "toggled" : "activate",G_CALLBACK(data->callback),data->user_data);

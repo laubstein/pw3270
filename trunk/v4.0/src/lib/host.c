@@ -1076,3 +1076,13 @@ Disconnect_action(Widget w unused, XEvent *event, String *params,
 	host_disconnect(False);
 }
 */
+
+LIB3270_EXPORT const char	* get_connected_lu(void)
+{
+	return connected_lu;
+}
+
+LIB3270_EXPORT const char	* get_current_host(void)
+{
+	return current_host;
+}
