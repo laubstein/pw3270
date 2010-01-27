@@ -402,13 +402,13 @@ bin/Debug/plugins/rx3270$(DLLEXT): 	bin/Debug/lib3270$(DLLEXT) \
 					$(foreach SRC, $(REXX_PLG_SRC) $(REXX_COMMON_SRC), obj/Debug/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(GUI_LDFLAGS) $(REXX_LDFLAGS)
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS) $(GUI_LDFLAGS)
 
 bin/Debug/librx3270$(DLLEXT): 		bin/Debug/lib3270$(DLLEXT) \
 					$(foreach SRC, $(REXX_STD_SRC) $(REXX_COMMON_SRC), obj/Debug/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS)
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS) $(GUI_LDFLAGS)
 
 #Release
 obj/Release/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/*.h $(GLOBAL_DEPENDS)
@@ -420,7 +420,7 @@ bin/Release/plugins/rx3270$(DLLEXT): 	bin/Release/lib3270$(DLLEXT) \
 					$(foreach SRC, $(REXX_PLG_SRC) $(REXX_COMMON_SRC), obj/Release/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(GUI_LDFLAGS) $(REXX_LDFLAGS)
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS) $(GUI_LDFLAGS)
 
 bin/Release/librx3270$(DLLEXT): 		bin/Release/lib3270$(DLLEXT) \
 					$(foreach SRC, $(REXX_STD_SRC) $(REXX_COMMON_SRC), obj/Release/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
