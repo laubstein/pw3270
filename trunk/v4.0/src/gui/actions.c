@@ -508,7 +508,7 @@
 	int			state		= data->attr.key_state & (GDK_SHIFT_MASK|GDK_CONTROL_MASK|GDK_ALT_MASK);
 	int			f;
 
-	Trace("%s: %d",name,data->ui_type);
+//	Trace("%s: %d",name,data->ui_type);
 
 	switch(data->ui_type)
 	{
@@ -737,7 +737,7 @@
  void SetHostname(const gchar *hostname)
  {
 	SetString("Network","Hostname",hostname);
-	CallPlugins("SetHostname",hostname);
+	CallPlugins("pw3270_plugin_update_hostname",hostname);
  }
 
  void action_SetHostname(void)

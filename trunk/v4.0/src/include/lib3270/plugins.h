@@ -54,18 +54,15 @@
 				#define LOCAL_EXTERN extern
 		#endif
 
-		#define PW3270_PLUGIN_ENTRY
+		#define PW3270_PLUGIN_ENTRY extern
 
 	#endif
 
 
 	PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow, const gchar *script);
 	PW3270_PLUGIN_ENTRY void pw3270_plugin_stop(GtkWidget *topwindow);
-
-/*
-	void SetHostname(const gchar *hostname);
-	void SetLUname(const gchar *luname);
-*/
+	PW3270_PLUGIN_ENTRY void pw3270_plugin_update_luname(GtkWidget *topwindow, const gchar *luname);
+	PW3270_PLUGIN_ENTRY void pw3270_plugin_update_hostname(GtkWidget *topwindow, const gchar *servername);
 
 #endif // PLUGINS_H_INCLUDED
 

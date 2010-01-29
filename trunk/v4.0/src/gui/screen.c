@@ -447,7 +447,7 @@
  	if(lu)
 		luname = g_convert(lu, -1, "UTF-8", CHARSET, NULL, NULL, NULL);
 
-	CallPlugins("SetLUname",luname);
+	CallPlugins("pw3270_plugin_update_luname",luname);
 
 	DrawOIA(pixmap,color);
 
