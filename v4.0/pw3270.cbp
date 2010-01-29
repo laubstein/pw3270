@@ -433,6 +433,11 @@
 		<Unit filename="src/gui/colors.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/gui/commands.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/gui/config.c">
 			<Option compilerVar="CC" />
 		</Unit>

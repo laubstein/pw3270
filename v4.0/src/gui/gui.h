@@ -414,4 +414,8 @@
 	LOCAL_EXTERN int		  gui_console_window_append(HCONSOLE hwnd, const char *fmt, va_list args);
 	LOCAL_EXTERN char 		* gui_console_window_wait_for_user_entry(HCONSOLE hwnd);
 
+	// Command interpreter
+	LOCAL_EXTERN int		  run_command(const gchar *line, GError **error);
+
+
 #endif // GUI_H_INCLUDED

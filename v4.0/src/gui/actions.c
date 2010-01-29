@@ -377,6 +377,45 @@
 
  }
 
+/**
+ * Default script action - Call defined commands 1 by 1
+ *
+ */
+ static void action_script_activated(GtkWidget *widget, GtkWidget *topwindow)
+ {
+// 	const gchar	*filename	= g_object_get_data(G_OBJECT(widget),"script_filename");
+ 	const gchar	*text	= g_object_get_data(G_OBJECT(widget),"script_text");
+	gchar			**line;
+	int				ln;
+
+	// TODO (perry#1#): If text == NULL read it from filename
+
+	line = g_strsplit(text,"\n",-1);
+
+	for(ln = 0; line[ln]; ln++)
+	{
+		GError	*error	= NULL;
+
+		line[ln] = g_strstrip(line[ln]);
+
+		if(*line[ln] && *line[ln] != '#')
+		{
+			if(run_command(line[ln], &error))
+			{
+				if(error)
+				{
+					Warning( N_( "Error spawning %s\n%s" ), line[ln], error->message ? error->message : N_( "Unexpected error" ));
+					g_error_free(error);
+					error = NULL;
+				}
+			}
+		}
+	}
+
+	g_strfreev(line);
+
+ }
+
  void init_gui_toggles(void)
  {
  	int 		f;
@@ -469,6 +508,8 @@
 	int			state		= data->attr.key_state & (GDK_SHIFT_MASK|GDK_CONTROL_MASK|GDK_ALT_MASK);
 	int			f;
 
+	Trace("%s: %d",name,data->ui_type);
+
 	switch(data->ui_type)
 	{
 	case UI_CALLBACK_TYPE_TOGGLE:
@@ -482,6 +523,22 @@
 	case UI_CALLBACK_TYPE_SCROLL:
 		if(data->sub >= 0 && data->sub <= G_N_ELEMENTS(scroll_action))
 			scroll_action[data->sub] = data->action = gtk_action_new(name, gettext(data->attr.label ? data->attr.label : data->name), gettext(data->attr.tooltip),data->attr.stock_id);
+		break;
+
+	case UI_CALLBACK_TYPE_SCRIPT:
+		data->action = gtk_action_new(name, gettext(data->attr.label ? data->attr.label : data->name), gettext(data->attr.tooltip),data->attr.stock_id);
+
+		if(data->script.filename)
+			g_object_set_data_full(G_OBJECT(data->action),"script_filename",g_strdup(data->script.filename),g_free);
+
+		if(data->script.text)
+			g_object_set_data_full(G_OBJECT(data->action),"script_text",g_strdup(data->script.text),g_free);
+
+		if(data->callback)
+			g_signal_connect(G_OBJECT(data->action),"activate",G_CALLBACK(data->callback),topwindow);
+		else
+			g_signal_connect(G_OBJECT(data->action),"activate",G_CALLBACK(action_script_activated),topwindow);
+
 		break;
 
 	default:
