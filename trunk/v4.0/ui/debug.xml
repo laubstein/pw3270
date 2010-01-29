@@ -34,7 +34,20 @@
 
 		<menu action='FileMenu' />
 
-		<menu action='EditMenu' />
+		<menu action='EditMenu' >
+			<menuitem name='EditScreen' label='Edit screen' >
+				<script platform='linux'>gedit "%{ScreenContents}"</script>
+			</menuitem>
+
+			<menuitem name='EditCopy' label='Edit copy' >
+				<script platform='linux'>gedit "%{Clipboard}"</script>
+			</menuitem>
+
+			<menuitem name='EditSelection' label='Edit selected area' group='selection' >
+				<script platform='linux'>gedit "%{SelectedArea}"</script>
+			</menuitem>
+
+		</menu>
 
 		<menu name='View' >
 			<menuitem action='Toggle' id='DSTrace'/>

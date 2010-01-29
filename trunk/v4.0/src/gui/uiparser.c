@@ -52,20 +52,20 @@
 
  struct ui_element
  {
- 	GtkUIManagerItemType	type;
+ 	GtkUIManagerItemType		  type;
 
- 	gchar					*path;
- 	gchar					*label;
- 	gchar					*accel;
+ 	gchar						* path;
+ 	gchar						* label;
+ 	gchar						* accel;
 
-	GtkToggleAction			*view_action;
+	GtkToggleAction				* view_action;
 
- 	struct ui_element		*previous;
- 	struct ui_element		*next;
+ 	struct ui_element			* previous;
+ 	struct ui_element			* next;
 
-	guint 				  	merge_id;
+	guint 				  		  merge_id;
 
- 	gchar					name[1];
+ 	gchar						  name[1];
 
  };
 
@@ -118,8 +118,9 @@
 
 	gchar						* path;
 	struct keypad_descriptor	* current_keypad;
+	struct action_descriptor	* current_action;
 
-	const gchar					* filename;
+	const gchar				* filename;
 
 	struct ui_element			* first_element;
 	struct ui_element			* last_element;
@@ -149,12 +150,15 @@
  	// TODO (perry#1#): Convert action_name to lowercase first
 	struct action_descriptor *data	= g_hash_table_lookup(info->actions,action_name);
 
-	if(data)
-		return data;
+	if(!data)
+	{
+		// Allocate a new action
+		data = g_malloc0(sizeof(struct action_descriptor)+strlen(action_name));
+		strcpy(data->name,action_name);
+		g_hash_table_insert(info->actions,g_strdup(data->name),data);
+	}
 
-	data = g_malloc0(sizeof(struct action_descriptor)+strlen(action_name));
-	strcpy(data->name,action_name);
-	g_hash_table_insert(info->actions,g_strdup(data->name),data);
+	info->current_action = data;
 
 	return data;
  }
@@ -347,6 +351,9 @@
 	UNLOAD_ATTRIBUTE(stock_id);
 	UNLOAD_ATTRIBUTE(accel);
 	UNLOAD_ATTRIBUTE(text);
+
+	g_free(data->script.text);
+	g_free(data->script.filename);
 
 	g_free(data);
  }
@@ -605,6 +612,46 @@
 
  }
 
+ static void create_script_element(struct action_script *script,const gchar **names, const gchar **values)
+ {
+ 	const gchar *ptr = get_xml_attribute(names,values,"platform");
+
+	if(ptr)
+	{
+#ifdef linux
+		if(g_ascii_strncasecmp(ptr,"linux",5))
+		{
+			script->enabled = FALSE;
+			return;
+		}
+#endif
+
+#ifdef WIN32
+		if(g_ascii_strncasecmp(ptr,"win",3))
+		{
+			script->enabled = FALSE;
+			return;
+		}
+#endif
+	}
+
+	/* Enable script */
+	script->enabled = TRUE;
+
+	/* Get filename */
+	ptr = get_xml_attribute(names,values,"filename");
+	if(ptr)
+	{
+		if(script->filename)
+			g_free(script->filename);
+		script->filename = g_strdup(ptr);
+	}
+
+	/* Get callback from "language" attribute */
+	#warning Needs more work
+
+ }
+
  static void element_start(GMarkupParseContext *context,const gchar *element_name,const gchar **names,const gchar **values, gpointer user_data, GError **error)
  {
  	const gchar	*name = get_xml_attribute(names,values,"name");
@@ -668,6 +715,17 @@
 			create_keypad_button( ((struct parse_data *) user_data)->current_keypad,names,values);
 
 	}
+	else if(!g_ascii_strcasecmp(element_name,"script"))
+	{
+		if(!( ((struct parse_data *) user_data)->current_action))
+			g_set_error(error,xml_parse_error(),EINVAL,_("<script> element should be used only inside another active element"));
+		else
+		{
+			create_script_element( & (((struct parse_data *) user_data)->current_action->script), names, values);
+			((struct parse_data *) user_data)->current_action->ui_type = UI_CALLBACK_TYPE_SCRIPT;
+		}
+	}
+
 /*
   GTK_UI_MANAGER_PLACEHOLDER       = 1 << 3,
   GTK_UI_MANAGER_POPUP_WITH_ACCELS = 1 << 9
@@ -697,22 +755,39 @@
 
  static void element_text(GMarkupParseContext *context,const gchar *text,gsize text_len, gpointer user_data, GError **error)
  {
-/*
- 	gchar *str = g_malloc0(text_len+1);
- 	strcpy(str,text);
+ 	struct action_descriptor	*action = ((struct parse_data *) user_data)->current_action;
+ 	gchar 						*str = g_malloc0(text_len+1);
+
+ 	memcpy(str,text,text_len);
 
  	g_strstrip(str);
 
- 	if(*str && (((struct parse_data *) user_data)->current) )
- 	{
-		struct action_data *action = (((struct parse_data *) user_data)->current);
-		if(action->text)
-			g_free(action->text);
-		action->text = g_strdup(str);
- 	}
+	if(!*str)
+	{
+		g_free(str);
+		return;
+	}
 
- 	g_free(str);
-*/
+	if(!action)
+	{
+		g_set_error(error,xml_parse_error(),EINVAL,_("Expecting active element"));
+		g_free(str);
+		return;
+	}
+
+	if(!action->script.enabled)
+	{
+		g_free(str);
+		return;
+	}
+
+
+	if(action->script.text)
+		g_free(action->script.text);
+
+	action->script.text = str;
+	return;
+
  }
 
  static void element_passthrough(GMarkupParseContext *context,const gchar *passthrough_text, gsize text_len,  gpointer user_data,GError **error)

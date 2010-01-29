@@ -39,6 +39,7 @@
 	UI_CALLBACK_TYPE_DEFAULT,
 	UI_CALLBACK_TYPE_TOGGLE,
 	UI_CALLBACK_TYPE_SCROLL,
+	UI_CALLBACK_TYPE_SCRIPT,
 
 	UI_CALLBACK_TYPE_USER
  } UI_CALLBACK_TYPE;
@@ -72,6 +73,13 @@
 	GdkModifierType 		  key_state;
  };
 
+ struct action_script
+ {
+	gboolean 	enabled;
+	gchar		*text;
+	gchar		*filename;
+ };
+
  struct action_descriptor
  {
 	struct ui_attributes	  attr;
@@ -86,6 +94,8 @@
 	gpointer		 		  user_data;		/**< User data for callback */
 
 	GtkAction				* action;
+
+	struct action_script	  script;
 
 	gchar					  name[1];
  };
