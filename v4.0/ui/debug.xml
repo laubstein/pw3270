@@ -39,7 +39,7 @@
 				<script platform='linux'>gedit "%{ScreenContents}"</script>
 			</menuitem>
 
-			<menuitem name='EditCopy' label='Edit copy' >
+			<menuitem name='EditCopy' label='Edit copy' group='clipboard' >
 				<script platform='linux'>gedit "%{Clipboard}"</script>
 			</menuitem>
 

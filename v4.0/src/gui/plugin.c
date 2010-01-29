@@ -199,9 +199,9 @@
 #ifdef HAVE_PLUGINS
  static void call(GModule *handle, struct call_parameter *arg)
  {
-	void (*ptr)(const gchar *arg) = NULL;
+	void (*ptr)(GtkWidget *widget, const gchar *arg) = NULL;
 	if(g_module_symbol(handle, arg->name, (gpointer) &ptr))
-		ptr(arg->arg);
+		ptr(topwindow,arg->arg);
  }
 
  static void start_plugin(GModule *handle, struct call_parameter *arg)
