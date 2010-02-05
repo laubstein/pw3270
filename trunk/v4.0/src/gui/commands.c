@@ -69,7 +69,6 @@
 	return 0;
  }
 
-
  static gboolean parse_arguments(const gchar *command_line, gchar **tempfile, gint *argcp, gchar ***argvp, GError **error)
  {
 	int		f;
@@ -145,38 +144,114 @@
  static void process_ended(GPid pid,gint status,gchar *tempfile)
  {
  	Trace("Process %d ended with status %d",(int) pid, status);
- 	remove(tempfile);
- 	g_free(tempfile);
+ 	if(tempfile)
+ 	{
+		remove(tempfile);
+		g_free(tempfile);
+ 	}
  }
 
- int run_command(const gchar *line, GError **error)
+ int spawn_async_process(const gchar *line, GPid *pid, gchar **tempfile, GError **error)
  {
 	gint 	argc	= 0;
 	gchar	**argv	= NULL;
-	gchar	*tempfile = NULL;
 
-	if(!parse_arguments(line,&tempfile,&argc,&argv,error))
+	if(!parse_arguments(line,tempfile,&argc,&argv,error))
 	{
 		return -1;
 	}
 	else
 	{
-		GPid	pid;
-
 		// Spawn command
-		if(!g_spawn_async(NULL,argv,NULL,G_SPAWN_SEARCH_PATH|G_SPAWN_DO_NOT_REAP_CHILD,NULL,NULL,&pid,error))
+		if(!g_spawn_async(NULL,argv,NULL,G_SPAWN_SEARCH_PATH|G_SPAWN_DO_NOT_REAP_CHILD,NULL,NULL,pid,error))
 		{
 			g_strfreev(argv);
-			if(tempfile)
-				remove(tempfile);
+			if(*tempfile)
+			{
+				remove(*tempfile);
+				g_free(*tempfile);
+				*tempfile = NULL;
+			}
 			return -1;
 		}
-
-		g_child_watch_add(pid,(GChildWatchFunc) process_ended,tempfile);
-		g_strfreev(argv);
-
 	}
 
+	g_strfreev(argv);
+
+	return 0;
+ }
+
+ static const struct _internal_command
+ {
+ 	const gchar	*cmd;
+ 	int				(*call)(gint argc, const gchar **argv);
+ } internal_command[] =
+ {
+ 	// TODO (perry#1#): Implement internal commands
+ };
+
+ int run_command(const gchar *line, GError **error)
+ {
+	gchar	*tempfile	= NULL;
+	GPid	pid;
+	gint 	argc		= 0;
+	gchar	**argv		= NULL;
+	int		f;
+
+	if(!parse_arguments(line,&tempfile,&argc,&argv,error))
+		return -1;
+
+	Trace("Command \"%s\" with %d arguments",argv[0],argc);
+
+	// Check for internal commands
+	for(f=0;f<G_N_ELEMENTS(internal_command);f++)
+	{
+		if(!g_ascii_strcasecmp(argv[0],internal_command[f].cmd))
+		{
+			int rc = internal_command[f].call(argc,(const gchar **) argv);
+			if(tempfile)
+				remove(tempfile);
+			return rc;
+		}
+	}
+
+	// Check for action commands
+	if(argc == 1)
+	{
+		 GtkAction *action =  get_action_by_name(argv[0]);
+		 if(action)
+		 {
+		 	gtk_action_activate(action);
+		 	return 0;
+		 }
+	}
+
+	// Spawn external process
+	if(!g_spawn_async(NULL,argv,NULL,G_SPAWN_SEARCH_PATH|G_SPAWN_DO_NOT_REAP_CHILD,NULL,NULL,&pid,error))
+	{
+		g_strfreev(argv);
+		if(tempfile)
+		{
+			g_free(tempfile);
+			remove(tempfile);
+		}
+		return -1;
+	}
+
+	g_child_watch_add(pid,(GChildWatchFunc) process_ended,tempfile);
+
+	g_strfreev(argv);
+
+	return 0;
+
+
+/*
+
+	if(spawn_async_process(line, &pid, &tempfile, error))
+		return -1;
+
+	g_child_watch_add(pid,(GChildWatchFunc) process_ended,tempfile);
+*/
 	return 0;
  }
 

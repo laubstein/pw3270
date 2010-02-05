@@ -43,23 +43,28 @@
 
 #include "globals.h"
 
-#if !defined(_WIN32) /*[*/
-#include <sys/wait.h>
-#include <signal.h>
-#endif /*]*/
+#if !defined(_WIN32)
+	#include <sys/wait.h>
+	#include <signal.h>
+#endif
 
 #include <errno.h>
 #include <lib3270/toggle.h>
 
 
-/* Globals */
+/*---[ Globals ]------------------------------------------------------------------------------------------------*/
+
 #ifdef HAVE_LIBGNOME
 static GnomeClient *client = 0;
 #endif
 
-static const char	*cl_hostname	= NULL;
-static const char	*startup_script = NULL;
-static gchar 		*gtk_theme = NULL;
+const char			*on_lu_command		= NULL;
+
+static const char	*cl_hostname		= NULL;
+static const char	*startup_script		= NULL;
+static gchar		*gtk_theme 			= NULL;
+
+/*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
 /* Callback for connection state changes. */
 static void connect_main(int status)
@@ -313,6 +318,7 @@ static void load_options(GOptionContext *context)
 		{ "icon",	 			'i', 0, G_OPTION_ARG_FILENAME, 	&program_logo,						N_( "Path to an image file for program icon" ),							NULL },
 		{ "window-title",	 	't', 0, G_OPTION_ARG_STRING, 	&window_title,						N_( "Main window title" ),												PROGRAM_NAME },
 		{ "theme",				'T', 0, G_OPTION_ARG_FILENAME,	&gtk_theme,							N_( "Theme file (gtkrc)" ),												NULL },
+		{ "on-lu",				'L', 0, G_OPTION_ARG_STRING,	&on_lu_command,						N_( "Command to run when LU name is available" ),						NULL },
 
 #ifdef HAVE_PLUGINS
 		{ "plugins",	 		'p', 0, G_OPTION_ARG_STRING, 	&plugin_list,						N_( "Full path of plugins to load" ),									NULL },
@@ -533,7 +539,7 @@ int main(int argc, char *argv[])
 	screen_suspend();
 
 	if(cl_hostname != CN)
-		SetHostname(cl_hostname);
+		SetString("Network","Hostname",cl_hostname);
 	else
 		cl_hostname = GetString("Network","Hostname",CN);
 

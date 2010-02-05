@@ -186,39 +186,41 @@
  	extern const gchar *program_release;
  	extern const gchar *program_fullversion;
 
-	extern GtkWidget				*topwindow;
-	extern GdkPixmap				*pixmap;
-	extern GtkWidget				*SelectionPopup;
-	extern GtkWidget				*DefaultPopup;
-	extern GtkWidget				*terminal;
-	extern GdkColor					color[TERMINAL_COLOR_COUNT+1];
+	LOCAL_EXTERN const char		* on_lu_command;
+
+	LOCAL_EXTERN GtkWidget			* topwindow;
+	LOCAL_EXTERN GdkPixmap			* pixmap;
+	LOCAL_EXTERN GtkWidget			* SelectionPopup;
+	LOCAL_EXTERN GtkWidget			* DefaultPopup;
+	LOCAL_EXTERN GtkWidget			* terminal;
+	LOCAL_EXTERN GdkColor			  color[TERMINAL_COLOR_COUNT+1];
 
 #ifdef MOUSE_POINTER_CHANGE
-	extern GdkCursor        		*wCursor[CURSOR_MODE_3270];
+	extern GdkCursor        		* wCursor[CURSOR_MODE_3270];
 #endif
 
-	extern PangoFontDescription	*font;
-	extern gint					cMode;
+	extern PangoFontDescription	* font;
+	extern gint					  cMode;
 
-	extern int 					terminal_rows;
-	extern int				 		terminal_cols;
-	extern int						left_margin;
-	extern int						top_margin;
+	extern int 					  terminal_rows;
+	extern int				 		  terminal_cols;
+	extern int						  left_margin;
+	extern int						  top_margin;
 
-	extern gint					fontWidth;
-	extern gint					fontHeight;
+	extern gint					  fontWidth;
+	extern gint					  fontHeight;
 
-	extern gint					cCol;
-	extern gint					cRow;
-	extern gboolean 				WaitingForChanges;
-	extern char					*charset;
-	extern gchar 					*window_title;
-	extern gboolean				screen_suspended;
+	extern gint					  cCol;
+	extern gint					  cRow;
+	extern gboolean 				  WaitingForChanges;
+	extern char					* charset;
+	extern gchar 					* window_title;
+	extern gboolean				  screen_suspended;
 
-	extern gchar					*program_data;
-	extern gchar					*program_logo;
-	extern gchar					*program_config_file;
-	extern gchar					*program_config_filename_and_path;
+	extern gchar					* program_data;
+	extern gchar					* program_logo;
+	extern gchar					* program_config_file;
+	extern gchar					* program_config_filename_and_path;
 
 #ifdef HAVE_PLUGINS
 	extern gchar					*plugin_path;
@@ -386,8 +388,6 @@
 	int		UnloadPlugins(void);
 	void	CallPlugins(const gchar *name, const gchar *arg);
 
-	void 	SetHostname(const gchar *hostname);
-
 	enum text_layout
 	{
 		TEXT_LAYOUT_NORMAL,
@@ -416,6 +416,7 @@
 
 	// Command interpreter
 	LOCAL_EXTERN int		  run_command(const gchar *line, GError **error);
+	LOCAL_EXTERN int 		  spawn_async_process(const gchar *line, GPid *pid, gchar **tempfile, GError **error);
 
 
 #endif // GUI_H_INCLUDED

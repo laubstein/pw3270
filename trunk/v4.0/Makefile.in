@@ -35,6 +35,7 @@ PACKAGE ?= @PACKAGE@
 PACKAGE_TARNAME ?= @PACKAGE_TARNAME@
 PACKAGE_VERSION ?= @PACKAGE_VERSION@
 PACKAGE_MANAGER ?= @PACKAGE_MANAGER@
+DEFAULT_CONFIG ?= @DEFAULT_CONFIG@
 
 datarootdir ?= @datarootdir@
 docdir ?= @docdir@
@@ -501,6 +502,7 @@ install: Release po/pt_BR.po $(PACKAGE).desktop
 
 	@install --mode=644 $(PACKAGE).@LOGOEXT@ $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 $(DEFAULT_CONFIG) $(DESTDIR)/$(datarootdir)/$(PACKAGE)/@PROGRAM_NAME@.conf
 
 	@install --mode=644 src/include/lib3270.h $(DESTDIR)/@includedir@
 	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
