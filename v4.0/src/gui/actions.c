@@ -383,14 +383,26 @@
  */
  static void action_script_activated(GtkWidget *widget, GtkWidget *topwindow)
  {
-// 	const gchar	*filename	= g_object_get_data(G_OBJECT(widget),"script_filename");
+ 	const gchar	*filename	= g_object_get_data(G_OBJECT(widget),"script_filename");
  	const gchar	*text	= g_object_get_data(G_OBJECT(widget),"script_text");
 	gchar			**line;
 	int				ln;
 
-	// TODO (perry#1#): If text == NULL read it from filename
+	Trace("script_text: %p",text);
 
-	line = g_strsplit(text,"\n",-1);
+	if(text)
+	{
+		line = g_strsplit(text,"\n",-1);
+	}
+	else if(filename)
+	{
+		// TODO (perry#1#): Read and split filename contents
+		return;
+	}
+	else
+	{
+		return;
+	}
 
 	for(ln = 0; line[ln]; ln++)
 	{
@@ -404,7 +416,7 @@
 			{
 				if(error)
 				{
-					Warning( N_( "Error spawning %s\n%s" ), line[ln], error->message ? error->message : N_( "Unexpected error" ));
+					Warning( N_( "Error calling %s\n%s" ), line[ln], error->message ? error->message : N_( "Unexpected error" ));
 					g_error_free(error);
 					error = NULL;
 				}
@@ -734,12 +746,6 @@
 	SaveText(N_( "Save clipboard contents" ), GetClipboard());
  }
 
- void SetHostname(const gchar *hostname)
- {
-	SetString("Network","Hostname",hostname);
-	CallPlugins("pw3270_plugin_update_hostname",hostname);
- }
-
  void action_SetHostname(void)
  {
  	char			*hostname;
@@ -828,7 +834,7 @@
 			{
 				// Connection OK
 				again = FALSE;
-				SetHostname(buffer);
+				SetString("Network","Hostname",buffer);
 			}
 			break;
 

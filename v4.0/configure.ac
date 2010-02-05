@@ -302,6 +302,15 @@ AC_ARG_WITH([program-name],
 	pw3270_cv_progname="$PACKAGE_NAME"
 ])
 
+AC_ARG_WITH([default-config],
+	[AS_HELP_STRING([--with-default-config], [Default configuration file])],
+[
+	pw3270_cv_config="$withval"
+],[
+	pw3270_cv_config="$PACKAGE_NAME.conf"
+])
+
+
 AC_ARG_WITH([pic],
 	[AS_HELP_STRING([--with-pic], [enable support for PIC libraries (required to compile PW3270 on some systems)])],
 [
@@ -466,6 +475,7 @@ AC_SUBST(ICONFILE,$pw3270_cv_icon)
 AC_SUBST(LOGOFILE,$pw3270_cv_logo)
 
 AC_SUBST(PROGRAM_NAME,"$pw3270_cv_progname")
+AC_SUBST(DEFAULT_CONFIG,"$pw3270_cv_config")
 
 AC_SUBST(LD)
 AC_SUBST(HOST_CC)

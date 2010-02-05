@@ -54,7 +54,15 @@
 			<menuitem action='Toggle' id='EventTrace'/>
 		</menu>
 
-		<menu action='ScriptsMenu' />
+		<menu action='ScriptsMenu' >
+			<menuitem name='ReconnectScript' label='Disconnect/Connect' group='online' >
+				<script>
+				Disconnect
+				Connect
+				</script>
+			</menuitem>
+		</menu>
+
 		<menu action='NetworkMenu'/>
 
 		<menu action='SettingsMenu' />

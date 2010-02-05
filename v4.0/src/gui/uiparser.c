@@ -616,7 +616,7 @@
  {
  	const gchar *ptr = get_xml_attribute(names,values,"platform");
 
-	if(ptr)
+	if(ptr && *ptr)
 	{
 #ifdef linux
 		if(g_ascii_strncasecmp(ptr,"linux",5))
