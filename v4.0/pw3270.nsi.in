@@ -8,6 +8,9 @@ XPStyle on
 # define the directory to install to
 installDir $PROGRAMFILES\@PROGRAM_NAME@
 
+#define the installer icon
+icon "@ICONFILE@"
+
 # Get installation folder from registry if available
 InstallDirRegKey HKCU "Software\@PROGRAM_NAME@" ""
 
@@ -51,8 +54,8 @@ SubSection "@PROGRAM_NAME@" SecMain
 
 		# UI definition files
 		CreateDirectory "$INSTDIR\ui"
-		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.xml" ui\default.xml
-		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.act" ui\default.act
+
+		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.xml" bin\Release\ui\default.xml
 
 		# Locale files
 		CreateDirectory "$INSTDIR\@localedir@\pt_BR\LC_MESSAGES"
@@ -118,11 +121,11 @@ SectionEnd
 SubSection "Extras" SecExtra
 
 	Section "Right keypad" RKeypad
-		file "/oname=$INSTDIR\ui\keypad.xml" "ui\keypad.xml"
+		file "/oname=$INSTDIR\ui\keypad.xml" "bin\Release\ui\keypad.xml"
 	SectionEnd
 
 	Section /o "Function bar" FBar
-		file "/oname=$INSTDIR\ui\functions.xml" "ui\functions.xml"
+		file "/oname=$INSTDIR\ui\functions.xml" "bin\Release\ui\functions.xml"
 	SectionEnd
 
 	Section /o "Software Development Kit" SecSDK

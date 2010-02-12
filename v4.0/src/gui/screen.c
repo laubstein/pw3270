@@ -448,6 +448,7 @@
 		remove(tempfile);
 		g_free(tempfile);
  	}
+ 	g_spawn_close_pid(pid);
  }
 
  static void set_lu(const char *lu)

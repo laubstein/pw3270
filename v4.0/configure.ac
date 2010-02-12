@@ -307,9 +307,16 @@ AC_ARG_WITH([default-config],
 [
 	pw3270_cv_config="$withval"
 ],[
-	pw3270_cv_config="$PACKAGE_NAME.conf"
+	pw3270_cv_config="default.conf"
 ])
 
+AC_ARG_WITH([ui-files],
+	[AS_HELP_STRING([--with-ui-files], [User interface files])],
+[
+	pw3270_cv_ui="$withval"
+],[
+	pw3270_cv_ui="ui/default.xml ui/functions.xml ui/keypad.xml ui/debug.xml"
+])
 
 AC_ARG_WITH([pic],
 	[AS_HELP_STRING([--with-pic], [enable support for PIC libraries (required to compile PW3270 on some systems)])],
@@ -476,6 +483,7 @@ AC_SUBST(LOGOFILE,$pw3270_cv_logo)
 
 AC_SUBST(PROGRAM_NAME,"$pw3270_cv_progname")
 AC_SUBST(DEFAULT_CONFIG,"$pw3270_cv_config")
+AC_SUBST(UI_XML_FILES,"$pw3270_cv_ui")
 
 AC_SUBST(LD)
 AC_SUBST(HOST_CC)

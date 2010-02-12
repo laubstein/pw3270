@@ -48,7 +48,7 @@ EXTENSIONS ?= @EXTENSIONS@
 DLLEXT ?= @DLLEXT@
 
 TARGETS = @PROGRAM_NAME@@EXEEXT@
-UI_XML_FILES = default.xml functions.xml keypad.xml debug.xml $(PLUGINS_UI)
+UI_XML_FILES ?= @UI_XML_FILES@
 
 TMPDIR ?= /tmp
 
@@ -146,6 +146,8 @@ Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
 	@msgfmt -c -v -o bin/Release/pt_BR.mo po/pt_BR.po
 	@rm -f bin/Release/gtk-runtime
 	@if [ -d "@GTKRUNTIME@" ]; then ln -s "@GTKRUNTIME@" bin/Release/gtk-runtime ;fi
+	@mkdir -p bin/Release/ui
+	@for i in $(UI_XML_FILES); do install --mode=644 $$i bin/Release/ui; done
 	@echo @PACKAGE@ Ok!
 
 Debug:		$(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) \
@@ -467,7 +469,8 @@ pot/$(PACKAGE).pot:	$(foreach SRC, $(basename $(APP_SRCS)), pot/gui/$(SRC).pot) 
 			$(foreach SRC, $(basename $(REXX_COMMON_SRC)), pot/plugins/rexx/$(SRC).pot) \
 			$(foreach SRC, $(basename $(REXX_STD_SRC)), pot/plugins/rexx/$(SRC).pot) \
 			$(foreach SRC, $(basename $(REXX_PLG_SRC)), pot/plugins/rexx/$(SRC).pot) \
-			$(foreach SRC, $(basename $(UI_XML_FILES)), pot/ui/$(SRC).pot)
+			$(foreach SRC, $(basename $(UI_XML_FILES)), pot/$(SRC).pot) \
+			$(foreach SRC, $(basename $(PLUGINS_UI)), pot/ui/$(SRC).pot)
 
 	@rm -f $@
 	@msgcat --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
@@ -490,12 +493,9 @@ install: Release po/pt_BR.po $(PACKAGE).desktop
 
 	@for i in $(PLUGINS); do install --mode=755 bin/Release/plugins/$$i$(DLLEXT) $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins; done
 	@for i in $(PLUGINS_UI); do install --mode=644 ui/$$i $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui; done
+	@for i in $(UI_XML_FILES); do install --mode=644 $$i $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui; done
 
 	@install --mode=755 bin/Release/lib3270$(DLLEXT) $(DESTDIR)/$(LIBDIR)
-
-	@install --mode=644 ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
-	@install --mode=644 ui/debug.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
-	@install --mode=644 ui/functions.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 
 	@install --mode=644 ui/keypad.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@install --mode=644 ui/functions.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui

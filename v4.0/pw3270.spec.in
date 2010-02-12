@@ -205,6 +205,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/%{name}
 %{_datadir}/applications/*.desktop
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
+%{_datadir}/%{name}/pw3270.conf
 %{_datadir}/%{name}/ui/default.xml
 %{_datadir}/%{name}/ui/keypad.xml
 %{_datadir}/%{name}/ui/functions.xml

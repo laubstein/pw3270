@@ -33,6 +33,15 @@
  #include <lib3270/config.h>
  #include <stdlib.h>
 
+#ifdef WIN32
+	#include <sys/types.h>
+	#include <sys/stat.h>
+	#include <fcntl.h>
+#else
+	#include <glib.h>
+	#include <glib/gstdio.h>
+#endif
+
  #include "gui.h"
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
@@ -42,7 +51,10 @@
 
  static int save_in_tempfile(gchar **filename, const gchar *str)
  {
+#ifndef WIN32
  	GError	*error = NULL;
+#endif
+
 	gchar   tmpname[20];
 
 	do
@@ -53,6 +65,26 @@
 	} while(g_file_test(*filename,G_FILE_TEST_EXISTS));
 
 	Trace("Temporary file: %s",*filename);
+
+#ifdef WIN32
+
+	{
+		int fd = open(*filename,O_CREAT|O_TRUNC|O_TEXT|O_WRONLY,S_IRWXU);
+
+		if(fd < 0)
+		{
+			Warning( N_( "Can't create temporary file %s\n" ), *filename);
+			remove(*filename);
+			g_free(*filename);
+			return -1;
+		}
+
+		write(fd,str,strlen(str));
+
+		close(fd);
+	}
+
+#else
 
 	if(!g_file_set_contents(*filename,str,-1,&error))
 	{
@@ -65,6 +97,8 @@
 			g_free(*filename);
 			return -1;
 	}
+
+#endif
 
 	return 0;
  }
@@ -149,6 +183,7 @@
 		remove(tempfile);
 		g_free(tempfile);
  	}
+ 	g_spawn_close_pid(pid);
  }
 
  int spawn_async_process(const gchar *line, GPid *pid, gchar **tempfile, GError **error)
@@ -158,6 +193,7 @@
 
 	if(!parse_arguments(line,tempfile,&argc,&argv,error))
 	{
+		Trace("%s: Cant parse arguments",__FUNCTION__);
 		return -1;
 	}
 	else
@@ -165,6 +201,7 @@
 		// Spawn command
 		if(!g_spawn_async(NULL,argv,NULL,G_SPAWN_SEARCH_PATH|G_SPAWN_DO_NOT_REAP_CHILD,NULL,NULL,pid,error))
 		{
+			Trace("%s: Cant spawn process \"%s\" with %d arguments",__FUNCTION__,argv[0],argc);
 			g_strfreev(argv);
 			if(*tempfile)
 			{
@@ -242,16 +279,6 @@
 
 	g_strfreev(argv);
 
-	return 0;
-
-
-/*
-
-	if(spawn_async_process(line, &pid, &tempfile, error))
-		return -1;
-
-	g_child_watch_add(pid,(GChildWatchFunc) process_ended,tempfile);
-*/
 	return 0;
  }
 
