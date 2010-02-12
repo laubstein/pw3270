@@ -830,7 +830,7 @@
 		gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't parse UI" ) );
 
 		if(error && error->message)
-			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), error->message);
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s", error->message);
 
 		g_error_free(error);
 
@@ -856,7 +856,7 @@
 		gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't parse UI" ) );
 
 		if(error && error->message)
-			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), error->message);
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s", error->message);
 
 		g_error_free(error);
 
@@ -1264,7 +1264,7 @@
 		gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't load UI" ) );
 
 		if(error && error->message)
-			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), error->message);
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s", error->message);
 		g_error_free(error);
 
 		gtk_dialog_run(GTK_DIALOG (dialog));
