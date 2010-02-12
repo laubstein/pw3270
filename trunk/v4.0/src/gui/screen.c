@@ -485,7 +485,7 @@
 					gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't start script" ) );
 
 					if(error && error->message)
-						gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), error->message);
+						gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog) ,"%s", error->message);
 
 					g_error_free(error);
 
@@ -1040,10 +1040,10 @@
 		}
 		else
 		{
-			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), system);
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s", system);
 		}
 #else
-		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), system);
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s", system);
 #endif
 	}
 
