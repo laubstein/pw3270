@@ -55,12 +55,6 @@
 		</menu>
 
 		<menu action='ScriptsMenu' >
-			<menuitem name='ReconnectScript' label='Disconnect/Connect' group='online' >
-				<script>
-				Disconnect
-				Connect
-				</script>
-			</menuitem>
 		</menu>
 
 		<menu action='NetworkMenu'/>
@@ -74,4 +68,12 @@
 <!---			<menuitem action='Toggle' id='GDKDebug' /> --->
 		</menu>
 	</menubar>
+
+	<accelerator name='ConnectDisconnect' group='online' key='F12' >
+		<script>
+		Disconnect
+		Connect
+		</script>
+	</accelerator>
+
 </ui>
