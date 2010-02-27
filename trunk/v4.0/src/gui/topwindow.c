@@ -408,7 +408,7 @@
 
 #else
 
-	set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
+	set_action_group_sensitive_state(ACTION_GROUP_PASTE,TRUE);
 
 #endif
 

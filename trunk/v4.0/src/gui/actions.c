@@ -94,11 +94,7 @@
 	{ GDK_Right,			0,					NULL,	G_CALLBACK(action_Right)			},
 	{ GDK_Down,				0,					NULL,	G_CALLBACK(action_Down)				},
 	{ GDK_Tab,				0,					NULL,	G_CALLBACK(action_NextField)		},
-
-#ifdef WIN32
 	{ GDK_ISO_Left_Tab,		GDK_SHIFT_MASK,		NULL,	G_CALLBACK(action_PreviousField)	},
-#endif
-
 	{ GDK_KP_Left,			0,					NULL,	G_CALLBACK(action_Left)				},
 	{ GDK_KP_Up,			0,					NULL,	G_CALLBACK(action_Up)				},
 	{ GDK_KP_Right,			0,					NULL,	G_CALLBACK(action_Right)			},
