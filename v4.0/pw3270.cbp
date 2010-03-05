@@ -518,6 +518,10 @@
 		<Unit filename="src/include/lib3270/plugins.h" />
 		<Unit filename="src/include/lib3270/statusc.h" />
 		<Unit filename="src/include/lib3270/toggle.h" />
+		<Unit filename="src/lib/Makefile">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/lib/XtGlue.c">
 			<Option compilerVar="CC" />
 		</Unit>
