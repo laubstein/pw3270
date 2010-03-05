@@ -53,7 +53,7 @@ UI_XML_FILES ?= @UI_XML_FILES@
 TMPDIR ?= /tmp
 
 # Set command paths and mkfb (which has to run locally)
-MKFB = mkfb
+MKFB = bin/mkfb
 CC = @CC@
 LD = @LD@
 
@@ -435,8 +435,19 @@ bin/Release/librx3270$(DLLEXT): 		bin/Release/lib3270$(DLLEXT) \
 # Misc Targets
 ####################################################################################################
 
+src/lib/fallbacks.c: $(MKFB) src/lib/X3270.xad Makefile
+	@$(RM) $@
+	@mkdir -p `dirname $@`
+	@$(MKFB) -c src/lib/X3270.xad $@
+
+$(MKFB): src/lib/mkfb.c Makefile
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) -g -o $@ -D_WIN32 src/lib/mkfb.c
+
 bin/xml2pot: src/xml2pot.c
 	@echo $< ...
+	@mkdir -p `dirname $@`
 	@$(CC) $(GTK_CFLAGS) $(GTK_LIBS) -o $@ $<
 
 $(PACKAGE).desktop: Makefile
@@ -457,9 +468,6 @@ $(PACKAGE).ico: @ICONFILE@
 
 $(PACKAGE).@LOGOEXT@: @LOGOFILE@
 	@convert @LOGOFILE@ $@
-
-src/lib/fallbacks.c:  src/lib/X3270.xad
-	@make -C src/lib fallbacks.c
 
 src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@src/mkversion.sh
@@ -574,7 +582,7 @@ clean:
 	@rm -fr src/oxt/com
 	@rm -f	src/lib/fallbacks.c
 	@rm -f	src/lib/version.o
-	@rm -f	src/lib/mkfb.exe
+	@rm -f	$(MKFB)
 	@rm -f	src/version.c
 	@rm -f	sources.lst
 	@rm -f	$(PACKAGE)-$(PACKAGE_VERSION).tar.gz
