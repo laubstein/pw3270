@@ -99,8 +99,19 @@ static void connect_main(int status)
 	set_action_group_sensitive_state(ACTION_GROUP_ONLINE,online);
 	set_action_group_sensitive_state(ACTION_GROUP_OFFLINE,!online);
 
+#if defined( USE_SELECTIONS )
+
+	set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
+	if(online)
+		gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),update_paste_action,0);
+
+#else
+
+ 	set_action_group_sensitive_state(ACTION_GROUP_PASTE,online);
+
+#endif
+
 	keypad_set_sensitive(topwindow,online);
-//	SetKeypadSensitive(online);
 
 }
 

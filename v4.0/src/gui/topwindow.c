@@ -227,16 +227,12 @@
 
 #endif
 
-#if defined( USE_SELECTIONS ) && !defined(WIN32)
+#if defined( USE_SELECTIONS )
 
- static void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
+ void clipboard_owner_changed(GtkClipboard *clipboard, GdkEventOwnerChange *event, gpointer user_data)
  {
- 	set_action_group_sensitive_state(ACTION_GROUP_PASTE,text ? TRUE : FALSE);
- }
-
- static void clipboard_owner_changed(GtkClipboard *clipboard, GdkEventOwnerChange *event, gpointer user_data)
- {
-	gtk_clipboard_request_text(clipboard,clipboard_text_received,0);
+	if(CONNECTED)
+		gtk_clipboard_request_text(clipboard,update_paste_action,0);
  }
 
 #endif
@@ -383,33 +379,20 @@
 	action_ClearSelection();
 	ClearClipboard();
 
-#ifdef USE_PRIMARY_SELECTION
-
-	g_signal_connect(	G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_PRIMARY)),
-						"owner-change",G_CALLBACK(selection_owner_changed),0 );
-
-#endif
-
 	set_action_group_sensitive_state(ACTION_GROUP_ONLINE,FALSE);
 	set_action_group_sensitive_state(ACTION_GROUP_OFFLINE,TRUE);
 	set_action_group_sensitive_state(ACTION_GROUP_CLIPBOARD,FALSE);
+	set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
 
 	set_action_sensitive_by_name("Reselect",FALSE);
 	set_action_sensitive_by_name("PasteNext",FALSE);
 
-#if defined( USE_SELECTIONS ) && !defined( WIN32 )
+#if defined( USE_PRIMARY_SELECTION )
+	g_signal_connect(	G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_PRIMARY)),"owner-change",G_CALLBACK(selection_owner_changed),0 );
+#endif
 
-	set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
-
-	g_signal_connect(	G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_NONE)),"owner-change",G_CALLBACK(clipboard_owner_changed),0 );
-
-	// TODO (perry#1#): Request clipboard only when online to avoid enabling paste options when offline.
-	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_text_received,0);
-
-#else
-
-	set_action_group_sensitive_state(ACTION_GROUP_PASTE,TRUE);
-
+#if defined( USE_SELECTIONS )
+	g_signal_connect(G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_NONE)),"owner-change",G_CALLBACK(clipboard_owner_changed),0 );
 #endif
 
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);

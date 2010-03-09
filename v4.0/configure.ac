@@ -75,6 +75,7 @@ LD_RLSFLAGS="-Wl,--strip-all"
 LD=$CC
 PLUGINS=""
 PLUGINS_UI=""
+REXX_SYMBOL_HACK=""
 EXTENSIONS=""
 CPPUENV="gcc3"
 
@@ -87,6 +88,7 @@ case "$host" in
 		PLUGINS="pipectl $PLUGINS"
 		OS_CFLAGS="-mno-cygwin -mms-bitfields -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500"
 		OS_DLLFLAGS="-mno-cygwin -shared -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
+		REXX_SYMBOL_HACK="-Wl,--exclude-symbols,REXXAPI_NULL_THUNK_DATA -Wl,--exclude-symbols,rexx_NULL_THUNK_DATA"
 
 		# http://oldwiki.mingw.org/index.php/MSVC-MinGW-DLL
 		LD_APIFLAGS="-Wl,--warn-duplicate-exports,--output-def,\$(basename \$(@F)).def,--out-implib,\$(basename \$(@F)).a"
@@ -430,6 +432,7 @@ fi
 AC_SUBST(REXX_LIBS)
 AC_SUBST(REXX_CFLAGS)
 AC_SUBST(REXX_CONFIG)
+AC_SUBST(REXX_SYMBOL_HACK)
 
 # Other options
 

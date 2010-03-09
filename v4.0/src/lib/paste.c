@@ -206,9 +206,7 @@ LIB3270_EXPORT int lib3270_paste_string(unsigned char *str)
 			break;
 
 		default:
-			Trace("Pasting %c at %d,%d",*str,BA_TO_ROW(cursor_addr),BA_TO_COL(cursor_addr));
 			last = paste_char(&data, *str);
-			Trace("Last: %d",last);
 
 		}
 		str++;
