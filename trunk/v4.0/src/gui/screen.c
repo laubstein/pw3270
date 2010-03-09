@@ -39,6 +39,11 @@
 #include <lib3270/localdefs.h>
 #include <lib3270/toggle.h>
 
+#if _POSIX_C_SOURCE >= 1 || _XOPEN_SOURCE || _POSIX_SOURCE
+	#include <sys/types.h>
+	#include <signal.h>
+#endif
+
 #ifdef WIN32
 	#include <windows.h>
 #else
@@ -436,12 +441,13 @@
 	}
  }
 
- static gboolean lu_child_active = FALSE;
+ static GPid on_lu_pid = 0;
 
  static void lu_child_ended(GPid pid,gint status,gchar *tempfile)
  {
  	Trace("Process %d ended with status %d",(int) pid, status);
- 	lu_child_active = FALSE;
+
+ 	on_lu_pid = 0;
 
  	if(tempfile)
  	{
@@ -463,19 +469,20 @@
  	{
 		luname = g_convert(lu, -1, "UTF-8", CHARSET, NULL, NULL, NULL);
 
-		if(on_lu_command && !lu_child_active)
+		if(on_lu_command && !on_lu_pid)
 		{
-			GPid	pid;
 			GError	*error 		= NULL;
 			gchar	*tempfile	= NULL;
 
-			if(spawn_async_process(on_lu_command, &pid, &tempfile, &error))
+			if(spawn_async_process(on_lu_command, &on_lu_pid, &tempfile, &error))
 			{
+				on_lu_pid = 0;
+
 				if(error)
 				{
 					GtkWidget *dialog;
 
-					// Can't parse UI definition, notify user
+					// Can't start process, notify user
 					dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
 														GTK_DIALOG_DESTROY_WITH_PARENT,
 														GTK_MESSAGE_WARNING,
@@ -495,10 +502,55 @@
 			}
 			else
 			{
-				lu_child_active = TRUE;
-				g_child_watch_add(pid,(GChildWatchFunc) lu_child_ended, tempfile);
+				g_child_watch_add(on_lu_pid,(GChildWatchFunc) lu_child_ended, tempfile);
 			}
 		}
+ 	}
+ 	else if(on_lu_pid)
+ 	{
+#if _POSIX_C_SOURCE >= 1 || _XOPEN_SOURCE || _POSIX_SOURCE
+		Trace("Sending SIGTERM do pid %d",(int) on_lu_pid);
+
+		if(kill( (pid_t) on_lu_pid, SIGTERM) < 0)
+		{
+			GtkWidget *dialog;
+
+			// Can't kill process, notify user
+			dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+												GTK_DIALOG_DESTROY_WITH_PARENT,
+												GTK_MESSAGE_WARNING,
+												GTK_BUTTONS_OK,
+												_(  "Can't stop LU association script" ));
+
+			gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't stop script" ) );
+			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog) ,"%s", strerror(errno));
+
+			gtk_dialog_run(GTK_DIALOG (dialog));
+			gtk_widget_destroy(dialog);
+
+		}
+#elif defined( WIN32 )
+
+		if(!TerminateProcess((HANDLE) on_lu_pid, -1))
+		{
+			GtkWidget *dialog;
+
+			// Can't kill process, notify user
+			dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+												GTK_DIALOG_DESTROY_WITH_PARENT,
+												GTK_MESSAGE_WARNING,
+												GTK_BUTTONS_OK,
+												_(  "Can't stop LU association script" ));
+
+			gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't stop script" ) );
+//			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog) ,"%s", strerror(errno));
+
+			gtk_dialog_run(GTK_DIALOG (dialog));
+			gtk_widget_destroy(dialog);
+		}
+
+#endif
+
  	}
 
 	CallPlugins("pw3270_plugin_update_luname",luname);
