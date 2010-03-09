@@ -237,7 +237,14 @@
 
  }
 
- static void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
+#if defined( USE_SELECTIONS )
+ void update_paste_action(GtkClipboard *clipboard, const gchar *text, gpointer data)
+ {
+	set_action_group_sensitive_state(ACTION_GROUP_PASTE,text ? TRUE : FALSE);
+ }
+#endif
+
+ void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
  	Trace("%s",__FUNCTION__);
 	process_text_received(text);
@@ -450,4 +457,5 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
  	else
  		CopyAsText(TRUE);
  }
+
 

@@ -418,5 +418,7 @@
 	LOCAL_EXTERN int		  run_command(const gchar *line, GError **error);
 	LOCAL_EXTERN int 		  spawn_async_process(const gchar *line, GPid *pid, gchar **tempfile, GError **error);
 
+	// Clipboard
+	LOCAL_EXTERN void 		  update_paste_action(GtkClipboard *clipboard, const gchar *text, gpointer data);
 
 #endif // GUI_H_INCLUDED
