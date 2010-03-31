@@ -137,6 +137,7 @@ SubSection "Extras" SecExtra
 		file "/oname=$INSTDIR\sdk\include\lib3270.h" "src\include\lib3270.h"
 		file "/oname=$INSTDIR\sdk\include\lib3270\api.h" "src\include\lib3270\api.h"
 		file "/oname=$INSTDIR\sdk\include\lib3270\config.h" "src\include\lib3270\config.h"
+		file "/oname=$INSTDIR\sdk\include\lib3270\plugins.h" "src\include\lib3270\plugins.h"
 
 		CreateDirectory "$INSTDIR\sdk\lib"
 		file "/oname=$INSTDIR\sdk\lib\lib3270.def" "bin\Release\lib3270.def"

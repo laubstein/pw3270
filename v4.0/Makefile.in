@@ -514,7 +514,7 @@ install: Release po/pt_BR.po $(PACKAGE).desktop
 	@msgfmt -c -v -o $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo po/pt_BR.po
 
 	@mkdir -p $(DESTDIR)/$(docdir)
-	@install --mode=644 LICENÇA $(DESTDIR)/$(docdir)
+	@install --mode=644 LICENCA $(DESTDIR)/$(docdir)
 	@install --mode=644 LICENSE $(DESTDIR)/$(docdir)
 	@install --mode=644 AUTHORS $(DESTDIR)/$(docdir)
 
@@ -533,7 +533,7 @@ $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 
 	@cp AUTHORS $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 	@cp LICENSE $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
-	@cp LICENÇA $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp LICENCA $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
 
 	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
 	@cp -r image/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
