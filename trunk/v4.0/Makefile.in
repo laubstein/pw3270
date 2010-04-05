@@ -229,7 +229,7 @@ obj/Release/version.o: src/version.c
 bin/Release/@PROGRAM_NAME@@EXEEXT@: bin/Release/lib3270$(DLLEXT) $(foreach SRC, $(basename $(APP_SRCS)), obj/Release/src/gui/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) @LD_RLSFLAGS@ -o $@ $^ $(APP_LDFLAGS) $(GUI_LDFLAGS)
+	@$(CC) @LD_RLSFLAGS@ -o $@ $^ $(APP_LDFLAGS) -Wl,-rpath,$(LIBDIR) $(GUI_LDFLAGS)
 
 bin/Release/lib3270$(DLLEXT): obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
