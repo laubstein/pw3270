@@ -190,7 +190,8 @@
 
 	// build the argument string
 	memset(&argv,0,sizeof(argv));
-	MAKERXSTRING(argv, arg, strlen(arg));
+	argv.strptr = (char *) arg;
+	argv.strlength = strlen(arg);
 
 	// set up default return
 	memset(&retstr,0,sizeof(retstr));
@@ -204,15 +205,15 @@
 	if(load_rexx_script(filename,prg))
 		return -1;
 
-	return_code = RexxStart(	1,					// argument count
-								&argv,				// argument array
-								NULL,				// REXX procedure name
-								prg,				// program
-								PACKAGE_NAME,		// default address name
-								RXCOMMAND,			// calling as a subcommand
-								rexx_exit_array,	// EXITs for this call
-								&rc,				// converted return code
-								&retstr);			// returned result
+	return_code = RexxStart(	1,						// argument count
+								(PCONSTRXSTRING) &argv,	// argument array
+								NULL,					// REXX procedure name
+								prg,					// program
+								PACKAGE_NAME,			// default address name
+								RXCOMMAND,				// calling as a subcommand
+								rexx_exit_array,		// EXITs for this call
+								&rc,					// converted return code
+								&retstr);				// returned result
 
 	Trace("RexxStart(%s): %d",filename,(int) return_code);
 
