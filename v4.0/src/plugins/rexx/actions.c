@@ -86,15 +86,15 @@
 
 	// Run rexx script
 	Trace("Starting script \"%s\"",filename);
-	return_code = RexxStart(	1,					// argument count
-								&argv,				// argument array
-								NULL,				// REXX procedure name
-								prg,				// program
-								PACKAGE_NAME,		// default address name
-								RXCOMMAND,			// calling as a subcommand
-								rexx_exit_array,	// EXITs for this call
-								&rc,				// converted return code
-								&retstr);			// returned result
+	return_code = RexxStart(	1,						// argument count
+								(PCONSTRXSTRING) &argv,	// argument array
+								NULL,					// REXX procedure name
+								prg,					// program
+								PACKAGE_NAME,			// default address name
+								RXCOMMAND,				// calling as a subcommand
+								rexx_exit_array,		// EXITs for this call
+								&rc,					// converted return code
+								&retstr);				// returned result
 
 	g_free(prg->strptr);
 
