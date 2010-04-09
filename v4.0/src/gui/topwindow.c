@@ -218,7 +218,6 @@
  }
 
 #ifdef USE_PRIMARY_SELECTION
-
  static void selection_owner_changed(GtkClipboard *clipboard, GdkEventOwnerChange *event, gpointer user_data)
  {
  	if(!GTK_WIDGET_HAS_FOCUS(terminal))

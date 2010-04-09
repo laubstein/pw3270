@@ -63,6 +63,7 @@ const char			*on_lu_command		= NULL;
 static const char	*cl_hostname		= NULL;
 static const char	*startup_script		= NULL;
 static gchar		*gtk_theme 			= NULL;
+static gchar		*log_filename		= NULL;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -99,7 +100,11 @@ static void connect_main(int status)
 	set_action_group_sensitive_state(ACTION_GROUP_ONLINE,online);
 	set_action_group_sensitive_state(ACTION_GROUP_OFFLINE,!online);
 
-#if defined( USE_SELECTIONS )
+#if defined( WIN32 )
+
+	set_action_group_sensitive_state(ACTION_GROUP_PASTE,online);
+
+#elif defined( USE_SELECTIONS )
 
 	set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
 	if(online)
@@ -183,9 +188,16 @@ static int program_init(void)
 			return EINVAL;
 	}
 
-	/* If running on win32 changes to program path */
+	/* Try command-line defined log */
+	if(log_filename)
+		has_log = (Set3270Log(log_filename) == 0);
+
+	Trace("Log is %s",has_log ? "set" : "unset");
+
+	/* If running on win32 try to save log in program path */
 #if defined(_WIN32) || defined( DEBUG ) /*[*/
-	has_log = trylog(g_build_filename(program_data, G_DIR_SEPARATOR_S, logname, NULL));
+	if(!has_log)
+		has_log = trylog(g_build_filename(program_data, G_DIR_SEPARATOR_S, logname, NULL));
 #endif
 
 	/* Init Log system */
@@ -206,7 +218,6 @@ static int program_init(void)
 
 	if(!has_log)
 		has_log = trylog(g_build_filename(g_get_tmp_dir(),logname,NULL));
-
 
 	g_log_set_default_handler(log_callback,"GLog");
 
@@ -321,19 +332,20 @@ static void load_options(GOptionContext *context)
 {
 	static GOptionEntry entries[] =
 	{
-		{ "config-file",	 	'c', 0, G_OPTION_ARG_FILENAME, 	&program_config_filename_and_path,	N_( "Fixed path and filename for load/save the configuration data" ), 	NULL },
+		{ "config-file",	 	'c', 0, G_OPTION_ARG_FILENAME, 	&program_config_filename_and_path,	N_( "Fixed path and filename for load/save the configuration data" ), 	NULL			},
 		{ "config",				'C', 0, G_OPTION_ARG_STRING,	&program_config_file,				N_( "Name of configuration file (auto-search)" ),						PROGRAM_NAME ".conf" },
-		{ "host",				'h', 0, G_OPTION_ARG_STRING,	&cl_hostname,						N_( "Host identifier" ),												NULL },
-		{ "startup-script", 	's', 0, G_OPTION_ARG_FILENAME, 	&startup_script,					N_( "Run script on startup (if available)" ),							NULL },
-		{ "program-data",	 	'd', 0, G_OPTION_ARG_STRING, 	&program_data,						N_( "Path to search for data and configuration files" ),				NULL },
-		{ "icon",	 			'i', 0, G_OPTION_ARG_FILENAME, 	&program_logo,						N_( "Path to an image file for program icon" ),							NULL },
-		{ "window-title",	 	't', 0, G_OPTION_ARG_STRING, 	&window_title,						N_( "Main window title" ),												PROGRAM_NAME },
-		{ "theme",				'T', 0, G_OPTION_ARG_FILENAME,	&gtk_theme,							N_( "Theme file (gtkrc)" ),												NULL },
-		{ "on-lu",				'L', 0, G_OPTION_ARG_STRING,	&on_lu_command,						N_( "Command to run when LU name is available" ),						NULL },
+		{ "host",				'h', 0, G_OPTION_ARG_STRING,	&cl_hostname,						N_( "Host identifier" ),												NULL			},
+		{ "startup-script", 	's', 0, G_OPTION_ARG_FILENAME, 	&startup_script,					N_( "Run script on startup (if available)" ),							NULL			},
+		{ "program-data",	 	'd', 0, G_OPTION_ARG_STRING, 	&program_data,						N_( "Path to search for data and configuration files" ),				NULL			},
+		{ "icon",	 			'i', 0, G_OPTION_ARG_FILENAME, 	&program_logo,						N_( "Path to an image file for program icon" ),							NULL			},
+		{ "window-title",	 	't', 0, G_OPTION_ARG_STRING, 	&window_title,						N_( "Main window title" ),												PROGRAM_NAME	},
+		{ "theme",				'T', 0, G_OPTION_ARG_FILENAME,	&gtk_theme,							N_( "Theme file (gtkrc)" ),												NULL 			},
+		{ "log",				'l', 0, G_OPTION_ARG_FILENAME,	&log_filename,						N_( "Log file" ),														NULL			},
+		{ "on-lu",				'L', 0, G_OPTION_ARG_STRING,	&on_lu_command,						N_( "Command to run when LU name is available" ),						NULL			},
 
 #ifdef HAVE_PLUGINS
-		{ "plugins",	 		'p', 0, G_OPTION_ARG_STRING, 	&plugin_list,						N_( "Full path of plugins to load" ),									NULL },
-		{ "plugin-path",	 	'P', 0, G_OPTION_ARG_STRING, 	&plugin_path,						N_( "Path to search for plugins" ),										NULL },
+		{ "plugins",	 		'p', 0, G_OPTION_ARG_STRING, 	&plugin_list,						N_( "Full path of plugins to load" ),									NULL			},
+		{ "plugin-path",	 	'P', 0, G_OPTION_ARG_STRING, 	&plugin_path,						N_( "Path to search for plugins" ),										NULL			},
 #endif
 
 		{ NULL }

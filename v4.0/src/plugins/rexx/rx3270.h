@@ -70,6 +70,7 @@
 		#define REXXV3
 		#define REXXENTRY 		APIENTRY
 		#define RexxReturnCode	ULONG
+		#define PCONSTRXSTRING	RXSTRING *
 		typedef void *REXXPFN;
 
 	#else

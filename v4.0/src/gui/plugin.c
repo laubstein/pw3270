@@ -90,7 +90,7 @@
 	else
 	{
 		Trace("Can't load %s: %s",filename,g_module_error());
-		Log("Can't load %s: %s",filename,g_module_error());
+		Log("Can't load \"%s\": %s",filename,g_module_error());
 	}
  }
 
@@ -141,7 +141,28 @@
 		if(list)
 		{
 			for(f=0;list[f];f++)
-				load_plugin(list[f]);
+			{
+				if(g_file_test(list[f],G_FILE_TEST_EXISTS))
+				{
+					load_plugin(list[f]);
+				}
+				else
+				{
+					GtkWidget *dialog;
+
+					dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+														GTK_DIALOG_DESTROY_WITH_PARENT,
+														GTK_MESSAGE_WARNING,
+														GTK_BUTTONS_OK,
+														_(  "Can't load \"%s\"" ), list[f]);
+
+					gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't load plugin" ) );
+					gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), _( "The required plugin file wasn't found" ));
+					gtk_dialog_run(GTK_DIALOG (dialog));
+					gtk_widget_destroy(dialog);
+
+				}
+			}
 			g_strfreev(list);
 		}
 	}
