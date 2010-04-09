@@ -145,6 +145,12 @@ SubSection "Extras" SecExtra
 
 	SectionEnd
 
+	Section /o "Debug & Trace menus" SecDBGMenu
+
+		file "/oname=$INSTDIR\ui\debug.xml" "bin\Release\ui\debug.xml"
+
+	SectionEnd
+
 	Section /o "Rexx extension library" SecRexxLib
 
 		setOutPath $PROGRAMFILES\ooRexx

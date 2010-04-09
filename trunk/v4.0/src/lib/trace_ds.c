@@ -240,15 +240,12 @@ trace_dsn(const char *fmt, ...)
  */
 static void vwtrace(const char *fmt, va_list args)
 {
-
-#if defined (LIB3270)
-
 	char buf[16384];
 
 	vsnprintf(buf,16384,fmt,args);
 
 	if(!tracewindow_handle)
-		tracewindow_handle = console_window_new( "Trace Window", NULL );
+		tracewindow_handle = console_window_new( _( "Trace Window" ), NULL );
 
 	if(tracewindow_handle)
 		console_window_append(tracewindow_handle,"%s",buf);
@@ -256,52 +253,8 @@ static void vwtrace(const char *fmt, va_list args)
 	if(tracef != NULL)
 	{
 		if(fwrite(buf,strlen(buf),1,tracef) != 1)
-			popup_an_errno(errno,"Write to trace file failed");
+			popup_an_errno(errno,_( "Write to trace file failed\n%s" ),strerror(errno));
 	}
-
-#else
-
-	if (tracef_bufptr != CN) {
-		tracef_bufptr += vsprintf(tracef_bufptr, fmt, args);
-	} else if (tracef != NULL) {
-		int n2w, nw;
-		char buf[16384];
-
-		buf[0] = 0;
-		(void) vsnprintf(buf, sizeof(buf), fmt, args);
-		buf[sizeof(buf) - 1] = '\0';
-		n2w = strlen(buf);
-
-		nw = fwrite(buf, n2w, 1, tracef);
-		if (nw == 1) {
-			tracef_size += nw;
-			fflush(tracef);
-		} else {
-			if (errno != EPIPE
-#if defined(EILSEQ) /*[*/
-					   && errno != EILSEQ
-#endif /*]*/
-					                     )
-				popup_an_errno(errno,
-				    "Write to trace file failed");
-#if defined(EILSEQ) /*[*/
-			if (errno != EILSEQ)
-#endif /*]*/
-				stop_tracing();
-		}
-		if (tracef_pipe != NULL) {
-			nw = fwrite(buf, n2w, 1, tracef_pipe);
-			if (nw != 1) {
-				(void) fclose(tracef_pipe);
-				tracef_pipe = NULL;
-			} else {
-			    	fflush(tracef_pipe);
-			}
-		}
-	}
-
-#endif
-
 }
 
 /* Write to the trace file. */
@@ -611,27 +564,16 @@ get_devfd(const char *pathname)
 }
 
 /* Callback for "OK" button on trace popup */
-static void
-tracefile_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
+static void tracefile_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 {
 	char *tfn = CN;
 	int devfd = -1;
-#if defined(X3270_DISPLAY) /*[*/
-	int pipefd[2];
-	Boolean just_piped = False;
-#endif /*]*/
 	char *buf;
-
-#if defined(X3270_DISPLAY) /*[*/
-	if (w)
-		tfn = XawDialogGetValueString((Widget)client_data);
-	else
-#endif /*]*/
 
 	tfn = (char *)client_data;
 	tfn = do_subst(tfn, True, True);
-	if (strchr(tfn, '\'') ||
-	    ((int)strlen(tfn) > 0 && tfn[strlen(tfn)-1] == '\\')) {
+	if (strchr(tfn, '\'') || ((int)strlen(tfn) > 0 && tfn[strlen(tfn)-1] == '\\'))
+	{
 		popup_an_error("Illegal file name: %s", tfn);
 		Free(tfn);
 		return;
@@ -641,162 +583,43 @@ tracefile_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 	tracef_midpoint = 0;
 	Replace(tracef_midpoint_header, CN);
 
-	if (!strcmp(tfn, "stdout")) {
+	if (!strcmp(tfn, "stdout"))
+	{
 		tracef = stdout;
-	} else {
-#if defined(X3270_DISPLAY) /*[*/
-		FILE *pipefile = NULL;
+	}
+	else
+	{
+		/* Get the trace file maximum. */
+		get_tracef_max();
 
-		if (!strcmp(tfn, "none") || !tfn[0]) {
-			just_piped = True;
-			if (!appres.trace_monitor) {
-				popup_an_error("Must specify a trace file "
-				    "name");
-				free(tfn);
-				return;
-			}
-		}
-
-		if (appres.trace_monitor) {
-			if (pipe(pipefd) < 0) {
-				popup_an_errno(errno, "pipe() failed");
-				Free(tfn);
-				return;
-			}
-			pipefile = fdopen(pipefd[1], "w");
-			if (pipefile == NULL) {
-				popup_an_errno(errno, "fdopen() failed");
-				(void) close(pipefd[0]);
-				(void) close(pipefd[1]);
-				Free(tfn);
-				return;
-			}
-			(void) SETLINEBUF(pipefile);
-			(void) fcntl(pipefd[1], F_SETFD, 1);
-		}
-
-		if (just_piped) {
-			tracef = pipefile;
-		} else
-#endif /*]*/
+		/* If there's a limit, the file can't exist. */
+		if (tracef_max && !access(tfn, R_OK))
 		{
-#if defined(X3270_DISPLAY) /*[*/
-			tracef_pipe = pipefile;
-#endif /*]*/
-			/* Get the trace file maximum. */
-			get_tracef_max();
+			popup_an_error("Trace file '%s' already exists",tfn);
+			Free(tfn);
+			return;
+		}
 
-			/* If there's a limit, the file can't exist. */
-			if (tracef_max && !access(tfn, R_OK)) {
-				popup_an_error("Trace file '%s' already exists",
-				    tfn);
-#if defined(X3270_DISPLAY) /*[*/
-				fclose(tracef_pipe);
-				(void) close(pipefd[0]);
-				(void) close(pipefd[1]);
-#endif /*]*/
-				Free(tfn);
-				return;
-			}
-
-			/* Open and configure the file. */
-			if ((devfd = get_devfd(tfn)) >= 0)
-				tracef = fdopen(dup(devfd), "a");
-			else
-				tracef = fopen(tfn, tracef_max? "w+": "a");
-			if (tracef == (FILE *)NULL) {
-				popup_an_errno(errno, tfn);
-#if defined(X3270_DISPLAY) /*[*/
-				fclose(tracef_pipe);
-				(void) close(pipefd[0]);
-				(void) close(pipefd[1]);
-#endif /*]*/
-				Free(tfn);
-				return;
-			}
-			(void) SETLINEBUF(tracef);
+		/* Open and configure the file. */
+		if ((devfd = get_devfd(tfn)) >= 0)
+			tracef = fdopen(dup(devfd), "a");
+		else
+			tracef = fopen(tfn, tracef_max? "w+": "a");
+		if (tracef == (FILE *)NULL)
+		{
+			popup_an_errno(errno, tfn);
+			Free(tfn);
+			return;
+		}
+		(void) SETLINEBUF(tracef);
 #if !defined(_WIN32) /*[*/
-			(void) fcntl(fileno(tracef), F_SETFD, 1);
+		(void) fcntl(fileno(tracef), F_SETFD, 1);
 #endif /*]*/
-		}
 	}
-
-#if defined(X3270_DISPLAY) /*[*/
-	/* Start the monitor window */
-	if (tracef != stdout && appres.trace_monitor) {
-		switch (tracewindow_pid = fork_child()) {
-		    case 0:	/* child process */
-			{
-				char cmd[64];
-
-				(void) sprintf(cmd, "cat <&%d", pipefd[0]);
-				(void) execlp("xterm", "xterm",
-				    "-title", just_piped? "trace": tfn,
-				    "-sb", "-e", "/bin/sh", "-c",
-				    cmd, CN);
-			}
-			(void) perror("exec(xterm) failed");
-			_exit(1);
-		    default:	/* parent */
-			(void) close(pipefd[0]);
-			++children;
-			break;
-		    case -1:	/* error */
-			popup_an_errno(errno, "fork() failed");
-			break;
-		}
-	}
-#endif /*]*/
-
-#if defined (LIB3270)
 
 	/* Open pw3270's console window */
-
 	if(!tracewindow_handle)
-		tracewindow_handle = console_window_new( "Trace Window", NULL );
-
-#elif defined(_WIN32) /*[*/
-
-	/* Start the monitor window. */
-
-	#warning Find a better way
-
-	if (tracef != stdout && appres.trace_monitor) {
-		STARTUPINFO startupinfo;
-		PROCESS_INFORMATION process_information;
-		char *path;
-		char *args;
-
-	    	(void) memset(&startupinfo, '\0', sizeof(STARTUPINFO));
-		startupinfo.cb = sizeof(STARTUPINFO);
-		startupinfo.lpTitle = tfn;
-		(void) memset(&process_information, '\0',
-			      sizeof(PROCESS_INFORMATION));
-		path = xs_buffer("%scatf.exe", PROGRAM_BIN);
-		args = xs_buffer("\"%scatf.exe\" \"%s\"", PROGRAM_BIN, tfn);
-		if (CreateProcess(
-		    path,
-		    args,
-		    NULL,
-		    NULL,
-		    FALSE,
-		    CREATE_NEW_CONSOLE,
-		    NULL,
-		    NULL,
-		    &startupinfo,
-		    &process_information) == 0) {
-		    	popup_an_error("CreateProcess(%s) failed: %s",
-				path, win32_strerror(GetLastError()));
-			Free(path);
-			Free(args);
-		} else {
-			Free(path);
-		    	Free(args);
-			tracewindow_handle = process_information.hProcess;
-			CloseHandle(process_information.hThread);
-		}
-	}
-#endif /*]*/
+		tracewindow_handle = console_window_new( tfn, NULL );
 
 	Free(tfn);
 
@@ -809,11 +632,6 @@ tracefile_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 	buf = create_tracefile_header("started");
 	wtrace("%s", buf);
 	Free(buf);
-
-#if defined(X3270_DISPLAY) /*[*/
-	if (w)
-		XtPopdown(trace_shell);
-#endif /*]*/
 
 }
 
