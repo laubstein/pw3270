@@ -826,7 +826,7 @@ void notify_toggle_changed(int ix, int value, int reason)
 		callbacks->toggle_changed(ix,value,reason,toggle_names[ix]);
 }
 
-LIB3270_EXPORT void	update_toggle_actions(void)
+LIB3270_EXPORT void update_toggle_actions(void)
 {
 	int f;
 
@@ -949,3 +949,4 @@ LIB3270_EXPORT char * console_window_wait_for_user_entry(HCONSOLE hwnd)
 		return callbacks->console_entry(hwnd);
 	return NULL;
 }
+

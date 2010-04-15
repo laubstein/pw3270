@@ -56,16 +56,15 @@
 
  static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer data )
  {
- 	Trace("%s","Destroying top-window");
+ 	Trace("%s called - Destroying top-window",__FUNCTION__);
  	action_Save();
- 	gtk_main_quit();
  	Trace("%s","Ok");
     return FALSE;
  }
 
  static void destroy( GtkWidget *widget, gpointer   data )
  {
- 	Trace("%s","Destroying top-window");
+ 	Trace("%s called - Destroying top-window %p",__FUNCTION__,topwindow);
  	topwindow = NULL;
 	program_quit();
  	Trace("%s","Ok");
@@ -220,7 +219,7 @@
 #ifdef USE_PRIMARY_SELECTION
  static void selection_owner_changed(GtkClipboard *clipboard, GdkEventOwnerChange *event, gpointer user_data)
  {
- 	if(!GTK_WIDGET_HAS_FOCUS(terminal))
+ 	if(terminal && !GTK_WIDGET_HAS_FOCUS(terminal))
 		action_ClearSelection();
  }
 
@@ -408,6 +407,7 @@
 
  void program_quit(void)
  {
+ 	Trace("%s called, disconnecting",__FUNCTION__);
  	host_disconnect(0);
 	gtk_main_quit();
  }

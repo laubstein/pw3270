@@ -408,7 +408,6 @@
     return RXFUNC_OK;
  }
 
-
  RexxReturnCode REXXENTRY rx3270SetCharset(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
 	if(!Argc)
@@ -419,4 +418,80 @@
 	rexx_charset = g_strdup(Argv->strptr);
 
     return RetValue(Retstr,0);
+ }
+
+ void pw3270_call_rexx_script(GtkAction *action, GtkWidget *program_window)
+ {
+	LONG      			return_code;                 	// interpreter return code
+#ifdef CONSTRXSTRING
+	CONSTRXSTRING		argv;           	          	// program argument string
+#else
+	RXSTRING			argv;           	          	// program argument string
+#endif
+	RXSTRING			retstr;                      	// program return value
+	RXSTRING			prg[2];							// Program data
+	short     			rc			= 0;               	// converted return code
+
+ 	const gchar		*filename	= g_object_get_data(G_OBJECT(action),"script_filename");
+ 	const gchar		*text		= g_object_get_data(G_OBJECT(action),"script_text");
+
+ 	Trace("%s starts",__FUNCTION__);
+
+	if(lock_rexx_script_engine(program_window))
+		return;
+
+	// build the argument string
+	memset(&argv,0,sizeof(argv));
+	argv.strptr = "";
+	argv.strlength = strlen(argv.strptr);
+
+	// set up default return
+	memset(&retstr,0,sizeof(retstr));
+
+	Trace("%s","Running pending events");
+	RunPendingEvents(0);
+
+	/* Preload script file contents */
+	memset(prg,0,2*sizeof(RXSTRING));
+
+	if(text)
+	{
+		prg[0].strptr		= (char *) text;
+		prg[0].strlength	= strlen(prg[0].strptr);
+	}
+	else if(load_rexx_script(filename,prg))
+	{
+		return;
+	}
+
+	return_code = RexxStart(	1,						// argument count
+								(PCONSTRXSTRING) &argv,	// argument array
+								NULL,					// REXX procedure name
+								prg,					// program
+								PACKAGE_NAME,			// default address name
+								RXCOMMAND,				// calling as a subcommand
+								rexx_exit_array,		// EXITs for this call
+								&rc,					// converted return code
+								&retstr);				// returned result
+
+	Trace("RexxStart(%s): %d",filename,(int) return_code);
+
+	if(!text)
+		g_free(prg[0].strptr);
+
+	// process return value
+	Trace("Return value: \"%s\"",retstr.strptr);
+
+	if(RXSTRPTR(prg[1]))
+		RexxFreeMemory(RXSTRPTR(prg[1]));
+
+	if(RXSTRPTR(retstr))
+		RexxFreeMemory(RXSTRPTR(retstr));
+
+	Trace("Call of \"%s\" ends (rc=%d return_code=%d)",filename,rc,(int) return_code);
+
+	// Check script state
+	rc = unlock_rexx_script_engine(program_window, filename, rc, return_code);
+
+ 	Trace("%s ends",__FUNCTION__);
  }
