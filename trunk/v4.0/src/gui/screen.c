@@ -1107,13 +1107,23 @@
  static void warning(const char *fmt, va_list arg)
  {
  	gchar		*msg	= g_strdup_vprintf(gettext(fmt),arg);
- 	GtkWidget 	*dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
-													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_WARNING,
-													GTK_BUTTONS_CLOSE,
-													"%s",msg );
+ 	GtkWidget 	*dialog;
 
  	g_warning("%s",msg);
+
+	if(!topwindow)
+	{
+		g_free(msg);
+		return;
+	}
+
+ 	dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+										GTK_DIALOG_DESTROY_WITH_PARENT,
+										GTK_MESSAGE_WARNING,
+										GTK_BUTTONS_CLOSE,
+										"%s",msg );
+
+	Trace("msg: %s dialog: %p topwindow: %p",msg,dialog,topwindow);
 
 	gtk_dialog_run(GTK_DIALOG (dialog));
 	gtk_widget_destroy(dialog);
@@ -1213,3 +1223,4 @@
 		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
 
  }
+

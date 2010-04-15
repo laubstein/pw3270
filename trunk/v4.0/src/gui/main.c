@@ -580,6 +580,7 @@ int main(int argc, char *argv[])
 
 		// Run main loop
 		gtk_main();
+		Trace("%s --- Loop de mensagems encerrou",__FUNCTION__);
 	}
 	else
 	{

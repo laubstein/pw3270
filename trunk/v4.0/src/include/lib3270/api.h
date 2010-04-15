@@ -412,6 +412,7 @@
 		LIB3270_EXPORT int 			  Get3270Socket(void);
 		LIB3270_EXPORT void 		  popup_an_error(const char *fmt, ...);
 		LIB3270_EXPORT void 		  popup_system_error(const char *title, const char *message, const char *system);
+		LIB3270_EXPORT void 		  popup_a_sockerr(char *fmt, ...);
 		LIB3270_EXPORT STATUS_CODE	  query_3270_terminal_status(void);
 
 		/* Get connection info */

@@ -309,8 +309,8 @@
  {
 
 	struct action_descriptor	* data			= NULL;
- 	const gchar					* action_name	= get_xml_attribute(names,values,"name");
- 	const gchar					* callback_name	= get_xml_attribute(names,values,"action");
+ 	const gchar				* action_name	= get_xml_attribute(names,values,"name");
+ 	const gchar				* callback_name	= get_xml_attribute(names,values,"action");
  	gchar						* ptr;
 	UI_CALLBACK					  cbk;
 
@@ -337,7 +337,7 @@
 	data->user_data	= cbk.user_data;
 
 	if(cbk.label && !data->attr.label)
-			data->attr.label = g_strdup(cbk.label);
+		data->attr.label = g_strdup(cbk.label);
 
 	return data;
  }
@@ -648,7 +648,11 @@
 	}
 
 	/* Get callback from "language" attribute */
-	#warning Needs more work
+#ifdef HAVE_PLUGINS
+	ptr = get_xml_attribute(names,values,"language");
+	if(ptr && *ptr && get_symbol_by_name(NULL, (gpointer) &script->callback, "pw3270_call_%s_script", ptr))
+		return;
+#endif
 
  }
 

@@ -383,8 +383,8 @@ static union {
 } haddr;
 socklen_t ha_len = sizeof(haddr);
 
-#if defined(_WIN32) /*[*/
-void popup_a_sockerr(char *fmt, ...)
+#if defined(_WIN32)
+LIB3270_EXPORT void popup_a_sockerr(char *fmt, ...)
 {
 	va_list args;
 	char buffer[4096];
@@ -396,9 +396,8 @@ void popup_a_sockerr(char *fmt, ...)
 	popup_system_error( N_( "Network error" ), buffer, win32_strerror(socket_errno()));
 
 }
-#else /*][*/
-void
-popup_a_sockerr(char *fmt, ...)
+#else
+LIB3270_EXPORT void popup_a_sockerr(char *fmt, ...)
 {
 	va_list args;
 	char buffer[4096];
@@ -410,7 +409,7 @@ popup_a_sockerr(char *fmt, ...)
 	popup_system_error( N_( "Network error" ), buffer, strerror(errno));
 
 }
-#endif /*]*/
+#endif
 
 /*
  * net_connect
@@ -984,6 +983,7 @@ net_input(void)
 					strcpy(err_buf, "unknown error");
 				trace_dsn("RCVD SSL_read error %ld (%s)\n", e,
 				    err_buf);
+
 				popup_an_error("SSL_read:\n%s", err_buf);
 				host_disconnect(True);
 				return;
@@ -3212,7 +3212,8 @@ ssl_init(void)
 	SSL_CTX_set_info_callback(ssl_ctx, client_info_callback);
 
 	/* XXX: May need to get key file and password. */
-	if (appres.cert_file) {
+	if (appres.cert_file)
+	{
 		if (!(SSL_CTX_use_certificate_chain_file(ssl_ctx,
 						appres.cert_file))) {
 			unsigned long e;
@@ -3231,40 +3232,40 @@ ssl_init(void)
 }
 
 /* Callback for tracing protocol negotiation. */
-static void
-client_info_callback(INFO_CONST SSL *s, int where, int ret)
+static void client_info_callback(INFO_CONST SSL *s, int where, int ret)
 {
-	if (where == SSL_CB_CONNECT_LOOP) {
-		trace_dsn("SSL_connect: %s %s\n",
-		    SSL_state_string(s), SSL_state_string_long(s));
-	} else if (where == SSL_CB_CONNECT_EXIT) {
-		if (ret == 0) {
-			trace_dsn("SSL_connect: failed in %s\n",
-			    SSL_state_string_long(s));
-		} else if (ret < 0) {
+	if (where == SSL_CB_CONNECT_LOOP)
+	{
+		trace_dsn("SSL_connect: %s %s\n",SSL_state_string(s), SSL_state_string_long(s));
+	}
+	else if (where == SSL_CB_CONNECT_EXIT)
+	{
+		if (ret == 0)
+		{
+			trace_dsn("SSL_connect: failed in %s\n",SSL_state_string_long(s));
+		}
+		else if (ret < 0)
+		{
 			unsigned long e;
 			char err_buf[1024];
 
-			err_buf[0] = '\n';
 			e = ERR_get_error();
 			if (e != 0)
 				(void) ERR_error_string(e, err_buf + 1);
 #if defined(_WIN32) /*[*/
 			else if (GetLastError() != 0)
-				strcpy(err_buf + 1,
-					win32_strerror(GetLastError()));
+				strncpy(err_buf,win32_strerror(GetLastError()),1023);
 #else /*][*/
 			else if (errno != 0)
-				strcpy(err_buf + 1, strerror(errno));
+				strncpy(err_buf, strerror(errno),1023);
 #endif /*]*/
 			else
 				err_buf[0] = '\0';
-			trace_dsn("SSL_connect: error in %s%s\n",
-			    SSL_state_string_long(s),
-			    err_buf);
-			popup_an_error("SSL_connect: error in %s%s",
-			    SSL_state_string_long(s),
-			    err_buf);
+
+			trace_dsn("SSL_connect: error in %s\n%s\n",SSL_state_string_long(s),err_buf);
+
+			popup_system_error(_( "SSL Connect error" ), SSL_state_string_long(s), err_buf);
+
 		}
 	}
 }

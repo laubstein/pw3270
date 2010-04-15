@@ -242,10 +242,17 @@
             Warning( N_( "Negotiation with %s failed!" ),host);
         }
 
-        gtk_widget_set_sensitive(topwindow,TRUE);
-        gtk_widget_grab_focus(terminal);
+		Trace("Topwindow: %p Terminal: %p",topwindow,terminal);
+
+		if(topwindow)
+			gtk_widget_set_sensitive(topwindow,TRUE);
+
+		if(terminal)
+			gtk_widget_grab_focus(terminal);
 
     }
+
+	Trace("%s ends",__FUNCTION__);
 
  }
 
@@ -542,7 +549,9 @@
 		if(data->script.text)
 			g_object_set_data_full(G_OBJECT(data->action),"script_text",g_strdup(data->script.text),g_free);
 
-		if(data->callback)
+		if(data->script.callback)
+			g_signal_connect(G_OBJECT(data->action),"activate",G_CALLBACK(data->script.callback),topwindow);
+		else if(data->callback)
 			g_signal_connect(G_OBJECT(data->action),"activate",G_CALLBACK(data->callback),topwindow);
 		else
 			g_signal_connect(G_OBJECT(data->action),"activate",G_CALLBACK(action_script_activated),topwindow);
