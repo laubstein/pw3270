@@ -61,7 +61,7 @@ if [ ! -f $REV_FILE ]; then
 	exit -1
 fi
 
-echo "pw3270 $PACKAGE_VERSION-$PACKAGE_RELEASE"
+echo "pw3270 $PACKAGE_VERSION-$PACKAGE_RELEASE Ok"
 
 
 
