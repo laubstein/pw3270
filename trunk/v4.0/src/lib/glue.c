@@ -155,9 +155,17 @@ const char *toggle_names[N_TOGGLES] =
 
 int lib3270_init(void)
 {
+	static int configured = 0;
 	int 	ovc, ovr;
 	int 	model_number;
 	char	junk;
+
+	Trace("%s - configured=%d",__FUNCTION__,configured);
+
+	if(configured)
+		return EBUSY;
+
+	configured = 1;
 
 #if defined(_WIN32)
 

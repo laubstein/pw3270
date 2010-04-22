@@ -74,6 +74,7 @@ LD_APIFLAGS=""
 LD_RLSFLAGS="-Wl,--strip-all"
 LD=$CC
 PLUGINS=""
+TARGETS=""
 PLUGINS_UI=""
 REXX_SYMBOL_HACK=""
 EXTENSIONS=""
@@ -99,10 +100,14 @@ case "$host" in
 		OS_APPSRCS="resources.rc"
 		LOGOEXT="gif"
 		localedir="locale"
+
+		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/win32"
+		java_ldflags="-Wl,--exclude-symbols,jvm_NULL_THUNK_DATA -L\$(JDK_HOME)/lib -Wl,-rpath,\$(JRE_HOME)/bin/client -ljvm"
+
+
 		;;
 
 	*)
-
 		AC_CHECK_FILE("/opt/openoffice.org/basis3.0/program/unorc",oo_home="/opt/openoffice.org",oo_home="none")
 		AC_CHECK_FILE("/opt/broffice.org3/program/soffice.bin",oo_home="/opt/broffice.org3",)
 		AC_CHECK_FILE("/usr/lib/ooo3/program/soffice.bin",oo_home="/usr/lib/ooo3",)
@@ -114,6 +119,8 @@ case "$host" in
 		AC_CHECK_FILE("/opt/openoffice.org/basis3.0/sdk/bin/idlc",oo_sdk_home="/opt/openoffice.org/basis3.0/sdk",oo_sdk_home="none")
 		AC_CHECK_FILE("/opt/openoffice.org/basis3.1/sdk/bin/idlc",oo_sdk_home="/opt/openoffice.org/basis3.1/sdk",)
 
+		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
+		java_ldflags="-L\$(JRE_HOME)/lib/i386/client -Wl,-rpath,\$(JRE_HOME)/lib/i386/client -ljvm"
 esac
 
 # Check for iconv
@@ -329,6 +336,46 @@ AC_ARG_WITH([pic],
 ])
 
 #
+# Check for java options
+#
+AC_ARG_WITH([jdk-home],
+	[AS_HELP_STRING([--with-jdk-home], [Define java sdk home])],
+[
+	JDK_HOME="$withval"
+], )
+
+AC_ARG_WITH([jre-home],
+	[AS_HELP_STRING([--with-jre-home], [Define java runtime home])],
+[
+	JRE_HOME="$withval"
+], )
+
+AC_ARG_ENABLE([java],
+	[AS_HELP_STRING([--disable-java], [disable building of java plugin])],
+[
+	pw3270_cv_java="$enableval"
+],[
+	AC_CHECK_FILE("$JDK_HOME/include/jni.h",pw3270_cv_java="yes",pw3270_cv_java="no")
+])
+
+AC_ARG_WITH([jnidir],
+	[AS_HELP_STRING([--with-jnidir], [jni libraries path])],
+[
+	jnidir="$withval"
+],[
+	jnidir="\$(LIBDIR)/java"
+] )
+
+AC_ARG_WITH([jvmjardir],
+	[AS_HELP_STRING([--with-jvmjardir], [JAR files installation path])],
+[
+	jardir="$withval"
+],[
+	jardir="\$(LIBDIR)/jvm-exports"
+] )
+
+
+#
 # Check for OpenOffice.org
 #
 AC_ARG_WITH([office-home],
@@ -364,6 +411,10 @@ AC_ARG_WITH([office-types],
 	types_rdb="$withval"
 ] )
 
+AC_SUBST(JDK_HOME,$JDK_HOME)
+AC_SUBST(JRE_HOME,$JRE_HOME)
+AC_SUBST(JAVA_CFLAGS,$java_cflags)
+AC_SUBST(JAVA_LDFLAGS,$java_ldflags)
 
 AC_PATH_PROG([UNOPKG], unopkg, [$oo_home/program/unopkg] )
 AC_PATH_PROG([IDLC], idlc, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
@@ -444,7 +495,6 @@ if test "$pw3270_cv_plugins" == "yes"; then
 	AC_DEFINE([HAVE_PLUGINS])
 	AC_SUBST(PLUGINS)
 	AC_SUBST(PLUGINS_UI)
-
 fi
 
 if test "$pw3270_cv_print_font" == "yes"; then
@@ -461,6 +511,12 @@ fi
 
 if test "$pw3270_cv_use_primary_selection" == "yes"; then
 	AC_DEFINE([USE_PRIMARY_SELECTION])
+fi
+
+if test "$pw3270_cv_java" == "yes"; then
+	AC_DEFINE([HAVE_JAVA])
+	PLUGINS="j3270plugin $PLUGINS"
+	TARGETS="$TARGETS libpw3270_jni\$(DLLEXT) pw3270.jar"
 fi
 
 if test "_$HOST_CC" = "_" ; then
@@ -502,6 +558,7 @@ AC_SUBST(LD_RLSFLAGS)
 AC_SUBST(OS_SRCS)
 AC_SUBST(DLLEXT)
 AC_SUBST(EXEEXT)
+AC_SUBST(TARGETS)
 
 AC_DEFINE_UNQUOTED(LOGOEXT,"$LOGOEXT")
 AC_SUBST(LOGOEXT)
@@ -509,6 +566,8 @@ AC_SUBST(LOGOEXT)
 AC_SUBST(EXTENSIONS)
 AC_SUBST(WINDRES)
 AC_SUBST(libdir)
+AC_SUBST(jnidir)
+AC_SUBST(jardir)
 AC_SUBST(OS_APPSRCS)
 AC_SUBST(OS_APISRCS)
 AC_SUBST(GTKRUNTIME,$pw3270_cv_gtkruntime)

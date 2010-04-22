@@ -48,13 +48,14 @@
 		// http://gcc.gnu.org/wiki/Visibility
 		#if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
 				#define LOCAL_EXTERN __hidden extern
+				#define PW3270_PLUGIN_ENTRY extern
 		#elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
 				#define LOCAL_EXTERN __attribute__((visibility("hidden"))) extern
+				#define PW3270_PLUGIN_ENTRY __attribute__((visibility("default"))) extern
 		#else
 				#define LOCAL_EXTERN extern
+				#define PW3270_PLUGIN_ENTRY extern
 		#endif
-
-		#define PW3270_PLUGIN_ENTRY extern
 
 	#endif
 

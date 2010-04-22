@@ -401,6 +401,7 @@ gboolean StopPlugins(void)
 	symbol_name = g_strdup_vprintf(fmt,arg);
 	va_end(arg);
 
+	Trace("Module: %p Symbol: %s",module,symbol_name);
 	if(module)
 	{
 		ret = g_module_symbol(module,symbol_name,pointer);
@@ -410,12 +411,14 @@ gboolean StopPlugins(void)
 		GSList *el = plugins;
 		while(el && !ret)
 		{
-			ret = g_module_symbol((GModule *)el->data,symbol_name,pointer);
+			Trace("el->data: %p",el->data);
+			if(el->data)
+				ret = g_module_symbol((GModule *)el->data,symbol_name,pointer);
 			el = el->next;
 		}
 	}
 
-	Trace("Symbol %s: %p",symbol_name,*pointer);
+	Trace("Symbol(%s): %p Found: %s",symbol_name,*pointer,ret ? "yes" : "no");
 
 	g_free(symbol_name);
 #endif

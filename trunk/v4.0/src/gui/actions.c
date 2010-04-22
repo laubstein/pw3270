@@ -391,7 +391,7 @@
 	gchar			**line;
 	int				ln;
 
-	Trace("script_text: %p",text);
+	Trace("Internal script_text: %p",text);
 
 	if(text)
 	{
@@ -541,21 +541,16 @@
 		break;
 
 	case UI_CALLBACK_TYPE_SCRIPT:
-		data->action = gtk_action_new(name, gettext(data->attr.label ? data->attr.label : data->name), gettext(data->attr.tooltip),data->attr.stock_id);
-
-		if(data->script.filename)
-			g_object_set_data_full(G_OBJECT(data->action),"script_filename",g_strdup(data->script.filename),g_free);
 
 		if(data->script.text)
 			g_object_set_data_full(G_OBJECT(data->action),"script_text",g_strdup(data->script.text),g_free);
 
-		if(data->script.callback)
-			g_signal_connect(G_OBJECT(data->action),"activate",G_CALLBACK(data->script.callback),topwindow);
-		else if(data->callback)
+		if(data->callback)
 			g_signal_connect(G_OBJECT(data->action),"activate",G_CALLBACK(data->callback),topwindow);
 		else
 			g_signal_connect(G_OBJECT(data->action),"activate",G_CALLBACK(action_script_activated),topwindow);
 
+		data->callback = 0;
 		break;
 
 	default:

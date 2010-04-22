@@ -77,8 +77,7 @@
  {
 	gboolean 	enabled;
 	gchar		*text;
-	gchar		*filename;
-	GCallback	callback;			/**< Callback for "activated" signal */
+//	gchar		*filename;
  };
 
  struct action_descriptor

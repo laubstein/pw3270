@@ -17,10 +17,16 @@
 %endif
 
 %if 0%(if [ -x /opt/openoffice.org/basis3.0/sdk/bin/idlc ]; then echo 1; else echo 0; fi)
-	%define _uno		1
-	%define ooo_home	/opt/openoffice.org
+	%define _uno			1
+	%define ooo_home		/opt/openoffice.org
 	%define ooo_ure_home	/opt/openoffice.org/ure
 	%define ooo_sdk_home	/opt/openoffice.org/basis3.0/sdk
+%endif
+
+#---[ Check for Java ]------------------------------------------------------------------------------------------------
+
+%if 0%(if [ -x @JDK_HOME@/bin/javah ]; then echo 1; else echo 0; fi)
+	%define _java	1
 %endif
 
 #---[ Check for distro ]----------------------------------------------------------------------------------------------
@@ -130,6 +136,21 @@ Revision: @PACKAGE_REVISION@
 
 %endif
 
+%if 0%{?_java}
+%package java
+Provides:	%{name}-java
+Group:		Development/Libraries
+Summary:	Java bindings for %{name}
+Requires:	%{name}-lib = @PACKAGE_VERSION@
+
+%description java
+Jni library allowing 3270 access from java programs, includes plugin for use of java
+classes inside %{name}'s UI
+
+Revision: @PACKAGE_REVISION@
+
+%endif
+
 %prep
 
 %setup -q -n %{name}-%{version}
@@ -137,10 +158,18 @@ aclocal
 autoconf
 
 %if 0%{?_uno}
-	%configure --disable-trace --with-office-sdk-home="%{ooo_sdk_home}" --with-office-home="%{ooo_home}" --with-office-ure-home="%{ooo_ure_home}"
+	UNO_OPTIONS="--with-office-sdk-home=%{ooo_sdk_home} --with-office-home=%{ooo_home} --with-office-ure-home=%{ooo_ure_home}"
 %else
-	%configure --disable-trace
+	UNO_OPTIONS=""
 %endif
+
+%if 0%{?_java}
+	JAVA_OPTIONS="--with-jnidir=%{_jnidir} --with-jvmjardir=%{_jvmjardir}"
+%else
+	JAVA_OPTIONS=""
+%endif
+
+%configure --disable-trace $UNO_OPTIONS $JAVA_OPTIONS
 
 %build
 make clean
@@ -195,6 +224,13 @@ install -m 644 bin/Release/librx3270.so %{buildroot}%{_libdir}/librx3270.so
 %if 0%{?_uno}
 mkdir -p $RPM_BUILD_ROOT/%ooo_home/share/extension/install/
 install -m 644 %{name}.oxt $RPM_BUILD_ROOT/%ooo_home/share/extension/install/%{name}.oxt
+%endif
+
+%if 0%{?_java}
+mkdir -p $RPM_BUILD_ROOT/%{_jnidir}
+install -m 644 bin/Release/libpw3270_jni.so $RPM_BUILD_ROOT/%{_jnidir}
+mkdir -p $RPM_BUILD_ROOT/%{_jvmjardir}
+install -m 644 bin/Release/pw3270.jar $RPM_BUILD_ROOT/%{_jvmjardir}
 %endif
 
 %clean
@@ -264,4 +300,11 @@ fi
 %ooo_home/share/extension/install/*.oxt
 %endif
 
+%if 0%{?_java}
+%files java
+%defattr(-,root,root)
+%{_jnidir}
+%{_jvmjardir}
+%{_libdir}/%{name}/plugins/j3270plugin.so
+%endif
 
