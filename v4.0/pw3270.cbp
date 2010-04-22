@@ -68,6 +68,16 @@
 					<Add option="-g" />
 				</Compiler>
 			</Target>
+			<Target title="jnidebug">
+				<Option output="bin/Debug/libpw3270_jni" prefix_auto="0" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option parameters="--program-data=.  --plugin-path=./bin/Debug/plugins" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
@@ -448,6 +458,7 @@
 			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/gui/filetransfer.c">
 			<Option compilerVar="CC" />
@@ -460,6 +471,7 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/gui/main.c">
 			<Option compilerVar="CC" />
@@ -490,17 +502,20 @@
 			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/gui/uiparser.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/gui/uiparser.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/gui/version.c">
 			<Option compilerVar="CC" />
@@ -518,6 +533,15 @@
 		<Unit filename="src/include/lib3270/plugins.h" />
 		<Unit filename="src/include/lib3270/statusc.h" />
 		<Unit filename="src/include/lib3270/toggle.h" />
+		<Unit filename="src/java/pw3270_jni.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/java/terminal.java">
+			<Option target="Release" />
+			<Option target="jnidebug" />
+		</Unit>
 		<Unit filename="src/lib/Makefile">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -568,6 +592,7 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/lib/glue.c">
 			<Option compilerVar="CC" />
@@ -612,6 +637,7 @@
 			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/lib/popupsc.h" />
 		<Unit filename="src/lib/print.c">
@@ -756,6 +782,10 @@
 			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
+		<Unit filename="src/plugins/java/j3270plugin.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+		</Unit>
 		<Unit filename="src/plugins/pipectl/commands.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
@@ -766,15 +796,18 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/plugins/pipectl/pipectl.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/plugins/pipectl/pipetest.c">
 			<Option compilerVar="CC" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/plugins/rexx/actions.c">
 			<Option compilerVar="CC" />
@@ -792,6 +825,7 @@
 			<Option target="Release" />
 			<Option target="DBGRexx" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/plugins/rexx/gui.c">
 			<Option compilerVar="CC" />
@@ -824,23 +858,27 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="ui/debug.xml" />
 		<Unit filename="ui/default.act">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="ui/default.xml" />
 		<Unit filename="ui/functions.xml">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="ui/keypad.xml">
 			<Option target="Debug" />
 			<Option target="Release" />
 			<Option target="pipetest" />
+			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="ui/rexx.xml" />
 		<Extensions>

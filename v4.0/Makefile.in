@@ -47,7 +47,7 @@ PLUGINS_UI ?= @PLUGINS_UI@
 EXTENSIONS ?= @EXTENSIONS@
 DLLEXT ?= @DLLEXT@
 
-TARGETS = @PROGRAM_NAME@@EXEEXT@
+TARGETS = @PROGRAM_NAME@@EXEEXT@ @TARGETS@
 UI_XML_FILES ?= @UI_XML_FILES@
 
 TMPDIR ?= /tmp
@@ -57,14 +57,27 @@ MKFB = bin/mkfb
 
 # Set compilers
 HOST_CC = @HOST_CC@
+NATIVECC = @HOST_CC@
+
 CC = @CC@
 LD = @LD@
 
 CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@
 
-NATIVECC = @HOST_CC@
 WINDRES = @WINDRES@
+
+####################################################################################################
+# Java Stuff
+####################################################################################################
+JRE_HOME = @JRE_HOME@
+JDK_HOME = @JDK_HOME@
+
+JNIDIR ?= @jnidir@
+JARDIR ?= @jardir@
+
+JAVA_CFLAGS ?= @JAVA_CFLAGS@ -DJNIDIR=\"$(JNIDIR)\" -DJARDIR=\"$(JARDIR)\"
+JAVA_LDFLAGS ?= @JAVA_LDFLAGS@
 
 ####################################################################################################
 # OpenOffice.org stuff
@@ -113,32 +126,36 @@ REXX_LDFLAGS = @REXX_LIBS@ @GTK_LIBS@ @OS_DLLFLAGS@ @LIBICONV@ @REXX_SYMBOL_HACK
 # Sources
 ####################################################################################################
 
-APP_SRCS =		main.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
+APP_SRCS =	main.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c \
 			clipboard.c print.c config.c colors.c plugin.c filetransfer.c \
 			version.c draw.c tracewindow.c uiparser.c commands.c @OS_APPSRCS@
 
-API_SRCS = 		XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
+API_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 			ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c idle.c kybd.c \
 			macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
 			sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
 			xio.c keymap.c resolver.c log.c paste.c @OS_APISRCS@
 
 REXX_COMMON_SRC =	common_start.c screen.c toggle.c tools.c init.c network.c filetransfer.c
-REXX_STD_SRC =		std_start.c
-REXX_PLG_SRC =		plg_start.c gui.c dialogs.c actions.c
+REXX_STD_SRC =	std_start.c
+REXX_PLG_SRC =	plg_start.c gui.c dialogs.c actions.c
 
-PIPECTL_SRC =		init.c commands.c
+PIPECTL_SRC =	init.c commands.c
 
-OOO_SRCS = 		main.cxx connection.cxx screen.cxx actions.cxx status.cxx
+JNI_SRC =	pw3270_jni.c
+
+JPLUGIN_SRC = j3270plugin.c
+
+OOO_SRCS = 	main.cxx connection.cxx screen.cxx actions.cxx status.cxx
 
 ####################################################################################################
 # Targets
 ####################################################################################################
 
 Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
-		$(PACKAGE).@LOGOEXT@ \
-		$(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN)$(DLLEXT)) \
-		$(foreach BIN, $(EXTENSIONS), bin/Release/$(BIN)$(DLLEXT))
+			$(PACKAGE).@LOGOEXT@ \
+			$(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN)$(DLLEXT)) \
+			$(foreach BIN, $(EXTENSIONS), bin/Release/$(BIN)$(DLLEXT))
 	@install --mode=644 $(PACKAGE).@LOGOEXT@ bin/Release/$(PACKAGE).@LOGOEXT@
 	@msgfmt -c -v -o bin/Release/pt_BR.mo po/pt_BR.po
 	@rm -f bin/Release/gtk-runtime
@@ -420,6 +437,83 @@ bin/Release/librx3270$(DLLEXT): 		bin/Release/lib3270$(DLLEXT) \
 	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS)
 
 ####################################################################################################
+# Java Targets
+####################################################################################################
+
+# Misc
+bin/java/@PACKAGE@/%.class: src/java/%.java
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@javac -cp bin/java -sourcepath src/java -d bin/java $^
+
+src/java/lib3270_jni.h: bin/java/@PACKAGE@/terminal.class
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@javah -o $@ -classpath bin/java @PACKAGE@.terminal
+
+
+# Debug
+obj/Debug/src/java/%.o: src/java/%.c src/java/lib3270_jni.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(JAVA_CFLAGS) $(CFLAGS) -o $@ -c $<
+
+obj/Debug/src/plugins/java/%.o: src/plugins/java/%.c $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(JAVA_CFLAGS) $(APP_CFLAGS) $(GUI_CFLAGS) $(CFLAGS) -o $@ -c $<
+
+bin/Debug/@PROGRAM_NAME@.jar: bin/java/@PACKAGE@/terminal.class
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@jar -cvf "$@" -C "bin/java" "@PACKAGE@"
+
+bin/Debug/plugins/j3270plugin$(DLLEXT): 	bin/Debug/lib3270$(DLLEXT) \
+				$(foreach SRC, $(JPLUGIN_SRC), obj/Debug/src/plugins/java/$(basename $(SRC)).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -Lbin/Debug -l3270 $(JAVA_LDFLAGS) $(GTK_LIBS)
+
+bin/Debug/lib$(PACKAGE)_jni$(DLLEXT): bin/Debug/lib3270$(DLLEXT) $(foreach SRC, $(basename $(JNI_SRC)), obj/Debug/src/java/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -Lbin/Debug -l3270 -Wl,-rpath,bin/Debug
+
+jnidebug: bin/Debug/lib$(PACKAGE)_jni$(DLLEXT) bin/Release/$(PACKAGE).jar
+
+
+# Release
+obj/Release/src/java/%.o: src/java/%.c src/java/lib3270_jni.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(JAVA_CFLAGS) $(CFLAGS) -o $@ -c $<
+
+obj/Release/src/plugins/java/%.o: src/plugins/java/%.c $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(JAVA_CFLAGS) $(GUI_CFLAGS) $(CFLAGS) -o $@ -c $<
+
+bin/Release/@PROGRAM_NAME@.jar: bin/java/@PACKAGE@/terminal.class
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@jar -cvf "$@" -C "bin/java" "@PACKAGE@"
+
+bin/Release/plugins/j3270plugin$(DLLEXT): 	bin/Release/lib3270$(DLLEXT) \
+				$(foreach SRC, $(JPLUGIN_SRC), obj/Release/src/plugins/java/$(basename $(SRC)).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -Lbin/Release -l3270 $(JAVA_LDFLAGS) $(GTK_LIBS)
+
+
+bin/Release/lib$(PACKAGE)_jni$(DLLEXT): bin/Release/lib3270$(DLLEXT) $(foreach SRC, $(basename $(JNI_SRC)), obj/Release/src/java/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -Lbin/Release -l3270 -Wl,-rpath,$(LIBDIR)
+
+java: bin/Release/$(PACKAGE).jar bin/Release/lib$(PACKAGE)_jni$(DLLEXT) bin/Release/plugins/j3270plugin$(DLLEXT)
+	@echo "Java modules ok Ok!"
+
+####################################################################################################
 # Misc Targets
 ####################################################################################################
 
@@ -485,7 +579,7 @@ install: Release po/pt_BR.po $(PACKAGE).desktop
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
 	@mkdir -p $(DESTDIR)/@includedir@/lib3270
 
-	@for i in $(TARGETS); do install --mode=755 bin/Release/$$i $(DESTDIR)/$(bindir); done
+	@install --mode=755 bin/Release/@PROGRAM_NAME@@EXEEXT@ $(DESTDIR)/$(bindir)
 
 	@for i in $(PLUGINS); do install --mode=755 bin/Release/plugins/$$i$(DLLEXT) $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins; done
 	@for i in $(PLUGINS_UI); do install --mode=644 ui/$$i $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui; done
@@ -582,14 +676,16 @@ clean:
 	@rm -fr locale
 	@rm -f *.nsi
 	@rm -f $(PACKAGE).ico
-	@rm -f $(PACKAGE).@LOGOEXT@
+	@rm -f $(PACKAGE).@LOGOEXT
 	@rm -f @PROGRAM_NAME@.oxt
+	@rm -f src/java/lib3270_jni.h
 
 	@if [ -e src/plugins/rexx/Makefile ]; then make -C src/plugins/rexx clean; fi
 	@if [ -e src/extensions/uno/Makefile ]; then make -C src/extensions/uno clean; fi
 
 	@find . -name "*.obj" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.map" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.class" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.def" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.lnk" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.a" -exec mv -f {} $(TMPDIR) \;

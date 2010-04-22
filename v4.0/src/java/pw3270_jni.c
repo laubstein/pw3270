@@ -34,9 +34,15 @@
 #include <jni.h>
 #include <time.h>
 #include <malloc.h>
+#include <stdio.h>
 #include <string.h>
 #include <lib3270.h>
 #include <lib3270/config.h>
+
+#ifndef WIN32
+	#include <sys/types.h>
+	#include <unistd.h>
+#endif
 
 /*---[ Prototipes & Defines ]------------------------------------------------------------------------------*/
 
@@ -84,8 +90,13 @@
 
 int lib3270_jni_init(void)
 {
+#ifdef WIN32
 	Trace("Running %s on %s %s %s",__FUNCTION__,__FILE__,__DATE__,__TIME__);
-    lib3270_init();
+#else
+	Trace("Running %s on %s %s %s (pid: %d)",__FUNCTION__,__FILE__,__DATE__,__TIME__,getpid());
+#endif
+
+	lib3270_init();
     Trace("%s ends",__FUNCTION__);
 	return 0;
 }

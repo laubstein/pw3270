@@ -333,7 +333,10 @@
 	load_action_attributes(info,data,names,values);
 
 	data->ui_type	= cbk.type;
-	data->callback	= cbk.callback;
+
+	if(!data->callback)
+		data->callback	= cbk.callback;
+
 	data->user_data	= cbk.user_data;
 
 	if(cbk.label && !data->attr.label)
@@ -353,7 +356,7 @@
 	UNLOAD_ATTRIBUTE(text);
 
 	g_free(data->script.text);
-	g_free(data->script.filename);
+//	g_free(data->script.filename);
 
 	g_free(data);
  }
@@ -635,10 +638,8 @@
 #endif
 	}
 
-	/* Enable script */
-	script->enabled = TRUE;
-
 	/* Get filename */
+/*
 	ptr = get_xml_attribute(names,values,"filename");
 	if(ptr)
 	{
@@ -646,20 +647,13 @@
 			g_free(script->filename);
 		script->filename = g_strdup(ptr);
 	}
-
-	/* Get callback from "language" attribute */
-#ifdef HAVE_PLUGINS
-	ptr = get_xml_attribute(names,values,"language");
-	if(ptr && *ptr && get_symbol_by_name(NULL, (gpointer) &script->callback, "pw3270_call_%s_script", ptr))
-		return;
-#endif
-
+*/
  }
 
  static void element_start(GMarkupParseContext *context,const gchar *element_name,const gchar **names,const gchar **values, gpointer user_data, GError **error)
  {
  	const gchar	*name = get_xml_attribute(names,values,"name");
- 	gchar 		*path = ((struct parse_data *) user_data)->path;
+ 	gchar 			*path = ((struct parse_data *) user_data)->path;
 
 	if(!*name)
 		name = get_xml_attribute(names,values,"action");
@@ -721,12 +715,49 @@
 	}
 	else if(!g_ascii_strcasecmp(element_name,"script"))
 	{
-		if(!( ((struct parse_data *) user_data)->current_action))
+		struct action_descriptor *data = ((struct parse_data *) user_data)->current_action;
+
+		if(!data)
+		{
 			g_set_error(error,xml_parse_error(),EINVAL,_("<script> element should be used only inside another active element"));
+		}
 		else
 		{
-			create_script_element( & (((struct parse_data *) user_data)->current_action->script), names, values);
-			((struct parse_data *) user_data)->current_action->ui_type = UI_CALLBACK_TYPE_SCRIPT;
+			create_script_element( &data->script, names, values);
+			data->ui_type = UI_CALLBACK_TYPE_SCRIPT;
+
+			if(!(name && *name))
+				name = data->name;
+
+			if(!name)
+			{
+				g_set_error(error,xml_parse_error(),EINVAL,_("<script> element requires a name"));
+			}
+			else if(data->script.enabled);
+			{
+				int f;
+
+#ifdef HAVE_PLUGINS
+				const gchar *ptr = get_xml_attribute(names,values,"language");
+				if(ptr && *ptr)
+					data->script.enabled = get_symbol_by_name(NULL, (gpointer) &data->callback, "pw3270_call_%s_script", ptr);
+#endif
+				if(data->script.enabled)
+				{
+					data->action = gtk_action_new(name, gettext(data->attr.label ? data->attr.label : data->name), gettext(data->attr.tooltip),data->attr.stock_id);
+					Trace("Action %s: %p",name,data->action);
+
+					for(f=0;names[f];f++)
+					{
+						gchar *ptr = g_strdup_printf("script_%s",names[f]);
+						Trace("%s=%s",ptr,values[f]);
+						g_object_set_data_full(G_OBJECT(data->action),ptr,g_strdup(values[f]),g_free);
+						g_free(ptr);
+					}
+				}
+
+			}
+
 		}
 	}
 
@@ -754,7 +785,6 @@
  		if(ptr)
 			*ptr = 0;
  	}
-
  }
 
  static void element_text(GMarkupParseContext *context,const gchar *text,gsize text_len, gpointer user_data, GError **error)
