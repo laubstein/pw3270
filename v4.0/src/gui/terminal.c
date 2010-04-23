@@ -634,6 +634,7 @@
 
  	if(!screen_suspended)
  	{
+		cMode |= CURSOR_MODE_SHOW;
 		InvalidateCursor();
 
 		cCol			= col;
