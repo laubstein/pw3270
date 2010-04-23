@@ -102,7 +102,7 @@ case "$host" in
 		localedir="locale"
 
 		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/win32"
-		java_ldflags="-Wl,--exclude-symbols,jvm_NULL_THUNK_DATA -L\$(JDK_HOME)/lib -Wl,-rpath,\$(JRE_HOME)/bin/client -ljvm"
+		java_ldflags="-Wl,--exclude-symbols,jvm_NULL_THUNK_DATA -L\$(JDK_HOME)/lib -ljvm"
 
 
 		;;
