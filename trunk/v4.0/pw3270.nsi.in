@@ -109,6 +109,51 @@ SubSection "@PROGRAM_NAME@" SecMain
 
 	SubSectionEnd
 
+	SubSection "Java API & Plugin" SecJava
+
+		Section /o "JNI module" jni
+			setOutPath $INSTDIR
+			CreateDirectory "$INSTDIR\java"
+			file "/oname=$INSTDIR\java\pw3270.jar" bin\Release\pw3270.jar
+			file "/oname=$INSTDIR\java\libpw3270_jni.dll" bin\Release\libpw3270_jni.dll
+		SectionEnd
+
+		Section /o "Java plugin" jplugin
+			setOutPath $INSTDIR
+			CreateDirectory "$INSTDIR\plugins"
+			file "/oname=$INSTDIR\plugins\j3270plugin.dll" bin\Release\plugins\j3270plugin.dll
+		SectionEnd
+
+	SubSectionEnd
+
+
+	SubSection "Extras" SecExtra
+
+		Section "Right keypad" RKeypad
+			file "/oname=$INSTDIR\ui\keypad.xml" "bin\Release\ui\keypad.xml"
+		SectionEnd
+
+		Section /o "Function bar" FBar
+			file "/oname=$INSTDIR\ui\functions.xml" "bin\Release\ui\functions.xml"
+		SectionEnd
+
+		Section /o "Debug & Trace menus" SecDBGMenu
+
+			file "/oname=$INSTDIR\ui\debug.xml" "bin\Release\ui\debug.xml"
+
+		SectionEnd
+
+		Section /o "Rexx extension library" SecRexxLib
+
+			setOutPath $PROGRAMFILES\ooRexx
+			file bin\Release\librx3270.dll
+			file src\plugins\rexx\rx3270.cls
+
+		SectionEnd
+
+	SubSectionEnd
+
+
 SubSectionEnd
 
 Section "GTK+ Runtime" SecGTK
@@ -118,48 +163,24 @@ Section "GTK+ Runtime" SecGTK
 
 SectionEnd
 
-SubSection "Extras" SecExtra
+Section /o "Software Development Kit" SecSDK
 
-	Section "Right keypad" RKeypad
-		file "/oname=$INSTDIR\ui\keypad.xml" "bin\Release\ui\keypad.xml"
-	SectionEnd
+	CreateDirectory "$INSTDIR\sdk"
+	CreateDirectory "$INSTDIR\sdk\include"
+	CreateDirectory "$INSTDIR\sdk\include\lib3270"
 
-	Section /o "Function bar" FBar
-		file "/oname=$INSTDIR\ui\functions.xml" "bin\Release\ui\functions.xml"
-	SectionEnd
+	file "/oname=$INSTDIR\sdk\include\lib3270.h" "src\include\lib3270.h"
+	file "/oname=$INSTDIR\sdk\include\lib3270\api.h" "src\include\lib3270\api.h"
+	file "/oname=$INSTDIR\sdk\include\lib3270\config.h" "src\include\lib3270\config.h"
+	file "/oname=$INSTDIR\sdk\include\lib3270\plugins.h" "src\include\lib3270\plugins.h"
 
-	Section /o "Software Development Kit" SecSDK
+	CreateDirectory "$INSTDIR\sdk\lib"
+	file "/oname=$INSTDIR\sdk\lib\lib3270.def" "bin\Release\lib3270.def"
+	file "/oname=$INSTDIR\sdk\lib\lib3270.a" "bin\Release\lib3270.a"
 
-		CreateDirectory "$INSTDIR\sdk"
-		CreateDirectory "$INSTDIR\sdk\include"
-		CreateDirectory "$INSTDIR\sdk\include\lib3270"
+SectionEnd
 
-		file "/oname=$INSTDIR\sdk\include\lib3270.h" "src\include\lib3270.h"
-		file "/oname=$INSTDIR\sdk\include\lib3270\api.h" "src\include\lib3270\api.h"
-		file "/oname=$INSTDIR\sdk\include\lib3270\config.h" "src\include\lib3270\config.h"
-		file "/oname=$INSTDIR\sdk\include\lib3270\plugins.h" "src\include\lib3270\plugins.h"
 
-		CreateDirectory "$INSTDIR\sdk\lib"
-		file "/oname=$INSTDIR\sdk\lib\lib3270.def" "bin\Release\lib3270.def"
-		file "/oname=$INSTDIR\sdk\lib\lib3270.a" "bin\Release\lib3270.a"
-
-	SectionEnd
-
-	Section /o "Debug & Trace menus" SecDBGMenu
-
-		file "/oname=$INSTDIR\ui\debug.xml" "bin\Release\ui\debug.xml"
-
-	SectionEnd
-
-	Section /o "Rexx extension library" SecRexxLib
-
-		setOutPath $PROGRAMFILES\ooRexx
-		file bin\Release\librx3270.dll
-		file src\plugins\rexx\rx3270.cls
-
-	SectionEnd
-
-SubSectionEnd
 
 # create a section to define what the uninstaller does.
 # the section will always be named "Uninstall"
