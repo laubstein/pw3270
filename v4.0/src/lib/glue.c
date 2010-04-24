@@ -441,7 +441,7 @@ static const struct lib3270_option options[] =
 #endif /*]*/
     { OptHostsFile,OPT_STRING,  False, ResHostsFile, offset(hostsfile), NULL },
 #if defined(C3270) /*[*/
-    { OptKeymap,   OPT_STRING,  False, ResKeymap,    offset(key_map), NULL },
+    { OptKeymap,   OPT_STRING,  False, ResKeymap,    offset(key_map), N_( "Specifies a keymap name and optional modifiers." ) },
 #endif /*]*/
 #if defined(X3270_DBCS) /*[*/
     { OptLocalEncoding,OPT_STRING,False,ResLocalEncoding,offset(local_encoding), NULL },
@@ -453,10 +453,10 @@ static const struct lib3270_option options[] =
     { OptOnce,     OPT_BOOLEAN, True,  ResOnce,      offset(once), NULL },
     { OptOversize, OPT_STRING,  False, ResOversize,  offset(oversize), NULL },
     { OptPort,     OPT_STRING,  False, ResPort,      offset(port), NULL },
-#if defined(C3270) /*[*/
+#if defined(C3270) && !defined(LIB3270) /*[*/
     { OptPrinterLu,OPT_STRING,  False, ResPrinterLu, offset(printer_lu), NULL },
 #endif /*]*/
-    { OptProxy,	   OPT_STRING,  False, ResProxy,     offset(proxy), NULL },
+    { OptProxy,	   OPT_STRING,  False, ResProxy,     offset(proxy), N_( "Proxy server (type:host[:port])" ) },
 #if defined(S3270) /*[*/
     { OptScripted, OPT_NOP,     False, ResScripted,  NULL, NULL },
 #endif /*]*/
@@ -468,7 +468,7 @@ static const struct lib3270_option options[] =
     { OptSocket,   OPT_BOOLEAN, True,  ResSocket,    offset(socket), NULL },
 #endif /*]*/
 
-    { OptTermName, OPT_STRING,  False, ResTermName,  offset(termname), NULL },
+    { OptTermName, OPT_STRING,  False, ResTermName,  offset(termname), N_( "Specifies the terminal name to be transmitted over the telnet connection." ) },
 
 #if defined(WC3270) /*[*/
     { OptTitle,    OPT_STRING,  False, ResTitle,     offset(title), NULL },
