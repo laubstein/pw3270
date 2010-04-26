@@ -411,11 +411,6 @@ AC_ARG_WITH([office-types],
 	types_rdb="$withval"
 ] )
 
-AC_SUBST(JDK_HOME,$JDK_HOME)
-AC_SUBST(JRE_HOME,$JRE_HOME)
-AC_SUBST(JAVA_CFLAGS,$java_cflags)
-AC_SUBST(JAVA_LDFLAGS,$java_ldflags)
-
 AC_PATH_PROG([UNOPKG], unopkg, [$oo_home/program/unopkg] )
 AC_PATH_PROG([IDLC], idlc, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
 AC_PATH_PROG([CPPUMAKER], cppumaker, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
@@ -562,6 +557,19 @@ AC_SUBST(TARGETS)
 
 AC_DEFINE_UNQUOTED(LOGOEXT,"$LOGOEXT")
 AC_SUBST(LOGOEXT)
+
+AC_SUBST(JDK_HOME,$JDK_HOME)
+
+if test "_$JRE_HOME" = "_" ; then
+	AC_CHECK_FILE("$JDK_HOME/jre/lib/i386/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
+	AC_CHECK_FILE("/usr/lib/jvm/java/jre/lib/i386/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
+	AC_CHECK_FILE("/etc/alternatives/jre/lib/i386/client/libjvm.so",JRE_HOME="/etc/alternatives/jre",)
+fi
+
+AC_SUBST(JRE_HOME,$JRE_HOME)
+
+AC_SUBST(JAVA_CFLAGS,$java_cflags)
+AC_SUBST(JAVA_LDFLAGS,$java_ldflags)
 
 AC_SUBST(EXTENSIONS)
 AC_SUBST(WINDRES)
