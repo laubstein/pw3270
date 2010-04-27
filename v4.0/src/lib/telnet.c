@@ -120,7 +120,12 @@ char           *termtype;
 extern struct timeval ds_ts;
 
 /* Statics */
-static int      sock = -1;	/* active socket */
+static int      		sock 			= -1;	/* active socket */
+
+#if defined(HAVE_LIBSSL) /*[*/
+static unsigned long last_ssl_error	= 0;
+#endif
+
 #if defined(_WIN32) /*[*/
 static HANDLE	sock_handle = NULL;
 #endif /*]*/
@@ -625,6 +630,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 
 		/* init ssl */
 #if defined(HAVE_LIBSSL) /*[*/
+		last_ssl_error = 0;
 		if (ssl_host)
 			ssl_init();
 #endif /*]*/
@@ -3251,16 +3257,27 @@ static void client_info_callback(INFO_CONST SSL *s, int where, int ret)
 
 			e = ERR_get_error();
 			if (e != 0)
-				(void) ERR_error_string(e, err_buf + 1);
-#if defined(_WIN32) /*[*/
+			{
+				if(e == last_ssl_error)
+					return;
+				last_ssl_error = e;
+				(void) ERR_error_string(e, err_buf);
+			}
+#if defined(_WIN32)
 			else if (GetLastError() != 0)
+			{
 				strncpy(err_buf,win32_strerror(GetLastError()),1023);
-#else /*][*/
+			}
+#else
 			else if (errno != 0)
+			{
 				strncpy(err_buf, strerror(errno),1023);
-#endif /*]*/
+			}
+#endif
 			else
+			{
 				err_buf[0] = '\0';
+			}
 
 			trace_dsn("SSL_connect: error in %s\n%s\n",SSL_state_string_long(s),err_buf);
 
