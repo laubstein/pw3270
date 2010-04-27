@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 TEMPFILE=`mktemp`
 find . -name *.c > $TEMPFILE
 
