@@ -461,7 +461,7 @@
 		LIB3270_EXPORT int action_CursorRight(void);
 
 		LIB3270_EXPORT int action_EraseInput(void);
-		LIB3270_EXPORT int action_ClearFields(void);
+		LIB3270_EXPORT int action_Clear(void);
 
 		LIB3270_EXPORT int action_DeleteWord(void);
 		LIB3270_EXPORT int action_DeleteField(void);

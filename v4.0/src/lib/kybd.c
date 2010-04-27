@@ -2522,13 +2522,13 @@ LIB3270_EXPORT int action_SysReq(void)
 /*
  * Clear AID key
  */
-void Clear_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+static void Clear_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 		action_debug(Clear_action, event, params, num_params);
-		action_ClearFields();
+		action_Clear();
 }
 
-LIB3270_EXPORT int action_ClearFields(void)
+LIB3270_EXPORT int action_Clear(void)
 {
 	reset_idle_timer();
 	if (kybdlock & KL_OIA_MINUS)
