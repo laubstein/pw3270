@@ -50,8 +50,10 @@ extern void BackTab_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 extern void CircumNot_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
+/*
 extern void Clear_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
+*/
 extern void Compose_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 extern void CursorSelect_action(Widget w, XEvent *event, String *params,

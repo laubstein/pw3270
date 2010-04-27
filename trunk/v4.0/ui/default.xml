@@ -64,6 +64,7 @@
 			<menuitem action='Reselect' group='online'/>
 
 			<separator/>
+			<menuitem action='Clear' group='online' />
 			<menuitem action='EraseInput' icon='clear' group='online' />
 <!---			<menuitem action='EraseField' key='<Ctrl>u' group='online' /> -->
 			<menuitem action='EraseEOF' group='online' />

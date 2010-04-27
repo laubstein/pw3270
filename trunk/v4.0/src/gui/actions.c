@@ -58,6 +58,8 @@
  static void action_pfkey(GtkAction *action,gpointer id);
  static void action_pakey(GtkAction *action,gpointer id);
 
+  static void action_PrintScreen(GtkWidget *w, gpointer user_data);
+
 /*---[ Gui toggles ]--------------------------------------------------------------------------------------------*/
 
  static const struct _gui_toggle_info
@@ -100,6 +102,8 @@
 	{ GDK_KP_Right,			0,					NULL,	G_CALLBACK(action_Right)			},
 	{ GDK_KP_Down,			0,					NULL,	G_CALLBACK(action_Down)				},
 	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(action_NextField)		},
+	{ GDK_3270_PrintScreen,	0,					NULL,	G_CALLBACK(action_PrintScreen)		},
+	{ GDK_Print,			GDK_CONTROL_MASK,	NULL,	G_CALLBACK(action_PrintScreen)		},
  };
 
  static struct _pf_action
@@ -165,9 +169,9 @@
  	clear_and_call(0,lib3270_Reset);
  }
 
- static void clear_fields_action(void)
+ static void clear_action(void)
  {
- 	clear_and_call(0,action_ClearFields);
+ 	clear_and_call(0,action_Clear);
  }
 
  static void erase_input_action(void)
@@ -500,7 +504,7 @@
 		return TRUE;
 	}
 
-	Trace("Key action%04x: %s %s",event->keyval,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "");
+	Trace("Key action 0x%04x: %s %s",event->keyval,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "");
 
     // Check for special keyproc actions
 	for(f=0; f < G_N_ELEMENTS(keyboard_action);f++)
@@ -898,7 +902,7 @@
 		{	"Reselect",			N_( "Reselect" ),				G_CALLBACK(Reselect)				},
 		{	"SelectAll",		N_( "Select all" ),				G_CALLBACK(action_SelectAll)		},
 		{	"EraseInput",		N_( "Erase input" ),			G_CALLBACK(erase_input_action)		},
-		{	"ClearFields",		N_( "Clear" ),					G_CALLBACK(clear_fields_action)		},
+		{	"Clear",			N_( "Clear" ),					G_CALLBACK(clear_action)			},
 
 		{	"Reset",			N_( "Reset" ),					G_CALLBACK(action_Reset)			},
 		{	"Escape",			N_( "Escape" ),					G_CALLBACK(action_Reset)			},
