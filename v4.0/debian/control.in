@@ -20,7 +20,7 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, binutils (>= 2.14.90.0.7)
 Description: pw3270 shared libraries. (Rev. @PACKAGE_REVISION@)
  This package contains the pw3270 shared library for the core application.
 
-Package: lib3270-dev
+Package: pw3270-dev
 Architecture: any
 Section: libdevel
 Depends: ${misc:Depends}, lib3270 (= ${binary:Version})
