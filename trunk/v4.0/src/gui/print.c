@@ -46,57 +46,44 @@
 
  static int doPrint(GtkPrintOperation *prt, GtkPrintContext *context,cairo_t *cr,gint page)
  {
- 	gchar					**text;
-	PangoFontDescription	*FontDescr	= (PangoFontDescription *) g_object_get_data(G_OBJECT(prt),"3270FontDescr");
-	PangoLayout				*FontLayout	= (PangoLayout *) g_object_get_data(G_OBJECT(prt),"3270FontLayout");
-	int						pg			= 0;
-	gdouble					maxHeight 	= gtk_print_context_get_height(context);
-	gdouble					current		= 0;
-	gdouble 				pos;
+	gdouble					maxHeight	= gtk_print_context_get_height(context);
+	PangoFontDescription	*desc;
+	gint					pg			= 0;
+	gdouble					row			= 0;
 
-	if(!FontDescr)
-	{
-		FontDescr = pango_font_description_from_string(g_object_get_data(G_OBJECT(prt),"3270FontName"));
-		g_object_set_data_full(G_OBJECT(prt),"3270FontDescr",FontDescr,(void (*)(gpointer)) pango_font_description_free);
-	}
+	gchar					**text;
+	gdouble					text_height;
 
-	if(!FontLayout)
-	{
-		Trace("Creating FontLayout to context %p",context);
-		FontLayout = gtk_print_context_create_pango_layout(context);
-		g_object_set_data_full(G_OBJECT(prt),"3270FontLayout",FontLayout,(void (*)(gpointer)) g_object_unref);
-		pango_layout_set_font_description(FontLayout,FontDescr);
-	}
+
+	desc = pango_font_description_from_string(g_object_get_data(G_OBJECT(prt),"3270FontName"));
 
 	for(text = g_object_get_data(G_OBJECT(prt),"3270Text");*text;text++)
 	{
-		gdouble width, height;
-		PangoRectangle	rect;
+		gint		layout_height;
+		PangoLayout	*layout			= gtk_print_context_create_pango_layout(context);
 
-		pango_layout_set_text(FontLayout,*text,-1);
+		pango_layout_set_font_description(layout, desc);
+		pango_layout_set_text(layout, *text, -1);
+		pango_layout_get_size(layout, NULL, &layout_height);
+		text_height = ((gdouble)layout_height) / PANGO_SCALE;
 
-		pango_layout_get_extents(FontLayout,NULL,&rect);
-		width = rect.width / PANGO_SCALE;
-		height = rect.height / PANGO_SCALE;
-
-		pos = current;
-
-		if( (current+height) > maxHeight)
+		if((row+text_height) >= maxHeight)
 		{
+			row = 0;
 			pg++;
-			current = 0;
-		}
-		else
-		{
-			current += height;
 		}
 
 		if(cr && page == pg)
 		{
-			cairo_move_to(cr,0,pos);
-			pango_cairo_show_layout(cr,FontLayout);
+			cairo_move_to(cr,0,row);
+			pango_cairo_show_layout(cr, layout);
 		}
+
+		row += text_height;
+		g_object_unref(layout);
 	}
+
+	pango_font_description_free(desc);
 
 	return pg+1;
  }
@@ -124,14 +111,29 @@
 
  static void custom_widget_apply(GtkPrintOperation *prt, GtkWidget *font_dialog, gpointer user_data)
  {
- 	gchar *font = gtk_font_selection_get_font_name(GTK_FONT_SELECTION(font_dialog));
+ 	gchar *font = NULL;
+
+#if GTK_CHECK_VERSION(2,20,0)
+	if(gtk_widget_get_realized(font_dialog))
+#else
+	if(GTK_WIDGET_REALIZED(font_dialog))
+#endif
+		font = gtk_font_selection_get_font_name(GTK_FONT_SELECTION(font_dialog));
+
+	Trace("Selected font: \"%s\"",font);
+
 	if(font)
 		g_object_set_data_full(G_OBJECT(prt),"3270FontName",font,g_free);
  }
 
+
  static void load_font(GtkWidget *widget, GtkPrintOperation *prt)
  {
-	gtk_font_selection_set_font_name(GTK_FONT_SELECTION(widget),g_object_get_data(G_OBJECT(prt),"3270FontName"));
+ 	gchar *fontname = g_object_get_data(G_OBJECT(prt),"3270FontName");
+
+ 	Trace("Loading font \"%s\"",fontname);
+
+	gtk_font_selection_set_font_name(GTK_FONT_SELECTION(widget),fontname);
  }
 
  static GObject * create_custom_widget(GtkPrintOperation *prt, gpointer user_data)
@@ -156,15 +158,7 @@
  {
 	GKeyFile 				*conf		= GetConf();
 
-#ifdef HAVE_PRINT_FONT_DIALOG
-	gchar					*ptr;
-#endif
-
 	GtkPrintSettings		*settings	= gtk_print_operation_get_print_settings(prt);
-
-#ifdef HAVE_PRINT_FONT_DIALOG
-	PangoFontDescription	*FontDescr	= (PangoFontDescription *) g_object_get_data(G_OBJECT(prt),"3270FontDescr");
-#endif
 
 #if GTK_CHECK_VERSION(2,12,0)
 	GtkPageSetup			*setup		= gtk_print_operation_get_default_page_setup(prt);
@@ -172,7 +166,6 @@
 
 	if(!conf)
 		return;
-
 	Trace("Settings: %p Conf: %p",settings,conf);
 #if GTK_CHECK_VERSION(2,12,0)
 	gtk_print_settings_to_key_file(settings,conf,NULL);
@@ -181,18 +174,7 @@
 	gtk_print_settings_foreach(settings,(GtkPrintSettingsFunc) SavePrintSetting,conf);
 #endif
 
-
-#ifdef HAVE_PRINT_FONT_DIALOG
-	if(FontDescr)
-	{
-		ptr = pango_font_description_to_string(FontDescr);
-		if(ptr)
-		{
-			g_key_file_set_string(conf,"Print","Font",ptr);
-			g_free(ptr);
-		}
-	}
-#endif
+	g_key_file_set_string(conf,"Print","Font",g_object_get_data(G_OBJECT(prt),"3270FontName"));
 
  }
 
@@ -217,8 +199,6 @@
 	font = GetString("Print","Font","");
 	if(!*font)
 		font = GetString("Terminal","Font","Courier");
-
-	Trace("Fonte para impressao: \"%s\"",font);
 
 	g_object_set_data_full(G_OBJECT(prt),"3270FontName",g_strdup(font),g_free);
 
