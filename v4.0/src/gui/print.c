@@ -73,13 +73,14 @@
 			pg++;
 		}
 
+		row += text_height;
+
 		if(cr && page == pg)
 		{
 			cairo_move_to(cr,0,row);
 			pango_cairo_show_layout(cr, layout);
 		}
 
-		row += text_height;
 		g_object_unref(layout);
 	}
 
