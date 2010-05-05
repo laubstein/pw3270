@@ -548,7 +548,7 @@ $(PACKAGE).desktop: Makefile
 $(PACKAGE).ico: @ICONFILE@
 	@cp @ICONFILE@ $@
 
-$(PACKAGE).@LOGOEXT@: @LOGOFILE@
+$(PACKAGE).@LOGOEXT@: @LOGOFILE@ Makefile
 	@convert @LOGOFILE@ $@
 
 src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
@@ -676,7 +676,7 @@ clean:
 	@rm -fr locale
 	@rm -f *.nsi
 	@rm -f $(PACKAGE).ico
-	@rm -f $(PACKAGE).@LOGOEXT
+	@rm -f $(PACKAGE).@LOGOEXT@
 	@rm -f @PROGRAM_NAME@.oxt
 	@rm -f src/java/lib3270_jni.h
 
