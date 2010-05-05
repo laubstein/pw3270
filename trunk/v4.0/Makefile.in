@@ -463,7 +463,7 @@ obj/Debug/src/plugins/java/%.o: src/plugins/java/%.c $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) $(DBG_CFLAGS) $(JAVA_CFLAGS) $(APP_CFLAGS) $(GUI_CFLAGS) $(CFLAGS) -o $@ -c $<
 
-bin/Debug/@PROGRAM_NAME@.jar: bin/java/@PACKAGE@/terminal.class
+bin/Debug/$(PACKAGE).jar: bin/java/@PACKAGE@/terminal.class
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@jar -cvf "$@" -C "bin/java" "@PACKAGE@"
@@ -493,7 +493,7 @@ obj/Release/src/plugins/java/%.o: src/plugins/java/%.c $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) $(JAVA_CFLAGS) $(GUI_CFLAGS) $(CFLAGS) -o $@ -c $<
 
-bin/Release/@PROGRAM_NAME@.jar: bin/java/@PACKAGE@/terminal.class
+bin/Release/$(PACKAGE).jar: bin/java/@PACKAGE@/terminal.class
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@jar -cvf "$@" -C "bin/java" "@PACKAGE@"
