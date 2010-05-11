@@ -104,6 +104,9 @@
 	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(action_NextField)		},
 	{ GDK_3270_PrintScreen,	0,					NULL,	G_CALLBACK(action_PrintScreen)		},
 	{ GDK_Print,			GDK_CONTROL_MASK,	NULL,	G_CALLBACK(action_PrintScreen)		},
+#ifdef WIN32
+	{ GDK_Pause,			0,					NULL,	0									},
+#endif
  };
 
  static struct _pf_action
@@ -504,7 +507,13 @@
 		return TRUE;
 	}
 
-	Trace("Key action 0x%04x: %s %s",event->keyval,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "");
+#ifdef WIN32
+	// FIXME (perry#1#): Find a better way!
+	if( event->keyval == 0xffffff && event->hardware_keycode == 0x0013)
+		event->keyval = GDK_Pause;
+#endif
+
+	Trace("Key action 0x%04x: %s %s keycode: 0x%04x",event->keyval,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "",event->hardware_keycode);
 
     // Check for special keyproc actions
 	for(f=0; f < G_N_ELEMENTS(keyboard_action);f++)
@@ -513,6 +522,8 @@
 		{
 			if(keyboard_action[f].action)
 				gtk_action_activate(keyboard_action[f].action);
+			else if(!keyboard_action[f].def)
+				return FALSE;
 			else
 				keyboard_action[f].def();
 			return TRUE;
