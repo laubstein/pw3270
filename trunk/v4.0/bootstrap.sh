@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PACKAGE_VERSION=4.1
-PACKAGE_RELEASE=0
+PACKAGE_RELEASE=1
 
 REV_FILE=./revision.m4
 
