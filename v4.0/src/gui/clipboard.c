@@ -141,7 +141,7 @@
 
  }
 
- static void process_text_received(const gchar *text)
+ static void process_text_received(const gchar *text, const gchar *encoding)
  {
  	gchar 	*buffer;
  	gchar 	*ptr;
@@ -152,7 +152,7 @@
 
  	Trace("%s",__FUNCTION__);
 
-	buffer = g_convert(text, -1, CHARSET, "UTF-8", NULL, NULL, &error);
+	buffer = g_convert(text, -1, CHARSET, encoding, NULL, NULL, &error);
 
     if(!buffer)
     {
@@ -165,15 +165,16 @@
     		const gchar *to;
     	} xlat[] =
     	{
-    		{ "–",	"-"		},
-    		{ "→",	"->"	},
-    		{ "←",	"<-" 	},
-    		{ "©",	"(c)"	},
-    		{ "↔",	"<->"	},
-    		{ "™",	"(TM)"	},
-    		{ "®",	"(R)"	},
-    		{ "“",	"\""	},
-    		{ "”",	"\""	}
+    		{ "–",		"-"		},
+    		{ "→",		"->"	},
+    		{ "←",		"<-" 	},
+    		{ "©",		"(c)"	},
+    		{ "↔",		"<->"	},
+    		{ "™",		"(TM)"	},
+    		{ "®",		"(R)"	},
+    		{ "“",		"\""	},
+    		{ "”",		"\""	},
+    		{ "…",		"..."	},
     	};
 
 		gchar *string = g_strdup(text);
@@ -199,7 +200,49 @@
 			}
 		}
 
-		buffer = g_convert(string, -1, CHARSET, "UTF-8", NULL, NULL, &error);
+		buffer = g_convert(string, -1, CHARSET, encoding, NULL, NULL, &error);
+
+		if(!buffer)
+		{
+			gchar **ln = g_strsplit(string,"\n",-1);
+
+			for(f=0;ln[f];f++)
+			{
+				gchar *str = g_convert(ln[f], -1, CHARSET, encoding, NULL, NULL, &error);
+
+				if(!str)
+				{
+					GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+																GTK_DIALOG_DESTROY_WITH_PARENT,
+																GTK_MESSAGE_ERROR,
+																GTK_BUTTONS_OK,
+																_(  "Can't convert line %d from %s to %s" ),f+1, encoding, CHARSET);
+
+					gtk_window_set_title(GTK_WINDOW(dialog), _( "Charset error" ) );
+					if(error)
+					{
+						gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s\n%s", error->message ? error->message : N_( "Unexpected error" ), ln[f]);
+						g_error_free(error);
+						error = 0;
+					}
+					else
+					{
+						gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s", ln[f]);
+					}
+					gtk_dialog_run(GTK_DIALOG (dialog));
+					gtk_widget_destroy(dialog);
+					return;
+
+				}
+				else
+				{
+					g_free(str);
+				}
+			}
+
+			g_strfreev(ln);
+			g_free(string);
+		}
 
 		g_free(string);
 
@@ -209,12 +252,15 @@
 														GTK_DIALOG_DESTROY_WITH_PARENT,
 														GTK_MESSAGE_ERROR,
 														GTK_BUTTONS_OK,
-														_(  "Can't convert clipboard charset to %s" ), CHARSET);
+														_(  "Can't convert text from %s to %s" ), encoding, CHARSET);
 
 			gtk_window_set_title(GTK_WINDOW(dialog), _( "Charset error" ) );
 			if(error)
+			{
 				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s", error->message ? error->message : N_( "Unexpected error" ));
-
+				g_error_free(error);
+				error = 0;
+			}
 			gtk_dialog_run(GTK_DIALOG (dialog));
 			gtk_widget_destroy(dialog);
 
@@ -249,7 +295,7 @@
  void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
  	Trace("%s",__FUNCTION__);
-	process_text_received(text);
+	process_text_received(text,"UTF-8");
  }
 
 #ifdef USE_PRIMARY_SELECTION
@@ -262,7 +308,7 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
  		return;
  	}
 	Trace("Pasting primary selection %p",clipboard);
-	process_text_received(text);
+	process_text_received(text,"UTF-8");
  }
 #endif
 
@@ -308,7 +354,9 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 		}
 		else
 		{
-			process_text_received(buffer);
+			const gchar *charset = NULL;
+			g_get_charset(&charset);
+			process_text_received(buffer,charset);
 		}
 
 		g_free(filename);
