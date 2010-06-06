@@ -216,24 +216,15 @@
 	return pix;
  }
 
-#ifdef USE_PRIMARY_SELECTION
  static void selection_owner_changed(GtkClipboard *clipboard, GdkEventOwnerChange *event, gpointer user_data)
  {
+ 	Trace("%s called reason: %d owner: %p",__FUNCTION__,(int) event->reason, (void *) event->owner);
  	if(terminal && !GTK_WIDGET_HAS_FOCUS(terminal))
 		action_ClearSelection();
+
+	if(event->owner)
+		check_clipboard_contents();
  }
-
-#endif
-
-#if defined( USE_SELECTIONS )
-
- void clipboard_owner_changed(GtkClipboard *clipboard, GdkEventOwnerChange *event, gpointer user_data)
- {
-	if(CONNECTED)
-		gtk_clipboard_request_text(clipboard,update_paste_action,0);
- }
-
-#endif
 
  int CreateTopWindow(void)
  {
@@ -385,13 +376,7 @@
 	set_action_sensitive_by_name("Reselect",FALSE);
 	set_action_sensitive_by_name("PasteNext",FALSE);
 
-#if defined( USE_PRIMARY_SELECTION )
-	g_signal_connect(	G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_PRIMARY)),"owner-change",G_CALLBACK(selection_owner_changed),0 );
-#endif
-
-#if defined( USE_SELECTIONS )
-	g_signal_connect(G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_NONE)),"owner-change",G_CALLBACK(clipboard_owner_changed),0 );
-#endif
+	g_signal_connect(G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_CLIPBOARD)),"owner-change",G_CALLBACK(selection_owner_changed),0);
 
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
 	ptr = GetString("TopWindow","Title","");

@@ -47,12 +47,6 @@
  static void SelectField(int row, int col);
  static void SetDragType(int type);
 
-#ifndef USE_PRIMARY_SELECTION
-	#define SelectionChanged() /* */
-#else
-	static void SelectionChanged(void);
-#endif
-
 /*---[ Constants ]------------------------------------------------------------*/
 
 /*---[ Statics ]--------------------------------------------------------------*/
@@ -366,7 +360,7 @@
 
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 2: // Single click on button 2
 		Trace("Single click (button: %d)",event->button);
-		action_PasteSelection();
+		action_Paste();
 		break;
 
 	case ((SELECT_MODE_FIELD & 0x0F) << 4) | 1:	// Double click, select field
@@ -495,7 +489,6 @@
 	if(gc)
 		gdk_gc_destroy(gc);
 
-	SelectionChanged();
  }
 
  static void UpdateSelectedText(void)
@@ -562,9 +555,6 @@
 
 	if(gc)
 		gdk_gc_destroy(gc);
-
-
-	SelectionChanged();
 
  }
 
@@ -661,37 +651,37 @@
 		}
 		else if(row == startRow)
 		{
-			Trace("Top (%d,%x)",row,col);
+//			Trace("Top (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_TOP);
 		}
 		else if(row == endRow && col == startCol)
 		{
-			Trace("Bottom-left (%d,%x)",row,col);
+//			Trace("Bottom-left (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_BOTTOM_LEFT);
 		}
 		else if(row == endRow && col == endCol)
 		{
-			Trace("Bottom-right (%d,%x)",row,col);
+//			Trace("Bottom-right (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_BOTTOM_RIGHT);
 		}
 		else if(row == endRow)
 		{
-			Trace("Bottom (%d,%x)",row,col);
+//			Trace("Bottom (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_BOTTOM);
 		}
 		else if(col == startCol)
 		{
-			Trace("Left (%d,%x)",row,col);
+//			Trace("Left (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_LEFT);
 		}
 		else if(col == endCol)
 		{
-			Trace("Right (%d,%x)",row,col);
+//			Trace("Right (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_RIGHT);
 		}
 		else if(col >= startCol && col <= endCol && row >= startRow && row <= endRow)
 		{
-			Trace("Inside (%d,%x)",row,col);
+//			Trace("Inside (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_INSIDE);
 		}
 		else
@@ -704,7 +694,7 @@
 	{
 		DecodePosition(event,row,col);
 
-		Trace("Drag_type: %d Position: %d,%d",drag_type,row,col);
+//		Trace("Drag_type: %d Position: %d,%d",drag_type,row,col);
 
 		switch(drag_type)
 		{
@@ -803,11 +793,6 @@
  	SetDragType(DRAG_TYPE_NONE);
 	SetSelection(FALSE);
 	SetSelectionMode(SELECT_MODE_NONE);
-
-// #ifdef USE_PRIMARY_SELECTION
-//	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_PRIMARY),"",-1);
-// #endif
-
  }
 
  void action_SelectAll(GtkWidget *w, gpointer user_data)
@@ -897,29 +882,7 @@
 
  gboolean mouse_enter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data)
  {
-/*
-#if defined(WIN32) && defined(MOUSE_POINTER_CHANGE)
-
-	switch(event->type)
-	{
-	case GDK_ENTER_NOTIFY:
-		break;
-
-	case GDK_LEAVE_NOTIFY:
-		break;
-	}
-
-#endif
-*/
  	return 0;
  }
 
-#ifdef USE_PRIMARY_SELECTION
- static void SelectionChanged(void)
- {
-	gchar *selection = GetSelection();
-	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_PRIMARY),selection,-1);
-	g_free(selection);
- }
-#endif
 

@@ -286,8 +286,9 @@
 	void 		DrawCursorPosition(void);
 
 	#define		GetSelection() GetScreenContents(0)
-	gchar 		*GetClipboard(void);
-	gchar 		*GetScreenContents(gboolean all);
+	LOCAL_EXTERN void	  check_clipboard_contents(void);
+	gchar 				* GetClipboard(void);
+	gchar 				* GetScreenContents(gboolean all);
 
 	gboolean 	mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data);
 	gboolean 	mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
