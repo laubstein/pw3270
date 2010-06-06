@@ -59,10 +59,10 @@
 
  enum
  {
-  TARGET_STRING,
-  TARGET_TEXT,
-  TARGET_COMPOUND_TEXT,
-  TARGET_UTF8_STRING
+	TARGET_STRING,
+	TARGET_TEXT,
+	TARGET_COMPOUND_TEXT,
+	TARGET_UTF8_STRING
  };
 
  static void clipboard_get(GtkClipboard *clipboard, GtkSelectionData *selection_data, guint info, gpointer data)
