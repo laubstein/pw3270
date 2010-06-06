@@ -38,6 +38,8 @@
 	#define LIB3270_INTERNAL __hidden extern
 #elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
 	#define LIB3270_INTERNAL __attribute__((visibility("hidden"))) extern
+#elif defined( WIN32 )
+	#define LIB3270_INTERNAL
 #else
 	#define LIB3270_INTERNAL
 	#warning Exporting internal calls

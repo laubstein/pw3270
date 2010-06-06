@@ -129,6 +129,7 @@
 
  static int paste_char(PASTE_DATA *data, unsigned char c)
  {
+
 	if(toggled(SMART_PASTE))
 	{
 		int faddr = find_field_attribute(cursor_addr);
@@ -167,7 +168,7 @@
  * @Returns 0 if ok, negative if error or number of processed characters.
  *
  */
-LIB3270_EXPORT int lib3270_paste_string(unsigned char *str)
+LIB3270_EXPORT int lib3270_paste_string(const unsigned char *str)
 {
 	PASTE_DATA data = { 0, BA_TO_ROW(cursor_addr), cursor_addr, BA_TO_COL(cursor_addr) };
 	unsigned char last = 1;

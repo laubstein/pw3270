@@ -38,7 +38,7 @@
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
- static GString *clipboard_contents = NULL;
+ static gchar *clipboard_string = NULL;
 
  static enum _clipboard_mode
  {
@@ -51,67 +51,86 @@
 
  gchar * GetClipboard(void)
  {
- 	if(!clipboard_contents)
+ 	if(!clipboard_string)
 		return g_strdup("");
 
-	return g_strdup(clipboard_contents->str);
+	return g_strdup(clipboard_string);
  }
 
- static void UpdateClipboardString(enum _clipboard_mode mode, gboolean append, gchar *str)
+ enum
  {
- 	if(!str)
- 	{
-		if(clipboard_contents)
-			g_string_truncate(clipboard_contents,0);
-		else
-			clipboard_contents = g_string_new("");
- 	}
- 	else if(!clipboard_contents)
- 	{
-		clipboard_contents = g_string_new(str);
- 	}
-	else if(append)
-	{
-		g_string_append_c(clipboard_contents,'\n');
-		g_string_append(clipboard_contents,str);
-	}
-	else
-	{
-#if GTK_CHECK_VERSION(2,14,0)
-		g_string_overwrite(clipboard_contents,0,str);
-		g_string_truncate(clipboard_contents,strlen(str));
-#else
-		g_string_truncate(clipboard_contents,0);
-		g_string_append(clipboard_contents,str);
-#endif
-	}
+  TARGET_STRING,
+  TARGET_TEXT,
+  TARGET_COMPOUND_TEXT,
+  TARGET_UTF8_STRING
+ };
 
- 	if(!(clipboard_contents->len > 0 && terminal))
+ static void clipboard_get(GtkClipboard *clipboard, GtkSelectionData *selection_data, guint info, gpointer data)
+ {
+ 	Trace("%s called",__FUNCTION__);
+
+ 	if(clipboard_string)
+ 	{
+ 		gsize	sz;
+ 		gchar 	*utf_clipboard = g_convert_with_fallback(clipboard_string,-1,"UTF-8",CHARSET,"",NULL,&sz,NULL);
+
+ 		if(utf_clipboard)
+ 		{
+			gtk_selection_data_set_text(selection_data, utf_clipboard,sz);
+			g_free(utf_clipboard);
+ 		}
+ 	}
+ }
+
+ static void clipboard_clear(GtkClipboard *clipboard, gpointer data)
+ {
+ 	Trace("%s called",__FUNCTION__);
+ }
+
+ static void UpdateClipboard(void)
+ {
+	static const GtkTargetEntry targets[] =
+	{
+		{ "STRING",			0, 	TARGET_STRING			},
+		{ "TEXT",			0, 	TARGET_TEXT				},
+		{ "COMPOUND_TEXT",	0,	TARGET_COMPOUND_TEXT	},
+		{ "UTF8_STRING",	0,	TARGET_UTF8_STRING		}
+	};
+
+	Trace("%s called",__FUNCTION__);
+
+ 	if(clipboard_string)
+ 	{
+		gtk_clipboard_set_with_data (	gtk_widget_get_clipboard(topwindow,GDK_NONE),
+										targets, G_N_ELEMENTS (targets),
+										clipboard_get, clipboard_clear,
+										clipboard_string );
+
+
+		set_action_group_sensitive_state(ACTION_GROUP_CLIPBOARD,TRUE);
+ 	}
+ 	else
  	{
  		clipboard_mode = CLIPBOARD_MODE_NONE;
 		set_action_group_sensitive_state(ACTION_GROUP_CLIPBOARD,FALSE);
-		return;
  	}
-
-	clipboard_mode = mode;
-	gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_contents->str,-1);
-	set_action_group_sensitive_state(ACTION_GROUP_CLIPBOARD,TRUE);
-
  }
 
- static void paste_string(gchar *str)
+ static void paste_string(const gchar *str)
  {
- 	int 		sz;
+ 	int 	sz;
+ 	gchar	*last_clipboard;
 
  	if(!str)
  	{
-		UpdateClipboardString(CLIPBOARD_MODE_NONE,FALSE,NULL);
-		Trace("%s",__FUNCTION__);
+		ClearClipboard();
 		return;
  	}
 
-	sz = lib3270_paste_string((unsigned char *) str);
+	Trace("Pasting %p with %d bytes)",str,strlen(str));
+	sz = lib3270_paste_string((const unsigned char *) str);
 	Trace("Paste returned %d (string has %d bytes)",sz,strlen(str));
+
 	if(sz < 1)
 	{
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
@@ -130,29 +149,44 @@
 		return;
 	}
 
-	if(*(str+sz))
-		UpdateClipboardString(CLIPBOARD_MODE_TEXT,FALSE,str+sz);
-	else
-		UpdateClipboardString(CLIPBOARD_MODE_NONE,FALSE,NULL);
+	/* Update clipboard contents */
+	last_clipboard = clipboard_string;
 
-	set_action_sensitive_by_name("PasteNext",clipboard_contents->len > 0);
+	if(strlen(str) > sz)
+	{
+		clipboard_mode		= CLIPBOARD_MODE_TEXT;
+		clipboard_string	= g_strdup(str+sz);
+	}
+	else
+	{
+		clipboard_mode		= CLIPBOARD_MODE_NONE;
+		clipboard_string	= NULL;
+	}
+
+	if(last_clipboard)
+		g_free(last_clipboard);
+
+	UpdateClipboard();
+	set_action_sensitive_by_name("PasteNext",clipboard_string != NULL);
 
 	screen_resume();
+
+	Trace("%s - ends (clipboard_string=%p)",__FUNCTION__,clipboard_string);
 
  }
 
  static void process_text_received(const gchar *text, const gchar *encoding)
  {
- 	gchar 	*buffer;
+ 	gchar 	*buffer = NULL;
  	gchar 	*ptr;
  	GError	*error = NULL;
 
  	if(!text)
 		return;
 
- 	Trace("%s",__FUNCTION__);
-
 	buffer = g_convert(text, -1, CHARSET, encoding, NULL, NULL, &error);
+
+ 	Trace("%s buffer=%p error=%p",__FUNCTION__,buffer,error);
 
     if(!buffer)
     {
@@ -181,6 +215,7 @@
 
 		if(error)
 		{
+			Trace("%s error=%p",__FUNCTION__,error);
 			g_error_free(error);
 			error = NULL;
 		}
@@ -200,6 +235,7 @@
 			}
 		}
 
+		Trace("%s error=%p",__FUNCTION__,error);
 		buffer = g_convert(string, -1, CHARSET, encoding, NULL, NULL, &error);
 
 		if(!buffer)
@@ -209,6 +245,12 @@
 			for(f=0;ln[f];f++)
 			{
 				gchar *str = g_convert(ln[f], -1, CHARSET, encoding, NULL, NULL, &error);
+
+				if(error)
+				{
+					g_error_free(error);
+					error = 0;
+				}
 
 				if(!str)
 				{
@@ -246,6 +288,13 @@
 
 		g_free(string);
 
+		if(error)
+		{
+			g_error_free(error);
+			error = 0;
+		}
+
+
     	if(!buffer)
     	{
 			GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
@@ -278,11 +327,14 @@
 			*ptr = ' ';
     }
 
-	Trace("Received text:\n%s\n",buffer);
+	Trace("Received text:%p (%d bytes) Clipboard is %p\n",buffer,strlen(buffer),clipboard_string);
 
 	paste_string(buffer);
+
+	Trace("%s: Releasing buffer %p",__FUNCTION__,buffer);
 	g_free(buffer);
 
+	Trace("%s: ends",__FUNCTION__);
  }
 
 #if defined( USE_SELECTIONS )
@@ -294,8 +346,9 @@
 
  void clipboard_text_received(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
- 	Trace("%s",__FUNCTION__);
+ 	Trace("%s begins",__FUNCTION__);
 	process_text_received(text,"UTF-8");
+ 	Trace("%s ends",__FUNCTION__);
  }
 
 #ifdef USE_PRIMARY_SELECTION
@@ -372,8 +425,9 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 
  void action_Paste(void)
  {
- 	Trace("%s",__FUNCTION__);
+ 	Trace("%s begins",__FUNCTION__);
 	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,GDK_NONE),clipboard_text_received,(gpointer) 0);
+ 	Trace("%s ends",__FUNCTION__);
  }
 
  void action_PasteSelection(void)
@@ -387,23 +441,46 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 
  void action_PasteNext(void)
  {
- 	if(clipboard_contents && clipboard_contents->len > 0)
-		paste_string(clipboard_contents->str);
+ 	Trace("%s begins",__FUNCTION__);
+ 	if(clipboard_string && *clipboard_string)
+		paste_string(clipboard_string);
 	else
 		action_Paste();
+ 	Trace("%s ends",__FUNCTION__);
  }
 
  void ClearClipboard(void)
  {
-	UpdateClipboardString(CLIPBOARD_MODE_NONE,FALSE,NULL);
+	if(clipboard_string)
+	{
+		g_free(clipboard_string);
+		clipboard_string = NULL;
+	}
+	UpdateClipboard();
+	set_action_sensitive_by_name("PasteNext",FALSE);
  }
 
  static void CopyAsText(gboolean append)
  {
-	gchar *str = GetSelection();
-	Trace("%s (append: %s mode: %d)",__FUNCTION__,append ? "Yes" : "No",(int) clipboard_mode);
-	UpdateClipboardString(CLIPBOARD_MODE_TEXT,append,str);
-	g_free(str);
+	gchar *last_clipboard = clipboard_string;
+
+	if(append && last_clipboard)
+	{
+		gchar *ptr = GetSelection();
+		clipboard_string = g_strconcat(last_clipboard,"\n",ptr,NULL);
+		g_free(ptr);
+	}
+	else
+	{
+		clipboard_string = GetSelection();
+	}
+
+	if(last_clipboard)
+		g_free(last_clipboard);
+
+	clipboard_mode = CLIPBOARD_MODE_TEXT;
+	UpdateClipboard();
+
  }
 
  static void CopyAsTable(gboolean append)
@@ -413,6 +490,7 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 	int				row, col;
 	ELEMENT			*el;
 	GString			*buffer;
+	gchar 			*last_clipboard;
 
 	Trace("%s (append: %s mode: %d)",__FUNCTION__,append ? "Yes" : "No",(int) clipboard_mode);
 
@@ -482,12 +560,29 @@ static void primary_text_received(GtkClipboard *clipboard, const gchar *text, gp
 		}
  	}
 
+ 	g_free(cols);
+
 	Trace("Tabela lida:\n%s\n",buffer->str);
 
-	UpdateClipboardString(CLIPBOARD_MODE_TABLE,append,buffer->str);
+	/* Update clipboard contents */
+	last_clipboard = clipboard_string;
 
-	g_string_free(buffer,TRUE);
- 	g_free(cols);
+	if(append && last_clipboard)
+	{
+		clipboard_string = g_strconcat(last_clipboard,"\n",buffer->str,NULL);
+		g_string_free(buffer,TRUE);
+	}
+	else
+	{
+		clipboard_string = g_string_free(buffer,FALSE);
+	}
+
+	if(last_clipboard)
+		g_free(last_clipboard);
+
+	clipboard_mode = CLIPBOARD_MODE_TABLE;
+	UpdateClipboard();
+
  }
 
  void action_CopyAsTable(void)
