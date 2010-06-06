@@ -71,10 +71,6 @@
 
 	#undef MOUSE_POINTER_CHANGE
 
-	/* Extended features */
-	#undef USE_PRIMARY_SELECTION
-	#undef USE_SELECTIONS
-
 	/* Default toggles */
 	#define DEFAULT_TOGGLE_RECTANGLE_SELECT
 	#define DEFAULT_TOGGLE_CURSOR_POS

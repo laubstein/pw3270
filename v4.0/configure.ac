@@ -238,22 +238,6 @@ AC_ARG_ENABLE([mouse-pointer-change],
 	pw3270_cv_pointer_change="yes"
 ])
 
-AC_ARG_ENABLE([selections],
-	[AS_HELP_STRING([--disable-selections], [ignore selection events])],
-[
-	pw3270_cv_use_selections="$enableval"
-],[
-	pw3270_cv_use_selections="yes"
-])
-
-AC_ARG_ENABLE([primary-selection],
-	[AS_HELP_STRING([--disable-primary-selection], [disable usage of GDK_SELECTION_PRIMARY])],
-[
-	pw3270_cv_use_primary_selection="$enableval"
-],[
-	pw3270_cv_use_primary_selection="yes"
-])
-
 AC_ARG_WITH([rexx-sdk],
 	[AS_HELP_STRING([--with-rexx-sdk], [Set Rexx SDK root path])],
 [
