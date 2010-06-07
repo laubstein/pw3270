@@ -1,4 +1,4 @@
-!include "MUI.nsh"
+!include "MUI2.nsh"
 
 Name "@PROGRAM_NAME@"
 Caption "@PROGRAM_NAME@ - 3270 Emulator for windows/gtk"
@@ -9,7 +9,9 @@ XPStyle on
 installDir $PROGRAMFILES\@PROGRAM_NAME@
 
 #define the installer icon
-icon "@ICONFILE@"
+!define MUI_ICON "@PROGRAM_NAME@.ico"
+!define MUI_UNICON "@PROGRAM_NAME@.ico"
+icon "@PROGRAM_NAME@.ico"
 
 # Get installation folder from registry if available
 InstallDirRegKey HKCU "Software\@PROGRAM_NAME@" ""
@@ -46,6 +48,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 
 		# Binary files
 		file "/oname=$INSTDIR\@PROGRAM_NAME@.exe"	"bin\Release\@PROGRAM_NAME@.exe"
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.ico"	"@PROGRAM_NAME@.ico"
 
 		# Configuration files
 		file "/oname=$INSTDIR\@PROGRAM_NAME@.@LOGOEXT@"	"bin\Release\@PACKAGE@.@LOGOEXT@"
@@ -67,6 +70,12 @@ SubSection "@PROGRAM_NAME@" SecMain
 		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
 			         "DisplayName" "@PROGRAM_NAME@ - 3270 emulator for windows/gtk"
 		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
+			         "DisplayIcon" "$INSTDIR\@PROGRAM_NAME@.ico"
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
+			         "DisplayVersion" "@PACKAGE_VERSION@ (Rev: @PACKAGE_REVISION@)"
+
+
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
 			         "UninstallString" "$INSTDIR\uninstall.exe"
 		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
 			         "InstallLocation" "$INSTDIR"
@@ -74,8 +83,6 @@ SubSection "@PROGRAM_NAME@" SecMain
 			         "NoModify" "1"
 		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
 			         "NoRepair" "1"
-		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
-			         "DisplayVersion" "@PACKAGE_VERSION@ (Rev: @PACKAGE_REVISION@)"
 
 		# Save instalation dir
 		WriteRegStr HKCU "Software\@PROGRAM_NAME@" "" $INSTDIR
