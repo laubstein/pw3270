@@ -42,6 +42,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 
 		# define the output path for this file
 		setOutPath $INSTDIR
+		SetShellVarContext all
 
 		createShortCut "$SMPROGRAMS\@PROGRAM_NAME@.lnk" "$INSTDIR\@PROGRAM_NAME@.exe"
 		createShortCut "$DESKTOP\@PROGRAM_NAME@.lnk" "$INSTDIR\@PROGRAM_NAME@.exe"
@@ -196,6 +197,9 @@ section "Uninstall"
 	# Always delete uninstaller first
 	delete $INSTDIR\uninstaller.exe
 
+	# Set SMPROGRAMS and DESKTOP path
+	SetShellVarContext all
+
 	# now delete installed files
 	delete $INSTDIR\@PROGRAM_NAME@.exe
 	delete $INSTDIR\lib3270.dll
@@ -204,6 +208,7 @@ section "Uninstall"
 	delete $INSTDIR\ui.xml
 	delete $INSTDIR\@PROGRAM_NAME@.jpg
 	delete $INSTDIR\@PROGRAM_NAME@.log
+
 	delete $SMPROGRAMS\@PROGRAM_NAME@.lnk
 	delete $DESKTOP\@PROGRAM_NAME@.lnk
 
