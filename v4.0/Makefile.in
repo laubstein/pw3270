@@ -207,7 +207,7 @@ obj/Debug/src/gui/%.o: src/gui/%.c src/gui/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(APP_CFLAGS) $(GUI_CFLAGS) -o $@ -c $<
 
-obj/Debug/src/gui/resources.o: src/gui/resources.rc $(PACKAGE).ico Makefile
+obj/Debug/src/gui/resources.o: src/gui/resources.rc @PROGRAM_NAME@.ico Makefile
 	@echo $< ...
 	@$(WINDRES) --include-dir=. -i $< -o $@
 
@@ -230,7 +230,7 @@ obj/Release/src/gui/%.o: src/gui/%.c src/gui/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) $(APP_CFLAGS) $(GUI_CFLAGS) -o $@ -c $<
 
-obj/Release/src/gui/resources.o: src/gui/resources.rc $(PACKAGE).ico Makefile
+obj/Release/src/gui/resources.o: src/gui/resources.rc @PROGRAM_NAME@.ico Makefile
 	@echo $< ...
 	@$(WINDRES) --include-dir=src/gui -i $< -o $@
 
@@ -545,7 +545,7 @@ $(PACKAGE).desktop: Makefile
 	@echo "Terminal=false" >> $@
 	@echo "Type=Application" >> $@
 
-$(PACKAGE).ico: @ICONFILE@
+@PROGRAM_NAME@.ico: @ICONFILE@
 	@cp @ICONFILE@ $@
 
 $(PACKAGE).@LOGOEXT@: @LOGOFILE@ Makefile
@@ -675,7 +675,7 @@ clean:
 	@rm -f *.lnk
 	@rm -fr locale
 	@rm -f *.nsi
-	@rm -f $(PACKAGE).ico
+	@rm -f @PROGRAM_NAME@.ico
 	@rm -f $(PACKAGE).@LOGOEXT@
 	@rm -f @PROGRAM_NAME@.oxt
 	@rm -f src/java/lib3270_jni.h
