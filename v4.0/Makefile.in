@@ -207,8 +207,9 @@ obj/Debug/src/gui/%.o: src/gui/%.c src/gui/*.h $(GLOBAL_DEPENDS)
 	@mkdir -p `dirname $@`
 	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(APP_CFLAGS) $(GUI_CFLAGS) -o $@ -c $<
 
-obj/Debug/src/gui/resources.o: src/gui/resources.rc @PROGRAM_NAME@.ico Makefile
+obj/Debug/src/gui/resources.o: src/gui/resources.rc @PROGRAM_NAME@.ico $(PACKAGE).ico Makefile
 	@echo $< ...
+	@mkdir -p `dirname $@`
 	@$(WINDRES) --include-dir=. -i $< -o $@
 
 obj/Debug/version.o: src/version.c
@@ -548,6 +549,9 @@ $(PACKAGE).desktop: Makefile
 @PROGRAM_NAME@.ico: @ICONFILE@
 	@cp @ICONFILE@ $@
 
+$(PACKAGE).ico: @ICONFILE@
+	@cp @ICONFILE@ $@
+
 $(PACKAGE).@LOGOEXT@: @LOGOFILE@ Makefile
 	@convert @LOGOFILE@ $@
 
@@ -675,7 +679,7 @@ clean:
 	@rm -f *.lnk
 	@rm -fr locale
 	@rm -f *.nsi
-	@rm -f @PROGRAM_NAME@.ico
+	@rm -f *.ico
 	@rm -f $(PACKAGE).@LOGOEXT@
 	@rm -f @PROGRAM_NAME@.oxt
 	@rm -f src/java/lib3270_jni.h
