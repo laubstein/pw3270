@@ -57,7 +57,9 @@
 	if(Argc > 1)
 		wait = atoi(Argv[1].strptr);
 
+	Trace("%s(%s,%d)",__FUNCTION__,Argv[0].strptr,wait);
 	rc = host_connect(Argv[0].strptr,wait);
+	Trace("%s exits with %d",__FUNCTION__,rc);
 
 	return RetValue(Retstr,rc);
  }

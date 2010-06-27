@@ -705,10 +705,10 @@ setup_lus(void)
 	int n_lus = 1;
 	int i;
 
-	connected_lu = CN;
+	h3270.connected_lu = CN;
 	connected_type = CN;
 
-	if (!luname[0]) {
+	if (!h3270.luname[0]) {
 		Replace(lus, NULL);
 		curr_lu = (char **)NULL;
 		try_lu = CN;
@@ -719,7 +719,7 @@ setup_lus(void)
 	 * Count the commas in the LU name.  That plus one is the
 	 * number of LUs to try.
 	 */
-	lu = luname;
+	lu = h3270.luname;
 	while ((comma = strchr(lu, ',')) != CN) {
 		n_lus++;
 		lu++;
@@ -730,11 +730,11 @@ setup_lus(void)
 	 * the LUs.
 	 */
 	Replace(lus,
-	    (char **)Malloc((n_lus+1) * sizeof(char *) + strlen(luname) + 1));
+	    (char **)Malloc((n_lus+1) * sizeof(char *) + strlen(h3270.luname) + 1));
 
 	/* Copy each LU into the array. */
 	lu = (char *)(lus + n_lus + 1);
-	(void) strcpy(lu, luname);
+	(void) strcpy(lu, h3270.luname);
 	i = 0;
 	do {
 		lus[i++] = lu;
@@ -858,13 +858,14 @@ connection_complete(void)
  *	Output is possible on the socket.  Used only when a connection is
  *	pending, to determine that the connection is complete.
  */
-static void
-output_possible(void)
+static void output_possible(void)
 {
-	if (HALF_CONNECTED) {
+	if (HALF_CONNECTED)
+	{
 		connection_complete();
 	}
-	if (output_id) {
+	if (output_id)
+	{
 		RemoveInput(output_id);
 		output_id = 0L;
 	}
@@ -1427,10 +1428,10 @@ telnet_fsm(unsigned char c)
 				tt_len = strlen(termtype);
 				if (try_lu != CN && *try_lu) {
 					tt_len += strlen(try_lu) + 1;
-					connected_lu = try_lu;
+					h3270.connected_lu = try_lu;
 				} else
-					connected_lu = CN;
-				status_lu(connected_lu);
+					h3270.connected_lu = CN;
+				status_lu(h3270.connected_lu);
 
 				tb_len = 4 + tt_len + 2;
 				tt_out = Malloc(tb_len + 1);
@@ -1613,8 +1614,8 @@ tn3270e_negotiate(void)
 				(void)strncpy(reported_lu,
 				    (char *)&sbbuf[3+tnlen+1], snlen);
 				reported_lu[snlen] = '\0';
-				connected_lu = reported_lu;
-				status_lu(connected_lu);
+				h3270.connected_lu = reported_lu;
+				status_lu(h3270.connected_lu);
 			}
 
 			/* Tell them what we can do. */
@@ -3099,7 +3100,7 @@ net_snap_options(void)
 
 		space3270out(5 +
 			((connected_type != CN) ? strlen(connected_type) : 0) +
-			((connected_lu != CN) ? + strlen(connected_lu) : 0) +
+			((h3270.connected_lu != CN) ? + strlen(h3270.connected_lu) : 0) +
 			2);
 		*obptr++ = IAC;
 		*obptr++ = SB;
@@ -3111,11 +3112,11 @@ net_snap_options(void)
 					strlen(connected_type));
 			obptr += strlen(connected_type);
 		}
-		if (connected_lu != CN) {
+		if (h3270.connected_lu != CN) {
 			*obptr++ = TN3270E_OP_CONNECT;
-			(void) memcpy(obptr, connected_lu,
-					strlen(connected_lu));
-			obptr += strlen(connected_lu);
+			(void) memcpy(obptr, h3270.connected_lu,
+					strlen(h3270.connected_lu));
+			obptr += strlen(h3270.connected_lu);
 		}
 		*obptr++ = IAC;
 		*obptr++ = SE;

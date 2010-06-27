@@ -106,7 +106,19 @@
 			#define Log(fmt, ...)		WriteLog("MSG",fmt,__VA_ARGS__)
 		#endif
 
-		/**   input key type */
+		/** 3270 connection handle */
+		#define         LUNAME_SIZE     16
+
+		typedef struct _h3270
+		{
+			unsigned short 	  sz;				/**< Struct size */
+			char				* connected_lu;
+			char				  luname[LUNAME_SIZE+1];
+
+
+		} H3270;
+
+		/** input key type */
 		enum keytype
 		{
 			KT_STD,

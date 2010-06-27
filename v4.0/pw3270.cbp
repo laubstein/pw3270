@@ -675,6 +675,10 @@
 		</Unit>
 		<Unit filename="src/lib/seec.h" />
 		<Unit filename="src/lib/selectc.h" />
+		<Unit filename="src/lib/session.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/lib/sf.c">
 			<Option compilerVar="CC" />
 		</Unit>

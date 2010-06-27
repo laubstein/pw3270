@@ -239,7 +239,7 @@ static unsigned long DefaultAddInput(int source, void (*fn)(void))
 {
 	input_t *ip;
 
-	ip = (input_t *)Malloc(sizeof(input_t));
+	ip = (input_t *) Malloc(sizeof(input_t));
 	ip->source = source;
 	ip->condition = InputReadMask;
 	ip->proc = fn;
@@ -247,9 +247,9 @@ static unsigned long DefaultAddInput(int source, void (*fn)(void))
 	inputs = ip;
 	inputs_changed = True;
 
-	Trace("Input source added(%d - %p): %p",source,fn,ip);
+	Trace("%s: fd=%d callback=%p handle=%p",__FUNCTION__,source,fn,ip);
 
-	return (unsigned long)ip;
+	return (unsigned long) ip;
 }
 
 static unsigned long DefaultAddExcept(int source, void (*fn)(void))
@@ -267,7 +267,7 @@ static unsigned long DefaultAddExcept(int source, void (*fn)(void))
 	inputs = ip;
 	inputs_changed = True;
 
-	Trace("Input exception added(%d - %p): %p",source,fn,ip);
+	Trace("%s: fd=%d callback=%p handle=%p",__FUNCTION__,source,fn,ip);
 
 	return (unsigned long)ip;
 #endif /*]*/
@@ -286,7 +286,7 @@ static unsigned long DefaultAddOutput(int source, void (*fn)(void))
 	inputs = ip;
 	inputs_changed = True;
 
-	Trace("Output source added(%d - %p): %p",source,fn,ip);
+	Trace("%s: fd=%d callback=%p handle=%p",__FUNCTION__,source,fn,ip);
 
 	return (unsigned long)ip;
 }
@@ -297,19 +297,23 @@ static void DefaultRemoveInput(unsigned long id)
 	input_t *ip;
 	input_t *prev = (input_t *)NULL;
 
-	Trace("Removing input source: %p",(input_t *) id);
+	Trace("%s: fhandle=%p",__FUNCTION__,(input_t *) id);
 
-	for (ip = inputs; ip != (input_t *)NULL; ip = ip->next) {
+	for (ip = inputs; ip != (input_t *)NULL; ip = ip->next)
+	{
 		if (ip == (input_t *)id)
 			break;
+
 		prev = ip;
 	}
 	if (ip == (input_t *)NULL)
 		return;
+
 	if (prev != (input_t *)NULL)
 		prev->next = ip->next;
 	else
 		inputs = ip->next;
+
 	Free(ip);
 	inputs_changed = True;
 }
@@ -321,18 +325,18 @@ static void DefaultRemoveInput(unsigned long id)
 /* Event dispatcher. */
 static int DefaultProcessEvents(int block)
 {
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 	HANDLE ha[MAX_HA];
 	DWORD nha;
 	DWORD tmo;
 	DWORD ret;
 	unsigned long long now;
 	int i;
-#else /*][*/
+#else
 	fd_set rfds, wfds, xfds;
 	int ns;
 	struct timeval now, twait, *tp;
-#endif /*]*/
+#endif
 	input_t *ip, *ip_next;
 	struct timeout *t;
 	Boolean any_events;
@@ -340,30 +344,31 @@ static int DefaultProcessEvents(int block)
 
     retry:
 
-	/* If we've processed any input, then don't block again. */
+	// If we've processed any input, then don't block again.
 
 	if(processed_any)
 		block = 0;
 	any_events = False;
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 	nha = 0;
-#else /*][*/
+#else
 	FD_ZERO(&rfds);
 	FD_ZERO(&wfds);
 	FD_ZERO(&xfds);
-#endif /*]*/
+#endif
+
 	for (ip = inputs; ip != (input_t *)NULL; ip = ip->next)
 	{
 		if ((unsigned long)ip->condition & InputReadMask)
 		{
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 			ha[nha++] = (HANDLE)ip->source;
-#else /*][*/
+#else
 			FD_SET(ip->source, &rfds);
-#endif /*]*/
+#endif
 			any_events = True;
 		}
-#if !defined(_WIN32) /*[*/
+#if !defined(_WIN32)
 		if ((unsigned long)ip->condition & InputWriteMask)
 		{
 			FD_SET(ip->source, &wfds);
@@ -374,19 +379,19 @@ static int DefaultProcessEvents(int block)
 			FD_SET(ip->source, &xfds);
 			any_events = True;
 		}
-#endif /*]*/
+#endif
 	}
 
 	if (block)
 	{
 		if (timeouts != TN) {
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 			ms_ts(&now);
 			if (now > timeouts->ts)
 				tmo = 0;
 			else
 				tmo = timeouts->ts - now;
-#else /*][*/
+#else
 			(void) gettimeofday(&now, (void *)NULL);
 			twait.tv_sec = timeouts->tv.tv_sec - now.tv_sec;
 			twait.tv_usec = timeouts->tv.tv_usec - now.tv_usec;
@@ -397,71 +402,71 @@ static int DefaultProcessEvents(int block)
 			if (twait.tv_sec < 0L)
 				twait.tv_sec = twait.tv_usec = 0L;
 			tp = &twait;
-#endif /*]*/
+#endif
 			any_events = True;
 		} else {
 			// Block for 1 second (at maximal)
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 			tmo = 1;
-#else /*][*/
+#else
 			twait.tv_sec = 1;
 			twait.tv_usec = 0L;
 			tp = &twait;
-#endif /*]*/
+#endif
 		}
 	}
 	else
 	{
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 		tmo = 1;
-#else /*][*/
+#else
 		twait.tv_sec = twait.tv_usec = 0L;
 		tp = &twait;
-#endif /*]*/
+#endif
 	}
 
 	if (!any_events)
 		return processed_any;
 
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 	ret = WaitForMultipleObjects(nha, ha, FALSE, tmo);
 	if (ret == WAIT_FAILED)
 	{
-#else /*][*/
+#else
 	ns = select(FD_SETSIZE, &rfds, &wfds, &xfds, tp);
 	if (ns < 0)
 	{
 		if (errno != EINTR)
 			Warning( "process_events: select() failed" );
-#endif /*]*/
+#endif
 		return processed_any;
 	}
 
 	inputs_changed = False;
 
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 	for (i = 0, ip = inputs; ip != (input_t *)NULL; ip = ip_next, i++)
 	{
-#else /*][*/
-	for (ip = inputs; ip != (input_t *)NULL; ip = ip_next)
+#else
+	for (ip = inputs; ip != (input_t *) NULL; ip = ip_next)
 	{
-#endif /*]*/
+#endif
 		ip_next = ip->next;
 		if (((unsigned long)ip->condition & InputReadMask) &&
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 		    ret == WAIT_OBJECT_0 + i)
 		{
-#else /*][*/
+#else
 		    FD_ISSET(ip->source, &rfds))
 		{
-#endif /*]*/
+#endif
 			(*ip->proc)();
 			processed_any = True;
 			if (inputs_changed)
 				goto retry;
 		}
 
-#if !defined(_WIN32) /*[*/
+#if !defined(_WIN32)
 		if (((unsigned long)ip->condition & InputWriteMask) && FD_ISSET(ip->source, &wfds))
 		{
 			(*ip->proc)();
@@ -476,24 +481,24 @@ static int DefaultProcessEvents(int block)
 			if (inputs_changed)
 				goto retry;
 		}
-#endif /*]*/
+#endif
 	}
 
-	/* See what's expired. */
+	// See what's expired.
 	if (timeouts != TN) {
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 		ms_ts(&now);
-#else /*][*/
+#else
 		(void) gettimeofday(&now, (void *)NULL);
-#endif /*]*/
+#endif
 		while ((t = timeouts) != TN) {
-#if defined(_WIN32) /*[*/
+#if defined(_WIN32)
 			if (t->ts <= now) {
-#else /*][*/
+#else
 			if (t->tv.tv_sec < now.tv_sec ||
 			    (t->tv.tv_sec == now.tv_sec &&
 			     t->tv.tv_usec < now.tv_usec)) {
-#endif /*]*/
+#endif
 				timeouts = t->next;
 				t->in_play = True;
 				(*t->proc)();
