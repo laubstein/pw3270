@@ -32,6 +32,7 @@
 
 /* Autoconf settings. */
 #include <lib3270/config.h>			/* autoconf settings */
+#include <lib3270/api.h>			/* lib3270 API calls and defs */
 
 /* From glibconfig.h */
 #if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
@@ -142,10 +143,12 @@ enum iaction {
 	IA_IDLE
 };
 
-/* Simple global variables */
+/* Simple global variables - At some point in the future they'll be moved to the session structure */
 
 LIB3270_INTERNAL int		COLS;
 LIB3270_INTERNAL int		ROWS;
+
+#include "session.h"
 
 #if defined(X3270_DISPLAY) /*[*/
 	LIB3270_INTERNAL Atom		a_3270, a_registry, a_encoding;
@@ -156,7 +159,6 @@ LIB3270_INTERNAL const char		*build;
 LIB3270_INTERNAL const char		*build_rpq_timestamp;
 LIB3270_INTERNAL const char 		*build_rpq_version;
 LIB3270_INTERNAL int				children;
-LIB3270_INTERNAL char				*connected_lu;
 LIB3270_INTERNAL char				*connected_type;
 LIB3270_INTERNAL char				*current_host;
 LIB3270_INTERNAL unsigned short	current_port;
@@ -200,9 +202,6 @@ LIB3270_INTERNAL char		*hostname;
 	#endif /*]*/
 
 #endif /*]*/
-
-#define         LUNAME_SIZE     16
-LIB3270_INTERNAL char		luname[LUNAME_SIZE+1];
 
 #if defined(LOCAL_PROCESS) /*[*/
 	LIB3270_INTERNAL Boolean	local_process;

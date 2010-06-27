@@ -83,7 +83,7 @@
 #include "winversc.h"
 #endif /*]*/
 
-#include <lib3270/api.h>
+#include "session.h"
 
 #if defined WIN32
 	BOOL WINAPI DllMain(HANDLE hinst, DWORD dwcallpurpose, LPVOID lpvResvd);
@@ -99,21 +99,12 @@
 // extern void usage(char *);
 
  #define LAST_ARG	"--"
-//#if defined(WC3270) /*[*/
-//#define PROFILE_SFX	".wc3270"
-//#define PROFILE_SFX_LEN	(sizeof(PROFILE_SFX) - 1)
-//#define PROFILE_SSFX	".wc3"
-//#define PROFILE_SSFX_LEN (sizeof(PROFILE_SSFX) - 1)
-//#endif /*]*/
-//
-//#if defined(C3270) /*[*/
-//extern void merge_profile(void); /* XXX */
-//#endif /*]*/
 
 /* Statics */
 static int parse_model_number(char *m);
 
 /* Globals */
+H3270			h3270;
 const char		*programname;
 char			full_model_name[FULL_MODEL_NAME_SIZE] = "IBM-";
 char			*model_name = &full_model_name[4];
@@ -153,6 +144,12 @@ const char *toggle_names[N_TOGGLES] =
 	"SmartPaste"
 };
 
+static void init_3270_session(H3270 *session)
+{
+	memset(session,0,sizeof(H3270));
+	session->sz = sizeof(H3270);
+}
+
 int lib3270_init(void)
 {
 	static int configured = 0;
@@ -166,6 +163,8 @@ int lib3270_init(void)
 		return EBUSY;
 
 	configured = 1;
+
+	init_3270_session(&h3270);
 
 #if defined(_WIN32)
 

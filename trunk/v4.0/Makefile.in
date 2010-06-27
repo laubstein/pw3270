@@ -402,6 +402,8 @@ bin/Debug/pipetest@EXEEXT@: obj/Debug/src/plugins/pipectl/pipetest.o
 ####################################################################################################
 
 # Debug
+DBGRexx: bin/Debug/librx3270$(DLLEXT)
+
 obj/Debug/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`

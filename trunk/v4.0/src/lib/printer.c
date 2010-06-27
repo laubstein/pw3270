@@ -178,11 +178,11 @@ printer_start(const char *lu)
 		}
 
 		/* Gotta be connected to an LU. */
-		if (connected_lu == CN) {
+		if (h3270.connected_lu == CN) {
 			popup_an_error("Not connected to a specific LU");
 			return;
 		}
-		lu = connected_lu;
+		lu = h3270.connected_lu;
 		cmdlineName = ResAssocCommand;
 	} else {
 		/* Specific LU passed in. */

@@ -30,8 +30,6 @@
  *
  */
 
-
-
  #include "rx3270.h"
 
 #ifdef HAVE_ICONV
@@ -136,6 +134,9 @@ RexxReturnCode REXXENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], P
  	// Load rexx calls
 	for(f=0; f < G_N_ELEMENTS(rexx_exported_calls); f++)
 		RexxRegisterFunctionExe((char *) rexx_exported_calls[f].name,rexx_exported_calls[f].call);
+
+	// Init 3270 library
+	lib3270_init();
 
 	return RetValue(Retstr,0);
 }
