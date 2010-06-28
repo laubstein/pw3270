@@ -81,6 +81,7 @@ EXTENSIONS=""
 CPPUENV="gcc3"
 
 AC_CHECK_PROG(PACKAGE_MANAGER, "rpmbuild", "rpm")
+AC_CHECK_PROG(PACKAGE_MANAGER, "dpkg-buildpackage","deb")
 
 case "$host" in
 	*-mingw32)
@@ -108,17 +109,27 @@ case "$host" in
 		;;
 
 	*)
+
+		# Check for OpenOffice
 		AC_CHECK_FILE("/opt/openoffice.org/basis3.0/program/unorc",oo_home="/opt/openoffice.org",oo_home="none")
 		AC_CHECK_FILE("/opt/broffice.org3/program/soffice.bin",oo_home="/opt/broffice.org3",)
 		AC_CHECK_FILE("/usr/lib/ooo3/program/soffice.bin",oo_home="/usr/lib/ooo3",)
+		AC_CHECK_FILE("/usr/lib/openoffice/program/soffice.bin",oo_home="/usr/lib/openoffice/",)
 
+		# Check for OpenOffice URE
 		AC_CHECK_FILE("/opt/openoffice.org/ure/lib/unorc",oo_ure_home="/opt/openoffice.org/ure",oo_ure_home="none")
+		AC_CHECK_FILE("/usr/lib/ure/lib/unorc",oo_ure_home="/usr/lib/ure",)
+
+		# Check for types.rdb
 		AC_CHECK_FILE("$oo_ure_home/share/misc/types.rdb",types_rdb=$oo_ure_home/share/misc/types.rdb,types_rdb="no")
 		AC_CHECK_FILE("$oo_home/solver/bin/types.rdb", types_rdb=$oo_home/solver/bin/types.rdb,)
 
+		# Check for OpenOffice SDK
 		AC_CHECK_FILE("/opt/openoffice.org/basis3.0/sdk/bin/idlc",oo_sdk_home="/opt/openoffice.org/basis3.0/sdk",oo_sdk_home="none")
 		AC_CHECK_FILE("/opt/openoffice.org/basis3.1/sdk/bin/idlc",oo_sdk_home="/opt/openoffice.org/basis3.1/sdk",)
+		AC_CHECK_FILE("/usr/lib/openoffice/basis3.2/sdk/bin/idlc",oo_sdk_home="/opt/openoffice.org/basis3.2/sdk",)
 
+		# Check for Java
 		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
 		java_ldflags="-L\$(JRE_HOME)/lib/i386/client -Wl,-rpath,\$(JRE_HOME)/lib/i386/client -ljvm"
 esac
