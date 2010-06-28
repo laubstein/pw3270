@@ -1872,8 +1872,7 @@ do_read_buffer(String *params, Cardinal num_params, struct ea *buf, int fd)
 	if (fd >= 0) {
 		char *s;
 
-		s = xs_buffer("rows %d cols %d cursor %d\n", ROWS, COLS,
-				cursor_addr);
+		s = xs_buffer("rows %d cols %d cursor %d\n", ROWS, COLS, cursor_addr);
 		(void) write(fd, s, strlen(s));
 		Free(s);
 	}
@@ -2719,6 +2718,7 @@ CloseScript_action(Widget w unused, XEvent *event unused, String *params,
 }
 
 /* Execute an arbitrary shell command. */
+/*
 void
 Execute_action(Widget w unused, XEvent *event unused, String *params,
     Cardinal *num_params)
@@ -2727,6 +2727,7 @@ Execute_action(Widget w unused, XEvent *event unused, String *params,
 		return;
 	(void) system(params[0]);
 }
+*/
 
 /* Timeout for Expect action. */
 static void
