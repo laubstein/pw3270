@@ -182,10 +182,13 @@ memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/
 install-package: $(PACKAGE_MANAGER)
 
 rpm: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
-	rpmbuild -ta @PACKAGE@-@PACKAGE_VERSION@.tar.gz
+	@rpmbuild -ta @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 
 nsi: Release
-	wine "$(HOME)/.wine/drive_c/Arquivos de programas/NSIS/makensis.exe" "$(PACKAGE).nsi"
+	@wine "$(HOME)/.wine/drive_c/Arquivos de programas/NSIS/makensis.exe" "$(PACKAGE).nsi"
+
+deb:
+	@dpkg-buildpackage -rfakeroot -uc -us
 
 ####################################################################################################
 # Rules
