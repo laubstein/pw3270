@@ -44,9 +44,7 @@
 
 int SAL_CALL main(int argc, char **argv)
 {
-	TRACE("%s","createSimpleRegistry");
 	Reference< XSimpleRegistry > xReg = createSimpleRegistry();
-	TRACE("SimpleRegistry: %p",xReg);
 
 	OSL_ENSURE( xReg.is(), "### cannot get service instance of \"com.sun.star.regiystry.SimpleRegistry\"!" );
 

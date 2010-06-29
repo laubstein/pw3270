@@ -132,7 +132,7 @@ sal_Int16 SAL_CALL pw3270::uno_impl::Disconnect() throw (RuntimeException)
 
 	yeld();
 
-	host_disconnect(0);
+	host_disconnect(this->hSession,0);
 
 	yeld();
 

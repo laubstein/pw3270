@@ -230,7 +230,7 @@ Sequence< OUString > pw3270::uno_impl::getSupportedServiceNames() throw (Runtime
 
 /*---[ Implement pw3270 ]----------------------------------------------------------------------------------*/
 
-static bool started = false;
+// static bool started = false;
 static int instances = 0;
 
 pw3270::uno_impl::uno_impl( const Reference< XComponentContext > & xContext )
@@ -239,14 +239,19 @@ pw3270::uno_impl::uno_impl( const Reference< XComponentContext > & xContext )
 	hostinfo = NULL;
 
 	instances++;
-	TRACE("********************* Object created %s (instances: %d)",__FUNCTION__,instances);
 
+/*
 	if(!started)
 	{
 		started = true;
 		TRACE("Initializing library with %s",OFFICE_PROGRAM);
 		lib3270_init();
 	}
+*/
+
+	this->hSession = new_3270_session();
+
+	TRACE("Object created %s (instances: %d session: %p)",__FUNCTION__,instances,this->hSession);
 
 }
 

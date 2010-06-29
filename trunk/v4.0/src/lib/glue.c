@@ -166,8 +166,9 @@ H3270 * new_3270_session(void)
 
 	if(configured)
 	{
+		// TODO (perry#5#): Allocate a new structure.
 		errno = EBUSY;
-		return NULL;
+		return rc;
 	}
 
 	configured = 1;
@@ -257,6 +258,7 @@ H3270 * new_3270_session(void)
 
 	Trace("%s finished",__FUNCTION__);
 
+	errno = 0;
 	return rc;
 }
 
