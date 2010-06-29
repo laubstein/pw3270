@@ -71,7 +71,10 @@ public:
 
 private:
 
+	H3270 *hSession;
+
 	void network_loop(void);
+
 	static void start_thread(uno_impl *obj);
 
 	rtl_TextEncoding getEncoding()

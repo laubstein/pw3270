@@ -73,9 +73,9 @@
 
  static void status(GString *rsp, gint argc, gchar **argv)
  {
- 	const gchar	* luname	= get_connected_lu();
+ 	const gchar	* luname	= get_connected_lu(0);
  	const gchar	* cstate	= get_state();
- 	const gchar	* host		= get_current_host();
+ 	const gchar	* host		= get_current_host(0);
 
 	g_string_append_printf(rsp,"%s %s %s",cstate,luname ? luname : "None",host ? host : "-");
 
@@ -88,7 +88,7 @@
 
  static void luname(GString *rsp, gint argc, gchar **argv)
  {
- 	const char *luname = get_connected_lu();
+ 	const char *luname = get_connected_lu(0);
 	g_string_append_printf(rsp,"%s",luname ? luname : "None");
  }
 
