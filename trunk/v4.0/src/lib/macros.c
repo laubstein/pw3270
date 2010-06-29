@@ -1353,7 +1353,7 @@ sms_error(const char *msg)
 
 	/* Cancel any login. */
 	if (s != NULL && s->is_login)
-		host_disconnect(True);
+		host_disconnect(&h3270,True);
 }
 
 /*
@@ -2071,7 +2071,7 @@ status_string(void)
 	}
 
 	if (CONNECTED)
-		connect_stat = xs_buffer("C(%s)", current_host);
+		connect_stat = xs_buffer("C(%s)", h3270.current_host);
 	else
 		connect_stat = NewString("N");
 
@@ -2710,7 +2710,7 @@ CloseScript_action(Widget w unused, XEvent *event unused, String *params,
 		    sms->next != SN) {
 			sms->next->success = False;
 			if (sms->is_login)
-				host_disconnect(True);
+				host_disconnect(&h3270,True);
 		}
 	} else
 		popup_an_error("%s can only be called from a script",
@@ -2743,7 +2743,7 @@ expect_timed_out(void)
 	sms->state = SS_INCOMPLETE;
 	sms->success = False;
 	if (sms->is_login)
-		host_disconnect(True);
+		host_disconnect(&h3270,True);
 	sms_continue();
 }
 
@@ -2759,7 +2759,7 @@ wait_timed_out(void)
 
 	/* If this is a login macro, it has failed. */
 	if (sms->is_login)
-		host_disconnect(True);
+		host_disconnect(&h3270,True);
 
 	sms->success = False;
 	sms->state = SS_INCOMPLETE;

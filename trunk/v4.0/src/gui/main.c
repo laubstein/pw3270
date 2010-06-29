@@ -55,15 +55,16 @@
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
 #ifdef HAVE_LIBGNOME
-static GnomeClient *client = 0;
+static GnomeClient * client = 0;
 #endif
 
-const char			*on_lu_command		= NULL;
+const char			* on_lu_command		= NULL;
+H3270				* hSession			= NULL;
 
-static const char	*cl_hostname		= NULL;
-static const char	*startup_script		= NULL;
-static gchar		*gtk_theme 			= NULL;
-static gchar		*log_filename		= NULL;
+static const char	* cl_hostname		= NULL;
+static const char	* startup_script	= NULL;
+static gchar		* gtk_theme 		= NULL;
+static gchar		* log_filename		= NULL;
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -490,7 +491,7 @@ int main(int argc, char *argv[])
 	LoadPlugins();
 
 	Trace("Initializing library with %s...",argv[0]);
-	rc = lib3270_init();
+	hSession = new_3270_session();
 
 	if(rc)
 	{

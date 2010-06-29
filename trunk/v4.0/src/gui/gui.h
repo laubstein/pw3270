@@ -194,6 +194,8 @@
 	LOCAL_EXTERN GtkWidget			* DefaultPopup;
 	LOCAL_EXTERN GtkWidget			* terminal;
 	LOCAL_EXTERN GdkColor			  color[TERMINAL_COLOR_COUNT+1];
+	LOCAL_EXTERN H3270				* hSession;
+
 
 #ifdef MOUSE_POINTER_CHANGE
 	extern GdkCursor        		* wCursor[CURSOR_MODE_3270];

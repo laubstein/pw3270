@@ -144,27 +144,36 @@ const char *toggle_names[N_TOGGLES] =
 	"SmartPaste"
 };
 
-static void init_3270_session(H3270 *session)
-{
-	memset(session,0,sizeof(H3270));
-	session->sz = sizeof(H3270);
-}
-
-int lib3270_init(void)
+/**
+ * Create a new 3270 object (INCOMPLETE).
+ *
+ * This function will create and initialize a new 3270 session, but, now
+ * it just returns a static 3270 session structure.
+ *
+ * @return lib3270 internal session structure.
+ *
+ */
+H3270 * new_3270_session(void)
 {
 	static int configured = 0;
-	int 	ovc, ovr;
-	int 	model_number;
-	char	junk;
+
+	H3270		*rc = &h3270;
+	int 		ovc, ovr;
+	int 		model_number;
+	char		junk;
 
 	Trace("%s - configured=%d",__FUNCTION__,configured);
 
 	if(configured)
-		return EBUSY;
+	{
+		errno = EBUSY;
+		return NULL;
+	}
 
 	configured = 1;
 
-	init_3270_session(&h3270);
+	memset(rc,0,sizeof(H3270));
+	rc->sz = sizeof(H3270);
 
 #if defined(_WIN32)
 
@@ -248,7 +257,7 @@ int lib3270_init(void)
 
 	Trace("%s finished",__FUNCTION__);
 
-	return 0;
+	return rc;
 }
 
 /*

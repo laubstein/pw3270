@@ -147,7 +147,7 @@
 		return RetValue(Retstr,ENOTCONN);
 	}
 
-	host_disconnect(0);
+	host_disconnect(hSession,0);
 	return RetValue(Retstr,0);
  }
 

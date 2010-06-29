@@ -650,7 +650,7 @@ status_connect(int connected)
 			id = STATUS_CODE_CONNECTED;
 
 #if defined(HAVE_LIBSSL) /*[*/
-		set(OIA_FLAG_SECURE,secure_connection);
+		set(OIA_FLAG_SECURE,h3270.secure_connection);
 #endif /*]*/
 
 	} else {

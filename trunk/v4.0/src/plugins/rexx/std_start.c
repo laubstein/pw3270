@@ -136,7 +136,7 @@ RexxReturnCode REXXENTRY rx3270LoadFuncs(PSZ Name, LONG Argc, RXSTRING Argv[], P
 		RexxRegisterFunctionExe((char *) rexx_exported_calls[f].name,rexx_exported_calls[f].call);
 
 	// Init 3270 library
-	lib3270_init();
+	hSession = new_3270_session();
 
 	return RetValue(Retstr,0);
 }

@@ -44,6 +44,10 @@
 	#include <unistd.h>
 #endif
 
+/*---[ Statics ]-------------------------------------------------------------------------------------------*/
+
+ static H3270 *hSession = NULL;
+
 /*---[ Prototipes & Defines ]------------------------------------------------------------------------------*/
 
 #if defined WIN32
@@ -96,7 +100,7 @@ int lib3270_jni_init(void)
 	Trace("Running %s on %s %s %s (pid: %d)",__FUNCTION__,__FILE__,__DATE__,__TIME__,getpid());
 #endif
 
-	lib3270_init();
+	hSession = new_3270_session();
     Trace("%s ends",__FUNCTION__);
 	return 0;
 }
@@ -156,7 +160,7 @@ JNIEXPORT jint JNICALL Java_pw3270_terminal_Disconnect(JNIEnv *env, jobject obj)
 	if(QueryCstate() <= NOT_CONNECTED)
 		return EINVAL;
 
-	host_disconnect(0);
+	host_disconnect(hSession,0);
 
 	return 0;
 }

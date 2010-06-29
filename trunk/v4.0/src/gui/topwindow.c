@@ -393,6 +393,6 @@
  void program_quit(void)
  {
  	Trace("%s called, disconnecting",__FUNCTION__);
- 	host_disconnect(0);
+ 	host_disconnect(hSession, 0);
 	gtk_main_quit();
  }

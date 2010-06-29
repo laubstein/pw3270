@@ -125,7 +125,7 @@ x3270_exit(int n)
 	shutdown_toggles();
 
 	/* Shut down the socket gracefully. */
-	host_disconnect(False);
+	host_disconnect(&h3270,False);
 
 	/* Tell anyone else who's interested. */
 	st_changed(ST_EXITING, True);
