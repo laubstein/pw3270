@@ -533,6 +533,11 @@
 		<Unit filename="src/include/lib3270/plugins.h" />
 		<Unit filename="src/include/lib3270/statusc.h" />
 		<Unit filename="src/include/lib3270/toggle.h" />
+		<Unit filename="src/java/lib3270_jni.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="jnidebug" />
+		</Unit>
 		<Unit filename="src/java/pw3270_jni.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />

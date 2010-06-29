@@ -65,10 +65,11 @@ Boolean		no_login_host = False;
 Boolean		non_tn3270e_host = False;
 Boolean		passthru_host = False;
 Boolean		ssl_host = False;
-#define		LUNAME_SIZE	16
-char		luname[LUNAME_SIZE+1];
-char		*connected_lu = CN;
-char		*connected_type = CN;
+
+//#define		LUNAME_SIZE	16
+//char		luname[LUNAME_SIZE+1];
+//char		*connected_lu = CN;
+//char		*connected_type = CN;
 Boolean		ever_3270 = False;
 
 char           *current_host = CN;
@@ -547,7 +548,7 @@ static int do_connect(const char *n)
 		/* Strip off and remember leading qualifiers. */
 		if ((s = split_host(nb, &ansi_host, &std_ds_host,
 		    &passthru_host, &non_tn3270e_host, &ssl_host,
-		    &no_login_host, luname, &port,
+		    &no_login_host, h3270.luname, &port,
 		    &needed)) == CN)
 			return -1;
 
@@ -561,7 +562,7 @@ static int do_connect(const char *n)
 			Free(s);
 			if (!(s = split_host(target_name, &ansi_host,
 			    &std_ds_host, &passthru_host, &non_tn3270e_host,
-			    &ssl_host, &no_login_host, luname, &port,
+			    &ssl_host, &no_login_host, h3270.luname, &port,
 			    &needed)))
 				return -1;
 		}
@@ -705,8 +706,11 @@ static void try_reconnect(void)
 }
 #endif /*]*/
 
-void host_disconnect(int failed)
+void host_disconnect(H3270 *h, int failed)
 {
+	if(!h)
+		h = &h3270;
+
 	if (CONNECTED || HALF_CONNECTED) {
 		x_remove_input();
 		net_disconnect();
@@ -1065,24 +1069,16 @@ LIB3270_EXPORT int host_reconnect(int wait)
 }
 #endif /*]*/
 
-/*
-void
-Disconnect_action(Widget w unused, XEvent *event, String *params,
-	Cardinal *num_params)
+LIB3270_EXPORT const char	* get_connected_lu(H3270 *h)
 {
-	action_debug(Disconnect_action, event, params, num_params);
-	if (check_usage(Disconnect_action, *num_params, 0, 0) < 0)
-		return;
-	host_disconnect(False);
-}
-*/
-
-LIB3270_EXPORT const char	* get_connected_lu(void)
-{
-	return connected_lu;
+	if(h)
+		return h->connected_lu;
+	return h3270.connected_lu;
 }
 
-LIB3270_EXPORT const char	* get_current_host(void)
+LIB3270_EXPORT const char	* get_current_host(H3270 *h)
 {
-	return current_host;
+	if(h)
+		return h->current_host;
+	return h3270.current_host;
 }

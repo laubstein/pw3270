@@ -217,9 +217,8 @@
 
 	DisableNetworkActions();
  	action_ClearSelection();
- 	host_disconnect(0);
+ 	host_disconnect(hSession,0);
  }
-
 
  void action_Connect(void)
  {
@@ -820,7 +819,7 @@
 	}
 	else
 	{
-		gtk_entry_set_text(port,GetString("Network","DefaultPort","8023"));
+		gtk_entry_set_text(port,GetString("Network","DefaultPort","23"));
 	}
 
 	gtk_entry_set_text(host,hostname);

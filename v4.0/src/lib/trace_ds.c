@@ -432,8 +432,7 @@ create_tracefile_header(const char *mode)
 		wtrace(", APL mode");
 	wtrace("\n");
 	if (CONNECTED)
-		wtrace(" Connected to %s, port %u\n",
-		    current_host, current_port);
+		wtrace(" Connected to %s, port %u\n",h3270.current_host, h3270.current_port);
 
 	/* Snap the current TELNET options. */
 	if (net_snap_options()) {

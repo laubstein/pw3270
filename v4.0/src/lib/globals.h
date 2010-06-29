@@ -159,9 +159,8 @@ LIB3270_INTERNAL const char		*build;
 LIB3270_INTERNAL const char		*build_rpq_timestamp;
 LIB3270_INTERNAL const char 		*build_rpq_version;
 LIB3270_INTERNAL int				children;
-LIB3270_INTERNAL char				*connected_type;
-LIB3270_INTERNAL char				*current_host;
-LIB3270_INTERNAL unsigned short	current_port;
+// LIB3270_INTERNAL char				*current_host;
+// LIB3270_INTERNAL unsigned short	current_port;
 
 #if defined(X3270_DBCS) /*[*/
 	LIB3270_INTERNAL Boolean		dbcs;
@@ -189,8 +188,6 @@ LIB3270_INTERNAL char		*full_efontname;
 	LIB3270_INTERNAL char	*full_efontname_dbcs;
 #endif /*]*/
 
-#define FULL_MODEL_NAME_SIZE 13
-LIB3270_INTERNAL char		full_model_name[FULL_MODEL_NAME_SIZE];
 LIB3270_INTERNAL char		*funky_font;
 LIB3270_INTERNAL char		*hostname;
 
@@ -221,9 +218,9 @@ LIB3270_INTERNAL char			*reconnect_host;
 LIB3270_INTERNAL int			screen_depth;
 LIB3270_INTERNAL Boolean		scroll_initted;
 
-#if defined(HAVE_LIBSSL) /*[*/
-	LIB3270_INTERNAL Boolean	secure_connection;
-#endif /*]*/
+//#if defined(HAVE_LIBSSL) /*[*/
+//	LIB3270_INTERNAL Boolean	secure_connection;
+//#endif /*]*/
 
 LIB3270_INTERNAL Boolean		shifted;
 LIB3270_INTERNAL Boolean		ssl_host;

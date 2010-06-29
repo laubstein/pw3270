@@ -152,7 +152,7 @@
 		}
 		else if(!g_strcasecmp(argv[f],"%{luname}"))
 		{
-			const gchar *ptr = get_connected_lu();
+			const gchar *ptr = get_connected_lu(hSession);
 			if(ptr)
 			{
 				g_free(argv[f]);
@@ -161,7 +161,7 @@
 		}
 		else if(!g_strcasecmp(argv[f],"%{host}"))
 		{
-			const gchar *ptr = get_current_host();
+			const gchar *ptr = get_current_host(hSession);
 			if(ptr)
 			{
 				g_free(argv[f]);

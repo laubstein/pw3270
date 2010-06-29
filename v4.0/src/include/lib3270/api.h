@@ -107,7 +107,9 @@
 		#endif
 
 		/** 3270 connection handle */
-		#define         LUNAME_SIZE     16
+		#define LUNAME_SIZE				16
+		#define FULL_MODEL_NAME_SIZE	13
+
 
 		typedef struct _h3270
 		{
@@ -115,6 +117,14 @@
 			char				* connected_lu;
 			char				  luname[LUNAME_SIZE+1];
 
+			char				  full_model_name[FULL_MODEL_NAME_SIZE+1];
+
+			char				* connected_type;
+
+			char				* current_host;
+			unsigned short	  current_port;
+
+			int					  secure_connection;
 
 		} H3270;
 
@@ -403,7 +413,7 @@
 
 		LIB3270_EXPORT int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
 
-		LIB3270_EXPORT int lib3270_init(void);
+		LIB3270_EXPORT H3270 * new_3270_session(void);
 
 		LIB3270_EXPORT const struct lib3270_option * get_3270_option_table(int sz);
 
@@ -417,7 +427,7 @@
 		LIB3270_EXPORT int screen_read(char *dest, int baddr, int count);
 		LIB3270_EXPORT void Input_String(const unsigned char *str);
 		LIB3270_EXPORT void screen_size(int *rows, int *cols);
-		LIB3270_EXPORT int query_secure_connection(void);
+		LIB3270_EXPORT int query_secure_connection(H3270 *h);
 		LIB3270_EXPORT int lib3270_paste_string(const unsigned char *str);
 
         /* Misc calls */
@@ -428,8 +438,8 @@
 		LIB3270_EXPORT STATUS_CODE	  query_3270_terminal_status(void);
 
 		/* Get connection info */
-		LIB3270_EXPORT const char	* get_connected_lu(void);
-		LIB3270_EXPORT const char	* get_current_host(void);
+		LIB3270_EXPORT const char	* get_connected_lu(H3270 *h);
+		LIB3270_EXPORT const char	* get_current_host(H3270 *h);
 
 		LIB3270_EXPORT int Toggled(int ix);
 
@@ -449,9 +459,9 @@
 
        /* Console calls */
 		LIB3270_EXPORT HCONSOLE	  console_window_new(const char *title, const char *label);
-		LIB3270_EXPORT void		  console_window_delete(HCONSOLE hwnd);
+		LIB3270_EXPORT void	  console_window_delete(HCONSOLE hwnd);
 		LIB3270_EXPORT int		  console_window_append(HCONSOLE hwnd, const char *fmt, ...);
-		LIB3270_EXPORT char		* console_window_wait_for_user_entry(HCONSOLE hwnd);
+		LIB3270_EXPORT char	* console_window_wait_for_user_entry(HCONSOLE hwnd);
 
         /* Cursor calls */
 		LIB3270_EXPORT int cursor_get_addr(void);
@@ -488,7 +498,7 @@
 		/* Host connect/disconnect and state change. */
 		LIB3270_EXPORT int host_connect(const char *n, int wait);
 		LIB3270_EXPORT int host_reconnect(int wait);
-		LIB3270_EXPORT void host_disconnect(int disable);
+		LIB3270_EXPORT void host_disconnect(H3270 *h, int disable);
 		LIB3270_EXPORT void register_schange(int tx, void (*func)(int));
 
 		/* Console/Trace window */

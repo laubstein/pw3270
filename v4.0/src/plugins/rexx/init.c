@@ -34,6 +34,7 @@
 
 /*---[ Statics ]----------------------------------------------------------------------------------*/
 
+ H3270 *hSession = NULL;
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
@@ -50,15 +51,18 @@
 /*----------------------------------------------------------------------------*/
  RexxReturnCode REXXENTRY rx3270Init(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	int 	rc = 0;
-
-
 	if(Argc < 1)
 		return RXFUNC_BADCALL;
 
-	rc = lib3270_init();
+	if(hSession)
+		return RetValue(Retstr,EBUSY);
 
-	return RetValue(Retstr,rc);
+	hSession = new_3270_session();
+
+	if(!hSession)
+		return RetValue(Retstr,-1);
+
+	return RetValue(Retstr,0);
 
  }
 
