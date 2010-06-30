@@ -79,6 +79,7 @@ PLUGINS_UI=""
 REXX_SYMBOL_HACK=""
 EXTENSIONS=""
 CPPUENV="gcc3"
+INSTALL_TARGETS=""
 
 AC_CHECK_PROG(PACKAGE_MANAGER, "rpmbuild", "rpm")
 AC_CHECK_PROG(PACKAGE_MANAGER, "dpkg-buildpackage","deb")
@@ -406,21 +407,27 @@ AC_ARG_WITH([office-types],
 	types_rdb="$withval"
 ] )
 
-AC_PATH_PROG([UNOPKG], unopkg, [$oo_home/program/unopkg] )
-AC_PATH_PROG([IDLC], idlc, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
-AC_PATH_PROG([CPPUMAKER], cppumaker, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
-AC_PATH_PROG([REGMERGE], regmerge, "no", [$PATH$PATH_SEPARATOR$oo_home/ure/bin$PATH_SEPARATOR$oo_ure_home/bin])
-AC_PATH_PROG([REGCOMP], regcomp, "no", [$PATH$PATH_SEPARATOR$oo_home/ure/bin$PATH_SEPARATOR$oo_ure_home/bin])
+if test "$oo_sdk_home" != "none"; then
 
-AC_SUBST(OO_SDK_HOME,$oo_sdk_home)
-AC_SUBST(OO_URE_HOME,$oo_ure_home)
-AC_SUBST(OO_HOME,$oo_home)
-AC_SUBST(TYPES_RDB,$types_rdb)
-AC_SUBST(CPPUENV)
-AC_SUBST(PACKAGE_MANAGER)
+	AC_PATH_PROG([UNOPKG], unopkg, [$oo_home/program/unopkg] )
+	AC_PATH_PROG([IDLC], idlc, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
+	AC_PATH_PROG([CPPUMAKER], cppumaker, "no", [$PATH$PATH_SEPARATOR$oo_sdk_home/bin])
+	AC_PATH_PROG([REGMERGE], regmerge, "no", [$PATH$PATH_SEPARATOR$oo_home/ure/bin$PATH_SEPARATOR$oo_ure_home/bin])
+	AC_PATH_PROG([REGCOMP], regcomp, "no", [$PATH$PATH_SEPARATOR$oo_home/ure/bin$PATH_SEPARATOR$oo_ure_home/bin])
 
-AC_DEFINE_UNQUOTED(OFFICE_HOME,"$oo_home")
-AC_DEFINE_UNQUOTED(OFFICE_PROGRAM,"$oo_program")
+	AC_SUBST(OO_SDK_HOME,$oo_sdk_home)
+	AC_SUBST(OO_URE_HOME,$oo_ure_home)
+	AC_SUBST(OO_HOME,$oo_home)
+	AC_SUBST(TYPES_RDB,$types_rdb)
+	AC_SUBST(CPPUENV)
+	AC_SUBST(PACKAGE_MANAGER)
+
+	AC_DEFINE_UNQUOTED(OFFICE_HOME,"$oo_home")
+	AC_DEFINE_UNQUOTED(OFFICE_PROGRAM,"$oo_program")
+
+	INSTALL_TARGETS="$INSTALL_TARGETS install-oxt"
+
+fi
 
 # Checks for libraries.
 PKG_CHECK_EXISTS
@@ -461,6 +468,7 @@ if test "$pw3270_cv_rexx" == "yes"; then
 	PLUGINS="rx3270 $PLUGINS"
 	PLUGINS_UI="rexx.xml $PLUGINS_UI"
 	EXTENSIONS="librx3270 $EXTENSIONS"
+	INSTALL_TARGETS="$INSTALL_TARGETS install-rexx-plugin"
 elif test "$pw3270_cv_rexx" != "no"; then
 	AC_DEFINE(HAVE_REXX)
 	REXX_CFLAGS="-I$pw3270_cv_rexx/api"
@@ -468,6 +476,7 @@ elif test "$pw3270_cv_rexx" != "no"; then
 	PLUGINS="rx3270 $PLUGINS"
 	PLUGINS_UI="rexx.xml $PLUGINS_UI"
 	EXTENSIONS="librx3270 $EXTENSIONS"
+	INSTALL_TARGETS="$INSTALL_TARGETS install-rexx-plugin"
 fi
 
 AC_SUBST(REXX_LIBS)
@@ -507,6 +516,7 @@ if test "$pw3270_cv_java" == "yes"; then
 	AC_DEFINE([HAVE_JAVA])
 	PLUGINS="j3270plugin $PLUGINS"
 	TARGETS="$TARGETS libpw3270_jni\$(DLLEXT) pw3270.jar"
+	INSTALL_TARGETS="$INSTALL_TARGETS install-java-plugin"
 fi
 
 if test "_$HOST_CC" = "_" ; then
@@ -574,6 +584,7 @@ AC_SUBST(jardir)
 AC_SUBST(OS_APPSRCS)
 AC_SUBST(OS_APISRCS)
 AC_SUBST(GTKRUNTIME,$pw3270_cv_gtkruntime)
+AC_SUBST(INSTALL_TARGETS)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
