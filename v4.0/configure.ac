@@ -127,7 +127,7 @@ case "$host" in
 		# Check for OpenOffice SDK
 		AC_CHECK_FILE("/opt/openoffice.org/basis3.0/sdk/bin/idlc",oo_sdk_home="/opt/openoffice.org/basis3.0/sdk",oo_sdk_home="none")
 		AC_CHECK_FILE("/opt/openoffice.org/basis3.1/sdk/bin/idlc",oo_sdk_home="/opt/openoffice.org/basis3.1/sdk",)
-		AC_CHECK_FILE("/usr/lib/openoffice/basis3.2/sdk/bin/idlc",oo_sdk_home="/opt/openoffice.org/basis3.2/sdk",)
+		AC_CHECK_FILE("/usr/lib/openoffice/basis3.2/sdk/bin/idlc",oo_sdk_home="/usr/lib/openoffice/basis3.2/sdk",)
 
 		# Check for Java
 		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
