@@ -550,6 +550,7 @@ $(PACKAGE).desktop: Makefile
 	@echo "Icon=$(datarootdir)/$(PACKAGE)/$(PACKAGE).@LOGOEXT@" >> $@
 	@echo "Terminal=false" >> $@
 	@echo "Type=Application" >> $@
+	@echo "StartupNotify=true" >> $@
 
 @PROGRAM_NAME@.ico: @ICONFILE@
 	@cp @ICONFILE@ $@
