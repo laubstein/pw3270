@@ -581,7 +581,7 @@ tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 # Install targets
 ####################################################################################################
 
-install: install-common install-rexx-plugin install-dev install-doc
+install: install-common @INSTALL_TARGETS@ install-dev install-doc
 
 install-java-plugin: bin/Release/libpw3270_jni.so bin/Release/pw3270.jar
 	@mkdir -p $(DESTDIR)/$(JNIDIR)
