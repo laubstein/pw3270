@@ -577,14 +577,49 @@ $(PACKAGE).po: pot/$(PACKAGE).pot
 
 tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 
-install: Release po/pt_BR.po $(PACKAGE).desktop
+####################################################################################################
+# Install targets
+####################################################################################################
+
+install: install-common install-rexx-plugin install-dev install-doc
+
+install-java-plugin: bin/Release/libpw3270_jni.so bin/Release/pw3270.jar
+	@mkdir -p $(DESTDIR)/$(JNIDIR)
+	@mkdir -p $(DESTDIR)/$(JARDIR)
+	@install -m 644 bin/Release/libpw3270_jni.so $(DESTDIR)/$(JNIDIR)
+	@install -m 644 bin/Release/pw3270.jar $(DESTDIR)/$(JARDIR)
+
+install-rexx-plugin: bin/Release/librx3270.so
+	@mkdir -p $(DESTDIR)/$(bindir)
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+	@mkdir -p $(DESTDIR)/$(LIBDIR)
+	@rexxc src/plugins/rexx/rx3270.cls $(DESTDIR)/$(bindir)/rx3270.cls
+	@install -m 644 ui/rexx.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui/rexx.xml
+	@install -m 644 bin/Release/librx3270.so $(DESTDIR)/$(LIBDIR)/librx3270.so
+
+install-oxt: @PROGRAM_NAME@.oxt
+	@mkdir -p $(DESTDIR)/$(OO_HOME)/share/extension/install/
+	@install -m 644 @PROGRAM_NAME@.oxt $(DESTDIR)/$(OO_HOME)/share/extension/install/@PROGRAM_NAME@.oxt
+
+install-dev: lib3270.pc
+	@mkdir -p $(DESTDIR)/@includedir@/lib3270
+	@mkdir -p $(DESTDIR)/$(LIBDIR)/pkgconfig
+	@install --mode=644 src/include/lib3270.h $(DESTDIR)/@includedir@
+	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
+	@install --mode=644 lib3270.pc $(DESTDIR)/$(LIBDIR)/pkgconfig/$(PACKAGE).pc
+
+install-doc:
+	@mkdir -p $(DESTDIR)/$(docdir)
+	@install --mode=644 LICENCA $(DESTDIR)/$(docdir)
+	@install --mode=644 LICENSE $(DESTDIR)/$(docdir)
+	@install --mode=644 AUTHORS $(DESTDIR)/$(docdir)
+
+install-common: Release po/pt_BR.po $(PACKAGE).desktop
 
 	@mkdir -p $(DESTDIR)/$(bindir)
 	@mkdir -p $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins
-	@mkdir -p $(DESTDIR)/$(LIBDIR)/pkgconfig
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
-	@mkdir -p $(DESTDIR)/@includedir@/lib3270
 
 	@install --mode=755 bin/Release/@PROGRAM_NAME@@EXEEXT@ $(DESTDIR)/$(bindir)
 
@@ -601,10 +636,6 @@ install: Release po/pt_BR.po $(PACKAGE).desktop
 	@install --mode=644 colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 $(DEFAULT_CONFIG) $(DESTDIR)/$(datarootdir)/$(PACKAGE)/@PROGRAM_NAME@.conf
 
-	@install --mode=644 src/include/lib3270.h $(DESTDIR)/@includedir@
-	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
-	@install --mode=644 lib3270.pc $(DESTDIR)/$(LIBDIR)/pkgconfig/$(PACKAGE).pc
-
 	@mkdir -p $(DESTDIR)/$(datarootdir)/applications/
 	@desktop-file-install	--mode 644 \
 				--dir $(DESTDIR)/$(datarootdir)/applications \
@@ -613,12 +644,6 @@ install: Release po/pt_BR.po $(PACKAGE).desktop
 
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES
 	@msgfmt -c -v -o $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo po/pt_BR.po
-
-	@mkdir -p $(DESTDIR)/$(docdir)
-	@install --mode=644 LICENCA $(DESTDIR)/$(docdir)
-	@install --mode=644 LICENSE $(DESTDIR)/$(docdir)
-	@install --mode=644 AUTHORS $(DESTDIR)/$(docdir)
-
 
 $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 

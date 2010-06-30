@@ -2,7 +2,8 @@ Source: pw3270
 Section: unknown
 Priority: extra
 Maintainer: Perry Werneck <perry.werneck@gmail.com>
-Build-Depends: debhelper (>= 7), autotools-dev, autoconf, libgtk2.0-dev, gettext, imagemagick, libssl-dev, libgnome2-dev, libgnomeui-dev,
+Build-Depends: debhelper (>= 7), autotools-dev, autoconf, libgtk2.0-dev, gettext, imagemagick, libssl-dev, libgnome2-dev, libgnomeui-dev, oorexx
+# OpenOffice: openoffice.org-dev ure
 Standards-Version: @PACKAGE_VERSION@.@PACKAGE_RELEASE@
 Homepage: http://www.softwarepublico.gov.br/dotlrn/clubs/pw3270/
 
@@ -29,6 +30,6 @@ Description: pw3270 development files. (Rev. @PACKAGE_REVISION@)
 
 Package: pw3270-plugin-rexx
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, pw3270 (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, pw3270 (= ${binary:Version}), oorexx
 Description: Rexx plugin for pw3270. (Rev. @PACKAGE_REVISION@)
  This package contains the plugin to allow rexx scripting.

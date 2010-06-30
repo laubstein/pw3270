@@ -87,9 +87,6 @@
 		<Unit filename="debian/control.in">
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="debian/lib3270-dev.install">
-			<Option target="Release" />
-		</Unit>
 		<Unit filename="debian/lib3270.install">
 			<Option target="Release" />
 		</Unit>
