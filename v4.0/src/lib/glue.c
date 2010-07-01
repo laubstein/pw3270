@@ -1062,15 +1062,6 @@ action_output(const char *fmt, ...)
 */
 }
 
-/*
-void usage(char *msg)
-{
-	if (msg != CN)
-		Warning(msg);
-
-	popup_an_error("Usage: %s [options] [ps:][LUname@]hostname[:port]",programname);
-}
-*/
 
 #if defined(_WIN32) /*[*/
 
@@ -1096,3 +1087,4 @@ gettimeofday(struct timeval *tv, void *ignored)
 }
 
 #endif /*]*/
+

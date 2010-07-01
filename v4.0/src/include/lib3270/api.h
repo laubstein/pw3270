@@ -361,6 +361,7 @@
 			unsigned short	sz;
 
 			int		(*init)(void);
+			int		(*popup_dialog)(H3270 *session, int type, const char *title, const char *msg, const char *fmt, va_list arg);
 			void	(*Error)(const char *fmt, va_list arg);
 			void	(*Warning)(const char *fmt, va_list arg);
 			void	(*SysError)(const char *title, const char *message, const char *system);
@@ -417,8 +418,10 @@
 
 		LIB3270_EXPORT const struct lib3270_option * get_3270_option_table(int sz);
 
+		/* Popups */
 		LIB3270_EXPORT void Error(const char *fmt, ...);
 		LIB3270_EXPORT void Warning(const char *fmt, ...);
+		LIB3270_EXPORT void show_3270_popup_dialog(H3270 *session, int type, const char *title, const char *msg, const char *fmt, ...);
 
 		/* Set/Get screen contents */
 		LIB3270_EXPORT int find_field_attribute(int baddr);
@@ -430,8 +433,10 @@
 		LIB3270_EXPORT int query_secure_connection(H3270 *h);
 		LIB3270_EXPORT int lib3270_paste_string(const unsigned char *str);
 
-        /* Misc calls */
+		/* Network related calls */
 		LIB3270_EXPORT int 			  Get3270Socket(void);
+
+        /* Misc calls */
 		LIB3270_EXPORT void 		  popup_an_error(const char *fmt, ...);
 		LIB3270_EXPORT void 		  popup_system_error(const char *title, const char *message, const char *system);
 		LIB3270_EXPORT void 		  popup_a_sockerr(char *fmt, ...);
@@ -457,7 +462,7 @@
 		LIB3270_EXPORT void screen_suspend(void);
 		LIB3270_EXPORT void screen_disp(void);
 
-       /* Console calls */
+		/* Console calls */
 		LIB3270_EXPORT HCONSOLE	  console_window_new(const char *title, const char *label);
 		LIB3270_EXPORT void	  console_window_delete(HCONSOLE hwnd);
 		LIB3270_EXPORT int		  console_window_append(HCONSOLE hwnd, const char *fmt, ...);

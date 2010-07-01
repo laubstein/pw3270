@@ -3249,6 +3249,7 @@ static void client_info_callback(INFO_CONST SSL *s, int where, int ret)
 		if (ret == 0)
 		{
 			trace_dsn("SSL_connect: failed in %s\n",SSL_state_string_long(s));
+			WriteLog("SSL","connect failed in %s (Alert: %s)",SSL_state_string_long(s),SSL_alert_type_string_long(ret));
 		}
 		else if (ret < 0)
 		{
@@ -3256,12 +3257,15 @@ static void client_info_callback(INFO_CONST SSL *s, int where, int ret)
 			char err_buf[1024];
 
 			e = ERR_get_error();
-			if (e != 0)
+			while(ERR_peek_error() == e)	// Remove other messages with the same error
+				e = ERR_get_error();
+
+			if(e != 0)
 			{
 				if(e == last_ssl_error)
 					return;
 				last_ssl_error = e;
-				(void) ERR_error_string(e, err_buf);
+				(void) ERR_error_string_n(e, err_buf, 1023);
 			}
 #if defined(_WIN32)
 			else if (GetLastError() != 0)
@@ -3279,9 +3283,11 @@ static void client_info_callback(INFO_CONST SSL *s, int where, int ret)
 				err_buf[0] = '\0';
 			}
 
-			trace_dsn("SSL_connect: error in %s\n%s\n",SSL_state_string_long(s),err_buf);
+			trace_dsn("SSL Connect error in %s\nState: %s\nAlert: %s\n",err_buf,SSL_state_string_long(s),SSL_alert_type_string_long(ret));
 
-			popup_system_error(_( "SSL Connect error" ), SSL_state_string_long(s), err_buf);
+			show_3270_popup_dialog(&h3270,1,_( "SSL Connect error" ),err_buf,SSL_state_string_long(s),SSL_alert_type_string_long(ret));
+
+//			popup_system_error(_( "SSL Connect error" ), SSL_state_string_long(s), err_buf);
 
 		}
 	}

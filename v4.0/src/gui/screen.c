@@ -76,27 +76,28 @@
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
- static void	setsize(int rows, int cols);
- static int  	addch(int row, int col, int c, unsigned short attr);
- static void	set_charset(char *dcs);
- static void	erase(void);
- static int		SetSuspended(int state);
- static void	SetScript(SCRIPT_STATE state);
- static void	set_cursor(CURSOR_MODE mode);
- static void	set_oia(OIA_FLAG id, int on);
- static void	set_compose(int on, unsigned char c, int keytype);
- static void	set_lu(const char *lu);
- static void	changed(int bstart, int bend);
- static void	error(const char *fmt, va_list arg);
- static void 	warning(const char *fmt, va_list arg);
- static void	syserror(const char *title, const char *message, const char *system);
- static int		init(void);
- static void 	update_toggle(int ix, int value, int reason, const char *name);
- static void	show_timer(long seconds);
- static void	DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
- static void 	DrawImageByWidth(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
- static gchar	*convert_monocase(int c, gsize *sz);
- static gchar	*convert_regular(int c, gsize *sz);
+ static void	  setsize(int rows, int cols);
+ static int  	  addch(int row, int col, int c, unsigned short attr);
+ static void	  set_charset(char *dcs);
+ static void	  erase(void);
+ static int	  SetSuspended(int state);
+ static void	  SetScript(SCRIPT_STATE state);
+ static void	  set_cursor(CURSOR_MODE mode);
+ static void	  set_oia(OIA_FLAG id, int on);
+ static void	  set_compose(int on, unsigned char c, int keytype);
+ static void	  set_lu(const char *lu);
+ static void	  changed(int bstart, int bend);
+ static void	  error(const char *fmt, va_list arg);
+ static void 	  warning(const char *fmt, va_list arg);
+ static void	  syserror(const char *title, const char *message, const char *system);
+ static int	  init(void);
+ static void 	  update_toggle(int ix, int value, int reason, const char *name);
+ static void	  show_timer(long seconds);
+ static void	  DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
+ static void 	  DrawImageByWidth(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
+ static gchar	* convert_monocase(int c, gsize *sz);
+ static gchar	* convert_regular(int c, gsize *sz);
+ static int	  popup_dialog(H3270 *session, int type, const char *title, const char *msg, const char *fmt, va_list arg);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -105,9 +106,12 @@
 	sizeof(struct lib3270_screen_callbacks),
 
 	init,				// int (*init)(void);
+
+	popup_dialog,		// int	(*popup_dialog)(H3270 *session, int type, const char *title, const char *msg, const char *fmt, va_list arg);
 	error,				// void (*Error)(const char *fmt, va_list arg);
 	warning,			// void (*Warning)(const char *fmt, va_list arg);
 	syserror,			// void	(*SysError)(const char *title, const char *message, const char *system);
+
 	setsize,			// void (*setsize)(int rows, int cols);
 	addch,				// void (*addch)(int row, int col, int c, int attr);
 	set_charset,		// void (*charset)(char *dcs);
@@ -1130,6 +1134,63 @@
 
 	g_free(msg);
  }
+
+ static int popup_dialog(H3270 *session, int type, const char *title, const char *msg, const char *fmt, va_list arg)
+ {
+ 	static const struct _tbl
+ 	{
+ 		const gchar	* title;
+ 		GtkMessageType	  dialog_type;
+ 		GtkButtonsType 	  dialog_buttons;
+ 	} tbl[] =
+ 	{
+ 		{ N_( "Information" ),	GTK_MESSAGE_INFO,	GTK_BUTTONS_CLOSE 		},
+ 		{ N_( "Error" ),		GTK_MESSAGE_ERROR, 	GTK_BUTTONS_OK			},
+ 	};
+
+ 	GtkWidget		*dialog;
+ 	gchar			*secondary		= NULL;
+ 	GtkResponseType	 response;
+
+ 	if(arg && fmt)
+		secondary = g_strdup_vprintf(gettext(fmt),arg);
+
+	if(type > G_N_ELEMENTS(tbl))
+		type = 0;
+
+	dialog = gtk_message_dialog_new_with_markup(	GTK_WINDOW(topwindow),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													tbl[type].dialog_type,
+													tbl[type].dialog_buttons,
+													"%s",msg );
+
+	gtk_window_set_title(GTK_WINDOW(dialog), title ? title : tbl[type].title);
+
+	if(secondary)
+	{
+		gtk_message_dialog_format_secondary_markup(GTK_MESSAGE_DIALOG(dialog),"%s",secondary);
+		g_free(secondary);
+	}
+
+	if(type == 1)
+	{
+		// Insert button to close program (Usefull in openSSL message errors
+		gtk_dialog_add_button(GTK_DIALOG(dialog),_( "Abort" ), 10);
+	}
+
+	response = gtk_dialog_run(GTK_DIALOG (dialog));
+
+	gtk_widget_destroy(dialog);
+
+	if(response == 10)
+	{
+		Log("Aborting by user action in error dialog \"%s\"",msg);
+		gtk_main_quit();
+	}
+
+	return (int) response;
+ }
+
 
  static void error(const char *fmt, va_list arg)
  {
