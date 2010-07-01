@@ -35,13 +35,14 @@ LIB3270_INTERNAL char *xs_buffer(const char *fmt, ...) printflike(1, 2);
 LIB3270_INTERNAL void xs_error(const char *fmt, ...) printflike(1, 2);
 LIB3270_INTERNAL void xs_warning(const char *fmt, ...) printflike(1, 2);
 
-LIB3270_INTERNAL unsigned long AddInput(int, void (*)(void));
-LIB3270_INTERNAL unsigned long AddExcept(int, void (*)(void));
-LIB3270_INTERNAL unsigned long AddOutput(int, void (*)(void));
+LIB3270_INTERNAL unsigned long AddInput(int, H3270 *session, void (*fn)(H3270 *session));
+LIB3270_INTERNAL unsigned long AddExcept(int, H3270 *session, void (*fn)(H3270 *session));
+LIB3270_INTERNAL unsigned long AddOutput(int, H3270 *session, void (*fn)(H3270 *session));
 LIB3270_INTERNAL void RemoveInput(unsigned long);
-LIB3270_INTERNAL unsigned long AddTimeOut(unsigned long msec, void (*fn)(void));
+LIB3270_INTERNAL unsigned long AddTimeOut(unsigned long msec, H3270 *session, void (*fn)(H3270 *session));
 LIB3270_INTERNAL void RemoveTimeOut(unsigned long cookie);
 LIB3270_INTERNAL KeySym StringToKeysym(char *s);
+
 LIB3270_INTERNAL char *KeysymToString(KeySym k);
 LIB3270_INTERNAL int read_resource_file(const char *filename, Boolean fatal);
 LIB3270_INTERNAL Boolean split_hier(char *label, char **base, char ***parents);

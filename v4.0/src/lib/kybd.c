@@ -1533,8 +1533,7 @@ LIB3270_EXPORT int action_PreviousField(void)
  * Deferred keyboard unlock.
  */
 
-static void
-defer_unlock(void)
+static void defer_unlock(H3270 *session)
 {
 	kybdlock_clr(KL_DEFERRED_UNLOCK, "defer_unlock");
 	status_reset();
@@ -1602,7 +1601,7 @@ do_reset(Boolean explicit)
   (KL_DEFERRED_UNLOCK | KL_OIA_TWAIT | KL_OIA_LOCKED | KL_AWAITING_FIRST)) {
 		kybdlock_clr(~KL_DEFERRED_UNLOCK, "do_reset");
 		kybdlock_set(KL_DEFERRED_UNLOCK, "do_reset");
-		unlock_id = AddTimeOut(UNLOCK_MS, defer_unlock);
+		unlock_id = AddTimeOut(UNLOCK_MS, &h3270, defer_unlock);
 	}
 
 	/* Clean up other modes. */

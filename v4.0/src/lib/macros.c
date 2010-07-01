@@ -194,12 +194,12 @@ static enum iaction st_cause[] = { IA_MACRO, IA_MACRO, IA_COMMAND, IA_KEYMAP,
 static void cleanup_socket(Boolean b);
 #endif /*]*/
 static void script_prompt(Boolean success);
-static void script_input(void);
+static void script_input(H3270 *session);
 static void sms_pop(Boolean can_exit);
 #if defined(X3270_SCRIPT) /*[*/
 static void socket_connection(void);
 #endif /*]*/
-static void wait_timed_out(void);
+static void wait_timed_out(H3270 *session);
 
 /* Macro that defines that the keyboard is locked due to user input. */
 #define KBWAIT	(kybdlock & (KL_OIA_LOCKED|KL_OIA_TWAIT|KL_DEFERRED_UNLOCK))
@@ -399,7 +399,7 @@ script_enable(void)
 {
 	if (sms->infd >= 0 && stdin_id == 0) {
 		trace_dsn("Enabling input for %s[%d]\n", ST_NAME, sms_depth);
-		stdin_id = AddInput(sms->infd, script_input);
+		stdin_id = AddInput(sms->infd, &h3270, script_input);
 	}
 }
 
@@ -1403,8 +1403,7 @@ sms_info(const char *fmt, ...)
 }
 
 /* Process available input from a script. */
-static void
-script_input(void)
+static void script_input(H3270 *session)
 {
 	char buf[128];
 	int nr;
@@ -2413,7 +2412,7 @@ Wait_action(Widget w unused, XEvent *event unused, String *params,
 
 	/* Set up a timeout, if they want one. */
 	if (tmo >= 0)
-		sms->wait_id = AddTimeOut(tmo? (tmo * 1000): 1, wait_timed_out);
+		sms->wait_id = AddTimeOut(tmo? (tmo * 1000): 1, &h3270, wait_timed_out);
 }
 
 /*
@@ -2730,8 +2729,7 @@ Execute_action(Widget w unused, XEvent *event unused, String *params,
 */
 
 /* Timeout for Expect action. */
-static void
-expect_timed_out(void)
+static void expect_timed_out(H3270 *session)
 {
 	if (sms == SN || sms->state != SS_EXPECTING)
 		return;
@@ -2748,8 +2746,7 @@ expect_timed_out(void)
 }
 
 /* Timeout for Wait action. */
-static void
-wait_timed_out(void)
+static void wait_timed_out(H3270 *session)
 {
 	/* Pop up the error message. */
 	popup_an_error("%s: Timed out", action_name(Wait_action));
@@ -2800,7 +2797,7 @@ Expect_action(Widget w unused, XEvent *event unused, String *params,
 	/* See if the text is there already; if not, wait for it. */
 	expand_expect(params[0]);
 	if (!expect_matches()) {
-		sms->expect_id = AddTimeOut(tmo * 1000, expect_timed_out);
+		sms->expect_id = AddTimeOut(tmo * 1000, &h3270, expect_timed_out);
 		sms->state = SS_EXPECTING;
 	}
 	/* else allow sms to proceed */

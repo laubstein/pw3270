@@ -95,10 +95,10 @@ static char charset_file[256];	/* /tmp/cs$PID */
 static Boolean need_cs = False;
 
 #if !defined(_WIN32) /*[*/
-static void	printer_output(void);
-static void	printer_error(void);
-static void	printer_otimeout(void);
-static void	printer_etimeout(void);
+static void	printer_output(H3270 *session);
+static void	printer_error(H3270 *error);
+static void	printer_otimeout(H3270 *session);
+static void	printer_etimeout(H3270 *session);
 static void	printer_dump(struct pr3o *p, Boolean is_err, Boolean is_dead);
 #endif /*]*/
 static void	printer_host_connect(int connected unused);
@@ -378,10 +378,8 @@ printer_start(const char *lu)
 		printer_stdout.fd = stdout_pipe[0];
 		(void) close(stderr_pipe[1]);
 		printer_stderr.fd = stderr_pipe[0];
-		printer_stdout.input_id = AddInput(printer_stdout.fd,
-		    printer_output);
-		printer_stderr.input_id = AddInput(printer_stderr.fd,
-		    printer_error);
+		printer_stdout.input_id = AddInput(printer_stdout.fd,&h3270,printer_output);
+		printer_stderr.input_id = AddInput(printer_stderr.fd,&h3270,printer_error);
 		++children;
 		break;
 	    case -1:	/* error */
@@ -515,21 +513,18 @@ printer_data(struct pr3o *p, Boolean is_err)
 	if (p->count >= PRINTER_BUF - 1) {
 		printer_dump(p, is_err, False);
 	} else if (p->timeout_id == 0L) {
-		p->timeout_id = AddTimeOut(1000,
-		    is_err? printer_etimeout: printer_otimeout);
+		p->timeout_id = AddTimeOut(1000, &h3270, is_err? printer_etimeout: printer_otimeout);
 	}
 }
 
 /* The printer process has some output for us. */
-static void
-printer_output(void)
+static void printer_output(H3270 *session)
 {
 	printer_data(&printer_stdout, False);
 }
 
 /* The printer process has some error output for us. */
-static void
-printer_error(void)
+static void printer_error(H3270 *session)
 {
 	printer_data(&printer_stderr, True);
 }
@@ -547,14 +542,14 @@ printer_timeout(struct pr3o *p, Boolean is_err)
 
 /* Timeout from printer output. */
 static void
-printer_otimeout(void)
+printer_otimeout(H3270 *session)
 {
 	printer_timeout(&printer_stdout, False);
 }
 
 /* Timeout from printer error output. */
 static void
-printer_etimeout(void)
+printer_etimeout(H3270 *session)
 {
 	printer_timeout(&printer_stderr, True);
 }
