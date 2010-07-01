@@ -309,8 +309,8 @@
  {
 
 	struct action_descriptor	* data			= NULL;
- 	const gchar				* action_name	= get_xml_attribute(names,values,"name");
- 	const gchar				* callback_name	= get_xml_attribute(names,values,"action");
+ 	const gchar					* action_name	= get_xml_attribute(names,values,"name");
+ 	const gchar					* callback_name	= get_xml_attribute(names,values,"action");
  	gchar						* ptr;
 	UI_CALLBACK					  cbk;
 
@@ -638,6 +638,8 @@
 #endif
 	}
 
+	script->enabled = TRUE;
+
 	/* Get filename */
 /*
 	ptr = get_xml_attribute(names,values,"filename");
@@ -742,6 +744,7 @@
 				if(ptr && *ptr)
 					data->script.enabled = get_symbol_by_name(NULL, (gpointer) &data->callback, "pw3270_call_%s_script", ptr);
 #endif
+				Trace("*********************enabled: %d",data->script.enabled);
 				if(data->script.enabled)
 				{
 					data->action = gtk_action_new(name, gettext(data->attr.label ? data->attr.label : data->name), gettext(data->attr.tooltip),data->attr.stock_id);

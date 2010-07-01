@@ -218,13 +218,71 @@
 	return 0;
  }
 
+// Internal commands
+ static int Connect(gint argc, const gchar **argv)
+ {
+	const gchar *host;
+
+	switch(argc)
+	{
+	case 1:
+		host = GetString("Network","Hostname",NULL);
+		if(!host)
+		{
+			action_SetHostname();
+			return 0;
+		}
+		break;
+
+	case 2:
+		host = argv[1];
+		break;
+
+	default:
+		return EINVAL;
+	}
+
+ 	Trace("%s Connected:%d",__FUNCTION__,PCONNECTED);
+
+ 	if(PCONNECTED)
+ 		return EBUSY;
+
+ 	action_ClearSelection();
+
+	DisableNetworkActions();
+
+	gtk_widget_set_sensitive(topwindow,FALSE);
+
+	RunPendingEvents(0);
+
+	Trace("Connect to \"%s\"",host);
+
+	if(host_connect(host,1) == ENOTCONN)
+	{
+		Warning( N_( "Negotiation with %s failed!" ),host);
+	}
+
+	Trace("Topwindow: %p Terminal: %p",topwindow,terminal);
+
+	if(topwindow)
+		gtk_widget_set_sensitive(topwindow,TRUE);
+
+	if(terminal)
+		gtk_widget_grab_focus(terminal);
+
+	return 0;
+
+ }
+
+ // Command interpreter
+ #define INTERNAL_COMMAND_ENTRY(x) { #x, x }
  static const struct _internal_command
  {
  	const gchar	*cmd;
  	int				(*call)(gint argc, const gchar **argv);
  } internal_command[] =
  {
- 	// TODO (perry#1#): Implement internal commands
+	INTERNAL_COMMAND_ENTRY(Connect),
  };
 
  int run_command(const gchar *line, GError **error)
