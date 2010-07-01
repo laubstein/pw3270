@@ -806,7 +806,7 @@ int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk)
 	return 0;
 }
 
-LIB3270_EXPORT void show_3270_popup_dialog(H3270 *session, int type, const char *title, const char *msg, const char *fmt, ...)
+LIB3270_EXPORT void show_3270_popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, ...)
 {
 	if(!fmt)
 		fmt = "";

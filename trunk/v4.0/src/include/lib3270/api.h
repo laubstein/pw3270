@@ -128,6 +128,15 @@
 
 		} H3270;
 
+		/** Type of dialog boxes */
+		typedef enum _PW3270_DIALOG
+		{
+			PW3270_DIALOG_INFO,		/**< Simple information dialog */
+			PW3270_DIALOG_CRITICAL,	/**< Critical error, user can abort application */
+
+			PW3270_DIALOG_USER
+		} PW3270_DIALOG;
+
 		/** input key type */
 		enum keytype
 		{
@@ -361,7 +370,7 @@
 			unsigned short	sz;
 
 			int		(*init)(void);
-			int		(*popup_dialog)(H3270 *session, int type, const char *title, const char *msg, const char *fmt, va_list arg);
+			int		(*popup_dialog)(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, va_list arg);
 			void	(*Error)(const char *fmt, va_list arg);
 			void	(*Warning)(const char *fmt, va_list arg);
 			void	(*SysError)(const char *title, const char *message, const char *system);
@@ -421,7 +430,7 @@
 		/* Popups */
 		LIB3270_EXPORT void Error(const char *fmt, ...);
 		LIB3270_EXPORT void Warning(const char *fmt, ...);
-		LIB3270_EXPORT void show_3270_popup_dialog(H3270 *session, int type, const char *title, const char *msg, const char *fmt, ...);
+		LIB3270_EXPORT void show_3270_popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, ...);
 
 		/* Set/Get screen contents */
 		LIB3270_EXPORT int find_field_attribute(int baddr);

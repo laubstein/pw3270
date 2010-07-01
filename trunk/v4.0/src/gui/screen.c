@@ -97,7 +97,7 @@
  static void 	  DrawImageByWidth(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
  static gchar	* convert_monocase(int c, gsize *sz);
  static gchar	* convert_regular(int c, gsize *sz);
- static int	  popup_dialog(H3270 *session, int type, const char *title, const char *msg, const char *fmt, va_list arg);
+ static int	  popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, va_list arg);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -1135,7 +1135,7 @@
 	g_free(msg);
  }
 
- static int popup_dialog(H3270 *session, int type, const char *title, const char *msg, const char *fmt, va_list arg)
+ static int popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, va_list arg)
  {
  	static const struct _tbl
  	{
@@ -1172,7 +1172,7 @@
 		g_free(secondary);
 	}
 
-	if(type == 1)
+	if(type == PW3270_DIALOG_CRITICAL)
 	{
 		// Insert button to close program (Usefull in openSSL message errors
 		gtk_dialog_add_button(GTK_DIALOG(dialog),_( "Abort" ), 10);

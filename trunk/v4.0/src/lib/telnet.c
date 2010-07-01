@@ -3282,7 +3282,7 @@ static void client_info_callback(INFO_CONST SSL *s, int where, int ret)
 
 			trace_dsn("SSL Connect error in %s\nState: %s\nAlert: %s\n",err_buf,SSL_state_string_long(s),SSL_alert_type_string_long(ret));
 
-			show_3270_popup_dialog(&h3270,1,_( "SSL Connect error" ),err_buf,SSL_state_string_long(s),SSL_alert_type_string_long(ret));
+			show_3270_popup_dialog(&h3270, PW3270_DIALOG_CRITICAL, _( "SSL Connect error" ),err_buf,SSL_state_string_long(s),SSL_alert_type_string_long(ret));
 
 //			popup_system_error(_( "SSL Connect error" ), SSL_state_string_long(s), err_buf);
 
