@@ -320,7 +320,7 @@ static void continue_tls(unsigned char *sbbuf, int len);
 #endif /*]*/
 
 #if !defined(_WIN32) /*[*/
-static void output_possible(void);
+static void output_possible(H3270 *session);
 #endif /*]*/
 
 #if defined(_WIN32) /*[*/
@@ -646,7 +646,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 				trace_dsn("Connection pending.\n");
 				*pending = True;
 #if !defined(_WIN32) /*[*/
-				output_id = AddOutput(sock, output_possible);
+				output_id = AddOutput(sock, &h3270, output_possible);
 #endif /*]*/
 			} else {
 				popup_a_sockerr( N_( "Can't connect to %s:%d" ),hostname, h3270.current_port);
@@ -857,7 +857,7 @@ connection_complete(void)
  *	Output is possible on the socket.  Used only when a connection is
  *	pending, to determine that the connection is complete.
  */
-static void output_possible(void)
+static void output_possible(H3270 *session)
 {
 	if (HALF_CONNECTED)
 	{
@@ -915,8 +915,7 @@ net_disconnect(void)
  *	socket.  Reads the data, processes the special telnet commands
  *	and calls process_ds to process the 3270 data stream.
  */
-void
-net_input(void)
+void net_input(H3270 *session)
 {
 	register unsigned char	*cp;
 	int	nr;
@@ -944,9 +943,8 @@ net_input(void)
 				case WSAEINVAL:
 					return;
 				default:
-					fprintf(stderr,
-					    "second connect() failed: %s\n",
-					    win32_strerror(err));
+					#warning Notify User!
+					fprintf(stderr,"second connect() failed: %s\n",win32_strerror(err));
 					x3270_exit(1);
 				}
 			}
@@ -1922,8 +1920,7 @@ process_eor(void)
  * net_exception
  *	Called when there is an exceptional condition on the socket.
  */
-void
-net_exception(void)
+void net_exception(H3270 *session)
 {
 #if defined(LOCAL_PROCESS) /*[*/
 	if (local_process) {

@@ -88,7 +88,7 @@ static void save_recent(const char *);
 #endif
 
 #if defined(X3270_DISPLAY) || defined(LIB3270)
-static void try_reconnect(void);
+static void try_reconnect(H3270 *session);
 #endif /*]*/
 
 static char *
@@ -698,7 +698,7 @@ int host_connect(const char *n, int wait)
 /*
  * Called from timer to attempt an automatic reconnection.
  */
-static void try_reconnect(void)
+static void try_reconnect(H3270 *session)
 {
 	WriteLog("3270","Starting auto-reconnect (Host: %s)",reconnect_host ? reconnect_host : "-");
 	auto_reconnect_inprogress = False;
@@ -721,7 +721,7 @@ void host_disconnect(H3270 *h, int failed)
 		{
 			/* Schedule an automatic reconnection. */
 			auto_reconnect_inprogress = True;
-			(void) AddTimeOut(failed? RECONNECT_ERR_MS: RECONNECT_MS, try_reconnect);
+			(void) AddTimeOut(failed? RECONNECT_ERR_MS: RECONNECT_MS, &h3270, try_reconnect);
 		}
 #endif
 

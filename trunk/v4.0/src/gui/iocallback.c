@@ -46,18 +46,18 @@
 	static int static_CallAndWait(int(*callback)(void *), void *parm);
 #endif
 
-static unsigned long	static_AddInput(int source, void (*fn)(void));
+static unsigned long	static_AddInput(int source, H3270 *session, void (*fn)(H3270 *session));
 static void		static_RemoveSource(unsigned long id);
 
 #if !defined(_WIN32) /*[*/
-static unsigned long	static_AddOutput(int source, void (*fn)(void));
+static unsigned long	static_AddOutput(int source, H3270 *session, void (*fn)(H3270 *session));
 #endif
 
-static unsigned long	static_AddExcept(int source, void (*fn)(void));
-static unsigned long	static_AddTimeOut(unsigned long interval_ms, void (*proc)(void));
-static void 		static_RemoveTimeOut(unsigned long timer);
-static int		static_Sleep(int seconds);
-static int 		static_RunPendingEvents(int wait);
+static unsigned long	static_AddExcept(int source, H3270 *session, void (*fn)(H3270 *session));
+static unsigned long	static_AddTimeOut(unsigned long interval_ms, H3270 *session, void (*proc)(H3270 *session));
+static void 			static_RemoveTimeOut(unsigned long timer);
+static int				static_Sleep(int seconds);
+static int 			static_RunPendingEvents(int wait);
 
 static gboolean 		IO_prepare(GSource *source, gint *timeout);
 static gboolean 		IO_check(GSource *source);
@@ -72,13 +72,15 @@ typedef struct _IO_Source
 	GSource gsrc;
 	GPollFD	poll;
 	int		source;
-	void	(*fn)(void);
+	void	(*fn)(H3270 *session);
+	H3270 	*session;
 } IO_Source;
 
 typedef struct _timer
 {
 	unsigned char remove;
-	void (*fn)(void);
+	void	(*fn)(H3270 *session);
+	H3270 	*session;
 } TIMER;
 
 const struct lib3270_io_callbacks program_io_callbacks =
@@ -120,7 +122,7 @@ const struct lib3270_io_callbacks program_io_callbacks =
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
-static unsigned long AddSource(int source, gushort events, void (*fn)(void))
+static unsigned long AddSource(int source, H3270 *session, gushort events, void (*fn)(H3270 *session))
 {
 	IO_Source *src = (IO_Source *) g_source_new(&IOSources,sizeof(IO_Source));
 
@@ -135,10 +137,10 @@ static unsigned long AddSource(int source, gushort events, void (*fn)(void))
 	return (unsigned long) src;
 }
 
-static unsigned long static_AddInput(int source, void (*fn)(void))
+static unsigned long static_AddInput(int source, H3270 *session, void (*fn)(H3270 *session))
 {
 	Trace("Adding Input handle %08x",source);
-	return AddSource(source,G_IO_IN|G_IO_HUP|G_IO_ERR,fn);
+	return AddSource(source,session,G_IO_IN|G_IO_HUP|G_IO_ERR,fn);
 }
 
 static void static_RemoveSource(unsigned long id)
@@ -151,40 +153,43 @@ static void static_RemoveSource(unsigned long id)
 }
 
 #if !defined(_WIN32) /*[*/
-static unsigned long static_AddOutput(int source, void (*fn)(void))
+static unsigned long static_AddOutput(int source, H3270 *session, void (*fn)(H3270 *session))
 {
 	Trace("Adding Output handle %08x",source);
-	return AddSource(source,G_IO_OUT|G_IO_HUP|G_IO_ERR,fn);
+	return AddSource(source,session,G_IO_OUT|G_IO_HUP|G_IO_ERR,fn);
 }
 #endif /*]*/
 
-static unsigned long static_AddExcept(int source, void (*fn)(void))
+static unsigned long static_AddExcept(int source, H3270 *session, void (*fn)(H3270 *session))
 {
 #if defined(_WIN32) /*[*/
 	return 0;
 #else
 	Trace("Adding Except handle %08x",source);
-	return AddSource(source,G_IO_HUP|G_IO_ERR,fn);
+	return AddSource(source,session,G_IO_HUP|G_IO_ERR,fn);
 #endif
 }
 
 static gboolean do_timer(TIMER *t)
 {
+	Trace("%s t=%p callback=%p session=%p",__FUNCTION__,t,t->fn,t->session);
 	if(!t->remove)
-		t->fn();
+		t->fn(t->session);
+	Trace("%s",__FUNCTION__);
 	return FALSE;
 }
 
-static unsigned long static_AddTimeOut(unsigned long interval, void (*proc)(void))
+static unsigned long static_AddTimeOut(unsigned long interval, H3270 *session, void (*proc)(H3270 *session))
 {
 	TIMER *t = g_malloc(sizeof(TIMER));
 
-	t->remove = 0;
-	t->fn = proc;
+	t->remove	= 0;
+	t->fn		= proc;
+	t->session	= session;
 
 	g_timeout_add_full(G_PRIORITY_DEFAULT, (guint) interval, (GSourceFunc) do_timer, t, g_free);
 
-	Trace("Timeout with %ld ms created with id %p",interval,t);
+	Trace("Timeout with %ld ms created with id %p callback=%p session=%p",interval,t,proc,session);
 
 	return (unsigned long) t;
 }
@@ -256,7 +261,9 @@ static gboolean IO_dispatch(GSource *source, GSourceFunc callback, gpointer user
 	 * should call the callback function with user_data and whatever additional
 	 * parameters are needed for this type of event source.
 	 */
-	((IO_Source *) source)->fn();
+	Trace("%s",__FUNCTION__);
+	((IO_Source *) source)->fn(((IO_Source *) source)->session);
+	Trace("%s",__FUNCTION__);
 	return TRUE;
 }
 

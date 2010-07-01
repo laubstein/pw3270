@@ -56,9 +56,9 @@ static Boolean excepting = False;
 void
 x_add_input(int net_sock)
 {
-	ns_exception_id = AddExcept(net_sock, net_exception);
+	ns_exception_id = AddExcept(net_sock, &h3270, net_exception);
 	excepting = True;
-	ns_read_id = AddInput(net_sock, net_input);
+	ns_read_id = AddInput(net_sock, &h3270, net_input);
 	reading = True;
 }
 
@@ -86,10 +86,10 @@ x_except_on(int net_sock)
 		return;
 	if (reading)
 		RemoveInput(ns_read_id);
-	ns_exception_id = AddExcept(net_sock, net_exception);
+	ns_exception_id = AddExcept(net_sock, &h3270, net_exception);
 	excepting = True;
 	if (reading)
-		ns_read_id = AddInput(net_sock, net_input);
+		ns_read_id = AddInput(net_sock, &h3270, net_input);
 }
 
 /*

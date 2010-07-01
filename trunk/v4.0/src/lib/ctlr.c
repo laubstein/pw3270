@@ -2748,8 +2748,7 @@ delta_msec(struct timeval *t1, struct timeval *t0)
 	       (t1->tv_usec - t0->tv_usec + 500) / 1000;
 }
 
-static void
-keep_ticking(void)
+static void keep_ticking(H3270 *session)
 {
 	struct timeval t1;
 	long msec;
@@ -2759,7 +2758,7 @@ keep_ticking(void)
 		t_want.tv_sec++;
 		msec = delta_msec(&t_want, &t1);
 	} while (msec <= 0);
-	tick_id = AddTimeOut(msec, keep_ticking);
+	tick_id = AddTimeOut(msec, &h3270, keep_ticking);
 	status_timing(&t_start, &t1);
 }
 
@@ -2775,7 +2774,7 @@ ticking_start(Boolean anyway)
 	if (ticking)
 		RemoveTimeOut(tick_id);
 	ticking = True;
-	tick_id = AddTimeOut(1000, keep_ticking);
+	tick_id = AddTimeOut(1000, &h3270, keep_ticking);
 	t_want = t_start;
 }
 
