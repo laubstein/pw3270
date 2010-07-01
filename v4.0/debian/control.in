@@ -33,3 +33,11 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pw3270 (= ${binary:Version}), oorexx
 Description: Rexx plugin for pw3270. (Rev. @PACKAGE_REVISION@)
  This package contains the plugin to allow rexx scripting.
+
+Package: pw3270-openoffice
+Architecture: any
+Section: libs
+Depends: ${misc:Depends}, lib3270 (= ${binary:Version})
+Description: Uno/OpenOffice library allowing 3270 access from StarBasic. (Rev. @PACKAGE_REVISION@)
+ This package contains the openoffice.org extenstion file to allow 3270 access from StarBasic.
+
