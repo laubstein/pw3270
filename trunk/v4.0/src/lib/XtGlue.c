@@ -586,11 +586,13 @@ Free(void *p)
 		free(p);
 }
 
+/*
 char *
 NewString(const char *s)
 {
 	return strcpy(Malloc(strlen(s) + 1), s);
 }
+*/
 
 static struct {
 	/*const*/ char *name;	/* not const because of ancient X11 API */

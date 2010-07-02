@@ -96,7 +96,7 @@
 	#define LIB3270_MODULE_NAME "rexx"
 	#include <lib3270/api.h>
 	#include <lib3270/plugins.h>
-	#include <lib3270/localdefs.h>
+//	#include <lib3270/localdefs.h>
 	#include <lib3270/statusc.h>
 	#include <lib3270/toggle.h>
 

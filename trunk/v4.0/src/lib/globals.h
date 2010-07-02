@@ -97,7 +97,7 @@
 #include <sys/types.h>			/* Basic system data types */
 #include <sys/time.h>			/* System time-related data types */
 #include <time.h>				/* C library time functions */
-#include <lib3270/localdefs.h>	/* {s,tcl,c}3270-specific defines */
+#include "localdefs.h"			/* {s,tcl,c}3270-specific defines */
 
 /*
  * Cancel out contradictory parts.

@@ -208,6 +208,7 @@ H3270 * new_3270_session(void)
 		model_number = 4;
 #endif
 	}
+
 #if defined(C3270) && !defined(_WIN32)
 	if(appres.mono)
 		appres.m3279 = False;
@@ -219,19 +220,28 @@ H3270 * new_3270_session(void)
 	if (appres.m3279 && model_number == 4)
 		model_number = 3;
 #endif
+
+	Trace("Model_number: %d",model_number);
+
 	if (!appres.extended || appres.oversize == CN || sscanf(appres.oversize, "%dx%d%c", &ovc, &ovr, &junk) != 2) {
 		ovc = 0;
 		ovr = 0;
 	}
 	set_rows_cols(model_number, ovc, ovr);
+
+
 	if (appres.termname != CN)
 		termtype = appres.termname;
 	else
 		termtype = full_model_name;
 
+	Trace("Termtype: %s",termtype);
+
 	if (appres.apl_mode)
 		appres.charset = Apl;
 
+
+	Trace("Charset: %s",appres.charset);
 	if (charset_init(appres.charset) != CS_OKAY)
 	{
 		Warning( _( "Cannot find charset \"%s\", using defaults" ), appres.charset);
