@@ -202,6 +202,7 @@ charset_init(char *csname)
 
 	/* Figure out the locale code set (character set encoding). */
 	codeset_name = nl_langinfo(CODESET);
+	Trace("codeset_name: %s",codeset_name);
 	set_codeset(codeset_name);
 #endif /*]*/
 

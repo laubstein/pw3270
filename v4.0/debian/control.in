@@ -30,7 +30,7 @@ Description: pw3270 development files. (Rev. @PACKAGE_REVISION@)
 
 Package: pw3270-plugin-rexx
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, pw3270 (= ${binary:Version}), oorexx
+Depends: ${shlibs:Depends}, ${misc:Depends}, pw3270 (= ${binary:Version}), oorexx (>= 4.0.1)
 Description: Rexx plugin for pw3270. (Rev. @PACKAGE_REVISION@)
  This package contains the plugin to allow rexx scripting.
 

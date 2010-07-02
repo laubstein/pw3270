@@ -36,7 +36,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <errno.h>
-#include <lib3270/localdefs.h>
+// #include <lib3270/localdefs.h>
 #include <lib3270/toggle.h>
 
 #if _POSIX_C_SOURCE >= 1 || _XOPEN_SOURCE || _POSIX_SOURCE

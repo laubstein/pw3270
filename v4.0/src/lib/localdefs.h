@@ -55,9 +55,11 @@ typedef struct _XtActionsRec{
 #define NoSymbol		0L
 
 /* These are local functions with similar semantics to X functions. */
-extern void *Malloc(size_t);
-extern void Free(void *);
-extern void *Calloc(size_t, size_t);
-extern void *Realloc(void *, size_t);
-extern char *NewString(const char *);
+LIB3270_INTERNAL void *Malloc(size_t);
+LIB3270_INTERNAL void Free(void *);
+LIB3270_INTERNAL void *Calloc(size_t, size_t);
+LIB3270_INTERNAL void *Realloc(void *, size_t);
+
+#define NewString(x) strdup(x)
+//extern char *NewString(const char *);
 

@@ -407,6 +407,9 @@ bin/Debug/pipetest@EXEEXT@: obj/Debug/src/plugins/pipectl/pipetest.o
 # Debug
 DBGRexx: bin/Debug/librx3270$(DLLEXT)
 
+rextest:  bin/Debug/librx3270$(DLLEXT)
+	@LD_LIBRARY_PATH=bin/Debug rexx rexxtest.rex
+
 obj/Debug/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`

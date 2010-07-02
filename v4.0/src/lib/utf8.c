@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270. Registro no INPI sob o nome G3270.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como utf8.c e possui 514 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -340,6 +340,8 @@ static char *utf8_tab[U_MAX][96] = {
 void
 set_codeset(char *codeset_name)
 {
+	char *new_codeset;
+
 #if defined(X3270_DBCS) /*[*/
     	is_gb18030 = !strcasecmp(codeset_name, "gb18030");
 #endif /*]*/
@@ -356,7 +358,10 @@ set_codeset(char *codeset_name)
 	is_utf8 = 1;
 #endif /*]*/
 
-	Replace(locale_codeset, NewString(codeset_name));
+	Trace("%s locale_codeset: %p new_codeset: %p (%s)",__FUNCTION__,locale_codeset,codeset_name,codeset_name);
+	new_codeset = NewString(codeset_name);
+	Replace(locale_codeset, new_codeset);
+	Trace("%s",__FUNCTION__);
 }
 
 /*
