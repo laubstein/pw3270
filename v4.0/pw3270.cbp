@@ -526,7 +526,6 @@
 		<Unit filename="src/include/lib3270/config.h" />
 		<Unit filename="src/include/lib3270/config.h.in" />
 		<Unit filename="src/include/lib3270/kybdc.h" />
-		<Unit filename="src/include/lib3270/localdefs.h" />
 		<Unit filename="src/include/lib3270/plugins.h" />
 		<Unit filename="src/include/lib3270/statusc.h" />
 		<Unit filename="src/include/lib3270/toggle.h" />
@@ -620,6 +619,7 @@
 		<Unit filename="src/lib/kybd.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/lib/localdefs.h" />
 		<Unit filename="src/lib/log.c">
 			<Option compilerVar="CC" />
 		</Unit>
