@@ -114,7 +114,7 @@ int             linemode = 1;
 #if defined(LOCAL_PROCESS) /*[*/
 Boolean		local_process = False;
 #endif /*]*/
-char           *termtype;
+// char           *termtype;
 
 /* Externals */
 extern struct timeval ds_ts;
@@ -305,7 +305,6 @@ static const char *trsp_flag[2] = { "POSITIVE-RESPONSE", "NEGATIVE-RESPONSE" };
 #endif /*]*/
 
 #if defined(HAVE_LIBSSL) /*[*/
-// Boolean secure_connection = False;
 static SSL_CTX *ssl_ctx;
 static SSL *ssl_con;
 static Boolean need_tls_follows = False;
@@ -665,7 +664,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 	if (appres.termname == CN && std_ds_host) {
 		(void) sprintf(ttype_tmpval, "IBM-327%c-%d",
 		    appres.m3279 ? '9' : '8', model_num);
-		termtype = ttype_tmpval;
+		h3270.termtype = ttype_tmpval;
 	}
 
 	/* all done */
@@ -894,14 +893,15 @@ net_disconnect(void)
 
 	/* Restore terminal type to its default. */
 	if (appres.termname == CN)
-		termtype = h3270.full_model_name;
+		h3270.termtype = h3270.full_model_name;
 
 	/* We're not connected to an LU any more. */
 	status_lu(CN);
 
 #if !defined(_WIN32) /*[*/
 	/* We have no more interest in output buffer space. */
-	if (output_id != 0L) {
+	if (output_id != 0L)
+	{
 		RemoveInput(output_id);
 		output_id = 0L;
 	}
@@ -1422,7 +1422,7 @@ telnet_fsm(unsigned char c)
 					return -1;
 				}
 
-				tt_len = strlen(termtype);
+				tt_len = strlen(h3270.termtype);
 				if (try_lu != CN && *try_lu) {
 					tt_len += strlen(try_lu) + 1;
 					h3270.connected_lu = try_lu;
@@ -1434,7 +1434,7 @@ telnet_fsm(unsigned char c)
 				tt_out = Malloc(tb_len + 1);
 				(void) sprintf(tt_out, "%c%c%c%c%s%s%s%c%c",
 				    IAC, SB, TELOPT_TTYPE, TELQUAL_IS,
-				    termtype,
+				    h3270.termtype,
 				    (try_lu != CN && *try_lu) ? "@" : "",
 				    (try_lu != CN && *try_lu) ? try_lu : "",
 				    IAC, SE);
@@ -1482,7 +1482,7 @@ tn3270e_request(void)
 	char *tt_out;
 	char *t;
 
-	tt_len = strlen(termtype);
+	tt_len = strlen(h3270.termtype);
 	if (try_lu != CN && *try_lu)
 		tt_len += strlen(try_lu) + 1;
 
@@ -1491,7 +1491,7 @@ tn3270e_request(void)
 	t = tt_out;
 	t += sprintf(tt_out, "%c%c%c%c%c%s",
 	    IAC, SB, TELOPT_TN3270E, TN3270E_OP_DEVICE_TYPE,
-	    TN3270E_OP_REQUEST, termtype);
+	    TN3270E_OP_REQUEST, h3270.termtype);
 
 	/* Convert 3279 to 3278, per the RFC. */
 	if (tt_out[12] == '9')
@@ -1506,7 +1506,7 @@ tn3270e_request(void)
 
 	trace_dsn("SENT %s %s DEVICE-TYPE REQUEST %.*s%s%s "
 		   "%s\n",
-	    cmd(SB), opt(TELOPT_TN3270E), strlen(termtype), tt_out + 5,
+	    cmd(SB), opt(TELOPT_TN3270E), strlen(h3270.termtype), tt_out + 5,
 	    (try_lu != CN && *try_lu) ? " CONNECT " : "",
 	    (try_lu != CN && *try_lu) ? try_lu : "",
 	    cmd(SE));
@@ -3424,7 +3424,7 @@ net_query_lu_name(void)
 		return "";
 }
 
-/* Return the hostname and port. */
+/* Return the hostname and port. */ /*
 const char *
 net_query_host(void)
 {
@@ -3433,17 +3433,17 @@ net_query_host(void)
 	if (CONNECTED) {
 		Free(s);
 
-#if defined(LOCAL_PROCESS) /*[*/
+#if defined(LOCAL_PROCESS)
 		if (local_process) {
 			s = xs_buffer("process %s", hostname);
 		} else
-#endif /*]*/
+#endif
 		{
 			s = xs_buffer("host %s %u %s",
 					hostname, current_port,
-#if defined(HAVE_LIBSSL) /*[*/
-					secure_connection? "encrypted":
-#endif /*]*/
+#if defined(HAVE_LIBSSL)
+					h3270.secure_connection? "encrypted":
+#endif
 							   "unencrypted"
 					    );
 		}
@@ -3451,6 +3451,7 @@ net_query_host(void)
 	} else
 		return "";
 }
+*/
 
 #endif /*]*/
 

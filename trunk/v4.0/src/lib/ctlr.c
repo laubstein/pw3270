@@ -270,7 +270,7 @@ ctlr_set_rows_cols(int mn, int ovc, int ovr)
 	}
 
 	/* Update the model name. */
-	(void) sprintf(model_name, "327%c-%d%s",
+	(void) sprintf(h3270.model_name, "327%c-%d%s",
 	    appres.m3279 ? '9' : '8',
 	    model_num,
 	    appres.extended ? "-E" : "");

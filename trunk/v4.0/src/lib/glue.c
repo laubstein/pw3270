@@ -106,8 +106,8 @@ static int parse_model_number(char *m);
 /* Globals */
 H3270			h3270;
 const char		*programname;
-char			full_model_name[FULL_MODEL_NAME_SIZE] = "IBM-";
-char			*model_name = &full_model_name[4];
+// char			full_model_name[FULL_MODEL_NAME_SIZE] = "IBM-";
+//char			*model_name = &full_model_name[4];
 AppRes			appres;
 int				children = 0;
 Boolean			exiting = False;
@@ -176,6 +176,9 @@ H3270 * new_3270_session(void)
 	memset(rc,0,sizeof(H3270));
 	rc->sz = sizeof(H3270);
 
+	strncpy(rc->full_model_name,"IBM-",FULL_MODEL_NAME_SIZE);
+	rc->model_name = &rc->full_model_name[4];
+
 #if defined(_WIN32)
 
 	(void) get_version_info();
@@ -231,11 +234,11 @@ H3270 * new_3270_session(void)
 
 
 	if (appres.termname != CN)
-		termtype = appres.termname;
+		rc->termtype = appres.termname;
 	else
-		termtype = full_model_name;
+		rc->termtype = rc->full_model_name;
 
-	Trace("Termtype: %s",termtype);
+	Trace("Termtype: %s",rc->termtype);
 
 	if (appres.apl_mode)
 		appres.charset = Apl;
