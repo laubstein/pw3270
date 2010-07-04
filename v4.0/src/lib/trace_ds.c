@@ -420,7 +420,7 @@ create_tracefile_header(const char *mode)
 	wtrace(" Version: %s\n", build);
 	save_yourself();
 	wtrace(" Command: %s\n", command_string);
-	wtrace(" Model %s", model_name);
+	wtrace(" Model %s", h3270.model_name);
 #if defined(X3270_DISPLAY) || (defined(C3270) && !defined(_WIN32)) /*[*/
 	wtrace(", %s display", appres.mono ? "monochrome" : "color");
 #endif /*]*/

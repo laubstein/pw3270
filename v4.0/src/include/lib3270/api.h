@@ -118,6 +118,8 @@
 			char				  luname[LUNAME_SIZE+1];
 
 			char				  full_model_name[FULL_MODEL_NAME_SIZE+1];
+			char				* model_name;
+			char           	* termtype;
 
 			char				* connected_type;
 
