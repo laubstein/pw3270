@@ -526,7 +526,7 @@
 		<Unit filename="src/include/lib3270/config.h" />
 		<Unit filename="src/include/lib3270/config.h.in" />
 		<Unit filename="src/include/lib3270/kybdc.h" />
-		<Unit filename="src/include/lib3270/plugins.h" />
+		<Unit filename="src/include/lib3270/plugins.h.in" />
 		<Unit filename="src/include/lib3270/statusc.h" />
 		<Unit filename="src/include/lib3270/toggle.h" />
 		<Unit filename="src/java/lib3270_jni.h">

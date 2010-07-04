@@ -59,6 +59,8 @@
    { NULL, 			RXENDLST 	}
  };
 
+ EXPORT_PW3270_PLUGIN_INFORMATION("Rexx script support");
+
  GtkWidget			* program_window	= NULL;
  HCONSOLE			  console_window	= NULL;
  SCRIPT_STATE		  rexx_script_state	= SCRIPT_STATE_NONE;

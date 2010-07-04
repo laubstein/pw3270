@@ -75,7 +75,7 @@
 
  static void load_plugin(const gchar *filename)
  {
- 	GModule *handle;
+ 	GModule 					*handle;
 
 	Trace("Loading plugin in %s",filename);
 
@@ -85,6 +85,38 @@
 
 	if(handle)
 	{
+		PW3270_PLUGIN_VERSION_INFO	*info;
+
+		if(g_module_symbol(handle, "pw3270_plugin_version_info", (gpointer) &info))
+		{
+			Trace("%s info: Revision: %d Version: %s Description: \"%s\"",filename,info->rev,info->vrs,info->descr);
+			if(info->rev < PW3270_PLUGIN_REQUIRED_REVISION)
+			{
+				// Incompatible or outdated plugin
+				GtkWidget *dialog;
+
+				Log("Plugin \"%s\" can't be loaded: Revision: %d Version: %s Description: \"%s\"",filename,info->rev,info->vrs,info->descr);
+
+				dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_WARNING,
+													GTK_BUTTONS_OK,
+													_(  "The plugin \"%s\" is incompatible or outdated." ), info->descr);
+
+				gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't load plugin" ) );
+				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), _( "It was designed for pw3270 version %s (Revision %d)\nand can't be loaded in current application level." ),info->vrs,info->rev);
+				gtk_dialog_run(GTK_DIALOG (dialog));
+				gtk_widget_destroy(dialog);
+
+				g_module_close(handle);
+				return;
+			}
+		}
+		else
+		{
+			Log("Warning: No EXPORT_PW3270_PLUGIN_INFORMATION info on \"%s\"",filename);
+		}
+
 		plugins = g_slist_append(plugins,handle);
 	}
 	else

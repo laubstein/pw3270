@@ -102,7 +102,7 @@
 #define N_OPTS		256
 
 /* Globals */
-char    	*hostname = CN;
+// char    	*hostname = CN;
 time_t          ns_time;
 int             ns_brcvd;
 int             ns_rrcvd;
@@ -460,7 +460,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 	*resolving = False;
 	*pending = False;
 
-	Replace(hostname, NewString(host));
+	Replace(h3270.hostname, NewString(host));
 
 	/* get the passthru host and port number */
 	if (passthru_host) {
@@ -648,7 +648,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 				output_id = AddOutput(sock, &h3270, output_possible);
 #endif /*]*/
 			} else {
-				popup_a_sockerr( N_( "Can't connect to %s:%d" ),hostname, h3270.current_port);
+				popup_a_sockerr( N_( "Can't connect to %s:%d" ),h3270.hostname, h3270.current_port);
 				close_fail;
 			}
 		} else {
@@ -757,14 +757,14 @@ net_connected(void)
 	    	trace_dsn("Connected to proxy server %s, port %u.\n",
 			proxy_host, proxy_port);
 
-	    	if (proxy_negotiate(proxy_type, sock, hostname,
+	    	if (proxy_negotiate(proxy_type, sock, h3270.hostname,
 			    h3270.current_port) < 0) {
 		    	host_disconnect(&h3270,True);
 			return;
 		}
 	}
 
-	trace_dsn("Connected to %s, port %u%s.\n", hostname, h3270.current_port,ssl_host? " via SSL": "");
+	trace_dsn("Connected to %s, port %u%s.\n", h3270.hostname, h3270.current_port,ssl_host? " via SSL": "");
 
 #if defined(HAVE_LIBSSL) /*[*/
 	/* Set up SSL. */
@@ -824,8 +824,8 @@ net_connected(void)
 	if (passthru_host) {
 		char *buf;
 
-		buf = Malloc(strlen(hostname) + 32);
-		(void) sprintf(buf, "%s %d\r\n", hostname, h3270.current_port);
+		buf = Malloc(strlen(h3270.hostname) + 32);
+		(void) sprintf(buf, "%s %d\r\n", h3270.hostname, h3270.current_port);
 		(void) send(sock, buf, strlen(buf), 0);
 		Free(buf);
 	}
@@ -1006,7 +1006,7 @@ void net_input(H3270 *session)
 #endif /*]*/
 			trace_dsn("RCVD socket error %d\n", errno);
 			if (HALF_CONNECTED) {
-				popup_a_sockerr( N_( "%s:%d" ),hostname, h3270.current_port);
+				popup_a_sockerr( N_( "%s:%d" ),h3270.hostname, h3270.current_port);
 			} else if (socket_errno() != SE_ECONNRESET) {
 				popup_a_sockerr( N_( "Socket read error" ) );
 			}
