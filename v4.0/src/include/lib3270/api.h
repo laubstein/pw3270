@@ -114,14 +114,15 @@
 		typedef struct _h3270
 		{
 			unsigned short 	  sz;				/**< Struct size */
+
+			char    			* hostname;
+			char				* connected_type;
 			char				* connected_lu;
 			char				  luname[LUNAME_SIZE+1];
 
 			char				  full_model_name[FULL_MODEL_NAME_SIZE+1];
 			char				* model_name;
 			char           	* termtype;
-
-			char				* connected_type;
 
 			char				* current_host;
 			unsigned short	  current_port;

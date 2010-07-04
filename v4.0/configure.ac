@@ -591,6 +591,7 @@ AC_OUTPUT(Makefile)
 AC_OUTPUT(src/gui/version.c)
 AC_OUTPUT(src/oxt/description.xml)
 AC_OUTPUT(src/oxt/manifest.xml)
+AC_OUTPUT(src/include/lib3270/plugins.h)
 AC_OUTPUT(version)
 
 case "$host" in

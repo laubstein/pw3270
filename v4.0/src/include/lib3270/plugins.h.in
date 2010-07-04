@@ -36,6 +36,11 @@
 
 	#include <gtk/gtk.h>
 
+	#define PW3270_VERSION 	"@PACKAGE_VERSION@"
+	#define PW3270_REVISION @PACKAGE_REVISION@
+
+	#define PW3270_PLUGIN_REQUIRED_REVISION 1356
+
 	#if defined(_WIN32)
 		#include <windows.h>
 
@@ -59,7 +64,19 @@
 
 	#endif
 
+	// Exported plugin info
+	typedef struct _pw3270_plugin_version_info
+	{
+		int				  rev;
+		const char 		* vrs;
+		const char		* descr;
+	} PW3270_PLUGIN_VERSION_INFO;
 
+	PW3270_PLUGIN_ENTRY PW3270_PLUGIN_VERSION_INFO pw3270_plugin_version_info;
+
+	#define EXPORT_PW3270_PLUGIN_INFORMATION(x) PW3270_PLUGIN_VERSION_INFO pw3270_plugin_version_info = { @PACKAGE_REVISION@, "@PACKAGE_VERSION@", x };
+
+	// Plugin standard calls
 	PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow, const gchar *script);
 	PW3270_PLUGIN_ENTRY void pw3270_plugin_stop(GtkWidget *topwindow);
 	PW3270_PLUGIN_ENTRY void pw3270_plugin_update_luname(GtkWidget *topwindow, const gchar *luname);
