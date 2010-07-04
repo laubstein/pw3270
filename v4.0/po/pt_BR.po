@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: pw3270 4.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-01-18 17:12-0200\n"
-"PO-Revision-Date: 2010-07-02 10:45-0300\n"
+"PO-Revision-Date: 2010-07-05 12:19-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid " Unknown frame type from host"
 msgstr ""
 
-#: src/lib/telnet.c:1011
+#: src/lib/telnet.c:1009
 #, c-format
 msgid "%s:%d"
 msgstr ""
@@ -54,19 +54,19 @@ msgstr "Biblioteca 3270 falhou ao iniciar"
 msgid "3270 options"
 msgstr "Opções do 3270"
 
-#: src/gui/uiparser.c:711
+#: src/gui/uiparser.c:713
 msgid "<button> element should be used only inside <keypad><row>"
 msgstr "Elemento <button> só deve ser usado dentro de <keypad><row>"
 
-#: src/gui/uiparser.c:704
+#: src/gui/uiparser.c:706
 msgid "<row> element should be used only inside <keypad>"
 msgstr "Elemento <row> só deve ser usado dentro de <keypad>"
 
-#: src/gui/uiparser.c:734
+#: src/gui/uiparser.c:736
 msgid "<script> element requires a name"
 msgstr "Tag <script> precisa de um nome"
 
-#: src/gui/uiparser.c:722
+#: src/gui/uiparser.c:724
 msgid "<script> element should be used only inside another active element"
 msgstr "Elemento <script> só pode ser usado dentro de outro elemento ativo"
 
@@ -86,7 +86,7 @@ msgstr "Sobre"
 msgid "Action failed"
 msgstr "Operação falhou"
 
-#: src/gui/clipboard.c:513
+#: src/gui/clipboard.c:534
 msgid "Activate rectangle select option and try again."
 msgstr "Ative a opção \"Selecionar como retângulo\" e tente novamente"
 
@@ -162,7 +162,7 @@ msgstr "Borda"
 msgid "Browse"
 msgstr "Procurar"
 
-#: src/lib/telnet.c:652
+#: src/lib/telnet.c:651
 #, c-format
 msgid "Can't connect to %s:%d"
 msgstr "Não foi possível conectar a %s:%d"
@@ -177,7 +177,7 @@ msgstr "Não foi possível converter a linha %d de %s para %s"
 msgid "Can't convert text from %s to %s"
 msgstr "Não foi possível converter o texto de %s para %s"
 
-#: src/gui/clipboard.c:512
+#: src/gui/clipboard.c:533
 msgid "Can't copy non rectangular area"
 msgstr "Não é possível copiar áreas não retangulares"
 
@@ -194,33 +194,27 @@ msgid ""
 msgstr "Não foi possível criar arquivo temporário:\n"
 "%s"
 
-#: src/gui/uiparser.c:1296
+#: src/gui/uiparser.c:1299
 #, c-format
 msgid "Can't find UI definitions in %s"
 msgstr "Não encontrei definição de interface em %s"
 
-#: src/gui/plugin.c:157
+#: src/gui/plugin.c:189
 #, c-format
 msgid "Can't load \"%s\""
 msgstr "Não consigo carregar \"%s\""
 
-#: src/gui/uiparser.c:862 src/plugins/rexx/plg_start.c:157
+#: src/gui/clipboard.c:390 src/gui/uiparser.c:865
+#: src/plugins/rexx/plg_start.c:159
 #, c-format
 msgid "Can't load %s"
 msgstr "Não foi possível carregar %s"
 
-#: src/gui/clipboard.c:383
-#, c-format
-msgid ""
-"Can't load %s\n"
-"%s"
-msgstr "Não foi possível carregar %s\n%s"
-
-#: src/gui/uiparser.c:1298
+#: src/gui/uiparser.c:1301
 msgid "Can't load UI"
 msgstr "Não foi possível ler a interface"
 
-#: src/gui/plugin.c:159
+#: src/gui/plugin.c:106 src/gui/plugin.c:191
 msgid "Can't load plugin"
 msgstr "Não foi possível carregar plugin"
 
@@ -228,7 +222,7 @@ msgstr "Não foi possível carregar plugin"
 msgid "Can't open local file"
 msgstr "Não foi possível abrir arquivo local"
 
-#: src/gui/uiparser.c:220 src/gui/uiparser.c:864 src/gui/uiparser.c:890
+#: src/gui/uiparser.c:220 src/gui/uiparser.c:867 src/gui/uiparser.c:893
 msgid "Can't parse UI"
 msgstr "Erro no processamento da interface"
 
@@ -237,7 +231,7 @@ msgstr "Erro no processamento da interface"
 msgid "Can't parse accelerator \"%s\""
 msgstr "Não foi possível converter tecla \"%s\""
 
-#: src/gui/uiparser.c:888
+#: src/gui/uiparser.c:891
 #, c-format
 msgid "Can't parse ui in %s"
 msgstr "Não foi possível processar interface em %s"
@@ -281,7 +275,7 @@ msgstr "Não foi possível iniciar"
 msgid "Can't start LU association script"
 msgstr "Não foi possível iniciar comando de associação de LU"
 
-#: src/gui/screen.c:496 src/plugins/rexx/plg_start.c:79
+#: src/gui/screen.c:496 src/plugins/rexx/plg_start.c:81
 msgid "Can't start script"
 msgstr "Não foi possível iniciar o script"
 
@@ -297,7 +291,7 @@ msgstr "Não foi possível parar script"
 msgid "Cancelled by user"
 msgstr "Cancelado pelo usuário"
 
-#: src/lib/glue.c:237
+#: src/lib/glue.c:250
 #, c-format
 msgid "Cannot find charset \"%s\", using defaults"
 msgstr "Não encontrei codificação para \"%s\", usando padrão"
@@ -322,7 +316,7 @@ msgstr "Cores"
 msgid "Command to run when LU name is available"
 msgstr "Comando a executar quando o nome da LU ficar disponível"
 
-#: src/gui/tracewindow.c:72 src/plugins/rexx/plg_start.c:264
+#: src/gui/tracewindow.c:72 src/plugins/rexx/plg_start.c:266
 msgid "Command:"
 msgstr "Comando:"
 
@@ -422,7 +416,7 @@ msgstr "Salvar captura de tela"
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
-#: src/lib/telnet.c:1230
+#: src/lib/telnet.c:1228
 msgid "EOR received when not in 3270 mode, ignored."
 msgstr "\"EOR\" recebido fora do modo 3270, ignorado"
 
@@ -528,7 +522,7 @@ msgstr ""
 msgid "Event Trace"
 msgstr ""
 
-#: src/gui/uiparser.c:807
+#: src/gui/uiparser.c:810
 msgid "Expecting active element"
 msgstr "Esperando elemento ativo"
 
@@ -536,7 +530,7 @@ msgstr "Esperando elemento ativo"
 msgid "External Rexx script"
 msgstr "Script rexx externo"
 
-#: src/plugins/rexx/plg_start.c:159
+#: src/plugins/rexx/plg_start.c:161
 msgid "File error"
 msgstr "Erro de arquivo"
 
@@ -648,9 +642,16 @@ msgstr "Intensificado/Protegido"
 msgid "Intensified/Unprotected"
 msgstr "Intensificado/Desprotegido"
 
-#: src/gui/clipboard.c:510
+#: src/gui/clipboard.c:531
 msgid "Invalid action"
 msgstr "Ação inválida"
+
+#: src/gui/plugin.c:107
+#, c-format
+msgid ""
+"It was designed for pw3270 version %s (Revision %d)\n"
+"and can't be loaded in current application level."
+msgstr ""
 
 #: src/gui/actions.c:73
 msgid "Keep selected"
@@ -712,7 +713,7 @@ msgstr "Mostarda"
 msgid "Name of configuration file (auto-search)"
 msgstr "Nome do arquivo de configuração (pesquisa automática)"
 
-#: src/gui/actions.c:248
+#: src/gui/actions.c:248 src/gui/commands.c:262
 #, c-format
 msgid "Negotiation with %s failed!"
 msgstr "Negociação com %s falhou!"
@@ -721,7 +722,7 @@ msgstr "Negociação com %s falhou!"
 msgid "Network"
 msgstr "Rede"
 
-#: src/lib/telnet.c:401 src/lib/telnet.c:414
+#: src/lib/telnet.c:400 src/lib/telnet.c:413
 msgid "Network error"
 msgstr "Erro de comunicação"
 
@@ -881,6 +882,10 @@ msgstr "Erro na passagem de parâmetros"
 msgid "Paste"
 msgstr "Colar"
 
+#: src/gui/clipboard.c:392
+msgid "Paste error"
+msgstr "Erro ao colar"
+
 #: src/gui/actions.c:910
 msgid "Paste next"
 msgstr "Colar próximo"
@@ -913,7 +918,7 @@ msgstr "Rosa"
 msgid "Please wait"
 msgstr "Por favor, aguarde"
 
-#: src/plugins/rexx/plg_start.c:82
+#: src/plugins/rexx/plg_start.c:84
 msgid "Please, try again in a few moments"
 msgstr "Por favor, tente novamente em alguns instantes"
 
@@ -965,7 +970,7 @@ msgstr "Progresso"
 msgid "Properties"
 msgstr "Propriedades"
 
-#: src/lib/glue.c:469
+#: src/lib/glue.c:482
 msgid "Proxy server (type:host[:port])"
 msgstr "Servidor proxy (tipo:host[:porta])"
 
@@ -1013,8 +1018,8 @@ msgstr ""
 msgid "Return"
 msgstr ""
 
-#: src/gui/main.c:505 src/plugins/rexx/plg_start.c:112
-#: src/plugins/rexx/plg_start.c:129
+#: src/gui/main.c:505 src/plugins/rexx/plg_start.c:114
+#: src/plugins/rexx/plg_start.c:131
 #, c-format
 msgid "Return code was %d"
 msgstr "Código de saída foi %d"
@@ -1023,11 +1028,11 @@ msgstr "Código de saída foi %d"
 msgid "Rexx message"
 msgstr "Mensagem Rexx"
 
-#: src/plugins/rexx/plg_start.c:128
+#: src/plugins/rexx/plg_start.c:130
 msgid "Rexx script error"
 msgstr "Erro no script rexx"
 
-#: src/plugins/rexx/plg_start.c:111
+#: src/plugins/rexx/plg_start.c:113
 msgid "Rexx script failed"
 msgstr "Script Rexx falhou"
 
@@ -1035,7 +1040,7 @@ msgstr "Script Rexx falhou"
 msgid "Rexx scripts"
 msgstr "Scripts rexx"
 
-#: src/plugins/rexx/plg_start.c:264
+#: src/plugins/rexx/plg_start.c:266
 msgid "Rexx trace"
 msgstr "Trace Rexx"
 
@@ -1051,7 +1056,7 @@ msgstr "Executa script na inicialização (Se disponível)"
 msgid "Running transfer"
 msgstr "Transferindo"
 
-#: src/lib/telnet.c:3288
+#: src/lib/telnet.c:3285
 msgid "SSL Connect error"
 msgstr ""
 
@@ -1087,12 +1092,12 @@ msgstr "Salvar texto selecionado"
 msgid "Screen Trace"
 msgstr ""
 
-#: src/plugins/rexx/plg_start.c:125
+#: src/plugins/rexx/plg_start.c:127
 #, c-format
 msgid "Script %s aborted"
 msgstr "Script %s foi abortado"
 
-#: src/plugins/rexx/plg_start.c:314
+#: src/plugins/rexx/plg_start.c:316
 msgid "Script message"
 msgstr "Mensagem do script"
 
@@ -1204,7 +1209,7 @@ msgstr "Separador"
 msgid "Set hostname"
 msgstr "Mudar servidor"
 
-#: src/lib/glue.c:459
+#: src/lib/glue.c:472
 msgid "Set terminal model (screen size)"
 msgstr "Define o modelo do terminal (tamanho da tela)"
 
@@ -1228,11 +1233,11 @@ msgstr "Mostrar tempo"
 msgid "Smart paste"
 msgstr "Colar inteligente"
 
-#: src/lib/telnet.c:1013
+#: src/lib/telnet.c:1011
 msgid "Socket read error"
 msgstr "Erro ao receber dados"
 
-#: src/lib/telnet.c:2018
+#: src/lib/telnet.c:2015
 msgid "Socket write error"
 msgstr "Erro ao enviar dados"
 
@@ -1240,11 +1245,11 @@ msgstr "Erro ao enviar dados"
 msgid "Space allocation units"
 msgstr "Unidade de alocação de espaço"
 
-#: src/lib/glue.c:454
+#: src/lib/glue.c:467
 msgid "Specifies a keymap name and optional modifiers."
 msgstr ""
 
-#: src/lib/glue.c:481
+#: src/lib/glue.c:494
 msgid ""
 "Specifies the terminal name to be transmitted over the telnet connection."
 msgstr "Especifica o nome do terminal a ser transmitido na conexão telnet"
@@ -1265,7 +1270,7 @@ msgstr ""
 msgid "System Error"
 msgstr "Erro de sistema"
 
-#: src/plugins/rexx/plg_start.c:81
+#: src/plugins/rexx/plg_start.c:83
 msgid "System busy"
 msgstr "Sistema ocupado"
 
@@ -1277,11 +1282,16 @@ msgstr ""
 msgid "Text file"
 msgstr "Arquivo texto"
 
+#: src/gui/plugin.c:104
+#, c-format
+msgid "The plugin \"%s\" is incompatible or outdated."
+msgstr ""
+
 #: src/lib/ft.c:171
 msgid "The remote file name is invalid"
 msgstr "O nome do arquivo remoto não é válido"
 
-#: src/gui/plugin.c:160
+#: src/gui/plugin.c:192
 msgid "The required plugin file wasn't found"
 msgstr "O arquivo de plugin pedido não foi encontrado"
 
@@ -1388,8 +1398,8 @@ msgstr "Indefinido"
 
 #: src/gui/actions.c:428 src/gui/actions.c:631 src/gui/actions.c:679
 #: src/gui/actions.c:738 src/gui/clipboard.c:139 src/gui/clipboard.c:265
-#: src/gui/clipboard.c:308 src/gui/clipboard.c:383 src/gui/print.c:324
-#: src/gui/print.c:353 src/gui/commands.c:93 src/plugins/rexx/plg_start.c:160
+#: src/gui/clipboard.c:308 src/gui/print.c:324 src/gui/print.c:353
+#: src/gui/commands.c:93 src/plugins/rexx/plg_start.c:162
 msgid "Unexpected error"
 msgstr "Erro inesperado"
 
@@ -1402,12 +1412,12 @@ msgstr "Tipo inesperado %d na fila de teclado"
 msgid "Unknown FT control code from host"
 msgstr "Recebi código FT desconhecido"
 
-#: src/lib/kybd.c:3424
+#: src/lib/kybd.c:3423
 #, c-format
 msgid "Unknown PA key %d"
 msgstr "Tecla desconhecida: PA%02d"
 
-#: src/lib/kybd.c:3446
+#: src/lib/kybd.c:3445
 #, c-format
 msgid "Unknown PF key %d"
 msgstr "Tecla desconhecida: PF%02d"
@@ -1537,7 +1547,7 @@ msgstr "_Sair"
 msgid "_View"
 msgstr "Exibir"
 
-#: src/lib/telnet.c:3174 src/lib/telnet.c:3182
+#: src/lib/telnet.c:3171 src/lib/telnet.c:3179
 #, c-format
 msgid "fcntl(%s)"
 msgstr ""
@@ -1546,22 +1556,22 @@ msgstr ""
 msgid "ftDftUknownOpen"
 msgstr ""
 
-#: src/lib/telnet.c:3167
+#: src/lib/telnet.c:3164
 #, c-format
 msgid "ioctl(%s)"
 msgstr ""
 
-#: src/plugins/rexx/plg_start.c:109
+#: src/plugins/rexx/plg_start.c:111
 #, c-format
 msgid "script %s failed"
 msgstr "script %s falhou"
 
-#: src/lib/telnet.c:602 src/lib/telnet.c:607 src/lib/telnet.c:613
+#: src/lib/telnet.c:601 src/lib/telnet.c:606 src/lib/telnet.c:612
 #, c-format
 msgid "setsockopt(%s)"
 msgstr ""
 
-#: src/lib/telnet.c:595
+#: src/lib/telnet.c:594
 msgid "socket"
 msgstr ""
 
