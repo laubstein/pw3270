@@ -58,60 +58,6 @@
 	return g_strdup(clipboard_string);
  }
 
-/*
- enum
- {
-	TARGET_STRING,
-	TARGET_TEXT,
-	TARGET_COMPOUND_TEXT,
-	TARGET_UTF8_STRING
- };
-
- static void clipboard_get(GtkClipboard *clipboard, GtkSelectionData *selection_data, guint info, gpointer data)
- {
- 	Trace("%s called",__FUNCTION__);
-
- 	if(clipboard_string)
-		gtk_selection_data_set_text(selection_data, clipboard_string,-1);
- }
-
- static void clipboard_clear(GtkClipboard *clipboard, gpointer data)
- {
- 	Trace("%s called",__FUNCTION__);
- }
-
- static void UpdateClipboard(void)
- {
-	static const GtkTargetEntry targets[] =
-	{
-		{ "STRING",			0, 	TARGET_STRING			},
-		{ "TEXT",			0, 	TARGET_TEXT				},
-		{ "COMPOUND_TEXT",	0,	TARGET_COMPOUND_TEXT	},
-		{ "UTF8_STRING",	0,	TARGET_UTF8_STRING		}
-	};
-
-	Trace("%s begins",__FUNCTION__);
-
- 	if(clipboard_string)
- 	{
-		gtk_clipboard_set_with_data (	gtk_widget_get_clipboard(topwindow,GDK_NONE),
-										targets, G_N_ELEMENTS (targets),
-										clipboard_get, clipboard_clear,
-										clipboard_string );
-
-
- 		Trace("%s: clipboard set",__FUNCTION__);
-		set_action_group_sensitive_state(ACTION_GROUP_CLIPBOARD,TRUE);
- 	}
- 	else
- 	{
- 		Trace("%s: No string on clipboard",__FUNCTION__);
- 		clipboard_mode = CLIPBOARD_MODE_NONE;
-		set_action_group_sensitive_state(ACTION_GROUP_CLIPBOARD,FALSE);
- 	}
- }
-*/
-
  static void paste_string(const gchar *str)
  {
  	int 	sz;
@@ -354,6 +300,25 @@
 														 GTK_STOCK_OPEN,	GTK_RESPONSE_ACCEPT,
 														 NULL );
 
+/*
+#ifdef DEBUG
+	{
+		GtkWidget *box   = gtk_hbox_new(FALSE,2);
+		GtkWidget *combo = gtk_combo_box_new_text();
+
+		gtk_combo_box_append_text(GTK_COMBO_BOX(combo),"System default");
+		gtk_combo_box_append_text(GTK_COMBO_BOX(combo),"UTF-8");
+
+		gtk_box_pack_end(GTK_BOX(box),combo,FALSE,FALSE,0),
+		gtk_box_pack_end(GTK_BOX(box),gtk_label_new(_( "File encoding:" )),FALSE,FALSE,0),
+
+
+		gtk_widget_show_all(box);
+		gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog),box);
+
+	}
+#endif
+*/
 
 	ptr = g_key_file_get_string(conf,"uri","PasteTextFile",NULL);
 	if(ptr)
@@ -380,8 +345,25 @@
 
 		if(!g_file_get_contents(filename, &buffer, &sz, &error))
 		{
-			Warning( N_( "Can't load %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			GtkWidget *dialog;
+
+			// Can't parse UI definition, notify user
+			dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+												GTK_DIALOG_DESTROY_WITH_PARENT,
+												GTK_MESSAGE_ERROR,
+												GTK_BUTTONS_CLOSE,
+												_(  "Can't load %s" ), filename);
+
+			gtk_window_set_title(GTK_WINDOW(dialog), _( "Paste error" ) );
+
+			if(error->message)
+				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s",error->message);
+
+			gtk_dialog_run(GTK_DIALOG (dialog));
+			gtk_widget_destroy(dialog);
+
 			g_error_free(error);
+
 		}
 		else
 		{
