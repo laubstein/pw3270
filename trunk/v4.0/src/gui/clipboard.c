@@ -300,25 +300,58 @@
 														 GTK_STOCK_OPEN,	GTK_RESPONSE_ACCEPT,
 														 NULL );
 
-/*
 #ifdef DEBUG
 	{
-		GtkWidget *box   = gtk_hbox_new(FALSE,2);
-		GtkWidget *combo = gtk_combo_box_new_text();
+		static const struct _encoding
+		{
+			const gchar *descr;
+			const gchar *name;
+		} encoding[] =
+		{
+			{ N_( "Unicode" ),						"UTF-8"		},
+			{ N_( "Windows Latin-1 "),				"CP1252"	},
+			{ N_( "Latin Alphabet No. 1" ),			"iso8859-1"	},
+		};
 
-		gtk_combo_box_append_text(GTK_COMBO_BOX(combo),"System default");
-		gtk_combo_box_append_text(GTK_COMBO_BOX(combo),"UTF-8");
+		const gchar 	*syschr		= NULL;
+		GtkWidget 		*expander	= gtk_expander_new(_( "Text encoding") );
+		GtkWidget		*frame		= gtk_scrolled_window_new(NULL,NULL);
+		GtkTreeModel	*model 		= (GtkTreeModel *) gtk_list_store_new(2,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_STRING);
+		GtkWidget		*view		= gtk_tree_view_new_with_model(model);
+		int				 f;
 
-		gtk_box_pack_end(GTK_BOX(box),combo,FALSE,FALSE,0),
-		gtk_box_pack_end(GTK_BOX(box),gtk_label_new(_( "File encoding:" )),FALSE,FALSE,0),
+		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view),FALSE);
+		gtk_tree_view_insert_column_with_attributes( GTK_TREE_VIEW(view), -1, "0", gtk_cell_renderer_text_new(), "text", 0, NULL);
+		gtk_tree_view_insert_column_with_attributes( GTK_TREE_VIEW(view), -1, "1", gtk_cell_renderer_text_new(), "text", 1, NULL);
 
+		g_get_charset(&syschr);
+		if(syschr)
+		{
+			GtkTreeIter iter;
+			gtk_list_store_append((GtkListStore *) model,&iter);
+			gtk_list_store_set((GtkListStore *) model, &iter,  0, _( "System default" ), 1, syschr, -1);
+			gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(view)),&iter);
+		}
 
-		gtk_widget_show_all(box);
-		gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog),box);
+		for(f=0;f<G_N_ELEMENTS(encoding);f++)
+		{
+			if(!syschr || strcmp(syschr,encoding[f].name))
+			{
+				GtkTreeIter iter;
+				gtk_list_store_append((GtkListStore *) model,&iter);
+				gtk_list_store_set((GtkListStore *) model, &iter,  0, gettext(encoding[f].descr), 1, encoding[f].name, -1);
+			}
+		}
+
+		gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(frame),GTK_POLICY_NEVER,GTK_POLICY_AUTOMATIC);
+		gtk_container_add(GTK_CONTAINER(frame),view);
+        gtk_container_add(GTK_CONTAINER(expander),frame);
+
+		gtk_widget_show_all(expander);
+		gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog),expander);
 
 	}
 #endif
-*/
 
 	ptr = g_key_file_get_string(conf,"uri","PasteTextFile",NULL);
 	if(ptr)

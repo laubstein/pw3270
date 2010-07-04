@@ -175,6 +175,7 @@ H3270 * new_3270_session(void)
 
 	memset(rc,0,sizeof(H3270));
 	rc->sz = sizeof(H3270);
+	rc->sock = -1;
 
 	strncpy(rc->full_model_name,"IBM-",FULL_MODEL_NAME_SIZE);
 	rc->model_name = &rc->full_model_name[4];
