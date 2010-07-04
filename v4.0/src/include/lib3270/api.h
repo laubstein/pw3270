@@ -115,6 +115,12 @@
 		{
 			unsigned short 	  sz;				/**< Struct size */
 
+			int      			  sock;				/**< Network socket */
+
+			#if defined(_WIN32) /*[*/
+			HANDLE				  sock_handle;
+			#endif /*]*/
+
 			char    			* hostname;
 			char				* connected_type;
 			char				* connected_lu;
