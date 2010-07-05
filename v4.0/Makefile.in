@@ -696,6 +696,20 @@ $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
 	@echo $@
 
 distclean: clean
+	@rm -f src/version.c
+	@rm -f src/java/lib3270_jni.h
+	@rm -f src/include/lib3270/plugins.h
+	@rm -f src/include/lib3270/stamp-h1
+	@rm -f src/include/lib3270/config.h
+	@rm -f src/gui/version.c
+	@rm -f src/gui/resources.rc
+	@rm -f src/lib/fallbacks.c
+	@rm -f src/oxt/description.xml
+	@rm -f src/oxt/pw3270.uno.exp
+	@rm -f src/oxt/manifest.xml
+	@rm -f src/oxt/pw3270.uno.lib
+	@rm -f lib3270.pc
+	@rm -f pw3270.layout
 
 clean:
 	@rm -fr obj
@@ -721,6 +735,7 @@ clean:
 	@rm -f $(PACKAGE).@LOGOEXT@
 	@rm -f @PROGRAM_NAME@.oxt
 	@rm -f src/java/lib3270_jni.h
+	@rm -f src/oxt/pw3270.uno.rdb
 
 	@if [ -e src/plugins/rexx/Makefile ]; then make -C src/plugins/rexx clean; fi
 	@if [ -e src/extensions/uno/Makefile ]; then make -C src/extensions/uno clean; fi
@@ -736,5 +751,6 @@ clean:
 	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.exe" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.log" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.dll" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "leak.out" -exec mv -f {} $(TMPDIR) \;
 	@find . -name "*.tmp" -exec mv -f {} $(TMPDIR) \;
