@@ -62,8 +62,8 @@
 #include <stdarg.h>
 
 #if defined(HAVE_LIBSSL) /*[*/
-#include <openssl/ssl.h>
-#include <openssl/err.h>
+	#include <openssl/ssl.h>
+	#include <openssl/err.h>
 #endif /*]*/
 #include "tn3270e.h"
 #include "3270ds.h"
@@ -2002,8 +2002,7 @@ net_rawout(unsigned const char *buf, int len)
 
 				e = ERR_get_error();
 				(void) ERR_error_string(e, err_buf);
-				trace_dsn("RCVD SSL_write error %ld (%s)\n", e,
-				    err_buf);
+				trace_dsn("RCVD SSL_write error %ld (%s)\n", e,err_buf);
 				popup_an_error("SSL_write:\n%s", err_buf);
 				host_disconnect(&h3270,False);
 				return;
