@@ -603,6 +603,7 @@ case "$host" in
 	*)
 		AC_OUTPUT(pw3270.spec)
 		AC_OUTPUT(debian/control)
+		AC_OUTPUT(debian/changelog)
 		AC_OUTPUT(lib3270.pc)
 
 	;;

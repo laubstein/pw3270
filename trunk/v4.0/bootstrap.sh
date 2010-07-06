@@ -3,6 +3,7 @@
 PACKAGE_VERSION=4.1
 PACKAGE_RELEASE=2
 
+REV=`date +%y%m%d%H%M`
 REV_FILE=./revision.m4
 
 if [ -d .svn ]; then
@@ -24,7 +25,6 @@ if [ ! -z $SVN ]; then
 			REV=`$SVN info | grep "^Revision:" | cut -d" " -f2`
 			LCD=`$SVN info | grep "^Last Changed Date:" | cut -d" " -f4,5`
 		else
-			REV=`date +%y%m%d%H%M`
 			LCD=""
 		fi
 
@@ -42,8 +42,14 @@ if [ ! -z $SVN ]; then
 
 fi
 
+SVN_SCRIPT="s/@PACKAGE_VERSION@/$PACKAGE_VERSION/g;s/@PACKAGE_RELEASE@/$PACKAGE_RELEASE/g;s/@PACKAGE_REVISION@/$REV/g;s/@DATE_CHANGED@/`date --rfc-2822`/g"
+
 if [ -e "debian/control.in" ]; then
-	sed "s/@PACKAGE_VERSION@/$PACKAGE_VERSION/g;s/@PACKAGE_RELEASE@/$PACKAGE_RELEASE/g" "debian/control.in" > "debian/control"
+	sed "$SVN_SCRIPT" "debian/control.in" > "debian/control"
+fi
+
+if [ -e "debian/changelog.in" ]; then
+	sed "$SVN_SCRIPT" "debian/changelog.in" > "debian/changelog"
 fi
 
 aclocal

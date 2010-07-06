@@ -1,0 +1,6 @@
+pw3270 (@PACKAGE_VERSION@.@PACKAGE_RELEASE@) unstable; urgency=low
+
+  * SVN release $Rev$
+
+ -- Perry Werneck <perry.werneck@gmail.com>  Wed, 07 Jul 2010 09:29:31 -0300
+
