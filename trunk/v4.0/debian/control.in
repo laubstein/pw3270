@@ -26,6 +26,13 @@ Depends: ${misc:Depends}, lib3270 (= ${binary:Version}), oorexx (>= 4.0.1)
 Description: 3270 support for rexx scripts. (Rev. @PACKAGE_REVISION@)
  This package contains the rexx layer for acessing 3270 hosts.
 
+Package: lib3270-openoffice.org
+Architecture: any
+Section: libs
+Depends: ${misc:Depends}, lib3270 (= ${binary:Version})
+Description: Uno/OpenOffice library allowing 3270 access from StarBasic. (Rev. @PACKAGE_REVISION@)
+ This package contains the openoffice.org extenstion file to allow 3270 access from StarBasic.
+
 Package: pw3270-dev
 Architecture: any
 Section: libdevel
@@ -39,10 +46,4 @@ Depends: ${misc:Depends}, pw3270 (= ${binary:Version}), lib3270-rexx (= ${binary
 Description: Rexx plugin for pw3270. (Rev. @PACKAGE_REVISION@)
  This package contains the plugin to allow rexx scripting inside pw3270.
 
-Package: pw3270-openoffice
-Architecture: any
-Section: libs
-Depends: ${misc:Depends}, lib3270 (= ${binary:Version})
-Description: Uno/OpenOffice library allowing 3270 access from StarBasic. (Rev. @PACKAGE_REVISION@)
- This package contains the openoffice.org extenstion file to allow 3270 access from StarBasic.
 
