@@ -107,19 +107,27 @@ Revision: @PACKAGE_REVISION@
 
 %if 0%{?_rexx}
 %package rexx
-Provides:	%{name}-rexx
-Summary:	Devel for 3270 Communication library for %{name}
+Summary:	Rexx scripts support for %{name}
 Group:		Development/Libraries
-Requires:       ooRexx >= 3.2.0 %{name}-lib = @PACKAGE_VERSION@
-BuildRequires:  ooRexx >= 3.2.0
+Requires:	ooRexx >= 3.2.0 %{name}-lib = @PACKAGE_VERSION@ 
+BuildRequires:	ooRexx >= 3.2.0
 
 %description rexx
-Plugin to add Rexx support in %{name}
+Rexx bindings for 3270 access using lib3270 (non-gui)
 
 Revision: @PACKAGE_REVISION@
 
-%endif
+%package plugins-rexx
+Summary:	Rexx plugin for  %{name}
+Group:		Development/Libraries
+Requires:	%{name}-rexx = @PACKAGE_VERSION@
+BuildRequires:	ooRexx >= 3.2.0
 
+%description plugins-rexx
+Plugin to add Rexx scripting suport in %{name}
+
+Revision: @PACKAGE_REVISION@
+%endif
 
 %if 0%{?_uno}
 %package OpenOffice
@@ -133,22 +141,28 @@ BuildRequires:	autoconf sed pkgconfig zip
 Uno/OpenOffice library allowing 3270 access from StarBasic
 
 Revision: @PACKAGE_REVISION@
-
 %endif
 
 %if 0%{?_java}
 %package java
-Provides:	%{name}-java
 Group:		Development/Libraries
 Summary:	Java bindings for %{name}
 Requires:	%{name}-lib = @PACKAGE_VERSION@
 
 %description java
-Jni library allowing 3270 access from java programs, includes plugin for use of java
-classes inside %{name}'s UI
+Jni library allowing 3270 access from java programs (non-GUI)
 
 Revision: @PACKAGE_REVISION@
 
+%package plugins-java
+Group:		Development/Libraries
+Summary:	Java bindings for %{name}
+Requires:	%{name}-java = @PACKAGE_VERSION@
+
+%description plugins-java
+Plugin allowing use of java classes inside %{name}'s UI
+
+Revision: @PACKAGE_REVISION@
 %endif
 
 %prep
@@ -262,10 +276,13 @@ fi
 %if 0%{?_rexx}
 %files rexx
 %defattr(-,root,root)
-%{_libdir}/%{name}/plugins/rx3270.so
-%{_datadir}/%{name}/ui/rexx.xml
 %{_libdir}/librx3270.so
 %{_bindir}/rx3270.cls
+
+%files plugins-rexx
+%defattr(-,root,root)
+%{_libdir}/%{name}/plugins/rx3270.so
+%{_datadir}/%{name}/ui/rexx.xml
 %endif
 
 %if 0%{?_uno}
@@ -279,6 +296,10 @@ fi
 %defattr(-,root,root)
 %{_jnidir}
 %{_jvmjardir}
+%{_libdir}/%{name}/plugins/j3270plugin.so
+
+%files plugins-java
+%defattr(-,root,root)
 %{_libdir}/%{name}/plugins/j3270plugin.so
 %endif
 
