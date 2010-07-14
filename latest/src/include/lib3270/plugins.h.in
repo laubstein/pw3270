@@ -36,15 +36,15 @@
 
 	#include <gtk/gtk.h>
 
-	#define PW3270_VERSION 	"@PACKAGE_VERSION@"
-	#define PW3270_REVISION @PACKAGE_REVISION@
+	#define PW3270_VERSION 	"4.1"
+	#define PW3270_REVISION 1366
 
 	#define PW3270_PLUGIN_REQUIRED_REVISION 1356
 
 	#if defined(_WIN32)
 		#include <windows.h>
 
-		#define PW3270_PLUGIN_ENTRY	__declspec (dllexport)
+		#define PW3270_MODULE_EXPORT	__declspec (dllexport)
 		#define LOCAL_EXTERN		extern
 
 	#else
@@ -53,33 +53,40 @@
 		// http://gcc.gnu.org/wiki/Visibility
 		#if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
 				#define LOCAL_EXTERN __hidden extern
-				#define PW3270_PLUGIN_ENTRY extern
+				#define PW3270_MODULE_EXPORT extern
 		#elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
 				#define LOCAL_EXTERN __attribute__((visibility("hidden"))) extern
-				#define PW3270_PLUGIN_ENTRY __attribute__((visibility("default"))) extern
+				#define PW3270_MODULE_EXPORT __attribute__((visibility("default"))) extern
 		#else
 				#define LOCAL_EXTERN extern
-				#define PW3270_PLUGIN_ENTRY extern
+				#define PW3270_MODULE_EXPORT extern
 		#endif
 
 	#endif
 
+	// Compatibility
+	#define PW3270_PLUGIN_ENTRY PW3270_MODULE_EXPORT
+
+	// Build standard plugin entry
+	#define PW3270_MODULE_ENTRY(type, function) PW3270_MODULE_EXPORT type pw3270_plugin_ ## function
+
 	// Exported plugin info
 	typedef struct _pw3270_plugin_version_info
 	{
-		int				  rev;
+		int			  rev;
 		const char 		* vrs;
 		const char		* descr;
 	} PW3270_PLUGIN_VERSION_INFO;
 
-	PW3270_PLUGIN_ENTRY PW3270_PLUGIN_VERSION_INFO pw3270_plugin_version_info;
-
+	PW3270_MODULE_EXPORT PW3270_PLUGIN_VERSION_INFO pw3270_plugin_version_info;
 	#define EXPORT_PW3270_PLUGIN_INFORMATION(x) PW3270_PLUGIN_VERSION_INFO pw3270_plugin_version_info = { @PACKAGE_REVISION@, "@PACKAGE_VERSION@", x };
 
 	// Plugin standard calls
-	PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow, const gchar *script);
-	PW3270_PLUGIN_ENTRY void pw3270_plugin_stop(GtkWidget *topwindow);
-	PW3270_PLUGIN_ENTRY void pw3270_plugin_update_luname(GtkWidget *topwindow, const gchar *luname);
+	PW3270_MODULE_ENTRY ( void, start ) (GtkWidget *topwindow, const gchar *script);
+	PW3270_MODULE_ENTRY ( void, stop  ) (GtkWidget *topwindow);
+	PW3270_MODULE_ENTRY ( void, update_luname ) (GtkWidget *topwindow, const gchar *luname);
 
 #endif // PLUGINS_H_INCLUDED
+
+
 
