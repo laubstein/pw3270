@@ -176,6 +176,25 @@
 	return NULL;
  }
 
+ static void LoadInputMethods(void)
+ {
+	GtkWidget *topmenu = widget_from_action_name("InputMethod");
+
+	if(topmenu && input_method)
+	{
+		GtkWidget *menu	= gtk_menu_new();
+		gtk_im_multicontext_append_menuitems((GtkIMMulticontext *) input_method,GTK_MENU_SHELL(menu));
+		gtk_widget_show_all(menu);
+		gtk_menu_item_set_submenu(GTK_MENU_ITEM(topmenu),menu);
+	}
+#ifdef DEBUG
+	else
+	{
+		Trace("*** %s","No fontselect menu");
+	}
+#endif
+ }
+
  static void LoadFontMenu(void)
  {
 	gchar		*selected;
@@ -345,6 +364,7 @@
 		}
 
 		LoadFontMenu();
+		LoadInputMethods();
 
 		g_object_unref(manager);
 	}
