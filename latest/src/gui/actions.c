@@ -942,7 +942,7 @@
 		{	"SettingsMenu",		N_( "Settings" ),				NULL								},
 		{	"ScriptsMenu",		N_( "Scripts" ),				NULL								},
 		{	"ViewMenu",			N_( "_View" ),					NULL								},
-		{	"InputMethod",		N_( "Input Method" ),			NULL								},
+		{	"InputMethod",		N_( "Input method" ),			NULL								},
 		{	"ToolbarMenu",		N_( "Toolbars" ),				NULL								},
 		{	"DebugMenu",		N_( "Debug" ),					NULL								},
 		{	"FontSettings",		N_( "Select font" ),			NULL								},
