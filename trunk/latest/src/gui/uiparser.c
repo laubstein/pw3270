@@ -744,7 +744,6 @@
 				if(ptr && *ptr)
 					data->script.enabled = get_symbol_by_name(NULL, (gpointer) &data->callback, "pw3270_call_%s_script", ptr);
 #endif
-				Trace("*********************enabled: %d",data->script.enabled);
 				if(data->script.enabled)
 				{
 					data->action = gtk_action_new(name, gettext(data->attr.label ? data->attr.label : data->name), gettext(data->attr.tooltip),data->attr.stock_id);
@@ -1084,44 +1083,48 @@
 
 		if(element->type == GTK_UI_MANAGER_MENU && !g_ascii_strcasecmp(element->name,"view"))
 			view = element;
+
 	}
 
 	gtk_ui_manager_ensure_update(info->manager);
 
 	Trace("View menu: %p",view);
 
-	if(!view)
-		return;
-
-	// Add menus & toolbars
-	data.path = g_strconcat(view->path,"/",view->name,NULL);
-	data.merge_id = gtk_ui_manager_new_merge_id(info->manager);
-
-	for(element = info->first_element;element;element = element->next)
+	if(view)
 	{
-		if(element->view_action)
+		// Populate view menu
+
+		data.path = g_strconcat(view->path,"/",view->name,NULL);
+		data.merge_id = gtk_ui_manager_new_merge_id(info->manager);
+
+		for(element = info->first_element;element;element = element->next)
 		{
-			const gchar *name = gtk_action_get_name(GTK_ACTION(element->view_action));
+			if(element->view_action)
+			{
+				const gchar *name = gtk_action_get_name(GTK_ACTION(element->view_action));
 
 #if GTK_CHECK_VERSION(2,18,0)
-			const gchar *label = gtk_action_get_label(GTK_ACTION(element->view_action));
+				const gchar *label = gtk_action_get_label(GTK_ACTION(element->view_action));
 #else
-			const gchar *label = NULL;
-			g_object_get(G_OBJECT(element->view_action),"label",&label,NULL);
+				const gchar *label = NULL;
+				g_object_get(G_OBJECT(element->view_action),"label",&label,NULL);
 #endif
 
-			Trace("Incluindo %s/%s",data.path,name);
-			if(label && *label)
-				gtk_ui_manager_add_ui(data.manager,data.merge_id,data.path,name,name,GTK_UI_MANAGER_MENUITEM,FALSE);
+				Trace("Incluindo %s/%s",data.path,name);
+				if(label && *label)
+					gtk_ui_manager_add_ui(data.manager,data.merge_id,data.path,name,name,GTK_UI_MANAGER_MENUITEM,FALSE);
+			}
 		}
+
+		// Add keypads
+		g_hash_table_foreach(info->keypads, (GHFunc) add_keypad_view_action, &data);
+
+		// Release memory & update
+		g_free(data.path);
 	}
 
-	// Add keypads
-	g_hash_table_foreach(info->keypads, (GHFunc) add_keypad_view_action, &data);
-
-	// Release memory & update
-	g_free(data.path);
 	gtk_ui_manager_ensure_update(info->manager);
+
  }
 
  static void create_keypad_by_descriptor(const gchar *name, struct keypad_descriptor *keypad, struct parse_data *info)

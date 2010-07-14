@@ -56,36 +56,36 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
- GtkWidget						*terminal					= NULL;
- GdkPixmap						*pixmap						= NULL;
+ GdkColor						  color[TERMINAL_COLOR_COUNT+1];
 
- GdkColor						color[TERMINAL_COLOR_COUNT+1];
+ GtkWidget						* terminal				= NULL;
+ GdkPixmap						* pixmap				= NULL;
 
- static int 					lWidth 			= -1;
- static int 					lHeight 		= -1;
- static int 					lFont 			= -1;
+ GtkIMContext					* input_method			= NULL;
 
- static gint					sWidth			= 0;
- static gint					sHeight			= 0;
+ static int 					lWidth 					= -1;
+ static int 					lHeight 				= -1;
+ static int 					lFont 					= -1;
 
- static PangoFontDescription	*terminal_font_descr		= NULL;
+ static gint					sWidth					= 0;
+ static gint					sHeight					= 0;
 
- static GtkIMContext			*im;
+ static PangoFontDescription	*terminal_font_descr	= NULL;
 
- static const gchar 			*layout_name[] = { "PangoLayout_normal", "PangoLayout_underline" };
+ static const gchar 			*layout_name[]			= { "PangoLayout_normal", "PangoLayout_underline" };
 
- static int					szFonts			= MAX_FONT_SIZES;
+ static int					szFonts					= MAX_FONT_SIZES;
  static FONTSIZE				fsize[MAX_FONT_SIZES];
- gint							fontWidth		= 0;
- gint							fontHeight		= 0;
+ gint							fontWidth				= 0;
+ gint							fontHeight				= 0;
 
  // Cursor info
- gint							cMode			= CURSOR_MODE_ENABLED|CURSOR_MODE_BASE|CURSOR_MODE_SHOW;
- gint							cCol			= 0;
- gint							cRow			= 0;
- static GdkPixmap				*pCursor		= NULL;
+ gint							cMode					= CURSOR_MODE_ENABLED|CURSOR_MODE_BASE|CURSOR_MODE_SHOW;
+ gint							cCol					= 0;
+ gint							cRow					= 0;
+ static GdkPixmap				*pCursor				= NULL;
  static GdkRectangle			rCursor;
- static int					blink_enabled	= 0;
+ static int					blink_enabled			= 0;
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
@@ -318,7 +318,7 @@
     Trace("Realizing %p",widget);
 
 	// Configure im context
-    gtk_im_context_set_client_window(im,widget->window);
+    gtk_im_context_set_client_window(input_method,widget->window);
 
 #ifdef MOUSE_POINTER_CHANGE
     gdk_window_set_cursor(widget->window,wCursor[0]);
@@ -335,14 +335,14 @@
 
  static gboolean focus_in(GtkWidget *widget, GdkEventFocus *event, gpointer x)
  {
-	gtk_im_context_focus_in(im);
+	gtk_im_context_focus_in(input_method);
 	InvalidateCursor();
 	return 0;
  }
 
  static gboolean focus_out(GtkWidget *widget, GdkEventFocus *event, gpointer x)
  {
-	gtk_im_context_focus_out(im);
+	gtk_im_context_focus_out(input_method);
 	InvalidateCursor();
 	return 0;
  }
@@ -356,12 +356,12 @@
  {
 	UpdateKeyboardState(event->state & KEYBOARD_STATE_MASK);
 
-	if(gtk_im_context_filter_keypress(im,event))
+	if(gtk_im_context_filter_keypress(input_method,event))
 		return TRUE;
 
 	if(KeyboardAction(widget,event,user_data))
 	{
-		gtk_im_context_reset(im);
+		gtk_im_context_reset(input_method);
 		return TRUE;
 	}
 
@@ -372,7 +372,7 @@
  {
 	UpdateKeyboardState(event->state & KEYBOARD_STATE_MASK);
 
-	if(gtk_im_context_filter_keypress(im,event))
+	if(gtk_im_context_filter_keypress(input_method,event))
 		return TRUE;
 
 	return FALSE;
@@ -520,7 +520,7 @@
  	LoadColors();
  	FontChanged();
 
-	im = gtk_im_context_simple_new();
+	input_method = gtk_im_multicontext_new();
 
 	terminal = gtk_event_box_new();
 	gtk_widget_set_app_paintable(terminal,TRUE);
@@ -536,22 +536,22 @@
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Events.html#GdkEventMask
     gtk_widget_add_events(terminal,GDK_KEY_PRESS_MASK|GDK_KEY_RELEASE_MASK|GDK_BUTTON_PRESS_MASK|GDK_BUTTON_MOTION_MASK|GDK_BUTTON_RELEASE_MASK|GDK_POINTER_MOTION_MASK|GDK_ENTER_NOTIFY_MASK);
 
-    g_signal_connect(G_OBJECT(terminal),	"expose_event",  		G_CALLBACK(expose),					0);
-    g_signal_connect(G_OBJECT(terminal),	"configure-event",		G_CALLBACK(configure),				0);
-    g_signal_connect(G_OBJECT(terminal),	"size-allocate",		G_CALLBACK(size_allocate),			0);
-    g_signal_connect(G_OBJECT(terminal),	"key-press-event",		G_CALLBACK(key_press),				0);
-    g_signal_connect(G_OBJECT(terminal),	"key-release-event",	G_CALLBACK(key_release),			0);
-    g_signal_connect(G_OBJECT(terminal),	"realize",				G_CALLBACK(realize),				0);
-    g_signal_connect(G_OBJECT(terminal),	"focus-in-event",		G_CALLBACK(focus_in),				0);
-    g_signal_connect(G_OBJECT(terminal),	"focus-out-event",		G_CALLBACK(focus_out),				0);
-    g_signal_connect(G_OBJECT(im),			"commit",				G_CALLBACK(im_commit),				0);
+    g_signal_connect(G_OBJECT(terminal),		"expose_event",  		G_CALLBACK(expose),					0);
+    g_signal_connect(G_OBJECT(terminal),		"configure-event",		G_CALLBACK(configure),				0);
+    g_signal_connect(G_OBJECT(terminal),		"size-allocate",		G_CALLBACK(size_allocate),			0);
+    g_signal_connect(G_OBJECT(terminal),		"key-press-event",		G_CALLBACK(key_press),				0);
+    g_signal_connect(G_OBJECT(terminal),		"key-release-event",	G_CALLBACK(key_release),			0);
+    g_signal_connect(G_OBJECT(terminal),		"realize",				G_CALLBACK(realize),				0);
+    g_signal_connect(G_OBJECT(terminal),		"focus-in-event",		G_CALLBACK(focus_in),				0);
+    g_signal_connect(G_OBJECT(terminal),		"focus-out-event",		G_CALLBACK(focus_out),				0);
+    g_signal_connect(G_OBJECT(input_method),	"commit",				G_CALLBACK(im_commit),				0);
 
     // Connect mouse events
-    g_signal_connect(G_OBJECT(terminal), 	"button-press-event",	G_CALLBACK(mouse_button_press),		0);
-    g_signal_connect(G_OBJECT(terminal), 	"button-release-event",	G_CALLBACK(mouse_button_release),	0);
-    g_signal_connect(G_OBJECT(terminal), 	"motion-notify-event",	G_CALLBACK(mouse_motion),    		0);
-    g_signal_connect(G_OBJECT(terminal), 	"enter-notify-event",	G_CALLBACK(mouse_enter),    		0);
-    g_signal_connect(G_OBJECT(terminal), 	"scroll-event",			G_CALLBACK(mouse_scroll),			0);
+    g_signal_connect(G_OBJECT(terminal), 		"button-press-event",	G_CALLBACK(mouse_button_press),		0);
+    g_signal_connect(G_OBJECT(terminal), 		"button-release-event",	G_CALLBACK(mouse_button_release),	0);
+    g_signal_connect(G_OBJECT(terminal), 		"motion-notify-event",	G_CALLBACK(mouse_motion),    		0);
+    g_signal_connect(G_OBJECT(terminal), 		"enter-notify-event",	G_CALLBACK(mouse_enter),    		0);
+    g_signal_connect(G_OBJECT(terminal), 		"scroll-event",			G_CALLBACK(mouse_scroll),			0);
 
 	register_tchange(CROSSHAIR,set_crosshair);
 	register_tchange(CURSOR_POS,set_showcursor);
@@ -630,7 +630,7 @@
 	if(row == cRow && col == cCol)
 		return;
 
-	gtk_im_context_reset(im);
+	gtk_im_context_reset(input_method);
 
  	if(!screen_suspended)
  	{
@@ -693,7 +693,7 @@
 	}
 
 	// Mark to redraw
-	gtk_im_context_set_cursor_location(im,&rCursor);
+	gtk_im_context_set_cursor_location(input_method,&rCursor);
 	InvalidateCursor();
  }
 

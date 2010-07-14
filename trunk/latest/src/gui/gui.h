@@ -195,6 +195,7 @@
 	LOCAL_EXTERN GtkWidget			* terminal;
 	LOCAL_EXTERN GdkColor			  color[TERMINAL_COLOR_COUNT+1];
 	LOCAL_EXTERN H3270				* hSession;
+	LOCAL_EXTERN GtkIMContext		* input_method;
 
 
 #ifdef MOUSE_POINTER_CHANGE

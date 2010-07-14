@@ -105,6 +105,9 @@
 				<menuitem action='Toggle' id='SmartPaste' />
 			</menu>
 
+			<!--- Special action - InputMethod menu will be populated with Gtk input_method menu items --->
+			<menuitem name='InputMethod' label='Input method' />
+
 		</menu>
 
 		<menu name='HelpMenu'>
@@ -160,6 +163,7 @@
 
 		<separator/>
 		<menuitem action='Quit'/>
+
 	</popup>
 
 	<accelerator action='Toggle' id='Insert' key='Insert' group='online' />
