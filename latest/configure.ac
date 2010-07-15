@@ -328,7 +328,14 @@ AC_ARG_WITH([pic],
 [
 	pw3270_cv_pic="$withval"
 ],[
-	pw3270_cv_pic="no"
+
+	if test "$host_cpu" = "x86_64"; then
+		pw3270_cv_pic="yes"
+	else
+		pw3270_cv_pic="no"
+	fi
+
+
 ])
 
 #

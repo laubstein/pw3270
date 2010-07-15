@@ -319,12 +319,12 @@ oooDebug: bin/Debug/unotest
 obj/Debug/src/oxt/%.o: src/oxt/%.cxx src/oxt/*.hpp $(GLOBAL_DEPENDS) uno/include/br/com/bb/$(PACKAGE).hpp
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CXX) $(DBG_CFLAGS) $(CFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -Iuno/include -o $@ -c $<
+	@$(CXX) $(DBG_CFLAGS) $(CFLAGS) $(DLL_CFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -Iuno/include -o $@ -c $<
 
 obj/Release/src/oxt/%.o: src/oxt/%.cxx src/oxt/*.hpp $(GLOBAL_DEPENDS) uno/include/br/com/bb/$(PACKAGE).hpp
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CXX) $(CFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -Iuno/include -o $@ -c $<
+	@$(CXX) $(CFLAGS) $(DLL_CFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -Iuno/include -o $@ -c $<
 
 bin/Debug/unotest: bin/Debug/@PROGRAM_NAME@.uno@DLLEXT@ obj/Debug/src/oxt/testprogram.@OBJEXT@
 	@echo $@ ...
@@ -431,7 +431,7 @@ bin/Debug/librx3270$(DLLEXT): 		bin/Debug/lib3270$(DLLEXT) \
 obj/Release/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(CFLAGS) $(GUI_CFLAGS) $(REXX_CFLAGS) -o $@ -c $<
+	@$(CC) $(CFLAGS) $(GUI_CFLAGS) $(REXX_CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
 
 bin/Release/plugins/rx3270$(DLLEXT): 	bin/Release/lib3270$(DLLEXT) \
 					$(foreach SRC, $(REXX_PLG_SRC) $(REXX_COMMON_SRC), obj/Release/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
