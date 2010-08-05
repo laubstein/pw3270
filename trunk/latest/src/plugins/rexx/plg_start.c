@@ -44,6 +44,7 @@
  #define INCL_RXARI
  #include "rx3270.h"
 
+ #include <lib3270/plugins.h>
  #include <gmodule.h>
 
 /*---[ Prototipes ]-------------------------------------------------------------------------------*/
@@ -175,11 +176,7 @@
 	return 0;
  }
 
-#ifndef CONSTRXSTRING
-	#define CONSTRXSTRING RXSTRING
-#endif
-
- PW3270_SCRIPT_INTERPRETER( rex )
+ PW3270_SCRIPT_INTERPRETER(rex)
  {
 	LONG      			return_code = -1;  	// interpreter return code
 	RXSTRING			retstr;            	// program return value

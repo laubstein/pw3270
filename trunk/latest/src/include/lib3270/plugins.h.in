@@ -70,6 +70,9 @@
 	// Build standard plugin entry
 	#define PW3270_MODULE_ENTRY(type, function) PW3270_MODULE_EXPORT type pw3270_plugin_ ## function
 
+	// Build script interpreter
+	#define PW3270_SCRIPT_INTERPRETER(type) PW3270_MODULE_EXPORT void pw3270_script_interpreter_ ## type ( const gchar *script_name, const gchar *script_text, int argc, gchar **argv )
+
 	// Exported plugin info
 	typedef struct _pw3270_plugin_version_info
 	{
@@ -82,7 +85,7 @@
 	#define EXPORT_PW3270_PLUGIN_INFORMATION(x) PW3270_PLUGIN_VERSION_INFO pw3270_plugin_version_info = { @PACKAGE_REVISION@, "@PACKAGE_VERSION@", x };
 
 	// Plugin standard calls
-	PW3270_MODULE_ENTRY ( void, start ) (GtkWidget *topwindow, const gchar *script);
+	PW3270_MODULE_ENTRY ( void, start ) (GtkWidget *topwindow);
 	PW3270_MODULE_ENTRY ( void, stop  ) (GtkWidget *topwindow);
 	PW3270_MODULE_ENTRY ( void, update_luname ) (GtkWidget *topwindow, const gchar *luname);
 
