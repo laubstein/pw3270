@@ -197,7 +197,7 @@
  	return 0;
  }
 
- PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow, const gchar *script)
+ PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow)
  {
 	// Create processing thread
 	static const LPTSTR lpszRequest	= TEXT("\\\\.\\pipe\\" PACKAGE_NAME );

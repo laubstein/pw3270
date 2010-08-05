@@ -85,6 +85,10 @@
 		#define RXFUNC_BADCALL 40
 	#endif
 
+	#ifndef CONSTRXSTRING
+		#define CONSTRXSTRING RXSTRING
+	#endif
+
 	/* include the "C" stuff */
 	#include <string.h>
 	#include <sys/time.h>                   /* System time-related data types */
