@@ -322,20 +322,20 @@ static void load_options(GOptionContext *context)
 {
 	static GOptionEntry entries[] =
 	{
-		{ "config-file",	 	'c', 0, G_OPTION_ARG_FILENAME, 	&program_config_filename_and_path,	N_( "Fixed path and filename for load/save the configuration data" ), 	NULL			},
-		{ "config",				'C', 0, G_OPTION_ARG_STRING,	&program_config_file,				N_( "Name of configuration file (auto-search)" ),						PROGRAM_NAME ".conf" },
-		{ "host",				'h', 0, G_OPTION_ARG_STRING,	&cl_hostname,						N_( "Host identifier" ),												NULL			},
-		{ "startup-script", 	's', 0, G_OPTION_ARG_FILENAME, 	&startup_script,					N_( "Run script on startup (if available)" ),							NULL			},
-		{ "program-data",	 	'd', 0, G_OPTION_ARG_STRING, 	&program_data,						N_( "Path to search for data and configuration files" ),				NULL			},
-		{ "icon",	 			'i', 0, G_OPTION_ARG_FILENAME, 	&program_logo,						N_( "Path to an image file for program icon" ),							NULL			},
-		{ "window-title",	 	't', 0, G_OPTION_ARG_STRING, 	&window_title,						N_( "Main window title" ),												PROGRAM_NAME	},
-		{ "theme",				'T', 0, G_OPTION_ARG_FILENAME,	&gtk_theme,							N_( "Theme file (gtkrc)" ),												NULL 			},
-		{ "log",				'l', 0, G_OPTION_ARG_FILENAME,	&log_filename,						N_( "Log file" ),														NULL			},
-		{ "on-lu",				'L', 0, G_OPTION_ARG_STRING,	&on_lu_command,						N_( "Command to run when LU name is available" ),						NULL			},
+		{ "config-file",	 	'c', 0, G_OPTION_ARG_FILENAME, 	&program_config_filename_and_path,	N_( "Fixed path and filename for load/save the configuration data" ), 		NULL			},
+		{ "config",				'C', 0, G_OPTION_ARG_STRING,	&program_config_file,				N_( "Name of configuration file (auto-search)" ),							PROGRAM_NAME ".conf" },
+		{ "host",				'h', 0, G_OPTION_ARG_STRING,	&cl_hostname,						N_( "Host identifier" ),													NULL			},
+		{ "startup-script", 	's', 0, G_OPTION_ARG_FILENAME, 	&startup_script,					N_( "Run scripts on startup (Example: script1(arg1,arg2);script2(arg)" ),	NULL			},
+		{ "program-data",	 	'd', 0, G_OPTION_ARG_STRING, 	&program_data,						N_( "Path to search for data and configuration files" ),					NULL			},
+		{ "icon",	 			'i', 0, G_OPTION_ARG_FILENAME, 	&program_logo,						N_( "Path to an image file for program icon" ),								NULL			},
+		{ "window-title",	 	't', 0, G_OPTION_ARG_STRING, 	&window_title,						N_( "Main window title" ),													PROGRAM_NAME	},
+		{ "theme",				'T', 0, G_OPTION_ARG_FILENAME,	&gtk_theme,							N_( "Theme file (gtkrc)" ),													NULL 			},
+		{ "log",				'l', 0, G_OPTION_ARG_FILENAME,	&log_filename,						N_( "Log file" ),															NULL			},
+		{ "on-lu",				'L', 0, G_OPTION_ARG_STRING,	&on_lu_command,						N_( "Command to run when LU name is available" ),							NULL			},
 
 #ifdef HAVE_PLUGINS
-		{ "plugins",	 		'p', 0, G_OPTION_ARG_STRING, 	&plugin_list,						N_( "Full path of plugins to load" ),									NULL			},
-		{ "plugin-path",	 	'P', 0, G_OPTION_ARG_STRING, 	&plugin_path,						N_( "Path to search for plugins" ),										NULL			},
+		{ "plugins",	 		'p', 0, G_OPTION_ARG_STRING, 	&plugin_list,						N_( "Full path of plugins to load" ),										NULL			},
+		{ "plugin-path",	 	'P', 0, G_OPTION_ARG_STRING, 	&plugin_path,						N_( "Path to search for plugins" ),											NULL			},
 #endif
 
 		{ NULL }

@@ -259,12 +259,13 @@
 
  static void start_plugin(GModule *handle, struct call_parameter *arg)
  {
-	void (*ptr)(GtkWidget *widget, const gchar *arg) = NULL;
+	void (*ptr)(GtkWidget *widget) = NULL;
 
 //	Trace("%s::%s: %d",g_module_name(handle),arg->name,g_module_symbol(handle, arg->name, (gpointer) &ptr));
 
 	if(g_module_symbol(handle, arg->name, (gpointer) &ptr))
-		ptr(topwindow,arg->arg);
+		ptr(topwindow);
+
  }
 
  static void stop_plugin(GModule *handle, gpointer dunno)
@@ -285,6 +286,9 @@ gboolean StartPlugins(const gchar *startup_script)
 
  	if(plugins)
  	 	g_slist_foreach(plugins,(GFunc) start_plugin,&p);
+
+	if(startup_script)
+		run_script_list(startup_script);
 
 #endif
 	return FALSE;
@@ -310,117 +314,6 @@ gboolean StopPlugins(void)
  	 	g_slist_foreach(plugins,(GFunc) call,&p);
 #endif
  }
-
-/*
- static void process_ended(GPid pid,gint status,gchar *tempfile)
- {
- 	Trace("Process %d ended with status %d",(int) pid, status);
- 	remove(tempfile);
- 	g_free(tempfile);
- }
-
- void RunExternalProgramWithText(const gchar *cmd, const gchar *str)
- {
-	GError	*error		= NULL;
-	gchar	*filename	= NULL;
-	GPid 	pid			= 0;
-	gchar	*argv[3];
-	gchar	tmpname[20];
-
-	Trace("Running comand %s\n%s",cmd,str);
-
-	do
-	{
-		g_free(filename);
-		g_snprintf(tmpname,19,"%08lx.tmp",rand() ^ ((unsigned long) time(0)));
-		filename = g_build_filename(g_get_tmp_dir(),tmpname,NULL);
-	} while(g_file_test(filename,G_FILE_TEST_EXISTS));
-
-	Trace("Temporary file: %s",filename);
-
-	if(!g_file_set_contents(filename,str,-1,&error))
-	{
-		if(error)
-		{
-			Warning( N_( "Can't create temporary file:\n%s" ), error->message ? error->message : N_( "Unexpected error" ));
-			g_error_free(error);
-		}
-		remove(filename);
-		g_free(filename);
-		return;
-	}
-
-	argv[0] = (gchar *) cmd;
-	argv[1] = filename;
-	argv[2] = NULL;
-
-	Trace("Spawning %s %s",cmd,filename);
-
-	error = NULL;
-
-	if(!g_spawn_async(	NULL,											// const gchar *working_directory,
-						argv,											// gchar **argv,
-						NULL,											// gchar **envp,
-						G_SPAWN_SEARCH_PATH|G_SPAWN_DO_NOT_REAP_CHILD,	// GSpawnFlags flags,
-						NULL,											// GSpawnChildSetupFunc child_setup,
-						NULL,											// gpointer user_data,
-						&pid,											// GPid *child_pid,
-						&error ))										// GError **error);
-	{
-		if(error)
-		{
-			Warning( N_( "Error spawning %s\n%s" ), argv[0], error->message ? error->message : N_( "Unexpected error" ));
-			g_error_free(error);
-		}
-		remove(filename);
-		g_free(filename);
-		return;
-	}
-
-	Trace("pid %d",(int) pid);
-
-	g_child_watch_add(pid,(GChildWatchFunc) process_ended,filename);
- }
-*/
-
-/*
- static void ExecWithScreen(GtkAction *action, gpointer cmd)
- {
- 	gchar *screen = GetScreenContents(TRUE);
- 	RunExternalProgramWithText(cmd,screen);
- 	g_free(screen);
-
- }
-
- static void ExecWithCopy(GtkAction *action, gpointer cmd)
- {
- 	gchar *text = GetClipboard();
- 	RunExternalProgramWithText(cmd,text);
- 	g_free(text);
- }
-
- static void ExecWithSelection(GtkAction *action, gpointer cmd)
- {
- 	gchar *screen = GetScreenContents(FALSE);
- 	RunExternalProgramWithText(cmd,screen);
- 	g_free(screen);
- }
-
- static void ExecPFKey(GtkAction *action, gpointer cmd)
- {
-	if(!TOGGLED_KEEP_SELECTED)
-		action_ClearSelection();
-	action_PFKey(atoi(cmd));
- }
-
- static void ExecPAKey(GtkAction *action, gpointer cmd)
- {
-	if(!TOGGLED_KEEP_SELECTED)
-		action_ClearSelection();
-	Trace("%s(%d)",__FUNCTION__,atoi(cmd));
-	action_PAKey(atoi(cmd));
- }
-*/
 
  gboolean get_symbol_by_name(GModule *module, gpointer *pointer, const gchar *fmt, ...)
  {
