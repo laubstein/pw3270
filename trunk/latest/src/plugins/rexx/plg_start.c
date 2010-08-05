@@ -175,14 +175,105 @@
 	return 0;
  }
 
+#ifndef CONSTRXSTRING
+	#define CONSTRXSTRING RXSTRING
+#endif
+
+ PW3270_SCRIPT_INTERPRETER( rex )
+ {
+	LONG      			return_code = -1;  	// interpreter return code
+	RXSTRING			retstr;            	// program return value
+	RXSTRING			prg[2];				// Program data
+	short     			rc	= 0;           	// converted return code
+	CONSTRXSTRING 		*rxArgv;		 	// program argument string
+
+ 	Trace("%s begins argc=%d",__FUNCTION__,argc);
+
+	if(lock_rexx_script_engine(program_window))
+		return;
+
+	// Build argument strings
+
+ 	if(argc)
+ 	{
+ 		int f;
+
+		rxArgv = g_malloc0(sizeof(CONSTRXSTRING)*argc);
+
+		for(f=0;f<argc;f++)
+		{
+			rxArgv[f].strptr = argv[f];
+			rxArgv[f].strlength	= strlen(rxArgv[f].strptr);
+		}
+ 	}
+ 	else
+ 	{
+		argc = 1;
+		rxArgv = g_malloc0(sizeof(CONSTRXSTRING));
+		rxArgv->strptr = "";
+ 	}
+
+	// set up default return
+	memset(&retstr,0,sizeof(retstr));
+
+	// Reset program data
+	memset(prg,0,2*sizeof(RXSTRING));
+
+	Trace("%s","Running pending events");
+	RunPendingEvents(0);
+
+	// Run script
+	if(script_text)
+	{
+		// Received an script text
+		prg[0].strptr = (char *) script_text;
+		prg[0].strlength = strlen(prg[0].strptr);
+		return_code = RexxStart(	argc,						// argument count
+									(PCONSTRXSTRING) rxArgv,	// argument array
+									NULL,						// REXX procedure name
+									prg,						// program
+									PACKAGE_NAME,				// default address name
+									RXCOMMAND,					// calling as a subcommand
+									rexx_exit_array,			// EXITs for this call
+									&rc,						// converted return code
+									&retstr);					// returned result
+
+	}
+	else if(script_name)
+	{
+		// Pass script filename directly to rexx interpreter
+		return_code = RexxStart(	argc,						// argument count
+									(PCONSTRXSTRING) rxArgv,	// argument array
+									(char *) script_name,		// REXX procedure name
+									(PRXSTRING)  0,				// no instore used
+									PACKAGE_NAME,				// default address name
+									RXCOMMAND,					// calling as a subcommand
+									rexx_exit_array,			// EXITs for this call
+									&rc,						// converted return code
+									&retstr);					// returned result
+	}
+
+	// process return value
+	g_free(rxArgv);
+
+	Trace("Return value: \"%s\"",retstr.strptr);
+
+	if(RXSTRPTR(prg[1]))
+		RexxFreeMemory(RXSTRPTR(prg[1]));
+
+	if(RXSTRPTR(retstr))
+		RexxFreeMemory(RXSTRPTR(retstr));
+
+	// Check script state
+	rc = unlock_rexx_script_engine(program_window, script_name ? script_name : "script", rc, return_code);
+
+	Trace("%s exits with rc=%d",__FUNCTION__,rc);
+ }
+
  int call_rexx(const gchar *filename, const gchar *arg)
  {
 	LONG      			return_code;                 	// interpreter return code
-#ifdef CONSTRXSTRING
 	CONSTRXSTRING		argv;           	          	// program argument string
-#else
-	RXSTRING			argv;           	          	// program argument string
-#endif
 	RXSTRING			retstr;                      	// program return value
 	RXSTRING			prg[2];							// Program data
 	short     			rc		= 0;                   	// converted return code
@@ -239,7 +330,15 @@
 	return (int) rc;
  }
 
- PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow, const gchar *script)
+/**
+ * Plugin startup entry.
+ *
+ * Called, during the initialization to startup the plugin module.
+ *
+ * @param topwindow	pw3270's toplevel window.
+ *
+ */
+ PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow)
  {
 	int	 f;
 
@@ -252,12 +351,6 @@
 	for(f=0; f < G_N_ELEMENTS(rexx_exported_calls); f++)
 		RexxRegisterFunctionExe((char *) rexx_exported_calls[f].name,rexx_exported_calls[f].call);
 
- 	// Check for startup script
- 	if(!(script && g_str_has_suffix(script,".rex")))
-		return;
-
- 	Trace("Calling %s",script);
-	call_rexx(script,"");
  }
 
  static HCONSOLE * getTraceWindow(void)
