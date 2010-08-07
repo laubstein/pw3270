@@ -53,9 +53,9 @@
  //		http://www.javafaq.nu/java-article1027.html
  //		http://blog.vinceliu.com/2008/01/writing-your-own-custom-loader-for-java.html
 
-/*---[ Exports ]----------------------------------------------------------------------------------*/
+/*---[ Globals ]----------------------------------------------------------------------------------*/
 
- // extern void pw3270_call_java_script(GtkAction *action, GtkWidget *window);
+ EXPORT_PW3270_PLUGIN_INFORMATION("Java support");
 
 /*---[ Statics ]----------------------------------------------------------------------------------*/
 

@@ -427,5 +427,13 @@
 	// Clipboard
 	LOCAL_EXTERN void 		  update_paste_action(GtkClipboard *clipboard, const gchar *text, gpointer data);
 
+	// Command interpreter
+	typedef gchar * (*PW3270_COMMAND_POINTER)(gint argc, const gchar **argv);
+	#define PW3270_COMMAND_ENTRY(name) PW3270_MODULE_EXPORT gchar * pw3270_command_entry_ ## name (int argc, const gchar **argv )
+
+	// Script/command calls
+	LOCAL_EXTERN PW3270_COMMAND_POINTER get_command_pointer(const gchar *cmd);
+	LOCAL_EXTERN void					run_script_command_line(const gchar *script);
+
 
 #endif // GUI_H_INCLUDED
