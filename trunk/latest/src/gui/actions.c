@@ -420,17 +420,7 @@
 		line[ln] = g_strstrip(line[ln]);
 
 		if(*line[ln] && *line[ln] != '#')
-		{
-			if(run_command(line[ln], &error))
-			{
-				if(error)
-				{
-					Warning( N_( "Error calling %s\n%s" ), line[ln], error->message ? error->message : N_( "Unexpected error" ));
-					g_error_free(error);
-					error = NULL;
-				}
-			}
-		}
+			run_script_command_line(line[ln]);
 	}
 
 	g_strfreev(line);

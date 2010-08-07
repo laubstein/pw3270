@@ -513,6 +513,7 @@
  	else if(on_lu_pid)
  	{
 #if _POSIX_C_SOURCE >= 1 || _XOPEN_SOURCE || _POSIX_SOURCE
+
 		Trace("Sending SIGTERM do pid %d",(int) on_lu_pid);
 
 		if(kill( (pid_t) on_lu_pid, SIGTERM) < 0)
