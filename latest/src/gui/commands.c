@@ -31,6 +31,7 @@
  */
 
  #include <lib3270/config.h>
+ #include <lib3270/plugins.h>
  #include <stdlib.h>
 
 #ifdef WIN32
@@ -43,6 +44,8 @@
 #endif
 
  #include "gui.h"
+
+// TODO (perry#1#): DEPRECATED - Replace with the new command/macro engine on script.c
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
@@ -219,7 +222,7 @@
  }
 
 // Internal commands
- static int Connect(gint argc, const gchar **argv)
+ PW3270_COMMAND_ENTRY(connect)
  {
 	const gchar *host;
 
@@ -239,13 +242,13 @@
 		break;
 
 	default:
-		return EINVAL;
+		return NULL;
 	}
 
  	Trace("%s Connected:%d",__FUNCTION__,PCONNECTED);
 
  	if(PCONNECTED)
- 		return EBUSY;
+ 		return g_strdup("BUSY");
 
  	action_ClearSelection();
 
@@ -275,23 +278,37 @@
  }
 
  // Command interpreter
- #define INTERNAL_COMMAND_ENTRY(x) { #x, x }
+ #define INTERNAL_COMMAND_ENTRY(x) { #x, pw3270_command_entry_ ## x }
  static const struct _internal_command
  {
  	const gchar	*cmd;
- 	int				(*call)(gint argc, const gchar **argv);
+ 	PW3270_COMMAND_POINTER call;
  } internal_command[] =
  {
-	INTERNAL_COMMAND_ENTRY(Connect),
+	INTERNAL_COMMAND_ENTRY(connect),
  };
+
+ PW3270_COMMAND_POINTER get_command_pointer(const gchar *cmd)
+ {
+ 	int f;
+
+	for(f=0;f<G_N_ELEMENTS(internal_command);f++)
+	{
+		if(!g_ascii_strcasecmp(cmd,internal_command[f].cmd))
+			return internal_command[f].call;
+	}
+
+	return NULL;
+ }
 
  int run_command(const gchar *line, GError **error)
  {
+	PW3270_COMMAND_POINTER cmd;
+
 	gchar	*tempfile	= NULL;
 	GPid	pid;
 	gint 	argc		= 0;
 	gchar	**argv		= NULL;
-	int		f;
 
 	if(!parse_arguments(line,&tempfile,&argc,&argv,error))
 		return -1;
@@ -299,15 +316,19 @@
 	Trace("Command \"%s\" with %d arguments",argv[0],argc);
 
 	// Check for internal commands
-	for(f=0;f<G_N_ELEMENTS(internal_command);f++)
+	cmd = get_command_pointer(argv[0]);
+	if(cmd)
 	{
-		if(!g_ascii_strcasecmp(argv[0],internal_command[f].cmd))
+		int rc = -1;
+		gchar *rsp = cmd(argc-1,(const gchar **) argv+1);
+		if(tempfile)
+			remove(tempfile);
+		if(rsp)
 		{
-			int rc = internal_command[f].call(argc,(const gchar **) argv);
-			if(tempfile)
-				remove(tempfile);
-			return rc;
+			rc = atoi(rsp);
+			g_free(rsp);
 		}
+		return rc;
 	}
 
 	// Check for action commands
