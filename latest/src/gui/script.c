@@ -214,9 +214,10 @@
 	return 0;
  }
 
- void script_interpreter( const gchar *script_type, const gchar *script_name, const gchar *script_text, int argc, gchar **argv )
+ int script_interpreter( const gchar *script_type, const gchar *script_name, const gchar *script_text, int argc, gchar **argv )
  {
  	int f;
+ 	int rc = 0;
  	const struct cnvt *convert[argc+1];
  	gchar *converted_argv[argc+1];
 
@@ -246,11 +247,11 @@
 	// Run script
 	if(script_type)
 	{
-		void (*interpret)( const gchar *script_name, const gchar *script_text, int argc, gchar **argv );
+		int (*interpret)( const gchar *script_name, const gchar *script_text, int argc, gchar **argv );
 
 		if(get_symbol_by_name(NULL,(gpointer) &interpret,"pw3270_script_interpreter_%s",script_type))
 		{
-			interpret(script_name,script_text,argc,converted_argv);
+			rc = interpret(script_name,script_text,argc,converted_argv);
 		}
 		else if(script_name && g_file_test(script_name,G_FILE_TEST_IS_EXECUTABLE))
 		{
@@ -274,7 +275,7 @@
 			if(gtk_dialog_run(GTK_DIALOG (dialog)) == GTK_RESPONSE_CANCEL)
 				gtk_main_quit();
 			gtk_widget_destroy(dialog);
-
+			rc = EINVAL;
 		}
 	}
 	else if(script_name)
@@ -286,6 +287,8 @@
 			gchar *rsp = cmd(argc,(const gchar **) argv);
 			if(rsp)
 				g_free(rsp);
+			else
+				rc = -1;
 		}
 		else if(g_file_test(script_name,G_FILE_TEST_IS_EXECUTABLE))
 		{
@@ -309,6 +312,7 @@
 			if(gtk_dialog_run(GTK_DIALOG (dialog)) == GTK_RESPONSE_CANCEL)
 				gtk_main_quit();
 			gtk_widget_destroy(dialog);
+			rc = ENOENT;
 		}
 	}
 
@@ -319,6 +323,7 @@
 			convert[f]->end(converted_argv[f]);
 	}
 
+	return rc;
  }
 
 /**
@@ -326,11 +331,13 @@
  *
  * @param script Script line in the format script(arg1,arg2,...,argn)
  *
+ * @return 0 if ok, error code if non ok
  */
- void run_script_command_line(const gchar *script)
+ int run_script_command_line(const gchar *script)
  {
 	gchar *begin_arg = g_strstr_len(script,-1,"(");
 	gchar *type;
+	int	   rc = 0;
 
 	if(begin_arg)
 	{
@@ -373,10 +380,11 @@
 
 			gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't start script" ) );
 
-
+			rc = -1;
 			if(error)
 			{
 				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s",  error->message );
+				rc = error->code;
 				g_error_free(error);
 			}
 
@@ -385,7 +393,7 @@
 
 			gtk_widget_destroy(dialog);
 
-			return;
+			return rc;
 		}
 
 
@@ -393,10 +401,12 @@
 		if(type)
 			type++;
 
-		script_interpreter(type,argv[0],NULL,argc-1,argv+1);
+		rc = script_interpreter(type,argv[0],NULL,argc-1,argv+1);
 
 		g_strfreev(argv);
 	}
+
+	return rc;
  }
 
 /**

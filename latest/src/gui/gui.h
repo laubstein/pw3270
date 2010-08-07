@@ -418,12 +418,6 @@
 	LOCAL_EXTERN int		  gui_console_window_append(HCONSOLE hwnd, const char *fmt, va_list args);
 	LOCAL_EXTERN char 		* gui_console_window_wait_for_user_entry(HCONSOLE hwnd);
 
-	// Command interpreter & script support
-	LOCAL_EXTERN int		  run_command(const gchar *line, GError **error);
-	LOCAL_EXTERN int 		  spawn_async_process(const gchar *line, GPid *pid, gchar **tempfile, GError **error);
-	LOCAL_EXTERN void 		  script_interpreter( const gchar *script_type, const gchar *script_name, const gchar *script_text, int argc, gchar **argv );
-	LOCAL_EXTERN void 		  run_script_list( const gchar *scripts );
-
 	// Clipboard
 	LOCAL_EXTERN void 		  update_paste_action(GtkClipboard *clipboard, const gchar *text, gpointer data);
 
@@ -431,9 +425,15 @@
 	typedef gchar * (*PW3270_COMMAND_POINTER)(gint argc, const gchar **argv);
 	#define PW3270_COMMAND_ENTRY(name) PW3270_MODULE_EXPORT gchar * pw3270_command_entry_ ## name (int argc, const gchar **argv )
 
-	// Script/command calls
+	// Command interpreter & script support
 	LOCAL_EXTERN PW3270_COMMAND_POINTER get_command_pointer(const gchar *cmd);
-	LOCAL_EXTERN void					run_script_command_line(const gchar *script);
+	LOCAL_EXTERN int					run_script_command_line(const gchar *script);
+	LOCAL_EXTERN int 		  			script_interpreter( const gchar *script_type, const gchar *script_name, const gchar *script_text, int argc, gchar **argv );
+	LOCAL_EXTERN void 		  			run_script_list( const gchar *scripts );
+
+//	LOCAL_EXTERN int		  run_command(const gchar *line, GError **error);
+//	LOCAL_EXTERN int 		  spawn_async_process(const gchar *line, GPid *pid, gchar **tempfile, GError **error);
+
 
 
 #endif // GUI_H_INCLUDED
