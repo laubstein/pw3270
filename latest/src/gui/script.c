@@ -122,33 +122,41 @@
 
  struct child_cleanup
  {
- 	void (*end)(gpointer arg);
- 	gchar *arg;
+	void (*end)(gpointer arg);
+	gchar *text;
  };
 
- static void child_ended(GPid pid,gint status,struct child_cleanup *cleanup)
+ struct child_info
+ {
+ 	GPid *out_pid;
+	struct child_cleanup arg[1];
+ };
+
+ static void child_ended(GPid pid,gint status,struct child_info *info)
  {
  	int f;
 
  	Trace("Process %d ended with status %d",(int) pid, status);
 
-	for(f=0;cleanup[f].end;f++)
+ 	if(info->out_pid && *info->out_pid == pid)
+		*info->out_pid = 0;
+
+	for(f=0;info->arg[f].end;f++)
 	{
-		Trace("Cleaning %d: %p(%s)",f,cleanup[f].end,cleanup[f].arg);
-		cleanup[f].end(cleanup[f].arg);
+		Trace("Cleaning %d: %p(%s)",f,info->arg[f].end,info->arg[f].text);
+		info->arg[f].end(info->arg[f].text);
 	}
 
-	g_free(cleanup);
+	g_free(info);
  	g_spawn_close_pid(pid);
- 	exit(-1);
  }
 
- static int spawn_child(const gchar *script_name, int argc, const struct cnvt **convert, gchar **argv)
+ static int spawn_child(const gchar *script_name, int argc, const struct cnvt **convert, gchar **argv, GPid *out_pid)
  {
 	gchar *child_argv[argc+2];
-	struct child_cleanup *cleanup;
+	struct child_info	*info;
 	int 	f;
-	GPid 	pid;
+	GPid 	pid = 0;
 	GError	*err = NULL;
 	int		qtd = 0;
 	int		pos = 0;
@@ -197,24 +205,31 @@
 	}
 
 	// Keep tempfiles until child ends
-	cleanup	= g_malloc0((sizeof(struct child_cleanup)*qtd));
+	info = g_malloc0(sizeof(struct child_info)+sizeof(struct child_cleanup)*qtd);
+
+	if(out_pid)
+	{
+		*out_pid = pid;
+		info->out_pid = out_pid;
+	}
+
 	for(f=0;child_argv[f] && pos < qtd;f++)
 	{
 		if(convert[f] && g_file_test(argv[f],G_FILE_TEST_EXISTS))
 		{
-			cleanup[pos].end = convert[f]->end;
-			cleanup[pos].arg = argv[f];
+			info->arg[pos].end	= convert[f]->end;
+			info->arg[pos].text	= argv[f];
 			convert[f] = NULL;
 			pos++;
 		}
 	}
 
-	g_child_watch_add(pid,(GChildWatchFunc) child_ended, cleanup);
+	g_child_watch_add(pid,(GChildWatchFunc) child_ended, info);
 
 	return 0;
  }
 
- int script_interpreter( const gchar *script_type, const gchar *script_name, const gchar *script_text, int argc, gchar **argv )
+ int script_interpreter(const gchar *script_type, const gchar *script_name, const gchar *script_text, int argc, gchar **argv, GPid *pid )
  {
  	int f;
  	int rc = 0;
@@ -255,7 +270,7 @@
 		}
 		else if(script_name && g_file_test(script_name,G_FILE_TEST_IS_EXECUTABLE))
 		{
-			spawn_child(script_name,argc,convert,converted_argv);
+			spawn_child(script_name,argc,convert,converted_argv,pid);
 		}
 		else
 		{
@@ -292,7 +307,7 @@
 		}
 		else if(g_file_test(script_name,G_FILE_TEST_IS_EXECUTABLE))
 		{
-			spawn_child(script_name,argc,convert,converted_argv);
+			spawn_child(script_name,argc,convert,converted_argv,pid);
 		}
 		else
 		{
@@ -330,14 +345,17 @@
  * Run a single script.
  *
  * @param script Script line in the format script(arg1,arg2,...,argn)
+ * @param pid		Place to store the child process if (if there's one).
  *
  * @return 0 if ok, error code if non ok
  */
- int run_script_command_line(const gchar *script)
+ int run_script_command_line(const gchar *script, GPid *pid)
  {
 	gchar *begin_arg = g_strstr_len(script,-1,"(");
 	gchar *type;
 	int	   rc = 0;
+
+	Trace("%s(%s)",__FUNCTION__,script);
 
 	if(begin_arg)
 	{
@@ -357,7 +375,7 @@
 		Trace("Calling script %s(%s)",script,begin_arg);
 
 		argv = g_strsplit(begin_arg,",",-1);
-		script_interpreter(type,script,NULL,g_strv_length(argv),argv);
+		script_interpreter(type,script,NULL,g_strv_length(argv),argv,pid);
 
 		g_strfreev(argv);
 	}
@@ -401,7 +419,7 @@
 		if(type)
 			type++;
 
-		rc = script_interpreter(type,argv[0],NULL,argc-1,argv+1);
+		rc = script_interpreter(type,argv[0],NULL,argc-1,argv+1,pid);
 
 		g_strfreev(argv);
 	}
@@ -422,7 +440,7 @@
 	gchar **script = g_strsplit(scripts,";",-1);
 
 	for(str=0;script[str];str++)
-		run_script_command_line(script[str]);
+		run_script_command_line(script[str],NULL);
 
 	g_strfreev(script);
 

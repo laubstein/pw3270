@@ -85,7 +85,7 @@
 
 	if(handle)
 	{
-		PW3270_PLUGIN_VERSION_INFO	*info;
+		PW3270_PLUGIN_VERSION_INFO *info = NULL;
 
 		if(g_module_symbol(handle, "pw3270_plugin_version_info", (gpointer) &info))
 		{
@@ -101,7 +101,7 @@
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_WARNING,
 													GTK_BUTTONS_OK,
-													_(  "The plugin \"%s\" is incompatible or outdated." ), info->descr);
+													_(  "The plugin \"%s\" is incompatible or outdated." ), info->descr ? info->descr : filename);
 
 				gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't load plugin" ) );
 				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), _( "It was designed for pw3270 version %s (Revision %d)\nand can't be loaded in current application level." ),info->vrs,info->rev);

@@ -415,12 +415,9 @@
 
 	for(ln = 0; line[ln]; ln++)
 	{
-		GError	*error	= NULL;
-
 		line[ln] = g_strstrip(line[ln]);
-
 		if(*line[ln] && *line[ln] != '#')
-			run_script_command_line(line[ln]);
+			run_script_command_line(line[ln],NULL);
 	}
 
 	g_strfreev(line);
