@@ -447,20 +447,6 @@
 
  static GPid on_lu_pid = 0;
 
- static void lu_child_ended(GPid pid,gint status,gchar *tempfile)
- {
- 	Trace("Process %d ended with status %d",(int) pid, status);
-
- 	on_lu_pid = 0;
-
- 	if(tempfile)
- 	{
-		remove(tempfile);
-		g_free(tempfile);
- 	}
- 	g_spawn_close_pid(pid);
- }
-
  static void set_lu(const char *lu)
  {
  	if(luname)
@@ -475,38 +461,9 @@
 
 		if(on_lu_command && !on_lu_pid)
 		{
-			GError	*error 		= NULL;
-			gchar	*tempfile	= NULL;
-
-			if(spawn_async_process(on_lu_command, &on_lu_pid, &tempfile, &error))
+			if(run_script_command_line(on_lu_command, &on_lu_pid))
 			{
 				on_lu_pid = 0;
-
-				if(error)
-				{
-					GtkWidget *dialog;
-
-					// Can't start process, notify user
-					dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
-														GTK_DIALOG_DESTROY_WITH_PARENT,
-														GTK_MESSAGE_WARNING,
-														GTK_BUTTONS_OK,
-														_(  "Can't start LU association script" ));
-
-					gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't start script" ) );
-
-					if(error && error->message)
-						gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog) ,"%s", error->message);
-
-					g_error_free(error);
-
-					gtk_dialog_run(GTK_DIALOG (dialog));
-					gtk_widget_destroy(dialog);
-				}
-			}
-			else
-			{
-				g_child_watch_add(on_lu_pid,(GChildWatchFunc) lu_child_ended, tempfile);
 			}
 		}
  	}

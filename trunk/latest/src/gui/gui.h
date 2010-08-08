@@ -427,8 +427,8 @@
 
 	// Command interpreter & script support
 	LOCAL_EXTERN PW3270_COMMAND_POINTER get_command_pointer(const gchar *cmd);
-	LOCAL_EXTERN int					run_script_command_line(const gchar *script);
-	LOCAL_EXTERN int 		  			script_interpreter( const gchar *script_type, const gchar *script_name, const gchar *script_text, int argc, gchar **argv );
+	LOCAL_EXTERN int					run_script_command_line(const gchar *script, GPid *pid);
+	LOCAL_EXTERN int 		  			script_interpreter( const gchar *script_type, const gchar *script_name, const gchar *script_text, int argc, gchar **argv, GPid *pid);
 	LOCAL_EXTERN void 		  			run_script_list( const gchar *scripts );
 
 //	LOCAL_EXTERN int		  run_command(const gchar *line, GError **error);
