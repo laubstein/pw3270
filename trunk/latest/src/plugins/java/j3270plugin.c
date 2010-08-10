@@ -62,11 +62,14 @@
  static GStaticMutex	mutex	= G_STATIC_MUTEX_INIT;
  static JNIEnv			*env	= NULL;
  static JavaVM			*jvm	= NULL;
+ static GtkWidget		*window = NULL;
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
-static void run_class(GtkWidget *window, const gchar *classname, const gchar *argument, JNIEnv *env)
-{
+ #define end_java_script() g_static_mutex_unlock(&mutex);
+
+ static void run_class(const gchar *classname, int argc, gchar **argv)
+ {
 	jclass			 cls;
 	jmethodID		 mid;
 	jstring			 jstr;
@@ -102,7 +105,7 @@ static void run_class(GtkWidget *window, const gchar *classname, const gchar *ar
 	}
 
 	/* create a new java string to be passes to the class */
-	if ((jstr = (*env)->NewStringUTF(env, argument ? argument : classname)) == 0)
+	if ((jstr = (*env)->NewStringUTF(env, argv[0] ? argv[0] : classname)) == 0)
 	{
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -143,9 +146,166 @@ static void run_class(GtkWidget *window, const gchar *classname, const gchar *ar
 
  }
 
+ static int begin_java_script(void)
+ {
+	GKeyFile		*ini			= (GKeyFile *) g_object_get_data(G_OBJECT(window),"pw3270_config");
+	JavaVMInitArgs	vm_args;
+	JavaVMOption	options[5];
+	gchar			*classpath		= NULL;
+	gchar			*libpath		= NULL;
+	gchar			*program_data	= g_object_get_data(G_OBJECT(window),"pw3270_dpath");;
+	jint			rc = 0;
+	int				f;
+
+ 	if(!g_static_mutex_trylock(&mutex))
+ 	{
+ 		// Can't lock java script engine
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CANCEL,
+													"%s", _(  "Can't start script" ));
+
+		gtk_window_set_title(GTK_WINDOW(dialog), _( "System busy" ));
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s",_( "Please, try again in a few moments" ));
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+
+		g_static_mutex_unlock(&mutex);
+		return -1;
+ 	}
+
+	if(jvm)
+		return 0;
+
+	// Load VM options
+	vm_args.version		= JNI_VERSION_1_2;
+	vm_args.nOptions	= 0;
+	vm_args.options 	= options;
+
+	if(ini)
+	{
+		// Load VM options
+		classpath		= g_key_file_get_string(ini,"java","classpath",NULL);
+		libpath			= g_key_file_get_string(ini,"java","libpath",NULL);
+	}
+
+	if(!program_data)
+		program_data = ".";
+
+#ifdef DEBUG
+	options[vm_args.nOptions++].optionString = g_strdup("-verbose");
+#endif
+
+#if defined( WIN32 )
+	if(libpath)
+		options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.library.path=%s",libpath);
+	else
+		options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.library.path=%s;%s" G_DIR_SEPARATOR_S "java",program_data,program_data);
+
+#elif defined( JNIDIR )
+	if(libpath)
+		options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.library.path=%s",libpath);
+	else
+		options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.library.path=%s:%s:%s" G_DIR_SEPARATOR_S "java",JNIDIR,program_data,program_data);
+#else
+	if(libpath)
+		options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.library.path=%s",libpath);
+#endif
+
+#if defined( WIN32 )
+
+	if(classpath)
+		options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.class.path=%s",classpath);
+	else
+		options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.class.path=%s" G_DIR_SEPARATOR_S PACKAGE_NAME ".jar;%s;%s" G_DIR_SEPARATOR_S "java", \
+																					program_data,program_data,program_data);
+
+#elif defined( JARDIR )
+
+	if(classpath)
+		options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.class.path=%s",classpath);
+	else
+		options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.class.path=%s" G_DIR_SEPARATOR_S PACKAGE_NAME ".jar:%s:%s" G_DIR_SEPARATOR_S "java", \
+																					JARDIR,program_data,program_data);
+#else
+
+	if(classpath)
+		options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.class.path=%s",classpath);
+
+#endif
+
+	// Create Java Virtual machine
+	rc = JNI_CreateJavaVM(&jvm,(void **)&env,&vm_args);
+
+	// Release options
+	for(f=0;f<vm_args.nOptions;f++)
+	{
+		Trace("Releasing option %d: %s",f,options[f].optionString);
+		g_free(options[f].optionString);
+	}
+
+	if(rc < 0)
+	{
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CANCEL,
+													"%s", _(  "Can't create java VM" ));
+
+		gtk_window_set_title(GTK_WINDOW(dialog), _( "Script startup failure" ));
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "The error code was %d" ), rc);
+
+		gtk_dialog_run(GTK_DIALOG (dialog));
+		gtk_widget_destroy(dialog);
+
+		jvm = NULL;
+		g_static_mutex_unlock(&mutex);
+		return rc;
+
+	}
+
+	return 0;
+ }
+
+/**
+ * Plugin startup entry.
+ *
+ * Called, during the initialization to startup the plugin module.
+ *
+ * @param topwindow	pw3270's toplevel window.
+ *
+ */
+ PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow)
+ {
+ 	window = topwindow;
+ }
+
+ PW3270_SCRIPT_INTERPRETER(class)
+ {
+ 	int rc = begin_java_script();
+	if(rc)
+		return PW3270_SCRIPT_RETURN(rc);
+
+	if(argc && argv)
+	{
+		run_class(script_name,argc,argv);
+	}
+	else
+	{
+		gchar *a[] = { (gchar *) "", NULL };
+		run_class(script_name,1,a);
+	}
+
+	end_java_script();
+
+	return PW3270_SCRIPT_OK;
+ }
+
  PW3270_PLUGIN_ENTRY void pw3270_call_java_script(GtkAction *action, GtkWidget *window)
  {
-	const gchar	*argument	= g_object_get_data(G_OBJECT(action),"script_argument");;
+ 	gchar		*argv[]		= { (gchar *) g_object_get_data(G_OBJECT(action),"script_argument"), NULL };
  	const gchar	*classname	= g_object_get_data(G_OBJECT(action),"script_class");
 
 	if(!classname)
@@ -164,126 +324,11 @@ static void run_class(GtkWidget *window, const gchar *classname, const gchar *ar
 
 	Trace("Classname: %s",classname);
 
- 	if(!g_static_mutex_trylock(&mutex))
- 	{
- 		// Can't lock java script engine
-		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
-													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_CANCEL,
-													"%s", _(  "Can't start script" ));
-
-		gtk_window_set_title(GTK_WINDOW(dialog), _( "System busy" ));
-		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s",_( "Please, try again in a few moments" ));
-
-        gtk_dialog_run(GTK_DIALOG (dialog));
-        gtk_widget_destroy(dialog);
-
-		g_static_mutex_unlock(&mutex);
+	if(begin_java_script())
 		return;
- 	}
 
-	if(!jvm)
-	{
-		GKeyFile		*ini			= (GKeyFile *) g_object_get_data(G_OBJECT(window),"pw3270_config");
-		JavaVMInitArgs	vm_args;
-		JavaVMOption	options[5];
-		gchar			*classpath		= NULL;
-		gchar			*libpath		= NULL;
-		gchar			*program_data	= g_object_get_data(G_OBJECT(window),"pw3270_dpath");;
-		jint			rc = 0;
-		int				f;
+	run_class(classname,1,argv);
 
-
-		// Load VM options
-		vm_args.version		= JNI_VERSION_1_2;
-		vm_args.nOptions	= 0;
-		vm_args.options 	= options;
-
-		if(ini)
-		{
-			// Load VM options
-			classpath		= g_key_file_get_string(ini,"java","classpath",NULL);
-			libpath			= g_key_file_get_string(ini,"java","libpath",NULL);
-		}
-
-		if(!program_data)
-			program_data = ".";
-
-#ifdef DEBUG
-		options[vm_args.nOptions++].optionString = g_strdup("-verbose");
-#endif
-
-#if defined( WIN32 )
-
-		if(libpath)
-			options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.library.path=%s",libpath);
-		else
-			options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.library.path=%s;%s" G_DIR_SEPARATOR_S "java",program_data,program_data);
-
-#elif defined( JNIDIR )
-		if(libpath)
-			options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.library.path=%s",libpath);
-		else
-			options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.library.path=%s:%s:%s" G_DIR_SEPARATOR_S "java",JNIDIR,program_data,program_data);
-#else
-		if(libpath)
-			options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.library.path=%s",libpath);
-#endif
-
-#if defined( WIN32 )
-
-		if(classpath)
-			options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.class.path=%s",classpath);
-		else
-			options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.class.path=%s" G_DIR_SEPARATOR_S PACKAGE_NAME ".jar;%s;%s" G_DIR_SEPARATOR_S "java", \
-																						program_data,program_data,program_data);
-
-#elif defined( JARDIR )
-
-		if(classpath)
-			options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.class.path=%s",classpath);
-		else
-			options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.class.path=%s" G_DIR_SEPARATOR_S PACKAGE_NAME ".jar:%s:%s" G_DIR_SEPARATOR_S "java", \
-																						JARDIR,program_data,program_data);
-#else
-		if(classpath)
-			options[vm_args.nOptions++].optionString = g_strdup_printf("-Djava.class.path=%s",classpath);
-#endif
-
-		// Create Java Virtual machine
-		rc = JNI_CreateJavaVM(&jvm,(void **)&env,&vm_args);
-
-		// Release options
-		for(f=0;f<vm_args.nOptions;f++)
-		{
-			Trace("Releasing option %d: %s",f,options[f].optionString);
-			g_free(options[f].optionString);
-		}
-
-		if(rc < 0)
-		{
-			GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
-														GTK_DIALOG_DESTROY_WITH_PARENT,
-														GTK_MESSAGE_ERROR,
-														GTK_BUTTONS_CANCEL,
-														"%s", _(  "Can't create java VM" ));
-
-			gtk_window_set_title(GTK_WINDOW(dialog), _( "Script startup failure" ));
-			gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "The error code was %d" ), rc);
-
-			gtk_dialog_run(GTK_DIALOG (dialog));
-			gtk_widget_destroy(dialog);
-
-			jvm = NULL;
-			g_static_mutex_unlock(&mutex);
-			return;
-
-		}
-	}
-
-	run_class(window,classname,argument,env);
-
-	g_static_mutex_unlock(&mutex);
+	end_java_script();
  }
 
