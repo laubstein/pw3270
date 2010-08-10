@@ -187,7 +187,7 @@
  	Trace("%s begins argc=%d",__FUNCTION__,argc);
 
 	if(lock_rexx_script_engine(program_window))
-		return;
+		return PW3270_SCRIPT_ERROR(EBUSY);
 
 	// Build argument strings
 
@@ -265,6 +265,8 @@
 	rc = unlock_rexx_script_engine(program_window, script_name ? script_name : "script", rc, return_code);
 
 	Trace("%s exits with rc=%d",__FUNCTION__,rc);
+
+	return PW3270_SCRIPT_RETURN(rc);
  }
 
  int call_rexx(const gchar *filename, const gchar *arg)
