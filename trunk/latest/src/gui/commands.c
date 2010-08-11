@@ -45,8 +45,6 @@
 
  #include "gui.h"
 
-// TODO (perry#1#): DEPRECATED - Replace with the new command/macro engine on script.c
-
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
 
