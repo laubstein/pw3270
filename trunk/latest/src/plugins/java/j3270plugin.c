@@ -70,10 +70,10 @@
 
  static void run_class(const gchar *classname, int argc, gchar **argv)
  {
-	jclass			 cls;
-	jmethodID		 mid;
-	jstring			 jstr;
-	jobjectArray	 args;
+	jclass			cls;
+	jmethodID		mid;
+	jobjectArray	args;
+	int				f;
 
 	// Locate and load classfile
 	if ((cls = (*env)->FindClass(env, classname)) == 0)
@@ -104,23 +104,8 @@
 		return;
 	}
 
-	/* create a new java string to be passes to the class */
-	if ((jstr = (*env)->NewStringUTF(env, argv[0] ? argv[0] : classname)) == 0)
-	{
-		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
-													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_CANCEL,
-													_(  "Out of memory on %s" ), classname );
-
-		gtk_window_set_title(GTK_WINDOW(dialog), _( "Java script failure" ));
-        gtk_dialog_run(GTK_DIALOG (dialog));
-        gtk_widget_destroy(dialog);
-		return;
-	}
-
-   /* create a new string array with a single element containing the string created above */
-	args = (*env)->NewObjectArray(env, 1, (*env)->FindClass(env, "java/lang/String"), jstr);
+	/* create a new string array with a single element containing the string created above */
+	args = (*env)->NewObjectArray(env, argc, (*env)->FindClass(env, "java/lang/String"), (*env)->NewStringUTF(env, ""));
 	if (args == 0)
 	{
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
@@ -141,7 +126,13 @@
 	Trace("%s: Calling main(%p,%p,%p,%p) on pid %d",__FUNCTION__,env,cls,mid,args,getpid());
 #endif
 
+	for(f=0;f<argc;f++)
+	{
+		(*env)->SetObjectArrayElement(env,args,f,(*env)->NewStringUTF(env, argv[f] ? argv[f] : ""));
+	}
+
 	(*env)->CallStaticVoidMethod(env, cls, mid, args);
+
 	Trace("%s: Ends",__FUNCTION__);
 
  }
