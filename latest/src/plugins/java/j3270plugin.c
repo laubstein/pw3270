@@ -285,18 +285,28 @@
  PW3270_SCRIPT_INTERPRETER(class)
  {
  	int rc = begin_java_script();
+ 	gchar *class_name;
+ 	gchar *ptr;
+
 	if(rc)
 		return PW3270_SCRIPT_RETURN(rc);
 
+	class_name = g_strdup(script_name);
+	ptr = g_strrstr(class_name,".class");
+	if(ptr)
+		*ptr = 0;
+
 	if(argc && argv)
 	{
-		run_class(script_name,argc,argv);
+		run_class(class_name,argc,argv);
 	}
 	else
 	{
 		gchar *a[] = { (gchar *) "", NULL };
-		run_class(script_name,1,a);
+		run_class(class_name,1,a);
 	}
+
+	g_free(class_name);
 
 	end_java_script();
 
