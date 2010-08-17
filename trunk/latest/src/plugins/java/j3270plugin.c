@@ -81,11 +81,12 @@
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_CANCEL,
+													GTK_BUTTONS_OK_CANCEL,
 													_(  "Can't find class %s" ), classname );
 
 		gtk_window_set_title(GTK_WINDOW(dialog), _( "Java script failure" ));
-        gtk_dialog_run(GTK_DIALOG (dialog));
+        if(gtk_dialog_run(GTK_DIALOG (dialog)) == GTK_RESPONSE_CANCEL)
+			gtk_main_quit();
         gtk_widget_destroy(dialog);
 		return;
 	}
@@ -95,11 +96,12 @@
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_CANCEL,
+													GTK_BUTTONS_OK_CANCEL,
 													_(  "Can't find main in class %s" ), classname );
 
 		gtk_window_set_title(GTK_WINDOW(dialog), _( "Java script failure" ));
-        gtk_dialog_run(GTK_DIALOG (dialog));
+        if(gtk_dialog_run(GTK_DIALOG (dialog)) == GTK_RESPONSE_CANCEL)
+			gtk_main_quit();
         gtk_widget_destroy(dialog);
 		return;
 	}
@@ -111,11 +113,12 @@
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_CANCEL,
+													GTK_BUTTONS_OK_CANCEL,
 													_(  "Out of memory on %s" ), classname );
 
 		gtk_window_set_title(GTK_WINDOW(dialog), _( "Java script failure" ));
-        gtk_dialog_run(GTK_DIALOG (dialog));
+        if(gtk_dialog_run(GTK_DIALOG (dialog)) == GTK_RESPONSE_CANCEL)
+			gtk_main_quit();
         gtk_widget_destroy(dialog);
 		return;
 	}
@@ -128,6 +131,7 @@
 
 	for(f=0;f<argc;f++)
 	{
+		Trace("Arg(%d): %s",f,argv[f] ? argv[f] : "");
 		(*env)->SetObjectArrayElement(env,args,f,(*env)->NewStringUTF(env, argv[f] ? argv[f] : ""));
 	}
 
