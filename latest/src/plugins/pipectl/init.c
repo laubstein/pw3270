@@ -34,6 +34,10 @@
 
  #define PIPE_BUFFER_LENGTH 512
 
+/*---[ Globals ]----------------------------------------------------------------------------------*/
+
+ EXPORT_PW3270_PLUGIN_INFORMATION("Pipe controller");
+
 /*---[ Statics ]----------------------------------------------------------------------------------*/
 
  static HANDLE 	  hPipe			= INVALID_HANDLE_VALUE;
