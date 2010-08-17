@@ -73,6 +73,8 @@ WINDRES = @WINDRES@
 JRE_HOME = @JRE_HOME@
 JDK_HOME = @JDK_HOME@
 
+JAVAC = $(JDK_HOME)/bin/javac
+
 JNIDIR ?= @jnidir@
 JARDIR ?= @jardir@
 
@@ -298,6 +300,20 @@ pot/%.pot: %.xml bin/xml2pot
 	@bin/xml2pot "$<" > "$@"
 
 ####################################################################################################
+# Misc Rules             
+####################################################################################################
+
+%.class: %.java
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(JAVAC) -cp bin/java -sourcepath `dirname $^` -d `dirname $@` $^
+
+bin/java/@PACKAGE@/%.class: src/java/%.java
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(JAVAC) -cp bin/java -sourcepath src/java -d bin/java $^
+
+####################################################################################################
 # OpenOffice.org extension
 ####################################################################################################
 
@@ -446,15 +462,10 @@ bin/Release/librx3270$(DLLEXT): 		bin/Release/lib3270$(DLLEXT) \
 	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS)
 
 ####################################################################################################
-# Java Targets
+# Java
 ####################################################################################################
 
 # Misc
-bin/java/@PACKAGE@/%.class: src/java/%.java
-	@echo $< ...
-	@mkdir -p `dirname $@`
-	@javac -cp bin/java -sourcepath src/java -d bin/java $^
-
 src/java/lib3270_jni.h: bin/java/@PACKAGE@/terminal.class
 	@echo $< ...
 	@mkdir -p `dirname $@`
