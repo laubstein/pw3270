@@ -80,6 +80,8 @@ REXX_SYMBOL_HACK=""
 EXTENSIONS=""
 CPPUENV="gcc3"
 INSTALL_TARGETS=""
+JAVAC="\$(JDK_HOME)/bin/javac"
+JAVAH="\$(JDK_HOME)/bin/javah"
 
 AC_CHECK_PROG(PACKAGE_MANAGER, "rpmbuild", "rpm")
 AC_CHECK_PROG(PACKAGE_MANAGER, "dpkg-buildpackage","deb")
@@ -106,6 +108,11 @@ case "$host" in
 		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/win32"
 		java_ldflags="-Wl,--exclude-symbols,jvm_NULL_THUNK_DATA -L\$(JDK_HOME)/lib -ljvm"
 
+		# Check for native javac
+		JAVAC="javac"
+
+		# Check for native javah
+		JAVAH="javah"
 
 		;;
 
@@ -588,6 +595,8 @@ AC_SUBST(WINDRES)
 AC_SUBST(libdir)
 AC_SUBST(jnidir)
 AC_SUBST(jardir)
+AC_SUBST(JAVAC)
+AC_SUBST(JAVAH)
 AC_SUBST(OS_APPSRCS)
 AC_SUBST(OS_APISRCS)
 AC_SUBST(GTKRUNTIME,$pw3270_cv_gtkruntime)

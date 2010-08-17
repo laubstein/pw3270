@@ -73,7 +73,8 @@ WINDRES = @WINDRES@
 JRE_HOME = @JRE_HOME@
 JDK_HOME = @JDK_HOME@
 
-JAVAC = $(JDK_HOME)/bin/javac
+JAVAC = @JAVAC@
+JAVAH = @JAVAH@
 
 JNIDIR ?= @jnidir@
 JARDIR ?= @jardir@
@@ -300,7 +301,7 @@ pot/%.pot: %.xml bin/xml2pot
 	@bin/xml2pot "$<" > "$@"
 
 ####################################################################################################
-# Misc Rules             
+# Misc Rules
 ####################################################################################################
 
 %.class: %.java
@@ -469,8 +470,7 @@ bin/Release/librx3270$(DLLEXT): 		bin/Release/lib3270$(DLLEXT) \
 src/java/lib3270_jni.h: bin/java/@PACKAGE@/terminal.class
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@javah -o $@ -classpath bin/java @PACKAGE@.terminal
-
+	@$(JAVAH) -o $@ -classpath bin/java @PACKAGE@.terminal
 
 # Debug
 obj/Debug/src/java/%.o: src/java/%.c src/java/lib3270_jni.h $(GLOBAL_DEPENDS)
