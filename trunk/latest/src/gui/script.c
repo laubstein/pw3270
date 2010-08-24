@@ -270,6 +270,12 @@
 		{
 			rc = interpret(script_name,script_text,argc,converted_argv);
 		}
+		else
+		{
+			spawn_child(script_name,argc,convert,converted_argv,pid);
+		}
+
+/*
 		else if(script_name && g_file_test(script_name,G_FILE_TEST_IS_EXECUTABLE))
 		{
 			spawn_child(script_name,argc,convert,converted_argv,pid);
@@ -294,6 +300,7 @@
 			gtk_widget_destroy(dialog);
 			rc = EINVAL;
 		}
+*/
 	}
 	else if(script_name)
 	{
@@ -307,6 +314,11 @@
 			else
 				rc = -1;
 		}
+		else
+		{
+			spawn_child(script_name,argc,convert,converted_argv,pid);
+		}
+/*
 		else if(g_file_test(script_name,G_FILE_TEST_IS_EXECUTABLE))
 		{
 			spawn_child(script_name,argc,convert,converted_argv,pid);
@@ -331,6 +343,7 @@
 			gtk_widget_destroy(dialog);
 			rc = ENOENT;
 		}
+*/
 	}
 
 	// Release converted arguments
