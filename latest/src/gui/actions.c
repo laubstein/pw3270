@@ -243,10 +243,26 @@
         gtk_widget_set_sensitive(topwindow,FALSE);
         RunPendingEvents(0);
 
-        if(host_connect(host,1) == ENOTCONN)
+        switch(host_connect(host,1))
         {
+		case 0:
+			break;
+
+		case EAGAIN:	// Auto-reconnection in progress
+			break;
+
+		case EBUSY:	// System busy (already connected or connecting)
+            Warning( N_( "Negotiation with %s failed: Connection already in progress" ),host);
+			break;
+
+        case ENOTCONN:	// Connection failed
             Warning( N_( "Negotiation with %s failed!" ),host);
+			break;
+
+		default:
+            Warning( N_( "Unexpected error during negociation with %s" ),host);
         }
+
 
 		Trace("Topwindow: %p Terminal: %p",topwindow,terminal);
 
