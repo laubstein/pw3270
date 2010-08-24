@@ -72,7 +72,7 @@ Boolean		ssl_host = False;
 //char		*connected_type = CN;
 Boolean		ever_3270 = False;
 
-char           *current_host = CN;
+// char           *current_host = CN;
 char           *full_current_host = CN;
 unsigned short  current_port;
 char	       *reconnect_host = CN;
@@ -583,15 +583,14 @@ static int do_connect(const char *n)
 	if (n != full_current_host) {
 		Replace(full_current_host, NewString(n));
 	}
-	Replace(current_host, CN);
+	Replace(h3270.current_host, CN);
 	if (localprocess_cmd != CN) {
 		if (full_current_host[strlen(OptLocalProcess)] != '\0')
-		current_host = NewString(full_current_host +
-		    strlen(OptLocalProcess) + 1);
+			h3270.current_host = NewString(full_current_host + strlen(OptLocalProcess) + 1);
 		else
-			current_host = NewString("default shell");
+			h3270.current_host = NewString("default shell");
 	} else {
-		current_host = s;
+		h3270.current_host = s;
 	}
 
 	has_colons = (strchr(chost, ':') != NULL);
@@ -666,12 +665,18 @@ static int do_connect(const char *n)
  * @param	n		Host ID
  * @param	wait	Non zero to wait for connection to be ok.
  *
- * @return 0 for success, error code on error
+ * @return 0 for success, EAGAIN if auto-reconnect is in progress, EBUSY if connected, ENOTCONN if connection has failed, -1 on unexpected failure.
  *
  */
 int host_connect(const char *n, int wait)
 {
 	RunPendingEvents(0);
+
+	if(auto_reconnect_inprogress)
+		return EAGAIN;
+
+	if(PCONNECTED)
+		return EBUSY;
 
 	if(do_connect(n))
 		return -1;
@@ -1043,7 +1048,7 @@ LIB3270_EXPORT int host_reconnect(int wait)
 	if (CONNECTED || HALF_CONNECTED)
 		return EBUSY;
 
-	if (current_host == CN)
+	if (h3270.current_host == CN)
 		return ENOENT;
 
 	if (auto_reconnect_inprogress)
