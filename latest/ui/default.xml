@@ -177,7 +177,9 @@
 	<accelerator action='Delete' key='Delete' group='online' />
 	<accelerator action='Erase' key='BackSpace' group='online' />
 	<accelerator action='EraseEOF' key='End' group='online' />
+
 	<accelerator action='SysREQ' key='Sys_Req' group='online' />
+	<accelerator action='SysREQ' key='<shift>Print' group='online' />
 
 	<accelerator action='SelectRight' key='<Shift>Right' group='online' />
 	<accelerator action='SelectLeft' key='<Shift>Left' group='online' />
