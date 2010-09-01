@@ -261,9 +261,7 @@ static gboolean IO_dispatch(GSource *source, GSourceFunc callback, gpointer user
 	 * should call the callback function with user_data and whatever additional
 	 * parameters are needed for this type of event source.
 	 */
-	Trace("%s",__FUNCTION__);
 	((IO_Source *) source)->fn(((IO_Source *) source)->session);
-	Trace("%s",__FUNCTION__);
 	return TRUE;
 }
 

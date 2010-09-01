@@ -91,17 +91,6 @@
 
 	if(m == SELECT_MODE_NONE && select_mode != SELECT_MODE_INVALID)
 		set_action_sensitive_by_name("Reselect",TRUE);
-/*
-	{
-		if(!reselect)
-			reselect = gtk_action_group_get_action(online_actions,"Reselect");
-		gtk_action_set_sensitive(reselect,TRUE);
-	}
-
-	if(!copyastable)
-		copyastable = gtk_action_group_get_action(selection_actions,"CopyAsTable");
-	gtk_action_set_sensitive(copyastable,m == SELECT_MODE_RECTANGLE);
-*/
 
 	set_action_sensitive_by_name("CopyAsTable",m == SELECT_MODE_RECTANGLE);
 

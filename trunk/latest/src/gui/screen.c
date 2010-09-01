@@ -400,9 +400,6 @@
 
  void action_Redraw(void)
  {
-#ifdef DEBUG
- 	screen_disp();
-#endif
  	DrawScreen(color,pixmap);
 	DrawOIA(pixmap,color);
 	gtk_widget_queue_draw(terminal);
@@ -860,7 +857,6 @@
 		if(terminal)
 			gtk_widget_queue_draw_area(terminal,left_margin+(fontWidth << 3),OIAROW,fontWidth << 4,fontHeight+1);
 
-		Trace("%s","Status updated");
 	}
 
  }

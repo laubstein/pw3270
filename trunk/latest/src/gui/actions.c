@@ -103,7 +103,10 @@
 	{ GDK_KP_Down,			0,					NULL,	G_CALLBACK(action_Down)				},
 	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(action_NextField)		},
 	{ GDK_3270_PrintScreen,	0,					NULL,	G_CALLBACK(action_PrintScreen)		},
+
 	{ GDK_Print,			GDK_CONTROL_MASK,	NULL,	G_CALLBACK(action_PrintScreen)		},
+	{ GDK_Print,			GDK_SHIFT_MASK,		NULL,	G_CALLBACK(action_SysReq)			},
+
 #ifdef WIN32
 	{ GDK_Pause,			0,					NULL,	0									},
 #endif
