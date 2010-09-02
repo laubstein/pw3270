@@ -32,6 +32,8 @@
 
 
 #include "gui.h"
+#include "actions.h"
+
 #include <lib3270/config.h>
 #include <malloc.h>
 #include <string.h>

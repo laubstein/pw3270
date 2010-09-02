@@ -299,34 +299,6 @@
 	gboolean 	mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 	gboolean 	mouse_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 
-	void 		action_SelectAll(GtkWidget *w, gpointer user_data);
-	void		action_SelectLeft(GtkWidget *w, gpointer user_data);
-	void		action_SelectUp(GtkWidget *w, gpointer user_data);
-	void		action_SelectRight(GtkWidget *w, gpointer user_data);
-	void		action_SelectDown(GtkWidget *w, gpointer user_data);
-	void		action_SelectionLeft(GtkWidget *w, gpointer user_data);
-	void		action_SelectionUp(GtkWidget *w, gpointer user_data);
-	void		action_SelectionRight(GtkWidget *w, gpointer user_data);
-	void		action_SelectionDown(GtkWidget *w, gpointer user_data);
-
-    void            action_Connect(void);
-	void 			action_Append(void);
-	void 			action_Copy(void);
-	void 			action_CopyAsTable(void);
-	void 			action_SelectField(void);
-	void			action_ClearSelection(void);
-	void 			action_Save(void);
-	void			action_Restore(void);
-	void 			action_Redraw(void);
-	void 			action_SelectColors(void);
-	void 			action_SetHostname(void);
-	void 			action_Paste(void);
-	void			action_PasteSelection(void);
-	void 			action_PasteNext(void);
-	void 			action_PasteTextFile(void);
-	void 			action_Download(void);
-	void 			action_Upload(void);
-
 	int 			LoadColors(void);
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
 	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);

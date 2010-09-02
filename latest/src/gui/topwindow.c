@@ -31,6 +31,7 @@
  */
 
  #include "gui.h"
+ #include "actions.h"
  #include "uiparser.h"
 
  #include <gdk/gdkkeysyms.h>

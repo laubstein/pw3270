@@ -33,6 +33,7 @@
  #include <lib3270/config.h>
 
  #include "gui.h"
+ #include "actions.h"
  #include "uiparser.h"
  #include <gdk/gdkkeysyms.h>
  #include <errno.h>
@@ -872,8 +873,8 @@
  {
 	static const struct _action
 	{
-		const gchar	* name;			/**< Name of the action */
-		const gchar	* label;		/**< Default action label */
+		const gchar	* name;		/**< Name of the action */
+		const gchar	* label;	/**< Default action label */
 		GCallback	  callback;		/**< Callback for "activated/toggled" signal */
 	}
 	action[] =

@@ -31,6 +31,7 @@
  */
 
 #include "gui.h"
+#include "actions.h"
 
 #include <stdio.h>
 #include <gtk/gtk.h>

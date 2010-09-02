@@ -309,8 +309,8 @@
  {
 
 	struct action_descriptor	* data			= NULL;
- 	const gchar					* action_name	= get_xml_attribute(names,values,"name");
- 	const gchar					* callback_name	= get_xml_attribute(names,values,"action");
+ 	const gchar				* action_name	= get_xml_attribute(names,values,"name");
+ 	const gchar				* callback_name	= get_xml_attribute(names,values,"action");
  	gchar						* ptr;
 	UI_CALLBACK					  cbk;
 
@@ -450,11 +450,10 @@
  {
 	struct action_descriptor *entry = get_action_descriptor(info, names, values);
 
-	entry->callback_type = type;
-
 	if(!entry)
 		return;
 
+	entry->callback_type = type;
 	ui_element_append(info, type, entry->name);
 
  }
@@ -639,17 +638,6 @@
 	}
 
 	script->enabled = TRUE;
-
-	/* Get filename */
-/*
-	ptr = get_xml_attribute(names,values,"filename");
-	if(ptr)
-	{
-		if(script->filename)
-			g_free(script->filename);
-		script->filename = g_strdup(ptr);
-	}
-*/
  }
 
  static void element_start(GMarkupParseContext *context,const gchar *element_name,const gchar **names,const gchar **values, gpointer user_data, GError **error)
@@ -757,9 +745,7 @@
 						g_free(ptr);
 					}
 				}
-
 			}
-
 		}
 	}
 
@@ -1151,7 +1137,6 @@
 	GtkWidget	*box;
 	int			r;
 	int			c;
-//	int			f;
 
 	GTK_WIDGET_UNSET_FLAGS(table,GTK_CAN_FOCUS);
 	GTK_WIDGET_UNSET_FLAGS(table,GTK_CAN_DEFAULT);
@@ -1265,9 +1250,6 @@
 	struct ui_element	* element;
  	struct parse_data 	  info;
 	GError 				* error = NULL;
-//	GList				* list;
-//	GtkWidget			**keypad;
-//	int					  sz;
 
 	path = g_build_filename(program_data,"ui",NULL);
 

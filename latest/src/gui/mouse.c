@@ -32,6 +32,7 @@
 
 
  #include "gui.h"
+ #include "actions.h"
 
  #include <globals.h>
  #include <lib3270/kybdc.h>
@@ -69,7 +70,7 @@
 
  int GetSelectedRectangle(GdkRectangle *rect)
  {
-	// FIXME (perry#3#): First check if the selection area isn't rectangular.
+	// First check if the selection area isn't rectangular.
  	if(!Toggled(RECTANGLE_SELECT))
 		return EINVAL;
 
@@ -80,9 +81,6 @@
 
 	return 0;
  }
-
-// static GtkAction *reselect = NULL;
-// static GtkAction *copyastable = NULL;
 
  void SetSelectionMode(int m)
  {
