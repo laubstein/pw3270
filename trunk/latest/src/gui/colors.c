@@ -35,6 +35,7 @@
  #include "gui.h"
  #include <ctype.h>
  #include <string.h>
+ #include "actions.h"
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 

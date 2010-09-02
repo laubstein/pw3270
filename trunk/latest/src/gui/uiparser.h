@@ -77,7 +77,6 @@
  {
 	gboolean 	enabled;
 	gchar		*text;
-//	gchar		*filename;
  };
 
  struct action_descriptor
