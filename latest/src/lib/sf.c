@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como sf.c e possui 964 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -685,6 +685,11 @@ do_query_reply(unsigned char code)
 			obptr_len = obuf + obptr0;
 			len = (obptr - obuf) - obptr0;
 			SET16(obptr_len, len);
+#ifdef DEBUG
+			trace_ds("\tStructuredField len=%d\n",len);
+			trace_netdata('\t', obuf + obptr0, len);
+#endif
+
 		} else {
 			/* Back over the header. */
 			obptr -= 4;
@@ -776,16 +781,18 @@ do_qr_color(void)
 			*obptr++ = 0x00;
 	}
 
-#if !defined(X3270_DISPLAY) /*[*/
-	/* Add background color. */
+/*
+#if !defined(X3270_DISPLAY)
+	// Add background color.
 	if (appres.m3279) {
 		space3270out(4);
-		*obptr++ = 4;		/* length */
-		*obptr++ = 0x02;	/* background color */
-		*obptr++ = 0x00;	/* attribute */
-		*obptr++ = 0xf0;	/* default color */
+		*obptr++ = 4;		// length
+		*obptr++ = 0x02;	// background color
+		*obptr++ = 0x00;	// attribute
+		*obptr++ = 0xf0;	// default color
 	}
-#endif /*]*/
+#endif
+*/
 }
 
 static void
