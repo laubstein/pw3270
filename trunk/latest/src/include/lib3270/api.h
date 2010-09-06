@@ -399,7 +399,10 @@
 			void	(*cursor)(CURSOR_MODE mode);
 			void	(*lu)(const char *lu);
 			void	(*set)(OIA_FLAG id, int on);
+
 			void	(*erase)(void);
+			void	(*display)(void);
+
 			void	(*toggle_changed)(int ix, int value, int reason, const char *name);
 			void	(*show_timer)(long seconds);
 
