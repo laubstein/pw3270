@@ -2498,6 +2498,7 @@ SysReq_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 
 LIB3270_EXPORT int action_SysReq(void)
 {
+	Trace("%s",__FUNCTION__);
 	reset_idle_timer();
 	if (IN_ANSI)
 		return 0;

@@ -167,7 +167,7 @@
 
 	if(!conf)
 		return;
-	Trace("Settings: %p Conf: %p",settings,conf);
+	Trace("Settings: %p Conf: %p page_setup: %p",settings,conf,setup);
 #if GTK_CHECK_VERSION(2,12,0)
 	gtk_print_settings_to_key_file(settings,conf,NULL);
 	gtk_page_setup_to_key_file(setup,conf,NULL);
@@ -183,7 +183,9 @@
  {
 	GKeyFile			*conf	= GetConf();
  	GtkPrintOperation	*prt;
- 	const gchar			*font;
+ 	const gchar		*font;
+	GtkPageSetup 		*page_setup = NULL;
+	GtkPrintSettings 	*print_settings = NULL;
 
  	if(!text)
 		return -EINVAL;
@@ -251,34 +253,40 @@
 			}
 		}
 
-		gtk_print_operation_set_print_settings(prt,gtk_print_settings_new_from_key_file(conf,NULL,NULL));
-		gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new_from_key_file(conf,NULL,NULL));
-#else // GTK_CHECK_VERSION(2,12,0)
-		{
-			GtkPrintSettings *settings = gtk_print_settings_new();
-			if(settings)
-			{
-				gchar 				**list;
-				int 				f;
+		print_settings = gtk_print_settings_new_from_key_file(conf,NULL,NULL);
+		page_setup = gtk_page_setup_new_from_key_file(conf,NULL,NULL);
 
-				list = g_key_file_get_keys(conf,"PrintSettings",NULL,NULL);
-				if(list)
-				{
-					for(f=0;list[f];f++)
-						gtk_print_settings_set(settings,list[f],g_key_file_get_string(conf,"PrintSettings",list[f],NULL));
-					g_strfreev(list);
-				}
+		if(!page_setup)
+			page_setup = gtk_page_setup_new();
+
+#else // GTK_CHECK_VERSION(2,12,0)
+		print_settings = gtk_print_settings_new();
+		if(print_settings)
+		{
+			gchar 				**list;
+			int 				f;
+
+			list = g_key_file_get_keys(conf,"PrintSettings",NULL,NULL);
+			if(list)
+			{
+				for(f=0;list[f];f++)
+					gtk_print_settings_set(print_settings,list[f],g_key_file_get_string(conf,"PrintSettings",list[f],NULL));
+				g_strfreev(list);
 			}
-			gtk_print_operation_set_print_settings(prt,settings);
-			gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new());
 		}
+		page_setup = gtk_page_setup_new();
 #endif
 	}
 	else
 	{
-		gtk_print_operation_set_default_page_setup(prt,gtk_page_setup_new());
+		page_setup = gtk_page_setup_new();
 		gtk_print_operation_set_print_settings(prt,gtk_print_settings_new());
 	}
+
+	Trace("page_setup: %p print_settings: %p",page_setup,print_settings);
+	gtk_print_operation_set_print_settings(prt,print_settings);
+	gtk_print_operation_set_default_page_setup(prt,page_setup);
+
 
 	// Run Print dialog
 	gtk_print_operation_run(prt,GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG,GTK_WINDOW(topwindow),NULL);
