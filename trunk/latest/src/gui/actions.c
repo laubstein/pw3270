@@ -103,7 +103,9 @@
 	{ GDK_KP_Right,			0,					NULL,	G_CALLBACK(action_Right)			},
 	{ GDK_KP_Down,			0,					NULL,	G_CALLBACK(action_Down)				},
 	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(action_NextField)		},
+
 	{ GDK_3270_PrintScreen,	0,					NULL,	G_CALLBACK(action_PrintScreen)		},
+	{ GDK_Sys_Req,			0,					NULL,	G_CALLBACK(action_SysReq)			},
 
 	{ GDK_Print,			GDK_CONTROL_MASK,	NULL,	G_CALLBACK(action_PrintScreen)		},
 	{ GDK_Print,			GDK_SHIFT_MASK,		NULL,	G_CALLBACK(action_SysReq)			},
@@ -243,30 +245,50 @@
     }
     else
     {
+    	int rc;
+
         DisableNetworkActions();
         gtk_widget_set_sensitive(topwindow,FALSE);
         RunPendingEvents(0);
 
-        switch(host_connect(host,1))
-        {
-		case 0:
-			break;
+		rc = host_connect(host,1);
 
-		case EAGAIN:	// Auto-reconnection in progress
-			break;
+		if(rc && rc != EAGAIN)
+		{
+			// Connection failed, notify user
+			GtkWidget *dialog;
 
-		case EBUSY:	// System busy (already connected or connecting)
-            Warning( N_( "Negotiation with %s failed: Connection already in progress" ),host);
-			break;
+			dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+												GTK_DIALOG_DESTROY_WITH_PARENT,
+												GTK_MESSAGE_WARNING,
+												GTK_BUTTONS_OK,
+												_(  "Negotiation with %s failed" ), host);
 
-        case ENOTCONN:	// Connection failed
-            Warning( N_( "Negotiation with %s failed!" ),host);
-			break;
+			gtk_window_set_title(GTK_WINDOW(dialog), _( "Connection error" ) );
 
-		default:
-            Warning( N_( "Unexpected error during negociation with %s" ),host);
-        }
+			switch(rc)
+			{
+			case EBUSY:	// System busy (already connected or connecting)
+				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog) ,"%s", _( "Connection already in progress" ));
+				break;
 
+			case ENOTCONN:	// Connection failed
+				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog) ,"%s", _( "Can't connect" ));
+				break;
+
+			case -1:
+				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog) ,_( "Unexpected error" ));
+				break;
+
+			default:
+				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog) ,_( "The error code was %d (%s)" ), rc, strerror(rc));
+			}
+
+			gtk_dialog_run(GTK_DIALOG (dialog));
+			gtk_widget_destroy(dialog);
+
+
+		}
 
 		Trace("Topwindow: %p Terminal: %p",topwindow,terminal);
 

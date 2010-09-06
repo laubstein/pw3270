@@ -250,7 +250,7 @@
 													"%s", _(  "Can't create java VM" ));
 
 		gtk_window_set_title(GTK_WINDOW(dialog), _( "Script startup failure" ));
-		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "The error code was %d" ), rc);
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "The error code was %d" ), (int) rc);
 
 		gtk_dialog_run(GTK_DIALOG (dialog));
 		gtk_widget_destroy(dialog);
