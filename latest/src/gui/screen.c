@@ -81,7 +81,10 @@
  static void	  setsize(int rows, int cols);
  static int  	  addch(int row, int col, int c, unsigned short attr);
  static void	  set_charset(char *dcs);
+
  static void	  erase(void);
+ static void	  display(void);
+
  static int	  SetSuspended(int state);
  static void	  SetScript(SCRIPT_STATE state);
  static void	  set_cursor(CURSOR_MODE mode);
@@ -130,7 +133,9 @@
 	set_cursor,			// void (*cursor)(CURSOR_MODE mode);
 	set_lu,				// void (*lu)(const char *lu);
 	set_oia,			// void (*set)(OIA_FLAG id, int on);
+
 	erase,				// void (*erase)(void);
+	display,			// void	(*display)(void);
 	update_toggle,		// void (*toggle_changed)(int ix, int value, int reason, const char *name);
 	show_timer,			// void	(*show_timer)(long seconds);
 
@@ -192,6 +197,7 @@
 
  static void changed(int bstart, int bend)
  {
+ //	Trace("%s(%d,%d)",__FUNCTION__,bstart,bend);
  }
 
  static void set_compose(int on, unsigned char c, int keytype)
@@ -1241,3 +1247,8 @@
 
  }
 
+ static void display(void)
+ {
+ 	if(terminal && terminal->window)
+		gdk_window_process_updates(terminal->window,FALSE);
+ }

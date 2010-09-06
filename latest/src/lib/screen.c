@@ -365,15 +365,12 @@ void screen_disp(void)
 {
 	int row, col;
 	int a;
-//	int c;
 	int attr = defattr;
 	unsigned char fa;
 #if defined(X3270_DBCS) /*[*/
 	enum dbcs_state d;
 #endif /*]*/
 	int fa_addr;
-
-//	Trace("%s starts",__FUNCTION__);
 
 	fa = get_field_attribute(0);
 	a = color_from_fa(fa);
@@ -449,7 +446,8 @@ void screen_disp(void)
 		}
 	}
 
-//	Trace("%s ends",__FUNCTION__);
+	if(callbacks && callbacks->display)
+		callbacks->display();
 
 	screen_has_changes = 0;
 }
