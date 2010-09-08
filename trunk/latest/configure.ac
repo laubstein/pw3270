@@ -352,7 +352,9 @@ AC_ARG_WITH([jdk-home],
 	[AS_HELP_STRING([--with-jdk-home], [Define java sdk home])],
 [
 	JDK_HOME="$withval"
-], )
+],[
+	AC_CHECK_FILE("/usr/lib/jvm/java-6-sun/bin/javac",JDK_HOME="/usr/lib/jvm/java-6-sun",)
+] )
 
 AC_ARG_WITH([jre-home],
 	[AS_HELP_STRING([--with-jre-home], [Define java runtime home])],
@@ -583,6 +585,7 @@ if test "_$JRE_HOME" = "_" ; then
 	AC_CHECK_FILE("$JDK_HOME/jre/lib/i386/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
 	AC_CHECK_FILE("/usr/lib/jvm/java/jre/lib/i386/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
 	AC_CHECK_FILE("/etc/alternatives/jre/lib/i386/client/libjvm.so",JRE_HOME="/etc/alternatives/jre",)
+	AC_CHECK_FILE("/usr/lib/jvm/java-6-sun/jre/lib/i386/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java-6-sun/jre",)
 fi
 
 AC_SUBST(JRE_HOME,$JRE_HOME)

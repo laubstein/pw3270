@@ -117,13 +117,13 @@ Rexx bindings for 3270 access using lib3270 (non-gui)
 
 Revision: @PACKAGE_REVISION@
 
-%package plugins-rexx
+%package plugin-rexx
 Summary:	Rexx plugin for  %{name}
 Group:		Development/Libraries
 Requires:	%{name}-rexx = @PACKAGE_VERSION@
 BuildRequires:	ooRexx >= 3.2.0
 
-%description plugins-rexx
+%description plugin-rexx
 Plugin to add Rexx scripting suport in %{name}
 
 Revision: @PACKAGE_REVISION@
@@ -154,12 +154,12 @@ Jni library allowing 3270 access from java programs (non-GUI)
 
 Revision: @PACKAGE_REVISION@
 
-%package plugins-java
+%package plugin-java
 Group:		Development/Libraries
-Summary:	Java bindings for %{name}
+Summary:	Java plugin for %{name}
 Requires:	%{name}-java = @PACKAGE_VERSION@
 
-%description plugins-java
+%description plugin-java
 Plugin allowing use of java classes inside %{name}'s UI
 
 Revision: @PACKAGE_REVISION@
@@ -279,7 +279,7 @@ fi
 %{_libdir}/librx3270.so
 %{_bindir}/rx3270.cls
 
-%files plugins-rexx
+%files plugin-rexx
 %defattr(-,root,root)
 %{_libdir}/%{name}/plugins/rx3270.so
 %{_datadir}/%{name}/ui/rexx.xml
@@ -296,9 +296,8 @@ fi
 %defattr(-,root,root)
 %{_jnidir}
 %{_jvmjardir}
-%{_libdir}/%{name}/plugins/j3270plugin.so
 
-%files plugins-java
+%files plugin-java
 %defattr(-,root,root)
 %{_libdir}/%{name}/plugins/j3270plugin.so
 %endif
