@@ -47,6 +47,7 @@
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
+#ifdef ENABLE_PANGO
  /**
   * Draw entire buffer.
   *
@@ -285,3 +286,58 @@
 
 	}
  }
+
+#else // ENABLE_PANGO
+
+ static void draw_region(cairo_t *cr, int left, int top, int bstart, int bend)
+ {
+
+	int addr;
+
+	for(addr = bstart; addr < bend; addr++)
+	{
+		if(screen[addr].cg)
+		{
+			// Graphics char
+		}
+		else if(*screen[addr].ch != ' ' && *screen[addr].ch)
+		{
+			// Text char
+			cairo_move_to(cr, left, top);
+			cairo_show_text(cr, screen[addr].ch);
+		}
+	}
+
+ }
+
+/**
+ * Draw entire terminal in a drawable
+ *
+ * @param pix	Target image
+ * @param left	Left margin
+ * @param top	Top margin
+ *
+ */
+ LOCAL_EXTERN void DrawTerminal(GdkDrawable *pix, int left, int top)
+ {
+ 	int 	width;
+ 	int 	height;
+	cairo_t *cr	= gdk_cairo_create(pix);
+
+	gdk_drawable_get_size(pix,&width,&height);
+
+	cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
+	cairo_rectangle(cr, 0, 0, width, height);
+	cairo_fill(cr);
+
+	cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+
+	draw_region(cr,left,top,0,terminal_cols * terminal_rows);
+
+	cairo_destroy(cr);
+
+ }
+
+#endif // USE_PANGO
+
+

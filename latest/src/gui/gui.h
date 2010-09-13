@@ -69,13 +69,13 @@
 		DRAG_TYPE_NONE
 	};
 
-	extern int 			drag_type;
-	extern CURSOR_MODE		cursor_mode;
+	LOCAL_EXTERN int 			drag_type;
+	LOCAL_EXTERN CURSOR_MODE	cursor_mode;
 
 	#define MAX_CHR_LENGTH 3
 	typedef struct _element
 	{
-		gchar				ch[MAX_CHR_LENGTH];	/**< UTF-8 string */
+		gchar			ch[MAX_CHR_LENGTH];	/**< UTF-8 string */
 		unsigned short	fg;					/**< Foreground color */
 		unsigned short	bg;					/**< Background color */
 
@@ -95,7 +95,8 @@
 		unsigned char		status;
 
 	} ELEMENT;
-	extern ELEMENT *screen;
+
+	LOCAL_EXTERN ELEMENT *screen;
 
     enum GUI_TOGGLE
     {
@@ -169,9 +170,9 @@
 	#define CURSOR_MODE_CROSS 	0x02
 	#define CURSOR_MODE_BASE	0x04
 
-	#define OIAROW				(top_margin+1+(fontHeight*terminal_rows))
-	#define CHARSET 			charset ? charset : "ISO-8859-1"
-	#define IS_FUNCTION_KEY(event)   (event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(event->state & (GDK_MOD1_MASK|GDK_CONTROL_MASK)))
+	#define OIAROW					(top_margin+1+(fontHeight*terminal_rows))
+	#define CHARSET 				charset ? charset : "ISO-8859-1"
+	#define IS_FUNCTION_KEY(event)	(event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(event->state & (GDK_MOD1_MASK|GDK_CONTROL_MASK)))
 
 	#ifndef GDK_ALT_MASK
 		#define GDK_ALT_MASK GDK_MOD1_MASK
@@ -181,12 +182,12 @@
 	#define PopupAnError( x )		Error("%s",x);
 	#define WarningPopup(fmt, ...)	Warning(fmt,__VA_ARGS__);
 
- 	extern const gchar *program_name;
- 	extern const gchar *program_version;
- 	extern const gchar *program_release;
- 	extern const gchar *program_fullversion;
+ 	LOCAL_EXTERN const gchar		* program_name;
+ 	LOCAL_EXTERN const gchar		* program_version;
+ 	LOCAL_EXTERN const gchar		* program_release;
+ 	LOCAL_EXTERN const gchar		* program_fullversion;
 
-	LOCAL_EXTERN const char		* on_lu_command;
+	LOCAL_EXTERN const char			* on_lu_command;
 
 	LOCAL_EXTERN GtkWidget			* topwindow;
 	LOCAL_EXTERN GdkPixmap			* pixmap;
@@ -199,35 +200,39 @@
 
 
 #ifdef MOUSE_POINTER_CHANGE
-	extern GdkCursor        		* wCursor[CURSOR_MODE_3270];
+	LOCAL_EXTERN GdkCursor        		* wCursor[CURSOR_MODE_3270];
 #endif
 
-	extern PangoFontDescription	* font;
-	extern gint					  cMode;
+	LOCAL_EXTERN gint					  cMode;
 
-	extern int 					  terminal_rows;
-	extern int				 		  terminal_cols;
-	extern int						  left_margin;
-	extern int						  top_margin;
+	LOCAL_EXTERN int 					  terminal_rows;
+	LOCAL_EXTERN int				 	  terminal_cols;
+	LOCAL_EXTERN int					  left_margin;
+	LOCAL_EXTERN int					  top_margin;
 
-	extern gint					  fontWidth;
-	extern gint					  fontHeight;
+	// Font rendering
+// #ifdef USE_PANGO
+	LOCAL_EXTERN PangoFontDescription	* font;
+// #endif
+	LOCAL_EXTERN gint					  fontWidth;
+	LOCAL_EXTERN gint					  fontHeight;
 
-	extern gint					  cCol;
-	extern gint					  cRow;
-	extern gboolean 				  WaitingForChanges;
-	extern char					* charset;
-	extern gchar 					* window_title;
-	extern gboolean				  screen_suspended;
+	LOCAL_EXTERN gint					  cCol;
+	LOCAL_EXTERN gint					  cRow;
+	LOCAL_EXTERN gboolean 				  WaitingForChanges;
+	LOCAL_EXTERN char					* charset;
+	LOCAL_EXTERN gchar 					* window_title;
+	LOCAL_EXTERN gboolean				  screen_suspended;
 
-	extern gchar					* program_data;
-	extern gchar					* program_logo;
-	extern gchar					* program_config_file;
-	extern gchar					* program_config_filename_and_path;
+	// Paths
+	LOCAL_EXTERN gchar					* program_data;
+	LOCAL_EXTERN gchar					* program_logo;
+	LOCAL_EXTERN gchar					* program_config_file;
+	LOCAL_EXTERN gchar					* program_config_filename_and_path;
 
 #ifdef HAVE_PLUGINS
-	extern gchar					*plugin_path;
-	extern gchar					*plugin_list;
+	LOCAL_EXTERN gchar					* plugin_path;
+	LOCAL_EXTERN gchar					* plugin_list;
 #endif
 
 	enum _action_groups
@@ -255,9 +260,6 @@
 	gboolean 	StartPlugins(const gchar *startup_script);
 	gboolean 	StopPlugins(void);
 
-	int 		DrawScreen(GdkColor *clr, GdkDrawable *draw);
-	void 		DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);
-	void 		DrawOIA(GdkDrawable *draw, GdkColor *clr);
 	void 		PrintConsole(const gchar *fmt, ...);
 
 	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
@@ -282,7 +284,6 @@
 #ifdef X3270_FT
 	int 		initft(void);
 	int 		create_ft_progress_dialog(void);
-
 #endif
 
 	gboolean	PFKey(guint key);
@@ -301,7 +302,6 @@
 
 	int 			LoadColors(void);
 	GtkUIManager	*LoadApplicationUI(GtkWidget *widget);
-	void 			DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);
 	void			UpdateKeyboardState(guint state);
 	int				PrintText(const char *name, gchar *text);
 	void 			RestoreWindowSize(const gchar *group, GtkWidget *widget);
@@ -360,10 +360,11 @@
 	LOCAL_EXTERN GModule	* get_plugin_by_name(const gchar *plugin_name);
 	LOCAL_EXTERN gboolean 	  get_symbol_by_name(GModule *module, gpointer *pointer, const gchar *fmt, ...);
 
-	int 	LoadPlugins(void);
-	int		UnloadPlugins(void);
-	void	CallPlugins(const gchar *name, const gchar *arg);
+	LOCAL_EXTERN int 		  LoadPlugins(void);
+	LOCAL_EXTERN int		  UnloadPlugins(void);
+	LOCAL_EXTERN void		  CallPlugins(const gchar *name, const gchar *arg);
 
+	// Screen Rendering
 	enum text_layout
 	{
 		TEXT_LAYOUT_NORMAL,
@@ -371,14 +372,23 @@
 	};
 
 	#define TEXT_LAYOUT_OIA TEXT_LAYOUT_NORMAL
+	LOCAL_EXTERN PangoLayout * getPangoLayout(enum text_layout id);
 
-	PangoLayout * getPangoLayout(enum text_layout id);
+#ifdef USE_PANGO
+	LOCAL_EXTERN int 		DrawScreen(GdkColor *clr, GdkDrawable *draw);
+	LOCAL_EXTERN void 		DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);
+	LOCAL_EXTERN void 		DrawOIA(GdkDrawable *draw, GdkColor *clr);
 
-	#ifdef USE_FONT_CACHE
-		void clear_font_cache(void);
-	#else
-		#define clear_font_cache() /* */
-	#endif
+	#define DrawTerminal(pix,left,top) DrawScreen(color,pix); DrawOIA(pix,color);
+
+#else // USE_PANGO
+	LOCAL_EXTERN void		DrawTerminal(GdkDrawable *pix, int left, int top);
+
+	#define DrawOIA(draw, clr); /* */
+
+
+#endif // USE_PANGO
+
 
 	// Toolbar & Keypad
 	// LOCAL_EXTERN void 		  configure_toolbar(GtkWidget *toolbar, GtkWidget *menu, const gchar *label);
@@ -402,10 +412,5 @@
 	LOCAL_EXTERN int					run_script_command_line(const gchar *script, GPid *pid);
 	LOCAL_EXTERN int 		  			script_interpreter( const gchar *script_type, const gchar *script_name, const gchar *script_text, int argc, gchar **argv, GPid *pid);
 	LOCAL_EXTERN void 		  			run_script_list( const gchar *scripts );
-
-//	LOCAL_EXTERN int		  run_command(const gchar *line, GError **error);
-//	LOCAL_EXTERN int 		  spawn_async_process(const gchar *line, GPid *pid, gchar **tempfile, GError **error);
-
-
 
 #endif // GUI_H_INCLUDED

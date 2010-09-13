@@ -141,8 +141,12 @@
 
 	if(redraw && terminal && pixmap)
 	{
+#ifdef USE_PANGO
 		DrawScreen(color,pixmap);
 		DrawOIA(pixmap,color);
+#else // USE_PANGO
+		#warning Need more work
+#endif // USE_PANGO
 		gtk_widget_queue_draw(terminal);
 	}
 
@@ -202,9 +206,13 @@
 
 	if(redraw && terminal && pixmap)
 	{
+#ifdef USE_PANGO
 		DrawScreen(color,pixmap);
 		DrawOIA(pixmap,color);
 		gtk_widget_queue_draw(terminal);
+#else // USE_PANGO
+		#warning Need more work
+#endif // USE_PANGO
 	}
  }
 
@@ -461,8 +469,12 @@
 			{
 				// Changed, mark to update
 				screen[pos].status = status;
+#ifdef USE_PANGO
 				DrawElement(pixmap,color,gc,x,y,screen+pos);
 				gtk_widget_queue_draw_area(terminal,x,y,fontWidth,fontHeight);
+#else // USE_PANGO
+				#warning Need More work
+#endif // USE_PANGO
 			}
 			pos++;
 			x += fontWidth;
@@ -531,8 +543,12 @@
 			{
 				// Changed, mark to update
 				screen[pos].status = status;
+#ifdef USE_PANGO
 				DrawElement(pixmap,color,gc,x,y,screen+pos);
 				gtk_widget_queue_draw_area(terminal,x,y,fontWidth,fontHeight);
+#else // USE_PANGO
+				#warning work in progress
+#endif
 			}
 			pos++;
 			x += fontWidth;
