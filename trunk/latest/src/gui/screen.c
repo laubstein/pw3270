@@ -236,11 +236,15 @@
 
 	if(!screen_suspended && terminal && pixmap)
  	{
+#ifdef USE_PANGO
 		DrawScreen(color,pixmap);
 		DrawOIA(pixmap,color);
 		RedrawCursor();
 		if(Toggled(CURSOR_POS))
 			DrawCursorPosition();
+#else // USE_PANGO
+	#warning Need work
+#endif // USE_PANGO
 		gtk_widget_queue_draw(terminal);
  	}
 
@@ -365,6 +369,7 @@
 
 	memcpy(el,&in,sizeof(ELEMENT));
 
+#ifdef ENABLE_PANGO
 	if(!screen_suspended && terminal && pixmap)
 	{
 		// Update pixmap, queue screen redraw.
@@ -382,8 +387,9 @@
 
 		if(row == cRow && col == cCol)
 			RedrawCursor();
-
 	}
+#endif // ENABLE_PANGO
+
 
 	return 0;
  }
@@ -408,8 +414,7 @@
 
  void action_Redraw(void)
  {
- 	DrawScreen(color,pixmap);
-	DrawOIA(pixmap,color);
+	DrawTerminal(pixmap,left_margin,top_margin);
 	gtk_widget_queue_draw(terminal);
  }
 
@@ -576,6 +581,8 @@
 	}
 #endif
  }
+
+#ifdef USE_PANGO
 
  void DrawOIA(GdkDrawable *draw, GdkColor *clr)
  {
@@ -744,6 +751,8 @@
 
  }
 
+#endif // USE_PANGO
+
  static void set_oia(OIA_FLAG id, int on)
  {
  	if(id > OIA_FLAG_USER)
@@ -868,6 +877,7 @@
 	}
 
  }
+
 
  CURSOR_MODE cursor_mode = -1;
 

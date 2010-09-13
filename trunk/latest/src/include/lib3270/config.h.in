@@ -45,7 +45,6 @@
 	#undef HAVE_PLUGINS
 	#undef HAVE_LIBGNOME
 	#undef HAVE_REXX
-	#undef HAVE_PRINT_FONT_DIALOG
 
 	#ifndef LIBX3270DIR
 		#define LIBX3270DIR "."
@@ -58,6 +57,15 @@
 	#ifndef PROGRAM_DATA
 		#define PROGRAM_DATA "."
 	#endif
+
+	/* Fonts */
+	#ifndef DEBUG
+		#define ENABLE_PANGO 1
+	#else
+		#define ENABLE_CAIRO 1
+	#endif
+
+	#undef HAVE_PRINT_FONT_DIALOG
 
 	/* Optional parts. */
 	#undef X3270_TRACE

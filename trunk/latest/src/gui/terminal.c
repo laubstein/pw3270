@@ -71,10 +71,9 @@
  static gint					sHeight					= 0;
 
  static PangoFontDescription	*terminal_font_descr	= NULL;
-
  static const gchar 			*layout_name[]			= { "PangoLayout_normal", "PangoLayout_underline" };
 
- static int					szFonts					= MAX_FONT_SIZES;
+ static int						szFonts					= MAX_FONT_SIZES;
  static FONTSIZE				fsize[MAX_FONT_SIZES];
  gint							fontWidth				= 0;
  gint							fontHeight				= 0;
@@ -107,11 +106,17 @@
 
 	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
 
+#ifdef USE_PANGO
 	getCachedGC(pix);
 
 	DrawScreen(color, pix);
 	DrawOIA(pix,color);
 	RedrawCursor();
+
+#else // USE_PANGO
+	DrawTerminal(pix,left_margin,top_margin);
+#endif // USE_PANGO
+
 	return pix;
  }
 
@@ -157,7 +162,6 @@
 
 		}
 	}
-
 	return 0;
  }
 
@@ -324,7 +328,7 @@
     gdk_window_set_cursor(widget->window,wCursor[0]);
 #endif
 
-    // Load imagems
+    // Load images
     LoadImages(widget->window, widget->style->fg_gc[GTK_WIDGET_STATE(widget)]);
 
 	// Set terminal size
@@ -655,6 +659,8 @@
 
  void RedrawCursor(void)
  {
+ #ifdef USE_PANGO
+
 	ELEMENT 	el;
 	GdkGC   	*gc;
 
@@ -695,6 +701,11 @@
 	// Mark to redraw
 	gtk_im_context_set_cursor_location(input_method,&rCursor);
 	InvalidateCursor();
+#else // USE_PANGO
+
+	#warning Need more work
+
+#endif // USE_PANGO
  }
 
  PangoLayout * getPangoLayout(enum text_layout id)
