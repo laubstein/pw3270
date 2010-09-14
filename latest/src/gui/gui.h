@@ -264,7 +264,6 @@
 
 	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 	void 		ParseInput(const gchar *string);
-	void 		MoveCursor(int row, int col);
 	void		LoadImages(GdkDrawable *drawable, GdkGC *gc);
 	void 		InvalidatePixmaps(GdkDrawable *drawable, GdkGC *gc);
 	void 		ReloadPixmaps(void);
@@ -276,6 +275,7 @@
 	void		init_gui_toggles(void);
 	GtkWidget * widget_from_action_name(const gchar *name);
 
+	LOCAL_EXTERN void 	update_cursor_position(int row, int col);
 	LOCAL_EXTERN void 	set_action_sensitive_by_name(const gchar *name,gboolean sensitive);
 	LOCAL_EXTERN void	set_action_group_sensitive_state(int id, gboolean status);
 
