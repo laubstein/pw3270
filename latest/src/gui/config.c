@@ -295,6 +295,16 @@
 	SaveConfigFile();
  }
 
+/**
+ * Get and string from configuration file.
+ *
+ * @param group	Configuration file section
+ * @param key		Keyname
+ * @param def		Default value
+ *
+ * @return String with the value read (release with g_free)
+ *
+ */
  gchar * GetString(const gchar *group, const gchar *key, const gchar *def)
  {
  	gchar *ret = NULL;

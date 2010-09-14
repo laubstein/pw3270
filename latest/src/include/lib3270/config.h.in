@@ -58,13 +58,6 @@
 		#define PROGRAM_DATA "."
 	#endif
 
-	/* Fonts */
-	#ifndef DEBUG
-		#define ENABLE_PANGO 1
-	#else
-		#define ENABLE_CAIRO 1
-	#endif
-
 	#undef HAVE_PRINT_FONT_DIALOG
 
 	/* Optional parts. */

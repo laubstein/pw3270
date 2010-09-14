@@ -33,6 +33,7 @@
 
  #include "gui.h"
  #include "actions.h"
+ #include "fonts.h"
 
  #include <globals.h>
  #include <lib3270/kybdc.h>
@@ -47,6 +48,7 @@
  static void UpdateSelectedRegion(int start, int end);
  static void SelectField(int row, int col);
  static void SetDragType(int type);
+ static void SetSelection(gboolean selected);
 
 /*---[ Constants ]------------------------------------------------------------*/
 
@@ -120,36 +122,12 @@
 
  void action_SelectField(void)
  {
- 	int 		pos;
- 	gboolean	redraw	= FALSE;
-
-	if(!screen)
+ 	if(!valid_terminal_window())
 		return;
 
-	for(pos = 0; pos < (terminal_rows * terminal_cols);pos++)
-	{
-		if(screen[pos].status & ELEMENT_STATUS_SELECTED)
-		{
-			redraw = TRUE;
-			screen[pos].status &= ~ELEMENT_STATUS_SELECTED;
-		}
-	}
-
+	SetSelection(FALSE);
 	SelectField(cRow,cCol);
-
 	SetSelectionMode(SELECT_MODE_FIELD);
-
-	if(redraw && terminal && pixmap)
-	{
-#ifdef USE_PANGO
-		DrawScreen(color,pixmap);
-		DrawOIA(pixmap,color);
-#else // USE_PANGO
-		#warning Need more work
-#endif // USE_PANGO
-		gtk_widget_queue_draw(terminal);
-	}
-
  }
 
  static void SelectField(int row, int col)
@@ -183,12 +161,12 @@
  static void SetSelection(gboolean selected)
  {
  	int 			pos;
- 	gboolean		redraw	= FALSE;
+ 	int				start = -1;
+ 	int				end   = -1;
 	unsigned char	status;
 
 	if(!screen)
 		return;
-
 
 	for(pos = 0; pos < (terminal_rows * terminal_cols);pos++)
 	{
@@ -199,28 +177,24 @@
 
 		if(screen[pos].status != status)
 		{
-			redraw = TRUE;
+			if(start < 0)
+				start = pos;
+			end = pos;
 			screen[pos].status = status;
 		}
 	}
 
-	if(redraw && terminal && pixmap)
-	{
-#ifdef USE_PANGO
-		DrawScreen(color,pixmap);
-		DrawOIA(pixmap,color);
-		gtk_widget_queue_draw(terminal);
-#else // USE_PANGO
-		#warning Need more work
-#endif // USE_PANGO
-	}
+	if(valid_terminal_window() && start > 0)
+		update_region(start,end);
  }
 
- #define DecodePosition(event,row,col) _DecodePosition(event->x,event->y,&row,&col)
-
- static int _DecodePosition(long x, long y, int *row, int *col)
+ static int DecodePosition(long x, long y, int *row, int *col)
  {
+ 	#warning Need rebuild
+
  	int rc = 0;
+
+/*
 
  	if(x < left_margin)
  	{
@@ -251,7 +225,7 @@
 	{
 		*row = ((((unsigned long) y) - top_margin)/fontHeight);
 	}
-
+*/
 	return rc;
  }
 
@@ -277,14 +251,14 @@
 
 			action_ClearSelection();
 
-			if(!DecodePosition(event,startRow,startCol))
+			if(!DecodePosition(event->x,event->y,&startRow,&startCol))
 				button_flags |= BUTTON_FLAG_COMBO;
 
 			break;
 
 		case DRAG_TYPE_INSIDE:
 			SetSelectionMode(SELECT_MODE_DRAG);
-			DecodePosition(event,dragRow,dragCol);
+			DecodePosition(event->x,event->y,&dragRow,&dragCol);
 			dragRow -= startRow;
 			dragCol -= startCol;
 			Trace("Selection mode Drag: %d (Position: %d,%d)",SELECT_MODE_DRAG,dragRow,dragCol);
@@ -298,7 +272,7 @@
 		break;
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1 | BUTTON_FLAG_COMBO:
-		DecodePosition(event,startRow,startCol);
+		DecodePosition(event->x,event->y,&startRow,&startCol);
 		SetSelectionMode(SELECT_MODE_FIELD);
 		Trace("Button 1 double-clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
 		break;
@@ -340,7 +314,7 @@
  {
 	int row,col;
 
-	DecodePosition(event,row,col);
+	DecodePosition(event->x,event->y,&row,&col);
 
 	Trace("Button %d release Action: %d",event->button, (int) ( ((select_mode & 0x0F) << 4) | (event->button & 0x0F)));
 
@@ -399,24 +373,15 @@
 
  static void UpdateSelectedRectangle(void)
  {
- 	int				x,y,row,col;
-	GdkGC			*gc		= NULL;
-	PangoLayout 	*layout	= NULL;
- 	int				pos		= 0;
- 	int				left;
- 	int				right;
- 	int				top;
- 	int				bottom;
+ 	int		  row,col;
+ 	int		  pos		= 0;
+ 	int		  left;
+ 	int		  right;
+ 	int		  top;
+ 	int		  bottom;
 
-	if(!(select_mode && screen && terminal))
+	if(!(select_mode && screen && valid_terminal_window()))
 		return;
-
-	// Clear selection box, invalidate drawing area.
-	if(pixmap)
-		gc = gdk_gc_new(pixmap);
-
-	if(terminal)
-		layout = gtk_widget_create_pango_layout(terminal," ");
 
 	if(startRow > endRow)
 	{
@@ -440,10 +405,11 @@
 		right = endCol;
 	}
 
-	y = top_margin;
 	for(row = 0; row < terminal_rows;row++)
 	{
-		x = left_margin;
+		int start	= -1;
+		int end		= -1;
+
 		for(col = 0; col < terminal_cols;col++)
 		{
 			unsigned char status = screen[pos].status & ELEMENT_STATUS_FIELD_MASK;
@@ -463,31 +429,22 @@
 
 				if(row == bottom)
 					status |= SELECTION_BOX_BOTTOM;
+
 			}
 
 			if(screen[pos].status != status)
 			{
-				// Changed, mark to update
 				screen[pos].status = status;
-#ifdef USE_PANGO
-				DrawElement(pixmap,color,gc,x,y,screen+pos);
-				gtk_widget_queue_draw_area(terminal,x,y,fontWidth,fontHeight);
-#else // USE_PANGO
-				#warning Need More work
-#endif // USE_PANGO
+				if(start < 0)
+					start = pos;
+				end = pos;
 			}
+
 			pos++;
-			x += fontWidth;
 		}
-		y += fontHeight;
+		if(start > 0)
+			update_region(start,end);
 	}
-
-	if(layout)
-		g_object_unref(layout);
-
-	if(gc)
-		gdk_gc_destroy(gc);
-
  }
 
  static void UpdateSelectedText(void)
@@ -495,34 +452,31 @@
  	UpdateSelectedRegion((startRow * terminal_cols)+startCol,(endRow * terminal_cols)+endCol);
  }
 
- static void UpdateSelectedRegion(int start, int end)
+ static void UpdateSelectedRegion(int bstart, int bend)
  {
  	int			pos		= 0;
- 	int			x,y,row,col;
-	GdkGC		*gc		= NULL;
+ 	int			row,col;
 
-	if(!(screen && terminal))
+	if(valid_terminal_window())
 		return;
 
- 	if(start > end)
+ 	if(bstart > bend)
  	{
-		int temp = start;
-		start = end;
-		end = temp;
+		int temp = bstart;
+		bstart = bend;
+		bend = temp;
  	}
 
-	if(pixmap)
-		gc = gdk_gc_new(pixmap);
-
-	y = top_margin;
 	for(row = 0; row < terminal_rows;row++)
 	{
-		x = left_margin;
+		int start	= -1;
+		int end		= -1;
+
 		for(col = 0; col < terminal_cols;col++)
 		{
 			unsigned char status = screen[pos].status & ELEMENT_STATUS_FIELD_MASK;
 
-			if (pos >= start && pos <= end)
+			if (pos >= bstart && pos <= bend)
 			{
 				status |= ELEMENT_STATUS_SELECTED;
 
@@ -541,23 +495,19 @@
 
 			if(screen[pos].status != status)
 			{
-				// Changed, mark to update
 				screen[pos].status = status;
-#ifdef USE_PANGO
-				DrawElement(pixmap,color,gc,x,y,screen+pos);
-				gtk_widget_queue_draw_area(terminal,x,y,fontWidth,fontHeight);
-#else // USE_PANGO
-				#warning work in progress
-#endif
+				if(start < 0)
+					start = pos;
+				end = pos;
 			}
-			pos++;
-			x += fontWidth;
-		}
-		y += fontHeight;
-	}
 
-	if(gc)
-		gdk_gc_destroy(gc);
+			pos++;
+		}
+
+		if(start > 0)
+			update_region(start,end);
+
+	}
 
  }
 
@@ -619,12 +569,12 @@
 			return mouse_motion(widget,event,user_data); // Recursive call to update selection box
 
 		case SELECT_MODE_RECTANGLE:
-			DecodePosition(event,endRow,endCol);
+			DecodePosition(event->x,event->y,&endRow,&endCol);
 			UpdateSelectedRectangle();
 			break;
 
 		case SELECT_MODE_TEXT:
-			DecodePosition(event,endRow,endCol);
+			DecodePosition(event->x,event->y,&endRow,&endCol);
 			UpdateSelectedText();
 			break;
 
@@ -634,7 +584,7 @@
 	{
 		int row, col;
 
-		if(DecodePosition(event,row,col))
+		if(DecodePosition(event->x,event->y,&row,&col))
 		{
 			SetDragType(DRAG_TYPE_NONE);
 		}
@@ -695,7 +645,7 @@
 	}
 	else if(select_mode == SELECT_MODE_DRAG)
 	{
-		DecodePosition(event,row,col);
+		DecodePosition(event->x,event->y,&row,&col);
 
 //		Trace("Drag_type: %d Position: %d,%d",drag_type,row,col);
 

@@ -31,8 +31,11 @@
  */
 
 
-#include "gui.h"
 #include <lib3270/config.h>
+
+#include "gui.h"
+#include "fonts.h"
+
 #include <malloc.h>
 #include <string.h>
 #include <errno.h>
@@ -43,7 +46,9 @@
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
-/*---[ Statics ]-------------------------------------------------------------------------------------------*/
+/*---[ Globals ]-------------------------------------------------------------------------------------------*/
+
+ GdkColor color[TERMINAL_COLOR_COUNT+1];
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
@@ -289,13 +294,55 @@
 
 #else // ENABLE_PANGO
 
- static void draw_region(cairo_t *cr, int left, int top, int bstart, int bend)
+ void update_region(int bstart, int bend)
  {
+ 	cairo_t *cr;
 
-	int addr;
+	cr = get_terminal_cairo_context();
+	draw_region(cr,bstart,bend,color);
+	cairo_destroy(cr);
 
-	for(addr = bstart; addr < bend; addr++)
+	#warning NEED MORE WORK - Queue only changed area
+	gtk_widget_queue_draw(terminal);
+
+
+ }
+
+ void draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr)
+ {
+ 	int addr;
+ 	int col	= (bstart % terminal_cols);
+ 	int x	= left_margin + (col * fontWidth);
+ 	int y	= top_margin  + ((bstart / terminal_cols) * fontHeight);
+ 	int baseline = y + fontAscent;	/**< Baseline for font drawing; it's not the same as font Height */
+
+//	Trace("%s row=%d col=%d x=%d y=%d left=%d top=%d start=%d end=%d",__FUNCTION__,row,col,x,y,left_margin,top_margin,bstart,bend);
+
+	for(addr = bstart; addr <= bend; addr++)
 	{
+		if(clr)
+		{
+			short	fg;
+			short 	bg;
+
+			if(screen[addr].status & ELEMENT_STATUS_SELECTED)
+			{
+				fg = TERMINAL_COLOR_SELECTED_FG;
+				bg = TERMINAL_COLOR_SELECTED_BG;
+			}
+			else
+			{
+				fg = (screen[addr].fg & 0xFF);
+				bg = (screen[addr].bg & 0xFF);
+			}
+
+			gdk_cairo_set_source_color(cr,clr+bg);
+			cairo_rectangle(cr, x, y, fontWidth, fontHeight);
+			cairo_fill(cr);
+
+			gdk_cairo_set_source_color(cr,clr+fg);
+		}
+
 		if(screen[addr].cg)
 		{
 			// Graphics char
@@ -303,41 +350,76 @@
 		else if(*screen[addr].ch != ' ' && *screen[addr].ch)
 		{
 			// Text char
-			cairo_move_to(cr, left, top);
-			cairo_show_text(cr, screen[addr].ch);
+			cairo_move_to(cr,x,baseline);
+			cairo_show_text(cr,screen[addr].ch);
+		}
+
+		if(TOGGLED_UNDERLINE && (screen[addr].fg & COLOR_ATTR_UNDERLINE))
+		{
+			// Draw underline
+			// FIXME (perry#1#): Use cairo_move_to && cairo_line_to
+			int line = baseline + (fontDescent/2);
+			cairo_rectangle(cr, x, line, fontWidth, 1);
+			cairo_fill(cr);
+		}
+
+		if(++col >= terminal_cols)
+		{
+			col  = 0;
+			x    = left_margin;
+			y   += fontHeight;
+			baseline += fontHeight;
+		}
+		else
+		{
+			x += fontWidth;
 		}
 	}
-
  }
 
 /**
- * Draw entire terminal in a drawable
- *
- * @param pix	Target image
- * @param left	Left margin
- * @param top	Top margin
+ * Draw entire terminal contents
  *
  */
- LOCAL_EXTERN void DrawTerminal(GdkDrawable *pix, int left, int top)
+ void update_terminal_contents(void)
  {
  	int 	width;
  	int 	height;
-	cairo_t *cr	= gdk_cairo_create(pix);
+ 	cairo_t *cr	= get_terminal_cairo_context();
 
-	gdk_drawable_get_size(pix,&width,&height);
+	gdk_drawable_get_size(get_terminal_pixmap(),&width,&height);
 
-	cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
+	gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_BACKGROUND);
 	cairo_rectangle(cr, 0, 0, width, height);
 	cairo_fill(cr);
 
-	cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
-
-	draw_region(cr,left,top,0,terminal_cols * terminal_rows);
+	draw_region(cr,0,(terminal_cols * terminal_rows)-1,color);
 
 	cairo_destroy(cr);
 
  }
 
-#endif // USE_PANGO
+/**
+ * Redraw terminal widget.
+ *
+ * Update all font information & sizes and refresh entire terminal window.
+ *
+ */
+ void action_Redraw(void)
+ {
+	if(valid_terminal_window())
+	{
+		gint width;
+		gint height;
+
+		update_font_info(terminal);
+		gdk_drawable_get_size(terminal->window,&width,&height);
+		update_screen_size(terminal, width, height);
+		update_terminal_contents();
+	}
+	gtk_widget_queue_draw(terminal);
+ }
+
+#endif // ENABLE_PANGO
 
 

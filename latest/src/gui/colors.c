@@ -286,7 +286,7 @@
 	else
 	{
 		ReloadPixmaps();
-		action_Redraw();
+		update_terminal_contents();
 	}
 
  }
@@ -346,7 +346,7 @@
 		ParseColorList(ptr);
 		g_free(ptr);
 		ReloadPixmaps();
-		action_Redraw();
+		update_terminal_contents();
 	}
  }
 
@@ -567,7 +567,8 @@
 
 	gtk_widget_destroy(dialog);
 	ReloadPixmaps();
-	action_Redraw();
+	update_terminal_contents();
+
 
  }
 

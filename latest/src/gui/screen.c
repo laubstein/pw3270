@@ -32,6 +32,7 @@
 
 
 #include "gui.h"
+#include "fonts.h"
 #include "actions.h"
 
 #include <lib3270/config.h>
@@ -171,25 +172,27 @@
  } pix[IMAGE_COUNT];
 
 
- int 								terminal_rows	= 0;
- int 								terminal_cols	= 0;
- int								left_margin		= 0;
- int								top_margin		= 0;
+ int 								  terminal_rows	= 0;
+ int 								  terminal_cols	= 0;
+ int								  left_margin	= 0;
+ int								  top_margin	= 0;
 
- ELEMENT							*screen			= NULL;
- char								*charset		= NULL;
- char								*window_title	= PROGRAM_NAME;
- int								screen_suspended = 0;
+ ELEMENT							* screen		= NULL;
+ char								* charset		= NULL;
+ char								* window_title	= PROGRAM_NAME;
 
- static int							szScreen		= 0;
- static const struct status_code	*sts_data		= NULL;
- static unsigned char				compose			= 0;
- static gchar						*luname			= 0;
- static const gchar					*status_msg		= NULL;
- static guint						kbrd_state		= 0;
- static char 						timer[9]		= "";
+ gboolean							  screen_suspended = FALSE;
 
- static gchar 						*(*convert_charset)(int c, gsize *sz) = convert_regular;
+ static int						  szScreen		= 0;
+ static const struct status_code	* sts_data		= NULL;
+ static unsigned char			  compose		= 0;
+ static gchar						* luname		= 0;
+ static const gchar				* status_msg	= NULL;
+ static guint						  kbrd_state	= 0;
+ static char 						  timer[9]		= "";
+
+ static gchar 						* (*convert_charset)(int c, gsize *sz) = convert_regular;
+
  static gboolean					oia_flag[OIA_FLAG_USER];
  static SCRIPT_STATE 				script_state = SCRIPT_STATE_NONE;
 
@@ -197,7 +200,6 @@
 
  static void changed(int bstart, int bend)
  {
- //	Trace("%s(%d,%d)",__FUNCTION__,bstart,bend);
  }
 
  static void set_compose(int on, unsigned char c, int keytype)
@@ -208,43 +210,37 @@
 		compose = 0;
  }
 
- GdkGC * getCachedGC(GdkDrawable *draw)
- {
- 	GdkGC *gc;
-
-#ifdef DEBUG
-	if(!draw)
-	{
-		Trace("Error: Called %s with null object",__FUNCTION__);
-	}
-#endif
-
- 	gc = ((GdkGC *) g_object_get_data(G_OBJECT(draw),"CachedGC"));
- 	if(gc)
-		return gc;
-
-	gc = gdk_gc_new(draw);
-	g_object_set_data_full(G_OBJECT(draw),"CachedGC",gc,g_object_unref);
-	return gc;
- }
-
  static int SetSuspended(int state)
  {
  	int rc = screen_suspended;
- 	screen_suspended = state;
-	Trace("%s state: %d",__FUNCTION__,state);
 
-	if(!screen_suspended && terminal && pixmap)
+ 	Trace("%s(%d): suspended: %d",__FUNCTION__,state,screen_suspended);
+
+ 	if(screen_suspended == state)
+		return rc;
+
+ 	screen_suspended = state;
+
+	if(screen_suspended)
+	{
+		Trace("%s screen updates disabled",__FUNCTION__);
+
+//		if(terminal && terminal->window)
+//			gdk_window_freeze_updates(terminal->window);
+	}
+	else
  	{
-#ifdef USE_PANGO
-		DrawScreen(color,pixmap);
-		DrawOIA(pixmap,color);
-		RedrawCursor();
-		if(Toggled(CURSOR_POS))
-			DrawCursorPosition();
-#else // USE_PANGO
-	#warning Need work
-#endif // USE_PANGO
+		Trace("%s screen updates enabled",__FUNCTION__);
+
+// 		if(terminal && terminal->window)
+//			gdk_window_thaw_updates(terminal->window);
+
+ 		if(valid_terminal_window())
+ 		{
+			update_terminal_contents();
+			if(Toggled(CURSOR_POS))
+				DrawCursorPosition();
+ 		}
 		gtk_widget_queue_draw(terminal);
  	}
 
@@ -314,12 +310,12 @@
  {
  	ELEMENT in;
  	ELEMENT *el;
- 	int		pos = (row*terminal_cols)+col;
+ 	int		baddr = (row*terminal_cols)+col;
 
  	if(!screen || col >= terminal_cols || row >= terminal_rows)
 		return EINVAL;
 
-	if(pos > szScreen)
+	if(baddr > szScreen)
 		return EFAULT;
 
 	memset(&in,0,sizeof(in));
@@ -355,7 +351,7 @@
 		in.fg |= COLOR_ATTR_UNDERLINE;
 
 	// Get element entry in the buffer, update ONLY if changed
- 	el = screen + pos;
+ 	el = screen + baddr;
 
 	in.status = el->status;
 
@@ -369,27 +365,13 @@
 
 	memcpy(el,&in,sizeof(ELEMENT));
 
-#ifdef ENABLE_PANGO
-	if(!screen_suspended && terminal && pixmap)
+	if(!screen_suspended && valid_terminal_window())
 	{
-		// Update pixmap, queue screen redraw.
-		gint 		x, y;
-	 	GdkGC		*gc		= gdk_gc_new(pixmap);
-
-		x = left_margin + (col * fontWidth);
-		y = top_margin + (row * fontHeight);
-
-		DrawElement(pixmap,color,gc,x,y,el);
-
-		gdk_gc_destroy(gc);
-
-		gtk_widget_queue_draw_area(terminal,x,y,fontWidth,fontHeight);
-
-		if(row == cRow && col == cCol)
-			RedrawCursor();
+		cairo_t *cr	= get_terminal_cairo_context();
+		draw_region(cr,baddr,baddr,color);
+		cairo_destroy(cr);
+		gtk_widget_queue_draw_area(terminal,left_margin + (col * fontWidth),top_margin + (row * fontHeight),fontWidth,fontHeight);
 	}
-#endif // ENABLE_PANGO
-
 
 	return 0;
  }
@@ -405,17 +387,14 @@
 		screen = g_new0(ELEMENT,szScreen);
 		terminal_rows = rows;
 		terminal_cols = cols;
-	}
 
+		if(terminal && terminal->window)
+			action_Redraw();
+
+	}
 
  	Trace("Terminal set to %d rows with %d cols, screen set to %p",rows,cols,screen);
 
- }
-
- void action_Redraw(void)
- {
-	DrawTerminal(pixmap,left_margin,top_margin);
-	gtk_widget_queue_draw(terminal);
  }
 
  /**
@@ -424,12 +403,9 @@
   */
  static void erase(void)
  {
-	GdkGC		*gc;
-	int			width;
-	int			height;
-	int			f;
+ 	int f;
 
-	Trace("Erasing screen! (pixmap: %p screen: %p terminal: %p)",pixmap,screen,terminal);
+	Trace("Erasing screen! (pixmap: %p screen: %p terminal: %p)",get_terminal_pixmap(),screen,terminal);
 
 	if(screen)
 	{
@@ -444,21 +420,29 @@
 		}
 	}
 
-	if(pixmap && terminal)
+	if(valid_terminal_window())
 	{
-		gc = getCachedGC(pixmap);
-		gdk_drawable_get_size(pixmap,&width,&height);
-		gdk_gc_set_foreground(gc,color);
-		gdk_draw_rectangle(pixmap,gc,1,0,0,width,height);
-		DrawOIA(pixmap,color);
+		int 	width;
+		int 	height;
+		cairo_t *cr	= get_terminal_cairo_context();
+
+		gdk_drawable_get_size(get_terminal_pixmap(),&width,&height);
+
+		gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_BACKGROUND);
+		cairo_rectangle(cr, 0, 0, width, height);
+		cairo_fill(cr);
+
+		cairo_destroy(cr);
 		gtk_widget_queue_draw(terminal);
 	}
+
  }
 
  static GPid on_lu_pid = 0;
 
  static void set_lu(const char *lu)
  {
+/*
  	if(luname)
  	{
 		g_free(luname);
@@ -531,11 +515,12 @@
 
 	if(terminal)
 		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
-
+*/
  }
 
  static void DrawStatus(GdkDrawable *draw, GdkColor *clr)
  {
+#ifdef ENABLE_PANGO
  	PangoLayout *layout = getPangoLayout(TEXT_LAYOUT_OIA);
 	GdkGC 		*gc = getCachedGC(draw);
 
@@ -580,6 +565,13 @@
 		gdk_draw_layout_with_colors(draw,gc,col,OIAROW+1,layout,clr+TERMINAL_COLOR_OIA,clr+TERMINAL_COLOR_OIA_BACKGROUND);
 	}
 #endif
+
+
+#else // ENABLE_PANGO
+
+
+#endif // ENABLE_PANGO
+
  }
 
 #ifdef USE_PANGO
@@ -755,6 +747,8 @@
 
  static void set_oia(OIA_FLAG id, int on)
  {
+ 	#warning Work in progress
+/*
  	if(id > OIA_FLAG_USER)
 		return;
 
@@ -764,6 +758,7 @@
 
 	if(terminal)
 		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
+*/
  }
 
  static void set_charset(char *dcs)
@@ -868,12 +863,16 @@
 		if(id == STATUS_CODE_BLANK)
 			set_cursor(CURSOR_MODE_NORMAL);
 
+		#warning Apresentar string com o status na tela
+/*
 		if(pixmap)
 			DrawStatus(pixmap, color);
+
 
 		if(terminal)
 			gtk_widget_queue_draw_area(terminal,left_margin+(fontWidth << 3),OIAROW,fontWidth << 4,fontHeight+1);
 
+*/
 	}
 
  }
@@ -897,8 +896,11 @@
 
  static int Loaded = 0;
 
+
  void LoadImages(GdkDrawable *drawable, GdkGC *gc)
  {
+ 	#warning Work in progress
+/*
  	int			f;
  	GdkPixmap	*temp;
 
@@ -943,7 +945,7 @@
 			pix[f].pix = 0;
 		}
  	}
-
+*/
  }
 
  void ReloadPixmaps(void)
@@ -1217,6 +1219,8 @@
 
  static void show_timer(long seconds)
  {
+ 	#warning Work in progress
+/*
  	if(seconds > 0)
  	{
 		Trace("Timer: %d seconds",(int) seconds);
@@ -1230,6 +1234,7 @@
  	}
 
 	gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
+*/
 
  }
 
@@ -1241,6 +1246,9 @@
 
  static void SetScript(SCRIPT_STATE state)
  {
+ 	#warning Work in progress
+
+/*
 	if(script_state == SCRIPT_STATE_NONE)
 	{
 		// No script. Start timer
@@ -1254,6 +1262,7 @@
 	DrawOIA(pixmap,color);
 	if(terminal)
 		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
+*/
 
  }
 

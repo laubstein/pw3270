@@ -31,6 +31,7 @@
  */
 
  #include "gui.h"
+ #include "fonts.h"
  #include "actions.h"
  #include "uiparser.h"
 
@@ -120,8 +121,7 @@
 		SetString("Terminal","Font",vlr);
 
 		g_free(vlr);
-
-		FontChanged();
+		action_Redraw();
 	}
  }
 
@@ -369,8 +369,6 @@
 
 		g_object_unref(manager);
 	}
-
-	FontChanged();
 
 	gtk_box_pack_start(GTK_BOX(vbox), terminal, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), vbox,TRUE,TRUE,0);
