@@ -375,21 +375,28 @@ void screen_disp(void)
 	fa = get_field_attribute(0);
 	a = color_from_fa(fa);
 	fa_addr = find_field_attribute(0); /* may be -1, that's okay */
-	for (row = 0; row < ROWS; row++) {
+	for (row = 0; row < ROWS; row++)
+	{
 		int baddr;
 
-		for (col = 0; col < cCOLS; col++) {
+		for (col = 0; col < cCOLS; col++)
+		{
 			baddr = row*cCOLS+col;
-			if (ea_buf[baddr].fa) {
-			    	/* Field attribute. */
+			if (ea_buf[baddr].fa)
+			{
+			    /* Field attribute. */
 				fa_addr = baddr;
 				fa = ea_buf[baddr].fa;
 				a = calc_attrs(baddr, baddr, fa);
 				addch(row,col,' ',(attr = defattr)|CHAR_ATTR_MARKER);
-			} else if (FA_IS_ZERO(fa)) {
-			    	/* Blank. */
+			}
+			else if (FA_IS_ZERO(fa))
+			{
+			   	/* Blank. */
 				addch(row,col,' ',attr=a);
-			} else {
+			}
+			else
+			{
 			    	/* Normal text. */
 				if (!(ea_buf[baddr].gr ||
 				      ea_buf[baddr].fg ||
@@ -404,44 +411,22 @@ void screen_disp(void)
 					 */
 					attr = b = calc_attrs(baddr, fa_addr, fa);
 				}
-#if defined(X3270_DBCS) /*[*/
 
-				#warning Is it working?
-
-				d = ctlr_dbcs_state(baddr);
-				if (IS_LEFT(d)) {
-					int xaddr = baddr;
-					char mb[16];
-					int len;
-					int i;
-
-					INC_BA(xaddr);
-					len = dbcs_to_mb(ea_buf[baddr].cc,
-					    ea_buf[xaddr].cc,
-					    mb);
-					for (i = 0; i < len; i++) {
-						addch(mb[i] & 0xff);
-					}
-				} else if (!IS_RIGHT(d)) {
-#endif /*]*/
-					if (ea_buf[baddr].cs == CS_LINEDRAW)
-					{
-						addch(row,col,ea_buf[baddr].cc,attr);
-					}
-					else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
-					{
-						addch(row,col,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
-					}
-					else
-					{
-						if (toggled(MONOCASE))
-							addch(row,col,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
-						else
-							addch(row,col,ebc2asc[ea_buf[baddr].cc],attr);
-					}
-#if defined(X3270_DBCS) /*[*/
+				if (ea_buf[baddr].cs == CS_LINEDRAW)
+				{
+					addch(row,col,ea_buf[baddr].cc,attr);
 				}
-#endif /*]*/
+				else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
+				{
+					addch(row,col,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
+				}
+				else
+				{
+					if (toggled(MONOCASE))
+						addch(row,col,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
+					else
+						addch(row,col,ebc2asc[ea_buf[baddr].cc],attr);
+				}
 			}
 		}
 	}

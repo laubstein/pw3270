@@ -136,7 +136,7 @@
 	set_oia,			// void (*set)(OIA_FLAG id, int on);
 
 	erase,				// void (*erase)(void);
-	display,			// void	(*display)(void);
+	display,			// void	(*display)(int bstart, int bend);
 	update_toggle,		// void (*toggle_changed)(int ix, int value, int reason, const char *name);
 	show_timer,			// void	(*show_timer)(long seconds);
 
@@ -221,19 +221,9 @@
 
  	screen_suspended = state;
 
-	if(screen_suspended)
-	{
-		Trace("%s screen updates disabled",__FUNCTION__);
-
-//		if(terminal && terminal->window)
-//			gdk_window_freeze_updates(terminal->window);
-	}
-	else
+	if(!screen_suspended)
  	{
 		Trace("%s screen updates enabled",__FUNCTION__);
-
-// 		if(terminal && terminal->window)
-//			gdk_window_thaw_updates(terminal->window);
 
  		if(valid_terminal_window())
  		{
@@ -360,18 +350,11 @@
 	else
 		in.status &= ~ELEMENT_STATUS_FIELD_MARKER;
 
-	if(!memcmp(&in,el,sizeof(ELEMENT)))
+	if(el->changed || !memcmp(&in,el,sizeof(ELEMENT)))
 		return 0;
 
 	memcpy(el,&in,sizeof(ELEMENT));
-
-	if(!screen_suspended && valid_terminal_window())
-	{
-		cairo_t *cr	= get_terminal_cairo_context();
-		draw_region(cr,baddr,baddr,color);
-		cairo_destroy(cr);
-		gtk_widget_queue_draw_area(terminal,left_margin + (col * fontWidth),top_margin + (row * fontHeight),fontWidth,fontHeight);
-	}
+	el->changed = TRUE;
 
 	return 0;
  }
@@ -405,7 +388,7 @@
  {
  	int f;
 
-	Trace("Erasing screen! (pixmap: %p screen: %p terminal: %p)",get_terminal_pixmap(),screen,terminal);
+	Trace("Erasing screen! (pixmap: %p screen: %p terminal: %p valid: %s)",get_terminal_pixmap(),screen,terminal, valid_terminal_window() ? "Yes" : "No");
 
 	if(screen)
 	{
@@ -1268,6 +1251,56 @@
 
  static void display(void)
  {
- 	if(terminal && terminal->window)
+	if(valid_terminal_window())
+	{
+		int		baddr   =  0;
+		int		row;
+		int		col;
+		cairo_t *cr		= get_terminal_cairo_context();
+
+		Trace("%s begins",__FUNCTION__);
+
+		for(row = 0; row < terminal_rows; row++)
+		{
+			int		cstart	= -1;
+			int 	bstart	= -1;
+			int 	bend	= -1;
+			int 	y 		= top_margin+(row * fontHeight);
+
+			for(col = 0;col < terminal_cols;col++)
+			{
+				if(screen[baddr].changed)
+				{
+					if(bstart < 0)
+					{
+						bstart = baddr;
+						cstart = col;
+					}
+					bend = baddr+1;
+					screen[baddr].changed = FALSE;
+				}
+				else if(bstart >= 0)
+				{
+					draw_region(cr,bstart,bend,color);
+					top_margin +(row*terminal_cols);
+					gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,(bend-bstart)*fontWidth,fontHeight);
+					bstart = bend = -1;
+				}
+				baddr++;
+			}
+
+			if(bstart >= 0)
+			{
+				draw_region(cr,bstart,bend,color);
+				gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,(bend-bstart)*fontWidth,fontHeight);
+			}
+		}
+
+		cairo_destroy(cr);
+
 		gdk_window_process_updates(terminal->window,FALSE);
+
+		Trace("%s ends",__FUNCTION__);
+	}
+
  }

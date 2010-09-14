@@ -316,6 +316,8 @@
  	int y	= top_margin  + ((bstart / terminal_cols) * fontHeight);
  	int baseline = y + fontAscent;	/**< Baseline for font drawing; it's not the same as font Height */
 
+	Trace("%s(%d,%d)",__FUNCTION__,bstart,bend);
+
 //	Trace("%s row=%d col=%d x=%d y=%d left=%d top=%d start=%d end=%d",__FUNCTION__,row,col,x,y,left_margin,top_margin,bstart,bend);
 
 	for(addr = bstart; addr <= bend; addr++)
@@ -357,10 +359,11 @@
 		if(TOGGLED_UNDERLINE && (screen[addr].fg & COLOR_ATTR_UNDERLINE))
 		{
 			// Draw underline
-			// FIXME (perry#1#): Use cairo_move_to && cairo_line_to
 			int line = baseline + (fontDescent/2);
-			cairo_rectangle(cr, x, line, fontWidth, 1);
-			cairo_fill(cr);
+
+			cairo_move_to(cr,x,line);
+			cairo_rel_line_to(cr, fontWidth, 0);
+			cairo_stroke (cr);
 		}
 
 		if(++col >= terminal_cols)
@@ -422,4 +425,21 @@
 
 #endif // ENABLE_PANGO
 
+ cairo_t * get_terminal_cairo_context(void)
+ {
+	double ux=1, uy=1;
 
+ 	cairo_t *cr = gdk_cairo_create(pixmap_terminal);
+
+	cairo_set_font_face(cr,fontFace);
+	cairo_set_font_size(cr,fontSize);
+
+	cairo_device_to_user_distance (cr, &ux, &uy);
+
+	if (ux < uy)
+		ux = uy;
+
+	cairo_set_line_width(cr, ux);
+
+	return cr;
+ }
