@@ -111,34 +111,34 @@
  {
 	sizeof(struct lib3270_screen_callbacks),
 
-	init,				// int (*init)(void);
+	init,					// int (*init)(void);
 
-	popup_dialog,		// int	(*popup_dialog)(H3270 *session, int type, const char *title, const char *msg, const char *fmt, va_list arg);
-	error,				// void (*Error)(const char *fmt, va_list arg);
-	warning,			// void (*Warning)(const char *fmt, va_list arg);
-	syserror,			// void	(*SysError)(const char *title, const char *message, const char *system);
+	popup_dialog,			// int	(*popup_dialog)(H3270 *session, int type, const char *title, const char *msg, const char *fmt, va_list arg);
+	error,					// void (*Error)(const char *fmt, va_list arg);
+	warning,				// void (*Warning)(const char *fmt, va_list arg);
+	syserror,				// void	(*SysError)(const char *title, const char *message, const char *system);
 
-	setsize,			// void (*setsize)(int rows, int cols);
-	addch,				// void (*addch)(int row, int col, int c, int attr);
-	set_charset,		// void (*charset)(char *dcs);
-	settitle,			// void (*title)(char *text);
-	changed,			// void (*changed)(int bstart, int bend);
-	gdk_beep,			// void (*ring_bell)(void);
-	action_Redraw,		// void (*redraw)(void);
-	MoveCursor,			// void (*move_cursor)(int row, int col);
-	SetSuspended,		// int	(*set_suspended)(int state);
-	SetScript,			// void	(*set_script)(SCRIPT_STATE state);
-	NULL,				// void (*reset)(int lock);
-	SetStatusCode,		// void (*status)(STATUS_CODE id);
-	set_compose,		// void (*compose)(int on, unsigned char c, int keytype);
-	set_cursor,			// void (*cursor)(CURSOR_MODE mode);
-	set_lu,				// void (*lu)(const char *lu);
-	set_oia,			// void (*set)(OIA_FLAG id, int on);
+	setsize,				// void (*setsize)(int rows, int cols);
+	addch,					// void (*addch)(int row, int col, int c, int attr);
+	set_charset,			// void (*charset)(char *dcs);
+	settitle,				// void (*title)(char *text);
+	changed,				// void (*changed)(int bstart, int bend);
+	gdk_beep,				// void (*ring_bell)(void);
+	action_Redraw,			// void (*redraw)(void);
+	update_cursor_position,	// void (*move_cursor)(int row, int col);
+	SetSuspended,			// int	(*set_suspended)(int state);
+	SetScript,				// void	(*set_script)(SCRIPT_STATE state);
+	NULL,					// void (*reset)(int lock);
+	SetStatusCode,			// void (*status)(STATUS_CODE id);
+	set_compose,			// void (*compose)(int on, unsigned char c, int keytype);
+	set_cursor,				// void (*cursor)(CURSOR_MODE mode);
+	set_lu,					// void (*lu)(const char *lu);
+	set_oia,				// void (*set)(OIA_FLAG id, int on);
 
-	erase,				// void (*erase)(void);
-	display,			// void	(*display)(int bstart, int bend);
-	update_toggle,		// void (*toggle_changed)(int ix, int value, int reason, const char *name);
-	show_timer,			// void	(*show_timer)(long seconds);
+	erase,					// void (*erase)(void);
+	display,				// void	(*display)(int bstart, int bend);
+	update_toggle,			// void (*toggle_changed)(int ix, int value, int reason, const char *name);
+	show_timer,				// void	(*show_timer)(long seconds);
 
 	gui_console_window_new,						// HCONSOLE	(*console_new)(const char *title, const char *label);
 	gui_console_window_delete,					// void		(*console_delete)(HCONSOLE hwnd);
@@ -405,18 +405,16 @@
 
 	if(valid_terminal_window())
 	{
-		int 	width;
-		int 	height;
+		int 	width  = terminal_cols * fontWidth;
+		int 	height = terminal_rows * fontHeight;
 		cairo_t *cr	= get_terminal_cairo_context();
 
-		gdk_drawable_get_size(get_terminal_pixmap(),&width,&height);
-
 		gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_BACKGROUND);
-		cairo_rectangle(cr, 0, 0, width, height);
+		cairo_rectangle(cr, left_margin, top_margin, width, height);
 		cairo_fill(cr);
 
 		cairo_destroy(cr);
-		gtk_widget_queue_draw(terminal);
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,width,height);
 	}
 
  }

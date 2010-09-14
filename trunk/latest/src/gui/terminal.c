@@ -60,7 +60,7 @@
  gint							cCol					= 0;
  gint							cRow					= 0;
 // static GdkPixmap				*pCursor				= NULL;
-// static GdkRectangle			rCursor;
+ static GdkRectangle			rCursor;
  static int					blink_enabled			= 0;
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
@@ -79,6 +79,35 @@
 	}
 
  }
+
+ static void draw_cursor(void)
+ {
+ 	if(!valid_terminal_window())
+		return;
+
+	rCursor.x 		= left_margin + (cCol * fontWidth);
+	rCursor.y 		= top_margin + (cRow * fontHeight);
+	rCursor.width 	= fontWidth;
+
+	Trace("Cursor at %d,%d",rCursor.x,rCursor.y);
+
+	gtk_im_context_set_cursor_location(input_method,&rCursor);
+
+//	if(cMode & (CURSOR_MODE_ENABLED|CURSOR_MODE_CROSS) == (CURSOR_MODE_ENABLED|CURSOR_MODE_CROSS))
+	{
+		int	 width;
+		int	 height;
+
+		gdk_drawable_get_size(terminal->window,&width,&height);
+
+		gtk_widget_queue_draw_area(terminal,0,rCursor.y+fontAscent,width,1);
+		gtk_widget_queue_draw_area(terminal,rCursor.x,0,1,height);
+
+	}
+
+ }
+
+
 
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
@@ -101,6 +130,21 @@
 
     cairo_destroy(cr);
 
+//	if(cMode & (CURSOR_MODE_ENABLED|CURSOR_MODE_CROSS) == (CURSOR_MODE_ENABLED|CURSOR_MODE_CROSS))
+	{
+		// Draw cross-hair cursor
+		int			width;
+		int			height;
+		GtkStyle	*style	= gtk_widget_get_style(widget);
+		GdkGC 		*gc		= style->fg_gc[GTK_STATE_NORMAL];
+
+		gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CROSS_HAIR);
+		gdk_drawable_get_size(widget->window,&width,&height);
+
+		gdk_draw_line(widget->window,gc,rCursor.x,0,rCursor.x,OIAROW-1);
+		gdk_draw_line(widget->window,gc,0,rCursor.y+fontAscent,width,rCursor.y+fontAscent);
+
+	}
 
 /*
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
@@ -437,7 +481,7 @@
 	gtk_widget_queue_draw(terminal);
  }
 
- void MoveCursor(int row, int col)
+ void update_cursor_position(int row, int col)
  {
 	if(row == cRow && col == cCol)
 		return;
@@ -446,13 +490,19 @@
 
  	if(!screen_suspended)
  	{
+ 		int width;
+ 		int height;
+
 		cMode |= CURSOR_MODE_SHOW;
-//		InvalidateCursor();
+
+		gdk_drawable_get_size(terminal->window,&width,&height);
+		gtk_widget_queue_draw_area(terminal,0,rCursor.y+fontAscent,width,1);
+		gtk_widget_queue_draw_area(terminal,rCursor.x,0,1,height);
 
 		cCol			= col;
 		cRow			= row;
 
-//		RedrawCursor();
+		draw_cursor();
 
 		if(Toggled(CURSOR_POS) && valid_terminal_window())
 			DrawCursorPosition();

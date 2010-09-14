@@ -345,6 +345,19 @@
 			gdk_cairo_set_source_color(cr,clr+fg);
 		}
 
+		if(TOGGLED_UNDERLINE && (screen[addr].fg & COLOR_ATTR_UNDERLINE))
+		{
+			// Draw underline
+			int line = baseline + (fontDescent/2);
+
+//			cairo_rectangle(cr, x, y, fontWidth, fontHeight);
+
+			cairo_move_to(cr,x,line);
+			cairo_rel_line_to(cr, fontWidth, 0);
+
+			cairo_stroke (cr);
+		}
+
 		if(screen[addr].cg)
 		{
 			// Graphics char
@@ -354,16 +367,6 @@
 			// Text char
 			cairo_move_to(cr,x,baseline);
 			cairo_show_text(cr,screen[addr].ch);
-		}
-
-		if(TOGGLED_UNDERLINE && (screen[addr].fg & COLOR_ATTR_UNDERLINE))
-		{
-			// Draw underline
-			int line = baseline + (fontDescent/2);
-
-			cairo_move_to(cr,x,line);
-			cairo_rel_line_to(cr, fontWidth, 0);
-			cairo_stroke (cr);
 		}
 
 		if(++col >= terminal_cols)
@@ -427,19 +430,12 @@
 
  cairo_t * get_terminal_cairo_context(void)
  {
-	double ux=1, uy=1;
-
  	cairo_t *cr = gdk_cairo_create(pixmap_terminal);
 
 	cairo_set_font_face(cr,fontFace);
 	cairo_set_font_size(cr,fontSize);
 
-	cairo_device_to_user_distance (cr, &ux, &uy);
-
-	if (ux < uy)
-		ux = uy;
-
-	cairo_set_line_width(cr, ux);
+	cairo_set_line_width(cr, 1.);
 
 	return cr;
  }
