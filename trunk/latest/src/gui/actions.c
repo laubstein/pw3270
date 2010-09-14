@@ -33,6 +33,7 @@
  #include <lib3270/config.h>
 
  #include "gui.h"
+ #include "fonts.h"
  #include "actions.h"
  #include "uiparser.h"
  #include <gdk/gdkkeysyms.h>
@@ -417,15 +418,10 @@
  {
     gui_toggle[id] = gtk_toggle_action_get_active(action);
 
-	screen_suspend();
-
 	SetBoolean("Toggles",gui_toggle_info[id].name,gui_toggle[id]);
 
     if(id == GUI_TOGGLE_BOLD)
-        FontChanged();
-
-	screen_resume();
-
+		action_Redraw();
  }
 
 /**
@@ -485,12 +481,10 @@
  }
 
 /*
-
  static void action_ToggleGDKDebug(GtkToggleAction *action, gpointer user_data)
  {
 	gdk_window_set_debug_updates(gtk_toggle_action_get_active(action));
  }
-
 */
 
  static void action_pfkey(GtkAction *action, gpointer id)

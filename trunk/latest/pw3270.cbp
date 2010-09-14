@@ -464,6 +464,15 @@
 		<Unit filename="src/gui/filetransfer.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/gui/fonts.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gui/fonts.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/gui/gui.h" />
 		<Unit filename="src/gui/iocallback.c">
 			<Option compilerVar="CC" />

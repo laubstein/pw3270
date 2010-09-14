@@ -58,7 +58,7 @@
 	{
 		DRAG_TYPE_TOP_LEFT, 	// Top-left
 		DRAG_TYPE_TOP_RIGHT,	// Top-right
-		DRAG_TYPE_TOP,			// Top
+		DRAG_TYPE_TOP,			// Topcairo +parse +color
 		DRAG_TYPE_BOTTOM_LEFT,	// Bottom-left
 		DRAG_TYPE_BOTTOM_RIGHT,	// Bottom-right
 		DRAG_TYPE_BOTTOM,		// Bottom
@@ -75,7 +75,8 @@
 	#define MAX_CHR_LENGTH 3
 	typedef struct _element
 	{
-		gchar			ch[MAX_CHR_LENGTH];	/**< UTF-8 string */
+		gchar				ch[MAX_CHR_LENGTH];	/**< UTF-8 string */
+
 		unsigned short	fg;					/**< Foreground color */
 		unsigned short	bg;					/**< Background color */
 
@@ -187,10 +188,9 @@
  	LOCAL_EXTERN const gchar		* program_release;
  	LOCAL_EXTERN const gchar		* program_fullversion;
 
-	LOCAL_EXTERN const char			* on_lu_command;
+	LOCAL_EXTERN const char		* on_lu_command;
 
 	LOCAL_EXTERN GtkWidget			* topwindow;
-	LOCAL_EXTERN GdkPixmap			* pixmap;
 	LOCAL_EXTERN GtkWidget			* SelectionPopup;
 	LOCAL_EXTERN GtkWidget			* DefaultPopup;
 	LOCAL_EXTERN GtkWidget			* terminal;
@@ -198,6 +198,13 @@
 	LOCAL_EXTERN H3270				* hSession;
 	LOCAL_EXTERN GtkIMContext		* input_method;
 
+	// Pixmaps
+	LOCAL_EXTERN GdkPixmap			* pixmap_terminal;
+	#define get_terminal_pixmap()	pixmap_terminal
+	#define valid_terminal_window()	(pixmap_terminal != NULL)
+	#define get_terminal_cairo_context()	gdk_cairo_create(pixmap_terminal); \
+											cairo_set_font_face(cr,fontFace); \
+											cairo_set_font_size(cr,fontSize); \
 
 #ifdef MOUSE_POINTER_CHANGE
 	LOCAL_EXTERN GdkCursor        		* wCursor[CURSOR_MODE_3270];
@@ -207,15 +214,9 @@
 
 	LOCAL_EXTERN int 					  terminal_rows;
 	LOCAL_EXTERN int				 	  terminal_cols;
+
 	LOCAL_EXTERN int					  left_margin;
 	LOCAL_EXTERN int					  top_margin;
-
-	// Font rendering
-// #ifdef USE_PANGO
-	LOCAL_EXTERN PangoFontDescription	* font;
-// #endif
-	LOCAL_EXTERN gint					  fontWidth;
-	LOCAL_EXTERN gint					  fontHeight;
 
 	LOCAL_EXTERN gint					  cCol;
 	LOCAL_EXTERN gint					  cRow;
@@ -265,7 +266,6 @@
 	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 	void 		ParseInput(const gchar *string);
 	void 		MoveCursor(int row, int col);
-	void 		InvalidateCursor(void);
 	void		LoadImages(GdkDrawable *drawable, GdkGC *gc);
 	void 		InvalidatePixmaps(GdkDrawable *drawable, GdkGC *gc);
 	void 		ReloadPixmaps(void);
@@ -273,7 +273,6 @@
 	void 		set_rectangle_select(int value, enum toggle_type reason);
 	void 		SetStatusCode(STATUS_CODE id);
 	void 		SetTerminalFont(const gchar *fontname);
-	void 		RedrawCursor(void);
 
 	void		init_gui_toggles(void);
 	GtkWidget * widget_from_action_name(const gchar *name);
@@ -371,24 +370,11 @@
 		TEXT_LAYOUT_UNDERLINE
 	};
 
-	#define TEXT_LAYOUT_OIA TEXT_LAYOUT_NORMAL
-	LOCAL_EXTERN PangoLayout * getPangoLayout(enum text_layout id);
-
-#ifdef USE_PANGO
-	LOCAL_EXTERN int 		DrawScreen(GdkColor *clr, GdkDrawable *draw);
-	LOCAL_EXTERN void 		DrawElement(GdkDrawable *draw, GdkColor *clr, GdkGC *gc, int x, int y, ELEMENT *el);
-	LOCAL_EXTERN void 		DrawOIA(GdkDrawable *draw, GdkColor *clr);
-
-	#define DrawTerminal(pix,left,top) DrawScreen(color,pix); DrawOIA(pix,color);
-
-#else // USE_PANGO
-	LOCAL_EXTERN void		DrawTerminal(GdkDrawable *pix, int left, int top);
+	LOCAL_EXTERN void 		update_terminal_contents(void);
+	LOCAL_EXTERN void 		draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr);
+	LOCAL_EXTERN void 		update_region(int bstart, int bend);
 
 	#define DrawOIA(draw, clr); /* */
-
-
-#endif // USE_PANGO
-
 
 	// Toolbar & Keypad
 	// LOCAL_EXTERN void 		  configure_toolbar(GtkWidget *toolbar, GtkWidget *menu, const gchar *label);

@@ -511,6 +511,8 @@ int main(int argc, char *argv[])
 		return rc;
 	}
 
+	LoadColors();
+
 	if(CreateTopWindow())
 	{
 		GtkWidget *dialog = gtk_message_dialog_new(	NULL,

@@ -31,6 +31,8 @@
  */
 
 #include "gui.h"
+#include "fonts.h"
+
 #include <lib3270/toggle.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
@@ -38,52 +40,27 @@
 #include <stdlib.h>
 #include <malloc.h>
 
-// TODO (perry#7#): Find a better way to get font sizes!!!
-#define MAX_FONT_SIZES	54
-
-
 #define KEYBOARD_STATE_MASK GDK_SHIFT_MASK
 // |GDK_ALT_MASK|GDK_LOCK_MASK)
 
 /*---[ Structs ]------------------------------------------------------------------------------------------------*/
 
- typedef struct _fontsize
- {
- 	int 	size;
- 	int 	width;
-	int 	height;
- } FONTSIZE;
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
- GdkColor						  color[TERMINAL_COLOR_COUNT+1];
+// GdkColor						  color[TERMINAL_COLOR_COUNT+1];
 
  GtkWidget						* terminal				= NULL;
- GdkPixmap						* pixmap				= NULL;
+ GdkPixmap						* pixmap_terminal		= NULL;
 
  GtkIMContext					* input_method			= NULL;
-
- static int 					lWidth 					= -1;
- static int 					lHeight 				= -1;
- static int 					lFont 					= -1;
-
- static gint					sWidth					= 0;
- static gint					sHeight					= 0;
-
- static PangoFontDescription	*terminal_font_descr	= NULL;
- static const gchar 			*layout_name[]			= { "PangoLayout_normal", "PangoLayout_underline" };
-
- static int						szFonts					= MAX_FONT_SIZES;
- static FONTSIZE				fsize[MAX_FONT_SIZES];
- gint							fontWidth				= 0;
- gint							fontHeight				= 0;
 
  // Cursor info
  gint							cMode					= CURSOR_MODE_ENABLED|CURSOR_MODE_BASE|CURSOR_MODE_SHOW;
  gint							cCol					= 0;
  gint							cRow					= 0;
- static GdkPixmap				*pCursor				= NULL;
- static GdkRectangle			rCursor;
+// static GdkPixmap				*pCursor				= NULL;
+// static GdkRectangle			rCursor;
  static int					blink_enabled			= 0;
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
@@ -93,35 +70,39 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
- static GdkPixmap * GetPixmap(GtkWidget *widget)
+ static void release_pixmaps(void)
  {
-	GdkPixmap	*pix;
+	if(pixmap_terminal)
+	{
+		gdk_pixmap_unref(pixmap_terminal);
+		pixmap_terminal = NULL;
+	}
 
-	if(!widget->window)
-		return NULL;
-
-	gdk_drawable_get_size(widget->window,&sWidth,&sHeight);
-
-	Trace("Creating pixmap with %dx%d",sWidth,sHeight);
-
-	pix = gdk_pixmap_new(widget->window,sWidth,sHeight,-1);
-
-#ifdef USE_PANGO
-	getCachedGC(pix);
-
-	DrawScreen(color, pix);
-	DrawOIA(pix,color);
-	RedrawCursor();
-
-#else // USE_PANGO
-	DrawTerminal(pix,left_margin,top_margin);
-#endif // USE_PANGO
-
-	return pix;
  }
 
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
+	GdkWindow *window = gtk_widget_get_window(widget);
+ 	cairo_t *cr	= gdk_cairo_create(window);
+
+ 	if(!pixmap_terminal)
+ 	{
+ 		// Rebuild pixmap
+ 		gint width;
+ 		gint height;
+		gdk_drawable_get_size(window,&width,&height);
+		pixmap_terminal = gdk_pixmap_new(window,width,height,-1);
+		update_terminal_contents();
+ 	}
+
+    gdk_cairo_set_source_pixmap(cr, pixmap_terminal, 0, 0);
+    gdk_cairo_rectangle(cr, &event->area);
+    cairo_fill(cr);
+
+    cairo_destroy(cr);
+
+
+/*
     // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
 	GdkGC *gc;
 
@@ -162,130 +143,35 @@
 
 		}
 	}
+*/
+
 	return 0;
  }
 
- static void UpdateFontData(int sel)
- {
-	pango_font_description_set_size(terminal_font_descr,fsize[sel].size);
-
-//	Trace("Updating font data (sel: %d)",sel);
-	gtk_widget_modify_font(terminal,terminal_font_descr);
-
- 	fsize[sel].width = fontWidth;
- 	fsize[sel].height = fontHeight;
-
-//	Trace("Font(%d): Width=%d Height: %d",sel,fontWidth,fontHeight);
-
- }
-
- static void LoadFontSizes(void)
- {
-	/* Load all font sizes */
-	gchar	*conf;
-	gchar	**ptr;
-	int 	f;
-
-	memset(fsize,0,MAX_FONT_SIZES * sizeof(FONTSIZE));
-
-	// Default font sizes from http://svn.gnome.org/svn/gtk+/trunk/gtk/gtkfontsel.c
-	conf = GetString("Terminal","FontSizes","6,7,8,9,10,11,12,13,14,16,18,20,22,24,26,28,32,36,40,48,56,64,72");
-
-	if(conf && *conf && *conf != '*') // "*" in .conf reverts to default behavior of "all" font sizes
-	{
-		Trace("Font sizes: %s",conf);
-		ptr = g_strsplit(conf,",",MAX_FONT_SIZES);
-		for(f=0;ptr[f];f++)
-		{
-			fsize[f].size = atoi(ptr[f]) * PANGO_SCALE;
-			UpdateFontData(f);
-		}
-		szFonts = f;
-		g_strfreev(ptr);
-	}
-	else
-	{
-		Trace("Loading font sizes from 0 to %d",MAX_FONT_SIZES);
-		szFonts = MAX_FONT_SIZES;
-
-		for(f=0;f<MAX_FONT_SIZES;f++)
-		{
-			fsize[f].size = (f+1) * PANGO_SCALE;
-			UpdateFontData(f);
-		}
-	}
-
-	g_free(conf);
- }
-
+/**
+ * Update font size & margins according to new terminal size.
+ *
+ * @param widget	Terminal widget.
+ * @param width	New terminal width.
+ * @param height	New terminal height.
+ *
+ */
  static void ResizeTerminal(GtkWidget *widget, gint width, gint height)
  {
- 	int				f;
-	int 			left	= left_margin;
-	int 			top		= top_margin;;
-	GdkPixmap		*pix;
-	GdkGC			*gc;
+ 	static gint lastWidth  = -1;
+ 	static gint lastHeight = -1;
 
-	if(lWidth == width && lHeight == height && lFont > 0)
+	if(lastWidth == width && lastHeight == height)
 		return;
 
-	lWidth = width;
-	lHeight = height;
+	lastWidth  = width;
+	lastHeight = height;
 
-	if(lFont == -1)
-	{
-		lFont = -2;
-		LoadFontSizes();
-		gtk_widget_set_usize(widget,(terminal_cols*fsize->width),((terminal_rows+1)*fsize->height));
-	}
+ 	update_screen_size(widget, width, height);
 
-	/* Get the best font for the current window size */
-	for(f=0;f<szFonts && ((fsize[f].height*(terminal_rows+1))+2) < height && (fsize[f].width*terminal_cols) < width;f++);
+	// Invalidate pixmaps, will redraw on next expose
+	release_pixmaps();
 
-	if(f >= MAX_FONT_SIZES)
-		f = (MAX_FONT_SIZES-1);
-	else if(f > 0)
-		f--;
-
-	Trace("LastFont: %d NEwFont: %d",lFont,f);
-
-	if(f != lFont)
-	{
-		Trace("Font size changes from %d to %d (%dx%d)",lFont,f,terminal_cols*fsize[f].width,terminal_rows*fsize[f].height);
-		lFont = f;
-		pango_font_description_set_size(terminal_font_descr,fsize[f].size);
-		gtk_widget_modify_font(terminal,terminal_font_descr);
-	}
-
-	/* Center image */
-	left_margin = (width >> 1) - ((terminal_cols * fontWidth) >> 1);
-	if(left_margin < 0)
-		left_margin = 0;
-
-	top_margin = (height >> 1) - (((terminal_rows+1) * fontHeight) >> 1);
-	if(top_margin < 0)
-		top_margin = 0;
-
-	/* No pixmap, will create a new one in the next expose */
-	if(!pixmap)
-		return;
-
-	/* Font size hasn't changed, rebuild pixmap using the saved image */
-	pix = gdk_pixmap_new(widget->window,sWidth = width,sHeight = height,-1);
-	gc = getCachedGC(pix);
-
-	gdk_gc_set_foreground(gc,color);
-	gdk_draw_rectangle(pix,gc,1,0,0,width,height);
-
-	gdk_draw_drawable(pix,gc,pixmap,
-								left,top,
-								left_margin,top_margin,
-								(terminal_cols * fsize[lFont].width),OIAROW+1+fsize[lFont].height);
-
-	/* Set the new pixmap */
-	gdk_pixmap_unref(pixmap);
-	pixmap = pix;
-	RedrawCursor();
  }
 
  static void configure(GtkWidget *widget, GdkEventConfigure *event, void *t)
@@ -299,17 +185,13 @@
  	Trace("%s","Destroying terminal");
  	terminal = NULL;
 
-	if(pixmap)
-	{
-		gdk_pixmap_unref(pixmap);
-		pixmap = NULL;
-	}
+	release_pixmaps();
 
- 	if(terminal_font_descr)
- 	{
-		pango_font_description_free(terminal_font_descr);
-		terminal_font_descr = NULL;
- 	}
+	if(fontFace)
+	{
+		cairo_font_face_destroy(fontFace);
+		fontFace = NULL;
+	}
 
  	Trace("%s","Terminal destroyed");
 
@@ -328,26 +210,33 @@
     gdk_window_set_cursor(widget->window,wCursor[0]);
 #endif
 
+	init_terminal_font(widget);
+
+	#warning Work in progress
+/*
     // Load images
     LoadImages(widget->window, widget->style->fg_gc[GTK_WIDGET_STATE(widget)]);
+*/
 
 	// Set terminal size
 	gdk_drawable_get_size(widget->window,&width,&height);
+
 	ResizeTerminal(widget, width, height);
+
 
  }
 
  static gboolean focus_in(GtkWidget *widget, GdkEventFocus *event, gpointer x)
  {
 	gtk_im_context_focus_in(input_method);
-	InvalidateCursor();
+//	InvalidateCursor();
 	return 0;
  }
 
  static gboolean focus_out(GtkWidget *widget, GdkEventFocus *event, gpointer x)
  {
 	gtk_im_context_focus_out(input_method);
-	InvalidateCursor();
+//	InvalidateCursor();
 	return 0;
  }
 
@@ -388,7 +277,6 @@
 		cMode |= CURSOR_MODE_CROSS;
 	else
 		cMode &= ~CURSOR_MODE_CROSS;
-	gtk_widget_queue_draw(terminal);
  }
 
  static gboolean blink_cursor(gpointer ptr)
@@ -402,7 +290,7 @@
 			cMode ^= CURSOR_MODE_SHOW;
 		else
 			cMode |= CURSOR_MODE_SHOW;
-		InvalidateCursor();
+//		InvalidateCursor();
  	}
 	return TRUE;
  }
@@ -420,18 +308,21 @@
 	else
 		cMode |= CURSOR_MODE_SHOW;
 
-
-	gtk_widget_queue_draw(terminal);
+//	InvalidateCursor();
  }
 
  static void set_insert(int value, enum toggle_type reason)
  {
+ 	#warning Work in progress
+
+/*
 	DrawOIA(pixmap,color);
 
 	if(terminal)
 		gtk_widget_queue_draw(terminal);
 
  	RedrawCursor();
+*/
  }
 
  static void size_allocate(GtkWidget *widget, GtkAllocation *allocation, gpointer user_data)
@@ -441,89 +332,8 @@
 		ResizeTerminal(widget,allocation->width,allocation->height);
  }
 
- void FontChanged(void)
- {
- 	gchar	*font = GetString("Terminal","Font","Courier");
- 	gchar 	vlr[1024];
-
-	g_snprintf(vlr,1023,"%s%s",	font, TOGGLED_BOLD ? " Bold" : "" );
-
-	g_free(font);
-
-	SetTerminalFont(vlr);
-
- }
-
- void SetTerminalFont(const gchar *fontname)
- {
- 	Trace("Selected font: %s (last: %p)",fontname,terminal_font_descr);
-
-	lFont = -1;
-
- 	if(terminal_font_descr)
-		pango_font_description_free(terminal_font_descr);
-
-	terminal_font_descr = pango_font_description_from_string(fontname);
-
-	if(terminal && terminal->window)
-	{
-		gdk_drawable_get_size(terminal->window,&sWidth,&sHeight);
-		ResizeTerminal(terminal,sWidth,sHeight);
-		gtk_widget_queue_draw(terminal);
-	}
-
- }
-
- static void update_font_layout(void)
- {
- 	PangoLayout *layout;
-
- 	// Font context changed, invalidate cached info
-	if(pixmap)
-	{
-		gdk_pixmap_unref(pixmap);
-		pixmap = NULL;
-	}
-
-	if(pCursor)
-	{
-		gdk_pixmap_unref(pCursor);
-		pCursor = NULL;
-	}
-
-	// Update metrics
-	layout = getPangoLayout(TEXT_LAYOUT_UNDERLINE);
-	pango_layout_context_changed(layout);
-
-	layout = getPangoLayout(TEXT_LAYOUT_NORMAL);
-	pango_layout_context_changed(layout);
-
-	// FIXME (perry#1#): Is there any better way to get the font size in pixels?
-	pango_layout_set_text(layout,"A",1);
-	pango_layout_get_pixel_size(layout,&fontWidth,&fontHeight);
-
-//	Trace("Font size changes to %dx%d",fontWidth,fontHeight);
-
- }
-
- static void direction_changed(GtkWidget *widget, GtkTextDirection previous_direction, gpointer user_data)
- {
- 	update_font_layout();
- }
-
- static void style_set(GtkWidget *widget, GtkStyle  *previous_style, gpointer user_data)
- {
- 	update_font_layout();
- }
-
  GtkWidget *CreateTerminalWindow(void)
  {
-	memset(fsize,0,MAX_FONT_SIZES * sizeof(FONTSIZE));
-	memset(color,0,sizeof(GdkColor)*TERMINAL_COLOR_COUNT);
-
- 	LoadColors();
- 	FontChanged();
-
 	input_method = gtk_im_multicontext_new();
 
 	terminal = gtk_event_box_new();
@@ -531,8 +341,11 @@
 	gtk_widget_set_redraw_on_allocate(terminal,TRUE);
 
 	g_signal_connect(G_OBJECT(terminal), "destroy", 			G_CALLBACK(destroy), NULL);
+
+/*
 	g_signal_connect(G_OBJECT(terminal), "direction-changed",	G_CALLBACK(direction_changed), NULL);
 	g_signal_connect(G_OBJECT(terminal), "style-set",			G_CALLBACK(style_set), NULL);
+*/
 
 	// Configure terminal widget
     GTK_WIDGET_SET_FLAGS(terminal, GTK_CAN_DEFAULT|GTK_CAN_FOCUS);
@@ -566,18 +379,9 @@
 	return terminal;
  }
 
- void InvalidateCursor(void)
- {
-	gtk_widget_queue_draw_area(terminal,rCursor.x,rCursor.y+rCursor.height,rCursor.width,fontHeight-rCursor.height);
-	if(cMode & CURSOR_MODE_CROSS)
-	{
-		gtk_widget_queue_draw_area(terminal,rCursor.x,0,rCursor.x,OIAROW-1);
-		gtk_widget_queue_draw_area(terminal,0,rCursor.y+fontHeight,sWidth,rCursor.y+fontHeight);
-	}
- }
-
  void DrawCursorPosition(void)
  {
+#ifdef ENABLE_PANGO
 	GdkGC 		*gc;
 	PangoLayout *layout;
 	int			x		= left_margin+(fontWidth*(terminal_cols-7));
@@ -603,10 +407,14 @@
 
 	gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fontWidth*7,fontHeight);
 
+#endif // ENABLE_PANGO
+
  }
 
  static void set_showcursor(int value, enum toggle_type reason)
  {
+ 	#warning work in progress
+/*
  	if(!(terminal && pixmap))
 		return;
 
@@ -625,7 +433,7 @@
 		gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fontWidth*7,fontHeight);
 
 	}
-
+*/
 	gtk_widget_queue_draw(terminal);
  }
 
@@ -639,14 +447,14 @@
  	if(!screen_suspended)
  	{
 		cMode |= CURSOR_MODE_SHOW;
-		InvalidateCursor();
+//		InvalidateCursor();
 
 		cCol			= col;
 		cRow			= row;
 
-		RedrawCursor();
+//		RedrawCursor();
 
-		if(Toggled(CURSOR_POS) && terminal && pixmap)
+		if(Toggled(CURSOR_POS) && valid_terminal_window())
 			DrawCursorPosition();
  	}
  	else
@@ -657,9 +465,10 @@
 
  }
 
+/*
  void RedrawCursor(void)
  {
- #ifdef USE_PANGO
+ #ifdef ENABLE_PANGO
 
 	ELEMENT 	el;
 	GdkGC   	*gc;
@@ -701,44 +510,12 @@
 	// Mark to redraw
 	gtk_im_context_set_cursor_location(input_method,&rCursor);
 	InvalidateCursor();
-#else // USE_PANGO
+#else // ENABLE_PANGO
 
 	#warning Need more work
 
-#endif // USE_PANGO
+#endif // ENABLE_PANGO
  }
 
- PangoLayout * getPangoLayout(enum text_layout id)
- {
-	PangoAttribute	*attr;
-	PangoAttrList 	*attrlist;
- 	PangoLayout		*rc;
-
- 	if(!terminal)
-		return NULL;
-
-	rc = (PangoLayout *) g_object_get_data(G_OBJECT(terminal),layout_name[id]);
-
- 	if(!rc)
- 	{
-		rc = gtk_widget_create_pango_layout(terminal,"");
-
-		if(id == TEXT_LAYOUT_UNDERLINE)
-		{
-			attrlist = pango_layout_get_attributes(rc);
-			if(!attrlist)
-				attrlist = pango_attr_list_new();
-
-			attr = pango_attr_underline_new(PANGO_UNDERLINE_SINGLE);
-			pango_attr_list_change(attrlist,attr);
-			pango_layout_set_attributes(rc,attrlist);
-		}
-
-		g_object_set_data_full(G_OBJECT(terminal),layout_name[id],rc,g_object_unref);
-
- 	}
-
-	return rc;
- }
-
+*/
 
