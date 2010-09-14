@@ -60,7 +60,7 @@
  static void action_pfkey(GtkAction *action,gpointer id);
  static void action_pakey(GtkAction *action,gpointer id);
 
-  static void action_PrintScreen(GtkWidget *w, gpointer user_data);
+ static void action_PrintScreen(GtkWidget *w, gpointer user_data);
 
 /*---[ Gui toggles ]--------------------------------------------------------------------------------------------*/
 
@@ -480,12 +480,10 @@
 
  }
 
-/*
  static void action_ToggleGDKDebug(GtkToggleAction *action, gpointer user_data)
  {
 	gdk_window_set_debug_updates(gtk_toggle_action_get_active(action));
  }
-*/
 
  static void action_pfkey(GtkAction *action, gpointer id)
  {
@@ -1084,6 +1082,17 @@
 					*name = g_strconcat("Toggle",gui_toggle_info[f].name,NULL);
 				return 0;
 			}
+		}
+
+		if(!g_ascii_strcasecmp(id,"gdkdebug"))
+		{
+			info->type 		= UI_CALLBACK_TYPE_TOGGLE;
+			info->label		= _( "Debug window updates" );
+			info->callback	= G_CALLBACK(action_ToggleGDKDebug);
+			info->user_data = (gpointer) f;
+			if(name)
+				*name = g_strdup("ToggleGDKDebug");
+			return 0;
 		}
 
 		return EINVAL;

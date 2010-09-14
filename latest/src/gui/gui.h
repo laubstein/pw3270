@@ -77,6 +77,8 @@
 	{
 		gchar				ch[MAX_CHR_LENGTH];	/**< UTF-8 string */
 
+		gboolean			changed;			/**< Element needs update? */
+
 		unsigned short	fg;					/**< Foreground color */
 		unsigned short	bg;					/**< Background color */
 
@@ -202,9 +204,6 @@
 	LOCAL_EXTERN GdkPixmap			* pixmap_terminal;
 	#define get_terminal_pixmap()	pixmap_terminal
 	#define valid_terminal_window()	(pixmap_terminal != NULL)
-	#define get_terminal_cairo_context()	gdk_cairo_create(pixmap_terminal); \
-											cairo_set_font_face(cr,fontFace); \
-											cairo_set_font_size(cr,fontSize); \
 
 #ifdef MOUSE_POINTER_CHANGE
 	LOCAL_EXTERN GdkCursor        		* wCursor[CURSOR_MODE_3270];
@@ -370,9 +369,10 @@
 		TEXT_LAYOUT_UNDERLINE
 	};
 
-	LOCAL_EXTERN void 		update_terminal_contents(void);
-	LOCAL_EXTERN void 		draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr);
-	LOCAL_EXTERN void 		update_region(int bstart, int bend);
+	LOCAL_EXTERN void 		  update_terminal_contents(void);
+	LOCAL_EXTERN void 		  draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr);
+	LOCAL_EXTERN void 		  update_region(int bstart, int bend);
+	LOCAL_EXTERN cairo_t	* get_terminal_cairo_context(void);
 
 	#define DrawOIA(draw, clr); /* */
 
