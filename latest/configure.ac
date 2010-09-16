@@ -56,6 +56,9 @@ AM_INIT_AUTOMAKE
 AC_PROG_CXX
 AC_PROG_CC
 
+# Check for iconv
+AM_ICONV
+
 # Target options
 
 DLLEXT=".so"
@@ -115,9 +118,14 @@ case "$host" in
 		JAVAH="javah"
 
 		;;
+		
+	*-apple-*)
+		OS_DLLFLAGS="-arch i386 -shared"
+
+	
+	;;
 
 	*)
-
 		# Check for OpenOffice
 		AC_CHECK_FILE("/opt/openoffice.org/basis3.0/program/unorc",oo_home="/opt/openoffice.org",oo_home="none")
 		AC_CHECK_FILE("/opt/broffice.org3/program/soffice.bin",oo_home="/opt/broffice.org3",)
@@ -141,9 +149,6 @@ case "$host" in
 		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
 		java_ldflags="-L\$(JRE_HOME)/lib/i386/client -Wl,-rpath,\$(JRE_HOME)/lib/i386/client -ljvm"
 esac
-
-# Check for iconv
-AM_ICONV
 
 # Check for ELF symbol visibility support
 # Try to compile PROGRAM, check for warnings
