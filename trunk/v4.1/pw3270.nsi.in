@@ -1,0 +1,236 @@
+!include "MUI2.nsh"
+
+Name "@PROGRAM_NAME@"
+Caption "@PROGRAM_NAME@ - 3270 Emulator for windows/gtk"
+outfile "@PROGRAM_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@-setup.exe"
+XPStyle on
+
+# define the directory to install to
+installDir $PROGRAMFILES\@PROGRAM_NAME@
+
+#define the installer icon
+!define MUI_ICON "@PROGRAM_NAME@.ico"
+!define MUI_UNICON "@PROGRAM_NAME@.ico"
+icon "@PROGRAM_NAME@.ico"
+
+# Get installation folder from registry if available
+InstallDirRegKey HKCU "Software\@PROGRAM_NAME@" ""
+
+RequestExecutionLevel admin
+
+# Interface
+
+!define MUI_ABORTWARNING
+# !insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_LICENSE "LICENSE"
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+
+# !insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+# !insertmacro MUI_UNPAGE_FINISH
+
+# Languages
+!insertmacro MUI_LANGUAGE "English"
+
+# default section
+SubSection "@PROGRAM_NAME@" SecMain
+
+	Section "Core" SecCore
+
+		# define the output path for this file
+		setOutPath $INSTDIR
+		SetShellVarContext all
+
+		createShortCut "$SMPROGRAMS\@PROGRAM_NAME@.lnk" "$INSTDIR\@PROGRAM_NAME@.exe"
+		createShortCut "$DESKTOP\@PROGRAM_NAME@.lnk" "$INSTDIR\@PROGRAM_NAME@.exe"
+
+		# Binary files
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.exe"	"bin\Release\@PROGRAM_NAME@.exe"
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.ico"	"@PROGRAM_NAME@.ico"
+
+		# Configuration files
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.@LOGOEXT@"	"bin\Release\@PACKAGE@.@LOGOEXT@"
+		file "/oname=$INSTDIR\colors.conf"		"colors.conf"
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.conf"	"@DEFAULT_CONFIG@"
+
+		# UI definition files
+		CreateDirectory "$INSTDIR\ui"
+
+		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.xml" bin\Release\ui\default.xml
+
+		# Locale files
+		CreateDirectory "$INSTDIR\@localedir@\pt_BR\LC_MESSAGES"
+		file "/oname=$INSTDIR\@localedir@\pt_BR\LC_MESSAGES\@PACKAGE@.mo" "bin\Release\pt_BR.mo"
+
+		# define uninstaller name
+		writeUninstaller $INSTDIR\uninstall.exe
+
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
+			         "DisplayName" "@PROGRAM_NAME@ - 3270 emulator for windows/gtk"
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
+			         "DisplayIcon" "$INSTDIR\@PROGRAM_NAME@.ico"
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
+			         "DisplayVersion" "@PACKAGE_VERSION@ (Rev: @PACKAGE_REVISION@)"
+
+
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
+			         "UninstallString" "$INSTDIR\uninstall.exe"
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
+			         "InstallLocation" "$INSTDIR"
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
+			         "NoModify" "1"
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@" \
+			         "NoRepair" "1"
+
+		# Save instalation dir
+		WriteRegStr HKCU "Software\@PROGRAM_NAME@" "" $INSTDIR
+
+		# Main library
+		file "/oname=$SYSDIR\lib3270.dll" bin\Release\lib3270.dll
+
+	sectionEnd
+
+	SubSection "Plugins" SecPLugin
+
+		Section /o "Rexx" RexxPlugin
+			setOutPath $INSTDIR
+
+			CreateDirectory "$INSTDIR"
+			file src\plugins\rexx\rx3270.cls
+
+			CreateDirectory "$INSTDIR\plugins"
+			file "/oname=$INSTDIR\plugins\rx3270.dll" bin\Release\plugins\rx3270.dll
+			file "/oname=$INSTDIR\ui\rexx.xml" ui\rexx.xml
+
+		sectionEnd
+
+		Section /o "Pipe control" PipePlugin
+			setOutPath $INSTDIR
+
+			CreateDirectory "$INSTDIR\plugins"
+			file "/oname=$INSTDIR\plugins\pipectl.dll" bin\Release\plugins\pipectl.dll
+
+		sectionEnd
+
+	SubSectionEnd
+
+	SubSection "Java API & Plugin" SecJava
+
+		Section /o "JNI module" jni
+			setOutPath $INSTDIR
+			CreateDirectory "$INSTDIR\java"
+			file "/oname=$INSTDIR\java\pw3270.jar" bin\Release\pw3270.jar
+			file "/oname=$INSTDIR\java\libpw3270_jni.dll" bin\Release\libpw3270_jni.dll
+		SectionEnd
+
+		Section /o "Java plugin" jplugin
+			setOutPath $INSTDIR
+			CreateDirectory "$INSTDIR\plugins"
+			file "/oname=$INSTDIR\plugins\j3270plugin.dll" bin\Release\plugins\j3270plugin.dll
+		SectionEnd
+
+	SubSectionEnd
+
+
+	SubSection "Extras" SecExtra
+
+		Section "Right keypad" RKeypad
+			file "/oname=$INSTDIR\ui\keypad.xml" "bin\Release\ui\keypad.xml"
+		SectionEnd
+
+		Section /o "Function bar" FBar
+			file "/oname=$INSTDIR\ui\functions.xml" "bin\Release\ui\functions.xml"
+		SectionEnd
+
+		Section /o "Debug & Trace menus" SecDBGMenu
+
+			file "/oname=$INSTDIR\ui\debug.xml" "bin\Release\ui\debug.xml"
+
+		SectionEnd
+
+		Section /o "Rexx extension library" SecRexxLib
+
+			setOutPath $PROGRAMFILES\ooRexx
+			file bin\Release\librx3270.dll
+			file src\plugins\rexx\rx3270.cls
+
+		SectionEnd
+
+	SubSectionEnd
+
+
+SubSectionEnd
+
+Section "GTK+ Runtime" SecGTK
+
+	setOutPath $INSTDIR
+	file /r "bin\Release\gtk-runtime\*.*"
+
+SectionEnd
+
+Section /o "Software Development Kit" SecSDK
+
+	CreateDirectory "$INSTDIR\sdk"
+	CreateDirectory "$INSTDIR\sdk\include"
+	CreateDirectory "$INSTDIR\sdk\include\lib3270"
+
+	file "/oname=$INSTDIR\sdk\include\lib3270.h" "src\include\lib3270.h"
+	file "/oname=$INSTDIR\sdk\include\lib3270\api.h" "src\include\lib3270\api.h"
+	file "/oname=$INSTDIR\sdk\include\lib3270\config.h" "src\include\lib3270\config.h"
+	file "/oname=$INSTDIR\sdk\include\lib3270\plugins.h" "src\include\lib3270\plugins.h"
+
+	CreateDirectory "$INSTDIR\sdk\lib"
+	file "/oname=$INSTDIR\sdk\lib\lib3270.def" "bin\Release\lib3270.def"
+	file "/oname=$INSTDIR\sdk\lib\lib3270.a" "bin\Release\lib3270.a"
+
+SectionEnd
+
+
+
+# create a section to define what the uninstaller does.
+# the section will always be named "Uninstall"
+section "Uninstall"
+
+	# Always delete uninstaller first
+	delete $INSTDIR\uninstaller.exe
+
+	# Set SMPROGRAMS and DESKTOP path
+	SetShellVarContext all
+
+	# now delete installed files
+	delete $INSTDIR\@PROGRAM_NAME@.exe
+	delete $INSTDIR\lib3270.dll
+	delete $INSTDIR\@PROGRAM_NAME@.conf
+	delete $INSTDIR\actions.conf
+	delete $INSTDIR\ui.xml
+	delete $INSTDIR\@PROGRAM_NAME@.jpg
+	delete $INSTDIR\@PROGRAM_NAME@.log
+
+	delete $SMPROGRAMS\@PROGRAM_NAME@.lnk
+	delete $DESKTOP\@PROGRAM_NAME@.lnk
+
+	RMDir /r "$INSTDIR\locale"
+	RMDir /r "$INSTDIR\share"
+	RMDir /r "$INSTDIR\etc"
+	RMDir /r "$INSTDIR\plugins"
+	RMDir /r "$INSTDIR\sdk"
+	RMDir /r "$INSTDIR\gtk2-runtime"
+
+	# Delete all files
+	delete "$INSTDIR\*.dll"
+
+	# Remove registry
+	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PROGRAM_NAME@"
+
+	# Delete System libraries
+	delete $SYSDIR\lib3270.dll
+
+	# Delete extension libraries
+	delete $PROGRAMFILES\ooRexx\rx3270.dll
+
+	RMDir /r "$INSTDIR"
+
+sectionEnd

@@ -1,0 +1,98 @@
+/*
+ * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+ * aplicativos mainframe. Registro no INPI sob o nome G3270.
+ *
+ * Copyright (C) <2008> <Banco do Brasil S.A.>
+ *
+ * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+ * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+ * Free Software Foundation.
+ *
+ * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+ * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+ * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+ * obter mais detalhes.
+ *
+ * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+ * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA, 02111-1307, USA
+ *
+ * Este programa está nomeado como plugins.h e possui 45 linhas de código.
+ *
+ * Contatos:
+ *
+ * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+ * erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+ * licinio@bb.com.br		(Licínio Luis Branco)
+ * kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+ * macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+ *
+ */
+
+#ifndef PLUGINS_H_INCLUDED
+
+	#define PLUGINS_H_INCLUDED 1
+
+	#include <gtk/gtk.h>
+
+	#define PW3270_VERSION 	@PACKAGE_VERSION@
+	#define PW3270_REVISION @PACKAGE_REVISION@
+
+	#define PW3270_PLUGIN_REQUIRED_REVISION 1356
+
+	#if defined(_WIN32)
+		#include <windows.h>
+
+		#define PW3270_MODULE_EXPORT	__declspec (dllexport)
+		#define LOCAL_EXTERN		extern
+
+	#else
+		#include <stdarg.h>
+
+		// http://gcc.gnu.org/wiki/Visibility
+		#if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
+				#define LOCAL_EXTERN __hidden extern
+				#define PW3270_MODULE_EXPORT extern
+		#elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
+				#define LOCAL_EXTERN __attribute__((visibility("hidden"))) extern
+				#define PW3270_MODULE_EXPORT __attribute__((visibility("default"))) extern
+		#else
+				#define LOCAL_EXTERN extern
+				#define PW3270_MODULE_EXPORT extern
+		#endif
+
+	#endif
+
+	// Compatibility
+	#define PW3270_PLUGIN_ENTRY PW3270_MODULE_EXPORT
+
+	// Build standard plugin entry
+	#define PW3270_MODULE_ENTRY(type, function) PW3270_MODULE_EXPORT type pw3270_plugin_ ## function
+
+	// Build script interpreter
+	#define PW3270_SCRIPT_INTERPRETER(type) PW3270_MODULE_EXPORT int pw3270_script_interpreter_ ## type ( const gchar *script_name, const gchar *script_text, int argc, gchar **argv )
+	#define PW3270_SCRIPT_OK 0
+	#define PW3270_SCRIPT_ERROR(err) err
+	#define PW3270_SCRIPT_RETURN(x) x
+
+	// Exported plugin info
+	typedef struct _pw3270_plugin_version_info
+	{
+		int			  rev;
+		const char 		* vrs;
+		const char		* descr;
+	} PW3270_PLUGIN_VERSION_INFO;
+
+	PW3270_MODULE_EXPORT PW3270_PLUGIN_VERSION_INFO pw3270_plugin_version_info;
+	#define EXPORT_PW3270_PLUGIN_INFORMATION(x) PW3270_PLUGIN_VERSION_INFO pw3270_plugin_version_info = { @PACKAGE_REVISION@, "@PACKAGE_VERSION@", x };
+
+	// Plugin standard calls
+	PW3270_MODULE_ENTRY ( void, start ) (GtkWidget *topwindow);
+	PW3270_MODULE_ENTRY ( void, stop  ) (GtkWidget *topwindow);
+	PW3270_MODULE_ENTRY ( void, update_luname ) (GtkWidget *topwindow, const gchar *luname);
+
+#endif // PLUGINS_H_INCLUDED
+
+
+
