@@ -1,0 +1,1627 @@
+# Portuguese/Brazil translation of pw3270.
+# Copyright (C) 2010 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Perry Werneck <perry.werneck@gmail.com>, 2010.
+# , fuzzy
+# 
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: pw3270 4.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-01-18 17:12-0200\n"
+"PO-Revision-Date: 2010-09-06 10:00-0300\n"
+"Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
+"Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit"
+
+#: src/lib/ft_cut.c:294
+msgid " Unknown frame type from host"
+msgstr ""
+
+#: src/lib/telnet.c:1013
+#, c-format
+msgid "%s:%d"
+msgstr ""
+
+#: src/gui/main.c:454
+msgid "- 3270 Emulator for GTK+"
+msgstr "- Emulador 3270 para GTK+"
+
+#: src/gui/main.c:433
+msgid "- 3270 Emulator for Gnome"
+msgstr "- Emulador 3270 para Gnome"
+
+#: src/gui/main.c:442
+msgid "3270 Emulator"
+msgstr "Emulador 3270"
+
+#: src/gui/actions.c:389
+msgid "3270 Terminal emulator for GTK."
+msgstr "Emulador 3270 para GTK"
+
+#: src/gui/actions.c:387
+msgid "3270 Terminal emulator for Gnome."
+msgstr "Emulador de terminal 3270 para Gnome"
+
+#: src/gui/main.c:503
+msgid "3270 library failed to start"
+msgstr "Biblioteca 3270 falhou ao iniciar"
+
+#: src/gui/main.c:355
+msgid "3270 options"
+msgstr "Opções do 3270"
+
+#: src/lib/telnet.c:3301
+#, c-format
+msgid ""
+"<b>Connection state:</b> %s\n"
+"<b>Alert message:</b> %s"
+msgstr "<b>Estado da conexão:</b>·%s\n"
+"<b>Mensagem de alerta::</b>·%s"
+
+#: src/gui/uiparser.c:701
+msgid "<button> element should be used only inside <keypad><row>"
+msgstr "Elemento <button> só deve ser usado dentro de <keypad><row>"
+
+#: src/gui/uiparser.c:694
+msgid "<row> element should be used only inside <keypad>"
+msgstr "Elemento <row> só deve ser usado dentro de <keypad>"
+
+#: src/gui/uiparser.c:724
+msgid "<script> element requires a name"
+msgstr "Tag <script> precisa de um nome"
+
+#: src/gui/uiparser.c:712
+msgid "<script> element should be used only inside another active element"
+msgstr "Elemento <script> só pode ser usado dentro de outro elemento ativo"
+
+#: src/gui/screen.c:1134
+msgid "Abort"
+msgstr "Abortar"
+
+#: src/gui/filetransfer.c:785
+msgid "Aborting..."
+msgstr "Cancelando..."
+
+#: src/gui/actions.c:982
+msgid "About"
+msgstr "Sobre"
+
+#: src/gui/clipboard.c:84
+msgid "Action failed"
+msgstr "Operação falhou"
+
+#: src/gui/clipboard.c:528
+msgid "Activate rectangle select option and try again."
+msgstr "Ative a opção \"Selecionar como retângulo\" e tente novamente"
+
+#: src/gui/actions.c:954
+msgid "Add to copy"
+msgstr "Copiar anexando"
+
+#: src/gui/filetransfer.c:391
+msgid "Add/Remove CR at end of line"
+msgstr "Inserir/Remover CR no final da linha"
+
+#: src/gui/actions.c:1024
+msgid "Aid wait"
+msgstr ""
+
+#: src/gui/actions.c:1010
+msgid "Alt Cursor"
+msgstr ""
+
+#: src/gui/filetransfer.c:392
+msgid "Append"
+msgstr "Adicionar"
+
+#: src/gui/actions.c:1026
+msgid "Auto-Reconnect"
+msgstr "Reconexão automática"
+
+#: src/gui/filetransfer.c:415
+msgid "Avblock"
+msgstr ""
+
+#: src/gui/filetransfer.c:407
+msgid "BLKSIZE:"
+msgstr ""
+
+#: src/gui/colors.c:373 src/gui/colors.c:395 src/gui/colors.c:403
+msgid "Background"
+msgstr "Fundo"
+
+#: src/gui/actions.c:998
+msgid "Backspace"
+msgstr ""
+
+#: src/gui/colors.c:364
+msgid "Base attributes"
+msgstr "Atributos básicos"
+
+#: src/gui/colors.c:381
+msgid "Black"
+msgstr "Preto"
+
+#: src/gui/actions.c:1017
+msgid "Blank Fill"
+msgstr "Completar com espaços"
+
+#: src/gui/actions.c:1011
+msgid "Blinking Cursor"
+msgstr "Cursor piscante"
+
+#: src/gui/colors.c:374
+msgid "Blue"
+msgstr "Azul"
+
+#: src/gui/actions.c:73
+msgid "Bold"
+msgstr "Negrito"
+
+#: src/gui/colors.c:397
+msgid "Border"
+msgstr "Borda"
+
+#: src/gui/filetransfer.c:494
+msgid "Browse"
+msgstr "Procurar"
+
+#: src/gui/actions.c:276
+msgid "Can't connect"
+msgstr "Não foi possível conectar ao host"
+
+#: src/lib/telnet.c:652
+#, c-format
+msgid "Can't connect to %s:%d"
+msgstr "Não foi possível conectar a %s:%d"
+
+#: src/gui/clipboard.c:206
+#, c-format
+msgid "Can't convert line %d from %s to %s"
+msgstr "Não foi possível converter a linha %d de %s para %s"
+
+#: src/gui/clipboard.c:249
+#, c-format
+msgid "Can't convert text from %s to %s"
+msgstr "Não foi possível converter o texto de %s para %s"
+
+#: src/gui/clipboard.c:527
+msgid "Can't copy non rectangular area"
+msgstr "Não é possível copiar áreas não retangulares"
+
+#: src/gui/print.c:324 src/gui/script.c:474 src/gui/script.c:485
+#, c-format
+msgid ""
+"Can't create temporary file:\n"
+"%s"
+msgstr "Não foi possível criar arquivo temporário:\n"
+"%s"
+
+#: src/gui/uiparser.c:1284
+#, c-format
+msgid "Can't find UI definitions in %s"
+msgstr "Não encontrei definição de interface em %s"
+
+#: src/gui/plugin.c:189
+#, c-format
+msgid "Can't load \"%s\""
+msgstr "Não consigo carregar \"%s\""
+
+#: src/gui/clipboard.c:388 src/gui/uiparser.c:850
+#: src/plugins/rexx/plg_start.c:160
+#, c-format
+msgid "Can't load %s"
+msgstr "Não foi possível carregar %s"
+
+#: src/gui/uiparser.c:1286
+msgid "Can't load UI"
+msgstr "Não foi possível ler a interface"
+
+#: src/gui/plugin.c:106 src/gui/plugin.c:191
+msgid "Can't load plugin"
+msgstr "Não foi possível carregar plugin"
+
+#: src/lib/ft.c:177
+msgid "Can't open local file"
+msgstr "Não foi possível abrir arquivo local"
+
+#: src/gui/uiparser.c:220 src/gui/uiparser.c:852 src/gui/uiparser.c:878
+msgid "Can't parse UI"
+msgstr "Erro no processamento da interface"
+
+#: src/gui/uiparser.c:221
+#, c-format
+msgid "Can't parse accelerator \"%s\""
+msgstr "Não foi possível converter tecla \"%s\""
+
+#: src/gui/uiparser.c:876
+#, c-format
+msgid "Can't parse ui in %s"
+msgstr "Não foi possível processar interface em %s"
+
+#: src/gui/filetransfer.c:682
+#, c-format
+msgid "Can't receive \"%s\""
+msgstr "Não foi possível receber \"%s\""
+
+#: src/gui/main.c:238
+msgid "Can't register into lib3270 I/O callback table."
+msgstr "Não foi possível efetuar o registro na tabela de I/O 3270."
+
+#: src/gui/main.c:253
+msgid "Can't register into lib3270 file-transfer callback table."
+msgstr "Não foi possível fazer o registro das funções de transferência de arquivo na biblioteca 3270"
+
+#: src/gui/main.c:245
+msgid "Can't register into lib3270 screen callback table."
+msgstr "Não foi possível registrar chamadas de tela na interface 3270."
+
+#: src/gui/config.c:232
+#, c-format
+msgid "Can't save %s"
+msgstr "Não foi possível gravar %s"
+
+#: src/gui/filetransfer.c:682
+#, c-format
+msgid "Can't send \"%s\""
+msgstr "Não foi possível enviar arquivo \"%s\""
+
+#: src/gui/actions.c:715
+msgid "Can't set device buffer contents"
+msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
+
+#: src/gui/main.c:505 src/gui/main.c:522 src/gui/script.c:195
+msgid "Can't start"
+msgstr "Não foi possível iniciar"
+
+#: src/gui/script.c:193
+#, c-format
+msgid "Can't start external program \"%s\""
+msgstr "Não foi possível iniciar programa externo \"%s\""
+
+#: src/gui/script.c:414 src/plugins/rexx/plg_start.c:82
+msgid "Can't start script"
+msgstr "Não foi possível iniciar o script"
+
+#: src/gui/script.c:412
+#, c-format
+msgid "Can't start script \"%s\""
+msgstr "Não foi possível iniciar script \"%s\""
+
+#: src/gui/screen.c:484 src/gui/screen.c:504
+msgid "Can't stop LU association script"
+msgstr "Não consigo parar o script de associação de LU"
+
+#: src/gui/screen.c:486 src/gui/screen.c:506
+msgid "Can't stop script"
+msgstr "Não foi possível parar script"
+
+#: src/lib/ft.c:146
+msgid "Cancelled by user"
+msgstr "Cancelado pelo usuário"
+
+#: src/lib/glue.c:251
+#, c-format
+msgid "Cannot find charset \"%s\", using defaults"
+msgstr "Não encontrei codificação para \"%s\", usando padrão"
+
+#: src/gui/clipboard.c:208 src/gui/clipboard.c:251
+msgid "Charset error"
+msgstr "Erro no código de página"
+
+#: src/gui/actions.c:944 ui/keypad.xml:81
+msgid "Clear"
+msgstr "Limpar"
+
+#: src/gui/colors.c:426
+msgid "Color setup"
+msgstr "Configuração de cores"
+
+#: src/gui/actions.c:984
+msgid "Colors"
+msgstr "Cores"
+
+#: src/gui/main.c:335
+msgid "Command to run when LU name is available"
+msgstr "Comando a executar quando o nome da LU ficar disponível"
+
+#: src/gui/tracewindow.c:72 src/plugins/rexx/plg_start.c:358
+msgid "Command:"
+msgstr "Comando:"
+
+#: src/gui/actions.c:76
+msgid "Connect on startup"
+msgstr "Conectar ao iniciar"
+
+#: src/gui/actions.c:272
+msgid "Connection already in progress"
+msgstr "Conexão em andamento"
+
+#: src/gui/actions.c:267
+msgid "Connection error"
+msgstr "Erro de conexão"
+
+#: src/gui/tracewindow.c:71
+msgid "Console"
+msgstr ""
+
+#: src/gui/actions.c:956
+msgid "Copy"
+msgstr "Copiar"
+
+#: src/gui/actions.c:957
+msgid "Copy as table"
+msgstr "Copiar como tabela"
+
+#: src/gui/actions.c:1022
+msgid "Cross Hair Cursor"
+msgstr "Régua"
+
+#: src/gui/colors.c:400
+msgid "Cross-hair"
+msgstr "Régua"
+
+#: src/gui/filetransfer.c:151
+msgid "Current:"
+msgstr "Atual:"
+
+#: src/gui/colors.c:366
+msgid "Cursor"
+msgstr ""
+
+#: src/gui/colors.c:355
+msgid "Custom colors"
+msgstr "Cores personalizadas"
+
+#: src/gui/filetransfer.c:414
+msgid "Cylinders"
+msgstr "Cilindros"
+
+#: src/gui/filetransfer.c:598
+msgid "DFT Buffer size:"
+msgstr "Tamanho do buffer DFT"
+
+#: src/gui/actions.c:1014
+msgid "DS Trace"
+msgstr ""
+
+#: src/gui/colors.c:382
+msgid "Dark Blue"
+msgstr "Azul escuro"
+
+#: src/gui/colors.c:385
+msgid "Dark Green"
+msgstr "Verde escuro"
+
+#: src/lib/ft_cut.c:163 src/lib/ft_cut.c:172
+msgid "Data conversion error"
+msgstr "Erro na conversão de dados"
+
+#: src/gui/actions.c:976
+msgid "Debug"
+msgstr ""
+
+#: src/gui/filetransfer.c:400 src/gui/filetransfer.c:412
+msgid "Default"
+msgstr "Padrão"
+
+#: src/gui/colors.c:84
+msgid "Default Color Set 2"
+msgstr "Esquema de cores padrão 2"
+
+#: src/gui/colors.c:49
+msgid "Default Color set 1"
+msgstr "Esquema de cores padrão 1"
+
+#: src/gui/actions.c:997
+msgid "Delete Char"
+msgstr "Apaga caractere"
+
+#: src/gui/actions.c:995
+msgid "Delete Word"
+msgstr "Apagar palavra"
+
+#: src/gui/actions.c:933
+msgid "Down"
+msgstr ""
+
+#: src/gui/actions.c:913
+msgid "Dump screen"
+msgstr "Salvar captura de tela"
+
+#: src/gui/actions.c:739
+msgid "Dump screen contents"
+msgstr "Salvar captura de tela"
+
+#: src/lib/telnet.c:1232
+msgid "EOR received when not in 3270 mode, ignored."
+msgstr "\"EOR\" recebido fora do modo 3270, ignorado"
+
+#: src/gui/filetransfer.c:151
+msgid "ETA:"
+msgstr ""
+
+#: ui/debug.xml:43
+msgid "Edit copy"
+msgstr "Editar cópia"
+
+#: ui/debug.xml:39
+msgid "Edit screen"
+msgstr "Editar tela"
+
+#: ui/debug.xml:47
+msgid "Edit selected area"
+msgstr "Editar área selecionada"
+
+#: src/gui/actions.c:989
+msgid "Enter"
+msgstr ""
+
+#: ui/keypad.xml:85
+msgid ""
+"Erase\n"
+"EOF"
+msgstr "Apagar\n"
+"Campo"
+
+#: ui/keypad.xml:86
+msgid ""
+"Erase\n"
+"Input"
+msgstr "Apagar\n"
+"Campos"
+
+#: src/gui/actions.c:996
+msgid "Erase Field"
+msgstr "Apagar campo"
+
+#: src/gui/actions.c:943
+msgid "Erase input"
+msgstr "Apagar campos"
+
+#: src/gui/actions.c:992
+msgid "Erase to end of field"
+msgstr "Limpar até o final do campo"
+
+#: src/gui/actions.c:993
+msgid "Erase to end of line"
+msgstr "Limpar até o final da linha"
+
+#: src/gui/screen.c:1104
+msgid "Error"
+msgstr "Erro"
+
+#: src/gui/actions.c:708
+#, c-format
+msgid ""
+"Error loading %s\n"
+"%s"
+msgstr "Erro lendo %s\n"
+"%s"
+
+#: src/gui/uiparser.c:218
+#, c-format
+msgid "Error parsing %s"
+msgstr "Erro ao processar %s"
+
+#: src/gui/actions.c:660 src/gui/actions.c:767
+#, c-format
+msgid ""
+"Error saving %s\n"
+"%s"
+msgstr "Erro salvando %s\n"
+"%s"
+
+#: src/gui/config.c:234
+msgid "Error saving file"
+msgstr "Erro ao gravar arquivo"
+
+#: src/gui/print.c:353
+#, c-format
+msgid ""
+"Error spawning %s\n"
+"%s"
+msgstr "Erro ao iniciar processo %s\n"
+"%s"
+
+#: src/gui/actions.c:947
+msgid "Escape"
+msgstr ""
+
+#: src/gui/actions.c:1019
+msgid "Event Trace"
+msgstr ""
+
+#: src/gui/uiparser.c:795
+msgid "Expecting active element"
+msgstr "Esperando elemento ativo"
+
+#: ui/rexx.xml:38
+msgid "External Rexx script"
+msgstr "Script rexx externo"
+
+#: src/plugins/rexx/plg_start.c:162
+msgid "File error"
+msgstr "Erro de arquivo"
+
+#: src/gui/filetransfer.c:175
+msgid "File transfer"
+msgstr "Transferência de arquivo"
+
+#: src/gui/filetransfer.c:686
+msgid "File transfer failed"
+msgstr "Transferência de arquivo falhou"
+
+#: src/lib/ft.c:167
+msgid "File transfer is already active"
+msgstr "Transferência de arquivos já está ativa"
+
+#: src/gui/actions.c:994
+msgid "First Field"
+msgstr ""
+
+#: src/gui/filetransfer.c:401
+msgid "Fixed"
+msgstr "Fixo"
+
+#: src/gui/main.c:326
+msgid "Fixed path and filename for load/save the configuration data"
+msgstr "Caminho e nome do arquivo para ler/gravar dados de configuração"
+
+#: src/gui/print.c:211
+msgid "Font"
+msgstr "Fonte"
+
+#: src/gui/colors.c:396 src/gui/colors.c:404
+msgid "Foreground"
+msgstr "Frente"
+
+#: src/gui/filetransfer.c:148
+msgid "From:"
+msgstr "De:"
+
+#: src/gui/actions.c:1025
+msgid "Full Screen"
+msgstr "Tela-cheia"
+
+#: src/gui/main.c:338
+msgid "Full path of plugins to load"
+msgstr "Caminho completo dos plugins a carregar"
+
+#: ui/functions.xml:35
+msgid "Function bar"
+msgstr "Barra de funções"
+
+#: src/gui/main.c:169
+msgid "GTK Version mismatch"
+msgstr "Divergência na versão do GTK"
+
+#: src/gui/colors.c:388
+msgid "Gray"
+msgstr "Cinza"
+
+#: src/gui/colors.c:377
+msgid "Green"
+msgstr "Verde"
+
+#: src/gui/actions.c:968
+msgid "Help"
+msgstr "Ajuda"
+
+#: src/lib/ft.c:378
+msgid "Host disconnected, transfer cancelled"
+msgstr "Servidor desconectou, transferência cancelada"
+
+#: src/gui/filetransfer.c:397
+msgid "Host file name:"
+msgstr "Nome do arquivo remoto:"
+
+#: src/gui/main.c:328
+msgid "Host identifier"
+msgstr "Identificador do host"
+
+#: src/gui/filetransfer.c:390
+msgid "Host is TSO"
+msgstr ""
+
+#: src/gui/actions.c:816
+msgid "Hostname:"
+msgstr "Endereço do servidor:"
+
+#: src/lib/ft_cut.c:481
+msgid "Illegal frame length"
+msgstr ""
+
+#: src/gui/screen.c:1103
+msgid "Information"
+msgstr "Informação"
+
+#: src/gui/filetransfer.c:185
+msgid "Informations"
+msgstr "Informações"
+
+#: src/gui/actions.c:974 ui/default.xml:109
+msgid "Input method"
+msgstr "Método de entrada"
+
+#: src/gui/actions.c:1027
+msgid "Insert"
+msgstr ""
+
+#: src/gui/colors.c:393
+msgid "Intensified/Protected"
+msgstr "Intensificado/Protegido"
+
+#: src/gui/colors.c:391
+msgid "Intensified/Unprotected"
+msgstr "Intensificado/Desprotegido"
+
+#: src/gui/clipboard.c:525
+msgid "Invalid action"
+msgstr "Ação inválida"
+
+#: src/gui/plugin.c:107
+#, c-format
+msgid ""
+"It was designed for pw3270 version %s (Revision %d)\n"
+"and can't be loaded in current application level."
+msgstr "Módulo desenvolvido para·pw3270·versão·%s·(Revisão·%d)\n"
+"não pode ser carregado no nível atual."
+""
+
+#: src/gui/actions.c:74
+msgid "Keep selected"
+msgstr "Manter selecionado"
+
+#: src/gui/clipboard.c:85
+msgid "Keyboard is locked"
+msgstr "Entrada de teclado está bloqueada"
+
+#: src/gui/actions.c:1028
+msgid "Keypad"
+msgstr "Teclado de funções"
+
+#: src/gui/filetransfer.c:406
+msgid "LRECL:"
+msgstr ""
+
+#: ui/keypad.xml:35
+msgid "Lateral keypad"
+msgstr "Barra lateral"
+
+#: src/gui/clipboard.c:313
+msgid "Latin Alphabet No. 1"
+msgstr ""
+
+#: src/gui/actions.c:931
+msgid "Left"
+msgstr "Esquerda"
+
+#: src/gui/actions.c:1016
+msgid "Line Wrap"
+msgstr ""
+
+#: src/gui/actions.c:679 src/gui/actions.c:906
+msgid "Load screen dump"
+msgstr "Carregar captura de tela"
+
+#: src/gui/filetransfer.c:396
+msgid "Local file name:"
+msgstr "Nome do arquivo local:"
+
+#: src/gui/colors.c:407
+msgid "Locked status"
+msgstr "Bloqueada"
+
+#: src/gui/main.c:334
+msgid "Log file"
+msgstr "Arquivo de log"
+
+#: src/gui/main.c:332
+msgid "Main window title"
+msgstr "Título da janela principal"
+
+#: src/gui/actions.c:1009
+msgid "Monocase"
+msgstr "Só maiúsculas"
+
+#: src/gui/colors.c:387
+msgid "Mustard"
+msgstr "Mostarda"
+
+#: src/gui/main.c:327
+msgid "Name of configuration file (auto-search)"
+msgstr "Nome do arquivo de configuração (pesquisa automática)"
+
+#: src/gui/actions.c:265
+#, c-format
+msgid "Negotiation with %s failed"
+msgstr "Negociação com %s falhou"
+
+#: src/gui/commands.c:95
+#, c-format
+msgid "Negotiation with %s failed!"
+msgstr "Negociação com %s falhou!"
+
+#: src/gui/actions.c:979
+msgid "Network"
+msgstr "Rede"
+
+#: src/lib/telnet.c:401 src/lib/telnet.c:414
+msgid "Network error"
+msgstr "Erro de comunicação"
+
+#: src/gui/actions.c:935
+msgid "Next field"
+msgstr "Próximo campo"
+
+#: src/gui/colors.c:399
+msgid "Normal"
+msgstr ""
+
+#: src/gui/colors.c:406
+msgid "Normal status"
+msgstr "Situação normal"
+
+#: src/gui/colors.c:392
+msgid "Normal/Protected"
+msgstr "Normal/Protegido"
+
+#: src/gui/colors.c:390
+msgid "Normal/Unprotected"
+msgstr "Normal/Desprotegido"
+
+#: src/lib/ft.c:385
+msgid "Not in 3270 mode, transfer cancelled"
+msgstr "Fora do modo 3270, transferência cancelada"
+
+#: src/gui/colors.c:367
+msgid "OIA"
+msgstr ""
+
+#: src/gui/main.c:306
+msgid "Option parsing failed."
+msgstr "Tratamento de opções falhou"
+
+#: src/gui/colors.c:383
+msgid "Orange"
+msgstr "Laranja"
+
+#: src/gui/actions.c:1027
+msgid "Overwrite"
+msgstr ""
+
+#: ui/keypad.xml:72
+msgid "PA1"
+msgstr ""
+
+#: ui/keypad.xml:73
+msgid "PA2"
+msgstr ""
+
+#: ui/keypad.xml:74
+msgid "PA3"
+msgstr ""
+
+#: ui/functions.xml:36 ui/keypad.xml:37
+msgid "PF1"
+msgstr ""
+
+#: ui/functions.xml:45 ui/keypad.xml:52
+msgid "PF10"
+msgstr ""
+
+#: ui/functions.xml:46 ui/keypad.xml:53
+msgid "PF11"
+msgstr ""
+
+#: ui/functions.xml:47 ui/keypad.xml:54
+msgid "PF12"
+msgstr ""
+
+#: ui/functions.xml:50
+msgid "PF13"
+msgstr ""
+
+#: ui/functions.xml:51
+msgid "PF14"
+msgstr ""
+
+#: ui/functions.xml:52
+msgid "PF15"
+msgstr ""
+
+#: ui/functions.xml:53
+msgid "PF16"
+msgstr ""
+
+#: ui/functions.xml:54
+msgid "PF17"
+msgstr ""
+
+#: ui/functions.xml:55
+msgid "PF18"
+msgstr ""
+
+#: ui/functions.xml:56
+msgid "PF19"
+msgstr ""
+
+#: ui/functions.xml:37 ui/keypad.xml:38
+msgid "PF2"
+msgstr ""
+
+#: ui/functions.xml:57
+msgid "PF20"
+msgstr ""
+
+#: ui/functions.xml:58
+msgid "PF21"
+msgstr ""
+
+#: ui/functions.xml:59
+msgid "PF22"
+msgstr ""
+
+#: ui/functions.xml:60
+msgid "PF23"
+msgstr ""
+
+#: ui/functions.xml:61
+msgid "PF24"
+msgstr ""
+
+#: ui/functions.xml:38 ui/keypad.xml:39
+msgid "PF3"
+msgstr ""
+
+#: ui/functions.xml:39 ui/keypad.xml:42
+msgid "PF4"
+msgstr ""
+
+#: ui/functions.xml:40 ui/keypad.xml:43
+msgid "PF5"
+msgstr ""
+
+#: ui/functions.xml:41 ui/keypad.xml:44
+msgid "PF6"
+msgstr ""
+
+#: ui/functions.xml:42 ui/keypad.xml:47
+msgid "PF7"
+msgstr ""
+
+#: ui/functions.xml:43 ui/keypad.xml:48
+msgid "PF8"
+msgstr ""
+
+#: ui/functions.xml:44 ui/keypad.xml:49
+msgid "PF9"
+msgstr ""
+
+#: src/gui/main.c:308
+msgid "Parse error"
+msgstr "Erro na passagem de parâmetros"
+
+#: src/gui/actions.c:963
+msgid "Paste"
+msgstr "Colar"
+
+#: src/gui/clipboard.c:390
+msgid "Paste error"
+msgstr "Erro ao colar"
+
+#: src/gui/actions.c:939
+msgid "Paste next"
+msgstr "Colar próximo"
+
+#: src/gui/actions.c:940 src/gui/clipboard.c:296
+msgid "Paste text file"
+msgstr "Colar arquivo texto"
+
+#: src/gui/actions.c:1020
+msgid "Paste with left margin"
+msgstr "Colar com margem"
+
+#: src/gui/main.c:331
+msgid "Path to an image file for program icon"
+msgstr "Caminho para arquivo de imagem contendo o ícone do programa"
+
+#: src/gui/main.c:330
+msgid "Path to search for data and configuration files"
+msgstr "Caminho dos arquivos de dados e configuração"
+
+#: src/gui/main.c:339
+msgid "Path to search for plugins"
+msgstr "Caminho a pesquisar por plugins"
+
+#: src/gui/colors.c:376
+msgid "Pink"
+msgstr "Rosa"
+
+#: src/plugins/rexx/dialogs.c:312
+msgid "Please wait"
+msgstr "Por favor, aguarde"
+
+#: src/plugins/rexx/plg_start.c:85
+msgid "Please, try again in a few moments"
+msgstr "Por favor, tente novamente em alguns instantes"
+
+#: src/gui/actions.c:819
+msgid "Port:"
+msgstr "Porta:"
+
+#: src/gui/actions.c:978
+msgid "Preferences"
+msgstr "Preferências"
+
+#: src/gui/actions.c:936
+msgid "Previous field"
+msgstr "Campo anterior"
+
+#: src/gui/filetransfer.c:408
+msgid "Primary space:"
+msgstr ""
+
+#: src/gui/actions.c:912
+msgid "Print"
+msgstr "Imprimir"
+
+#: src/gui/actions.c:961
+msgid "Print copy"
+msgstr "Imprimir cópia"
+
+#: src/gui/actions.c:958
+msgid "Print selected"
+msgstr "Imprimir seleção"
+
+#: src/plugins/rexx/dialogs.c:285
+msgid "Processing data..."
+msgstr "Processando informações..."
+
+#: src/gui/main.c:584
+msgid "Program aborted"
+msgstr "Programa cancelado"
+
+#: src/gui/main.c:582
+msgid "Program window was destroyed"
+msgstr "Janela principal foi destruida"
+
+#: src/gui/filetransfer.c:219
+msgid "Progress"
+msgstr "Progresso"
+
+#: src/gui/actions.c:980
+msgid "Properties"
+msgstr "Propriedades"
+
+#: src/lib/glue.c:483
+msgid "Proxy server (type:host[:port])"
+msgstr "Servidor proxy (tipo:host[:porta])"
+
+#: src/gui/colors.c:384
+msgid "Purple"
+msgstr "Púrpura"
+
+#: src/gui/actions.c:950
+msgid "Receive file"
+msgstr "Receber arquivo"
+
+#: src/gui/filetransfer.c:463
+msgid "Receive file from host"
+msgstr "Receber arquivo do servidor"
+
+#: src/gui/filetransfer.c:715
+msgid "Receiving file"
+msgstr "Recebendo arquivo"
+
+#: src/gui/filetransfer.c:530
+msgid "Record format"
+msgstr "Formato de registro"
+
+#: src/gui/colors.c:375
+msgid "Red"
+msgstr "Vermelho"
+
+#: src/gui/actions.c:910
+msgid "Redraw screen"
+msgstr "Redesenhar a tela"
+
+#: src/gui/filetransfer.c:393
+msgid "Remap ASCII Characters"
+msgstr ""
+
+#: src/gui/actions.c:941
+msgid "Reselect"
+msgstr "Reselecionar"
+
+#: src/gui/actions.c:946 ui/keypad.xml:82
+msgid "Reset"
+msgstr ""
+
+#: src/gui/actions.c:988
+msgid "Return"
+msgstr ""
+
+#: src/gui/main.c:506 src/plugins/rexx/plg_start.c:115
+#: src/plugins/rexx/plg_start.c:132
+#, c-format
+msgid "Return code was %d"
+msgstr "Código de saída foi %d"
+
+#: src/plugins/rexx/gui.c:138
+msgid "Rexx message"
+msgstr "Mensagem Rexx"
+
+#: src/plugins/rexx/plg_start.c:131
+msgid "Rexx script error"
+msgstr "Erro no script rexx"
+
+#: src/plugins/rexx/plg_start.c:114
+msgid "Rexx script failed"
+msgstr "Script Rexx falhou"
+
+#: ui/rexx.xml:39
+msgid "Rexx scripts"
+msgstr "Scripts rexx"
+
+#: src/plugins/rexx/plg_start.c:358
+msgid "Rexx trace"
+msgstr "Trace Rexx"
+
+#: src/gui/actions.c:930
+msgid "Right"
+msgstr "Direita"
+
+#: src/gui/main.c:329
+msgid "Run scripts on startup (Example: script1(arg1,arg2);script2(arg)"
+msgstr "Executa scripts ao iniciar (Exemplo: script1(arg1,arg2);script2(arg))"
+
+#: src/gui/filetransfer.c:775
+msgid "Running transfer"
+msgstr "Transferindo"
+
+#: src/lib/telnet.c:3299
+msgid "SSL Connect error"
+msgstr "Erro na conexão SSL"
+
+#: src/gui/actions.c:986
+msgid "Save"
+msgstr "Salvar"
+
+#: src/gui/actions.c:789
+msgid "Save clipboard contents"
+msgstr "Salvar área de transferência"
+
+#: src/gui/actions.c:962
+msgid "Save copy"
+msgstr "Salvar cópia"
+
+#: src/gui/actions.c:911
+msgid "Save screen"
+msgstr "Salvar tela"
+
+#: src/gui/actions.c:779
+msgid "Save screen contents"
+msgstr "Salvar conteúdo da tela"
+
+#: src/gui/actions.c:959
+msgid "Save selected"
+msgstr "Salvar seleção"
+
+#: src/gui/actions.c:784
+msgid "Save selected text"
+msgstr "Salvar texto selecionado"
+
+#: src/gui/actions.c:1018
+msgid "Screen Trace"
+msgstr ""
+
+#: src/plugins/rexx/plg_start.c:128
+#, c-format
+msgid "Script %s aborted"
+msgstr "Script %s foi abortado"
+
+#: src/plugins/rexx/plg_start.c:408
+msgid "Script message"
+msgstr "Mensagem do script"
+
+#: src/gui/actions.c:972
+msgid "Scripts"
+msgstr ""
+
+#: src/gui/actions.c:1015
+msgid "Scroll bar"
+msgstr ""
+
+#: src/gui/filetransfer.c:409
+msgid "Secondary space:"
+msgstr ""
+
+#: src/gui/actions.c:801
+msgid "Secure connection"
+msgstr "Conexão segura"
+
+#: src/gui/actions.c:922
+msgid "Select Down"
+msgstr ""
+
+#: src/gui/actions.c:917
+msgid "Select Field"
+msgstr "Selecionar campo"
+
+#: src/gui/actions.c:920
+msgid "Select Left"
+msgstr ""
+
+#: src/plugins/rexx/actions.c:185
+msgid "Select Rexx script to run"
+msgstr "Selecione script rexx a executar"
+
+#: src/gui/actions.c:919
+msgid "Select Right"
+msgstr "Seleciona a direita"
+
+#: src/gui/actions.c:921
+msgid "Select Up"
+msgstr ""
+
+#: src/gui/actions.c:942
+msgid "Select all"
+msgstr "Selecionar tudo"
+
+#: src/gui/actions.c:1021
+msgid "Select by rectangles"
+msgstr "Seleção retangular"
+
+#: src/gui/filetransfer.c:304
+msgid "Select file to receive"
+msgstr "Selecione arquivo a receber"
+
+#: src/gui/filetransfer.c:304
+msgid "Select file to send"
+msgstr "Selecione arquivo a enviar"
+
+#: src/gui/actions.c:977 ui/default.xml:89
+msgid "Select font"
+msgstr "Selecionar fonte"
+
+#: src/gui/actions.c:802
+msgid "Select hostname"
+msgstr "Selecionar servidor"
+
+#: src/gui/colors.c:365
+msgid "Selected text"
+msgstr "Texto selecionado"
+
+#: src/gui/actions.c:927
+msgid "Selection Down"
+msgstr ""
+
+#: src/gui/actions.c:925
+msgid "Selection Left"
+msgstr ""
+
+#: src/gui/actions.c:924
+msgid "Selection Right"
+msgstr ""
+
+#: src/gui/actions.c:926
+msgid "Selection Up"
+msgstr ""
+
+#: src/gui/actions.c:951
+msgid "Send file"
+msgstr "Enviar arquivo"
+
+#: src/gui/filetransfer.c:463
+msgid "Send file to host"
+msgstr "Enviar arquivo para o servidor"
+
+#: src/gui/actions.c:966
+msgid "Send/Receive"
+msgstr "Enviar/Receber"
+
+#: src/gui/filetransfer.c:722
+msgid "Sending file"
+msgstr "Enviando arquivo"
+
+#: src/gui/colors.c:405
+msgid "Separator"
+msgstr "Separador"
+
+#: src/gui/actions.c:907
+msgid "Set hostname"
+msgstr "Mudar servidor"
+
+#: src/lib/glue.c:473
+msgid "Set terminal model (screen size)"
+msgstr "Define o modelo do terminal (tamanho da tela)"
+
+#: src/gui/actions.c:971
+msgid "Settings"
+msgstr "Configuração"
+
+#: src/gui/actions.c:75
+msgid "Show Underline"
+msgstr "Mostrar sublinhado"
+
+#: src/gui/main.c:355
+msgid "Show lib3270 options"
+msgstr "Mostra opções da biblioteca 3270"
+
+#: src/gui/actions.c:1012
+msgid "Show timing"
+msgstr "Mostrar tempo"
+
+#: src/gui/actions.c:1029
+msgid "Smart paste"
+msgstr "Colar inteligente"
+
+#: src/lib/telnet.c:1015
+msgid "Socket read error"
+msgstr "Erro ao receber dados"
+
+#: src/lib/telnet.c:2018
+msgid "Socket write error"
+msgstr "Erro ao enviar dados"
+
+#: src/gui/filetransfer.c:550
+msgid "Space allocation units"
+msgstr "Unidade de alocação de espaço"
+
+#: src/lib/glue.c:468
+msgid "Specifies a keymap name and optional modifiers."
+msgstr ""
+
+#: src/lib/glue.c:495
+msgid ""
+"Specifies the terminal name to be transmitted over the telnet connection."
+msgstr "Especifica o nome do terminal a ser transmitido na conexão telnet"
+
+#: src/gui/filetransfer.c:151
+msgid "Started:"
+msgstr "Iniciado:"
+
+#: src/gui/filetransfer.c:148
+msgid "Status:"
+msgstr "Situação:"
+
+#: src/gui/actions.c:999
+msgid "Sys Req"
+msgstr ""
+
+#: src/gui/screen.c:1039
+msgid "System Error"
+msgstr "Erro de sistema"
+
+#: src/plugins/rexx/plg_start.c:84
+msgid "System busy"
+msgstr "Sistema ocupado"
+
+#: src/gui/clipboard.c:332
+msgid "System default"
+msgstr "Padrão do sistema"
+
+#: src/gui/colors.c:363
+msgid "Terminal"
+msgstr ""
+
+#: src/gui/clipboard.c:317
+msgid "Text encoding"
+msgstr "Padrão de caracteres"
+
+#: src/gui/filetransfer.c:389
+msgid "Text file"
+msgstr "Arquivo texto"
+
+#: src/gui/actions.c:284
+#, c-format
+msgid "The error code was %d (%s)"
+msgstr "O código de erro foi %d (%s)"
+
+#: src/gui/plugin.c:104
+#, c-format
+msgid "The plugin \"%s\" is incompatible or outdated."
+msgstr "Plugin \"%s\" é incompatível ou desatualizado."
+
+#: src/lib/ft.c:171
+msgid "The remote file name is invalid"
+msgstr "O nome do arquivo remoto não é válido"
+
+#: src/gui/plugin.c:192
+msgid "The required plugin file wasn't found"
+msgstr "O arquivo de plugin pedido não foi encontrado"
+
+#: src/gui/main.c:333
+msgid "Theme file (gtkrc)"
+msgstr "Arquivo de tema (gtkrc)"
+
+#: src/gui/actions.c:346
+msgid ""
+"This program is free software; you can redistribute it and/or modify it "
+"under the terms of the GNU General Public License as published by the Free "
+"Software Foundation; either version 2 of the License, or (at your option) "
+"any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful, but WITHOUT "
+"ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or "
+"FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for "
+"more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License along with "
+"this program; if not, write to the Free Software Foundation, Inc., 51 "
+"Franklin St, Fifth Floor, Boston, MA 02111-1307 USA"
+msgstr ""
+
+#: src/gui/main.c:165
+#, c-format
+msgid "This program requires GTK version %d.%d.%d"
+msgstr "Este programa precisa do GTK versão %d.%d.%d"
+
+#: src/gui/filetransfer.c:148
+msgid "To:"
+msgstr "Para:"
+
+#: ui/default.xml:120
+msgid "Toolbar"
+msgstr "Barra de ferramentas"
+
+#: src/gui/actions.c:975
+msgid "Toolbars"
+msgstr "Barras de ferramentas"
+
+#: src/gui/main.c:520
+msgid "Top window failed to start"
+msgstr "Janela principal não iniciou"
+
+#: src/gui/filetransfer.c:151
+msgid "Total:"
+msgstr ""
+
+#: src/lib/trace_ds.c:248
+msgid "Trace Window"
+msgstr ""
+
+#: src/gui/actions.c:1013
+msgid "Track Cursor"
+msgstr "Mostrar posição do cursor"
+
+#: src/gui/filetransfer.c:413
+msgid "Tracks"
+msgstr "Trilhas"
+
+#: src/lib/ft_cut.c:350
+msgid "Transfer cancelled by host"
+msgstr "Transferência cancelada pelo host"
+
+#: src/lib/ft_cut.c:377 src/lib/ft_cut.c:473 src/lib/ft_dft.c:218
+#: src/lib/ft_dft.c:355
+msgid "Transfer cancelled by user"
+msgstr "Transferência cancelada pelo usuário"
+
+#: src/gui/filetransfer.c:739
+#, c-format
+msgid "Transfer complete, %ld bytes transferred %.2lg Kbytes/sec in %s mode"
+msgstr "Transferência completa,·%ld·bytes·transferidos·%.2lg·Kbytes/sec·em modo %s"
+
+#: src/gui/filetransfer.c:501
+msgid "Transfer options"
+msgstr "Opções de transferência"
+
+#: src/lib/ft_cut.c:442
+msgid "Transmission error"
+msgstr "Erro de transmissão"
+
+#: src/gui/colors.c:378 src/gui/colors.c:386
+msgid "Turquoise"
+msgstr "Turquesa"
+
+#: src/gui/clipboard.c:82
+msgid "Unable to paste clipboard string"
+msgstr "Não foi possível colar texto da área de trabalho"
+
+#: src/gui/config.c:235
+#, c-format
+msgid "Unable to save configuration data in %s"
+msgstr "Não foi possível salvar a configuração em %s"
+
+#: src/lib/ft.c:260
+msgid "Unable to send file-transfer request"
+msgstr "Incapaz de enviar o pedido de transferência de arquivos"
+
+#: src/gui/filetransfer.c:403
+msgid "Undefined"
+msgstr "Indefinido"
+
+#: src/gui/actions.c:280 src/gui/actions.c:660 src/gui/actions.c:708
+#: src/gui/actions.c:767 src/gui/clipboard.c:85 src/gui/clipboard.c:211
+#: src/gui/clipboard.c:254 src/gui/print.c:324 src/gui/print.c:353
+#: src/gui/script.c:474 src/gui/script.c:485 src/plugins/rexx/plg_start.c:163
+msgid "Unexpected error"
+msgstr "Erro inesperado"
+
+#: src/lib/kybd.c:316
+#, c-format
+msgid "Unexpected type %d in typeahead queue"
+msgstr "Tipo inesperado %d na fila de teclado"
+
+#: src/gui/clipboard.c:311
+msgid "Unicode"
+msgstr ""
+
+#: src/lib/ft_cut.c:357
+msgid "Unknown FT control code from host"
+msgstr "Recebi código FT desconhecido"
+
+#: src/lib/kybd.c:3424
+#, c-format
+msgid "Unknown PA key %d"
+msgstr "Tecla desconhecida: PA%02d"
+
+#: src/lib/kybd.c:3446
+#, c-format
+msgid "Unknown PF key %d"
+msgstr "Tecla desconhecida: PF%02d"
+
+#: src/lib/resolver.c:162
+#, c-format
+msgid ""
+"Unknown host:\n"
+"%s"
+msgstr "Servidor desconhecido:\n"
+"%s"
+
+#: src/lib/resolver.c:143
+#, c-format
+msgid "Unknown port number or service: %s"
+msgstr "Número de porta ou serviço desconhecido: %s"
+
+#: src/gui/actions.c:955
+msgid "Unselect"
+msgstr "Desmarcar"
+
+#: src/gui/actions.c:932
+msgid "Up"
+msgstr ""
+
+#: src/gui/filetransfer.c:402
+msgid "Variable"
+msgstr "Variável"
+
+#: src/gui/actions.c:1023
+msgid "Visible Control chars"
+msgstr ""
+
+#: src/gui/colors.c:380
+msgid "White"
+msgstr "Branco"
+
+#: src/gui/actions.c:1025
+msgid "Window"
+msgstr "Janela"
+
+#: src/gui/clipboard.c:312
+msgid "Windows Latin-1 "
+msgstr ""
+
+#: src/lib/trace_ds.c:256
+#, c-format
+msgid ""
+"Write to trace file failed\n"
+"%s"
+msgstr "Gravação no arquivo de trace falhou\n"
+"%s"
+
+#: src/gui/screen.c:789 src/gui/screen.c:817
+msgid "X"
+msgstr ""
+
+#: src/gui/screen.c:793
+msgid "X -f"
+msgstr ""
+
+#: src/gui/screen.c:825
+msgid "X Connecting"
+msgstr "X Conectando"
+
+#: src/gui/screen.c:809
+msgid "X Inhibit"
+msgstr "X Inibido"
+
+#: src/gui/screen.c:785
+msgid "X Not Connected"
+msgstr "X Não conectado"
+
+#: src/gui/screen.c:801
+msgid "X Numeric"
+msgstr "X Numérico"
+
+#: src/gui/screen.c:805
+msgid "X Overflow"
+msgstr "X Estouro"
+
+#: src/gui/screen.c:797
+msgid "X Protected"
+msgstr "X Protegido"
+
+#: src/gui/screen.c:821
+msgid "X Resolving"
+msgstr "X Resolvendo"
+
+#: src/gui/screen.c:773
+msgid "X System"
+msgstr "X Sistema"
+
+#: src/gui/screen.c:777
+msgid "X Wait"
+msgstr "X Aguarde"
+
+#: src/gui/colors.c:379
+msgid "Yellow"
+msgstr "Amarelo"
+
+#: src/gui/actions.c:905
+msgid "_Connect"
+msgstr "_Conectar"
+
+#: src/gui/actions.c:914
+msgid "_Disconnect"
+msgstr "_Desconectar"
+
+#: src/gui/actions.c:969
+msgid "_Edit"
+msgstr "_Editar"
+
+#: src/gui/actions.c:965
+msgid "_File"
+msgstr "_Arquivo"
+
+#: src/gui/actions.c:967
+msgid "_Network"
+msgstr "_Rede"
+
+#: src/gui/actions.c:970
+msgid "_Options"
+msgstr "_Opções"
+
+#: src/gui/actions.c:983
+msgid "_Quit"
+msgstr "_Sair"
+
+#: src/gui/actions.c:973 ui/default.xml:75
+msgid "_View"
+msgstr "Exibir"
+
+#: src/lib/telnet.c:3174 src/lib/telnet.c:3182
+#, c-format
+msgid "fcntl(%s)"
+msgstr ""
+
+#: src/lib/ft_dft.c:165
+msgid "ftDftUknownOpen"
+msgstr ""
+
+#: src/lib/telnet.c:3167
+#, c-format
+msgid "ioctl(%s)"
+msgstr ""
+
+#: src/plugins/rexx/plg_start.c:112
+#, c-format
+msgid "script %s failed"
+msgstr "script %s falhou"
+
+#: src/lib/telnet.c:602 src/lib/telnet.c:607 src/lib/telnet.c:613
+#, c-format
+msgid "setsockopt(%s)"
+msgstr ""
+
+#: src/lib/telnet.c:595
+msgid "socket"
+msgstr ""
+

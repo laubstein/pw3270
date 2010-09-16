@@ -1,0 +1,89 @@
+/*
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
+ * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+ * aplicativos mainframe. Registro no INPI sob o nome G3270.
+ *
+ * Copyright (C) <2008> <Banco do Brasil S.A.>
+ *
+ * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+ * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+ * Free Software Foundation.
+ *
+ * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+ * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+ * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+ * obter mais detalhes.
+ *
+ * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+ * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA, 02111-1307, USA
+ *
+ * Este programa está nomeado como pw3270.idl e possui x linhas de código.
+ *
+ * Contatos:
+ *
+ * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+ * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
+ * licinio@bb.com.br		(Licínio Luis Branco)
+ * kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+ * macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+ *
+ */
+
+#include <com/sun/star/uno/XInterface.idl>
+#include <com/sun/star/lang/XTypeProvider.idl>
+
+/*
+
+	http://wiki.services.openoffice.org/wiki/IDL_Files_and_Cpp
+	http://wiki.services.openoffice.org/wiki/IDL_Files_and_Cpp#Specifying_an_interface
+
+ */
+
+module br { module com { module bb {
+
+   /**
+     * Interface to lib3270.
+     *
+     * http://wiki.services.openoffice.org/wiki/Documentation/DevGuide/ProUNO/Bridge/Default_Mappings
+     *
+     */
+    interface pw3270intf : com::sun::star::uno::XInterface
+    {
+		/* Get library/extension info */
+		string	getVersion();
+		string	getRevision();
+
+		/* Connect/Disconnect */
+        short	Connect( [in] string hostinfo, [in] short timeout );
+        short 	Disconnect();
+        short	getConnectionState();
+
+        /* Get Status */
+		boolean isConnected();
+		boolean isTerminalReady();
+
+		/* Get/Query Screen contents */
+        string	getScreenContentAt([in] short row, [in] short col, [in] short size);
+        string	getScreenContent();
+		boolean	queryStringAt([in] short row, [in] short col, [in] string key);
+
+		/* Actions/Screen changes */
+		short	sendEnterKey();
+		short 	setStringAt([in] short row, [in] short col, [in] string str);
+		short	sendPFKey([in] short key);
+
+		/* Waiting */
+		short	waitForTerminalReady([in] short timeout);
+        short	waitForStringAt([in] short row, [in] short col, [in] string key, [in] short timeout);
+
+    };
+
+    service pw3270
+    {
+        // exported interfaces:
+        interface pw3270intf;
+    };
+
+}; }; };
+
