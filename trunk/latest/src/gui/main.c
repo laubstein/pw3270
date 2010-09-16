@@ -31,6 +31,7 @@
  */
 
 #include "gui.h"
+#include "oia.h"
 #include "actions.h"
 
 #include <stdio.h>
@@ -94,8 +95,7 @@ static void connect_main(int status)
 	if(terminal)
 	{
 		gtk_widget_set_sensitive(terminal,online);
-		DrawOIA(pixmap,color);
-		gtk_widget_queue_draw(terminal);
+		update_oia_element(OIA_ELEMENT_CONNECTION_STATUS);
 		gtk_widget_grab_focus(terminal);
 	}
 

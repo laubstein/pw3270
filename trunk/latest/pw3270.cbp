@@ -452,6 +452,11 @@
 		<Unit filename="src/gui/config.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/gui/cursor.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/gui/draw.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
@@ -482,6 +487,15 @@
 		</Unit>
 		<Unit filename="src/gui/mouse.c">
 			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gui/oia.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gui/oia.h">
+			<Option target="Debug" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="src/gui/plugin.c">
 			<Option compilerVar="CC" />

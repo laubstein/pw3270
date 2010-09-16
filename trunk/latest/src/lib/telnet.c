@@ -897,6 +897,7 @@ net_disconnect(void)
 		h3270.termtype = h3270.full_model_name;
 
 	/* We're not connected to an LU any more. */
+	h3270.connected_lu = CN;
 	status_lu(CN);
 
 #if !defined(_WIN32) /*[*/

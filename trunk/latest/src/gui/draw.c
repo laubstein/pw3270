@@ -34,6 +34,7 @@
 #include <lib3270/config.h>
 
 #include "gui.h"
+#include "oia.h"
 #include "fonts.h"
 
 #include <malloc.h>
@@ -294,17 +295,51 @@
 
 #else // ENABLE_PANGO
 
- void update_region(int bstart, int bend)
+ void draw_element(cairo_t *cr, int x, int y, int baseline, int addr, GdkColor *clr)
  {
- 	cairo_t *cr;
+	if(clr)
+	{
+		short	fg;
+		short 	bg;
 
-	cr = get_terminal_cairo_context();
-	draw_region(cr,bstart,bend,color);
-	cairo_destroy(cr);
+		if(screen[addr].status & ELEMENT_STATUS_SELECTED)
+		{
+			fg = TERMINAL_COLOR_SELECTED_FG;
+			bg = TERMINAL_COLOR_SELECTED_BG;
+		}
+		else
+		{
+			fg = (screen[addr].fg & 0xFF);
+			bg = (screen[addr].bg & 0xFF);
+		}
 
-	#warning NEED MORE WORK - Queue only changed area
-	gtk_widget_queue_draw(terminal);
+		cairo_set_3270_color(cr,bg);
+		cairo_rectangle(cr, x, y, fontWidth, fontHeight);
+		cairo_fill(cr);
 
+		cairo_set_3270_color(cr,fg);
+	}
+
+	if(TOGGLED_UNDERLINE && (screen[addr].fg & COLOR_ATTR_UNDERLINE))
+	{
+		// Draw underline
+		int sl = (fontDescent/3);
+		if(sl < 1)
+			sl = 1;
+		cairo_rectangle(cr, x, baseline + (fontDescent/2), fontWidth, sl);
+		cairo_fill(cr);
+	}
+
+	if(screen[addr].cg)
+	{
+		// Graphics char
+	}
+	else if(*screen[addr].ch != ' ' && *screen[addr].ch)
+	{
+		// Text char
+		cairo_move_to(cr,x,baseline);
+		cairo_show_text(cr,screen[addr].ch);
+	}
 
  }
 
@@ -316,59 +351,9 @@
  	int y	= top_margin  + ((bstart / terminal_cols) * fontHeight);
  	int baseline = y + fontAscent;	/**< Baseline for font drawing; it's not the same as font Height */
 
-	Trace("%s(%d,%d)",__FUNCTION__,bstart,bend);
-
-//	Trace("%s row=%d col=%d x=%d y=%d left=%d top=%d start=%d end=%d",__FUNCTION__,row,col,x,y,left_margin,top_margin,bstart,bend);
-
 	for(addr = bstart; addr <= bend; addr++)
 	{
-		if(clr)
-		{
-			short	fg;
-			short 	bg;
-
-			if(screen[addr].status & ELEMENT_STATUS_SELECTED)
-			{
-				fg = TERMINAL_COLOR_SELECTED_FG;
-				bg = TERMINAL_COLOR_SELECTED_BG;
-			}
-			else
-			{
-				fg = (screen[addr].fg & 0xFF);
-				bg = (screen[addr].bg & 0xFF);
-			}
-
-			gdk_cairo_set_source_color(cr,clr+bg);
-			cairo_rectangle(cr, x, y, fontWidth, fontHeight);
-			cairo_fill(cr);
-
-			gdk_cairo_set_source_color(cr,clr+fg);
-		}
-
-		if(TOGGLED_UNDERLINE && (screen[addr].fg & COLOR_ATTR_UNDERLINE))
-		{
-			// Draw underline
-			int line = baseline + (fontDescent/2);
-
-//			cairo_rectangle(cr, x, y, fontWidth, fontHeight);
-
-			cairo_move_to(cr,x,line);
-			cairo_rel_line_to(cr, fontWidth, 0);
-
-			cairo_stroke (cr);
-		}
-
-		if(screen[addr].cg)
-		{
-			// Graphics char
-		}
-		else if(*screen[addr].ch != ' ' && *screen[addr].ch)
-		{
-			// Text char
-			cairo_move_to(cr,x,baseline);
-			cairo_show_text(cr,screen[addr].ch);
-		}
-
+		draw_element(cr,x,y,baseline,addr,clr);
 		if(++col >= terminal_cols)
 		{
 			col  = 0;
@@ -395,13 +380,16 @@
 
 	gdk_drawable_get_size(get_terminal_pixmap(),&width,&height);
 
-	gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_BACKGROUND);
+	cairo_set_3270_color(cr,TERMINAL_COLOR_BACKGROUND);
 	cairo_rectangle(cr, 0, 0, width, height);
 	cairo_fill(cr);
 
 	draw_region(cr,0,(terminal_cols * terminal_rows)-1,color);
+	draw_oia(cr);
 
 	cairo_destroy(cr);
+
+	update_cursor_pixmap();
 
  }
 
@@ -421,6 +409,7 @@
 		update_font_info(terminal);
 		gdk_drawable_get_size(terminal->window,&width,&height);
 		update_screen_size(terminal, width, height);
+		update_cursor_info();
 		update_terminal_contents();
 	}
 	gtk_widget_queue_draw(terminal);
@@ -434,8 +423,6 @@
 
 	cairo_set_font_face(cr,fontFace);
 	cairo_set_font_size(cr,fontSize);
-
-	cairo_set_line_width(cr, 1.);
 
 	return cr;
  }

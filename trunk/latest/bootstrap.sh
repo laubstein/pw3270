@@ -1,7 +1,7 @@
 #!/bin/bash
 
-PACKAGE_VERSION=4.1
-PACKAGE_RELEASE=4
+PACKAGE_VERSION=4.2
+PACKAGE_RELEASE=0
 
 REV=`date +%y%m%d%H%M`
 REV_FILE=./revision.m4

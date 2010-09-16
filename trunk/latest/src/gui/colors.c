@@ -30,7 +30,6 @@
  *
  */
 
-
  #include <lib3270/config.h>
  #include "gui.h"
  #include <ctype.h>
@@ -214,7 +213,7 @@
 		parsecolorentry(TERMINAL_COLOR_SELECTED_BG,					clr[TERMINAL_COLOR_WHITE]);
 		parsecolorentry(TERMINAL_COLOR_SELECTED_FG,					clr[TERMINAL_COLOR_BLACK]);
 
-		for(f=TERMINAL_COLOR_CURSOR;f < TERMINAL_COLOR_COUNT;f++)
+		for(f=TERMINAL_COLOR_CURSOR_BACKGROUND;f < TERMINAL_COLOR_COUNT;f++)
 			parsecolorentry(f,clr[TERMINAL_COLOR_GREEN]);
 
 	}
@@ -285,8 +284,11 @@
 	}
 	else
 	{
-		ReloadPixmaps();
+		#warning Work in progress
+//		ReloadPixmaps();
 		update_terminal_contents();
+		gtk_widget_queue_draw(terminal);
+
 	}
 
  }
@@ -345,8 +347,12 @@
 		ptr = g_strdup(vlr);
 		ParseColorList(ptr);
 		g_free(ptr);
-		ReloadPixmaps();
+
+		#warning Work in progress
+		// ReloadPixmaps();
+
 		update_terminal_contents();
+		gtk_widget_queue_draw(terminal);
 	}
  }
 
@@ -363,7 +369,7 @@
  		{ TERMINAL_COLOR_BACKGROUND,		N_( "Terminal" )			},
  		{ TERMINAL_COLOR_FIELD_DEFAULT,		N_( "Base attributes" )		},
  		{ TERMINAL_COLOR_SELECTED_BG,		N_( "Selected text" )		},
- 		{ TERMINAL_COLOR_CURSOR,			N_( "Cursor" )				},
+ 		{ TERMINAL_COLOR_CURSOR_BACKGROUND,	N_( "Cursor background" )	},
  		{ TERMINAL_COLOR_OIA_BACKGROUND,	N_( "OIA" )					}
 
  	};
@@ -566,8 +572,12 @@
 	SetInt("ColorSetup","PanedPosition",gtk_paned_get_position(GTK_PANED(box)));
 
 	gtk_widget_destroy(dialog);
-	ReloadPixmaps();
+
+	#warning Work in progress
+	// ReloadPixmaps();
+
 	update_terminal_contents();
+	gtk_widget_queue_draw(terminal);
 
 
  }
