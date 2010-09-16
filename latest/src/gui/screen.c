@@ -32,6 +32,7 @@
 
 
 #include "gui.h"
+#include "oia.h"
 #include "fonts.h"
 #include "actions.h"
 
@@ -61,22 +62,6 @@
 
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
 
- #ifdef DEBUG
- 	#define STATUS_CODE_DESCRIPTION(x,c,y) { #x, c, y }
- #else
- 	#define STATUS_CODE_DESCRIPTION(x,c,y) { c, y }
- #endif
-
- struct status_code
- {
-#ifdef DEBUG
-	const char *dbg;
-#endif
-	int			clr;
-	const char	*string;
- };
-
-
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
  static void	  setsize(int rows, int cols);
@@ -99,8 +84,8 @@
  static int	  init(void);
  static void 	  update_toggle(int ix, int value, int reason, const char *name);
  static void	  show_timer(long seconds);
- static void	  DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
- static void 	  DrawImageByWidth(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
+// static void	  DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
+// static void 	  DrawImageByWidth(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
  static gchar	* convert_monocase(int c, gsize *sz);
  static gchar	* convert_regular(int c, gsize *sz);
  static int	  popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, va_list arg);
@@ -147,6 +132,7 @@
 
  };
 
+/*
  static const struct _imagedata
  {
 	const unsigned char	*data;
@@ -170,31 +156,28 @@
  	int		   Width;
  	int		   Height;
  } pix[IMAGE_COUNT];
+*/
 
+ int 								  terminal_rows				= 0;
+ int 								  terminal_cols				= 0;
+ int								  left_margin				= 0;
+ int								  top_margin				= 0;
 
- int 								  terminal_rows	= 0;
- int 								  terminal_cols	= 0;
- int								  left_margin	= 0;
- int								  top_margin	= 0;
+ ELEMENT							* screen					= NULL;
+ char								* charset					= NULL;
+ char								* window_title				= PROGRAM_NAME;
 
- ELEMENT							* screen		= NULL;
- char								* charset		= NULL;
- char								* window_title	= PROGRAM_NAME;
+ gboolean							  screen_updates_enabled	= FALSE;
 
- gboolean							  screen_suspended = FALSE;
-
- static int						  szScreen		= 0;
- static const struct status_code	* sts_data		= NULL;
- static unsigned char			  compose		= 0;
- static gchar						* luname		= 0;
- static const gchar				* status_msg	= NULL;
- static guint						  kbrd_state	= 0;
- static char 						  timer[9]		= "";
+ int						  		  terminal_buffer_length = 0;
+// static const struct status_code	* sts_data		= NULL;
+// static unsigned char			  compose		= 0;
+// static gchar						* luname		= 0;
+// static const gchar				* status_msg	= NULL;
+// static guint						  kbrd_state	= 0;
+// static char 						  timer[9]		= "";
 
  static gchar 						* (*convert_charset)(int c, gsize *sz) = convert_regular;
-
- static gboolean					oia_flag[OIA_FLAG_USER];
- static SCRIPT_STATE 				script_state = SCRIPT_STATE_NONE;
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
@@ -204,37 +187,36 @@
 
  static void set_compose(int on, unsigned char c, int keytype)
  {
+/*
  	if(on)
  		compose = c;
 	else
 		compose = 0;
+*/
  }
 
  static int SetSuspended(int state)
  {
- 	int rc = screen_suspended;
+ 	gboolean enabled = (state == 0);
 
- 	Trace("%s(%d): suspended: %d",__FUNCTION__,state,screen_suspended);
+	if(enabled == screen_updates_enabled)
+		return 0;
 
- 	if(screen_suspended == state)
-		return rc;
+	screen_updates_enabled = enabled;
 
- 	screen_suspended = state;
+ 	Trace("%s(%d): screen updates are %s",__FUNCTION__,state,screen_updates_enabled ? "enabled" : "disabled");
 
-	if(!screen_suspended)
+	if(screen_updates_enabled)
  	{
-		Trace("%s screen updates enabled",__FUNCTION__);
-
  		if(valid_terminal_window())
  		{
+			update_cursor_info();
 			update_terminal_contents();
-			if(Toggled(CURSOR_POS))
-				DrawCursorPosition();
  		}
-		gtk_widget_queue_draw(terminal);
+ 		gtk_widget_queue_draw(terminal);
  	}
 
- 	return rc;
+ 	return TRUE;
  }
 
 
@@ -296,8 +278,41 @@
 	screen_disp();
  }
 
+ static void convert_cg(ELEMENT *el, int c)
+ {
+ 	static const struct _xlat
+ 	{
+ 		int c;
+ 		const gchar *str;
+ 	} xlat[] =
+ 	{
+		{ 0x8c,	"≤" },	// CG 0xf7, less or equal
+		{ 0xae, "≥" },	// CG 0xd9, greater or equal
+		{ 0xbe, "≠" },	// CG 0x3e, not equal
+//		{ 0xa3, " " },	// CG 0x93, bullet
+		{ 0xad, "["	},
+		{ 0xbd, "]" }
+ 	};
+
+ 	int f;
+
+ 	for(f=0;f < G_N_ELEMENTS(xlat); f++)
+ 	{
+		if(xlat[f].c == c)
+		{
+			strcpy(el->ch,xlat[f].str);
+			return;
+		}
+ 	}
+
+	el->cg	= (unsigned short) c;
+	*el->ch	= ' ';
+
+ }
+
  static int addch(int row, int col, int c, unsigned short attr)
  {
+
  	ELEMENT in;
  	ELEMENT *el;
  	int		baddr = (row*terminal_cols)+col;
@@ -305,7 +320,7 @@
  	if(!screen || col >= terminal_cols || row >= terminal_rows)
 		return EINVAL;
 
-	if(baddr > szScreen)
+	if(baddr > terminal_buffer_length)
 		return EFAULT;
 
 	memset(&in,0,sizeof(in));
@@ -314,8 +329,7 @@
 	{
 		if(attr & CHAR_ATTR_CG)
 		{
-			in.cg	= (unsigned short) c;
-			*in.ch			= ' ';
+			convert_cg(&in,c);
 		}
 		else
 		{
@@ -366,8 +380,8 @@
 
 	if(rows && cols)
 	{
-		szScreen = rows*cols;
-		screen = g_new0(ELEMENT,szScreen);
+		terminal_buffer_length = rows*cols;
+		screen = g_new0(ELEMENT,terminal_buffer_length);
 		terminal_rows = rows;
 		terminal_cols = cols;
 
@@ -376,7 +390,7 @@
 
 	}
 
- 	Trace("Terminal set to %d rows with %d cols, screen set to %p",rows,cols,screen);
+// 	Trace("Terminal set to %d rows with %d cols, screen set to %p",rows,cols,screen);
 
  }
 
@@ -394,7 +408,7 @@
 	{
 		unsigned char status;
 
-		for(f=0;f<szScreen;f++)
+		for(f=0;f<terminal_buffer_length;f++)
 		{
 			status				= screen[f].status & ~ELEMENT_STATUS_FIELD_MARKER;
 			memset(screen+f,0,sizeof(ELEMENT));
@@ -403,7 +417,7 @@
 		}
 	}
 
-	if(valid_terminal_window())
+	if(valid_terminal_window() && screen_updates_enabled)
 	{
 		int 	width  = terminal_cols * fontWidth;
 		int 	height = terminal_rows * fontHeight;
@@ -423,12 +437,9 @@
 
  static void set_lu(const char *lu)
  {
-/*
- 	if(luname)
- 	{
-		g_free(luname);
-		luname = NULL;
- 	}
+ 	gchar *luname = NULL;
+
+	update_oia_element(OIA_ELEMENT_LUNAME);
 
  	if(lu)
  	{
@@ -491,67 +502,6 @@
  	}
 
 	CallPlugins("pw3270_plugin_update_luname",luname);
-
-	DrawOIA(pixmap,color);
-
-	if(terminal)
-		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
-*/
- }
-
- static void DrawStatus(GdkDrawable *draw, GdkColor *clr)
- {
-#ifdef ENABLE_PANGO
- 	PangoLayout *layout = getPangoLayout(TEXT_LAYOUT_OIA);
-	GdkGC 		*gc = getCachedGC(draw);
-
- 	int col = left_margin+(fontWidth << 3);
-
-	gdk_gc_set_foreground(gc,clr+TERMINAL_COLOR_OIA_BACKGROUND);
-	gdk_draw_rectangle(draw,gc,1,col,OIAROW+1,fontWidth << 4,fontHeight+1);
-
-	if(sts_data && status_msg && *status_msg)
-	{
-		if(*status_msg == 'X')
-		{
-			int f;
-			int cols = (fontWidth/3)+1;
-
-			gdk_gc_set_foreground(gc,clr+sts_data->clr);
-
-			for(f=0;f<cols;f++)
-			{
-				gdk_draw_line(draw,gc,col,OIAROW+f+3, col+(fontWidth-1),(OIAROW+(fontHeight-2)+f)-cols);
-				gdk_draw_line(draw,gc,col+(fontWidth-1),OIAROW+f+3, col,(OIAROW+(fontHeight-2)+f)-cols);
-			}
-
-			col += fontWidth;
-			pango_layout_set_text(layout,status_msg+1,-1);
-		}
-		else
-		{
-			pango_layout_set_text(layout,status_msg,-1);
-		}
-		gdk_draw_layout_with_colors(draw,gc,col,OIAROW+1,layout,clr+sts_data->clr,clr+TERMINAL_COLOR_OIA_BACKGROUND);
-	}
-#ifdef DEBUG
-	else if(sts_data)
-	{
-		pango_layout_set_text(layout,sts_data->dbg,-1);
-		gdk_draw_layout_with_colors(draw,gc,col,OIAROW+1,layout,clr+sts_data->clr,clr+TERMINAL_COLOR_OIA_BACKGROUND);
-	}
-	else
-	{
-		pango_layout_set_text(layout,"STATUS_NONE",-1);
-		gdk_draw_layout_with_colors(draw,gc,col,OIAROW+1,layout,clr+TERMINAL_COLOR_OIA,clr+TERMINAL_COLOR_OIA_BACKGROUND);
-	}
-#endif
-
-
-#else // ENABLE_PANGO
-
-
-#endif // ENABLE_PANGO
 
  }
 
@@ -728,18 +678,52 @@
 
  static void set_oia(OIA_FLAG id, int on)
  {
- 	#warning Work in progress
-/*
  	if(id > OIA_FLAG_USER)
 		return;
 
- 	oia_flag[id] = on;
+	oia_flag[id] = on;
 
-	DrawOIA(pixmap,color);
+	switch(id)
+	{
+	case OIA_FLAG_BOXSOLID:
+		update_oia_element(OIA_ELEMENT_CONNECTION_STATUS);
+		break;
 
-	if(terminal)
-		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
-*/
+	case OIA_FLAG_UNDERA:
+		update_oia_element(OIA_ELEMENT_UNDERA);
+		break;
+
+	case OIA_FLAG_SECURE:
+		update_oia_element(OIA_ELEMENT_SSL_INDICATOR);
+		break;
+
+	case OIA_FLAG_TYPEAHEAD:
+		update_oia_element(OIA_ELEMENT_TYPEAHEAD_INDICATOR);
+		break;
+
+#ifdef OIA_ELEMENT_PRINTER_INDICATOR
+	case OIA_FLAG_PRINTER:
+		update_oia_element(OIA_ELEMENT_PRINTER_INDICATOR);
+		break;
+#endif //  OIA_ELEMENT_PRINTER_INDICATOR
+
+#ifdef OIA_ELEMENT_REVERSE_INPUT_INDICATOR
+	case OIA_FLAG_REVERSE:
+		update_oia_element(OIA_ELEMENT_REVERSE_INPUT_INDICATOR);
+		break;
+#endif // OIA_ELEMENT_REVERSE_INPUT_INDICATOR
+
+	default:
+
+		// Unexpected flag, update all OIA.
+		if(valid_terminal_window())
+		{
+			cairo_t *cr	= get_terminal_cairo_context();
+			draw_oia(cr);
+			cairo_destroy(cr);
+			gtk_widget_queue_draw_area(terminal,OIAROW,left_margin,terminal_cols*fontWidth,fontHeight+1);
+		}
+	}
  }
 
  static void set_charset(char *dcs)
@@ -749,112 +733,25 @@
 	charset = g_strdup(dcs);
  }
 
- static STATUS_CODE last_id = (STATUS_CODE) -1;
-
  void SetStatusCode(STATUS_CODE id)
  {
- 	static const struct status_code tbl[STATUS_CODE_USER] =
- 	{
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_BLANK,
-									TERMINAL_COLOR_OIA_STATUS_OK,
-									"" ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_SYSWAIT,
-									TERMINAL_COLOR_OIA_STATUS_OK,
-									N_( "X System" ) ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_TWAIT,
-									TERMINAL_COLOR_OIA_STATUS_OK,
-									N_( "X Wait" ) ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_CONNECTED,
-									TERMINAL_COLOR_OIA_STATUS_OK,
-									NULL ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_DISCONNECTED,
-									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "X Not Connected" ) ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_AWAITING_FIRST,
-									TERMINAL_COLOR_OIA_STATUS_OK,
-									N_( "X" ) ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_MINUS,
-									TERMINAL_COLOR_OIA_STATUS_OK,
-									N_( "X -f" ) ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_PROTECTED,
-									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "X Protected" ) ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_NUMERIC,
-									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "X Numeric" ) ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_OVERFLOW,
-									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "X Overflow" ) ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_INHIBIT,
-									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "X Inhibit" ) ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_KYBDLOCK,
-									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									NULL ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_X,
-									TERMINAL_COLOR_OIA_STATUS_INVALID,
-									N_( "X" ) ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_RESOLVING,
-									TERMINAL_COLOR_OIA_STATUS_WARNING,
-									N_( "X Resolving" ) ),
-
-		STATUS_CODE_DESCRIPTION(	STATUS_CODE_CONNECTING,
-									TERMINAL_COLOR_OIA_STATUS_WARNING,
-									N_( "X Connecting" ) ),
-
-
-	};
-
-	/* Check if status has changed to avoid unnecessary redraws */
-	if(id == last_id && !sts_data)
+ 	if(id == terminal_message_id)
 		return;
 
-	if(id >= STATUS_CODE_USER)
+	terminal_message_id = id;
+
+	if(id == STATUS_CODE_BLANK)
+	{
+		set_cursor(CURSOR_MODE_NORMAL);
+		update_cursor_pixmap();
+	}
+	else if(id >= STATUS_CODE_USER)
 	{
 		Log("Unexpected status code %d",(int) id);
 		return;
 	}
 
-	last_id 	= id;
-	sts_data 	= tbl+id;
-
-	Trace("Status changed to %s (%s)",sts_data->dbg,sts_data->string ? sts_data->string : "NULL");
-
-	if(sts_data->string)
-	{
-		if(*sts_data->string)
-			status_msg = gettext(sts_data->string);
-		else
-			status_msg = "";
-
-		// FIXME (perry#2#): Find why the library is keeping the cursor as "locked" in some cases. When corrected this "workaround" can be removed.
-		if(id == STATUS_CODE_BLANK)
-			set_cursor(CURSOR_MODE_NORMAL);
-
-		#warning Apresentar string com o status na tela
-/*
-		if(pixmap)
-			DrawStatus(pixmap, color);
-
-
-		if(terminal)
-			gtk_widget_queue_draw_area(terminal,left_margin+(fontWidth << 3),OIAROW,fontWidth << 4,fontHeight+1);
-
-*/
-	}
+	update_oia_element(OIA_ELEMENT_MESSAGE_AREA);
 
  }
 
@@ -875,7 +772,7 @@
 
  }
 
- static int Loaded = 0;
+// static int Loaded = 0;
 
 
  void LoadImages(GdkDrawable *drawable, GdkGC *gc)
@@ -929,6 +826,7 @@
 */
  }
 
+/*
  void ReloadPixmaps(void)
  {
 	LoadImages(terminal->window, terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)]);
@@ -947,7 +845,7 @@
 
  	if(!pix[id].pix)
  	{
- 		/* Resize by Width */
+ 		// Resize by Width
         ratio = ((double) gdk_pixbuf_get_height(pix[id].base)) / ((double) gdk_pixbuf_get_width(pix[id].base));
 		temp  = (int) ((double) ratio * ((double) Height));
 	    pix[id].pix = gdk_pixbuf_scale_simple(pix[id].base,Width,temp,GDK_INTERP_HYPER);
@@ -980,11 +878,14 @@
 		gdk_pixbuf_render_to_drawable(pix[id].pix,drawable,gc,0,0,x,y,-1,-1,GDK_RGB_DITHER_NORMAL,0,0);
 
  }
+*/
 
+/*
  void UpdateKeyboardState(guint state)
  {
 
  }
+*/
 
  gchar * GetScreenContents(gboolean all)
  {
@@ -1198,65 +1099,58 @@
 
  }
 
+ static gboolean update_timer_spinner(gpointer dunno)
+ {
+	oia_spinner_step++;
+	update_oia_element(OIA_ELEMENT_COMMAND_SPINNER);
+	return oia_timer > 0;
+ }
+
  static void show_timer(long seconds)
  {
- 	#warning Work in progress
-/*
  	if(seconds > 0)
  	{
-		Trace("Timer: %d seconds",(int) seconds);
-		g_snprintf(timer,6,"%02d:%02d",(int) (seconds/60),(int) (seconds % 60));
-		DrawOIA(pixmap,color);
+ 		if(oia_timer < 0)
+			g_timeout_add((guint) 150, (GSourceFunc) update_timer_spinner, 0);
+		oia_timer = (seconds % 5940);
  	}
- 	else if(*timer)
+ 	else
  	{
- 		*timer = 0;
-		DrawOIA(pixmap,color);
+ 		oia_timer = -1;
  	}
-
-	gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
-*/
-
+	update_oia_element(OIA_ELEMENT_COMMAND_SPINNER);
+ 	update_oia_element(OIA_ELEMENT_COMMAND_TIMER);
  }
 
  static gboolean script_timer(gpointer dunno)
  {
-	// TODO (perry#9#): Blink script indicator according current state
- 	return script_state != SCRIPT_STATE_NONE;
+	oia_script_blink = !oia_script_blink;
+ 	update_oia_element(OIA_ELEMENT_SCRIPT_INDICATOR);
+ 	return oia_script_state != SCRIPT_STATE_NONE;
  }
 
  static void SetScript(SCRIPT_STATE state)
  {
- 	#warning Work in progress
-
-/*
-	if(script_state == SCRIPT_STATE_NONE)
-	{
-		// No script. Start timer
-		script_state = state;
-		g_timeout_add((guint) 10, (GSourceFunc) script_timer, 0);
+ 	if(oia_script_state == state)
 		return;
-	}
 
-	// Update OIA
-	script_state = state;
-	DrawOIA(pixmap,color);
-	if(terminal)
-		gtk_widget_queue_draw_area(terminal,left_margin,OIAROW,fontWidth*terminal_cols,fontHeight+1);
-*/
+	if(oia_script_state == SCRIPT_STATE_NONE)
+		g_timeout_add((guint) 500, (GSourceFunc) script_timer, 0);
+
+	oia_script_state = state;
+	oia_script_blink = TRUE;
+ 	update_oia_element(OIA_ELEMENT_SCRIPT_INDICATOR);
 
  }
 
  static void display(void)
  {
-	if(valid_terminal_window())
+	if(valid_terminal_window() && screen_updates_enabled)
 	{
 		int		baddr   =  0;
 		int		row;
 		int		col;
-		cairo_t *cr		= get_terminal_cairo_context();
-
-		Trace("%s begins",__FUNCTION__);
+		cairo_t *cr	= get_terminal_cairo_context();
 
 		for(row = 0; row < terminal_rows; row++)
 		{
@@ -1274,14 +1168,13 @@
 						bstart = baddr;
 						cstart = col;
 					}
-					bend = baddr+1;
+					bend = baddr;
 					screen[baddr].changed = FALSE;
 				}
 				else if(bstart >= 0)
 				{
 					draw_region(cr,bstart,bend,color);
-					top_margin +(row*terminal_cols);
-					gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,(bend-bstart)*fontWidth,fontHeight);
+					gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,fontHeight);
 					bstart = bend = -1;
 				}
 				baddr++;
@@ -1290,7 +1183,7 @@
 			if(bstart >= 0)
 			{
 				draw_region(cr,bstart,bend,color);
-				gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,(bend-bstart)*fontWidth,fontHeight);
+				gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,fontHeight);
 			}
 		}
 
@@ -1298,7 +1191,5 @@
 
 		gdk_window_process_updates(terminal->window,FALSE);
 
-		Trace("%s ends",__FUNCTION__);
 	}
-
  }

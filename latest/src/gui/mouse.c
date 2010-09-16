@@ -46,7 +46,7 @@
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
  static void UpdateSelectedRegion(int start, int end);
- static void SelectField(int row, int col);
+ static void SelectField(int addr);
  static void SetDragType(int type);
  static void SetSelection(gboolean selected);
 
@@ -126,17 +126,15 @@
 		return;
 
 	SetSelection(FALSE);
-	SelectField(cRow,cCol);
+	SelectField(cursor_position);
 	SetSelectionMode(SELECT_MODE_FIELD);
  }
 
- static void SelectField(int row, int col)
+ static void SelectField(int addr)
  {
- 	int baddr = find_field_attribute((row * terminal_cols) + col);
+ 	int baddr = find_field_attribute(addr);
  	int length = find_field_length(baddr);
  	int function = 0;
-
-	Trace("Field %d with %d bytes",baddr,length);
 
 	if(length < 0 || length > ((terminal_cols * terminal_cols) - baddr))
 		return;
@@ -185,16 +183,17 @@
 	}
 
 	if(valid_terminal_window() && start > 0)
-		update_region(start,end);
+	{
+		cairo_t *cr = get_terminal_cairo_context();
+		draw_region(cr,start,end,color);
+		cairo_destroy(cr);
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*fontHeight);
+	}
  }
 
  static int DecodePosition(long x, long y, int *row, int *col)
  {
- 	#warning Need rebuild
-
  	int rc = 0;
-
-/*
 
  	if(x < left_margin)
  	{
@@ -225,7 +224,7 @@
 	{
 		*row = ((((unsigned long) y) - top_margin)/fontHeight);
 	}
-*/
+
 	return rc;
  }
 
@@ -312,7 +311,8 @@
 
  gboolean mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  {
-	int row,col;
+	int row = 0;
+	int col = 0;
 
 	DecodePosition(event->x,event->y,&row,&col);
 
@@ -334,7 +334,7 @@
 
 	case ((SELECT_MODE_FIELD & 0x0F) << 4) | 1:	// Double click, select field
 		Trace("Selecting field (button: %d)",event->button);
-		SelectField(startRow,startCol);
+		SelectField((startRow * terminal_cols) + startCol);
 		break;
 
 	case ((SELECT_MODE_COPY & 0x0F) << 4) | 1:
@@ -373,15 +373,15 @@
 
  static void UpdateSelectedRectangle(void)
  {
- 	int		  row,col;
- 	int		  pos		= 0;
- 	int		  left;
- 	int		  right;
- 	int		  top;
- 	int		  bottom;
+ 	int		  		row,col;
+	int		  		pos		= 0;
+ 	int		  		left;
+ 	int		  		right;
+ 	int		  		top;
+ 	int		  		bottom;
 
-	if(!(select_mode && screen && valid_terminal_window()))
-		return;
+//	if(!(select_mode && screen))
+//		return;
 
 	if(startRow > endRow)
 	{
@@ -407,8 +407,10 @@
 
 	for(row = 0; row < terminal_rows;row++)
 	{
-		int start	= -1;
-		int end		= -1;
+		int scol	= -1;
+		int ecol	= -1;
+		int saddr	= -1;
+		int eaddr	= -1;
 
 		for(col = 0; col < terminal_cols;col++)
 		{
@@ -418,6 +420,7 @@
 			{
 				status |= ELEMENT_STATUS_SELECTED;
 
+/*
 				if(col == left)
 					status |= SELECTION_BOX_LEFT;
 
@@ -429,22 +432,37 @@
 
 				if(row == bottom)
 					status |= SELECTION_BOX_BOTTOM;
+*/
 
 			}
 
 			if(screen[pos].status != status)
 			{
 				screen[pos].status = status;
-				if(start < 0)
-					start = pos;
-				end = pos;
+
+				if(saddr < 0)
+				{
+					saddr = pos;
+					scol  = col;
+				}
+				eaddr = pos;
+				ecol  = col;
 			}
 
 			pos++;
 		}
-		if(start > 0)
-			update_region(start,end);
+
+		if(saddr >= 0)
+		{
+			cairo_t *cr = get_terminal_cairo_context();
+			draw_region(cr,saddr,eaddr,color);
+			cairo_destroy(cr);
+		}
 	}
+
+	if(valid_terminal_window())
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*fontHeight);
+
  }
 
  static void UpdateSelectedText(void)
@@ -454,11 +472,8 @@
 
  static void UpdateSelectedRegion(int bstart, int bend)
  {
- 	int			pos		= 0;
- 	int			row,col;
-
-	if(valid_terminal_window())
-		return;
+ 	int pos		= 0;
+ 	int row,col;
 
  	if(bstart > bend)
  	{
@@ -469,8 +484,8 @@
 
 	for(row = 0; row < terminal_rows;row++)
 	{
-		int start	= -1;
-		int end		= -1;
+		int saddr = -1;
+		int eaddr = -1;
 
 		for(col = 0; col < terminal_cols;col++)
 		{
@@ -480,34 +495,42 @@
 			{
 				status |= ELEMENT_STATUS_SELECTED;
 
+/*
 				if(!(row && (screen[pos-terminal_cols].status) & ELEMENT_STATUS_SELECTED))
 					status |= SELECTION_BOX_TOP;
 
 				if(!(pos && col && (screen[pos-1].status) & ELEMENT_STATUS_SELECTED))
 					status |= SELECTION_BOX_LEFT;
 
-				if(pos+1 > end || col == (terminal_cols-1))
+				if(pos+1 > scol || col == (terminal_cols-1))
 					status |= SELECTION_BOX_RIGHT;
 
-				if((pos+terminal_cols) > end)
+				if((pos+terminal_cols) > ecol)
 					status |= SELECTION_BOX_BOTTOM;
+*/
 			}
 
 			if(screen[pos].status != status)
 			{
 				screen[pos].status = status;
-				if(start < 0)
-					start = pos;
-				end = pos;
+				if(saddr < 0)
+					saddr = pos;
+				eaddr = pos;
 			}
-
 			pos++;
 		}
 
-		if(start > 0)
-			update_region(start,end);
+		if(saddr >= 0)
+		{
+			cairo_t *cr = get_terminal_cairo_context();
+			draw_region(cr,saddr,eaddr,color);
+			cairo_destroy(cr);
+		}
 
 	}
+
+	if(valid_terminal_window())
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*fontHeight);
 
  }
 
@@ -557,7 +580,8 @@
 
  gboolean mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
  {
-	int row, col, r, c;
+	int row = 0;
+	int col = 0;
 
 	if(button_flags & BUTTON_FLAG_COMBO)
 	{
@@ -582,7 +606,8 @@
 	}
 	else if(select_mode == SELECT_MODE_RECTANGLE)
 	{
-		int row, col;
+		int row = 0;
+		int col = 0;
 
 		if(DecodePosition(event->x,event->y,&row,&col))
 		{
@@ -645,6 +670,9 @@
 	}
 	else if(select_mode == SELECT_MODE_DRAG)
 	{
+		int r;
+		int c;
+
 		DecodePosition(event->x,event->y,&row,&col);
 
 //		Trace("Drag_type: %d Position: %d,%d",drag_type,row,col);
@@ -756,17 +784,21 @@
 
  static void doSelect(int (*call)(void))
  {
+ 	int row = cursor_position / terminal_cols;
+ 	int col = cursor_position % terminal_cols;
+
  	if(select_mode == SELECT_MODE_NONE)
  	{
  		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
- 		startRow = endRow = cRow;
- 		startCol = endCol = cCol;
+
+ 		startRow = endRow = row;
+ 		startCol = endCol = col;
  	}
 
  	call();
 
-	endRow = cRow;
-	endCol = cCol;
+	endRow = row;
+	endCol = col;
 
 	Reselect();
  }

@@ -84,7 +84,7 @@
 	fontDescent = font_size[size].descent;
 	fontAscent  = font_size[size].ascent;
 
-	Trace("%s - screen=%p",__FUNCTION__,screen);
+//	Trace("%s - screen=%p",__FUNCTION__,screen);
 
 	// Center image
 	left_margin = (width >> 1) - ((terminal_cols * fontWidth) >> 1);

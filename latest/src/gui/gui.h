@@ -147,7 +147,7 @@
 		TERMINAL_COLOR_SELECTED_FG,
 		TERMINAL_COLOR_SELECTED_BORDER,
 
-		TERMINAL_COLOR_CURSOR,
+		TERMINAL_COLOR_CURSOR_BACKGROUND,
 		TERMINAL_COLOR_CROSS_HAIR,
 
 		// Oia Colors
@@ -160,13 +160,19 @@
 		TERMINAL_COLOR_COUNT
 	};
 
+	#define TERMINAL_COLOR_CURSOR_FOREGROUND	TERMINAL_COLOR_BACKGROUND
 	#define TERMINAL_COLOR_OIA_CURSOR 			TERMINAL_COLOR_OIA_STATUS_OK
-	#define TERMINAL_COLOR_OIA_LU 				TERMINAL_COLOR_OIA_STATUS_OK
+	#define TERMINAL_COLOR_OIA_LUNAME			TERMINAL_COLOR_OIA_STATUS_OK
 	#define TERMINAL_COLOR_OIA_TIMER			TERMINAL_COLOR_OIA_STATUS_OK
-	#define TERMINAL_COLOR_SSL 					TERMINAL_COLOR_OIA
+	#define TERMINAL_COLOR_SSL_INDICATOR		TERMINAL_COLOR_OIA
+	#define TERMINAL_COLOR_OIA_INDICATORS		TERMINAL_COLOR_OIA
+	#define TERMINAL_COLOR_OIA_SCRIPT_INDICATOR	TERMINAL_COLOR_OIA
 	#define TERMINAL_COLOR_OIA_STATUS_WARNING	TERMINAL_COLOR_OIA
 	#define TERMINAL_COLOR_FIELD				TERMINAL_COLOR_FIELD_DEFAULT
 	#define TERMINAL_COLOR_DEFAULT_FG			TERMINAL_COLOR_WHITE
+
+	#define TERMINAL_COLOR_OIA_TIMER			TERMINAL_COLOR_OIA_STATUS_OK
+	#define TERMINAL_COLOR_OIA_SPINNER			TERMINAL_COLOR_OIA_STATUS_OK
 
 	#define CURSOR_MODE_SHOW	0x80
 	#define CURSOR_MODE_ENABLED	0x40
@@ -199,11 +205,16 @@
 	LOCAL_EXTERN GdkColor			  color[TERMINAL_COLOR_COUNT+1];
 	LOCAL_EXTERN H3270				* hSession;
 	LOCAL_EXTERN GtkIMContext		* input_method;
+	LOCAL_EXTERN gint				  terminal_buffer_length;
 
 	// Pixmaps
-	LOCAL_EXTERN GdkPixmap			* pixmap_terminal;
-	#define get_terminal_pixmap()	pixmap_terminal
-	#define valid_terminal_window()	(pixmap_terminal != NULL)
+	LOCAL_EXTERN GdkPixmap			* pixmap_cursor;	/**< Pixmap with cursor image */
+	LOCAL_EXTERN GdkPixmap			* pixmap_terminal;	/**< Pixmap with terminal contents */
+
+	#define get_terminal_pixmap()		pixmap_terminal
+	#define get_cursor_pixmap()			pixmap_cursor
+	#define cairo_set_3270_color(cr,x)	gdk_cairo_set_source_color(cr,color+x)
+	#define valid_terminal_window()		(pixmap_terminal != NULL)
 
 #ifdef MOUSE_POINTER_CHANGE
 	LOCAL_EXTERN GdkCursor        		* wCursor[CURSOR_MODE_3270];
@@ -217,12 +228,14 @@
 	LOCAL_EXTERN int					  left_margin;
 	LOCAL_EXTERN int					  top_margin;
 
-	LOCAL_EXTERN gint					  cCol;
-	LOCAL_EXTERN gint					  cRow;
+	LOCAL_EXTERN gint					  cursor_position;
+	LOCAL_EXTERN GdkRectangle			  rCursor;
+	LOCAL_EXTERN gboolean			      cursor_blink;
+
 	LOCAL_EXTERN gboolean 				  WaitingForChanges;
 	LOCAL_EXTERN char					* charset;
 	LOCAL_EXTERN gchar 					* window_title;
-	LOCAL_EXTERN gboolean				  screen_suspended;
+	LOCAL_EXTERN gboolean				  screen_updates_enabled;
 
 	// Paths
 	LOCAL_EXTERN gchar					* program_data;
@@ -276,6 +289,10 @@
 	GtkWidget * widget_from_action_name(const gchar *name);
 
 	LOCAL_EXTERN void 	update_cursor_position(int row, int col);
+	LOCAL_EXTERN void	update_cursor_info(void);
+	LOCAL_EXTERN void	queue_draw_cursor(void);
+	LOCAL_EXTERN void	update_cursor_pixmap(void);
+
 	LOCAL_EXTERN void 	set_action_sensitive_by_name(const gchar *name,gboolean sensitive);
 	LOCAL_EXTERN void	set_action_group_sensitive_state(int id, gboolean status);
 
@@ -285,7 +302,7 @@
 #endif
 
 	gboolean	PFKey(guint key);
-	void 		DrawCursorPosition(void);
+//	void 		DrawCursorPosition(void);
 
 	#define		GetSelection() GetScreenContents(0)
 	LOCAL_EXTERN void	  check_clipboard_contents(void);
@@ -307,7 +324,8 @@
 	int 			GetFunctionKey(GdkEventKey *event);
 	int 			wait4negotiations(const char *cl_hostname);
 	GdkPixbuf 		*LoadLogo(void);
-	GdkGC 			*getCachedGC(GdkDrawable *draw);
+
+//	GdkGC 			*getCachedGC(GdkDrawable *draw);
 
 	void			FontChanged(void);
 
@@ -371,6 +389,8 @@
 
 	LOCAL_EXTERN void 		  update_terminal_contents(void);
 	LOCAL_EXTERN void 		  draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr);
+	LOCAL_EXTERN void		  draw_element(cairo_t *cr, int x, int y, int baseline, int addr, GdkColor *clr);
+
 	LOCAL_EXTERN void 		  update_region(int bstart, int bend);
 	LOCAL_EXTERN cairo_t	* get_terminal_cairo_context(void);
 

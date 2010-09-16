@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como terminal.c e possui 636 linhas de código.
+ * Este programa está nomeado como terminal.c e possui - linhas de código.
  *
  * Contatos:
  *
@@ -31,6 +31,7 @@
  */
 
 #include "gui.h"
+#include "oia.h"
 #include "fonts.h"
 
 #include <lib3270/toggle.h>
@@ -48,20 +49,9 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
-// GdkColor						  color[TERMINAL_COLOR_COUNT+1];
-
- GtkWidget						* terminal				= NULL;
- GdkPixmap						* pixmap_terminal		= NULL;
-
- GtkIMContext					* input_method			= NULL;
-
- // Cursor info
- gint							cMode					= CURSOR_MODE_ENABLED|CURSOR_MODE_BASE|CURSOR_MODE_SHOW;
- gint							cCol					= 0;
- gint							cRow					= 0;
-// static GdkPixmap				*pCursor				= NULL;
- static GdkRectangle			rCursor;
- static int					blink_enabled			= 0;
+ GtkWidget		* terminal				= NULL;
+ GdkPixmap		* pixmap_terminal		= NULL;
+ GtkIMContext	* input_method			= NULL;
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
@@ -78,36 +68,12 @@
 		pixmap_terminal = NULL;
 	}
 
- }
-
- static void draw_cursor(void)
- {
- 	if(!valid_terminal_window())
-		return;
-
-	rCursor.x 		= left_margin + (cCol * fontWidth);
-	rCursor.y 		= top_margin + (cRow * fontHeight);
-	rCursor.width 	= fontWidth;
-
-	Trace("Cursor at %d,%d",rCursor.x,rCursor.y);
-
-	gtk_im_context_set_cursor_location(input_method,&rCursor);
-
-//	if(cMode & (CURSOR_MODE_ENABLED|CURSOR_MODE_CROSS) == (CURSOR_MODE_ENABLED|CURSOR_MODE_CROSS))
+	if(get_cursor_pixmap())
 	{
-		int	 width;
-		int	 height;
-
-		gdk_drawable_get_size(terminal->window,&width,&height);
-
-		gtk_widget_queue_draw_area(terminal,0,rCursor.y+fontAscent,width,1);
-		gtk_widget_queue_draw_area(terminal,rCursor.x,0,1,height);
-
+		gdk_pixmap_unref(get_cursor_pixmap());
+		pixmap_cursor = NULL;
 	}
-
  }
-
-
 
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
@@ -128,66 +94,48 @@
     gdk_cairo_rectangle(cr, &event->area);
     cairo_fill(cr);
 
-    cairo_destroy(cr);
-
-//	if(cMode & (CURSOR_MODE_ENABLED|CURSOR_MODE_CROSS) == (CURSOR_MODE_ENABLED|CURSOR_MODE_CROSS))
-	{
-		// Draw cross-hair cursor
-		int			width;
-		int			height;
-		GtkStyle	*style	= gtk_widget_get_style(widget);
-		GdkGC 		*gc		= style->fg_gc[GTK_STATE_NORMAL];
-
-		gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CROSS_HAIR);
-		gdk_drawable_get_size(widget->window,&width,&height);
-
-		gdk_draw_line(widget->window,gc,rCursor.x,0,rCursor.x,OIAROW-1);
-		gdk_draw_line(widget->window,gc,0,rCursor.y+fontAscent,width,rCursor.y+fontAscent);
-
-	}
-
-/*
-    // http://developer.gnome.org/doc/API/2.0/gdk/gdk-Event-Structures.html#GdkEventExpose
-	GdkGC *gc;
-
-	if(!widget->window)
-		return 0;
-
-	gc = getCachedGC(widget->window);
-
-    if(!pixmap)
-		pixmap = GetPixmap(widget); // No pixmap, get a new one
-
-	gdk_draw_drawable(widget->window,	gc,
-										GDK_DRAWABLE(pixmap),
-										event->area.x,event->area.y,
-										event->area.x,event->area.y,
-										event->area.width,event->area.height);
-
 	if((cMode & CURSOR_MODE_ENABLED))
 	{
-		// Draw cursor
-
-		if(cMode & CURSOR_MODE_CROSS)
+		if(!get_cursor_pixmap())
 		{
-			// Draw cross-hair cursor
-			gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_CROSS_HAIR);
-			gdk_draw_line(widget->window,gc,rCursor.x,0,rCursor.x,OIAROW-1);
-			gdk_draw_line(widget->window,gc,0,rCursor.y+fontHeight,sWidth,rCursor.y+fontHeight);
+			pixmap_cursor = gdk_pixmap_new(window,rCursor.width,rCursor.height,-1);
+			update_cursor_pixmap();
 		}
 
 		if( (cMode & (CURSOR_MODE_BASE|CURSOR_MODE_SHOW)) == (CURSOR_MODE_BASE|CURSOR_MODE_SHOW) )
 		{
-			// Draw standard cursor
-			gdk_draw_drawable(		widget->window,	gc,
-									GDK_DRAWABLE(pCursor),
-									0,rCursor.height,
-									rCursor.x,rCursor.y+rCursor.height,
-									rCursor.width,fontHeight-rCursor.height);
 
+			gdk_cairo_set_source_pixmap(cr, get_cursor_pixmap(), rCursor.x, rCursor.y);
+			cairo_rectangle(cr, rCursor.x, rCursor.y, rCursor.width, rCursor.height);
+			cairo_fill(cr);
+
+/*
+			GtkStyle	*style	= gtk_widget_get_style(widget);
+			gdk_draw_drawable(		widget->window,	style->fg_gc[GTK_STATE_NORMAL],
+									GDK_DRAWABLE(get_cursor_pixmap()),
+									0,0,
+									rCursor.x,rCursor.y,
+									rCursor.width,rCursor.height);
+*/
+		}
+
+
+		if(cMode & CURSOR_MODE_CROSS)
+		{
+			// Draw cross-hair cursor
+			int			width;
+			int			height;
+
+			gdk_drawable_get_size(window,&width,&height);
+
+			gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_CROSS_HAIR);
+			cairo_rectangle(cr, rCursor.x, 0, 1, OIAROW-1);
+			cairo_rectangle(cr, 0, rCursor.y+fontAscent, width,1);
+			cairo_fill(cr);
 		}
 	}
-*/
+
+    cairo_destroy(cr);
 
 	return 0;
  }
@@ -215,6 +163,7 @@
 
 	// Invalidate pixmaps, will redraw on next expose
 	release_pixmaps();
+	update_cursor_info();
 
  }
 
@@ -273,14 +222,14 @@
  static gboolean focus_in(GtkWidget *widget, GdkEventFocus *event, gpointer x)
  {
 	gtk_im_context_focus_in(input_method);
-//	InvalidateCursor();
+	queue_draw_cursor();
 	return 0;
  }
 
  static gboolean focus_out(GtkWidget *widget, GdkEventFocus *event, gpointer x)
  {
 	gtk_im_context_focus_out(input_method);
-//	InvalidateCursor();
+	queue_draw_cursor();
 	return 0;
  }
 
@@ -291,7 +240,8 @@
 
  static gboolean key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
-	UpdateKeyboardState(event->state & KEYBOARD_STATE_MASK);
+ 	#define Work in progress
+	// UpdateKeyboardState(event->state & KEYBOARD_STATE_MASK);
 
 	if(gtk_im_context_filter_keypress(input_method,event))
 		return TRUE;
@@ -307,7 +257,8 @@
 
  static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
-	UpdateKeyboardState(event->state & KEYBOARD_STATE_MASK);
+ 	#define work in progress
+	// UpdateKeyboardState(event->state & KEYBOARD_STATE_MASK);
 
 	if(gtk_im_context_filter_keypress(input_method,event))
 		return TRUE;
@@ -317,15 +268,17 @@
 
  static void set_crosshair(int value, enum toggle_type reason)
  {
+	queue_draw_cursor();
  	if(value)
 		cMode |= CURSOR_MODE_CROSS;
 	else
 		cMode &= ~CURSOR_MODE_CROSS;
+	queue_draw_cursor();
  }
 
  static gboolean blink_cursor(gpointer ptr)
  {
- 	if(!blink_enabled)
+ 	if(!cursor_blink)
 		return FALSE;
 
  	if(cMode & CURSOR_MODE_ENABLED)
@@ -334,7 +287,7 @@
 			cMode ^= CURSOR_MODE_SHOW;
 		else
 			cMode |= CURSOR_MODE_SHOW;
-//		InvalidateCursor();
+		gtk_widget_queue_draw_area(terminal,rCursor.x,rCursor.y,rCursor.width,rCursor.height);
  	}
 	return TRUE;
  }
@@ -342,36 +295,39 @@
 
  static void set_blink(int value, enum toggle_type reason)
  {
- 	if(value == blink_enabled)
-		return;
-
-	blink_enabled = value;
-
 	if(value)
+	{
+		// Activate blinking
+		if(cursor_blink)
+			return;
+
+		cursor_blink = TRUE;
 		g_timeout_add((guint) 750, (GSourceFunc) blink_cursor, 0);
+
+	}
 	else
+	{
+		// Deactivate blinking
+		if(!cursor_blink)
+			return;
+
+		cursor_blink = FALSE;
 		cMode |= CURSOR_MODE_SHOW;
 
-//	InvalidateCursor();
+	}
+
+	queue_draw_cursor();
  }
 
  static void set_insert(int value, enum toggle_type reason)
  {
- 	#warning Work in progress
-
-/*
-	DrawOIA(pixmap,color);
-
-	if(terminal)
-		gtk_widget_queue_draw(terminal);
-
- 	RedrawCursor();
-*/
+	gtk_widget_queue_draw_area(terminal,rCursor.x,rCursor.y,rCursor.width,rCursor.height);
+	update_oia_element(OIA_ELEMENT_INSERT_INDICATOR);
  }
 
  static void size_allocate(GtkWidget *widget, GtkAllocation *allocation, gpointer user_data)
  {
- 	Trace("Terminal changes to %dx%d pixels",allocation->width,allocation->height);
+// 	Trace("Terminal changes to %dx%d pixels",allocation->width,allocation->height);
     if(widget->window)
 		ResizeTerminal(widget,allocation->width,allocation->height);
  }
@@ -423,38 +379,11 @@
 	return terminal;
  }
 
- void DrawCursorPosition(void)
- {
-#ifdef ENABLE_PANGO
-	GdkGC 		*gc;
-	PangoLayout *layout;
-	int			x		= left_margin+(fontWidth*(terminal_cols-7));
-	char		buffer[10];
-
-	if(!pixmap)
-		return;
-
-	gc = getCachedGC(pixmap);
-
-	gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
-	gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fontWidth*7,fontHeight);
-
-	layout = getPangoLayout(TEXT_LAYOUT_OIA);
-
-	sprintf(buffer,"%03d/%03d",cRow+1,cCol+1);
-	pango_layout_set_text(layout,buffer,-1);
-
-	gdk_draw_layout_with_colors(pixmap,gc,
-						x,OIAROW+1,
-						layout,
-						color+TERMINAL_COLOR_OIA_CURSOR,color+TERMINAL_COLOR_OIA_BACKGROUND);
-
-	gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fontWidth*7,fontHeight);
-
-#endif // ENABLE_PANGO
-
- }
-
+/**
+ * Liga/desliga apresentação da posição do cursor na OIA
+ *
+ * @param value	Valor modificado (Diferente de zero apresenta o cursor)
+ */
  static void set_showcursor(int value, enum toggle_type reason)
  {
  	#warning work in progress
@@ -477,95 +406,8 @@
 		gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fontWidth*7,fontHeight);
 
 	}
-*/
 	gtk_widget_queue_draw(terminal);
- }
-
- void update_cursor_position(int row, int col)
- {
-	if(row == cRow && col == cCol)
-		return;
-
-	gtk_im_context_reset(input_method);
-
- 	if(!screen_suspended)
- 	{
- 		int width;
- 		int height;
-
-		cMode |= CURSOR_MODE_SHOW;
-
-		gdk_drawable_get_size(terminal->window,&width,&height);
-		gtk_widget_queue_draw_area(terminal,0,rCursor.y+fontAscent,width,1);
-		gtk_widget_queue_draw_area(terminal,rCursor.x,0,1,height);
-
-		cCol			= col;
-		cRow			= row;
-
-		draw_cursor();
-
-		if(Toggled(CURSOR_POS) && valid_terminal_window())
-			DrawCursorPosition();
- 	}
- 	else
- 	{
-		cCol			= col;
-		cRow			= row;
- 	}
-
- }
-
-/*
- void RedrawCursor(void)
- {
- #ifdef ENABLE_PANGO
-
-	ELEMENT 	el;
-	GdkGC   	*gc;
-
-	if(!terminal->window)
-		return;
-
-	memset(&rCursor,0,sizeof(rCursor));
-
-	// Draw cursor pixmap
-	if(!pCursor)
-		pCursor = gdk_pixmap_new(terminal->window,fontWidth,fontHeight,-1);
-
-	memcpy(&el,screen + (cRow*terminal_cols)+cCol,sizeof(ELEMENT));
-	el.fg = 0;
-	el.bg = TERMINAL_COLOR_CURSOR;
-
-	gc = gdk_gc_new(pCursor);
-	DrawElement(pCursor, color, gc, 0, 0, &el);
-	gdk_gc_destroy(gc);
-
-	// Set cursor position
-	rCursor.x 		= left_margin + (cCol * fontWidth);
-	rCursor.y 		= top_margin + (cRow * fontHeight);
-	rCursor.width 	= fontWidth;
-
-	if(Toggled(INSERT))
-	{
-		rCursor.height = 0;
-	}
-	else
-	{
-		rCursor.height =fontHeight - (fontHeight/4);
-
-		if(rCursor.height < 1)
-			rCursor.height = 1;
-	}
-
-	// Mark to redraw
-	gtk_im_context_set_cursor_location(input_method,&rCursor);
-	InvalidateCursor();
-#else // ENABLE_PANGO
-
-	#warning Need more work
-
-#endif // ENABLE_PANGO
- }
-
 */
+
+ }
 
