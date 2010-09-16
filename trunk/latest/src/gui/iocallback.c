@@ -32,6 +32,9 @@
 
 #if defined(_WIN32) /*[*/
 	#include <windows.h>
+#elif defined(__APPLE__)
+	#include <poll.h>
+	#include <string.h>
 #else
 	#include <poll.h>
 	#include <malloc.h>
