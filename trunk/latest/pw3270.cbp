@@ -90,6 +90,9 @@
 		<Unit filename="debian/lib3270.install">
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="debian/pw3270-plugin-java.install">
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="debian/pw3270-plugin-rexx.install">
 			<Option target="Release" />
 		</Unit>
@@ -537,9 +540,6 @@
 			<Option target="Release" />
 			<Option target="pipetest" />
 			<Option target="jnidebug" />
-		</Unit>
-		<Unit filename="src/gui/version.c">
-			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/gui/version.c.in" />
 		<Unit filename="src/include/X11/keysym.h" />

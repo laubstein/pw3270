@@ -34,17 +34,35 @@
 
 	#define FONTS_H_INCLUDED
 
+	typedef struct _pw3270_font_info
+	{
+		gint				  width;	/**< Font width, in pixels */
+		gint				  height;	/**< Font height, in pixels */
+		gint				  descent;	/**< Font descent, in pixels */
+		gint				  ascent;	/**< Font ascent, in pixels */
+		cairo_font_face_t	* face;		/**< Font face */
+		double			  	  size;		/**< Font size */
+	} PW3270_FONT_INFO;
+
 	// Globals
-	LOCAL_EXTERN gint					  fontWidth;	/**< Current font width, in pixels */
-	LOCAL_EXTERN gint					  fontHeight;	/**< Current font height, in pixels */
-	LOCAL_EXTERN gint					  fontDescent;	/**< Current font descent, in pixels */
-	LOCAL_EXTERN gint					  fontAscent;	/**< Current font ascent, in pixels */
-	LOCAL_EXTERN cairo_font_face_t 		* fontFace;		/**< Current font face */
-	LOCAL_EXTERN double			  	  fontSize;		/**< Current font size */
+	LOCAL_EXTERN PW3270_FONT_INFO	terminal_font_info;
 
 	// Prototipes
 	LOCAL_EXTERN void		init_terminal_font(GtkWidget *widget);
 	LOCAL_EXTERN void		update_font_info(GtkWidget *widget);
 	LOCAL_EXTERN gboolean	update_screen_size(GtkWidget *widget, gint width, gint height);
+
+	// Terminal font macros
+	#define terminal_font_width() terminal_font_info.width
+	#define terminal_font_height() terminal_font_info.height
+	#define terminal_font_descent() terminal_font_info.descent
+	#define terminal_font_face() terminal_font_info.face
+	#define terminal_font_size() terminal_font_info.size
+
+	// Compatibility macros
+	#define fontAscent	terminal_font_info.ascent
+	#define fontWidth	terminal_font_info.width
+	#define fontHeight	terminal_font_info.height
+	#define fontDescent	terminal_font_info.descent
 
 #endif // FONTS_H_INCLUDED

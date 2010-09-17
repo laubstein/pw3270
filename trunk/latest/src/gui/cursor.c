@@ -76,8 +76,8 @@
 
  	cr = gdk_cairo_create(get_cursor_pixmap());
 
-	cairo_set_font_face(cr,fontFace);
-	cairo_set_font_size(cr,fontSize);
+	cairo_set_font_face(cr,terminal_font_info.face);
+	cairo_set_font_size(cr,terminal_font_info.size);
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_CURSOR_BACKGROUND);
 	cairo_rectangle(cr, 0, 0, rCursor.width, rCursor.height);

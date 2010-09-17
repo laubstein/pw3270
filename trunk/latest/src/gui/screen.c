@@ -57,10 +57,12 @@
 	#include <stdlib.h>
 #endif
 
+/*
 #include "locked.bm"
 #include "unlocked.bm"
 #include "shift.bm"
 #include "four.bm"
+*/
 
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
 
@@ -505,6 +507,8 @@
 
 	CallPlugins("pw3270_plugin_update_luname",luname);
 
+	if(luname)
+		g_free(luname);
  }
 
 #ifdef USE_PANGO
@@ -696,7 +700,7 @@
 		break;
 
 	case OIA_FLAG_SECURE:
-		update_oia_element(OIA_ELEMENT_SSL_INDICATOR);
+		update_oia_element(OIA_ELEMENT_SSL_STATE);
 		break;
 
 	case OIA_FLAG_TYPEAHEAD:
