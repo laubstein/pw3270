@@ -37,7 +37,9 @@
 #include "actions.h"
 
 #include <lib3270/config.h>
-#include <malloc.h>
+#ifndef __APPLE__
+	#include <malloc.h>
+#endif
 #include <string.h>
 #include <errno.h>
 // #include <lib3270/localdefs.h>
