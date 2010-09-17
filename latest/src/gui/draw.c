@@ -37,7 +37,10 @@
 #include "oia.h"
 #include "fonts.h"
 
-#include <malloc.h>
+#ifndef __APPLE__
+	#include <malloc.h>
+#endif
+
 #include <string.h>
 #include <errno.h>
 

@@ -39,7 +39,10 @@
 #include <gdk/gdkkeysyms.h>
 #include <string.h>
 #include <stdlib.h>
-#include <malloc.h>
+
+#ifndef __APPLE__
+	#include <malloc.h>
+#endif
 
 #define KEYBOARD_STATE_MASK GDK_SHIFT_MASK
 // |GDK_ALT_MASK|GDK_LOCK_MASK)
