@@ -45,13 +45,7 @@
  	gint	height;
  } *font_size = NULL;
 
- gint 				  fontWidth		= 10;
- gint 				  fontHeight	= 12;
- gint 				  fontDescent	=  2;
- gint 				  fontAscent	= 10;
- cairo_font_face_t	* fontFace		= NULL;
- double			  fontSize		= 10;
-
+ PW3270_FONT_INFO terminal_font_info = { 0 };
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -78,11 +72,11 @@
  	if(size < 0)
 		size = 0;
 
-	fontSize	= font_size[size].size;
-	fontWidth	= font_size[size].width;
-	fontHeight 	= font_size[size].height;
-	fontDescent = font_size[size].descent;
-	fontAscent  = font_size[size].ascent;
+	terminal_font_info.size		= font_size[size].size;
+	terminal_font_info.width	= font_size[size].width;
+	terminal_font_info.height 	= font_size[size].height;
+	terminal_font_info.descent	= font_size[size].descent;
+	terminal_font_info.ascent	= font_size[size].ascent;
 
 //	Trace("%s - screen=%p",__FUNCTION__,screen);
 
@@ -108,13 +102,13 @@
  	cairo_t	*cr	= gdk_cairo_create(widget->window);
  	gchar	*fontname = GetString("Terminal","Font","Courier");
 
-	if(fontFace)
-		cairo_font_face_destroy(fontFace);
+	if(terminal_font_info.face)
+		cairo_font_face_destroy(terminal_font_info.face);
 
-	fontFace = cairo_toy_font_face_create(fontname,CAIRO_FONT_SLANT_NORMAL,TOGGLED_BOLD ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
+	terminal_font_info.face = cairo_toy_font_face_create(fontname,CAIRO_FONT_SLANT_NORMAL,TOGGLED_BOLD ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
 
 	/* Load font sizes */
-	cairo_set_font_face(cr,fontFace);
+	cairo_set_font_face(cr,terminal_font_info.face);
 
  	for(f=0;font_size[f].size;f++)
  	{
@@ -132,11 +126,11 @@
 
  	}
 
-	fontWidth	= font_size->width;
-	fontHeight 	= font_size->height;
-	fontSize	= font_size->size;
-	fontAscent	= font_size->ascent;
-	fontDescent	= font_size->descent;
+	terminal_font_info.width	= font_size->width;
+	terminal_font_info.height	= font_size->height;
+	terminal_font_info.descent	= font_size->descent;
+	terminal_font_info.ascent	= font_size->ascent;
+	terminal_font_info.size		= font_size->size;
 
  	Trace("Minimum terminal size is %dx%d",terminal_cols*font_size->width, (terminal_rows+1)*font_size->height);
 
@@ -164,6 +158,13 @@
  	int					f;
 
 	Trace("%s",__FUNCTION__);
+
+	memset(&terminal_font_info,0,sizeof(terminal_font_info));
+	terminal_font_info.width	= 10;
+	terminal_font_info.height	= 12;
+	terminal_font_info.descent	=  2;
+	terminal_font_info.ascent	= 10;
+	terminal_font_info.size		= 10;
 
 	vlr = g_strsplit(*list == '*' ? default_sizes : list,",",-1);
 

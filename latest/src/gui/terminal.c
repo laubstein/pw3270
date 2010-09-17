@@ -107,9 +107,13 @@
 
 		if( (cMode & (CURSOR_MODE_BASE|CURSOR_MODE_SHOW)) == (CURSOR_MODE_BASE|CURSOR_MODE_SHOW) )
 		{
-
 			gdk_cairo_set_source_pixmap(cr, get_cursor_pixmap(), rCursor.x, rCursor.y);
-			cairo_rectangle(cr, rCursor.x, rCursor.y, rCursor.width, rCursor.height);
+
+			if(Toggled(INSERT))
+				cairo_rectangle(cr, rCursor.x, rCursor.y, rCursor.width, rCursor.height);
+			else
+				cairo_rectangle(cr, rCursor.x, rCursor.y+terminal_font_info.ascent, rCursor.width, terminal_font_info.descent);
+
 			cairo_fill(cr);
 
 /*
@@ -183,10 +187,10 @@
 
 	release_pixmaps();
 
-	if(fontFace)
+	if(terminal_font_info.face)
 	{
-		cairo_font_face_destroy(fontFace);
-		fontFace = NULL;
+		cairo_font_face_destroy(terminal_font_info.face);
+		terminal_font_info.face = NULL;
 	}
 
  	Trace("%s","Terminal destroyed");
@@ -241,10 +245,46 @@
 	ParseInput(arg1);
  }
 
+ static void update_keyboard_state(GdkEventKey *event, gboolean status)
+ {
+
+	if(event->keyval == GDK_Shift_R || event->keyval == GDK_Shift_L)
+	{
+		oia_shift_state = status;
+		update_oia_element(OIA_ELEMENT_SHIFT_STATE);
+		Trace("Shift is %s",status ? "Active" : "Inactive");
+	}
+
+	if(event->keyval == GDK_Alt_L || event->keyval == GDK_ISO_Level3_Shift)
+	{
+		oia_alt_state = status;
+		update_oia_element(OIA_ELEMENT_ALT_STATE);
+		Trace("Alt is %s",status ? "Active" : "Inactive");
+	}
+
+#if GTK_CHECK_VERSION(2,16,0)
+
+	// http://library.gnome.org/devel/gdk/stable/gdk-Keyboard-Handling.html#gdk-keymap-get-caps-lock-state
+	if(event->keyval == GDK_Caps_Lock)
+	{
+		gboolean state = gdk_keymap_get_caps_lock_state(gdk_keymap_get_default());
+
+		Trace("Caps-lock is %s",state ? "ON" : "OFF");
+
+		if(state != oia_caps_state)
+		{
+			oia_caps_state = state;
+			update_oia_element(OIA_ELEMENT_CAPS_INDICATOR);
+		}
+	}
+
+#endif
+
+ }
+
  static gboolean key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
- 	#define Work in progress
-	// UpdateKeyboardState(event->state & KEYBOARD_STATE_MASK);
+ 	update_keyboard_state(event,TRUE);
 
 	if(gtk_im_context_filter_keypress(input_method,event))
 		return TRUE;
@@ -260,8 +300,7 @@
 
  static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
- 	#define work in progress
-	// UpdateKeyboardState(event->state & KEYBOARD_STATE_MASK);
+ 	update_keyboard_state(event,FALSE);
 
 	if(gtk_im_context_filter_keypress(input_method,event))
 		return TRUE;
@@ -389,28 +428,6 @@
  */
  static void set_showcursor(int value, enum toggle_type reason)
  {
- 	#warning work in progress
-/*
- 	if(!(terminal && pixmap))
-		return;
-
-	if(value)
-	{
-		DrawCursorPosition();
-	}
-	else
-	{
-		GdkGC *gc	= getCachedGC(terminal->window);
-		int   x		= left_margin+(fontWidth*(terminal_cols-7));
-
-		gdk_gc_set_foreground(gc,color+TERMINAL_COLOR_OIA_BACKGROUND);
-		gdk_draw_rectangle(pixmap,gc,1,x,OIAROW+1,fontWidth*7,fontHeight);
-
-		gtk_widget_queue_draw_area(terminal,x,OIAROW+1,fontWidth*7,fontHeight);
-
-	}
-	gtk_widget_queue_draw(terminal);
-*/
-
+	update_oia_element(OIA_ELEMENT_CURSOR_POSITION);
  }
 

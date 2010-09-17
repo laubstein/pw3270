@@ -424,8 +424,8 @@
  {
  	cairo_t *cr = gdk_cairo_create(pixmap_terminal);
 
-	cairo_set_font_face(cr,fontFace);
-	cairo_set_font_size(cr,fontSize);
+	cairo_set_font_face(cr,terminal_font_info.face);
+	cairo_set_font_size(cr,terminal_font_info.size);
 
 	return cr;
  }

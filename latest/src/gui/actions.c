@@ -31,6 +31,7 @@
  */
 
  #include <lib3270/config.h>
+ #include <gdk/gdk.h>
 
  #include "gui.h"
  #include "fonts.h"

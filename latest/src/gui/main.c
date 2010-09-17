@@ -96,6 +96,7 @@ static void connect_main(int status)
 	{
 		gtk_widget_set_sensitive(terminal,online);
 		update_oia_element(OIA_ELEMENT_CONNECTION_STATUS);
+		update_oia_element(OIA_ELEMENT_UNDERA);
 		gtk_widget_grab_focus(terminal);
 	}
 
