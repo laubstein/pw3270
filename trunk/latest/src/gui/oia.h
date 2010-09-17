@@ -77,6 +77,7 @@
 
 	LOCAL_EXTERN void update_oia_element(OIA_ELEMENT el);
 	LOCAL_EXTERN void draw_oia(cairo_t *cr);
+	LOCAL_EXTERN void oia_set_timer(long seconds);
 
 #endif // OIA_H_INCLUDED
 

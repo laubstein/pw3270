@@ -44,6 +44,7 @@
 #include <stdio.h>
 #include <glib.h>
 #include "gui.h"
+#include "oia.h"
 
 #ifdef G_THREADS_ENABLED
 	static int static_CallAndWait(int(*callback)(void *), void *parm);
@@ -282,7 +283,7 @@ static gboolean IO_closure(gpointer data)
 
 struct bgParameter
 {
-	int			status;
+	gboolean	running;
 	int			rc;
 	int(*callback)(void *);
 	void		*parm;
@@ -291,32 +292,22 @@ struct bgParameter
 
 gpointer BgCall(struct bgParameter *p)
 {
+	Trace("%s starts",__FUNCTION__);
 	p->rc = p->callback(p->parm);
-	p->status = 2;
+	p->running = FALSE;
+	Trace("%s ends",__FUNCTION__);
 	return 0;
-}
-
-static gboolean BgCallTimer(struct bgParameter *p)
-{
-	if(p->status == 2)
-	{
-		p->status = 0;
-		return FALSE;
-	}
-
-	// TODO (perry#9#): Update some indicator in screen to inform the user of the application's "busy" state.
-
-	return TRUE;
 }
 
 static int static_CallAndWait(int(*callback)(void *), void *parm)
 {
-	struct bgParameter p = { 3, -1, callback, parm };
+	struct bgParameter p = { TRUE, -1, callback, parm };
 	GThread	*thread;
 
 	Trace("Starting auxiliary thread for callback %p",callback);
 
-    thread =  g_thread_create( (GThreadFunc) BgCall, &p, 0, NULL);
+	p.running = TRUE;
+    thread = g_thread_create( (GThreadFunc) BgCall, &p, 0, NULL);
 
     if(!thread)
     {
@@ -324,18 +315,27 @@ static int static_CallAndWait(int(*callback)(void *), void *parm)
     	return -1;
     }
 
-	g_timeout_add((guint) 100, (GSourceFunc) BgCallTimer, &p);
-
 	if(topwindow)
 	{
+		time_t start = ((time_t) -1);
+
+		if(oia_timer < 0)
+			start = time(0);
 
 #ifdef MOUSE_POINTER_CHANGE
 		if(terminal && terminal->window)
 			gdk_window_set_cursor(terminal->window,wCursor[CURSOR_MODE_WAITING]);
 #endif
 
-		while(p.status && topwindow)
+		while(p.running && topwindow)
+		{
+			if(start != ((time_t) -1))
+				oia_set_timer((long) (time(0)) - start);
 			gtk_main_iteration();
+		}
+
+		if(start != ((time_t) -1))
+			oia_set_timer(-1);
 
 #ifdef MOUSE_POINTER_CHANGE
 		if(terminal && terminal->window && drag_type == DRAG_TYPE_NONE && cursor_mode != -1)
@@ -344,11 +344,11 @@ static int static_CallAndWait(int(*callback)(void *), void *parm)
 
 	}
 
-	if(p.status)
+	if(p.running)
 	{
 		Log("Waiting for background thread %p",thread);
 
-		while(p.status)
+		while(p.running)
 			g_thread_yield();
 
 		Log("Thread %p ends",thread);

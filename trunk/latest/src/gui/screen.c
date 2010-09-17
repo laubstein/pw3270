@@ -83,7 +83,7 @@
  static void	  syserror(const char *title, const char *message, const char *system);
  static int	  init(void);
  static void 	  update_toggle(int ix, int value, int reason, const char *name);
- static void	  show_timer(long seconds);
+// static void	  show_timer(long seconds);
 // static void	  DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
 // static void 	  DrawImageByWidth(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
  static gchar	* convert_monocase(int c, gsize *sz);
@@ -123,7 +123,7 @@
 	erase,					// void (*erase)(void);
 	display,				// void	(*display)(int bstart, int bend);
 	update_toggle,			// void (*toggle_changed)(int ix, int value, int reason, const char *name);
-	show_timer,				// void	(*show_timer)(long seconds);
+	oia_set_timer,			// void	(*show_timer)(long seconds);
 
 	gui_console_window_new,						// HCONSOLE	(*console_new)(const char *title, const char *label);
 	gui_console_window_delete,					// void		(*console_delete)(HCONSOLE hwnd);
@@ -1097,29 +1097,6 @@
 	if(action)
 		gtk_action_set_visible(action,value ? FALSE : TRUE);
 
- }
-
- static gboolean update_timer_spinner(gpointer dunno)
- {
-	oia_spinner_step++;
-	update_oia_element(OIA_ELEMENT_COMMAND_SPINNER);
-	return oia_timer > 0;
- }
-
- static void show_timer(long seconds)
- {
- 	if(seconds > 0)
- 	{
- 		if(oia_timer < 0)
-			g_timeout_add((guint) 150, (GSourceFunc) update_timer_spinner, 0);
-		oia_timer = (seconds % 5940);
- 	}
- 	else
- 	{
- 		oia_timer = -1;
- 	}
-	update_oia_element(OIA_ELEMENT_COMMAND_SPINNER);
- 	update_oia_element(OIA_ELEMENT_COMMAND_TIMER);
  }
 
  static gboolean script_timer(gpointer dunno)

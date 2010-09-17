@@ -430,7 +430,7 @@
 
 	oia_clear_rect(cr,r);
 
-	if(oia_timer > 0)
+	if(oia_timer >= 0)
 	{
 		gchar *text;
 		text = g_strdup_printf("%02d:%02d",oia_timer/60,oia_timer % 60);
@@ -585,5 +585,32 @@
 		cairo_show_text(cr,msg);
 
 	}
+ }
+
+ static gboolean update_timer_spinner(gpointer dunno)
+ {
+	oia_spinner_step++;
+	update_oia_element(OIA_ELEMENT_COMMAND_SPINNER);
+	return (oia_timer >= 0);
+ }
+
+ void oia_set_timer(long seconds)
+ {
+ 	if(seconds < 0)
+ 	{
+ 		oia_timer = -1;
+ 	}
+ 	else if(seconds == oia_timer)
+ 	{
+ 		return;
+ 	}
+ 	else
+ 	{
+ 		if(oia_timer < 0)
+			g_timeout_add((guint) 150, (GSourceFunc) update_timer_spinner, 0);
+		oia_timer = (seconds % 5940);
+ 	}
+	update_oia_element(OIA_ELEMENT_COMMAND_SPINNER);
+ 	update_oia_element(OIA_ELEMENT_COMMAND_TIMER);
  }
 
