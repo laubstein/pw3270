@@ -118,11 +118,11 @@ case "$host" in
 		JAVAH="javah"
 
 		;;
-		
+
 	*-apple-*)
 		OS_DLLFLAGS="-arch i386 -shared"
+		OS_LFLAGS="-arch i386"
 
-	
 	;;
 
 	*)
