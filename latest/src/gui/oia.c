@@ -317,46 +317,72 @@
 
 	r->x = (r->width - (37*terminal_font_info.width));
 	r->width = terminal_font_info.width*2;
-	r->height = terminal_font_info.height;
 
-	oia_clear_icon(cr,r);
+	oia_clear_rect(cr,r);
 
-/*
-#ifdef DEBUG
-//	if(oia_shift_state)
+	r->x++;
+	r->y++;
+	r->width -= 2;
+	r->height -= 2;
+
+	if(r->width < 3 || r->height < 3)
+		return;
+
+	if(oia_shift_state)
 	{
-		double sz = (r->width/3);
-		double bs = (r->y+r->height)-(sz*1.5);
-		double x,y,c;
-		#warning Work in progress
+/*
+		  00000000001
+		  01234567890
+		00     * ....
+		01    * *....
+		02   *   *...
+		03  *     *..
+		04 *       *.
+		05****   ****
+		06   *   *
+		07   *   *
+		08   *   *
+		09   *   *
+		10   *   *
+		11   *   *
+		12   *   *
+		13   *   *
+		14   *   *
+		15   *****
+*/
+		// Scale image
+		double b,x,y,w,h,l;
+
+		if(r->height > r->width)
+		{
+			w = r->width;
+			h = w*1.5;
+		}
+		else // width > height
+		{
+			h = r->height;
+			w = h/1.5;
+		}
+
+		// Set image position
+		x = r->x + ((r->width - w)/2);
+		y = r->y + ((r->height - h)/2);
+		l = (w/3);
+		b = y+(w/1.5);
 
 		cairo_set_3270_color(cr,TERMINAL_COLOR_SHIFT_STATE);
-		cairo_move_to(cr,r->x+(r->width/2),r->y+1);
-		cairo_line_to(cr,r->x+r->width,bs);
-		cairo_rel_line_to(cr,-sz,0);
-		cairo_get_current_point(cr,&x,&y);
-		c = y;
-		cairo_line_to(cr,x,r->y+r->height);
-		cairo_rel_line_to(cr,-sz,0);
-		cairo_get_current_point(cr,&x,&y);
-		cairo_line_to(cr,x,c);
-		cairo_line_to(cr,r->x,c);
+
+		cairo_move_to(cr,x+(w/2),y);
+		cairo_line_to(cr,x+w,b);
+		cairo_line_to(cr,(x+w)-l,b);
+		cairo_line_to(cr,(x+w)-l,y+h);
+		cairo_line_to(cr,x+l,y+h);
+		cairo_line_to(cr,x+l,b);
+		cairo_line_to(cr,x,b);
 		cairo_close_path(cr);
-
-
-
-		// cairo_move_to(cr,r->x+sz,r->y+r->height);
-		// cairo_rel_line_to(cr,sz,0);
-		// cairo_rel_line_to(cr,0,-(sz*1.5));
-		// cairo_rel_line_to(cr,sz,0);
-		// cairo_line_to(cr,r->x+(r->width/2),r->y+1);
-
-//		oia_show_text(cr,r,"*",TERMINAL_COLOR_SHIFT_STATE);
 
 		cairo_stroke(cr);
 	}
-#endif
-*/
 
  }
 
