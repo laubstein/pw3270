@@ -44,9 +44,6 @@
 	#include <malloc.h>
 #endif
 
-#define KEYBOARD_STATE_MASK GDK_SHIFT_MASK
-// |GDK_ALT_MASK|GDK_LOCK_MASK)
-
 /*---[ Structs ]------------------------------------------------------------------------------------------------*/
 
 
@@ -301,6 +298,13 @@
  static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
  	update_keyboard_state(event,FALSE);
+
+	// Check for alt-key again
+	if(!(event->state & GDK_ALT_MASK) && oia_alt_state)
+	{
+		oia_alt_state = FALSE;
+		update_oia_element(OIA_ELEMENT_ALT_STATE);
+	}
 
 	if(gtk_im_context_filter_keypress(input_method,event))
 		return TRUE;
