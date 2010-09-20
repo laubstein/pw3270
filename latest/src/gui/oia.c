@@ -331,6 +331,8 @@
 	if(oia_shift_state)
 	{
 /*
+		http://4umi.com/web/javascript/xbm.htm
+
 		  00000000001
 		  01234567890
 		00     * ....
@@ -416,12 +418,54 @@
 
  static void oia_draw_ssl_state(cairo_t *cr, GdkRectangle *r)
  {
+/*
+  00000000001111111
+  01234567890123456
+00        xxxxxxx
+01       x       x
+02      x  xxxxx  x
+03      x x     x x
+04      x x     x x
+05      x x     x x
+06      x x     x x
+07      x x     x x
+08      x x     xxx
+09xxxxxxxxxxx
+10xxxxxxxxxxx
+11xxxxxxxxxxx
+12xxxxxxxxxxx
+13xxxxxxxxxxx
+14xxxxxxxxxxx
+15x         x
+16xxxxxxxxxxx
+
+  00000000001111111
+  01234567890123456
+00     xxxxxxx
+01    x       x
+02   x  xxxxx  x
+03   x x     x x
+04   x x     x x
+05   x x     x x
+06   x x     x x
+07   x x     x x
+08   x x     x x
+09..xxxxxxxxxxxxx
+10  xxxxxxxxxxxxx
+11  xxxxxxxxxxxxx
+12  xxxxxxxxxxxxx
+13  xxxxxxxxxxxxx
+14  xxxxxxxxxxxxx
+15  x           x
+16  xxxxxxxxxxxxx
+
+*/
 	// * M-44...42	SSL Status
 	r->x = (r->width - (44*terminal_font_info.width));
-	r->width = terminal_font_info.width*2;
-	r->height = fontHeight;
+	r->width = terminal_font_info.width *2;
+	r->height = terminal_font_info.height;
 
-	oia_clear_icon(cr,r);
+	oia_clear_rect(cr,r);
 
 	if(query_secure_connection(hSession))
 	{
