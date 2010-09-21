@@ -70,25 +70,27 @@
 
 
 	// Globals
-	LOCAL_EXTERN gboolean		oia_flag[OIA_FLAG_USER];
+	LOCAL_EXTERN gboolean		  oia_flag[OIA_FLAG_USER];
 
-	LOCAL_EXTERN gboolean		oia_shift_state;
-	LOCAL_EXTERN gboolean		oia_alt_state;
+	LOCAL_EXTERN gboolean		  oia_shift_state;
+	LOCAL_EXTERN gboolean		  oia_alt_state;
+
 #if GTK_CHECK_VERSION(2,16,0)
-	LOCAL_EXTERN gboolean		oia_caps_state;
+	LOCAL_EXTERN gboolean		  oia_caps_state;
 #endif
 
-	LOCAL_EXTERN STATUS_CODE	terminal_message_id;
+	LOCAL_EXTERN STATUS_CODE	  terminal_message_id;
 
-	LOCAL_EXTERN SCRIPT_STATE 	oia_script_state;
-	LOCAL_EXTERN gboolean		oia_script_blink;
-	LOCAL_EXTERN gint			oia_spinner_step;
+	LOCAL_EXTERN SCRIPT_STATE 	  oia_script_state;
+	LOCAL_EXTERN gboolean		  oia_script_blink;
+	LOCAL_EXTERN gint			  oia_spinner_step;
 
-	LOCAL_EXTERN gint			oia_timer;
+	LOCAL_EXTERN gint			  oia_timer;
 
 	// Prototips
+	LOCAL_EXTERN void update_oia(void);
 	LOCAL_EXTERN void update_oia_element(OIA_ELEMENT el);
-	LOCAL_EXTERN void draw_oia(cairo_t *cr);
+	LOCAL_EXTERN void draw_oia(cairo_t *cr, GdkGC *gc);
 	LOCAL_EXTERN void oia_set_timer(long seconds);
 
 #endif // OIA_H_INCLUDED

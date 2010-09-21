@@ -372,6 +372,16 @@
  }
 
 /**
+ * Get cached graphics context
+ *
+ */
+ GdkGC * get_terminal_cached_gc(void)
+ {
+ 	return GDK_GC(g_object_get_data(G_OBJECT(get_terminal_pixmap()),"cached_gc"));
+ }
+
+
+/**
  * Draw entire terminal contents
  *
  */
@@ -388,7 +398,7 @@
 	cairo_fill(cr);
 
 	draw_region(cr,0,(terminal_cols * terminal_rows)-1,color);
-	draw_oia(cr);
+	draw_oia(cr,get_terminal_cached_gc());
 
 	cairo_destroy(cr);
 
@@ -425,7 +435,8 @@
  	cairo_t *cr = gdk_cairo_create(pixmap_terminal);
 
 	cairo_set_font_face(cr,terminal_font_info.face);
-	cairo_set_font_size(cr,terminal_font_info.size);
+//	cairo_set_font_size(cr,terminal_font_info.size);
+	cairo_set_font_matrix(cr,terminal_font_info.matrix);
 
 	return cr;
  }

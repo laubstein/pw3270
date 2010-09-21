@@ -36,14 +36,17 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
- struct font_size
+ struct _font_list
  {
- 	double size;
- 	gint	ascent;
- 	gint	descent;
- 	gint	width;
- 	gint	height;
- } *font_size = NULL;
+ 	double 		size;
+ 	gint			ascent;
+ 	gint			descent;
+ 	gint			width;
+ 	gint			height;
+	cairo_matrix_t	matrix;
+ } *font_list = NULL;
+
+ double *font_size = NULL;
 
  PW3270_FONT_INFO terminal_font_info = { 0 };
 
@@ -63,20 +66,37 @@
  	int size = -1;
  	int f;
 
- 	for(f=0;font_size[f].size;f++)
+ 	for(f=0;font_list[f].size;f++)
  	{
-		if( ((font_size[f].height*(terminal_rows+1))+2) < height && (font_size[f].width*terminal_cols) < width )
+		if( ((font_list[f].height*(terminal_rows+1))+2) < height && (font_list[f].width*terminal_cols) < width )
 			size = f;
  	}
 
  	if(size < 0)
 		size = 0;
 
-	terminal_font_info.size		= font_size[size].size;
-	terminal_font_info.width	= font_size[size].width;
-	terminal_font_info.height 	= font_size[size].height;
-	terminal_font_info.descent	= font_size[size].descent;
-	terminal_font_info.ascent	= font_size[size].ascent;
+//	terminal_font_info.size		= font_list[size].size;
+	terminal_font_info.matrix	= &font_list[size].matrix;
+	terminal_font_info.descent	= font_list[size].descent;
+	terminal_font_info.ascent	= font_list[size].ascent;
+
+	if(terminal_font_info.width != font_list[size].width || terminal_font_info.height != font_list[size].height)
+	{
+		terminal_font_info.width	= font_list[size].width;
+		terminal_font_info.height 	= font_list[size].height;
+
+		Trace("Font size changed to %dx%d",terminal_font_info.width,terminal_font_info.height);
+
+		for(f=0;f<OIA_PIXMAP_COUNT;f++)
+		{
+			if(pixmap_oia[f])
+			{
+				gdk_pixmap_unref(pixmap_oia[f]);
+				pixmap_oia[f] = 0;
+			}
+		}
+	}
+
 
 //	Trace("%s - screen=%p",__FUNCTION__,screen);
 
@@ -99,8 +119,11 @@
  void update_font_info(GtkWidget *widget)
  {
  	int		f;
- 	cairo_t	*cr	= gdk_cairo_create(widget->window);
- 	gchar	*fontname = GetString("Terminal","Font","Courier");
+	cairo_t	*cr			= gdk_cairo_create(widget->window);
+ 	gchar	*fontname	= GetString("Terminal","Font","Courier");
+ 	int		pos = 0;
+    double width = -1;
+    double height = -1;
 
 	if(terminal_font_info.face)
 		cairo_font_face_destroy(terminal_font_info.face);
@@ -110,31 +133,57 @@
 	/* Load font sizes */
 	cairo_set_font_face(cr,terminal_font_info.face);
 
- 	for(f=0;font_size[f].size;f++)
+ 	for(f=0;font_size[f];f++)
  	{
 		cairo_font_extents_t sz;
 
- 		cairo_set_font_size(cr,font_size[f].size);
- 		cairo_font_extents(cr,&sz);
+		cairo_set_font_size(cr,font_size[f]);
+		cairo_font_extents(cr,&sz);
 
- 		font_size[f].width  = (int) sz.max_x_advance;
- 		font_size[f].height = (int) sz.height;
- 		font_size[f].ascent = (int) sz.ascent;
- 		font_size[f].descent = (int) sz.descent;
+		if(width != sz.max_x_advance || height != sz.height)
+		{
+			// Font size changed
 
-		Trace("%s(%d): %dx%d descent: %d ascent: %d",fontname,(int) font_size[f].size, font_size[f].width, font_size[f].height, font_size[f].descent, font_size[f].ascent);
+			cairo_get_font_matrix(cr,&font_list[pos].matrix);
 
+			font_list[pos].size 	= font_size[f];
+			font_list[pos].width  	= (int) sz.max_x_advance;
+			font_list[pos].height 	= (int) sz.height;
+			font_list[pos].ascent 	= (int) sz.ascent;
+			font_list[pos].descent	= (int) sz.descent;
+
+			Trace("%s size=%d xx=%d yx=%d xy=%d yy=%d x0=%d y0=%d w=%d h=%d+%d",
+										fontname,
+										(int) font_list[pos].size ,
+										(int) font_list[pos].matrix.xx ,
+										(int) font_list[pos].matrix.yx ,
+										(int) font_list[pos].matrix.xy ,
+										(int) font_list[pos].matrix.yy ,
+										(int) font_list[pos].matrix.x0 ,
+										(int) font_list[pos].matrix.y0,
+										(int) font_list[pos].width,
+										(int) font_list[pos].ascent,
+										(int) font_list[pos].descent);
+
+			width 	= sz.max_x_advance;
+			height	= sz.height;
+
+			pos = pos+1;
+		}
  	}
 
-	terminal_font_info.width	= font_size->width;
-	terminal_font_info.height	= font_size->height;
-	terminal_font_info.descent	= font_size->descent;
-	terminal_font_info.ascent	= font_size->ascent;
-	terminal_font_info.size		= font_size->size;
+	memset(font_list+pos,0,sizeof(struct _font_list));
 
- 	Trace("Minimum terminal size is %dx%d",terminal_cols*font_size->width, (terminal_rows+1)*font_size->height);
+	terminal_font_info.width	= font_list->width;
+	terminal_font_info.height	= font_list->height;
+	terminal_font_info.descent	= font_list->descent;
+	terminal_font_info.ascent	= font_list->ascent;
+//	terminal_font_info.size		= font_list->size;
+	terminal_font_info.matrix	= &font_list->matrix;
 
-	gtk_widget_set_size_request(widget, terminal_cols*font_size->width, (terminal_rows+1)*font_size->height);
+ 	Trace("Minimum terminal size is %dx%d",terminal_cols*font_list->width, (terminal_rows+1)*font_list->height);
+
+	gtk_widget_set_size_request(widget, terminal_cols*font_list->width, ((terminal_rows+2)*font_list->height));
 
  	g_free(fontname);
 	cairo_destroy(cr);
@@ -164,16 +213,17 @@
 	terminal_font_info.height	= 12;
 	terminal_font_info.descent	=  2;
 	terminal_font_info.ascent	= 10;
-	terminal_font_info.size		= 10;
+//	terminal_font_info.size		= 10;
 
 	vlr = g_strsplit(*list == '*' ? default_sizes : list,",",-1);
 
 	sz = g_strv_length(vlr);
 
-	font_size = g_malloc0((sz+1) * sizeof(struct font_size));
+	font_size = g_malloc0((sz+1) * sizeof(double));
+	font_list = g_malloc0((sz+1) * sizeof(struct _font_list));
 
 	for(f=0;f<sz;f++)
-		font_size[f].size = g_ascii_strtod(vlr[f],NULL);
+		font_size[f] = g_ascii_strtod(vlr[f],NULL);
 
 	g_strfreev(vlr);
 	g_free(list);

@@ -41,7 +41,8 @@
 		gint				  descent;	/**< Font descent, in pixels */
 		gint				  ascent;	/**< Font ascent, in pixels */
 		cairo_font_face_t	* face;		/**< Font face */
-		double			  	  size;		/**< Font size */
+		cairo_matrix_t		* matrix;	/**< Font matrix */
+//		double			  	  size;		/**< Font size */
 	} PW3270_FONT_INFO;
 
 	// Globals

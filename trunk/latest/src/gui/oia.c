@@ -37,58 +37,62 @@
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
- static void oia_cursor_position(cairo_t *cr, GdkRectangle *r);
- static void oia_lu_name(cairo_t *cr, GdkRectangle *r);
+ static void oia_cursor_position(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
+ static void oia_lu_name(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
- static void oia_insert_indicator(cairo_t *cr, GdkRectangle *r);
- static void oia_draw_typeahead_state(cairo_t *cr, GdkRectangle *r);
- static void oia_script_indicator(cairo_t *cr, GdkRectangle *r);
- static void oia_undera_indicator(cairo_t *cr, GdkRectangle *r);
- static void oia_connection_status(cairo_t *cr, GdkRectangle *r);
+ static void oia_insert_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
+ static void oia_draw_typeahead_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
+ static void oia_script_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
+ static void oia_undera_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
+ static void oia_connection_status(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
- static void oia_draw_shift_state(cairo_t *cr, GdkRectangle *r);
- static void oia_draw_alt_state(cairo_t *cr, GdkRectangle *r);
- static void oia_draw_ssl_state(cairo_t *cr, GdkRectangle *r);
+ static void oia_draw_shift_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
+ static void oia_draw_alt_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
+ static void oia_draw_ssl_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
 #if GTK_CHECK_VERSION(2,16,0)
- static void oia_draw_caps_state(cairo_t *cr, GdkRectangle *r);
+ static void oia_draw_caps_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 #endif // GTK 2.16.0
 
- static void oia_four_in_a_square(cairo_t *cr, GdkRectangle *r);
+ static void oia_four_in_a_square(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
- static void oia_update_timer(cairo_t *cr, GdkRectangle *r);
- static void oia_update_spinner(cairo_t *cr, GdkRectangle *r);
+ static void oia_update_timer(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
+ static void oia_update_spinner(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
- static void oia_message_area(cairo_t *cr, GdkRectangle *r);
+ static void oia_message_area(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
- static void dunno(cairo_t *cr, GdkRectangle *r);
+ static void dunno(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
  static void oia_clear_rect(cairo_t *cr, GdkRectangle *r);
  static void oia_show_text(cairo_t *cr, GdkRectangle *r, const gchar *text, enum TERMINAL_COLOR c);
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
- gboolean		oia_flag[OIA_FLAG_USER];
- STATUS_CODE	terminal_message_id = (STATUS_CODE) -1;
+ #define OIAROW	(top_margin+4+(terminal_font_info.height*terminal_rows))
 
- SCRIPT_STATE 	oia_script_state = SCRIPT_STATE_NONE;
+ gboolean		  oia_flag[OIA_FLAG_USER];
+ STATUS_CODE	  terminal_message_id = (STATUS_CODE) -1;
+
+ SCRIPT_STATE	  oia_script_state = SCRIPT_STATE_NONE;
 #if GTK_CHECK_VERSION(2,16,0)
- gboolean		oia_caps_state;
+ gboolean		  oia_caps_state;
 #endif
 
- gboolean		oia_script_blink = TRUE;
+ gboolean		  oia_script_blink = TRUE;
 
- gboolean		oia_shift_state	= FALSE;
- gboolean		oia_alt_state = FALSE;
+ gboolean		  oia_shift_state	= FALSE;
+ gboolean		  oia_alt_state = FALSE;
 
- gint			oia_timer = -1;
- gint			oia_spinner_step = 0;
+ GdkPixmap		* pixmap_lock[2] = { NULL, NULL };
+
+ gint			  oia_timer = -1;
+ gint			  oia_spinner_step = 0;
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
  static const struct _oia_calls
  {
-	void (*update)(cairo_t *cr, GdkRectangle *r);
+	void (*update)(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
  } oia_call[OIA_ELEMENT_COUNT] =
  {
 	{ oia_four_in_a_square		},	// "4" in a square
@@ -116,24 +120,23 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
- static void dunno(cairo_t *cr, GdkRectangle *r)
+ static void dunno(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
  }
 
-/*
- void update_oia_contents(void)
+ void update_oia(void)
  {
  	if(valid_terminal_window())
 	{
 		cairo_t *cr	= get_terminal_cairo_context();
-		draw_oia(cr);
+		GdkGC *gc = get_terminal_cached_gc();
+		draw_oia(cr,gc);
 		cairo_destroy(cr);
-		gtk_widget_queue_draw_area(terminal,OIAROW,left_margin,terminal_cols*fontWidth,fontHeight+1);
+		gtk_widget_queue_draw_area(terminal,OIAROW,left_margin,terminal_cols*fontWidth,fontHeight+2);
 	}
  }
-*/
 
- void draw_oia(cairo_t *cr)
+ void draw_oia(cairo_t *cr, GdkGC *gc)
  {
  	int	f;
  	int row = OIAROW;
@@ -141,11 +144,6 @@
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
 	cairo_rectangle(cr, left_margin, row, width, fontHeight);
-	cairo_fill(cr);
-
-	// http://cairographics.org/FAQ/#sharp_lines
-	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_SEPARATOR);
-	cairo_rectangle(cr, left_margin, row-1, width, 1);
 	cairo_fill(cr);
 
 	width += left_margin;
@@ -157,8 +155,14 @@
 		rect.y = row;
 		rect.width = width;
 		rect.height = fontHeight;
-		oia_call[f].update(cr,&rect);
+		oia_call[f].update(cr,gc,&rect);
 	}
+
+	// http://cairographics.org/FAQ/#sharp_lines
+	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_SEPARATOR);
+	cairo_rectangle(cr, left_margin, row-2, (terminal_cols * fontWidth), 1);
+	cairo_fill(cr);
+
  }
 
  void update_oia_element(OIA_ELEMENT el)
@@ -173,7 +177,7 @@
 		rect.height = fontHeight;
 		rect.width = left_margin + (terminal_cols * fontWidth);
 
-		oia_call[el].update(cr,&rect);
+		oia_call[el].update(cr,get_terminal_cached_gc(),&rect);
 
 		cairo_destroy(cr);
 
@@ -272,15 +276,9 @@
  	return step;
  }
 
- static void draw_border(cairo_t *cr, GdkRectangle *r)
+ static void draw_border(cairo_t *cr, GdkGC *gc, GdkRectangle *r, enum TERMINAL_COLOR clr)
  {
-/*
-	cairo_move_to (cr, r->x, r->y);
-	cairo_rel_line_to (cr, r->width, 0);
-	cairo_rel_line_to (cr, 0, r->height);
-	cairo_rel_line_to (cr, -r->width, 0);
-	cairo_close_path(cr);
-*/
+	cairo_set_3270_color(cr,clr);
 
 	cairo_rectangle(cr, r->x, r->y, r->width,1);
 	cairo_rectangle(cr, r->x, r->y+r->height, r->width,1);
@@ -294,7 +292,7 @@
  * Update calls.
  */
 
- static void oia_draw_alt_state(cairo_t *cr, GdkRectangle *r)
+ static void oia_draw_alt_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	// *	M-41	Alt Status
 
@@ -311,14 +309,14 @@
 
  }
 
- static void oia_draw_shift_state(cairo_t *cr, GdkRectangle *r)
+ static void oia_draw_shift_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	// *	M-37...36	Shift Status
 
 	r->x = (r->width - (37*terminal_font_info.width));
 	r->width = terminal_font_info.width*2;
 
-	oia_clear_rect(cr,r);
+	oia_clear_icon(cr,r);
 
 	r->x++;
 	r->y++;
@@ -352,8 +350,9 @@
 		14   *   *
 		15   *****
 */
+
 		// Scale image
-		double b,x,y,w,h,l;
+		int b,x,y,w,h,l;
 
 		if(r->height > r->width)
 		{
@@ -384,11 +383,12 @@
 		cairo_close_path(cr);
 
 		cairo_stroke(cr);
+
 	}
 
  }
 
- static void oia_draw_typeahead_state(cairo_t *cr, GdkRectangle *r)
+ static void oia_draw_typeahead_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
  	// * M-33 Typeahead indication ("T" or blank)
 	r->x = (r->width - (34*terminal_font_info.width));
@@ -402,7 +402,7 @@
  }
 
 #if GTK_CHECK_VERSION(2,16,0)
- static void oia_draw_caps_state(cairo_t *cr, GdkRectangle *r)
+ static void oia_draw_caps_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	r->x = (r->width - (39*terminal_font_info.width));
 	r->width = terminal_font_info.width;
@@ -416,7 +416,35 @@
  }
 #endif // GTK 2.16.0
 
- static void oia_draw_ssl_state(cairo_t *cr, GdkRectangle *r)
+ static GdkPixmap * oia_create_scaled_pixmap(GdkRectangle *r, GdkGC *gc, const unsigned char *data, gint width, gint height, enum TERMINAL_COLOR cl)
+ {
+ 	GdkPixbuf *buf;
+ 	GdkPixbuf *pix;
+ 	GdkPixmap *ret;
+	GdkPixmap *tmp = gdk_pixmap_create_from_data(	get_terminal_pixmap(),
+													(const char *) data,width,height,
+													gdk_drawable_get_depth(get_terminal_pixmap()),
+													color+cl,
+													color+TERMINAL_COLOR_OIA_BACKGROUND );
+
+	buf = gdk_pixbuf_get_from_drawable(0, tmp, gdk_drawable_get_colormap(get_terminal_pixmap()),0, 0, 0, 0, width, height);
+
+	gdk_pixmap_unref(tmp);
+
+	pix = gdk_pixbuf_scale_simple(buf,r->width,r->height,GDK_INTERP_HYPER);
+
+	ret = gdk_pixmap_new(get_terminal_pixmap(),r->width,r->height,gdk_drawable_get_depth(get_terminal_pixmap()));
+
+	gdk_pixbuf_render_to_drawable(pix,GDK_DRAWABLE(ret),gc,0,0,0,0,-1,-1,GDK_RGB_DITHER_NORMAL,0,0);
+
+    gdk_pixbuf_unref(buf);
+    gdk_pixbuf_unref(pix);
+
+    return ret;
+
+ }
+
+ static void oia_draw_ssl_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 /*
   00000000001111111
@@ -460,20 +488,42 @@
 16  xxxxxxxxxxxxx
 
 */
-	// * M-44...42	SSL Status
-	r->x = (r->width - (44*terminal_font_info.width));
-	r->width = terminal_font_info.width *2;
-	r->height = terminal_font_info.height;
 
-	oia_clear_rect(cr,r);
+	#include "locked.bm"
+	#include "unlocked.bm"
 
-	if(query_secure_connection(hSession))
+	static const struct _imagedata
 	{
-		oia_show_text(cr,r,"S",TERMINAL_COLOR_SSL_STATE);
-	}
+		const unsigned char	*data;
+		gint					width;
+		gint					height;
+	} imagedata[] =
+	{
+		{ locked_bits,		locked_width,	locked_height	},
+		{ unlocked_bits,	unlocked_width,	unlocked_height	},
+
+	};
+
+	int idx = query_secure_connection(hSession) ? OIA_PIXMAP_LOCKED : OIA_PIXMAP_UNLOCKED;
+
+	// * M-44...42	SSL Status
+	r->x = (r->width - (44*terminal_font_info.width))+1;
+	r->y++;
+	r->width = (terminal_font_info.width*2)-1;
+	r->height = terminal_font_info.height-1;
+
+	oia_clear_icon(cr,r);
+
+	if(!pixmap_oia[idx])
+		pixmap_oia[idx] = oia_create_scaled_pixmap(r,gc,imagedata[idx].data,imagedata[idx].width,imagedata[idx].height,TERMINAL_COLOR_SSL_STATE);
+
+	gdk_cairo_set_source_pixmap(cr, pixmap_oia[idx], r->x, r->y);
+	gdk_cairo_rectangle(cr,r);
+	cairo_fill(cr);
+
  }
 
- static void oia_insert_indicator(cairo_t *cr, GdkRectangle *r)
+ static void oia_insert_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	r->x = (r->width - (32*terminal_font_info.width));
 	r->width = terminal_font_info.width;
@@ -485,7 +535,7 @@
 		oia_show_text(cr,r,"I",TERMINAL_COLOR_OIA_INDICATORS);
  }
 
- static void oia_script_indicator(cairo_t *cr, GdkRectangle *r)
+ static void oia_script_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	r->x = (r->width - (30*terminal_font_info.width));
 	r->width = fontWidth;
@@ -498,7 +548,7 @@
 
  }
 
- static void oia_four_in_a_square(cairo_t *cr, GdkRectangle *r)
+ static void oia_four_in_a_square(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	//  0          "4" in a square
 	r->x = left_margin;
@@ -509,14 +559,13 @@
 	cairo_rectangle(cr, r->x, r->y+1, r->width,r->height);
 	cairo_fill(cr);
 
-	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_INDICATORS);
-	draw_border(cr,r);
+	draw_border(cr,gc,r,TERMINAL_COLOR_OIA_INDICATORS);
 
 	cairo_move_to(cr,r->x+2,r->y+fontAscent);
 	cairo_show_text(cr,"4");
  }
 
- static void oia_undera_indicator(cairo_t *cr, GdkRectangle *r)
+ static void oia_undera_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	//  1          "A" underlined
 	r->x = (left_margin+terminal_font_info.width+4);
@@ -540,7 +589,7 @@
 
  }
 
- static void oia_connection_status(cairo_t *cr, GdkRectangle *r)
+ static void oia_connection_status(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	// 2          solid box if connected, "?" in a box if not
 	r->x = (left_margin+(terminal_font_info.width*2)+6);
@@ -553,11 +602,11 @@
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_INDICATORS);
 
-	Trace("%s box_solid=%s", __FUNCTION__, oia_flag[OIA_FLAG_BOXSOLID] ? "Yes" : "No" );
+//	Trace("%s box_solid=%s", __FUNCTION__, oia_flag[OIA_FLAG_BOXSOLID] ? "Yes" : "No" );
 
 	if(IN_ANSI)
 	{
-		draw_border(cr,r);
+		draw_border(cr,gc,r,TERMINAL_COLOR_OIA_INDICATORS);
 		cairo_move_to(cr,r->x+2,r->y+terminal_font_info.ascent);
 		cairo_show_text(cr,"N");
 	}
@@ -568,13 +617,13 @@
 	}
 	else if(IN_SSCP)
 	{
-		draw_border(cr,r);
+		draw_border(cr,gc,r,TERMINAL_COLOR_OIA_INDICATORS);
 		cairo_move_to(cr,r->x+2,r->y+terminal_font_info.ascent);
 		cairo_show_text(cr,"S");
 	}
 	else
 	{
-		draw_border(cr,r);
+		draw_border(cr,gc,r,TERMINAL_COLOR_OIA_INDICATORS);
 		cairo_move_to(cr,r->x+2,r->y+terminal_font_info.ascent);
 		cairo_show_text(cr,"?");
 	}
@@ -582,7 +631,7 @@
  }
 
 
- static void oia_cursor_position(cairo_t *cr, GdkRectangle *r)
+ static void oia_cursor_position(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	// M-7..M		cursor position (rrr/ccc or blank)
  	int width = 8*fontWidth;
@@ -604,7 +653,7 @@
 
  }
 
- static void oia_lu_name(cairo_t *cr, GdkRectangle *r)
+ static void oia_lu_name(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
  	const char *luname = get_connected_lu(hSession);
 
@@ -617,7 +666,7 @@
 		oia_show_text(cr, r,luname, TERMINAL_COLOR_OIA_LUNAME);
  }
 
- static void oia_update_timer(cairo_t *cr, GdkRectangle *r)
+ static void oia_update_timer(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
  	r->x = (r->width - (fontWidth*14));
  	r->width = fontWidth*5;
@@ -633,7 +682,7 @@
 	}
  }
 
- static void oia_update_spinner(cairo_t *cr, GdkRectangle *r)
+ static void oia_update_spinner(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
  	r->x = (r->width - (fontWidth*16));
 	r->width = fontWidth*2;
@@ -654,7 +703,7 @@
  }
 
 
- static void oia_message_area(cairo_t *cr, GdkRectangle *r)
+ static void oia_message_area(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
  	// From 6 to M - 46 - Status message
 	#ifdef DEBUG

@@ -58,7 +58,7 @@
 
 	switch(argc)
 	{
-	case 1:
+	case 0:
 		host = GetString("Network","Hostname",NULL);
 		if(!host)
 		{
@@ -67,8 +67,8 @@
 		}
 		break;
 
-	case 2:
-		host = argv[1];
+	case 1:
+		host = argv[0];
 		break;
 
 	default:

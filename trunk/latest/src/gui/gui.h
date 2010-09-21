@@ -183,7 +183,6 @@
 	#define CURSOR_MODE_CROSS 	0x02
 	#define CURSOR_MODE_BASE	0x04
 
-	#define OIAROW					(top_margin+1+(terminal_font_info.height*terminal_rows))
 	#define CHARSET 				charset ? charset : "ISO-8859-1"
 	#define IS_FUNCTION_KEY(event)	(event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(event->state & (GDK_MOD1_MASK|GDK_CONTROL_MASK)))
 
@@ -214,6 +213,16 @@
 	// Pixmaps
 	LOCAL_EXTERN GdkPixmap			* pixmap_cursor;	/**< Pixmap with cursor image */
 	LOCAL_EXTERN GdkPixmap			* pixmap_terminal;	/**< Pixmap with terminal contents */
+
+	enum OIA_PIXMAP
+	{
+		OIA_PIXMAP_LOCKED,		// 0 = Locked
+		OIA_PIXMAP_UNLOCKED,	// 1 = Unlocked
+
+		OIA_PIXMAP_COUNT
+	};
+
+	LOCAL_EXTERN GdkPixmap			* pixmap_oia[OIA_PIXMAP_COUNT];
 
 	#define get_terminal_pixmap()		pixmap_terminal
 	#define get_cursor_pixmap()			pixmap_cursor
@@ -306,7 +315,6 @@
 #endif
 
 	gboolean	PFKey(guint key);
-//	void 		DrawCursorPosition(void);
 
 	#define		GetSelection() GetScreenContents(0)
 	LOCAL_EXTERN void	  check_clipboard_contents(void);
@@ -397,6 +405,7 @@
 
 	LOCAL_EXTERN void 		  update_region(int bstart, int bend);
 	LOCAL_EXTERN cairo_t	* get_terminal_cairo_context(void);
+	LOCAL_EXTERN GdkGC		* get_terminal_cached_gc(void);
 
 	#define DrawOIA(draw, clr); /* */
 
