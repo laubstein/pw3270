@@ -16,7 +16,11 @@ if [ ! -z $SVN ]; then
 
 	echo "Updating sources..."
 	$SVN update >/dev/null 2>&1
-	if [ "$?" == "0" ]; then
+	if [ "$?" != "0" ]; then
+	
+		echo "$SVN update failed!"
+
+	else
 
 		if $SVN --xml info >/dev/null 2>&1; then
 			REV=`$SVN --xml info | tr -d '\r\n' | sed -e 's/.*<commit.*revision="\([0-9]*\)".*<\/commit>.*/\1/'`
