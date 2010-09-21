@@ -62,6 +62,8 @@
 
  static void release_pixmaps(void)
  {
+ 	int f;
+
 	if(pixmap_terminal)
 	{
 		gdk_pixmap_unref(pixmap_terminal);
@@ -73,6 +75,16 @@
 		gdk_pixmap_unref(get_cursor_pixmap());
 		pixmap_cursor = NULL;
 	}
+
+	for(f=0;f<OIA_PIXMAP_COUNT;f++)
+	{
+		if(pixmap_oia[f])
+		{
+			gdk_pixmap_unref(pixmap_oia[f]);
+			pixmap_oia[f] = 0;
+		}
+	}
+
  }
 
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
@@ -87,6 +99,7 @@
  		gint height;
 		gdk_drawable_get_size(window,&width,&height);
 		pixmap_terminal = gdk_pixmap_new(window,width,height,-1);
+		g_object_set_data_full(G_OBJECT(pixmap_terminal),"cached_gc",gdk_gc_new(GDK_DRAWABLE(pixmap_terminal)),g_object_unref);
 		update_terminal_contents();
  	}
 
@@ -133,7 +146,7 @@
 			gdk_drawable_get_size(window,&width,&height);
 
 			gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_CROSS_HAIR);
-			cairo_rectangle(cr, rCursor.x, 0, 1, OIAROW-1);
+			cairo_rectangle(cr, rCursor.x, 0, 1, top_margin+2+(terminal_font_info.height*terminal_rows));
 			cairo_rectangle(cr, 0, rCursor.y+fontAscent, width,1);
 			cairo_fill(cr);
 		}
@@ -208,12 +221,6 @@
 #endif
 
 	init_terminal_font(widget);
-
-	#warning Work in progress
-/*
-    // Load images
-    LoadImages(widget->window, widget->style->fg_gc[GTK_WIDGET_STATE(widget)]);
-*/
 
 	// Set terminal size
 	gdk_drawable_get_size(widget->window,&width,&height);

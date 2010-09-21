@@ -275,32 +275,6 @@
 			spawn_child(script_name,argc,convert,converted_argv,pid);
 		}
 
-/*
-		else if(script_name && g_file_test(script_name,G_FILE_TEST_IS_EXECUTABLE))
-		{
-			spawn_child(script_name,argc,convert,converted_argv,pid);
-		}
-		else
-		{
-			GtkWidget *dialog;
-
-			dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
-												GTK_DIALOG_DESTROY_WITH_PARENT,
-												GTK_MESSAGE_WARNING,
-												GTK_BUTTONS_OK_CANCEL,
-												_(  "Can't find a valid interpreter for \"%s\"" ), script_type);
-
-			gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't start script" ) );
-
-			if(script_name)
-				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), _( "The script \"%s\" can't be started.\nDo you have the required plugin installed?" ),script_name);
-
-			if(gtk_dialog_run(GTK_DIALOG (dialog)) == GTK_RESPONSE_CANCEL)
-				gtk_main_quit();
-			gtk_widget_destroy(dialog);
-			rc = EINVAL;
-		}
-*/
 	}
 	else if(script_name)
 	{
@@ -318,32 +292,6 @@
 		{
 			spawn_child(script_name,argc,convert,converted_argv,pid);
 		}
-/*
-		else if(g_file_test(script_name,G_FILE_TEST_IS_EXECUTABLE))
-		{
-			spawn_child(script_name,argc,convert,converted_argv,pid);
-		}
-		else
-		{
-			GtkWidget *dialog;
-
-			dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
-												GTK_DIALOG_DESTROY_WITH_PARENT,
-												GTK_MESSAGE_WARNING,
-												GTK_BUTTONS_OK_CANCEL,
-												_(  "Can't start script \"%s\"" ), script_name);
-
-			gtk_window_set_title(GTK_WINDOW(dialog), _( "Can't start script" ) );
-
-			if(script_name)
-				gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s",  _( "The script file is invalid or nonexistent." ));
-
-			if(gtk_dialog_run(GTK_DIALOG (dialog)) == GTK_RESPONSE_CANCEL)
-				gtk_main_quit();
-			gtk_widget_destroy(dialog);
-			rc = ENOENT;
-		}
-*/
 	}
 
 	// Release converted arguments

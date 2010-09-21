@@ -273,8 +273,6 @@
 	if(id < 0 || id >= TERMINAL_COLOR_COUNT)
 		return;
 
-    LoadImages(terminal->window, terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)]);
-
 	gtk_color_selection_get_current_color(widget,color+id);
 	gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+id,TRUE,TRUE);
 
@@ -284,8 +282,6 @@
 	}
 	else
 	{
-		#warning Work in progress
-//		ReloadPixmaps();
 		update_terminal_contents();
 		gtk_widget_queue_draw(terminal);
 

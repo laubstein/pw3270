@@ -162,26 +162,21 @@
  } pix[IMAGE_COUNT];
 */
 
- int 								  terminal_rows				= 0;
- int 								  terminal_cols				= 0;
- int								  left_margin				= 0;
- int								  top_margin				= 0;
+ int 			  terminal_rows						= 0;
+ int 			  terminal_cols						= 0;
+ int			  left_margin						= 0;
+ int			  top_margin						= 0;
 
- ELEMENT							* screen					= NULL;
- char								* charset					= NULL;
- char								* window_title				= PROGRAM_NAME;
+ ELEMENT		* screen							= NULL;
+ char			* charset							= NULL;
+ char			* window_title						= PROGRAM_NAME;
 
- gboolean							  screen_updates_enabled	= FALSE;
+ GdkPixmap		* pixmap_oia[OIA_PIXMAP_COUNT]		= { NULL, NULL};
 
- int						  		  terminal_buffer_length = 0;
-// static const struct status_code	* sts_data		= NULL;
-// static unsigned char			  compose		= 0;
-// static gchar						* luname		= 0;
-// static const gchar				* status_msg	= NULL;
-// static guint						  kbrd_state	= 0;
-// static char 						  timer[9]		= "";
+ gboolean		  screen_updates_enabled			= FALSE;
+ int			  terminal_buffer_length			= 0;
 
- static gchar 						* (*convert_charset)(int c, gsize *sz) = convert_regular;
+ static gchar 	* (*convert_charset)(int c, gsize *sz) = convert_regular;
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
 
@@ -435,6 +430,12 @@
 		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,width,height);
 	}
 
+	if(get_cursor_pixmap())
+	{
+		gdk_pixmap_unref(get_cursor_pixmap());
+		pixmap_cursor = NULL;
+	}
+
  }
 
  static GPid on_lu_pid = 0;
@@ -511,38 +512,37 @@
 		g_free(luname);
  }
 
-#ifdef USE_PANGO
+/*
 
  void DrawOIA(GdkDrawable *draw, GdkColor *clr)
  {
-    /*
-     * The status line is laid out thusly (M is maxCOLS):
-     *
-     *	0			"4" in a square
-     *	1			"A" underlined
-     *	2			solid box if connected, "?" in a box if not
-     *	3..7		empty
-     *	8...		message area
-     *	M-43...42	SSL Status
-     *	M-41		Meta indication ("M" or blank)
-     *	M-40		Alt indication ("A" or blank)
-     *	M-39...38	Shift Status
-     *	M-37		empty
-     *	M-36		Compose indication ("C" or blank)
-     *	M-35		Compose first character
-     *	M-34		Caps indications ("A" or blank)
-     *	M-33		Typeahead indication ("T" or blank)
-     *	M-31		Alternate keymap indication ("K" or blank)
-     *	M-30		Reverse input mode indication ("R" or blank)
-     *	M-29		Insert mode indication (Special symbol/"I" or blank)
-     *	M-28		Printer indication ("P" or blank)
-     *	M-27		Script indication ("S" or blank)
-     *	M-26		empty
-     *	M-25..M-14	LU Name
-     *	M-15..M-9	command timing (Clock symbol and m:ss, or blank)
-     *	M-7..M		cursor position (rrr/ccc or blank)
-     *
-     */
+    // The status line is laid out thusly (M is maxCOLS):
+    //
+    //	0			"4" in a square
+    //	1			"A" underlined
+    //	2			solid box if connected, "?" in a box if not
+    //	3..7		empty
+    //	8...		message area
+    //	M-43...42	SSL Status
+    //	M-41		Meta indication ("M" or blank)
+    //	M-40		Alt indication ("A" or blank)
+    //	M-39...38	Shift Status
+    //	M-37		empty
+    //	M-36		Compose indication ("C" or blank)
+    //	M-35		Compose first character
+    //	M-34		Caps indications ("A" or blank)
+    //	M-33		Typeahead indication ("T" or blank)
+    //	M-31		Alternate keymap indication ("K" or blank)
+    //	M-30		Reverse input mode indication ("R" or blank)
+    //	M-29		Insert mode indication (Special symbol/"I" or blank)
+    //	M-28		Printer indication ("P" or blank)
+    //	M-27		Script indication ("S" or blank)
+    //	M-26		empty
+    //	M-25..M-14	LU Name
+    //	M-15..M-9	command timing (Clock symbol and m:ss, or blank)
+    //	M-7..M		cursor position (rrr/ccc or blank)
+    //
+    //
 	GdkGC 			*gc;
 	PangoLayout 	*layout;
 	int   			row		= OIAROW;
@@ -680,7 +680,7 @@
 
  }
 
-#endif // USE_PANGO
+*/
 
  static void set_oia(OIA_FLAG id, int on)
  {
@@ -722,13 +722,7 @@
 	default:
 
 		// Unexpected flag, update all OIA.
-		if(valid_terminal_window())
-		{
-			cairo_t *cr	= get_terminal_cairo_context();
-			draw_oia(cr);
-			cairo_destroy(cr);
-			gtk_widget_queue_draw_area(terminal,OIAROW,left_margin,terminal_cols*fontWidth,fontHeight+1);
-		}
+		update_oia();
 	}
  }
 
@@ -781,10 +775,10 @@
 // static int Loaded = 0;
 
 
+/*
  void LoadImages(GdkDrawable *drawable, GdkGC *gc)
  {
  	#warning Work in progress
-/*
  	int			f;
  	GdkPixmap	*temp;
 
@@ -829,10 +823,8 @@
 			pix[f].pix = 0;
 		}
  	}
-*/
  }
 
-/*
  void ReloadPixmaps(void)
  {
 	LoadImages(terminal->window, terminal->style->fg_gc[GTK_WIDGET_STATE(terminal)]);
@@ -884,9 +876,7 @@
 		gdk_pixbuf_render_to_drawable(pix[id].pix,drawable,gc,0,0,x,y,-1,-1,GDK_RGB_DITHER_NORMAL,0,0);
 
  }
-*/
 
-/*
  void UpdateKeyboardState(guint state)
  {
 
@@ -1153,6 +1143,10 @@
 					}
 					bend = baddr;
 					screen[baddr].changed = FALSE;
+
+					if(baddr == cursor_position)
+						update_cursor_pixmap();
+
 				}
 				else if(bstart >= 0)
 				{
