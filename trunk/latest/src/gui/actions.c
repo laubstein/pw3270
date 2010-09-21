@@ -898,6 +898,7 @@
 		{	"Connect",			N_( "_Connect" ),				G_CALLBACK(action_Connect)			},
 		{	"LoadScreenDump",	N_( "Load screen dump" ),		G_CALLBACK(action_LoadScreenDump)	},
 		{ 	"SetHostname",		N_( "Set hostname" ),			G_CALLBACK(action_SetHostname)		},
+		{	"TestPattern",		N_( "Show test pattern" ),		G_CALLBACK(show_3270_test_pattern)	},
 
 		// Online actions
 		{	"Redraw",			N_( "Redraw screen" ),			G_CALLBACK(action_Redraw)			},

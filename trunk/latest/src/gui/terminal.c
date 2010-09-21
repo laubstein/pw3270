@@ -146,7 +146,7 @@
 			gdk_drawable_get_size(window,&width,&height);
 
 			gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_CROSS_HAIR);
-			cairo_rectangle(cr, rCursor.x, 0, 1, top_margin+2+(terminal_font_info.height*terminal_rows));
+			cairo_rectangle(cr, rCursor.x, 0, 1, top_margin+2+(terminal_font_info.spacing*terminal_rows));
 			cairo_rectangle(cr, 0, rCursor.y+fontAscent, width,1);
 			cairo_fill(cr);
 		}
@@ -176,7 +176,7 @@
 	lastWidth  = width;
 	lastHeight = height;
 
- 	update_screen_size(widget, width, height);
+ 	update_terminal_font_size(width, height);
 
 	// Invalidate pixmaps, will redraw on next expose
 	release_pixmaps();
@@ -196,12 +196,7 @@
  	terminal = NULL;
 
 	release_pixmaps();
-
-	if(terminal_font_info.face)
-	{
-		cairo_font_face_destroy(terminal_font_info.face);
-		terminal_font_info.face = NULL;
-	}
+	release_font_info(&terminal_font_info);
 
  	Trace("%s","Terminal destroyed");
 
@@ -210,6 +205,8 @@
  static void realize(GtkWidget *widget, void *t)
  {
  	gint width, height;
+	cairo_t	*cr			= gdk_cairo_create(terminal->window);
+	gchar	*fontname	= GetString("Terminal","Font","Courier");
 
     Trace("Realizing %p",widget);
 
@@ -220,10 +217,16 @@
     gdk_window_set_cursor(widget->window,wCursor[0]);
 #endif
 
-	init_terminal_font(widget);
+	update_font_info(cr, fontname, &terminal_font_info);
+
+	gtk_widget_set_size_request(terminal, terminal_cols*terminal_font_info.width, ((terminal_rows+2)*terminal_font_info.height));
+
+	g_free(fontname);
+	cairo_destroy(cr);
 
 	// Set terminal size
 	gdk_drawable_get_size(widget->window,&width,&height);
+
 
 	ResizeTerminal(widget, width, height);
 
@@ -388,6 +391,8 @@
  GtkWidget *CreateTerminalWindow(void)
  {
 	input_method = gtk_im_multicontext_new();
+
+	load_font_sizes();
 
 	terminal = gtk_event_box_new();
 	gtk_widget_set_app_paintable(terminal,TRUE);

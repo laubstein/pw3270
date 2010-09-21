@@ -55,13 +55,13 @@
 /**
  * Update font & coordinates for screen elements.
  *
- * @param widget	Terminal widget.
- * @param width	New widget width.
- * @param height	New widget height.
+ * @param info	Font description data.
+ * @param width	Widget width.
+ * @param height	Widget height.
  *
  * @return TRUE if the image needs update
  */
- gboolean update_screen_size(GtkWidget *widget, gint width, gint height)
+ gboolean update_terminal_font_size(gint width, gint height)
  {
  	int size = -1;
  	int f;
@@ -83,9 +83,17 @@
 	if(terminal_font_info.width != font_list[size].width || terminal_font_info.height != font_list[size].height)
 	{
 		terminal_font_info.width	= font_list[size].width;
-		terminal_font_info.height 	= font_list[size].height;
+
+		terminal_font_info.height 	=
+		terminal_font_info.spacing = font_list[size].height;
 
 		Trace("Font size changed to %dx%d",terminal_font_info.width,terminal_font_info.height);
+
+		if(terminal_font_info.font)
+		{
+			cairo_scaled_font_destroy(terminal_font_info.font);
+			terminal_font_info.font = NULL;
+		}
 
 		for(f=0;f<OIA_PIXMAP_COUNT;f++)
 		{
@@ -97,15 +105,21 @@
 		}
 	}
 
+	// Adjust line spacing
 
-//	Trace("%s - screen=%p",__FUNCTION__,screen);
+	terminal_font_info.spacing = height / (terminal_rows+2);
+
+//	Trace("Spacing: %d  height: %d",terminal_font_info.spacing, terminal_font_info.height);
+
+	if(terminal_font_info.spacing < terminal_font_info.height)
+		terminal_font_info.spacing = terminal_font_info.height;
 
 	// Center image
-	left_margin = (width >> 1) - ((terminal_cols * fontWidth) >> 1);
+	left_margin = (width >> 1) - ((terminal_cols * terminal_font_info.width) >> 1);
 	if(left_margin < 0)
 		left_margin = 0;
 
-	top_margin = (height >> 1) - (((terminal_rows+1) * fontHeight) >> 1);
+	top_margin = (height >> 1) - (((terminal_rows+1) * terminal_font_info.spacing) >> 1);
 	if(top_margin < 0)
 		top_margin = 0;
 
@@ -113,25 +127,42 @@
  }
 
 /**
+ * Release font info.
+ *
+ */
+ void release_font_info(PW3270_FONT_INFO *info)
+ {
+	if(info->face)
+	{
+		cairo_font_face_destroy(info->face);
+		info->face = NULL;
+	}
+
+	if(info->font)
+	{
+		cairo_scaled_font_destroy(info->font);
+		info->font = NULL;
+	}
+
+ }
+
+/**
  * Load terminal font info
  *
  */
- void update_font_info(GtkWidget *widget)
+ void update_font_info(cairo_t *cr, const gchar *fontname, PW3270_FONT_INFO *info)
  {
  	int		f;
-	cairo_t	*cr			= gdk_cairo_create(widget->window);
- 	gchar	*fontname	= GetString("Terminal","Font","Courier");
  	int		pos = 0;
     double width = -1;
     double height = -1;
 
-	if(terminal_font_info.face)
-		cairo_font_face_destroy(terminal_font_info.face);
+	release_font_info(info);
 
-	terminal_font_info.face = cairo_toy_font_face_create(fontname,CAIRO_FONT_SLANT_NORMAL,TOGGLED_BOLD ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
+	info->face = cairo_toy_font_face_create(fontname,CAIRO_FONT_SLANT_NORMAL,TOGGLED_BOLD ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
 
 	/* Load font sizes */
-	cairo_set_font_face(cr,terminal_font_info.face);
+	cairo_set_font_face(cr,info->face);
 
  	for(f=0;font_size[f];f++)
  	{
@@ -174,19 +205,17 @@
 
 	memset(font_list+pos,0,sizeof(struct _font_list));
 
-	terminal_font_info.width	= font_list->width;
-	terminal_font_info.height	= font_list->height;
-	terminal_font_info.descent	= font_list->descent;
-	terminal_font_info.ascent	= font_list->ascent;
-//	terminal_font_info.size		= font_list->size;
-	terminal_font_info.matrix	= &font_list->matrix;
+	info->width		= font_list->width;
+
+	info->spacing 	=
+	info->height	= font_list->height;
+
+	info->descent	= font_list->descent;
+	info->ascent	= font_list->ascent;
+//	info->size		= font_list->size;
+	info->matrix	= &font_list->matrix;
 
  	Trace("Minimum terminal size is %dx%d",terminal_cols*font_list->width, (terminal_rows+1)*font_list->height);
-
-	gtk_widget_set_size_request(widget, terminal_cols*font_list->width, ((terminal_rows+2)*font_list->height));
-
- 	g_free(fontname);
-	cairo_destroy(cr);
 
  }
 
@@ -194,10 +223,8 @@
 /**
  * Load font sizes.
  *
- * @param widget	Widget to set.
- *
  */
- void init_terminal_font(GtkWidget *widget)
+ void load_font_sizes(void)
  {
  	static const gchar *default_sizes = "6,7,8,9,10,11,12,13,14,16,18,20,22,24,26,28,32,36,40,48,56,64,72";
 
@@ -209,11 +236,6 @@
 	Trace("%s",__FUNCTION__);
 
 	memset(&terminal_font_info,0,sizeof(terminal_font_info));
-	terminal_font_info.width	= 10;
-	terminal_font_info.height	= 12;
-	terminal_font_info.descent	=  2;
-	terminal_font_info.ascent	= 10;
-//	terminal_font_info.size		= 10;
 
 	vlr = g_strsplit(*list == '*' ? default_sizes : list,",",-1);
 
@@ -227,8 +249,6 @@
 
 	g_strfreev(vlr);
 	g_free(list);
-
-	update_font_info(widget);
 
  }
 

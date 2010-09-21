@@ -722,6 +722,7 @@ distclean: clean
 	@rm -f src/oxt/pw3270.uno.lib
 	@rm -f lib3270.pc
 	@rm -f pw3270.layout
+	@rm -f *.nsi
 
 clean:
 	@rm -fr obj
@@ -742,7 +743,6 @@ clean:
 	@rm -f config.status
 	@rm -f *.lnk
 	@rm -fr locale
-	@rm -f *.nsi
 	@rm -f *.ico
 	@rm -f $(PACKAGE).@LOGOEXT@
 	@rm -f @PROGRAM_NAME@.oxt

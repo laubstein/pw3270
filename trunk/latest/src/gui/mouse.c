@@ -187,7 +187,7 @@
 		cairo_t *cr = get_terminal_cairo_context();
 		draw_region(cr,start,end,color);
 		cairo_destroy(cr);
-		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*fontHeight);
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*terminal_font_info.spacing);
 	}
  }
 
@@ -215,14 +215,14 @@
 		*row = 0;
 		rc = -1;
 	}
-	else if(y > (top_margin+(terminal_rows * fontHeight)))
+	else if(y > (top_margin+(terminal_rows * terminal_font_info.spacing)))
 	{
 		*row = terminal_rows-1;
 		rc = -1;
 	}
 	else
 	{
-		*row = ((((unsigned long) y) - top_margin)/fontHeight);
+		*row = ((((unsigned long) y) - top_margin)/terminal_font_info.spacing);
 	}
 
 	return rc;
@@ -420,7 +420,6 @@
 			{
 				status |= ELEMENT_STATUS_SELECTED;
 
-/*
 				if(col == left)
 					status |= SELECTION_BOX_LEFT;
 
@@ -432,7 +431,6 @@
 
 				if(row == bottom)
 					status |= SELECTION_BOX_BOTTOM;
-*/
 
 			}
 
@@ -461,7 +459,7 @@
 	}
 
 	if(valid_terminal_window())
-		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*fontHeight);
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*terminal_font_info.spacing);
 
  }
 
@@ -495,19 +493,17 @@
 			{
 				status |= ELEMENT_STATUS_SELECTED;
 
-/*
 				if(!(row && (screen[pos-terminal_cols].status) & ELEMENT_STATUS_SELECTED))
 					status |= SELECTION_BOX_TOP;
 
 				if(!(pos && col && (screen[pos-1].status) & ELEMENT_STATUS_SELECTED))
 					status |= SELECTION_BOX_LEFT;
 
-				if(pos+1 > scol || col == (terminal_cols-1))
+				if(pos+1 > bend || col == (terminal_cols-1))
 					status |= SELECTION_BOX_RIGHT;
 
-				if((pos+terminal_cols) > ecol)
+				if((pos+terminal_cols) > bend)
 					status |= SELECTION_BOX_BOTTOM;
-*/
 			}
 
 			if(screen[pos].status != status)
@@ -530,7 +526,7 @@
 	}
 
 	if(valid_terminal_window())
-		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*fontHeight);
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*terminal_font_info.spacing);
 
  }
 

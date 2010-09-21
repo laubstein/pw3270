@@ -63,8 +63,9 @@
 
 		<menu action='DebugMenu'>
 			<menuitem action='Redraw'/>
-			<menuitem action='DumpScreen'/>
-			<menuitem action='LoadScreenDump'/>
+			<menuitem action='DumpScreen' group='offline' />
+			<menuitem action='LoadScreenDump' group='offline' />
+			<menuitem action='TestPattern' group='offline' />
 			<menuitem action='Toggle' id='GDKDebug'/>
 		</menu>
 	</menubar>
