@@ -419,7 +419,7 @@
 	if(valid_terminal_window() && screen_updates_enabled)
 	{
 		int 	width  = terminal_cols * fontWidth;
-		int 	height = terminal_rows * fontHeight;
+		int 	height = terminal_rows * terminal_font_info.spacing;
 		cairo_t *cr	= get_terminal_cairo_context();
 
 		gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_BACKGROUND);
@@ -1130,7 +1130,7 @@
 			int		cstart	= -1;
 			int 	bstart	= -1;
 			int 	bend	= -1;
-			int 	y 		= top_margin+(row * fontHeight);
+			int 	y 		= top_margin+(row * terminal_font_info.spacing);
 
 			for(col = 0;col < terminal_cols;col++)
 			{
@@ -1151,7 +1151,7 @@
 				else if(bstart >= 0)
 				{
 					draw_region(cr,bstart,bend,color);
-					gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,fontHeight);
+					gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
 					bstart = bend = -1;
 				}
 				baddr++;
@@ -1160,7 +1160,7 @@
 			if(bstart >= 0)
 			{
 				draw_region(cr,bstart,bend,color);
-				gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,fontHeight);
+				gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
 			}
 		}
 

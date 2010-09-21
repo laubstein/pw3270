@@ -36,22 +36,28 @@
 
 	typedef struct _pw3270_font_info
 	{
-		gint				  width;	/**< Font width, in pixels */
-		gint				  height;	/**< Font height, in pixels */
-		gint				  descent;	/**< Font descent, in pixels */
-		gint				  ascent;	/**< Font ascent, in pixels */
-		cairo_font_face_t	* face;		/**< Font face */
-		cairo_matrix_t		* matrix;	/**< Font matrix */
-//		double			  	  size;		/**< Font size */
+		gint				  width;		/**< Font width, in pixels */
+		gint				  height;		/**< Font height, in pixels */
+		gint				  descent;		/**< Font descent, in pixels */
+		gint				  ascent;		/**< Font ascent, in pixels */
+		gint				  spacing;		/**< Line height, in pixels */
+		cairo_font_face_t	* face;			/**< Font face */
+		cairo_scaled_font_t * font;			/**< Scaled font - http://library.gnome.org/devel/cairo/stable/cairo-scaled-font.html */
+		cairo_matrix_t		* matrix;		/**< Font matrix */
 	} PW3270_FONT_INFO;
 
 	// Globals
 	LOCAL_EXTERN PW3270_FONT_INFO	terminal_font_info;
 
 	// Prototipes
-	LOCAL_EXTERN void		init_terminal_font(GtkWidget *widget);
-	LOCAL_EXTERN void		update_font_info(GtkWidget *widget);
-	LOCAL_EXTERN gboolean	update_screen_size(GtkWidget *widget, gint width, gint height);
+	LOCAL_EXTERN void		load_font_sizes(void);
+	LOCAL_EXTERN void		update_font_info(cairo_t *cr, const gchar *fontname, PW3270_FONT_INFO *info);
+	LOCAL_EXTERN void 		release_font_info(PW3270_FONT_INFO *info);
+
+	LOCAL_EXTERN gboolean	update_terminal_font_size(gint width, gint height);
+
+	LOCAL_EXTERN void		draw_element(cairo_t *cr, PW3270_FONT_INFO *font, int x, int y, int baseline, int addr, GdkColor *clr);
+
 
 	// Terminal font macros
 	#define terminal_font_width() terminal_font_info.width

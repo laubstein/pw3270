@@ -85,7 +85,7 @@
 	cairo_fill(cr);
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_CURSOR_FOREGROUND);
-	draw_element(cr,0,0,fontAscent,cursor_position,NULL);
+	draw_element(cr,&terminal_font_info,0,0,terminal_font_info.ascent,cursor_position,NULL);
 
     cairo_destroy(cr);
  }
@@ -96,9 +96,9 @@
  	int col = cursor_position % terminal_cols;
 
 	rCursor.x 		= left_margin + (col * fontWidth);
-	rCursor.y 		= top_margin + (row * fontHeight);
+	rCursor.y 		= top_margin + (row * terminal_font_info.spacing);
 	rCursor.width 	= fontWidth;
-	rCursor.height	= fontHeight;
+	rCursor.height	= terminal_font_info.height;
  }
 
  void update_cursor_position(int row, int col)

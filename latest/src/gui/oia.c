@@ -68,7 +68,7 @@
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
- #define OIAROW	(top_margin+4+(terminal_font_info.height*terminal_rows))
+ #define OIAROW	(top_margin+4+(terminal_font_info.spacing*terminal_rows))
 
  gboolean		  oia_flag[OIA_FLAG_USER];
  STATUS_CODE	  terminal_message_id = (STATUS_CODE) -1;
@@ -132,7 +132,7 @@
 		GdkGC *gc = get_terminal_cached_gc();
 		draw_oia(cr,gc);
 		cairo_destroy(cr);
-		gtk_widget_queue_draw_area(terminal,OIAROW,left_margin,terminal_cols*fontWidth,fontHeight+2);
+		gtk_widget_queue_draw_area(terminal,OIAROW,left_margin,terminal_cols*fontWidth,terminal_font_info.spacing+2);
 	}
  }
 
@@ -143,7 +143,7 @@
  	int width = (terminal_cols * fontWidth);
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
-	cairo_rectangle(cr, left_margin, row, width, fontHeight);
+	cairo_rectangle(cr, left_margin, row, width, terminal_font_info.height);
 	cairo_fill(cr);
 
 	width += left_margin;
@@ -154,7 +154,7 @@
 		memset(&rect,0,sizeof(rect));
 		rect.y = row;
 		rect.width = width;
-		rect.height = fontHeight;
+		rect.height = terminal_font_info.height;
 		oia_call[f].update(cr,gc,&rect);
 	}
 
@@ -174,7 +174,7 @@
 
 		memset(&rect,0,sizeof(rect));
 		rect.y = OIAROW;
-		rect.height = fontHeight;
+		rect.height = terminal_font_info.height;
 		rect.width = left_margin + (terminal_cols * fontWidth);
 
 		oia_call[el].update(cr,get_terminal_cached_gc(),&rect);
@@ -298,7 +298,7 @@
 
 	r->x = (r->width - (41*terminal_font_info.width));
 	r->width = terminal_font_info.width;
-	r->height = terminal_font_info.height;
+//	r->height = terminal_font_info.height;
 
 	oia_clear_rect(cr,r);
 
@@ -393,7 +393,7 @@
  	// * M-33 Typeahead indication ("T" or blank)
 	r->x = (r->width - (34*terminal_font_info.width));
 	r->width = terminal_font_info.width;
-	r->height = terminal_font_info.height;
+//	r->height = terminal_font_info.height;
 
 	oia_clear_rect(cr,r);
 
@@ -510,7 +510,7 @@
 	r->x = (r->width - (44*terminal_font_info.width))+1;
 	r->y++;
 	r->width = (terminal_font_info.width*2)-1;
-	r->height = terminal_font_info.height-1;
+	r->height--;
 
 	oia_clear_icon(cr,r);
 
@@ -527,7 +527,7 @@
  {
 	r->x = (r->width - (32*terminal_font_info.width));
 	r->width = terminal_font_info.width;
-	r->height = fontHeight;
+//	r->height = fontHeight;
 
 	oia_clear_rect(cr,r);
 
@@ -539,7 +539,7 @@
  {
 	r->x = (r->width - (30*terminal_font_info.width));
 	r->width = fontWidth;
-	r->height = fontHeight;
+//	r->height = fontHeight;
 
 	oia_clear_rect(cr,r);
 
@@ -553,7 +553,7 @@
 	//  0          "4" in a square
 	r->x = left_margin;
 	r->width = terminal_font_info.width+2;
-	r->height = terminal_font_info.height;
+//	r->height = terminal_font_info.height;
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
 	cairo_rectangle(cr, r->x, r->y+1, r->width,r->height);
@@ -570,7 +570,7 @@
 	//  1          "A" underlined
 	r->x = (left_margin+terminal_font_info.width+4);
 	r->width = terminal_font_info.width;
-	r->height = terminal_font_info.height;
+//	r->height = terminal_font_info.height;
 
 	oia_clear_rect(cr,r);
 
@@ -594,7 +594,7 @@
 	// 2          solid box if connected, "?" in a box if not
 	r->x = (left_margin+(terminal_font_info.width*2)+6);
 	r->width = terminal_font_info.width+2;
-	r->height = terminal_font_info.height;
+//	r->height = terminal_font_info.height;
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
 	cairo_rectangle(cr, r->x, r->y+1, r->width,r->height);
@@ -686,7 +686,7 @@
  {
  	r->x = (r->width - (fontWidth*16));
 	r->width = fontWidth*2;
-	r->height = fontHeight;
+//	r->height = fontHeight;
 
 	oia_clear_icon(cr,r);
 	r->x++;
