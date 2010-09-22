@@ -30,6 +30,35 @@
  *
  */
 
+/*
+ * The status line is laid out thusly (M is maxCOLS):
+ *
+ *	0			"4" in a square
+ *	1			"A" underlined
+ *	2			solid box if connected, "?" in a box if not
+ *	3..7		empty
+ *	8...		message area
+ *	M-43...42	SSL Status
+ *	M-41		Meta indication ("M" or blank)
+ *	M-40		Alt indication ("A" or blank)
+ *	M-39...38	Shift Status
+ *	M-37		empty
+ *	M-36		Compose indication ("C" or blank)
+ *	M-35		Compose first character
+ *	M-34		Caps indications ("A" or blank)
+ *	M-33		Typeahead indication ("T" or blank)
+ *	M-31		Alternate keymap indication ("K" or blank)
+ *	M-30		Reverse input mode indication ("R" or blank)
+ *	M-29		Insert mode indication (Special symbol/"I" or blank)
+ *	M-28		Printer indication ("P" or blank)
+ *	M-27		Script indication ("S" or blank)
+ *	M-26		empty
+ *	M-25..M-14	LU Name
+ *	M-15..M-9	command timing (Clock symbol and m:ss, or blank)
+ *	M-7..M		cursor position (rrr/ccc or blank)
+ *
+ */
+
 #include <math.h>
 #include "gui.h"
 #include "fonts.h"
@@ -50,9 +79,9 @@
  static void oia_draw_alt_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
  static void oia_draw_ssl_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
-#if GTK_CHECK_VERSION(2,16,0)
+#if HAVE_CAPS_STATE
  static void oia_draw_caps_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
-#endif // GTK 2.16.0
+#endif // HAVE_CAPS_STATE
 
  static void oia_four_in_a_square(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
@@ -74,9 +103,9 @@
  STATUS_CODE	  terminal_message_id = (STATUS_CODE) -1;
 
  SCRIPT_STATE	  oia_script_state = SCRIPT_STATE_NONE;
-#if GTK_CHECK_VERSION(2,16,0)
+#ifdef HAVE_CAPS_STATE
  gboolean		  oia_caps_state;
-#endif
+#endif // HAVE_CAPS_STATE
 
  gboolean		  oia_script_blink = TRUE;
 
@@ -110,10 +139,9 @@
 	{ oia_update_spinner		},  // Spinner indicator
 	{ oia_cursor_position		},	// cursor position (rrr/ccc or blank)
 
-#if GTK_CHECK_VERSION(2,16,0)
+#ifdef HAVE_CAPS_STATE
 	{ oia_draw_caps_state		},	// Caps indications ("A" or blank)
-#endif
-
+#endif // HAVE_CAPS_STATE
 
  };
 
@@ -141,6 +169,10 @@
  	int	f;
  	int row = OIAROW;
  	int width = (terminal_cols * fontWidth);
+
+#ifdef HAVE_CAPS_STATE
+	oia_caps_state = gdk_keymap_get_caps_lock_state(gdk_keymap_get_default());
+#endif // HAVE_CAPS_STATE
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
 	cairo_rectangle(cr, left_margin, row, width, terminal_font_info.height);
@@ -401,7 +433,7 @@
 		oia_show_text(cr,r,"T",TERMINAL_COLOR_TYPEAHEAD_STATE);
  }
 
-#if GTK_CHECK_VERSION(2,16,0)
+#ifdef HAVE_CAPS_STATE
  static void oia_draw_caps_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	r->x = (r->width - (39*terminal_font_info.width));
@@ -414,7 +446,7 @@
 		oia_show_text(cr,r,"A",TERMINAL_COLOR_OIA_INDICATORS);
 
  }
-#endif // GTK 2.16.0
+#endif // HAVE_CAPS_STATE
 
  static GdkPixmap * oia_create_scaled_pixmap(GdkRectangle *r, GdkGC *gc, const unsigned char *data, gint width, gint height, enum TERMINAL_COLOR cl)
  {
