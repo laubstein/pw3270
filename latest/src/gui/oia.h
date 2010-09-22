@@ -34,6 +34,10 @@
 
 	#define OIA_H_INCLUDED
 
+	// #if GTK_CHECK_VERSION(2,16,0)
+	//	#define HAVE_CAPS_STATE 1
+	// #endif
+
 	// OIA elements
 	typedef enum _OIA_ELEMENT
 	{
@@ -53,9 +57,9 @@
 		OIA_ELEMENT_COMMAND_SPINNER,			/**< Spinner */
 		OIA_ELEMENT_CURSOR_POSITION,	 		/**< cursor position (rrr/ccc or blank) */
 
-#if GTK_CHECK_VERSION(2,16,0)
+#ifdef HAVE_CAPS_STATE
 		OIA_ELEMENT_CAPS_INDICATOR, 			/**< Caps indications ("A" or blank) */
-#endif
+#endif // HAVE_CAPS_STATE
 
 //		OIA_ELEMENT_META_INDICATOR, 			/**< Meta indication ("M" or blank) */
 //		OIA_ELEMENT_COMPOSE_INDICATOR,			/**< Compose indication ("C" or blank) */
@@ -75,9 +79,9 @@
 	LOCAL_EXTERN gboolean		  oia_shift_state;
 	LOCAL_EXTERN gboolean		  oia_alt_state;
 
-#if GTK_CHECK_VERSION(2,16,0)
+#ifdef HAVE_CAPS_STATE
 	LOCAL_EXTERN gboolean		  oia_caps_state;
-#endif
+#endif // HAVE_CAPS_STATE
 
 	LOCAL_EXTERN STATUS_CODE	  terminal_message_id;
 

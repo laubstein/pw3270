@@ -227,9 +227,7 @@
 	// Set terminal size
 	gdk_drawable_get_size(widget->window,&width,&height);
 
-
 	ResizeTerminal(widget, width, height);
-
 
  }
 
@@ -269,7 +267,7 @@
 		Trace("Alt is %s",status ? "Active" : "Inactive");
 	}
 
-#if GTK_CHECK_VERSION(2,16,0)
+#ifdef HAVE_CAPS_STATE
 
 	// http://library.gnome.org/devel/gdk/stable/gdk-Keyboard-Handling.html#gdk-keymap-get-caps-lock-state
 	if(event->keyval == GDK_Caps_Lock)
@@ -285,12 +283,13 @@
 		}
 	}
 
-#endif
+#endif // HAVE_CAPS_STATE
 
  }
 
  static gboolean key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
+
  	update_keyboard_state(event,TRUE);
 
 	if(gtk_im_context_filter_keypress(input_method,event))
