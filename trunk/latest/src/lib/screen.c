@@ -965,6 +965,7 @@ LIB3270_EXPORT void show_3270_test_pattern(void)
 	int pos = 0;
 	int f;
 
+	Trace("%s begins",__FUNCTION__);
 	for(f=0;f<max;f++)
 	{
 		if(!pat[row].cc[pos])
@@ -977,8 +978,11 @@ LIB3270_EXPORT void show_3270_test_pattern(void)
 		ea_buf[f].cc = pat[row].cc[pos++];
 	}
 
+	Trace("%s display",__FUNCTION__);
+
 	screen_disp();
 
+	Trace("%s ends",__FUNCTION__);
 }
 
 LIB3270_EXPORT struct ea * copy_device_buffer(int *el)

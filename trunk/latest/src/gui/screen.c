@@ -299,6 +299,7 @@
  	{
 		if(xlat[f].c == c)
 		{
+//			Trace("%s \"%s\" %d",__FUNCTION__,xlat[f].str,strlen(xlat[f].str));
 			strcpy(el->ch,xlat[f].str);
 			return;
 		}
@@ -340,6 +341,7 @@
 			else
 				Log("Invalid size when converting \"%c\" to \"%s\"",c,str);
 			g_free(str);
+
 		}
 	}
 
