@@ -72,17 +72,17 @@
 	LOCAL_EXTERN int 			drag_type;
 	LOCAL_EXTERN CURSOR_MODE	cursor_mode;
 
-	#define MAX_CHR_LENGTH 3
+	#define MAX_CHR_LENGTH 4
 	typedef struct _element
 	{
 		gchar				ch[MAX_CHR_LENGTH];	/**< UTF-8 string */
 
 		gboolean			changed;			/**< Element needs update? */
 
-		unsigned short	fg;					/**< Foreground color */
-		unsigned short	bg;					/**< Background color */
+		unsigned short	fg;						/**< Foreground color */
+		unsigned short	bg;						/**< Background color */
 
-		unsigned short	cg;					/**< CG character */
+		unsigned short	cg;						/**< CG character */
 
 		#define SELECTION_BOX_LEFT			0x10
 		#define SELECTION_BOX_RIGHT			0x20
