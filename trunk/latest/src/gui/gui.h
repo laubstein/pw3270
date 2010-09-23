@@ -337,8 +337,6 @@
 	int 			wait4negotiations(const char *cl_hostname);
 	GdkPixbuf 		*LoadLogo(void);
 
-//	GdkGC 			*getCachedGC(GdkDrawable *draw);
-
 	void			FontChanged(void);
 
 	int 			CloseConfigFile(void);
@@ -365,21 +363,6 @@
 
 
 	void			program_quit(void);
-
-	enum _SELECT_MODE
-	{
-		SELECT_MODE_NONE,
-		SELECT_MODE_TEXT,
-		SELECT_MODE_RECTANGLE,
-		SELECT_MODE_FIELD,
-		SELECT_MODE_COPY,
-		SELECT_MODE_APPEND,
-		SELECT_MODE_DRAG,
-
-		SELECT_MODE_INVALID
-	};
-
-	void	SetSelectionMode(int m);
 
 	LOCAL_EXTERN int		  get_selected_rectangle(GdkRectangle *rect);
 

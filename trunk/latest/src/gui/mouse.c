@@ -43,24 +43,38 @@
 
 /*---[ Defines ]--------------------------------------------------------------*/
 
+ enum SELECT_MODE
+ {
+	SELECT_MODE_NONE,
+	SELECT_MODE_TEXT,
+	SELECT_MODE_RECTANGLE,
+	SELECT_MODE_FIELD,
+	SELECT_MODE_COPY,
+	SELECT_MODE_APPEND,
+	SELECT_MODE_DRAG,
+
+	SELECT_MODE_INVALID
+ };
+
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
  static void UpdateSelectedRegion(int start, int end);
  static void SelectField(int addr);
  static void SetDragType(int type);
  static void SetSelection(gboolean selected);
+ static void SetSelectionMode(enum SELECT_MODE m);
 
 /*---[ Constants ]------------------------------------------------------------*/
 
 /*---[ Statics ]--------------------------------------------------------------*/
 
- static int 			startRow 	= 0;
- static int 			startCol 	= 0;
- static int 			endRow 		= 0;
- static int 			endCol		= 0;
- static int 			dragRow		= 0;
- static int 			dragCol		= 0;
- static int 			select_mode	= SELECT_MODE_INVALID;
+ static int 				startRow 	= -1;
+ static int 				startCol 	= 0;
+ static int 				endRow 		= 0;
+ static int 				endCol		= 0;
+ static int 				dragRow		= 0;
+ static int 				dragCol		= 0;
+ static enum SELECT_MODE	select_mode	= SELECT_MODE_INVALID;
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
@@ -98,19 +112,30 @@
 	return 0;
  }
 
- void SetSelectionMode(int m)
+ static void SetSelectionMode(enum SELECT_MODE m)
  {
  	if(m == select_mode)
 		return;
 
-	if(m == SELECT_MODE_NONE && select_mode != SELECT_MODE_INVALID)
-		set_action_sensitive_by_name("Reselect",TRUE);
+	switch( (int) m)
+	{
+		case SELECT_MODE_RECTANGLE:
+			set_action_sensitive_by_name("CopyAsTable",TRUE);
+			set_action_sensitive_by_name("CopyAsImage",TRUE);
+			break;
 
-	set_action_sensitive_by_name("CopyAsTable",m == SELECT_MODE_RECTANGLE);
-	set_action_sensitive_by_name("CopyAsImage",m == SELECT_MODE_RECTANGLE);
+		case SELECT_MODE_TEXT:
+			set_action_sensitive_by_name("CopyAsTable",FALSE);
+			set_action_sensitive_by_name("CopyAsImage",FALSE);
+			break;
+
+		case SELECT_MODE_NONE:
+			if(select_mode != SELECT_MODE_INVALID)
+				set_action_sensitive_by_name("Reselect",TRUE);
+			break;
+	}
 
 	select_mode = m;
-
 	set_action_group_sensitive_state(ACTION_GROUP_SELECTION,(select_mode == SELECT_MODE_NONE) ? FALSE : TRUE );
 
  }
@@ -551,12 +576,18 @@
 		return;
 
 	action_ClearSelection();
-	SetSelectionMode(value ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 
-	if(select_mode == SELECT_MODE_TEXT)
-		UpdateSelectedText();
-	else
+	if(value)
+	{
+		SetSelectionMode(SELECT_MODE_RECTANGLE);
 		UpdateSelectedRectangle();
+	}
+	else
+	{
+		SetSelectionMode(SELECT_MODE_TEXT);
+		UpdateSelectedText();
+	}
+
  }
 
  void Reselect(void)
@@ -597,7 +628,7 @@
 	if(button_flags & BUTTON_FLAG_COMBO)
 	{
 		// Moving with button 1 pressed, update selection
-		switch(select_mode)
+		switch( ((int) select_mode) )
 		{
 		case SELECT_MODE_NONE:	// Start selection
 			SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
@@ -630,47 +661,38 @@
 		}
 		else if(row == startRow && col == startCol)
 		{
-			Trace("Top-left (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_TOP_LEFT);
 		}
 		else if(row == startRow && col == endCol)
 		{
-			Trace("Top-right (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_TOP_RIGHT);
 		}
 		else if(row == startRow)
 		{
-//			Trace("Top (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_TOP);
 		}
 		else if(row == endRow && col == startCol)
 		{
-//			Trace("Bottom-left (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_BOTTOM_LEFT);
 		}
 		else if(row == endRow && col == endCol)
 		{
-//			Trace("Bottom-right (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_BOTTOM_RIGHT);
 		}
 		else if(row == endRow)
 		{
-//			Trace("Bottom (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_BOTTOM);
 		}
 		else if(col == startCol)
 		{
-//			Trace("Left (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_LEFT);
 		}
 		else if(col == endCol)
 		{
-//			Trace("Right (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_RIGHT);
 		}
 		else if(col >= startCol && col <= endCol && row >= startRow && row <= endRow)
 		{
-//			Trace("Inside (%d,%x)",row,col);
 			SetDragType(DRAG_TYPE_INSIDE);
 		}
 		else
