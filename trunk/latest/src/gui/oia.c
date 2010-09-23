@@ -36,26 +36,27 @@
  *	0			"4" in a square
  *	1			"A" underlined
  *	2			solid box if connected, "?" in a box if not
- *	3..7		empty
- *	8...		message area
- *	M-43...42	SSL Status
- *	M-41		Meta indication ("M" or blank)
- *	M-40		Alt indication ("A" or blank)
- *	M-39...38	Shift Status
- *	M-37		empty
- *	M-36		Compose indication ("C" or blank)
- *	M-35		Compose first character
- *	M-34		Caps indications ("A" or blank)
- *	M-33		Typeahead indication ("T" or blank)
- *	M-31		Alternate keymap indication ("K" or blank)
- *	M-30		Reverse input mode indication ("R" or blank)
- *	M-29		Insert mode indication (Special symbol/"I" or blank)
- *	M-28		Printer indication ("P" or blank)
- *	M-27		Script indication ("S" or blank)
- *	M-26		empty
- *	M-25..M-14	LU Name
- *	M-15..M-9	command timing (Clock symbol and m:ss, or blank)
- *	M-7..M		cursor position (rrr/ccc or blank)
+ *				empty
+ *	5...M-47	message area
+*	M-46...45	SSL Status
+ *	M-			Meta indication ("M" or blank)
+ *	M-41		Alt indication ("A" or blank)
+ *	M-			empty
+ *	M-			Compose indication ("C" or blank)
+ *	M-			Compose first character
+ *	M-39		Caps indication ("A" or blank)
+ *	M-37...36	Shift Status
+ *	M-34		Typeahead indication ("T" or blank)
+ *	M-			Alternate keymap indication ("K" or blank)
+ *	M-			Reverse input mode indication ("R" or blank)
+ *	M-32		Insert mode indication (Special symbol/"I" or blank)
+ *	M-30		Script indication
+ *	M-			Printer indication ("P" or blank)
+ *	M-			empty
+ *	M-28...		LU Name
+ *	M-16..15	commang timing spinner
+ *	M-14		command timing (Clock symbol and m:ss, or blank)
+ *	M-7...m		cursor position (rrr/ccc or blank)
  *
  */
 
@@ -69,7 +70,7 @@
  static void oia_cursor_position(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
  static void oia_lu_name(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
- static void oia_insert_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
+ static void oia_draw_insert_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
  static void oia_draw_typeahead_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
  static void oia_script_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
  static void oia_undera_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
@@ -79,9 +80,9 @@
  static void oia_draw_alt_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
  static void oia_draw_ssl_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
-#if HAVE_CAPS_STATE
+#if defined(HAVE_CAPS_STATE) || defined(DEBUG)
  static void oia_draw_caps_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
-#endif // HAVE_CAPS_STATE
+#endif // HAVE_CAPS_STATE || DEBUG
 
  static void oia_four_in_a_square(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
@@ -103,9 +104,10 @@
  STATUS_CODE	  terminal_message_id = (STATUS_CODE) -1;
 
  SCRIPT_STATE	  oia_script_state = SCRIPT_STATE_NONE;
-#ifdef HAVE_CAPS_STATE
- gboolean		  oia_caps_state;
-#endif // HAVE_CAPS_STATE
+
+#if defined(HAVE_CAPS_STATE) || defined(DEBUG)
+ gboolean		  oia_caps_state = FALSE;
+#endif // HAVE_CAPS_STATE || DEBUG
 
  gboolean		  oia_script_blink = TRUE;
 
@@ -132,16 +134,16 @@
 	{ oia_draw_alt_state		},	// Alt indication ("A" or blank)
 	{ oia_draw_shift_state		},	// Shift Status
 	{ oia_draw_typeahead_state	},	// Typeahead indication ("T" or blank)
-	{ oia_insert_indicator		},	// Insert mode indication (Special symbol/"I" or blank)
+	{ oia_draw_insert_state		},	// Insert mode indication (Special symbol/"I" or blank)
 	{ oia_script_indicator		},	// Script indication ("S" or blank)
 	{ oia_lu_name				},	// LU Name
 	{ oia_update_timer			},	// command timing (Clock symbol and m:ss, or blank)
 	{ oia_update_spinner		},  // Spinner indicator
 	{ oia_cursor_position		},	// cursor position (rrr/ccc or blank)
 
-#ifdef HAVE_CAPS_STATE
+#if defined(HAVE_CAPS_STATE) || defined(DEBUG)
 	{ oia_draw_caps_state		},	// Caps indications ("A" or blank)
-#endif // HAVE_CAPS_STATE
+#endif // HAVE_CAPS_STATE || DEBUG
 
  };
 
@@ -169,10 +171,6 @@
  	int	f;
  	int row = OIAROW;
  	int width = (terminal_cols * fontWidth);
-
-#ifdef HAVE_CAPS_STATE
-	oia_caps_state = gdk_keymap_get_caps_lock_state(gdk_keymap_get_default());
-#endif // HAVE_CAPS_STATE
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
 	cairo_rectangle(cr, left_margin, row, width, terminal_font_info.height);
@@ -336,7 +334,7 @@
 
 #ifdef DEBUG
 	if(oia_alt_state)
-		oia_show_text(cr,r,"A",TERMINAL_COLOR_ALT_STATE);
+		oia_show_text(cr,r,"A",TERMINAL_COLOR_OIA_ALT_STATE);
 #endif
 
  }
@@ -403,7 +401,7 @@
 		l = (w/3);
 		b = y+(w/1.5);
 
-		cairo_set_3270_color(cr,TERMINAL_COLOR_SHIFT_STATE);
+		cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_SHIFT_STATE);
 
 		cairo_move_to(cr,x+(w/2),y);
 		cairo_line_to(cr,x+w,b);
@@ -422,7 +420,7 @@
 
  static void oia_draw_typeahead_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
- 	// * M-33 Typeahead indication ("T" or blank)
+ 	// * M-34 Typeahead indication ("T" or blank)
 	r->x = (r->width - (34*terminal_font_info.width));
 	r->width = terminal_font_info.width;
 //	r->height = terminal_font_info.height;
@@ -430,10 +428,10 @@
 	oia_clear_rect(cr,r);
 
 	if(oia_flag[OIA_FLAG_TYPEAHEAD])
-		oia_show_text(cr,r,"T",TERMINAL_COLOR_TYPEAHEAD_STATE);
+		oia_show_text(cr,r,"T",TERMINAL_COLOR_OIA_TYPEAHEAD_STATE);
  }
 
-#ifdef HAVE_CAPS_STATE
+#if defined(HAVE_CAPS_STATE) || defined(DEBUG)
  static void oia_draw_caps_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	r->x = (r->width - (39*terminal_font_info.width));
@@ -442,11 +440,16 @@
 
 	oia_clear_rect(cr,r);
 
+#if GTK_CHECK_VERSION(2,16,0)
+	// http://library.gnome.org/devel/gdk/stable/gdk-Keyboard-Handling.html#gdk-keymap-get-caps-lock-state
+	oia_caps_state = gdk_keymap_get_caps_lock_state(gdk_keymap_get_default());
+#endif
+
 	if(oia_caps_state)
 		oia_show_text(cr,r,"A",TERMINAL_COLOR_OIA_INDICATORS);
 
  }
-#endif // HAVE_CAPS_STATE
+#endif // HAVE_CAPS_STATE || DEBUG
 
  static GdkPixmap * oia_create_scaled_pixmap(GdkRectangle *r, GdkGC *gc, const unsigned char *data, gint width, gint height, enum TERMINAL_COLOR cl)
  {
@@ -538,8 +541,7 @@
 
 	int idx = query_secure_connection(hSession) ? OIA_PIXMAP_LOCKED : OIA_PIXMAP_UNLOCKED;
 
-	// * M-44...42	SSL Status
-	r->x = (r->width - (44*terminal_font_info.width))+1;
+	r->x = (r->width - (46*terminal_font_info.width))+1;
 	r->y++;
 	r->width = (terminal_font_info.width*2)-1;
 	r->height--;
@@ -547,7 +549,7 @@
 	oia_clear_icon(cr,r);
 
 	if(!pixmap_oia[idx])
-		pixmap_oia[idx] = oia_create_scaled_pixmap(r,gc,imagedata[idx].data,imagedata[idx].width,imagedata[idx].height,TERMINAL_COLOR_SSL_STATE);
+		pixmap_oia[idx] = oia_create_scaled_pixmap(r,gc,imagedata[idx].data,imagedata[idx].width,imagedata[idx].height,TERMINAL_COLOR_OIA_SSL_STATE);
 
 	gdk_cairo_set_source_pixmap(cr, pixmap_oia[idx], r->x, r->y);
 	gdk_cairo_rectangle(cr,r);
@@ -555,23 +557,38 @@
 
  }
 
- static void oia_insert_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
+ static void oia_draw_insert_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	r->x = (r->width - (32*terminal_font_info.width));
 	r->width = terminal_font_info.width;
-//	r->height = fontHeight;
 
+	oia_clear_icon(cr,r);
+
+	if(Toggled(INSERT))
+	{
+		double y = r->y+(r->height-2);
+
+		cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_INSERT_STATE);
+
+		cairo_move_to(cr,r->x,y);
+		cairo_rel_line_to(cr,r->width/2,-(r->height/1.7));
+		cairo_line_to(cr,r->x+r->width,y);
+
+		cairo_stroke(cr);
+	}
+
+/*
 	oia_clear_rect(cr,r);
 
 	if(Toggled(INSERT))
 		oia_show_text(cr,r,"I",TERMINAL_COLOR_OIA_INDICATORS);
+*/
  }
 
  static void oia_script_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	r->x = (r->width - (30*terminal_font_info.width));
 	r->width = fontWidth;
-//	r->height = fontHeight;
 
 	oia_clear_rect(cr,r);
 
@@ -585,7 +602,6 @@
 	//  0          "4" in a square
 	r->x = left_margin;
 	r->width = terminal_font_info.width+2;
-//	r->height = terminal_font_info.height;
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
 	cairo_rectangle(cr, r->x, r->y+1, r->width,r->height);
@@ -602,7 +618,6 @@
 	//  1          "A" underlined
 	r->x = (left_margin+terminal_font_info.width+4);
 	r->width = terminal_font_info.width;
-//	r->height = terminal_font_info.height;
 
 	oia_clear_rect(cr,r);
 
@@ -613,11 +628,7 @@
 		cairo_move_to(cr,r->x,r->y+fontAscent+(fontDescent/2));
 		cairo_rel_line_to(cr,terminal_font_info.width,0);
 		cairo_stroke(cr);
-
-//		cairo_rectangle(cr, r->x, r->y+fontAscent + (fontDescent/2), fontWidth, sl);
-//		cairo_fill(cr);
 	}
-
 
  }
 
@@ -626,15 +637,12 @@
 	// 2          solid box if connected, "?" in a box if not
 	r->x = (left_margin+(terminal_font_info.width*2)+6);
 	r->width = terminal_font_info.width+2;
-//	r->height = terminal_font_info.height;
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
 	cairo_rectangle(cr, r->x, r->y+1, r->width,r->height);
 	cairo_fill(cr);
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_INDICATORS);
-
-//	Trace("%s box_solid=%s", __FUNCTION__, oia_flag[OIA_FLAG_BOXSOLID] ? "Yes" : "No" );
 
 	if(IN_ANSI)
 	{
@@ -718,7 +726,6 @@
  {
  	r->x = (r->width - (fontWidth*16));
 	r->width = fontWidth*2;
-//	r->height = fontHeight;
 
 	oia_clear_icon(cr,r);
 	r->x++;
@@ -737,7 +744,6 @@
 
  static void oia_message_area(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
- 	// From 6 to M - 46 - Status message
 	#ifdef DEBUG
 		#define OIA_MESSAGE(x,c,y) { #x, c, y }
 	#else
@@ -825,8 +831,8 @@
 
 	msg = message[current_message_id].string;
 
-	r->x = left_margin + (terminal_font_info.width * 7);
-	r->width = (r->width - (terminal_font_info.width * 45)) - r->x;
+	r->x = left_margin + (terminal_font_info.width * 5);
+	r->width = (r->width - (terminal_font_info.width * 47)) - r->x;
 
 	if(r->width < 0)
 		return;

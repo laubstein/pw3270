@@ -31,6 +31,7 @@
  */
 
  #include "gui.h"
+ #include "fonts.h"
  #include <globals.h>
  #include <lib3270/kybdc.h>
  #include <lib3270/toggle.h>
@@ -515,22 +516,8 @@
 
 	Trace("%s (append: %s mode: %d)",__FUNCTION__,append ? "Yes" : "No",(int) clipboard_mode);
 
- 	if(GetSelectedRectangle(&rect))
- 	{
- 		// FIXME (perry#3#): First check if the selection area isn't rectangular.
-		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
-													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_CANCEL,
-													"%s", _(  "Invalid action" ));
-
-		gtk_window_set_title(GTK_WINDOW(dialog),_( "Can't copy non rectangular area" ));
-		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s",_( "Activate rectangle select option and try again." ));
-
-        gtk_dialog_run(GTK_DIALOG (dialog));
-        gtk_widget_destroy(dialog);
+ 	if(get_selected_rectangle(&rect))
  		return;
- 	}
 
  	// Find column delimiters
  	cols = g_malloc0(rect.width * sizeof(gboolean));
@@ -598,6 +585,68 @@
  {
  	CopyAsText(FALSE);
  }
+
+ void action_CopyAsImage(void)
+ {
+ 	GdkPixmap		* pix;
+ 	GdkPixbuf		* img;
+	GdkRectangle	  rect;
+	int				  width;
+	int				  height;
+	int				  r;
+	int				  y;
+	cairo_t			* cr;
+	int				  baseline;
+	int				  baddr;
+
+ 	if(get_selected_rectangle(&rect))
+ 		return;
+
+	Trace("%s begins", __FUNCTION__);
+
+	width  = terminal_font_info.width * rect.width;
+	height = terminal_font_info.spacing * rect.height;
+
+	pix = gdk_pixmap_new(GDK_DRAWABLE(get_terminal_pixmap()),width,height,-1);
+
+	cr = gdk_cairo_create(pix);
+	cairo_set_scaled_font(cr,terminal_font_info.font);
+
+	baddr = rect.y * terminal_cols;
+	baseline = terminal_font_info.ascent;
+	y = 0;
+
+	for(r=0;r < rect.height;r++)
+	{
+		int c;
+		int x = 0;
+		int addr = baddr + rect.x;
+
+		for(c=0;c < rect.width;c++)
+		{
+			draw_element(cr,&terminal_font_info,x,y,baseline,addr+c,color);
+			x += terminal_font_info.width;
+		}
+
+		baddr += terminal_cols;
+		y += terminal_font_info.spacing;
+		baseline += terminal_font_info.spacing;
+	}
+
+	cairo_destroy(cr);
+
+	img = gdk_pixbuf_get_from_drawable(0, pix, gdk_drawable_get_colormap(get_terminal_pixmap()),0, 0, 0, 0, width, height);
+
+	g_object_unref(pix);
+
+	gtk_clipboard_set_image(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_CLIPBOARD),img);
+
+	g_object_unref(img);
+
+	Trace("%s ends", __FUNCTION__);
+ }
+
+
 
  void action_Append(void)
  {

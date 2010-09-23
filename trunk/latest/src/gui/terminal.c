@@ -267,23 +267,10 @@
 		Trace("Alt is %s",status ? "Active" : "Inactive");
 	}
 
-#ifdef HAVE_CAPS_STATE
-
-	// http://library.gnome.org/devel/gdk/stable/gdk-Keyboard-Handling.html#gdk-keymap-get-caps-lock-state
+#if defined(HAVE_CAPS_STATE) || defined(DEBUG)
 	if(event->keyval == GDK_Caps_Lock)
-	{
-		gboolean state = gdk_keymap_get_caps_lock_state(gdk_keymap_get_default());
-
-		Trace("Caps-lock is %s",state ? "ON" : "OFF");
-
-		if(state != oia_caps_state)
-		{
-			oia_caps_state = state;
-			update_oia_element(OIA_ELEMENT_CAPS_INDICATOR);
-		}
-	}
-
-#endif // HAVE_CAPS_STATE
+		update_oia_element(OIA_ELEMENT_CAPS_INDICATOR);
+#endif // GTK_CHECK_VERSION(2,16,0)
 
  }
 

@@ -891,12 +891,6 @@
 			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="ui/debug.xml" />
-		<Unit filename="ui/default.act">
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="pipetest" />
-			<Option target="jnidebug" />
-		</Unit>
 		<Unit filename="ui/default.xml" />
 		<Unit filename="ui/functions.xml">
 			<Option target="Debug" />

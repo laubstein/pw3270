@@ -949,6 +949,9 @@
 		{	"Unselect",			N_( "Unselect" ),				G_CALLBACK(action_ClearSelection)	},
 		{	"Copy",				N_( "Copy" ),					G_CALLBACK(action_Copy)				},
 		{	"CopyAsTable",		N_( "Copy as table" ),			G_CALLBACK(action_CopyAsTable)		},
+
+		{	"CopyAsImage",		N_( "Copy as image" ),			G_CALLBACK(action_CopyAsImage)		},
+
 		{	"PrintSelected",	N_( "Print selected" ),			G_CALLBACK(action_PrintSelected)	},
 		{	"SaveSelected",		N_( "Save selected" ),			G_CALLBACK(action_SaveSelected)		},
 

@@ -70,11 +70,25 @@
 
 /*---[ Implement ]------------------------------------------------------------*/
 
- int GetSelectedRectangle(GdkRectangle *rect)
+ int get_selected_rectangle(GdkRectangle *rect)
  {
 	// First check if the selection area isn't rectangular.
  	if(!Toggled(RECTANGLE_SELECT))
+ 	{
+		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(topwindow),
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CANCEL,
+													"%s", _(  "Invalid action" ));
+
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "Can't copy non rectangular area" ));
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s",_( "Activate rectangle select option and try again." ));
+
+        gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+
 		return EINVAL;
+ 	}
 
 	rect->x			= startCol;
 	rect->y			= startRow;
@@ -93,6 +107,7 @@
 		set_action_sensitive_by_name("Reselect",TRUE);
 
 	set_action_sensitive_by_name("CopyAsTable",m == SELECT_MODE_RECTANGLE);
+	set_action_sensitive_by_name("CopyAsImage",m == SELECT_MODE_RECTANGLE);
 
 	select_mode = m;
 
@@ -182,7 +197,7 @@
 		}
 	}
 
-	if(valid_terminal_window() && start > 0)
+	if(valid_terminal_window() && start >= 0)
 	{
 		cairo_t *cr = get_terminal_cairo_context();
 		draw_region(cr,start,end,color);
