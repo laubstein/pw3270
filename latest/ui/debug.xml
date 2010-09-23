@@ -36,8 +36,6 @@
 
 		<menu action='EditMenu' >
 
-			<menuitem action='CopyAsImage' group='selection' />
-
 			<menuitem name='EditScreen' label='Edit screen' >
 				<script platform='linux'>gedit "%{ScreenContents}"</script>
 			</menuitem>
