@@ -57,9 +57,9 @@
 		OIA_ELEMENT_COMMAND_SPINNER,			/**< Spinner */
 		OIA_ELEMENT_CURSOR_POSITION,	 		/**< cursor position (rrr/ccc or blank) */
 
-#ifdef HAVE_CAPS_STATE
+#if defined(HAVE_CAPS_STATE) || defined(DEBUG)
 		OIA_ELEMENT_CAPS_INDICATOR, 			/**< Caps indications ("A" or blank) */
-#endif // HAVE_CAPS_STATE
+#endif // HAVE_CAPS_STATE || DEBUG
 
 //		OIA_ELEMENT_META_INDICATOR, 			/**< Meta indication ("M" or blank) */
 //		OIA_ELEMENT_COMPOSE_INDICATOR,			/**< Compose indication ("C" or blank) */

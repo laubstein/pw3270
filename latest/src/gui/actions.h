@@ -58,6 +58,8 @@
 	LOCAL_EXTERN void	action_Append(void);
 	LOCAL_EXTERN void	action_Copy(void);
 	LOCAL_EXTERN void	action_CopyAsTable(void);
+	LOCAL_EXTERN void	action_CopyAsImage(void);
+
 	LOCAL_EXTERN void	action_SelectField(void);
 	LOCAL_EXTERN void	action_ClearSelection(void);
 
