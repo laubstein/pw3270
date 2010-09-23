@@ -384,7 +384,7 @@
 	};
 
 	LOCAL_EXTERN void 		  update_terminal_contents(void);
-	LOCAL_EXTERN void 		  draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr);
+	LOCAL_EXTERN void 		  draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr, GdkRectangle *r);
 
 	LOCAL_EXTERN void 		  update_region(int bstart, int bend);
 	LOCAL_EXTERN cairo_t	* get_terminal_cairo_context(void);

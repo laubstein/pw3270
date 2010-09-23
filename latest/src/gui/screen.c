@@ -850,7 +850,9 @@
 			int		cstart	= -1;
 			int 	bstart	= -1;
 			int 	bend	= -1;
-			int 	y 		= top_margin+(row * terminal_font_info.spacing);
+//#ifdef DEBUG
+//			int 	y 		= top_margin+(row * terminal_font_info.spacing);
+//#endif
 
 			for(col = 0;col < terminal_cols;col++)
 			{
@@ -870,8 +872,27 @@
 				}
 				else if(bstart >= 0)
 				{
-					draw_region(cr,bstart,bend,color);
-					gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
+					GdkRectangle r;
+					draw_region(cr,bstart,bend,color,&r);
+					gdk_window_invalidate_rect(terminal->window,&r,FALSE);
+
+//					#ifdef DEBUG
+//						if(r.x != left_margin+(cstart*fontWidth) || r.y != y || r.width != ((bend-bstart)+1)*fontWidth || r.height != terminal_font_info.spacing)
+//						{
+//							Trace("%s(%d,%d %d,%d->%d,%d row=%d (%d)) - Unexpected size returned from draw_region",
+//													__FUNCTION__,
+//													bstart,
+//													bend,
+//													bstart%terminal_cols,bstart/terminal_cols,
+//													bend%terminal_cols,bend/terminal_cols,
+//													row,(row*terminal_font_info.spacing)+top_margin);
+//							Trace("Rect: %d,%d->%d,%d",r.x,r.y,r.width,r.height);
+//							Trace("Area: %d,%d->%d,%d",left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
+//						}
+//					#endif
+
+//					gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
+
 					bstart = bend = -1;
 				}
 				baddr++;
@@ -879,8 +900,20 @@
 
 			if(bstart >= 0)
 			{
-				draw_region(cr,bstart,bend,color);
-				gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
+				GdkRectangle r;
+				draw_region(cr,bstart,bend,color,&r);
+				gdk_window_invalidate_rect(terminal->window,&r,FALSE);
+
+//				#ifdef DEBUG
+//					if(r.x != left_margin+(cstart*fontWidth) || r.y != y || r.width != ((bend-bstart)+1)*fontWidth || r.height != terminal_font_info.spacing)
+//					{
+//						Trace("%s(%d,%d) - Unexpected size returned from draw_region",__FUNCTION__,bstart,bend);
+//						Trace("Rect: %d,%d->%d,%d",r.x,r.y,r.width,r.height);
+//						Trace("Area: %d,%d->%d,%d",left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
+//					}
+//				#endif
+
+//				gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
 			}
 		}
 
