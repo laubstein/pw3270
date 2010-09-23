@@ -91,11 +91,12 @@
 
 	LOCAL_EXTERN gint			  oia_timer;
 
-	// Prototips
+	// Prototipes
 	LOCAL_EXTERN void update_oia(void);
 	LOCAL_EXTERN void update_oia_element(OIA_ELEMENT el);
 	LOCAL_EXTERN void draw_oia(cairo_t *cr, GdkGC *gc);
 	LOCAL_EXTERN void oia_set_timer(long seconds);
+	LOCAL_EXTERN void oia_release_pixmaps(void);
 
 #endif // OIA_H_INCLUDED
 

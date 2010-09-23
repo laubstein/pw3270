@@ -62,8 +62,6 @@
 
  static void release_pixmaps(void)
  {
- 	int f;
-
 	if(pixmap_terminal)
 	{
 		gdk_pixmap_unref(pixmap_terminal);
@@ -76,14 +74,7 @@
 		pixmap_cursor = NULL;
 	}
 
-	for(f=0;f<OIA_PIXMAP_COUNT;f++)
-	{
-		if(pixmap_oia[f])
-		{
-			gdk_pixmap_unref(pixmap_oia[f]);
-			pixmap_oia[f] = 0;
-		}
-	}
+	oia_release_pixmaps();
 
  }
 

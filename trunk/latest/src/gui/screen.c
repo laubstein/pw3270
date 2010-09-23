@@ -57,13 +57,6 @@
 	#include <stdlib.h>
 #endif
 
-/*
-#include "locked.bm"
-#include "unlocked.bm"
-#include "shift.bm"
-#include "four.bm"
-*/
-
 /*---[ Structures ]----------------------------------------------------------------------------------------*/
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
@@ -170,8 +163,6 @@
  ELEMENT		* screen							= NULL;
  char			* charset							= NULL;
  char			* window_title						= PROGRAM_NAME;
-
- GdkPixmap		* pixmap_oia[OIA_PIXMAP_COUNT]		= { NULL, NULL};
 
  gboolean		  screen_updates_enabled			= FALSE;
  int			  terminal_buffer_length			= 0;
