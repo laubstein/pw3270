@@ -51,6 +51,7 @@
 		<menu name='EditMenu'>
 			<menuitem action='Copy' key='<ctrl>c' icon='copy' group='selection' />
 			<menuitem action='CopyAsTable' key='<ctrl><alt>c' group='selection' />
+			<menuitem action='CopyAsImage' group='selection' />
 			<menuitem action='Append' key='<shift><ctrl>c' group='selection' />
 			<menuitem action='Paste' key='<ctrl>v' icon='paste' group='paste' />
 			<menuitem action='PasteNext' key='<shift><ctrl>v' />
