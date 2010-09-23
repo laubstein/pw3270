@@ -32,6 +32,7 @@
 
  #include <lib3270/config.h>
  #include "gui.h"
+ #include "oia.h"
  #include <ctype.h>
  #include <string.h>
  #include "actions.h"
@@ -220,39 +221,6 @@
 
 	g_strfreev(clr);
 
-/*
-
- 	int 	f		= 0;
- 	char	buffer	= g_strdup(str);
- 	char	*ptr;
-
-
- 	for(ptr = strtok(buffer,",");ptr;ptr =
-		f++;
-
-	strcpy(buffer,str);
-
-
-	if(f == TERMINAL_COLOR_COUNT)
-	{
-		for(f=0;ptr && f < TERMINAL_COLOR_COUNT;f++)
-		{
-			if(ptr)
-			{
-				gdk_color_parse(ptr,color+f);
-				ptr = strtok(NULL,",");
-			}
-			else
-			{
-				gdk_color_parse("LimeGreen",color+f);
-			}
-			gdk_colormap_alloc_color(gtk_widget_get_default_colormap(),color+f,TRUE,TRUE);
-		}
-	}
-
-	g_free(buffer);
-*/
-
  }
 
  int LoadColors(void)
@@ -282,6 +250,9 @@
 	}
 	else
 	{
+		if(id >= TERMINAL_COLOR_OIA)
+			oia_release_pixmaps();
+
 		update_terminal_contents();
 		gtk_widget_queue_draw(terminal);
 
@@ -344,8 +315,7 @@
 		ParseColorList(ptr);
 		g_free(ptr);
 
-		#warning Work in progress
-		// ReloadPixmaps();
+		oia_release_pixmaps();
 
 		update_terminal_contents();
 		gtk_widget_queue_draw(terminal);
@@ -365,7 +335,7 @@
  		{ TERMINAL_COLOR_BACKGROUND,		N_( "Terminal" )			},
  		{ TERMINAL_COLOR_FIELD_DEFAULT,		N_( "Base attributes" )		},
  		{ TERMINAL_COLOR_SELECTED_BG,		N_( "Selected text" )		},
- 		{ TERMINAL_COLOR_CURSOR_BACKGROUND,	N_( "Cursor background" )	},
+ 		{ TERMINAL_COLOR_CURSOR_BACKGROUND,	N_( "Cursor" )				},
  		{ TERMINAL_COLOR_OIA_BACKGROUND,	N_( "OIA" )					}
 
  	};
@@ -403,7 +373,7 @@
 
 		// Oia Colors
 		N_( "Background" ),					// TERMINAL_COLOR_OIA_BACKGROUND
-		N_( "Foreground" ),					// TERMINAL_COLOR_OIA
+		N_( "Foreground" ),					// TERMINAL_COLOR_OIA_FOREGROUND
 		N_( "Separator" ),					// TERMINAL_COLOR_OIA_SEPARATOR
 		N_( "Normal status" ),				// TERMINAL_COLOR_OIA_STATUS_OK
 		N_( "Locked status" ),				// TERMINAL_COLOR_OIA_STATUS_INVALID
@@ -569,9 +539,7 @@
 
 	gtk_widget_destroy(dialog);
 
-	#warning Work in progress
-	// ReloadPixmaps();
-
+	oia_release_pixmaps();
 	update_terminal_contents();
 	gtk_widget_queue_draw(terminal);
 

@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: pw3270 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-01-18 17:12-0200\n"
-"PO-Revision-Date: 2010-09-22 16:55-0300\n"
+"PO-Revision-Date: 2010-09-23 17:21-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -78,7 +78,7 @@ msgstr "Tag <script> precisa de um nome"
 msgid "<script> element should be used only inside another active element"
 msgstr "Elemento <script> só pode ser usado dentro de outro elemento ativo"
 
-#: src/gui/screen.c:750
+#: src/gui/screen.c:741
 msgid "Abort"
 msgstr "Abortar"
 
@@ -94,7 +94,7 @@ msgstr "Sobre"
 msgid "Action failed"
 msgstr "Operação falhou"
 
-#: src/gui/mouse.c:85
+#: src/gui/mouse.c:99
 msgid "Activate rectangle select option and try again."
 msgstr "Ative a opção \"Selecionar como retângulo\" e tente novamente"
 
@@ -130,7 +130,7 @@ msgstr ""
 msgid "BLKSIZE:"
 msgstr ""
 
-#: src/gui/colors.c:375 src/gui/colors.c:397 src/gui/colors.c:405
+#: src/gui/colors.c:345 src/gui/colors.c:367 src/gui/colors.c:375
 msgid "Background"
 msgstr "Fundo"
 
@@ -138,11 +138,11 @@ msgstr "Fundo"
 msgid "Backspace"
 msgstr ""
 
-#: src/gui/colors.c:366
+#: src/gui/colors.c:336
 msgid "Base attributes"
 msgstr "Atributos básicos"
 
-#: src/gui/colors.c:383
+#: src/gui/colors.c:353
 msgid "Black"
 msgstr "Preto"
 
@@ -154,7 +154,7 @@ msgstr "Completar com espaços"
 msgid "Blinking Cursor"
 msgstr "Cursor piscante"
 
-#: src/gui/colors.c:376
+#: src/gui/colors.c:346
 msgid "Blue"
 msgstr "Azul"
 
@@ -162,7 +162,7 @@ msgstr "Azul"
 msgid "Bold"
 msgstr "Negrito"
 
-#: src/gui/colors.c:399
+#: src/gui/colors.c:369
 msgid "Border"
 msgstr "Borda"
 
@@ -189,7 +189,7 @@ msgstr "Não foi possível converter a linha %d de %s para %s"
 msgid "Can't convert text from %s to %s"
 msgstr "Não foi possível converter o texto de %s para %s"
 
-#: src/gui/mouse.c:84
+#: src/gui/mouse.c:98
 msgid "Can't copy non rectangular area"
 msgstr "Não é possível copiar áreas não retangulares"
 
@@ -292,11 +292,11 @@ msgstr "Não foi possível iniciar o script"
 msgid "Can't start script \"%s\""
 msgstr "Não foi possível iniciar script \"%s\""
 
-#: src/gui/screen.c:478 src/gui/screen.c:498
+#: src/gui/screen.c:469 src/gui/screen.c:489
 msgid "Can't stop LU association script"
 msgstr "Não consigo parar o script de associação de LU"
 
-#: src/gui/screen.c:480 src/gui/screen.c:500
+#: src/gui/screen.c:471 src/gui/screen.c:491
 msgid "Can't stop script"
 msgstr "Não foi possível parar script"
 
@@ -317,7 +317,7 @@ msgstr "Erro no código de página"
 msgid "Clear"
 msgstr "Limpar"
 
-#: src/gui/colors.c:428
+#: src/gui/colors.c:398
 msgid "Color setup"
 msgstr "Configuração de cores"
 
@@ -365,7 +365,7 @@ msgstr "Copiar como tabela"
 msgid "Cross Hair Cursor"
 msgstr "Régua"
 
-#: src/gui/colors.c:402
+#: src/gui/colors.c:372
 msgid "Cross-hair"
 msgstr "Régua"
 
@@ -373,11 +373,11 @@ msgstr "Régua"
 msgid "Current:"
 msgstr "Atual:"
 
-#: src/gui/colors.c:368
-msgid "Cursor background"
+#: src/gui/colors.c:338
+msgid "Cursor"
 msgstr ""
 
-#: src/gui/colors.c:357
+#: src/gui/colors.c:327
 msgid "Custom colors"
 msgstr "Cores personalizadas"
 
@@ -393,11 +393,11 @@ msgstr "Tamanho do buffer DFT"
 msgid "DS Trace"
 msgstr ""
 
-#: src/gui/colors.c:384
+#: src/gui/colors.c:354
 msgid "Dark Blue"
 msgstr "Azul escuro"
 
-#: src/gui/colors.c:387
+#: src/gui/colors.c:357
 msgid "Dark Green"
 msgstr "Verde escuro"
 
@@ -417,11 +417,11 @@ msgstr "Mostrar atualizações de tela"
 msgid "Default"
 msgstr "Padrão"
 
-#: src/gui/colors.c:83
+#: src/gui/colors.c:84
 msgid "Default Color Set 2"
 msgstr "Esquema de cores padrão 2"
 
-#: src/gui/colors.c:48
+#: src/gui/colors.c:49
 msgid "Default Color set 1"
 msgstr "Esquema de cores padrão 1"
 
@@ -453,15 +453,15 @@ msgstr "\"EOR\" recebido fora do modo 3270, ignorado"
 msgid "ETA:"
 msgstr ""
 
-#: ui/debug.xml:46
+#: ui/debug.xml:44
 msgid "Edit copy"
 msgstr "Editar cópia"
 
-#: ui/debug.xml:42
+#: ui/debug.xml:40
 msgid "Edit screen"
 msgstr "Editar tela"
 
-#: ui/debug.xml:50
+#: ui/debug.xml:48
 msgid "Edit selected area"
 msgstr "Editar área selecionada"
 
@@ -499,7 +499,7 @@ msgstr "Limpar até o final do campo"
 msgid "Erase to end of line"
 msgstr "Limpar até o final da linha"
 
-#: src/gui/screen.c:720
+#: src/gui/screen.c:711
 msgid "Error"
 msgstr "Erro"
 
@@ -584,7 +584,7 @@ msgstr "Caminho e nome do arquivo para ler/gravar dados de configuração"
 msgid "Font"
 msgstr "Fonte"
 
-#: src/gui/colors.c:398 src/gui/colors.c:406
+#: src/gui/colors.c:368 src/gui/colors.c:376
 msgid "Foreground"
 msgstr "Frente"
 
@@ -608,11 +608,11 @@ msgstr "Barra de funções"
 msgid "GTK Version mismatch"
 msgstr "Divergência na versão do GTK"
 
-#: src/gui/colors.c:390
+#: src/gui/colors.c:360
 msgid "Gray"
 msgstr "Cinza"
 
-#: src/gui/colors.c:379
+#: src/gui/colors.c:349
 msgid "Green"
 msgstr "Verde"
 
@@ -644,7 +644,7 @@ msgstr "Endereço do servidor:"
 msgid "Illegal frame length"
 msgstr ""
 
-#: src/gui/screen.c:719
+#: src/gui/screen.c:710
 msgid "Information"
 msgstr "Informação"
 
@@ -652,7 +652,7 @@ msgstr "Informação"
 msgid "Informations"
 msgstr "Informações"
 
-#: src/gui/actions.c:971 ui/default.xml:109
+#: src/gui/actions.c:971 ui/default.xml:110
 msgid "Input method"
 msgstr "Método de entrada"
 
@@ -660,15 +660,15 @@ msgstr "Método de entrada"
 msgid "Insert"
 msgstr ""
 
-#: src/gui/colors.c:395
+#: src/gui/colors.c:365
 msgid "Intensified/Protected"
 msgstr "Intensificado/Protegido"
 
-#: src/gui/colors.c:393
+#: src/gui/colors.c:363
 msgid "Intensified/Unprotected"
 msgstr "Intensificado/Desprotegido"
 
-#: src/gui/mouse.c:82
+#: src/gui/mouse.c:96
 msgid "Invalid action"
 msgstr "Ação inválida"
 
@@ -721,7 +721,7 @@ msgstr "Carregar captura de tela"
 msgid "Local file name:"
 msgstr "Nome do arquivo local:"
 
-#: src/gui/colors.c:409
+#: src/gui/colors.c:379
 msgid "Locked status"
 msgstr "Bloqueada"
 
@@ -737,7 +737,7 @@ msgstr "Título da janela principal"
 msgid "Monocase"
 msgstr "Só maiúsculas"
 
-#: src/gui/colors.c:389
+#: src/gui/colors.c:359
 msgid "Mustard"
 msgstr "Mostarda"
 
@@ -767,19 +767,19 @@ msgstr "Erro de comunicação"
 msgid "Next field"
 msgstr "Próximo campo"
 
-#: src/gui/colors.c:401
+#: src/gui/colors.c:371
 msgid "Normal"
 msgstr ""
 
-#: src/gui/colors.c:408
+#: src/gui/colors.c:378
 msgid "Normal status"
 msgstr "Situação normal"
 
-#: src/gui/colors.c:394
+#: src/gui/colors.c:364
 msgid "Normal/Protected"
 msgstr "Normal/Protegido"
 
-#: src/gui/colors.c:392
+#: src/gui/colors.c:362
 msgid "Normal/Unprotected"
 msgstr "Normal/Desprotegido"
 
@@ -787,7 +787,7 @@ msgstr "Normal/Desprotegido"
 msgid "Not in 3270 mode, transfer cancelled"
 msgstr "Fora do modo 3270, transferência cancelada"
 
-#: src/gui/colors.c:369
+#: src/gui/colors.c:339
 msgid "OIA"
 msgstr ""
 
@@ -795,7 +795,7 @@ msgstr ""
 msgid "Option parsing failed."
 msgstr "Tratamento de opções falhou"
 
-#: src/gui/colors.c:385
+#: src/gui/colors.c:355
 msgid "Orange"
 msgstr "Laranja"
 
@@ -947,7 +947,7 @@ msgstr "Caminho dos arquivos de dados e configuração"
 msgid "Path to search for plugins"
 msgstr "Caminho a pesquisar por plugins"
 
-#: src/gui/colors.c:378
+#: src/gui/colors.c:348
 msgid "Pink"
 msgstr "Rosa"
 
@@ -1011,7 +1011,7 @@ msgstr "Propriedades"
 msgid "Proxy server (type:host[:port])"
 msgstr "Servidor proxy (tipo:host[:porta])"
 
-#: src/gui/colors.c:386
+#: src/gui/colors.c:356
 msgid "Purple"
 msgstr "Púrpura"
 
@@ -1031,7 +1031,7 @@ msgstr "Recebendo arquivo"
 msgid "Record format"
 msgstr "Formato de registro"
 
-#: src/gui/colors.c:377
+#: src/gui/colors.c:347
 msgid "Red"
 msgstr "Vermelho"
 
@@ -1194,7 +1194,7 @@ msgstr "Selecione arquivo a receber"
 msgid "Select file to send"
 msgstr "Selecione arquivo a enviar"
 
-#: src/gui/actions.c:974 ui/default.xml:89
+#: src/gui/actions.c:974 ui/default.xml:90
 msgid "Select font"
 msgstr "Selecionar fonte"
 
@@ -1202,7 +1202,7 @@ msgstr "Selecionar fonte"
 msgid "Select hostname"
 msgstr "Selecionar servidor"
 
-#: src/gui/colors.c:367
+#: src/gui/colors.c:337
 msgid "Selected text"
 msgstr "Texto selecionado"
 
@@ -1238,7 +1238,7 @@ msgstr "Enviar/Receber"
 msgid "Sending file"
 msgstr "Enviando arquivo"
 
-#: src/gui/colors.c:407
+#: src/gui/colors.c:377
 msgid "Separator"
 msgstr "Separador"
 
@@ -1307,7 +1307,7 @@ msgstr "Situação:"
 msgid "Sys Req"
 msgstr ""
 
-#: src/gui/screen.c:655
+#: src/gui/screen.c:646
 msgid "System Error"
 msgstr "Erro de sistema"
 
@@ -1319,7 +1319,7 @@ msgstr "Sistema ocupado"
 msgid "System default"
 msgstr "Padrão do sistema"
 
-#: src/gui/colors.c:365
+#: src/gui/colors.c:335
 msgid "Terminal"
 msgstr ""
 
@@ -1379,7 +1379,7 @@ msgstr "Este programa precisa do GTK versão %d.%d.%d"
 msgid "To:"
 msgstr "Para:"
 
-#: ui/default.xml:120
+#: ui/default.xml:121
 msgid "Toolbar"
 msgstr "Barra de ferramentas"
 
@@ -1429,7 +1429,7 @@ msgstr "Opções de transferência"
 msgid "Transmission error"
 msgstr "Erro de transmissão"
 
-#: src/gui/colors.c:380 src/gui/colors.c:388
+#: src/gui/colors.c:350 src/gui/colors.c:358
 msgid "Turquoise"
 msgstr "Turquesa"
 
@@ -1509,7 +1509,7 @@ msgstr "Variável"
 msgid "Visible Control chars"
 msgstr ""
 
-#: src/gui/colors.c:382
+#: src/gui/colors.c:352
 msgid "White"
 msgstr "Branco"
 
@@ -1529,51 +1529,51 @@ msgid ""
 msgstr "Gravação no arquivo de trace falhou\n"
 "%s"
 
-#: src/gui/oia.c:767 src/gui/oia.c:795
+#: src/gui/oia.c:805 src/gui/oia.c:833
 msgid "X"
 msgstr ""
 
-#: src/gui/oia.c:771
+#: src/gui/oia.c:809
 msgid "X -f"
 msgstr ""
 
-#: src/gui/oia.c:803
+#: src/gui/oia.c:841
 msgid "X Connecting"
 msgstr "X Conectando"
 
-#: src/gui/oia.c:787
+#: src/gui/oia.c:825
 msgid "X Inhibit"
 msgstr "X Inibido"
 
-#: src/gui/oia.c:763
+#: src/gui/oia.c:801
 msgid "X Not Connected"
 msgstr "X Não conectado"
 
-#: src/gui/oia.c:779
+#: src/gui/oia.c:817
 msgid "X Numeric"
 msgstr "X Numérico"
 
-#: src/gui/oia.c:783
+#: src/gui/oia.c:821
 msgid "X Overflow"
 msgstr "X Estouro"
 
-#: src/gui/oia.c:775
+#: src/gui/oia.c:813
 msgid "X Protected"
 msgstr "X Protegido"
 
-#: src/gui/oia.c:799
+#: src/gui/oia.c:837
 msgid "X Resolving"
 msgstr "X Resolvendo"
 
-#: src/gui/oia.c:751
+#: src/gui/oia.c:789
 msgid "X System"
 msgstr "X Sistema"
 
-#: src/gui/oia.c:755
+#: src/gui/oia.c:793
 msgid "X Wait"
 msgstr "X Aguarde"
 
-#: src/gui/colors.c:381
+#: src/gui/colors.c:351
 msgid "Yellow"
 msgstr "Amarelo"
 
@@ -1605,7 +1605,7 @@ msgstr "_Opções"
 msgid "_Quit"
 msgstr "_Sair"
 
-#: src/gui/actions.c:970 ui/default.xml:75
+#: src/gui/actions.c:970 ui/default.xml:76
 msgid "_View"
 msgstr "Exibir"
 

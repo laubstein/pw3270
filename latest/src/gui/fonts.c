@@ -32,6 +32,7 @@
 
 
 #include "gui.h"
+#include "oia.h"
 #include "fonts.h"
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
@@ -95,14 +96,8 @@
 			terminal_font_info.font = NULL;
 		}
 
-		for(f=0;f<OIA_PIXMAP_COUNT;f++)
-		{
-			if(pixmap_oia[f])
-			{
-				gdk_pixmap_unref(pixmap_oia[f]);
-				pixmap_oia[f] = 0;
-			}
-		}
+		oia_release_pixmaps();
+
 	}
 
 	// Adjust line spacing

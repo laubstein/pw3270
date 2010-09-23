@@ -95,6 +95,9 @@
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
+ static GdkPixmap * pixmap_oia[OIA_PIXMAP_COUNT] = { NULL, NULL};
+
+
  #define OIAROW	(top_margin+4+(terminal_font_info.spacing*terminal_rows))
 
  gboolean		  oia_flag[OIA_FLAG_USER];
@@ -110,8 +113,6 @@
 
  gboolean		  oia_shift_state	= FALSE;
  gboolean		  oia_alt_state = FALSE;
-
- GdkPixmap		* pixmap_lock[2] = { NULL, NULL };
 
  gint			  oia_timer = -1;
  gint			  oia_spinner_step = 0;
@@ -440,7 +441,7 @@
 #endif
 
 	if(oia_caps_state)
-		oia_show_text(cr,r,"A",TERMINAL_COLOR_OIA_INDICATORS);
+		oia_show_text(cr,r,"A",TERMINAL_COLOR_OIA_CAPS_STATE);
 
  }
 #endif // HAVE_CAPS_STATE || DEBUG
@@ -601,7 +602,7 @@
 	cairo_rectangle(cr, r->x, r->y+1, r->width,r->height);
 	cairo_fill(cr);
 
-	draw_border(cr,gc,r,TERMINAL_COLOR_OIA_INDICATORS);
+	draw_border(cr,gc,r,TERMINAL_COLOR_OIA_FOREGROUND);
 
 	cairo_move_to(cr,r->x+2,r->y+fontAscent);
 	cairo_show_text(cr,"4");
@@ -617,7 +618,7 @@
 
 	if(oia_flag[OIA_FLAG_UNDERA])
 	{
-		oia_show_text(cr,r,(IN_E) ? "B" : "A", TERMINAL_COLOR_OIA_INDICATORS);
+		oia_show_text(cr,r,(IN_E) ? "B" : "A", TERMINAL_COLOR_OIA_UNDERA);
 
 		cairo_move_to(cr,r->x,r->y+fontAscent+(fontDescent/2));
 		cairo_rel_line_to(cr,terminal_font_info.width,0);
@@ -636,11 +637,11 @@
 	cairo_rectangle(cr, r->x, r->y+1, r->width,r->height);
 	cairo_fill(cr);
 
-	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_INDICATORS);
+	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_FOREGROUND);
 
 	if(IN_ANSI)
 	{
-		draw_border(cr,gc,r,TERMINAL_COLOR_OIA_INDICATORS);
+		draw_border(cr,gc,r,TERMINAL_COLOR_OIA_FOREGROUND);
 		cairo_move_to(cr,r->x+2,r->y+terminal_font_info.ascent);
 		cairo_show_text(cr,"N");
 	}
@@ -651,13 +652,13 @@
 	}
 	else if(IN_SSCP)
 	{
-		draw_border(cr,gc,r,TERMINAL_COLOR_OIA_INDICATORS);
+		draw_border(cr,gc,r,TERMINAL_COLOR_OIA_FOREGROUND);
 		cairo_move_to(cr,r->x+2,r->y+terminal_font_info.ascent);
 		cairo_show_text(cr,"S");
 	}
 	else
 	{
-		draw_border(cr,gc,r,TERMINAL_COLOR_OIA_INDICATORS);
+		draw_border(cr,gc,r,TERMINAL_COLOR_OIA_FOREGROUND);
 		cairo_move_to(cr,r->x+2,r->y+terminal_font_info.ascent);
 		cairo_show_text(cr,"?");
 	}
@@ -920,3 +921,17 @@
  	update_oia_element(OIA_ELEMENT_COMMAND_TIMER);
  }
 
+ void oia_release_pixmaps(void)
+ {
+ 	int f;
+
+	for(f=0;f<OIA_PIXMAP_COUNT;f++)
+	{
+		if(pixmap_oia[f])
+		{
+			gdk_pixmap_unref(pixmap_oia[f]);
+			pixmap_oia[f] = NULL;
+		}
+	}
+
+ }
