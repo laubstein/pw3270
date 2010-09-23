@@ -214,13 +214,17 @@
 
  }
 
- void draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr)
+ void draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr, GdkRectangle *r)
  {
  	int addr;
  	int col	= (bstart % terminal_cols);
  	int x	= left_margin + (col * fontWidth);
  	int y	= top_margin  + ((bstart / terminal_cols) * terminal_font_info.spacing);
- 	int baseline = y + fontAscent;	/**< Baseline for font drawing; it's not the same as font Height */
+ 	int baseline = y + terminal_font_info.ascent;
+
+	memset(r,0,sizeof(GdkRectangle));
+	r->x = r->width = x;
+	r->y = r->height = y;
 
 	for(addr = bstart; addr <= bend; addr++)
 	{
@@ -234,9 +238,19 @@
 		}
 		else
 		{
-			x += fontWidth;
+			x += terminal_font_info.width;
 		}
+
+		if(x > r->width)
+			r->width = x;
+
+		if(y > r->height)
+			r->height = y;
+
 	}
+
+	r->width  = (r->width - r->x)  + terminal_font_info.width;
+	r->height = (r->height - r->y) + terminal_font_info.spacing;
  }
 
 /**
@@ -255,8 +269,9 @@
  */
  void update_terminal_contents(void)
  {
- 	int 	width;
- 	int 	height;
+ 	int 		width;
+ 	int 		 height;
+ 	GdkRectangle r;
  	cairo_t *cr	= get_terminal_cairo_context();
 
 	gdk_drawable_get_size(get_terminal_pixmap(),&width,&height);
@@ -265,7 +280,7 @@
 	cairo_rectangle(cr, 0, 0, width, height);
 	cairo_fill(cr);
 
-	draw_region(cr,0,(terminal_cols * terminal_rows)-1,color);
+	draw_region(cr,0,(terminal_cols * terminal_rows)-1,color,&r);
 	draw_oia(cr,get_terminal_cached_gc());
 
 	cairo_destroy(cr);

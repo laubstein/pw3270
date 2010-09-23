@@ -224,8 +224,9 @@
 
 	if(valid_terminal_window() && start >= 0)
 	{
+		GdkRectangle r;
 		cairo_t *cr = get_terminal_cairo_context();
-		draw_region(cr,start,end,color);
+		draw_region(cr,start,end,color,&r);
 		cairo_destroy(cr);
 		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*terminal_font_info.spacing);
 	}
@@ -492,8 +493,9 @@
 
 		if(saddr >= 0)
 		{
+			GdkRectangle r;
 			cairo_t *cr = get_terminal_cairo_context();
-			draw_region(cr,saddr,eaddr,color);
+			draw_region(cr,saddr,eaddr,color,&r);
 			cairo_destroy(cr);
 		}
 	}
@@ -558,8 +560,9 @@
 
 		if(saddr >= 0)
 		{
+			GdkRectangle r;
 			cairo_t *cr = get_terminal_cairo_context();
-			draw_region(cr,saddr,eaddr,color);
+			draw_region(cr,saddr,eaddr,color,&r);
 			cairo_destroy(cr);
 		}
 
