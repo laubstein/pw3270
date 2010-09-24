@@ -4188,15 +4188,16 @@ clear_xks(void)
 	}
 }
 
-#if defined(X3270_DISPLAY) /*[*/
+#if defined(X3270_DISPLAY)
 /*
- * X-dependent code starts here.
- */
+//
+//X-dependent code starts here.
+//
 
-/*
- * Translate a keymap (from an XQueryKeymap or a KeymapNotify event) into
- * a bitmap of Shift, Meta or Alt keys pressed.
- */
+//
+// Translate a keymap (from an XQueryKeymap or a KeymapNotify event) into
+// a bitmap of Shift, Meta or Alt keys pressed.
+//
 #define key_is_down(kc, bitmap) (kc && ((bitmap)[(kc)/8] & (1<<((kc)%8))))
 int
 state_from_keymap(char keymap[32])
@@ -4229,31 +4230,33 @@ state_from_keymap(char keymap[32])
 }
 #undef key_is_down
 
-/*
- * Process shift keyboard events.  The code has to look for the raw Shift keys,
- * rather than using the handy "state" field in the event structure.  This is
- * because the event state is the state _before_ the key was pressed or
- * released.  This isn't enough information to distinguish between "left
- * shift released" and "left shift released, right shift still held down"
- * events, for example.
- *
- * This function is also called as part of Focus event processing.
- */
+//
+// Process shift keyboard events.  The code has to look for the raw Shift keys,
+// rather than using the handy "state" field in the event structure.  This is
+// because the event state is the state _before_ the key was pressed or
+// released.  This isn't enough information to distinguish between "left
+// shift released" and "left shift released, right shift still held down"
+// events, for example.
+//
+// This function is also called as part of Focus event processing.
+//
 void
 PA_Shift_action(Widget w unused, XEvent *event unused, String *params unused,
     Cardinal *num_params unused)
 {
 	char	keys[32];
 
-#if defined(INTERNAL_ACTION_DEBUG) /*[*/
+#if defined(INTERNAL_ACTION_DEBUG)
 	action_debug(PA_Shift_action, event, params, num_params);
-#endif /*]*/
+#endif
 	XQueryKeymap(display, keys);
 	shift_event(state_from_keymap(keys));
 }
-#endif /*]*/
+*/
+#endif
 
 #if defined(X3270_DISPLAY) || defined(C3270) /*[*/
+/*
 static Boolean
 build_composites(void)
 {
@@ -4278,7 +4281,7 @@ build_composites(void)
 		    appres.compose_map);
 		return False;
 	}
-	c1 = c = NewString(c0);	/* will be modified by strtok */
+	c1 = c = NewString(c0);	// will be modified by strtok
 	while ((ln = strtok(c, "\n"))) {
 		Boolean okay = True;
 
@@ -4314,6 +4317,7 @@ build_composites(void)
 	Free(c1);
 	return True;
 }
+*/
 
 /*
  * Called by the toolkit when the "Compose" key is pressed.  "Compose" is
@@ -4324,7 +4328,7 @@ build_composites(void)
  *
  * The mechanism breaks down a little when the user presses "Compose" and
  * then a non-data key.  Oh well.
- */
+ */ /*
 void
 Compose_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -4338,14 +4342,14 @@ Compose_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 		composing = COMPOSE;
 		status_compose(True, 0, KT_STD);
 	}
-}
+} */
 #endif /*]*/
 
 #if defined(X3270_DISPLAY) /*[*/
 
 /*
  * Called by the toolkit for any key without special actions.
- */
+ */ /*
 void
 Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -4357,16 +4361,16 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 	action_debug(Default_action, event, params, num_params);
 	switch (event->type) {
 	    case KeyPress:
-#if defined(X3270_DBCS) /*[*/
+#if defined(X3270_DBCS)
 		if (!xim_lookup((XKeyEvent *)event))
 			return;
-#endif /*]*/
+#endif
 		ll = XLookupString(kevent, buf, 32, &ks, (XComposeStatus *) 0);
 		if (ll == 1) {
-			/* Add Meta; XLookupString won't. */
+			// Add Meta; XLookupString won't.
 			if (event_is_meta(kevent->state))
 				buf[0] |= 0x80;
-			/* Remap certain control characters. */
+			// Remap certain control characters.
 			if (!IN_ANSI) switch (buf[0]) {
 			    case '\t':
 				action_internal(Tab_action, IA_DEFAULT, CN, CN);
@@ -4398,7 +4402,7 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 			return;
 		}
 
-		/* Pick some other reasonable defaults. */
+		// Pick some other reasonable defaults.
 		switch (ks) {
 		    case XK_Up:
 			action_internal(Up_action, IA_DEFAULT, CN, CN);
@@ -4413,9 +4417,9 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 			action_internal(Right_action, IA_DEFAULT, CN, CN);
 			break;
 		    case XK_Insert:
-#if defined(XK_KP_Insert) /*[*/
+#if defined(XK_KP_Insert)
 		    case XK_KP_Insert:
-#endif /*]*/
+#endif
 			action_internal(Insert_action, IA_DEFAULT, CN, CN);
 			break;
 		    case XK_Delete:
@@ -4427,26 +4431,26 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 		    case XK_Tab:
 			action_internal(Tab_action, IA_DEFAULT, CN, CN);
 			break;
-#if defined(XK_ISO_Left_Tab) /*[*/
+#if defined(XK_ISO_Left_Tab)
 		    case XK_ISO_Left_Tab:
 			action_internal(BackTab_action, IA_DEFAULT, CN, CN);
 			break;
-#endif /*]*/
+#endif
 		    case XK_Clear:
 			action_internal(Clear_action, IA_DEFAULT, CN, CN);
 			break;
 		    case XK_Sys_Req:
 			action_internal(SysReq_action, IA_DEFAULT, CN, CN);
 			break;
-#if defined(XK_EuroSign) /*[*/
+#if defined(XK_EuroSign)
 		    case XK_EuroSign:
 			action_internal(Key_action, IA_DEFAULT, "currency",
 				CN);
 			break;
-#endif /*]*/
+#endif
 
-#if defined(XK_3270_Duplicate) /*[*/
-		    /* Funky 3270 keysyms. */
+#if defined(XK_3270_Duplicate)
+		    // Funky 3270 keysyms.
 		    case XK_3270_Duplicate:
 			action_internal(Dup_action, IA_DEFAULT, CN, CN);
 			break;
@@ -4494,10 +4498,10 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 			action_Enter();
 //			action_internal(Enter_action, IA_DEFAULT, CN, CN);
 			break;
-#endif /*]*/
+#endif
 
-#if defined(X3270_APL) /*[*/
-		    /* Funky APL keysyms. */
+#if defined(X3270_APL)
+		    // Funky APL keysyms.
 		    case XK_downcaret:
 			action_internal(Key_action, IA_DEFAULT, "apl_downcaret",
 			    CN);
@@ -4564,22 +4568,22 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 			action_internal(Key_action, IA_DEFAULT, "apl_righttack",
 			    CN);
 			break;
-#endif /*]*/
+#endif
 
 		    default:
 			if (ks >= XK_F1 && ks <= XK_F24) {
 				(void) sprintf(buf, "%ld", ks - XK_F1 + 1);
 				action_internal(PF_action, IA_DEFAULT, buf, CN);
-#if defined(XK_CYRILLIC) /*[*/
+#if defined(XK_CYRILLIC)
 			} else if (ks == XK_Cyrillic_io ||
 				   ks == XK_Cyrillic_IO ||
 				   (ks >= XK_Cyrillic_yu &&
 				    ks <= XK_Cyrillic_HARDSIGN)) {
-				/* Map XK to KOI8-R. */
+				// Map XK to KOI8-R.
 				(void) sprintf(buf, "%ld", ks & 0xff);
 				action_internal(Key_action, IA_DEFAULT, buf,
 						CN);
-#endif /*]*/
+#endif
 			} else if (xk_selector && ((ks >> 8) == xk_selector)) {
 				key_ACharacter((unsigned char)(ks & 0xff),
 						KT_STD, IA_KEY, NULL);
@@ -4601,6 +4605,7 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 		break;
 	}
 }
+*/
 
 /*
  * Set or clear a temporary keymap.
@@ -4609,7 +4614,7 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
  *				"x" was already added, remove it)
  *   TemporaryKeymap()		removes the previous keymap, if any
  *   TemporaryKeymap(None)	removes the previous keymap, if any
- */
+ */ /*
 void
 TemporaryKeymap_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -4630,5 +4635,6 @@ TemporaryKeymap_action(Widget w unused, XEvent *event, String *params, Cardinal 
 //		cancel_if_idle_command();
 	}
 }
+*/
 
 #endif /*]*/

@@ -631,9 +631,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/lib/icmdc.h" />
-		<Unit filename="src/lib/idle.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/lib/idlec.h" />
 		<Unit filename="src/lib/keymapc.h" />
 		<Unit filename="src/lib/keypadc.h" />
