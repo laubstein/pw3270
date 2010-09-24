@@ -396,7 +396,6 @@
 			void	(*set_script)(SCRIPT_STATE state);
 			void	(*reset)(int lock);
 			void	(*status)(STATUS_CODE id);
-			void	(*compose)(int on, unsigned char c, int keytype);
 			void	(*cursor)(CURSOR_MODE mode);
 			void	(*lu)(const char *lu);
 			void	(*set)(OIA_FLAG id, int on);

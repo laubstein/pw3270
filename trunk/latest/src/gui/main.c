@@ -169,7 +169,7 @@ static int program_init(void)
 		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),"%s",msg);
 		gtk_window_set_title(GTK_WINDOW(dialog),_( "GTK Version mismatch" ));
 
-#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 10
+#if GTK_CHECK_VERSION(2,10,0)
 		gtk_window_set_deletable(GTK_WINDOW(dialog),FALSE);
 #endif
 
@@ -236,14 +236,48 @@ static int program_init(void)
 	Trace("%s","Opening configuration file");
 	if(Register3270IOCallbacks(&program_io_callbacks))
 	{
-		PopupAnError( N_( "Can't register into lib3270 I/O callback table." ) );
+		int rc;
+		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CANCEL,
+													"%s", _( "Can't register as I/O manager in lib3270" ));
+
+
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Please, check if lib3270 version is %s" ),program_version);
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "3270 library failed" ));
+
+#if GTK_CHECK_VERSION(2,10,0)
+		gtk_window_set_deletable(GTK_WINDOW(dialog),FALSE);
+#endif
+
+        rc = gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+
 		return -1;
 	}
 
 	Trace("%s","Setting screen callbacks");
 	if(Register3270ScreenCallbacks(&program_screen_callbacks))
 	{
-		PopupAnError( N_( "Can't register into lib3270 screen callback table." ) );
+		int rc;
+		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+													GTK_DIALOG_DESTROY_WITH_PARENT,
+													GTK_MESSAGE_ERROR,
+													GTK_BUTTONS_CANCEL,
+													"%s", _( "Can't register as screen manager in lib3270" ));
+
+
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Please, check if lib3270 version is %s" ),program_version);
+		gtk_window_set_title(GTK_WINDOW(dialog),_( "3270 library failed" ));
+
+#if GTK_CHECK_VERSION(2,10,0)
+		gtk_window_set_deletable(GTK_WINDOW(dialog),FALSE);
+#endif
+
+        rc = gtk_dialog_run(GTK_DIALOG (dialog));
+        gtk_widget_destroy(dialog);
+
 		return -1;
 	}
 

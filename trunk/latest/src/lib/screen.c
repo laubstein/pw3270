@@ -608,11 +608,13 @@ LIB3270_EXPORT void status_typeahead(int on)
 	set(OIA_FLAG_TYPEAHEAD,on);
 }
 
+/*
 LIB3270_EXPORT void status_compose(int on, unsigned char c, enum keytype keytype)
 {
 	if(callbacks && callbacks->compose)
 		callbacks->compose(on,c,keytype);
 }
+*/
 
 void
 status_lu(const char *lu)
