@@ -60,7 +60,6 @@ AC_PROG_CC
 AM_ICONV
 
 # Target options
-
 DLLEXT=".so"
 
 OS_CFLAGS=""
@@ -148,6 +147,10 @@ case "$host" in
 		# Check for Java
 		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
 		java_ldflags="-L\$(JRE_HOME)/lib/i386/client -Wl,-rpath,\$(JRE_HOME)/lib/i386/client -ljvm"
+
+		# Check for ImageMagick
+
+
 esac
 
 # Check for ELF symbol visibility support
@@ -544,6 +547,11 @@ if test "_$HOST_CC" = "_" ; then
 	HOST_CC="\$(CC)"
 fi
 
+# Check for ImageMagick
+AC_CHECK_PROG(CONVERT, convert, convert, scripts/convert-sh)
+AC_SUBST(CONVERT)
+
+# Define program name
 AC_DEFINE_UNQUOTED(PROGRAM_NAME,"$pw3270_cv_progname")
 
 AC_DEFINE([X3270_TN3270E])
