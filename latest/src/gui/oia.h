@@ -58,7 +58,7 @@
 		OIA_ELEMENT_CURSOR_POSITION,	 		/**< cursor position (rrr/ccc or blank) */
 
 #if defined(HAVE_CAPS_STATE) || defined(DEBUG)
-		OIA_ELEMENT_CAPS_INDICATOR, 			/**< Caps indications ("A" or blank) */
+		OIA_ELEMENT_CAPS_STATE,		 			/**< Caps indications ("A" or blank) */
 #endif // HAVE_CAPS_STATE || DEBUG
 
 //		OIA_ELEMENT_META_INDICATOR, 			/**< Meta indication ("M" or blank) */

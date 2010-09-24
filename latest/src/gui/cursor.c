@@ -77,7 +77,6 @@
  	cr = gdk_cairo_create(get_cursor_pixmap());
 
 	cairo_set_font_face(cr,terminal_font_info.face);
-//	cairo_set_font_size(cr,terminal_font_info.size);
 	cairo_set_font_matrix(cr,terminal_font_info.matrix);
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_CURSOR_BACKGROUND);
@@ -95,7 +94,7 @@
  	int row = cursor_position / terminal_cols;
  	int col = cursor_position % terminal_cols;
 
-	rCursor.x 		= left_margin + (col * fontWidth);
+	rCursor.x 		= left_margin + (col * terminal_font_info.width);
 	rCursor.y 		= top_margin + (row * terminal_font_info.spacing);
 	rCursor.width 	= fontWidth;
 	rCursor.height	= terminal_font_info.height;
@@ -126,6 +125,7 @@
 
  		update_cursor_info();
  		update_cursor_pixmap();
+ 		gtk_im_context_set_cursor_location(input_method,&rCursor);
 
 		gtk_widget_queue_draw_area(terminal,0,rCursor.y+fontAscent,width,1);
 		gtk_widget_queue_draw_area(terminal,rCursor.x,0,1,height);

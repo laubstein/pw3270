@@ -236,10 +236,7 @@
 	return 0;
  }
 
- static void im_commit(GtkIMContext *imcontext, gchar *arg1, gpointer user_data)
- {
-	ParseInput(arg1);
- }
+ #define keyval_is_alt() (event->keyval == GDK_Alt_L || event->keyval == GDK_Meta_L || event->keyval == GDK_ISO_Level3_Shift)
 
  static void update_keyboard_state(GdkEventKey *event, gboolean status)
  {
@@ -251,18 +248,23 @@
 		Trace("Shift is %s",status ? "Active" : "Inactive");
 	}
 
-	if(event->keyval == GDK_Alt_L || event->keyval == GDK_ISO_Level3_Shift)
+	if(keyval_is_alt())
 	{
 		oia_alt_state = status;
 		update_oia_element(OIA_ELEMENT_ALT_STATE);
-		Trace("Alt is %s",status ? "Active" : "Inactive");
+		Trace("Alt key is %s - Alt mask is %s - State is %08x",status ? "Active" : "Inactive",event->state & GDK_ALT_MASK ? "Active" : "Inactive",event->state);
 	}
 
 #if defined(HAVE_CAPS_STATE) || defined(DEBUG)
 	if(event->keyval == GDK_Caps_Lock)
-		update_oia_element(OIA_ELEMENT_CAPS_INDICATOR);
+		update_oia_element(OIA_ELEMENT_CAPS_STATE);
 #endif // GTK_CHECK_VERSION(2,16,0)
 
+ }
+
+ static void im_commit(GtkIMContext *imcontext, gchar *arg1, gpointer user_data)
+ {
+	ParseInput(arg1);
  }
 
  static gboolean key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
@@ -285,13 +287,6 @@
  static gboolean key_release(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
  	update_keyboard_state(event,FALSE);
-
-	// Check for alt-key again
-	if(!(event->state & GDK_ALT_MASK) && oia_alt_state)
-	{
-		oia_alt_state = FALSE;
-		update_oia_element(OIA_ELEMENT_ALT_STATE);
-	}
 
 	if(gtk_im_context_filter_keypress(input_method,event))
 		return TRUE;
@@ -396,7 +391,6 @@
     g_signal_connect(G_OBJECT(terminal),		"realize",				G_CALLBACK(realize),				0);
     g_signal_connect(G_OBJECT(terminal),		"focus-in-event",		G_CALLBACK(focus_in),				0);
     g_signal_connect(G_OBJECT(terminal),		"focus-out-event",		G_CALLBACK(focus_out),				0);
-    g_signal_connect(G_OBJECT(input_method),	"commit",				G_CALLBACK(im_commit),				0);
 
     // Connect mouse events
     g_signal_connect(G_OBJECT(terminal), 		"button-press-event",	G_CALLBACK(mouse_button_press),		0);
@@ -404,6 +398,9 @@
     g_signal_connect(G_OBJECT(terminal), 		"motion-notify-event",	G_CALLBACK(mouse_motion),    		0);
     g_signal_connect(G_OBJECT(terminal), 		"enter-notify-event",	G_CALLBACK(mouse_enter),    		0);
     g_signal_connect(G_OBJECT(terminal), 		"scroll-event",			G_CALLBACK(mouse_scroll),			0);
+
+	// Connect input method events
+    g_signal_connect(G_OBJECT(input_method),	"commit",				G_CALLBACK(im_commit),				0);
 
 	register_tchange(CROSSHAIR,set_crosshair);
 	register_tchange(CURSOR_POS,set_showcursor);
