@@ -572,7 +572,7 @@ $(PACKAGE).desktop: Makefile
 	@cp @ICONFILE@ $@
 
 $(PACKAGE).@LOGOEXT@: @LOGOFILE@ Makefile
-	@convert @LOGOFILE@ $@
+	@@CONVERT@ @LOGOFILE@ $@
 
 src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@src/mkversion.sh
