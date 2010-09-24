@@ -72,7 +72,6 @@
  static void	  SetScript(SCRIPT_STATE state);
  static void	  set_cursor(CURSOR_MODE mode);
  static void	  set_oia(OIA_FLAG id, int on);
- static void	  set_compose(int on, unsigned char c, int keytype);
  static void	  set_lu(const char *lu);
  static void	  changed(int bstart, int bend);
  static void	  error(const char *fmt, va_list arg);
@@ -112,7 +111,6 @@
 	SetScript,				// void	(*set_script)(SCRIPT_STATE state);
 	NULL,					// void (*reset)(int lock);
 	SetStatusCode,			// void (*status)(STATUS_CODE id);
-	set_compose,			// void (*compose)(int on, unsigned char c, int keytype);
 	set_cursor,				// void (*cursor)(CURSOR_MODE mode);
 	set_lu,					// void (*lu)(const char *lu);
 	set_oia,				// void (*set)(OIA_FLAG id, int on);
@@ -173,16 +171,6 @@
 
  static void changed(int bstart, int bend)
  {
- }
-
- static void set_compose(int on, unsigned char c, int keytype)
- {
-/*
- 	if(on)
- 		compose = c;
-	else
-		compose = 0;
-*/
  }
 
  static int SetSuspended(int state)

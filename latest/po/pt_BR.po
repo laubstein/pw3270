@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: pw3270 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-01-18 17:12-0200\n"
-"PO-Revision-Date: 2010-09-23 17:21-0300\n"
+"PO-Revision-Date: 2010-09-24 09:04-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -26,15 +26,15 @@ msgstr ""
 msgid "%s:%d"
 msgstr ""
 
-#: src/gui/main.c:455
+#: src/gui/main.c:489
 msgid "- 3270 Emulator for GTK+"
 msgstr "- Emulador 3270 para GTK+"
 
-#: src/gui/main.c:434
+#: src/gui/main.c:468
 msgid "- 3270 Emulator for Gnome"
 msgstr "- Emulador 3270 para Gnome"
 
-#: src/gui/main.c:443
+#: src/gui/main.c:477
 msgid "3270 Emulator"
 msgstr "Emulador 3270"
 
@@ -46,11 +46,15 @@ msgstr "Emulador 3270 para GTK"
 msgid "3270 Terminal emulator for Gnome."
 msgstr "Emulador de terminal 3270 para Gnome"
 
-#: src/gui/main.c:504
+#: src/gui/main.c:248 src/gui/main.c:272
+msgid "3270 library failed"
+msgstr "Biblioteca 3270 falhou"
+
+#: src/gui/main.c:538
 msgid "3270 library failed to start"
 msgstr "Biblioteca 3270 falhou ao iniciar"
 
-#: src/gui/main.c:356
+#: src/gui/main.c:390
 msgid "3270 options"
 msgstr "Opções do 3270"
 
@@ -78,7 +82,7 @@ msgstr "Tag <script> precisa de um nome"
 msgid "<script> element should be used only inside another active element"
 msgstr "Elemento <script> só pode ser usado dentro de outro elemento ativo"
 
-#: src/gui/screen.c:741
+#: src/gui/screen.c:729
 msgid "Abort"
 msgstr "Abortar"
 
@@ -248,17 +252,17 @@ msgstr "Não foi possível processar interface em %s"
 msgid "Can't receive \"%s\""
 msgstr "Não foi possível receber \"%s\""
 
-#: src/gui/main.c:239
-msgid "Can't register into lib3270 I/O callback table."
-msgstr "Não foi possível efetuar o registro na tabela de I/O 3270."
+#: src/gui/main.c:244
+msgid "Can't register as I/O manager in lib3270"
+msgstr "Não foi possível registrar como gerenciador de I/O na biblioteca 3270"
 
-#: src/gui/main.c:254
+#: src/gui/main.c:268
+msgid "Can't register as screen manager in lib3270"
+msgstr "Não foi possível registrar como gerenciador de tela na lib3270"
+
+#: src/gui/main.c:288
 msgid "Can't register into lib3270 file-transfer callback table."
 msgstr "Não foi possível fazer o registro das funções de transferência de arquivo na biblioteca 3270"
-
-#: src/gui/main.c:246
-msgid "Can't register into lib3270 screen callback table."
-msgstr "Não foi possível registrar chamadas de tela na interface 3270."
 
 #: src/gui/config.c:232
 #, c-format
@@ -274,7 +278,7 @@ msgstr "Não foi possível enviar arquivo \"%s\""
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
-#: src/gui/main.c:506 src/gui/main.c:525 src/gui/script.c:195
+#: src/gui/main.c:540 src/gui/main.c:559 src/gui/script.c:195
 msgid "Can't start"
 msgstr "Não foi possível iniciar"
 
@@ -292,11 +296,11 @@ msgstr "Não foi possível iniciar o script"
 msgid "Can't start script \"%s\""
 msgstr "Não foi possível iniciar script \"%s\""
 
-#: src/gui/screen.c:469 src/gui/screen.c:489
+#: src/gui/screen.c:457 src/gui/screen.c:477
 msgid "Can't stop LU association script"
 msgstr "Não consigo parar o script de associação de LU"
 
-#: src/gui/screen.c:471 src/gui/screen.c:491
+#: src/gui/screen.c:459 src/gui/screen.c:479
 msgid "Can't stop script"
 msgstr "Não foi possível parar script"
 
@@ -325,7 +329,7 @@ msgstr "Configuração de cores"
 msgid "Colors"
 msgstr "Cores"
 
-#: src/gui/main.c:336
+#: src/gui/main.c:370
 msgid "Command to run when LU name is available"
 msgstr "Comando a executar quando o nome da LU ficar disponível"
 
@@ -499,7 +503,7 @@ msgstr "Limpar até o final do campo"
 msgid "Erase to end of line"
 msgstr "Limpar até o final da linha"
 
-#: src/gui/screen.c:711
+#: src/gui/screen.c:699
 msgid "Error"
 msgstr "Erro"
 
@@ -576,7 +580,7 @@ msgstr ""
 msgid "Fixed"
 msgstr "Fixo"
 
-#: src/gui/main.c:327
+#: src/gui/main.c:361
 msgid "Fixed path and filename for load/save the configuration data"
 msgstr "Caminho e nome do arquivo para ler/gravar dados de configuração"
 
@@ -596,7 +600,7 @@ msgstr "De:"
 msgid "Full Screen"
 msgstr "Tela-cheia"
 
-#: src/gui/main.c:339
+#: src/gui/main.c:373
 msgid "Full path of plugins to load"
 msgstr "Caminho completo dos plugins a carregar"
 
@@ -628,7 +632,7 @@ msgstr "Servidor desconectou, transferência cancelada"
 msgid "Host file name:"
 msgstr "Nome do arquivo remoto:"
 
-#: src/gui/main.c:329
+#: src/gui/main.c:363
 msgid "Host identifier"
 msgstr "Identificador do host"
 
@@ -644,7 +648,7 @@ msgstr "Endereço do servidor:"
 msgid "Illegal frame length"
 msgstr ""
 
-#: src/gui/screen.c:710
+#: src/gui/screen.c:698
 msgid "Information"
 msgstr "Informação"
 
@@ -725,11 +729,11 @@ msgstr "Nome do arquivo local:"
 msgid "Locked status"
 msgstr "Bloqueada"
 
-#: src/gui/main.c:335
+#: src/gui/main.c:369
 msgid "Log file"
 msgstr "Arquivo de log"
 
-#: src/gui/main.c:333
+#: src/gui/main.c:367
 msgid "Main window title"
 msgstr "Título da janela principal"
 
@@ -741,7 +745,7 @@ msgstr "Só maiúsculas"
 msgid "Mustard"
 msgstr "Mostarda"
 
-#: src/gui/main.c:328
+#: src/gui/main.c:362
 msgid "Name of configuration file (auto-search)"
 msgstr "Nome do arquivo de configuração (pesquisa automática)"
 
@@ -791,7 +795,7 @@ msgstr "Fora do modo 3270, transferência cancelada"
 msgid "OIA"
 msgstr ""
 
-#: src/gui/main.c:307
+#: src/gui/main.c:341
 msgid "Option parsing failed."
 msgstr "Tratamento de opções falhou"
 
@@ -911,7 +915,7 @@ msgstr ""
 msgid "PF9"
 msgstr ""
 
-#: src/gui/main.c:309
+#: src/gui/main.c:343
 msgid "Parse error"
 msgstr "Erro na passagem de parâmetros"
 
@@ -935,15 +939,15 @@ msgstr "Colar arquivo texto"
 msgid "Paste with left margin"
 msgstr "Colar com margem"
 
-#: src/gui/main.c:332
+#: src/gui/main.c:366
 msgid "Path to an image file for program icon"
 msgstr "Caminho para arquivo de imagem contendo o ícone do programa"
 
-#: src/gui/main.c:331
+#: src/gui/main.c:365
 msgid "Path to search for data and configuration files"
 msgstr "Caminho dos arquivos de dados e configuração"
 
-#: src/gui/main.c:340
+#: src/gui/main.c:374
 msgid "Path to search for plugins"
 msgstr "Caminho a pesquisar por plugins"
 
@@ -954,6 +958,11 @@ msgstr "Rosa"
 #: src/plugins/rexx/dialogs.c:312
 msgid "Please wait"
 msgstr "Por favor, aguarde"
+
+#: src/gui/main.c:247 src/gui/main.c:271
+#, c-format
+msgid "Please, check if lib3270 version is %s"
+msgstr "Por favor, verifique se a versão da lib3270 é %s"
 
 #: src/plugins/rexx/plg_start.c:85
 msgid "Please, try again in a few moments"
@@ -991,11 +1000,11 @@ msgstr "Imprimir seleção"
 msgid "Processing data..."
 msgstr "Processando informações..."
 
-#: src/gui/main.c:587
+#: src/gui/main.c:621
 msgid "Program aborted"
 msgstr "Programa cancelado"
 
-#: src/gui/main.c:585
+#: src/gui/main.c:619
 msgid "Program window was destroyed"
 msgstr "Janela principal foi destruida"
 
@@ -1055,7 +1064,7 @@ msgstr ""
 msgid "Return"
 msgstr ""
 
-#: src/gui/main.c:507 src/plugins/rexx/plg_start.c:115
+#: src/gui/main.c:541 src/plugins/rexx/plg_start.c:115
 #: src/plugins/rexx/plg_start.c:132
 #, c-format
 msgid "Return code was %d"
@@ -1085,7 +1094,7 @@ msgstr "Trace Rexx"
 msgid "Right"
 msgstr "Direita"
 
-#: src/gui/main.c:330
+#: src/gui/main.c:364
 msgid "Run scripts on startup (Example: script1(arg1,arg2);script2(arg)"
 msgstr "Executa scripts ao iniciar (Exemplo: script1(arg1,arg2);script2(arg))"
 
@@ -1258,7 +1267,7 @@ msgstr "Configuração"
 msgid "Show Underline"
 msgstr "Mostrar sublinhado"
 
-#: src/gui/main.c:356
+#: src/gui/main.c:390
 msgid "Show lib3270 options"
 msgstr "Mostra opções da biblioteca 3270"
 
@@ -1307,7 +1316,7 @@ msgstr "Situação:"
 msgid "Sys Req"
 msgstr ""
 
-#: src/gui/screen.c:646
+#: src/gui/screen.c:634
 msgid "System Error"
 msgstr "Erro de sistema"
 
@@ -1349,7 +1358,7 @@ msgstr "O nome do arquivo remoto não é válido"
 msgid "The required plugin file wasn't found"
 msgstr "O arquivo de plugin pedido não foi encontrado"
 
-#: src/gui/main.c:334
+#: src/gui/main.c:368
 msgid "Theme file (gtkrc)"
 msgstr "Arquivo de tema (gtkrc)"
 
@@ -1387,7 +1396,7 @@ msgstr "Barra de ferramentas"
 msgid "Toolbars"
 msgstr "Barras de ferramentas"
 
-#: src/gui/main.c:523
+#: src/gui/main.c:557
 msgid "Top window failed to start"
 msgstr "Janela principal não iniciou"
 
@@ -1457,7 +1466,7 @@ msgstr "Indefinido"
 msgid "Unexpected error"
 msgstr "Erro inesperado"
 
-#: src/lib/kybd.c:316
+#: src/lib/kybd.c:319
 #, c-format
 msgid "Unexpected type %d in typeahead queue"
 msgstr "Tipo inesperado %d na fila de teclado"
@@ -1470,12 +1479,12 @@ msgstr ""
 msgid "Unknown FT control code from host"
 msgstr "Recebi código FT desconhecido"
 
-#: src/lib/kybd.c:3424
+#: src/lib/kybd.c:3448
 #, c-format
 msgid "Unknown PA key %d"
 msgstr "Tecla desconhecida: PA%02d"
 
-#: src/lib/kybd.c:3446
+#: src/lib/kybd.c:3470
 #, c-format
 msgid "Unknown PF key %d"
 msgstr "Tecla desconhecida: PF%02d"

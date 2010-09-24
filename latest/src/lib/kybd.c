@@ -85,7 +85,8 @@
 /*#define KYBDLOCK_TRACE	1*/
 
 /* Statics */
-static enum	{ NONE, COMPOSE, FIRST } composing = NONE;
+// static enum	{ NONE, COMPOSE, FIRST } composing = NONE;
+
 static unsigned char pf_xlate[] = {
 	AID_PF1,  AID_PF2,  AID_PF3,  AID_PF4,  AID_PF5,  AID_PF6,
 	AID_PF7,  AID_PF8,  AID_PF9,  AID_PF10, AID_PF11, AID_PF12,
@@ -129,12 +130,14 @@ struct akeysym {
 	KeySym keysym;
 	enum keytype keytype;
 };
+/*
 static struct akeysym cc_first;
 static struct composite {
 	struct akeysym k1, k2;
 	struct akeysym translation;
 } *composites = NULL;
 static int n_composites = 0;
+*/
 
 #define ak_eq(k1, k2)	(((k1).keysym  == (k2).keysym) && \
 			 ((k1).keytype == (k2).keytype))
@@ -162,7 +165,7 @@ static struct ta
 static char dxl[] = "0123456789abcdef";
 #define FROM_HEX(c)	(strchr(dxl, tolower(c)) - dxl)
 
-extern Widget *screen;
+// extern Widget *screen;
 
 #define KYBDLOCK_IS_OERR	(kybdlock && !(kybdlock & ~KL_OERR_MASK))
 
@@ -1343,7 +1346,7 @@ void
 key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,
 	       Boolean *skipped)
 {
-	register int i;
+//	register int i;
 	struct akeysym ak;
 
 //	reset_idle_timer();
@@ -1354,6 +1357,7 @@ key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,
 	ak.keysym = c;
 	ak.keytype = keytype;
 
+/*
 	switch (composing) {
 	    case NONE:
 		break;
@@ -1391,6 +1395,7 @@ key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,
 		}
 		break;
 	}
+*/
 
 	trace_event(" %s -> Key(\"%s\")\n",
 	    ia_name[(int) cause], ctl_see((int) c));
@@ -1576,11 +1581,14 @@ do_reset(Boolean explicit)
 
 		if (flush_ta())
 			half_reset = True;
+
+/*
 		if (composing != NONE) {
 			composing = NONE;
 			status_compose(False, 0, KT_STD);
 			half_reset = True;
 		}
+*/
 		if (half_reset)
 			return;
 	}
@@ -1620,8 +1628,9 @@ do_reset(Boolean explicit)
 	/* Clean up other modes. */
 	status_reset();
 	mcursor_normal();
-	composing = NONE;
-	status_compose(False, 0, KT_STD);
+
+//	composing = NONE;
+//	status_compose(False, 0, KT_STD);
 
 	lib3270_event_counter[COUNTER_ID_RESET]++;
 	Trace("Reset counter updated to %d",lib3270_event_counter[COUNTER_ID_RESET]);
@@ -3417,7 +3426,7 @@ HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
  *  If in 3270 mode, translate to "notsign".
  * This action is obsoleted by the use of 3270-mode and NVT-mode keymaps, but
  * is still defined here for backwards compatibility with old keymaps.
- */
+ */ /*
 void
 CircumNot_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -3429,6 +3438,7 @@ CircumNot_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 	else
 		key_ACharacter('^', KT_STD, IA_KEY, NULL);
 }
+*/
 
 /* PA key action for String actions */
 static void
