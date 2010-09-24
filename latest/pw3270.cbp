@@ -635,9 +635,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/lib/idlec.h" />
-		<Unit filename="src/lib/keymap.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/lib/keymapc.h" />
 		<Unit filename="src/lib/keypadc.h" />
 		<Unit filename="src/lib/kybd.c">
@@ -645,9 +642,6 @@
 		</Unit>
 		<Unit filename="src/lib/localdefs.h" />
 		<Unit filename="src/lib/log.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/lib/macros.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/lib/macrosc.h" />

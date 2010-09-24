@@ -44,7 +44,7 @@
 
 #include "actionsc.h"
 #include "hostc.h"
-#include "macrosc.h"
+// #include "macrosc.h"
 #include "menubarc.h"
 #include "popupsc.h"
 #include "telnetc.h"
@@ -634,8 +634,9 @@ static int do_connect(const char *n)
 	/* Set pending string. */
 	if (ps == CN)
 		ps = appres.login_macro;
-	if (ps != CN)
-		login_macro(ps);
+
+//	if (ps != CN)
+//		login_macro(ps);
 
 	/* Prepare Xt for I/O. */
 	x_add_input(net_sock);

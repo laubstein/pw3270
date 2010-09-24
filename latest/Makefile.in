@@ -135,10 +135,11 @@ APP_SRCS =	main.c iocallback.c topwindow.c terminal.c screen.c actions.c mouse.c
 			cursor.c @OS_APPSRCS@
 
 API_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
-			ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c idle.c kybd.c \
-			macros.c print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
+			ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c kybd.c \
+			print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
 			sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
-			xio.c keymap.c resolver.c log.c paste.c @OS_APISRCS@
+			xio.c resolver.c log.c paste.c @OS_APISRCS@
+# keymap.c idle.c macros.c
 
 REXX_COMMON_SRC =	common_start.c screen.c toggle.c tools.c init.c network.c filetransfer.c
 REXX_STD_SRC =	std_start.c
