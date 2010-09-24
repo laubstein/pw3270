@@ -49,7 +49,7 @@
 #include "icmdc.h"
 #endif
 #include "kybdc.h"
-#include "macrosc.h"
+// #include "macrosc.h"
 #include "objects.h"
 #include "popupsc.h"
 #include "screenc.h"

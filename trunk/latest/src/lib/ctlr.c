@@ -52,7 +52,7 @@
 #include "ft_dftc.h"
 #include "hostc.h"
 #include "kybdc.h"
-#include "macrosc.h"
+// #include "macrosc.h"
 #include "popupsc.h"
 #include "screenc.h"
 #include "scrollc.h"
@@ -478,7 +478,7 @@ ctlr_erase(int alt)
 	screen_erase();
 
 	/* Let a script go. */
-	sms_host_output();
+//	sms_host_output();
 
 	if (alt == screen_alt)
 		return;
@@ -1900,7 +1900,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 	ps_process();
 
 	/* Let a script go. */
-	sms_host_output();
+//	sms_host_output();
 
 	/* Tell 'em what happened. */
 	return rv;
@@ -2011,7 +2011,7 @@ ctlr_write_sscp_lu(unsigned char buf[], int buflen)
 	do_reset(False);
 
 	/* Let a script go. */
-	sms_host_output();
+//	sms_host_output();
 }
 
 #if defined(X3270_DBCS) /*[*/
@@ -2302,7 +2302,7 @@ ps_process(void)
 {
 	while (run_ta())
 		;
-	sms_continue();
+//	sms_continue();
 
 #if defined(X3270_FT) /*[*/
 	/* Process file transfers. */
@@ -2785,7 +2785,7 @@ ticking_stop(void)
 
 	(void) gettimeofday(&t1, (struct timezone *) 0);
 	if (mticking) {
-		sms_accumulate_time(&t_start, &t1);
+//		sms_accumulate_time(&t_start, &t1);
 		mticking = False;
 	} else {
 		return;

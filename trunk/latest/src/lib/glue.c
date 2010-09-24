@@ -60,9 +60,9 @@
 #include "ctlrc.h"
 #include "gluec.h"
 #include "hostc.h"
-#include "keymapc.h"
+// #include "keymapc.h"
 #include "kybdc.h"
-#include "macrosc.h"
+//#include "macrosc.h"
 #include "menubarc.h"
 #include "popupsc.h"
 #include "screenc.h"
@@ -72,7 +72,7 @@
 #include "togglesc.h"
 #include "trace_dsc.h"
 #include "utilc.h"
-#include "idlec.h"
+// #include "idlec.h"
 #include "printerc.h"
 
 #if defined(X3270_FT)
@@ -255,12 +255,12 @@ H3270 * new_3270_session(void)
 //	action_init();
 	screen_init();
 	kybd_init();
-	idle_init();
-	keymap_init();
+//	idle_init();
+//	keymap_init();
 	hostfile_init();
 	hostfile_init();
 	ansi_init();
-	sms_init();
+//	sms_init();
 
 #if defined(X3270_FT)
 	ft_init();

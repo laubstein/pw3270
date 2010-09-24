@@ -74,7 +74,7 @@
 #include "ctlrc.h"
 #include "hostc.h"
 #include "kybdc.h"
-#include "macrosc.h"
+// #include "macrosc.h"
 #include "popupsc.h"
 #include "proxyc.h"
 #include "resolverc.h"
@@ -1191,7 +1191,7 @@ telnet_fsm(unsigned char c)
 				if (linemode && appres.onlcr && c == '\n')
 					ansi_process((unsigned int) '\r');
 				ansi_process((unsigned int) c);
-				sms_store(c);
+//				sms_store(c);
 			}
 #endif /*]*/
 		} else {
@@ -1218,7 +1218,7 @@ telnet_fsm(unsigned char c)
 				}
 				trace_dsn(see_chr);
 				ansi_process((unsigned int) c);
-				sms_store(c);
+//				sms_store(c);
 #endif /*]*/
 			} else
 				store3270in(c);

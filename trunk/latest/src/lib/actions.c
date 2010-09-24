@@ -40,9 +40,9 @@
 
 #include "actionsc.h"
 #include "hostc.h"
-#include "keymapc.h"
+// #include "keymapc.h"
 #include "kybdc.h"
-#include "macrosc.h"
+// #include "macrosc.h"
 #include "popupsc.h"
 #include "printc.h"
 #include "resources.h"
@@ -641,7 +641,7 @@ check_usage(XtActionProc action, Cardinal nargs, Cardinal nargs_min,
 		popup_an_error("Action requires %d argument%s",action, nargs_min, nargs_min == 1 ? "" : "s");
 	else
 		popup_an_error("Action requires %d or %d arguments",nargs_min, nargs_max);
-	cancel_if_idle_command();
+//	cancel_if_idle_command();
 	return -1;
 }
 

@@ -58,11 +58,11 @@
 #include "ctlrc.h"
 #include "ftc.h"
 #include "hostc.h"
-#include "idlec.h"
-#include "keymapc.h"
+// #include "idlec.h"
+// #include "keymapc.h"
 #include "keypadc.h"
 #include "kybdc.h"
-#include "macrosc.h"
+// #include "macrosc.h"
 #include "popupsc.h"
 #include "printc.h"
 #include "screenc.h"
@@ -462,9 +462,10 @@ reverse_mode(Boolean on)
 static void
 operator_error(int error_type)
 {
-	if (sms_redirect())
-		popup_an_error("Keyboard locked");
-	if (appres.oerr_lock || sms_redirect()) {
+//	if (sms_redirect())
+//		popup_an_error("Keyboard locked");
+
+	if(appres.oerr_lock) { // || sms_redirect()) {
 		status_oerr(error_type);
 		mcursor_locked();
 		kybdlock_set((unsigned int)error_type, "operator_error");
@@ -584,7 +585,7 @@ LIB3270_EXPORT int action_PFKey(int k)
 	if (k < 1 || k > PF_SZ)
 		return EINVAL;
 
-	reset_idle_timer();
+//	reset_idle_timer();
 
 	if (kybdlock & KL_OIA_MINUS)
 		return -1;
@@ -613,10 +614,12 @@ LIB3270_EXPORT int action_PAKey(int key)
 {
 	if (key < 1 || key > PA_SZ)
 	{
-		cancel_if_idle_command();
+//		cancel_if_idle_command();
 		return EINVAL;
 	}
-	reset_idle_timer();
+
+//	reset_idle_timer();
+
 	if (kybdlock & KL_OIA_MINUS)
 		return -1;
 	else if (kybdlock)
@@ -638,7 +641,9 @@ Attn_action(Widget w unused, XEvent *event, String *params,
 	action_debug(Attn_action, event, params, num_params);
 	if (!IN_3270)
 		return;
-	reset_idle_timer();
+
+//	reset_idle_timer();
+
 	net_interrupt();
 }
 
@@ -655,7 +660,9 @@ Interrupt_action(Widget w unused, XEvent *event, String *params,
 	action_debug(Interrupt_action, event, params, num_params);
 	if (!IN_3270)
 		return;
-	reset_idle_timer();
+
+//	reset_idle_timer();
+
 	net_interrupt();
 }
 
@@ -794,7 +801,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 	register unsigned char	fa;
 	enum dbcs_why why;
 
-	reset_idle_timer();
+//	reset_idle_timer();
 
 	if (skipped != NULL)
 		*skipped = False;
@@ -1339,7 +1346,7 @@ key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,
 	register int i;
 	struct akeysym ak;
 
-	reset_idle_timer();
+//	reset_idle_timer();
 
 	if (skipped != NULL)
 		*skipped = False;
@@ -1434,15 +1441,18 @@ MonoCase_action(Widget w unused, XEvent *event, String *params,
 /*
  * Flip the display left-to-right
  */
+ /*
 void
 Flip_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
 	action_debug(Flip_action, event, params, num_params);
-	reset_idle_timer();
+
+//	reset_idle_timer();
+
 	screen_flip();
 }
-
+*/
 
 
 /*
@@ -1458,7 +1468,9 @@ Tab_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 
 LIB3270_EXPORT int action_NextField(void)
 {
-	reset_idle_timer();
+
+//	reset_idle_timer();
+
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
 			kybdlock_clr(KL_OERR_MASK, "Tab");
@@ -1493,7 +1505,8 @@ LIB3270_EXPORT int action_PreviousField(void)
 	register int	baddr, nbaddr;
 	int		sbaddr;
 
-	reset_idle_timer();
+//	reset_idle_timer();
+
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
 			kybdlock_clr(KL_OERR_MASK, "BackTab");
@@ -1594,7 +1607,7 @@ do_reset(Boolean explicit)
 #if defined(X3270_FT) /*[*/
 	    || ft_state != FT_NONE
 #endif /*]*/
-	    || (!appres.unlock_delay && !sms_in_macro())
+	    || (!appres.unlock_delay) // && !sms_in_macro())
 	    || (unlock_delay_time != 0 && (time(NULL) - unlock_delay_time) > 1)) {
 		kybdlock_clr(-1, "do_reset");
 	} else if (kybdlock &
@@ -1627,7 +1640,8 @@ Reset_action(Widget w unused, XEvent *event, String *params,
 
 LIB3270_EXPORT int lib3270_Reset(void)
 {
-	reset_idle_timer();
+//	reset_idle_timer();
+
 	do_reset(True);
 	return 0;
 }
@@ -1645,7 +1659,7 @@ void Home_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 
 LIB3270_EXPORT int action_FirstField(void)
 {
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(Home_action, CN, CN);
 		return 0;
@@ -1693,7 +1707,7 @@ void Left_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 LIB3270_EXPORT int action_CursorLeft(void)
 {
 //	action_debug(Left_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock)
 	{
 		if (KYBDLOCK_IS_OERR)
@@ -1823,7 +1837,7 @@ Delete_action(Widget w unused, XEvent *event, String *params,
 
 LIB3270_EXPORT int action_Delete(void)
 {
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		ENQUEUE_ACTION(action_Delete);
 //		enq_ta(Delete_action, CN, CN);
@@ -1857,7 +1871,7 @@ BackSpace_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
 	action_debug(BackSpace_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(BackSpace_action, CN, CN);
 		return;
@@ -1955,7 +1969,7 @@ Erase_action(Widget w unused, XEvent *event, String *params,
 
 LIB3270_EXPORT int action_Erase(void)
 {
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		ENQUEUE_ACTION(action_Erase);
 //		enq_ta(Erase_action, CN, CN);
@@ -1988,7 +2002,7 @@ LIB3270_EXPORT int action_CursorRight(void)
 	enum dbcs_state d;
 
 //	action_debug(Right_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock)
 	{
 		if (KYBDLOCK_IS_OERR)
@@ -2037,7 +2051,7 @@ Left2_action(Widget w unused, XEvent *event, String *params,
 	enum dbcs_state d;
 
 	action_debug(Left2_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
 			kybdlock_clr(KL_OERR_MASK, "Left2");
@@ -2077,7 +2091,7 @@ PreviousWord_action(Widget w unused, XEvent *event, String *params,
 	Boolean prot;
 
 	action_debug(PreviousWord_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(PreviousWord_action, CN, CN);
 		return;
@@ -2144,7 +2158,7 @@ Right2_action(Widget w unused, XEvent *event, String *params,
 	enum dbcs_state d;
 
 	action_debug(Right2_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
 			kybdlock_clr(KL_OERR_MASK, "Right2");
@@ -2229,7 +2243,7 @@ NextWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 	unsigned char c;
 
 	action_debug(NextWord_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(NextWord_action, CN, CN);
 		return;
@@ -2304,7 +2318,7 @@ LIB3270_EXPORT int action_CursorUp(void)
 	register int	baddr;
 
 //	action_debug(Up_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR)
 		{
@@ -2353,7 +2367,7 @@ LIB3270_EXPORT int action_CursorDown(void)
 	register int	baddr;
 
 //	action_debug(Down_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock)
 	{
 		if (KYBDLOCK_IS_OERR)
@@ -2390,7 +2404,7 @@ Newline_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 	register unsigned char	fa;
 
 	action_debug(Newline_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(Newline_action, CN, CN);
 		return;
@@ -2419,7 +2433,7 @@ void
 Dup_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(Dup_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(Dup_action, CN, CN);
 		return;
@@ -2440,7 +2454,7 @@ void
 FieldMark_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(FieldMark_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(FieldMark_action, CN, CN);
 		return;
@@ -2473,7 +2487,7 @@ void Enter_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
  */
 LIB3270_EXPORT int action_Enter(void)
 {
-	reset_idle_timer();
+//	reset_idle_timer();
 
 	Trace("%s (kybdlock & KL_OIA_MINUS): %d kybdlock: %d",__FUNCTION__,(kybdlock & KL_OIA_MINUS),kybdlock);
 
@@ -2499,7 +2513,7 @@ SysReq_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 LIB3270_EXPORT int action_SysReq(void)
 {
 	Trace("%s",__FUNCTION__);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (IN_ANSI)
 		return 0;
 #if defined(X3270_TN3270E) /*[*/
@@ -2530,7 +2544,7 @@ static void Clear_action(Widget w unused, XEvent *event, String *params, Cardina
 
 LIB3270_EXPORT int action_Clear(void)
 {
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock & KL_OIA_MINUS)
 		return 0;
 	if (kybdlock && CONNECTED) {
@@ -2645,7 +2659,7 @@ CursorSelect_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
 	action_debug(CursorSelect_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(CursorSelect_action, CN, CN);
 		return;
@@ -2669,7 +2683,7 @@ MouseSelect_action(Widget w, XEvent *event, String *params,
 	action_debug(MouseSelect_action, event, params, num_params);
 	if (w != *screen)
 		return;
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock)
 		return;
 #if defined(X3270_ANSI) /*[*/
@@ -2702,7 +2716,7 @@ LIB3270_EXPORT int lib3270_EraseEOL(void)
 	enum dbcs_state d;
 	enum dbcs_why why = DBCS_FIELD;
 
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock)
 	{
 		enq_ta((void (*)(Widget, XEvent *, String *, Cardinal *)) lib3270_EraseEOL, CN, CN);
@@ -2768,7 +2782,7 @@ LIB3270_EXPORT int lib3270_EraseEOF(void)
 	enum dbcs_state d;
 	enum dbcs_why why = DBCS_FIELD;
 
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock)
 	{
 		enq_ta((void (*)(Widget, XEvent *, String *, Cardinal *)) lib3270_EraseEOF, CN, CN);
@@ -2828,7 +2842,7 @@ LIB3270_EXPORT int action_EraseInput(void)
 	unsigned char	fa;
 	Boolean		f;
 
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta((void (*)(Widget, XEvent *, String *, Cardinal *)) action_EraseInput, CN, CN);
 		return 0;
@@ -2898,7 +2912,7 @@ LIB3270_EXPORT int action_DeleteWord(void)
 	register int baddr;
 	register unsigned char	fa;
 
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(DeleteWord_action, CN, CN);
 		return 0;
@@ -2971,7 +2985,7 @@ LIB3270_EXPORT int action_DeleteField(void)
 	register int	baddr;
 	register unsigned char	fa;
 
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(DeleteField_action, CN, CN);
 		return 0;
@@ -3013,7 +3027,7 @@ void
 Insert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(Insert_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(Insert_action, CN, CN);
 		return;
@@ -3033,7 +3047,7 @@ void
 ToggleInsert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(ToggleInsert_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(ToggleInsert_action, CN, CN);
 		return;
@@ -3054,7 +3068,7 @@ void
 ToggleReverse_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(ToggleReverse_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(ToggleReverse_action, CN, CN);
 		return;
@@ -3079,7 +3093,7 @@ FieldEnd_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 	int	last_nonblank = -1;
 
 	action_debug(FieldEnd_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(FieldEnd_action, CN, CN);
 		return;
@@ -3130,7 +3144,7 @@ MoveCursor_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 
 	action_debug(MoveCursor_action, event, params, num_params);
 
-	reset_idle_timer();
+//	reset_idle_timer();
 	if (kybdlock) {
 		if (*num_params == 2)
 			enq_ta(MoveCursor_action, params[0], params[1]);
@@ -3162,7 +3176,7 @@ MoveCursor_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 	    default:		/* couln't say */
 		popup_an_error("%s requires 0 or 2 arguments",
 		    action_name(MoveCursor_action));
-		cancel_if_idle_command();
+//		cancel_if_idle_command();
 		break;
 	}
 }
@@ -3256,7 +3270,7 @@ xim_lookup(XKeyEvent *event)
  */
 void Input_String(const unsigned char *str)
 {
-	reset_idle_timer();
+//	reset_idle_timer();
 
 	// FIXME (perry#3#): It works but, is it right?
 	while(*str)
@@ -3278,7 +3292,7 @@ Key_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 	enum keytype keytype;
 
 	action_debug(Key_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 
 	for (i = 0; i < *num_params; i++) {
 		char *s = params[i];
@@ -3287,13 +3301,13 @@ Key_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 		if (k == NoSymbol) {
 			popup_an_error("%s: Nonexistent or invalid KeySym: %s",
 			    action_name(Key_action), s);
-			cancel_if_idle_command();
+//			cancel_if_idle_command();
 			continue;
 		}
 		if (k & ~0xff) {
 			popup_an_error("%s: Invalid KeySym: %s",
 			    action_name(Key_action), s);
-			cancel_if_idle_command();
+//			cancel_if_idle_command();
 			continue;
 		}
 		key_ACharacter((unsigned char)(k & 0xff), keytype, IA_KEY,
@@ -3312,7 +3326,7 @@ String_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 	char *s0, *s;
 
 	action_debug(String_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 
 	/* Determine the total length of the strings. */
 	for (i = 0; i < *num_params; i++)
@@ -3356,7 +3370,7 @@ String_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 	*s = '\0';
 
 	/* Set a pending string. */
-	ps_set(s0, False);
+//	ps_set(s0, False);
 }
 
 /*
@@ -3371,7 +3385,7 @@ HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 	char *t;
 
 	action_debug(HexString_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 
 	/* Determine the total length of the strings. */
 	for (i = 0; i < *num_params; i++) {
@@ -3394,7 +3408,7 @@ HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 	}
 
 	/* Set a pending string. */
-	ps_set(s, True);
+//	ps_set(s, True);
 }
 
 /*
@@ -3408,7 +3422,7 @@ void
 CircumNot_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(CircumNot_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 
 	if (IN_3270 && composing == NONE)
 		key_ACharacter(0xac, KT_STD, IA_KEY, NULL);
@@ -3422,7 +3436,7 @@ do_pa(unsigned n)
 {
 	if (n < 1 || n > PA_SZ) {
 		popup_an_error( _( "Unknown PA key %d" ), n);
-		cancel_if_idle_command();
+//		cancel_if_idle_command();
 		return;
 	}
 /*
@@ -3444,7 +3458,7 @@ static void do_pf(unsigned n)
 {
 	if (n < 1 || n > PF_SZ) {
 		popup_an_error( _( "Unknown PF key %d" ), n);
-		cancel_if_idle_command();
+//		cancel_if_idle_command();
 		return;
 	}
 	action_PFKey(n);
@@ -3699,7 +3713,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 			    case 'a':
 				popup_an_error("%s: Bell not supported",
 				    action_name(String_action));
-				cancel_if_idle_command();
+//				cancel_if_idle_command();
 				state = BASE;
 				break;
 			    case 'b':
@@ -3746,7 +3760,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 			    case 'v':
 				popup_an_error("%s: Vertical tab not supported",
 				    action_name(String_action));
-				cancel_if_idle_command();
+//				cancel_if_idle_command();
 				state = BASE;
 				break;
 			    case 'x':
@@ -3790,7 +3804,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				popup_an_error("%s: Unknown character "
 						"after \\p",
 				    action_name(String_action));
-				cancel_if_idle_command();
+//				cancel_if_idle_command();
 				state = BASE;
 				break;
 			}
@@ -3803,7 +3817,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				popup_an_error("%s: Unknown character "
 						"after \\pf",
 				    action_name(String_action));
-				cancel_if_idle_command();
+//				cancel_if_idle_command();
 				state = BASE;
 			} else {
 				do_pf(literal);
@@ -3822,7 +3836,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				popup_an_error("%s: Unknown character "
 						"after \\pa",
 				    action_name(String_action));
-				cancel_if_idle_command();
+//				cancel_if_idle_command();
 				state = BASE;
 			} else {
 				do_pa(literal);
@@ -3842,7 +3856,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 			} else {
 				popup_an_error("%s: Missing hex digits after \\x",
 				    action_name(String_action));
-				cancel_if_idle_command();
+//				cancel_if_idle_command();
 				state = BASE;
 				continue;
 			}
@@ -3919,7 +3933,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 	    default:
 		popup_an_error("%s: Missing data after \\",
 		    action_name(String_action));
-		cancel_if_idle_command();
+//		cancel_if_idle_command();
 		break;
 	}
 
@@ -3950,7 +3964,7 @@ hex_input(char *s)
 	if (strlen(s) % 2) {
 		popup_an_error("%s: Odd number of characters in specification",
 		    action_name(HexString_action));
-		cancel_if_idle_command();
+//		cancel_if_idle_command();
 		return;
 	}
 	t = s;
@@ -3965,20 +3979,20 @@ hex_input(char *s)
 			if (escaped) {
 				popup_an_error("%s: Double \\E",
 				    action_name(HexString_action));
-				cancel_if_idle_command();
+//				cancel_if_idle_command();
 				return;
 			}
 			if (!IN_3270) {
 				popup_an_error("%s: \\E in ANSI mode",
 				    action_name(HexString_action));
-				cancel_if_idle_command();
+//				cancel_if_idle_command();
 				return;
 			}
 			escaped = True;
 		} else {
 			popup_an_error("%s: Illegal character in specification",
 			    action_name(HexString_action));
-			cancel_if_idle_command();
+//			cancel_if_idle_command();
 			return;
 		}
 		t += 2;
@@ -3986,7 +4000,7 @@ hex_input(char *s)
 	if (escaped) {
 		popup_an_error("%s: Nothing follows \\E",
 		    action_name(HexString_action));
-		cancel_if_idle_command();
+//		cancel_if_idle_command();
 		return;
 	}
 
@@ -4028,7 +4042,7 @@ void
 ignore_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(ignore_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 }
 
 #if defined(X3270_FT) /*[*/
@@ -4315,7 +4329,7 @@ void
 Compose_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(Compose_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 
 	if (!composites && !build_composites())
 		return;
@@ -4600,7 +4614,7 @@ void
 TemporaryKeymap_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(TemporaryKeymap_action, event, params, num_params);
-	reset_idle_timer();
+//	reset_idle_timer();
 
 	if (check_usage(TemporaryKeymap_action, *num_params, 0, 1) < 0)
 		return;
@@ -4613,7 +4627,7 @@ TemporaryKeymap_action(Widget w unused, XEvent *event, String *params, Cardinal 
 	if (temporary_keymap(params[0]) < 0) {
 		popup_an_error("%s: Can't find %s %s",
 		    action_name(TemporaryKeymap_action), ResKeymap, params[0]);
-		cancel_if_idle_command();
+//		cancel_if_idle_command();
 	}
 }
 
