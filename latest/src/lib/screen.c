@@ -82,7 +82,6 @@ static const struct lib3270_screen_callbacks *callbacks = NULL;
 
 int lib3270_event_counter[COUNTER_ID_USER] = { 0, 0, 0 };
 
-static int defattr = 0;
 Boolean screen_has_changes = 0;
 
 enum ts { TS_AUTO, TS_ON, TS_OFF };
@@ -151,15 +150,7 @@ screen_init(void)
 	if (ab_mode == TS_AUTO)
 		ab_mode = appres.m3279? TS_ON: TS_OFF;
 
-	/* If the want monochrome, assume they want green. */
-	if (!appres.m3279) {
-    	defattr = COLOR_GREEN;
-//		if (ab_mode == TS_ON)
-//			defattr = COLOR_WHITE;
-	}
-
 	/* Pull in the user's color mappings. */
-//	init_user_colors();
 
 	/* Set up the controller. */
 	ctlr_init(-1);
@@ -365,7 +356,7 @@ void screen_disp(void)
 {
 	int row, col;
 	int a;
-	int attr = defattr;
+	int attr = COLOR_GREEN;
 	unsigned char fa;
 #if defined(X3270_DBCS) /*[*/
 	enum dbcs_state d;
@@ -382,13 +373,13 @@ void screen_disp(void)
 		for (col = 0; col < cCOLS; col++)
 		{
 			baddr = row*cCOLS+col;
-			if (ea_buf[baddr].fa)
+			if(ea_buf[baddr].fa)
 			{
 			    /* Field attribute. */
 				fa_addr = baddr;
 				fa = ea_buf[baddr].fa;
 				a = calc_attrs(baddr, baddr, fa);
-				addch(row,col,' ',(attr = defattr)|CHAR_ATTR_MARKER);
+				addch(row,col,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
 			}
 			else if (FA_IS_ZERO(fa))
 			{
