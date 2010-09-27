@@ -85,6 +85,9 @@ INSTALL_TARGETS=""
 JAVAC="\$(JDK_HOME)/bin/javac"
 JAVAH="\$(JDK_HOME)/bin/javah"
 
+pw3270_cv_statusbar="no"
+
+
 AC_CHECK_PROG(PACKAGE_MANAGER, "rpmbuild", "rpm")
 AC_CHECK_PROG(PACKAGE_MANAGER, "dpkg-buildpackage","deb")
 
@@ -121,6 +124,7 @@ case "$host" in
 	*-apple-*)
 		OS_DLLFLAGS="-shared"
 		OS_LFLAGS=""
+		pw3270_cv_statusbar="yes"
 
 	;;
 
@@ -248,6 +252,12 @@ AC_ARG_ENABLE([print-font-dialog],
 	pw3270_cv_print_font="yes"
 ])
 
+AC_ARG_ENABLE([statusbar],
+	[AS_HELP_STRING([--enable-statusbar], [Enable GtkStatusBar])],
+[
+	pw3270_cv_statusbar="$enableval"
+
+], )
 
 AC_ARG_WITH([ssl],
 	[AS_HELP_STRING([--without-ssl], [do not use libssl])],
@@ -512,6 +522,10 @@ AC_SUBST(REXX_SYMBOL_HACK)
 
 if test "$pw3270_cv_trace" == "yes"; then
 	AC_DEFINE([X3270_TRACE])
+fi
+
+if test "$pw3270_cv_statusbar" == "yes"; then
+	AC_DEFINE([HAVE_GTK_STATUS_BAR])
 fi
 
 if test "$pw3270_cv_plugins" == "yes"; then
