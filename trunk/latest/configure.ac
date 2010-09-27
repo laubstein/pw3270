@@ -494,6 +494,14 @@ fi
 AC_SUBST(LIBSSL_LIBS)
 AC_SUBST(LIBSSL_CFLAGS)
 
+# Check for ige-mac-integration
+PKG_CHECK_MODULES( [IGEMAC], [ige-mac-integration],
+					AC_DEFINE(HAVE_IGEMAC),
+					AC_MSG_NOTICE([ige-mac-integratio not present.]) )
+
+AC_SUBST(IGEMAC_LIBS)
+AC_SUBST(IGEMAC_CFLAGS)
+
 # Check for rexx devel
 if test "$pw3270_cv_rexx" == "yes"; then
 	AC_DEFINE(HAVE_REXX)
