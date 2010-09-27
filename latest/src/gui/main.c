@@ -148,6 +148,30 @@ static gboolean trylog(gchar *path)
 	return rc == 0;
 }
 
+static int show_lib3270_register_error(const gchar *msg)
+{
+	int rc;
+	GtkWidget *dialog = gtk_message_dialog_new(	NULL,
+											   GTK_DIALOG_DESTROY_WITH_PARENT,
+											   GTK_MESSAGE_ERROR,
+											   GTK_BUTTONS_CANCEL,
+											   "%s", msg);
+	
+	
+	gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Please, check if lib3270 version is %s" ),program_version);
+	gtk_window_set_title(GTK_WINDOW(dialog),_( "3270 library failed" ));
+	
+#if GTK_CHECK_VERSION(2,10,0)
+	gtk_window_set_deletable(GTK_WINDOW(dialog),FALSE);
+#endif
+	
+	rc = gtk_dialog_run(GTK_DIALOG (dialog));
+	gtk_widget_destroy(dialog);
+	
+	return -1;
+}
+
+
 static int program_init(void)
 {
 	static const gchar	*logname	= PROGRAM_NAME ".log";
@@ -220,12 +244,18 @@ static int program_init(void)
 	if(gtk_theme)
 		ptr = g_strdup(gtk_theme);
 	else
-#ifdef WIN32
+	{
+#if defined(WIN32)
 		ptr = GetString( "gtk", "theme", "themes/MS-Windows/gtk-2.0/gtkrc");
+#elif defined(__APPLE__)
+		gchar *def = g_build_filename(g_get_home_dir(),".gtkrc",NULL);
+		ptr = GetString("gtk","theme",def);
+		g_free(def);
 #else
 		ptr = GetString( "gtk", "theme", "");
 #endif
-
+	}
+	
 	if(ptr)
 	{
 		if(*ptr && g_file_test(ptr,G_FILE_TEST_IS_REGULAR))
@@ -235,59 +265,17 @@ static int program_init(void)
 
 	Trace("%s","Opening configuration file");
 	if(Register3270IOCallbacks(&program_io_callbacks))
-	{
-		int rc;
-		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
-													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_CANCEL,
-													"%s", _( "Can't register as I/O manager in lib3270" ));
-
-
-		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Please, check if lib3270 version is %s" ),program_version);
-		gtk_window_set_title(GTK_WINDOW(dialog),_( "3270 library failed" ));
-
-#if GTK_CHECK_VERSION(2,10,0)
-		gtk_window_set_deletable(GTK_WINDOW(dialog),FALSE);
-#endif
-
-        rc = gtk_dialog_run(GTK_DIALOG (dialog));
-        gtk_widget_destroy(dialog);
-
-		return -1;
-	}
+		return show_lib3270_register_error(_( "Can't register as I/O manager." ));
 
 	Trace("%s","Setting screen callbacks");
 	if(Register3270ScreenCallbacks(&program_screen_callbacks))
-	{
-		int rc;
-		GtkWidget *dialog = gtk_message_dialog_new(	NULL,
-													GTK_DIALOG_DESTROY_WITH_PARENT,
-													GTK_MESSAGE_ERROR,
-													GTK_BUTTONS_CANCEL,
-													"%s", _( "Can't register as screen manager in lib3270" ));
+		return show_lib3270_register_error(_( "Can't register as screen manager." ));
 
-
-		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Please, check if lib3270 version is %s" ),program_version);
-		gtk_window_set_title(GTK_WINDOW(dialog),_( "3270 library failed" ));
-
-#if GTK_CHECK_VERSION(2,10,0)
-		gtk_window_set_deletable(GTK_WINDOW(dialog),FALSE);
-#endif
-
-        rc = gtk_dialog_run(GTK_DIALOG (dialog));
-        gtk_widget_destroy(dialog);
-
-		return -1;
-	}
 
 #ifdef X3270_FT
 	Trace("%s","Starting FT feature");
 	if(initft())
-	{
-		PopupAnError( N_( "Can't register into lib3270 file-transfer callback table." ) );
-		return -1;
-	}
+		return show_lib3270_register_error(_( "Can't register as file-transfer manager." ));
 #endif
 
 	Trace("%s completed!",__FUNCTION__);
