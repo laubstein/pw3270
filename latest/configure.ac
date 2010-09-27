@@ -119,8 +119,8 @@ case "$host" in
 		;;
 
 	*-apple-*)
-		OS_DLLFLAGS="-arch i386 -shared"
-		OS_LFLAGS="-arch i386"
+		OS_DLLFLAGS="-shared"
+		OS_LFLAGS=""
 
 	;;
 
