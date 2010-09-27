@@ -292,10 +292,13 @@
 
 #endif
 
-
 	GtkWidget				*toolbar;
  	GtkWidget				*vbox;
  	GtkWidget				*hbox;
+#ifdef HAVE_GTK_STATUS_BAR
+ 	GtkWidget				*box;
+ 	GtkWidget				*widget;
+#endif // HAVE_GTK_STATUS_BAR
 	GtkUIManager			*manager;
 	GdkPixbuf				*pix;
 	gchar 					*ptr;
@@ -374,6 +377,21 @@
 	gtk_box_pack_start(GTK_BOX(hbox), vbox,TRUE,TRUE,0);
 
 	gtk_box_pack_start(GTK_BOX(toolbar), hbox, TRUE, TRUE, 0);
+
+#ifdef HAVE_GTK_STATUS_BAR
+	box = gtk_vbox_new(FALSE,0);
+	gtk_box_pack_start(GTK_BOX(box),toolbar,TRUE,TRUE,0);
+
+	widget =  gtk_statusbar_new();
+	gtk_statusbar_set_has_resize_grip(GTK_STATUSBAR(widget),TRUE);
+	gtk_box_pack_end(GTK_BOX(box),widget,FALSE,FALSE,0);
+
+	gtk_widget_show(widget);
+	gtk_widget_show(box);
+    gtk_container_add(GTK_CONTAINER(topwindow),box);
+#else
+    gtk_container_add(GTK_CONTAINER(topwindow),toolbar);
+#endif // HAVE_GTK_STATUS_BAR
 
     gtk_container_add(GTK_CONTAINER(topwindow),toolbar);
 

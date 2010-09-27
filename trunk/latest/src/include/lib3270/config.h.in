@@ -71,6 +71,7 @@
 	#undef X3270_SCRIPT
 
 	#undef MOUSE_POINTER_CHANGE
+	#undef HAVE_GTK_STATUS_BAR
 
 	/* Default toggles */
 	#define DEFAULT_TOGGLE_RECTANGLE_SELECT
