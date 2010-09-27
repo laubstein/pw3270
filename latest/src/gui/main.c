@@ -37,7 +37,9 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
 
-#ifdef HAVE_LIBGNOME
+#if defined( HAVE_IGEMAC )
+	#include <gtkosxapplication.h>
+#elif defined( HAVE_LIBGNOME )
 	#include <gnome.h>
 #endif
 
@@ -56,8 +58,14 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
-#ifdef HAVE_LIBGNOME
+#if defined( HAVE_IGEMAC )
+
+static GtkOSXApplication * osxapp = 0;
+
+#elif defined( HAVE_LIBGNOME )
+
 static GnomeClient * client = 0;
+
 #endif
 
 const char			* on_lu_command		= NULL;
@@ -451,7 +459,20 @@ int main(int argc, char *argv[])
 	bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
 	textdomain(PACKAGE_NAME);
 
-#ifdef HAVE_LIBGNOME
+#if defined( HAVE_IGEMAC )
+
+	context = g_option_context_new (_("- 3270 Emulator for Gtk-OSX"));
+	load_options(context);
+	
+	osxapp = g_object_new(GTK_TYPE_OSX_APPLICATION, NULL);
+	
+	g_thread_init(NULL);
+	gtk_init(&argc, &argv);
+	
+	if(parse_option_context(context,&argc, &argv))
+		return -1;
+
+#elif defined( HAVE_LIBGNOME )
 
 	context = g_option_context_new (_("- 3270 Emulator for Gnome"));
 
