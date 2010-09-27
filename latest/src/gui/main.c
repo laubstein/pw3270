@@ -464,10 +464,9 @@ int main(int argc, char *argv[])
 	context = g_option_context_new (_("- 3270 Emulator for Gtk-OSX"));
 	load_options(context);
 	
-	osxapp = g_object_new(GTK_TYPE_OSX_APPLICATION, NULL);
-	
 	g_thread_init(NULL);
 	gtk_init(&argc, &argv);
+	osxapp = g_object_new(GTK_TYPE_OSX_APPLICATION, NULL);
 	
 	if(parse_option_context(context,&argc, &argv))
 		return -1;
@@ -616,6 +615,10 @@ int main(int argc, char *argv[])
 		g_timeout_add((guint) 10, (GSourceFunc) StartPlugins, (gpointer) startup_script);
 
 		// Run main loop
+#if defined( HAVE_IGEMAC )
+		gtk_osxapplication_ready(osxapp);
+#endif
+		
 		gtk_main();
 		Trace("%s --- Loop de mensagems encerrou",__FUNCTION__);
 	}
