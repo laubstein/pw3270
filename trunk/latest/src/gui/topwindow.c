@@ -35,6 +35,10 @@
  #include "actions.h"
  #include "uiparser.h"
 
+#if defined( HAVE_IGEMAC )
+ #include <gtkosxapplication.h>
+#endif
+
  #include <gdk/gdkkeysyms.h>
  #include <lib3270/config.h>
 
@@ -315,8 +319,12 @@
 	{
 		main_icon = g_list_append(main_icon, pix);
 		gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
-	}
 
+#if defined( HAVE_IGEMAC )
+		gtk_osxapplication_set_dock_icon_pixbuf(g_object_new(GTK_TYPE_OSX_APPLICATION, NULL),pix);
+#endif
+	}
+	 
 #ifdef MOUSE_POINTER_CHANGE
 
 	#ifdef WIN32
