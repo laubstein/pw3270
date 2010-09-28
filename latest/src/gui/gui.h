@@ -48,11 +48,9 @@
 	#include <gtk/gtk.h>
 	#include <gdk/gdk.h>
 	#include <glib.h>
-	
+
 	#if defined( HAVE_IGEMAC )
 		#include <gtkosxapplication.h>
-	#elif defined( HAVE_LIBGNOME )
-		#include <gnome.h>
 	#endif
 
 	#include <lib3270/api.h>
