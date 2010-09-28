@@ -48,6 +48,12 @@
 	#include <gtk/gtk.h>
 	#include <gdk/gdk.h>
 	#include <glib.h>
+	
+	#if defined( HAVE_IGEMAC )
+		#include <gtkosxapplication.h>
+	#elif defined( HAVE_LIBGNOME )
+		#include <gnome.h>
+	#endif
 
 	#include <lib3270/api.h>
 	#include <lib3270/toggle.h>
@@ -196,6 +202,10 @@
 	#define PopupAWarning(fmt, ...)	Warning(fmt,__VA_ARGS__)
 	#define PopupAnError( x )		Error("%s",x);
 	#define WarningPopup(fmt, ...)	Warning(fmt,__VA_ARGS__);
+
+#if defined( HAVE_IGEMAC )
+	LOCAL_EXTERN GtkOSXApplication	* osxapp;
+#endif
 
  	LOCAL_EXTERN const gchar		* program_name;
  	LOCAL_EXTERN const gchar		* program_version;

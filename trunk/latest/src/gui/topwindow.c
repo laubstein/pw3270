@@ -35,10 +35,6 @@
  #include "actions.h"
  #include "uiparser.h"
 
-#if defined( HAVE_IGEMAC )
- #include <gtkosxapplication.h>
-#endif
-
  #include <gdk/gdkkeysyms.h>
  #include <lib3270/config.h>
 
@@ -321,8 +317,9 @@
 		gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
 
 #if defined( HAVE_IGEMAC )
-		gtk_osxapplication_set_dock_icon_pixbuf(g_object_new(GTK_TYPE_OSX_APPLICATION, NULL),pix);
+		gtk_osxapplication_set_dock_icon_pixbuf(osxapp,pix);
 #endif
+
 	}
 	 
 #ifdef MOUSE_POINTER_CHANGE
@@ -392,6 +389,7 @@
 
 	widget =  gtk_statusbar_new();
 	gtk_statusbar_set_has_resize_grip(GTK_STATUSBAR(widget),TRUE);
+
 	gtk_box_pack_end(GTK_BOX(box),widget,FALSE,FALSE,0);
 
 	gtk_widget_show(widget);

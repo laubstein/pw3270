@@ -62,6 +62,10 @@
 #include "fonts.h"
 #include "oia.h"
 
+#ifndef __APPLE__
+	#define ENABLE_BM_PIXMAPS 1
+#endif
+
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
  static void oia_draw_cursor_position(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
@@ -95,8 +99,9 @@
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
+#ifdef ENABLE_BM_PIXMAPS
  static GdkPixmap * pixmap_oia[OIA_PIXMAP_COUNT] = { NULL, NULL};
-
+#endif // ENABLE_BM_PIXMAPS
 
  #define OIAROW	(top_margin+4+(terminal_font_info.spacing*terminal_rows))
 
@@ -446,6 +451,7 @@
  }
 #endif // HAVE_CAPS_STATE || DEBUG
 
+#ifdef ENABLE_BM_PIXMAPS
  static GdkPixmap * oia_create_scaled_pixmap(GdkRectangle *r, GdkGC *gc, const unsigned char *data, gint width, gint height, enum TERMINAL_COLOR cl)
  {
  	GdkPixbuf *buf;
@@ -473,6 +479,7 @@
     return ret;
 
  }
+#endif //  ENABLE_BM_PIXMAPS
 
  static void oia_draw_ssl_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
@@ -519,6 +526,10 @@
 
 */
 
+#ifdef ENABLE_BM_PIXMAPS
+	 
+	// Pixmap version
+	 
 	#include "locked.bm"
 	#include "unlocked.bm"
 
@@ -549,7 +560,27 @@
 	gdk_cairo_set_source_pixmap(cr, pixmap_oia[idx], r->x, r->y);
 	gdk_cairo_rectangle(cr,r);
 	cairo_fill(cr);
+	 
+#else
+	 
+	// Non Pixmap version
 
+	r->x = (r->width - (46*terminal_font_info.width))+1;
+	r->y++;
+	r->width = (terminal_font_info.width*2)-1;
+	r->height--;
+	 
+	oia_clear_icon(cr,r);
+
+	if(query_secure_connection(hSession))
+	{
+		cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_SSL_STATE);
+		cairo_arc(cr,r->x+(r->width/2),r->y+(r->height/2),r->width/(2.5),0,2*M_PI);
+		cairo_fill(cr);
+	}
+	 
+#endif // ENABLE_BM_PIXMAPS
+	 
  }
 
  static void oia_draw_insert_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
@@ -923,7 +954,8 @@
 
  void oia_release_pixmaps(void)
  {
- 	int f;
+#ifdef ENABLE_BM_PIXMAPS
+	 int f;
 
 	for(f=0;f<OIA_PIXMAP_COUNT;f++)
 	{
@@ -933,5 +965,5 @@
 			pixmap_oia[f] = NULL;
 		}
 	}
-
+#endif // ENABLE_BM_PIXMAPS 
  }
