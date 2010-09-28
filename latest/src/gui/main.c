@@ -35,14 +35,6 @@
 #include "actions.h"
 
 #include <stdio.h>
-#include <gtk/gtk.h>
-
-#if defined( HAVE_IGEMAC )
-	#include <gtkosxapplication.h>
-#elif defined( HAVE_LIBGNOME )
-	#include <gnome.h>
-#endif
-
 #include <glib/gstdio.h>
 
 #include "globals.h"
@@ -60,11 +52,11 @@
 
 #if defined( HAVE_IGEMAC )
 
-static GtkOSXApplication * osxapp = 0;
+GtkOSXApplication	* osxapp = 0;
 
 #elif defined( HAVE_LIBGNOME )
 
-static GnomeClient * client = 0;
+static GnomeClient	* client = 0;
 
 #endif
 
@@ -117,6 +109,10 @@ static void connect_main(int status)
 		set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
 
 	keypad_set_sensitive(topwindow,online);
+	
+	#ifdef HAVE_IGEMAC
+		gtk_osxapplication_attention_request(osxapp,INFO_REQUEST);
+	#endif
 
 }
 
@@ -255,12 +251,8 @@ static int program_init(void)
 	{
 #if defined(WIN32)
 		ptr = GetString( "gtk", "theme", "themes/MS-Windows/gtk-2.0/gtkrc");
-#elif defined(__APPLE__)
-		gchar *def = g_build_filename(g_get_home_dir(),".gtkrc",NULL);
-		ptr = GetString("gtk","theme",def);
-		g_free(def);
 #else
-		ptr = GetString( "gtk", "theme", "");
+		ptr = GetString( "gtk", "theme", "");		
 #endif
 	}
 	
@@ -507,7 +499,11 @@ int main(int argc, char *argv[])
 
 	if(!program_data)
 	{
-#if defined( WIN32 )
+#if defined( HAVE_IGEMAC )
+
+		program_data = gtk_osxapplication_get_bundle_path(osxapp);
+		
+#elif defined( WIN32 )
 
 		gchar *ptr = g_path_get_dirname(argv[0]);
 		g_chdir(ptr);
