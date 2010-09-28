@@ -35,6 +35,11 @@
 #include "actions.h"
 
 #include <stdio.h>
+
+#if defined( HAVE_LIBGNOME )
+	#include <gnome.h>
+#endif
+
 #include <glib/gstdio.h>
 
 #include "globals.h"
@@ -109,7 +114,7 @@ static void connect_main(int status)
 		set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
 
 	keypad_set_sensitive(topwindow,online);
-	
+
 	#ifdef HAVE_IGEMAC
 		gtk_osxapplication_attention_request(osxapp,INFO_REQUEST);
 	#endif
@@ -160,18 +165,18 @@ static int show_lib3270_register_error(const gchar *msg)
 											   GTK_MESSAGE_ERROR,
 											   GTK_BUTTONS_CANCEL,
 											   "%s", msg);
-	
-	
+
+
 	gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),_( "Please, check if lib3270 version is %s" ),program_version);
 	gtk_window_set_title(GTK_WINDOW(dialog),_( "3270 library failed" ));
-	
+
 #if GTK_CHECK_VERSION(2,10,0)
 	gtk_window_set_deletable(GTK_WINDOW(dialog),FALSE);
 #endif
-	
+
 	rc = gtk_dialog_run(GTK_DIALOG (dialog));
 	gtk_widget_destroy(dialog);
-	
+
 	return -1;
 }
 
@@ -252,10 +257,10 @@ static int program_init(void)
 #if defined(WIN32)
 		ptr = GetString( "gtk", "theme", "themes/MS-Windows/gtk-2.0/gtkrc");
 #else
-		ptr = GetString( "gtk", "theme", "");		
+		ptr = GetString( "gtk", "theme", "");
 #endif
 	}
-	
+
 	if(ptr)
 	{
 		if(*ptr && g_file_test(ptr,G_FILE_TEST_IS_REGULAR))
@@ -455,11 +460,11 @@ int main(int argc, char *argv[])
 
 	context = g_option_context_new (_("- 3270 Emulator for Gtk-OSX"));
 	load_options(context);
-	
+
 	g_thread_init(NULL);
 	gtk_init(&argc, &argv);
 	osxapp = g_object_new(GTK_TYPE_OSX_APPLICATION, NULL);
-	
+
 	if(parse_option_context(context,&argc, &argv))
 		return -1;
 
@@ -502,7 +507,7 @@ int main(int argc, char *argv[])
 #if defined( HAVE_IGEMAC )
 
 		program_data = gtk_osxapplication_get_bundle_path(osxapp);
-		
+
 #elif defined( WIN32 )
 
 		gchar *ptr = g_path_get_dirname(argv[0]);
@@ -614,7 +619,7 @@ int main(int argc, char *argv[])
 #if defined( HAVE_IGEMAC )
 		gtk_osxapplication_ready(osxapp);
 #endif
-		
+
 		gtk_main();
 		Trace("%s --- Loop de mensagems encerrou",__FUNCTION__);
 	}
