@@ -68,7 +68,7 @@
  static const struct _gui_toggle_info
  {
     const gchar     *name;
-    const gchar     *label;
+    const gchar     *label_disabled;
     const gboolean  def;
  } gui_toggle_info[GUI_TOGGLE_COUNT] =
  {
@@ -890,9 +890,9 @@
  {
 	static const struct _action
 	{
-		const gchar	* name;		/**< Name of the action */
-		const gchar	* label;	/**< Default action label */
-		GCallback	  callback;		/**< Callback for "activated/toggled" signal */
+		const gchar	* name;				/**< Name of the action */
+		const gchar	* label_disabled;	/**< Default action label */
+		GCallback	  callback;			/**< Callback for "activated/toggled" signal */
 	}
 	action[] =
 	{
@@ -998,11 +998,12 @@
 		{ "SysREQ",				N_( "Sys Req" ),				G_CALLBACK(action_SysReq)			},
 	};
 
+/*
 	static const struct _toggle_info
 	{
-		const gchar *do_label;
-		const gchar *set_label;
-		const gchar *reset_label;
+		const gchar *do_label_disabled;
+		const gchar *set_label_disabled;
+		const gchar *reset_label_disabled;
 	} toggle_info[N_TOGGLES] =
 	{
 		{ N_( "Monocase" ),					NULL,		NULL				},
@@ -1027,6 +1028,7 @@
 		{ N_( "Keypad" ),					NULL,		NULL				},
 		{ N_( "Smart paste" ),				NULL,		NULL				},
 	};
+*/
 
 	int			f;
 
@@ -1067,7 +1069,7 @@
 			if(!g_ascii_strcasecmp(id,get_toggle_name(f)))
 			{
 				info->type 		= UI_CALLBACK_TYPE_TOGGLE;
-				info->label		= toggle_info[f].do_label;
+//				info->label		= toggle_info[f].do_label;
 				info->callback	= G_CALLBACK(toggle_action);
 				info->user_data = (gpointer) f;
 				if(name)
@@ -1082,7 +1084,7 @@
 			if(!g_ascii_strcasecmp(id,gui_toggle_info[f].name))
 			{
 				info->type 		= UI_CALLBACK_TYPE_TOGGLE;
-				info->label		= gui_toggle_info[f].label;
+//				info->label		= gui_toggle_info[f].label;
 				info->callback	= G_CALLBACK(toggle_gui);
 				info->user_data = (gpointer) f;
 				if(name)
@@ -1094,7 +1096,7 @@
 		if(!g_ascii_strcasecmp(id,"gdkdebug"))
 		{
 			info->type 		= UI_CALLBACK_TYPE_TOGGLE;
-			info->label		= _( "Debug window updates" );
+//			info->label		= _( "Debug window updates" );
 			info->callback	= G_CALLBACK(action_ToggleGDKDebug);
 			info->user_data = (gpointer) f;
 			if(name)
@@ -1114,7 +1116,7 @@
 			if(!g_ascii_strcasecmp(id,get_toggle_name(f)))
 			{
 				info->type 		= UI_CALLBACK_TYPE_DEFAULT;
-				info->label		= toggle_info[f].set_label ? toggle_info[f].set_label : toggle_info[f].do_label;
+//				info->label		= toggle_info[f].set_label ? toggle_info[f].set_label : toggle_info[f].do_label;
 				info->callback	= G_CALLBACK(toggle_set_action);
 				info->user_data = (gpointer) f;
 				if(name)
@@ -1134,7 +1136,7 @@
 			if(!g_ascii_strcasecmp(id,get_toggle_name(f)))
 			{
 				info->type 		= UI_CALLBACK_TYPE_DEFAULT;
-				info->label		= toggle_info[f].reset_label ? toggle_info[f].reset_label : toggle_info[f].do_label;
+//				info->label		= toggle_info[f].reset_label ? toggle_info[f].reset_label : toggle_info[f].do_label;
 				info->callback	= G_CALLBACK(toggle_reset_action);
 				info->user_data = (gpointer) f;
 				if(name)
@@ -1151,7 +1153,7 @@
 		if(!g_ascii_strcasecmp(key,action[f].name))
 		{
 			info->type = UI_CALLBACK_TYPE_DEFAULT;
-			info->label = action[f].label;
+//			info->label = action[f].label;
 			info->callback = action[f].callback;
 			return 0;
 		}

@@ -51,8 +51,8 @@
 		</menu>
 
 		<menu name='View' >
-			<menuitem action='Toggle' id='DSTrace'/>
-			<menuitem action='Toggle' id='EventTrace'/>
+			<menuitem action='Toggle' id='DSTrace' label='DS Trace'/>
+			<menuitem action='Toggle' id='EventTrace' label='Event Trace' />
 		</menu>
 
 		<menu action='ScriptsMenu' >
@@ -62,12 +62,12 @@
 
 		<menu action='SettingsMenu' />
 
-		<menu action='DebugMenu'>
-			<menuitem action='Redraw'/>
-			<menuitem action='DumpScreen' group='offline' />
-			<menuitem action='LoadScreenDump' group='offline' />
-			<menuitem action='TestPattern' group='offline' />
-			<menuitem action='Toggle' id='GDKDebug'/>
+		<menu action='DebugMenu' label='Debug' >
+			<menuitem action='Redraw' label='Redraw screen'/>
+			<menuitem action='DumpScreen' group='offline' label='DumpScreen' />
+			<menuitem action='LoadScreenDump' group='offline' label='Load screen dump' />
+			<menuitem action='TestPattern' group='offline' label='Show test pattern' />
+			<menuitem action='Toggle' id='GDKDebug' label='Debug window updates' />
 		</menu>
 	</menubar>
 
