@@ -62,13 +62,22 @@ static void no_callback(int value, enum toggle_type reason)
 {
 }
 
-/* Register a callback to monitor toggle changes */
-LIB3270_EXPORT int register_tchange(int ix, void (*callback)(int value, enum toggle_type reason))
+/**
+ * Register a callback method to be called when toggle changes.
+ *
+ * Register a callback function to be called when the toggle changes; NOTE: the callback will be called
+ * during the register to make sure the toogle state in the client is ok.
+ *
+ * @param ix		Toggle id.
+ * @param callback	Function to call when toggle changes.
+ *
+ */
+LIB3270_EXPORT void register_3270_toggle_monitor(LIB3270_TOGGLE_ID ix, void (*callback)(int value, enum toggle_type reason))
 {
 	struct toggle *t;
 
 	if(ix < 0 || ix >= N_TOGGLES)
-		return EINVAL;
+		return;
 
 	t = &appres.toggle[ix];
 
@@ -81,8 +90,6 @@ LIB3270_EXPORT int register_tchange(int ix, void (*callback)(int value, enum tog
 	{
 		t->callback = no_callback;
 	}
-
-	return 0;
 }
 
 int Toggled(int ix)
@@ -96,7 +103,7 @@ int Toggled(int ix)
  * Generic toggle stuff
  */
 static void
-do_toggle_reason(int ix, enum toggle_type reason)
+do_toggle_reason(LIB3270_TOGGLE_ID ix, enum toggle_type reason)
 {
 	struct toggle *t = &appres.toggle[ix];
 
@@ -118,14 +125,23 @@ do_toggle_reason(int ix, enum toggle_type reason)
 
 }
 
-LIB3270_EXPORT int set_toggle(int ix, int value)
+/**
+ * Set 3270 toggle state.
+ *
+ * @param ix	Toggle to set.
+ * @param value	New toggle state (non zero for true).
+ *
+ * @return 0 if the toggle wasn't changed, non zero if it was changed.
+ *
+ */
+LIB3270_EXPORT int set_toggle(LIB3270_TOGGLE_ID ix, int value)
 {
 	Boolean v = ((Boolean) (value != 0)); // Convert int in Boolean
 
 	struct toggle	*t;
 
 	if(ix < 0 || ix >= N_TOGGLES)
-		return EINVAL;
+		return 0;
 
 	t = &appres.toggle[ix];
 
@@ -134,10 +150,10 @@ LIB3270_EXPORT int set_toggle(int ix, int value)
 
 	do_toggle_reason(ix, TT_INTERACTIVE);
 
-	return 0;
+	return -1;
 }
 
-LIB3270_EXPORT int do_toggle(int ix)
+LIB3270_EXPORT int do_3270_toggle(LIB3270_TOGGLE_ID ix)
 {
 	if(ix < 0 || ix >= N_TOGGLES)
 		return EINVAL;
@@ -231,20 +247,20 @@ shutdown_toggles(void)
 #endif /*]*/
 }
 
-LIB3270_EXPORT const char *get_toggle_name(int ix)
+LIB3270_EXPORT const char * get_3270_toggle_name(LIB3270_TOGGLE_ID ix)
 {
 	if(ix < N_TOGGLES)
 		return toggle_names[ix];
 	return "";
 }
 
-LIB3270_EXPORT int get_toggle_by_name(const char *name)
+LIB3270_EXPORT LIB3270_TOGGLE_ID get_3270_toggle_by_name(const char *name)
 {
 	int f;
 
 	for(f=0;f<N_TOGGLES;f++)
 	{
-		if(!strcmp(name,toggle_names[f]))
+		if(!strcasecmp(name,toggle_names[f]))
 			return f;
 	}
 

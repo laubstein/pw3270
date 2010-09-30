@@ -350,3 +350,8 @@ enum state_change
 	#define PT_ON_THE_SPOT		"OnTheSpot"
 #endif /*]*/
 
+/* Library internal calls */
+
+LIB3270_INTERNAL void							  initialize_toggles(void);
+LIB3270_INTERNAL void							  shutdown_toggles(void);
+

@@ -30,14 +30,39 @@
  *
  */
 
-#ifndef ACTIONS_H_INCLUDED
+ #include "gui.h"
+ #include "actions.h"
+ 
+/*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
-	#define ACTIONS_H_INCLUDED 2
+ GtkActionGroup *action_group[ACTION_GROUP_MAX+1] = { 0 };
+ 
+ const gchar *action_group_name[ACTION_GROUP_MAX] = 
+ {  
+		"default",
+		"online",
+		"offline",
+		"selection",
+		"clipboard",
+		"paste",
+		"filetransfer"
+ };
+
+/*---[ Implement ]----------------------------------------------------------------------------------------------*/
+
+ void init_actions(void)
+ {
+	int f;
 	
-	LOCAL_EXTERN GtkActionGroup	* action_group[ACTION_GROUP_MAX+1];
-	LOCAL_EXTERN const gchar	* action_group_name[ACTION_GROUP_MAX];
-	
-	/* API Prototipes */
-	LOCAL_EXTERN void init_actions(void);
-	
-#endif // ACTION_H_INCLUDED
+	memset(action_group,0,sizeof(action_group));
+        
+	for(f=0;f<G_N_ELEMENTS(action_group_name);f++)
+		action_group[f] = gtk_action_group_new(action_group_name[f]);
+		
+ }
+ 
+ void update_3270_toggle_actions(int toggle, int value)
+ {
+	#warning Implementar
+ }
+ 

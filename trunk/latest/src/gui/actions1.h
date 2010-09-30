@@ -34,7 +34,11 @@
 
 	#define ACTIONS_H_INCLUDED
 
-	LOCAL_EXTERN void 	init_actions(GtkWidget *widget);
+	LOCAL_EXTERN void			  init_actions(GtkWidget *widget);
+	LOCAL_EXTERN GCallback 		  get_action_callback_by_name(const gchar *name);
+	LOCAL_EXTERN GtkAction 		* get_action_by_name(const gchar *name);
+	LOCAL_EXTERN void			  update_3270_toggle_action(int toggle, int value);
+
 
 	LOCAL_EXTERN void	action_SelectAll(GtkWidget *w, gpointer user_data);
 	LOCAL_EXTERN void	action_SelectLeft(GtkWidget *w, gpointer user_data);

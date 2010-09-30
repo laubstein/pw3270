@@ -1225,4 +1225,37 @@
 #endif
 
  }
+ 
+ void update_3270_toggle_action(int toggle, int value)
+ {
+	const gchar	*name = get_toggle_name(toggle);
+
+ 	GtkAction	*action;
+ 	gchar		*ptr;
+
+	ptr = g_strconcat("Toggle",name,NULL);
+	action = get_action_by_name(ptr);
+	g_free(ptr);
+
+	// Update toggle buttons
+	if(action)
+		gtk_toggle_action_set_active((GtkToggleAction *) action,value);
+
+	// Update toolbar items
+	ptr = g_strconcat("ToggleReset",name,NULL);
+	action = get_action_by_name(ptr);
+	g_free(ptr);
+
+	if(action)
+		gtk_action_set_visible(action,value ? TRUE : FALSE);
+
+	ptr = g_strconcat("ToggleSet",name,NULL);
+	action = get_action_by_name(ptr);
+	g_free(ptr);
+	if(action)
+		gtk_action_set_visible(action,value ? FALSE : TRUE);
+
+ } 
+
+
 
