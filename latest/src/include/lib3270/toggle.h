@@ -38,7 +38,7 @@
 
 	enum toggle_type { TT_INITIAL, TT_INTERACTIVE, TT_ACTION, TT_FINAL, TT_UPDATE };
 
-	enum _toggle
+	typedef enum _lib3270_toggle_id
 	{
 		MONOCASE,
 		ALT_CURSOR,
@@ -63,18 +63,22 @@
 		SMART_PASTE,
 
 		N_TOGGLES
-	};
+	} LIB3270_TOGGLE_ID;
 
-	extern void					initialize_toggles(void);
-	extern void					shutdown_toggles(void);
+	LIB3270_EXPORT void					  register_3270_toggle_monitor(LIB3270_TOGGLE_ID ix, void (*callback)(int value, enum toggle_type reason));
+	LIB3270_EXPORT int					  do_3270_toggle(LIB3270_TOGGLE_ID ix);
+	LIB3270_EXPORT int					  set_3270_toggle(LIB3270_TOGGLE_ID ix, int value);
 
-	LIB3270_EXPORT int 			register_tchange(int ix, void (*callback)(int value, enum toggle_type reason));
-	LIB3270_EXPORT int			do_toggle(int ix);
-	LIB3270_EXPORT int			set_toggle(int ix, int value);
+	LIB3270_EXPORT const char			* get_3270_toggle_name(LIB3270_TOGGLE_ID ix);
+	LIB3270_EXPORT LIB3270_TOGGLE_ID	  get_3270_toggle_by_name(const char *name);
 
-	LIB3270_EXPORT const char	*get_toggle_name(int ix);
-	LIB3270_EXPORT int			get_toggle_by_name(const char *name);
+	LIB3270_EXPORT void					  update_toggle_actions(void);
 
-	LIB3270_EXPORT void			update_toggle_actions(void);
+	// Compatibility macros
+	#define register_tchange(ix,callback) register_3270_toggle_monitor(ix,callback)
+	#define do_toggle(ix) do_3270_toggle(ix)
+	#define get_toggle_name(ix) get_3270_toggle_name(ix)
+	#define set_toggle(ix,value) set_3270_toggle(ix,value)
+	#define get_toggle_by_name(name) get_3270_toggle_by_name(name)
 
 #endif /* TOGGLE3270_H_INCLUDED */

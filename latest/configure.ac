@@ -126,8 +126,9 @@ case "$host" in
 		LD_RLSFLAGS=""
 		OS_LFLAGS=""
 		pw3270_cv_statusbar="yes"
+#		OS_APPSRCS="actions.c"
 
-	;;
+		;;
 
 	*)
 		# Check for OpenOffice

@@ -270,7 +270,7 @@
 	LOCAL_EXTERN gchar					* plugin_list;
 #endif
 
-	enum _action_groups
+	typedef enum _action_group
 	{
 		ACTION_GROUP_DEFAULT,
 		ACTION_GROUP_ONLINE,
@@ -281,7 +281,8 @@
 		ACTION_GROUP_FT,
 
 		ACTION_GROUP_MAX
-	};
+		
+	} ACTION_GROUP_ID;
 
 	extern const struct lib3270_io_callbacks program_io_callbacks;
 	extern const struct lib3270_screen_callbacks program_screen_callbacks;
