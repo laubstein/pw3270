@@ -74,10 +74,14 @@
     { "Bold", 			    FALSE	},
     { "KeepSelected", 	    FALSE	},
     { "Underline",		    TRUE	},
+	
+	
+	
+	
     { "AutoConnect",    	TRUE	}
  };
 
- gboolean gui_toggle[GUI_TOGGLE_COUNT] = { 0 };
+ gboolean gui_toggle_state[GUI_TOGGLE_COUNT] = { 0 };
 
 
 /*---[ Action tables ]------------------------------------------------------------------------------------------*/
@@ -211,8 +215,8 @@
 
  void DisableNetworkActions(void)
  {
-	set_action_group_sensitive_state(ACTION_GROUP_ONLINE,FALSE);
-	set_action_group_sensitive_state(ACTION_GROUP_OFFLINE,FALSE);
+	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
+	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
  }
 
  static void action_Disconnect(GtkWidget *w, gpointer user_data)
@@ -227,7 +231,7 @@
  	host_disconnect(hSession,0);
  }
 
- void action_Connect(void)
+ PW3270_ACTION( connect )
  {
     const gchar *host;
 
@@ -242,7 +246,7 @@
 
     if(host == CN)
     {
-        action_SetHostname();
+        action_sethostname(0);
     }
     else
     {
@@ -311,7 +315,7 @@
  	if(PCONNECTED)
 		action_Enter();
 	else
-		action_Connect();
+		action_connect(0);
  }
 
  static void action_PrintScreen(GtkWidget *w, gpointer user_data)
@@ -418,9 +422,19 @@
 
  static void toggle_gui(GtkToggleAction *action, int id)
  {
-    gui_toggle[id] = gtk_toggle_action_get_active(action);
+    gui_toggle_state[id] = gtk_toggle_action_get_active(action);
 
-	SetBoolean("Toggles",gui_toggle_info[id].name,gui_toggle[id]);
+	SetBoolean("Toggles",gui_toggle_info[id].name,gui_toggle_state[id]);
+
+
+
+
+
+
+
+
+
+
 
     if(id == GUI_TOGGLE_BOLD)
 		action_Redraw();
@@ -472,11 +486,11 @@
 
  	for(f=0;f<GUI_TOGGLE_COUNT;f++)
  	{
- 		gui_toggle[f] = GetBoolean("Toggles", gui_toggle_info[f].name, gui_toggle_info[f].def);
+ 		gui_toggle_state[f] = GetBoolean("Toggles", gui_toggle_info[f].name, gui_toggle_info[f].def);
 		name = g_strconcat("Toggle",gui_toggle_info[f].name,NULL);
 		action = get_action_by_name(name);
 		if(action)
-			gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),gui_toggle[f]);
+			gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),gui_toggle_state[f]);
 		g_free(name);
  	}
 
@@ -709,8 +723,8 @@
 				Warning( N_( "Can't set device buffer contents" ) );
 
 			gtk_widget_set_sensitive(terminal,TRUE);
-			set_action_group_sensitive_state(ACTION_GROUP_ONLINE,TRUE);
-			set_action_group_sensitive_state(ACTION_GROUP_OFFLINE,TRUE);
+			action_group_set_sensitive(ACTION_GROUP_ONLINE,TRUE);
+			action_group_set_sensitive(ACTION_GROUP_OFFLINE,TRUE);
 
 			gtk_widget_queue_draw(terminal);
 			gtk_widget_grab_focus(terminal);
@@ -783,7 +797,7 @@
 	SaveText(N_( "Save clipboard contents" ), GetClipboard());
  }
 
- void action_SetHostname(void)
+ PW3270_ACTION( sethostname )
  {
  	char			*hostname;
  	char			*ptr;
@@ -895,9 +909,9 @@
 	action[] =
 	{
 		// Offline actions
-		{	"Connect",			G_CALLBACK(action_Connect)			},
+		{	"Connect",			G_CALLBACK(action_connect)			},
 		{	"LoadScreenDump",	G_CALLBACK(action_LoadScreenDump)	},
-		{ 	"SetHostname",		G_CALLBACK(action_SetHostname)		},
+		{ 	"SetHostname",		G_CALLBACK(action_sethostname)		},
 		{	"TestPattern",		G_CALLBACK(show_3270_test_pattern)	},
 
 		// Online actions
@@ -1183,7 +1197,8 @@
  }
 
 
- void set_action_group_sensitive_state(int id, gboolean status)
+
+ void action_group_set_sensitive(ACTION_GROUP_ID id, gboolean status)
  {
 	gtk_action_group_set_sensitive(action_group[id],status);
  }
@@ -1193,7 +1208,7 @@
 	gtk_action_group_set_sensitive(action_group[ACTION_GROUP_FT],state);
  }
 
- void init_actions(GtkWidget *widget)
+ void init_actions(void)
  {
 	static const gchar	*group_name[]	= { "default", "online", "offline", "selection", "clipboard", "paste", "filetransfer" };
  	GtkActionGroup		**group			= g_malloc0((G_N_ELEMENTS(group_name)+1)*sizeof(GtkActionGroup *));
@@ -1215,7 +1230,7 @@
 	}
 #endif
 
-	g_object_set_data_full(G_OBJECT(widget),"ActionGroups",group,g_free);
+	g_object_set_data_full(G_OBJECT(topwindow),"ActionGroups",group,g_free);
 
 #ifdef 	X3270_FT
 	set_ft_action_state(0);

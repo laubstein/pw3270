@@ -115,13 +115,14 @@
         GUI_TOGGLE_COUNT
     };
 
-    #define TOGGLED_BOLD			    gui_toggle[GUI_TOGGLE_BOLD]
-    #define TOGGLED_KEEP_SELECTED	    gui_toggle[GUI_TOGGLE_KEEP_SELECTED]
-    #define TOGGLED_SMART_PASTE		    gui_toggle[GUI_TOGGLE_SMART_PASTE]
-    #define TOGGLED_UNDERLINE		    gui_toggle[GUI_TOGGLE_UNDERLINE]
-    #define TOGGLED_CONNECT_ON_STARTUP  gui_toggle[GUI_TOGGLE_CONNECT_ON_STARTUP]
+    #define TOGGLED_BOLD			    gui_toggle_state[GUI_TOGGLE_BOLD]
+    #define TOGGLED_KEEP_SELECTED	    gui_toggle_state[GUI_TOGGLE_KEEP_SELECTED]
+    #define TOGGLED_SMART_PASTE		    gui_toggle_state[GUI_TOGGLE_SMART_PASTE]
+    #define TOGGLED_UNDERLINE		    gui_toggle_state[GUI_TOGGLE_UNDERLINE]
+    #define TOGGLED_CONNECT_ON_STARTUP  gui_toggle_state[GUI_TOGGLE_CONNECT_ON_STARTUP]
 
-    extern gboolean gui_toggle[GUI_TOGGLE_COUNT];
+    LOCAL_EXTERN gboolean		  gui_toggle_state[GUI_TOGGLE_COUNT];
+	LOCAL_EXTERN const gchar	* gui_toggle_name[GUI_TOGGLE_COUNT+1];
 
 	enum TERMINAL_COLOR
 	{
@@ -313,9 +314,6 @@
 	LOCAL_EXTERN void	update_cursor_info(void);
 	LOCAL_EXTERN void	queue_draw_cursor(void);
 	LOCAL_EXTERN void	update_cursor_pixmap(void);
-
-	LOCAL_EXTERN void 	set_action_sensitive_by_name(const gchar *name,gboolean sensitive);
-	LOCAL_EXTERN void	set_action_group_sensitive_state(int id, gboolean status);
 
 #ifdef X3270_FT
 	int 		initft(void);

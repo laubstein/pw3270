@@ -34,10 +34,17 @@
 
 	#define ACTIONS_H_INCLUDED
 
-	LOCAL_EXTERN void			  init_actions(GtkWidget *widget);
+	/* Macros */
+	#define PW3270_ACTION( name )				LOCAL_EXTERN void action_ ## name (GtkAction *action)
+	#define DECLARE_PW3270_ACTION( name, attr )	LOCAL_EXTERN void action_ ## name (GtkAction *action)
+
+	LOCAL_EXTERN void			  init_actions(void);
 	LOCAL_EXTERN GCallback 		  get_action_callback_by_name(const gchar *name);
 	LOCAL_EXTERN GtkAction 		* get_action_by_name(const gchar *name);
 	LOCAL_EXTERN void			  update_3270_toggle_action(int toggle, int value);
+
+	LOCAL_EXTERN void			  action_group_set_sensitive(ACTION_GROUP_ID id, gboolean status);
+	LOCAL_EXTERN void			  set_action_sensitive_by_name(const gchar *name, gboolean sensitive);
 
 
 	LOCAL_EXTERN void	action_SelectAll(GtkWidget *w, gpointer user_data);
@@ -50,12 +57,10 @@
 	LOCAL_EXTERN void	action_SelectionRight(GtkWidget *w, gpointer user_data);
 	LOCAL_EXTERN void	action_SelectionDown(GtkWidget *w, gpointer user_data);
 
-    LOCAL_EXTERN void	action_Connect(void);
 	LOCAL_EXTERN void	action_Save(void);
 	LOCAL_EXTERN void	action_Restore(void);
 	LOCAL_EXTERN void	action_Redraw(void);
 	LOCAL_EXTERN void	action_SelectColors(void);
-	LOCAL_EXTERN void	action_SetHostname(void);
 
 	LOCAL_EXTERN void	action_Paste(void);
 	LOCAL_EXTERN void	action_PasteSelection(void);
@@ -72,5 +77,6 @@
 	LOCAL_EXTERN void	action_Download(void);
 	LOCAL_EXTERN void	action_Upload(void);
 
+	#include "action_table.h"
 
 #endif // ACTIONS_H_INCLUDED

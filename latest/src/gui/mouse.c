@@ -136,7 +136,7 @@
 	}
 
 	select_mode = m;
-	set_action_group_sensitive_state(ACTION_GROUP_SELECTION,(select_mode == SELECT_MODE_NONE) ? FALSE : TRUE );
+	action_group_set_sensitive(ACTION_GROUP_SELECTION,(select_mode == SELECT_MODE_NONE) ? FALSE : TRUE );
 
  }
 

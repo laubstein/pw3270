@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como actions.h e possui - linhas de código.
+ * Este programa está nomeado como action_table.h e possui - linhas de código.
  *
  * Contatos:
  *
@@ -30,25 +30,7 @@
  *
  */
 
-#ifndef ACTIONS_H_INCLUDED
-
-	#define ACTIONS_H_INCLUDED 2
-	
-	/* Macros */
-	#define DECLARE_PW3270_ACTION( name, attr )	LOCAL_EXTERN void action_ ## name (GtkAction *action);
-	#define PW3270_ACTION( name )				LOCAL_EXTERN void action_ ## name (GtkAction *action)
-	
-	/* Globals */
-	LOCAL_EXTERN GtkActionGroup	* action_group[ACTION_GROUP_MAX+1];
-	LOCAL_EXTERN const gchar	* action_group_name[ACTION_GROUP_MAX];
-	
-	/* API Prototipes */
-	LOCAL_EXTERN void init_actions(void);
-	LOCAL_EXTERN void action_group_set_sensitive(ACTION_GROUP_ID id, gboolean status);
-		
-	/* Actions */
-	#include "action_table.h"
+	/* Network actions */
 	DECLARE_PW3270_ACTION( sethostname, "" );
     DECLARE_PW3270_ACTION( connect, "host" );
-	
-#endif // ACTION_H_INCLUDED
+

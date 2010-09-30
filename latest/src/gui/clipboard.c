@@ -421,17 +421,17 @@
  static void clipboard_text_check(GtkClipboard *clipboard, const gchar *text, gpointer data)
  {
  	Trace("%s called with text=%p",__FUNCTION__,text);
-	set_action_group_sensitive_state(ACTION_GROUP_PASTE,text != NULL);
+	action_group_set_sensitive(ACTION_GROUP_PASTE,text != NULL);
  }
 #endif
 
  void check_clipboard_contents(void)
  {
 #ifdef WIN32
-	set_action_group_sensitive_state(ACTION_GROUP_PASTE,TRUE);
+	action_group_set_sensitive(ACTION_GROUP_PASTE,TRUE);
 
 #else
-	set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
+	action_group_set_sensitive(ACTION_GROUP_PASTE,FALSE);
 	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_CLIPBOARD),clipboard_text_check,(gpointer) 0);
 #endif
  }
@@ -492,7 +492,7 @@
 		gtk_clipboard_set_text(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_CLIPBOARD),str ? str : "",-1);
  	}
 
-	set_action_group_sensitive_state(ACTION_GROUP_PASTE,TRUE);
+	action_group_set_sensitive(ACTION_GROUP_PASTE,TRUE);
 
 	if(last_clipboard)
 		g_free(last_clipboard);

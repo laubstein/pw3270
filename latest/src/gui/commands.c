@@ -62,7 +62,7 @@
 		host = GetString("Network","Hostname",NULL);
 		if(!host)
 		{
-			action_SetHostname();
+			action_sethostname(0);
 			return 0;
 		}
 		break;
@@ -82,7 +82,8 @@
 
  	action_ClearSelection();
 
-	DisableNetworkActions();
+	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
+	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
 
 	gtk_widget_set_sensitive(topwindow,FALSE);
 

@@ -178,6 +178,7 @@
 			font_list[pos].ascent 	= (int) sz.ascent;
 			font_list[pos].descent	= (int) sz.descent;
 
+/*
 			Trace("%s size=%d xx=%d yx=%d xy=%d yy=%d x0=%d y0=%d w=%d h=%d+%d",
 										fontname,
 										(int) font_list[pos].size ,
@@ -190,6 +191,7 @@
 										(int) font_list[pos].width,
 										(int) font_list[pos].ascent,
 										(int) font_list[pos].descent);
+*/										
 
 			width 	= sz.max_x_advance;
 			height	= sz.height;

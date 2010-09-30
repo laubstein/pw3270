@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como actions.c e possui - linhas de código.
+ * Este programa está nomeado como toggle.c e possui - linhas de código.
  *
  * Contatos:
  *
@@ -31,76 +31,20 @@
  */
 
  #include "gui.h"
- #include "actions.h"
- 
+
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
- GtkActionGroup *action_group[ACTION_GROUP_MAX+1] = { 0 };
- 
- const gchar *action_group_name[ACTION_GROUP_MAX] = 
- {  
-		"default",
-		"online",
-		"offline",
-		"selection",
-		"clipboard",
-		"paste",
-		"filetransfer"
- };
+ gboolean		  gui_toggle_state[GUI_TOGGLE_COUNT]	= { 0 };
+ const gchar	* gui_toggle_name[GUI_TOGGLE_COUNT+1]	= { "Bold", "KeepSelected", "Underline", "AutoConnect", NULL };
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
- void init_actions(void)
+ void init_gui_toggles(void)
  {
-	int f;
-	
-	memset(action_group,0,sizeof(action_group));
-        
-	for(f=0;f<G_N_ELEMENTS(action_group_name);f++)
-		action_group[f] = gtk_action_group_new(action_group_name[f]);
+ 	int f;
 
+ 	for(f=0;f<GUI_TOGGLE_COUNT;f++)
+ 		gui_toggle_state[f] = GetBoolean("Toggles", gui_toggle_name[f],FALSE);
 
-	g_object_set_data(G_OBJECT(topwindow),"ActionGroups",action_group);
-		
- } 
- 
- void update_3270_toggle_action(int toggle, int value)
- {
-	#warning Implementar
- }
- 
- void action_group_set_sensitive(ACTION_GROUP_ID id, gboolean status)
- {
-	// TODO (perry#1#): Replace action_group_set_sensitive() for a macro call to gtk_action_group_set_sensitive
-	gtk_action_group_set_sensitive(action_group[id],status);
- }
- 
- void set_action_sensitive_by_name(const gchar *name,gboolean sensitive)
- {
-	int p;
-
-	for(p = 0; action_group[p]; p++)
-	{
-		GtkAction *act = gtk_action_group_get_action(action_group[p],name);
-		if(act)
-		{
-			Trace("%s: %s(%s)",__FUNCTION__,name,sensitive ? "sensitive" : "insensitive");
-			gtk_action_set_sensitive(act,sensitive);
-			return;
-		}
-	}
-
-	Trace("%s: %s isn't available",__FUNCTION__,name);
-
- }
- 
- PW3270_ACTION( sethostname )
- {
-	#warning Implementar
- }
- 
- PW3270_ACTION( connect )
- {
-	#warning Implementar
  }
 
