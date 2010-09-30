@@ -34,6 +34,8 @@
 
 	#define ACTIONS_H_INCLUDED
 
+	LOCAL_EXTERN void 	init_actions(GtkWidget *widget);
+
 	LOCAL_EXTERN void	action_SelectAll(GtkWidget *w, gpointer user_data);
 	LOCAL_EXTERN void	action_SelectLeft(GtkWidget *w, gpointer user_data);
 	LOCAL_EXTERN void	action_SelectUp(GtkWidget *w, gpointer user_data);

@@ -34,7 +34,7 @@
 #include "gui.h"
 #include "oia.h"
 #include "fonts.h"
-#include "actions.h"
+#include "actions1.h"
 
 #include <lib3270/config.h>
 #ifndef __APPLE__

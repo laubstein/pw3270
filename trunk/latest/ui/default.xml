@@ -128,8 +128,8 @@
 		<toolitem action='Disconnect' />
 
 		<separator/>
-		<toolitem action='ToggleSet' id='FullScreen' icon='fullscreen' />
-		<toolitem action='ToggleReset' id='FullScreen' icon='leave-fullscreen' />
+		<toolitem action='ToggleSet' id='FullScreen' icon='fullscreen' label='Full Screen' />
+		<toolitem action='ToggleReset' id='FullScreen' icon='leave-fullscreen' label='Window' />
 		<toolitem action='SelectColors' />
 		<toolitem action='PrintScreen' />
 		<toolitem action='Quit' />

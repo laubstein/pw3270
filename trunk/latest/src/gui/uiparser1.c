@@ -40,7 +40,7 @@
  #include <string.h>
 
  #include "gui.h"
- #include "uiparser.h"
+ #include "uiparser1.h"
 
  #define APPEND_ELEMENT_IN_LIST(first,last,el)	el->previous  = last; \
 												last = el; \

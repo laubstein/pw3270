@@ -70,7 +70,8 @@ APP_CFLAGS="-Isrc/lib"
 OS_DLLFLAGS="-shared -Wl,-soname,\$(@F)"
 OS_LFLAGS=""
 OS_SRCS=""
-OS_APPSRCS=""
+OS_APPSRCS="topwindow1.c uiparser1.c actions1.c"
+
 LOGOEXT="png"
 LD_APIFLAGS=""
 LD_RLSFLAGS="-Wl,--strip-all"
@@ -86,7 +87,6 @@ JAVAC="\$(JDK_HOME)/bin/javac"
 JAVAH="\$(JDK_HOME)/bin/javah"
 
 pw3270_cv_statusbar="no"
-
 
 AC_CHECK_PROG(PACKAGE_MANAGER, "rpmbuild", "rpm")
 AC_CHECK_PROG(PACKAGE_MANAGER, "dpkg-buildpackage","deb")
@@ -106,7 +106,7 @@ case "$host" in
 		LD_RLSFLAGS="-mwindows $LD_RLSFLAGS"
 		OS_LFLAGS="-lws2_32"
 		OS_APISRCS="w3misc.c winvers.c"
-		OS_APPSRCS="resources.rc"
+		OS_APPSRCS="uiparser1.c resources.rc"
 		LOGOEXT="gif"
 		localedir="locale"
 
@@ -123,6 +123,7 @@ case "$host" in
 
 	*-apple-*)
 		OS_DLLFLAGS="-shared"
+		LD_RLSFLAGS=""
 		OS_LFLAGS=""
 		pw3270_cv_statusbar="yes"
 

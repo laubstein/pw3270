@@ -35,8 +35,8 @@
 
  #include "gui.h"
  #include "fonts.h"
- #include "actions.h"
- #include "uiparser.h"
+ #include "actions1.h"
+ #include "uiparser1.h"
  #include <gdk/gdkkeysyms.h>
  #include <errno.h>
 
@@ -68,14 +68,13 @@
  static const struct _gui_toggle_info
  {
     const gchar     *name;
-    const gchar     *label_disabled;
     const gboolean  def;
  } gui_toggle_info[GUI_TOGGLE_COUNT] =
  {
-    { "Bold", 			    N_( "Bold" ),				FALSE	},
-    { "KeepSelected", 	    N_( "Keep selected" ),		FALSE	},
-    { "Underline",		    N_( "Show Underline" ), 	TRUE	},
-    { "AutoConnect",    	N_( "Connect on startup" ),	TRUE	}
+    { "Bold", 			    FALSE	},
+    { "KeepSelected", 	    FALSE	},
+    { "Underline",		    TRUE	},
+    { "AutoConnect",    	TRUE	}
  };
 
  gboolean gui_toggle[GUI_TOGGLE_COUNT] = { 0 };
@@ -891,144 +890,111 @@
 	static const struct _action
 	{
 		const gchar	* name;				/**< Name of the action */
-		const gchar	* label_disabled;	/**< Default action label */
 		GCallback	  callback;			/**< Callback for "activated/toggled" signal */
 	}
 	action[] =
 	{
 		// Offline actions
-		{	"Connect",			N_( "_Connect" ),				G_CALLBACK(action_Connect)			},
-		{	"LoadScreenDump",	N_( "Load screen dump" ),		G_CALLBACK(action_LoadScreenDump)	},
-		{ 	"SetHostname",		N_( "Set hostname" ),			G_CALLBACK(action_SetHostname)		},
-		{	"TestPattern",		N_( "Show test pattern" ),		G_CALLBACK(show_3270_test_pattern)	},
+		{	"Connect",			G_CALLBACK(action_Connect)			},
+		{	"LoadScreenDump",	G_CALLBACK(action_LoadScreenDump)	},
+		{ 	"SetHostname",		G_CALLBACK(action_SetHostname)		},
+		{	"TestPattern",		G_CALLBACK(show_3270_test_pattern)	},
 
 		// Online actions
-		{	"Redraw",			N_( "Redraw screen" ),			G_CALLBACK(action_Redraw)			},
-		{	"SaveScreen",		N_( "Save screen" ),			G_CALLBACK(action_SaveScreen)		},
-		{	"PrintScreen",		N_( "Print" ),					G_CALLBACK(action_PrintScreen)		},
-		{	"DumpScreen",		N_( "Dump screen" ),			G_CALLBACK(action_DumpScreen)		},
-		{	"Disconnect",		N_( "_Disconnect" ),			G_CALLBACK(action_Disconnect)		},
+		{	"Redraw",			G_CALLBACK(action_Redraw)			},
+		{	"SaveScreen",		G_CALLBACK(action_SaveScreen)		},
+		{	"PrintScreen",		G_CALLBACK(action_PrintScreen)		},
+		{	"DumpScreen",		G_CALLBACK(action_DumpScreen)		},
+		{	"Disconnect",		G_CALLBACK(action_Disconnect)		},
 
 		// Select actions
-		{	"SelectField",		N_( "Select Field" ),			G_CALLBACK(action_SelectField)		},
+		{	"SelectField",		G_CALLBACK(action_SelectField)		},
 
-		{ 	"SelectRight",		N_( "Select Right" ),			G_CALLBACK(action_SelectRight)		},
-		{ 	"SelectLeft",		N_( "Select Left" ),			G_CALLBACK(action_SelectLeft)		},
-		{ 	"SelectUp",			N_( "Select Up" ),				G_CALLBACK(action_SelectUp)			},
-		{ 	"SelectDown",		N_( "Select Down" ),			G_CALLBACK(action_SelectDown)		},
+		{ 	"SelectRight",		G_CALLBACK(action_SelectRight)		},
+		{ 	"SelectLeft",		G_CALLBACK(action_SelectLeft)		},
+		{ 	"SelectUp",			G_CALLBACK(action_SelectUp)			},
+		{ 	"SelectDown",		G_CALLBACK(action_SelectDown)		},
 
-		{	"SelectionRight",	N_( "Selection Right" ),		G_CALLBACK(action_SelectionRight)	},
-		{	"SelectionLeft",	N_( "Selection Left" ),			G_CALLBACK(action_SelectionLeft)	},
-		{	"SelectionUp",		N_( "Selection Up" ),			G_CALLBACK(action_SelectionUp)		},
-		{	"SelectionDown",	N_( "Selection Down" ),			G_CALLBACK(action_SelectionDown)	},
+		{	"SelectionRight",	G_CALLBACK(action_SelectionRight)	},
+		{	"SelectionLeft",	G_CALLBACK(action_SelectionLeft)	},
+		{	"SelectionUp",		G_CALLBACK(action_SelectionUp)		},
+		{	"SelectionDown",	G_CALLBACK(action_SelectionDown)	},
 
 		// Cursor Movement
-		{ 	"CursorRight",		N_( "Right" ),					G_CALLBACK(action_Right)			},
-		{ 	"CursorLeft",		N_( "Left" ),					G_CALLBACK(action_Left)				},
-		{ 	"CursorUp",			N_( "Up" ),						G_CALLBACK(action_Up)				},
-		{ 	"CursorDown",		N_( "Down" ),					G_CALLBACK(action_Down)				},
+		{ 	"CursorRight",		G_CALLBACK(action_Right)			},
+		{ 	"CursorLeft",		G_CALLBACK(action_Left)				},
+		{ 	"CursorUp",			G_CALLBACK(action_Up)				},
+		{ 	"CursorDown",		G_CALLBACK(action_Down)				},
 
-		{	"NextField",		N_( "Next field" ),				G_CALLBACK(action_NextField)		},
-		{	"PreviousField",	N_( "Previous field" ),			G_CALLBACK(action_PreviousField)	},
+		{	"NextField",		G_CALLBACK(action_NextField)		},
+		{	"PreviousField",	G_CALLBACK(action_PreviousField)	},
 
 		// Edit actions
-		{	"PasteNext",		N_( "Paste next" ),				G_CALLBACK(action_PasteNext)		},
-		{	"PasteTextFile",	N_( "Paste text file" ),		G_CALLBACK(action_PasteTextFile)	},
-		{	"Reselect",			N_( "Reselect" ),				G_CALLBACK(Reselect)				},
-		{	"SelectAll",		N_( "Select all" ),				G_CALLBACK(action_SelectAll)		},
-		{	"EraseInput",		N_( "Erase input" ),			G_CALLBACK(erase_input_action)		},
-		{	"Clear",			N_( "Clear" ),					G_CALLBACK(clear_action)			},
+		{	"PasteNext",		G_CALLBACK(action_PasteNext)		},
+		{	"PasteTextFile",	G_CALLBACK(action_PasteTextFile)	},
+		{	"Reselect",			G_CALLBACK(Reselect)				},
+		{	"SelectAll",		G_CALLBACK(action_SelectAll)		},
+		{	"EraseInput",		G_CALLBACK(erase_input_action)		},
+		{	"Clear",			G_CALLBACK(clear_action)			},
 
-		{	"Reset",			N_( "Reset" ),					G_CALLBACK(action_Reset)			},
-		{	"Escape",			N_( "Escape" ),					G_CALLBACK(action_Reset)			},
+		{	"Reset",			G_CALLBACK(action_Reset)			},
+		{	"Escape",			G_CALLBACK(action_Reset)			},
 
 		// File-transfer actions
-		{	"Download",			N_( "Receive file" ),			G_CALLBACK(action_Download)			},
-		{	"Upload",   		N_( "Send file" ),   			G_CALLBACK(action_Upload)			},
+		{	"Download",			G_CALLBACK(action_Download)			},
+		{	"Upload",   		G_CALLBACK(action_Upload)			},
 
 		// Selection actions
-		{	"Append",			N_( "Add to copy" ),			G_CALLBACK(action_Append)			},
-		{	"Unselect",			N_( "Unselect" ),				G_CALLBACK(action_ClearSelection)	},
-		{	"Copy",				N_( "Copy" ),					G_CALLBACK(action_Copy)				},
-		{	"CopyAsTable",		N_( "Copy as table" ),			G_CALLBACK(action_CopyAsTable)		},
+		{	"Append",			G_CALLBACK(action_Append)			},
+		{	"Unselect",			G_CALLBACK(action_ClearSelection)	},
+		{	"Copy",				G_CALLBACK(action_Copy)				},
+		{	"CopyAsTable",		G_CALLBACK(action_CopyAsTable)		},
 
-		{	"CopyAsImage",		N_( "Copy as image" ),			G_CALLBACK(action_CopyAsImage)		},
+		{	"CopyAsImage",		G_CALLBACK(action_CopyAsImage)		},
 
-		{	"PrintSelected",	N_( "Print selected" ),			G_CALLBACK(action_PrintSelected)	},
-		{	"SaveSelected",		N_( "Save selected" ),			G_CALLBACK(action_SaveSelected)		},
+		{	"PrintSelected",	G_CALLBACK(action_PrintSelected)	},
+		{	"SaveSelected",		G_CALLBACK(action_SaveSelected)		},
 
-		{	"PrintClipboard",	N_( "Print copy" ),				G_CALLBACK(action_PrintClipboard)	},
-		{	"SaveClipboard",	N_( "Save copy" ),				G_CALLBACK(action_SaveClipboard)	},
-		{	"Paste",			N_( "Paste" ),					G_CALLBACK(action_Paste)			},
+		{	"PrintClipboard",	G_CALLBACK(action_PrintClipboard)	},
+		{	"SaveClipboard",	G_CALLBACK(action_SaveClipboard)	},
+		{	"Paste",			G_CALLBACK(action_Paste)			},
 
-		{	"FileMenu",			N_( "_File" ),					NULL								},
-		{	"FTMenu",			N_( "Send/Receive" ),			NULL								},
-		{	"NetworkMenu",		N_( "_Network" ),				NULL								},
-		{	"HelpMenu",			N_( "Help" ),					NULL								},
-		{	"EditMenu",			N_( "_Edit" ),					NULL								},
-		{	"OptionsMenu",		N_( "_Options" ),				NULL								},
-		{	"SettingsMenu",		N_( "Settings" ),				NULL								},
-		{	"ScriptsMenu",		N_( "Scripts" ),				NULL								},
-		{	"ViewMenu",			N_( "_View" ),					NULL								},
-		{	"InputMethod",		N_( "Input method" ),			NULL								},
-		{	"ToolbarMenu",		N_( "Toolbars" ),				NULL								},
-		{	"DebugMenu",		N_( "Debug" ),					NULL								},
-		{	"FontSettings",		N_( "Select font" ),			NULL								},
-		{	"Preferences",		N_( "Preferences" ),			NULL								},
-		{	"Network",			N_( "Network" ),				NULL								},
-		{	"Properties",		N_( "Properties" ),				NULL								},
+		{	"FileMenu",			NULL								},
+		{	"FTMenu",			NULL								},
+		{	"NetworkMenu",		NULL								},
+		{	"HelpMenu",			NULL								},
+		{	"EditMenu",			NULL								},
+		{	"OptionsMenu",		NULL								},
+		{	"SettingsMenu",		NULL								},
+		{	"ScriptsMenu",		NULL								},
+		{	"ViewMenu",			NULL								},
+		{	"InputMethod",		NULL								},
+		{	"ToolbarMenu",		NULL								},
+		{	"DebugMenu",		NULL								},
+		{	"FontSettings",		NULL								},
+		{	"Preferences",		NULL								},
+		{	"Network",			NULL								},
+		{	"Properties",		NULL								},
 
-		{	"About",			N_( "About" ),					G_CALLBACK(action_About)			},
-		{	"Quit",				N_( "_Quit" ),					G_CALLBACK(action_Quit)				},
-		{	"SelectColors",		N_( "Colors" ),					G_CALLBACK(action_SelectColors)		},
+		{	"About",			G_CALLBACK(action_About)			},
+		{	"Quit",				G_CALLBACK(action_Quit)				},
+		{	"SelectColors",		G_CALLBACK(action_SelectColors)		},
 
-		{	"Save",				N_( "Save" ),					NULL								},
+		{	"Save",				NULL								},
 
-		{ 	"Return",			N_( "Return" ),					G_CALLBACK(action_enter)			},
-		{ 	"Enter",			N_( "Enter" ),					G_CALLBACK(action_enter)			},
+		{ 	"Return",			G_CALLBACK(action_enter)			},
+		{ 	"Enter",			G_CALLBACK(action_enter)			},
 
 		// Lib3270 calls
-		{ "EraseEOF",			N_( "Erase to end of field" ),	G_CALLBACK(lib3270_EraseEOF)		},
-		{ "EraseEOL",			N_( "Erase to end of line" ),	G_CALLBACK(lib3270_EraseEOL)		},
-		{ "Home",				N_( "First Field" ),			G_CALLBACK(action_FirstField)		},
-		{ "DeleteWord",			N_( "Delete Word" ),			G_CALLBACK(action_DeleteWord)		},
-		{ "EraseField",			N_( "Erase Field" ),			G_CALLBACK(action_DeleteField)		},
-		{ "Delete",				N_( "Delete Char" ),			G_CALLBACK(action_Delete)			},
-		{ "Erase",				N_( "Backspace" ),				G_CALLBACK(action_Erase)			},
-		{ "SysREQ",				N_( "Sys Req" ),				G_CALLBACK(action_SysReq)			},
+		{ "EraseEOF",			G_CALLBACK(lib3270_EraseEOF)		},
+		{ "EraseEOL",			G_CALLBACK(lib3270_EraseEOL)		},
+		{ "Home",				G_CALLBACK(action_FirstField)		},
+		{ "DeleteWord",			G_CALLBACK(action_DeleteWord)		},
+		{ "EraseField",			G_CALLBACK(action_DeleteField)		},
+		{ "Delete",				G_CALLBACK(action_Delete)			},
+		{ "Erase",				G_CALLBACK(action_Erase)			},
+		{ "SysREQ",				G_CALLBACK(action_SysReq)			},
 	};
-
-/*
-	static const struct _toggle_info
-	{
-		const gchar *do_label_disabled;
-		const gchar *set_label_disabled;
-		const gchar *reset_label_disabled;
-	} toggle_info[N_TOGGLES] =
-	{
-		{ N_( "Monocase" ),					NULL,		NULL				},
-		{ N_( "Alt Cursor" ),				NULL,		NULL				},
-		{ N_( "Blinking Cursor" ),			NULL,		NULL				},
-		{ N_( "Show timing" ),				NULL,		NULL				},
-		{ N_( "Track Cursor" ),				NULL,		NULL				},
-		{ N_( "DS Trace" ),					NULL,		NULL				},
-		{ N_( "Scroll bar" ),				NULL,		NULL				},
-		{ N_( "Line Wrap" ),				NULL,		NULL				},
-		{ N_( "Blank Fill" ),				NULL,		NULL				},
-		{ N_( "Screen Trace" ),				NULL,		NULL				},
-		{ N_( "Event Trace" ),				NULL,		NULL				},
-		{ N_( "Paste with left margin" ),	NULL,		NULL				},
-		{ N_( "Select by rectangles" ),		NULL,		NULL				},
-		{ N_( "Cross Hair Cursor" ),		NULL,		NULL				},
-		{ N_( "Visible Control chars" ),	NULL,		NULL				},
-		{ N_( "Aid wait" ),					NULL,		NULL				},
-		{ N_( "Full Screen" ),				NULL,		N_( "Window" )		},
-		{ N_( "Auto-Reconnect" ),			NULL,		NULL				},
-		{ N_( "Insert" ),					NULL,		N_( "Overwrite")	},
-		{ N_( "Keypad" ),					NULL,		NULL				},
-		{ N_( "Smart paste" ),				NULL,		NULL				},
-	};
-*/
 
 	int			f;
 
