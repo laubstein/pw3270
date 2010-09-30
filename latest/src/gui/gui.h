@@ -283,8 +283,6 @@
 		ACTION_GROUP_MAX
 	};
 
-	LOCAL_EXTERN void 	init_actions(GtkWidget *widget);
-
 	extern const struct lib3270_io_callbacks program_io_callbacks;
 	extern const struct lib3270_screen_callbacks program_screen_callbacks;
 
