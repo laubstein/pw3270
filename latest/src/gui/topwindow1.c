@@ -32,8 +32,8 @@
 
  #include "gui.h"
  #include "fonts.h"
- #include "actions.h"
- #include "uiparser.h"
+ #include "actions1.h"
+ #include "uiparser1.h"
 
  #include <gdk/gdkkeysyms.h>
  #include <lib3270/config.h>

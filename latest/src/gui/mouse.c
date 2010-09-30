@@ -32,7 +32,7 @@
 
 
  #include "gui.h"
- #include "actions.h"
+ #include "actions1.h"
  #include "fonts.h"
 
  #include <globals.h>

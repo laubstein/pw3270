@@ -32,7 +32,7 @@
 
 #include "gui.h"
 #include "oia.h"
-#include "actions.h"
+#include "actions1.h"
 
 #include <stdio.h>
 
