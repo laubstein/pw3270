@@ -93,7 +93,7 @@ static void connect_main(int status)
 		ctlr_erase(True);
 		online = FALSE;
 #ifdef 	X3270_FT
-		set_action_group_sensitive_state(ACTION_GROUP_FT,status);
+		action_group_set_sensitive(ACTION_GROUP_FT,status);
 #endif
 	}
 
@@ -105,13 +105,13 @@ static void connect_main(int status)
 		gtk_widget_grab_focus(terminal);
 	}
 
-	set_action_group_sensitive_state(ACTION_GROUP_ONLINE,online);
-	set_action_group_sensitive_state(ACTION_GROUP_OFFLINE,!online);
+	action_group_set_sensitive(ACTION_GROUP_ONLINE,online);
+	action_group_set_sensitive(ACTION_GROUP_OFFLINE,!online);
 
 	if(online)
 		check_clipboard_contents();
 	else
-		set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
+		action_group_set_sensitive(ACTION_GROUP_PASTE,FALSE);
 
 	keypad_set_sensitive(topwindow,online);
 
@@ -604,13 +604,12 @@ int main(int argc, char *argv[])
 		cl_hostname = GetString("Network","Hostname",CN);
 
     if(TOGGLED_CONNECT_ON_STARTUP)
-        action_Connect();
+        action_connect(0);
 
 	if(topwindow)
 	{
 		screen_resume();
 		screen_disp();
-//		peer_script_init();
 
 		// Start plugins after the creation of main loop
 		g_timeout_add((guint) 10, (GSourceFunc) StartPlugins, (gpointer) startup_script);

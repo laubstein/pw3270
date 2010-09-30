@@ -307,7 +307,7 @@
 	g_object_set_data(G_OBJECT(topwindow),"pw3270_config",	(gpointer) GetConf());
 	g_object_set_data(G_OBJECT(topwindow),"pw3270_dpath",	(gpointer) program_data);
 
-	init_actions(topwindow);
+	init_actions();
 
 	pix = LoadLogo();
 
@@ -411,10 +411,10 @@
 	action_ClearSelection();
 	ClearClipboard();
 
-	set_action_group_sensitive_state(ACTION_GROUP_ONLINE,FALSE);
-	set_action_group_sensitive_state(ACTION_GROUP_OFFLINE,TRUE);
-	set_action_group_sensitive_state(ACTION_GROUP_CLIPBOARD,FALSE);
-	set_action_group_sensitive_state(ACTION_GROUP_PASTE,FALSE);
+	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
+	action_group_set_sensitive(ACTION_GROUP_OFFLINE,TRUE);
+	action_group_set_sensitive(ACTION_GROUP_CLIPBOARD,FALSE);
+	action_group_set_sensitive(ACTION_GROUP_PASTE,FALSE);
 
 	set_action_sensitive_by_name("Reselect",FALSE);
 	set_action_sensitive_by_name("PasteNext",FALSE);
