@@ -441,6 +441,15 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="src/gui/actions1.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gui/actions1.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/gui/clipboard.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -516,8 +525,10 @@
 		<Unit filename="src/gui/terminal.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/gui/topwindow.c">
+		<Unit filename="src/gui/topwindow1.c">
 			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="src/gui/tracewindow.c">
 			<Option compilerVar="CC" />
@@ -528,18 +539,14 @@
 			<Option target="pipetest" />
 			<Option target="jnidebug" />
 		</Unit>
-		<Unit filename="src/gui/uiparser.c">
+		<Unit filename="src/gui/uiparser1.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
-			<Option target="pipetest" />
-			<Option target="jnidebug" />
 		</Unit>
-		<Unit filename="src/gui/uiparser.h">
+		<Unit filename="src/gui/uiparser1.h">
 			<Option target="Debug" />
 			<Option target="Release" />
-			<Option target="pipetest" />
-			<Option target="jnidebug" />
 		</Unit>
 		<Unit filename="src/gui/version.c.in" />
 		<Unit filename="src/include/X11/keysym.h" />

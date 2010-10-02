@@ -32,6 +32,7 @@
 
  #include "gui.h"
  #include "fonts.h"
+ #include "actions1.h"
  #include <globals.h>
  #include <lib3270/kybdc.h>
  #include <lib3270/toggle.h>
