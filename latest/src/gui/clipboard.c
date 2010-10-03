@@ -71,9 +71,9 @@
 		return;
  	}
 
-	Trace("Pasting %p with %d bytes)",str,strlen(str));
+//	Trace("Pasting %p with %d bytes)",str,strlen(str));
 	sz = lib3270_paste_string((const unsigned char *) str);
-	Trace("Paste returned %d (string has %d bytes)",sz,strlen(str));
+//	Trace("Paste returned %d (string has %d bytes)",sz,strlen(str));
 
 	if(sz < 1)
 	{
@@ -110,7 +110,7 @@
 	if(last_clipboard)
 		g_free(last_clipboard);
 
-	set_action_sensitive_by_name("PasteNext",clipboard_string != NULL);
+	gtk_action_set_sensitive(action_by_id[ACTION_PASTENEXT],clipboard_string != NULL);
 
 	screen_resume();
 
@@ -461,7 +461,8 @@
 		g_free(clipboard_string);
 		clipboard_string = NULL;
 	}
-	set_action_sensitive_by_name("PasteNext",FALSE);
+	gtk_action_set_sensitive(action_by_id[ACTION_PASTENEXT],FALSE);
+
  }
 
  static void set_clipboard_contents(enum _clipboard_mode mode, gboolean append, gchar *str)

@@ -238,7 +238,7 @@
 
  static void selection_owner_changed(GtkClipboard *clipboard, GdkEventOwnerChange *event, gpointer user_data)
  {
- 	Trace("%s called reason: %d owner: %p",__FUNCTION__,(int) event->reason, (void *) event->owner);
+// 	Trace("%s called reason: %d owner: %p",__FUNCTION__,(int) event->reason, (void *) event->owner);
  	if(terminal && !GTK_WIDGET_HAS_FOCUS(terminal))
 		action_ClearSelection();
 
@@ -401,6 +401,20 @@
 
     gtk_container_add(GTK_CONTAINER(topwindow),toolbar);
 
+	{
+		static const gchar *name[ACTION_ID_MAX] = { "CopyAsTable", "CopyAsImage", "PasteNext", "Unselect", "Reselect" };
+		int f;
+		
+		for(f=0;f<ACTION_ID_MAX;f++)
+		{
+			GtkAction *a = get_action_by_name(name[f]);
+			if(a)
+				action_by_id[f] = a;
+		}
+	}
+
+	gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],FALSE);
+	
 	gtk_widget_show(terminal);
 	gtk_widget_show(toolbar);
 	gtk_widget_show(hbox);
@@ -416,8 +430,8 @@
 	action_group_set_sensitive(ACTION_GROUP_CLIPBOARD,FALSE);
 	action_group_set_sensitive(ACTION_GROUP_PASTE,FALSE);
 
-	set_action_sensitive_by_name("Reselect",FALSE);
-	set_action_sensitive_by_name("PasteNext",FALSE);
+	gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],FALSE);
+	gtk_action_set_sensitive(action_by_id[ACTION_PASTENEXT],FALSE);
 
 	g_signal_connect(G_OBJECT(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_CLIPBOARD)),"owner-change",G_CALLBACK(selection_owner_changed),0);
 

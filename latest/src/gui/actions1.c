@@ -87,6 +87,8 @@
 /*---[ Action tables ]------------------------------------------------------------------------------------------*/
 
  GtkActionGroup 		**action_group		= NULL;
+ GtkAction				* action_by_id[ACTION_ID_MAX] = { NULL };
+
  static GtkAction 		*scroll_action[]	= { NULL, NULL, NULL, NULL };
 
  static struct _keyboard_action
@@ -153,6 +155,7 @@
 	return rc;
  }
 
+/*
  void set_action_sensitive_by_name(const gchar *name,gboolean sensitive)
  {
 	int p;
@@ -171,6 +174,7 @@
 	Trace("%s: %s isn't available",__FUNCTION__,name);
 
  }
+*/
 
  static void clear_and_call(GtkAction *action, int (*call)(void))
  {
@@ -1212,6 +1216,7 @@
  {
 	static const gchar	*group_name[]	= { "default", "online", "offline", "selection", "clipboard", "paste", "filetransfer" };
  	GtkActionGroup		**group			= g_malloc0((G_N_ELEMENTS(group_name)+1)*sizeof(GtkActionGroup *));
+	GtkAction			*dunno			= gtk_action_new("Dunno",NULL,NULL,NULL);
 	int					f;
 
 	for(f=0;f<G_N_ELEMENTS(group_name);f++)
@@ -1231,6 +1236,9 @@
 #endif
 
 	g_object_set_data_full(G_OBJECT(topwindow),"ActionGroups",group,g_free);
+
+	for(f=0;f<G_N_ELEMENTS(action_by_id);f++)
+		action_by_id[f] = dunno;
 
 #ifdef 	X3270_FT
 	set_ft_action_state(0);
