@@ -284,6 +284,18 @@
 		ACTION_GROUP_MAX
 		
 	} ACTION_GROUP_ID;
+	
+	typedef enum _action_id
+	{
+		ACTION_COPY_AS_TABLE,
+		ACTION_COPY_AS_IMAGE,
+		ACTION_PASTENEXT,
+		ACTION_UNSELECT,
+		ACTION_RESELECT,
+	
+		ACTION_ID_MAX
+		
+	} 	ACTION_ID;
 
 	extern const struct lib3270_io_callbacks program_io_callbacks;
 	extern const struct lib3270_screen_callbacks program_screen_callbacks;
@@ -349,7 +361,6 @@
 	int				OpenConfigFile(void);
 
 	LOCAL_EXTERN	GCallback 		  get_action_callback_by_name(const gchar *name);
-	LOCAL_EXTERN	GtkAction 		* get_action_by_name(const gchar *name);
 
 	gchar 			*GetString(const gchar *group, const gchar *key, const gchar *def);
 	void 			SetString(const gchar *group, const gchar *key, const gchar *val);

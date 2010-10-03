@@ -120,18 +120,27 @@
 	switch( (int) m)
 	{
 		case SELECT_MODE_RECTANGLE:
-			set_action_sensitive_by_name("CopyAsTable",TRUE);
-			set_action_sensitive_by_name("CopyAsImage",TRUE);
+			gtk_action_set_sensitive(action_by_id[ACTION_COPY_AS_TABLE],TRUE);
+			gtk_action_set_sensitive(action_by_id[ACTION_COPY_AS_IMAGE],TRUE);
+			gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],FALSE);
+			gtk_action_set_sensitive(action_by_id[ACTION_UNSELECT],TRUE);
 			break;
 
 		case SELECT_MODE_TEXT:
-			set_action_sensitive_by_name("CopyAsTable",FALSE);
-			set_action_sensitive_by_name("CopyAsImage",FALSE);
+			gtk_action_set_sensitive(action_by_id[ACTION_COPY_AS_TABLE],FALSE);
+			gtk_action_set_sensitive(action_by_id[ACTION_COPY_AS_IMAGE],FALSE);
+			gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],FALSE);
+			gtk_action_set_sensitive(action_by_id[ACTION_UNSELECT],TRUE);
 			break;
 
+		case SELECT_MODE_FIELD:
+			gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],FALSE);
+			gtk_action_set_sensitive(action_by_id[ACTION_UNSELECT],TRUE);
+			break;
+			
 		case SELECT_MODE_NONE:
-			if(select_mode != SELECT_MODE_INVALID)
-				set_action_sensitive_by_name("Reselect",TRUE);
+			gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],select_mode != SELECT_MODE_INVALID);
+			gtk_action_set_sensitive(action_by_id[ACTION_UNSELECT],FALSE);
 			break;
 	}
 
