@@ -42,6 +42,7 @@
 	UI_CALLBACK_TYPE_SCRIPT,
 
 	UI_CALLBACK_TYPE_USER
+
  } UI_CALLBACK_TYPE;
 
  typedef struct _ui_callback

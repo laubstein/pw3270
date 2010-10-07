@@ -32,7 +32,7 @@
 
  #include "gui.h"
  #include "fonts.h"
- #include "actions1.h"
+ #include "actions.h"
  #include <globals.h>
  #include <lib3270/kybdc.h>
  #include <lib3270/toggle.h>
@@ -291,7 +291,7 @@
  	Trace("%s ends",__FUNCTION__);
  }
 
- void action_PasteTextFile(void)
+ PW3270_ACTION( pastetextfile )
  {
 	GKeyFile 	*conf	= GetConf();
  	gchar		*ptr;
@@ -437,20 +437,20 @@
 #endif
  }
 
- void action_Paste(void)
+ PW3270_ACTION( paste )
  {
  	Trace("%s begins",__FUNCTION__);
 	gtk_clipboard_request_text(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_CLIPBOARD),clipboard_text_received,(gpointer) 0);
  	Trace("%s ends",__FUNCTION__);
  }
 
- void action_PasteNext(void)
+ PW3270_ACTION( pastenext )
  {
  	Trace("%s begins",__FUNCTION__);
  	if(clipboard_string && *clipboard_string)
 		paste_string(clipboard_string);
 	else
-		action_Paste();
+		action_paste(action);
  	Trace("%s ends",__FUNCTION__);
  }
 
@@ -578,17 +578,17 @@
 
  }
 
- void action_CopyAsTable(void)
+ PW3270_ACTION( copyastable )
  {
  	CopyAsTable(FALSE);
  }
 
- void action_Copy(void)
+ PW3270_ACTION( copy )
  {
  	CopyAsText(FALSE);
  }
 
- void action_CopyAsImage(void)
+ PW3270_ACTION( copyasimage )
  {
  	GdkPixmap		* pix;
  	GdkPixbuf		* img;
@@ -649,8 +649,7 @@
  }
 
 
-
- void action_Append(void)
+ PW3270_ACTION( append )
  {
  	if(clipboard_mode == CLIPBOARD_MODE_TABLE)
  		CopyAsTable(TRUE);

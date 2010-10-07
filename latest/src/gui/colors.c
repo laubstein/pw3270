@@ -35,7 +35,7 @@
  #include "oia.h"
  #include <ctype.h>
  #include <string.h>
- #include "actions1.h"
+ #include "actions.h"
 
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
@@ -322,7 +322,7 @@
 	}
  }
 
- void action_SelectColors(void)
+ PW3270_ACTION( selectcolors )
  {
  	static const gchar *custom = N_( "Custom colors" );
 

@@ -1121,6 +1121,7 @@
 																gettext(keypad->attr.tooltip),
 																gettext(keypad->attr.stock_id));
 
+	Trace("Group: %p",info->group[0]);
 	if(keypad->attr.accel)
 		gtk_action_group_add_action_with_accel(info->group[0],GTK_ACTION(keypad->view_action),keypad->attr.accel);
 	else

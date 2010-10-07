@@ -434,6 +434,10 @@
 		<Unit filename="src/extensions/uno/src/ooo3270.hpp" />
 		<Unit filename="src/extensions/uno/src/screen.cxx" />
 		<Unit filename="src/extensions/uno/src/test_program.cxx" />
+		<Unit filename="src/gui/action_table.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/gui/actions.c">
 			<Option compilerVar="CC" />
 		</Unit>

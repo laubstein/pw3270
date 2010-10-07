@@ -32,7 +32,7 @@
 
 
  #include "gui.h"
- #include "actions1.h"
+ #include "actions.h"
  #include "fonts.h"
 
  #include <globals.h>
@@ -137,7 +137,7 @@
 			gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],FALSE);
 			gtk_action_set_sensitive(action_by_id[ACTION_UNSELECT],TRUE);
 			break;
-			
+
 		case SELECT_MODE_NONE:
 			gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],select_mode != SELECT_MODE_INVALID);
 			gtk_action_set_sensitive(action_by_id[ACTION_UNSELECT],FALSE);
@@ -169,7 +169,7 @@
  	return ret;
  }
 
- void action_SelectField(void)
+ PW3270_ACTION( selectfield )
  {
  	if(!valid_terminal_window())
 		return;
@@ -298,7 +298,7 @@
 		{
 		case DRAG_TYPE_NONE:
 
-			action_ClearSelection();
+			action_clearselection(0);
 
 			if(!DecodePosition(event->x,event->y,&startRow,&startCol))
 				button_flags |= BUTTON_FLAG_COMBO;
@@ -372,14 +372,14 @@
  	{
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 1: // Single click, just move cursor
 		Trace("Single click (button: %d)",event->button);
-		action_ClearSelection();
+		action_clearselection(0);
 		if(row >= 0 && row <= terminal_rows && col >= 0 && col <= terminal_cols)
 			cursor_move((row*terminal_cols)+col);
 		break;
 
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 2: // Single click on button 2
 		Trace("Single click (button: %d)",event->button);
-		action_Paste();
+		action_paste(0);
 		break;
 
 	case ((SELECT_MODE_FIELD & 0x0F) << 4) | 1:	// Double click, select field
@@ -389,14 +389,14 @@
 
 	case ((SELECT_MODE_COPY & 0x0F) << 4) | 1:
 		Trace("Copy text (button: %d)",event->button);
-		action_Copy();
-		action_ClearSelection();
+		action_copy(0);
+		action_clearselection(0);
 		break;
 
 	case ((SELECT_MODE_APPEND & 0x0F) << 4) | 1:
 		Trace("Append text (button: %d)",event->button);
-		action_Append();
-		action_ClearSelection();
+		action_append(0);
+		action_clearselection(0);
 		break;
 
 	case ((SELECT_MODE_DRAG & 0x0F) << 4) | 1: // Left Drag
@@ -587,7 +587,7 @@
  	if(select_mode != SELECT_MODE_RECTANGLE && select_mode != SELECT_MODE_TEXT)
 		return;
 
-	action_ClearSelection();
+	action_clearselection(0);
 
 	if(value)
 	{
@@ -811,7 +811,7 @@
     return 0;
  }
 
- void action_ClearSelection(void)
+ void action_clearselection(GtkAction *action)
  {
  	if(select_mode == SELECT_MODE_NONE)
 		return;
@@ -821,7 +821,7 @@
 	SetSelectionMode(SELECT_MODE_NONE);
  }
 
- void action_SelectAll(GtkWidget *w, gpointer user_data)
+ void action_selectall(GtkAction *action)
  {
  	SetSelection(TRUE);
 	SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
@@ -848,22 +848,22 @@
 	Reselect();
  }
 
- void action_SelectLeft(GtkWidget *w, gpointer user_data)
+ PW3270_ACTION( selectleft )
  {
  	doSelect(action_CursorLeft);
  }
 
- void action_SelectRight(GtkWidget *w, gpointer user_data)
+ PW3270_ACTION( selectright )
  {
  	doSelect(action_CursorRight);
  }
 
- void action_SelectUp(GtkWidget *w, gpointer user_data)
+ PW3270_ACTION( selectup )
  {
  	doSelect(action_CursorUp);
  }
 
- void action_SelectDown(GtkWidget *w, gpointer user_data)
+ PW3270_ACTION( selectdown )
  {
  	doSelect(action_CursorDown);
  }
@@ -882,13 +882,13 @@
 
  }
 
- void action_SelectionUp(GtkWidget *w, gpointer user_data)
+ PW3270_ACTION( selectionup )
  {
 	if(startRow > 0 && endRow > 0)
 		MoveSelection(-1,0);
  }
 
- void action_SelectionDown(GtkWidget *w, gpointer user_data)
+ PW3270_ACTION( selectiondown )
  {
  	int maxrow = terminal_rows-1;
 
@@ -896,13 +896,13 @@
 		MoveSelection(1,0);
  }
 
- void action_SelectionLeft(GtkWidget *w, gpointer user_data)
+ PW3270_ACTION( selectionleft )
  {
 	if(startCol > 0 && endCol > 0)
 		MoveSelection(0,-1);
  }
 
- void action_SelectionRight(GtkWidget *w, gpointer user_data)
+ PW3270_ACTION( selectionright )
  {
  	int maxcol = terminal_cols-1;
 

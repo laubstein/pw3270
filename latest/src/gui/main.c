@@ -32,7 +32,7 @@
 
 #include "gui.h"
 #include "oia.h"
-#include "actions1.h"
+#include "actions.h"
 
 #include <stdio.h>
 
@@ -295,7 +295,7 @@ static gint save_session (GnomeClient *client, gint phase, GnomeSaveStyle save_s
 	gchar** argv;
 	guint argc;
 
-	action_Save();
+	action_save(0);
 
 	/* allocate 0-filled, so it will be NULL-terminated */
 	argv = g_malloc0(sizeof(gchar*)*2);

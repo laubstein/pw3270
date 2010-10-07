@@ -39,6 +39,7 @@
  #include <stdlib.h>
 
  #include "gui.h"
+ #include "actions.h"
 
 #if defined(X3270_FT)
 
@@ -799,12 +800,12 @@ http://www.suggestsoft.com/images/medieval-software/medieval-bluetooth-obex-file
 
 #endif // X3270_FT
 
- void action_Download(void)
+ PW3270_ACTION( download )
  {
  	ftdialog(TRUE);
  }
 
- void action_Upload(void)
+ PW3270_ACTION( upload )
  {
  	ftdialog(FALSE);
  }

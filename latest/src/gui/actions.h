@@ -33,22 +33,25 @@
 #ifndef ACTIONS_H_INCLUDED
 
 	#define ACTIONS_H_INCLUDED 2
-	
+
 	/* Macros */
 	#define DECLARE_PW3270_ACTION( name, attr )	LOCAL_EXTERN void action_ ## name (GtkAction *action);
 	#define PW3270_ACTION( name )				LOCAL_EXTERN void action_ ## name (GtkAction *action)
-	
+
 	/* Globals */
 	LOCAL_EXTERN GtkActionGroup	* action_group[ACTION_GROUP_MAX+1];
 	LOCAL_EXTERN const gchar	* action_group_name[ACTION_GROUP_MAX];
-	
+	LOCAL_EXTERN GtkAction		* action_by_id[ACTION_ID_MAX];
+
 	/* API Prototipes */
 	LOCAL_EXTERN void init_actions(void);
 	LOCAL_EXTERN void action_group_set_sensitive(ACTION_GROUP_ID id, gboolean status);
-		
+
+	/* Deprecated */
+	LOCAL_EXTERN void			  update_3270_toggle_action(int toggle, int value);
+
+
 	/* Actions */
 	#include "action_table.h"
-	DECLARE_PW3270_ACTION( sethostname, "" );
-    DECLARE_PW3270_ACTION( connect, "host" );
-	
+
 #endif // ACTION_H_INCLUDED

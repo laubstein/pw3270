@@ -35,7 +35,7 @@
 
  #include "gui.h"
  #include "fonts.h"
- #include "actions1.h"
+ #include "actions.h"
  #include "uiparser1.h"
  #include <gdk/gdkkeysyms.h>
  #include <errno.h>
@@ -61,7 +61,6 @@
  static void action_pfkey(GtkAction *action,gpointer id);
  static void action_pakey(GtkAction *action,gpointer id);
 
- static void action_PrintScreen(GtkWidget *w, gpointer user_data);
 
 /*---[ Gui toggles ]--------------------------------------------------------------------------------------------*/
 
@@ -74,10 +73,10 @@
     { "Bold", 			    FALSE	},
     { "KeepSelected", 	    FALSE	},
     { "Underline",		    TRUE	},
-	
-	
-	
-	
+
+
+
+
     { "AutoConnect",    	TRUE	}
  };
 
@@ -86,7 +85,7 @@
 
 /*---[ Action tables ]------------------------------------------------------------------------------------------*/
 
- GtkActionGroup 		**action_group		= NULL;
+ GtkActionGroup			* action_group[ACTION_GROUP_MAX+1];
  GtkAction				* action_by_id[ACTION_ID_MAX] = { NULL };
 
  static GtkAction 		*scroll_action[]	= { NULL, NULL, NULL, NULL };
@@ -111,10 +110,10 @@
 	{ GDK_KP_Down,			0,					NULL,	G_CALLBACK(action_Down)				},
 	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(action_NextField)		},
 
-	{ GDK_3270_PrintScreen,	0,					NULL,	G_CALLBACK(action_PrintScreen)		},
+	{ GDK_3270_PrintScreen,	0,					NULL,	G_CALLBACK(action_printscreen)		},
 	{ GDK_Sys_Req,			0,					NULL,	G_CALLBACK(action_SysReq)			},
 
-	{ GDK_Print,			GDK_CONTROL_MASK,	NULL,	G_CALLBACK(action_PrintScreen)		},
+	{ GDK_Print,			GDK_CONTROL_MASK,	NULL,	G_CALLBACK(action_printscreen)		},
 	{ GDK_Print,			GDK_SHIFT_MASK,		NULL,	G_CALLBACK(action_SysReq)			},
 
 #ifdef WIN32
@@ -178,7 +177,7 @@
 
  static void clear_and_call(GtkAction *action, int (*call)(void))
  {
- 	action_ClearSelection();
+ 	action_clearselection(0);
  	call();
  }
 
@@ -223,15 +222,15 @@
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
  }
 
- static void action_Disconnect(GtkWidget *w, gpointer user_data)
+ void action_disconnect(GtkAction *action)
  {
- 	Trace("%s Connected:%d Widget: %p",__FUNCTION__,PCONNECTED,w);
+ 	Trace("%s: Connected:%d",__FUNCTION__,PCONNECTED);
 
  	if(!PCONNECTED)
  		return;
 
 	DisableNetworkActions();
- 	action_ClearSelection();
+ 	action_clearselection(0);
  	host_disconnect(hSession,0);
  }
 
@@ -244,7 +243,7 @@
  	if(PCONNECTED)
  		return;
 
- 	action_ClearSelection();
+ 	action_clearselection(0);
 
 	host = GetString("Network","Hostname",CN);
 
@@ -313,16 +312,16 @@
 
  }
 
- void action_enter(GtkWidget *w, gpointer user_data)
+ void action_enter(GtkAction *action)
  {
- 	action_ClearSelection();
+ 	action_clearselection(0);
  	if(PCONNECTED)
 		action_Enter();
 	else
 		action_connect(0);
  }
 
- static void action_PrintScreen(GtkWidget *w, gpointer user_data)
+ void action_printscreen(GtkAction *action)
  {
 	PrintText(PROGRAM_NAME, GetScreenContents(TRUE));
  }
@@ -337,13 +336,13 @@
 	PrintText(PROGRAM_NAME, GetClipboard());
  }
 
- static void action_Quit(void)
+ void action_quit(GtkAction *action)
  {
- 	action_Save();
+ 	action_save(0);
  	program_quit();
  }
 
- static void action_About(GtkWidget *w, gpointer user_data)
+ void action_about(GtkAction *action)
  {
  	static const char *authors[] = {	"Paul Mattes <Paul.Mattes@usa.net>",
 										"GTRC",
@@ -430,18 +429,8 @@
 
 	SetBoolean("Toggles",gui_toggle_info[id].name,gui_toggle_state[id]);
 
-
-
-
-
-
-
-
-
-
-
     if(id == GUI_TOGGLE_BOLD)
-		action_Redraw();
+		action_redraw(0);
  }
 
 /**
@@ -510,7 +499,7 @@
 	Trace("Running PF %d",(int) id);
 
 	if(!TOGGLED_KEEP_SELECTED)
-		action_ClearSelection();
+		action_clearselection(0);
  	action_PFKey((int) id);
  }
 
@@ -519,7 +508,7 @@
 	Trace("Running PA %d",(int) id);
 
 	if(!TOGGLED_KEEP_SELECTED)
-		action_ClearSelection();
+		action_clearselection(action);
  	action_PAKey((int) id);
  }
 
@@ -919,24 +908,24 @@
 		{	"TestPattern",		G_CALLBACK(show_3270_test_pattern)	},
 
 		// Online actions
-		{	"Redraw",			G_CALLBACK(action_Redraw)			},
+		{	"Redraw",			G_CALLBACK(action_redraw)			},
 		{	"SaveScreen",		G_CALLBACK(action_SaveScreen)		},
-		{	"PrintScreen",		G_CALLBACK(action_PrintScreen)		},
+		{	"PrintScreen",		G_CALLBACK(action_printscreen)		},
 		{	"DumpScreen",		G_CALLBACK(action_DumpScreen)		},
-		{	"Disconnect",		G_CALLBACK(action_Disconnect)		},
+		{	"Disconnect",		G_CALLBACK(action_disconnect)		},
 
 		// Select actions
-		{	"SelectField",		G_CALLBACK(action_SelectField)		},
+		{	"SelectField",		G_CALLBACK(action_selectfield)		},
 
-		{ 	"SelectRight",		G_CALLBACK(action_SelectRight)		},
-		{ 	"SelectLeft",		G_CALLBACK(action_SelectLeft)		},
-		{ 	"SelectUp",			G_CALLBACK(action_SelectUp)			},
-		{ 	"SelectDown",		G_CALLBACK(action_SelectDown)		},
+		{ 	"SelectRight",		G_CALLBACK(action_selectright)		},
+		{ 	"SelectLeft",		G_CALLBACK(action_selectleft)		},
+		{ 	"SelectUp",			G_CALLBACK(action_selectup)			},
+		{ 	"SelectDown",		G_CALLBACK(action_selectdown)		},
 
-		{	"SelectionRight",	G_CALLBACK(action_SelectionRight)	},
-		{	"SelectionLeft",	G_CALLBACK(action_SelectionLeft)	},
-		{	"SelectionUp",		G_CALLBACK(action_SelectionUp)		},
-		{	"SelectionDown",	G_CALLBACK(action_SelectionDown)	},
+		{	"SelectionRight",	G_CALLBACK(action_selectionright)	},
+		{	"SelectionLeft",	G_CALLBACK(action_selectionleft)	},
+		{	"SelectionUp",		G_CALLBACK(action_selectionup)		},
+		{	"SelectionDown",	G_CALLBACK(action_selectiondown)	},
 
 		// Cursor Movement
 		{ 	"CursorRight",		G_CALLBACK(action_Right)			},
@@ -948,10 +937,10 @@
 		{	"PreviousField",	G_CALLBACK(action_PreviousField)	},
 
 		// Edit actions
-		{	"PasteNext",		G_CALLBACK(action_PasteNext)		},
-		{	"PasteTextFile",	G_CALLBACK(action_PasteTextFile)	},
+		{	"PasteNext",		G_CALLBACK(action_pastenext)		},
+		{	"PasteTextFile",	G_CALLBACK(action_pastetextfile)	},
 		{	"Reselect",			G_CALLBACK(Reselect)				},
-		{	"SelectAll",		G_CALLBACK(action_SelectAll)		},
+		{	"SelectAll",		G_CALLBACK(action_selectall)		},
 		{	"EraseInput",		G_CALLBACK(erase_input_action)		},
 		{	"Clear",			G_CALLBACK(clear_action)			},
 
@@ -959,23 +948,23 @@
 		{	"Escape",			G_CALLBACK(action_Reset)			},
 
 		// File-transfer actions
-		{	"Download",			G_CALLBACK(action_Download)			},
-		{	"Upload",   		G_CALLBACK(action_Upload)			},
+		{	"Download",			G_CALLBACK(action_download)			},
+		{	"Upload",   		G_CALLBACK(action_upload)			},
 
 		// Selection actions
-		{	"Append",			G_CALLBACK(action_Append)			},
-		{	"Unselect",			G_CALLBACK(action_ClearSelection)	},
-		{	"Copy",				G_CALLBACK(action_Copy)				},
-		{	"CopyAsTable",		G_CALLBACK(action_CopyAsTable)		},
+		{	"Append",			G_CALLBACK(action_append)			},
+		{	"Unselect",			G_CALLBACK(action_clearselection)	},
+		{	"Copy",				G_CALLBACK(action_copy)				},
+		{	"CopyAsTable",		G_CALLBACK(action_copyastable)		},
 
-		{	"CopyAsImage",		G_CALLBACK(action_CopyAsImage)		},
+		{	"CopyAsImage",		G_CALLBACK(action_copyasimage)		},
 
 		{	"PrintSelected",	G_CALLBACK(action_PrintSelected)	},
 		{	"SaveSelected",		G_CALLBACK(action_SaveSelected)		},
 
 		{	"PrintClipboard",	G_CALLBACK(action_PrintClipboard)	},
 		{	"SaveClipboard",	G_CALLBACK(action_SaveClipboard)	},
-		{	"Paste",			G_CALLBACK(action_Paste)			},
+		{	"Paste",			G_CALLBACK(action_paste)			},
 
 		{	"FileMenu",			NULL								},
 		{	"FTMenu",			NULL								},
@@ -994,9 +983,9 @@
 		{	"Network",			NULL								},
 		{	"Properties",		NULL								},
 
-		{	"About",			G_CALLBACK(action_About)			},
-		{	"Quit",				G_CALLBACK(action_Quit)				},
-		{	"SelectColors",		G_CALLBACK(action_SelectColors)		},
+		{	"About",			G_CALLBACK(action_about)			},
+		{	"Quit",				G_CALLBACK(action_quit)				},
+		{	"SelectColors",		G_CALLBACK(action_selectcolors)		},
 
 		{	"Save",				NULL								},
 
@@ -1215,27 +1204,27 @@
  void init_actions(void)
  {
 	static const gchar	*group_name[]	= { "default", "online", "offline", "selection", "clipboard", "paste", "filetransfer" };
- 	GtkActionGroup		**group			= g_malloc0((G_N_ELEMENTS(group_name)+1)*sizeof(GtkActionGroup *));
-	GtkAction			*dunno			= gtk_action_new("Dunno",NULL,NULL,NULL);
+ 	GtkAction			*dunno			= gtk_action_new("Dunno",NULL,NULL,NULL);
 	int					f;
 
-	for(f=0;f<G_N_ELEMENTS(group_name);f++)
+	#ifdef DEBUG
+		if(ACTION_GROUP_MAX != G_N_ELEMENTS(group_name))
+		{
+			Trace("Unexpected action_group size, found %d, expecting %d",G_N_ELEMENTS(group_name),ACTION_GROUP_MAX);
+			exit(-1);
+		}
+	#endif
+
+	for(f=0;f<ACTION_GROUP_MAX;f++)
 	{
-		group[f] = gtk_action_group_new(group_name[f]);
-		gtk_action_group_set_translation_domain(group[f], PACKAGE_NAME);
+		action_group[f] = gtk_action_group_new(group_name[f]);
+
+		Trace("action(%d): %p %s",f,action_group[f],group_name[f]);
+		gtk_action_group_set_translation_domain(action_group[f], PACKAGE_NAME);
 	}
 
-	action_group = group;
-
-#ifdef DEBUG
-	if(f != ACTION_GROUP_MAX)
-	{
-		Trace("Unexpected action_group size, found %d, expecting %d",f,ACTION_GROUP_MAX);
-		exit(-1);
-	}
-#endif
-
-	g_object_set_data_full(G_OBJECT(topwindow),"ActionGroups",group,g_free);
+	action_group[f] = 0;
+	g_object_set_data_full(G_OBJECT(topwindow),"ActionGroups",action_group,g_free);
 
 	for(f=0;f<G_N_ELEMENTS(action_by_id);f++)
 		action_by_id[f] = dunno;
@@ -1248,7 +1237,7 @@
 #endif
 
  }
- 
+
  void update_3270_toggle_action(int toggle, int value)
  {
 	const gchar	*name = get_toggle_name(toggle);
@@ -1278,7 +1267,7 @@
 	if(action)
 		gtk_action_set_visible(action,value ? FALSE : TRUE);
 
- } 
+ }
 
 
 
