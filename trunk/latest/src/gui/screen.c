@@ -34,7 +34,7 @@
 #include "gui.h"
 #include "oia.h"
 #include "fonts.h"
-#include "actions1.h"
+#include "actions.h"
 
 #include <lib3270/config.h>
 #ifndef __APPLE__
@@ -68,7 +68,7 @@
  static void	  erase(void);
  static void	  display(void);
 
- static int	  SetSuspended(int state);
+ static int		  SetSuspended(int state);
  static void	  SetScript(SCRIPT_STATE state);
  static void	  set_cursor(CURSOR_MODE mode);
  static void	  set_oia(OIA_FLAG id, int on);
@@ -77,11 +77,9 @@
  static void	  error(const char *fmt, va_list arg);
  static void 	  warning(const char *fmt, va_list arg);
  static void	  syserror(const char *title, const char *message, const char *system);
- static int	  init(void);
+ static int		  init(void);
  static void 	  update_toggle(int ix, int value, int reason, const char *name);
-// static void	  show_timer(long seconds);
-// static void	  DrawImage(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
-// static void 	  DrawImageByWidth(GdkDrawable *drawable, GdkGC *gc, int id, int x, int y, int Width, int Height);
+ static void 	  redraw(void);
  static gchar	* convert_monocase(int c, gsize *sz);
  static gchar	* convert_regular(int c, gsize *sz);
  static int	  popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, va_list arg);
@@ -105,7 +103,7 @@
 	settitle,				// void (*title)(char *text);
 	changed,				// void (*changed)(int bstart, int bend);
 	gdk_beep,				// void (*ring_bell)(void);
-	action_Redraw,			// void (*redraw)(void);
+	redraw,					// void (*redraw)(void);
 	update_cursor_position,	// void (*move_cursor)(int row, int col);
 	SetSuspended,			// int	(*set_suspended)(int state);
 	SetScript,				// void	(*set_script)(SCRIPT_STATE state);
@@ -168,6 +166,11 @@
  static gchar 	* (*convert_charset)(int c, gsize *sz) = convert_regular;
 
 /*---[ Implement ]-----------------------------------------------------------------------------------------*/
+
+ static void redraw(void)
+ {
+	action_redraw(0);
+ }
 
  static void changed(int bstart, int bend)
  {
@@ -366,7 +369,7 @@
 		terminal_cols = cols;
 
 		if(terminal && terminal->window)
-			action_Redraw();
+			action_redraw(0);
 
 	}
 

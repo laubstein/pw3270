@@ -32,7 +32,7 @@
 
  #include "gui.h"
  #include "fonts.h"
- #include "actions1.h"
+ #include "actions.h"
  #include "uiparser1.h"
 
  #include <gdk/gdkkeysyms.h>
@@ -59,7 +59,7 @@
  static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer data )
  {
  	Trace("%s called - Destroying top-window",__FUNCTION__);
- 	action_Save();
+ 	action_save(0);
  	Trace("%s","Ok");
     return FALSE;
  }
@@ -121,7 +121,7 @@
 		SetString("Terminal","Font",vlr);
 
 		g_free(vlr);
-		action_Redraw();
+		action_redraw(0);
 	}
  }
 
@@ -240,7 +240,7 @@
  {
 // 	Trace("%s called reason: %d owner: %p",__FUNCTION__,(int) event->reason, (void *) event->owner);
  	if(terminal && !GTK_WIDGET_HAS_FOCUS(terminal))
-		action_ClearSelection();
+		action_clearselection(0);
 
 	if(event->owner)
 		check_clipboard_contents();
@@ -321,7 +321,7 @@
 #endif
 
 	}
-	 
+
 #ifdef MOUSE_POINTER_CHANGE
 
 	#ifdef WIN32
@@ -404,7 +404,7 @@
 	{
 		static const gchar *name[ACTION_ID_MAX] = { "CopyAsTable", "CopyAsImage", "PasteNext", "Unselect", "Reselect" };
 		int f;
-		
+
 		for(f=0;f<ACTION_ID_MAX;f++)
 		{
 			GtkAction *a = get_action_by_name(name[f]);
@@ -414,7 +414,7 @@
 	}
 
 	gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],FALSE);
-	
+
 	gtk_widget_show(terminal);
 	gtk_widget_show(toolbar);
 	gtk_widget_show(hbox);
@@ -422,7 +422,7 @@
 
 	gtk_window_set_role(GTK_WINDOW(topwindow), PACKAGE_NAME "_TOP" );
 
-	action_ClearSelection();
+	action_clearselection(0);
 	ClearClipboard();
 
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
@@ -440,7 +440,7 @@
 	settitle(ptr);
 	g_free(ptr);
 
-	action_Restore();
+	action_restore(0);
 
 	gtk_window_set_position(GTK_WINDOW(topwindow),GTK_WIN_POS_CENTER);
 

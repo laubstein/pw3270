@@ -44,7 +44,7 @@
 #endif
 
  #include "gui.h"
- #include "actions1.h"
+ #include "actions.h"
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
@@ -80,7 +80,7 @@
  	if(PCONNECTED)
  		return g_strdup("BUSY");
 
- 	action_ClearSelection();
+ 	action_clearselection(0);
 
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);

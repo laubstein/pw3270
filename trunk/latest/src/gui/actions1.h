@@ -34,15 +34,17 @@
 
 	#define ACTIONS_H_INCLUDED
 
+	#error Deprecated, use actions.h
+
 	/* Macros */
-	#define PW3270_ACTION( name )				LOCAL_EXTERN void action_ ## name (GtkAction *action)
+	#define PW3270_ACTION( name )				LOCAL_EXTERN void action_ ## name (GtkAction *action);
 	#define DECLARE_PW3270_ACTION( name, attr )	LOCAL_EXTERN void action_ ## name (GtkAction *action)
 
 	LOCAL_EXTERN GtkAction		* action_by_id[ACTION_ID_MAX];
 
 	LOCAL_EXTERN void			  init_actions(void);
 	LOCAL_EXTERN GCallback 		  get_action_callback_by_name(const gchar *name);
-	
+
 	LOCAL_EXTERN void			  update_3270_toggle_action(int toggle, int value);
 
 	LOCAL_EXTERN void			  action_group_set_sensitive(ACTION_GROUP_ID id, gboolean status);

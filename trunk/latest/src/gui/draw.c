@@ -34,6 +34,7 @@
 #include <lib3270/config.h>
 
 #include "gui.h"
+#include "actions.h"
 #include "oia.h"
 #include "fonts.h"
 
@@ -295,7 +296,7 @@
  * Update all font information & sizes and refresh entire terminal window.
  *
  */
- void action_Redraw(void)
+ PW3270_ACTION( redraw )
  {
 	if(valid_terminal_window())
 	{

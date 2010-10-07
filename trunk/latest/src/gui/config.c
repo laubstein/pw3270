@@ -33,6 +33,7 @@
 
  #include <lib3270/config.h>
  #include "gui.h"
+ #include "actions.h"
  #include <ctype.h>
  #include <sys/stat.h>
  #include <string.h>
@@ -256,7 +257,7 @@
 	g_key_file_set_integer_list(program_config,group,"size",pos,2);
  }
 
- void action_Restore(void)
+ PW3270_ACTION( restore )
  {
     int f;
 
@@ -275,8 +276,7 @@
 	}
  }
 
-
- void action_Save(void)
+ PW3270_ACTION( save )
  {
 	GdkWindowState	CurrentState;
 	int				f;

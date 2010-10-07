@@ -31,6 +31,48 @@
  */
 
 	/* Network actions */
-	DECLARE_PW3270_ACTION( sethostname, "" );
-    DECLARE_PW3270_ACTION( connect, "host" );
+	DECLARE_PW3270_ACTION( sethostname, "" )
+    DECLARE_PW3270_ACTION( connect, "host" )
+    DECLARE_PW3270_ACTION( disconnect, "" )
+
+	/* Configuration actions */
+	DECLARE_PW3270_ACTION( save, "" )
+	DECLARE_PW3270_ACTION( restore, "" )
+	DECLARE_PW3270_ACTION( selectcolors, "" )
+
+	/* Misc actions */
+	DECLARE_PW3270_ACTION( about, "" )
+	DECLARE_PW3270_ACTION( quit, "" )
+
+	/* Screen actions */
+	DECLARE_PW3270_ACTION( redraw, "" )
+
+	/* File Transfer actions */
+	DECLARE_PW3270_ACTION( download, "" )
+	DECLARE_PW3270_ACTION( upload, "" )
+
+	/* Print actions */
+	DECLARE_PW3270_ACTION( printscreen, "")
+
+	/* Clipboard actions */
+	DECLARE_PW3270_ACTION( clearselection, "" )
+	DECLARE_PW3270_ACTION( selectfield, "" )
+	DECLARE_PW3270_ACTION( copy, "" )
+	DECLARE_PW3270_ACTION( copyastable, "" )
+	DECLARE_PW3270_ACTION( copyasimage, "" )
+	DECLARE_PW3270_ACTION( paste, "" )
+	DECLARE_PW3270_ACTION( pastenext, "" )
+	DECLARE_PW3270_ACTION( pastetextfile, "" )
+	DECLARE_PW3270_ACTION( append, "" )
+	DECLARE_PW3270_ACTION( selectall, "" )
+
+	DECLARE_PW3270_ACTION( selectright, ""  )
+	DECLARE_PW3270_ACTION( selectleft, ""  )
+	DECLARE_PW3270_ACTION( selectup, ""  )
+	DECLARE_PW3270_ACTION( selectdown, ""  )
+
+	DECLARE_PW3270_ACTION( selectionleft, ""  )
+	DECLARE_PW3270_ACTION( selectionup, ""  )
+	DECLARE_PW3270_ACTION( selectionright, ""  )
+	DECLARE_PW3270_ACTION( selectiondown, ""  )
 
