@@ -811,7 +811,7 @@
     return 0;
  }
 
- void action_clearselection(GtkAction *action)
+ PW3270_ACTION( clearselection )
  {
  	if(select_mode == SELECT_MODE_NONE)
 		return;
@@ -821,7 +821,7 @@
 	SetSelectionMode(SELECT_MODE_NONE);
  }
 
- void action_selectall(GtkAction *action)
+ PW3270_ACTION( selectall )
  {
  	SetSelection(TRUE);
 	SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);

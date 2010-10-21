@@ -30,6 +30,9 @@
  *
  */
 
+	/* Keyboard actions */
+	DECLARE_PW3270_ACTION( enter, "" )
+
 	/* Network actions */
 	DECLARE_PW3270_ACTION( sethostname, "" )
     DECLARE_PW3270_ACTION( connect, "host" )

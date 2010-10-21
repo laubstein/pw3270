@@ -49,6 +49,7 @@
 
 	/* Deprecated */
 	LOCAL_EXTERN void			  update_3270_toggle_action(int toggle, int value);
+	LOCAL_EXTERN GtkAction 		* get_action_by_name(const gchar *name);
 
 
 	/* Actions */

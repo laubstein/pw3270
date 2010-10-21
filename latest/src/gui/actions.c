@@ -32,13 +32,13 @@
 
  #include "gui.h"
  #include "actions.h"
- 
+
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
  GtkActionGroup *action_group[ACTION_GROUP_MAX+1] = { 0 };
- 
- const gchar *action_group_name[ACTION_GROUP_MAX] = 
- {  
+
+ const gchar *action_group_name[ACTION_GROUP_MAX] =
+ {
 		"default",
 		"online",
 		"offline",
@@ -53,28 +53,28 @@
  void init_actions(void)
  {
 	int f;
-	
+
 	memset(action_group,0,sizeof(action_group));
-        
+
 	for(f=0;f<G_N_ELEMENTS(action_group_name);f++)
 		action_group[f] = gtk_action_group_new(action_group_name[f]);
 
 
 	g_object_set_data(G_OBJECT(topwindow),"ActionGroups",action_group);
-		
- } 
- 
+
+ }
+
  void update_3270_toggle_action(int toggle, int value)
  {
 	#warning Implementar
  }
- 
+
  void action_group_set_sensitive(ACTION_GROUP_ID id, gboolean status)
  {
 	// TODO (perry#1#): Replace action_group_set_sensitive() for a macro call to gtk_action_group_set_sensitive
 	gtk_action_group_set_sensitive(action_group[id],status);
  }
- 
+
  void set_action_sensitive_by_name(const gchar *name,gboolean sensitive)
  {
 	int p;
@@ -93,14 +93,5 @@
 	Trace("%s: %s isn't available",__FUNCTION__,name);
 
  }
- 
- PW3270_ACTION( sethostname )
- {
-	#warning Implementar
- }
- 
- PW3270_ACTION( connect )
- {
-	#warning Implementar
- }
+
 
