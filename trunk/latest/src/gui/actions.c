@@ -35,7 +35,8 @@
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
- GtkActionGroup *action_group[ACTION_GROUP_MAX+1] = { 0 };
+ GtkActionGroup		* action_group[ACTION_GROUP_MAX+1]	= { 0 };
+ GtkAction			* action_by_id[ACTION_ID_MAX]		= { NULL };
 
  const gchar *action_group_name[ACTION_GROUP_MAX] =
  {
@@ -48,19 +49,24 @@
 		"filetransfer"
  };
 
+ static	GtkAction	* action_nop = NULL;
+ 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
  void init_actions(void)
  {
 	int f;
 
+	if(!action_nop)
+		action_nop = gtk_action_new("NOP",NULL,NULL,NULL);
+	
 	memset(action_group,0,sizeof(action_group));
 
 	for(f=0;f<G_N_ELEMENTS(action_group_name);f++)
 		action_group[f] = gtk_action_group_new(action_group_name[f]);
 
-
-	g_object_set_data(G_OBJECT(topwindow),"ActionGroups",action_group);
+	for(f=0;f<G_N_ELEMENTS(action_by_id);f++)
+		action_by_id[f] = action_nop;
 
  }
 
