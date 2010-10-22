@@ -1401,15 +1401,16 @@ Flip_action(Widget w unused, XEvent *event, String *params,
 /*
  * Tab forward to next field.
  */
-
+/*
 void
 Tab_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(Tab_action, event, params, num_params);
 	action_NextField();
 }
+*/
 
-LIB3270_EXPORT int action_NextField(void)
+LIB3270_ACTION( tab )
 {
 
 //	reset_idle_timer();
@@ -1419,7 +1420,7 @@ LIB3270_EXPORT int action_NextField(void)
 			kybdlock_clr(KL_OERR_MASK, "Tab");
 			status_reset();
 		} else {
-			enq_ta(Tab_action, CN, CN);
+			ENQUEUE_ACTION(lib3270_tab);
 			return 0;
 		}
 	}
@@ -1436,14 +1437,15 @@ LIB3270_EXPORT int action_NextField(void)
 
 /*
  * Tab backward to previous field.
- */
+ */ /*
 void BackTab_action(Widget w unused, XEvent *event, String *params,Cardinal *num_params)
 {
 	action_debug(BackTab_action, event, params, num_params);
 	action_PreviousField();
 }
+*/
 
-LIB3270_EXPORT int action_PreviousField(void)
+LIB3270_ACTION( backtab )
 {
 	register int	baddr, nbaddr;
 	int		sbaddr;
@@ -1455,7 +1457,7 @@ LIB3270_EXPORT int action_PreviousField(void)
 			kybdlock_clr(KL_OERR_MASK, "BackTab");
 			status_reset();
 		} else {
-			enq_ta(BackTab_action, CN, CN);
+			ENQUEUE_ACTION(lib3270_backtab);
 			return 0;
 		}
 	}
@@ -1784,11 +1786,11 @@ Delete_action(Widget w unused, XEvent *event, String *params,
 }
 */
 
-LIB3270_EXPORT int action_Delete(void)
+LIB3270_ACTION( delete )
 {
 //	reset_idle_timer();
 	if (kybdlock) {
-		ENQUEUE_ACTION(action_Delete);
+		ENQUEUE_ACTION(lib3270_delete);
 //		enq_ta(Delete_action, CN, CN);
 		return 0;
 	}
@@ -1916,12 +1918,11 @@ Erase_action(Widget w unused, XEvent *event, String *params,
 }
 */
 
-LIB3270_EXPORT int action_Erase(void)
+LIB3270_ACTION( erase )
 {
 //	reset_idle_timer();
 	if (kybdlock) {
-		ENQUEUE_ACTION(action_Erase);
-//		enq_ta(Erase_action, CN, CN);
+		ENQUEUE_ACTION(lib3270_erase);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -2459,7 +2460,7 @@ SysReq_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 }
 */
 
-LIB3270_EXPORT int action_SysReq(void)
+LIB3270_ACTION( sysreq )
 {
 	Trace("%s",__FUNCTION__);
 //	reset_idle_timer();
@@ -2474,7 +2475,7 @@ LIB3270_EXPORT int action_SysReq(void)
 		if (kybdlock & KL_OIA_MINUS)
 			return 0;
 		else if (kybdlock)
-			ENQUEUE_ACTION(action_SysReq);
+			ENQUEUE_ACTION(lib3270_sysreq);
 		else
 			key_AID(AID_SYSREQ);
 	}
@@ -2493,13 +2494,13 @@ static void Clear_action(Widget w unused, XEvent *event, String *params, Cardina
 }
 */
 
-LIB3270_EXPORT int action_Clear(void)
+LIB3270_ACTION( clear )
 {
 //	reset_idle_timer();
 	if (kybdlock & KL_OIA_MINUS)
 		return 0;
 	if (kybdlock && CONNECTED) {
-		ENQUEUE_ACTION(action_Clear);
+		ENQUEUE_ACTION(lib3270_clear);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -2793,7 +2794,7 @@ void EraseInput_action(Widget w unused, XEvent *event, String *params, Cardinal 
 }
  */
 
-LIB3270_EXPORT int action_EraseInput(void)
+LIB3270_ACTION( eraseinput )
 {
 	register int	baddr, sbaddr;
 	unsigned char	fa;
@@ -2801,7 +2802,7 @@ LIB3270_EXPORT int action_EraseInput(void)
 
 //	reset_idle_timer();
 	if (kybdlock) {
-		enq_ta((void (*)(Widget, XEvent *, String *, Cardinal *)) action_EraseInput, CN, CN);
+		ENQUEUE_ACTION( lib3270_eraseinput );
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -2856,22 +2857,24 @@ LIB3270_EXPORT int action_EraseInput(void)
  * but the last.
  *
  * Which is to say, does a ^W.
- */
+ */ /*
 void
 DeleteWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(DeleteWord_action, event, params, num_params);
 	action_DeleteWord();
 }
+*/
 
-LIB3270_EXPORT int action_DeleteWord(void)
+LIB3270_ACTION( deleteword )
 {
 	register int baddr;
 	register unsigned char	fa;
 
 //	reset_idle_timer();
 	if (kybdlock) {
-		enq_ta(DeleteWord_action, CN, CN);
+		ENQUEUE_ACTION(lib3270_deleteword);
+//		enq_ta(DeleteWord_action, CN, CN);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -2929,22 +2932,24 @@ LIB3270_EXPORT int action_DeleteWord(void)
  * the front of the field.
  *
  * Which is to say, does a ^U.
- */
+ */ /*
 void
 DeleteField_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(DeleteField_action, event, params, num_params);
 	action_DeleteField();
 }
+*/
 
-LIB3270_EXPORT int action_DeleteField(void)
+LIB3270_ACTION( deletefield )
 {
 	register int	baddr;
 	register unsigned char	fa;
 
 //	reset_idle_timer();
 	if (kybdlock) {
-		enq_ta(DeleteField_action, CN, CN);
+		ENQUEUE_ACTION(lib3270_deletefield);
+//		enq_ta(DeleteField_action, CN, CN);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -3565,7 +3570,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 					key_ACharacter((unsigned char) ' ',
 					    KT_STD, ia, &skipped);
 				} else {
-					action_Clear();
+					lib3270_clear();
 					skipped = False;
 					if (IN_3270)
 						return len-1;
@@ -3587,7 +3592,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 			    case '\r':	/* ignored */
 				break;
 			    case '\t':
-				action_internal(Tab_action, ia, CN, CN);
+			    lib3270_tab();
 				skipped = False;
 				break;
 			    case '\\':	/* backslashes are NOT special when
@@ -3659,7 +3664,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				state = BASE;
 				break;
 			    case 'f':
-			    action_Clear();
+			    lib3270_clear();
 				skipped = False;
 				state = BASE;
 				if (IN_3270)
@@ -3683,12 +3688,12 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				state = BASE;
 				break;
 			    case 't':
-				action_internal(Tab_action, ia, CN, CN);
+			    lib3270_tab();
 				skipped = False;
 				state = BASE;
 				break;
 			    case 'T':
-				action_internal(BackTab_action, ia, CN, CN);
+			    lib3270_tab();
 				skipped = False;
 				state = BASE;
 				break;

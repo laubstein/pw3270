@@ -656,6 +656,10 @@ case "$host" in
 		AC_OUTPUT(src/gui/resources.rc)
 	;;
 
+	*-apple-*)
+		AC_OUTPUT(Info.plist)
+	;;
+
 	*)
 		AC_OUTPUT(pw3270.spec)
 		AC_OUTPUT(debian/control)

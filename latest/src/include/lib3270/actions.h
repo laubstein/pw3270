@@ -67,26 +67,25 @@
 
 	/* Misc actions */
 	LIB3270_CLEAR_SELECTION_ACTION( reset );
+	LIB3270_CLEAR_SELECTION_ACTION( clear );
+	LIB3270_CLEAR_SELECTION_ACTION( eraseinput );
 
 	LIB3270_ACTION( firstfield );
 	LIB3270_ACTION( eraseeof );
 	LIB3270_ACTION( eraseeol );
+	LIB3270_ACTION( erase );
+	LIB3270_ACTION( delete );
 
-	LIB3270_EXPORT int action_NextField(void);
-	LIB3270_EXPORT int action_PreviousField(void);
+	LIB3270_ACTION( tab );
+	LIB3270_ACTION( backtab );
+
+	LIB3270_ACTION( deleteword );
+	LIB3270_ACTION( deletefield );
+	LIB3270_ACTION( sysreq );
 
 	LIB3270_EXPORT int action_CursorUp(void);
 	LIB3270_EXPORT int action_CursorDown(void);
 	LIB3270_EXPORT int action_CursorLeft(void);
 	LIB3270_EXPORT int action_CursorRight(void);
-
-	LIB3270_EXPORT int action_EraseInput(void);
-	LIB3270_EXPORT int action_Clear(void);
-
-	LIB3270_EXPORT int action_DeleteWord(void);
-	LIB3270_EXPORT int action_DeleteField(void);
-	LIB3270_EXPORT int action_Delete(void);
-	LIB3270_EXPORT int action_Erase(void);
-	LIB3270_EXPORT int action_SysReq(void);
 
 

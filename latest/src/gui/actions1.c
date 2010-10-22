@@ -101,19 +101,19 @@
 	{ GDK_Up,				0,					NULL,	G_CALLBACK(action_Up)				},
 	{ GDK_Right,			0,					NULL,	G_CALLBACK(action_Right)			},
 	{ GDK_Down,				0,					NULL,	G_CALLBACK(action_Down)				},
-	{ GDK_Tab,				0,					NULL,	G_CALLBACK(action_NextField)		},
-	{ GDK_ISO_Left_Tab,		GDK_SHIFT_MASK,		NULL,	G_CALLBACK(action_PreviousField)	},
+	{ GDK_Tab,				0,					NULL,	G_CALLBACK(lib3270_tab)				},
+	{ GDK_ISO_Left_Tab,		GDK_SHIFT_MASK,		NULL,	G_CALLBACK(lib3270_backtab)			},
 	{ GDK_KP_Left,			0,					NULL,	G_CALLBACK(action_Left)				},
 	{ GDK_KP_Up,			0,					NULL,	G_CALLBACK(action_Up)				},
 	{ GDK_KP_Right,			0,					NULL,	G_CALLBACK(action_Right)			},
 	{ GDK_KP_Down,			0,					NULL,	G_CALLBACK(action_Down)				},
-	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(action_NextField)		},
+	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(lib3270_tab)				},
 
 	{ GDK_3270_PrintScreen,	0,					NULL,	G_CALLBACK(action_printscreen)		},
-	{ GDK_Sys_Req,			0,					NULL,	G_CALLBACK(action_SysReq)			},
+	{ GDK_Sys_Req,			0,					NULL,	G_CALLBACK(lib3270_sysreq)			},
 
 	{ GDK_Print,			GDK_CONTROL_MASK,	NULL,	G_CALLBACK(action_printscreen)		},
-	{ GDK_Print,			GDK_SHIFT_MASK,		NULL,	G_CALLBACK(action_SysReq)			},
+	{ GDK_Print,			GDK_SHIFT_MASK,		NULL,	G_CALLBACK(lib3270_sysreq)			},
 
 #ifdef WIN32
 	{ GDK_Pause,			0,					NULL,	0									},
@@ -166,12 +166,12 @@
 
  static void clear_action(void)
  {
- 	clear_and_call(0,action_Clear);
+ 	clear_and_call(0,lib3270_clear);
  }
 
  static void erase_input_action(void)
  {
- 	clear_and_call(0,action_EraseInput);
+ 	clear_and_call(0,lib3270_eraseinput);
  }
 
  void action_Up(GtkWidget *w, gpointer user_data)
@@ -657,8 +657,8 @@
 		{ 	"CursorUp",			G_CALLBACK(action_Up)				},
 		{ 	"CursorDown",		G_CALLBACK(action_Down)				},
 
-		{	"NextField",		G_CALLBACK(action_NextField)		},
-		{	"PreviousField",	G_CALLBACK(action_PreviousField)	},
+		{	"NextField",		G_CALLBACK(lib3270_tab)				},
+		{	"PreviousField",	G_CALLBACK(lib3270_backtab)			},
 
 		// Edit actions
 		{	"PasteNext",		G_CALLBACK(action_pastenext)		},
@@ -720,11 +720,11 @@
 		{ "EraseEOF",			G_CALLBACK(lib3270_eraseeof)		},
 		{ "EraseEOL",			G_CALLBACK(lib3270_eraseeol)		},
 		{ "Home",				G_CALLBACK(lib3270_firstfield)		},
-		{ "DeleteWord",			G_CALLBACK(action_DeleteWord)		},
-		{ "EraseField",			G_CALLBACK(action_DeleteField)		},
-		{ "Delete",				G_CALLBACK(action_Delete)			},
-		{ "Erase",				G_CALLBACK(action_Erase)			},
-		{ "SysREQ",				G_CALLBACK(action_SysReq)			},
+		{ "DeleteWord",			G_CALLBACK(lib3270_deleteword)		},
+		{ "EraseField",			G_CALLBACK(lib3270_deletefield)		},
+		{ "Delete",				G_CALLBACK(lib3270_delete)			},
+		{ "Erase",				G_CALLBACK(lib3270_erase)			},
+		{ "SysREQ",				G_CALLBACK(lib3270_sysreq)			},
 	};
 
 	int			f;
