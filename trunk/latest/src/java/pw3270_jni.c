@@ -271,7 +271,7 @@ JNIEXPORT jboolean JNICALL Java_pw3270_terminal_queryStringAt(JNIEnv *env, jobje
 JNIEXPORT jint JNICALL Java_pw3270_terminal_sendEnterKey(JNIEnv *env, jobject obj)
 {
 	CHECK_FOR_TERMINAL_STATUS
-	return action_Enter();
+	return lib3270_send_enter();
 }
 
 JNIEXPORT jint JNICALL Java_pw3270_terminal_setStringAt(JNIEnv *env, jobject obj, jint row, jint col, jstring j_str)
@@ -299,7 +299,7 @@ JNIEXPORT jint JNICALL Java_pw3270_terminal_sendPFKey(JNIEnv *env, jobject obj, 
 {
 	CHECK_FOR_TERMINAL_STATUS
 
-	return action_PFKey(key);
+	return lib3270_send_pfkey(key);
 }
 
 JNIEXPORT jint JNICALL Java_pw3270_terminal_waitForTerminalReady(JNIEnv *env, jobject obj, jint timeout)

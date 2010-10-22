@@ -48,7 +48,7 @@
 {
 	CHECK_FOR_TERMINAL_STATUS
 
-	return action_Enter();
+	return lib3270_send_enter();
 }
 
 ::sal_Int16 SAL_CALL pw3270::uno_impl::setStringAt( ::sal_Int16 row, ::sal_Int16 col, const ::rtl::OUString& str ) throw (::com::sun::star::uno::RuntimeException)
@@ -77,5 +77,5 @@
 {
 	CHECK_FOR_TERMINAL_STATUS
 
-	return action_PFKey(key);
+	return lib3270_send_pfkey(key);
 }

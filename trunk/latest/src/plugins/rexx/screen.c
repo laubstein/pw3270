@@ -31,12 +31,7 @@
  */
 
  #include "rx3270.h"
-
  #include <errno.h>
- /*
- #include <lib3270/kybdc.h>
- #include <lib3270/actionsc.h>
- */
 
 /*---[ Statics ]----------------------------------------------------------------------------------*/
 
@@ -76,7 +71,7 @@
 	switch(Argc)
 	{
 	case 0:
-		action_Enter();
+		lib3270_send_enter();
 		break;
 
     case 1:
@@ -469,7 +464,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 	else if(query_3270_terminal_status() != STATUS_CODE_BLANK)
 		rc = EINVAL;
 	else
-		rc = action_Enter();
+		rc = lib3270_send_enter();
 
 	if(!rc)
 	{
@@ -509,7 +504,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 	else if(query_3270_terminal_status() != STATUS_CODE_BLANK)
 		rc = EINVAL;
 	else
-		rc = action_PFKey(atoi(Argv[0].strptr));
+		rc = lib3270_send_pfkey(atoi(Argv[0].strptr));
 
 	if(!rc)
 	{

@@ -58,11 +58,8 @@
 #include "ctlrc.h"
 #include "ftc.h"
 #include "hostc.h"
-// #include "idlec.h"
-// #include "keymapc.h"
 #include "keypadc.h"
 #include "kybdc.h"
-// #include "macrosc.h"
 #include "popupsc.h"
 #include "printc.h"
 #include "screenc.h"
@@ -541,87 +538,28 @@ key_AID(unsigned char aid_code)
 	status_ctlr_done();
 }
 
-/*
-void
-PF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+LIB3270_FKEY_ACTION( pfkey )
 {
-	unsigned k;
 
-	action_debug(PF_action, event, params, num_params);
-	if (check_usage(PF_action, *num_params, 1, 1) < 0)
-		return;
-	k = atoi(params[0]);
-
-
-	if (k < 1 || k > PF_SZ) {
-		popup_an_error("%s: Invalid argument '%s'",
-		    action_name(PF_action), params[0]);
-		cancel_if_idle_command();
-		return;
-	}
-	reset_idle_timer();
-	if (kybdlock & KL_OIA_MINUS)
-		return;
-	else if (kybdlock)
-		enq_ta(PF_action, params[0], CN);
-	else
-		key_AID(pf_xlate[k-1]);
-}
-
-LIB3270_EXPORT int action_PFKey(int key)
-{
-	char buffer[10];
-
-	if(key < 1 || key > PF_SZ)
+	if (key < 1 || key > PF_SZ)
 		return EINVAL;
-
-	snprintf(buffer,9,"%d",key);
-	action_internal(PF_action, IA_DEFAULT, buffer, 0);
-
-	return 0;
-}
-*/
-
-LIB3270_EXPORT int action_PFKey(int k)
-{
-
-	if (k < 1 || k > PF_SZ)
-		return EINVAL;
-
-//	reset_idle_timer();
 
 	if (kybdlock & KL_OIA_MINUS)
 		return -1;
 	else if (kybdlock)
-		enq_key(pf_xlate,k-1);
+		enq_key(pf_xlate,key-1);
 	else
-		key_AID(pf_xlate[k-1]);
+		key_AID(pf_xlate[key-1]);
 
 	return 0;
 }
 
-/*
-void
-PA_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-	action_debug(PA_action, event, params, num_params);
-
-	if (check_usage(PA_action, *num_params, 1, 1) < 0)
-		return;
-
-	action_PAKey(atoi(params[0]));
-}
-*/
-
-LIB3270_EXPORT int action_PAKey(int key)
+LIB3270_FKEY_ACTION( pakey )
 {
 	if (key < 1 || key > PA_SZ)
 	{
-//		cancel_if_idle_command();
 		return EINVAL;
 	}
-
-//	reset_idle_timer();
 
 	if (kybdlock & KL_OIA_MINUS)
 		return -1;
@@ -1647,7 +1585,7 @@ Reset_action(Widget w unused, XEvent *event, String *params,
 }
 */
 
-LIB3270_EXPORT int lib3270_Reset(void)
+LIB3270_CLEAR_SELECTION_ACTION( reset )
 {
 //	reset_idle_timer();
 
@@ -1660,17 +1598,19 @@ LIB3270_EXPORT int lib3270_Reset(void)
  * Move to first unprotected field on screen.
  */
 
+/*
 void Home_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(Home_action, event, params, num_params);
 	action_FirstField();
 }
+*/
 
-LIB3270_EXPORT int action_FirstField(void)
+LIB3270_ACTION( firstfield )
 {
 //	reset_idle_timer();
 	if (kybdlock) {
-		enq_ta(Home_action, CN, CN);
+		ENQUEUE_ACTION(lib3270_firstfield);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -2494,7 +2434,7 @@ void Enter_action(Widget w unused, XEvent *event, String *params, Cardinal *num_
  * @return 0 if ok, -1 if the action can't be performed.
  *
  */
-LIB3270_EXPORT int action_Enter(void)
+LIB3270_KEY_ACTION( enter )
 {
 //	reset_idle_timer();
 
@@ -2503,21 +2443,21 @@ LIB3270_EXPORT int action_Enter(void)
 	if (kybdlock & KL_OIA_MINUS)
 		return -1;
 	else if (kybdlock)
-		ENQUEUE_ACTION(action_Enter);
-//		enq_ta(Enter_action, CN, CN);
+		ENQUEUE_ACTION(lib3270_send_enter);
 	else
 		key_AID(AID_ENTER);
 
 	return 0;
 }
 
-
+/*
 void
 SysReq_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	action_debug(SysReq_action, event, params, num_params);
 	action_SysReq();
 }
+*/
 
 LIB3270_EXPORT int action_SysReq(void)
 {
@@ -2534,7 +2474,7 @@ LIB3270_EXPORT int action_SysReq(void)
 		if (kybdlock & KL_OIA_MINUS)
 			return 0;
 		else if (kybdlock)
-			enq_ta(SysReq_action, CN, CN);
+			ENQUEUE_ACTION(action_SysReq);
 		else
 			key_AID(AID_SYSREQ);
 	}
@@ -2545,11 +2485,13 @@ LIB3270_EXPORT int action_SysReq(void)
 /*
  * Clear AID key
  */
+/*
 static void Clear_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 		action_debug(Clear_action, event, params, num_params);
 		action_Clear();
 }
+*/
 
 LIB3270_EXPORT int action_Clear(void)
 {
@@ -2557,7 +2499,7 @@ LIB3270_EXPORT int action_Clear(void)
 	if (kybdlock & KL_OIA_MINUS)
 		return 0;
 	if (kybdlock && CONNECTED) {
-		enq_ta(Clear_action, CN, CN);
+		ENQUEUE_ACTION(action_Clear);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -2578,15 +2520,16 @@ LIB3270_EXPORT int action_Clear(void)
 /*
  * Cursor Select key (light pen simulator).
  */
+ /*
 static void
 lightpen_select(int baddr)
 {
 	int faddr;
 	register unsigned char	fa;
 	int designator;
-#if defined(X3270_DBCS) /*[*/
+#if defined(X3270_DBCS)
 	int designator2;
-#endif /*]*/
+#endif
 
 	faddr = find_field_attribute(baddr);
 	fa = ea_buf[faddr].fa;
@@ -2597,7 +2540,7 @@ lightpen_select(int baddr)
 	designator = faddr;
 	INC_BA(designator);
 
-#if defined(X3270_DBCS) /*[*/
+#if defined(X3270_DBCS)
 	if (dbcs) {
 		if (ea_buf[baddr].cs == CS_DBCS) {
 			designator2 = designator;
@@ -2634,23 +2577,23 @@ lightpen_select(int baddr)
 			return;
 		}
 	}
-#endif /*]*/
+#endif
 
 	switch (ea_buf[designator].cc) {
-	    case EBC_greater:		/* > */
-		ctlr_add(designator, EBC_question, 0); /* change to ? */
+	    case EBC_greater:
+		ctlr_add(designator, EBC_question, 0);
 		mdt_clear(faddr);
 		break;
-	    case EBC_question:		/* ? */
-		ctlr_add(designator, EBC_greater, 0);	/* change to > */
+	    case EBC_question:
+		ctlr_add(designator, EBC_greater, 0);
 		mdt_set(faddr);
 		break;
-	    case EBC_space:		/* space */
-	    case EBC_null:		/* null */
+	    case EBC_space:
+	    case EBC_null:
 		mdt_set(faddr);
 		key_AID(AID_SELECT);
 		break;
-	    case EBC_ampersand:		/* & */
+	    case EBC_ampersand:
 		mdt_set(faddr);
 		key_AID(AID_ENTER);
 		break;
@@ -2659,10 +2602,12 @@ lightpen_select(int baddr)
 		break;
 	}
 }
+*/
 
 /*
  * Cursor Select key (light pen simulator) -- at the current cursor location.
  */
+/*
 void
 CursorSelect_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -2674,17 +2619,19 @@ CursorSelect_action(Widget w unused, XEvent *event, String *params,
 		return;
 	}
 
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 	if (IN_ANSI)
 		return;
-#endif /*]*/
+#endif
 	lightpen_select(cursor_addr);
 }
+*/
 
-#if defined(X3270_DISPLAY) /*[*/
+#if defined(X3270_DISPLAY)
 /*
  * Cursor Select mouse action (light pen simulator).
  */
+/*
 void
 MouseSelect_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params)
@@ -2695,13 +2642,14 @@ MouseSelect_action(Widget w, XEvent *event, String *params,
 //	reset_idle_timer();
 	if (kybdlock)
 		return;
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 	if (IN_ANSI)
 		return;
-#endif /*]*/
+#endif
 	lightpen_select(mouse_baddr(w, event));
 }
-#endif /*]*/
+*/
+#endif
 
 
 /*
@@ -2718,7 +2666,7 @@ EraseEOF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
  * Erase End Of Line Key.
  *
  */
-LIB3270_EXPORT int lib3270_EraseEOL(void)
+LIB3270_ACTION( eraseeol )
 {
 	register int	baddr;
 	register unsigned char	fa;
@@ -2728,7 +2676,7 @@ LIB3270_EXPORT int lib3270_EraseEOL(void)
 //	reset_idle_timer();
 	if (kybdlock)
 	{
-		enq_ta((void (*)(Widget, XEvent *, String *, Cardinal *)) lib3270_EraseEOL, CN, CN);
+		ENQUEUE_ACTION(lib3270_eraseeol);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -2784,7 +2732,7 @@ LIB3270_EXPORT int lib3270_EraseEOL(void)
  * Erase End Of Field Key.
  *
  */
-LIB3270_EXPORT int lib3270_EraseEOF(void)
+LIB3270_ACTION( eraseeof )
 {
 	register int	baddr;
 	register unsigned char	fa;
@@ -2794,7 +2742,7 @@ LIB3270_EXPORT int lib3270_EraseEOF(void)
 //	reset_idle_timer();
 	if (kybdlock)
 	{
-		enq_ta((void (*)(Widget, XEvent *, String *, Cardinal *)) lib3270_EraseEOF, CN, CN);
+		ENQUEUE_ACTION(lib3270_eraseeof);
 		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -3446,20 +3394,10 @@ do_pa(unsigned n)
 {
 	if (n < 1 || n > PA_SZ) {
 		popup_an_error( _( "Unknown PA key %d" ), n);
-//		cancel_if_idle_command();
 		return;
 	}
-/*
-	if (kybdlock) {
-		char nn[3];
 
-		(void) sprintf(nn, "%d", n);
-		enq_ta(PA_action, nn, CN);
-		return;
-	}
-	key_AID(pa_xlate[n-1]);
-*/
-	action_PAKey(n);
+	lib3270_send_pakey(n);
 
 }
 
@@ -3468,20 +3406,10 @@ static void do_pf(unsigned n)
 {
 	if (n < 1 || n > PF_SZ) {
 		popup_an_error( _( "Unknown PF key %d" ), n);
-//		cancel_if_idle_command();
 		return;
 	}
-	action_PFKey(n);
-/*
-	if (kybdlock) {
-		char nn[3];
 
-		(void) sprintf(nn, "%d", n);
-		enq_ta(PF_action, nn, CN);
-		return;
-	}
-	key_AID(pf_xlate[n-1]);
-*/
+	lib3270_send_pfkey(n);
 }
 
 /*
@@ -3637,8 +3565,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 					key_ACharacter((unsigned char) ' ',
 					    KT_STD, ia, &skipped);
 				} else {
-					action_internal(Clear_action, ia, CN,
-							CN);
+					action_Clear();
 					skipped = False;
 					if (IN_3270)
 						return len-1;
@@ -3651,8 +3578,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 								ia, CN, CN);
 					skipped = False;
 				} else {
-					action_Enter();
-//					action_internal(Enter_action, ia, CN,CN);
+					lib3270_send_enter();
 					skipped = False;
 					if (IN_3270)
 						return len-1;
@@ -3733,7 +3659,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				state = BASE;
 				break;
 			    case 'f':
-				action_internal(Clear_action, ia, CN, CN);
+			    action_Clear();
 				skipped = False;
 				state = BASE;
 				if (IN_3270)
@@ -3741,8 +3667,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				else
 					break;
 			    case 'n':
-//				action_internal(Enter_action, ia, CN, CN);
-				action_Enter();
+				lib3270_send_enter();
  				skipped = False;
 				state = BASE;
 				if (IN_3270)

@@ -37,7 +37,6 @@
 
  #include <globals.h>
  #include <lib3270/kybdc.h>
- #include <lib3270/actionsc.h>
  #include <lib3270/toggle.h>
  #include <lib3270/3270ds.h>
 
@@ -191,7 +190,7 @@
 	if(length < 3)
 		function = CheckForFunction(baddr,length);
 
-	if(!action_PFKey(function))
+	if(!lib3270_send_pfkey(function))
 		return;
 
 	startRow = (baddr+1) / terminal_cols;

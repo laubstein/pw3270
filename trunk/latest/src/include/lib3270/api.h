@@ -326,7 +326,9 @@
 			STATUS_CODE_X,
 			STATUS_CODE_RESOLVING,
 			STATUS_CODE_CONNECTING,
+
 			STATUS_CODE_USER
+
 		} STATUS_CODE;
 
 		typedef enum _SCRIPT_STATE
@@ -336,6 +338,7 @@
 			SCRIPT_STATE_HALTED,
 
 			SCRIPT_STATE_USER
+
 		} SCRIPT_STATE;
 
 		typedef enum _OIA_FLAG
@@ -494,32 +497,7 @@
         LIB3270_EXPORT int cursor_set_addr(int baddr);
 		#define cursor_move(x) cursor_set_addr(x)
 
-		/* Actions */
-		LIB3270_EXPORT int action_Enter(void);
-		LIB3270_EXPORT int action_PFKey(int key);
-		LIB3270_EXPORT int action_PAKey(int key);
-		LIB3270_EXPORT int action_NextField(void);
-		LIB3270_EXPORT int action_PreviousField(void);
-		LIB3270_EXPORT int action_FirstField(void);
-		LIB3270_EXPORT int lib3270_Reset(void);
-
-		LIB3270_EXPORT int action_CursorUp(void);
-		LIB3270_EXPORT int action_CursorDown(void);
-		LIB3270_EXPORT int action_CursorLeft(void);
-		LIB3270_EXPORT int action_CursorRight(void);
-
-		LIB3270_EXPORT int action_EraseInput(void);
-		LIB3270_EXPORT int action_Clear(void);
-
-		LIB3270_EXPORT int action_DeleteWord(void);
-		LIB3270_EXPORT int action_DeleteField(void);
-		LIB3270_EXPORT int action_Delete(void);
-		LIB3270_EXPORT int action_Erase(void);
-		LIB3270_EXPORT int action_SysReq(void);
-
-		/* Keyboard actions */
-		LIB3270_EXPORT int lib3270_EraseEOF(void);
-		LIB3270_EXPORT int lib3270_EraseEOL(void);
+		#include <lib3270/actions.h>
 
 		/* Host connect/disconnect and state change. */
 		LIB3270_EXPORT int host_connect(const char *n, int wait);
