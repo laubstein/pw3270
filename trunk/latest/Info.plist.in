@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+
+	<!--- http://developer.apple.com/library/mac/#documentation/General/Reference/InfoPlistKeyReference/Introduction/Introduction.html#//apple_ref/doc/uid/TP40009247 -->
+
+	<dict>
+
+		<key>CFBundleDevelopmentRegion</key>
+		<string>en-US</string>
+
+		<key>CFBundleDisplayName</key>
+		<string>@PACKAGE@</string>
+
+		<key>CFBundleExecutable</key>
+		<string>@PACKAGE@</string>
+
+		<!--- <key>CFBundleIconFiles</key> --->
+		<!--- <key>CFBundleIdentifier</key> --->
+		<!--- <key>CFBundleInfoDictionaryVersion</key> --->
+
+		<key>CFBundleName</key>
+		<string>@PACKAGE@</string>
+
+		<key>CFBundleExecutable</key>
+		<string>@PACKAGE@</string>
+
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+
+		<key>CFBundleShortVersionString</key>
+		<string>@PACKAGE_VERSION@</string>
+
+		<!--- <key>CFBundleSignature</key> --->
+
+		<key>CFBundleVersion</key>
+		<string>@PACKAGE_VERSION@-@PACKAGE_RELEASE@</string>
+
+		<!--- <key>LSHasLocalizedDisplayName</key> --->
+		<key>NSHumanReadableCopyright</key>
+		<string>GPL</string>
+
+		<!--- key>CFBundleInfoDictionaryVersion</key> --->
+
+		<!--- <key>CFBundleIdentifier</key> --->
+	</dict>
+</plist>
+
