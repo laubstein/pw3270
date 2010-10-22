@@ -43,7 +43,6 @@
  #include <globals.h>
 
  #include <lib3270/kybdc.h>
- #include <lib3270/actionsc.h>
  #include <lib3270/toggle.h>
  #include <lib3270/plugins.h>
 
@@ -162,7 +161,7 @@
 
  static void action_Reset(void)
  {
- 	clear_and_call(0,lib3270_Reset);
+ 	clear_and_call(0,lib3270_reset);
  }
 
  static void clear_action(void)
@@ -327,7 +326,7 @@
 
 	if(!TOGGLED_KEEP_SELECTED)
 		action_clearselection(0);
- 	action_PFKey((int) id);
+ 	lib3270_send_pfkey((int) id);
  }
 
  static void action_pakey(GtkAction *action, gpointer id)
@@ -336,7 +335,7 @@
 
 	if(!TOGGLED_KEEP_SELECTED)
 		action_clearselection(action);
- 	action_PAKey((int) id);
+ 	lib3270_send_pakey((int) id);
  }
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
@@ -718,9 +717,9 @@
 		{ 	"Enter",			G_CALLBACK(action_enter)			},
 
 		// Lib3270 calls
-		{ "EraseEOF",			G_CALLBACK(lib3270_EraseEOF)		},
-		{ "EraseEOL",			G_CALLBACK(lib3270_EraseEOL)		},
-		{ "Home",				G_CALLBACK(action_FirstField)		},
+		{ "EraseEOF",			G_CALLBACK(lib3270_eraseeof)		},
+		{ "EraseEOL",			G_CALLBACK(lib3270_eraseeol)		},
+		{ "Home",				G_CALLBACK(lib3270_firstfield)		},
 		{ "DeleteWord",			G_CALLBACK(action_DeleteWord)		},
 		{ "EraseField",			G_CALLBACK(action_DeleteField)		},
 		{ "Delete",				G_CALLBACK(action_Delete)			},

@@ -40,7 +40,6 @@
 
  #include <globals.h>
  #include <lib3270/kybdc.h>
- #include <lib3270/actionsc.h>
  #include <lib3270/toggle.h>
  #include <lib3270/plugins.h>
 
