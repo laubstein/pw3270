@@ -219,7 +219,7 @@
  {
  	action_clearselection(0);
  	if(PCONNECTED)
-		lib3270_send_enter();
+		lib3270_enter();
 	else
 		action_connect(action);
  }

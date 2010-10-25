@@ -176,22 +176,22 @@
 
  void action_Up(GtkWidget *w, gpointer user_data)
  {
- 	clear_and_call(0,action_CursorUp);
+ 	clear_and_call(0,lib3270_cursor_up);
  }
 
  void action_Down(GtkWidget *w, gpointer user_data)
  {
- 	clear_and_call(0,action_CursorDown);
+ 	clear_and_call(0,lib3270_cursor_down);
  }
 
  void action_Left(GtkWidget *w, gpointer user_data)
  {
- 	clear_and_call(0,action_CursorLeft);
+ 	clear_and_call(0,lib3270_cursor_left);
  }
 
  void action_Right(GtkWidget *w, gpointer user_data)
  {
- 	clear_and_call(0,action_CursorRight);
+ 	clear_and_call(0,lib3270_cursor_right);
  }
 
  void DisableNetworkActions(void)
@@ -326,7 +326,7 @@
 
 	if(!TOGGLED_KEEP_SELECTED)
 		action_clearselection(0);
- 	lib3270_send_pfkey((int) id);
+ 	lib3270_pfkey((int) id);
  }
 
  static void action_pakey(GtkAction *action, gpointer id)
@@ -335,7 +335,7 @@
 
 	if(!TOGGLED_KEEP_SELECTED)
 		action_clearselection(action);
- 	lib3270_send_pakey((int) id);
+ 	lib3270_pakey((int) id);
  }
 
  gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)

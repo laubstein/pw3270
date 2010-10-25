@@ -190,7 +190,7 @@
 	if(length < 3)
 		function = CheckForFunction(baddr,length);
 
-	if(!lib3270_send_pfkey(function))
+	if(!lib3270_pfkey(function))
 		return;
 
 	startRow = (baddr+1) / terminal_cols;
@@ -849,22 +849,22 @@
 
  PW3270_ACTION( selectleft )
  {
- 	doSelect(action_CursorLeft);
+ 	doSelect(lib3270_cursor_left);
  }
 
  PW3270_ACTION( selectright )
  {
- 	doSelect(action_CursorRight);
+ 	doSelect(lib3270_cursor_right);
  }
 
  PW3270_ACTION( selectup )
  {
- 	doSelect(action_CursorUp);
+ 	doSelect(lib3270_cursor_up);
  }
 
  PW3270_ACTION( selectdown )
  {
- 	doSelect(action_CursorDown);
+ 	doSelect(lib3270_cursor_down);
  }
 
  static void MoveSelection(int row, int col)
