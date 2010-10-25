@@ -49,8 +49,67 @@
 		"filetransfer"
  };
 
+ static struct _keyboard_action
+ {
+	guint			keyval;
+	GdkModifierType	state;
+	GtkAction		*action;
+ } keyboard_action[] =
+ {
+	{ GDK_Left,				0,					NULL	},
+	{ GDK_Up,				0,					NULL	},
+	{ GDK_Right,			0,					NULL	},
+	{ GDK_Down,				0,					NULL	},
+	{ GDK_Tab,				0,					NULL	},
+	{ GDK_ISO_Left_Tab,		GDK_SHIFT_MASK,		NULL	},
+	{ GDK_KP_Left,			0,					NULL	},
+	{ GDK_KP_Up,			0,					NULL	},
+	{ GDK_KP_Right,			0,					NULL	},
+	{ GDK_KP_Down,			0,					NULL	},
+	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL	},
+
+	{ GDK_3270_PrintScreen,	0,					NULL	},
+	{ GDK_Sys_Req,			0,					NULL	},
+
+	{ GDK_Print,			GDK_CONTROL_MASK,	NULL	},
+	{ GDK_Print,			GDK_SHIFT_MASK,		NULL	},
+
+#ifdef WIN32
+	{ GDK_Pause,			0,					NULL	},
+#endif
+
+ };
+
+ static struct _toggle_action
+ {
+ 	GtkAction *set;
+ 	GtkAction *reset;
+ 	GtkAction *toggle;
+ } toggle_action[N_TOGGLES+GUI_TOGGLE_COUNT] = { 0 };
+
+ static struct _pf_action
+ {
+	GtkAction 	*normal;
+	GtkAction	*shift;
+ } pf_action[12] =
+ {
+ 	{ NULL,	NULL }, 	// PF01
+ 	{ NULL,	NULL }, 	// PF02
+ 	{ NULL,	NULL }, 	// PF03
+ 	{ NULL,	NULL }, 	// PF04
+ 	{ NULL,	NULL }, 	// PF05
+ 	{ NULL,	NULL }, 	// PF06
+ 	{ NULL,	NULL }, 	// PF07
+ 	{ NULL,	NULL }, 	// PF08
+ 	{ NULL,	NULL }, 	// PF09
+ 	{ NULL,	NULL }, 	// PF10
+ 	{ NULL,	NULL }, 	// PF11
+ 	{ NULL,	NULL }, 	// PF12
+ };
+
+
  static	GtkAction	* action_nop = NULL;
- 
+
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
  void init_actions(void)
@@ -59,7 +118,7 @@
 
 	if(!action_nop)
 		action_nop = gtk_action_new("NOP",NULL,NULL,NULL);
-	
+
 	memset(action_group,0,sizeof(action_group));
 
 	for(f=0;f<G_N_ELEMENTS(action_group_name);f++)
@@ -67,6 +126,22 @@
 
 	for(f=0;f<G_N_ELEMENTS(action_by_id);f++)
 		action_by_id[f] = action_nop;
+
+	for(f=0;f<G_N_ELEMENTS(keyboard_action);f++)
+		keyboard_action[f].action = action_nop;
+
+	for(f=0;f<G_N_ELEMENTS(toggle_action);f++)
+	{
+		toggle_action[f].set	= action_nop;
+		toggle_action[f].reset	= action_nop;
+		toggle_action[f].toggle	= action_nop;
+	}
+
+	for(f=0;f<G_N_ELEMENTS(pf_action);f++)
+	{
+		pf_action[f].normal = action_nop;
+		pf_action[f].shift  = action_nop;
+	}
 
  }
 
