@@ -109,23 +109,29 @@ addch(int row, int col, int c, int attr)
 		callbacks->addch(row, col, c, attr);
 }
 
-/* Initialize the screen. */
-void
-screen_init(void)
+/**
+ * Initialize the screen.
+ *
+ * @return 0 if ok, non zero if not
+ *
+ */
+int screen_init(void)
 {
 
 	/* Disallow altscreen/defscreen. */
-	if ((appres.altscreen != CN) || (appres.defscreen != CN)) {
-		(void) fprintf(stderr, "altscreen/defscreen not supported\n");
-		x3270_exit(1);
+	if ((appres.altscreen != CN) || (appres.defscreen != CN))
+	{
+		popup_an_error("altscreen/defscreen not supported");
+		return -1;
 	}
 
 	/* Initialize the console. */
 	if(callbacks && callbacks->init)
 	{
-		if(callbacks->init()) {
-			(void) fprintf(stderr, "Can't initialize terminal.\n");
-			x3270_exit(1);
+		if(callbacks->init())
+		{
+			popup_an_error("Can't initialize terminal.");
+			return -1;
 		}
 	}
 
@@ -169,6 +175,8 @@ screen_init(void)
 
 	/* Finish screen initialization. */
 	screen_suspend();
+
+	return 0;
 }
 
 /*
@@ -717,6 +725,7 @@ screen_title(char *text)
 		callbacks->title(text);
 }
 
+/*
 void
 Title_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -728,6 +737,7 @@ Title_action(Widget w unused, XEvent *event, String *params,
 
 	screen_title(params[0]);
 }
+*/
 
 static void
 relabel(int ignored unused)

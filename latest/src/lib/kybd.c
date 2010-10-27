@@ -449,12 +449,14 @@ kybd_init(void)
 /*
  * Toggle reverse mode.
  */
+ /*
 static void
 reverse_mode(Boolean on)
 {
 	reverse = on;
 	status_reverse_mode(on);
 }
+*/
 
 /*
  * Lock the keyboard because of an operator error.
@@ -1359,7 +1361,8 @@ key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,
 /*
  * Simple toggles.
  */
-#if defined(X3270_DISPLAY) /*[*/
+/*
+#if defined(X3270_DISPLAY)
 void
 AltCursor_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -1368,7 +1371,8 @@ AltCursor_action(Widget w unused, XEvent *event, String *params,
 	reset_idle_timer();
 	do_toggle(ALT_CURSOR);
 }
-#endif /*]*/
+#endif
+*/
 
 /*
 void
@@ -1410,7 +1414,7 @@ Tab_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 }
 */
 
-LIB3270_ACTION( tab )
+LIB3270_KEY_ACTION( tab )
 {
 
 //	reset_idle_timer();
@@ -1445,7 +1449,7 @@ void BackTab_action(Widget w unused, XEvent *event, String *params,Cardinal *num
 }
 */
 
-LIB3270_ACTION( backtab )
+LIB3270_KEY_ACTION( backtab )
 {
 	register int	baddr, nbaddr;
 	int		sbaddr;
@@ -1655,10 +1659,8 @@ void Left_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 }
 */
 
-LIB3270_EXPORT int action_CursorLeft(void)
+LIB3270_CURSOR_ACTION( left )
 {
-//	action_debug(Left_action, event, params, num_params);
-//	reset_idle_timer();
 	if (kybdlock)
 	{
 		if (KYBDLOCK_IS_OERR)
@@ -1668,7 +1670,7 @@ LIB3270_EXPORT int action_CursorLeft(void)
 		}
 		else
 		{
-			ENQUEUE_ACTION(action_CursorLeft);
+			ENQUEUE_ACTION(lib3270_cursor_left);
 			return 0;
 		}
 	}
@@ -1817,20 +1819,18 @@ LIB3270_ACTION( delete )
 /*
  * 3270-style backspace.
  */
-void
-BackSpace_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
+LIB3270_ACTION( backspace )
 {
-	action_debug(BackSpace_action, event, params, num_params);
+//	action_debug(BackSpace_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
-		enq_ta(BackSpace_action, CN, CN);
-		return;
+		ENQUEUE_ACTION( lib3270_backspace );
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI) {
 		net_send_erase();
-		return;
+		return 0;
 	}
 #endif /*]*/
 	if (reverse)
@@ -1845,6 +1845,7 @@ BackSpace_action(Widget w unused, XEvent *event, String *params,
 		cursor_move(baddr);
 	}
 	screen_disp();
+	return 0;
 }
 
 
@@ -1935,24 +1936,14 @@ LIB3270_ACTION( erase )
 	return 0;
 }
 
-
-/*
-void Right_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-	action_CursorRight();
-}
-*/
-
 /**
  * Cursor right 1 position.
  */
-LIB3270_EXPORT int action_CursorRight(void)
+LIB3270_CURSOR_ACTION( right )
 {
 	register int	baddr;
 	enum dbcs_state d;
 
-//	action_debug(Right_action, event, params, num_params);
-//	reset_idle_timer();
 	if (kybdlock)
 	{
 		if (KYBDLOCK_IS_OERR)
@@ -1962,8 +1953,7 @@ LIB3270_EXPORT int action_CursorRight(void)
 		}
 		else
 		{
-			ENQUEUE_ACTION(action_CursorRight);
-//			enq_ta(Right_action, CN, CN);
+			ENQUEUE_ACTION(lib3270_cursor_right);
 			return 0;
 		}
 	}
@@ -1992,7 +1982,7 @@ LIB3270_EXPORT int action_CursorRight(void)
 
 /*
  * Cursor left 2 positions.
- */
+ */ /*
 void
 Left2_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -2011,10 +2001,10 @@ Left2_action(Widget w unused, XEvent *event, String *params,
 			return;
 		}
 	}
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 	if (IN_ANSI)
 		return;
-#endif /*]*/
+#endif
 	baddr = cursor_addr;
 	DEC_BA(baddr);
 	d = ctlr_dbcs_state(baddr);
@@ -2025,33 +2015,32 @@ Left2_action(Widget w unused, XEvent *event, String *params,
 	if (IS_LEFT(d))
 		DEC_BA(baddr);
 	cursor_move(baddr);
-}
+} */
 
 
 /*
  * Cursor to previous word.
  */
-void
-PreviousWord_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
+LIB3270_ACTION( previousword )
 {
 	register int baddr;
 	int baddr0;
 	unsigned char  c;
 	Boolean prot;
 
-	action_debug(PreviousWord_action, event, params, num_params);
+//	action_debug(PreviousWord_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
-		enq_ta(PreviousWord_action, CN, CN);
-		return;
+		ENQUEUE_ACTION(lib3270_previousword);
+//		enq_ta(PreviousWord_action, CN, CN);
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI)
-		return;
+		return 0;
 #endif /*]*/
 	if (!formatted)
-		return;
+		return 0;
 
 	baddr = cursor_addr;
 	prot = FA_IS_PROTECTED(get_field_attribute(baddr));
@@ -2062,7 +2051,7 @@ PreviousWord_action(Widget w unused, XEvent *event, String *params,
 		while (!ea_buf[baddr].fa && c != EBC_space && c != EBC_null) {
 			DEC_BA(baddr);
 			if (baddr == cursor_addr)
-				return;
+				return 0;
 			c = ea_buf[baddr].cc;
 		}
 	}
@@ -2082,7 +2071,7 @@ PreviousWord_action(Widget w unused, XEvent *event, String *params,
 	} while (baddr != baddr0);
 
 	if (baddr == baddr0)
-		return;
+		return 0;
 
 	/* Go it its front. */
 	for (;;) {
@@ -2094,12 +2083,13 @@ PreviousWord_action(Widget w unused, XEvent *event, String *params,
 	}
 	INC_BA(baddr);
 	cursor_move(baddr);
+	return 0;
 }
 
 
 /*
  * Cursor right 2 positions.
- */
+ */ /*
 void
 Right2_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -2118,10 +2108,10 @@ Right2_action(Widget w unused, XEvent *event, String *params,
 			return;
 		}
 	}
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 	if (IN_ANSI)
 		return;
-#endif /*]*/
+#endif
 	baddr = cursor_addr;
 	INC_BA(baddr);
 	d = ctlr_dbcs_state(baddr);
@@ -2133,7 +2123,7 @@ Right2_action(Widget w unused, XEvent *event, String *params,
 		INC_BA(baddr);
 	cursor_move(baddr);
 }
-
+*/
 
 /* Find the next unprotected word, or -1 */
 static int
@@ -2186,24 +2176,24 @@ nt_word(int baddr)
 /*
  * Cursor to next unprotected word.
  */
-void
-NextWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+LIB3270_ACTION( nextword )
 {
 	register int	baddr;
 	unsigned char c;
 
-	action_debug(NextWord_action, event, params, num_params);
+//	action_debug(NextWord_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
-		enq_ta(NextWord_action, CN, CN);
-		return;
+		ENQUEUE_ACTION( lib3270_nextword );
+//		enq_ta(NextWord_action, CN, CN);
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI)
-		return;
+		return 0;
 #endif /*]*/
 	if (!formatted)
-		return;
+		return 0;
 
 	/* If not in an unprotected field, go to the next unprotected word. */
 	if (ea_buf[cursor_addr].fa ||
@@ -2211,14 +2201,14 @@ NextWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 		baddr = nu_word(cursor_addr);
 		if (baddr != -1)
 			cursor_move(baddr);
-		return;
+		return 0;
 	}
 
 	/* If there's another word in this field, go to it. */
 	baddr = nt_word(cursor_addr);
 	if (baddr != -1) {
 		cursor_move(baddr);
-		return;
+		return 0;
 	}
 
 	/* If in a word, go to just after its end. */
@@ -2229,12 +2219,12 @@ NextWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 			c = ea_buf[baddr].cc;
 			if (c == EBC_space || c == EBC_null) {
 				cursor_move(baddr);
-				return;
+				return 0;
 			} else if (ea_buf[baddr].fa) {
 				baddr = nu_word(baddr);
 				if (baddr != -1)
 					cursor_move(baddr);
-				return;
+				return 0;
 			}
 			INC_BA(baddr);
 		} while (baddr != cursor_addr);
@@ -2245,6 +2235,8 @@ NextWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 		if (baddr != -1)
 			cursor_move(baddr);
 	}
+
+	return 0;
 }
 
 
@@ -2263,7 +2255,7 @@ void Up_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
  * @return 0
  *
  */
-LIB3270_EXPORT int action_CursorUp(void)
+LIB3270_CURSOR_ACTION( up )
 {
 	register int	baddr;
 
@@ -2277,7 +2269,7 @@ LIB3270_EXPORT int action_CursorUp(void)
 		}
 		else
 		{
-			ENQUEUE_ACTION(action_CursorUp);
+			ENQUEUE_ACTION(lib3270_cursor_up);
 //			enq_ta(Up_action, CN, CN);
 			return 0;
 		}
@@ -2312,7 +2304,7 @@ Down_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params
  * @return 0
  *
  */
-LIB3270_EXPORT int action_CursorDown(void)
+LIB3270_CURSOR_ACTION( down )
 {
 	register int	baddr;
 
@@ -2326,7 +2318,7 @@ LIB3270_EXPORT int action_CursorDown(void)
 			status_reset();
 		} else
 		{
-			ENQUEUE_ACTION(action_CursorDown);
+			ENQUEUE_ACTION(lib3270_cursor_down);
 //			enq_ta(Down_action, CN, CN);
 			return 0;
 		}
@@ -2444,7 +2436,7 @@ LIB3270_KEY_ACTION( enter )
 	if (kybdlock & KL_OIA_MINUS)
 		return -1;
 	else if (kybdlock)
-		ENQUEUE_ACTION(lib3270_send_enter);
+		ENQUEUE_ACTION(lib3270_enter);
 	else
 		key_AID(AID_ENTER);
 
@@ -2984,7 +2976,7 @@ LIB3270_ACTION( deletefield )
 
 /*
  * Set insert mode key.
- */
+ */ /*
 void
 Insert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -2994,17 +2986,18 @@ Insert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 		enq_ta(Insert_action, CN, CN);
 		return;
 	}
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 	if (IN_ANSI)
 		return;
-#endif /*]*/
+#endif
 	set_toggle(INSERT,True);
 }
+*/
 
 
 /*
  * Toggle insert mode key.
- */
+ */ /*
 void
 ToggleInsert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -3014,18 +3007,19 @@ ToggleInsert_action(Widget w unused, XEvent *event, String *params, Cardinal *nu
 		enq_ta(ToggleInsert_action, CN, CN);
 		return;
 	}
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 	if (IN_ANSI)
 		return;
-#endif /*]*/
+#endif
 
 	do_toggle(INSERT);
 }
+*/
 
 
 /*
  * Toggle reverse mode key.
- */
+ */ /*
 void
 ToggleReverse_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -3035,42 +3029,42 @@ ToggleReverse_action(Widget w unused, XEvent *event, String *params, Cardinal *n
 		enq_ta(ToggleReverse_action, CN, CN);
 		return;
 	}
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 	if (IN_ANSI)
 		return;
-#endif /*]*/
+#endif
 	reverse_mode(!reverse);
-}
+} */
 
 
 /*
  * Move the cursor to the first blank after the last nonblank in the
  * field, or if the field is full, to the last character in the field.
  */
-void
-FieldEnd_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+LIB3270_ACTION( fieldend )
 {
 	int	baddr, faddr;
 	unsigned char	fa, c;
 	int	last_nonblank = -1;
 
-	action_debug(FieldEnd_action, event, params, num_params);
+//	action_debug(FieldEnd_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
-		enq_ta(FieldEnd_action, CN, CN);
-		return;
+		ENQUEUE_ACTION( lib3270_fieldend );
+//		enq_ta(FieldEnd_action, CN, CN);
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
 	if (IN_ANSI)
-		return;
+		return 0;
 #endif /*]*/
 	if (!formatted)
-		return;
+		return 0;
 	baddr = cursor_addr;
 	faddr = find_field_attribute(baddr);
 	fa = ea_buf[faddr].fa;
 	if (faddr == baddr || FA_IS_PROTECTED(fa))
-		return;
+		return 0;
 
 	baddr = faddr;
 	while (True) {
@@ -3092,6 +3086,7 @@ FieldEnd_action(Widget w unused, XEvent *event, String *params, Cardinal *num_pa
 			baddr = last_nonblank;
 	}
 	cursor_move(baddr);
+	return 0;
 }
 
 /*
@@ -3402,7 +3397,7 @@ do_pa(unsigned n)
 		return;
 	}
 
-	lib3270_send_pakey(n);
+	lib3270_pakey(n);
 
 }
 
@@ -3414,7 +3409,7 @@ static void do_pf(unsigned n)
 		return;
 	}
 
-	lib3270_send_pfkey(n);
+	lib3270_pfkey(n);
 }
 
 /*
@@ -3561,8 +3556,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 		    case BASE:
 			switch (c) {
 			    case '\b':
-			    action_CursorLeft();
-//				action_internal(Left_action, ia, CN, CN);
+			    lib3270_cursor_left();
 				skipped = False;
 				break;
 			    case '\f':
@@ -3583,7 +3577,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 								ia, CN, CN);
 					skipped = False;
 				} else {
-					lib3270_send_enter();
+					lib3270_enter();
 					skipped = False;
 					if (IN_3270)
 						return len-1;
@@ -3658,7 +3652,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				state = BASE;
 				break;
 			    case 'b':
-				action_CursorLeft();
+				lib3270_cursor_left();
 //				action_internal(Left_action, ia, CN, CN);
 				skipped = False;
 				state = BASE;
@@ -3672,7 +3666,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				else
 					break;
 			    case 'n':
-				lib3270_send_enter();
+				lib3270_enter();
  				skipped = False;
 				state = BASE;
 				if (IN_3270)

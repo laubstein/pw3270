@@ -157,7 +157,7 @@ H3270 * new_3270_session(void)
 {
 	static int configured = 0;
 
-	H3270		*rc = &h3270;
+	H3270		*hSession = &h3270;
 	int 		ovc, ovr;
 	int 		model_number;
 	char		junk;
@@ -168,17 +168,17 @@ H3270 * new_3270_session(void)
 	{
 		// TODO (perry#5#): Allocate a new structure.
 		errno = EBUSY;
-		return rc;
+		return hSession;
 	}
 
 	configured = 1;
 
-	memset(rc,0,sizeof(H3270));
-	rc->sz = sizeof(H3270);
-	rc->sock = -1;
+	memset(hSession,0,sizeof(H3270));
+	hSession->sz = sizeof(H3270);
+	hSession->sock = -1;
 
-	strncpy(rc->full_model_name,"IBM-",FULL_MODEL_NAME_SIZE);
-	rc->model_name = &rc->full_model_name[4];
+	strncpy(hSession->full_model_name,"IBM-",FULL_MODEL_NAME_SIZE);
+	hSession->model_name = &hSession->full_model_name[4];
 
 #if defined(_WIN32)
 
@@ -235,11 +235,11 @@ H3270 * new_3270_session(void)
 
 
 	if (appres.termname != CN)
-		rc->termtype = appres.termname;
+		hSession->termtype = appres.termname;
 	else
-		rc->termtype = rc->full_model_name;
+		hSession->termtype = hSession->full_model_name;
 
-	Trace("Termtype: %s",rc->termtype);
+	Trace("Termtype: %s",hSession->termtype);
 
 	if (appres.apl_mode)
 		appres.charset = Apl;
@@ -252,15 +252,13 @@ H3270 * new_3270_session(void)
 		(void) charset_init(CN);
 	}
 
-//	action_init();
-	screen_init();
+	if(screen_init())
+		return NULL;
+
 	kybd_init();
-//	idle_init();
-//	keymap_init();
 	hostfile_init();
 	hostfile_init();
 	ansi_init();
-//	sms_init();
 
 #if defined(X3270_FT)
 	ft_init();
@@ -273,7 +271,7 @@ H3270 * new_3270_session(void)
 	Trace("%s finished",__FUNCTION__);
 
 	errno = 0;
-	return rc;
+	return hSession;
 }
 
 /*
