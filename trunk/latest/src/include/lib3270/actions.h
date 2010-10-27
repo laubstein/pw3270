@@ -39,31 +39,34 @@
  *
  */
 
-	#ifndef LIB3270_ACTION
-		// Simple action, call with no arguments
-		#define LIB3270_ACTION( name )  LIB3270_EXPORT int lib3270_ ## name (void)
-	#endif
+	#define LIB3270_ACTION( name )  LIB3270_EXPORT int lib3270_ ## name (void)
 
-	#ifndef LIB3270_CLEAR_SELECTION_ACTION
-		// Clear actions - When called the selected area is cleared
-		#define LIB3270_CLEAR_SELECTION_ACTION( name )  LIB3270_EXPORT int lib3270_ ## name (void)
-	#endif
+	// Clear actions - When called the selected area is cleared
+	#define LIB3270_CLEAR_SELECTION_ACTION( name )  LIB3270_EXPORT int lib3270_ ## name (void)
 
-	#ifndef LIB3270_KEY_ACTION
-		// Single key actions
-		#define LIB3270_KEY_ACTION( name )  LIB3270_EXPORT int lib3270_send_ ## name (void)
-	#endif
+	// Single key actions
+	#define LIB3270_KEY_ACTION( name )  LIB3270_EXPORT int lib3270_ ## name (void)
 
-	#ifndef LIB3270_FKEY_ACTION
-		// PF & PA key actions
-		#define LIB3270_FKEY_ACTION( name )  LIB3270_EXPORT int lib3270_send_ ## name (int key)
-	#endif
+	// Cursor actions
+	#define LIB3270_CURSOR_ACTION( name )  LIB3270_EXPORT int lib3270_cursor_ ## name (void)
+
+	// PF & PA key actions
+	#define LIB3270_FKEY_ACTION( name )  LIB3270_EXPORT int lib3270_ ## name (int key)
+
 
 	/* Keyboard actions */
 	LIB3270_KEY_ACTION( enter );
+	LIB3270_KEY_ACTION( tab );
+	LIB3270_KEY_ACTION( backtab );
 
 	LIB3270_FKEY_ACTION( pfkey );
 	LIB3270_FKEY_ACTION( pakey );
+
+	/* Cursor movement */
+	LIB3270_CURSOR_ACTION( up );
+	LIB3270_CURSOR_ACTION( down );
+	LIB3270_CURSOR_ACTION( left );
+	LIB3270_CURSOR_ACTION( right );
 
 	/* Misc actions */
 	LIB3270_CLEAR_SELECTION_ACTION( reset );
@@ -76,16 +79,14 @@
 	LIB3270_ACTION( erase );
 	LIB3270_ACTION( delete );
 
-	LIB3270_ACTION( tab );
-	LIB3270_ACTION( backtab );
+	LIB3270_ACTION( backspace );
+	LIB3270_ACTION( previousword );
+	LIB3270_ACTION( nextword );
+	LIB3270_ACTION( fieldend );
 
 	LIB3270_ACTION( deleteword );
 	LIB3270_ACTION( deletefield );
 	LIB3270_ACTION( sysreq );
 
-	LIB3270_EXPORT int action_CursorUp(void);
-	LIB3270_EXPORT int action_CursorDown(void);
-	LIB3270_EXPORT int action_CursorLeft(void);
-	LIB3270_EXPORT int action_CursorRight(void);
 
 

@@ -111,23 +111,24 @@ x_remove_input(void)
 /*
  * Application exit, with cleanup.
  */
+ /*
 void
 x3270_exit(int n)
 {
 	static Boolean already_exiting = 0;
 
-	/* Handle unintentional recursion. */
+	// Handle unintentional recursion.
 	if (already_exiting)
 		return;
 	already_exiting = True;
 
-	/* Turn off toggle-related activity. */
+	// Turn off toggle-related activity.
 	shutdown_toggles();
 
-	/* Shut down the socket gracefully. */
+	// Shut down the socket gracefully.
 	host_disconnect(&h3270,False);
 
-	/* Tell anyone else who's interested. */
+	// Tell anyone else who's interested.
 	st_changed(ST_EXITING, True);
 
 	exit(n);
@@ -141,3 +142,4 @@ Quit_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 		x3270_exit(0);
 	}
 }
+*/

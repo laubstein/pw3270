@@ -25,7 +25,7 @@ LIB3270_INTERNAL void ring_bell(void);
 LIB3270_INTERNAL void screen_132(void);
 LIB3270_INTERNAL void screen_80(void);
 LIB3270_INTERNAL void screen_erase(void);
-LIB3270_INTERNAL void screen_init(void);
+LIB3270_INTERNAL int screen_init(void);
 LIB3270_INTERNAL void screen_flip(void);
 LIB3270_INTERNAL FILE *start_pager(void);
 LIB3270_INTERNAL Boolean screen_new_display_charsets(char *cslist, char *csname);
@@ -36,22 +36,15 @@ LIB3270_INTERNAL void notify_toggle_changed(int ix, int value, int reason);
 
 LIB3270_INTERNAL Boolean escaped;
 
-LIB3270_INTERNAL void Escape_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params);
-LIB3270_INTERNAL void Help_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params);
-LIB3270_INTERNAL void Redraw_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params);
-LIB3270_INTERNAL void Trace_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params);
-LIB3270_INTERNAL void Show_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params);
+LIB3270_INTERNAL void Escape_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
+LIB3270_INTERNAL void Help_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
+LIB3270_INTERNAL void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
+LIB3270_INTERNAL void Trace_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
+LIB3270_INTERNAL void Show_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
 
 #if defined(WC3270) /*[*/
-LIB3270_INTERNAL void Paste_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params);
-LIB3270_INTERNAL void Title_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params);
+LIB3270_INTERNAL void Paste_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
+LIB3270_INTERNAL void Title_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
 LIB3270_INTERNAL int windows_cp;
 #endif /*]*/
 

@@ -1016,30 +1016,6 @@ st_changed(int tx, int mode)
 	}
 }
 
-/* Explicit connect/disconnect actions. */
-
-/*
-void
-Connect_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
-{
-	action_debug(Connect_action, event, params, num_params);
-	if (check_usage(Connect_action, *num_params, 1, 1) < 0)
-		return;
-	if (CONNECTED || HALF_CONNECTED) {
-		popup_an_error("Already connected");
-		return;
-	}
-	(void) host_connect(params[0],0);
-
-	// If called from a script and the connection was successful (or
-	// half-successful), pause the script until we are connected and
-	// we have identified the host type.
-	//
-	if (!w && (CONNECTED || HALF_CONNECTED))
-		sms_connect_wait();
-}
-*/
-
 #if defined(X3270_MENUS) || defined(LIB3270) /*[*/
 
 LIB3270_EXPORT int host_reconnect(int wait)
