@@ -70,7 +70,7 @@ APP_CFLAGS="-Isrc/lib"
 OS_DLLFLAGS="-shared -Wl,-soname,\$(@F)"
 OS_LFLAGS=""
 OS_SRCS=""
-OS_APPSRCS="topwindow1.c uiparser1.c actions1.c"
+OS_APPSRCS=""
 
 LOGOEXT="png"
 LD_APIFLAGS=""
@@ -87,6 +87,7 @@ JAVAC="\$(JDK_HOME)/bin/javac"
 JAVAH="\$(JDK_HOME)/bin/javah"
 
 pw3270_cv_statusbar="no"
+pw3270_cv_macui="no"
 
 AC_CHECK_PROG(PACKAGE_MANAGER, "rpmbuild", "rpm")
 AC_CHECK_PROG(PACKAGE_MANAGER, "dpkg-buildpackage","deb")
@@ -106,7 +107,7 @@ case "$host" in
 		LD_RLSFLAGS="-mwindows $LD_RLSFLAGS"
 		OS_LFLAGS="-lws2_32"
 		OS_APISRCS="w3misc.c winvers.c"
-		OS_APPSRCS="uiparser1.c resources.rc"
+		OS_APPSRCS="resources.rc"
 		LOGOEXT="gif"
 		localedir="locale"
 
@@ -126,8 +127,6 @@ case "$host" in
 		LD_RLSFLAGS=""
 		OS_LFLAGS=""
 		pw3270_cv_statusbar="yes"
-#		OS_APPSRCS="actions.c toggle.c"
-
 		;;
 
 	*)
@@ -260,6 +259,14 @@ AC_ARG_ENABLE([statusbar],
 	pw3270_cv_statusbar="$enableval"
 
 ], )
+
+AC_ARG_WITH([macui],
+	[AS_HELP_STRING([--with-macui], [Use MAC OSX compatible UI manager ])],
+[
+	pw3270_cv_macui="$withval"
+
+], )
+
 
 AC_ARG_WITH([ssl],
 	[AS_HELP_STRING([--without-ssl], [do not use libssl])],
@@ -538,6 +545,12 @@ if test "$pw3270_cv_statusbar" == "yes"; then
 	AC_DEFINE([HAVE_GTK_STATUS_BAR])
 fi
 
+if test "$pw3270_cv_macui" == "yes"; then
+	UI_SRCS="actions.c toggle.c ui_parse.c"
+else
+	UI_SRCS="topwindow1.c uiparser1.c actions1.c"
+fi
+
 if test "$pw3270_cv_plugins" == "yes"; then
 	AC_DEFINE([HAVE_PLUGINS])
 	AC_SUBST(PLUGINS)
@@ -638,6 +651,7 @@ AC_SUBST(jardir)
 AC_SUBST(JAVAC)
 AC_SUBST(JAVAH)
 AC_SUBST(OS_APPSRCS)
+AC_SUBST(UI_SRCS)
 AC_SUBST(OS_APISRCS)
 AC_SUBST(GTKRUNTIME,$pw3270_cv_gtkruntime)
 AC_SUBST(INSTALL_TARGETS)

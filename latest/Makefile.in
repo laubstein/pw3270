@@ -132,7 +132,7 @@ REXX_LDFLAGS = @REXX_LIBS@ @GTK_LIBS@ @OS_DLLFLAGS@ @LIBICONV@ @REXX_SYMBOL_HACK
 APP_SRCS =	main.c iocallback.c terminal.c screen.c mouse.c \
 			clipboard.c print.c config.c colors.c plugin.c filetransfer.c fonts.c \
 			version.c draw.c tracewindow.c commands.c script.c oia.c \
-			cursor.c @OS_APPSRCS@ action_calls.c
+			cursor.c @OS_APPSRCS@ action_calls.c @UI_SRCS@
 
 API_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 			ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c kybd.c \
