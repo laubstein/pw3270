@@ -32,7 +32,13 @@
 
  #include "gui.h"
  #include "actions.h"
+ #include <gdk/gdkkeysyms.h>
+ 
+ #ifndef GDK_NUMLOCK_MASK
+	#define GDK_NUMLOCK_MASK GDK_MOD2_MASK
+ #endif
 
+ 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
  GtkActionGroup		* action_group[ACTION_GROUP_MAX+1]	= { 0 };
@@ -85,7 +91,7 @@
  	GtkAction *set;
  	GtkAction *reset;
  	GtkAction *toggle;
- } toggle_action[N_TOGGLES+GUI_TOGGLE_COUNT] = { 0 };
+ } toggle_action[N_TOGGLES+GUI_TOGGLE_COUNT] = { { 0 } };
 
  static struct _pf_action
  {

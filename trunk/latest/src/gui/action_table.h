@@ -45,7 +45,6 @@
 
 	/* Misc actions */
 	DECLARE_PW3270_ACTION( about, "" )
-	DECLARE_PW3270_ACTION( quit, "" )
 
 	/* Screen actions */
 	DECLARE_PW3270_ACTION( redraw, "" )
