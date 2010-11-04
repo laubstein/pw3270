@@ -30,26 +30,48 @@
  *
  */
 
-	#define DECLARE_LIB3270_ACTION( name )  				LIB3270_EXPORT int lib3270_ ## name (void);
-	#define LIB3270_ACTION( name )  						LIB3270_EXPORT int lib3270_ ## name (void)
+	/*
+	 * Action call table.
+	 *
+	 * Usually this definitions are used to declare lib3270's action table but,
+	 * if you redefine the creation macros it can be used to build a callback
+	 * table for g_object_connect calls.
+	 *
+	 */
 
-	// Clear actions - When called the selected area is cleared
-	#define DECLARE_LIB3270_CLEAR_SELECTION_ACTION( name )  LIB3270_EXPORT int lib3270_ ## name (void);
-	#define LIB3270_CLEAR_SELECTION_ACTION( name )			LIB3270_EXPORT int lib3270_ ## name (void)
+	/* Keyboard actions */
+	DECLARE_LIB3270_KEY_ACTION( enter )
+	DECLARE_LIB3270_KEY_ACTION( tab )
+	DECLARE_LIB3270_KEY_ACTION( backtab )
 
-	// Single key actions
-	#define DECLARE_LIB3270_KEY_ACTION( name )				LIB3270_EXPORT int lib3270_ ## name (void);
-	#define LIB3270_KEY_ACTION( name )						LIB3270_EXPORT int lib3270_ ## name (void)
+	DECLARE_LIB3270_FKEY_ACTION( pfkey )
+	DECLARE_LIB3270_FKEY_ACTION( pakey )
 
-	// Cursor actions
-	#define DECLARE_LIB3270_CURSOR_ACTION( name )			LIB3270_EXPORT int lib3270_cursor_ ## name (void);
-	#define LIB3270_CURSOR_ACTION( name )					LIB3270_EXPORT int lib3270_cursor_ ## name (void)
+	/* Cursor movement */
+	DECLARE_LIB3270_CURSOR_ACTION( up )
+	DECLARE_LIB3270_CURSOR_ACTION( down )
+	DECLARE_LIB3270_CURSOR_ACTION( left )
+	DECLARE_LIB3270_CURSOR_ACTION( right )
 
-	// PF & PA key actions
-	#define DECLARE_LIB3270_FKEY_ACTION( name )				LIB3270_EXPORT int lib3270_ ## name (int key);
-	#define LIB3270_FKEY_ACTION( name )						LIB3270_EXPORT int lib3270_ ## name (int key)
+	/* Misc actions */
+	DECLARE_LIB3270_CLEAR_SELECTION_ACTION( reset )
+	DECLARE_LIB3270_CLEAR_SELECTION_ACTION( clear )
+	DECLARE_LIB3270_CLEAR_SELECTION_ACTION( eraseinput )
+
+	DECLARE_LIB3270_ACTION( firstfield )
+	DECLARE_LIB3270_ACTION( eraseeof )
+	DECLARE_LIB3270_ACTION( eraseeol )
+	DECLARE_LIB3270_ACTION( erase )
+	DECLARE_LIB3270_ACTION( delete )
+
+	DECLARE_LIB3270_ACTION( backspace )
+	DECLARE_LIB3270_ACTION( previousword )
+	DECLARE_LIB3270_ACTION( nextword )
+	DECLARE_LIB3270_ACTION( fieldend )
+
+	DECLARE_LIB3270_ACTION( deleteword )
+	DECLARE_LIB3270_ACTION( deletefield )
+	DECLARE_LIB3270_ACTION( sysreq )
 
 
-	// Load action table entries
-	#include <lib3270/action_table.h>
 
