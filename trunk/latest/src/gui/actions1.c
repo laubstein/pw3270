@@ -85,9 +85,8 @@
 /*---[ Action tables ]------------------------------------------------------------------------------------------*/
 
  GtkActionGroup			* action_group[ACTION_GROUP_MAX+1];
- GtkAction				* action_by_id[ACTION_ID_MAX] = { NULL };
-
- static GtkAction 		*scroll_action[]	= { NULL, NULL, NULL, NULL };
+ GtkAction				* action_by_id[ACTION_ID_MAX] 		= { NULL };
+ GtkAction 				* action_scroll[ACTION_SCROLL_MAX]	= { NULL, NULL, NULL, NULL };
 
  static struct _keyboard_action
  {
@@ -194,11 +193,13 @@
  	clear_and_call(0,lib3270_cursor_right);
  }
 
+/*
  void DisableNetworkActions(void)
  {
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
  }
+*/
 
  void action_disconnect(GtkAction *action)
  {
@@ -207,7 +208,9 @@
  	if(!PCONNECTED)
  		return;
 
-	DisableNetworkActions();
+	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
+	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
+
  	action_clearselection(0);
  	host_disconnect(hSession,0);
  }
@@ -406,8 +409,8 @@
 		break;
 
 	case UI_CALLBACK_TYPE_SCROLL:
-		if(data->sub >= 0 && data->sub <= G_N_ELEMENTS(scroll_action))
-			scroll_action[data->sub] = data->action = gtk_action_new(name, gettext(data->attr.label ? data->attr.label : data->name), gettext(data->attr.tooltip),data->attr.stock_id);
+		if(data->sub >= 0 && data->sub <= G_N_ELEMENTS(action_scroll))
+			action_scroll[data->sub] = data->action = gtk_action_new(name, gettext(data->attr.label ? data->attr.label : data->name), gettext(data->attr.tooltip),data->attr.stock_id);
 		break;
 
 	case UI_CALLBACK_TYPE_SCRIPT:
@@ -899,21 +902,6 @@
 
 	return ENOENT;
  }
-
- gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
- {
-	if(query_3270_terminal_status() != STATUS_CODE_BLANK || event->direction < 0 || event->direction > G_N_ELEMENTS(scroll_action))
-		return 0;
-
-	Trace("Scroll: %d Action: %p",event->direction,scroll_action[event->direction]);
-
-	if(scroll_action[event->direction])
-		gtk_action_activate(scroll_action[event->direction]);
-
- 	return 0;
- }
-
-
 
  void action_group_set_sensitive(ACTION_GROUP_ID id, gboolean status)
  {

@@ -43,6 +43,9 @@
 	LOCAL_EXTERN const gchar	* action_group_name[ACTION_GROUP_MAX];
 	LOCAL_EXTERN GtkAction		* action_by_id[ACTION_ID_MAX];
 
+	#define ACTION_SCROLL_MAX 4
+	LOCAL_EXTERN GtkAction 		* action_scroll[ACTION_SCROLL_MAX];
+
 	/* API Prototipes */
 	LOCAL_EXTERN void init_actions(void);
 	LOCAL_EXTERN void action_group_set_sensitive(ACTION_GROUP_ID id, gboolean status);

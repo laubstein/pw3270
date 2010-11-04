@@ -158,7 +158,9 @@
     {
     	int rc;
 
-        DisableNetworkActions();
+		action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
+		action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
+
         gtk_widget_set_sensitive(topwindow,FALSE);
         RunPendingEvents(0);
 

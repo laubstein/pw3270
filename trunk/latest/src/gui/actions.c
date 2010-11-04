@@ -33,16 +33,17 @@
  #include "gui.h"
  #include "actions.h"
  #include <gdk/gdkkeysyms.h>
- 
+
  #ifndef GDK_NUMLOCK_MASK
 	#define GDK_NUMLOCK_MASK GDK_MOD2_MASK
  #endif
 
- 
+
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
  GtkActionGroup		* action_group[ACTION_GROUP_MAX+1]	= { 0 };
  GtkAction			* action_by_id[ACTION_ID_MAX]		= { NULL };
+ GtkAction 			* action_scroll[ACTION_SCROLL_MAX]	= { NULL };
 
  const gchar *action_group_name[ACTION_GROUP_MAX] =
  {
@@ -132,6 +133,9 @@
 
 	for(f=0;f<G_N_ELEMENTS(action_by_id);f++)
 		action_by_id[f] = action_nop;
+
+	for(f=0;f<G_N_ELEMENTS(action_scroll);f++)
+		action_scroll[f] = action_nop;
 
 	for(f=0;f<G_N_ELEMENTS(keyboard_action);f++)
 		keyboard_action[f].action = action_nop;

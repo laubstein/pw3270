@@ -33,6 +33,7 @@
 #include "gui.h"
 #include "oia.h"
 #include "fonts.h"
+#include "actions.h"
 
 #include <lib3270/toggle.h>
 #include <gdk/gdk.h>
@@ -358,6 +359,19 @@
 // 	Trace("Terminal changes to %dx%d pixels",allocation->width,allocation->height);
     if(widget->window)
 		ResizeTerminal(widget,allocation->width,allocation->height);
+ }
+
+ static gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
+ {
+	if(query_3270_terminal_status() != STATUS_CODE_BLANK || event->direction < 0 || event->direction > G_N_ELEMENTS(action_scroll))
+		return 0;
+
+	Trace("Scroll: %d Action: %p",event->direction,action_scroll[event->direction]);
+
+	if(action_scroll[event->direction])
+		gtk_action_activate(action_scroll[event->direction]);
+
+ 	return 0;
  }
 
  GtkWidget *CreateTerminalWindow(void)
