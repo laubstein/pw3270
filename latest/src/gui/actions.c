@@ -32,12 +32,51 @@
 
  #include "gui.h"
  #include "actions.h"
+ #include <lib3270/actions.h>
  #include <gdk/gdkkeysyms.h>
 
  #ifndef GDK_NUMLOCK_MASK
 	#define GDK_NUMLOCK_MASK GDK_MOD2_MASK
  #endif
 
+/*---[ Action callback table ]----------------------------------------------------------------------------------*/
+
+ enum action_type
+ {
+ 	ACTION_TYPE_GUI,
+ 	ACTION_TYPE_CALL,
+ 	ACTION_TYPE_CLEAR_SELECTION,
+ 	ACTION_TYPE_FKEY,
+
+ 	ACTION_TYPE_INVALID
+ };
+
+ // Redefine action-table macros
+ #undef DECLARE_PW3270_ACTION
+ #undef DECLARE_LIB3270_ACTION
+ #undef DECLARE_LIB3270_CLEAR_SELECTION_ACTION
+ #undef DECLARE_LIB3270_KEY_ACTION
+ #undef DECLARE_LIB3270_CURSOR_ACTION
+ #undef DECLARE_LIB3270_FKEY_ACTION
+
+ #define DECLARE_PW3270_ACTION( name, attr )			{ ACTION_TYPE_GUI, #name , (GCallback) action_ ## name, attr },
+ #define DECLARE_LIB3270_ACTION( name )  				{ ACTION_TYPE_CALL, #name, (GCallback) lib3270_ ## name, NULL },
+ #define DECLARE_LIB3270_CLEAR_SELECTION_ACTION( name ) { ACTION_TYPE_CLEAR_SELECTION, #name, (GCallback) lib3270_ ## name, NULL },
+ #define DECLARE_LIB3270_KEY_ACTION( name )				{ ACTION_TYPE_CALL, #name, (GCallback) lib3270_ ## name, NULL },
+ #define DECLARE_LIB3270_CURSOR_ACTION( name )			{ ACTION_TYPE_CALL, #name, (GCallback) lib3270_cursor_ ## name, NULL },
+ #define DECLARE_LIB3270_FKEY_ACTION( name )			{ ACTION_TYPE_FKEY, #name, (GCallback) lib3270_ ## name, NULL },
+
+ static const struct _action_table
+ {
+ 	unsigned short 	type;			/**< Action type (used to define the callback method) */
+ 	const 				gchar *action;	/**< Action name */
+ 	GCallback			call;			/**< Action method */
+ 	const				gchar *attr;	/**< Action attributes */
+ } action_table[] =
+ {
+	#include "action_table.h"
+	#include "lib3270/action_table.h"
+ };
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
@@ -113,7 +152,6 @@
  	{ NULL,	NULL }, 	// PF11
  	{ NULL,	NULL }, 	// PF12
  };
-
 
  static	GtkAction	* action_nop = NULL;
 
