@@ -41,6 +41,7 @@
 	#define DECLARE_PW3270_ACTION( name, attr )	LOCAL_EXTERN void action_ ## name (GtkAction *action)
 
 	LOCAL_EXTERN GtkAction		* action_by_id[ACTION_ID_MAX];
+	LOCAL_EXTERN GtkAction 		* action_scroll[ACTION_SCROLL_MAX];
 
 	LOCAL_EXTERN void			  init_actions(void);
 	LOCAL_EXTERN GCallback 		  get_action_callback_by_name(const gchar *name);

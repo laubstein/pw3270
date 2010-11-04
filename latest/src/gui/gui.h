@@ -282,9 +282,9 @@
 		ACTION_GROUP_FT,
 
 		ACTION_GROUP_MAX
-		
+
 	} ACTION_GROUP_ID;
-	
+
 	typedef enum _action_id
 	{
 		ACTION_COPY_AS_TABLE,
@@ -292,9 +292,9 @@
 		ACTION_PASTENEXT,
 		ACTION_UNSELECT,
 		ACTION_RESELECT,
-	
+
 		ACTION_ID_MAX
-		
+
 	} 	ACTION_ID;
 
 	extern const struct lib3270_io_callbacks program_io_callbacks;
@@ -339,7 +339,7 @@
 	gchar 				* GetClipboard(void);
 	gchar 				* GetScreenContents(gboolean all);
 
-	gboolean 	mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data);
+//	gboolean 	mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data);
 	gboolean 	mouse_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
 	gboolean 	mouse_enter(GtkWidget *widget, GdkEventCrossing *event, gpointer user_data);
 	gboolean 	mouse_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data);

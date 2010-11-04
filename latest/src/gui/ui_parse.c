@@ -50,7 +50,7 @@
  	struct _ui_element	* parent;	/**< The parent element */
  	GtkWidget			* widget;	/**< The element Widget */
  	GtkAction			* action;	/**< The associated action */
- 	const gchar			* name;		/**< The element name */
+ 	const gchar		* name;		/**< The element name */
 
  } UI_ELEMENT;
 
@@ -60,7 +60,7 @@
 	 */
 	static const gchar * app_menu_item[] = { "about", "settings" };
  #endif
- 
+
  typedef struct _parser_state
  {
  	GtkWidget		* window;									/**< Toplevel window */
@@ -83,7 +83,7 @@
 	GtkMenuItem		* quit_menu;								/**< Quit menu widget */
 	GtkMenuItem		* app_menu[G_N_ELEMENTS(app_menu_item)];	/**< Menu item elements on the mac application menu */
 #endif // MAC_INTEGRATION
-	
+
 	int				  ignore;									/**< Non 0 if subtree is disabled */
 
  } PARSER_STATE;
@@ -153,18 +153,18 @@
  	{
 		const gchar *attr = get_xml_attribute(names,values,rule[id].attr);
 		gchar *tmp;
-		
+
  		if(!attr)
  		{
 			*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Atrribute \"%s\" isn't defined on action \"%s\""), rule[id].attr,  action_name);
  			return NULL;
  		}
-		
+
  		tmp  = g_strdup_printf(rule[id].masc,attr);
 		name = g_ascii_strdown(tmp,-1);
 		g_free(tmp);
  	}
-	else 
+	else
 	{
 		name = g_ascii_strdown(action_name,-1);
 	}
@@ -180,10 +180,10 @@
 		gboolean	  toggle	= FALSE;
 		const gchar * icon		= get_xml_attribute(names,values,"icon");
 		const gchar * label		= get_xml_attribute(names,values,"label");
-		
+
 		if(icon)
 			stock = g_strdup_printf("gtk-%s",icon);
-	
+
 		if(label)
 			label = gettext(label);
 		else if(!stock)
@@ -191,7 +191,7 @@
 
 		if(id >= 0)
 			toggle = rule[id].toggle;
-			
+
 		if(toggle)
 			ret = GTK_ACTION(gtk_toggle_action_new(name, label, get_xml_attribute(names,values,"tooltip"), stock));
 		else
@@ -204,13 +204,13 @@
 		{
 			g_signal_connect(G_OBJECT(ret),"activate",G_CALLBACK(action_quit),state->window);
 		}
-		else 
+		else
 		{
 			if(setup(ret,TRUE,names,values,error))
 			{
 				// Action setup failed.
 				if(!*error)
-					*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unknown action: %s"), ptr, gtk_action_get_name(ret));
+					*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unknown action: %s"), gtk_action_get_name(ret));
 
 				g_free(name);
 				g_object_unref(ret);
@@ -219,7 +219,7 @@
 		}
 
 		gtk_action_set_accel_group(ret,state->accel_group);
-		
+
 		g_hash_table_insert(state->action,(gpointer) name, ret);
 
  	}
@@ -229,7 +229,7 @@
 		setup(ret,FALSE,names,values,error);
  		g_free(name);
  	}
-	
+
 	// Set common attributes
 	for(f=0;f<G_N_ELEMENTS(attr);f++)
 	{
@@ -305,7 +305,7 @@
 			return NULL;
 
 		el->widget = gtk_menu_bar_new();
-		
+
 #ifdef MAC_INTEGRATION
 		{
 			const gchar *ptr = get_xml_attribute(names,values,"topmenu");
@@ -327,7 +327,7 @@
  static void check_for_app_menu(const gchar *name, GtkWidget *widget, PARSER_STATE *state)
  {
 	int f;
-	
+
 	for(f=0;f<G_N_ELEMENTS(app_menu_item);f++)
 	{
 		if(!g_strcasecmp(name,app_menu_item[f]))
@@ -727,7 +727,7 @@
  {
 	if(state->ignore > 0)
 		state->ignore--;
-	
+
 	if(!g_strcasecmp(element_name,"separator"))
 		return;
 
@@ -891,7 +891,7 @@
 	g_dir_close(dir);
 	return 0;
  }
- 
+
  static void pack_menubar(gpointer key,UI_ELEMENT *el, GtkWidget *box)
  {
 	Trace("Packing menubar \"%s\" - %p",el->name, el->widget);
@@ -907,18 +907,23 @@
 
  static void sync_action_state(gpointer key, GtkAction *action, PARSER_STATE state)
  {
-	GSList			*child	= gtk_action_get_proxies(action);   
-	GtkActionGroup	*group	= (GtkActionGroup *) g_object_get_data(G_OBJECT(action),"group");	
+#if GTK_CHECK_VERSION(2,16,0)
+	GSList			*child	= gtk_action_get_proxies(action);
+#endif
 
-	gtk_action_group_add_action_with_accel(group ? group : action_group[0], action, g_object_get_data(G_OBJECT(action),"key"));	
+	GtkActionGroup	*group	= (GtkActionGroup *) g_object_get_data(G_OBJECT(action),"group");
+
+	gtk_action_group_add_action_with_accel(group ? group : action_group[0], action, g_object_get_data(G_OBJECT(action),"key"));
 	gtk_action_connect_accelerator(action);
 
 	// Update proxy widgets
+#if GTK_CHECK_VERSION(2,16,0)
 	while(child)
 	{
 		gtk_activatable_sync_action_properties(GTK_ACTIVATABLE(child->data),action);
 		child = child->next;
 	}
+#endif
  }
 
 /*---[ External Call ]------------------------------------------------------------------------------------*/
@@ -984,11 +989,11 @@
 	{
 		// Set application menu
 		int f;
-		
+
 		Trace("%s: Top menu is %p",__FUNCTION__,state.top_menu);
 		gtk_widget_hide(GTK_WIDGET(state.top_menu));
 		gtk_osxapplication_set_menu_bar(osxapp,state.top_menu);
-		
+
 		for(f=0;f<G_N_ELEMENTS(app_menu_item);f++)
 		{
 			if(state.app_menu[f])
@@ -997,10 +1002,10 @@
 				gtk_osxapplication_add_app_menu_item(osxapp,grp,state.app_menu[f]);
 			}
 		}
-		
+
 		if(state.quit_menu)
 			gtk_widget_hide(GTK_WIDGET(state.quit_menu));
-		
+
 	}
 #endif // MAC_INTEGRATION
 

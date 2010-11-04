@@ -537,6 +537,11 @@
 		<Unit filename="src/gui/terminal.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/gui/topwindow.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/gui/topwindow1.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
