@@ -33,11 +33,14 @@
  #include "gui.h"
  #include "actions.h"
  #include <lib3270/actions.h>
+ #include <glib.h>
  #include <gdk/gdkkeysyms.h>
 
  #ifndef GDK_NUMLOCK_MASK
 	#define GDK_NUMLOCK_MASK GDK_MOD2_MASK
  #endif
+
+ #define ERROR_DOMAIN g_quark_from_static_string("uiparser")
 
 /*---[ Action callback table ]----------------------------------------------------------------------------------*/
 
@@ -238,10 +241,15 @@
 	return NULL;
  }
 
-
- int action_setup_default(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ static void clear_and_call(GtkAction *action, void (*call)(void))
  {
-	const struct action_data *data = get_action_data(action, error);
+ 	action_clearselection(0);
+ 	call();
+ }
+
+ int action_setup_default(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ {
+	const struct action_data *data = get_action_data(name, error);
 	
 	if(!data)
 		return -1;
@@ -249,45 +257,85 @@
 	if(!connect)
 		return 0;
 
-	switch ((data->type)
+	switch(data->type)
 	{
 	case ACTION_TYPE_GUI:
 		g_signal_connect(G_OBJECT(action),"activate",data->callback,0);
 		break;
 		
  	case ACTION_TYPE_CALL:
+		g_signal_connect(G_OBJECT(action),"activate",data->callback,0);
 		break;
 		
  	case ACTION_TYPE_CLEAR_SELECTION:
+		g_signal_connect(G_OBJECT(action),"activate",G_CALLBACK(clear_and_call),data->callback);
 		break;
 		
 	default:
-		*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), ???);
+		*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), name);
 		return -1;
 	}
-		
-//		g_signal_connect(G_OBJECT(action),"activate",data->callback,0);
 		
 	return 0;
  }
 
- int action_setup_toggle(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ int action_setup_toggle(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
+	const struct action_data *data = get_action_data(name, error);
+	
+	if(!data)
+		return -1;
+
+	#warning Implementar
+
+	return 0;
  }
  
- int action_setup_toggleset(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ int action_setup_toggleset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
+	const struct action_data *data = get_action_data(name, error);
+	
+	if(!data)
+		return -1;
+
+	#warning Implementar
+
+	return 0;
  }
  
- int action_setup_togglereset(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ int action_setup_togglereset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
+	const struct action_data *data = get_action_data(name, error);
+	
+	if(!data)
+		return -1;
+
+	#warning Implementar
+
+	return 0;
  }
  
- int action_setup_pfkey(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ int action_setup_pfkey(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
+	const struct action_data *data = get_action_data(name, error);
+	
+	if(!data)
+		return -1;
+
+	#warning Implementar
+
+	return 0;
  }
 
- int action_setup_pakey(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ int action_setup_pakey(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
+	const struct action_data *data = get_action_data(name, error);
+	
+	if(!data)
+		return -1;
+
+	#warning Implementar
+
+	return 0;
  }
 

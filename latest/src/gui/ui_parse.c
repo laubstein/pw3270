@@ -108,70 +108,53 @@
 	gtk_widget_destroy(window);
  }
 
- static GtkAction * create_action(const gchar *action_name, const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
+ static GtkAction * create_action(const gchar *element_name, const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
  	static const struct _rule
  	{
 		gboolean	  toggle;
  		const gchar	* name;
- 		const gchar	* masc;
- 		const gchar	* attr;
-		int			  (*setup)(GtkAction *, gboolean, const gchar **, const gchar **, GError **);
+		int			  (*setup)(GtkAction *, const gchar *, gboolean, const gchar **, const gchar **, GError **);
 
  	} rule[] =
  	{
-		{ TRUE,		"toggle",			"toggle_%s",	"id", action_setup_toggle		},
+		{ TRUE,		"toggle",			action_setup_toggle			},
 
-		{ TRUE,		"toggleset",		"set_%s",		"id", action_setup_toggleset	},
-		{ TRUE,		"togglereset",		"reset_%s",		"id", action_setup_togglereset	},
+		{ TRUE,		"toggleset",		action_setup_toggleset		},
+		{ TRUE,		"togglereset",		action_setup_togglereset	},
 
-		{ FALSE,	"pfkey",			"pfkey_%s",		"id", action_setup_pfkey		},
-		{ FALSE,	"pakey",			"pakey_%s",		"id", action_setup_pakey		},
+		{ FALSE,	"pfkey",			action_setup_pfkey			},
+		{ FALSE,	"pakey",			action_setup_pakey			},
 
  	};
 
 	static const gchar *attr[] = { "key", "description" }; /**< Common attributes */
 
-	int				  (*setup)(GtkAction *, gboolean, const gchar **, const gchar **, GError **) = action_setup_default;
+	int				  (*setup)(GtkAction *, const gchar *, gboolean, const gchar **, const gchar **, GError **) = action_setup_default;
 
- 	int				  id	= -1;
- 	gchar			* name	= NULL;
+ 	int				  id			= -1;
+	gchar			* name;
+ 	const gchar		* action_name	= get_xml_attribute(names,values,"action");
 	GtkAction		* ret;
  	const gchar		* ptr;
  	int				  f;
+	
+	// No action, do nothing
+	if(!action_name)
+		return NULL;
 
  	for(f=0;f<G_N_ELEMENTS(rule) && id == -1;f++)
  	{
  		if(!g_strcasecmp(rule[f].name,action_name))
 		{
-				setup = rule[f].setup;
-				id = f;
+			setup = rule[f].setup;
+			id = f;
 		}
  	}
 
- 	if(id != -1)
- 	{
-		const gchar *attr = get_xml_attribute(names,values,rule[id].attr);
-		gchar *tmp;
-
- 		if(!attr)
- 		{
-			*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Atrribute \"%s\" isn't defined on action \"%s\""), rule[id].attr,  action_name);
- 			return NULL;
- 		}
-
- 		tmp  = g_strdup_printf(rule[id].masc,attr);
-		name = g_ascii_strdown(tmp,-1);
-		g_free(tmp);
- 	}
-	else
-	{
-		name = g_ascii_strdown(action_name,-1);
-	}
-
-
 	// Search if it was already created
- 	ret	= g_hash_table_lookup(state->action,name);
+	name = g_ascii_strdown(element_name,-1);
+ 	ret	 = g_hash_table_lookup(state->action,name);
 
  	if(!ret)
  	{
@@ -197,23 +180,25 @@
 		else
 			ret = gtk_action_new(name, label, get_xml_attribute(names,values,"tooltip"), stock);
 
+		Trace("Action: %s Name: %s Widget: %p",action_name,name,ret);
+
 		g_free(stock);
 
 		// Connect standard actions
-		if(!(strcasecmp(name,"quit") || toggle))
+		if(!(g_strcasecmp(action_name,"quit") || toggle))
 		{
 			g_signal_connect(G_OBJECT(ret),"activate",G_CALLBACK(action_quit),state->window);
 		}
 		else
 		{
-			if(setup(ret,TRUE,names,values,error))
+			if(setup(ret,action_name,TRUE,names,values,error))
 			{
 				// Action setup failed.
 				if(!*error)
-					*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unknown action: %s"), gtk_action_get_name(ret));
+					*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unknown action: %s"), action_name);
 
-				g_free(name);
 				g_object_unref(ret);
+				g_free(name);
 				return NULL;
 			}
 		}
@@ -226,8 +211,8 @@
  	else
  	{
  		// Already created, just update
-		setup(ret,FALSE,names,values,error);
- 		g_free(name);
+		setup(ret,action_name,FALSE,names,values,error);
+		g_free(name);
  	}
 
 	// Set common attributes
@@ -267,15 +252,13 @@
 
  static UI_ELEMENT *create_element(size_t sz, const gchar *element_name, const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
- 	UI_ELEMENT		*ret			= NULL;
- 	const gchar 	*action_name	= get_xml_attribute(names,values,"action");
-
+ 	UI_ELEMENT *ret = NULL;
+ 
 	ret = g_malloc0(sz+strlen(element_name)+1);
 	ret->name = ((gchar *) ret)+sz;
 	strcpy((char *) ret->name,element_name);
 
-	if(action_name)
-		ret->action = create_action(action_name,names,values,state,error);
+	ret->action = create_action(element_name,names,values,state,error);
 
  	return ret;
  }
@@ -343,13 +326,13 @@
  static UI_ELEMENT * start_menu(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
  	UI_ELEMENT		*el;
- 	const gchar	*name = get_xml_attribute(names,values,"name");
+ 	const gchar		*name = get_xml_attribute(names,values,"name");
  	GtkMenuShell	*menu;
 
- 	if(!name)
+	if(!name)
 		name = get_xml_attribute(names,values,"action");
 
-	if(!name)
+ 	if(!name)
  	{
 	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,"%s",_( "Can't accept unnamed menu"));
 		return NULL;
@@ -1015,14 +998,26 @@
 	gtk_window_add_accel_group(GTK_WINDOW(state.window),state.accel_group);
 
 	// Release control data
+	Trace("Releasing %p",state.accel_group);
 	g_object_unref(state.accel_group);
 
+	Trace("Releasing %p",state.menubar);
 	g_hash_table_unref(state.menubar);
+
+	Trace("Releasing %p",state.toolbar);
 	g_hash_table_unref(state.toolbar);
+
+	Trace("Releasing %p",state.tool);
 	g_hash_table_unref(state.tool);
+
+	Trace("Releasing %p",state.menu);
 	g_hash_table_unref(state.menu);
+
+	Trace("Releasing %p",state.action);
 	g_hash_table_unref(state.action);
 
+	Trace("Window: %p",state.window);
+	
 	return state.window;
  }
 

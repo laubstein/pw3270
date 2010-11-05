@@ -23,6 +23,7 @@
 	 * entry of the action in the xml files but, the callback will be set only in the first call.
 	 *
 	 * @param action	Action object to setup.
+	 * @param name		Action callback name.
 	 * @param connect	Connect signals.
 	 * @param names		Attribute names.
 	 * @param values	Atrribute values.
@@ -31,12 +32,12 @@
 	 * @return 0 if the action is valid, non zero if not
 	 *
 	 */
-	LOCAL_EXTERN int action_setup_default(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error);
+	LOCAL_EXTERN int action_setup_default(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error);
 
-	LOCAL_EXTERN int action_setup_toggle(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error);
-	LOCAL_EXTERN int action_setup_toggleset(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error);
-	LOCAL_EXTERN int action_setup_togglereset(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error);
-	LOCAL_EXTERN int action_setup_pfkey(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error);
-	LOCAL_EXTERN int action_setup_pakey(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error);
+	LOCAL_EXTERN int action_setup_toggle(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error);
+	LOCAL_EXTERN int action_setup_toggleset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error);
+	LOCAL_EXTERN int action_setup_togglereset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error);
+	LOCAL_EXTERN int action_setup_pfkey(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error);
+	LOCAL_EXTERN int action_setup_pakey(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error);
 
 #endif // UIPARSER_H_INCLUDED
