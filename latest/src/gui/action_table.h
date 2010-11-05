@@ -55,6 +55,8 @@
 
 	/* Print actions */
 	DECLARE_PW3270_ACTION( printscreen, "")
+	DECLARE_PW3270_ACTION( printselected, "")
+	DECLARE_PW3270_ACTION( printclipboard, "")
 
 	/* Clipboard actions */
 	DECLARE_PW3270_ACTION( clearselection, "" )

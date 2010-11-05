@@ -31,6 +31,7 @@
  */
 
  #include "gui.h"
+ #include "actions.h"
 
  #include <lib3270/config.h>
  #include <globals.h>
@@ -377,3 +378,18 @@
  }
 
 #endif // GTK_PRINT_OPERATION
+
+ PW3270_ACTION( printscreen )
+ {
+	PrintText(PROGRAM_NAME, GetScreenContents(TRUE));
+ }
+
+ PW3270_ACTION( printselected )
+ {
+	PrintText(PROGRAM_NAME, GetSelection());
+ }
+
+ PW3270_ACTION( printclipboard )
+ {
+	PrintText(PROGRAM_NAME, GetClipboard());
+ }
