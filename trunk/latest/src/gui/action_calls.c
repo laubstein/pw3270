@@ -293,3 +293,17 @@
  }
 
 
+ PW3270_ACTION( disconnect )
+ {
+ 	Trace("%s: Connected:%d",__FUNCTION__,PCONNECTED);
+
+ 	if(!PCONNECTED)
+ 		return;
+
+	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
+	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
+
+ 	action_clearselection(0);
+ 	host_disconnect(hSession,0);
+ }
+

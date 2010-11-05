@@ -201,6 +201,7 @@
  }
 */
 
+/*
  void action_disconnect(GtkAction *action)
  {
  	Trace("%s: Connected:%d",__FUNCTION__,PCONNECTED);
@@ -229,6 +230,7 @@
  {
 	PrintText(PROGRAM_NAME, GetClipboard());
  }
+*/
 
  void action_quit(GtkAction *action)
  {
@@ -686,10 +688,10 @@
 
 		{	"CopyAsImage",		G_CALLBACK(action_copyasimage)		},
 
-		{	"PrintSelected",	G_CALLBACK(action_PrintSelected)	},
+		{	"PrintSelected",	G_CALLBACK(action_printselected)	},
 		{	"SaveSelected",		G_CALLBACK(action_SaveSelected)		},
 
-		{	"PrintClipboard",	G_CALLBACK(action_PrintClipboard)	},
+		{	"PrintClipboard",	G_CALLBACK(action_printclipboard)	},
 		{	"SaveClipboard",	G_CALLBACK(action_SaveClipboard)	},
 		{	"Paste",			G_CALLBACK(action_paste)			},
 
