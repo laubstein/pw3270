@@ -66,11 +66,11 @@
  #define DECLARE_LIB3270_CURSOR_ACTION( name )			{ ACTION_TYPE_CALL, #name, (GCallback) lib3270_cursor_ ## name, NULL },
  #define DECLARE_LIB3270_FKEY_ACTION( name )			{ ACTION_TYPE_FKEY, #name, (GCallback) lib3270_ ## name, NULL },
 
- static const struct _action_table
+ static const struct action_data
  {
- 	unsigned short 	type;			/**< Action type (used to define the callback method) */
- 	const 				gchar *action;	/**< Action name */
- 	GCallback			call;			/**< Action method */
+ 	unsigned short 	type;				/**< Action type (used to define the callback method) */
+ 	const 				gchar *name;	/**< Action name */
+ 	GCallback			callback;		/**< Action method */
  	const				gchar *attr;	/**< Action attributes */
  } action_table[] =
  {
@@ -222,5 +222,72 @@
 	Trace("%s: %s isn't available",__FUNCTION__,name);
 
  }
+ 
+ static const struct action_data * get_action_data(const gchar *name, GError **error)
+ {
+	int f;
+	
+	for(f=0;f<G_N_ELEMENTS(action_table);f++)
+	{
+		if(!g_ascii_strcasecmp(action_table[f].name,name))
+			return action_table+f;
+	}
+	
+	*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), name);
 
+	return NULL;
+ }
+
+
+ int action_setup_default(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ {
+	const struct action_data *data = get_action_data(action, error);
+	
+	if(!data)
+		return -1;
+	
+	if(!connect)
+		return 0;
+
+	switch ((data->type)
+	{
+	case ACTION_TYPE_GUI:
+		g_signal_connect(G_OBJECT(action),"activate",data->callback,0);
+		break;
+		
+ 	case ACTION_TYPE_CALL:
+		break;
+		
+ 	case ACTION_TYPE_CLEAR_SELECTION:
+		break;
+		
+	default:
+		*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), ???);
+		return -1;
+	}
+		
+//		g_signal_connect(G_OBJECT(action),"activate",data->callback,0);
+		
+	return 0;
+ }
+
+ int action_setup_toggle(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ {
+ }
+ 
+ int action_setup_toggleset(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ {
+ }
+ 
+ int action_setup_togglereset(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ {
+ }
+ 
+ int action_setup_pfkey(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ {
+ }
+
+ int action_setup_pakey(GtkAction *action, gboolean connect, const gchar **names, const gchar **values, GError **error)
+ {
+ }
 

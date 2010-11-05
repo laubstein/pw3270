@@ -1,48 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-
-	<!--- http://developer.apple.com/library/mac/#documentation/General/Reference/InfoPlistKeyReference/Introduction/Introduction.html#//apple_ref/doc/uid/TP40009247 -->
-
-	<dict>
-
-		<key>CFBundleDevelopmentRegion</key>
-		<string>en-US</string>
-
-		<key>CFBundleDisplayName</key>
-		<string>@PACKAGE@</string>
-
-		<key>CFBundleExecutable</key>
-		<string>@PACKAGE@</string>
-
-		<!--- <key>CFBundleIconFiles</key> --->
-		<!--- <key>CFBundleIdentifier</key> --->
-		<!--- <key>CFBundleInfoDictionaryVersion</key> --->
-
-		<key>CFBundleName</key>
-		<string>@PACKAGE@</string>
-
-		<key>CFBundleExecutable</key>
-		<string>@PACKAGE@</string>
-
-		<key>CFBundlePackageType</key>
-		<string>APPL</string>
-
-		<key>CFBundleShortVersionString</key>
-		<string>@PACKAGE_VERSION@</string>
-
-		<!--- <key>CFBundleSignature</key> --->
-
-		<key>CFBundleVersion</key>
-		<string>@PACKAGE_VERSION@-@PACKAGE_RELEASE@</string>
-
-		<!--- <key>LSHasLocalizedDisplayName</key> --->
-		<key>NSHumanReadableCopyright</key>
-		<string>GPL</string>
-
-		<!--- key>CFBundleInfoDictionaryVersion</key> --->
-
-		<!--- <key>CFBundleIdentifier</key> --->
-	</dict>
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>English</string>
+	
+    <key>CFBundleExecutable</key>
+    <string>@PACKAGE@</string>
+	
+    <key>CFBundleGetInfoString</key>
+    <string>@PACKAGE@ - @PACKAGE_VERSION@-@PACKAGE_RELEASE@</string>
+	
+    <key>CFBundleIconFile</key>
+    <string>@PACKAGE@.icns</string>
+	
+    <key>CFBundleIdentifier</key>
+    <string>@PACKAGE@</string>
+    
+	<key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+	
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+	
+    <key>CFBundleShortVersionString</key>
+    <string>@PACKAGE_VERSION@</string>
+	
+    <key>CFBundleSignature</key>
+    <string>????</string>
+	
+    <key>CFBundleVersion</key>
+    <string>@PACKAGE_VERSION@</string>
+	
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright (C) 2008 Banco do Brasil S.A., GNU General Public License.</string>
+	
+    <key>LSMinimumSystemVersion</key>
+    <string>10.4</string>
+</dict>
 </plist>
-
