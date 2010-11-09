@@ -80,7 +80,7 @@
  	if(PCONNECTED)
  		return g_strdup("BUSY");
 
- 	action_clearselection(0);
+ 	unselect();
 
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);

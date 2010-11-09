@@ -180,11 +180,11 @@
 		else
 			ret = gtk_action_new(name, label, get_xml_attribute(names,values,"tooltip"), stock);
 
-		Trace("Action: %s Name: %s Widget: %p",action_name,name,ret);
-
 		g_free(stock);
 
 		// Connect standard actions
+		Trace("Name: %s toggle: %s",action_name,toggle ? "Yes" : "No");
+		
 		if(!(g_strcasecmp(action_name,"quit") || toggle))
 		{
 			g_signal_connect(G_OBJECT(ret),"activate",G_CALLBACK(action_quit),state->window);

@@ -146,7 +146,7 @@
  	if(PCONNECTED)
  		return;
 
- 	action_clearselection(0);
+ 	unselect();
 
 	host = GetString("Network","Hostname",CN);
 
@@ -219,7 +219,7 @@
 
  PW3270_ACTION( enter )
  {
- 	action_clearselection(0);
+ 	unselect();
  	if(PCONNECTED)
 		lib3270_enter();
 	else
@@ -292,6 +292,15 @@
 		gdk_pixbuf_unref(logo);
  }
 
+ PW3270_ACTION( unselect )
+ {
+	unselect();
+ }
+
+ PW3270_ACTION( reselect )
+ {
+	reselect();
+ }
 
  PW3270_ACTION( disconnect )
  {
@@ -303,7 +312,7 @@
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
 
- 	action_clearselection(0);
+ 	unselect();
  	host_disconnect(hSession,0);
  }
 

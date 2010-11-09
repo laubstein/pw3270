@@ -154,7 +154,7 @@
 
  static void clear_and_call(GtkAction *action, int (*call)(void))
  {
- 	action_clearselection(0);
+ 	unselect();
  	call();
  }
 
@@ -212,7 +212,7 @@
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
 
- 	action_clearselection(0);
+ 	unselect();
  	host_disconnect(hSession,0);
  }
 
@@ -330,7 +330,7 @@
 	Trace("Running PF %d",(int) id);
 
 	if(!TOGGLED_KEEP_SELECTED)
-		action_clearselection(0);
+		unselect();
  	lib3270_pfkey((int) id);
  }
 
@@ -339,7 +339,7 @@
 	Trace("Running PA %d",(int) id);
 
 	if(!TOGGLED_KEEP_SELECTED)
-		action_clearselection(action);
+		unselect();
  	lib3270_pakey((int) id);
  }
 
@@ -637,7 +637,7 @@
 
 		// Selection actions
 		{	"Append",			G_CALLBACK(action_append)			},
-		{	"Unselect",			G_CALLBACK(action_clearselection)	},
+		{	"Unselect",			G_CALLBACK(action_unselect)			},
 		{	"Copy",				G_CALLBACK(action_copy)				},
 		{	"CopyAsTable",		G_CALLBACK(action_copyastable)		},
 
@@ -879,7 +879,7 @@
 	#ifdef DEBUG
 		if(ACTION_GROUP_MAX != G_N_ELEMENTS(group_name))
 		{
-			Trace("Unexpected action_group size, found %d, expecting %d",G_N_ELEMENTS(group_name),ACTION_GROUP_MAX);
+			Trace("Unexpected action_group size, found %d, expecting %d",(int) G_N_ELEMENTS(group_name),(int) ACTION_GROUP_MAX);
 			exit(-1);
 		}
 	#endif
