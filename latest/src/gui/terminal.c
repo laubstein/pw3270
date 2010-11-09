@@ -276,7 +276,7 @@
 	if(gtk_im_context_filter_keypress(input_method,event))
 		return TRUE;
 
-	if(KeyboardAction(widget,event,user_data))
+	if(check_key_action(widget,event))
 	{
 		gtk_im_context_reset(input_method);
 		return TRUE;

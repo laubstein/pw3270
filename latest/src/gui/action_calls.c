@@ -307,3 +307,48 @@
  	host_disconnect(hSession,0);
  }
 
+ static int SaveText(const char *title, gchar *text)
+ {
+
+	GtkWidget *dialog = gtk_file_chooser_dialog_new( gettext(title),
+                                                     GTK_WINDOW(topwindow),
+                                                     GTK_FILE_CHOOSER_ACTION_SAVE,
+                                                     GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
+                                                     GTK_STOCK_SAVE,	GTK_RESPONSE_ACCEPT,
+                                                     NULL );
+
+
+	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	{
+		GError	*error = NULL;
+		gchar	*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+
+		if(!g_file_set_contents(filename,text,-1,&error))
+		{
+			Warning( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
+			g_error_free(error);
+		}
+
+		g_free(filename);
+	}
+
+	gtk_widget_destroy(dialog);
+ 	g_free(text);
+ 	return 0;
+ }
+
+ PW3270_ACTION( savescreen )
+ {
+	SaveText(N_( "Save screen contents" ), GetScreenContents(TRUE));
+ }
+
+ PW3270_ACTION( saveselected )
+ {
+	SaveText(N_( "Save selected text" ), GetSelection());
+ }
+
+ PW3270_ACTION( saveclipboard )
+ {
+	SaveText(N_( "Save clipboard contents" ), GetClipboard());
+ }
+

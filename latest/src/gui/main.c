@@ -113,7 +113,9 @@ static void connect_main(int status)
 	else
 		action_group_set_sensitive(ACTION_GROUP_PASTE,FALSE);
 
-	keypad_set_sensitive(topwindow,online);
+	#ifndef HAVE_MACUI
+		keypad_set_sensitive(topwindow,online);
+	#endif
 
 	#ifdef HAVE_IGEMAC
 		gtk_osxapplication_attention_request(osxapp,INFO_REQUEST);

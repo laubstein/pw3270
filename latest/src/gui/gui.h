@@ -309,7 +309,6 @@
 
 	void 		PrintConsole(const gchar *fmt, ...);
 
-	gboolean 	KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 	void 		ParseInput(const gchar *string);
 	void		LoadImages(GdkDrawable *drawable, GdkGC *gc);
 	void 		InvalidatePixmaps(GdkDrawable *drawable, GdkGC *gc);
@@ -322,10 +321,12 @@
 	void		init_gui_toggles(void);
 	GtkWidget * widget_from_action_name(const gchar *name);
 
-	LOCAL_EXTERN void 	update_cursor_position(int row, int col);
-	LOCAL_EXTERN void	update_cursor_info(void);
-	LOCAL_EXTERN void	queue_draw_cursor(void);
-	LOCAL_EXTERN void	update_cursor_pixmap(void);
+	LOCAL_EXTERN gboolean	  check_key_action(GtkWidget *widget, GdkEventKey *event);
+
+	LOCAL_EXTERN void		  update_cursor_position(int row, int col);
+	LOCAL_EXTERN void		  update_cursor_info(void);
+	LOCAL_EXTERN void		  queue_draw_cursor(void);
+	LOCAL_EXTERN void		  update_cursor_pixmap(void);
 
 #ifdef X3270_FT
 	int 		initft(void);

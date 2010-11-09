@@ -53,6 +53,11 @@
 	DECLARE_PW3270_ACTION( download, "" )
 	DECLARE_PW3270_ACTION( upload, "" )
 
+	/* Text actions */
+	DECLARE_PW3270_ACTION( savescreen, "")
+	DECLARE_PW3270_ACTION( saveselected, "")
+	DECLARE_PW3270_ACTION( saveclipboard, "")
+
 	/* Print actions */
 	DECLARE_PW3270_ACTION( printscreen, "")
 	DECLARE_PW3270_ACTION( printselected, "")

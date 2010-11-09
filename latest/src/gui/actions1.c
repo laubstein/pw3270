@@ -343,7 +343,7 @@
  	lib3270_pakey((int) id);
  }
 
- gboolean KeyboardAction(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+ gboolean check_key_action(GtkWidget *widget, GdkEventKey *event)
  {
  	int f;
  	int	state = event->state & (GDK_SHIFT_MASK|GDK_CONTROL_MASK|GDK_ALT_MASK);
@@ -471,36 +471,6 @@
 	return data->action;
  }
 
- static int SaveText(const char *title, gchar *text)
- {
-
-	GtkWidget *dialog = gtk_file_chooser_dialog_new( gettext(title),
-                                                     GTK_WINDOW(topwindow),
-                                                     GTK_FILE_CHOOSER_ACTION_SAVE,
-                                                     GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
-                                                     GTK_STOCK_SAVE,	GTK_RESPONSE_ACCEPT,
-                                                     NULL );
-
-
-	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
-	{
-		GError	*error = NULL;
-		gchar	*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-
-		if(!g_file_set_contents(filename,text,-1,&error))
-		{
-			Warning( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
-			g_error_free(error);
-		}
-
-		g_free(filename);
-	}
-
-	gtk_widget_destroy(dialog);
- 	g_free(text);
- 	return 0;
- }
-
  static void action_LoadScreenDump(void)
  {
  	gchar		*ptr;
@@ -606,21 +576,6 @@
 	gtk_widget_destroy(dialog);
  }
 
-  static void action_SaveScreen(void)
- {
-	SaveText(N_( "Save screen contents" ), GetScreenContents(TRUE));
- }
-
- static void action_SaveSelected(void)
- {
-	SaveText(N_( "Save selected text" ), GetSelection());
- }
-
- static void action_SaveClipboard(void)
- {
-	SaveText(N_( "Save clipboard contents" ), GetClipboard());
- }
-
  LOCAL_EXTERN int get_action_info_by_name(const gchar *key, const gchar **names, const gchar **values, gchar **name, UI_CALLBACK *info)
  {
 	static const struct _action
@@ -638,7 +593,7 @@
 
 		// Online actions
 		{	"Redraw",			G_CALLBACK(action_redraw)			},
-		{	"SaveScreen",		G_CALLBACK(action_SaveScreen)		},
+		{	"SaveScreen",		G_CALLBACK(action_savescreen)		},
 		{	"PrintScreen",		G_CALLBACK(action_printscreen)		},
 		{	"DumpScreen",		G_CALLBACK(action_DumpScreen)		},
 		{	"Disconnect",		G_CALLBACK(action_disconnect)		},
@@ -689,10 +644,10 @@
 		{	"CopyAsImage",		G_CALLBACK(action_copyasimage)		},
 
 		{	"PrintSelected",	G_CALLBACK(action_printselected)	},
-		{	"SaveSelected",		G_CALLBACK(action_SaveSelected)		},
+		{	"SaveSelected",		G_CALLBACK(action_saveselected)		},
 
 		{	"PrintClipboard",	G_CALLBACK(action_printclipboard)	},
-		{	"SaveClipboard",	G_CALLBACK(action_SaveClipboard)	},
+		{	"SaveClipboard",	G_CALLBACK(action_saveclipboard)	},
 		{	"Paste",			G_CALLBACK(action_paste)			},
 
 		{	"FileMenu",			NULL								},

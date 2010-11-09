@@ -15,6 +15,17 @@
 	 */
 	LOCAL_EXTERN GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget);
 
+	/**
+	 * Get an attribute from xml list.
+	 *
+	 * @param names	List of attribute names
+	 * @param values	List of attribute values
+	 * @param key		Attribute name to get
+	 *
+	 * @return Attribute value, or NULL.
+	 *
+	 */
+	LOCAL_EXTERN const gchar * get_xml_attribute(const gchar **names, const gchar **values, const gchar *key);
 
 	/**
 	 * Setup action attributes.

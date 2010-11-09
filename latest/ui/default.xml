@@ -41,7 +41,7 @@
 			<menuitem action='PrintSelected' group='selection' label='Print selected' />
 			<menuitem action='PrintClipboard' group='clipboard' label='Print copy' />
 			<separator/>
-			<menu action='FTMenu' group='filetransfer' label='Send/Receive' >
+			<menu name='FTMenu' group='filetransfer' label='Send/Receive' >
 				<menuitem action='Download' key='<alt>d' group='filetransfer' label='Receive file' />
 				<menuitem action='Upload' key='<alt>u' group='filetransfer' label='Send file' />
 			</menu>

@@ -91,7 +91,7 @@
 
 /*---[ Statics ]------------------------------------------------------------------------------------------*/
 
- static const gchar * get_xml_attribute(const gchar **names, const gchar **values, const gchar *key)
+ const gchar * get_xml_attribute(const gchar **names, const gchar **values, const gchar *key)
  {
 	while(*names && g_strcasecmp(*names,key))
 	{
@@ -138,7 +138,7 @@
 	GtkAction		* ret;
  	const gchar		* ptr;
  	int				  f;
-	
+
 	// No action, do nothing
 	if(!action_name)
 		return NULL;
@@ -253,7 +253,7 @@
  static UI_ELEMENT *create_element(size_t sz, const gchar *element_name, const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
  	UI_ELEMENT *ret = NULL;
- 
+
 	ret = g_malloc0(sz+strlen(element_name)+1);
 	ret->name = ((gchar *) ret)+sz;
 	strcpy((char *) ret->name,element_name);
@@ -1017,7 +1017,7 @@
 	g_hash_table_unref(state.action);
 
 	Trace("Window: %p",state.window);
-	
+
 	return state.window;
  }
 

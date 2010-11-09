@@ -547,6 +547,7 @@ fi
 
 if test "$pw3270_cv_macui" == "yes"; then
 	UI_SRCS="actions.c toggle.c ui_parse.c topwindow.c"
+	AC_DEFINE([HAVE_MACUI])
 else
 	UI_SRCS="topwindow1.c uiparser1.c actions1.c"
 fi
