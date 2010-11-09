@@ -32,8 +32,10 @@
 
  #include "gui.h"
  #include "actions.h"
+ #include "ui_parse.h"
  #include <lib3270/actions.h>
  #include <glib.h>
+ #include <stdlib.h>
  #include <gdk/gdkkeysyms.h>
 
  #ifndef GDK_NUMLOCK_MASK
@@ -188,12 +190,6 @@
 		toggle_action[f].toggle	= action_nop;
 	}
 
-	for(f=0;f<G_N_ELEMENTS(pf_action);f++)
-	{
-		pf_action[f].normal = action_nop;
-		pf_action[f].shift  = action_nop;
-	}
-
  }
 
  void update_3270_toggle_action(int toggle, int value)
@@ -225,17 +221,17 @@
 	Trace("%s: %s isn't available",__FUNCTION__,name);
 
  }
- 
+
  static const struct action_data * get_action_data(const gchar *name, GError **error)
  {
 	int f;
-	
+
 	for(f=0;f<G_N_ELEMENTS(action_table);f++)
 	{
 		if(!g_ascii_strcasecmp(action_table[f].name,name))
 			return action_table+f;
 	}
-	
+
 	*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), name);
 
 	return NULL;
@@ -247,13 +243,23 @@
  	call();
  }
 
+ static void pfkey(GtkAction *action, gpointer key)
+ {
+ 	lib3270_pfkey((int) key);
+ }
+
+ static void pakey(GtkAction *action, gpointer key)
+ {
+ 	lib3270_pakey((int) key);
+ }
+
  int action_setup_default(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
 	const struct action_data *data = get_action_data(name, error);
-	
+
 	if(!data)
 		return -1;
-	
+
 	if(!connect)
 		return 0;
 
@@ -262,27 +268,27 @@
 	case ACTION_TYPE_GUI:
 		g_signal_connect(G_OBJECT(action),"activate",data->callback,0);
 		break;
-		
+
  	case ACTION_TYPE_CALL:
 		g_signal_connect(G_OBJECT(action),"activate",data->callback,0);
 		break;
-		
+
  	case ACTION_TYPE_CLEAR_SELECTION:
 		g_signal_connect(G_OBJECT(action),"activate",G_CALLBACK(clear_and_call),data->callback);
 		break;
-		
+
 	default:
 		*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), name);
 		return -1;
 	}
-		
+
 	return 0;
  }
 
  int action_setup_toggle(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
 	const struct action_data *data = get_action_data(name, error);
-	
+
 	if(!data)
 		return -1;
 
@@ -290,11 +296,11 @@
 
 	return 0;
  }
- 
+
  int action_setup_toggleset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
 	const struct action_data *data = get_action_data(name, error);
-	
+
 	if(!data)
 		return -1;
 
@@ -302,11 +308,11 @@
 
 	return 0;
  }
- 
+
  int action_setup_togglereset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
 	const struct action_data *data = get_action_data(name, error);
-	
+
 	if(!data)
 		return -1;
 
@@ -314,28 +320,86 @@
 
 	return 0;
  }
- 
+
  int action_setup_pfkey(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
+ 	static const gchar *attr[] = { "id", "value" };
+ 	int f;
 	const struct action_data *data = get_action_data(name, error);
-	
+
 	if(!data)
 		return -1;
 
-	#warning Implementar
+	for(f=0;f < G_N_ELEMENTS(attr);f++)
+	{
+		const gchar *id = get_xml_attribute(names, values, attr[f]);
+		if(id)
+		{
+			int vl = atoi(id);
+			int pflen = G_N_ELEMENTS(pf_action);
 
-	return 0;
+			if(vl < 1 || vl > (pflen * 2))
+			{
+				*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Attribute %s in %s is unexpected of invalid" ), attr[f], name);
+				return -1;
+			}
+
+			if(vl < pflen)
+				pf_action[vl].normal = action;
+			else
+				pf_action[vl-pflen].shift = action;
+
+			if(connect)
+				g_signal_connect(G_OBJECT(action),"activate",G_CALLBACK(pfkey),(gpointer) vl);
+
+			return 0;
+		}
+
+
+	}
+
+	// No key attribute, error
+	*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Incomplete PFkey definition (no id): %s" ), name);
+	return -1;
  }
 
  int action_setup_pakey(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
+ 	static const gchar *attr[] = { "id", "value" };
+ 	int f;
 	const struct action_data *data = get_action_data(name, error);
-	
+
 	if(!data)
 		return -1;
 
-	#warning Implementar
+	for(f=0;f < G_N_ELEMENTS(attr);f++)
+	{
+		const gchar *id = get_xml_attribute(names, values, attr[f]);
+		if(id)
+		{
+			int vl = atoi(id);
+			if(vl < 1)
+			{
+				*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Attribute %s in %s is unexpected of invalid" ), attr[f], name);
+				return -1;
+			}
 
-	return 0;
+			if(connect)
+				g_signal_connect(G_OBJECT(action),"activate",G_CALLBACK(pakey),(gpointer) vl);
+
+			return 0;
+		}
+
+
+	}
+
+	// No key attribute, error
+	*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Incomplete PFkey definition (no id): %s" ), name);
+	return -1;
  }
 
+ gboolean check_key_action(GtkWidget *widget, GdkEventKey *event)
+ {
+ 	#warning Implementar
+ 	return FALSE;
+ }

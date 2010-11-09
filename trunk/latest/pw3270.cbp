@@ -556,6 +556,15 @@
 			<Option target="pipetest" />
 			<Option target="jnidebug" />
 		</Unit>
+		<Unit filename="src/gui/ui_parse.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gui/ui_parse.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src/gui/uiparser1.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />

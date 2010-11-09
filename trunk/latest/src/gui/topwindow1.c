@@ -74,31 +74,21 @@
  static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
  	// http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-key-press-event
-/*
-    if(IS_FUNCTION_KEY(event))
-		return(PFKey(GetFunctionKey(event)));
-    return FALSE;
-
-*/
-	if(KeyboardAction(widget,event,user_data))
-		return TRUE;
-
-	return FALSE;
-
+	return check_key_action(widget,event);
  }
 
+/*
  static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
  {
-/*
 
     if(IS_FUNCTION_KEY(event))
     {
     	GetFunctionKey(event);
     	return TRUE;
     }
-*/
  	return FALSE;
  }
+*/
 
  static void activate_font(GtkCheckMenuItem *item, gchar *text)
  {
@@ -336,7 +326,7 @@
 	g_signal_connect(G_OBJECT(topwindow),	"delete_event", 		G_CALLBACK(delete_event),			0);
 	g_signal_connect(G_OBJECT(topwindow),	"destroy", 				G_CALLBACK(destroy),				0);
     g_signal_connect(G_OBJECT(topwindow),	"key-press-event",		G_CALLBACK(key_press_event),		0);
-    g_signal_connect(G_OBJECT(topwindow), 	"key-release-event",	G_CALLBACK(key_release_event),		0);
+//    g_signal_connect(G_OBJECT(topwindow), 	"key-release-event",	G_CALLBACK(key_release_event),		0);
 
 	/* Create terminal window */
 	if(!CreateTerminalWindow())

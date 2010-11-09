@@ -92,7 +92,8 @@
 
 #endif // MOUSE_POINTER_CHANGE
 
-	GdkPixbuf *pix = NULL;
+	GdkPixbuf 	*pix = NULL;
+	gchar		*ptr;
 
 	init_actions();
 
@@ -112,10 +113,10 @@
 	if(!CreateTerminalWindow())
 		return -1;
 
-
 	// Load UI - Create toplevel window
-
-	#warning WORK_IN_PROGRESS
+	ptr = g_build_filename(program_data,"ui",NULL);
+	topwindow = create_window_from_ui_files(ptr,terminal);
+	g_free(ptr);
 
 	// Load program logo
 	if(program_logo && g_file_test(program_logo,G_FILE_TEST_IS_REGULAR))
