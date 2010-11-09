@@ -229,7 +229,7 @@
  {
 // 	Trace("%s called reason: %d owner: %p",__FUNCTION__,(int) event->reason, (void *) event->owner);
  	if(terminal && !GTK_WIDGET_HAS_FOCUS(terminal))
-		action_clearselection(0);
+		unselect();
 
 	if(event->owner)
 		check_clipboard_contents();
@@ -411,7 +411,7 @@
 
 	gtk_window_set_role(GTK_WINDOW(topwindow), PACKAGE_NAME "_TOP" );
 
-	action_clearselection(0);
+	unselect();
 	ClearClipboard();
 
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);

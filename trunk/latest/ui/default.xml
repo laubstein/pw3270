@@ -89,7 +89,7 @@
 			<!--- Special action - The fontselect menu will be populated with all available monospaced fonts --->
 			<menuitem name='fontselect' icon='select-font' label='Select font' />
 
-			<menu action='OptionsMenu' label='_Options' >
+			<menu name='OptionsMenu' label='_Options' >
 				<menuitem action='Toggle' id='AutoConnect' label='Connect on startup' />
 				<menuitem action='Toggle' id='CursorBlink' label='Blinking Cursor' />
 				<menuitem action='Toggle' id='Monocase' label='Monocase' />

@@ -297,7 +297,7 @@
 		{
 		case DRAG_TYPE_NONE:
 
-			action_clearselection(0);
+			unselect();
 
 			if(!DecodePosition(event->x,event->y,&startRow,&startCol))
 				button_flags |= BUTTON_FLAG_COMBO;
@@ -371,7 +371,7 @@
  	{
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 1: // Single click, just move cursor
 		Trace("Single click (button: %d)",event->button);
-		action_clearselection(0);
+		unselect();
 		if(row >= 0 && row <= terminal_rows && col >= 0 && col <= terminal_cols)
 			cursor_move((row*terminal_cols)+col);
 		break;
@@ -389,13 +389,13 @@
 	case ((SELECT_MODE_COPY & 0x0F) << 4) | 1:
 		Trace("Copy text (button: %d)",event->button);
 		action_copy(0);
-		action_clearselection(0);
+		unselect();
 		break;
 
 	case ((SELECT_MODE_APPEND & 0x0F) << 4) | 1:
 		Trace("Append text (button: %d)",event->button);
 		action_append(0);
-		action_clearselection(0);
+		unselect();
 		break;
 
 	case ((SELECT_MODE_DRAG & 0x0F) << 4) | 1: // Left Drag
@@ -586,7 +586,7 @@
  	if(select_mode != SELECT_MODE_RECTANGLE && select_mode != SELECT_MODE_TEXT)
 		return;
 
-	action_clearselection(0);
+	unselect();
 
 	if(value)
 	{
@@ -601,7 +601,7 @@
 
  }
 
- void Reselect(void)
+ void reselect(void)
  {
 	SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 	if(select_mode == SELECT_MODE_TEXT)
@@ -810,7 +810,7 @@
     return 0;
  }
 
- PW3270_ACTION( clearselection )
+ void unselect(void)
  {
  	if(select_mode == SELECT_MODE_NONE)
 		return;
@@ -844,7 +844,7 @@
 	endRow = row;
 	endCol = col;
 
-	Reselect();
+	reselect();
  }
 
  PW3270_ACTION( selectleft )
@@ -877,7 +877,7 @@
 	startCol 	+= col;
 	endCol 		+= col;
 
-	Reselect();
+	reselect();
 
  }
 

@@ -323,6 +323,9 @@
 
 	LOCAL_EXTERN gboolean	  check_key_action(GtkWidget *widget, GdkEventKey *event);
 
+	LOCAL_EXTERN void		  unselect(void);
+	LOCAL_EXTERN void		  reselect(void);
+
 	LOCAL_EXTERN void		  update_cursor_position(int row, int col);
 	LOCAL_EXTERN void		  update_cursor_info(void);
 	LOCAL_EXTERN void		  queue_draw_cursor(void);

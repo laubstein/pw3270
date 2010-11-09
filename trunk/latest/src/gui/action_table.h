@@ -64,7 +64,8 @@
 	DECLARE_PW3270_ACTION( printclipboard, "")
 
 	/* Clipboard actions */
-	DECLARE_PW3270_ACTION( clearselection, "" )
+	DECLARE_PW3270_ACTION( unselect, "" )
+	DECLARE_PW3270_ACTION( reselect, "" )
 	DECLARE_PW3270_ACTION( selectfield, "" )
 	DECLARE_PW3270_ACTION( copy, "" )
 	DECLARE_PW3270_ACTION( copyastable, "" )

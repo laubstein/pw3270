@@ -239,17 +239,23 @@
 
  static void clear_and_call(GtkAction *action, void (*call)(void))
  {
- 	action_clearselection(0);
+ 	unselect();
  	call();
  }
 
  static void pfkey(GtkAction *action, gpointer key)
  {
+ 	if(!TOGGLED_KEEP_SELECTED)
+		unselect();
+
  	lib3270_pfkey((int) key);
  }
 
  static void pakey(GtkAction *action, gpointer key)
  {
+	if(!TOGGLED_KEEP_SELECTED)
+		unselect();
+
  	lib3270_pakey((int) key);
  }
 
@@ -287,10 +293,6 @@
 
  int action_setup_toggle(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
-	const struct action_data *data = get_action_data(name, error);
-
-	if(!data)
-		return -1;
 
 	#warning Implementar
 
@@ -299,11 +301,7 @@
 
  int action_setup_toggleset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
-	const struct action_data *data = get_action_data(name, error);
-
-	if(!data)
-		return -1;
-
+ 
 	#warning Implementar
 
 	return 0;
@@ -311,10 +309,6 @@
 
  int action_setup_togglereset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
-	const struct action_data *data = get_action_data(name, error);
-
-	if(!data)
-		return -1;
 
 	#warning Implementar
 
