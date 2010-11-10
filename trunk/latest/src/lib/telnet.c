@@ -366,15 +366,15 @@ sockstart(void)
 	wVersionRequested = MAKEWORD(2, 2);
 
 	if (WSAStartup(wVersionRequested, &wsaData) != 0) {
-		fprintf(stderr, "WSAStartup failed: %s\n",
-			win32_strerror(GetLastError()));
-		x3270_exit(1);
+		#warning Notify User
+		fprintf(stderr, "WSAStartup failed: %s\n",win32_strerror(GetLastError()));
+		_exit(1);
 	}
 
 	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
-		fprintf(stderr, "Bad winsock version: %d.%d\n",
-			LOBYTE(wsaData.wVersion), HIBYTE(wsaData.wVersion));
-		x3270_exit(1);
+		#warning Notify User
+		fprintf(stderr, "Bad winsock version: %d.%d\n",LOBYTE(wsaData.wVersion), HIBYTE(wsaData.wVersion));
+		_exit(1);
 	}
 }
 #endif /*]*/
@@ -577,6 +577,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 					NULL);
 			}
 			perror(host);
+			#warning Notify User
 			_exit(1);
 			break;
 		    default:	/* parent */
@@ -678,15 +679,17 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 		h3270.sock_handle = CreateEvent(NULL, TRUE, FALSE, ename);
 		if (h3270.sock_handle == NULL)
 		{
+			#warning Notify User
 			Log("Cannot create socket handle: %s\n",win32_strerror(GetLastError()));
-			x3270_exit(1);
+			_exit(1);
 		}
 	}
 
 	if (WSAEventSelect(h3270.sock, h3270.sock_handle, FD_READ | FD_CONNECT | FD_CLOSE) != 0)
 	{
+		#warning Notify User
 		Log("WSAEventSelect failed: %s\n",win32_strerror(GetLastError()));
-		x3270_exit(1);
+		_exit(1);
 	}
 
 	return (int) h3270.sock_handle;
@@ -950,7 +953,7 @@ void net_input(H3270 *session)
 				default:
 					#warning Notify User!
 					Log("second connect() failed: %s\n",win32_strerror(err));
-					x3270_exit(1);
+					_exit(1);
 				}
 			}
 		}

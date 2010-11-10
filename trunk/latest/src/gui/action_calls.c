@@ -226,7 +226,6 @@
 		action_connect(action);
  }
 
-
  PW3270_ACTION( about )
  {
  	static const char *authors[] = {	"Paul Mattes <Paul.Mattes@usa.net>",

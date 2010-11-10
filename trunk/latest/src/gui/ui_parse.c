@@ -183,8 +183,8 @@
 		g_free(stock);
 
 		// Connect standard actions
-		Trace("Name: %s toggle: %s",action_name,toggle ? "Yes" : "No");
-		
+		Trace("Name: \"%s\" toggle: %s",action_name,toggle ? "Yes" : "No");
+
 		if(!(g_strcasecmp(action_name,"quit") || toggle))
 		{
 			g_signal_connect(G_OBJECT(ret),"activate",G_CALLBACK(action_quit),state->window);
@@ -211,7 +211,9 @@
  	else
  	{
  		// Already created, just update
-		setup(ret,action_name,FALSE,names,values,error);
+		Trace("Name: \"%s\"",action_name);
+		if(g_strcasecmp(action_name,"quit"))
+			setup(ret,action_name,FALSE,names,values,error);
 		g_free(name);
  	}
 
@@ -561,6 +563,8 @@
 
  	el = (UI_ELEMENT *) g_hash_table_lookup(state->tool,name);
 
+	Trace("%s: el=%p",__FUNCTION__,el);
+
  	if(!el)
  	{
  		// New toolbar item
@@ -569,9 +573,13 @@
 
 		if((el = create_element(sizeof(UI_ELEMENT),name,names,values,state,error)) == NULL)
 		{
+			Trace("%s: Can't create element",__FUNCTION__);
+
 		 	g_free(temp);
 			return NULL;
 		}
+
+		Trace("%s: action=%p",__FUNCTION__,el->action);
 
 		if(el->action)
 		{
@@ -600,6 +608,8 @@
 	gtk_toolbar_insert(GTK_TOOLBAR(state->current->widget),GTK_TOOL_ITEM(el->widget),-1);
 
 	g_free(temp);
+
+	Trace("%s ends",__FUNCTION__);
 	return el;
  }
 
@@ -656,29 +666,49 @@
 			{	"ui", 			start_dunno			},
 			{ 	"accelerator",	start_accelerator	},
 
+			// Keypad
+			{	"keypad", 		skip_block			},
+			{	"row",	 		skip_block			},
+			{	"button", 		skip_block			},
+
+			// Mouse actions
+			{	"scroll", 		skip_block			},
+
+			// Scripts
+			{	"script",		start_dunno			},
+
 			// OS dependant
+#if defined( WIN32 )
 
-#if !defined( WIN32 )
-			{	"windows",		skip_block			},
-#else
+			{	"apple", 		skip_block			},
+			{	"linux", 		skip_block			},
 			{	"windows", 		start_dunno			},
-#endif // !WIN32
 
-#if !defined( __APPLE__ )
-			{	"apple",		skip_block			},
-#else
+#elif defined( __APPLE__ )
+
 			{	"apple", 		start_dunno			},
-#endif // !WIN32
+			{	"linux", 		skip_block			},
+			{	"windows", 		skip_block			},
 
-#if !defined ( linux )
-			{	"linux",		skip_block			},
-#else
+#elif defined( linux )
+
+			{	"apple", 		skip_block			},
 			{	"linux", 		start_dunno			},
-#endif // !linux
+			{	"windows", 		skip_block			},
+#else
+
+			#warning Unexpected OS detected.
+			{	"apple", 		skip_block			},
+			{	"linux", 		skip_block			},
+			{	"windows", 		skip_block			},
+
+#endif
 
  	};
 
  	int f;
+
+	Trace("%s",element_name);
 
 	if(state->ignore > 0)
 	{

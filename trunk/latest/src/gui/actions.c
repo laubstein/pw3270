@@ -68,12 +68,12 @@
  #define DECLARE_LIB3270_ACTION( name )  				{ ACTION_TYPE_CALL, #name, (GCallback) lib3270_ ## name, NULL },
  #define DECLARE_LIB3270_CLEAR_SELECTION_ACTION( name ) { ACTION_TYPE_CLEAR_SELECTION, #name, (GCallback) lib3270_ ## name, NULL },
  #define DECLARE_LIB3270_KEY_ACTION( name )				{ ACTION_TYPE_CALL, #name, (GCallback) lib3270_ ## name, NULL },
- #define DECLARE_LIB3270_CURSOR_ACTION( name )			{ ACTION_TYPE_CALL, #name, (GCallback) lib3270_cursor_ ## name, NULL },
+ #define DECLARE_LIB3270_CURSOR_ACTION( name )			{ ACTION_TYPE_CALL, "cursor" #name, (GCallback) lib3270_cursor_ ## name, NULL },
  #define DECLARE_LIB3270_FKEY_ACTION( name )			{ ACTION_TYPE_FKEY, #name, (GCallback) lib3270_ ## name, NULL },
 
  static const struct action_data
  {
- 	unsigned short 	type;				/**< Action type (used to define the callback method) */
+ 	unsigned short 	type;			/**< Action type (used to define the callback method) */
  	const 				gchar *name;	/**< Action name */
  	GCallback			callback;		/**< Action method */
  	const				gchar *attr;	/**< Action attributes */
@@ -81,6 +81,14 @@
  {
 	#include "action_table.h"
 	#include "lib3270/action_table.h"
+
+	// Compatibility
+	{ ACTION_TYPE_GUI, 				"return", 			(GCallback) action_enter,		"" },
+	{ ACTION_TYPE_CLEAR_SELECTION,	"escape", 			(GCallback) lib3270_reset,		"" },
+	{ ACTION_TYPE_CALL, 			"previousfield",	(GCallback) lib3270_backtab,	"" },
+	{ ACTION_TYPE_CALL, 			"nextfield",		(GCallback) lib3270_tab,		"" },
+	{ ACTION_TYPE_CALL, 			"home",				(GCallback) lib3270_firstfield,	"" },
+
  };
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
@@ -232,6 +240,7 @@
 			return action_table+f;
 	}
 
+	Trace("%s - unexpected action \"%s\"",__FUNCTION__,name);
 	*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), name);
 
 	return NULL;
@@ -284,6 +293,7 @@
 		break;
 
 	default:
+		Trace("%s - unexpected action %s",__FUNCTION__,name);
 		*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), name);
 		return -1;
 	}
@@ -301,7 +311,7 @@
 
  int action_setup_toggleset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
- 
+
 	#warning Implementar
 
 	return 0;
