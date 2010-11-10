@@ -623,7 +623,7 @@
 		// Edit actions
 		{	"PasteNext",		G_CALLBACK(action_pastenext)		},
 		{	"PasteTextFile",	G_CALLBACK(action_pastetextfile)	},
-		{	"Reselect",			G_CALLBACK(Reselect)				},
+		{	"Reselect",			G_CALLBACK(action_reselect)				},
 		{	"SelectAll",		G_CALLBACK(action_selectall)		},
 		{	"EraseInput",		G_CALLBACK(erase_input_action)		},
 		{	"Clear",			G_CALLBACK(clear_action)			},
@@ -685,6 +685,9 @@
 		{ "Delete",				G_CALLBACK(lib3270_delete)			},
 		{ "Erase",				G_CALLBACK(lib3270_erase)			},
 		{ "SysREQ",				G_CALLBACK(lib3270_sysreq)			},
+
+		{ "FirstField",			G_CALLBACK(lib3270_firstfield)		},
+
 	};
 
 	int			f;
