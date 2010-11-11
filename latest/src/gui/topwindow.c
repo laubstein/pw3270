@@ -145,7 +145,6 @@
 
 	}
 
-
 	gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
-	return -1;
+	return 0;
  }

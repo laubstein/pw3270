@@ -187,6 +187,8 @@
  	Trace("%s","Destroying terminal");
  	terminal = NULL;
 
+ 	cursor_blink = FALSE;
+
 	release_pixmaps();
 	release_font_info(&terminal_font_info);
 
