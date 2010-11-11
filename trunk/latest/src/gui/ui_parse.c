@@ -104,8 +104,7 @@
 
  static void action_quit(GtkAction *action, GtkWidget *window)
  {
-	Trace("%s: Removing window %p",__FUNCTION__,window);
-	gtk_widget_destroy(window);
+	gtk_main_quit();
  }
 
  static GtkAction * create_action(const gchar *element_name, const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
@@ -120,8 +119,8 @@
  	{
 		{ TRUE,		"toggle",			action_setup_toggle			},
 
-		{ TRUE,		"toggleset",		action_setup_toggleset		},
-		{ TRUE,		"togglereset",		action_setup_togglereset	},
+		{ FALSE,	"toggleset",		action_setup_toggleset		},
+		{ FALSE,	"togglereset",		action_setup_togglereset	},
 
 		{ FALSE,	"pfkey",			action_setup_pfkey			},
 		{ FALSE,	"pakey",			action_setup_pakey			},
@@ -183,7 +182,7 @@
 		g_free(stock);
 
 		// Connect standard actions
-		Trace("Name: \"%s\" toggle: %s",action_name,toggle ? "Yes" : "No");
+//		Trace("Name: \"%s\" toggle: %s",action_name,toggle ? "Yes" : "No");
 
 		if(!(g_strcasecmp(action_name,"quit") || toggle))
 		{
@@ -708,7 +707,7 @@
 
  	int f;
 
-	Trace("%s",element_name);
+//	Trace("%s",element_name);
 
 	if(state->ignore > 0)
 	{

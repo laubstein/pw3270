@@ -301,16 +301,82 @@
 	return 0;
  }
 
+ static int get_toggle_id(const gchar **names, const gchar **values, GError **error)
+ {
+ 	const gchar	* toggle_name = get_xml_attribute(names, values, "id");
+ 	int 			  f;
+
+	if(!toggle_name)
+	{
+		*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid toggle definition" ));
+		return -1;
+	}
+
+ 	// Check for lib3270 toggles
+ 	for(f=0;f<N_TOGGLES;f++)
+ 	{
+ 		if(!g_ascii_strcasecmp(toggle_name,get_3270_toggle_name(f)))
+			return f;
+ 	}
+
+ 	// Check for GUI toggles
+ 	for(f=0;f<GUI_TOGGLE_COUNT;f++)
+ 	{
+ 		if(!g_ascii_strcasecmp(toggle_name,gui_toggle_name[f]))
+			return f+N_TOGGLES;
+ 	}
+
+	*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Unexpected or invalid toggle \"%s\"" ), toggle_name);
+
+ 	return -1;
+ }
+
+ static void lib3270_toggle_action(GtkToggleAction *action, gpointer id)
+ {
+		gboolean active = gtk_toggle_action_get_active(action);
+        Trace("%s(%s,%d)=%s",__FUNCTION__,gtk_action_get_name(GTK_ACTION(action)),(int) id,active ? "Active" : "Inactive");
+        set_toggle((int) id,active);
+ }
+
  int action_setup_toggle(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
+ 	int id = get_toggle_id(names,values,error);
 
-	#warning Implementar
+ 	if(id < 0)
+		return -1;
+
+	if(!connect)
+		return 0;
+
+	toggle_action[id].toggle = action;
+
+	if(id >= N_TOGGLES)
+	{
+		Trace("Connect toggle \"%s\" to gui",get_xml_attribute(names, values, "id"));
+		#warning Implementar
+	}
+	else
+	{
+		Trace("Connect toggle \"%s\" to lib3270",get_xml_attribute(names, values, "id"));
+		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),Toggled(id) ? TRUE : FALSE);
+		g_signal_connect(G_OBJECT(action),"toggled",G_CALLBACK(lib3270_toggle_action),(gpointer) id);
+	}
+
 
 	return 0;
  }
 
  int action_setup_toggleset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
+ 	int id = get_toggle_id(names,values,error);
+
+ 	if(id < 0)
+		return -1;
+
+	if(!connect)
+		return 0;
+
+	toggle_action[id].set = action;
 
 	#warning Implementar
 
@@ -319,6 +385,13 @@
 
  int action_setup_togglereset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
+ 	int id = get_toggle_id(names,values,error);
+
+ 	if(id < 0)
+		return -1;
+
+	if(!connect)
+		return 0;
 
 	#warning Implementar
 
