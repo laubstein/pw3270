@@ -2,9 +2,8 @@
 
 PACKAGE_VERSION=4.2
 PACKAGE_RELEASE=0
-
-REV=`date +%y%m%d%H%M`
 REV_FILE=./revision.m4
+REV=`date +%y%m%d%H%M`
 
 if [ -d .svn ]; then
 	SVN=`which svn 2> /dev/null`
@@ -46,15 +45,30 @@ if [ ! -z $SVN ]; then
 
 fi
 
-SVN_SCRIPT="s/@PACKAGE_VERSION@/$PACKAGE_VERSION/g;s/@PACKAGE_RELEASE@/$PACKAGE_RELEASE/g;s/@PACKAGE_REVISION@/$REV/g;s/@DATE_CHANGED@/`date --rfc-2822`/g"
+case $MACHTYPE in
+	
+*-apple-*)
 
-if [ -e "debian/control.in" ]; then
-	sed "$SVN_SCRIPT" "debian/control.in" > "debian/control"
-fi
+	if [ -z $JHBUILD_PREFIX ]; then
+		echo "JHBUILD_PREFIX is undefined"
+		exit -1
+	fi
 
-if [ -e "debian/changelog.in" ]; then
-	sed "$SVN_SCRIPT" "debian/changelog.in" > "debian/changelog"
-fi
+	;;
+	
+*)
+	SVN_SCRIPT="s/@PACKAGE_VERSION@/$PACKAGE_VERSION/g;s/@PACKAGE_RELEASE@/$PACKAGE_RELEASE/g;s/@PACKAGE_REVISION@/$REV/g;s/@DATE_CHANGED@/`date --rfc-2822`/g"
+
+	if [ -e "debian/control.in" ]; then
+		sed "$SVN_SCRIPT" "debian/control.in" > "debian/control"
+	fi
+
+	if [ -e "debian/changelog.in" ]; then
+		sed "$SVN_SCRIPT" "debian/changelog.in" > "debian/changelog"
+	fi
+	;;
+		
+esac
 
 aclocal
 if [ "$?" != "0" ]; then
