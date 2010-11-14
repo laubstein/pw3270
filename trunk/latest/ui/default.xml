@@ -30,7 +30,7 @@
 ------------------------------------------------------------------------------>
 
 <ui>
-	<menubar name='topmenu'>
+	<menubar name='topmenu' topmenu='yes'>
 
 		<menu name='FileMenu' label='_File' >
 			<menuitem action='SaveScreen' group='online' label='Save screen' />
