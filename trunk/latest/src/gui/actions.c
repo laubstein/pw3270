@@ -338,6 +338,23 @@
         set_toggle((int) id,active);
  }
 
+ static void gui_toggle_action(GtkToggleAction *action, gpointer id)
+ {
+		gboolean active = gtk_toggle_action_get_active(action);
+
+		if(active == gui_toggle_state[(int) id])
+			return;
+
+		gui_toggle_state[(int) id] = active;
+
+		Trace("%s(%s,%d)=%s",__FUNCTION__,gui_toggle_name[(int) id],(int) id, active ? "Active" : "Inactive");
+
+        SetBoolean("Toggles",gui_toggle_name[(int) id],gui_toggle_state[(int) id]);
+
+		if(id == GUI_TOGGLE_BOLD)
+			action_redraw(GTK_ACTION(action));
+ }
+
  int action_setup_toggle(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
  	int id = get_toggle_id(names,values,error);
@@ -352,8 +369,10 @@
 
 	if(id >= N_TOGGLES)
 	{
-		Trace("Connect toggle \"%s\" to gui",get_xml_attribute(names, values, "id"));
-		#warning Implementar
+		id -= N_TOGGLES;
+		Trace("Connect toggle \"%s\" to gui (id=%d)",get_xml_attribute(names, values, "id"),id);
+		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),gui_toggle_state[id]);
+		g_signal_connect(G_OBJECT(action),"toggled",G_CALLBACK(gui_toggle_action),(gpointer) id);
 	}
 	else
 	{
