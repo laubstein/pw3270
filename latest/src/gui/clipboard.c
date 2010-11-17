@@ -110,6 +110,7 @@
 	if(last_clipboard)
 		g_free(last_clipboard);
 
+	action_group_set_sensitive(ACTION_GROUP_CLIPBOARD,clipboard_string != NULL);
 	gtk_action_set_sensitive(action_by_id[ACTION_PASTENEXT],clipboard_string != NULL);
 
 	screen_resume();
@@ -462,6 +463,7 @@
 		clipboard_string = NULL;
 	}
 	gtk_action_set_sensitive(action_by_id[ACTION_PASTENEXT],FALSE);
+	action_group_set_sensitive(ACTION_GROUP_CLIPBOARD,FALSE);
 
  }
 
@@ -495,6 +497,7 @@
  	}
 
 	action_group_set_sensitive(ACTION_GROUP_PASTE,TRUE);
+	action_group_set_sensitive(ACTION_GROUP_CLIPBOARD,TRUE);
 
 	if(last_clipboard)
 		g_free(last_clipboard);
@@ -644,6 +647,8 @@
 	gtk_clipboard_set_image(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_CLIPBOARD),img);
 
 	g_object_unref(img);
+
+	action_group_set_sensitive(ACTION_GROUP_CLIPBOARD,FALSE);
 
 	Trace("%s ends", __FUNCTION__);
  }
