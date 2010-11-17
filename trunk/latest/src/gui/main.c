@@ -558,6 +558,7 @@ int main(int argc, char *argv[])
 	}
 
 	LoadColors();
+	init_gui_toggles();
 
 	if(CreateTopWindow())
 	{
@@ -584,7 +585,6 @@ int main(int argc, char *argv[])
 	register_tchange(MONOCASE,set_monocase);
 
 	update_toggle_actions();
-	init_gui_toggles();
 
 	if(!startup_script)
 	{

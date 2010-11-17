@@ -37,6 +37,19 @@
 
  static const gchar	*filename = NULL;
  static FILE		 	*out;
+ static GHashTable	 	*hash = NULL;
+
+ struct record
+ {
+ 	const gchar	*filename;
+ 	const gchar	*label;
+ 	gint			line_number;
+ 	gint			char_number;
+
+ 	gchar			text[1];
+ };
+
+/*---[ Implement ]----------------------------------------------------------------------------------------*/
 
  static void element_start(GMarkupParseContext *context,const gchar *element_name,const gchar **names,const gchar **values, gpointer user_data, GError **error)
  {
@@ -44,16 +57,26 @@
 
  	for(f=0;names[f];f++)
  	{
- 		if(!strcmp(names[f],"label"))
+ 		if(!strcmp(names[f],"label") && values[f])
  		{
- 			gint line_number = 0;
- 			gint char_number = 0;
+ 			struct record *rec = g_hash_table_lookup(hash,values[f]);
 
- 			g_markup_parse_context_get_position(context,&line_number,&char_number);
+ 			if(!rec)
+ 			{
+				struct record *rec = g_malloc0(sizeof(struct record)+strlen(values[f])+strlen(filename)+3);
+				char 	*ptr = rec->text;
 
- 			fprintf(out,"#: %s:%d\n",filename,(int) line_number);
-			fprintf(out,"msgid \"%s\"\n",values[f]);
-			fprintf(out,"msgstr \"\"\n\n");
+				g_markup_parse_context_get_position(context,&rec->line_number,&rec->char_number);
+
+				strcpy(ptr,filename);
+				rec->filename = ptr;
+				ptr += (strlen(ptr)+1);
+
+				strcpy(ptr,values[f]);
+				rec->label = ptr;
+
+				g_hash_table_insert(hash,(gpointer) rec->label, rec);
+ 			}
  		}
  	}
 
@@ -108,6 +131,13 @@
 	return 0;
  }
 
+ static void write_file(gpointer key,struct record *rec, FILE *out)
+ {
+	fprintf(out,"#: %s:%d\n",rec->filename,(int) rec->line_number);
+	fprintf(out,"msgid \"%s\"\n",rec->label);
+	fprintf(out,"msgstr \"\"\n\n");
+ }
+
  int main (int argc, char *argv[])
  {
 	static const char * header=	"# SOME DESCRIPTIVE TITLE.\n"
@@ -137,11 +167,16 @@
 
 	fprintf(out,"%s",header);
 
+	hash = g_hash_table_new(g_str_hash, g_str_equal);
+
 	for(f=1;f<argc;f++)
 	{
 		filename = argv[f];
 		rc = parsefile(context);
 	}
+
+	g_hash_table_foreach(hash,(GHFunc) write_file, out);
+
 
 	return rc;
  }
