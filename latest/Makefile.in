@@ -192,7 +192,7 @@ rpm: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 nsi: Release
 	@wine "$(HOME)/.wine/drive_c/Arquivos de programas/NSIS/makensis.exe" "$(PACKAGE).nsi"
 
-deb:
+deb: debian/control
 	@dpkg-buildpackage -rfakeroot -uc -us
 
 ####################################################################################################
@@ -597,15 +597,18 @@ tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
 # Install targets
 ####################################################################################################
 
-install: install-common install-gui @INSTALL_TARGETS@ install-dev install-doc
+debian/control: debian/control-base $(foreach PKT, @INSTALL_PACKETS@, debian/control-$(PKT))
+	@cat debian/control-base $(foreach PKT, @INSTALL_PACKETS@, debian/control-$(PKT)) > $@
 
-install-java-plugin: bin/Release/libpw3270_jni.so bin/Release/pw3270.jar
+install: install-common install-gui @INSTALL_TARGETS@ install-doc
+
+install-plugin-java: bin/Release/libpw3270_jni.so bin/Release/pw3270.jar
 	@mkdir -p $(DESTDIR)/$(JNIDIR)
 	@mkdir -p $(DESTDIR)/$(JARDIR)
 	@install -m 644 bin/Release/libpw3270_jni.so $(DESTDIR)/$(JNIDIR)
 	@install -m 644 bin/Release/pw3270.jar $(DESTDIR)/$(JARDIR)
 
-install-rexx-plugin: bin/Release/librx3270.so
+install-plugin-rexx: bin/Release/librx3270.so
 	@mkdir -p $(DESTDIR)/$(bindir)
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@mkdir -p $(DESTDIR)/$(LIBDIR)

@@ -59,8 +59,8 @@ case $MACHTYPE in
 *)
 	SVN_SCRIPT="s/@PACKAGE_VERSION@/$PACKAGE_VERSION/g;s/@PACKAGE_RELEASE@/$PACKAGE_RELEASE/g;s/@PACKAGE_REVISION@/$REV/g;s/@DATE_CHANGED@/`date --rfc-2822`/g"
 
-	if [ -e "debian/control.in" ]; then
-		sed "$SVN_SCRIPT" "debian/control.in" > "debian/control"
+	if [ -e "debian/control-base.in" ]; then
+		sed "$SVN_SCRIPT" "debian/control-base.in" > "debian/control-base"
 	fi
 
 	if [ -e "debian/changelog.in" ]; then
