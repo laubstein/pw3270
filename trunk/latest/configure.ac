@@ -77,12 +77,15 @@ LD_APIFLAGS=""
 LD_RLSFLAGS="-Wl,--strip-all"
 LD=$CC
 PLUGINS=""
+
+INSTALL_PACKETS="dev"
+INSTALL_TARGETS="install-dev"
+
 TARGETS=""
 PLUGINS_UI=""
 REXX_SYMBOL_HACK=""
 EXTENSIONS=""
 CPPUENV="gcc3"
-INSTALL_TARGETS=""
 JAVAC="\$(JDK_HOME)/bin/javac"
 JAVAH="\$(JDK_HOME)/bin/javah"
 
@@ -468,6 +471,7 @@ if test "$oo_sdk_home" != "none"; then
 	AC_DEFINE_UNQUOTED(OFFICE_HOME,"$oo_home")
 	AC_DEFINE_UNQUOTED(OFFICE_PROGRAM,"$oo_program")
 
+	INSTALL_PACKETS="$INSTALL_PACKETS oxt"
 	INSTALL_TARGETS="$INSTALL_TARGETS install-oxt"
 
 fi
@@ -506,7 +510,7 @@ AC_SUBST(LIBSSL_CFLAGS)
 # Check for ige-mac-integration
 PKG_CHECK_MODULES( [IGEMAC], [ige-mac-integration],
 					AC_DEFINE(HAVE_IGEMAC),
-					AC_MSG_NOTICE([ige-mac-integratio not present.]) )
+					AC_MSG_NOTICE([ige-mac-integration not present.]) )
 
 AC_SUBST(IGEMAC_LIBS)
 AC_SUBST(IGEMAC_CFLAGS)
@@ -519,7 +523,10 @@ if test "$pw3270_cv_rexx" == "yes"; then
 	PLUGINS="rx3270 $PLUGINS"
 	PLUGINS_UI="rexx.xml $PLUGINS_UI"
 	EXTENSIONS="librx3270 $EXTENSIONS"
-	INSTALL_TARGETS="$INSTALL_TARGETS install-rexx-plugin"
+
+	INSTALL_PACKETS="$INSTALL_PACKETS plugin-rexx"
+	INSTALL_TARGETS="$INSTALL_TARGETS install-plugin-rexx"
+
 elif test "$pw3270_cv_rexx" != "no"; then
 	AC_DEFINE(HAVE_REXX)
 	REXX_CFLAGS="-I$pw3270_cv_rexx/api"
@@ -527,7 +534,10 @@ elif test "$pw3270_cv_rexx" != "no"; then
 	PLUGINS="rx3270 $PLUGINS"
 	PLUGINS_UI="rexx.xml $PLUGINS_UI"
 	EXTENSIONS="librx3270 $EXTENSIONS"
-	INSTALL_TARGETS="$INSTALL_TARGETS install-rexx-plugin"
+
+	INSTALL_PACKETS="$INSTALL_PACKETS plugin-rexx"
+	INSTALL_TARGETS="$INSTALL_TARGETS install-plugin-rexx"
+
 fi
 
 AC_SUBST(REXX_LIBS)
@@ -578,7 +588,10 @@ if test "$pw3270_cv_java" == "yes"; then
 	AC_DEFINE([HAVE_JAVA])
 	PLUGINS="j3270plugin $PLUGINS"
 	TARGETS="$TARGETS libpw3270_jni\$(DLLEXT) pw3270.jar"
-	INSTALL_TARGETS="$INSTALL_TARGETS install-java-plugin"
+
+	INSTALL_PACKETS="$INSTALL_PACKETS plugin-java"
+	INSTALL_TARGETS="$INSTALL_TARGETS install-plugin-java"
+
 fi
 
 if test "_$HOST_CC" = "_" ; then
@@ -627,6 +640,9 @@ AC_SUBST(DLLEXT)
 AC_SUBST(EXEEXT)
 AC_SUBST(TARGETS)
 
+AC_SUBST(INSTALL_PACKETS)
+AC_SUBST(INSTALL_TARGETS)
+
 AC_DEFINE_UNQUOTED(LOGOEXT,"$LOGOEXT")
 AC_SUBST(LOGOEXT)
 
@@ -655,7 +671,6 @@ AC_SUBST(OS_APPSRCS)
 AC_SUBST(UI_SRCS)
 AC_SUBST(OS_APISRCS)
 AC_SUBST(GTKRUNTIME,$pw3270_cv_gtkruntime)
-AC_SUBST(INSTALL_TARGETS)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
@@ -677,7 +692,7 @@ case "$host" in
 
 	*)
 		AC_OUTPUT(pw3270.spec)
-		AC_OUTPUT(debian/control)
+		AC_OUTPUT(debian/control-base)
 		AC_OUTPUT(debian/changelog)
 		AC_OUTPUT(lib3270.pc)
 
