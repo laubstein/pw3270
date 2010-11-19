@@ -1411,6 +1411,16 @@
 
 	gtk_window_add_accel_group(GTK_WINDOW(window),gtk_ui_manager_get_accel_group(info.manager));
 
+	// Update action toggles
+ 	for(f=0;f<GUI_TOGGLE_COUNT;f++)
+ 	{
+ 		gchar *name = g_strconcat("Toggle",gui_toggle_info[f].name,NULL);
+ 		GtkAction *action = get_action_by_name(name);
+		if(action)
+			gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),gui_toggle_state[f]);
+		g_free(name);
+ 	}
+
 	// And return the created ui manager
 	return info.manager;
  }
