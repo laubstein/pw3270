@@ -182,17 +182,18 @@
 		ResizeTerminal(widget,event->width,event->height);
  }
 
+
  static void destroy( GtkWidget *widget, gpointer data)
  {
- 	Trace("%s","Destroying terminal");
- 	terminal = NULL;
+ 	Trace("Destroying terminal %p",widget);
 
  	cursor_blink = FALSE;
 
 	release_pixmaps();
 	release_font_info(&terminal_font_info);
 
- 	Trace("%s","Terminal destroyed");
+ 	terminal = NULL;
+ 	Trace("Terminal %p destroyed",widget);
 
  }
 

@@ -71,11 +71,4 @@
 		</menu>
 	</menubar>
 
-	<accelerator name='ConnectDisconnect' group='online' key='F12' >
-		<script>
-		Disconnect
-		Connect
-		</script>
-	</accelerator>
-
 </ui>

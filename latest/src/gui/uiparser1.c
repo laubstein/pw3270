@@ -740,7 +740,7 @@
 					for(f=0;names[f];f++)
 					{
 						gchar *ptr = g_strdup_printf("script_%s",names[f]);
-						Trace("%s=%s",ptr,values[f]);
+						Trace("%s=%s (ptr=%p)",ptr,values[f],ptr);
 						g_object_set_data_full(G_OBJECT(data->action),ptr,g_strdup(values[f]),g_free);
 						g_free(ptr);
 					}

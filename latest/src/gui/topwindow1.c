@@ -55,13 +55,15 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
+/*
  static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer data )
  {
  	Trace("%s called - Destroying top-window",__FUNCTION__);
- 	action_save(0);
+ 	// action_save(0);
  	Trace("%s","Ok");
     return FALSE;
  }
+*/
 
  static void destroy( GtkWidget *widget, gpointer   data )
  {
@@ -76,19 +78,6 @@
  	// http://developer.gnome.org/doc/API/2.0/gtk/GtkWidget.html#GtkWidget-key-press-event
 	return check_key_action(widget,event);
  }
-
-/*
- static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
- {
-
-    if(IS_FUNCTION_KEY(event))
-    {
-    	GetFunctionKey(event);
-    	return TRUE;
-    }
- 	return FALSE;
- }
-*/
 
  static void activate_font(GtkCheckMenuItem *item, gchar *text)
  {
@@ -323,12 +312,13 @@
 
 #endif
 
-	g_signal_connect(G_OBJECT(topwindow),	"delete_event", 		G_CALLBACK(delete_event),			0);
+//	g_signal_connect(G_OBJECT(topwindow),	"delete_event", 		G_CALLBACK(delete_event),			0);
 	g_signal_connect(G_OBJECT(topwindow),	"destroy", 				G_CALLBACK(destroy),				0);
     g_signal_connect(G_OBJECT(topwindow),	"key-press-event",		G_CALLBACK(key_press_event),		0);
 //    g_signal_connect(G_OBJECT(topwindow), 	"key-release-event",	G_CALLBACK(key_release_event),		0);
 
 	/* Create terminal window */
+	terminal = gtk_label_new("Teste");
 	if(!CreateTerminalWindow())
 		return -1;
 
@@ -439,6 +429,6 @@
  void program_quit(void)
  {
  	Trace("%s called, disconnecting",__FUNCTION__);
- 	host_disconnect(hSession, 0);
+ 	action_disconnect(0);
 	gtk_main_quit();
  }

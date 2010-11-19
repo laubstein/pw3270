@@ -36,7 +36,6 @@ LIB3270_INTERNAL void net_charmode(void);
 LIB3270_INTERNAL int net_connect(const char *, char *, Boolean, Boolean *, Boolean *);
 LIB3270_INTERNAL void net_disconnect(void);
 LIB3270_INTERNAL void net_exception(H3270 *session);
-LIB3270_INTERNAL int net_getsockname(void *buf, int *len);
 LIB3270_INTERNAL void net_hexansi_out(unsigned char *buf, int len);
 LIB3270_INTERNAL void net_input(H3270 *session);
 LIB3270_INTERNAL void net_interrupt(void);
@@ -60,3 +59,5 @@ LIB3270_INTERNAL void popup_a_sockerr(char *fmt, ...) printflike(1, 2);
 LIB3270_INTERNAL char *net_proxy_type(void);
 LIB3270_INTERNAL char *net_proxy_host(void);
 LIB3270_INTERNAL char *net_proxy_port(void);
+
+LIB3270_INTERNAL int net_getsockname(const H3270 *h3270, void *buf, int *len);
