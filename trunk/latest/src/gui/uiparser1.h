@@ -34,6 +34,14 @@
 
  #define UIPARSER_H_INCLUDED 1
 
+ struct _gui_toggle_info
+ {
+    const gchar     *name;
+    const gboolean  def;
+ };
+
+ LOCAL_EXTERN const struct _gui_toggle_info gui_toggle_info[GUI_TOGGLE_COUNT];
+
  typedef enum _ui_callback_type
  {
 	UI_CALLBACK_TYPE_DEFAULT,

@@ -63,11 +63,7 @@
 
 /*---[ Gui toggles ]--------------------------------------------------------------------------------------------*/
 
- static const struct _gui_toggle_info
- {
-    const gchar     *name;
-    const gboolean  def;
- } gui_toggle_info[GUI_TOGGLE_COUNT] =
+ const struct _gui_toggle_info gui_toggle_info[GUI_TOGGLE_COUNT] =
  {
     { "Bold", 			    FALSE	},
     { "KeepSelected", 	    FALSE	},
@@ -267,20 +263,10 @@
 
  void init_gui_toggles(void)
  {
- 	int 		f;
- 	gchar 		*name;
- 	GtkAction	*action;
+ 	int f;
 
  	for(f=0;f<GUI_TOGGLE_COUNT;f++)
- 	{
  		gui_toggle_state[f] = GetBoolean("Toggles", gui_toggle_info[f].name, gui_toggle_info[f].def);
-		name = g_strconcat("Toggle",gui_toggle_info[f].name,NULL);
-		action = get_action_by_name(name);
-		if(action)
-			gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),gui_toggle_state[f]);
-		g_free(name);
- 	}
-
  }
 
  static void action_ToggleGDKDebug(GtkToggleAction *action, gpointer user_data)
