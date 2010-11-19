@@ -150,7 +150,7 @@
 	g_key_file_set_boolean(program_config,group,key,val);
  }
 
- int SaveConfigFile(void)
+ static int SaveConfigFile(void)
  {
  	gchar	*ptr;
  	gchar	*filename;
@@ -244,7 +244,7 @@
 
  int CloseConfigFile(void)
  {
- 	SaveConfigFile();
+ 	action_save(0);
 	g_key_file_free(program_config);
 	program_config = NULL;
 	return 0;
@@ -284,13 +284,17 @@
 	if(!program_config)
 		return;
 
-	CurrentState = gdk_window_get_state(topwindow->window);
+	if(topwindow && topwindow->window)
+	{
+		CurrentState = gdk_window_get_state(topwindow->window);
 
-	if( !(CurrentState & (GDK_WINDOW_STATE_FULLSCREEN|GDK_WINDOW_STATE_MAXIMIZED|GDK_WINDOW_STATE_ICONIFIED)) )
-		SaveWindowSize("TopWindow",topwindow);
+		if( !(CurrentState & (GDK_WINDOW_STATE_FULLSCREEN|GDK_WINDOW_STATE_MAXIMIZED|GDK_WINDOW_STATE_ICONIFIED)) )
+			SaveWindowSize("TopWindow",topwindow);
 
-	for(f=0;f<(sizeof(WindowState)/sizeof(struct _WindowState));f++)
-		g_key_file_set_boolean(program_config,"TopWindow",WindowState[f].name, CurrentState & WindowState[f].flag);
+		for(f=0;f<(sizeof(WindowState)/sizeof(struct _WindowState));f++)
+			g_key_file_set_boolean(program_config,"TopWindow",WindowState[f].name, CurrentState & WindowState[f].flag);
+
+	}
 
 	SaveConfigFile();
  }

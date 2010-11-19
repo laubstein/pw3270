@@ -64,7 +64,6 @@
 	LOCAL_EXTERN void	action_SelectionRight(GtkWidget *w, gpointer user_data);
 	LOCAL_EXTERN void	action_SelectionDown(GtkWidget *w, gpointer user_data);
 
-	LOCAL_EXTERN void	action_Save(void);
 	LOCAL_EXTERN void	action_Restore(void);
 	LOCAL_EXTERN void	action_Redraw(void);
 	LOCAL_EXTERN void	action_SelectColors(void);

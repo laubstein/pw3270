@@ -314,8 +314,6 @@
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
 
-	action_save(0);
-
  }
 
  static int SaveText(const char *title, gchar *text)

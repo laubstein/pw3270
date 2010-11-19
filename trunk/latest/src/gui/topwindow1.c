@@ -55,21 +55,11 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
-/*
- static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer data )
- {
- 	Trace("%s called - Destroying top-window",__FUNCTION__);
- 	// action_save(0);
- 	Trace("%s","Ok");
-    return FALSE;
- }
-*/
-
  static void destroy( GtkWidget *widget, gpointer   data )
  {
  	Trace("%s called - Destroying top-window %p",__FUNCTION__,topwindow);
  	topwindow = NULL;
-	program_quit();
+	action_quit(0);
  	Trace("%s","Ok");
  }
 
@@ -426,9 +416,3 @@
 	return 0;
  }
 
- void program_quit(void)
- {
- 	Trace("%s called, disconnecting",__FUNCTION__);
- 	action_disconnect(0);
-	gtk_main_quit();
- }
