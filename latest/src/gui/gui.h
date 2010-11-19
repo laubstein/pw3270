@@ -382,9 +382,6 @@
 
 	void 			RunExternalProgramWithText(const gchar *cmd, const gchar *str);
 
-
-	void			program_quit(void);
-
 	LOCAL_EXTERN int		  get_selected_rectangle(GdkRectangle *rect);
 
 	void	set_monocase(int value, enum toggle_type reason);

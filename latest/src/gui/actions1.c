@@ -193,49 +193,12 @@
  	clear_and_call(0,lib3270_cursor_right);
  }
 
-/*
- void DisableNetworkActions(void)
- {
-	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
-	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
- }
-*/
-
-/*
- void action_disconnect(GtkAction *action)
- {
- 	Trace("%s: Connected:%d",__FUNCTION__,PCONNECTED);
-
- 	if(!PCONNECTED)
- 		return;
-
-	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
-	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
-
- 	unselect();
- 	host_disconnect(hSession,0);
- }
-
- void action_printscreen(GtkAction *action)
- {
-	PrintText(PROGRAM_NAME, GetScreenContents(TRUE));
- }
-
- static void action_PrintSelected(GtkWidget *w, gpointer user_data)
- {
-	PrintText(PROGRAM_NAME, GetSelection());
- }
-
- static void action_PrintClipboard(GtkWidget *w, gpointer user_data)
- {
-	PrintText(PROGRAM_NAME, GetClipboard());
- }
-*/
-
  void action_quit(GtkAction *action)
  {
- 	action_save(0);
- 	program_quit();
+ 	Trace("%s called, disconnecting",__FUNCTION__);
+ 	screen_updates_enabled = FALSE;
+ 	action_disconnect(0);
+	gtk_main_quit();
  }
 
  static void toggle_action(GtkToggleAction *action, gpointer id)

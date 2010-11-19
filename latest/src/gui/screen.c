@@ -385,7 +385,7 @@
  {
  	int f;
 
-	Trace("Erasing screen! (pixmap: %p screen: %p terminal: %p valid: %s)",get_terminal_pixmap(),screen,terminal, valid_terminal_window() ? "Yes" : "No");
+	Trace("Erasing screen! (pixmap: %p screen: %p terminal: %p window: %p valid: %s)",get_terminal_pixmap(),screen,terminal,terminal->window,valid_terminal_window() ? "Yes" : "No");
 
 	if(screen)
 	{
@@ -400,18 +400,22 @@
 		}
 	}
 
-	if(valid_terminal_window() && screen_updates_enabled)
+	if(valid_terminal_window())
 	{
-		int 	width  = terminal_cols * fontWidth;
-		int 	height = terminal_rows * terminal_font_info.spacing;
-		cairo_t *cr	= get_terminal_cairo_context();
 
-		gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_BACKGROUND);
-		cairo_rectangle(cr, left_margin, top_margin, width, height);
-		cairo_fill(cr);
+		if(screen_updates_enabled)
+		{
+			int 	width  = terminal_cols * fontWidth;
+			int 	height = terminal_rows * terminal_font_info.spacing;
+			cairo_t *cr	= get_terminal_cairo_context();
 
-		cairo_destroy(cr);
-		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,width,height);
+			gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_BACKGROUND);
+			cairo_rectangle(cr, left_margin, top_margin, width, height);
+			cairo_fill(cr);
+
+			cairo_destroy(cr);
+			gtk_widget_queue_draw_area(terminal,left_margin,top_margin,width,height);
+		}
 	}
 
 	if(get_cursor_pixmap())
@@ -419,7 +423,6 @@
 		gdk_pixmap_unref(get_cursor_pixmap());
 		pixmap_cursor = NULL;
 	}
-
  }
 
  static GPid on_lu_pid = 0;
