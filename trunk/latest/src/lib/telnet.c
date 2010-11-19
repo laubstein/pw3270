@@ -796,6 +796,7 @@ net_connected(void)
 	/* set up telnet options */
 	(void) memset((char *) myopts, 0, sizeof(myopts));
 	(void) memset((char *) hisopts, 0, sizeof(hisopts));
+
 #if defined(X3270_TN3270E) /*[*/
 	e_funcs = E_OPT(TN3270E_FUNC_BIND_IMAGE) |
 		  E_OPT(TN3270E_FUNC_RESPONSES) |
@@ -803,6 +804,7 @@ net_connected(void)
 	e_xmit_seq = 0;
 	response_required = TN3270E_RSF_NO_RESPONSE;
 #endif /*]*/
+
 #if defined(HAVE_LIBSSL) /*[*/
 	need_tls_follows = False;
 #endif /*]*/
@@ -1512,8 +1514,7 @@ tn3270e_request(void)
 
 	net_rawout((unsigned char *)tt_out, tb_len);
 
-	trace_dsn("SENT %s %s DEVICE-TYPE REQUEST %.*s%s%s "
-		   "%s\n",
+	trace_dsn("SENT %s %s DEVICE-TYPE REQUEST %.*s%s%s %s\n",
 	    cmd(SB), opt(TELOPT_TN3270E), strlen(h3270.termtype), tt_out + 5,
 	    (try_lu != CN && *try_lu) ? " CONNECT " : "",
 	    (try_lu != CN && *try_lu) ? try_lu : "",
@@ -1676,8 +1677,7 @@ tn3270e_negotiate(void)
 				e_funcs = e_rcvd;
 				tn3270e_subneg_send(TN3270E_OP_IS, e_funcs);
 				tn3270e_negotiated = 1;
-				trace_dsn("TN3270E option negotiation "
-				    "complete.\n");
+				trace_dsn("TN3270E option negotiation complete.\n");
 				check_in3270();
 			} else {
 				/*
@@ -1685,8 +1685,7 @@ tn3270e_negotiate(void)
 				 * Request the common subset.
 				 */
 				e_funcs &= e_rcvd;
-				tn3270e_subneg_send(TN3270E_OP_REQUEST,
-				    e_funcs);
+				tn3270e_subneg_send(TN3270E_OP_REQUEST,e_funcs);
 			}
 			break;
 
@@ -2466,8 +2465,7 @@ check_in3270(void)
 			tn3270e_bound = 0;
 		}
 #endif /*]*/
-		trace_dsn("Now operating in %s mode.\n",
-			state_name[new_cstate]);
+		trace_dsn("Now operating in %s mode.\n",state_name[new_cstate]);
 		host_in3270(new_cstate);
 	}
 }
@@ -3371,8 +3369,7 @@ continue_tls(unsigned char *sbbuf, int len)
 	h3270.secure_connection = True;
 
 	/* Success. */
-	trace_dsn("TLS/SSL negotiated connection complete.  "
-		  "Connection is now secure.\n");
+	trace_dsn("TLS/SSL negotiated connection complete. Connection is now secure.\n");
 
 	/* Tell the world that we are (still) connected, now in secure mode. */
 	host_connected();
@@ -3380,112 +3377,12 @@ continue_tls(unsigned char *sbbuf, int len)
 
 #endif /*]*/
 
-#if defined(X3270_SCRIPT) || defined(TCL3270) /*[*/
-
-/* Return the current BIND application name, if any. */ /*
-const char *
-net_query_bind_plu_name(void)
-{
-#if defined(X3270_TN3270E)
-	 // Return the PLU name, if we're in TN3270E 3270 mode and have
-	 // negotiated the BIND-IMAGE option.
-if ((cstate == CONNECTED_TN3270E) &&
-	    (e_funcs & E_OPT(TN3270E_FUNC_BIND_IMAGE)))
-		return plu_name;
-	else
-		return "";
-#else
-	// No TN3270E, no BIND negotiation.
-	return "";
-#endif
-}
-*/
-
-/* Return the current connection state. */ /*
-const char *
-net_query_connection_state(void)
-{
-	if (CONNECTED) {
-#if defined(X3270_TN3270E)
-		if (IN_E) {
-			switch (tn3270e_submode) {
-			default:
-			case E_NONE:
-				if (tn3270e_bound)
-					return "tn3270e bound";
-				else
-					return "tn3270e unbound";
-			case E_3270:
-				return "tn3270e lu-lu";
-			case E_NVT:
-				return "tn3270e nvt";
-			case E_SSCP:
-				return "tn3270 sscp-lu";
-			}
-		} else
-#endif
-		{
-			if (IN_3270)
-				return "tn3270 3270";
-			else
-				return "tn3270 nvt";
-		}
-	} else if (HALF_CONNECTED)
-		return "connecting";
-	else
-		return "";
-}
-*/
-
-/* Return the LU name. */ /*
-const char *
-net_query_lu_name(void)
-{
-	if (CONNECTED && connected_lu != CN)
-		return connected_lu;
-	else
-		return "";
-}
-*/
-
-/* Return the hostname and port. */ /*
-const char *
-net_query_host(void)
-{
-	static char *s = CN;
-
-	if (CONNECTED) {
-		Free(s);
-
-#if defined(LOCAL_PROCESS)
-		if (local_process) {
-			s = xs_buffer("process %s", hostname);
-		} else
-#endif
-		{
-			s = xs_buffer("host %s %u %s",
-					hostname, current_port,
-#if defined(HAVE_LIBSSL)
-					h3270.secure_connection? "encrypted":
-#endif
-							   "unencrypted"
-					    );
-		}
-		return s;
-	} else
-		return "";
-}
-*/
-
-#endif /*]*/
-
 /* Return the local address for the socket. */
-int
-net_getsockname(void *buf, int *len)
+int net_getsockname(const H3270 *h3270, void *buf, int *len)
 {
-	if (h3270.sock < 0)
+	if (h3270->sock < 0)
 		return -1;
-	return getsockname(h3270.sock, buf, (socklen_t *)(void *)len);
+	return getsockname(h3270->sock, buf, (socklen_t *)(void *)len);
 }
 
 /* Return a text version of the current proxy type, or NULL. */

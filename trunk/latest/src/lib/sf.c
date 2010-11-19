@@ -443,21 +443,21 @@ static enum pds
 sf_create_partition(unsigned char buf[], int buflen)
 {
 	unsigned char pid;
-	unsigned char uom;		/* unit of measure */
+	unsigned char uom;	/* unit of measure */
 	unsigned char am;		/* addressing mode */
-	unsigned char flags;		/* flags */
+	unsigned char flags;	/* flags */
 	unsigned short h;		/* height of presentation space */
 	unsigned short w;		/* width of presentation space */
-	unsigned short rv;		/* viewport origin row */
-	unsigned short cv;		/* viewport origin column */
-	unsigned short hv;		/* viewport height */
-	unsigned short wv;		/* viewport width */
-	unsigned short rw;		/* window origin row */
-	unsigned short cw;		/* window origin column */
-	unsigned short rs;		/* scroll rows */
+	unsigned short rv;	/* viewport origin row */
+	unsigned short cv;	/* viewport origin column */
+	unsigned short hv;	/* viewport height */
+	unsigned short wv;	/* viewport width */
+	unsigned short rw;	/* window origin row */
+	unsigned short cw;	/* window origin column */
+	unsigned short rs;	/* scroll rows */
 	/* hole */
-	unsigned short pw;		/* character cell point width */
-	unsigned short ph;		/* character cell point height */
+	unsigned short pw;	/* character cell point width */
+	unsigned short ph;	/* character cell point height */
 
 #if defined(X3270_TRACE) /*[*/
 	static const char *bit4[16] = {

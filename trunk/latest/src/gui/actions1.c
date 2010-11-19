@@ -876,8 +876,8 @@
  void init_actions(void)
  {
 	static const gchar	*group_name[]	= { "default", "online", "offline", "selection", "clipboard", "paste", "filetransfer" };
- 	GtkAction			*dunno			= gtk_action_new("Dunno",NULL,NULL,NULL);
-	int					f;
+ 	GtkAction				*dunno			= gtk_action_new("Dunno",NULL,NULL,NULL);
+	int						f;
 
 	#ifdef DEBUG
 		if(ACTION_GROUP_MAX != G_N_ELEMENTS(group_name))
@@ -896,7 +896,7 @@
 	}
 
 	action_group[f] = 0;
-	g_object_set_data_full(G_OBJECT(topwindow),"ActionGroups",action_group,g_free);
+	g_object_set_data(G_OBJECT(topwindow),"ActionGroups",action_group);
 
 	for(f=0;f<G_N_ELEMENTS(action_by_id);f++)
 		action_by_id[f] = dunno;
