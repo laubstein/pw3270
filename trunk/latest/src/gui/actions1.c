@@ -189,14 +189,6 @@
  	clear_and_call(0,lib3270_cursor_right);
  }
 
- void action_quit(GtkAction *action)
- {
- 	Trace("%s called, disconnecting",__FUNCTION__);
- 	screen_updates_enabled = FALSE;
- 	action_disconnect(0);
-	gtk_main_quit();
- }
-
  static void toggle_action(GtkToggleAction *action, gpointer id)
  {
  	Trace("%s(%d)",__FUNCTION__,(int) id);

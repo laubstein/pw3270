@@ -1191,7 +1191,7 @@ telnet_fsm(unsigned char c)
 				trace_dsn(" ...\n... ");
 				ansi_data = 4 + sl;
 			}
-			trace_dsn(see_chr);
+			trace_dsn("%s",see_chr);
 			if (!syncing) {
 				if (linemode && appres.onlcr && c == '\n')
 					ansi_process((unsigned int) '\r');
@@ -1221,7 +1221,7 @@ telnet_fsm(unsigned char c)
 					trace_dsn(" ...\n ...");
 					ansi_data = 4 + sl;
 				}
-				trace_dsn(see_chr);
+				trace_dsn("%s",see_chr);
 				ansi_process((unsigned int) c);
 //				sms_store(c);
 #endif /*]*/

@@ -35,6 +35,14 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
+ PW3270_ACTION( quit )
+ {
+ 	Trace("%s called, disconnecting",__FUNCTION__);
+ 	screen_updates_enabled = FALSE;
+ 	action_disconnect(0);
+	gtk_main_quit();
+ }
+
  PW3270_ACTION( sethostname )
  {
  	char			*hostname;
