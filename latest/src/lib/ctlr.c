@@ -702,11 +702,11 @@ ctlr_read_modified(unsigned char aid_byte, Boolean all)
 		if (!IN_SSCP) {
 			space3270out(3);
 			*obptr++ = aid_byte;
-			trace_ds(see_aid(aid_byte));
+			trace_ds("%s",see_aid(aid_byte));
 			if (short_read)
 			    goto rm_done;
 			ENCODE_BADDR(obptr, cursor_addr);
-			trace_ds(rcba(cursor_addr));
+			trace_ds("%s",rcba(cursor_addr));
 		} else {
 			space3270out(1);	/* just in case */
 		}
@@ -798,8 +798,8 @@ ctlr_read_modified(unsigned char aid_byte, Boolean all)
 				space3270out(1);
 				*obptr++ = ea_buf[baddr].cc;
 				if (!any)
-					trace_ds("'");
-				trace_ds(see_ebc(ea_buf[baddr].cc));
+					trace_ds("%s","'");
+				trace_ds("%s",see_ebc(ea_buf[baddr].cc));
 				any = True;
 				nbytes++;
 			}
@@ -1179,7 +1179,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			ctlr_add_bg(buffer_addr, 0); \
 			ctlr_add_gr(buffer_addr, 0); \
 			ctlr_add_ic(buffer_addr, 0); \
-			trace_ds(see_attr(fa)); \
+			trace_ds("%s",see_attr(fa)); \
 			formatted = True; \
 		}
 
@@ -1249,7 +1249,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 		case ORDER_SF:	/* start field */
 			END_TEXT("StartField");
 			if (previous != SBA)
-				trace_ds(rcba(buffer_addr));
+				trace_ds("%s",rcba(buffer_addr));
 			previous = ORDER;
 			cp++;		/* skip field attribute */
 			START_FIELD(*cp);
@@ -1264,7 +1264,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			buffer_addr = DECODE_BADDR(*(cp-1), *cp);
 			END_TEXT("SetBufferAddress");
 			previous = SBA;
-			trace_ds(rcba(buffer_addr));
+			trace_ds("%s",rcba(buffer_addr));
 			if (buffer_addr >= COLS * ROWS) {
 				ABORT_WRITE("invalid SBA address");
 			}
@@ -1275,7 +1275,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 		case ORDER_IC:	/* insert cursor */
 			END_TEXT("InsertCursor");
 			if (previous != SBA)
-				trace_ds(rcba(buffer_addr));
+				trace_ds("%s",rcba(buffer_addr));
 			previous = ORDER;
 			cursor_move(buffer_addr);
 			last_cmd = True;
@@ -1333,7 +1333,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			END_TEXT("RepeatToAddress");
 			cp += 2;	/* skip buffer address */
 			baddr = DECODE_BADDR(*(cp-1), *cp);
-			trace_ds(rcba(baddr));
+			trace_ds("%s",rcba(baddr));
 			cp++;		/* skip char to repeat */
 			add_dbcs = False;
 			ra_ge = False;
@@ -1437,7 +1437,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			baddr = DECODE_BADDR(*(cp-1), *cp);
 			END_TEXT("EraseUnprotectedAll");
 			if (previous != SBA)
-				trace_ds(rcba(baddr));
+				trace_ds("%s",rcba(baddr));
 			previous = ORDER;
 			if (baddr >= COLS * ROWS) {
 				ABORT_WRITE("invalid EUA address");
@@ -1486,7 +1486,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 		case ORDER_MF:	/* modify field */
 			END_TEXT("ModifyField");
 			if (previous != SBA)
-				trace_ds(rcba(buffer_addr));
+				trace_ds("%s",rcba(buffer_addr));
 			previous = ORDER;
 			cp++;
 			na = *cp;
@@ -1498,7 +1498,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 						cp++;
 						ctlr_add_fa(buffer_addr, *cp,
 							ea_buf[buffer_addr].cs);
-						trace_ds(see_attr(*cp));
+						trace_ds("%s",see_attr(*cp));
 					} else if (*cp == XA_FOREGROUND) {
 						trace_ds("%s",
 						    see_efa(*cp,
@@ -1557,7 +1557,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 		case ORDER_SFE:	/* start field extended */
 			END_TEXT("StartFieldExtended");
 			if (previous != SBA)
-				trace_ds(rcba(buffer_addr));
+				trace_ds("%s",rcba(buffer_addr));
 			previous = ORDER;
 			cp++;	/* skip order */
 			na = *cp;
