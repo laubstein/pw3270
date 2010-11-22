@@ -427,6 +427,18 @@ static void load_options(GOptionContext *context)
 
 }
 
+#if defined( HAVE_IGEMAC )
+
+static gboolean ApplicationBlockTermination(GtkOSXApplication *app, gpointer user_data) 
+{
+	Trace("%s called",__FUNCTION__);
+	action_quit(0);	
+	return TRUE;
+}
+
+#endif // defined( HAVE_IGEMAC )
+
+
 int main(int argc, char *argv[])
 {
 	static GOptionContext	*context;
@@ -469,6 +481,8 @@ int main(int argc, char *argv[])
 
 	if(parse_option_context(context,&argc, &argv))
 		return -1;
+
+	g_signal_connect(G_OBJECT(osxapp), "NSApplicationBlockTermination", GTK_SIGNAL_FUNC(ApplicationBlockTermination), 0);
 
 #elif defined( HAVE_LIBGNOME )
 

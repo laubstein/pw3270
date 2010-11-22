@@ -202,7 +202,11 @@
 
  void update_3270_toggle_action(int toggle, int value)
  {
-	#warning Implementar
+	if(toggle_action[toggle].reset)
+		gtk_action_set_visible(toggle_action[toggle].reset,value);
+
+	if(toggle_action[toggle].set)
+		gtk_action_set_visible(toggle_action[toggle].set,!value);
  }
 
  void action_group_set_sensitive(ACTION_GROUP_ID id, gboolean status)
@@ -334,7 +338,6 @@
  static void lib3270_toggle_action(GtkToggleAction *action, gpointer id)
  {
 	gboolean active = gtk_toggle_action_get_active(action);
-	Trace("%s(%s,%d)=%s",__FUNCTION__,gtk_action_get_name(GTK_ACTION(action)),(int) id,active ? "Active" : "Inactive");
 	set_toggle((int) id,active);
  }
 
@@ -348,7 +351,7 @@
 		gtk_action_set_visible(toggle_action[idx].reset,gui_toggle_state[id]);
 
 	if(toggle_action[idx].set)
-		gtk_action_set_visible(toggle_action[idx].reset,!gui_toggle_state[id]);
+		gtk_action_set_visible(toggle_action[idx].set,!gui_toggle_state[id]);
 
 	if(id == GUI_TOGGLE_BOLD)
 		action_redraw(GTK_ACTION(action));
@@ -447,8 +450,29 @@
 	return 0;
  }
 
+ static void lib3270_toggle_reset(GtkAction *action, gpointer id)
+ {
+	set_toggle((int) id,FALSE);
+
+	if(toggle_action[(int) id].set)
+		gtk_action_set_visible(toggle_action[(int) id].set,TRUE);
+
+	gtk_action_set_visible(action,FALSE);
+
+ }
+
+ static void gui_toggle_reset(GtkAction *action, gpointer id)
+ {
+	if(gui_toggle_state[(int) id])
+		return;
+
+	gui_toggle_state[(int) id] = FALSE;
+	update_gui_toggle(GTK_ACTION(action),(enum GUI_TOGGLE) id);
+ }
+
  int action_setup_togglereset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
+ 	gboolean state = FALSE;
  	int id = get_toggle_id(names,values,error);
 
  	if(id < 0)
@@ -457,7 +481,23 @@
 	if(!connect)
 		return 0;
 
-	#warning Implementar
+	toggle_action[id].reset = action;
+
+	if(id >= N_TOGGLES)
+	{
+		g_signal_connect(G_OBJECT(action),"activate",G_CALLBACK(gui_toggle_reset),(gpointer) (id - N_TOGGLES));
+		state = gui_toggle_state[ ((int) id) - N_TOGGLES];
+	}
+	else
+	{
+		g_signal_connect(G_OBJECT(action),"activate",G_CALLBACK(lib3270_toggle_reset),(gpointer) id);
+		state = Toggled(id) ? TRUE : FALSE;
+	}
+
+	gtk_action_set_visible(action,state);
+
+	if(toggle_action[(int) id].set)
+		gtk_action_set_visible(toggle_action[(int) id].set,!state);
 
 	return 0;
  }
