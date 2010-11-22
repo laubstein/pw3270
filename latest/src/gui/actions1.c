@@ -412,111 +412,6 @@
 	return data->action;
  }
 
- static void action_LoadScreenDump(void)
- {
- 	gchar		*ptr;
-	GKeyFile	*conf   = GetConf();
-
-	// TODO (perry#1#): Show an error message if online
-
-	GtkWidget 	*dialog = gtk_file_chooser_dialog_new( _( "Load screen dump" ),
-														GTK_WINDOW(topwindow),
-														GTK_FILE_CHOOSER_ACTION_OPEN,
-														GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
-														GTK_STOCK_OPEN,	GTK_RESPONSE_ACCEPT,
-														NULL );
-
-
-	ptr = g_key_file_get_string(conf,"uri","ScreenDump",NULL);
-	if(ptr)
-	{
-			gtk_file_chooser_set_uri(GTK_FILE_CHOOSER(dialog),ptr);
-			g_free(ptr);
-	}
-
-	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
-	{
-		GError		*error = NULL;
-		gchar		*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-		gsize		sz;
-		struct ea	*buffer	= NULL;
-		gchar		*ptr;
-
-		ptr = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
-		g_key_file_set_string(conf,"uri","ScreenDump",ptr);
-		g_free(ptr);
-
-		if(!g_file_get_contents(filename, (gchar **) ((void *) &buffer), &sz, &error))
-		{
-			Warning( N_( "Error loading %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
-			g_error_free(error);
-		}
-		else
-		{
-			sz /= sizeof(struct ea);
-			if(set_device_buffer(buffer,sz))
-				Warning( N_( "Can't set device buffer contents" ) );
-
-			gtk_widget_set_sensitive(terminal,TRUE);
-			action_group_set_sensitive(ACTION_GROUP_ONLINE,TRUE);
-			action_group_set_sensitive(ACTION_GROUP_OFFLINE,TRUE);
-
-			gtk_widget_queue_draw(terminal);
-			gtk_widget_grab_focus(terminal);
-
-		}
-		g_free(filename);
-		g_free(buffer);
-	}
-
-	gtk_widget_destroy(dialog);
- }
-
- static void action_DumpScreen(void)
- {
- 	gchar		*ptr;
-	GKeyFile	*conf   = GetConf();
-
-	// TODO (perry#1#): Show an error message if offline
-
-	GtkWidget 	*dialog = gtk_file_chooser_dialog_new( _( "Dump screen contents" ),
-														 GTK_WINDOW(topwindow),
-														 GTK_FILE_CHOOSER_ACTION_SAVE,
-														 GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
-														 GTK_STOCK_SAVE,	GTK_RESPONSE_ACCEPT,
-														 NULL );
-
-
-	ptr = g_key_file_get_string(conf,"uri","ScreenDump",NULL);
-	if(ptr)
-	{
-			gtk_file_chooser_set_uri(GTK_FILE_CHOOSER(dialog),ptr);
-			g_free(ptr);
-	}
-
-	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
-	{
-		GError		*error = NULL;
-		gchar		*filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-		int			sz;
-		struct ea	*buffer = copy_device_buffer(&sz);
-
-		ptr = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
-		g_key_file_set_string(conf,"uri","ScreenDump",ptr);
-		g_free(ptr);
-
-		if(!g_file_set_contents(filename,(gchar *) buffer,sz*sizeof(struct ea),&error))
-		{
-			Warning( N_( "Error saving %s\n%s" ), filename, error->message ? error->message : N_( "Unexpected error" ));
-			g_error_free(error);
-		}
-		g_free(filename);
-		free(buffer);
-	}
-
-	gtk_widget_destroy(dialog);
- }
-
  LOCAL_EXTERN int get_action_info_by_name(const gchar *key, const gchar **names, const gchar **values, gchar **name, UI_CALLBACK *info)
  {
 	static const struct _action
@@ -528,7 +423,7 @@
 	{
 		// Offline actions
 		{	"Connect",			G_CALLBACK(action_connect)			},
-		{	"LoadScreenDump",	G_CALLBACK(action_LoadScreenDump)	},
+		{	"LoadScreenDump",	G_CALLBACK(action_loadscreendump)	},
 		{ 	"SetHostname",		G_CALLBACK(action_sethostname)		},
 		{	"TestPattern",		G_CALLBACK(show_3270_test_pattern)	},
 
@@ -536,7 +431,7 @@
 		{	"Redraw",			G_CALLBACK(action_redraw)			},
 		{	"SaveScreen",		G_CALLBACK(action_savescreen)		},
 		{	"PrintScreen",		G_CALLBACK(action_printscreen)		},
-		{	"DumpScreen",		G_CALLBACK(action_DumpScreen)		},
+		{	"DumpScreen",		G_CALLBACK(action_dumpscreen)		},
 		{	"Disconnect",		G_CALLBACK(action_disconnect)		},
 
 		// Select actions

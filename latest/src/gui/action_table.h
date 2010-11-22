@@ -87,3 +87,6 @@
 	DECLARE_PW3270_ACTION( selectionright, ""  )
 	DECLARE_PW3270_ACTION( selectiondown, ""  )
 
+	/* Debug actions */
+	DECLARE_PW3270_ACTION( dumpscreen, ""  )
+	DECLARE_PW3270_ACTION( loadscreendump, ""  )
