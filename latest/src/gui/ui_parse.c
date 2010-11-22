@@ -102,11 +102,6 @@
  	return *names ? *values : NULL;
  }
 
- static void action_quit(GtkAction *action, GtkWidget *window)
- {
-	gtk_main_quit();
- }
-
  static GtkAction * create_action(const gchar *element_name, const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
  	static const struct _rule
@@ -184,26 +179,18 @@
 		// Connect standard actions
 //		Trace("Name: \"%s\" toggle: %s",action_name,toggle ? "Yes" : "No");
 
-		if(!(g_strcasecmp(action_name,"quit") || toggle))
+		if(setup(ret,action_name,TRUE,names,values,error))
 		{
-			g_signal_connect(G_OBJECT(ret),"activate",G_CALLBACK(action_quit),state->window);
-		}
-		else
-		{
-			if(setup(ret,action_name,TRUE,names,values,error))
-			{
-				// Action setup failed.
-				if(!*error)
-					*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unknown action: %s"), action_name);
+			// Action setup failed.
+			if(!*error)
+				*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unknown action: %s"), action_name);
 
-				g_object_unref(ret);
-				g_free(name);
-				return NULL;
-			}
+			g_object_unref(ret);
+			g_free(name);
+			return NULL;
 		}
 
 		gtk_action_set_accel_group(ret,state->accel_group);
-
 		g_hash_table_insert(state->action,(gpointer) name, ret);
 
  	}
