@@ -32,9 +32,9 @@
 <ui>
 	<menubar name='topmenu'>
 
-		<menu action='FileMenu' />
+		<menu name='FileMenu' label='_File' />
 
-		<menu action='EditMenu' >
+		<menu name='EditMenu' label='_Edit' >
 
 			<menuitem name='EditScreen' label='Edit screen' >
 				<script platform='linux'>gedit "%{ScreenContents}"</script>
@@ -55,20 +55,20 @@
 			<menuitem action='Toggle' id='EventTrace' label='Event Trace' />
 		</menu>
 
-		<menu action='ScriptsMenu' >
-		</menu>
+		<menu name='ScriptsMenu' label='Scripts' />
 
-		<menu action='NetworkMenu'/>
+		<menu name='NetworkMenu' label='_Network' />
 
-		<menu action='SettingsMenu' />
+		<menu name='SettingsMenu' label='Settings' />
 
-		<menu action='DebugMenu' label='Debug' >
+		<menu name='DebugMenu' label='Debug' >
 			<menuitem action='Redraw' label='Redraw screen'/>
 			<menuitem action='DumpScreen' group='offline' label='DumpScreen' />
 			<menuitem action='LoadScreenDump' group='offline' label='Load screen dump' />
 			<menuitem action='TestPattern' group='offline' label='Show test pattern' />
 			<menuitem action='Toggle' id='GDKDebug' label='Debug window updates' />
 		</menu>
+
 	</menubar>
 
 </ui>

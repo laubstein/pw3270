@@ -934,6 +934,10 @@
 			<Option target="pipetest" />
 			<Option target="jnidebug" />
 		</Unit>
+		<Unit filename="ui/hosts.xml">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="ui/keypad.xml">
 			<Option target="Debug" />
 			<Option target="Release" />
