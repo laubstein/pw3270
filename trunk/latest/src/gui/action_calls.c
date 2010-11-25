@@ -32,8 +32,11 @@
 
  #include "gui.h"
  #include "actions.h"
- #include <malloc.h>
-
+ 
+ #ifdef HAVE_MALLOC_H
+	#include <malloc.h>
+ #endif
+ 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
  PW3270_ACTION( quit )

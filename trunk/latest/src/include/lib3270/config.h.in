@@ -74,6 +74,7 @@
 	#undef HAVE_GTK_STATUS_BAR
 	#undef HAVE_IGEMAC
 	#undef HAVE_MACUI
+	#undef HAVE_MALLOC_H
 
 	/* Default toggles */
 	#define DEFAULT_TOGGLE_RECTANGLE_SELECT

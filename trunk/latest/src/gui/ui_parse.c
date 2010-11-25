@@ -205,7 +205,7 @@
  		// Already created, just update
 #if GTK_CHECK_VERSION(2,16,0)
 		if(label)
-			gtk_action_set_label(gettext(label));
+			gtk_action_set_label(GTK_ACTION(ret),gettext(label));
 #endif
 
 		Trace("Name: \"%s\"",action_name);
@@ -288,18 +288,19 @@
 
 		el->widget = gtk_menu_bar_new();
 
-#ifdef MAC_INTEGRATION
-		{
-			const gchar *ptr = get_xml_attribute(names,values,"topmenu");
-			if(ptr && !g_strcasecmp("yes",ptr))
-				state->top_menu = GTK_MENU_SHELL(el->widget);
-		}
-#endif // MAC_INTEGRATION
-
 		g_hash_table_insert(state->menubar,(gpointer) el->name,el);
 
 //		Trace("Menu created: %s widget=%p",el->name,el->widget);
  	}
+
+#ifdef MAC_INTEGRATION
+	{
+		const gchar *ptr = get_xml_attribute(names,values,"topmenu");
+		if(ptr && !g_strcasecmp("yes",ptr))
+			state->top_menu = GTK_MENU_SHELL(el->widget);
+	}
+#endif // MAC_INTEGRATION
+
 
 	return el;
 
@@ -384,14 +385,13 @@
 		gtk_menu_shell_append(menu,el->widget);
 
 		g_hash_table_insert(state->menu,(gpointer) el->name,el);
+ 	}
 
 #ifdef MAC_INTEGRATION
-		check_for_app_menu(el->name,el->widget,state);
+	check_for_app_menu(el->name,el->widget,state);
 #else
-		gtk_widget_show(el->widget);
+	gtk_widget_show(el->widget);
 #endif // MAC_INTEGRATION
-
- 	}
 
 	return el;
 
@@ -452,15 +452,15 @@
 
 		g_hash_table_insert(state->menu,(gpointer) el->name,el);
 
-#ifdef MAC_INTEGRATION
-		check_for_app_menu(el->name,el->widget,state);
-		if(!g_strcasecmp(el->name,"quit"))
-			state->quit_menu = GTK_MENU_ITEM(el->widget);
-#else
-		gtk_widget_show(el->widget);
-#endif // MAC_INTEGRATION
-
  	}
+
+#ifdef MAC_INTEGRATION
+	check_for_app_menu(el->name,el->widget,state);
+	if(!g_strcasecmp(el->name,"quit"))
+		state->quit_menu = GTK_MENU_ITEM(el->widget);
+#else
+	gtk_widget_show(el->widget);
+#endif // MAC_INTEGRATION
 
 	g_free(temp);
 	return el;
@@ -999,12 +999,13 @@
 
 
 #ifdef MAC_INTEGRATION
+	Trace("%s: Top menu: %p app: %p",__FUNCTION__,state.top_menu,osxapp);
+
 	if(state.top_menu)
 	{
 		// Set application menu
 		int f;
 
-		Trace("%s: Top menu is %p",__FUNCTION__,state.top_menu);
 		gtk_widget_hide(GTK_WIDGET(state.top_menu));
 		gtk_osxapplication_set_menu_bar(osxapp,state.top_menu);
 

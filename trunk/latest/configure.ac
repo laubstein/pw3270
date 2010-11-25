@@ -94,6 +94,7 @@ pw3270_cv_macui="no"
 
 AC_CHECK_PROG(PACKAGE_MANAGER, "rpmbuild", "rpm")
 AC_CHECK_PROG(PACKAGE_MANAGER, "dpkg-buildpackage","deb")
+AC_CHECK_HEADER(malloc.h, AC_DEFINE(HAVE_MALLOC_H,,[do we have malloc.h?]))
 
 case "$host" in
 	*-mingw32)

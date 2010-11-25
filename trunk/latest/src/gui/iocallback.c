@@ -37,13 +37,17 @@
 	#include <string.h>
 #else
 	#include <poll.h>
-	#include <malloc.h>
 	#include <string.h>
 #endif /*]*/
 
 #include <stdio.h>
 #include <glib.h>
 #include "gui.h"
+
+#ifdef HAVE_MALLOC_H
+	#include <malloc.h>
+#endif
+
 #include "oia.h"
 
 #ifdef G_THREADS_ENABLED

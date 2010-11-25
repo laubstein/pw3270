@@ -274,7 +274,7 @@
  {
 	const struct action_data *data = get_action_data(name, error);
 
-	Trace("data=%p strchr=%p",data,strchr(name,'.'));
+//	Trace("data=%p strchr=%p",data,strchr(name,'.'));
 
 	if(data)
 	{
