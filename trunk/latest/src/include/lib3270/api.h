@@ -202,7 +202,6 @@
 		 * Set the contents of the device buffer for debugging purposes
 		 */
 		LIB3270_EXPORT int  set_device_buffer(struct ea *src, int el);
-		LIB3270_EXPORT void show_3270_test_pattern(void);
 
 		/* File transfer */
 		#define FT_FLAG_RECEIVE					0x0001

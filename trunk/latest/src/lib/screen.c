@@ -910,7 +910,7 @@ LIB3270_EXPORT int set_device_buffer(struct ea *src, int el)
 	return 0;
 }
 
-LIB3270_EXPORT void show_3270_test_pattern(void)
+LIB3270_ACTION( testpattern )
 {
 	static const unsigned char text_pat[] =
 	{
@@ -986,6 +986,7 @@ LIB3270_EXPORT void show_3270_test_pattern(void)
 	screen_disp();
 
 	Trace("%s ends",__FUNCTION__);
+	return 0;
 }
 
 LIB3270_EXPORT struct ea * copy_device_buffer(int *el)

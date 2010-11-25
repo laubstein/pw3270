@@ -73,5 +73,6 @@
 	DECLARE_LIB3270_ACTION( deletefield )
 	DECLARE_LIB3270_ACTION( sysreq )
 
+	DECLARE_LIB3270_ACTION( testpattern )
 
 

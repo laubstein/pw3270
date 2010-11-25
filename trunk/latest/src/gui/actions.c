@@ -91,6 +91,7 @@
 
  };
 
+
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
  GtkActionGroup		* action_group[ACTION_GROUP_MAX+1]	= { 0 };
@@ -276,33 +277,35 @@
  {
 	const struct action_data *data = get_action_data(name, error);
 
-	if(!data)
-		return -1;
-
-	if(!connect)
-		return 0;
-
-	switch(data->type)
+	if(data)
 	{
-	case ACTION_TYPE_GUI:
-		g_signal_connect(G_OBJECT(action),"activate",data->callback,0);
-		break;
+		// Internal action, setup correctly
+		if(connect)
+		{
+			switch(data->type)
+			{
+			case ACTION_TYPE_GUI:
+				g_signal_connect(G_OBJECT(action),"activate",data->callback,0);
+				break;
 
- 	case ACTION_TYPE_CALL:
-		g_signal_connect(G_OBJECT(action),"activate",data->callback,0);
-		break;
+			case ACTION_TYPE_CALL:
+				g_signal_connect(G_OBJECT(action),"activate",data->callback,0);
+				break;
 
- 	case ACTION_TYPE_CLEAR_SELECTION:
-		g_signal_connect(G_OBJECT(action),"activate",G_CALLBACK(clear_and_call),data->callback);
-		break;
+			case ACTION_TYPE_CLEAR_SELECTION:
+				g_signal_connect(G_OBJECT(action),"activate",G_CALLBACK(clear_and_call),data->callback);
+				break;
 
-	default:
-		Trace("%s - unexpected action %s",__FUNCTION__,name);
-		*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), name);
-		return -1;
+			default:
+				Trace("%s - unexpected action %s",__FUNCTION__,name);
+				*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), name);
+				return -1;
+			}
+		}
+		return 0;
 	}
 
-	return 0;
+	return -1;
  }
 
  static int get_toggle_id(const gchar **names, const gchar **values, GError **error)

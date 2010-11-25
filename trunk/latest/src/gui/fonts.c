@@ -34,6 +34,7 @@
 #include "gui.h"
 #include "oia.h"
 #include "fonts.h"
+#include "actions.h"
 
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
@@ -191,7 +192,7 @@
 										(int) font_list[pos].width,
 										(int) font_list[pos].ascent,
 										(int) font_list[pos].descent);
-*/										
+*/
 
 			width 	= sz.max_x_advance;
 			height	= sz.height;
@@ -246,6 +247,81 @@
 
 	g_strfreev(vlr);
 	g_free(list);
+
+ }
+
+ static void activate_font(GtkCheckMenuItem *item, gchar *text)
+ {
+	if(gtk_check_menu_item_get_active(item))
+	{
+		gchar *vlr	= strdup(text);
+		char *ptr	= strchr(vlr,',');
+
+		if(ptr)
+		{
+			*(ptr++) = 0;
+			SetString("Terminal","FontSizes",ptr);
+		}
+		else
+		{
+			SetString("Terminal","FontSizes",NULL);
+		}
+
+		SetString("Terminal","Font",vlr);
+
+		g_free(vlr);
+		action_redraw(0);
+	}
+ }
+
+
+/**
+ * Load all monospaced fonts inside a menu.
+ *
+ * @param widget		Topwindow widget (Used for font families).
+ * @param topmenu	Font menu
+ * @param selected	Selected font.
+ *
+ */
+ void load_font_menu(GtkWidget *widget, GtkWidget *topmenu, const gchar *selected)
+ {
+	// Stolen from http://svn.gnome.org/svn/gtk+/trunk/gtk/gtkfontsel.c
+	PangoFontFamily **families;
+	gint 			n_families, i;
+
+ 	GtkWidget		*menu	= gtk_menu_new();
+ 	GSList 			*group	= NULL;
+
+	pango_context_list_families(gtk_widget_get_pango_context(widget),&families, &n_families);
+
+	Trace("Font families: %d menu: %p topmenu: %p",n_families,menu,topmenu);
+
+	for(i=0; i<n_families; i++)
+    {
+    	if(pango_font_family_is_monospace(families[i]))
+    	{
+			const gchar 	*name = pango_font_family_get_name (families[i]);
+			GtkWidget		*item = gtk_radio_menu_item_new_with_label(group,name);
+			gchar			*ptr;
+
+			group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+			ptr = g_strdup(name);
+			g_object_set_data_full(G_OBJECT(item),"FontName",ptr,g_free);
+			g_signal_connect(G_OBJECT(item),"toggled",G_CALLBACK(activate_font),ptr);
+
+			gtk_widget_show(item);
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
+
+			if(!strcmp(name,selected))
+				gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),TRUE);
+
+    	}
+    }
+
+	g_free(families);
+
+	gtk_widget_show_all(menu);
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(topmenu),menu);
 
  }
 

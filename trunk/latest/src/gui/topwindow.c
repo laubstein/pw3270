@@ -115,7 +115,7 @@
 
 	// Load UI - Create toplevel window
 	ptr = g_build_filename(program_data,"ui",NULL);
-	topwindow = create_window_from_ui_files(ptr,terminal);
+	topwindow = create_window_from_ui_files(ptr,terminal,NULL);
 	g_free(ptr);
 
 	// Load program logo
@@ -148,7 +148,7 @@
 	g_signal_connect(G_OBJECT(topwindow),"destroy",G_CALLBACK(action_quit),0);
 
 	gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
-	
+
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
 	ptr = GetString("TopWindow","Title","");
 	settitle(ptr);
@@ -157,6 +157,6 @@
 	action_restore(0);
 
 	gtk_window_set_position(GTK_WINDOW(topwindow),GTK_WIN_POS_CENTER);
-	
+
 	return 0;
  }

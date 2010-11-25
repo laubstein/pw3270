@@ -50,6 +50,7 @@
 
 		</menu>
 
+
 		<menu name='View' >
 			<menuitem action='Toggle' id='DSTrace' label='DS Trace'/>
 			<menuitem action='Toggle' id='EventTrace' label='Event Trace' />
@@ -66,7 +67,7 @@
 			<menuitem action='DumpScreen' group='offline' label='DumpScreen' />
 			<menuitem action='LoadScreenDump' group='offline' label='Load screen dump' />
 			<menuitem action='TestPattern' group='offline' label='Show test pattern' />
-			<menuitem action='Toggle' id='GDKDebug' label='Debug window updates' />
+			<!-- <menuitem action='Toggle' id='GDKDebug' label='Debug window updates' /> -->
 		</menu>
 
 	</menubar>
