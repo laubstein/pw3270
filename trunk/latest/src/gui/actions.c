@@ -73,7 +73,7 @@
 
  static const struct action_data
  {
- 	unsigned short 	type;			/**< Action type (used to define the callback method) */
+ 	enum action_type	type;			/**< Action type (used to define the callback method) */
  	const 				gchar *name;	/**< Action name */
  	GCallback			callback;		/**< Action method */
  	const				gchar *attr;	/**< Action attributes */
@@ -245,9 +245,6 @@
 			return action_table+f;
 	}
 
-	Trace("%s - unexpected action \"%s\"",__FUNCTION__,name);
-	*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), name);
-
 	return NULL;
  }
 
@@ -277,6 +274,8 @@
  {
 	const struct action_data *data = get_action_data(name, error);
 
+	Trace("data=%p strchr=%p",data,strchr(name,'.'));
+
 	if(data)
 	{
 		// Internal action, setup correctly
@@ -304,6 +303,44 @@
 		}
 		return 0;
 	}
+#ifdef HAVE_PLUGINS
+	else if(strchr(name,'.'))
+	{
+		// Common plugin action
+		gchar				* plugin_name	= g_strdup(name);
+		gchar				* entry_name	= strchr(plugin_name,'.');
+		GModule			 	* plugin;
+
+		*(entry_name++) = 0;
+
+//		Trace("Plugin: %s entry: %s method: action_%s_%s",plugin_name,entry_name,entry_name,GTK_IS_TOGGLE_ACTION(action) ? "toggled" : "activated");
+
+		plugin = get_plugin_by_name(plugin_name);
+		if(plugin)
+		{
+			GCallback callback;
+
+			if(!get_symbol_by_name(plugin,(gpointer) &callback,"action_%s_%s",entry_name,GTK_IS_TOGGLE_ACTION(action) ? "toggled" : "activated"))
+			{
+				*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), name);
+				return -1;
+			}
+
+			if(connect)
+				g_signal_connect(G_OBJECT(action),GTK_IS_TOGGLE_ACTION(action) ? "toggled" : "activate",callback,topwindow);
+
+			return 0;
+		}
+		else
+		{
+			*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected plugin name in action %s" ), name);
+			return -1;
+		}
+
+		g_free(plugin_name);
+
+	}
+#endif
 
 	return -1;
  }
