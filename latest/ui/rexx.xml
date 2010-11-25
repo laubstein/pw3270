@@ -31,10 +31,10 @@
 
 <ui>
 	<menubar name='topmenu'>
-		<menu action='FileMenu' />
-		<menu action='EditMenu' />
+		<menu name='FileMenu' label='_File' />
+		<menu name='EditMenu' label='_Edit' />
 		<menu name='View' />
-		<menu action='ScriptsMenu'>
+		<menu name='ScriptsMenu' label='Scripts' >
 			<menuitem action='rx3270.select' label='External Rexx script'/>
 			<menuitem name='rx3270.scripts' label='Rexx scripts' />
 		</menu>
