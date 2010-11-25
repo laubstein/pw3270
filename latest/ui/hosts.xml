@@ -32,15 +32,15 @@
 <ui>
 	<menubar name='topmenu'>
 
-		<menu name='FileMenu' />
+		<menu name='FileMenu' label='_File' />
 
-		<menu name='EditMenu' />
+		<menu name='EditMenu' label='_Edit' />
 
-		<menu name='View' />
+		<menu name='View' label='_View' />
 
-		<menu name='ScriptsMenu' />
+		<menu name='ScriptsMenu' label='Scripts' />
 
-		<menu name='NetworkMenu'>
+		<menu name='NetworkMenu' label='_Network' >
 			<menuitem name='efglobe' label='efglobe.com' group='offline'>
 				<script>
 					Connect fandezhi.efglobe.com:23

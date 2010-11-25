@@ -51,6 +51,7 @@
 
 	// Prototipes
 	LOCAL_EXTERN void		load_font_sizes(void);
+	LOCAL_EXTERN void		load_font_menu(GtkWidget *widget, GtkWidget *topmenu, const gchar *selected);
 	LOCAL_EXTERN void		update_font_info(cairo_t *cr, const gchar *fontname, PW3270_FONT_INFO *info);
 	LOCAL_EXTERN void 		release_font_info(PW3270_FONT_INFO *info);
 

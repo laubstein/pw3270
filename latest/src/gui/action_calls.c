@@ -312,17 +312,14 @@
 
  PW3270_ACTION( disconnect )
  {
+ 	if(!PCONNECTED)
+		return;
 
- 	if(PCONNECTED)
- 	{
-		Trace("%s - Disconecting",__FUNCTION__);
-		unselect();
-		host_disconnect(hSession,0);
- 	}
-
+	Trace("%s - Disconecting",__FUNCTION__);
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
-
+	unselect();
+	host_disconnect(hSession,0);
  }
 
  static int SaveText(const char *title, gchar *text)

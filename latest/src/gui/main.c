@@ -429,10 +429,10 @@ static void load_options(GOptionContext *context)
 
 #if defined( HAVE_IGEMAC )
 
-static gboolean ApplicationBlockTermination(GtkOSXApplication *app, gpointer user_data) 
+static gboolean ApplicationBlockTermination(GtkOSXApplication *app, gpointer user_data)
 {
 	Trace("%s called",__FUNCTION__);
-	action_quit(0);	
+	action_quit(0);
 	return TRUE;
 }
 

@@ -5,6 +5,18 @@
 	#define UIPARSER_H_INCLUDED 1
 
 	/**
+	 * List of special widgets on UI.
+	 *
+	 * Usually used for populating special menu entryes like input-method list.
+	 *
+	 */
+	 struct ui_widget_setup_table
+	 {
+	 	const gchar *name;
+	 	void (*setup)(GtkWidget *widget);
+	 };
+
+	/**
 	 * Create a toplevel window based on the XML files.
 	 *
 	 * @param path		Folder to search for .xml files.
@@ -13,7 +25,7 @@
 	 * @return Created toplevel window.
 	 *
 	 */
-	LOCAL_EXTERN GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget);
+	LOCAL_EXTERN GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget, struct ui_widget_setup_table *setup_table);
 
 	/**
 	 * Get an attribute from xml list.

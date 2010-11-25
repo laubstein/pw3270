@@ -425,7 +425,7 @@
 		{	"Connect",			G_CALLBACK(action_connect)			},
 		{	"LoadScreenDump",	G_CALLBACK(action_loadscreendump)	},
 		{ 	"SetHostname",		G_CALLBACK(action_sethostname)		},
-		{	"TestPattern",		G_CALLBACK(show_3270_test_pattern)	},
+		{	"TestPattern",		G_CALLBACK(lib3270_testpattern)		},
 
 		// Online actions
 		{	"Redraw",			G_CALLBACK(action_redraw)			},

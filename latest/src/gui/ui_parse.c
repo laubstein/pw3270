@@ -77,6 +77,7 @@
 
 	GtkAccelGroup	* accel_group;								/**< Accelerators */
 
+	struct ui_widget_setup_table *setup_table;					/**< Special widgets/menuitems */
 
 #ifdef MAC_INTEGRATION
 	GtkMenuShell	* top_menu;									/**< Mac OSX top menu */
@@ -128,9 +129,10 @@
 
  	int				  id			= -1;
 	gchar			* name;
- 	const gchar		* action_name	= get_xml_attribute(names,values,"action");
+ 	const gchar	* action_name	= get_xml_attribute(names,values,"action");
+	const gchar	* label			= get_xml_attribute(names,values,"label");
 	GtkAction		* ret;
- 	const gchar		* ptr;
+ 	const gchar	* ptr;
  	int				  f;
 
 	// No action, do nothing
@@ -156,15 +158,19 @@
 		gchar		* stock		= NULL;
 		gboolean	  toggle	= FALSE;
 		const gchar * icon		= get_xml_attribute(names,values,"icon");
-		const gchar * label		= get_xml_attribute(names,values,"label");
 
 		if(icon)
 			stock = g_strdup_printf("gtk-%s",icon);
 
 		if(label)
+		{
 			label = gettext(label);
-		else if(!stock)
-			label = name;
+		}
+		else
+		{
+			if(!stock)
+				label = gettext(name);
+		}
 
 		if(id >= 0)
 			toggle = rule[id].toggle;
@@ -197,6 +203,11 @@
  	else
  	{
  		// Already created, just update
+#if GTK_CHECK_VERSION(2,16,0)
+		if(label)
+			gtk_action_set_label(gettext(label));
+#endif
+
 		Trace("Name: \"%s\"",action_name);
 		if(g_strcasecmp(action_name,"quit"))
 			setup(ret,action_name,FALSE,names,values,error);
@@ -661,7 +672,7 @@
 			{	"scroll", 		skip_block			},
 
 			// Scripts
-			{	"script",		start_dunno			},
+			{	"script",		skip_block			},
 
 			// OS dependant
 #if defined( WIN32 )
@@ -694,11 +705,11 @@
 
  	int f;
 
-//	Trace("%s",element_name);
+//	Trace("%s %d",element_name,state->ignore);
 
 	if(state->ignore > 0)
 	{
-	//	Trace("Ignoring \"%s\" level=%d",element_name,state->ignore);
+//		Trace("Ignoring \"%s\" level=%d",element_name,state->ignore);
 		state->ignore++;
 		return;
 	}
@@ -725,7 +736,11 @@
  static void element_end(GMarkupParseContext *context, const gchar *element_name, PARSER_STATE *state, GError **error)
  {
 	if(state->ignore > 0)
+	{
+//		Trace("%s ignore=%d name=%s",__FUNCTION__,state->ignore,element_name);
 		state->ignore--;
+		return;
+	}
 
 	if(!g_strcasecmp(element_name,"separator"))
 		return;
@@ -927,7 +942,7 @@
 
 /*---[ External Call ]------------------------------------------------------------------------------------*/
 
- GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget)
+ GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget, struct ui_widget_setup_table *setup_table)
  {
 	PARSER_STATE 	  state;
 	GtkWidget		* hbox;
@@ -939,12 +954,12 @@
 	state.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	state.accel_group = gtk_accel_group_new();
 
-	state.menubar = g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
-	state.toolbar = g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
-	state.tool	  = g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
-	state.menu	  = g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
-
-	state.action  = g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) g_free, g_object_unref);
+	state.menubar 		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
+	state.toolbar 		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
+	state.tool	  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
+	state.menu	  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
+	state.setup_table	= setup_table;
+	state.action  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) g_free, g_object_unref);
 
 	// Parse
 	search_path(path, &state);
