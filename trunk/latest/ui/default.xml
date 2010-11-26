@@ -83,7 +83,7 @@
 			<menuitem action='Disconnect' icon='disconnect' group='online' label='_Disconnect' />
 		</menu>
 
-		<menu name='SettingsMenu' label='Settings' >
+		<menu name='SettingsMenu' label='Settings' sysmenu='yes' >
 			<menuitem action='SelectColors' icon='select-color' label='Colors' />
 
 			<!--- Special action - The fontselect menu will be populated with all available monospaced fonts --->
@@ -112,7 +112,7 @@
 		</menu>
 
 		<menu name='HelpMenu' label='Help' >
-			<menuitem action='About' icon='about' />
+			<menuitem action='About' icon='about' sysmenu='yes' />
 		</menu>
 
 	</menubar>

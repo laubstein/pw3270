@@ -58,7 +58,7 @@
 	/**
 	 * Name of the <menuitem> elements that will be moved for mac application menu.
 	 */
-	static const gchar * app_menu_item[] = { "about", "settings" };
+	static const gchar * app_menu_item[] = { "about", "preferences" };
  #endif
 
  typedef struct _parser_state
@@ -82,7 +82,8 @@
 #ifdef MAC_INTEGRATION
 	GtkMenuShell	* top_menu;									/**< Mac OSX top menu */
 	GtkMenuItem		* quit_menu;								/**< Quit menu widget */
-	GtkMenuItem		* app_menu[G_N_ELEMENTS(app_menu_item)];	/**< Menu item elements on the mac application menu */
+	GtkMenuItem		* app_menu[G_N_ELEMENTS(app_menu_item)];	/**< Standard menu item elements on the mac application menu */
+	GList			* sys_menu;									/**< Extra menu elements on the mac application menu */
 #endif // MAC_INTEGRATION
 
 	int				  ignore;									/**< Non 0 if subtree is disabled */
@@ -307,9 +308,13 @@
  }
 
 #ifdef MAC_INTEGRATION
- static void check_for_app_menu(const gchar *name, GtkWidget *widget, PARSER_STATE *state)
+ static void check_for_app_menu(const gchar *name, const gchar **names,const gchar **values, GtkWidget *widget, PARSER_STATE *state)
  {
+	const gchar *sysmenu = get_xml_attribute(names,values,"sysmenu");
 	int f;
+
+	if(!sysmenu || g_strcasecmp(sysmenu,"yes"))
+		return;
 
 	for(f=0;f<G_N_ELEMENTS(app_menu_item);f++)
 	{
@@ -319,6 +324,9 @@
 			return;
 		}
 	}
+	
+	state->sys_menu = g_list_prepend(state->sys_menu,GTK_MENU_ITEM(widget));
+	
  }
 #endif // MAC_INTEGRATION
 
@@ -388,7 +396,7 @@
  	}
 
 #ifdef MAC_INTEGRATION
-	check_for_app_menu(el->name,el->widget,state);
+	check_for_app_menu(el->name,names,values,el->widget,state);
 #else
 	gtk_widget_show(el->widget);
 #endif // MAC_INTEGRATION
@@ -455,7 +463,7 @@
  	}
 
 #ifdef MAC_INTEGRATION
-	check_for_app_menu(el->name,el->widget,state);
+	check_for_app_menu(el->name,names,values,el->widget,state);
 	if(!g_strcasecmp(el->name,"quit"))
 		state->quit_menu = GTK_MENU_ITEM(el->widget);
 #else
@@ -1016,6 +1024,19 @@
 				GtkOSXApplicationMenuGroup *grp = gtk_osxapplication_add_app_menu_group(osxapp);
 				gtk_osxapplication_add_app_menu_item(osxapp,grp,state.app_menu[f]);
 			}
+		}
+
+		if(state.sys_menu)
+		{
+			GList *l;
+			GtkOSXApplicationMenuGroup *grp = gtk_osxapplication_add_app_menu_group(osxapp);
+
+			for(l=g_list_last(state.sys_menu);l;l=g_list_previous(l))
+			{
+				gtk_osxapplication_add_app_menu_item(osxapp,grp,(GtkMenuItem *) l->data);
+			}
+		
+			g_list_free(state.sys_menu);
 		}
 
 		if(state.quit_menu)
