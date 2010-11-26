@@ -203,6 +203,9 @@
 
  void update_3270_toggle_action(int toggle, int value)
  {
+	if(toggle_action[toggle].toggle && GTK_IS_TOGGLE_ACTION(toggle_action[toggle].toggle))
+		gtk_toggle_action_set_active(toggle_action[toggle].toggle, value == 0 ? FALSE : TRUE);
+
 	if(toggle_action[toggle].reset)
 		gtk_action_set_visible(toggle_action[toggle].reset,value);
 
@@ -441,12 +444,6 @@
  static void lib3270_toggle_set(GtkAction *action, gpointer id)
  {
 	set_toggle((int) id,TRUE);
-
-	if(toggle_action[(int) id].reset)
-		gtk_action_set_visible(toggle_action[(int) id].reset,TRUE);
-
-	gtk_action_set_visible(action,FALSE);
-
  }
 
  static void gui_toggle_set(GtkAction *action, gpointer id)
@@ -493,12 +490,6 @@
  static void lib3270_toggle_reset(GtkAction *action, gpointer id)
  {
 	set_toggle((int) id,FALSE);
-
-	if(toggle_action[(int) id].set)
-		gtk_action_set_visible(toggle_action[(int) id].set,TRUE);
-
-	gtk_action_set_visible(action,FALSE);
-
  }
 
  static void gui_toggle_reset(GtkAction *action, gpointer id)

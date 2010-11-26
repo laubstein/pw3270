@@ -93,7 +93,7 @@
 #ifdef DEBUG
 	else
 	{
-		Trace("*** %s","No fontselect menu");
+		Trace("*** %s","No input method menu");
 	}
 #endif
  }
