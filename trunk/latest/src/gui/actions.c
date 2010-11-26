@@ -114,28 +114,29 @@
 	guint			keyval;
 	GdkModifierType	state;
 	GtkAction		*action;
+	GCallback		def;
  } keyboard_action[] =
  {
-	{ GDK_Left,				0,					NULL	},
-	{ GDK_Up,				0,					NULL	},
-	{ GDK_Right,			0,					NULL	},
-	{ GDK_Down,				0,					NULL	},
-	{ GDK_Tab,				0,					NULL	},
-	{ GDK_ISO_Left_Tab,		GDK_SHIFT_MASK,		NULL	},
-	{ GDK_KP_Left,			0,					NULL	},
-	{ GDK_KP_Up,			0,					NULL	},
-	{ GDK_KP_Right,			0,					NULL	},
-	{ GDK_KP_Down,			0,					NULL	},
-	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL	},
+	{ GDK_Left,				0,					NULL,	G_CALLBACK(lib3270_cursor_left)		},
+	{ GDK_Up,				0,					NULL,	G_CALLBACK(lib3270_cursor_up)		},
+	{ GDK_Right,			0,					NULL,	G_CALLBACK(lib3270_cursor_right)	},
+	{ GDK_Down,				0,					NULL,	G_CALLBACK(lib3270_cursor_down)		},
+	{ GDK_Tab,				0,					NULL,	G_CALLBACK(lib3270_tab)				},
+	{ GDK_ISO_Left_Tab,		GDK_SHIFT_MASK,		NULL,	G_CALLBACK(lib3270_backtab)			},
+	{ GDK_KP_Left,			0,					NULL,	G_CALLBACK(lib3270_cursor_left)		},
+	{ GDK_KP_Up,			0,					NULL,	G_CALLBACK(lib3270_cursor_up)		},
+	{ GDK_KP_Right,			0,					NULL,	G_CALLBACK(lib3270_cursor_right)	},
+	{ GDK_KP_Down,			0,					NULL,	G_CALLBACK(lib3270_cursor_down)		},
+	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(lib3270_tab)				},
 
-	{ GDK_3270_PrintScreen,	0,					NULL	},
-	{ GDK_Sys_Req,			0,					NULL	},
+	{ GDK_3270_PrintScreen,	0,					NULL,	G_CALLBACK(action_printscreen)		},
+	{ GDK_Sys_Req,			0,					NULL,	G_CALLBACK(lib3270_sysreq)			},
 
-	{ GDK_Print,			GDK_CONTROL_MASK,	NULL	},
-	{ GDK_Print,			GDK_SHIFT_MASK,		NULL	},
+	{ GDK_Print,			GDK_CONTROL_MASK,	NULL,	G_CALLBACK(action_printscreen)		},
+	{ GDK_Print,			GDK_SHIFT_MASK,		NULL,	G_CALLBACK(lib3270_sysreq)			},
 
 #ifdef WIN32
-	{ GDK_Pause,			0,					NULL	},
+	{ GDK_Pause,			0,					NULL,	0									},
 #endif
 
  };
@@ -190,7 +191,7 @@
 		action_scroll[f] = action_nop;
 
 	for(f=0;f<G_N_ELEMENTS(keyboard_action);f++)
-		keyboard_action[f].action = action_nop;
+		keyboard_action[f].action = 0;
 
 	for(f=0;f<G_N_ELEMENTS(toggle_action);f++)
 	{
@@ -204,7 +205,7 @@
  void update_3270_toggle_action(int toggle, int value)
  {
 	if(toggle_action[toggle].toggle && GTK_IS_TOGGLE_ACTION(toggle_action[toggle].toggle))
-		gtk_toggle_action_set_active(toggle_action[toggle].toggle, value == 0 ? FALSE : TRUE);
+		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(toggle_action[toggle].toggle), value == 0 ? FALSE : TRUE);
 
 	if(toggle_action[toggle].reset)
 		gtk_action_set_visible(toggle_action[toggle].reset,value);
@@ -612,6 +613,54 @@
 
  gboolean check_key_action(GtkWidget *widget, GdkEventKey *event)
  {
- 	#warning Implementar
+	int f;
+	int	state = event->state & (GDK_SHIFT_MASK|GDK_CONTROL_MASK|GDK_ALT_MASK);
+
+	// Check for PF keys
+	if(event->keyval >= GDK_F1 && event->keyval <= GDK_F12 && !(state & (GDK_CONTROL_MASK|GDK_ALT_MASK)))
+	{
+		GtkAction *action;
+
+		f = (event->keyval - GDK_F1);
+
+		action = (state & GDK_SHIFT_MASK) ? pf_action[f].shift : pf_action[f].normal;
+
+		Trace("PF%02d: %s %s action: %p",f+1,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "",action);
+
+		if(action)
+			gtk_action_activate(action);
+		else
+			pfkey(NULL, (gpointer) (f + ((state & GDK_SHIFT_MASK) ? 13 : 1)));
+
+		return TRUE;
+	}
+
+#ifdef WIN32
+	// FIXME (perry#1#): Find a better way!
+	if( event->keyval == 0xffffff && event->hardware_keycode == 0x0013)
+		event->keyval = GDK_Pause;
+#endif
+
+	Trace("Key action 0x%04x: %s %s keycode: 0x%04x",event->keyval,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "",event->hardware_keycode);
+
+    // Check for special keyproc actions
+	for(f=0; f < G_N_ELEMENTS(keyboard_action);f++)
+	{
+		if(keyboard_action[f].keyval == event->keyval && state == keyboard_action[f].state)
+		{
+			if(keyboard_action[f].action)
+			{
+				gtk_action_activate(keyboard_action[f].action);
+				return TRUE;
+			}
+			else if(keyboard_action[f].def)
+			{
+				keyboard_action[f].def();
+				return TRUE;
+			}
+			return FALSE;
+		}
+	}
+
  	return FALSE;
  }
