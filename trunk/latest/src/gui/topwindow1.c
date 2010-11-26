@@ -106,7 +106,7 @@
 	if(menu)
 	{
 		selected = GetString("Terminal","Font","Courier");
-		load_font_menu(topwindow, menu, selected);
+		load_font_menu(menu, selected);
 		g_free(selected);
 	}
 #ifdef DEBUG
