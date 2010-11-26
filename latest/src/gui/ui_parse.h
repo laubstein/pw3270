@@ -25,7 +25,7 @@
 	 * @return Created toplevel window.
 	 *
 	 */
-	LOCAL_EXTERN GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget, struct ui_widget_setup_table *setup_table);
+	LOCAL_EXTERN GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget, const struct ui_widget_setup_table *setup_table);
 
 	/**
 	 * Get an attribute from xml list.

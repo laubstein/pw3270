@@ -77,7 +77,7 @@
 
 	GtkAccelGroup	* accel_group;								/**< Accelerators */
 
-	struct ui_widget_setup_table *setup_table;					/**< Special widgets/menuitems */
+	const struct ui_widget_setup_table *setup_table;			/**< Special widgets/menuitems */
 
 #ifdef MAC_INTEGRATION
 	GtkMenuShell	* top_menu;									/**< Mac OSX top menu */
@@ -324,17 +324,30 @@
 			return;
 		}
 	}
-	
+
 	state->sys_menu = g_list_prepend(state->sys_menu,GTK_MENU_ITEM(widget));
-	
+
  }
 #endif // MAC_INTEGRATION
 
+ static void setup_widget(GtkWidget *widget, const gchar *name, const struct ui_widget_setup_table *table)
+ {
+	int f;
+
+	for(f=0;table[f].name;f++)
+	{
+		if(!g_strcasecmp(name,table[f].name))
+		{
+			table[f].setup(widget);
+			return;
+		}
+	}
+ }
 
  static UI_ELEMENT * start_menu(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
  	UI_ELEMENT		*el;
- 	const gchar		*name = get_xml_attribute(names,values,"name");
+ 	const gchar	*name = get_xml_attribute(names,values,"name");
  	GtkMenuShell	*menu;
 
 	if(!name)
@@ -376,7 +389,7 @@
 
  	if(!el)
  	{
- 		// New menubar
+ 		// New menu item
 		if((el = create_element(sizeof(UI_ELEMENT),name,names,values,state,error)) == NULL)
 			return NULL;
 
@@ -391,6 +404,8 @@
 		}
 
 		gtk_menu_shell_append(menu,el->widget);
+
+		setup_widget(el->widget,el->name,state->setup_table);
 
 		g_hash_table_insert(state->menu,(gpointer) el->name,el);
  	}
@@ -457,6 +472,7 @@
 		}
 
 		gtk_menu_shell_append((GtkMenuShell *) menu, el->widget);
+		setup_widget(el->widget,el->name,state->setup_table);
 
 		g_hash_table_insert(state->menu,(gpointer) el->name,el);
 
@@ -950,7 +966,7 @@
 
 /*---[ External Call ]------------------------------------------------------------------------------------*/
 
- GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget, struct ui_widget_setup_table *setup_table)
+ GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget, const struct ui_widget_setup_table *setup_table)
  {
 	PARSER_STATE 	  state;
 	GtkWidget		* hbox;
@@ -1005,7 +1021,6 @@
 	// Update action group & accelerators
 	g_hash_table_foreach(state.action,(GHFunc) sync_action_state, &state);
 
-
 #ifdef MAC_INTEGRATION
 	Trace("%s: Top menu: %p app: %p",__FUNCTION__,state.top_menu,osxapp);
 
@@ -1035,7 +1050,7 @@
 			{
 				gtk_osxapplication_add_app_menu_item(osxapp,grp,(GtkMenuItem *) l->data);
 			}
-		
+
 			g_list_free(state.sys_menu);
 		}
 

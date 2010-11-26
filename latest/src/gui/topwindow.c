@@ -32,6 +32,7 @@
 
 #include "gui.h"
 #include "actions.h"
+#include "fonts.h"
 #include "ui_parse.h"
 
 /*---[ Globals ]------------------------------------------------------------------------------------------*/
@@ -45,6 +46,21 @@
 #endif
 
 /*---[ Implement ]----------------------------------------------------------------------------------------*/
+
+ static void setup_font_select_menu(GtkWidget *widget)
+ {
+	gchar * selected = GetString("Terminal","Font","Courier");
+	load_font_menu(widget, selected);
+	g_free(selected);
+ }
+
+ static void setup_input_methods_menu(GtkWidget *widget)
+ {
+	GtkWidget *menu	= gtk_menu_new();
+	gtk_im_multicontext_append_menuitems((GtkIMMulticontext *) input_method,GTK_MENU_SHELL(menu));
+	gtk_widget_show_all(menu);
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(widget),menu);
+ }
 
  int CreateTopWindow(void)
  {
@@ -92,6 +108,13 @@
 
 #endif // MOUSE_POINTER_CHANGE
 
+	 static const struct ui_widget_setup_table widget_setup[] =
+	 {
+		{ "fontselect",		setup_font_select_menu		},
+		{ "inputmethod",	setup_input_methods_menu	},
+	 	{ NULL,				NULL						}
+	 };
+
 	GdkPixbuf 	*pix = NULL;
 	gchar		*ptr;
 
@@ -115,7 +138,7 @@
 
 	// Load UI - Create toplevel window
 	ptr = g_build_filename(program_data,"ui",NULL);
-	topwindow = create_window_from_ui_files(ptr,terminal,NULL);
+	topwindow = create_window_from_ui_files(ptr,terminal,widget_setup);
 	g_free(ptr);
 
 	// Load program logo

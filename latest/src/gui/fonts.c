@@ -283,7 +283,7 @@
  * @param selected	Selected font.
  *
  */
- void load_font_menu(GtkWidget *widget, GtkWidget *topmenu, const gchar *selected)
+ void load_font_menu(GtkWidget *topmenu, const gchar *selected)
  {
 	// Stolen from http://svn.gnome.org/svn/gtk+/trunk/gtk/gtkfontsel.c
 	PangoFontFamily **families;
@@ -292,9 +292,7 @@
  	GtkWidget		*menu	= gtk_menu_new();
  	GSList 			*group	= NULL;
 
-	pango_context_list_families(gtk_widget_get_pango_context(widget),&families, &n_families);
-
-	Trace("Font families: %d menu: %p topmenu: %p",n_families,menu,topmenu);
+	pango_context_list_families(gtk_widget_get_pango_context(topmenu),&families, &n_families);
 
 	for(i=0; i<n_families; i++)
     {
