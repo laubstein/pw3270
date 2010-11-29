@@ -104,7 +104,6 @@
 	}
  	else if(rc)
  	{
-//		gchar *name = g_path_get_basename(filename);
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
@@ -116,11 +115,9 @@
 
         gtk_dialog_run(GTK_DIALOG (dialog));
         gtk_widget_destroy(dialog);
-//        g_free(name);
  	}
  	else if(return_code)
  	{
-//		gchar *name = g_path_get_basename(filename);
 		GtkWidget *dialog = gtk_message_dialog_new(	GTK_WINDOW(window),
 													GTK_DIALOG_DESTROY_WITH_PARENT,
 													GTK_MESSAGE_ERROR,
@@ -133,7 +130,6 @@
 
         gtk_dialog_run(GTK_DIALOG (dialog));
         gtk_widget_destroy(dialog);
-//        g_free(name);
  	}
 
 	rexx_script_state = status_script(SCRIPT_STATE_NONE);
@@ -514,7 +510,7 @@
     return RetValue(Retstr,0);
  }
 
- void pw3270_call_rexx_script(GtkAction *action, GtkWidget *program_window)
+ void pw3270_call_rexx_script(GtkWidget *action, GtkWidget *program_window)
  {
 	LONG      			return_code;                 	// interpreter return code
 #ifdef CONSTRXSTRING

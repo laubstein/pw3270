@@ -67,7 +67,7 @@
 
  	if(!str)
  	{
-		ClearClipboard();
+		clear_clipboard_string();
 		return;
  	}
 
@@ -455,7 +455,7 @@
  	Trace("%s ends",__FUNCTION__);
  }
 
- void ClearClipboard(void)
+ void clear_clipboard_string(void)
  {
 	if(clipboard_string)
 	{
@@ -607,6 +607,8 @@
  	if(get_selected_rectangle(&rect))
  		return;
 
+	clear_clipboard_string();
+
 	Trace("%s begins", __FUNCTION__);
 
 	width  = terminal_font_info.width * rect.width;
@@ -647,8 +649,6 @@
 	gtk_clipboard_set_image(gtk_widget_get_clipboard(topwindow,GDK_SELECTION_CLIPBOARD),img);
 
 	g_object_unref(img);
-
-	action_group_set_sensitive(ACTION_GROUP_CLIPBOARD,FALSE);
 
 	Trace("%s ends", __FUNCTION__);
  }

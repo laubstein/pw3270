@@ -109,9 +109,14 @@ static void connect_main(int status)
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,!online);
 
 	if(online)
+	{
 		check_clipboard_contents();
+	}
 	else
+	{
+		clear_clipboard_string();
 		action_group_set_sensitive(ACTION_GROUP_PASTE,FALSE);
+	}
 
 	#ifndef HAVE_MACUI
 		keypad_set_sensitive(topwindow,online);
@@ -121,6 +126,15 @@ static void connect_main(int status)
 		gtk_osxapplication_attention_request(osxapp,INFO_REQUEST);
 	#endif
 
+}
+
+static void connect_in3270(int status)
+{
+#ifdef X3270_FT
+	action_group_set_sensitive(ACTION_GROUP_FT,status);
+#else
+	action_group_set_sensitive(ACTION_GROUP_FT,FALSE);
+#endif
 }
 
 static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer id)
@@ -588,8 +602,10 @@ int main(int argc, char *argv[])
 	}
 
 	connect_main(0);
+	connect_in3270(0);
 
 	register_schange(ST_CONNECT, connect_main);
+	register_schange(ST_3270_MODE, connect_in3270);
 
 //	Trace("Topwindow: %p (%d) terminal: %p (%d)",topwindow,GTK_IS_WIDGET(topwindow),terminal,GTK_IS_WIDGET(terminal));
 
