@@ -310,14 +310,12 @@
 #ifdef HAVE_PLUGINS
 	else if(strchr(name,'.'))
 	{
-		// Common plugin action
+		// Plugin action
 		gchar				* plugin_name	= g_strdup(name);
 		gchar				* entry_name	= strchr(plugin_name,'.');
 		GModule			 	* plugin;
 
 		*(entry_name++) = 0;
-
-//		Trace("Plugin: %s entry: %s method: action_%s_%s",plugin_name,entry_name,entry_name,GTK_IS_TOGGLE_ACTION(action) ? "toggled" : "activated");
 
 		plugin = get_plugin_by_name(plugin_name);
 		if(plugin)
@@ -412,12 +410,35 @@
 		update_gui_toggle(GTK_ACTION(action),(enum GUI_TOGGLE) id);
  }
 
+ static void action_toggle_gdk_debug(GtkToggleAction *action, gpointer user_data)
+ {
+	gdk_window_set_debug_updates(gtk_toggle_action_get_active(action));
+ }
+
  int action_setup_toggle(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
  {
  	int id = get_toggle_id(names,values,error);
 
  	if(id < 0)
+	{
+		name = get_xml_attribute(names, values, "id");
+
+		if(!name)
+			return -1;
+
+		Trace("[%s] %d",name,g_strcasecmp(name,"gdkdebug"));
+
+		if(!g_strcasecmp(name,"GDKDebug"))
+		{
+			g_error_free(*error);
+			*error = NULL;
+
+			if(connect)
+				g_signal_connect(G_OBJECT(action),"toggled",G_CALLBACK(action_toggle_gdk_debug),(gpointer) id);
+			return 0;
+		}
 		return -1;
+	}
 
 	if(!connect)
 		return 0;

@@ -420,11 +420,21 @@
 
  }
 
+ static  void script_activated(GtkWidget *widget, const gchar *script)
+ {
+ 	gtk_widget_set_sensitive(widget,FALSE);
+
+ 	Trace("%s: widget=%p script=%s",__FUNCTION__,widget,script);
+
+ 	gtk_widget_set_sensitive(widget,TRUE);
+ }
+
  static UI_ELEMENT * start_menuitem(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
  	gchar			*temp = NULL;
+ 	const gchar	*attr;
  	UI_ELEMENT		*el;
- 	const gchar		*name = get_xml_attribute(names,values,"name");
+ 	const gchar	*name = get_xml_attribute(names,values,"name");
 
 	if(!name)
 	{
@@ -446,7 +456,7 @@
  	if(!el)
  	{
  		// New menuitem
- 		GtkWidget *menu;
+		GtkWidget *menu = NULL;
 
 		if((el = create_element(sizeof(UI_ELEMENT),name,names,values,state,error)) == NULL)
 		{
@@ -478,12 +488,67 @@
 
  	}
 
+	attr = (gchar *) get_xml_attribute(names,values,"folder");
+
+ 	if(attr)
+ 	{
+		GDir	*dir;
+		gchar	*path = NULL;
+
+		if(*attr == '/')
+			path = g_strdup(attr);
+		else
+			path = g_build_filename(program_data,attr,NULL);
+
+		Trace("Loading scripts from \"%s\"",path);
+
+		dir = g_dir_open(path,0,NULL);
+
+		if(dir)
+		{
+			GtkWidget		*menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(el->widget));
+			const gchar	*name = g_dir_read_name(dir);
+
+			if(!menu)
+			{
+				menu = gtk_menu_new();
+				gtk_menu_item_set_submenu(GTK_MENU_ITEM(GTK_MENU_ITEM(el->widget)),menu);
+			}
+
+			while(name)
+			{
+				gchar *filename = g_build_filename(path,name,NULL);
+
+				if(g_file_test(filename, G_FILE_TEST_IS_REGULAR) && !(g_str_has_suffix(filename,"~") || g_str_has_suffix(filename,"bak")))
+				{
+					GtkWidget *item = gtk_menu_item_new_with_label(name);
+
+					g_object_set_data_full(G_OBJECT(item),"script_filename",filename,g_free);
+					g_signal_connect(G_OBJECT(item),"activate",G_CALLBACK(script_activated),filename);
+					gtk_menu_shell_append(GTK_MENU_SHELL(menu),item);
+					gtk_widget_show(item);
+				}
+				else
+				{
+					g_free(filename);
+				}
+				name = g_dir_read_name(dir);
+			}
+
+			g_dir_close(dir);
+
+		}
+
+		Trace("Scripts from \"%s\" ok",path);
+		g_free(path);
+ 	}
+
 #ifdef MAC_INTEGRATION
 	check_for_app_menu(el->name,names,values,el->widget,state);
 	if(!g_strcasecmp(el->name,"quit"))
 		state->quit_menu = GTK_MENU_ITEM(el->widget);
 #else
-	gtk_widget_show(el->widget);
+	gtk_widget_show_all(el->widget);
 #endif // MAC_INTEGRATION
 
 	g_free(temp);
@@ -584,7 +649,7 @@
 
  	el = (UI_ELEMENT *) g_hash_table_lookup(state->tool,name);
 
-	Trace("%s: el=%p",__FUNCTION__,el);
+//	Trace("%s: el=%p",__FUNCTION__,el);
 
  	if(!el)
  	{
@@ -600,7 +665,7 @@
 			return NULL;
 		}
 
-		Trace("%s: action=%p",__FUNCTION__,el->action);
+//		Trace("%s: action=%p",__FUNCTION__,el->action);
 
 		if(el->action)
 		{
@@ -630,7 +695,7 @@
 
 	g_free(temp);
 
-	Trace("%s ends",__FUNCTION__);
+//	Trace("%s ends",__FUNCTION__);
 	return el;
  }
 

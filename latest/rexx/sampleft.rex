@@ -1,6 +1,5 @@
 /*
- * Sample ultra-simples para envio de varios arquivos...
- *
+ * Short-Description:	File transfer sample
  */
 
  /* Verifica se esta conectado ao host */

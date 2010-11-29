@@ -35,6 +35,8 @@
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
+#ifndef HAVE_MACUI
+
  PW3270_PLUGIN_ENTRY void script_rexx_activated(GtkWidget *widget, GtkWidget *window)
  {
  	struct rexx_translated_data
@@ -177,6 +179,8 @@
 
 	return 0;
  }
+
+#endif // !HAVE_MACUI
 
  PW3270_PLUGIN_ENTRY void action_select_activated(GtkAction *action, GtkWidget *program_window)
  {

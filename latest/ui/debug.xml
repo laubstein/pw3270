@@ -64,10 +64,10 @@
 
 		<menu name='DebugMenu' label='Debug' >
 			<menuitem action='Redraw' label='Redraw screen'/>
-			<menuitem action='DumpScreen' group='offline' label='DumpScreen' />
+			<menuitem action='DumpScreen' group='online' label='Save screen dump' />
 			<menuitem action='LoadScreenDump' group='offline' label='Load screen dump' />
 			<menuitem action='TestPattern' group='offline' label='Show test pattern' />
-			<!-- <menuitem action='Toggle' id='GDKDebug' label='Debug window updates' /> -->
+			<menuitem action='Toggle' id='GDKDebug' label='Debug window updates' />
 		</menu>
 
 	</menubar>

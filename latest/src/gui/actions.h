@@ -51,7 +51,7 @@
 	LOCAL_EXTERN void action_group_set_sensitive(ACTION_GROUP_ID id, gboolean status);
 
 	/* Deprecated */
-	LOCAL_EXTERN void			  update_3270_toggle_action(int toggle, int value) __attribute__ ((deprecated));
+	LOCAL_EXTERN void			  update_3270_toggle_action(int toggle, int value);
 	LOCAL_EXTERN GtkAction 		* get_action_by_name(const gchar *name) __attribute__ ((deprecated));
 
 

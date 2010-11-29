@@ -340,6 +340,8 @@
 
 	#define		GetSelection() GetScreenContents(0)
 	LOCAL_EXTERN void	  check_clipboard_contents(void);
+	LOCAL_EXTERN void	  clear_clipboard_string(void);
+
 	gchar 				* GetClipboard(void);
 	gchar 				* GetScreenContents(gboolean all);
 
@@ -376,7 +378,6 @@
 	void			SetInt(const gchar *group, const gchar *key, gint val);
 
 	void 			DisableNetworkActions(void);
-	void 			ClearClipboard(void);
 	void			settitle(char *text);
 	GKeyFile 		*GetConf(void);
 
