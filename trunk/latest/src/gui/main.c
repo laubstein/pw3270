@@ -389,8 +389,6 @@ static void load_options(GOptionContext *context)
 		memset(entry,0,sizeof(GOptionEntry) *2);
 
 		entry->long_name = opt[f].name;
-//		entry->short_name;
-//		entry->flags;
 
 		switch(opt[f].type)
 		{
