@@ -325,9 +325,6 @@
 
 	gtk_window_set_role(GTK_WINDOW(topwindow), PACKAGE_NAME "_TOP" );
 
-	unselect();
-	ClearClipboard();
-
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,TRUE);
 	action_group_set_sensitive(ACTION_GROUP_CLIPBOARD,FALSE);
