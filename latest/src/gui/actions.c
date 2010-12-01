@@ -324,22 +324,28 @@
 
 			if(!get_symbol_by_name(plugin,(gpointer) &callback,"action_%s_%s",entry_name,GTK_IS_TOGGLE_ACTION(action) ? "toggled" : "activated"))
 			{
-				*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected action name: %s" ), name);
-				return -1;
+#ifdef DEBUG
+				gtk_action_set_sensitive(G_OBJECT(action),FALSE);
+#else
+				gtk_action_set_visible(G_OBJECT(action),FALSE);
+#endif			
 			}
-
-			if(connect)
+			else if(connect)
+			{
 				g_signal_connect(G_OBJECT(action),GTK_IS_TOGGLE_ACTION(action) ? "toggled" : "activate",callback,topwindow);
-
-			return 0;
+			}
 		}
 		else
 		{
-			*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid or unexpected plugin name in action %s" ), name);
-			return -1;
+#ifdef DEBUG
+			gtk_action_set_sensitive(G_OBJECT(action),FALSE);
+#else
+			gtk_action_set_visible(G_OBJECT(action),FALSE);
+#endif			
 		}
 
 		g_free(plugin_name);
+		return 0;
 
 	}
 #endif
