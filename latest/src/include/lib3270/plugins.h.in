@@ -71,7 +71,7 @@
 	#define PW3270_MODULE_ENTRY(type, function) PW3270_MODULE_EXPORT type pw3270_plugin_ ## function
 
 	// Build script interpreter
-	#define PW3270_SCRIPT_INTERPRETER(type) PW3270_MODULE_EXPORT int pw3270_script_interpreter_ ## type ( const gchar *script_name, const gchar *script_text, int argc, gchar **argv )
+	#define PW3270_SCRIPT_INTERPRETER(type) PW3270_MODULE_EXPORT int pw3270_script_interpreter_ ## type ( const gchar *script_name, const gchar *script_text, int argc, const gchar **argv )
 	#define PW3270_SCRIPT_OK 0
 	#define PW3270_SCRIPT_ERROR(err) err
 	#define PW3270_SCRIPT_RETURN(x) x
