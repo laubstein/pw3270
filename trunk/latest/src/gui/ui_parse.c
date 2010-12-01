@@ -422,11 +422,30 @@
 
  static  void script_activated(GtkWidget *widget, const gchar *script)
  {
+ 	gchar *argv[3];
+ 	const gchar *type = g_object_get_data(G_OBJECT(widget),"script_type");
+
+	if(!type)
+	{
+		type = g_strrstr(script,".");
+		if(type)
+			type++;
+	}
+
  	gtk_widget_set_sensitive(widget,FALSE);
 
  	Trace("%s: widget=%p script=%s",__FUNCTION__,widget,script);
 
+	argv[0] = script;
+	argv[1] = g_strdup_printf("%p",widget);
+	argv[2] = NULL;
+
+	script_interpreter(type, script, NULL, 2, (const gchar **) argv, NULL );
+
+	g_free(argv[1]);
+
  	gtk_widget_set_sensitive(widget,TRUE);
+
  }
 
  static UI_ELEMENT * start_menuitem(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)

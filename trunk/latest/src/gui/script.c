@@ -231,7 +231,7 @@
 	return 0;
  }
 
- int script_interpreter(const gchar *script_type, const gchar *script_name, const gchar *script_text, int argc, gchar **argv, GPid *pid )
+ int script_interpreter(const gchar *script_type, const gchar *script_name, const gchar *script_text, int argc, const gchar **argv, GPid *pid )
  {
  	int f;
  	int rc = 0;
@@ -253,11 +253,11 @@
 			if(convert[f])
 				converted_argv[f] = convert[f]->begin();
 			else
-				converted_argv[f] = argv[f];
+				converted_argv[f] = (gchar *) argv[f];
 		}
 		else
 		{
-			converted_argv[f] = argv[f];
+			converted_argv[f] = (gchar *) argv[f];
 		}
 	}
 
@@ -338,7 +338,7 @@
 		Trace("Calling script %s(%s)",script,begin_arg);
 
 		argv = g_strsplit(begin_arg,",",-1);
-		script_interpreter(type,script,NULL,g_strv_length(argv),argv,pid);
+		script_interpreter(type,script,NULL,g_strv_length(argv),(const gchar **) argv,pid);
 
 		g_strfreev(argv);
 	}
@@ -382,7 +382,7 @@
 		if(type)
 			type++;
 
-		rc = script_interpreter(type,argv[0],NULL,argc-1,argv+1,pid);
+		rc = script_interpreter(type,argv[0],NULL,argc-1,(const gchar **) (argv+1),pid);
 
 		g_strfreev(argv);
 	}

@@ -68,7 +68,7 @@
 
  #define end_java_script() g_static_mutex_unlock(&mutex);
 
- static void run_class(const gchar *classname, int argc, gchar **argv)
+ static void run_class(const gchar *classname, int argc, const gchar **argv)
  {
 	jclass			cls;
 	jmethodID		mid;
@@ -297,7 +297,7 @@
 	}
 	else
 	{
-		gchar *a[] = { (gchar *) "", NULL };
+		const gchar *a[] = { "", NULL };
 		run_class(class_name,1,a);
 	}
 
@@ -310,7 +310,7 @@
 
  PW3270_PLUGIN_ENTRY void pw3270_call_java_script(GtkAction *action, GtkWidget *window)
  {
- 	gchar		*argv[]		= { (gchar *) g_object_get_data(G_OBJECT(action),"script_argument"), NULL };
+ 	const gchar	*argv[]		= { g_object_get_data(G_OBJECT(action),"script_argument"), NULL };
  	const gchar	*classname	= g_object_get_data(G_OBJECT(action),"script_class");
 
 	if(!classname)

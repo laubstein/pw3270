@@ -114,6 +114,7 @@ static void connect_main(int status)
 	}
 	else
 	{
+		unselect();
 		clear_clipboard_string();
 		action_group_set_sensitive(ACTION_GROUP_PASTE,FALSE);
 	}
