@@ -422,7 +422,7 @@
 
  static  void script_activated(GtkWidget *widget, const gchar *script)
  {
- 	gchar *argv[3];
+ 	const gchar *argv[3];
  	const gchar *type = g_object_get_data(G_OBJECT(widget),"script_type");
 
 	if(!type)
@@ -442,7 +442,7 @@
 
 	script_interpreter(type, script, NULL, 2, (const gchar **) argv, NULL );
 
-	g_free(argv[1]);
+	g_free((gchar *) argv[1]);
 
  	gtk_widget_set_sensitive(widget,TRUE);
 
@@ -748,6 +748,66 @@
 	return NULL;
  }
 
+ static UI_ELEMENT * start_scroll(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
+ {
+ 	static const struct _direction
+ 	{
+ 		GdkScrollDirection	id;
+ 		const gchar 		*name;
+ 	} direction[] =
+ 	{
+		{ GDK_SCROLL_UP,	"up"	},
+		{ GDK_SCROLL_DOWN,	"down"	},
+		{ GDK_SCROLL_LEFT,	"left"	},
+		{ GDK_SCROLL_RIGHT,	"right"	}
+ 	};
+
+	GdkScrollDirection	  id		= (GdkScrollDirection) -1;
+ 	const gchar		* dir  		= get_xml_attribute(names,values,"direction");
+ 	const gchar		* name		= get_xml_attribute(names,values,"name");
+ 	int					  f;
+
+	if(!dir)
+ 	{
+	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,"%s", _( "Missing \"direction\" in scroll action"));
+		return NULL;
+ 	}
+
+	for(f=0;id == ((GdkScrollDirection) -1) && f < G_N_ELEMENTS(direction);f++)
+	{
+		if(!g_strcasecmp(dir,direction[f].name))
+			id = direction[f].id;
+	}
+
+	if(id < ((GdkScrollDirection) 0) || id >= ((GdkScrollDirection) ACTION_SCROLL_MAX) )
+ 	{
+	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Unknown or unexpected direction \"%s\""),dir);
+		return NULL;
+ 	}
+
+	Trace("Dir=%s id=%d",dir,(int) id);
+
+	if(action_scroll[(int) id])
+ 	{
+	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,"%s", _( "Duplicated scroll action"));
+		return NULL;
+ 	}
+
+	if(name)
+	{
+		action_scroll[(int) id] = create_action(name,names,values,state,error);
+	}
+	else
+	{
+		gchar *ptr = g_strdup_printf("scroll_%s",dir);
+		action_scroll[(int) id] = create_action(ptr,names,values,state,error);
+		g_free(ptr);
+	}
+
+	Trace("Action scroll_%s=%p",dir,action_scroll[(int) id]);
+
+	return NULL;
+ }
  static void element_start(GMarkupParseContext *context, const gchar *element_name, const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
  	static const struct _table
@@ -777,7 +837,7 @@
 			{	"button", 		skip_block			},
 
 			// Mouse actions
-			{	"scroll", 		skip_block			},
+			{	"scroll", 		start_scroll		},
 
 			// Scripts
 			{	"script",		skip_block			},
