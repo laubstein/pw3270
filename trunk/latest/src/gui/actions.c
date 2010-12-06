@@ -188,7 +188,7 @@
 		action_by_id[f] = action_nop;
 
 	for(f=0;f<G_N_ELEMENTS(action_scroll);f++)
-		action_scroll[f] = action_nop;
+		action_scroll[f] = NULL;
 
 	for(f=0;f<G_N_ELEMENTS(keyboard_action);f++)
 		keyboard_action[f].action = 0;
@@ -325,10 +325,10 @@
 			if(!get_symbol_by_name(plugin,(gpointer) &callback,"action_%s_%s",entry_name,GTK_IS_TOGGLE_ACTION(action) ? "toggled" : "activated"))
 			{
 #ifdef DEBUG
-				gtk_action_set_sensitive(G_OBJECT(action),FALSE);
+				gtk_action_set_sensitive(GTK_ACTION(action),FALSE);
 #else
-				gtk_action_set_visible(G_OBJECT(action),FALSE);
-#endif			
+				gtk_action_set_visible(GTK_ACTION(action),FALSE);
+#endif
 			}
 			else if(connect)
 			{
@@ -338,10 +338,10 @@
 		else
 		{
 #ifdef DEBUG
-			gtk_action_set_sensitive(G_OBJECT(action),FALSE);
+			gtk_action_set_sensitive(GTK_ACTION(action),FALSE);
 #else
-			gtk_action_set_visible(G_OBJECT(action),FALSE);
-#endif			
+			gtk_action_set_visible(GTK_ACTION(action),FALSE);
+#endif
 		}
 
 		g_free(plugin_name);
