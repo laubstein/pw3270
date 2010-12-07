@@ -109,6 +109,15 @@
 		"filetransfer"
  };
 
+ const gchar *action_id_name[ACTION_ID_MAX] =
+ {
+		"copyastable",
+		"copyasimage",
+		"pastenext",
+		"unselect",
+		"reselect"
+ };
+
  static struct _keyboard_action
  {
 	guint			keyval;
@@ -219,6 +228,7 @@
 	gtk_action_group_set_sensitive(action_group[id],status);
  }
 
+/*
  void set_action_sensitive_by_name(const gchar *name,gboolean sensitive)
  {
 	int p;
@@ -237,6 +247,7 @@
 	Trace("%s: %s isn't available",__FUNCTION__,name);
 
  }
+ */
 
  static const struct action_data * get_action_data(const gchar *name, GError **error)
  {

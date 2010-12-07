@@ -62,7 +62,7 @@
 
 			<menuitem action='SelectField' key='<Ctrl>f' group='online' label='Select Field' />
 			<menuitem action='Unselect' group='selection' label='Unselect' />
-			<menuitem action='Reselect' group='online' label='Reselect' />
+			<menuitem action='Reselect' key='<Ctrl>r' group='online' label='Reselect' />
 
 			<separator/>
 			<menuitem action='Clear' group='online' key='Pause' label='Clear' />
@@ -170,7 +170,7 @@
 	<accelerator action='Toggle' id='Insert' key='Insert' group='online' />
 
 	<accelerator action='Home' key='Home' group='online' />
-	<accelerator action='Reset' key='<Ctrl>r' group='online' />
+	<accelerator action='Reset' key='<Shift><Ctrl>r' group='online' />
 	<accelerator action='Return' key='Return' />
 	<accelerator action='Enter' key='KP_Enter' />
 	<accelerator action='Escape' key='Escape' group='online' />
