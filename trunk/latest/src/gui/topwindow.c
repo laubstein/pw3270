@@ -168,6 +168,8 @@
 
 	}
 
+	gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],FALSE);
+
 	g_signal_connect(G_OBJECT(topwindow),"destroy",G_CALLBACK(action_quit),0);
 
 	gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);

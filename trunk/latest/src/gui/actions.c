@@ -199,7 +199,6 @@
 		toggle_action[f].reset	= action_nop;
 		toggle_action[f].toggle	= action_nop;
 	}
-
  }
 
  void update_3270_toggle_action(int toggle, int value)

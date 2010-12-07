@@ -132,6 +132,7 @@
 	gchar			* name;
  	const gchar	* action_name	= get_xml_attribute(names,values,"action");
 	const gchar	* label			= get_xml_attribute(names,values,"label");
+ 	GtkActionGroup	* group			= NULL;
 	GtkAction		* ret;
  	const gchar	* ptr;
  	int				  f;
@@ -148,6 +149,22 @@
 			id = f;
 		}
  	}
+
+	// Check for action group
+	ptr =  get_xml_attribute(names,values,"group");
+	if(ptr)
+	{
+		for(f=0;action_group_name[f] && !group; f++)
+		{
+			if(!g_strcasecmp(ptr,action_group_name[f]))
+				group = action_group[f];
+		}
+		if(!group)
+		{
+			*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid action group \"%s\" on action %s"), ptr, action_name);
+			return NULL;
+		}
+	}
 
 	// Search if it was already created
 	name = g_ascii_strdown(element_name,-1);
@@ -200,6 +217,15 @@
 		gtk_action_set_accel_group(ret,state->accel_group);
 		g_hash_table_insert(state->action,(gpointer) name, ret);
 
+#if ! GTK_CHECK_VERSION(2,16,0)
+
+		g_object_set_data(G_OBJECT(ret),"group",group);
+
+        gtk_action_group_add_action_with_accel(group ? group : action_group[0], ret, get_xml_attribute(names,values,"key"));
+        gtk_action_connect_accelerator(ret);
+
+#endif // ! GTK_CHECK_VERSION(2,16,0)
+
  	}
  	else
  	{
@@ -223,28 +249,9 @@
 			g_object_set_data_full(G_OBJECT(ret),attr[f],g_strdup(a),g_free);
 	}
 
-	// Set action group
-	ptr =  get_xml_attribute(names,values,"group");
-	if(ptr)
-	{
-	 	GtkActionGroup *group = NULL;
-
-		for(f=0;action_group_name[f] && !group; f++)
-		{
-			if(!g_strcasecmp(ptr,action_group_name[f]))
-				group = action_group[f];
-		}
-
-		if(group)
-		{
-			g_object_set_data(G_OBJECT(ret),"group",group);
-		}
-		else
-		{
-			*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid action group \"%s\" on action %s"), ptr, gtk_action_get_name(ret));
- 			return NULL;
-		}
-	}
+#if GTK_CHECK_VERSION(2,16,0)
+	g_object_set_data(G_OBJECT(ret),"group",group);
+#endif // GTK_CHECK_VERSION(2,16,0)
 
 	return ret;
 
@@ -566,8 +573,6 @@
 	check_for_app_menu(el->name,names,values,el->widget,state);
 	if(!g_strcasecmp(el->name,"quit"))
 		state->quit_menu = GTK_MENU_ITEM(el->widget);
-#else
-	gtk_widget_show_all(el->widget);
 #endif // MAC_INTEGRATION
 
 	g_free(temp);
@@ -1087,26 +1092,23 @@
 	gtk_box_pack_start(GTK_BOX(box),el->widget,FALSE,FALSE,0);
  }
 
+#if GTK_CHECK_VERSION(2,16,0)
  static void sync_action_state(gpointer key, GtkAction *action, PARSER_STATE state)
  {
-#if GTK_CHECK_VERSION(2,16,0)
 	GSList			*child	= gtk_action_get_proxies(action);
-#endif
-
 	GtkActionGroup	*group	= (GtkActionGroup *) g_object_get_data(G_OBJECT(action),"group");
 
 	gtk_action_group_add_action_with_accel(group ? group : action_group[0], action, g_object_get_data(G_OBJECT(action),"key"));
 	gtk_action_connect_accelerator(action);
 
 	// Update proxy widgets
-#if GTK_CHECK_VERSION(2,16,0)
 	while(child)
 	{
 		gtk_activatable_sync_action_properties(GTK_ACTIVATABLE(child->data),action);
 		child = child->next;
 	}
-#endif
  }
+#endif // GTK_CHECK_VERSION(2,16,0)
 
 /*---[ External Call ]------------------------------------------------------------------------------------*/
 
@@ -1163,7 +1165,9 @@
 	gtk_container_add(GTK_CONTAINER(state.window),vbox);
 
 	// Update action group & accelerators
+#if GTK_CHECK_VERSION(2,16,0)
 	g_hash_table_foreach(state.action,(GHFunc) sync_action_state, &state);
+#endif // GTK_CHECK_VERSION(2,16,0)
 
 #ifdef MAC_INTEGRATION
 	Trace("%s: Top menu: %p app: %p",__FUNCTION__,state.top_menu,osxapp);
