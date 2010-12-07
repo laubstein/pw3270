@@ -41,6 +41,8 @@
 	/* Globals */
 	LOCAL_EXTERN GtkActionGroup	* action_group[ACTION_GROUP_MAX+1];
 	LOCAL_EXTERN const gchar	* action_group_name[ACTION_GROUP_MAX];
+
+	LOCAL_EXTERN const gchar 	* action_id_name[ACTION_ID_MAX];
 	LOCAL_EXTERN GtkAction		* action_by_id[ACTION_ID_MAX];
 
 	#define ACTION_SCROLL_MAX 4

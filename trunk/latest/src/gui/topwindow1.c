@@ -49,6 +49,15 @@
  GList 		*main_icon		= NULL;
  gchar		*program_logo	= NULL;
 
+ const gchar *action_id_name[ACTION_ID_MAX] =
+ {
+ 	"CopyAsTable",
+ 	"CopyAsImage",
+ 	"PasteNext",
+ 	"Unselect",
+ 	"Reselect"
+ };
+
 #ifdef MOUSE_POINTER_CHANGE
  GdkCursor	*wCursor[CURSOR_MODE_3270];
 #endif
@@ -305,12 +314,11 @@
     gtk_container_add(GTK_CONTAINER(topwindow),toolbar);
 
 	{
-		static const gchar *name[ACTION_ID_MAX] = { "CopyAsTable", "CopyAsImage", "PasteNext", "Unselect", "Reselect" };
 		int f;
 
 		for(f=0;f<ACTION_ID_MAX;f++)
 		{
-			GtkAction *a = get_action_by_name(name[f]);
+			GtkAction *a = get_action_by_name(action_id_name[f]);
 			if(a)
 				action_by_id[f] = a;
 		}

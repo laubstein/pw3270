@@ -1092,11 +1092,13 @@
 	gtk_box_pack_start(GTK_BOX(box),el->widget,FALSE,FALSE,0);
  }
 
-#if GTK_CHECK_VERSION(2,16,0)
- static void sync_action_state(gpointer key, GtkAction *action, PARSER_STATE state)
+ static void finish_action_setup(gpointer key, GtkAction *action, PARSER_STATE state)
  {
-	GSList			*child	= gtk_action_get_proxies(action);
-	GtkActionGroup	*group	= (GtkActionGroup *) g_object_get_data(G_OBJECT(action),"group");
+ 	const gchar	* name  = gtk_action_get_name(action);
+
+#if GTK_CHECK_VERSION(2,16,0)
+	GSList			* child	= gtk_action_get_proxies(action);
+	GtkActionGroup	* group	= (GtkActionGroup *) g_object_get_data(G_OBJECT(action),"group");
 
 	gtk_action_group_add_action_with_accel(group ? group : action_group[0], action, g_object_get_data(G_OBJECT(action),"key"));
 	gtk_action_connect_accelerator(action);
@@ -1107,8 +1109,23 @@
 		gtk_activatable_sync_action_properties(GTK_ACTIVATABLE(child->data),action);
 		child = child->next;
 	}
- }
 #endif // GTK_CHECK_VERSION(2,16,0)
+
+	if(name)
+	{
+		int f;
+
+		for(f=0;f<ACTION_ID_MAX;f++)
+		{
+			if(!g_ascii_strcasecmp(action_id_name[f],name))
+			{
+				action_by_id[f] = action;
+				return;
+			}
+		}
+	}
+
+ }
 
 /*---[ External Call ]------------------------------------------------------------------------------------*/
 
@@ -1165,9 +1182,7 @@
 	gtk_container_add(GTK_CONTAINER(state.window),vbox);
 
 	// Update action group & accelerators
-#if GTK_CHECK_VERSION(2,16,0)
-	g_hash_table_foreach(state.action,(GHFunc) sync_action_state, &state);
-#endif // GTK_CHECK_VERSION(2,16,0)
+	g_hash_table_foreach(state.action,(GHFunc) finish_action_setup, &state);
 
 #ifdef MAC_INTEGRATION
 	Trace("%s: Top menu: %p app: %p",__FUNCTION__,state.top_menu,osxapp);
