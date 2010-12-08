@@ -216,10 +216,9 @@
 
 	for(pos = 0; pos < (terminal_rows * terminal_cols);pos++)
 	{
+		status = screen[pos].status & ELEMENT_STATUS_FIELD_MASK;
 		if(selected)
-			status = screen[pos].status | ELEMENT_STATUS_SELECTED;
-		else
-			status = screen[pos].status & ~ELEMENT_STATUS_SELECTED;
+			status |= ELEMENT_STATUS_SELECTED;
 
 		if(screen[pos].status != status)
 		{
@@ -227,6 +226,29 @@
 				start = pos;
 			end = pos;
 			screen[pos].status = status;
+		}
+	}
+
+	if(selected)
+	{
+		// Set selection borders
+		int first = 0;
+		int last  = (terminal_rows-1)*terminal_cols;
+		for(pos = 0;pos < terminal_cols;pos++)
+		{
+			screen[first++].status |= SELECTION_BOX_TOP;
+			screen[last++].status |= SELECTION_BOX_BOTTOM;
+		}
+
+		first = 0;
+		last = terminal_cols-1;
+
+		for(pos = 0;pos < terminal_rows;pos++)
+		{
+			screen[first].status |= SELECTION_BOX_LEFT;
+			screen[last].status |= SELECTION_BOX_RIGHT;
+			first += terminal_cols;
+			last += terminal_cols;
 		}
 	}
 

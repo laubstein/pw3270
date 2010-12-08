@@ -14,7 +14,7 @@ fi
 if [ ! -z $SVN ]; then
 
 	echo "Updating sources..."
-	$SVN update >/dev/null 2>&1
+	$SVN update
 	if [ "$?" != "0" ]; then
 	
 		echo "$SVN update failed!"
