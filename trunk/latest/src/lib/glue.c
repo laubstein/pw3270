@@ -755,7 +755,7 @@ parse_xrm(const char *arg, const char *where)
 	else {
 		xs_warning("%s: Invalid resource syntax '%.*s', name must "
 		    "begin with '%s'",
-		    where, sizeof(me_dot)-1, arg, me_dot);
+		    where, (int) sizeof(me_dot)-1, arg, me_dot);
 		return;
 	}
 
