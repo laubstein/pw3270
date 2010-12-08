@@ -130,9 +130,10 @@
 
  	int				  id			= -1;
 	gchar			* name;
- 	const gchar	* action_name	= get_xml_attribute(names,values,"action");
-	const gchar	* label			= get_xml_attribute(names,values,"label");
- 	GtkActionGroup	* group			= NULL;
+ 	const gchar		* action_name	= get_xml_attribute(names,values,"action");
+	const gchar		* label			= get_xml_attribute(names,values,"label");
+	const gchar		* group_name	=  get_xml_attribute(names,values,"group");
+	GtkActionGroup	* group			= NULL;
 	GtkAction		* ret;
  	const gchar	* ptr;
  	int				  f;
@@ -151,12 +152,11 @@
  	}
 
 	// Check for action group
-	ptr =  get_xml_attribute(names,values,"group");
-	if(ptr)
+	if(group_name)
 	{
 		for(f=0;action_group_name[f] && !group; f++)
 		{
-			if(!g_strcasecmp(ptr,action_group_name[f]))
+			if(!g_strcasecmp(group_name,action_group_name[f]))
 				group = action_group[f];
 		}
 		if(!group)
@@ -250,7 +250,8 @@
 	}
 
 #if GTK_CHECK_VERSION(2,16,0)
-	g_object_set_data(G_OBJECT(ret),"group",group);
+	if(group_name)
+		g_object_set_data(G_OBJECT(ret),"group",group);
 #endif // GTK_CHECK_VERSION(2,16,0)
 
 	return ret;
