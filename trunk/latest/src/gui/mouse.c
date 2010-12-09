@@ -151,6 +151,7 @@
  static int CheckForFunction(int baddr, int length)
  {
  	int ret = 0;
+
 	if( !(*screen[baddr+1].ch == 'F' && FA_IS_PROTECTED(get_field_attribute(baddr))) )
 		return ret;
 
@@ -158,13 +159,14 @@
 	while(--length > 0)
 	{
 		baddr++;
+
 		if(*screen[baddr].ch > '9' || *screen[baddr].ch < '0')
 			return 0;
 
 		ret = (ret*10)+(*screen[baddr].ch - '0');
-		Trace("Field@%d: %c",baddr,*screen[baddr].ch);
 	}
 
+	Trace("%s: %d",__FUNCTION__,ret);
  	return ret;
  }
 
@@ -177,6 +179,12 @@
 		int length;
 		int sz = terminal_rows * terminal_cols;
 
+		if(g_ascii_isspace(*screen[start].ch))
+		{
+			action_selectfield(0);
+			return;
+		}
+
 		SetSelection(FALSE);
 
 		while(start > 0 && !g_ascii_isspace(*screen[start].ch))
@@ -187,9 +195,9 @@
 
 		length = end-start;
 
-		if(length < 3 )
+		if(length < 4 )
 		{
-			int function = CheckForFunction(start,length);
+			int function = CheckForFunction(start,length-1);
 			if(!lib3270_pfkey(function))
 				return;
 		}
