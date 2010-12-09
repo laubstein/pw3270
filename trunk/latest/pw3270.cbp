@@ -455,10 +455,6 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="src/gui/actions1.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
 		<Unit filename="src/gui/clipboard.c">
 			<Option compilerVar="CC" />
 		</Unit>
