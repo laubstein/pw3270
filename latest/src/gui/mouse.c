@@ -47,6 +47,7 @@
 	SELECT_MODE_NONE,
 	SELECT_MODE_TEXT,
 	SELECT_MODE_RECTANGLE,
+	SELECT_MODE_WORD,
 	SELECT_MODE_FIELD,
 	SELECT_MODE_COPY,
 	SELECT_MODE_APPEND,
@@ -58,7 +59,6 @@
 /*---[ Prototipes ]-----------------------------------------------------------*/
 
  static void UpdateSelectedRegion(int start, int end);
- static void SelectField(int addr);
  static void SetDragType(int type);
  static void SetSelection(gboolean selected);
  static void SetSelectionMode(enum SELECT_MODE m);
@@ -132,7 +132,7 @@
 			gtk_action_set_sensitive(action_by_id[ACTION_UNSELECT],TRUE);
 			break;
 
-		case SELECT_MODE_FIELD:
+		case SELECT_MODE_WORD:
 			gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],FALSE);
 			gtk_action_set_sensitive(action_by_id[ACTION_UNSELECT],TRUE);
 			break;
@@ -168,40 +168,78 @@
  	return ret;
  }
 
- PW3270_ACTION( selectfield )
+ PW3270_ACTION( selectword )
  {
- 	if(!valid_terminal_window())
-		return;
+ 	if(valid_terminal_window())
+ 	{
+		int start = cursor_position;
+		int end = start;
+		int length;
+		int sz = terminal_rows * terminal_cols;
 
-	SetSelection(FALSE);
-	SelectField(cursor_position);
-	SetSelectionMode(SELECT_MODE_FIELD);
+		SetSelection(FALSE);
+
+		while(start > 0 && !g_ascii_isspace(*screen[start].ch))
+			start--;
+
+		while(end < sz && !g_ascii_isspace(*screen[end].ch))
+			end++;
+
+		length = end-start;
+
+		if(length < 3 )
+		{
+			int function = CheckForFunction(start,length);
+			if(!lib3270_pfkey(function))
+				return;
+		}
+		start++;
+		end--;
+
+		startRow = start / terminal_cols;
+		startCol = start % terminal_cols;
+
+		UpdateSelectedRegion(start,end);
+
+		endRow = end / terminal_cols;
+		endCol = end % terminal_cols;
+
+		SetSelectionMode(SELECT_MODE_WORD);
+ 	}
  }
 
- static void SelectField(int addr)
+
+ PW3270_ACTION( selectfield )
  {
- 	int baddr = find_field_attribute(addr);
- 	int length = find_field_length(baddr);
- 	int function = 0;
+ 	if(valid_terminal_window())
+ 	{
+		int baddr = find_field_attribute(cursor_position);
+		int length = find_field_length(baddr);
 
-	if(length < 0 || length > ((terminal_cols * terminal_cols) - baddr))
-		return;
+		SetSelection(FALSE);
 
-	if(length < 3)
-		function = CheckForFunction(baddr,length);
+//		Trace("%s: %d %d",__FUNCTION__,length,((terminal_rows * terminal_cols) - baddr));
+//		if(length < 0 || length > ((terminal_rows * terminal_cols) - baddr))
+//			return;
 
-	if(!lib3270_pfkey(function))
-		return;
+		if(length < 3)
+		{
+			int function = CheckForFunction(baddr,length);
+			if(!lib3270_pfkey(function))
+				return;
+		}
 
-	startRow = (baddr+1) / terminal_cols;
-	startCol = (baddr+1) % terminal_cols;
+		startRow = (baddr+1) / terminal_cols;
+		startCol = (baddr+1) % terminal_cols;
 
-	UpdateSelectedRegion(baddr+1,baddr+length);
+		UpdateSelectedRegion(baddr+1,baddr+length);
 
-	baddr += length;
-	endRow = baddr / terminal_cols;
-	endCol = baddr % terminal_cols;
+		baddr += length;
+		endRow = baddr / terminal_cols;
+		endCol = baddr % terminal_cols;
 
+		SetSelectionMode(SELECT_MODE_FIELD);
+ 	}
  }
 
  static void SetSelection(gboolean selected)
@@ -318,12 +356,34 @@
 		switch(drag_type)
 		{
 		case DRAG_TYPE_NONE:
+			if(select_mode == SELECT_MODE_WORD)
+			{
+				int r,c;
 
-			unselect();
+				if(DecodePosition(event->x,event->y,&r,&c))
+				{
+					unselect();
+				}
+				else if(screen[(r*terminal_cols)+c].status & ELEMENT_STATUS_SELECTED)
+				{
+					SetSelectionMode(SELECT_MODE_FIELD);
+				}
+				else
+				{
+					startRow = r;
+					startCol = r;
+					button_flags |= BUTTON_FLAG_COMBO;
+					unselect();
+				}
+			}
+			else
+			{
+				Trace("Single click - mode = %d (Unselect)",select_mode);
+				unselect();
 
-			if(!DecodePosition(event->x,event->y,&startRow,&startCol))
-				button_flags |= BUTTON_FLAG_COMBO;
-
+				if(!DecodePosition(event->x,event->y,&startRow,&startCol))
+					button_flags |= BUTTON_FLAG_COMBO;
+			}
 			break;
 
 		case DRAG_TYPE_INSIDE:
@@ -343,7 +403,7 @@
 
 	case ((GDK_2BUTTON_PRESS & 0x0F) << 4) | 1 | BUTTON_FLAG_COMBO:
 		DecodePosition(event->x,event->y,&startRow,&startCol);
-		SetSelectionMode(SELECT_MODE_FIELD);
+		SetSelectionMode(SELECT_MODE_WORD);
 		Trace("Button 1 double-clicked at %ld,%ld (%d,%d)",(long) event->x, (long) event->y,startRow,startCol);
 		break;
 
@@ -391,7 +451,7 @@
 
 	switch( ((select_mode & 0x0F) << 4) | (event->button & 0x0F))
  	{
-	case ((SELECT_MODE_NONE & 0x0F) << 4) | 1: // Single click, just move cursor
+	case ((SELECT_MODE_NONE & 0x0F) << 4) | 1: // Single click on button 1
 		Trace("Single click (button: %d)",event->button);
 		unselect();
 		if(row >= 0 && row <= terminal_rows && col >= 0 && col <= terminal_cols)
@@ -403,9 +463,14 @@
 		action_paste(0);
 		break;
 
-	case ((SELECT_MODE_FIELD & 0x0F) << 4) | 1:	// Double click, select field
-		Trace("Selecting field (button: %d)",event->button);
-		SelectField((startRow * terminal_cols) + startCol);
+	case ((SELECT_MODE_FIELD & 0x0F) << 4) | 1: // Single click on button 1
+		Trace("Single click (button: %d)",event->button);
+		action_selectfield(0);
+		break;
+
+	case ((SELECT_MODE_WORD & 0x0F) << 4) | 1:	// Double click, select word
+		Trace("Selecting word (button: %d)",event->button);
+		action_selectword(0);
 		break;
 
 	case ((SELECT_MODE_COPY & 0x0F) << 4) | 1:
