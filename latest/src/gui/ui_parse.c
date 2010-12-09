@@ -135,7 +135,6 @@
 	const gchar		* group_name	=  get_xml_attribute(names,values,"group");
 	GtkActionGroup	* group			= NULL;
 	GtkAction		* ret;
- 	const gchar	* ptr;
  	int				  f;
 
 	// No action, do nothing
@@ -161,7 +160,7 @@
 		}
 		if(!group)
 		{
-			*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid action group \"%s\" on action %s"), ptr, action_name);
+			*error = g_error_new(ERROR_DOMAIN,EINVAL, _( "Invalid action group \"%s\" on action %s"), group_name, action_name);
 			return NULL;
 		}
 	}
