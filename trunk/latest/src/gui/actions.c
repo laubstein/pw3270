@@ -273,6 +273,8 @@
  	if(!TOGGLED_KEEP_SELECTED)
 		unselect();
 
+	Trace("%s: action=%p key=%d",__FUNCTION__,action,(int) key);
+
  	lib3270_pfkey((int) key);
  }
 
@@ -594,10 +596,10 @@
 				return -1;
 			}
 
-			if(vl < pflen)
-				pf_action[vl].normal = action;
+			if(vl <= pflen)
+				pf_action[vl-1].normal = action;
 			else
-				pf_action[vl-pflen].shift = action;
+				pf_action[vl-(pflen+1)].shift = action;
 
 			if(connect)
 				g_signal_connect(G_OBJECT(action),"activate",G_CALLBACK(pfkey),(gpointer) vl);
@@ -662,7 +664,15 @@
 
 		action = (state & GDK_SHIFT_MASK) ? pf_action[f].shift : pf_action[f].normal;
 
+#ifdef DEBUG
 		Trace("PF%02d: %s %s action: %p",f+1,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "",action);
+
+		if(action)
+		{
+			Trace("Action_name: \"%s\"", gtk_action_get_name(action));
+		}
+
+#endif
 
 		if(action)
 			gtk_action_activate(action);
