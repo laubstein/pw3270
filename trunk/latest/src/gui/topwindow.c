@@ -148,7 +148,7 @@
 	}
 	else
 	{
-		gchar *filename = g_strdup_printf("%s%c%s.%s", program_data, G_DIR_SEPARATOR, PROGRAM_NAME, LOGOEXT);
+		gchar *filename = g_build_filename(program_data,LOGO,NULL);
 
 		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
 			pix = gdk_pixbuf_new_from_file(filename, NULL);

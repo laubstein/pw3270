@@ -80,9 +80,6 @@
 	#define DEFAULT_TOGGLE_RECTANGLE_SELECT
 	#define DEFAULT_TOGGLE_CURSOR_POS
 
-	/* Filenames */
-	#undef LOGOEXT
-
 	/* Program name */
 	#undef PROGRAM_NAME
 

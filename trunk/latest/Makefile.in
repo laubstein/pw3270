@@ -36,9 +36,13 @@ PACKAGE_TARNAME ?= @PACKAGE_TARNAME@
 PACKAGE_VERSION ?= @PACKAGE_VERSION@
 PACKAGE_MANAGER ?= @PACKAGE_MANAGER@
 DEFAULT_CONFIG ?= @DEFAULT_CONFIG@
+PACKAGE_LOGO ?= @PACKAGE_LOGO@
+PACKAGE_ICON ?= @PACKAGE_ICON@
 
 datarootdir ?= @datarootdir@
 docdir ?= @docdir@
+LOGO = $(notdir $(PACKAGE_LOGO))
+ICON = $(notdir $(PACKAGE_ICON))
 
 LOCALEDIR ?= @localedir@
 
@@ -109,7 +113,7 @@ CFLAGS = @CFLAGS@ @OS_CFLAGS@ -g -Wall -DLIBDIR=\"$(LIBDIR)\" -DDATAROOTDIR=\"$(
 # Gtk/Gnome parameters
 GTK_CFLAGS = @GTK_CFLAGS@ @IGEMAC_CFLAGS@
 GTK_LIBS = @GTK_LIBS@ @IGEMAC_LIBS@
-GUI_CFLAGS = $(GTK_CFLAGS) @LIBGNOME_CFLAGS@
+GUI_CFLAGS = $(GTK_CFLAGS) @LIBGNOME_CFLAGS@ -DLOGO=\"$(LOGO)\" -DICON=\"$(ICON)\"
 GUI_LDFLAGS = $(GTK_LIBS) @LIBGNOME_LIBS@
 
 # Application parameters
@@ -158,10 +162,10 @@ OOO_SRCS = 	main.cxx connection.cxx screen.cxx actions.cxx status.cxx
 ####################################################################################################
 
 Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
-			$(PACKAGE).@LOGOEXT@ \
+			$(LOGO) \
 			$(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN)$(DLLEXT)) \
 			$(foreach BIN, $(EXTENSIONS), bin/Release/$(BIN)$(DLLEXT))
-	@install --mode=644 $(PACKAGE).@LOGOEXT@ bin/Release/$(PACKAGE).@LOGOEXT@
+	@install --mode=644 $(LOGO) bin/Release/$(LOGO)
 	@msgfmt -c -v -o bin/Release/pt_BR.mo po/pt_BR.po
 	@rm -f bin/Release/gtk-runtime
 	@if [ -d "@GTKRUNTIME@" ]; then ln -s "@GTKRUNTIME@" bin/Release/gtk-runtime ;fi
@@ -171,12 +175,12 @@ Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
 
 Debug:		$(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) \
 		$(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) \
-		$(PACKAGE).@LOGOEXT@
+		$(LOGO)
 
-run: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(PACKAGE).@LOGOEXT@
+run: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(LOGO)
 	@bin/Debug/@PROGRAM_NAME@ --program-data="$(PWD)" --plugin-path=./bin/Debug/plugins
 
-memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(PACKAGE).@LOGOEXT@
+memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(LOGO)
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
 	@cd bin/Debug ; LD_LIBRARY_PATH=. valgrind --leak-check=full ./@PROGRAM_NAME@ --program-data="../../"
 
@@ -554,6 +558,16 @@ bin/xml2pot: src/xml2pot.c
 	@mkdir -p `dirname $@`
 	@$(CC) $(GTK_CFLAGS) $(GTK_LIBS) -o $@ $<
 
+$(LOGO): $(PACKAGE_LOGO)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@cp $< $@
+
+$(ICON): $(PACKAGE_ICON)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@cp $< $@
+
 $(PACKAGE).desktop: Makefile
 	@rm -f $@
 	@echo "[Desktop Entry]" > $@
@@ -563,16 +577,10 @@ $(PACKAGE).desktop: Makefile
 	@echo "Name[pt_BR]=Terminal 3270" >> $@
 	@echo "Comment=IBM 3270 Terminal emulator" >> $@
 	@echo "Exec=$(bindir)/$(PACKAGE)" >> $@
-	@echo "Icon=$(datarootdir)/$(PACKAGE)/$(PACKAGE).@LOGOEXT@" >> $@
+	@echo "Icon=$(datarootdir)/$(PACKAGE)/$(ICON)" >> $@
 	@echo "Terminal=false" >> $@
 	@echo "Type=Application" >> $@
 	@echo "StartupNotify=true" >> $@
-
-@PROGRAM_NAME@.ico: @ICONFILE@
-	@cp @ICONFILE@ $@
-
-$(PACKAGE).@LOGOEXT@: @LOGOFILE@ Makefile
-	@@CONVERT@ @LOGOFILE@ $@
 
 src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@src/mkversion.sh
@@ -635,7 +643,7 @@ install-doc:
 	@install --mode=644 LICENSE $(DESTDIR)/$(docdir)
 	@install --mode=644 AUTHORS $(DESTDIR)/$(docdir)
 
-install-gui: bin/Release/@PROGRAM_NAME@@EXEEXT@ $(PACKAGE).@LOGOEXT@
+install-gui: bin/Release/@PROGRAM_NAME@@EXEEXT@
 	@mkdir -p $(DESTDIR)/$(bindir)
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
@@ -643,7 +651,7 @@ install-gui: bin/Release/@PROGRAM_NAME@@EXEEXT@ $(PACKAGE).@LOGOEXT@
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 
 	@install --mode=755 bin/Release/@PROGRAM_NAME@@EXEEXT@ $(DESTDIR)/$(bindir)
-	@install --mode=644 $(PACKAGE).@LOGOEXT@ $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644  $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 $(DEFAULT_CONFIG) $(DESTDIR)/$(datarootdir)/$(PACKAGE)/@PROGRAM_NAME@.conf
 
@@ -747,8 +755,8 @@ clean:
 	@rm -f config.status
 	@rm -f *.lnk
 	@rm -fr locale
-	@rm -f *.ico
-	@rm -f $(PACKAGE).@LOGOEXT@
+	@rm -f $(ICO)
+	@rm -f $(LOGO)
 	@rm -f @PROGRAM_NAME@.oxt
 	@rm -f src/java/lib3270_jni.h
 	@rm -f src/oxt/pw3270.uno.rdb
