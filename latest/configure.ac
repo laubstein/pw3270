@@ -72,7 +72,6 @@ OS_LFLAGS=""
 OS_SRCS=""
 OS_APPSRCS=""
 
-LOGOEXT="png"
 LD_APIFLAGS=""
 LD_RLSFLAGS="-Wl,--strip-all"
 LD=$CC
@@ -112,7 +111,10 @@ case "$host" in
 		OS_LFLAGS="-lws2_32"
 		OS_APISRCS="w3misc.c winvers.c"
 		OS_APPSRCS="resources.rc"
-		LOGOEXT="gif"
+		
+		pw3270_cv_icon="image/pw3270.ico"
+		pw3270_cv_logo="image/pw3270.jpg"
+
 		localedir="locale"
 
 		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/win32"
@@ -131,10 +133,16 @@ case "$host" in
 		LD_RLSFLAGS=""
 		OS_LFLAGS=""
 		pw3270_cv_statusbar="yes"
+		
+		pw3270_cv_icon="image/pw3270.icns"
+		pw3270_cv_logo="image/pw3270.png"
 		;;
 
 	*)
 		# Check for OpenOffice
+		pw3270_cv_icon="image/pw3270.png"
+		pw3270_cv_logo="image/pw3270.png"
+
 		AC_CHECK_FILE("/opt/openoffice.org/basis3.0/program/unorc",oo_home="/opt/openoffice.org",oo_home="none")
 		AC_CHECK_FILE("/opt/broffice.org3/program/soffice.bin",oo_home="/opt/broffice.org3",)
 		AC_CHECK_FILE("/usr/lib/ooo3/program/soffice.bin",oo_home="/usr/lib/ooo3",)
@@ -314,20 +322,13 @@ AC_ARG_WITH([icon],
 	[AS_HELP_STRING([--with-icon], [set icon filename])],
 [
 	pw3270_cv_icon="$withval"
-	AC_DEFINE_UNQUOTED(PROGRAM_ICON,"$pw3270_cv_icon")
-],[
-	pw3270_cv_icon="image/default.ico"
-])
+],)
 
 AC_ARG_WITH([logo],
 	[AS_HELP_STRING([--with-logo], [set logo filename])],
 [
 	pw3270_cv_logo="$withval"
-	AC_DEFINE_UNQUOTED(PROGRAM_LOGO,"$pw3270_cv_logo")
-
-],[
-	pw3270_cv_logo="image/default.png"
-])
+],)
 
 AC_ARG_WITH([gtk-runtime],
 	[AS_HELP_STRING([--with-gtk-runtime], [GTK runtime path (For windows installer)])],
@@ -618,8 +619,8 @@ AC_SUBST(PACKAGE_REVISION, "SVN_REV")
 AC_DEFINE(PACKAGE_RELEASE,"SVN_RELEASE")
 AC_SUBST(PACKAGE_RELEASE, "SVN_RELEASE")
 
-AC_SUBST(ICONFILE,$pw3270_cv_icon)
-AC_SUBST(LOGOFILE,$pw3270_cv_logo)
+AC_SUBST(PACKAGE_ICON,$pw3270_cv_icon)
+AC_SUBST(PACKAGE_LOGO,$pw3270_cv_logo)
 
 AC_SUBST(PROGRAM_NAME,"$pw3270_cv_progname")
 AC_SUBST(DEFAULT_CONFIG,"$pw3270_cv_config")
@@ -643,9 +644,6 @@ AC_SUBST(TARGETS)
 
 AC_SUBST(INSTALL_PACKETS)
 AC_SUBST(INSTALL_TARGETS)
-
-AC_DEFINE_UNQUOTED(LOGOEXT,"$LOGOEXT")
-AC_SUBST(LOGOEXT)
 
 AC_SUBST(JDK_HOME,$JDK_HOME)
 
