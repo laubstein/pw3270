@@ -333,7 +333,7 @@ oooDebug: bin/Debug/unotest
 	@cp src/oxt/manifest.xml uno/oxt.tmp/META-INF
 	@cp src/oxt/description.xml uno/oxt.tmp
 	@cp src/oxt/description.txt uno/oxt.tmp
-	@cp image/default.png uno/oxt.tmp/@PROGRAM_NAME@.png
+	@cp image/pw3270.png uno/oxt.tmp/@PROGRAM_NAME@.png
 	@cp bin/Release/@PROGRAM_NAME@.uno@DLLEXT@ uno/oxt.tmp
 	@cp uno/@PROGRAM_NAME@.uno.rdb uno/oxt.tmp
 	@cd uno/oxt.tmp ; zip -m -r ../../@PROGRAM_NAME@.oxt .
@@ -568,7 +568,7 @@ $(ICON): $(PACKAGE_ICON)
 	@mkdir -p `dirname $@`
 	@cp $< $@
 
-$(PACKAGE).desktop: Makefile
+$(PACKAGE).desktop: Makefile $(ICON)
 	@rm -f $@
 	@echo "[Desktop Entry]" > $@
 	@echo "Encoding=UTF-8" >> $@
@@ -643,7 +643,7 @@ install-doc:
 	@install --mode=644 LICENSE $(DESTDIR)/$(docdir)
 	@install --mode=644 AUTHORS $(DESTDIR)/$(docdir)
 
-install-gui: bin/Release/@PROGRAM_NAME@@EXEEXT@
+install-gui: bin/Release/@PROGRAM_NAME@@EXEEXT@ $(ICON) $(LOGO)
 	@mkdir -p $(DESTDIR)/$(bindir)
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
@@ -651,7 +651,8 @@ install-gui: bin/Release/@PROGRAM_NAME@@EXEEXT@
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 
 	@install --mode=755 bin/Release/@PROGRAM_NAME@@EXEEXT@ $(DESTDIR)/$(bindir)
-	@install --mode=644  $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 $(LOGO) $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 $(ICON) $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
 	@install --mode=644 $(DEFAULT_CONFIG) $(DESTDIR)/$(datarootdir)/$(PACKAGE)/@PROGRAM_NAME@.conf
 
