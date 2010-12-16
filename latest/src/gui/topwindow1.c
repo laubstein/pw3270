@@ -46,7 +46,11 @@
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
  GtkWidget	*topwindow 		= NULL;
+
+#ifndef WIN32
  GList 		*main_icon		= NULL;
+#endif
+
  gchar		*program_logo	= NULL;
 
  const gchar *action_id_name[ACTION_ID_MAX] =
@@ -136,7 +140,7 @@
 	if(program_logo && g_file_test(program_logo,G_FILE_TEST_IS_REGULAR))
 		return gdk_pixbuf_new_from_file(program_logo,NULL);
 
-	filename = g_strdup_printf("%s%c%s.%s", program_data, G_DIR_SEPARATOR, PROGRAM_NAME, LOGOEXT);
+	filename = g_build_filename(program_data,LOGO,NULL);
 
 	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
 		pix = gdk_pixbuf_new_from_file(filename, NULL);
@@ -224,10 +228,10 @@
 
 	if(pix)
 	{
+#if ! defined( WIN32 )
 		main_icon = g_list_append(main_icon, pix);
 		gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
-
-#if defined( HAVE_IGEMAC )
+#elif defined( HAVE_IGEMAC )
 		gtk_osxapplication_set_dock_icon_pixbuf(osxapp,pix);
 #endif
 

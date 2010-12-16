@@ -55,7 +55,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 		file "/oname=$INSTDIR\@PROGRAM_NAME@.ico"	"@PROGRAM_NAME@.ico"
 
 		# Configuration files
-		file "/oname=$INSTDIR\@PROGRAM_NAME@.@LOGOEXT@"	"bin\Release\@PACKAGE@.@LOGOEXT@"
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.gif"	"bin\Release\@PACKAGE@.gif"
 		file "/oname=$INSTDIR\colors.conf"		"colors.conf"
 		file "/oname=$INSTDIR\@PROGRAM_NAME@.conf"	"@DEFAULT_CONFIG@"
 
@@ -209,7 +209,7 @@ section "Uninstall"
 	delete $INSTDIR\@PROGRAM_NAME@.conf
 	delete $INSTDIR\actions.conf
 	delete $INSTDIR\ui.xml
-	delete $INSTDIR\@PROGRAM_NAME@.jpg
+	delete $INSTDIR\@PROGRAM_NAME@.gif
 	delete $INSTDIR\@PROGRAM_NAME@.log
 
 	delete $SMPROGRAMS\@PROGRAM_NAME@.lnk
@@ -239,6 +239,14 @@ section "Uninstall"
 sectionEnd
 
 Function .onInit
+
+FindProcDLL::FindProc "@PROGRAM_NAME@.exe"
+IntCmp $R0 1 0 notRunning
+
+    MessageBox MB_OK|MB_ICONEXCLAMATION "@PROGRAM_NAME@ is running. Please close it first" /SD IDOK
+    Abort
+
+notRunning:
 
 IfFileExists $PROGRAMFILES\ooRexx\rexx.exe RexxOK RexxNOK
 

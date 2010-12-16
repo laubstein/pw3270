@@ -111,9 +111,9 @@ case "$host" in
 		OS_LFLAGS="-lws2_32"
 		OS_APISRCS="w3misc.c winvers.c"
 		OS_APPSRCS="resources.rc"
-		
+
 		pw3270_cv_icon="image/pw3270.ico"
-		pw3270_cv_logo="image/pw3270.jpg"
+		pw3270_cv_logo="image/pw3270.gif"
 
 		localedir="locale"
 
@@ -133,14 +133,14 @@ case "$host" in
 		LD_RLSFLAGS=""
 		OS_LFLAGS=""
 		pw3270_cv_statusbar="yes"
-		
+
 		pw3270_cv_icon="image/pw3270.icns"
 		pw3270_cv_logo="image/pw3270.png"
 		;;
 
 	*)
 		# Check for OpenOffice
-		pw3270_cv_icon="image/pw3270.png"
+		pw3270_cv_icon="image/pw3270.svg"
 		pw3270_cv_logo="image/pw3270.png"
 
 		AC_CHECK_FILE("/opt/openoffice.org/basis3.0/program/unorc",oo_home="/opt/openoffice.org",oo_home="none")
