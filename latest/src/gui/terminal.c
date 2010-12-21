@@ -82,7 +82,11 @@
 
  static gboolean expose(GtkWidget *widget, GdkEventExpose *event, void *t)
  {
+#if GTK_CHECK_VERSION(2,14,0)
 	GdkWindow *window = gtk_widget_get_window(widget);
+#else
+	GdkWindow *window = widget->window;
+#endif
  	cairo_t *cr	= gdk_cairo_create(window);
 
  	if(!pixmap_terminal)
