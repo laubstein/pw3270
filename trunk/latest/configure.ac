@@ -484,6 +484,10 @@ PKG_CHECK_MODULES( [GTK], [glib-2.0 gtk+-2.0 >= 2.8 gthread-2.0 gthread-2.0 gmod
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
 
+PKG_CHECK_MODULES( [CAIRO], [cairo >= 1.8], AC_DEFINE(HAVE_CAIRO) )
+AC_SUBST(CAIRO_LIBS)
+AC_SUBST(CAIRO_CFLAGS)
+
 # Check for GNOME
 if test "$pw3270_cv_gnome" == "yes"; then
 	PKG_CHECK_MODULES( [LIBGNOME], [libgnome-2.0 libgnomeui-2.0],
