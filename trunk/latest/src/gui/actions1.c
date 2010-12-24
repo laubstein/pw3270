@@ -68,11 +68,8 @@
     { "Bold", 			    FALSE	},
     { "KeepSelected", 	    FALSE	},
     { "Underline",		    TRUE	},
-
-
-
-
-    { "AutoConnect",    	TRUE	}
+    { "AutoConnect",    	TRUE	},
+    { "KPAlternative",		FALSE	}
  };
 
  gboolean gui_toggle_state[GUI_TOGGLE_COUNT] = { 0 };
@@ -102,7 +99,9 @@
 	{ GDK_KP_Up,			0,					NULL,	G_CALLBACK(action_Up)				},
 	{ GDK_KP_Right,			0,					NULL,	G_CALLBACK(action_Right)			},
 	{ GDK_KP_Down,			0,					NULL,	G_CALLBACK(action_Down)				},
-	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(lib3270_tab)				},
+
+	{ GDK_KP_Add,			GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(action_kpadd)			},
+	{ GDK_KP_Subtract,		GDK_NUMLOCK_MASK,	NULL,	G_CALLBACK(action_kpsubtract)		},
 
 	{ GDK_3270_PrintScreen,	0,					NULL,	G_CALLBACK(action_printscreen)		},
 	{ GDK_Sys_Req,			0,					NULL,	G_CALLBACK(lib3270_sysreq)			},
@@ -321,6 +320,13 @@
 	{
 		if(keyboard_action[f].keyval == event->keyval && state == keyboard_action[f].state)
 		{
+#ifdef DEBUG
+			Trace("Action: %p  def: %p",keyboard_action[f].action,keyboard_action[f].def);
+			if(keyboard_action[f].action)
+			{
+				Trace("Action_name: %s",gtk_action_get_name(keyboard_action[f].action));
+			}
+#endif
 			if(keyboard_action[f].action)
 				gtk_action_activate(keyboard_action[f].action);
 			else if(!keyboard_action[f].def)
@@ -455,6 +461,9 @@
 
 		{	"NextField",		G_CALLBACK(lib3270_tab)				},
 		{	"PreviousField",	G_CALLBACK(lib3270_backtab)			},
+
+		{	"kpadd",			G_CALLBACK(action_kpadd)			},
+		{	"kpsubtract",		G_CALLBACK(action_kpsubtract)		},
 
 		// Edit actions
 		{	"PasteNext",		G_CALLBACK(action_pastenext)		},

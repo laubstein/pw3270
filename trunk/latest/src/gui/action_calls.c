@@ -32,11 +32,11 @@
 
  #include "gui.h"
  #include "actions.h"
- 
+
  #ifdef HAVE_MALLOC_H
 	#include <malloc.h>
  #endif
- 
+
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
  PW3270_ACTION( quit )
@@ -475,3 +475,21 @@
 	gtk_widget_destroy(dialog);
  }
 
+ PW3270_ACTION(kpadd)
+ {
+ 	Trace("%s - KPAlternative is %s",__FUNCTION__,TOGGLED_KP_ALTERNATIVE ? "Enabled" : "Disabled");
+ 	if(TOGGLED_KP_ALTERNATIVE)
+		lib3270_tab();
+	else
+		ParseInput("+");
+
+ }
+
+ PW3270_ACTION(kpsubtract)
+ {
+ 	Trace("%s - KPAlternative is %s",__FUNCTION__,TOGGLED_KP_ALTERNATIVE ? "Enabled" : "Disabled");
+ 	if(TOGGLED_KP_ALTERNATIVE)
+		lib3270_backtab();
+	else
+		ParseInput("-");
+ }

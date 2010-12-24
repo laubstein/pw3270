@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: pw3270 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-01-18 17:12-0200\n"
-"PO-Revision-Date: 2010-11-17 17:43-0200\n"
+"PO-Revision-Date: 2010-12-24 10:10-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -21,52 +21,52 @@ msgstr ""
 msgid " Unknown frame type from host"
 msgstr ""
 
-#: src/lib/telnet.c:1017
+#: src/lib/telnet.c:1019
 #, c-format
 msgid "%s:%d"
 msgstr ""
 
-#: src/gui/main.c:496
+#: src/gui/main.c:523
 msgid "- 3270 Emulator for GTK+"
 msgstr "- Emulador 3270 para GTK+"
 
-#: src/gui/main.c:475
+#: src/gui/main.c:502
 msgid "- 3270 Emulator for Gnome"
 msgstr "- Emulador 3270 para Gnome"
 
-#: src/gui/main.c:463
+#: src/gui/main.c:488
 msgid "- 3270 Emulator for Gtk-OSX"
 msgstr "- Emulador 3270 para Gtk-OSX"
 
-#: src/gui/main.c:484
+#: src/gui/main.c:511
 msgid "3270 Emulator"
 msgstr "Emulador 3270"
 
-#: src/gui/action_calls.c:283
+#: src/gui/action_calls.c:295
 msgid "3270 Terminal emulator for GTK."
 msgstr "Emulador 3270 para GTK"
 
-#: src/gui/action_calls.c:281
+#: src/gui/action_calls.c:293
 msgid "3270 Terminal emulator for Gnome."
 msgstr "Emulador de terminal 3270 para Gnome"
 
-#: src/gui/action_calls.c:279
+#: src/gui/action_calls.c:291
 msgid "3270 Terminal emulator for Gtk-OSX."
 msgstr "Emulador 3270 para Gtk-OSX."
 
-#: src/gui/main.c:173
+#: src/gui/main.c:188
 msgid "3270 library failed"
 msgstr "Biblioteca 3270 falhou"
 
-#: src/gui/main.c:549
+#: src/gui/main.c:576
 msgid "3270 library failed to start"
 msgstr "Biblioteca 3270 falhou ao iniciar"
 
-#: src/gui/main.c:385
+#: src/gui/main.c:400
 msgid "3270 options"
 msgstr "Opções do 3270"
 
-#: src/lib/telnet.c:3305
+#: src/lib/telnet.c:3303
 #, c-format
 msgid ""
 "<b>Connection state:</b> %s\n"
@@ -74,23 +74,23 @@ msgid ""
 msgstr "<b>Estado da conexão:</b>·%s\n"
 "<b>Mensagem de alerta::</b>·%s"
 
-#: src/gui/uiparser1.c:701
+#: src/gui/uiparser1.c:702
 msgid "<button> element should be used only inside <keypad><row>"
 msgstr "Elemento <button> só deve ser usado dentro de <keypad><row>"
 
-#: src/gui/uiparser1.c:694
+#: src/gui/uiparser1.c:695
 msgid "<row> element should be used only inside <keypad>"
 msgstr "Elemento <row> só deve ser usado dentro de <keypad>"
 
-#: src/gui/uiparser1.c:724
+#: src/gui/uiparser1.c:725
 msgid "<script> element requires a name"
 msgstr "Tag <script> precisa de um nome"
 
-#: src/gui/uiparser1.c:712
+#: src/gui/uiparser1.c:713
 msgid "<script> element should be used only inside another active element"
 msgstr "Elemento <script> só pode ser usado dentro de outro elemento ativo"
 
-#: src/gui/screen.c:732
+#: src/gui/screen.c:736
 msgid "Abort"
 msgstr "Abortar"
 
@@ -166,7 +166,7 @@ msgstr "Borda"
 msgid "Browse"
 msgstr "Procurar"
 
-#: src/gui/action_calls.c:189
+#: src/gui/action_calls.c:201
 msgid "Can't connect"
 msgstr "Não foi possível conectar ao host"
 
@@ -197,7 +197,7 @@ msgid ""
 msgstr "Não foi possível criar arquivo temporário:\n"
 "%s"
 
-#: src/gui/uiparser1.c:1285
+#: src/gui/uiparser1.c:1286
 #, c-format
 msgid "Can't find UI definitions in %s"
 msgstr "Não encontrei definição de interface em %s"
@@ -207,13 +207,13 @@ msgstr "Não encontrei definição de interface em %s"
 msgid "Can't load \"%s\""
 msgstr "Não consigo carregar \"%s\""
 
-#: src/gui/clipboard.c:391 src/gui/uiparser1.c:850
-#: src/plugins/rexx/plg_start.c:160
+#: src/gui/clipboard.c:391 src/gui/uiparser1.c:851
+#: src/plugins/rexx/plg_start.c:156
 #, c-format
 msgid "Can't load %s"
 msgstr "Não foi possível carregar %s"
 
-#: src/gui/uiparser1.c:1287
+#: src/gui/uiparser1.c:1288
 msgid "Can't load UI"
 msgstr "Não foi possível ler a interface"
 
@@ -225,16 +225,16 @@ msgstr "Não foi possível carregar plugin"
 msgid "Can't open local file"
 msgstr "Não foi possível abrir arquivo local"
 
-#: src/gui/uiparser1.c:220 src/gui/uiparser1.c:852 src/gui/uiparser1.c:878
+#: src/gui/uiparser1.c:221 src/gui/uiparser1.c:853 src/gui/uiparser1.c:879
 msgid "Can't parse UI"
 msgstr "Erro no processamento da interface"
 
-#: src/gui/uiparser1.c:221
+#: src/gui/uiparser1.c:222
 #, c-format
 msgid "Can't parse accelerator \"%s\""
 msgstr "Não foi possível converter tecla \"%s\""
 
-#: src/gui/uiparser1.c:876
+#: src/gui/uiparser1.c:877
 #, c-format
 msgid "Can't parse ui in %s"
 msgstr "Não foi possível processar interface em %s"
@@ -244,15 +244,15 @@ msgstr "Não foi possível processar interface em %s"
 msgid "Can't receive \"%s\""
 msgstr "Não foi possível receber \"%s\""
 
-#: src/gui/main.c:275
+#: src/gui/main.c:290
 msgid "Can't register as I/O manager."
 msgstr "Não foi possivel registrar gerenciador de I/O"
 
-#: src/gui/main.c:285
+#: src/gui/main.c:300
 msgid "Can't register as file-transfer manager."
 msgstr "Não foi possível registrar gerenciador de transferência de arquivos."
 
-#: src/gui/main.c:279
+#: src/gui/main.c:294
 msgid "Can't register as screen manager."
 msgstr "Não foi possível registrar gerenciador de telas."
 
@@ -266,11 +266,11 @@ msgstr "Não foi possível gravar %s"
 msgid "Can't send \"%s\""
 msgstr "Não foi possível enviar arquivo \"%s\""
 
-#: src/gui/actions1.c:517
+#: src/gui/action_calls.c:461
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
-#: src/gui/main.c:551 src/gui/main.c:571 src/gui/script.c:195
+#: src/gui/main.c:578 src/gui/main.c:598 src/gui/script.c:195
 msgid "Can't start"
 msgstr "Não foi possível iniciar"
 
@@ -288,11 +288,11 @@ msgstr "Não foi possível iniciar o script"
 msgid "Can't start script \"%s\""
 msgstr "Não foi possível iniciar script \"%s\""
 
-#: src/gui/screen.c:460 src/gui/screen.c:480
+#: src/gui/screen.c:464 src/gui/screen.c:484
 msgid "Can't stop LU association script"
 msgstr "Não consigo parar o script de associação de LU"
 
-#: src/gui/screen.c:462 src/gui/screen.c:482
+#: src/gui/screen.c:466 src/gui/screen.c:486
 msgid "Can't stop script"
 msgstr "Não foi possível parar script"
 
@@ -321,11 +321,11 @@ msgstr "Configuração de cores"
 msgid "Colors"
 msgstr "Cores"
 
-#: src/gui/main.c:365
+#: src/gui/main.c:380
 msgid "Command to run when LU name is available"
 msgstr "Comando a executar quando o nome da LU ficar disponível"
 
-#: src/gui/tracewindow.c:72 src/plugins/rexx/plg_start.c:358
+#: src/gui/tracewindow.c:72 src/plugins/rexx/plg_start.c:354
 msgid "Command:"
 msgstr "Comando:"
 
@@ -333,11 +333,11 @@ msgstr "Comando:"
 msgid "Connect on startup"
 msgstr "Conectar ao iniciar"
 
-#: src/gui/action_calls.c:185
+#: src/gui/action_calls.c:197
 msgid "Connection already in progress"
 msgstr "Conexão em andamento"
 
-#: src/gui/action_calls.c:180
+#: src/gui/action_calls.c:192
 msgid "Connection error"
 msgstr "Erro de conexão"
 
@@ -385,7 +385,7 @@ msgstr "Cilindros"
 msgid "DFT Buffer size:"
 msgstr "Tamanho do buffer DFT"
 
-#: ui/debug.xml:54
+#: ui/debug.xml:55
 msgid "DS Trace"
 msgstr ""
 
@@ -421,15 +421,11 @@ msgstr "Esquema de cores padrão 2"
 msgid "Default Color set 1"
 msgstr "Esquema de cores padrão 1"
 
-#: src/gui/actions1.c:541
+#: src/gui/action_calls.c:380
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
-#: ui/debug.xml:67
-msgid "DumpScreen"
-msgstr ""
-
-#: src/lib/telnet.c:1236
+#: src/lib/telnet.c:1238
 msgid "EOR received when not in 3270 mode, ignored."
 msgstr "\"EOR\" recebido fora do modo 3270, ignorado"
 
@@ -475,11 +471,11 @@ msgstr "Limpar até o final do campo"
 msgid "Erase to end of line"
 msgstr "Limpar até o final da linha"
 
-#: src/gui/screen.c:702
+#: src/gui/screen.c:706
 msgid "Error"
 msgstr "Erro"
 
-#: src/gui/actions1.c:510
+#: src/gui/action_calls.c:454
 #, c-format
 msgid ""
 "Error loading %s\n"
@@ -487,12 +483,12 @@ msgid ""
 msgstr "Erro lendo %s\n"
 "%s"
 
-#: src/gui/uiparser1.c:218
+#: src/gui/uiparser1.c:219
 #, c-format
 msgid "Error parsing %s"
 msgstr "Erro ao processar %s"
 
-#: src/gui/action_calls.c:336 src/gui/actions1.c:569
+#: src/gui/action_calls.c:346 src/gui/action_calls.c:408
 #, c-format
 msgid ""
 "Error saving %s\n"
@@ -512,11 +508,11 @@ msgid ""
 msgstr "Erro ao iniciar processo %s\n"
 "%s"
 
-#: ui/debug.xml:55
+#: ui/debug.xml:56
 msgid "Event Trace"
 msgstr ""
 
-#: src/gui/uiparser1.c:795
+#: src/gui/uiparser1.c:796
 msgid "Expecting active element"
 msgstr "Esperando elemento ativo"
 
@@ -524,7 +520,7 @@ msgstr "Esperando elemento ativo"
 msgid "External Rexx script"
 msgstr "Script rexx externo"
 
-#: src/plugins/rexx/plg_start.c:162
+#: src/plugins/rexx/plg_start.c:158
 msgid "File error"
 msgstr "Erro de arquivo"
 
@@ -544,7 +540,7 @@ msgstr "Transferência de arquivos já está ativa"
 msgid "Fixed"
 msgstr "Fixo"
 
-#: src/gui/main.c:356
+#: src/gui/main.c:371
 msgid "Fixed path and filename for load/save the configuration data"
 msgstr "Caminho e nome do arquivo para ler/gravar dados de configuração"
 
@@ -564,7 +560,7 @@ msgstr "De:"
 msgid "Full Screen"
 msgstr "Tela-cheia"
 
-#: src/gui/main.c:368
+#: src/gui/main.c:383
 msgid "Full path of plugins to load"
 msgstr "Caminho completo dos plugins a carregar"
 
@@ -572,7 +568,7 @@ msgstr "Caminho completo dos plugins a carregar"
 msgid "Function bar"
 msgstr "Barra de funções"
 
-#: src/gui/main.c:205
+#: src/gui/main.c:220
 msgid "GTK Version mismatch"
 msgstr "Divergência na versão do GTK"
 
@@ -584,7 +580,7 @@ msgstr "Cinza"
 msgid "Green"
 msgstr "Verde"
 
-#: ui/default.xml:115
+#: ui/default.xml:116
 msgid "Help"
 msgstr "Ajuda"
 
@@ -596,7 +592,7 @@ msgstr "Servidor desconectou, transferência cancelada"
 msgid "Host file name:"
 msgstr "Nome do arquivo remoto:"
 
-#: src/gui/main.c:358
+#: src/gui/main.c:373
 msgid "Host identifier"
 msgstr "Identificador do host"
 
@@ -604,7 +600,7 @@ msgstr "Identificador do host"
 msgid "Host is TSO"
 msgstr ""
 
-#: src/gui/action_calls.c:62
+#: src/gui/action_calls.c:74
 msgid "Hostname:"
 msgstr "Endereço do servidor:"
 
@@ -612,7 +608,7 @@ msgstr "Endereço do servidor:"
 msgid "Illegal frame length"
 msgstr ""
 
-#: src/gui/screen.c:701
+#: src/gui/screen.c:705
 msgid "Information"
 msgstr "Informação"
 
@@ -620,7 +616,7 @@ msgstr "Informação"
 msgid "Informations"
 msgstr "Informações"
 
-#: ui/default.xml:110
+#: ui/default.xml:111
 msgid "Input method"
 msgstr "Método de entrada"
 
@@ -665,7 +661,7 @@ msgstr "Barra lateral"
 msgid "Latin Alphabet No. 1"
 msgstr ""
 
-#: src/gui/actions1.c:481 ui/debug.xml:68
+#: src/gui/action_calls.c:425 ui/debug.xml:68
 msgid "Load screen dump"
 msgstr "Carregar captura de tela"
 
@@ -677,11 +673,11 @@ msgstr "Nome do arquivo local:"
 msgid "Locked status"
 msgstr "Bloqueada"
 
-#: src/gui/main.c:364
+#: src/gui/main.c:379
 msgid "Log file"
 msgstr "Arquivo de log"
 
-#: src/gui/main.c:362
+#: src/gui/main.c:377
 msgid "Main window title"
 msgstr "Título da janela principal"
 
@@ -693,11 +689,11 @@ msgstr "Só maiúsculas"
 msgid "Mustard"
 msgstr "Mostarda"
 
-#: src/gui/main.c:357
+#: src/gui/main.c:372
 msgid "Name of configuration file (auto-search)"
 msgstr "Nome do arquivo de configuração (pesquisa automática)"
 
-#: src/gui/action_calls.c:178
+#: src/gui/action_calls.c:190
 #, c-format
 msgid "Negotiation with %s failed"
 msgstr "Negociação com %s falhou"
@@ -711,7 +707,7 @@ msgstr "Negociação com %s falhou!"
 msgid "Network error"
 msgstr "Erro de comunicação"
 
-#: ui/default.xml:162
+#: ui/default.xml:163
 msgid "Next field"
 msgstr "Próximo campo"
 
@@ -739,7 +735,7 @@ msgstr "Fora do modo 3270, transferência cancelada"
 msgid "OIA"
 msgstr ""
 
-#: src/gui/main.c:336
+#: src/gui/main.c:351
 msgid "Option parsing failed."
 msgstr "Tratamento de opções falhou"
 
@@ -855,7 +851,7 @@ msgstr ""
 msgid "PF9"
 msgstr ""
 
-#: src/gui/main.c:338
+#: src/gui/main.c:353
 msgid "Parse error"
 msgstr "Erro na passagem de parâmetros"
 
@@ -879,15 +875,15 @@ msgstr "Colar arquivo texto"
 msgid "Paste with left margin"
 msgstr "Colar com margem"
 
-#: src/gui/main.c:361
+#: src/gui/main.c:376
 msgid "Path to an image file for program icon"
 msgstr "Caminho para arquivo de imagem contendo o ícone do programa"
 
-#: src/gui/main.c:360
+#: src/gui/main.c:375
 msgid "Path to search for data and configuration files"
 msgstr "Caminho dos arquivos de dados e configuração"
 
-#: src/gui/main.c:369
+#: src/gui/main.c:384
 msgid "Path to search for plugins"
 msgstr "Caminho a pesquisar por plugins"
 
@@ -899,7 +895,7 @@ msgstr "Rosa"
 msgid "Please wait"
 msgstr "Por favor, aguarde"
 
-#: src/gui/main.c:172
+#: src/gui/main.c:187
 #, c-format
 msgid "Please, check if lib3270 version is %s"
 msgstr "Por favor, verifique se a versão da lib3270 é %s"
@@ -908,11 +904,11 @@ msgstr "Por favor, verifique se a versão da lib3270 é %s"
 msgid "Please, try again in a few moments"
 msgstr "Por favor, tente novamente em alguns instantes"
 
-#: src/gui/action_calls.c:65
+#: src/gui/action_calls.c:77
 msgid "Port:"
 msgstr "Porta:"
 
-#: ui/default.xml:161
+#: ui/default.xml:162
 msgid "Previous field"
 msgstr "Campo anterior"
 
@@ -936,11 +932,11 @@ msgstr "Imprimir área selecionada"
 msgid "Processing data..."
 msgstr "Processando informações..."
 
-#: src/gui/main.c:635
+#: src/gui/main.c:664
 msgid "Program aborted"
 msgstr "Programa cancelado"
 
-#: src/gui/main.c:633
+#: src/gui/main.c:662
 msgid "Program window was destroyed"
 msgstr "Janela principal foi destruida"
 
@@ -992,8 +988,8 @@ msgstr "Reselecionar"
 msgid "Reset"
 msgstr ""
 
-#: src/gui/main.c:552 src/plugins/rexx/plg_start.c:115
-#: src/plugins/rexx/plg_start.c:132
+#: src/gui/main.c:579 src/plugins/rexx/plg_start.c:114
+#: src/plugins/rexx/plg_start.c:129
 #, c-format
 msgid "Return code was %d"
 msgstr "Código de saída foi %d"
@@ -1002,11 +998,11 @@ msgstr "Código de saída foi %d"
 msgid "Rexx message"
 msgstr "Mensagem Rexx"
 
-#: src/plugins/rexx/plg_start.c:131
+#: src/plugins/rexx/plg_start.c:128
 msgid "Rexx script error"
 msgstr "Erro no script rexx"
 
-#: src/plugins/rexx/plg_start.c:114
+#: src/plugins/rexx/plg_start.c:113
 msgid "Rexx script failed"
 msgstr "Script Rexx falhou"
 
@@ -1014,11 +1010,11 @@ msgstr "Script Rexx falhou"
 msgid "Rexx scripts"
 msgstr "Scripts rexx"
 
-#: src/plugins/rexx/plg_start.c:358
+#: src/plugins/rexx/plg_start.c:354
 msgid "Rexx trace"
 msgstr "Trace Rexx"
 
-#: src/gui/main.c:359
+#: src/gui/main.c:374
 msgid "Run scripts on startup (Example: script1(arg1,arg2);script2(arg)"
 msgstr "Executa scripts ao iniciar (Exemplo: script1(arg1,arg2);script2(arg))"
 
@@ -1026,11 +1022,11 @@ msgstr "Executa scripts ao iniciar (Exemplo: script1(arg1,arg2);script2(arg))"
 msgid "Running transfer"
 msgstr "Transferindo"
 
-#: src/lib/telnet.c:3303
+#: src/lib/telnet.c:3301
 msgid "SSL Connect error"
 msgstr "Erro na conexão SSL"
 
-#: src/gui/action_calls.c:360
+#: src/gui/action_calls.c:370
 msgid "Save clipboard contents"
 msgstr "Salvar área de transferência"
 
@@ -1042,28 +1038,32 @@ msgstr "Salvar cópia"
 msgid "Save screen"
 msgstr "Salvar tela"
 
-#: src/gui/action_calls.c:350
+#: src/gui/action_calls.c:360
 msgid "Save screen contents"
 msgstr "Salvar conteúdo da tela"
+
+#: ui/debug.xml:67
+msgid "Save screen dump"
+msgstr ""
 
 #: ui/default.xml:37
 msgid "Save selected"
 msgstr "Salvar seleção"
 
-#: src/gui/action_calls.c:355
+#: src/gui/action_calls.c:365
 msgid "Save selected text"
 msgstr "Salvar texto selecionado"
 
-#: src/plugins/rexx/plg_start.c:128
+#: src/plugins/rexx/plg_start.c:125
 #, c-format
 msgid "Script %s aborted"
 msgstr "Script %s foi abortado"
 
-#: src/plugins/rexx/plg_start.c:408
+#: src/plugins/rexx/plg_start.c:404
 msgid "Script message"
 msgstr "Mensagem do script"
 
-#: ui/default.xml:78
+#: ui/default.xml:78 ui/debug.xml:59 ui/rexx.xml:38
 msgid "Scripts"
 msgstr ""
 
@@ -1071,7 +1071,7 @@ msgstr ""
 msgid "Secondary space:"
 msgstr ""
 
-#: src/gui/action_calls.c:47
+#: src/gui/action_calls.c:59
 msgid "Secure connection"
 msgstr "Conexão segura"
 
@@ -1079,7 +1079,7 @@ msgstr "Conexão segura"
 msgid "Select Field"
 msgstr "Selecionar campo"
 
-#: src/plugins/rexx/actions.c:185
+#: src/plugins/rexx/actions.c:189
 msgid "Select Rexx script to run"
 msgstr "Selecione script rexx a executar"
 
@@ -1103,7 +1103,7 @@ msgstr "Selecione arquivo a enviar"
 msgid "Select font"
 msgstr "Selecionar fonte"
 
-#: src/gui/action_calls.c:48
+#: src/gui/action_calls.c:60
 msgid "Select hostname"
 msgstr "Selecionar servidor"
 
@@ -1139,7 +1139,7 @@ msgstr "Mudar servidor"
 msgid "Set terminal model (screen size)"
 msgstr "Define o modelo do terminal (tamanho da tela)"
 
-#: ui/default.xml:87
+#: ui/default.xml:87 ui/debug.xml:63
 msgid "Settings"
 msgstr "Configuração"
 
@@ -1147,7 +1147,7 @@ msgstr "Configuração"
 msgid "Show Underline"
 msgstr "Mostrar sublinhado"
 
-#: src/gui/main.c:385
+#: src/gui/main.c:400
 msgid "Show lib3270 options"
 msgstr "Mostra opções da biblioteca 3270"
 
@@ -1159,11 +1159,11 @@ msgstr "Mostrar padrão de teste"
 msgid "Smart paste"
 msgstr "Colar inteligente"
 
-#: src/lib/telnet.c:1019
+#: src/lib/telnet.c:1021
 msgid "Socket read error"
 msgstr "Erro ao receber dados"
 
-#: src/lib/telnet.c:2022
+#: src/lib/telnet.c:2021
 msgid "Socket write error"
 msgstr "Erro ao enviar dados"
 
@@ -1188,7 +1188,7 @@ msgstr "Iniciado:"
 msgid "Status:"
 msgstr "Situação:"
 
-#: src/gui/screen.c:637
+#: src/gui/screen.c:641
 msgid "System Error"
 msgstr "Erro de sistema"
 
@@ -1212,7 +1212,7 @@ msgstr "Padrão de caracteres"
 msgid "Text file"
 msgstr "Arquivo texto"
 
-#: src/gui/action_calls.c:197
+#: src/gui/action_calls.c:209
 #, c-format
 msgid "The error code was %d (%s)"
 msgstr "O código de erro foi %d (%s)"
@@ -1230,11 +1230,11 @@ msgstr "O nome do arquivo remoto não é válido"
 msgid "The required plugin file wasn't found"
 msgstr "O arquivo de plugin pedido não foi encontrado"
 
-#: src/gui/main.c:363
+#: src/gui/main.c:378
 msgid "Theme file (gtkrc)"
 msgstr "Arquivo de tema (gtkrc)"
 
-#: src/gui/action_calls.c:238
+#: src/gui/action_calls.c:250
 msgid ""
 "This program is free software; you can redistribute it and/or modify it "
 "under the terms of the GNU General Public License as published by the Free "
@@ -1251,7 +1251,7 @@ msgid ""
 "Franklin St, Fifth Floor, Boston, MA 02111-1307 USA"
 msgstr ""
 
-#: src/gui/main.c:201
+#: src/gui/main.c:216
 #, c-format
 msgid "This program requires GTK version %d.%d.%d"
 msgstr "Este programa precisa do GTK versão %d.%d.%d"
@@ -1260,11 +1260,11 @@ msgstr "Este programa precisa do GTK versão %d.%d.%d"
 msgid "To:"
 msgstr "Para:"
 
-#: ui/default.xml:121
+#: ui/default.xml:122
 msgid "Toolbar"
 msgstr "Barra de ferramentas"
 
-#: src/gui/main.c:569
+#: src/gui/main.c:596
 msgid "Top window failed to start"
 msgstr "Janela principal não iniciou"
 
@@ -1329,9 +1329,9 @@ msgstr "Indefinido"
 
 #: src/gui/clipboard.c:87 src/gui/clipboard.c:214 src/gui/clipboard.c:257
 #: src/gui/print.c:333 src/gui/print.c:362 src/gui/script.c:422
-#: src/gui/script.c:433 src/gui/action_calls.c:193 src/gui/action_calls.c:336
-#: src/gui/actions1.c:510 src/gui/actions1.c:569
-#: src/plugins/rexx/plg_start.c:163
+#: src/gui/script.c:433 src/gui/action_calls.c:205 src/gui/action_calls.c:346
+#: src/gui/action_calls.c:408 src/gui/action_calls.c:454
+#: src/plugins/rexx/plg_start.c:159
 msgid "Unexpected error"
 msgstr "Erro inesperado"
 
@@ -1375,6 +1375,10 @@ msgstr "Número de porta ou serviço desconhecido: %s"
 msgid "Unselect"
 msgstr "Desmarcar"
 
+#: ui/default.xml:107
+msgid "Use +/- for field navigation"
+msgstr "Usar teclas +/- para navegar por campos"
+
 #: src/gui/filetransfer.c:403
 msgid "Variable"
 msgstr "Variável"
@@ -1383,7 +1387,7 @@ msgstr "Variável"
 msgid "White"
 msgstr "Branco"
 
-#: ui/default.xml:132
+#: ui/default.xml:133
 msgid "Window"
 msgstr "Janela"
 
@@ -1455,15 +1459,15 @@ msgstr "_Conectar"
 msgid "_Disconnect"
 msgstr "_Desconectar"
 
-#: ui/default.xml:52
+#: ui/default.xml:52 ui/debug.xml:38 ui/rexx.xml:35
 msgid "_Edit"
 msgstr "_Editar"
 
-#: ui/default.xml:36
+#: ui/default.xml:36 ui/debug.xml:35 ui/rexx.xml:34
 msgid "_File"
 msgstr "_Arquivo"
 
-#: ui/default.xml:81
+#: ui/default.xml:81 ui/debug.xml:61
 msgid "_Network"
 msgstr "_Rede"
 
@@ -1475,7 +1479,7 @@ msgstr "_Opções"
 msgid "_View"
 msgstr "Exibir"
 
-#: src/lib/telnet.c:3178 src/lib/telnet.c:3186
+#: src/lib/telnet.c:3176 src/lib/telnet.c:3184
 #, c-format
 msgid "fcntl(%s)"
 msgstr ""
@@ -1484,12 +1488,12 @@ msgstr ""
 msgid "ftDftUknownOpen"
 msgstr ""
 
-#: src/lib/telnet.c:3171
+#: src/lib/telnet.c:3169
 #, c-format
 msgid "ioctl(%s)"
 msgstr ""
 
-#: src/plugins/rexx/plg_start.c:112
+#: src/plugins/rexx/plg_start.c:111
 #, c-format
 msgid "script %s failed"
 msgstr "script %s falhou"
