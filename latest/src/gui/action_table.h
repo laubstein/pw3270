@@ -32,6 +32,8 @@
 
 	/* Keyboard actions */
 	DECLARE_PW3270_ACTION( enter, "" )
+	DECLARE_PW3270_ACTION( kpadd, "" )
+	DECLARE_PW3270_ACTION( kpsubtract, "" )
 
 	/* Network actions */
 	DECLARE_PW3270_ACTION( sethostname, "" )

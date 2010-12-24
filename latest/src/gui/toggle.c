@@ -35,7 +35,7 @@
 /*---[ Globals ]------------------------------------------------------------------------------------------------*/
 
  gboolean		  gui_toggle_state[GUI_TOGGLE_COUNT]	= { 0 };
- const gchar	* gui_toggle_name[GUI_TOGGLE_COUNT+1]	= { "Bold", "KeepSelected", "Underline", "AutoConnect", NULL };
+ const gchar	* gui_toggle_name[GUI_TOGGLE_COUNT+1]	= { "Bold", "KeepSelected", "Underline", "AutoConnect", "KPAlternative", NULL };
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 

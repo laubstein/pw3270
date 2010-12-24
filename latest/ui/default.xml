@@ -104,6 +104,7 @@
 				<menuitem action='Toggle' id='Underline' label='Show Underline'  />
 				<menuitem action='Toggle' id='KeepSelected' label='Keep selected' />
 				<menuitem action='Toggle' id='SmartPaste' label='Smart paste' />
+				<menuitem action='Toggle' id='KPAlternative' label='Use +/- for field navigation' />
 			</menu>
 
 			<!--- Special action - InputMethod menu will be populated with Gtk input_method menu items --->
@@ -215,8 +216,13 @@
 	<accelerator name='PageUP' action='pfkey' id='7' group='online' key='Page_Up' />
 	<accelerator name='ShiftPageUP' action='pfkey' id='23' group='online' key='<Shift>Page_Up' />
 
-	<accelerator name='KP-' action='PreviousField' key='<shift>KP_Subtract' group='online' />
-	<accelerator name='KP+' action='NextField' key='<shift>KP_Add' group='online' />
+	<!--
+	<accelerator name='SKP-' action='PreviousField' key='<shift>KP_Subtract' group='online' />
+	<accelerator name='SKP+' action='NextField' key='<shift>KP_Add' group='online' />
+	--->
+
+	<accelerator name='KPsubtract' action='kpsubtract' key='KP_Subtract' group='online' />
+	<accelerator name='KPadd' action='kpadd' key='KP_Add' group='online' />
 
 </ui>
 

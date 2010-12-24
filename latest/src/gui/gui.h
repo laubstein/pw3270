@@ -111,6 +111,7 @@
         GUI_TOGGLE_KEEP_SELECTED,
         GUI_TOGGLE_UNDERLINE,
         GUI_TOGGLE_CONNECT_ON_STARTUP,
+        GUI_TOGGKE_KP_ALTERNATIVE,		/**< Keypad +/- move to next/previous field */
 
         GUI_TOGGLE_COUNT
     };
@@ -120,6 +121,7 @@
     #define TOGGLED_SMART_PASTE		    gui_toggle_state[GUI_TOGGLE_SMART_PASTE]
     #define TOGGLED_UNDERLINE		    gui_toggle_state[GUI_TOGGLE_UNDERLINE]
     #define TOGGLED_CONNECT_ON_STARTUP  gui_toggle_state[GUI_TOGGLE_CONNECT_ON_STARTUP]
+    #define TOGGLED_KP_ALTERNATIVE		gui_toggle_state[GUI_TOGGKE_KP_ALTERNATIVE]
 
     LOCAL_EXTERN gboolean		  gui_toggle_state[GUI_TOGGLE_COUNT];
 	LOCAL_EXTERN const gchar	* gui_toggle_name[GUI_TOGGLE_COUNT+1];
