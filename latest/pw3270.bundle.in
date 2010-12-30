@@ -52,7 +52,7 @@
 
   <main-binary>${prefix:bin}/@PACKAGE@</main-binary>
   <binary>
-	 ${prefix:bin}/*.so
+	 ${prefix:bin}/lib/*.so
   </binary>
 
   <!-- Copy in GTK+ modules.  Note the ${gtkdir} macro, which expands
@@ -94,6 +94,14 @@
   <data dest="${bundle}/ui/default.xml">
 	 ${project}/ui/default.xml
   </data>
+  
+  <data dest="${bundle}/colors.conf">
+	 ${project}/colors.conf
+  </data>
+
+  <data dest="${bundle}/@PACKAGE@.conf">
+	 ${project}/default.conf
+  </data>
 
   <!-- Copy in the themes data. You may want to trim this to save space
        in your bundle. -->
@@ -113,11 +121,9 @@
        theme of choice if they provide and example, or you can just
        change the source path. -->
 
-  <!--
   <data dest="${bundle}/Contents/Resources/etc/${gtkdir}/gtkrc">
-    ${project}/gtkrc
+    ${project}/gtkrc.mac
   </data>
-  -->
 
   <!-- Icon themes to copy. The "icons" property can be either of
        "auto", "all", or "none". All or none should be
