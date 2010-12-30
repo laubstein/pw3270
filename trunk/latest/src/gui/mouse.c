@@ -603,6 +603,8 @@
 		}
 	}
 
+	cursor_move((bottom*terminal_cols)+right);
+
 	if(valid_terminal_window())
 		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*terminal_font_info.spacing);
 
@@ -923,18 +925,21 @@
 
  static void doSelect(int (*call)(void))
  {
- 	int row = cursor_position / terminal_cols;
- 	int col = cursor_position % terminal_cols;
+ 	int row;
+ 	int col;
 
  	if(select_mode == SELECT_MODE_NONE)
  	{
  		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 
- 		startRow = endRow = row;
- 		startCol = endCol = col;
+ 		startRow = endRow = (cursor_position / terminal_cols);
+ 		startCol = endCol = (cursor_position % terminal_cols);
  	}
 
  	call();
+
+ 	row = cursor_position / terminal_cols;
+ 	col = cursor_position % terminal_cols;
 
 	endRow = row;
 	endCol = col;
