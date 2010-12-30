@@ -216,10 +216,8 @@
 	<accelerator name='PageUP' action='pfkey' id='7' group='online' key='Page_Up' />
 	<accelerator name='ShiftPageUP' action='pfkey' id='23' group='online' key='<Shift>Page_Up' />
 
-	<!--
 	<accelerator name='SKP-' action='PreviousField' key='<shift>KP_Subtract' group='online' />
 	<accelerator name='SKP+' action='NextField' key='<shift>KP_Add' group='online' />
-	--->
 
 	<accelerator name='KPsubtract' action='kpsubtract' key='KP_Subtract' group='online' />
 	<accelerator name='KPadd' action='kpadd' key='KP_Add' group='online' />
