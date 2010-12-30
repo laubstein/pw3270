@@ -13,15 +13,13 @@
          either define your own or just hardcode the path here.
     -->
     <prefix name="default">${env:JHBUILD_PREFIX}</prefix>
-	<prefix name="release">${project}/bin/Release</prefix>
+	<prefix name="bin">${project}/bin/Debug</prefix>
 
     <!-- The project directory is the default location of the created
          app. If you leave out the path, the current directory is
          used. Note the usage of an environment variable here again.
     -->
-	<!--
-    <destination overwrite="yes">${env:HOME}</destination>
-	-->
+    <destination overwrite="yes">${project}/bin</destination>
 	
     <image>
       <!-- Not implemented yet (DMG image). -->
@@ -42,8 +40,7 @@
          for example.
     -->
     <!-- runtime copy="yes">/usr/bin/python</runtime -->
-    <!-- Indicate the active gtk version to use. This is needed only
-         for gtk+-3.0 projects. -->
+    <!-- Indicate the active gtk version to use. This is needed only for gtk+-3.0 projects. -->
     <gtk>gtk+-2.0</gtk>
   </meta>
 
@@ -53,9 +50,9 @@
   -->
   <plist>${project}/Info.plist</plist>
 
-  <main-binary>${prefix:release}/@PACKAGE@</main-binary>
+  <main-binary>${prefix:bin}/@PACKAGE@</main-binary>
   <binary>
-	 ${prefix:release}/*.so
+	 ${prefix:bin}/*.so
   </binary>
 
   <!-- Copy in GTK+ modules.  Note the ${gtkdir} macro, which expands
@@ -74,11 +71,10 @@
        binaries link to are also copied in automatically.  Note also
        the included ${gtk} macro, which gets the correct package name
        to get. -->
-<!--
+  <!-- ${prefix}/lib/${gtkdir}/${pkg:${gtk}:gtk_binary_version}/engines/*.so -->
   <binary>
-    ${prefix}/lib/${gtkdir}/${pkg:${gtk}:gtk_binary_version}/engines/*.so
+    ${prefix}/lib/gtk-2.0/${pkg:gtk+-2.0:gtk_binary_version}/engines/*.so
   </binary>
--->
 
   <!-- Translation filenames, one for each program or library that you
        want to copy in to the bundle. The "dest" attribute is
@@ -95,8 +91,8 @@
        "dest" property. The destination must then start with the macro
        "${bundle}", which refers to the bundle root directory.
   -->
-  <data dest="${bundle}/ui">
-	 ${project}/bin/Release/ui/default.xml
+  <data dest="${bundle}/ui/default.xml">
+	 ${project}/ui/default.xml
   </data>
 
   <!-- Copy in the themes data. You may want to trim this to save space
