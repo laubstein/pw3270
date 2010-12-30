@@ -17,10 +17,16 @@
     <key>CFBundleIdentifier</key>
     <string>@PACKAGE@</string>
     
-	<key>CFBundleInfoDictionaryVersion</key>
+    <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
+
+    <key>CFBundleLongVersionString</key>
+    <string>@PACKAGE_VERSION@-@PACKAGE_RELEASE@ © Banco do Brasil S.A.</string>
 	
-    <key>CFBundlePackageType</key>
+    <key>CFBundleName</key>
+    <string>@PACKAGE@</string>
+  
+	<key>CFBundlePackageType</key>
     <string>APPL</string>
 	
     <key>CFBundleShortVersionString</key>
@@ -32,10 +38,16 @@
     <key>CFBundleVersion</key>
     <string>@PACKAGE_VERSION@</string>
 	
+	<key>CSResourcesFileMapped</key>
+	<true/>
+
+	<key>LSRequiresCarbon</key>
+	<true/>
+	
     <key>NSHumanReadableCopyright</key>
     <string>Copyright (C) 2008 Banco do Brasil S.A., GNU General Public License.</string>
 	
     <key>LSMinimumSystemVersion</key>
-    <string>10.4</string>
+    <string>10.6</string>
 </dict>
 </plist>
