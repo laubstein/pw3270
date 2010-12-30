@@ -165,12 +165,12 @@ Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
 			$(LOGO) \
 			$(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN)$(DLLEXT)) \
 			$(foreach BIN, $(EXTENSIONS), bin/Release/$(BIN)$(DLLEXT))
-	@install --mode=644 $(LOGO) bin/Release/$(LOGO)
+	@install -m 644 $(LOGO) bin/Release/$(LOGO)
 	@msgfmt -c -v -o bin/Release/pt_BR.mo po/pt_BR.po
 	@rm -f bin/Release/gtk-runtime
 	@if [ -d "@GTKRUNTIME@" ]; then ln -s "@GTKRUNTIME@" bin/Release/gtk-runtime ;fi
 	@mkdir -p bin/Release/ui
-	@for i in $(UI_XML_FILES); do install --mode=644 $$i bin/Release/ui; done
+	@for i in $(UI_XML_FILES); do install -m 644 $$i bin/Release/ui; done
 	@echo @PACKAGE@ Ok!
 
 Debug:		$(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) \

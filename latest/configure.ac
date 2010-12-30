@@ -691,6 +691,7 @@ case "$host" in
 
 	*-apple-*)
 		AC_OUTPUT(Info.plist)
+		AC_OUTPUT(pw3270.bundle)
 	;;
 
 	*)

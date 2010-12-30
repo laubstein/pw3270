@@ -13,13 +13,16 @@
          either define your own or just hardcode the path here.
     -->
     <prefix name="default">${env:JHBUILD_PREFIX}</prefix>
+	<prefix name="release">${project}/bin/Release</prefix>
 
     <!-- The project directory is the default location of the created
          app. If you leave out the path, the current directory is
          used. Note the usage of an environment variable here again.
     -->
-    <destination overwrite="yes">${env:HOME}/Desktop</destination>
-
+	<!--
+    <destination overwrite="yes">${env:HOME}</destination>
+	-->
+	
     <image>
       <!-- Not implemented yet (DMG image). -->
     </image>
@@ -50,25 +53,32 @@
   -->
   <plist>${project}/Info.plist</plist>
 
-  <main-binary>${prefix}/bin/Release/@PACKAGE@</main-binary>
+  <main-binary>${prefix:release}/@PACKAGE@</main-binary>
+  <binary>
+	 ${prefix:release}/*.so
+  </binary>
 
   <!-- Copy in GTK+ modules.  Note the ${gtkdir} macro, which expands
        to the correct library subdirectory for the specified gtk
        version.
   -->
+  <!--
   <binary>
      ${prefix}/lib/${gtkdir}/modules/*.so
   </binary>
-
+  -->
+  
   <!-- Copy in GTK+ theme engines. Note the use of the
        "${pkg:module:variable}" macro, which evaluates to a pkg-config
        variable in the specified module. Note that any libraries that
        binaries link to are also copied in automatically.  Note also
        the included ${gtk} macro, which gets the correct package name
        to get. -->
+<!--
   <binary>
     ${prefix}/lib/${gtkdir}/${pkg:${gtk}:gtk_binary_version}/engines/*.so
   </binary>
+-->
 
   <!-- Translation filenames, one for each program or library that you
        want to copy in to the bundle. The "dest" attribute is
@@ -85,9 +95,9 @@
        "dest" property. The destination must then start with the macro
        "${bundle}", which refers to the bundle root directory.
   -->
-  <!-- data>
-    ${prefix}/share/gtk-demo
-  </data -->
+  <data dest="${bundle}/ui">
+	 ${project}/bin/Release/ui/default.xml
+  </data>
 
   <!-- Copy in the themes data. You may want to trim this to save space
        in your bundle. -->
@@ -98,18 +108,20 @@
   <!-- Copy icons. Note that the .icns file is an Apple format which
        contains up to 4 sizes of icon. You can use
        /Developer/Applications/Utilities/Icon Composer.app to import
-       artwork and create the file. >
+       artwork and create the file. -->
   <data dest="${bundle}/Contents/Resources">
-    ${project}/@PACKAGE@.icns
-  </data -->
+    ${project}/image/@PACKAGE@.icns
+  </data>
 
   <!-- This is where theme commands go. You can copy them in from your
        theme of choice if they provide and example, or you can just
        change the source path. -->
 
+  <!--
   <data dest="${bundle}/Contents/Resources/etc/${gtkdir}/gtkrc">
     ${project}/gtkrc
   </data>
+  -->
 
   <!-- Icon themes to copy. The "icons" property can be either of
        "auto", "all", or "none". All or none should be
