@@ -280,6 +280,7 @@ static int program_init(void)
 
 	if(ptr)
 	{
+		Trace("Parsing theme \"%s\"",ptr);
 		if(*ptr && g_file_test(ptr,G_FILE_TEST_IS_REGULAR))
 			gtk_rc_parse(ptr);
 		g_free(ptr);
@@ -467,21 +468,22 @@ int main(int argc, char *argv[])
 	setlocale( LC_ALL, "" );
 #endif
 
-#if defined( LOCALEDIR )
+#if ! defined( HAVE_IGEMAC )
 
-	// http://bo.majewski.name/bluear/gnu/GTK/i18n/
-	Trace("Localedir: %s",LOCALEDIR);
-	bindtextdomain(PACKAGE_NAME, LOCALEDIR);
-
-#else
-
-	Trace("Localedir: %s",DATAROOTDIR G_DIR_SEPARATOR_S "locale");
-	bindtextdomain(PACKAGE_NAME, DATAROOTDIR G_DIR_SEPARATOR_S "locale" );
-
-#endif
+	#if defined( LOCALEDIR )
+		// http://bo.majewski.name/bluear/gnu/GTK/i18n/
+		Trace("Localedir: %s",LOCALEDIR);
+		bindtextdomain(PACKAGE_NAME, LOCALEDIR);
+	#else
+		Trace("Localedir: %s",DATAROOTDIR G_DIR_SEPARATOR_S "locale");
+		bindtextdomain(PACKAGE_NAME, DATAROOTDIR G_DIR_SEPARATOR_S "locale" );
+	#endif
 
 	bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
 	textdomain(PACKAGE_NAME);
+
+#endif
+
 
 #if defined( HAVE_IGEMAC )
 
@@ -491,6 +493,18 @@ int main(int argc, char *argv[])
 	g_thread_init(NULL);
 	gtk_init(&argc, &argv);
 	osxapp = g_object_new(GTK_TYPE_OSX_APPLICATION, NULL);
+
+	{
+		gchar *ptr = g_build_filename(gtk_osxapplication_get_bundle_path(osxapp),"Contents","Resources",LOCALEDIR,NULL);
+
+		bindtextdomain(PACKAGE_NAME, ptr);
+
+		bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
+		textdomain(PACKAGE_NAME);
+
+		g_free(ptr);
+	}
+
 
 	if(parse_option_context(context,&argc, &argv))
 		return -1;
@@ -535,7 +549,9 @@ int main(int argc, char *argv[])
 	{
 #if defined( HAVE_IGEMAC )
 
-		program_data = gtk_osxapplication_get_bundle_path(osxapp);
+		program_data = g_build_filename(gtk_osxapplication_get_bundle_path(osxapp),"Contents","Resources",NULL);
+
+		printf("Program data: %s\n",program_data);
 
 #elif defined( WIN32 )
 

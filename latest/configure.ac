@@ -134,6 +134,8 @@ case "$host" in
 		OS_LFLAGS=""
 		pw3270_cv_statusbar="yes"
 
+		localedir="share/locale"
+
 		pw3270_cv_icon="image/pw3270.icns"
 		pw3270_cv_logo="image/pw3270.png"
 		;;
