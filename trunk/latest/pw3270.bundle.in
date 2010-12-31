@@ -13,7 +13,7 @@
          either define your own or just hardcode the path here.
     -->
     <prefix name="default">${env:JHBUILD_PREFIX}</prefix>
-	<prefix name="bin">${project}/bin/Debug</prefix>
+	<prefix name="bin">${project}/bin/Release</prefix>
 
     <!-- The project directory is the default location of the created
          app. If you leave out the path, the current directory is
@@ -34,7 +34,7 @@
          not needed. If the source path is left out, the default
          script will be used.
     -->
-    <launcher-script>${project}/launcher.sh</launcher-script >
+    <launcher-script>${project}/mac/launcher.sh</launcher-script >
 
     <!-- Not implemented: Optional runtime, could be python or mono
          for example.
@@ -84,6 +84,15 @@
     ${prefix}/share/locale
   </translations>
 
+  <!--
+  <translations name="pw3270">
+    ${prefix:bin}/@localedir@
+  </translations>
+  -->
+  
+  <data dest="${bundle}/Contents/Resources/@localedir@/pt_BR/LC_MESSAGES/pw3270.mo">
+	${prefix:bin}/@localedir@/pt_BR/LC_MESSAGES/pw3270.mo
+  </data>
 
   <!-- Data to copy in, usually Glade/UI files, images, sounds files
        etc. The destination inside the bundle can be specified if the
@@ -91,16 +100,28 @@
        "dest" property. The destination must then start with the macro
        "${bundle}", which refers to the bundle root directory.
   -->
-  <data dest="${bundle}/ui/default.xml">
+  <data dest="${bundle}/Contents/Resources/ui/default.xml">
 	 ${project}/ui/default.xml
   </data>
   
-  <data dest="${bundle}/colors.conf">
+  <data dest="${bundle}/Contents/Resources/colors.conf">
 	 ${project}/colors.conf
   </data>
 
-  <data dest="${bundle}/@PACKAGE@.conf">
+  <data dest="${bundle}/Contents/@PACKAGE@.conf">
 	 ${project}/default.conf
+  </data>
+
+  <data dest="${bundle}/Contents/LICENCA">
+	${project}/LICENCA
+  </data>
+
+  <data dest="${bundle}/Contents/LICENSE">
+	${project}/LICENSE
+  </data>
+
+  <data dest="${bundle}/Contents/AUTHORS">
+	${project}/AUTHORS
   </data>
 
   <!-- Copy in the themes data. You may want to trim this to save space
@@ -122,7 +143,7 @@
        change the source path. -->
 
   <data dest="${bundle}/Contents/Resources/etc/${gtkdir}/gtkrc">
-    ${project}/gtkrc.mac
+    ${project}/mac/gtkrc
   </data>
 
   <!-- Icon themes to copy. The "icons" property can be either of

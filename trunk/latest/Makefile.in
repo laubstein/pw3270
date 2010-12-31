@@ -166,11 +166,15 @@ Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
 			$(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN)$(DLLEXT)) \
 			$(foreach BIN, $(EXTENSIONS), bin/Release/$(BIN)$(DLLEXT))
 	@install -m 644 $(LOGO) bin/Release/$(LOGO)
-	@msgfmt -c -v -o bin/Release/pt_BR.mo po/pt_BR.po
+
 	@rm -f bin/Release/gtk-runtime
 	@if [ -d "@GTKRUNTIME@" ]; then ln -s "@GTKRUNTIME@" bin/Release/gtk-runtime ;fi
 	@mkdir -p bin/Release/ui
 	@for i in $(UI_XML_FILES); do install -m 644 $$i bin/Release/ui; done
+	
+	@mkdir -p bin/Release/$(LOCALEDIR)/pt_BR/LC_MESSAGES
+	@msgfmt -c -v -o bin/Release/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo po/pt_BR.po
+
 	@echo @PACKAGE@ Ok!
 
 Debug:		$(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) \
@@ -185,7 +189,7 @@ memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/
 	@cd bin/Debug ; LD_LIBRARY_PATH=. valgrind --leak-check=full ./@PROGRAM_NAME@ --program-data="../../"
 
 ####################################################################################################
-# Install packages
+# Install packages & Bundles
 ####################################################################################################
 
 install-package: $(PACKAGE_MANAGER)
@@ -198,6 +202,10 @@ nsi: Release
 
 deb: debian/control
 	@dpkg-buildpackage -rfakeroot -uc -us
+
+bin/$(PACKAGE).app: Release
+	@rm -fr bin/$(PACKAGE).app
+	@$(HOME)/bin/ige-mac-bundler $(PACKAGE).bundle
 
 ####################################################################################################
 # Rules
@@ -256,12 +264,12 @@ obj/Release/version.o: src/version.c
 # Release Targets
 ####################################################################################################
 
-bin/Release/@PROGRAM_NAME@@EXEEXT@: bin/Release/lib3270$(DLLEXT) $(foreach SRC, $(basename $(APP_SRCS)), obj/Release/src/gui/$(SRC).@OBJEXT@)
+bin/Release/@PROGRAM_NAME@@EXEEXT@: bin/Release/lib/lib3270$(DLLEXT) $(foreach SRC, $(basename $(APP_SRCS)), obj/Release/src/gui/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) @LD_RLSFLAGS@ -o $@ $^ $(APP_LDFLAGS) -Wl,-rpath,$(LIBDIR) $(GUI_LDFLAGS)
 
-bin/Release/lib3270$(DLLEXT): obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
+bin/Release/lib/lib3270$(DLLEXT): obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@rm -f $(basename \$(@F)).a
@@ -274,12 +282,12 @@ bin/Release/lib3270$(DLLEXT): obj/Release/version.o obj/Release/src/lib/fallback
 # Debug Targets
 ####################################################################################################
 
-bin/Debug/@PROGRAM_NAME@@EXEEXT@: bin/Debug/lib3270$(DLLEXT) $(foreach SRC, $(basename $(APP_SRCS)), obj/Debug/src/gui/$(SRC).@OBJEXT@)
+bin/Debug/@PROGRAM_NAME@@EXEEXT@: bin/Debug/lib/lib3270$(DLLEXT) $(foreach SRC, $(basename $(APP_SRCS)), obj/Debug/src/gui/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) -o $@ $^ -Lbin/Debug -l3270 -Wl,-rpath,bin/Debug $(APP_LDFLAGS) $(GUI_LDFLAGS)
+	@$(CC) -o $@ $^ -Lbin/Debug/lib -l3270 -Wl,-rpath,bin/Debug/lib $(APP_LDFLAGS) $(GUI_LDFLAGS)
 
-bin/Debug/lib3270$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
+bin/Debug/lib/lib3270$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@rm -f $(basename \$(@F)).a
@@ -666,7 +674,7 @@ install-gui: bin/Release/@PROGRAM_NAME@@EXEEXT@ $(ICON) $(LOGO)
 				$(PACKAGE).desktop
 
 	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES
-	@msgfmt -c -v -o $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo po/pt_BR.po
+	@install --mode=644 bin/Release/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo
 
 install-common: Release po/pt_BR.po $(PACKAGE).desktop
 
@@ -677,7 +685,7 @@ install-common: Release po/pt_BR.po $(PACKAGE).desktop
 	@for i in $(PLUGINS); do install --mode=755 bin/Release/plugins/$$i$(DLLEXT) $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins; done
 	@for i in $(PLUGINS_UI); do install --mode=644 ui/$$i $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui; done
 
-	@install --mode=755 bin/Release/lib3270$(DLLEXT) $(DESTDIR)/$(LIBDIR)
+	@install --mode=755 bin/Release/lib/lib3270$(DLLEXT) $(DESTDIR)/$(LIBDIR)
 
 
 $(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
