@@ -108,7 +108,7 @@
 	 ${project}/colors.conf
   </data>
 
-  <data dest="${bundle}/Contents/@PACKAGE@.conf">
+  <data dest="${bundle}/Contents/Resources/@PACKAGE@.conf">
 	 ${project}/default.conf
   </data>
 
