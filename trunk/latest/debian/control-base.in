@@ -2,7 +2,7 @@ Source: pw3270
 Section: unknown
 Priority: extra
 Maintainer: Perry Werneck <perry.werneck@gmail.com>
-Build-Depends: debhelper (>= 7), autotools-dev, autoconf, libgtk2.0-dev, gettext, imagemagick, libssl-dev, libgnome2-dev, libgnomeui-dev, oorexx (>= 4.0.1), openoffice.org-dev, ure
+Build-Depends: debhelper (>= 7), autotools-dev, autoconf, libgtk2.0-dev, gettext, imagemagick, libssl-dev, libgnome2-dev, libgnomeui-dev, oorexx (>= 4.0.1), openoffice.org-dev, ure, sun-java6-jdk
 Standards-Version: @PACKAGE_VERSION@.@PACKAGE_RELEASE@
 Homepage: http://www.softwarepublico.gov.br/dotlrn/clubs/pw3270/
 
