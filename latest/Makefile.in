@@ -56,6 +56,10 @@ UI_XML_FILES ?= @UI_XML_FILES@
 
 TMPDIR ?= /tmp
 
+# Lib dirs
+DBG_LIBDIR=bin/Debug/lib
+RLS_LIBDIR=bin/Release/lib
+
 # Set command paths and mkfb (which has to run locally)
 MKFB = bin/mkfb
 
@@ -285,7 +289,7 @@ bin/Release/lib/lib3270$(DLLEXT): obj/Release/version.o obj/Release/src/lib/fall
 bin/Debug/@PROGRAM_NAME@@EXEEXT@: bin/Debug/lib/lib3270$(DLLEXT) $(foreach SRC, $(basename $(APP_SRCS)), obj/Debug/src/gui/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) -o $@ $^ -Lbin/Debug/lib -l3270 -Wl,-rpath,bin/Debug/lib $(APP_LDFLAGS) $(GUI_LDFLAGS)
+	@$(CC) -o $@ $^ -L$(DBG_LIBDIR) -l3270 -Wl,-rpath,bin/Debug/lib $(APP_LDFLAGS) $(GUI_LDFLAGS)
 
 bin/Debug/lib/lib3270$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
 	@echo $@ ...
@@ -360,17 +364,17 @@ obj/Release/src/oxt/%.o: src/oxt/%.cxx src/oxt/*.hpp $(GLOBAL_DEPENDS) uno/inclu
 bin/Debug/unotest: bin/Debug/@PROGRAM_NAME@.uno@DLLEXT@ obj/Debug/src/oxt/testprogram.@OBJEXT@
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CXX) -o $@ obj/Debug/src/oxt/testprogram.@OBJEXT@ -Lbin/Debug -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
+	@$(CXX) -o $@ obj/Debug/src/oxt/testprogram.@OBJEXT@ -L$(DBG_LIBDIR) -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
 
-bin/Release/@PROGRAM_NAME@.uno@DLLEXT@: bin/Release/lib3270$(DLLEXT) $(foreach SRC, $(basename $(OOO_SRCS)), obj/Release/src/oxt/$(SRC).@OBJEXT@)
+bin/Release/@PROGRAM_NAME@.uno@DLLEXT@: $(RLS_LIBDIR)/lib3270$(DLLEXT) $(foreach SRC, $(basename $(OOO_SRCS)), obj/Release/src/oxt/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CXX) @OS_DLLFLAGS@ -o $@ $(foreach SRC, $(basename $(OOO_SRCS)), obj/Release/src/oxt/$(SRC).@OBJEXT@) -Lbin/Release -Wl,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
+	@$(CXX) @OS_DLLFLAGS@ -o $@ $(foreach SRC, $(basename $(OOO_SRCS)), obj/Release/src/oxt/$(SRC).@OBJEXT@) -L$(RLS_LIBDIR) -Wl,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
 
-bin/Debug/@PROGRAM_NAME@.uno@DLLEXT@: bin/Debug/lib3270$(DLLEXT) $(foreach SRC, $(basename $(OOO_SRCS)), obj/Debug/src/oxt/$(SRC).@OBJEXT@)
+bin/Debug/@PROGRAM_NAME@.uno@DLLEXT@: $(DBG_LIBDIR)/lib3270$(DLLEXT) $(foreach SRC, $(basename $(OOO_SRCS)), obj/Debug/src/oxt/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CXX) @OS_DLLFLAGS@ -o $@ $(foreach SRC, $(basename $(OOO_SRCS)), obj/Debug/src/oxt/$(SRC).@OBJEXT@) -Lbin/Debug -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
+	@$(CXX) @OS_DLLFLAGS@ -o $@ $(foreach SRC, $(basename $(OOO_SRCS)), obj/Debug/src/oxt/$(SRC).@OBJEXT@) -L$(DBG_LIBDIR) -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
 
 uno/%.urd: src/oxt/%.idl
 	@echo $< ...
@@ -402,7 +406,7 @@ obj/Debug/src/plugins/pipectl/%.o: src/plugins/pipectl/%.c src/plugins/pipectl/*
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) $(DBG_CFLAGS) $(GUI_CFLAGS) $(DLL_CFLAGS) $(REXX_CFLAGS) -o $@ -c $<
 
-bin/Debug/plugins/pipectl$(DLLEXT): 	bin/Debug/lib3270$(DLLEXT) \
+bin/Debug/plugins/pipectl$(DLLEXT): 	$(DBG_LIBDIR)/lib3270$(DLLEXT) \
 					$(foreach SRC, $(PIPECTL_SRC), obj/Debug/src/plugins/pipectl/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
@@ -414,7 +418,7 @@ obj/Release/src/plugins/pipectl/%.o: src/plugins/pipectl/%.c src/plugins/pipectl
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) $(GUI_CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
 
-bin/Release/plugins/pipectl$(DLLEXT): 	bin/Release/lib3270$(DLLEXT) \
+bin/Release/plugins/pipectl$(DLLEXT): 	$(RLS_LIBDIR)/lib3270$(DLLEXT) \
 					$(foreach SRC, $(PIPECTL_SRC), obj/Release/src/plugins/pipectl/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
@@ -428,7 +432,7 @@ pipetest: bin/Debug/pipetest@EXEEXT@
 bin/Debug/pipetest@EXEEXT@: obj/Debug/src/plugins/pipectl/pipetest.o
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CC) -o $@ $^ -Lbin/Debug -Wl,-rpath,bin/Debug $(APP_LDFLAGS) $(GUI_LDFLAGS)
+	@$(CC) -o $@ $^ -L$(DBG_LIBDIR) -Wl,-rpath,bin/Debug $(APP_LDFLAGS) $(GUI_LDFLAGS)
 
 
 ####################################################################################################
@@ -446,13 +450,13 @@ obj/Debug/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/*.h $(GLOB
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) $(DBG_CFLAGS) $(GUI_CFLAGS) $(REXX_CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
 
-bin/Debug/plugins/rx3270$(DLLEXT): 	bin/Debug/lib3270$(DLLEXT) \
+bin/Debug/plugins/rx3270$(DLLEXT): 	bin/Debug/lib/lib3270$(DLLEXT) \
 					$(foreach SRC, $(REXX_PLG_SRC) $(REXX_COMMON_SRC), obj/Debug/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS) $(GUI_LDFLAGS)
 
-bin/Debug/librx3270$(DLLEXT): 		bin/Debug/lib3270$(DLLEXT) \
+bin/Debug/librx3270$(DLLEXT): 		bin/Debug/lib/lib3270$(DLLEXT) \
 					$(foreach SRC, $(REXX_STD_SRC) $(REXX_COMMON_SRC), obj/Debug/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
@@ -464,13 +468,13 @@ obj/Release/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/*.h $(GL
 	@mkdir -p `dirname $@`
 	@$(CC) $(CFLAGS) $(GUI_CFLAGS) $(REXX_CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
 
-bin/Release/plugins/rx3270$(DLLEXT): 	bin/Release/lib3270$(DLLEXT) \
+bin/Release/plugins/rx3270$(DLLEXT): 	bin/Release/lib/lib3270$(DLLEXT) \
 					$(foreach SRC, $(REXX_PLG_SRC) $(REXX_COMMON_SRC), obj/Release/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS) $(GUI_LDFLAGS)
 
-bin/Release/librx3270$(DLLEXT): 		bin/Release/lib3270$(DLLEXT) \
+bin/Release/librx3270$(DLLEXT): 		bin/Release/lib/lib3270$(DLLEXT) \
 					$(foreach SRC, $(REXX_STD_SRC) $(REXX_COMMON_SRC), obj/Release/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
 	@echo $< ...
 	@mkdir -p `dirname $@`
@@ -502,16 +506,16 @@ bin/Debug/$(PACKAGE).jar: bin/java/@PACKAGE@/terminal.class
 	@mkdir -p `dirname $@`
 	@jar -cvf "$@" -C "bin/java" "@PACKAGE@"
 
-bin/Debug/plugins/j3270plugin$(DLLEXT): 	bin/Debug/lib3270$(DLLEXT) \
+bin/Debug/plugins/j3270plugin$(DLLEXT): 	bin/Debug/lib/lib3270$(DLLEXT) \
 				$(foreach SRC, $(JPLUGIN_SRC), obj/Debug/src/plugins/java/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -Lbin/Debug -l3270 $(JAVA_LDFLAGS) $(GTK_LIBS)
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -L$(DBG_LIBDIR) -l3270 $(JAVA_LDFLAGS) $(GTK_LIBS)
 
-bin/Debug/lib$(PACKAGE)_jni$(DLLEXT): bin/Debug/lib3270$(DLLEXT) $(foreach SRC, $(basename $(JNI_SRC)), obj/Debug/src/java/$(SRC).@OBJEXT@)
+bin/Debug/lib$(PACKAGE)_jni$(DLLEXT): bin/Debug/lib/lib3270$(DLLEXT) $(foreach SRC, $(basename $(JNI_SRC)), obj/Debug/src/java/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -Lbin/Debug -l3270 -Wl,-rpath,bin/Debug
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -L$(DBG_LIBDIR) -l3270 -Wl,-rpath,bin/Debug
 
 jnidebug: bin/Debug/lib$(PACKAGE)_jni$(DLLEXT) bin/Release/$(PACKAGE).jar
 
@@ -520,7 +524,7 @@ jnidebug: bin/Debug/lib$(PACKAGE)_jni$(DLLEXT) bin/Release/$(PACKAGE).jar
 obj/Release/src/java/%.o: src/java/%.c src/java/lib3270_jni.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(JAVA_CFLAGS) $(CFLAGS) -o $@ -c $<
+	@$(CC) $(JAVA_CFLAGS) $(CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
 
 obj/Release/src/plugins/java/%.o: src/plugins/java/%.c $(GLOBAL_DEPENDS)
 	@echo $< ...
@@ -532,17 +536,17 @@ bin/Release/$(PACKAGE).jar: bin/java/@PACKAGE@/terminal.class
 	@mkdir -p `dirname $@`
 	@jar -cvf "$@" -C "bin/java" "@PACKAGE@"
 
-bin/Release/plugins/j3270plugin$(DLLEXT): 	bin/Release/lib3270$(DLLEXT) \
+bin/Release/plugins/j3270plugin$(DLLEXT): 	$(RLS_LIBDIR)/lib3270$(DLLEXT) \
 				$(foreach SRC, $(JPLUGIN_SRC), obj/Release/src/plugins/java/$(basename $(SRC)).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -Lbin/Release -l3270 $(JAVA_LDFLAGS) $(GTK_LIBS)
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -L$(RLS_LIBDIR) -l3270 $(JAVA_LDFLAGS) $(GTK_LIBS)
 
 
-bin/Release/lib$(PACKAGE)_jni$(DLLEXT): bin/Release/lib3270$(DLLEXT) $(foreach SRC, $(basename $(JNI_SRC)), obj/Release/src/java/$(SRC).@OBJEXT@)
+bin/Release/lib$(PACKAGE)_jni$(DLLEXT): $(RLS_LIBDIR)/lib3270$(DLLEXT) $(foreach SRC, $(basename $(JNI_SRC)), obj/Release/src/java/$(SRC).@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -Lbin/Release -l3270 -Wl,-rpath,$(LIBDIR)
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -L$(RLS_LIBDIR) -l3270 -Wl,-rpath,$(LIBDIR)
 
 java: bin/Release/$(PACKAGE).jar bin/Release/lib$(PACKAGE)_jni$(DLLEXT) bin/Release/plugins/j3270plugin$(DLLEXT)
 	@echo "Java modules ok Ok!"
