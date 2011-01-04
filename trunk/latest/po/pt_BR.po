@@ -1,7 +1,7 @@
 # Portuguese/Brazil translation of pw3270.
-# Copyright (C) 2010 THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2011 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Perry Werneck <perry.werneck@gmail.com>, 2010.
+# Perry Werneck <perry.werneck@gmail.com>, 2011.
 # , fuzzy
 # 
 # 
@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: pw3270 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-01-18 17:12-0200\n"
-"PO-Revision-Date: 2010-12-24 10:10-0200\n"
+"PO-Revision-Date: 2011-01-04 10:25-0200\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -26,19 +26,19 @@ msgstr ""
 msgid "%s:%d"
 msgstr ""
 
-#: src/gui/main.c:523
+#: src/gui/main.c:537
 msgid "- 3270 Emulator for GTK+"
 msgstr "- Emulador 3270 para GTK+"
 
-#: src/gui/main.c:502
+#: src/gui/main.c:516
 msgid "- 3270 Emulator for Gnome"
 msgstr "- Emulador 3270 para Gnome"
 
-#: src/gui/main.c:488
+#: src/gui/main.c:490
 msgid "- 3270 Emulator for Gtk-OSX"
 msgstr "- Emulador 3270 para Gtk-OSX"
 
-#: src/gui/main.c:511
+#: src/gui/main.c:525
 msgid "3270 Emulator"
 msgstr "Emulador 3270"
 
@@ -58,11 +58,11 @@ msgstr "Emulador 3270 para Gtk-OSX."
 msgid "3270 library failed"
 msgstr "Biblioteca 3270 falhou"
 
-#: src/gui/main.c:576
+#: src/gui/main.c:592
 msgid "3270 library failed to start"
 msgstr "Biblioteca 3270 falhou ao iniciar"
 
-#: src/gui/main.c:400
+#: src/gui/main.c:401
 msgid "3270 options"
 msgstr "Opções do 3270"
 
@@ -74,22 +74,6 @@ msgid ""
 msgstr "<b>Estado da conexão:</b>·%s\n"
 "<b>Mensagem de alerta::</b>·%s"
 
-#: src/gui/uiparser1.c:702
-msgid "<button> element should be used only inside <keypad><row>"
-msgstr "Elemento <button> só deve ser usado dentro de <keypad><row>"
-
-#: src/gui/uiparser1.c:695
-msgid "<row> element should be used only inside <keypad>"
-msgstr "Elemento <row> só deve ser usado dentro de <keypad>"
-
-#: src/gui/uiparser1.c:725
-msgid "<script> element requires a name"
-msgstr "Tag <script> precisa de um nome"
-
-#: src/gui/uiparser1.c:713
-msgid "<script> element should be used only inside another active element"
-msgstr "Elemento <script> só pode ser usado dentro de outro elemento ativo"
-
 #: src/gui/screen.c:736
 msgid "Abort"
 msgstr "Abortar"
@@ -97,6 +81,11 @@ msgstr "Abortar"
 #: src/gui/filetransfer.c:786
 msgid "Aborting..."
 msgstr "Cancelando..."
+
+#: src/gui/ui_parse.c:747
+#, c-format
+msgid "Accelerator \"%s\" is invalid in this context"
+msgstr "Acelerador \"%s\" não é válido nesse contexto"
 
 #: src/gui/clipboard.c:86
 msgid "Action failed"
@@ -117,6 +106,12 @@ msgstr "Inserir/Remover CR no final da linha"
 #: src/gui/filetransfer.c:393
 msgid "Append"
 msgstr "Adicionar"
+
+#: src/gui/actions.c:595 src/gui/actions.c:635
+#, c-format
+msgid "Attribute %s in %s is unexpected of invalid"
+msgstr "Atributo·%s·inesperado ou inválido em·%s"
+""
 
 #: ui/default.xml:102
 msgid "Auto-Reconnect"
@@ -166,6 +161,18 @@ msgstr "Borda"
 msgid "Browse"
 msgstr "Procurar"
 
+#: src/gui/ui_parse.c:365
+msgid "Can't accept unnamed menu"
+msgstr "Não posso aceitar menus sem nome"
+
+#: src/gui/ui_parse.c:285
+msgid "Can't accept unnamed menubar"
+msgstr "Não posso aceitar barra de ferramentas sem nome"
+
+#: src/gui/ui_parse.c:625
+msgid "Can't accept unnamed toolbar"
+msgstr "Não posso aceitar barra de ferramentas sem nome"
+
 #: src/gui/action_calls.c:201
 msgid "Can't connect"
 msgstr "Não foi possível conectar ao host"
@@ -197,25 +204,16 @@ msgid ""
 msgstr "Não foi possível criar arquivo temporário:\n"
 "%s"
 
-#: src/gui/uiparser1.c:1286
-#, c-format
-msgid "Can't find UI definitions in %s"
-msgstr "Não encontrei definição de interface em %s"
-
 #: src/gui/plugin.c:188
 #, c-format
 msgid "Can't load \"%s\""
 msgstr "Não consigo carregar \"%s\""
 
-#: src/gui/clipboard.c:391 src/gui/uiparser1.c:851
+#: src/gui/clipboard.c:391 src/gui/ui_parse.c:1055
 #: src/plugins/rexx/plg_start.c:156
 #, c-format
 msgid "Can't load %s"
 msgstr "Não foi possível carregar %s"
-
-#: src/gui/uiparser1.c:1288
-msgid "Can't load UI"
-msgstr "Não foi possível ler a interface"
 
 #: src/gui/plugin.c:105 src/gui/plugin.c:190
 msgid "Can't load plugin"
@@ -225,34 +223,38 @@ msgstr "Não foi possível carregar plugin"
 msgid "Can't open local file"
 msgstr "Não foi possível abrir arquivo local"
 
-#: src/gui/uiparser1.c:221 src/gui/uiparser1.c:853 src/gui/uiparser1.c:879
+#: src/gui/ui_parse.c:999 src/gui/ui_parse.c:1036 src/gui/ui_parse.c:1057
 msgid "Can't parse UI"
 msgstr "Erro no processamento da interface"
 
-#: src/gui/uiparser1.c:222
+#: src/gui/ui_parse.c:997
 #, c-format
-msgid "Can't parse accelerator \"%s\""
-msgstr "Não foi possível converter tecla \"%s\""
+msgid "Can't parse ui files in %s"
+msgstr "Não é possível carregar arquivos de interface em %s"
 
-#: src/gui/uiparser1.c:877
+#: src/gui/ui_parse.c:1034
 #, c-format
 msgid "Can't parse ui in %s"
 msgstr "Não foi possível processar interface em %s"
+
+#: src/gui/ui_parse.c:741
+msgid "Can't parse unnamed accelerator"
+msgstr "Não posso aceitar acelerador sem nome"
 
 #: src/gui/filetransfer.c:683
 #, c-format
 msgid "Can't receive \"%s\""
 msgstr "Não foi possível receber \"%s\""
 
-#: src/gui/main.c:290
+#: src/gui/main.c:291
 msgid "Can't register as I/O manager."
 msgstr "Não foi possivel registrar gerenciador de I/O"
 
-#: src/gui/main.c:300
+#: src/gui/main.c:301
 msgid "Can't register as file-transfer manager."
 msgstr "Não foi possível registrar gerenciador de transferência de arquivos."
 
-#: src/gui/main.c:294
+#: src/gui/main.c:295
 msgid "Can't register as screen manager."
 msgstr "Não foi possível registrar gerenciador de telas."
 
@@ -270,7 +272,7 @@ msgstr "Não foi possível enviar arquivo \"%s\""
 msgid "Can't set device buffer contents"
 msgstr "Não foi possivel mudar o conteúdo do buffer de dispositivo"
 
-#: src/gui/main.c:578 src/gui/main.c:598 src/gui/script.c:195
+#: src/gui/main.c:594 src/gui/main.c:614 src/gui/script.c:195
 msgid "Can't start"
 msgstr "Não foi possível iniciar"
 
@@ -321,7 +323,7 @@ msgstr "Configuração de cores"
 msgid "Colors"
 msgstr "Cores"
 
-#: src/gui/main.c:380
+#: src/gui/main.c:381
 msgid "Command to run when LU name is available"
 msgstr "Comando a executar quando o nome da LU ficar disponível"
 
@@ -425,6 +427,10 @@ msgstr "Esquema de cores padrão 1"
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
+#: src/gui/ui_parse.c:797
+msgid "Duplicated scroll action"
+msgstr "Ação de rolagem duplicada"
+
 #: src/lib/telnet.c:1238
 msgid "EOR received when not in 3270 mode, ignored."
 msgstr "\"EOR\" recebido fora do modo 3270, ignorado"
@@ -483,11 +489,6 @@ msgid ""
 msgstr "Erro lendo %s\n"
 "%s"
 
-#: src/gui/uiparser1.c:219
-#, c-format
-msgid "Error parsing %s"
-msgstr "Erro ao processar %s"
-
 #: src/gui/action_calls.c:346 src/gui/action_calls.c:408
 #, c-format
 msgid ""
@@ -511,10 +512,6 @@ msgstr "Erro ao iniciar processo %s\n"
 #: ui/debug.xml:56
 msgid "Event Trace"
 msgstr ""
-
-#: src/gui/uiparser1.c:796
-msgid "Expecting active element"
-msgstr "Esperando elemento ativo"
 
 #: ui/rexx.xml:38
 msgid "External Rexx script"
@@ -540,7 +537,7 @@ msgstr "Transferência de arquivos já está ativa"
 msgid "Fixed"
 msgstr "Fixo"
 
-#: src/gui/main.c:371
+#: src/gui/main.c:372
 msgid "Fixed path and filename for load/save the configuration data"
 msgstr "Caminho e nome do arquivo para ler/gravar dados de configuração"
 
@@ -560,7 +557,7 @@ msgstr "De:"
 msgid "Full Screen"
 msgstr "Tela-cheia"
 
-#: src/gui/main.c:383
+#: src/gui/main.c:384
 msgid "Full path of plugins to load"
 msgstr "Caminho completo dos plugins a carregar"
 
@@ -592,7 +589,7 @@ msgstr "Servidor desconectou, transferência cancelada"
 msgid "Host file name:"
 msgstr "Nome do arquivo remoto:"
 
-#: src/gui/main.c:373
+#: src/gui/main.c:374
 msgid "Host identifier"
 msgstr "Identificador do host"
 
@@ -607,6 +604,11 @@ msgstr "Endereço do servidor:"
 #: src/lib/ft_cut.c:480
 msgid "Illegal frame length"
 msgstr ""
+
+#: src/gui/actions.c:614 src/gui/actions.c:649
+#, c-format
+msgid "Incomplete PFkey definition (no id): %s"
+msgstr "Definição da tecla de função está incompleta (sem id): %s"
 
 #: src/gui/screen.c:705
 msgid "Information"
@@ -631,6 +633,30 @@ msgstr "Intensificado/Desprotegido"
 #: src/gui/mouse.c:95
 msgid "Invalid action"
 msgstr "Ação inválida"
+
+#: src/gui/ui_parse.c:163
+#, c-format
+msgid "Invalid action group \"%s\" on action %s"
+msgstr "Grupo de ações \"%s\" inválido na ação %s"
+
+#: src/gui/ui_parse.c:631
+#, c-format
+msgid "Invalid attribute \"action\" on toolbar %s"
+msgstr "Attributo \"action\" invalido na barra de ferramentas %s"
+
+#: src/gui/actions.c:316
+#, c-format
+msgid "Invalid or unexpected action name: %s"
+msgstr "Nome de ação \"%s\" é inválido ou inesperado"
+
+#: src/gui/ui_parse.c:209
+#, c-format
+msgid "Invalid or unknown action: %s"
+msgstr "Ação %s é inválida ou inesperada"
+
+#: src/gui/actions.c:375
+msgid "Invalid toggle definition"
+msgstr "Definição de chave inválida"
 
 #: src/gui/plugin.c:106
 #, c-format
@@ -673,13 +699,32 @@ msgstr "Nome do arquivo local:"
 msgid "Locked status"
 msgstr "Bloqueada"
 
-#: src/gui/main.c:379
+#: src/gui/main.c:380
 msgid "Log file"
 msgstr "Arquivo de log"
 
-#: src/gui/main.c:377
+#: src/gui/main.c:378
 msgid "Main window title"
 msgstr "Título da janela principal"
+
+#: src/gui/ui_parse.c:371
+#, c-format
+msgid "Menu \"%s\" is invalid at this context"
+msgstr "Menu \"%s\" é inválido nesse contexto"
+
+#: src/gui/ui_parse.c:391
+#, c-format
+msgid "Menu \"%s\" isn't inside a menubar or menu"
+msgstr "Menu \"%s\" não está dentro de uma barra de menus ou outro menu"
+
+#: src/gui/ui_parse.c:475
+#, c-format
+msgid "Menuitem \"%s\" isn't inside a <menu>"
+msgstr "Menuitem \"%s\" não está dentro de um <menu>"
+
+#: src/gui/ui_parse.c:777
+msgid "Missing \"direction\" in scroll action"
+msgstr "Falta o atributo \"direction\" na definição de rolagem"
 
 #: ui/default.xml:95
 msgid "Monocase"
@@ -689,7 +734,7 @@ msgstr "Só maiúsculas"
 msgid "Mustard"
 msgstr "Mostarda"
 
-#: src/gui/main.c:372
+#: src/gui/main.c:373
 msgid "Name of configuration file (auto-search)"
 msgstr "Nome do arquivo de configuração (pesquisa automática)"
 
@@ -735,7 +780,7 @@ msgstr "Fora do modo 3270, transferência cancelada"
 msgid "OIA"
 msgstr ""
 
-#: src/gui/main.c:351
+#: src/gui/main.c:352
 msgid "Option parsing failed."
 msgstr "Tratamento de opções falhou"
 
@@ -851,7 +896,7 @@ msgstr ""
 msgid "PF9"
 msgstr ""
 
-#: src/gui/main.c:353
+#: src/gui/main.c:354
 msgid "Parse error"
 msgstr "Erro na passagem de parâmetros"
 
@@ -875,15 +920,15 @@ msgstr "Colar arquivo texto"
 msgid "Paste with left margin"
 msgstr "Colar com margem"
 
-#: src/gui/main.c:376
+#: src/gui/main.c:377
 msgid "Path to an image file for program icon"
 msgstr "Caminho para arquivo de imagem contendo o ícone do programa"
 
-#: src/gui/main.c:375
+#: src/gui/main.c:376
 msgid "Path to search for data and configuration files"
 msgstr "Caminho dos arquivos de dados e configuração"
 
-#: src/gui/main.c:384
+#: src/gui/main.c:385
 msgid "Path to search for plugins"
 msgstr "Caminho a pesquisar por plugins"
 
@@ -932,11 +977,11 @@ msgstr "Imprimir área selecionada"
 msgid "Processing data..."
 msgstr "Processando informações..."
 
-#: src/gui/main.c:664
+#: src/gui/main.c:680
 msgid "Program aborted"
 msgstr "Programa cancelado"
 
-#: src/gui/main.c:662
+#: src/gui/main.c:678
 msgid "Program window was destroyed"
 msgstr "Janela principal foi destruida"
 
@@ -988,7 +1033,7 @@ msgstr "Reselecionar"
 msgid "Reset"
 msgstr ""
 
-#: src/gui/main.c:579 src/plugins/rexx/plg_start.c:114
+#: src/gui/main.c:595 src/plugins/rexx/plg_start.c:114
 #: src/plugins/rexx/plg_start.c:129
 #, c-format
 msgid "Return code was %d"
@@ -1014,7 +1059,7 @@ msgstr "Scripts rexx"
 msgid "Rexx trace"
 msgstr "Trace Rexx"
 
-#: src/gui/main.c:374
+#: src/gui/main.c:375
 msgid "Run scripts on startup (Example: script1(arg1,arg2);script2(arg)"
 msgstr "Executa scripts ao iniciar (Exemplo: script1(arg1,arg2);script2(arg))"
 
@@ -1131,6 +1176,14 @@ msgstr "Enviando arquivo"
 msgid "Separator"
 msgstr "Separador"
 
+#: src/gui/ui_parse.c:586
+msgid "Separator is invalid at this context (no parent)"
+msgstr "Separado inválido no contexto (sem pai)"
+
+#: src/gui/ui_parse.c:612
+msgid "Separator is invalid at this context (unexpected parent)"
+msgstr ""
+
 #: ui/default.xml:81
 msgid "Set hostname"
 msgstr "Mudar servidor"
@@ -1147,7 +1200,7 @@ msgstr "Configuração"
 msgid "Show Underline"
 msgstr "Mostrar sublinhado"
 
-#: src/gui/main.c:400
+#: src/gui/main.c:401
 msgid "Show lib3270 options"
 msgstr "Mostra opções da biblioteca 3270"
 
@@ -1230,7 +1283,7 @@ msgstr "O nome do arquivo remoto não é válido"
 msgid "The required plugin file wasn't found"
 msgstr "O arquivo de plugin pedido não foi encontrado"
 
-#: src/gui/main.c:378
+#: src/gui/main.c:379
 msgid "Theme file (gtkrc)"
 msgstr "Arquivo de tema (gtkrc)"
 
@@ -1264,7 +1317,12 @@ msgstr "Para:"
 msgid "Toolbar"
 msgstr "Barra de ferramentas"
 
-#: src/gui/main.c:596
+#: src/gui/ui_parse.c:669
+#, c-format
+msgid "Toolitem \"%s\" isn't inside a <toolbar>"
+msgstr ""
+
+#: src/gui/main.c:612
 msgid "Top window failed to start"
 msgstr "Janela principal não iniciou"
 
@@ -1335,6 +1393,11 @@ msgstr "Indefinido"
 msgid "Unexpected error"
 msgstr "Erro inesperado"
 
+#: src/gui/actions.c:393
+#, c-format
+msgid "Unexpected or invalid toggle \"%s\""
+msgstr ""
+
 #: src/lib/kybd.c:316
 #, c-format
 msgid "Unexpected type %d in typeahead queue"
@@ -1358,6 +1421,11 @@ msgstr "Tecla desconhecida: PA%02d"
 msgid "Unknown PF key %d"
 msgstr "Tecla desconhecida: PF%02d"
 
+#: src/gui/ui_parse.c:906
+#, c-format
+msgid "Unknown element \"%s\"."
+msgstr ""
+
 #: src/lib/resolver.c:162
 #, c-format
 msgid ""
@@ -1365,6 +1433,11 @@ msgid ""
 "%s"
 msgstr "Servidor desconhecido:\n"
 "%s"
+
+#: src/gui/ui_parse.c:789
+#, c-format
+msgid "Unknown or unexpected direction \"%s\""
+msgstr "Direção \"%s\" é desconhecida ou inesperada"
 
 #: src/lib/resolver.c:143
 #, c-format
