@@ -1,4 +1,4 @@
-fdnl
+dnl
 dnl Software pw3270, desenvolvido com base nos códigos fontes do  C3270  e  X3270
 dnl (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
 dnl aplicativos mainframe. Registro no INPI sob o nome G3270.
@@ -95,6 +95,21 @@ AC_CHECK_PROG(PACKAGE_MANAGER, "rpmbuild", "rpm")
 AC_CHECK_PROG(PACKAGE_MANAGER, "dpkg-buildpackage","deb")
 AC_CHECK_HEADER(malloc.h, AC_DEFINE(HAVE_MALLOC_H,,[do we have malloc.h?]))
 
+# Set JVM arch
+case $host_cpu in
+     x86_64)
+	JVM_ARCH=amd64
+	;;
+     i?86)
+	JVM_ARCH=i386
+	;;
+     *)
+	JVM_ARCH=$host_cpu
+	;;
+esac
+
+
+# Check for host options
 case "$host" in
 	*-mingw32)
 		DLLEXT=".dll"
@@ -650,19 +665,6 @@ AC_SUBST(INSTALL_TARGETS)
 
 AC_SUBST(JDK_HOME,$JDK_HOME)
 
-# Set JVM arch
-case $host_cpu in
-     x86_64)
-	JVM_ARCH=amd64
-	;;
-     i?86)
-	JVM_ARCH=i386
-	;;
-     *)
-	JVM_ARCH=$host_cpu
-	;;
-esac
-
 # Check for JRE_HOME
 if test "_$JRE_HOME" = "_" ; then
 	JRE_HOME="$JDK_HOME/jre"
@@ -673,8 +675,25 @@ if test "_$JRE_HOME" = "_" ; then
 fi
 
 # Check for libjvm
-AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/server/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/server",)
-AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/client/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/client",)
+if test "_$JAVA_LIBJVM" = "_" ; then
+
+	case "$host" in
+		*-mingw32)
+			JAVA_LIBJVM="$JRE_HOME/bin/client"
+			;;
+
+		*-apple-*)
+			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/server/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/server",)
+			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/client/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/client",)
+			;;
+
+		*)
+			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/server/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/server",)
+			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/client/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/client",)
+	esac
+
+
+fi
 
 if test "_$JAVA_LIBJVM" = "_" ; then
 	JAVA_LIBJVM_SO=`find $JRE_HOME/lib -name libjvm.so | head -n 1`
