@@ -1,4 +1,4 @@
-dnl
+fdnl
 dnl Software pw3270, desenvolvido com base nos códigos fontes do  C3270  e  X3270
 dnl (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
 dnl aplicativos mainframe. Registro no INPI sob o nome G3270.
@@ -165,10 +165,7 @@ case "$host" in
 
 		# Check for Java
 		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
-		java_ldflags="-L\$(JRE_HOME)/lib/i386/client -Wl,-rpath,\$(JRE_HOME)/lib/i386/client -ljvm"
-
-		# Check for ImageMagick
-
+		java_ldflags="-L\$(JAVA_LIBJVM) -Wl,-rpath,\$(JAVA_LIBJVM) -ljvm"
 
 esac
 
@@ -607,8 +604,8 @@ if test "_$HOST_CC" = "_" ; then
 fi
 
 # Check for ImageMagick
-AC_CHECK_PROG(CONVERT, convert, convert, scripts/convert-sh)
-AC_SUBST(CONVERT)
+# AC_CHECK_PROG(CONVERT, convert, convert, scripts/convert-sh)
+# AC_SUBST(CONVERT)
 
 # Define program name
 AC_DEFINE_UNQUOTED(PROGRAM_NAME,"$pw3270_cv_progname")
@@ -653,17 +650,37 @@ AC_SUBST(INSTALL_TARGETS)
 
 AC_SUBST(JDK_HOME,$JDK_HOME)
 
+# Set JVM arch
+case $host_cpu in
+     x86_64)
+	JVM_ARCH=amd64
+	;;
+     i?86)
+	JVM_ARCH=i386
+	;;
+     *)
+	JVM_ARCH=$host_cpu
+	;;
+esac
+
+# Check for JRE_HOME
 if test "_$JRE_HOME" = "_" ; then
-	AC_CHECK_FILE("$JDK_HOME/jre/lib/i386/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
-	AC_CHECK_FILE("/usr/lib/jvm/java/jre/lib/i386/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
-	AC_CHECK_FILE("/etc/alternatives/jre/lib/i386/client/libjvm.so",JRE_HOME="/etc/alternatives/jre",)
-	AC_CHECK_FILE("/usr/lib/jvm/java-6-sun/jre/lib/i386/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java-6-sun/jre",)
+	JRE_HOME="$JDK_HOME/jre"
+	AC_CHECK_FILE("$JDK_HOME/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
+	AC_CHECK_FILE("/usr/lib/jvm/java/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
+	AC_CHECK_FILE("/etc/alternatives/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/etc/alternatives/jre",)
+	AC_CHECK_FILE("/usr/lib/jvm/java-6-sun/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java-6-sun/jre",)
 fi
 
-AC_SUBST(JRE_HOME,$JRE_HOME)
+# Check for libjvm
+JAVA_LIBJVM_SO=`find $JRE_HOME/lib -name libjvm.so`
+JAVA_LIBJVM=`dirname "${JAVA_LIBJVM_SO}"`
 
+AC_SUBST(JRE_HOME,$JRE_HOME)
+AC_SUBST(JAVA_LIBJVM,$JAVA_LIBJVM)
 AC_SUBST(JAVA_CFLAGS,$java_cflags)
 AC_SUBST(JAVA_LDFLAGS,$java_ldflags)
+AC_SUBST(JVM_ARCH,$JVM_ARCH)
 
 AC_SUBST(EXTENSIONS)
 AC_SUBST(WINDRES)
