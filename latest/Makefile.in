@@ -80,7 +80,6 @@ WINDRES = @WINDRES@
 ####################################################################################################
 JRE_HOME = @JRE_HOME@
 JDK_HOME = @JDK_HOME@
-JVM_ARCH = @JVM_ARCH@
 JAVA_LIBJVM = @JAVA_LIBJVM@
 
 JAVAC = @JAVAC@

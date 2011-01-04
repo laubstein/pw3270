@@ -673,8 +673,13 @@ if test "_$JRE_HOME" = "_" ; then
 fi
 
 # Check for libjvm
-JAVA_LIBJVM_SO=`find $JRE_HOME/lib -name libjvm.so`
-JAVA_LIBJVM=`dirname "${JAVA_LIBJVM_SO}"`
+AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/server/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/server",)
+AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/client/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/client",)
+
+if test "_$JAVA_LIBJVM" = "_" ; then
+	JAVA_LIBJVM_SO=`find $JRE_HOME/lib -name libjvm.so | head -n 1`
+	JAVA_LIBJVM=`dirname "${JAVA_LIBJVM_SO}"`
+fi
 
 AC_SUBST(JRE_HOME,$JRE_HOME)
 AC_SUBST(JAVA_LIBJVM,$JAVA_LIBJVM)
