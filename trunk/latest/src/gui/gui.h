@@ -333,6 +333,9 @@
 	LOCAL_EXTERN void		  queue_draw_cursor(void);
 	LOCAL_EXTERN void		  update_cursor_pixmap(void);
 
+	LOCAL_EXTERN void		  gui_toogle_set_active(enum GUI_TOGGLE id, gboolean active);
+	LOCAL_EXTERN void		  gui_toogle_set_visible(enum GUI_TOGGLE id, gboolean visible);
+
 #ifdef X3270_FT
 	int 		initft(void);
 	int 		create_ft_progress_dialog(void);

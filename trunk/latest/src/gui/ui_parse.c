@@ -77,8 +77,6 @@
 
 	GtkAccelGroup	* accel_group;								/**< Accelerators */
 
-	const struct ui_widget_setup_table *setup_table;			/**< Special widgets/menuitems */
-
 #ifdef MAC_INTEGRATION
 	GtkMenuShell	* top_menu;									/**< Mac OSX top menu */
 	GtkMenuItem		* quit_menu;								/**< Quit menu widget */
@@ -337,20 +335,6 @@
  }
 #endif // MAC_INTEGRATION
 
- static void setup_widget(GtkWidget *widget, const gchar *name, const struct ui_widget_setup_table *table)
- {
-	int f;
-
-	for(f=0;table[f].name;f++)
-	{
-		if(!g_strcasecmp(name,table[f].name))
-		{
-			table[f].setup(widget);
-			return;
-		}
-	}
- }
-
  static UI_ELEMENT * start_menu(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
  	UI_ELEMENT		*el;
@@ -412,7 +396,7 @@
 
 		gtk_menu_shell_append(menu,el->widget);
 
-		setup_widget(el->widget,el->name,state->setup_table);
+//		setup_widget(el->widget,el->name,state->setup_table);
 
 		g_hash_table_insert(state->menu,(gpointer) el->name,el);
  	}
@@ -508,8 +492,6 @@
 		}
 
 		gtk_menu_shell_append((GtkMenuShell *) menu, el->widget);
-		setup_widget(el->widget,el->name,state->setup_table);
-
 		g_hash_table_insert(state->menu,(gpointer) el->name,el);
 
  	}
@@ -1079,7 +1061,7 @@
 	return 0;
  }
 
- static void pack_menubar(gpointer key,UI_ELEMENT *el, GtkWidget *box)
+ static void pack_menubar(gpointer key, UI_ELEMENT *el, GtkWidget *box)
  {
 	Trace("Packing menubar \"%s\" - %p",el->name, el->widget);
 	gtk_widget_show_all(el->widget);
@@ -1090,6 +1072,20 @@
  {
 	Trace("Packing toolbar \"%s\"",el->name);
 	gtk_box_pack_start(GTK_BOX(box),el->widget,FALSE,FALSE,0);
+ }
+
+ static void setup_menu(gpointer key, UI_ELEMENT *el, const struct ui_menu_setup_table *table)
+ {
+	int f;
+
+	for(f=0;table[f].name;f++)
+	{
+		if(!g_strcasecmp(key,table[f].name))
+		{
+			table[f].setup(el->widget);
+			return;
+		}
+	}
  }
 
  static void finish_action_setup(gpointer key, GtkAction *action, PARSER_STATE state)
@@ -1129,7 +1125,7 @@
 
 /*---[ External Call ]------------------------------------------------------------------------------------*/
 
- GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget, const struct ui_widget_setup_table *setup_table)
+ GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget, const struct ui_menu_setup_table *setup_table)
  {
 	PARSER_STATE 	  state;
 	GtkWidget		* hbox;
@@ -1145,7 +1141,6 @@
 	state.toolbar 		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
 	state.tool	  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
 	state.menu	  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
-	state.setup_table	= setup_table;
 	state.action  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) g_free, g_object_unref);
 
 	// Parse
@@ -1156,6 +1151,9 @@
 	hbox = gtk_hbox_new(FALSE,0);
 	gtk_widget_show(hbox);
 	gtk_widget_show(vbox);
+
+	// Menu Items
+	g_hash_table_foreach(state.menu,(GHFunc) setup_menu, (gpointer) setup_table);
 
 	// Menubar(s)
 	g_hash_table_foreach(state.menubar,(GHFunc) pack_menubar, vbox);

@@ -46,6 +46,8 @@
 	#undef HAVE_LIBGNOME
 	#undef HAVE_REXX
 
+	#define HAVE_FONTLIST_XML
+
 	#ifndef LIBX3270DIR
 		#define LIBX3270DIR "."
 	#endif

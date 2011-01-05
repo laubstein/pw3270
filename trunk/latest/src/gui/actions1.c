@@ -153,6 +153,18 @@
  	call();
  }
 
+ LOCAL_EXTERN void gui_toogle_set_visible(enum GUI_TOGGLE id, gboolean visible)
+ {
+ 	gchar		*name	= g_strconcat("Toggle",gui_toggle_info[id].name,NULL);
+	GtkAction	*action = get_action_by_name(name);
+
+	if(action)
+		gtk_action_set_visible(action,visible);
+
+	g_free(name);
+ }
+
+
  static void action_Reset(void)
  {
  	clear_and_call(0,lib3270_reset);
@@ -204,14 +216,22 @@
  	set_toggle(id,FALSE);
  }
 
- static void toggle_gui(GtkToggleAction *action, int id)
+ void gui_toogle_set_active(enum GUI_TOGGLE id, gboolean active)
  {
-    gui_toggle_state[id] = gtk_toggle_action_get_active(action);
+	if(gui_toggle_state[id] == active)
+		return;
+
+    gui_toggle_state[id] = active;
 
 	SetBoolean("Toggles",gui_toggle_info[id].name,gui_toggle_state[id]);
 
     if(id == GUI_TOGGLE_BOLD)
 		action_redraw(0);
+ }
+
+ static void toggle_gui(GtkToggleAction *action, int id)
+ {
+	gui_toogle_set_active((enum GUI_TOGGLE) id, gtk_toggle_action_get_active(action));
  }
 
 /**
@@ -574,7 +594,6 @@
 			if(!g_ascii_strcasecmp(id,get_toggle_name(f)))
 			{
 				info->type 		= UI_CALLBACK_TYPE_TOGGLE;
-//				info->label		= toggle_info[f].do_label;
 				info->callback	= G_CALLBACK(toggle_action);
 				info->user_data = (gpointer) f;
 				if(name)
@@ -589,7 +608,6 @@
 			if(!g_ascii_strcasecmp(id,gui_toggle_info[f].name))
 			{
 				info->type 		= UI_CALLBACK_TYPE_TOGGLE;
-//				info->label		= gui_toggle_info[f].label;
 				info->callback	= G_CALLBACK(toggle_gui);
 				info->user_data = (gpointer) f;
 				if(name)
@@ -601,7 +619,6 @@
 		if(!g_ascii_strcasecmp(id,"gdkdebug"))
 		{
 			info->type 		= UI_CALLBACK_TYPE_TOGGLE;
-//			info->label		= _( "Debug window updates" );
 			info->callback	= G_CALLBACK(action_ToggleGDKDebug);
 			info->user_data = (gpointer) f;
 			if(name)

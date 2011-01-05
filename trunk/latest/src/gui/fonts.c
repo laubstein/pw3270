@@ -270,26 +270,21 @@
 		SetString("Terminal","Font",vlr);
 
 		g_free(vlr);
+
+		vlr = g_object_get_data(G_OBJECT(item),"bold");
+
+		if(vlr)
+			gui_toogle_set_active(GUI_TOGGLE_BOLD,((g_strcasecmp(vlr,"yes") == 0) ? TRUE : FALSE));
+
 		action_redraw(0);
 	}
  }
 
-
-/**
- * Load all monospaced fonts inside a menu.
- *
- * @param widget		Topwindow widget (Used for font families).
- * @param topmenu	Font menu
- * @param selected	Selected font.
- *
- */
- void load_font_menu(GtkWidget *topmenu, const gchar *selected)
+ static void load_system_monospaced_fonts(GtkWidget *topmenu, GtkWidget *menu, const gchar *selected)
  {
 	// Stolen from http://svn.gnome.org/svn/gtk+/trunk/gtk/gtkfontsel.c
 	PangoFontFamily **families;
 	gint 			n_families, i;
-
- 	GtkWidget		*menu	= gtk_menu_new();
  	GSList 			*group	= NULL;
 
 	pango_context_list_families(gtk_widget_get_pango_context(topmenu),&families, &n_families);
@@ -304,7 +299,7 @@
 
 			group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
 			ptr = g_strdup(name);
-			g_object_set_data_full(G_OBJECT(item),"FontName",ptr,g_free);
+			g_object_set_data_full(G_OBJECT(item),"fontname",ptr,g_free);
 			g_signal_connect(G_OBJECT(item),"toggled",G_CALLBACK(activate_font),ptr);
 
 			gtk_widget_show(item);
@@ -318,8 +313,186 @@
 
 	g_free(families);
 
+ }
+
+#ifdef HAVE_FONTLIST_XML
+ struct parse_fontlist
+ {
+	GtkWidget		*menu;
+	GtkWidget		*item;
+	GSList 			*group;
+	const gchar	*selected;
+	gchar			*element;
+ };
+
+ static void fontmenu_start(GMarkupParseContext *context, const gchar *element_name, const gchar **names, const gchar **values, struct parse_fontlist *info, GError **error)
+ {
+	if(!g_strcasecmp(element_name,"fontlist"))
+	{
+
+	}
+	else if(!g_strcasecmp(element_name,"font"))
+	{
+		int	 f;
+
+		info->item  = gtk_radio_menu_item_new(info->group);
+		info->group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(info->item));
+
+		for(f=0;names[f];f++)
+		{
+			if(g_strcasecmp(names[f],"label"))
+			{
+				g_object_set_data_full(G_OBJECT(info->item),names[f],g_strdup(values[f]),g_free);
+			}
+			else
+			{
+#if GTK_CHECK_VERSION(2,16,0)
+				gtk_menu_item_set_label(GTK_MENU_ITEM(info->item),values[f]);
+#else
+				GtkWidget *label = gtk_label_new(values[f]);
+
+				gtk_misc_set_alignment(GTK_MISC(label),0,0.5);
+				gtk_container_add(GTK_CONTAINER(info->item),label);
+#endif
+				gtk_widget_show_all(info->item);
+
+			}
+		}
+
+		gtk_menu_shell_append(GTK_MENU_SHELL(info->menu),info->item);
+
+	}
+	else
+	{
+		if(info->element)
+			g_free(info->element);
+		info->element = g_strdup(element_name);
+
+	}
+
+ }
+
+ static void fontmenu_end(GMarkupParseContext *context, const gchar *element_name, struct parse_fontlist *info, GError **error)
+ {
+ 	if(!g_strcasecmp(element_name,"font") && info->item)
+ 	{
+ 		gchar *name = g_object_get_data(G_OBJECT(info->item),"name");
+ 		gchar *bold = g_object_get_data(G_OBJECT(info->item),"bold");
+
+ 		if(name)
+ 		{
+			if(!g_strcasecmp(info->selected,name))
+			{
+				gboolean fBold = FALSE;
+
+				if(bold)
+					fBold = g_strcasecmp(bold,"yes") == 0 ? TRUE : FALSE;
+
+				if(gui_toggle_state[GUI_TOGGLE_BOLD] == fBold)
+					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(info->item),TRUE);
+
+			}
+			g_signal_connect(G_OBJECT(info->item),"toggled",G_CALLBACK(activate_font),name);
+ 		}
+ 	}
+
+	if(info->element)
+	{
+		g_free(info->element);
+		info->element = 0;
+	}
+
+ }
+
+ static void fontmenu_text(GMarkupParseContext *context, const gchar *text, gsize sz, struct parse_fontlist *info, GError **error)
+ {
+ 	if(!(info->element && info->item))
+		return;
+
+	g_object_set_data_full(G_OBJECT(info->item),info->element,g_strdup(text),g_free);
+	g_free(info->element);
+	info->element = 0;
+ }
+
+#endif
+
+/**
+ * Load system's or predefined list of terminal fonts.
+ *
+ * Check for fontlist.xml in program's data folder if it exists, load it on
+ * supplied menu, if not populate the supplied menu with the fonts defined
+ * in fontlist.xml
+ *
+ * @param topmenu	Font menu
+ * @param selected	Selected font.
+ *
+ */
+ void load_font_menu(GtkWidget *topmenu, const gchar *selected)
+ {
+ 	GtkWidget	*menu	= gtk_menu_new();
+
+#ifdef HAVE_FONTLIST_XML
+	gchar *filename = g_build_filename(program_data,"fontlist.xml",NULL);
+
+	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+	{
+		gchar 	*text  = NULL;
+		GError	*error = NULL;
+
+		if(g_file_get_contents(filename,&text,NULL,&error))
+		{
+			static const GMarkupParser parser =
+			{
+				(void (*)(GMarkupParseContext *, const gchar *, const gchar **, const gchar **, gpointer, GError **))	fontmenu_start,
+				(void (*)(GMarkupParseContext *, const gchar *, gpointer, GError **))										fontmenu_end,
+				(void (*)(GMarkupParseContext *, const gchar *, gsize, gpointer, GError **))								fontmenu_text,
+				NULL,
+				NULL
+			};
+
+			struct parse_fontlist	info;
+			GMarkupParseContext 	*context;
+
+			Log("Loading fonts from %s",filename);
+
+			memset(&info,0,sizeof(info));
+			info.menu		= menu;
+			info.selected	= selected;
+
+			context = g_markup_parse_context_new(&parser,G_MARKUP_TREAT_CDATA_AS_TEXT,&info,NULL);
+
+			gui_toggle_state[GUI_TOGGLE_BOLD] = (gui_toggle_state[GUI_TOGGLE_BOLD] != 0) ? TRUE : FALSE;
+			gui_toogle_set_visible(GUI_TOGGLE_BOLD,FALSE);
+
+			g_markup_parse_context_parse(context,text,strlen(text),&error);
+			g_markup_parse_context_free(context);
+
+			if(info.element)
+				g_free(info.element);
+
+		}
+
+		if(error)
+		{
+			Log("Error parsing %s: %s",filename,error->message);
+			g_error_free(error);
+		}
+
+	}
+	else
+	{
+		load_system_monospaced_fonts(topmenu,menu,selected);
+	}
+
+	g_free(filename);
+
+#else
+
+	load_system_monospaced_fonts(topmenu,menu,selected);
+
+#endif
+
 	gtk_widget_show_all(menu);
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(topmenu),menu);
-
  }
 

@@ -401,9 +401,33 @@
 	set_toggle((int) id,active);
  }
 
- static void update_gui_toggle(GtkAction *action, enum GUI_TOGGLE id)
+ LOCAL_EXTERN void gui_toogle_set_visible(enum GUI_TOGGLE id, gboolean visible)
  {
  	int idx = ((int) id) + N_TOGGLES;
+
+	Trace("*************** %p %p %p ",toggle_action[idx].reset, toggle_action[idx].set, toggle_action[idx].toggle);
+
+	if(toggle_action[idx].reset)
+		gtk_action_set_visible(toggle_action[idx].reset,visible && gui_toggle_state[id]);
+
+	if(toggle_action[idx].set)
+		gtk_action_set_visible(toggle_action[idx].set,visible && !gui_toggle_state[id]);
+
+	if(toggle_action[idx].toggle)
+		gtk_action_set_visible(toggle_action[idx].toggle,visible);
+
+ }
+
+ void gui_toogle_set_active(enum GUI_TOGGLE id, gboolean active)
+ {
+ 	int idx = ((int) id) + N_TOGGLES;
+
+ 	if(gui_toggle_state[(int) id] == active)
+		return;
+
+	Trace("*************** %p %p %p ",toggle_action[idx].reset, toggle_action[idx].set, toggle_action[idx].toggle);
+
+	gui_toggle_state[(int) id] = active;
 
 	SetBoolean("Toggles",gui_toggle_name[id],gui_toggle_state[id]);
 
@@ -413,19 +437,16 @@
 	if(toggle_action[idx].set)
 		gtk_action_set_visible(toggle_action[idx].set,!gui_toggle_state[id]);
 
+	if(toggle_action[idx].toggle)
+		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(toggle_action[idx].toggle),active);
+
 	if(id == GUI_TOGGLE_BOLD)
-		action_redraw(GTK_ACTION(action));
+		action_redraw(0);
  }
 
  static void gui_toggle_action(GtkToggleAction *action, gpointer id)
  {
-		gboolean active = gtk_toggle_action_get_active(action);
-
-		if(active == gui_toggle_state[(int) id])
-			return;
-
-		gui_toggle_state[(int) id] = active;
-		update_gui_toggle(GTK_ACTION(action),(enum GUI_TOGGLE) id);
+	gui_toogle_set_active((enum GUI_TOGGLE) id, gtk_toggle_action_get_active(action));
  }
 
  static void action_toggle_gdk_debug(GtkToggleAction *action, gpointer user_data)
@@ -488,11 +509,7 @@
 
  static void gui_toggle_set(GtkAction *action, gpointer id)
  {
-	if(gui_toggle_state[(int) id])
-		return;
-
-	gui_toggle_state[(int) id] = TRUE;
-	update_gui_toggle(GTK_ACTION(action),(enum GUI_TOGGLE) id);
+	gui_toogle_set_active((enum GUI_TOGGLE) id,TRUE);
  }
 
  int action_setup_toggleset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
@@ -534,11 +551,7 @@
 
  static void gui_toggle_reset(GtkAction *action, gpointer id)
  {
-	if(gui_toggle_state[(int) id])
-		return;
-
-	gui_toggle_state[(int) id] = FALSE;
-	update_gui_toggle(GTK_ACTION(action),(enum GUI_TOGGLE) id);
+	gui_toogle_set_active((enum GUI_TOGGLE) id,FALSE);
  }
 
  int action_setup_togglereset(GtkAction *action, const gchar *name, gboolean connect, const gchar **names, const gchar **values, GError **error)
