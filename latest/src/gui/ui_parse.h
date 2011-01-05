@@ -10,10 +10,10 @@
 	 * Usually used for populating special menu entryes like input-method list.
 	 *
 	 */
-	 struct ui_widget_setup_table
+	 struct ui_menu_setup_table
 	 {
-	 	const gchar *name;
-	 	void (*setup)(GtkWidget *widget);
+	 	const gchar *name;					/**< Menu item name */
+	 	void (*setup)(GtkWidget *widget);	/**< Setup callback */
 	 };
 
 	/**
@@ -21,11 +21,12 @@
 	 *
 	 * @param path		Folder to search for .xml files.
 	 * @param app_widget	Main application widget.
+	 * @param setup		Callback table for populating dinamic sub-menus
 	 *
 	 * @return Created toplevel window.
 	 *
 	 */
-	LOCAL_EXTERN GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget, const struct ui_widget_setup_table *setup_table);
+	LOCAL_EXTERN GtkWidget * create_window_from_ui_files(const gchar *path, GtkWidget *app_widget, const struct ui_menu_setup_table *setup_table);
 
 	/**
 	 * Get an attribute from xml list.

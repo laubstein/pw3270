@@ -108,7 +108,7 @@
 
 #endif // MOUSE_POINTER_CHANGE
 
-	 static const struct ui_widget_setup_table widget_setup[] =
+	 static const struct ui_menu_setup_table widget_setup[] =
 	 {
 		{ "fontselect",		setup_font_select_menu		},
 		{ "inputmethod",	setup_input_methods_menu	},
