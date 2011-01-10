@@ -189,7 +189,7 @@ autoconf
 make clean
 make Release
 
-strip bin/Release/lib3270.so
+strip bin/Release/lib/lib3270.so
 strip bin/Release/@PACKAGE@
 
 %install
