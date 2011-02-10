@@ -210,7 +210,7 @@ deb: debian/control
 
 bin/$(PACKAGE).app: Release
 	@rm -fr bin/$(PACKAGE).app
-	@$(HOME)/bin/ige-mac-bundler $(PACKAGE).bundle
+	@ige-mac-bundler $(PACKAGE).bundle
 
 ####################################################################################################
 # Rules
