@@ -62,6 +62,10 @@ AM_ICONV
 # Target options
 DLLEXT=".so"
 
+# Which GUI
+pw3270_cv_gui="gtk2"
+
+#
 OS_CFLAGS=""
 DLL_CFLAGS=""
 API_CFLAGS="-DLIB3270=1 -Isrc/lib -Isrc/include/lib3270"
@@ -643,6 +647,8 @@ AC_SUBST(PACKAGE_LOGO,$pw3270_cv_logo)
 AC_SUBST(PROGRAM_NAME,"$pw3270_cv_progname")
 AC_SUBST(DEFAULT_CONFIG,"$pw3270_cv_config")
 AC_SUBST(UI_XML_FILES,"$pw3270_cv_ui")
+AC_SUBST(GUI,"$pw3270_cv_gui")
+
 
 AC_SUBST(LD)
 AC_SUBST(HOST_CC)
@@ -720,7 +726,7 @@ AC_SUBST(GTKRUNTIME,$pw3270_cv_gtkruntime)
 
 #dnl Configure which files to generate.
 AC_OUTPUT(Makefile)
-AC_OUTPUT(src/gui/version.c)
+AC_OUTPUT(src/gtk2/version.c)
 AC_OUTPUT(src/oxt/description.xml)
 AC_OUTPUT(src/oxt/manifest.xml)
 AC_OUTPUT(src/include/lib3270/plugins.h)
