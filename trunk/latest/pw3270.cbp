@@ -434,8 +434,169 @@
 		<Unit filename="src/extensions/uno/src/ooo3270.hpp" />
 		<Unit filename="src/extensions/uno/src/screen.cxx" />
 		<Unit filename="src/extensions/uno/src/test_program.cxx" />
-		<Unit filename="src/gui/action_calls.c">
+		<Unit filename="src/gtk2/action_calls.c">
 			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/action_table.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/actions.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/actions.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/actions1.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/clipboard.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/colors.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/commands.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/config.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/cursor.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/draw.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/filetransfer.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/fonts.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/fonts.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/gui.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/iocallback.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/main.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/mouse.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/oia.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/oia.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/plugin.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/print.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/resources.rc.in">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/screen.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/script.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/terminal.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/toggle.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/topwindow.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/topwindow1.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/tracewindow.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/ui_parse.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/ui_parse.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/uiparser1.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/uiparser1.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/gtk2/version.c.in">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
@@ -443,51 +604,7 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="src/gui/actions.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/gui/actions.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/actions1.c">
-			<Option compilerVar="CC" />
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/clipboard.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/colors.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/commands.c">
-			<Option compilerVar="CC" />
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/config.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/cursor.c">
-			<Option compilerVar="CC" />
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/draw.c">
-			<Option compilerVar="CC" />
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="unoDebug" />
-			<Option target="oooDebug" />
-			<Option target="pipetest" />
-			<Option target="jnidebug" />
-		</Unit>
-		<Unit filename="src/gui/filetransfer.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/fonts.c">
-			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
@@ -496,78 +613,15 @@
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="src/gui/gui.h" />
-		<Unit filename="src/gui/iocallback.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/mouse.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/oia.c">
-			<Option compilerVar="CC" />
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
 		<Unit filename="src/gui/oia.h">
 			<Option target="Debug" />
 			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/plugin.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/print.c">
-			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/gui/resources.rc.in">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="src/gui/screen.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/script.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/terminal.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/gui/toggle.c">
-			<Option compilerVar="CC" />
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/topwindow.c">
-			<Option compilerVar="CC" />
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/topwindow1.c">
-			<Option compilerVar="CC" />
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/tracewindow.c">
-			<Option compilerVar="CC" />
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="unoDebug" />
-			<Option target="oooDebug" />
-			<Option target="pipetest" />
-			<Option target="jnidebug" />
-		</Unit>
-		<Unit filename="src/gui/ui_parse.c">
-			<Option compilerVar="CC" />
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
 		<Unit filename="src/gui/ui_parse.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/uiparser1.c">
-			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
