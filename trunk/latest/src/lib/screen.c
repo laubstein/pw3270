@@ -319,13 +319,11 @@ void screen_erase(void)
 	screen_disp();
 }
 
-/*
-void screen_size(int *rows, int *cols)
+LIB3270_EXPORT void get_3270_terminal_size(H3270 *h, int *rows, int *cols)
 {
 	*rows = ROWS;
 	*cols = cCOLS;
 }
-*/
 
 void update_model_info(H3270 *session, int model, int cols, int rows)
 {

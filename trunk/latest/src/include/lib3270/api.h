@@ -455,6 +455,7 @@
 		LIB3270_EXPORT void screen_size(int *rows, int *cols);
 		LIB3270_EXPORT int query_secure_connection(H3270 *h);
 		LIB3270_EXPORT int lib3270_paste_string(const unsigned char *str);
+		LIB3270_EXPORT void get_3270_terminal_size(H3270 *h, int *rows, int *cols);
 
 		/* Network related calls */
 		LIB3270_EXPORT int 			  Get3270Socket(void);

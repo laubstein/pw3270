@@ -191,7 +191,7 @@ JNIEXPORT jstring JNICALL Java_pw3270_terminal_getScreenContentAt(JNIEnv *env, j
 	row--;
 	col--;
 
-	screen_size(&rows,&cols);
+	get_3270_terminal_size(hSession,&rows,&cols);
 
 	if(row < 0 || row > rows || col < 0 || col > cols || size < 1)
 		return (*env)->NewStringUTF(env,"");
@@ -218,7 +218,7 @@ JNIEXPORT jstring JNICALL Java_pw3270_terminal_getScreenContent(JNIEnv *env, job
 	char *ptr;
 	int  pos = 0;
 
-	screen_size(&rows,&cols);
+	get_3270_terminal_size(hSession,&rows,&cols);
 
 	sz = rows*(cols+1)+1;
 	ptr = buffer = (char *) malloc(sz);
@@ -248,7 +248,7 @@ JNIEXPORT jboolean JNICALL Java_pw3270_terminal_queryStringAt(JNIEnv *env, jobje
 	char 	*buffer;
 	jboolean	rc;
 
-	screen_size(&rows,&cols);
+	get_3270_terminal_size(hSession,&rows,&cols);
 
 	row--;
 	col--;
@@ -333,7 +333,7 @@ JNIEXPORT jint JNICALL Java_pw3270_terminal_waitForStringAt(JNIEnv *env, jobject
 	char 	*buffer;
 	int 	last = -1;
 
-	screen_size(&rows,&cols);
+	get_3270_terminal_size(hSession,&rows,&cols);
 
 	row--;
 	col--;

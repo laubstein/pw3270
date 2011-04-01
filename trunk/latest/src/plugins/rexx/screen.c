@@ -259,7 +259,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
  	const char *key;
  	char *buffer;
 
-	screen_size(&rows,&cols);
+	get_3270_terminal_size(hSession,&rows,&cols);
 
 	switch(Argc)
 	{
@@ -372,7 +372,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 	switch(Argc)
 	{
 	case 0:	// Get entire screen
-		screen_size(&rows,&cols);
+		get_3270_terminal_size(hSession,&rows,&cols);
 		qtd = (rows*(cols+1)+1);
 		buffer = malloc(qtd+2);
 
@@ -407,7 +407,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 		break;
 
 	case 3:	// Get start position from row/col
-		screen_size(&rows,&cols);
+		get_3270_terminal_size(hSession,&rows,&cols);
 
 		row = atoi(Argv[0].strptr)-1;
 		col = atoi(Argv[1].strptr)-1;
@@ -625,7 +625,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
  	char		*buffer;
 	time_t 	end = time(0)+RX3270_DEFAULT_TIMEOUT;
 
-	screen_size(&rows,&cols);
+	get_3270_terminal_size(hSession,&rows,&cols);
 
  	switch(Argc)
  	{
