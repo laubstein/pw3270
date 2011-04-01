@@ -735,7 +735,7 @@ AC_OUTPUT(version)
 case "$host" in
 	*-mingw32)
 		AC_OUTPUT(pw3270.nsi)
-		AC_OUTPUT(src/gui/resources.rc)
+		AC_OUTPUT(src/gtk2/resources.rc)
 	;;
 
 	*-apple-*)
