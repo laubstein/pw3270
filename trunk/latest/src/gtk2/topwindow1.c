@@ -111,23 +111,23 @@
 #endif
  }
 
- static void LoadFontMenu(void)
+ static void LoadMenus(void)
  {
 	gchar		*selected;
-	GtkWidget	*menu = widget_from_action_name("fontselect");
+	GtkWidget	*menu;
 
+
+	// Monospaced fonts
+	menu = widget_from_action_name("fontselect");
 	if(menu)
 	{
 		selected = GetString("Terminal","Font","Courier");
 		load_font_menu(menu, selected);
 		g_free(selected);
 	}
-#ifdef DEBUG
-	else
-	{
-		Trace("*** %s","No fontselect menu");
-	}
-#endif
+
+	// Screen sizes
+	load_screen_size_menu(widget_from_action_name("ScreenSizes"));
 
 	return;
  }
@@ -288,7 +288,7 @@
 			}
 		}
 
-		LoadFontMenu();
+		LoadMenus();
 		LoadInputMethods();
 
 		g_object_unref(manager);

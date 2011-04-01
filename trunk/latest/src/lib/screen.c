@@ -135,8 +135,8 @@ int screen_init(void)
 		}
 	}
 
-	if(callbacks && callbacks->setsize)
-		callbacks->setsize(maxROWS,maxCOLS);
+//	if(callbacks && callbacks->setsize)
+//		callbacks->setsize(maxROWS,maxCOLS);
 
 	/* Set up callbacks for state changes. */
 	register_schange(ST_CONNECT, status_connect);
@@ -319,10 +319,28 @@ void screen_erase(void)
 	screen_disp();
 }
 
+/*
 void screen_size(int *rows, int *cols)
 {
 	*rows = ROWS;
 	*cols = cCOLS;
+}
+*/
+
+void update_model_info(H3270 *session, int model, int cols, int rows)
+{
+	if(model == model_num && maxROWS == rows && maxCOLS == cols)
+		return;
+
+	maxCOLS   = cols;
+	maxROWS   = rows;
+	model_num = model;
+
+	/* Update the model name. */
+	(void) sprintf(session->model_name, "327%c-%d%s",appres.m3279 ? '9' : '8',model_num,appres.extended ? "-E" : "");
+
+	if(callbacks && callbacks->model_changed)
+		callbacks->model_changed(session, session->model_name,model_num,cols,rows);
 }
 
 /* Get screen contents */
@@ -725,20 +743,6 @@ screen_title(char *text)
 		callbacks->title(text);
 }
 
-/*
-void
-Title_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
-{
-	action_debug(Title_action, event, params, num_params);
-
-	if (check_usage(Title_action, *num_params, 1, 1) < 0)
-		return;
-
-	screen_title(params[0]);
-}
-*/
-
 static void
 relabel(int ignored unused)
 {
@@ -1033,4 +1037,5 @@ LIB3270_EXPORT char * console_window_wait_for_user_entry(HCONSOLE hwnd)
 		return callbacks->console_entry(hwnd);
 	return NULL;
 }
+
 

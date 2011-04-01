@@ -32,6 +32,7 @@
 
  #include "gui.h"
  #include "actions.h"
+ #include <stdlib.h>
 
  #ifdef HAVE_MALLOC_H
 	#include <malloc.h>
@@ -493,3 +494,4 @@
 	else
 		ParseInput("-");
  }
+

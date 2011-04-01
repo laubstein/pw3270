@@ -230,7 +230,7 @@
 
  static void load_action_attributes(struct parse_data *info, struct action_descriptor *data, const gchar **names, const gchar **values)
  {
- 	const gchar					* attr;
+ 	const gchar * attr;
 
 	// Create/Update action label
 	load_ui_attributes(info,&data->attr,names,values);
@@ -357,7 +357,6 @@
 	UNLOAD_ATTRIBUTE(text);
 
 	g_free(data->script.text);
-//	g_free(data->script.filename);
 
 	g_free(data);
  }

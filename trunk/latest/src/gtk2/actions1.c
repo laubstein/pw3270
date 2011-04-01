@@ -531,7 +531,7 @@
 		{	"Preferences",		NULL								},
 		{	"Network",			NULL								},
 		{	"Properties",		NULL								},
-
+		{	"ScreenSizes",		NULL								},
 		{	"About",			G_CALLBACK(action_about)			},
 		{	"Quit",				G_CALLBACK(action_quit)				},
 		{	"SelectColors",		G_CALLBACK(action_selectcolors)		},

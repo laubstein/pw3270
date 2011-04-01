@@ -57,7 +57,8 @@ LIB3270_INTERNAL int next_unprotected(int baddr0);
 LIB3270_INTERNAL enum pds process_ds(unsigned char *buf, int buflen);
 LIB3270_INTERNAL void ps_process(void);
 
-#define set_rows_cols(mn,ovc,ovr) ctlr_set_rows_cols(mn,ovc,ovr)
+LIB3270_INTERNAL void update_model_info(H3270 *session, int model, int cols, int rows);
+LIB3270_INTERNAL void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr);
 
 LIB3270_INTERNAL void ticking_start(Boolean anyway);
 LIB3270_INTERNAL void toggle_nop(struct toggle *t, enum toggle_type tt);

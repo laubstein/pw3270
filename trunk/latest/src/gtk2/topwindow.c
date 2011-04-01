@@ -54,6 +54,11 @@
 	g_free(selected);
  }
 
+ static void setup_screen_size_menu(GtkWidget *widget)
+ {
+	load_screen_size_menu(widget);
+ }
+
  static void setup_input_methods_menu(GtkWidget *widget)
  {
 	GtkWidget *menu	= gtk_menu_new();
@@ -112,6 +117,7 @@
 	 {
 		{ "fontselect",		setup_font_select_menu		},
 		{ "inputmethod",	setup_input_methods_menu	},
+		{ "screensizes",	setup_screen_size_menu		},
 	 	{ NULL,				NULL						}
 	 };
 

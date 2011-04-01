@@ -228,27 +228,6 @@
 	gtk_action_group_set_sensitive(action_group[id],status);
  }
 
-/*
- void set_action_sensitive_by_name(const gchar *name,gboolean sensitive)
- {
-	int p;
-
-	for(p = 0; action_group[p]; p++)
-	{
-		GtkAction *act = gtk_action_group_get_action(action_group[p],name);
-		if(act)
-		{
-			Trace("%s: %s(%s)",__FUNCTION__,name,sensitive ? "sensitive" : "insensitive");
-			gtk_action_set_sensitive(act,sensitive);
-			return;
-		}
-	}
-
-	Trace("%s: %s isn't available",__FUNCTION__,name);
-
- }
- */
-
  static const struct action_data * get_action_data(const gchar *name, GError **error)
  {
 	int f;
@@ -425,7 +404,7 @@
  	if(gui_toggle_state[(int) id] == active)
 		return;
 
-	Trace("*************** %p %p %p ",toggle_action[idx].reset, toggle_action[idx].set, toggle_action[idx].toggle);
+//	Trace("*************** %p %p %p ",toggle_action[idx].reset, toggle_action[idx].set, toggle_action[idx].toggle);
 
 	gui_toggle_state[(int) id] = active;
 

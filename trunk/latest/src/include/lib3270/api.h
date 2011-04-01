@@ -386,7 +386,7 @@
 			void	(*Error)(const char *fmt, va_list arg);
 			void	(*Warning)(const char *fmt, va_list arg);
 			void	(*SysError)(const char *title, const char *message, const char *system);
-			void	(*setsize)(int rows, int cols);
+			void 	(*model_changed)(H3270 *session, const char *name, int model, int cols, int rows);
 			int		(*addch)(int row, int col, int c, unsigned short attr);
 			void	(*charset)(char *dcs);
 			void	(*title)(char *text);
@@ -464,6 +464,7 @@
 		LIB3270_EXPORT void 		  popup_system_error(const char *title, const char *message, const char *system);
 		LIB3270_EXPORT void 		  popup_a_sockerr(char *fmt, ...);
 		LIB3270_EXPORT STATUS_CODE	  query_3270_terminal_status(void);
+		LIB3270_EXPORT int			  set_3270_model(H3270 *session, int model);
 
 		/* Get connection info */
 		LIB3270_EXPORT const char	* get_connected_lu(H3270 *h);
@@ -476,7 +477,6 @@
 		LIB3270_EXPORT int Wait(int seconds);
 
 		LIB3270_EXPORT void ctlr_erase(int alt);
-		LIB3270_EXPORT void ctlr_set_rows_cols(int mn, int ovc, int ovr);
         LIB3270_EXPORT int ctlr_get_cols(void);
         LIB3270_EXPORT int ctlr_get_rows(void);
 
