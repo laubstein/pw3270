@@ -66,7 +66,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 
 		# Locale files
 		CreateDirectory "$INSTDIR\@localedir@\pt_BR\LC_MESSAGES"
-		file "/oname=$INSTDIR\@localedir@\pt_BR\LC_MESSAGES\@PACKAGE@.mo" "bin\Release\pt_BR.mo"
+		file "/oname=$INSTDIR\@localedir@\pt_BR\LC_MESSAGES\@PACKAGE@.mo" "bin\Release\locale\pt_BR\LC_MESSAGES\@PACKAGE@.mo"
 
 		# define uninstaller name
 		writeUninstaller $INSTDIR\uninstall.exe
@@ -92,7 +92,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 		WriteRegStr HKCU "Software\@PROGRAM_NAME@" "" $INSTDIR
 
 		# Main library
-		file "/oname=$SYSDIR\lib3270.dll" bin\Release\lib3270.dll
+		file "/oname=$SYSDIR\lib3270.dll" bin\Release\lib\lib3270.dll
 
 	sectionEnd
 
@@ -186,8 +186,8 @@ Section /o "Software Development Kit" SecSDK
 	file "/oname=$INSTDIR\sdk\include\lib3270\plugins.h" "src\include\lib3270\plugins.h"
 
 	CreateDirectory "$INSTDIR\sdk\lib"
-	file "/oname=$INSTDIR\sdk\lib\lib3270.def" "bin\Release\lib3270.def"
-	file "/oname=$INSTDIR\sdk\lib\lib3270.a" "bin\Release\lib3270.a"
+	file "/oname=$INSTDIR\sdk\lib\lib3270.def" "bin\Release\lib\lib3270.def"
+	file "/oname=$INSTDIR\sdk\lib\lib3270.a" "bin\Release\lib\lib3270.a"
 
 SectionEnd
 
