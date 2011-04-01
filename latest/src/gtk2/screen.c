@@ -875,7 +875,7 @@
 
 	for(i=0; i< G_N_ELEMENTS(screen_size_text); i++)
     {
-    	gchar *name = g_strdup_printf(_( "Model %d (%s)"),i+2,screen_size_text[i]);
+    	gchar *name = g_strdup_printf( _( "Model %d (%s)"),i+2,screen_size_text[i]);
 
 		screen_size_menu[i] = gtk_radio_menu_item_new_with_label(group,name);
 
