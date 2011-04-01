@@ -62,14 +62,13 @@
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
- static void	  setsize(int rows, int cols);
  static int  	  addch(int row, int col, int c, unsigned short attr);
  static void	  set_charset(char *dcs);
 
  static void	  erase(void);
  static void	  display(void);
 
- static int		  SetSuspended(int state);
+ static int	  SetSuspended(int state);
  static void	  SetScript(SCRIPT_STATE state);
  static void	  set_cursor(CURSOR_MODE mode);
  static void	  set_oia(OIA_FLAG id, int on);
@@ -78,12 +77,13 @@
  static void	  error(const char *fmt, va_list arg);
  static void 	  warning(const char *fmt, va_list arg);
  static void	  syserror(const char *title, const char *message, const char *system);
- static int		  init(void);
+ static int	  init(void);
  static void 	  update_toggle(int ix, int value, int reason, const char *name);
  static void 	  redraw(void);
  static gchar	* convert_monocase(int c, gsize *sz);
  static gchar	* convert_regular(int c, gsize *sz);
  static int	  popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, va_list arg);
+ static void	  model_changed(H3270 *session, const char *name, int model, int cols, int rows);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -98,7 +98,8 @@
 	warning,				// void (*Warning)(const char *fmt, va_list arg);
 	syserror,				// void	(*SysError)(const char *title, const char *message, const char *system);
 
-	setsize,				// void (*setsize)(int rows, int cols);
+	model_changed,			// void	(*model_changed)(H3270 *session, const char *name, int model, int cols, int rows);
+
 	addch,					// void (*addch)(int row, int col, int c, int attr);
 	set_charset,			// void (*charset)(char *dcs);
 	settitle,				// void (*title)(char *text);
@@ -126,43 +127,21 @@
 
  };
 
-/*
- static const struct _imagedata
- {
-	const unsigned char	*data;
-    gint					width;
-    gint					height;
-    short					color;
- } imagedata[] =
- {
- 	{ locked_bits,		locked_width,	locked_height,   	TERMINAL_COLOR_SSL 		},
- 	{ unlocked_bits,	unlocked_width,	unlocked_height, 	TERMINAL_COLOR_SSL 		},
- 	{ shift_bits,		shift_width, 	shift_height,		TERMINAL_COLOR_OIA 		},
- 	{ four_bits,		four_width, 	four_height,		TERMINAL_COLOR_OIA 		},
- };
+ int 					  terminal_rows										= 0;
+ int 					  terminal_cols										= 0;
+ int					  left_margin										= 0;
+ int					  top_margin										= 0;
 
- #define IMAGE_COUNT (sizeof(imagedata)/sizeof(struct _imagedata))
+ ELEMENT				* screen											= NULL;
+ char					* charset											= NULL;
+ char					* window_title										= PROGRAM_NAME;
 
- static struct _pix
- {
- 	GdkPixbuf *base;
- 	GdkPixbuf *pix;
- 	int		   Width;
- 	int		   Height;
- } pix[IMAGE_COUNT];
-*/
+ gboolean				  screen_updates_enabled							= FALSE;
+ int					  terminal_buffer_length							= 0;
 
- int 			  terminal_rows						= 0;
- int 			  terminal_cols						= 0;
- int			  left_margin						= 0;
- int			  top_margin						= 0;
+ static const gchar	* screen_size_text[]								= { "80x24", "80x32", "80x43", "132x27" };
+ static GtkWidget		* screen_size_menu[G_N_ELEMENTS(screen_size_text)]	= { 0 };
 
- ELEMENT		* screen							= NULL;
- char			* charset							= NULL;
- char			* window_title						= PROGRAM_NAME;
-
- gboolean		  screen_updates_enabled			= FALSE;
- int			  terminal_buffer_length			= 0;
 
  static gchar 	* (*convert_charset)(int c, gsize *sz) = convert_regular;
 
@@ -355,27 +334,6 @@
 	el->changed = TRUE;
 
 	return 0;
- }
-
- static void setsize(int rows, int cols)
- {
-	g_free(screen);
-	screen = NULL;
-
-	if(rows && cols)
-	{
-		terminal_buffer_length = rows*cols;
-		screen = g_new0(ELEMENT,terminal_buffer_length);
-		terminal_rows = rows;
-		terminal_cols = cols;
-
-		if(terminal && terminal->window)
-			action_redraw(0);
-
-	}
-
-// 	Trace("Terminal set to %d rows with %d cols, screen set to %p",rows,cols,screen);
-
  }
 
  /**
@@ -884,4 +842,88 @@
 		gdk_window_process_updates(terminal->window,FALSE);
 
 	}
+ }
+
+ static void set_screen_size(GtkCheckMenuItem *item, int id)
+ {
+	if(gtk_check_menu_item_get_active(item))
+	{
+		Trace("Screen size set to %d",id);
+		set_3270_model(hSession,id);
+	}
+ }
+
+/**
+ * Load screen size menu.
+ *
+ * @param topmenu	Parent menu for screen size options.
+ *
+ */
+ void load_screen_size_menu(GtkWidget *topmenu)
+ {
+ 	int i;
+ 	GSList 		*group	= NULL;
+ 	GtkWidget	*menu;
+
+ 	if(!topmenu)
+ 	{
+ 		memset(screen_size_menu,0,sizeof(screen_size_menu));
+ 		return;
+ 	}
+
+ 	menu = gtk_menu_new();
+
+	for(i=0; i< G_N_ELEMENTS(screen_size_text); i++)
+    {
+    	gchar *name = g_strdup_printf(_( "Model %d (%s)"),i+2,screen_size_text[i]);
+
+		screen_size_menu[i] = gtk_radio_menu_item_new_with_label(group,name);
+
+		group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(screen_size_menu[i]));
+
+		g_free(name);
+
+		gtk_widget_show(screen_size_menu[i]);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu),screen_size_menu[i]);
+
+		g_signal_connect(G_OBJECT(screen_size_menu[i]),"toggled",G_CALLBACK(set_screen_size),(gpointer) i+2);
+
+    }
+
+	gtk_widget_show_all(menu);
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(topmenu),menu);
+
+ }
+
+ static void model_changed(H3270 *session, const char *name, int model, int cols, int rows)
+ {
+
+ 	// Check for screen buffer change
+ 	if(rows != terminal_rows || cols != terminal_cols)
+ 	{
+		g_free(screen);
+		screen = NULL;
+
+		if(rows && cols)
+		{
+			terminal_buffer_length = rows*cols;
+			screen = g_new0(ELEMENT,terminal_buffer_length);
+			terminal_rows = rows;
+			terminal_cols = cols;
+
+		}
+ 	}
+
+	// Update menu toggle (if available)
+	model -= 2;
+	if(model >= 0 && model <= G_N_ELEMENTS(screen_size_text))
+	{
+		if(screen_size_menu[model] && !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(screen_size_menu[model])))
+			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(screen_size_menu[model]),TRUE);
+	}
+
+	// Redraw
+	if(terminal && terminal->window)
+		action_redraw(0);
+
  }

@@ -227,12 +227,12 @@ H3270 * new_3270_session(void)
 
 	Trace("Model_number: %d",model_number);
 
-	if (!appres.extended || appres.oversize == CN || sscanf(appres.oversize, "%dx%d%c", &ovc, &ovr, &junk) != 2) {
+	if (!appres.extended || appres.oversize == CN || sscanf(appres.oversize, "%dx%d%c", &ovc, &ovr, &junk) != 2)
+	{
 		ovc = 0;
 		ovr = 0;
 	}
-	set_rows_cols(model_number, ovc, ovr);
-
+	ctlr_set_rows_cols(hSession, model_number, ovc, ovr);
 
 	if (appres.termname != CN)
 		hSession->termtype = appres.termname;

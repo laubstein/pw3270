@@ -72,9 +72,12 @@ extern unsigned char aid;
 
 /* Globals */
 int				ROWS, COLS;
-int				maxROWS, maxCOLS;
 int				ov_rows, ov_cols;
-int				model_num;
+
+int				maxROWS		= 0;
+int				maxCOLS		= 0;
+int				model_num	= -1;
+
 int				cursor_addr, buffer_addr;
 Boolean         screen_alt = False;	/* alternate screen? */
 Boolean         is_altbuffer = False;
@@ -192,93 +195,126 @@ ctlr_reinit(unsigned cmask)
 	}
 }
 
-/*
+/**
  * Deal with the relationships between model numbers and rows/cols.
+ *
+ * @param model	New model (updates model name
  */
-void
-ctlr_set_rows_cols(int mn, int ovc, int ovr)
+int	set_3270_model(H3270 *session, int model)
 {
-	int defmod;
+	if(CONNECTED)
+		return EBUSY;
 
-	switch (mn) {
+	ctlr_set_rows_cols(session,model,ov_cols,ov_rows);
+	ctlr_reinit(MODEL_CHANGE);
+	return 0;
+}
+
+void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr)
+{
+	static const struct _sz
+	{
+		unsigned char cols;
+		unsigned char rows;
+	} sz[] =
+	{
+		{  80, 24 },	// 2
+		{  80, 32 },	// 3
+		{  80, 43 },	// 4
+		{ 132, 27 }		// 5
+	};
+
+	int idx = mn -2;
+
+	if(idx < 0 || idx >= (sizeof(sz)/sizeof(struct _sz)))
+	{
+		idx = 2;
+		popup_an_error("Unknown model: %d - Defaulting to 4 (%dx%d)", mn, sz[idx].cols,sz[idx].rows);
+		mn  = 4;
+	}
+
+	update_model_info(session,mn,sz[idx].cols,sz[idx].rows);
+
+/*
+//	int defmod;
+
+	switch (mn)
+	{
 	case 2:
-		maxCOLS = 80;
-		maxROWS = 24;
-		model_num = 2;
+//		maxCOLS = 80;
+//		maxROWS = 24;
+//		model_num = 2;
+		update_model_info(session,2,80,24);
 		break;
 	case 3:
-		maxCOLS = 80;
-		maxROWS = 32;
-		model_num = 3;
+//		maxCOLS = 80;
+//		maxROWS = 32;
+//		model_num = 3;
+		update_model_info(session,3,80,32);
 		break;
 	case 4:
-#if defined(RESTRICT_3279) /*[*/
-		if (appres.m3279) {
-			popup_an_error("No 3279 Model 4\nDefaulting to model 3");
-			ctlr_set_rows_cols("3", ovc, ovr);
-			return;
-		}
-#endif /*]*/
-		maxCOLS = 80;
-		maxROWS = 43;
-		model_num = 4;
+//#if defined(RESTRICT_3279)
+//		if (appres.m3279) {
+//			popup_an_error("No 3279 Model 4\nDefaulting to model 3");
+//			ctlr_set_rows_cols("3", ovc, ovr);
+//			return;
+//		}
+//#endif
+//		maxCOLS = 80;
+//		maxROWS = 43;
+//		model_num = 4;
+		update_model_info(session,4,80,43);
 		break;
 	case 5:
-#if defined(RESTRICT_3279) /*[*/
-		if (appres.m3279) {
-			popup_an_error("No 3279 Model 5\nDefaulting to model 3");
-			ctlr_set_rows_cols(3, ovc, ovr);
-			return;
-		}
-#endif /*]*/
-		maxCOLS = 132;
-		maxROWS = 27;
-		model_num = 5;
+//#if defined(RESTRICT_3279)
+//		if (appres.m3279) {
+//			popup_an_error("No 3279 Model 5\nDefaulting to model 3");
+//			ctlr_set_rows_cols(3, ovc, ovr);
+//			return;
+//		}
+//#endif
+//		maxCOLS = 132;
+//		maxROWS = 27;
+//		model_num = 5;
+		update_model_info(session,5,132,27);
 		break;
-	default:
-#if defined(RESTRICT_3279) /*[*/
-		defmod = appres.m3279 ? 3 : 4;
-#else /*][*/
-		defmod = 4;
-#endif
-		popup_an_error("Unknown model: %d\nDefaulting to %d", mn,
-		    defmod);
-		ctlr_set_rows_cols(defmod, ovc, ovr);
-		return;
-	}
 
-	/* Apply oversize. */
+	default:
+//#if defined(RESTRICT_3279)
+//		defmod = appres.m3279 ? 3 : 4;
+//#else
+//		defmod = 4;
+//#endif
+//		popup_an_error("Unknown model: %d\nDefaulting to %d", mn,defmod);
+//		ctlr_set_rows_cols(defmod, ovc, ovr);
+		popup_an_error("Unknown model: %d - Defaulting to %d", mn, 4);
+		mn = 4;
+		update_model_info(session,4,80,43);
+	}
+*/
+
+	// Apply oversize.
 	ov_cols = 0;
 	ov_rows = 0;
-	if (ovc != 0 || ovr != 0) {
+	if (ovc != 0 || ovr != 0)
+	{
 		if (ovc <= 0 || ovr <= 0)
-			popup_an_error("Invalid %s %dx%d:\nNegative or zero",
-			    ResOversize, ovc, ovr);
+			popup_an_error("Invalid %s %dx%d:\nNegative or zero",ResOversize, ovc, ovr);
 		else if (ovc * ovr >= 0x4000)
-			popup_an_error("Invalid %s %dx%d:\nToo big",
-			    ResOversize, ovc, ovr);
+			popup_an_error("Invalid %s %dx%d:\nToo big",ResOversize, ovc, ovr);
 		else if (ovc > 0 && ovc < maxCOLS)
-			popup_an_error("Invalid %s cols (%d):\nLess than model %d cols (%d)",
-			    ResOversize, ovc, model_num, maxCOLS);
+			popup_an_error("Invalid %s cols (%d):\nLess than model %d cols (%d)",ResOversize, ovc, model_num, maxCOLS);
 		else if (ovr > 0 && ovr < maxROWS)
-			popup_an_error("Invalid %s rows (%d):\nLess than model %d rows (%d)",
-			    ResOversize, ovr, model_num, maxROWS);
-		else {
-			ov_cols = maxCOLS = ovc;
-			ov_rows = maxROWS = ovr;
-		}
+			popup_an_error("Invalid %s rows (%d):\nLess than model %d rows (%d)",ResOversize, ovr, model_num, maxROWS);
+		else
+			update_model_info(session,mn,ov_cols = ovc,ov_rows = ovr);
 	}
 
-	/* Update the model name. */
-	(void) sprintf(h3270.model_name, "327%c-%d%s",
-	    appres.m3279 ? '9' : '8',
-	    model_num,
-	    appres.extended ? "-E" : "");
-
-	/* Make sure that the current rows/cols are still 24x80. */
+	// Make sure that the current rows/cols are still 24x80.
 	COLS = 80;
 	ROWS = 24;
 	screen_alt = False;
+
 }
 
 

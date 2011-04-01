@@ -336,6 +336,9 @@
 	LOCAL_EXTERN void		  gui_toogle_set_active(enum GUI_TOGGLE id, gboolean active);
 	LOCAL_EXTERN void		  gui_toogle_set_visible(enum GUI_TOGGLE id, gboolean visible);
 
+	LOCAL_EXTERN void		  load_screen_size_menu(GtkWidget *topmenu);
+
+
 #ifdef X3270_FT
 	int 		initft(void);
 	int 		create_ft_progress_dialog(void);
