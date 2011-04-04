@@ -55,7 +55,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 		file "/oname=$INSTDIR\@PROGRAM_NAME@.ico"	"@PROGRAM_NAME@.ico"
 
 		# Configuration files
-		file "/oname=$INSTDIR\@PROGRAM_NAME@.gif"	"bin\Release\@PACKAGE@.gif"
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.gif"	"bin\Release\@PROGRAM_NAME@.gif"
 		file "/oname=$INSTDIR\colors.conf"		"colors.conf"
 		file "/oname=$INSTDIR\@PROGRAM_NAME@.conf"	"@DEFAULT_CONFIG@"
 
