@@ -18,6 +18,13 @@ InstallDirRegKey HKCU "Software\@PROGRAM_NAME@" ""
 
 RequestExecutionLevel admin
 
+# Properties
+VIProductVersion "@PACKAGE_VERSION@.@PACKAGE_RELEASE@.@PACKAGE_REVISION@"
+VIAddVersionKey "ProductName" "@PROGRAM_NAME@"
+VIAddVersionKey "FileDescription" "3270 Emulator for windows/gtk"
+VIAddVersionKey "FileVersion" "@PACKAGE_REVISION@"
+VIAddVersionKey "LegalCopyright" "GPL"
+
 # Interface
 
 !define MUI_ABORTWARNING
@@ -167,7 +174,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 
 SubSectionEnd
 
-Section "GTK+ Runtime" SecGTK
+Section /o "GTK+ Runtime" SecGTK
 
 	setOutPath $INSTDIR
 	file /r "bin\Release\gtk-runtime\*.*"
@@ -270,8 +277,38 @@ RexxNOK:
 	IntOp $0 $0 | ${SF_RO}
 	SectionSetFlags "${SecRexxLib}" $0
 
-
 PastRexxCheck:
+
+	ReadRegStr $4 HKLM "Software\GTK2-Runtime" "DllPath"
+
+	# remove trailing back slash
+	Push $4
+	Exch $EXEDIR
+	Exch $EXEDIR
+	Pop $4
+
+	# if Gtk runtime DLL path exists gtk runtime is already installed.
+	IfFileExists $4 gtkOK gtkNOK
+
+gtkOK:
+
+	SectionGetFlags "${SecGTK}" $0
+	IntOp $0 $0 & ${SECTION_OFF}
+	SectionSetFlags "${SecGTK}" $0
+
+goto PastGTKCheck
+
+gtkNOK:
+
+	SectionGetFlags "${SecGTK}" $0
+	IntOp $0 $0 | ${SF_SELECTED}
+	SectionSetFlags "${SecGTK}" $0
+
+goto PastGTKCheck
+
+
+
+PastGTKCheck:
 
 
 FunctionEnd
