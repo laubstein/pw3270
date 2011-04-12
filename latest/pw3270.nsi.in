@@ -66,6 +66,11 @@ SubSection "@PROGRAM_NAME@" SecMain
 		file "/oname=$INSTDIR\colors.conf"		"colors.conf"
 		file "/oname=$INSTDIR\@PROGRAM_NAME@.conf"	"@DEFAULT_CONFIG@"
 
+		# Documentation files
+		file "/oname=$INSTDIR\ChangeLog"		"ChangeLog"
+		file "/oname=$INSTDIR\AUTHORS"			"AUTHORS"
+		file "/oname=$INSTDIR\LICENSE"			"LICENSE"
+
 		# UI definition files
 		CreateDirectory "$INSTDIR\ui"
 

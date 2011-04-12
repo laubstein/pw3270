@@ -37,11 +37,11 @@ if [ ! -z $SVN ]; then
 
 	fi
 
-#	SVN2CL=`which svn2cl.sh 2> /dev/null`
-#	if [ ! -z $SVN2CL ]; then
-#		echo "Creating changelog ..."
-#		$SVN2CL
-#	fi
+	SVN2CL=`which svn2cl.sh 2> /dev/null`
+	if [ ! -z $SVN2CL ]; then
+		echo "Creating changelog ..."
+		$SVN2CL
+	fi
 
 fi
 
