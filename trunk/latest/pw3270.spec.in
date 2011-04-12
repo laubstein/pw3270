@@ -202,6 +202,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
+%doc ChangeLog AUTHORS LICENSE
 %{_bindir}/%{name}
 %{_datadir}/applications/*.desktop
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
