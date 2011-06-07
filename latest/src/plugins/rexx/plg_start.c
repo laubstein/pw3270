@@ -195,7 +195,7 @@
 
 		for(f=0;f<argc;f++)
 		{
-			rxArgv[f].strptr = argv[f];
+			rxArgv[f].strptr = (const char *) argv[f];
 			rxArgv[f].strlength	= strlen(rxArgv[f].strptr);
 		}
  	}
