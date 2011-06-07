@@ -92,7 +92,7 @@
 
  static void oia_message_area(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
- static void dunno(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
+// static void dunno(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
  static void oia_clear_rect(cairo_t *cr, GdkRectangle *r);
  static void oia_show_text(cairo_t *cr, GdkRectangle *r, const gchar *text, enum TERMINAL_COLOR c);
@@ -153,9 +153,11 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
+/*
  static void dunno(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
  }
+*/
 
  void update_oia(void)
  {
@@ -527,9 +529,9 @@
 */
 
 #ifdef ENABLE_BM_PIXMAPS
-	 
+
 	// Pixmap version
-	 
+
 	#include "locked.bm"
 	#include "unlocked.bm"
 
@@ -560,16 +562,16 @@
 	gdk_cairo_set_source_pixmap(cr, pixmap_oia[idx], r->x, r->y);
 	gdk_cairo_rectangle(cr,r);
 	cairo_fill(cr);
-	 
+
 #else
-	 
+
 	// Non Pixmap version
 
 	r->x = (r->width - (46*terminal_font_info.width))+1;
 	r->y++;
 	r->width = (terminal_font_info.width*2)-1;
 	r->height--;
-	 
+
 	oia_clear_icon(cr,r);
 
 	if(query_secure_connection(hSession))
@@ -578,9 +580,9 @@
 		cairo_arc(cr,r->x+(r->width/2),r->y+(r->height/2),r->width/(2.5),0,2*M_PI);
 		cairo_fill(cr);
 	}
-	 
+
 #endif // ENABLE_BM_PIXMAPS
-	 
+
  }
 
  static void oia_draw_insert_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
@@ -965,5 +967,5 @@
 			pixmap_oia[f] = NULL;
 		}
 	}
-#endif // ENABLE_BM_PIXMAPS 
+#endif // ENABLE_BM_PIXMAPS
  }

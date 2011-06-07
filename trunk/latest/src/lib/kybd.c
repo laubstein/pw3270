@@ -577,15 +577,17 @@ LIB3270_FKEY_ACTION( pakey )
 /*
  * ATTN key, per RFC 2355.  Sends IP, regardless.
  */
-LIB3270_ACTION(attn) 
+LIB3270_ACTION(attn)
 {
 //	action_debug(Attn_action, event, params, num_params);
 	if (!IN_3270)
-		return;
+		return 0;
 
 //	reset_idle_timer();
 
 	net_interrupt();
+
+	return 0;
 }
 
 /*
