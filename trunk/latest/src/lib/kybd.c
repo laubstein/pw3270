@@ -595,7 +595,7 @@ LIB3270_ACTION(attn)
  * on an AS/400, even when the keyboard is locked.
  *
  * This is now the same as the Attn action.
- */
+ */ /*
 void
 Interrupt_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -609,7 +609,7 @@ Interrupt_action(Widget w unused, XEvent *event, String *params,
 	net_interrupt();
 }
 
-
+*/
 
 /*
  * Prepare for an insert of 'count' bytes.
@@ -3092,7 +3092,7 @@ LIB3270_ACTION( fieldend )
 /*
  * MoveCursor action.  Depending on arguments, this is either a move to the
  * mouse cursor position, or to an absolute location.
- */
+ */ /*
 void
 MoveCursor_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -3109,14 +3109,14 @@ MoveCursor_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 	}
 
 	switch (*num_params) {
-#if defined(X3270_DISPLAY) /*[*/
-	    case 0:		/* mouse click, presumably */
+#if defined(X3270_DISPLAY
+	    case 0:		// mouse click, presumably
 		if (w != *screen)
 			return;
 		cursor_move(mouse_baddr(w, event));
 		break;
-#endif /*]*/
-	    case 2:		/* probably a macro call */
+#endif
+	    case 2:		// probably a macro call
 		row = atoi(params[0]);
 		col = atoi(params[1]);
 		if (!IN_3270) {
@@ -3130,7 +3130,7 @@ MoveCursor_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 		baddr = ((row * COLS) + col) % (ROWS * COLS);
 		cursor_move(baddr);
 		break;
-	    default:		/* couln't say */
+	    default:		// couln't say
 		popup_an_error("%s requires 0 or 2 arguments",
 		    action_name(MoveCursor_action));
 //		cancel_if_idle_command();
@@ -3138,12 +3138,12 @@ MoveCursor_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 	}
 }
 
-
+*/
 #if defined(X3270_DBCS) && defined(X3270_DISPLAY) /*[*/
 /*
  * Run a KeyPress through XIM.
  * Returns True if there is further processing to do, False otherwise.
- */
+ */ /*
 static Boolean
 xim_lookup(XKeyEvent *event)
 {
@@ -3220,7 +3220,8 @@ xim_lookup(XKeyEvent *event)
 	}
 	return rv;
 }
-#endif /*]*/
+*/
+#endif
 
 /*
  * Key action by string
