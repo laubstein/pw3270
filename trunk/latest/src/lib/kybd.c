@@ -580,6 +580,7 @@ LIB3270_FKEY_ACTION( pakey )
 LIB3270_ACTION(attn)
 {
 //	action_debug(Attn_action, event, params, num_params);
+
 	if (!IN_3270)
 		return 0;
 
