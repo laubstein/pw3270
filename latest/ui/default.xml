@@ -177,7 +177,7 @@
 	<accelerator action='Reset' key='<Shift><Ctrl>r' group='online' />
 	<accelerator action='Return' key='Return' />
 	<accelerator action='Enter' key='KP_Enter' />
-	<accelerator action='Escape' key='Escape' group='online' />
+	<accelerator action='Attn' key='Escape' group='online' />
 	<accelerator action='DeleteWord' key='<Ctrl>w' group='online' />
 	<accelerator action='Delete' key='Delete' group='online' />
 	<accelerator action='Erase' key='BackSpace' group='online' />
