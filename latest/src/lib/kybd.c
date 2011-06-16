@@ -573,6 +573,18 @@ LIB3270_FKEY_ACTION( pakey )
 	return 0;
 }
 
+LIB3270_ACTION(break)
+{
+
+	if (!IN_3270)
+		return 0;
+
+	Trace("%s",__FUNCTION__);
+	
+	net_break();
+
+	return 0;
+}
 
 /*
  * ATTN key, per RFC 2355.  Sends IP, regardless.
