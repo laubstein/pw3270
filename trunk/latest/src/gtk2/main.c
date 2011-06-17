@@ -409,7 +409,7 @@ static void load_options(GOptionContext *context)
 		switch(opt[f].type)
 		{
 		case OPT_BOOLEAN:		// FIXME (perry#1#): How can I set a boolean option?
-			entry->long_name = NULL;
+			entry->arg = G_OPTION_ARG_NONE;
 			break;
 
 		case OPT_STRING:
