@@ -72,4 +72,8 @@
 
 	</menubar>
 
+	<!---
+	<accelerator action='CursorUp' key='Control_R' group='online' />
+	--->
+
 </ui>

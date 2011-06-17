@@ -143,6 +143,8 @@
 
 	{ GDK_Print,			GDK_CONTROL_MASK,	NULL,	G_CALLBACK(action_printscreen)		},
 	{ GDK_Print,			GDK_SHIFT_MASK,		NULL,	G_CALLBACK(lib3270_sysreq)			},
+	{ GDK_Control_R,		0,					NULL,	NULL								},
+	{ GDK_Control_L,		0,					NULL,	NULL								},
 
 #ifdef WIN32
 	{ GDK_Pause,			0,					NULL,	0									},
