@@ -56,6 +56,7 @@
  static void action_Down(GtkWidget *w, gpointer user_data);
  static void action_Left(GtkWidget *w, gpointer user_data);
  static void action_Right(GtkWidget *w, gpointer user_data);
+ static void action_Newline(GtkWidget *w, gpointer user_data);
 
  static void action_pfkey(GtkAction *action,gpointer id);
  static void action_pakey(GtkAction *action,gpointer id);
@@ -200,6 +201,11 @@
  void action_Right(GtkWidget *w, gpointer user_data)
  {
  	clear_and_call(0,lib3270_cursor_right);
+ }
+
+ void action_Newline(GtkWidget *w, gpointer user_data)
+ {
+ 	clear_and_call(0,lib3270_cursor_newline);
  }
 
  static void toggle_action(GtkToggleAction *action, gpointer id)
@@ -480,6 +486,7 @@
 		{ 	"CursorLeft",		G_CALLBACK(action_Left)				},
 		{ 	"CursorUp",			G_CALLBACK(action_Up)				},
 		{ 	"CursorDown",		G_CALLBACK(action_Down)				},
+		{ 	"Newline",			G_CALLBACK(action_Newline)			},
 
 		{	"NextField",		G_CALLBACK(lib3270_tab)				},
 		{	"PreviousField",	G_CALLBACK(lib3270_backtab)			},
