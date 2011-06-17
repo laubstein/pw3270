@@ -310,7 +310,7 @@ static void initialize(void)
 #endif /*]*/
 
 	appres.numeric_lock = False;
-	appres.secure = False;
+//	appres.secure = False;
 
 #if defined(C3270) /*[*/
 	appres.oerr_lock = True;
@@ -462,17 +462,18 @@ static const struct lib3270_option options[] =
     { OptDsTrace,  OPT_BOOLEAN, True,  ResDsTrace,   toggle_offset(DS_TRACE), NULL },
 #endif /*]*/
     { OptHostsFile,OPT_STRING,  False, ResHostsFile, offset(hostsfile), NULL },
-#if defined(C3270) /*[*/
-    { OptKeymap,   OPT_STRING,  False, ResKeymap,    offset(key_map), N_( "Specifies a keymap name and optional modifiers." ) },
-#endif /*]*/
-#if defined(X3270_DBCS) /*[*/
-    { OptLocalEncoding,OPT_STRING,False,ResLocalEncoding,offset(local_encoding), NULL },
-#endif /*]*/
+//#if defined(C3270)
+//    { OptKeymap,   OPT_STRING,  False, ResKeymap,    offset(key_map), N_( "Specifies a keymap name and optional modifiers." ) },
+// #endif
+
+// #if defined(X3270_DBCS) /*[*/
+//    { OptLocalEncoding,OPT_STRING,False,ResLocalEncoding,offset(local_encoding), NULL },
+//#endif /*]*/
     { OptModel,    OPT_STRING,  False, ResKeymap,    offset(model), N_( "Set terminal model (screen size)" ) },
-#if defined(C3270) && !defined(_WIN32) /*[*/
-    { OptMono,     OPT_BOOLEAN, True,  ResMono,      offset(mono), NULL },
+#if !defined(_WIN32) /*[*/
+    { OptMono,     OPT_BOOLEAN, True,  ResMono,      offset(mono), N_( "Forces monochrome display" ) },
 #endif /*]*/
-    { OptOnce,     OPT_BOOLEAN, True,  ResOnce,      offset(once), NULL },
+//    { OptOnce,     OPT_BOOLEAN, True,  ResOnce,      offset(once), NULL },
     { OptOversize, OPT_STRING,  False, ResOversize,  offset(oversize), NULL },
     { OptPort,     OPT_STRING,  False, ResPort,      offset(port), NULL },
 #if defined(C3270) && !defined(LIB3270) /*[*/
@@ -482,9 +483,9 @@ static const struct lib3270_option options[] =
 #if defined(S3270) /*[*/
     { OptScripted, OPT_NOP,     False, ResScripted,  NULL, NULL },
 #endif /*]*/
-#if defined(C3270) /*[*/
-    { OptSecure,   OPT_BOOLEAN, True,  ResSecure,    offset(secure), NULL },
-#endif /*]*/
+//#if defined(C3270) /*[*/
+//    { OptSecure,   OPT_BOOLEAN, True,  ResSecure,    offset(secure), NULL },
+//#endif /*]*/
     { OptSet,      OPT_SKIP2,   False, NULL,         NULL, NULL },
 #if defined(X3270_SCRIPT) /*[*/
     { OptSocket,   OPT_BOOLEAN, True,  ResSocket,    offset(socket), NULL },
@@ -641,7 +642,7 @@ static struct {
 	{ ResIdleTimeout,offset(idle_timeout),	XRM_STRING },
 #endif /*]*/
 #if defined(C3270) /*[*/
-	{ ResKeymap,	offset(key_map),	XRM_STRING },
+//	{ ResKeymap,	offset(key_map),	XRM_STRING },
 	{ ResMetaEscape,offset(meta_escape),	XRM_STRING },
 	{ ResCursesKeypad,offset(curses_keypad),XRM_BOOLEAN },
 	{ ResCbreak,	offset(cbreak_mode),	XRM_BOOLEAN },
@@ -670,7 +671,7 @@ static struct {
 	{ ResQuit,	offset(quit),		XRM_STRING },
 	{ ResRprnt,	offset(rprnt),		XRM_STRING },
 #endif /*]*/
-	{ ResSecure,	offset(secure),		XRM_BOOLEAN },
+//	{ ResSecure,	offset(secure),		XRM_BOOLEAN },
 	{ ResTermName,	offset(termname),	XRM_STRING },
 #if defined(WC3270) /*[*/
 	{ ResTitle,	offset(title),		XRM_STRING },

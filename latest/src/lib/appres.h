@@ -85,44 +85,44 @@ struct toggle {
 
 typedef struct {
 	/* Basic colors */
-#if defined(X3270_DISPLAY) /*[*/
-	Pixel	foreground;
-	Pixel	background;
-#endif /*]*/
+// #if defined(X3270_DISPLAY) /*[*/
+//	Pixel	foreground;
+//	Pixel	background;
+// #endif /*]*/
 
 	/* Options (not toggles) */
-#if defined(X3270_DISPLAY) || (defined(C3270) && !defined(_WIN32)) /*[*/
+#if !defined(_WIN32) /*[*/
 	char mono;
 #endif /*]*/
 	char extended;
 	char m3279;
 	char modified_sel;
-	char once;
-#if defined(X3270_DISPLAY) /*[*/
-	char visual_bell;
-	char menubar;
-	char active_icon;
-	char label_icon;
-	char invert_kpshift;
-	char use_cursor_color;
-	char allow_resize;
-	char no_other;
-	char do_confirms;
-#if !defined(G3270)
-	char reconnect;
-#endif
-	char visual_select;
-	char suppress_host;
-	char suppress_font_menu;
-# if defined(X3270_KEYPAD) /*[*/
-	char keypad_on;
-# endif /*]*/
-#endif /*]*/
-#if defined(C3270) /*[*/
+//	char once;
+//#if defined(X3270_DISPLAY) /*[*/
+//	char visual_bell;
+//	char menubar;
+//	char active_icon;
+//	char label_icon;
+//	char invert_kpshift;
+//	char use_cursor_color;
+//	char allow_resize;
+//	char no_other;
+//	char do_confirms;
+// #if !defined(G3270)
+//	char reconnect;
+// #endif
+//	char visual_select;
+//	char suppress_host;
+//	char suppress_font_menu;
+//# if defined(X3270_KEYPAD) /*[*/
+//	char keypad_on;
+//# endif /*]*/
+//#endif /*]*/
+//#if defined(C3270) /*[*/
 	char all_bold_on;
 	char curses_keypad;
 	char cbreak_mode;
-#endif /*]*/
+//#endif /*]*/
 	char apl_mode;
 	char scripted;
 	char numeric_lock;
@@ -147,7 +147,7 @@ typedef struct {
 	char	*keypad;
 #endif /*]*/
 #if defined(X3270_DISPLAY) || defined(C3270) /*[*/
-	char	*key_map;
+//	char	*key_map;
 	char	*compose_map;
 	char	*printer_lu;
 #endif /*]*/
