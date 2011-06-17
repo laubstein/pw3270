@@ -580,7 +580,7 @@ LIB3270_ACTION(break)
 		return 0;
 
 	Trace("%s",__FUNCTION__);
-	
+
 	net_break();
 
 	return 0;
@@ -2349,25 +2349,27 @@ LIB3270_CURSOR_ACTION( down )
 }
 
 
-/*
+/**
  * Cursor to first field on next line or any lines after that.
  */
-void
-Newline_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+LIB3270_CURSOR_ACTION( newline )
 {
 	register int	baddr, faddr;
 	register unsigned char	fa;
 
-	action_debug(Newline_action, event, params, num_params);
+//	action_debug(Newline_action, event, params, num_params);
 //	reset_idle_timer();
-	if (kybdlock) {
-		enq_ta(Newline_action, CN, CN);
-		return;
+	if (kybdlock)
+	{
+		ENQUEUE_ACTION(lib3270_cursor_newline);
+//		enq_ta(Newline_action, CN, CN);
+		return 0;
 	}
 #if defined(X3270_ANSI) /*[*/
-	if (IN_ANSI) {
+	if (IN_ANSI)
+	{
 		net_sendc('\n');
-		return;
+		return 0;
 	}
 #endif /*]*/
 	baddr = (cursor_addr + COLS) % (COLS * ROWS);	/* down */
@@ -2378,6 +2380,8 @@ Newline_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 		cursor_move(baddr);
 	else
 		cursor_move(next_unprotected(baddr));
+
+	return 0;
 }
 
 
@@ -3587,8 +3591,8 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 			    case '\n':
 				if (pasting) {
 					if (!skipped)
-						action_internal(Newline_action,
-								ia, CN, CN);
+						lib3270_cursor_newline();
+//						action_internal(Newline_action,ia, CN, CN);
 					skipped = False;
 				} else {
 					lib3270_enter();
@@ -3690,11 +3694,14 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 			    case 'p':
 				state = BACKP;
 				break;
+
 			    case 'r':
-				action_internal(Newline_action, ia, CN, CN);
-				skipped = False;
-				state = BASE;
-				break;
+					lib3270_cursor_newline();
+//					action_internal(Newline_action, ia, CN, CN);
+					skipped = False;
+					state = BASE;
+					break;
+
 			    case 't':
 			    lib3270_tab();
 				skipped = False;
