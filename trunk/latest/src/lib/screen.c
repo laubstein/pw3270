@@ -85,7 +85,7 @@ int lib3270_event_counter[COUNTER_ID_USER] = { 0, 0, 0 };
 Boolean screen_has_changes = 0;
 
 enum ts { TS_AUTO, TS_ON, TS_OFF };
-enum ts ab_mode = TS_AUTO;
+// enum ts ab_mode = TS_AUTO;
 
 // int windows_cp = 0;
 
@@ -93,7 +93,7 @@ static void status_connect(int ignored);
 static void status_3270_mode(int ignored);
 static void status_printer(int on);
 static int color_from_fa(unsigned char fa);
-static Boolean ts_value(const char *s, enum ts *tsp);
+// static Boolean ts_value(const char *s, enum ts *tsp);
 static void relabel(int ignored);
 
 void set_display_charset(char *dcs)
@@ -118,12 +118,13 @@ addch(int row, int col, int c, int attr)
 int screen_init(void)
 {
 
-	/* Disallow altscreen/defscreen. */
+	/* Disallow altscreen/defscreen. */ /*
 	if ((appres.altscreen != CN) || (appres.defscreen != CN))
 	{
 		popup_an_error("altscreen/defscreen not supported");
 		return -1;
 	}
+	*/
 
 	/* Initialize the console. */
 	if(callbacks && callbacks->init)
@@ -148,13 +149,12 @@ int screen_init(void)
 	register_schange(ST_3270_MODE, relabel);
 
 	/* See about all-bold behavior. */
-	if (appres.all_bold_on)
-		ab_mode = TS_ON;
-	else if (!ts_value(appres.all_bold, &ab_mode))
-		(void) fprintf(stderr, "invalid %s value: '%s', "
-		    "assuming 'auto'\n", ResAllBold, appres.all_bold);
-	if (ab_mode == TS_AUTO)
-		ab_mode = appres.m3279? TS_ON: TS_OFF;
+//	if (appres.all_bold_on)
+//		ab_mode = TS_ON;
+//	else if (!ts_value(appres.all_bold, &ab_mode))
+//		(void) fprintf(stderr, "invalid %s value: '%s', assuming 'auto'\n", ResAllBold, appres.all_bold);
+//	if (ab_mode == TS_AUTO)
+//		ab_mode = appres.m3279? TS_ON: TS_OFF;
 
 	/* Pull in the user's color mappings. */
 
@@ -182,7 +182,7 @@ int screen_init(void)
 /*
  * Parse a tri-state resource value.
  * Returns True for success, False for failure.
- */
+ */ /*
 static Boolean
 ts_value(const char *s, enum ts *tsp)
 {
@@ -200,7 +200,7 @@ ts_value(const char *s, enum ts *tsp)
 	}
 	return True;
 }
-
+*/
 
 /* Map a field attribute to its default colors. */
 static int
@@ -210,7 +210,7 @@ color_from_fa(unsigned char fa)
 		return get_color_pair(DEFCOLOR_MAP(fa),0) | COLOR_ATTR_FIELD;
 
 	// Green on black
-	return get_color_pair(0,0) | COLOR_ATTR_FIELD | (((ab_mode == TS_ON) || FA_IS_HIGH(fa)) ? COLOR_ATTR_INTENSIFY : 0);
+	return get_color_pair(0,0) | COLOR_ATTR_FIELD | ((FA_IS_HIGH(fa)) ? COLOR_ATTR_INTENSIFY : 0);
 }
 
 static int reverse_colors(int a)
@@ -295,7 +295,7 @@ calc_attrs(int baddr, int fa_addr, int fa)
 	}
 */
 
-	if(!appres.m3279 &&	((gr & GR_INTENSIFY) || (ab_mode == TS_ON) || FA_IS_HIGH(fa)))
+	if(!appres.m3279 &&	((gr & GR_INTENSIFY) || FA_IS_HIGH(fa)))
 		a |= COLOR_ATTR_INTENSIFY;
 
 	if (gr & GR_REVERSE)

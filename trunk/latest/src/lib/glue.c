@@ -213,10 +213,9 @@ H3270 * new_3270_session(void)
 #endif
 	}
 
-#if defined(C3270) && !defined(_WIN32)
 	if(appres.mono)
 		appres.m3279 = False;
-#endif
+
 	if(!appres.extended)
 		appres.oversize = CN;
 
@@ -289,9 +288,7 @@ static void initialize(void)
 	initialize_toggles();
 
 	/* Set the defaults. */
-#if defined(C3270) && !defined(_WIN32) /*[*/
 	appres.mono = False;
-#endif /*]*/
 	appres.extended = True;
 
 #if defined(C3270) /*[*/
@@ -304,7 +301,7 @@ static void initialize(void)
 	appres.apl_mode = False;
 
 #if defined(C3270) || defined(TCL3270) /*[*/
-	appres.scripted = False;
+//	appres.scripted = False;
 #else /*][*/
 	appres.scripted = True;
 #endif /*]*/
@@ -358,8 +355,8 @@ static void initialize(void)
 
 #if defined(C3270) /*[*/
 	appres.meta_escape = "auto";
-	appres.curses_keypad = True;
-	appres.cbreak_mode = False;
+//	appres.curses_keypad = True;
+//	appres.cbreak_mode = False;
 #endif /*]*/
 
 #if defined(X3270_ANSI) /*[*/
@@ -440,24 +437,20 @@ int lib3270_unloaded(void)
 static const struct lib3270_option options[] =
 {
 	// TODO (perry#5#): Add option descriptions.
-#if defined(C3270) /*[*/
-    { OptAllBold,  OPT_BOOLEAN, True,  ResAllBold,   offset(all_bold_on), NULL },
-#endif /*]*/
-#if defined(C3270) /*[*/
-    { OptAltScreen,OPT_STRING,  False, ResAltScreen, offset(altscreen), NULL },
-#endif /*]*/
+//#if defined(C3270) /*[*/
+//    { OptAllBold,  OPT_BOOLEAN, True,  ResAllBold,   offset(all_bold_on), NULL },
+//    { OptAltScreen,OPT_STRING,  False, ResAltScreen, offset(altscreen), NULL },
+//#endif /*]*/
     { OptAplMode,  OPT_BOOLEAN, True,  ResAplMode,   offset(apl_mode), NULL },
 #if defined(C3270) /*[*/
-    { OptCbreak,   OPT_BOOLEAN, True,  ResCbreak,    offset(cbreak_mode), NULL },
+//    { OptCbreak,   OPT_BOOLEAN, True,  ResCbreak,    offset(cbreak_mode), NULL },
 #endif /*]*/
 #if defined(HAVE_LIBSSL) /*[*/
     { OptCertFile, OPT_STRING,  False, ResCertFile,  offset(cert_file), NULL },
 #endif /*]*/
     { OptCharset,  OPT_STRING,  False, ResCharset,   offset(charset), NULL },
     { OptClear,    OPT_SKIP2,   False, NULL,         NULL, NULL },
-#if defined(C3270) /*[*/
-    { OptDefScreen,OPT_STRING,  False, ResDefScreen, offset(defscreen), NULL },
-#endif /*]*/
+//    { OptDefScreen,OPT_STRING,  False, ResDefScreen, offset(defscreen), NULL },
 #if defined(X3270_TRACE) /*[*/
     { OptDsTrace,  OPT_BOOLEAN, True,  ResDsTrace,   toggle_offset(DS_TRACE), NULL },
 #endif /*]*/
@@ -597,10 +590,8 @@ static struct {
 	void *address;
 	enum resource_type { XRM_STRING, XRM_BOOLEAN, XRM_INT } type;
 } resources[] = {
-#if defined(C3270) /*[*/
 	{ ResAllBold,	offset(all_bold),	XRM_STRING },
-	{ ResAltScreen,	offset(altscreen),	XRM_STRING },
-#endif /*]*/
+//	{ ResAltScreen,	offset(altscreen),	XRM_STRING },
 	{ ResBsdTm,	offset(bsd_tm),		XRM_BOOLEAN },
 #if defined(HAVE_LIBSSL) /*[*/
 	{ ResCertFile,	offset(cert_file),	XRM_STRING },
@@ -608,9 +599,7 @@ static struct {
 	{ ResCharset,	offset(charset),	XRM_STRING },
 	{ ResColor8,	offset(color8),		XRM_BOOLEAN },
 	{ ResConfDir,	offset(conf_dir),	XRM_STRING },
-#if defined(C3270) /*[*/
-	{ ResDefScreen,	offset(defscreen),	XRM_STRING },
-#endif /*]*/
+//	{ ResDefScreen,	offset(defscreen),	XRM_STRING },
 #if defined(X3270_ANSI) /*[*/
 	{ ResEof,	offset(eof),		XRM_STRING },
 	{ ResErase,	offset(erase),		XRM_STRING },
@@ -644,8 +633,8 @@ static struct {
 #if defined(C3270) /*[*/
 //	{ ResKeymap,	offset(key_map),	XRM_STRING },
 	{ ResMetaEscape,offset(meta_escape),	XRM_STRING },
-	{ ResCursesKeypad,offset(curses_keypad),XRM_BOOLEAN },
-	{ ResCbreak,	offset(cbreak_mode),	XRM_BOOLEAN },
+//	{ ResCursesKeypad,offset(curses_keypad),XRM_BOOLEAN },
+//	{ ResCbreak,	offset(cbreak_mode),	XRM_BOOLEAN },
 #endif /*]*/
 #if defined(X3270_ANSI) /*[*/
 	{ ResKill,	offset(kill),		XRM_STRING },

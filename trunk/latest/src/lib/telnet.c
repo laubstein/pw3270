@@ -297,13 +297,13 @@ static const char *trsp_flag[2] = { "POSITIVE-RESPONSE", "NEGATIVE-RESPONSE" };
 #endif /*]*/
 #endif /*]*/
 
-#if defined(C3270) && defined(C3270_80_132) /*[*/
-#define XMIT_ROWS	((appres.altscreen != CN)? 24: maxROWS)
-#define XMIT_COLS	((appres.altscreen != CN)? 80: maxCOLS)
-#else /*][*/
+// #if defined(C3270) && defined(C3270_80_132) /*[*/
+// #define XMIT_ROWS	((appres.altscreen != CN)? 24: maxROWS)
+// #define XMIT_COLS	((appres.altscreen != CN)? 80: maxCOLS)
+// #else /*][*/
 #define XMIT_ROWS	maxROWS
 #define XMIT_COLS	maxCOLS
-#endif /*]*/
+// #endif /*]*/
 
 #if defined(HAVE_LIBSSL) /*[*/
 static SSL_CTX *ssl_ctx;
@@ -1130,8 +1130,7 @@ send_naws(void)
 	(void) sprintf(naws_msg + naws_len, "%c%c", IAC, SE);
 	naws_len += 2;
 	net_rawout((unsigned char *)naws_msg, naws_len);
-	trace_dsn("SENT %s NAWS %d %d %s\n", cmd(SB), XMIT_COLS,
-	    XMIT_ROWS, cmd(SE));
+	trace_dsn("SENT %s NAWS %d %d %s\n", cmd(SB), XMIT_COLS, XMIT_ROWS, cmd(SE));
 }
 
 

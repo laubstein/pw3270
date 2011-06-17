@@ -91,9 +91,7 @@ typedef struct {
 // #endif /*]*/
 
 	/* Options (not toggles) */
-#if !defined(_WIN32) /*[*/
 	char mono;
-#endif /*]*/
 	char extended;
 	char m3279;
 	char modified_sel;
@@ -119,12 +117,12 @@ typedef struct {
 //# endif /*]*/
 //#endif /*]*/
 //#if defined(C3270) /*[*/
-	char all_bold_on;
-	char curses_keypad;
-	char cbreak_mode;
+//	char all_bold_on;
+//	char curses_keypad;
+//	char cbreak_mode;
 //#endif /*]*/
 	char apl_mode;
-	char scripted;
+//	char scripted;
 	char numeric_lock;
 	char secure;
 	char oerr_lock;
@@ -181,8 +179,8 @@ typedef struct {
 #if defined(C3270) /*[*/
 	char	*meta_escape;
 	char	*all_bold;
-	char	*altscreen;
-	char	*defscreen;
+//	char	*altscreen;
+//	char	*defscreen;
 #endif /*]*/
 	char	*conf_dir;
 	char	*model;
