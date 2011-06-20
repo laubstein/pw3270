@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: pw3270 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-01-18 17:12-0200\n"
-"PO-Revision-Date: 2011-04-01 15:30-0300\n"
+"PO-Revision-Date: 2011-06-20 18:58-0300\n"
 "Last-Translator: Perry Werneck <perry.werneck@gmail.com>\n"
 "Language-Team: Portuguese/Brazil <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,7 @@ msgstr "Biblioteca 3270 falhou ao iniciar"
 msgid "3270 options"
 msgstr "Opções do 3270"
 
-#: src/lib/telnet.c:3303
+#: src/lib/telnet.c:3302
 #, c-format
 msgid ""
 "<b>Connection state:</b> %s\n"
@@ -189,7 +189,7 @@ msgstr "Não foi possível converter o texto de %s para %s"
 msgid "Can't copy non rectangular area"
 msgstr "Não é possível copiar áreas não retangulares"
 
-#: src/gtk2/print.c:333 src/gtk2/script.c:422 src/gtk2/script.c:433
+#: src/gtk2/print.c:334 src/gtk2/script.c:422 src/gtk2/script.c:433
 #, c-format
 msgid ""
 "Can't create temporary file:\n"
@@ -300,7 +300,7 @@ msgstr "Não foi possível parar script"
 msgid "Cancelled by user"
 msgstr "Cancelado pelo usuário"
 
-#: src/lib/glue.c:251
+#: src/lib/glue.c:250
 #, c-format
 msgid "Cannot find charset \"%s\", using defaults"
 msgstr "Não encontrei codificação para \"%s\", usando padrão"
@@ -425,7 +425,7 @@ msgstr "Esquema de cores padrão 1"
 msgid "Dump screen contents"
 msgstr "Salvar captura de tela"
 
-#: src/lib/telnet.c:1238
+#: src/lib/telnet.c:1237
 msgid "EOR received when not in 3270 mode, ignored."
 msgstr "\"EOR\" recebido fora do modo 3270, ignorado"
 
@@ -500,7 +500,7 @@ msgstr "Erro salvando %s\n"
 msgid "Error saving file"
 msgstr "Erro ao gravar arquivo"
 
-#: src/gtk2/print.c:362
+#: src/gtk2/print.c:363
 #, c-format
 msgid ""
 "Error spawning %s\n"
@@ -544,9 +544,13 @@ msgstr "Fixo"
 msgid "Fixed path and filename for load/save the configuration data"
 msgstr "Caminho e nome do arquivo para ler/gravar dados de configuração"
 
-#: src/gtk2/print.c:214
+#: src/gtk2/print.c:215
 msgid "Font"
 msgstr "Fonte"
+
+#: src/lib/glue.c:467
+msgid "Forces monochrome display"
+msgstr "Força tela monocromática"
 
 #: src/gtk2/colors.c:368 src/gtk2/colors.c:376
 msgid "Foreground"
@@ -949,7 +953,7 @@ msgstr "Janela principal foi destruida"
 msgid "Progress"
 msgstr "Progresso"
 
-#: src/lib/glue.c:481
+#: src/lib/glue.c:475
 msgid "Proxy server (type:host[:port])"
 msgstr "Servidor proxy (tipo:host[:porta])"
 
@@ -1027,7 +1031,7 @@ msgstr "Executa scripts ao iniciar (Exemplo: script1(arg1,arg2);script2(arg))"
 msgid "Running transfer"
 msgstr "Transferindo"
 
-#: src/lib/telnet.c:3301
+#: src/lib/telnet.c:3300
 msgid "SSL Connect error"
 msgstr "Erro na conexão SSL"
 
@@ -1144,7 +1148,7 @@ msgstr "Separador"
 msgid "Set hostname"
 msgstr "Mudar servidor"
 
-#: src/lib/glue.c:471
+#: src/lib/glue.c:465
 msgid "Set terminal model (screen size)"
 msgstr "Define o modelo do terminal (tamanho da tela)"
 
@@ -1172,7 +1176,7 @@ msgstr "Colar inteligente"
 msgid "Socket read error"
 msgstr "Erro ao receber dados"
 
-#: src/lib/telnet.c:2021
+#: src/lib/telnet.c:2020
 msgid "Socket write error"
 msgstr "Erro ao enviar dados"
 
@@ -1180,11 +1184,7 @@ msgstr "Erro ao enviar dados"
 msgid "Space allocation units"
 msgstr "Unidade de alocação de espaço"
 
-#: src/lib/glue.c:466
-msgid "Specifies a keymap name and optional modifiers."
-msgstr ""
-
-#: src/lib/glue.c:493
+#: src/lib/glue.c:487
 msgid ""
 "Specifies the terminal name to be transmitted over the telnet connection."
 msgstr "Especifica o nome do terminal a ser transmitido na conexão telnet"
@@ -1337,7 +1337,7 @@ msgid "Undefined"
 msgstr "Indefinido"
 
 #: src/gtk2/clipboard.c:87 src/gtk2/clipboard.c:214 src/gtk2/clipboard.c:257
-#: src/gtk2/print.c:333 src/gtk2/print.c:362 src/gtk2/script.c:422
+#: src/gtk2/print.c:334 src/gtk2/print.c:363 src/gtk2/script.c:422
 #: src/gtk2/script.c:433 src/gtk2/action_calls.c:206
 #: src/gtk2/action_calls.c:347 src/gtk2/action_calls.c:409
 #: src/gtk2/action_calls.c:455 src/plugins/rexx/plg_start.c:159
@@ -1357,12 +1357,12 @@ msgstr ""
 msgid "Unknown FT control code from host"
 msgstr "Recebi código FT desconhecido"
 
-#: src/lib/kybd.c:3396
+#: src/lib/kybd.c:3414
 #, c-format
 msgid "Unknown PA key %d"
 msgstr "Tecla desconhecida: PA%02d"
 
-#: src/lib/kybd.c:3408
+#: src/lib/kybd.c:3426
 #, c-format
 msgid "Unknown PF key %d"
 msgstr "Tecla desconhecida: PF%02d"
@@ -1412,47 +1412,47 @@ msgid ""
 msgstr "Gravação no arquivo de trace falhou\n"
 "%s"
 
-#: src/gtk2/oia.c:836 src/gtk2/oia.c:864
+#: src/gtk2/oia.c:838 src/gtk2/oia.c:866
 msgid "X"
 msgstr ""
 
-#: src/gtk2/oia.c:840
+#: src/gtk2/oia.c:842
 msgid "X -f"
 msgstr ""
 
-#: src/gtk2/oia.c:872
+#: src/gtk2/oia.c:874
 msgid "X Connecting"
 msgstr "X Conectando"
 
-#: src/gtk2/oia.c:856
+#: src/gtk2/oia.c:858
 msgid "X Inhibit"
 msgstr "X Inibido"
 
-#: src/gtk2/oia.c:832
+#: src/gtk2/oia.c:834
 msgid "X Not Connected"
 msgstr "X Não conectado"
 
-#: src/gtk2/oia.c:848
+#: src/gtk2/oia.c:850
 msgid "X Numeric"
 msgstr "X Numérico"
 
-#: src/gtk2/oia.c:852
+#: src/gtk2/oia.c:854
 msgid "X Overflow"
 msgstr "X Estouro"
 
-#: src/gtk2/oia.c:844
+#: src/gtk2/oia.c:846
 msgid "X Protected"
 msgstr "X Protegido"
 
-#: src/gtk2/oia.c:868
+#: src/gtk2/oia.c:870
 msgid "X Resolving"
 msgstr "X Resolvendo"
 
-#: src/gtk2/oia.c:820
+#: src/gtk2/oia.c:822
 msgid "X System"
 msgstr "X Sistema"
 
-#: src/gtk2/oia.c:824
+#: src/gtk2/oia.c:826
 msgid "X Wait"
 msgstr "X Aguarde"
 
@@ -1488,7 +1488,7 @@ msgstr "_Opções"
 msgid "_View"
 msgstr "Exibir"
 
-#: src/lib/telnet.c:3176 src/lib/telnet.c:3184
+#: src/lib/telnet.c:3175 src/lib/telnet.c:3183
 #, c-format
 msgid "fcntl(%s)"
 msgstr ""
@@ -1497,7 +1497,7 @@ msgstr ""
 msgid "ftDftUknownOpen"
 msgstr ""
 
-#: src/lib/telnet.c:3169
+#: src/lib/telnet.c:3168
 #, c-format
 msgid "ioctl(%s)"
 msgstr ""
