@@ -134,7 +134,7 @@
  int					  left_margin										= 0;
  int					  top_margin										= 0;
 
- ELEMENT				* screen											= NULL;
+ struct _screen		* screen											= NULL;
  char					* charset											= NULL;
  char					* window_title										= PROGRAM_NAME;
 
@@ -320,7 +320,7 @@
 		in.fg |= COLOR_ATTR_UNDERLINE;
 
 	// Get element entry in the buffer, update ONLY if changed
- 	el = screen + baddr;
+ 	el = screen->content + baddr;
 
 	in.status = el->status;
 
@@ -354,10 +354,10 @@
 
 		for(f=0;f<terminal_buffer_length;f++)
 		{
-			status				= screen[f].status & ~ELEMENT_STATUS_FIELD_MARKER;
+			status				= screen->content[f].status & ~ELEMENT_STATUS_FIELD_MARKER;
 			memset(screen+f,0,sizeof(ELEMENT));
-			screen[f].ch[0]		= ' ';
-			screen[f].status	= status;
+			screen->content[f].ch[0]		= ' ';
+			screen->content[f].status	= status;
 		}
 	}
 
@@ -563,14 +563,14 @@
 		*line = 0;
 		for(col = 0; col < terminal_cols;col++)
 		{
-			if(all || (screen[pos].status & ELEMENT_STATUS_SELECTED))
+			if(all || (screen->content[pos].status & ELEMENT_STATUS_SELECTED))
 			{
 				if(!*line)
 				{
 					if(*str->str)
 						g_string_append_c(str,'\n');
 				}
-				g_strlcat(line,*screen[pos].ch ? screen[pos].ch : " ",max);
+				g_strlcat(line,*screen->content[pos].ch ? screen->content[pos].ch : " ",max);
 			}
 			pos++;
 		}
@@ -778,7 +778,7 @@
 
 			for(col = 0;col < terminal_cols;col++)
 			{
-				if(screen[baddr].changed)
+				if(screen->content[baddr].changed)
 				{
 					if(bstart < 0)
 					{
@@ -786,7 +786,7 @@
 						cstart = col;
 					}
 					bend = baddr;
-					screen[baddr].changed = FALSE;
+					screen->content[baddr].changed = FALSE;
 
 					if(baddr == cursor_position)
 						update_cursor_pixmap();
@@ -901,20 +901,13 @@
  {
 
  	// Check for screen buffer change
- 	if(rows != terminal_rows || cols != terminal_cols)
- 	{
+ 	if(screen)
 		g_free(screen);
-		screen = NULL;
 
-		if(rows && cols)
-		{
-			terminal_buffer_length = rows*cols;
-			screen = g_new0(ELEMENT,terminal_buffer_length);
-			terminal_rows = rows;
-			terminal_cols = cols;
-
-		}
- 	}
+	terminal_buffer_length = rows*cols;
+	screen = g_malloc0(sizeof(struct _screen) + (sizeof(ELEMENT)*terminal_buffer_length));
+	terminal_rows = rows;
+	terminal_cols = cols;
 
 	// Update menu toggle (if available)
 	model -= 2;

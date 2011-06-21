@@ -140,15 +140,15 @@
 		short	fg;
 		short 	bg;
 
-		if(screen[addr].status & ELEMENT_STATUS_SELECTED)
+		if(screen->content[addr].status & ELEMENT_STATUS_SELECTED)
 		{
 			fg = TERMINAL_COLOR_SELECTED_FG;
 			bg = TERMINAL_COLOR_SELECTED_BG;
 		}
 		else
 		{
-			fg = (screen[addr].fg & 0xFF);
-			bg = (screen[addr].bg & 0xFF);
+			fg = (screen->content[addr].fg & 0xFF);
+			bg = (screen->content[addr].bg & 0xFF);
 		}
 
 		cairo_set_3270_color(cr,bg);
@@ -158,7 +158,7 @@
 		cairo_set_3270_color(cr,fg);
 	}
 
-	if(TOGGLED_UNDERLINE && (screen[addr].fg & COLOR_ATTR_UNDERLINE))
+	if(TOGGLED_UNDERLINE && (screen->content[addr].fg & COLOR_ATTR_UNDERLINE))
 	{
 		// Draw underline
 		int sl = (fontDescent/3);
@@ -168,41 +168,41 @@
 		cairo_fill(cr);
 	}
 
-	if(screen[addr].cg)
+	if(screen->content[addr].cg)
 	{
 		// Graphics char
-		draw_cg(cr, screen[addr].cg, x, y,font->width, font->height);
+		draw_cg(cr, screen->content[addr].cg, x, y,font->width, font->height);
 	}
-	else if(*screen[addr].ch != ' ' && *screen[addr].ch)
+	else if(*screen->content[addr].ch != ' ' && *screen->content[addr].ch)
 	{
 		// Text char
 		cairo_move_to(cr,x,baseline);
-		cairo_show_text(cr,screen[addr].ch);
+		cairo_show_text(cr,screen->content[addr].ch);
 	}
 
-	if(screen[addr].status & ELEMENT_STATUS_SELECTED)
+	if(screen->content[addr].status & ELEMENT_STATUS_SELECTED)
 	{
 		cairo_set_3270_color(cr,TERMINAL_COLOR_SELECTED_BORDER);
 
-		if(screen[addr].status & SELECTION_BOX_TOP)
+		if(screen->content[addr].status & SELECTION_BOX_TOP)
 		{
 			cairo_rectangle(cr, x, y, font->width, 1);
 			cairo_fill(cr);
 		}
 
-		if(screen[addr].status & SELECTION_BOX_BOTTOM)
+		if(screen->content[addr].status & SELECTION_BOX_BOTTOM)
 		{
 			cairo_rectangle(cr, x, y+(font->spacing-1), font->width, 1);
 			cairo_fill(cr);
 		}
 
-		if(screen[addr].status & SELECTION_BOX_LEFT)
+		if(screen->content[addr].status & SELECTION_BOX_LEFT)
 		{
 			cairo_rectangle(cr, x, y, 1, font->spacing);
 			cairo_fill(cr);
 		}
 
-		if(screen[addr].status & SELECTION_BOX_RIGHT)
+		if(screen->content[addr].status & SELECTION_BOX_RIGHT)
 		{
 			cairo_rectangle(cr, x+(font->width-1), y, 1, font->spacing);
 			cairo_fill(cr);

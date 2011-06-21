@@ -103,7 +103,10 @@
 
 	} ELEMENT;
 
-	LOCAL_EXTERN ELEMENT *screen;
+	LOCAL_EXTERN struct _screen
+	{
+		ELEMENT content[1];
+	} *screen;
 
     enum GUI_TOGGLE
     {

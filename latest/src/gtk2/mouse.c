@@ -152,7 +152,7 @@
  {
  	int ret = 0;
 
-	if( !(*screen[baddr+1].ch == 'F' && FA_IS_PROTECTED(get_field_attribute(baddr))) )
+	if( !(*screen->content[baddr+1].ch == 'F' && FA_IS_PROTECTED(get_field_attribute(baddr))) )
 		return ret;
 
 	baddr++;
@@ -160,10 +160,10 @@
 	{
 		baddr++;
 
-		if(*screen[baddr].ch > '9' || *screen[baddr].ch < '0')
+		if(*screen->content[baddr].ch > '9' || *screen->content[baddr].ch < '0')
 			return 0;
 
-		ret = (ret*10)+(*screen[baddr].ch - '0');
+		ret = (ret*10)+(*screen->content[baddr].ch - '0');
 	}
 
 	Trace("%s: %d",__FUNCTION__,ret);
@@ -179,7 +179,7 @@
 		int length;
 		int sz = terminal_rows * terminal_cols;
 
-		if(g_ascii_isspace(*screen[start].ch))
+		if(g_ascii_isspace(*screen->content[start].ch))
 		{
 			action_selectfield(0);
 			return;
@@ -187,10 +187,10 @@
 
 		SetSelection(FALSE);
 
-		while(start > 0 && !g_ascii_isspace(*screen[start].ch))
+		while(start > 0 && !g_ascii_isspace(*screen->content[start].ch))
 			start--;
 
-		while(end < sz && !g_ascii_isspace(*screen[end].ch))
+		while(end < sz && !g_ascii_isspace(*screen->content[end].ch))
 			end++;
 
 		length = end-start;
@@ -262,16 +262,16 @@
 
 	for(pos = 0; pos < (terminal_rows * terminal_cols);pos++)
 	{
-		status = screen[pos].status & ELEMENT_STATUS_FIELD_MASK;
+		status = screen->content[pos].status & ELEMENT_STATUS_FIELD_MASK;
 		if(selected)
 			status |= ELEMENT_STATUS_SELECTED;
 
-		if(screen[pos].status != status)
+		if(screen->content[pos].status != status)
 		{
 			if(start < 0)
 				start = pos;
 			end = pos;
-			screen[pos].status = status;
+			screen->content[pos].status = status;
 		}
 	}
 
@@ -282,8 +282,8 @@
 		int last  = (terminal_rows-1)*terminal_cols;
 		for(pos = 0;pos < terminal_cols;pos++)
 		{
-			screen[first++].status |= SELECTION_BOX_TOP;
-			screen[last++].status |= SELECTION_BOX_BOTTOM;
+			screen->content[first++].status |= SELECTION_BOX_TOP;
+			screen->content[last++].status |= SELECTION_BOX_BOTTOM;
 		}
 
 		first = 0;
@@ -291,8 +291,8 @@
 
 		for(pos = 0;pos < terminal_rows;pos++)
 		{
-			screen[first].status |= SELECTION_BOX_LEFT;
-			screen[last].status |= SELECTION_BOX_RIGHT;
+			screen->content[first].status |= SELECTION_BOX_LEFT;
+			screen->content[last].status |= SELECTION_BOX_RIGHT;
 			first += terminal_cols;
 			last += terminal_cols;
 		}
@@ -372,7 +372,7 @@
 				{
 					unselect();
 				}
-				else if(screen[(r*terminal_cols)+c].status & ELEMENT_STATUS_SELECTED)
+				else if(screen->content[(r*terminal_cols)+c].status & ELEMENT_STATUS_SELECTED)
 				{
 					SetSelectionMode(SELECT_MODE_FIELD);
 				}
@@ -558,7 +558,7 @@
 
 		for(col = 0; col < terminal_cols;col++)
 		{
-			unsigned char status = screen[pos].status & ELEMENT_STATUS_FIELD_MASK;
+			unsigned char status = screen->content[pos].status & ELEMENT_STATUS_FIELD_MASK;
 
 			if(col >= left && col <= right && row >= top && row <= bottom)
 			{
@@ -578,9 +578,9 @@
 
 			}
 
-			if(screen[pos].status != status)
+			if(screen->content[pos].status != status)
 			{
-				screen[pos].status = status;
+				screen->content[pos].status = status;
 
 				if(saddr < 0)
 				{
@@ -634,16 +634,16 @@
 
 		for(col = 0; col < terminal_cols;col++)
 		{
-			unsigned char status = screen[pos].status & ELEMENT_STATUS_FIELD_MASK;
+			unsigned char status = screen->content[pos].status & ELEMENT_STATUS_FIELD_MASK;
 
 			if (pos >= bstart && pos <= bend)
 			{
 				status |= ELEMENT_STATUS_SELECTED;
 
-				if(!(row && (screen[pos-terminal_cols].status) & ELEMENT_STATUS_SELECTED))
+				if(!(row && (screen->content[pos-terminal_cols].status) & ELEMENT_STATUS_SELECTED))
 					status |= SELECTION_BOX_TOP;
 
-				if(!(pos && col && (screen[pos-1].status) & ELEMENT_STATUS_SELECTED))
+				if(!(pos && col && (screen->content[pos-1].status) & ELEMENT_STATUS_SELECTED))
 					status |= SELECTION_BOX_LEFT;
 
 				if(pos+1 > bend || col == (terminal_cols-1))
@@ -653,9 +653,9 @@
 					status |= SELECTION_BOX_BOTTOM;
 			}
 
-			if(screen[pos].status != status)
+			if(screen->content[pos].status != status)
 			{
-				screen[pos].status = status;
+				screen->content[pos].status = status;
 				if(saddr < 0)
 					saddr = pos;
 				eaddr = pos;
