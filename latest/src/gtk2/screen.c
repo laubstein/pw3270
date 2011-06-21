@@ -129,8 +129,6 @@
 
  };
 
- int 					  terminal_rows										= 0;
- int 					  terminal_cols										= 0;
  int					  left_margin										= 0;
  int					  top_margin										= 0;
 
@@ -139,7 +137,6 @@
  char					* window_title										= PROGRAM_NAME;
 
  gboolean				  screen_updates_enabled							= FALSE;
- int					  terminal_buffer_length							= 0;
 
  static const gchar	* screen_size_text[]								= { "80x24", "80x32", "80x43", "132x27" };
  static GtkWidget		* screen_size_menu[G_N_ELEMENTS(screen_size_text)]	= { 0 };
@@ -279,12 +276,12 @@
 
  	ELEMENT in;
  	ELEMENT *el;
- 	int		baddr = (row*terminal_cols)+col;
+ 	int		baddr = (row*screen->cols)+col;
 
- 	if(!screen || col >= terminal_cols || row >= terminal_rows)
+ 	if(!screen || baddr > screen->length)
 		return EINVAL;
 
-	if(baddr > terminal_buffer_length)
+	if(baddr > screen->length)
 		return EFAULT;
 
 	memset(&in,0,sizeof(in));
@@ -352,11 +349,11 @@
 	{
 		unsigned char status;
 
-		for(f=0;f<terminal_buffer_length;f++)
+		for(f=0;f<screen->length;f++)
 		{
-			status				= screen->content[f].status & ~ELEMENT_STATUS_FIELD_MARKER;
-			memset(screen+f,0,sizeof(ELEMENT));
-			screen->content[f].ch[0]		= ' ';
+			status = screen->content[f].status & ~ELEMENT_STATUS_FIELD_MARKER;
+			memset(screen->content+f,0,sizeof(ELEMENT));
+			screen->content[f].ch[0]	= ' ';
 			screen->content[f].status	= status;
 		}
 	}
@@ -366,8 +363,8 @@
 
 		if(screen_updates_enabled)
 		{
-			int 	width  = terminal_cols * fontWidth;
-			int 	height = terminal_rows * terminal_font_info.spacing;
+			int 	width  = screen->cols * fontWidth;
+			int 	height = screen->rows * terminal_font_info.spacing;
 			cairo_t *cr	= get_terminal_cairo_context();
 
 			gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_BACKGROUND);
@@ -551,17 +548,24 @@
 
  gchar * GetScreenContents(gboolean all)
  {
- 	gsize	max = terminal_rows*terminal_cols*MAX_CHR_LENGTH;
- 	GString	*str = g_string_sized_new(max);
+ 	gsize	max;
+ 	GString	*str;
  	int		row,col;
  	int		pos	= 0;
 
-	for(row = 0; row < terminal_rows;row++)
+ 	if(!screen)
+		return NULL;
+
+	max = screen->rows*screen->cols*MAX_CHR_LENGTH;
+
+ 	str = g_string_sized_new(max);
+
+	for(row = 0; row < screen->rows;row++)
 	{
 		gchar		line[max];
 
 		*line = 0;
-		for(col = 0; col < terminal_cols;col++)
+		for(col = 0; col < screen->cols;col++)
 		{
 			if(all || (screen->content[pos].status & ELEMENT_STATUS_SELECTED))
 			{
@@ -767,7 +771,7 @@
 		int		col;
 		cairo_t *cr	= get_terminal_cairo_context();
 
-		for(row = 0; row < terminal_rows; row++)
+		for(row = 0; row < screen->rows; row++)
 		{
 			int		cstart	= -1;
 			int 	bstart	= -1;
@@ -776,7 +780,7 @@
 //			int 	y 		= top_margin+(row * terminal_font_info.spacing);
 //#endif
 
-			for(col = 0;col < terminal_cols;col++)
+			for(col = 0;col < screen->cols;col++)
 			{
 				if(screen->content[baddr].changed)
 				{
@@ -805,8 +809,8 @@
 //													__FUNCTION__,
 //													bstart,
 //													bend,
-//													bstart%terminal_cols,bstart/terminal_cols,
-//													bend%terminal_cols,bend/terminal_cols,
+//													bstart%screen->cols,bstart/screen->cols,
+//													bend%screen->cols,bend/screen->cols,
 //													row,(row*terminal_font_info.spacing)+top_margin);
 //							Trace("Rect: %d,%d->%d,%d",r.x,r.y,r.width,r.height);
 //							Trace("Area: %d,%d->%d,%d",left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
@@ -899,15 +903,19 @@
 
  static void model_changed(H3270 *session, const char *name, int model, int cols, int rows)
  {
+	int length = rows*cols;
 
  	// Check for screen buffer change
  	if(screen)
 		g_free(screen);
 
-	terminal_buffer_length = rows*cols;
-	screen = g_malloc0(sizeof(struct _screen) + (sizeof(ELEMENT)*terminal_buffer_length));
-	terminal_rows = rows;
-	terminal_cols = cols;
+	screen = g_malloc0(sizeof(struct _screen) + (sizeof(ELEMENT)*length));
+	screen->length	= length;
+	screen->rows	= rows;
+	screen->cols	= cols;
+
+	screen->rows = rows;
+	screen->cols = cols;
 
 	// Update menu toggle (if available)
 	model -= 2;

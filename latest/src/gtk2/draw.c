@@ -214,9 +214,9 @@
  void draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr, GdkRectangle *r)
  {
  	int addr;
- 	int col	= (bstart % terminal_cols);
+ 	int col	= (bstart % screen->cols);
  	int x	= left_margin + (col * fontWidth);
- 	int y	= top_margin  + ((bstart / terminal_cols) * terminal_font_info.spacing);
+ 	int y	= top_margin  + ((bstart / screen->cols) * terminal_font_info.spacing);
  	int baseline = y + terminal_font_info.ascent;
 
 	memset(r,0,sizeof(GdkRectangle));
@@ -226,7 +226,7 @@
 	for(addr = bstart; addr <= bend; addr++)
 	{
 		draw_element(cr,&terminal_font_info,x,y,baseline,addr,clr);
-		if(++col >= terminal_cols)
+		if(++col >= screen->cols)
 		{
 			col  = 0;
 			x    = left_margin;
@@ -277,7 +277,7 @@
 	cairo_rectangle(cr, 0, 0, width, height);
 	cairo_fill(cr);
 
-	draw_region(cr,0,(terminal_cols * terminal_rows)-1,color,&r);
+	draw_region(cr,0,(screen->cols * screen->rows)-1,color,&r);
 	draw_oia(cr,get_terminal_cached_gc());
 
 	cairo_destroy(cr);
@@ -304,7 +304,7 @@
 
 		update_font_info(cr, fontname, &terminal_font_info);
 
-		gtk_widget_set_size_request(terminal, terminal_cols*terminal_font_info.width, ((terminal_rows+2)*terminal_font_info.spacing));
+		gtk_widget_set_size_request(terminal, screen->cols*terminal_font_info.width, ((screen->rows+2)*terminal_font_info.spacing));
 
 		g_free(fontname);
 		cairo_destroy(cr);

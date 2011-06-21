@@ -105,7 +105,10 @@
 
 	LOCAL_EXTERN struct _screen
 	{
-		ELEMENT content[1];
+		int		length;			/**< Screen buffer length (row * cols) */
+		int		rows;			/**< Screen rows */
+		int		cols;			/**< Screen cols */
+		ELEMENT content[1];		/**< Screen contents */
 	} *screen;
 
     enum GUI_TOGGLE
@@ -225,7 +228,6 @@
 	LOCAL_EXTERN GdkColor			  color[TERMINAL_COLOR_COUNT+1];
 	LOCAL_EXTERN H3270				* hSession;
 	LOCAL_EXTERN GtkIMContext		* input_method;
-	LOCAL_EXTERN gint				  terminal_buffer_length;
 
 	// Pixmaps
 	LOCAL_EXTERN GdkPixmap			* pixmap_cursor;	/**< Pixmap with cursor image */
@@ -249,9 +251,6 @@
 #endif
 
 	LOCAL_EXTERN gint					  cMode;
-
-	LOCAL_EXTERN int 					  terminal_rows;
-	LOCAL_EXTERN int				 	  terminal_cols;
 
 	LOCAL_EXTERN int					  left_margin;
 	LOCAL_EXTERN int					  top_margin;

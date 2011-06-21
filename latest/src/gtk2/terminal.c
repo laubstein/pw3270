@@ -143,7 +143,7 @@
 			gdk_drawable_get_size(window,&width,&height);
 
 			gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_CROSS_HAIR);
-			cairo_rectangle(cr, rCursor.x, 0, 1, top_margin+2+(terminal_font_info.spacing*terminal_rows));
+			cairo_rectangle(cr, rCursor.x, 0, 1, top_margin+2+(terminal_font_info.spacing*screen->rows));
 			cairo_rectangle(cr, 0, rCursor.y+fontAscent, width,1);
 			cairo_fill(cr);
 		}
@@ -219,7 +219,7 @@
 
 	update_font_info(cr, fontname, &terminal_font_info);
 
-	gtk_widget_set_size_request(terminal, terminal_cols*terminal_font_info.width, ((terminal_rows+2)*terminal_font_info.height));
+	gtk_widget_set_size_request(terminal, screen->cols*terminal_font_info.width, ((screen->rows+2)*terminal_font_info.height));
 
 	g_free(fontname);
 	cairo_destroy(cr);

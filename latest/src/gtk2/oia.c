@@ -103,7 +103,7 @@
  static GdkPixmap * pixmap_oia[OIA_PIXMAP_COUNT] = { NULL, NULL};
 #endif // ENABLE_BM_PIXMAPS
 
- #define OIAROW	(top_margin+4+(terminal_font_info.spacing*terminal_rows))
+ #define OIAROW	(top_margin+4+(terminal_font_info.spacing*screen->rows))
 
  gboolean		  oia_flag[OIA_FLAG_USER];
  STATUS_CODE	  terminal_message_id = (STATUS_CODE) -1;
@@ -167,7 +167,7 @@
 		GdkGC *gc = get_terminal_cached_gc();
 		draw_oia(cr,gc);
 		cairo_destroy(cr);
-		gtk_widget_queue_draw_area(terminal,OIAROW,left_margin,terminal_cols*fontWidth,terminal_font_info.spacing+2);
+		gtk_widget_queue_draw_area(terminal,OIAROW,left_margin,screen->cols*fontWidth,terminal_font_info.spacing+2);
 	}
  }
 
@@ -175,7 +175,7 @@
  {
  	int	f;
  	int row   = OIAROW;
- 	int width = (terminal_cols * terminal_font_info.width);
+ 	int width = (screen->cols * terminal_font_info.width);
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
 	cairo_rectangle(cr, left_margin, row, width, terminal_font_info.height);
@@ -195,7 +195,7 @@
 
 	// http://cairographics.org/FAQ/#sharp_lines
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_SEPARATOR);
-	cairo_rectangle(cr, left_margin, row-2, (terminal_cols * fontWidth), 1);
+	cairo_rectangle(cr, left_margin, row-2, (screen->cols * fontWidth), 1);
 	cairo_fill(cr);
 
  }
@@ -210,7 +210,7 @@
 		memset(&rect,0,sizeof(rect));
 		rect.y = OIAROW;
 		rect.height = terminal_font_info.height;
-		rect.width = left_margin + (terminal_cols * fontWidth);
+		rect.width = left_margin + (screen->cols * fontWidth);
 
 		oia_call[el].update(cr,get_terminal_cached_gc(),&rect);
 
@@ -715,7 +715,7 @@
 		gchar *text;
 		cairo_text_extents_t s;
 
-		text = g_strdup_printf("%03d/%03d",(cursor_position/terminal_cols)+1,(cursor_position%terminal_cols)+1);
+		text = g_strdup_printf("%03d/%03d",(cursor_position/screen->cols)+1,(cursor_position%screen->cols)+1);
 
 		cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_CURSOR);
 		cairo_text_extents(cr,text,&s);
