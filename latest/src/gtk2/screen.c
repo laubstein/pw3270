@@ -73,7 +73,7 @@
  static void	  set_cursor(CURSOR_MODE mode);
  static void	  set_oia(OIA_FLAG id, int on);
  static void	  set_lu(const char *lu);
- static void	  changed(int bstart, int bend);
+// static void	  changed(int bstart, int bend);
  static void	  error(const char *fmt, va_list arg);
  static void 	  warning(const char *fmt, va_list arg);
  static void	  syserror(const char *title, const char *message, const char *system);
@@ -84,6 +84,10 @@
  static gchar	* convert_regular(int c, gsize *sz);
  static int	  popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, va_list arg);
  static void	  model_changed(H3270 *session, const char *name, int model, int cols, int rows);
+
+#ifdef HAVE_ALTSCREEN
+ static void view_changed(H3270 *session, int rows, int cols);
+#endif
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
@@ -103,7 +107,7 @@
 	addch,					// void (*addch)(int row, int col, int c, int attr);
 	set_charset,			// void (*charset)(char *dcs);
 	settitle,				// void (*title)(char *text);
-	changed,				// void (*changed)(int bstart, int bend);
+	NULL,					// void (*changed)(int bstart, int bend);
 	gdk_beep,				// void (*ring_bell)(void);
 	redraw,					// void (*redraw)(void);
 	update_cursor_position,	// void (*move_cursor)(int row, int col);
@@ -117,7 +121,11 @@
 
 	erase,					// void (*erase)(void);
 	display,				// void	(*display)(int bstart, int bend);
+#ifdef HAVE_ALTSCREEN
+	view_changed,			// 			void 	(*set_viewsize)(H3270 *session, int rows, int cols);
+#else
 	NULL,					// void (*set_viewsize)(int rows, int cols);
+#endif
 
 	update_toggle,			// void (*toggle_changed)(int ix, int value, int reason, const char *name);
 	oia_set_timer,			// void	(*show_timer)(long seconds);
@@ -152,9 +160,11 @@
 	action_redraw(0);
  }
 
+/*
  static void changed(int bstart, int bend)
  {
  }
+*/
 
  static int SetSuspended(int state)
  {
@@ -933,3 +943,20 @@
 		action_redraw(0);
 
  }
+
+#ifdef HAVE_ALTSCREEN
+ static void view_changed(H3270 *session, int rows, int cols)
+ {
+	if(!screen || rows > screen->rows || cols > screen->cols )
+		return;
+
+	Trace("View changed from %d x %d to %d x %d",view.rows,view.cols,rows,cols);
+
+	view.rows = rows;
+	view.cols = cols;
+
+	// Redraw
+	if(terminal && terminal->window)
+		action_redraw(0);
+ }
+#endif

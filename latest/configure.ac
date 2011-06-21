@@ -290,6 +290,16 @@ AC_ARG_ENABLE([statusbar],
 
 ], )
 
+AC_ARG_ENABLE([altscreen],
+	[AS_HELP_STRING([--enable-altscreen], [Enable alternate screen support])],
+[
+	pw3270_cv_altscreen="$enableval"
+
+],[
+	pw3270_cv_altscreen="no"
+])
+
+
 AC_ARG_WITH([macui],
 	[AS_HELP_STRING([--with-macui], [Use MAC OSX compatible UI manager ])],
 [
@@ -577,6 +587,10 @@ fi
 
 if test "$pw3270_cv_statusbar" == "yes"; then
 	AC_DEFINE([HAVE_GTK_STATUS_BAR])
+fi
+
+if test "$pw3270_cv_altscreen" == "yes"; then
+	AC_DEFINE([HAVE_ALTSCREEN])
 fi
 
 if test "$pw3270_cv_macui" == "yes"; then

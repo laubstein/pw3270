@@ -70,7 +70,7 @@
 
  	for(f=0;font_list[f].size;f++)
  	{
-		if( ((font_list[f].height*(screen->rows+1))+2) < height && (font_list[f].width*screen->cols) < width )
+		if( ((font_list[f].height*(view.rows+1))+2) < height && (font_list[f].width*view.cols) < width )
 			size = f;
  	}
 
