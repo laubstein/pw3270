@@ -118,14 +118,6 @@ addch(int row, int col, int c, int attr)
 int screen_init(void)
 {
 
-	/* Disallow altscreen/defscreen. */ /*
-	if ((appres.altscreen != CN) || (appres.defscreen != CN))
-	{
-		popup_an_error("altscreen/defscreen not supported");
-		return -1;
-	}
-	*/
-
 	/* Initialize the console. */
 	if(callbacks && callbacks->init)
 	{
@@ -135,9 +127,6 @@ int screen_init(void)
 			return -1;
 		}
 	}
-
-//	if(callbacks && callbacks->setsize)
-//		callbacks->setsize(maxROWS,maxCOLS);
 
 	/* Set up callbacks for state changes. */
 	register_schange(ST_CONNECT, status_connect);
@@ -604,14 +593,6 @@ LIB3270_EXPORT void status_changed(STATUS_CODE id)
 		callbacks->status(id);
 }
 
-/*
-void
-status_syswait(void)
-{
-	status_changed(STATUS_CODE_SYSWAIT);
-}
-*/
-
 LIB3270_EXPORT void status_twait(void)
 {
 	set(OIA_FLAG_UNDERA,False);
@@ -623,23 +604,26 @@ LIB3270_EXPORT void status_typeahead(int on)
 	set(OIA_FLAG_TYPEAHEAD,on);
 }
 
-/*
-LIB3270_EXPORT void status_compose(int on, unsigned char c, enum keytype keytype)
+void set_viewsize(H3270 *session, int rows, int cols)
 {
-	if(callbacks && callbacks->compose)
-		callbacks->compose(on,c,keytype);
-}
-*/
+	if(rows == ROWS && COLS == cols)
+		return;
 
-void
-status_lu(const char *lu)
+	ROWS = rows;
+	COLS = cols;
+
+	if(callbacks && callbacks->set_viewsize)
+		callbacks->set_viewsize(session,rows,cols);
+
+}
+
+void status_lu(const char *lu)
 {
 	if(callbacks && callbacks->lu)
 		callbacks->lu(lu);
 }
 
-static void
-status_connect(int connected)
+static void status_connect(int connected)
 {
 	STATUS_CODE id = STATUS_CODE_USER;
 

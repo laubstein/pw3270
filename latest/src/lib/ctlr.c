@@ -522,8 +522,7 @@ ctlr_erase(int alt)
 	if (alt) {
 		/* Going from 24x80 to maximum. */
 		screen_disp();
-		ROWS = maxROWS;
-		COLS = maxCOLS;
+		set_viewsize(&h3270,maxROWS,maxCOLS);
 	} else {
 		/* Going from maximum to 24x80. */
 		if (maxROWS > 24 || maxCOLS > 80) {
@@ -531,8 +530,7 @@ ctlr_erase(int alt)
 				ctlr_blanks();
 				screen_disp();
 			}
-			ROWS = 24;
-			COLS = 80;
+			set_viewsize(&h3270,24,80);
 		}
 	}
 
