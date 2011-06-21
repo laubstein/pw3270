@@ -342,6 +342,8 @@
 		*row = ((((unsigned long) y) - view.top)/terminal_font_info.spacing);
 	}
 
+//	Trace("%s x=%ld y=%ld r=%d c=%d",__FUNCTION__,x,y,*row,*col);
+
 	return rc;
  }
 
@@ -462,8 +464,8 @@
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 1: // Single click on button 1
 		Trace("Single click (button: %d)",event->button);
 		unselect();
-		if(row >= 0 && row <= screen->rows && col >= 0 && col <= screen->cols)
-			cursor_move((row*screen->cols)+col);
+		if(row >= 0 && row <= view.rows && col >= 0 && col <= view.cols)
+			cursor_move((row*view.cols)+col);
 		break;
 
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 2: // Single click on button 2
@@ -603,7 +605,7 @@
 		}
 	}
 
-	cursor_move((bottom*screen->cols)+right);
+	cursor_move((bottom*view.cols)+right);
 
 	if(valid_terminal_window())
 		gtk_widget_queue_draw_area(terminal,view.left,view.top,view.cols*fontWidth,view.rows*terminal_font_info.spacing);
@@ -879,9 +881,9 @@
 			if(startRow < 0)
 				startRow = 0;
 			endRow = startRow + r;
-			if(endRow >= (screen->rows-1))
+			if(endRow >= (view.rows-1))
 			{
-				endRow = (screen->rows-1);
+				endRow = (view.rows-1);
 				startRow = endRow - r;
 			}
 
@@ -891,9 +893,9 @@
 				startCol = 0;
 			endCol = startCol + c;
 
-			if(endCol >= (screen->cols-1))
+			if(endCol >= (view.cols-1))
 			{
-				endCol = (screen->cols-1);
+				endCol = (view.cols-1);
 				startCol = endCol - c;
 			}
 
