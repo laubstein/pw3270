@@ -91,8 +91,8 @@
 
  void update_cursor_info(void)
  {
- 	int row = cursor_position / terminal_cols;
- 	int col = cursor_position % terminal_cols;
+ 	int row = cursor_position / screen->cols;
+ 	int col = cursor_position % screen->cols;
 
 	rCursor.x 		= left_margin + (col * terminal_font_info.width);
 	rCursor.y 		= top_margin + (row * terminal_font_info.spacing);
@@ -102,7 +102,7 @@
 
  void update_cursor_position(int row, int col)
  {
- 	int addr = (row * terminal_cols) + col;
+ 	int addr = (row * screen->cols) + col;
 
 	if(addr == cursor_position)
 		return;

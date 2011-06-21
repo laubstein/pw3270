@@ -177,7 +177,7 @@
 		int start = cursor_position;
 		int end = start;
 		int length;
-		int sz = terminal_rows * terminal_cols;
+		int sz = screen->rows * screen->cols;
 
 		if(g_ascii_isspace(*screen->content[start].ch))
 		{
@@ -204,13 +204,13 @@
 		start++;
 		end--;
 
-		startRow = start / terminal_cols;
-		startCol = start % terminal_cols;
+		startRow = start / screen->cols;
+		startCol = start % screen->cols;
 
 		UpdateSelectedRegion(start,end);
 
-		endRow = end / terminal_cols;
-		endCol = end % terminal_cols;
+		endRow = end / screen->cols;
+		endCol = end % screen->cols;
 
 		SetSelectionMode(SELECT_MODE_WORD);
  	}
@@ -226,8 +226,8 @@
 
 		SetSelection(FALSE);
 
-//		Trace("%s: %d %d",__FUNCTION__,length,((terminal_rows * terminal_cols) - baddr));
-//		if(length < 0 || length > ((terminal_rows * terminal_cols) - baddr))
+//		Trace("%s: %d %d",__FUNCTION__,length,((screen->rows * screen->cols) - baddr));
+//		if(length < 0 || length > ((screen->rows * screen->cols) - baddr))
 //			return;
 
 		if(length < 3)
@@ -237,14 +237,14 @@
 				return;
 		}
 
-		startRow = (baddr+1) / terminal_cols;
-		startCol = (baddr+1) % terminal_cols;
+		startRow = (baddr+1) / screen->cols;
+		startCol = (baddr+1) % screen->cols;
 
 		UpdateSelectedRegion(baddr+1,baddr+length);
 
 		baddr += length;
-		endRow = baddr / terminal_cols;
-		endCol = baddr % terminal_cols;
+		endRow = baddr / screen->cols;
+		endCol = baddr % screen->cols;
 
 		SetSelectionMode(SELECT_MODE_FIELD);
  	}
@@ -260,7 +260,7 @@
 	if(!screen)
 		return;
 
-	for(pos = 0; pos < (terminal_rows * terminal_cols);pos++)
+	for(pos = 0; pos < (screen->rows * screen->cols);pos++)
 	{
 		status = screen->content[pos].status & ELEMENT_STATUS_FIELD_MASK;
 		if(selected)
@@ -279,22 +279,22 @@
 	{
 		// Set selection borders
 		int first = 0;
-		int last  = (terminal_rows-1)*terminal_cols;
-		for(pos = 0;pos < terminal_cols;pos++)
+		int last  = (screen->rows-1)*screen->cols;
+		for(pos = 0;pos < screen->cols;pos++)
 		{
 			screen->content[first++].status |= SELECTION_BOX_TOP;
 			screen->content[last++].status |= SELECTION_BOX_BOTTOM;
 		}
 
 		first = 0;
-		last = terminal_cols-1;
+		last = screen->cols-1;
 
-		for(pos = 0;pos < terminal_rows;pos++)
+		for(pos = 0;pos < screen->rows;pos++)
 		{
 			screen->content[first].status |= SELECTION_BOX_LEFT;
 			screen->content[last].status |= SELECTION_BOX_RIGHT;
-			first += terminal_cols;
-			last += terminal_cols;
+			first += screen->cols;
+			last += screen->cols;
 		}
 	}
 
@@ -304,7 +304,7 @@
 		cairo_t *cr = get_terminal_cairo_context();
 		draw_region(cr,start,end,color,&r);
 		cairo_destroy(cr);
-		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*terminal_font_info.spacing);
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,screen->cols*fontWidth,screen->rows*terminal_font_info.spacing);
 	}
  }
 
@@ -317,9 +317,9 @@
  		*col = 0;
  		rc = -1;
  	}
-	else if(x > (left_margin+(terminal_cols * fontWidth)))
+	else if(x > (left_margin+(screen->cols * fontWidth)))
 	{
-		*col = terminal_cols-1;
+		*col = screen->cols-1;
 		rc = -1;
 	}
 	else
@@ -332,9 +332,9 @@
 		*row = 0;
 		rc = -1;
 	}
-	else if(y > (top_margin+(terminal_rows * terminal_font_info.spacing)))
+	else if(y > (top_margin+(screen->rows * terminal_font_info.spacing)))
 	{
-		*row = terminal_rows-1;
+		*row = screen->rows-1;
 		rc = -1;
 	}
 	else
@@ -372,7 +372,7 @@
 				{
 					unselect();
 				}
-				else if(screen->content[(r*terminal_cols)+c].status & ELEMENT_STATUS_SELECTED)
+				else if(screen->content[(r*screen->cols)+c].status & ELEMENT_STATUS_SELECTED)
 				{
 					SetSelectionMode(SELECT_MODE_FIELD);
 				}
@@ -462,8 +462,8 @@
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 1: // Single click on button 1
 		Trace("Single click (button: %d)",event->button);
 		unselect();
-		if(row >= 0 && row <= terminal_rows && col >= 0 && col <= terminal_cols)
-			cursor_move((row*terminal_cols)+col);
+		if(row >= 0 && row <= screen->rows && col >= 0 && col <= screen->cols)
+			cursor_move((row*screen->cols)+col);
 		break;
 
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 2: // Single click on button 2
@@ -549,14 +549,14 @@
 		right = endCol;
 	}
 
-	for(row = 0; row < terminal_rows;row++)
+	for(row = 0; row < screen->rows;row++)
 	{
 		int scol	= -1;
 		int ecol	= -1;
 		int saddr	= -1;
 		int eaddr	= -1;
 
-		for(col = 0; col < terminal_cols;col++)
+		for(col = 0; col < screen->cols;col++)
 		{
 			unsigned char status = screen->content[pos].status & ELEMENT_STATUS_FIELD_MASK;
 
@@ -603,16 +603,16 @@
 		}
 	}
 
-	cursor_move((bottom*terminal_cols)+right);
+	cursor_move((bottom*screen->cols)+right);
 
 	if(valid_terminal_window())
-		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*terminal_font_info.spacing);
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,screen->cols*fontWidth,screen->rows*terminal_font_info.spacing);
 
  }
 
  static void UpdateSelectedText(void)
  {
- 	UpdateSelectedRegion((startRow * terminal_cols)+startCol,(endRow * terminal_cols)+endCol);
+ 	UpdateSelectedRegion((startRow * screen->cols)+startCol,(endRow * screen->cols)+endCol);
  }
 
  static void UpdateSelectedRegion(int bstart, int bend)
@@ -627,12 +627,12 @@
 		bend = temp;
  	}
 
-	for(row = 0; row < terminal_rows;row++)
+	for(row = 0; row < screen->rows;row++)
 	{
 		int saddr = -1;
 		int eaddr = -1;
 
-		for(col = 0; col < terminal_cols;col++)
+		for(col = 0; col < screen->cols;col++)
 		{
 			unsigned char status = screen->content[pos].status & ELEMENT_STATUS_FIELD_MASK;
 
@@ -640,16 +640,16 @@
 			{
 				status |= ELEMENT_STATUS_SELECTED;
 
-				if(!(row && (screen->content[pos-terminal_cols].status) & ELEMENT_STATUS_SELECTED))
+				if(!(row && (screen->content[pos-screen->cols].status) & ELEMENT_STATUS_SELECTED))
 					status |= SELECTION_BOX_TOP;
 
 				if(!(pos && col && (screen->content[pos-1].status) & ELEMENT_STATUS_SELECTED))
 					status |= SELECTION_BOX_LEFT;
 
-				if(pos+1 > bend || col == (terminal_cols-1))
+				if(pos+1 > bend || col == (screen->cols-1))
 					status |= SELECTION_BOX_RIGHT;
 
-				if((pos+terminal_cols) > bend)
+				if((pos+screen->cols) > bend)
 					status |= SELECTION_BOX_BOTTOM;
 			}
 
@@ -674,7 +674,7 @@
 	}
 
 	if(valid_terminal_window())
-		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*terminal_font_info.spacing);
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,screen->cols*fontWidth,screen->rows*terminal_font_info.spacing);
 
  }
 
@@ -879,9 +879,9 @@
 			if(startRow < 0)
 				startRow = 0;
 			endRow = startRow + r;
-			if(endRow >= (terminal_rows-1))
+			if(endRow >= (screen->rows-1))
 			{
-				endRow = (terminal_rows-1);
+				endRow = (screen->rows-1);
 				startRow = endRow - r;
 			}
 
@@ -891,9 +891,9 @@
 				startCol = 0;
 			endCol = startCol + c;
 
-			if(endCol >= (terminal_cols-1))
+			if(endCol >= (screen->cols-1))
 			{
-				endCol = (terminal_cols-1);
+				endCol = (screen->cols-1);
 				startCol = endCol - c;
 			}
 
@@ -932,14 +932,14 @@
  	{
  		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 
- 		startRow = endRow = (cursor_position / terminal_cols);
- 		startCol = endCol = (cursor_position % terminal_cols);
+ 		startRow = endRow = (cursor_position / screen->cols);
+ 		startCol = endCol = (cursor_position % screen->cols);
  	}
 
  	call();
 
- 	row = cursor_position / terminal_cols;
- 	col = cursor_position % terminal_cols;
+ 	row = cursor_position / screen->cols;
+ 	col = cursor_position % screen->cols;
 
 	endRow = row;
 	endCol = col;
@@ -989,7 +989,7 @@
 
  PW3270_ACTION( selectiondown )
  {
- 	int maxrow = terminal_rows-1;
+ 	int maxrow = screen->rows-1;
 
 	if(startRow < maxrow && endRow < maxrow)
 		MoveSelection(1,0);
@@ -1003,7 +1003,7 @@
 
  PW3270_ACTION( selectionright )
  {
- 	int maxcol = terminal_cols-1;
+ 	int maxcol = screen->cols-1;
 
 	if(startCol < maxcol && endCol < maxcol)
 		MoveSelection(0,1);

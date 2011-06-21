@@ -528,7 +528,7 @@
  	cols = g_malloc0(rect.width * sizeof(gboolean));
  	for(row=0;row < rect.height;row++)
  	{
-		el = screen+(((row+rect.y) * terminal_cols)+rect.x);
+		el = screen+(((row+rect.y) * screen->cols)+rect.x);
 		for(col = 0;col < rect.width;col++)
 		{
 			if(*el->ch && !g_ascii_isspace(*el->ch))
@@ -547,7 +547,7 @@
 		if(buffer->len > 0)
 			g_string_append_c(buffer,'\n');
 
-		el = screen+(((row+rect.y) * terminal_cols)+rect.x);
+		el = screen+(((row+rect.y) * screen->cols)+rect.x);
 		col = 0;
 		while(col < rect.width)
 		{
@@ -619,7 +619,7 @@
 	cr = gdk_cairo_create(pix);
 	cairo_set_scaled_font(cr,terminal_font_info.font);
 
-	baddr = rect.y * terminal_cols;
+	baddr = rect.y * screen->cols;
 	baseline = terminal_font_info.ascent;
 	y = 0;
 
@@ -635,7 +635,7 @@
 			x += terminal_font_info.width;
 		}
 
-		baddr += terminal_cols;
+		baddr += screen->cols;
 		y += terminal_font_info.spacing;
 		baseline += terminal_font_info.spacing;
 	}
