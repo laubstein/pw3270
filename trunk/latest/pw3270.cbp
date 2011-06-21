@@ -600,32 +600,7 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="src/gui/action_table.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/actions.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/fonts.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/gui.h" />
-		<Unit filename="src/gui/oia.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
 		<Unit filename="src/gui/resources.rc.in">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/ui_parse.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="src/gui/uiparser1.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
@@ -726,8 +701,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/lib/icmdc.h" />
-		<Unit filename="src/lib/idlec.h" />
-		<Unit filename="src/lib/keymapc.h" />
 		<Unit filename="src/lib/keypadc.h" />
 		<Unit filename="src/lib/kybd.c">
 			<Option compilerVar="CC" />
@@ -736,7 +709,6 @@
 		<Unit filename="src/lib/log.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/lib/macrosc.h" />
 		<Unit filename="src/lib/menubarc.h" />
 		<Unit filename="src/lib/mkfb.c">
 			<Option compilerVar="CC" />

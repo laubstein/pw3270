@@ -117,6 +117,8 @@
 
 	erase,					// void (*erase)(void);
 	display,				// void	(*display)(int bstart, int bend);
+	NULL,					// void (*set_viewsize)(int rows, int cols);
+
 	update_toggle,			// void (*toggle_changed)(int ix, int value, int reason, const char *name);
 	oia_set_timer,			// void	(*show_timer)(long seconds);
 

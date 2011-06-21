@@ -33,19 +33,24 @@ LIB3270_INTERNAL void mcursor_locked();
 LIB3270_INTERNAL void mcursor_normal();
 LIB3270_INTERNAL void mcursor_waiting();
 LIB3270_INTERNAL void notify_toggle_changed(int ix, int value, int reason);
+LIB3270_INTERNAL void set_viewsize(H3270 *session, int rows, int cols);
 
 LIB3270_INTERNAL Boolean escaped;
 
+/*
 LIB3270_INTERNAL void Escape_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
 LIB3270_INTERNAL void Help_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
 LIB3270_INTERNAL void Redraw_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
 LIB3270_INTERNAL void Trace_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
 LIB3270_INTERNAL void Show_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
+*/
 
-#if defined(WC3270) /*[*/
+/*
+#if defined(WC3270)
 LIB3270_INTERNAL void Paste_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
 LIB3270_INTERNAL void Title_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
 LIB3270_INTERNAL int windows_cp;
-#endif /*]*/
+#endif
+*/
 
 LIB3270_INTERNAL void screen_title(char *text);
