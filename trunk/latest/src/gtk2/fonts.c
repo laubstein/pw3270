@@ -103,7 +103,7 @@
 
 	// Adjust line spacing
 
-	terminal_font_info.spacing = height / (screen->rows+2);
+	terminal_font_info.spacing = height / (view.rows+2);
 
 //	Trace("Spacing: %d  height: %d",terminal_font_info.spacing, terminal_font_info.height);
 
@@ -111,13 +111,13 @@
 		terminal_font_info.spacing = terminal_font_info.height;
 
 	// Center image
-	left_margin = (width >> 1) - ((screen->cols * terminal_font_info.width) >> 1);
-	if(left_margin < 0)
-		left_margin = 0;
+	view.left = (width >> 1) - ((view.cols * terminal_font_info.width) >> 1);
+	if(view.left < 0)
+		view.left = 0;
 
-	top_margin = (height >> 1) - (((screen->rows+1) * terminal_font_info.spacing) >> 1);
-	if(top_margin < 0)
-		top_margin = 0;
+	view.top = (height >> 1) - (((view.rows+1) * terminal_font_info.spacing) >> 1);
+	if(view.top < 0)
+		view.top = 0;
 
 	return TRUE;
  }

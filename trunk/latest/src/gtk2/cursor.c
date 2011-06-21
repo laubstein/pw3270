@@ -94,8 +94,8 @@
  	int row = cursor_position / screen->cols;
  	int col = cursor_position % screen->cols;
 
-	rCursor.x 		= left_margin + (col * terminal_font_info.width);
-	rCursor.y 		= top_margin + (row * terminal_font_info.spacing);
+	rCursor.x 		= view.left + (col * terminal_font_info.width);
+	rCursor.y 		= view.top + (row * terminal_font_info.spacing);
 	rCursor.width 	= fontWidth;
 	rCursor.height	= terminal_font_info.height;
  }

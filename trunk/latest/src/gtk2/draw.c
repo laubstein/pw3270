@@ -214,9 +214,9 @@
  void draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr, GdkRectangle *r)
  {
  	int addr;
- 	int col	= (bstart % screen->cols);
- 	int x	= left_margin + (col * fontWidth);
- 	int y	= top_margin  + ((bstart / screen->cols) * terminal_font_info.spacing);
+ 	int col	= (bstart % view.cols);
+ 	int x	= view.left + (col * fontWidth);
+ 	int y	= view.top  + ((bstart / view.cols) * terminal_font_info.spacing);
  	int baseline = y + terminal_font_info.ascent;
 
 	memset(r,0,sizeof(GdkRectangle));
@@ -226,10 +226,10 @@
 	for(addr = bstart; addr <= bend; addr++)
 	{
 		draw_element(cr,&terminal_font_info,x,y,baseline,addr,clr);
-		if(++col >= screen->cols)
+		if(++col >= view.cols)
 		{
 			col  = 0;
-			x    = left_margin;
+			x    = view.left;
 			y   += terminal_font_info.spacing;
 			baseline += terminal_font_info.spacing;
 		}

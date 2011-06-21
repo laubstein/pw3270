@@ -103,7 +103,7 @@
  static GdkPixmap * pixmap_oia[OIA_PIXMAP_COUNT] = { NULL, NULL};
 #endif // ENABLE_BM_PIXMAPS
 
- #define OIAROW	(top_margin+4+(terminal_font_info.spacing*screen->rows))
+ #define OIAROW	(view.top+4+(terminal_font_info.spacing*view.rows))
 
  gboolean		  oia_flag[OIA_FLAG_USER];
  STATUS_CODE	  terminal_message_id = (STATUS_CODE) -1;
@@ -167,7 +167,7 @@
 		GdkGC *gc = get_terminal_cached_gc();
 		draw_oia(cr,gc);
 		cairo_destroy(cr);
-		gtk_widget_queue_draw_area(terminal,OIAROW,left_margin,screen->cols*fontWidth,terminal_font_info.spacing+2);
+		gtk_widget_queue_draw_area(terminal,OIAROW,view.left,view.cols*fontWidth,terminal_font_info.spacing+2);
 	}
  }
 
@@ -175,13 +175,13 @@
  {
  	int	f;
  	int row   = OIAROW;
- 	int width = (screen->cols * terminal_font_info.width);
+ 	int width = (view.cols * terminal_font_info.width);
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
-	cairo_rectangle(cr, left_margin, row, width, terminal_font_info.height);
+	cairo_rectangle(cr, view.left, row, width, terminal_font_info.height);
 	cairo_fill(cr);
 
-	width += left_margin;
+	width += view.left;
 	for(f=0;f<OIA_ELEMENT_COUNT;f++)
 	{
 		GdkRectangle rect;
@@ -195,7 +195,7 @@
 
 	// http://cairographics.org/FAQ/#sharp_lines
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_SEPARATOR);
-	cairo_rectangle(cr, left_margin, row-2, (screen->cols * fontWidth), 1);
+	cairo_rectangle(cr, view.left, row-2, (view.cols * fontWidth), 1);
 	cairo_fill(cr);
 
  }
@@ -210,7 +210,7 @@
 		memset(&rect,0,sizeof(rect));
 		rect.y = OIAROW;
 		rect.height = terminal_font_info.height;
-		rect.width = left_margin + (screen->cols * fontWidth);
+		rect.width = view.left + (view.cols * fontWidth);
 
 		oia_call[el].update(cr,get_terminal_cached_gc(),&rect);
 
@@ -628,7 +628,7 @@
  static void oia_four_in_a_square(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	//  0          "4" in a square
-	r->x = left_margin;
+	r->x = view.left;
 	r->width = terminal_font_info.width+2;
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
@@ -644,7 +644,7 @@
  static void oia_undera_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	//  1          "A" underlined
-	r->x = (left_margin+terminal_font_info.width+4);
+	r->x = (view.left+terminal_font_info.width+4);
 	r->width = terminal_font_info.width;
 
 	oia_clear_rect(cr,r);
@@ -663,7 +663,7 @@
  static void oia_connection_status(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	// 2          solid box if connected, "?" in a box if not
-	r->x = (left_margin+(terminal_font_info.width*2)+6);
+	r->x = (view.left+(terminal_font_info.width*2)+6);
 	r->width = terminal_font_info.width+2;
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
@@ -885,7 +885,7 @@
 
 	msg = message[current_message_id].string;
 
-	r->x = left_margin + (terminal_font_info.width * 5);
+	r->x = view.left + (terminal_font_info.width * 5);
 	r->width = (r->width - (terminal_font_info.width * 47)) - r->x;
 
 	if(r->width < 0)

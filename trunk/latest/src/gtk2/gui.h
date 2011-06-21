@@ -111,6 +111,14 @@
 		ELEMENT content[1];		/**< Screen contents */
 	} *screen;
 
+	LOCAL_EXTERN struct _view
+	{
+		int	 rows;			/**< View rows */
+		int	 cols;			/**< View cols */
+		int	 left;			/**< Left margin */
+		int	 top;			/**< Top margin */
+	} view;
+
     enum GUI_TOGGLE
     {
         GUI_TOGGLE_BOLD,
@@ -251,9 +259,6 @@
 #endif
 
 	LOCAL_EXTERN gint					  cMode;
-
-	LOCAL_EXTERN int					  left_margin;
-	LOCAL_EXTERN int					  top_margin;
 
 	LOCAL_EXTERN gint					  cursor_position;
 	LOCAL_EXTERN GdkRectangle			  rCursor;
