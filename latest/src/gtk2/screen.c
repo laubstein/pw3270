@@ -133,6 +133,7 @@
  int					  top_margin										= 0;
 
  struct _screen		* screen											= NULL;
+ struct _view			  view												= { 0 };
  char					* charset											= NULL;
  char					* window_title										= PROGRAM_NAME;
 
@@ -914,8 +915,10 @@
 	screen->rows	= rows;
 	screen->cols	= cols;
 
-	screen->rows = rows;
-	screen->cols = cols;
+	memset(&view,0,sizeof(view));
+
+	view.rows = screen->rows = rows;
+	view.cols = screen->cols = cols;
 
 	// Update menu toggle (if available)
 	model -= 2;

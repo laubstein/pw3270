@@ -143,7 +143,7 @@
 			gdk_drawable_get_size(window,&width,&height);
 
 			gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_CROSS_HAIR);
-			cairo_rectangle(cr, rCursor.x, 0, 1, top_margin+2+(terminal_font_info.spacing*screen->rows));
+			cairo_rectangle(cr, rCursor.x, 0, 1, view.top+2+(terminal_font_info.spacing*view.rows));
 			cairo_rectangle(cr, 0, rCursor.y+fontAscent, width,1);
 			cairo_fill(cr);
 		}

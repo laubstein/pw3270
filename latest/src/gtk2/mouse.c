@@ -304,7 +304,7 @@
 		cairo_t *cr = get_terminal_cairo_context();
 		draw_region(cr,start,end,color,&r);
 		cairo_destroy(cr);
-		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,screen->cols*fontWidth,screen->rows*terminal_font_info.spacing);
+		gtk_widget_queue_draw_area(terminal,view.left,view.top,view.cols*fontWidth,view.rows*terminal_font_info.spacing);
 	}
  }
 
@@ -312,34 +312,34 @@
  {
  	int rc = 0;
 
- 	if(x < left_margin)
+ 	if(x < view.left)
  	{
  		*col = 0;
  		rc = -1;
  	}
-	else if(x > (left_margin+(screen->cols * fontWidth)))
+	else if(x > (view.left+(view.cols * fontWidth)))
 	{
-		*col = screen->cols-1;
+		*col = view.cols-1;
 		rc = -1;
 	}
 	else
 	{
-		*col = ((((unsigned long) x) - left_margin)/fontWidth);
+		*col = ((((unsigned long) x) - view.left)/fontWidth);
 	}
 
-	if(y < top_margin)
+	if(y < view.top)
 	{
 		*row = 0;
 		rc = -1;
 	}
-	else if(y > (top_margin+(screen->rows * terminal_font_info.spacing)))
+	else if(y > (view.top+(view.rows * terminal_font_info.spacing)))
 	{
-		*row = screen->rows-1;
+		*row = view.rows-1;
 		rc = -1;
 	}
 	else
 	{
-		*row = ((((unsigned long) y) - top_margin)/terminal_font_info.spacing);
+		*row = ((((unsigned long) y) - view.top)/terminal_font_info.spacing);
 	}
 
 	return rc;
@@ -606,7 +606,7 @@
 	cursor_move((bottom*screen->cols)+right);
 
 	if(valid_terminal_window())
-		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,screen->cols*fontWidth,screen->rows*terminal_font_info.spacing);
+		gtk_widget_queue_draw_area(terminal,view.left,view.top,view.cols*fontWidth,view.rows*terminal_font_info.spacing);
 
  }
 
@@ -674,7 +674,7 @@
 	}
 
 	if(valid_terminal_window())
-		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,screen->cols*fontWidth,screen->rows*terminal_font_info.spacing);
+		gtk_widget_queue_draw_area(terminal,view.left,view.top,view.cols*fontWidth,view.rows*terminal_font_info.spacing);
 
  }
 

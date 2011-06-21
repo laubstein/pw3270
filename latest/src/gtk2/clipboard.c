@@ -528,7 +528,7 @@
  	cols = g_malloc0(rect.width * sizeof(gboolean));
  	for(row=0;row < rect.height;row++)
  	{
-		el = screen+(((row+rect.y) * screen->cols)+rect.x);
+		el = screen->content +(((row+rect.y) * screen->cols)+rect.x);
 		for(col = 0;col < rect.width;col++)
 		{
 			if(*el->ch && !g_ascii_isspace(*el->ch))
@@ -547,7 +547,7 @@
 		if(buffer->len > 0)
 			g_string_append_c(buffer,'\n');
 
-		el = screen+(((row+rect.y) * screen->cols)+rect.x);
+		el = screen->content+(((row+rect.y) * screen->cols)+rect.x);
 		col = 0;
 		while(col < rect.width)
 		{
