@@ -467,8 +467,8 @@ static const struct lib3270_option options[] =
     { OptMono,     OPT_BOOLEAN, True,  ResMono,      offset(mono), N_( "Forces monochrome display" ) },
 #endif /*]*/
 //    { OptOnce,     OPT_BOOLEAN, True,  ResOnce,      offset(once), NULL },
-    { OptOversize, OPT_STRING,  False, ResOversize,  offset(oversize), NULL },
-    { OptPort,     OPT_STRING,  False, ResPort,      offset(port), NULL },
+    { OptOversize, OPT_STRING,  False, ResOversize,  offset(oversize), N_( "Sets the screen dimensions to be larger than the default for the chosen model (COLSxROWS)." ) },
+    { OptPort,     OPT_STRING,  False, ResPort,      offset(port), N_( "The name of the default TCP port to connect" ) },
 #if defined(C3270) && !defined(LIB3270) /*[*/
     { OptPrinterLu,OPT_STRING,  False, ResPrinterLu, offset(printer_lu), NULL },
 #endif /*]*/
