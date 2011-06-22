@@ -665,7 +665,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 	/* set up temporary termtype */
 	if (appres.termname == CN && std_ds_host) {
 		(void) sprintf(ttype_tmpval, "IBM-327%c-%d",
-		    appres.m3279 ? '9' : '8', model_num);
+		    appres.m3279 ? '9' : '8', h3270.model_num);
 		h3270.termtype = ttype_tmpval;
 	}
 

@@ -57,7 +57,7 @@
 #include "screenc.h"
 #include "scrollc.h"
 #include "seec.h"
-#include "selectc.h"
+// #include "selectc.h"
 #include "sfc.h"
 #include "statusc.h"
 #include "tablesc.h"
@@ -72,11 +72,11 @@ extern unsigned char aid;
 
 /* Globals */
 int				ROWS, COLS;
-int				ov_rows, ov_cols;
+// int				ov_rows, ov_cols;
 
 int				maxROWS		= 0;
 int				maxCOLS		= 0;
-int				model_num	= -1;
+// int				model_num	= -1;
 
 int				cursor_addr, buffer_addr;
 Boolean         screen_alt = False;	/* alternate screen? */
@@ -86,9 +86,9 @@ struct ea      *ea_buf	= NULL;		/* 3270 device buffer */
 									/* ea_buf[-1] is the dummy default field attribute */
 
 Boolean         formatted = False;	/* set in screen_disp */
-Boolean         screen_need_refresh = False;
-int				first_changed = -1;
-int				last_changed = -1;
+// Boolean         screen_need_refresh = False;
+// int				first_changed = -1;
+// int				last_changed = -1;
 unsigned char	reply_mode = SF_SRM_FIELD;
 int				crm_nattr = 0;
 unsigned char	crm_attr[16];
@@ -128,6 +128,11 @@ static unsigned char	code_table[64] = {
 
 #define IsBlank(c)	((c == EBC_null) || (c == EBC_space))
 
+#define ALL_CHANGED	screen_changed(0,ROWS*COLS);
+#define REGION_CHANGED(f, l) screen_changed(f,l);
+#define ONE_CHANGED(n)	REGION_CHANGED(n, n+1);
+
+/*
 #define ALL_CHANGED	{ \
 	screen_changed(0,ROWS*COLS); \
 	if (IN_ANSI) { first_changed = 0; last_changed = ROWS*COLS; } }
@@ -139,6 +144,7 @@ static unsigned char	code_table[64] = {
 	    if (last_changed == -1 || l > last_changed) last_changed = l; } }
 
 #define ONE_CHANGED(n)	REGION_CHANGED(n, n+1)
+*/
 
 #define DECODE_BADDR(c1, c2) \
 	((((c1) & 0xC0) == 0x00) ? \
@@ -205,7 +211,7 @@ int	set_3270_model(H3270 *session, int model)
 	if(CONNECTED)
 		return EBUSY;
 
-	ctlr_set_rows_cols(session,model,ov_cols,ov_rows);
+	ctlr_set_rows_cols(session,model,session->ov_cols,session->ov_rows);
 	ctlr_reinit(MODEL_CHANGE);
 	return 0;
 }
@@ -294,8 +300,8 @@ void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr)
 */
 
 	// Apply oversize.
-	ov_cols = 0;
-	ov_rows = 0;
+	session->ov_cols = 0;
+	session->ov_rows = 0;
 	if (ovc != 0 || ovr != 0)
 	{
 		if (ovc <= 0 || ovr <= 0)
@@ -303,11 +309,11 @@ void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr)
 		else if (ovc * ovr >= 0x4000)
 			popup_an_error("Invalid %s %dx%d:\nToo big",ResOversize, ovc, ovr);
 		else if (ovc > 0 && ovc < maxCOLS)
-			popup_an_error("Invalid %s cols (%d):\nLess than model %d cols (%d)",ResOversize, ovc, model_num, maxCOLS);
+			popup_an_error("Invalid %s cols (%d):\nLess than model %d cols (%d)",ResOversize, ovc, session->model_num, maxCOLS);
 		else if (ovr > 0 && ovr < maxROWS)
-			popup_an_error("Invalid %s rows (%d):\nLess than model %d rows (%d)",ResOversize, ovr, model_num, maxROWS);
+			popup_an_error("Invalid %s rows (%d):\nLess than model %d rows (%d)",ResOversize, ovr, session->model_num, maxROWS);
 		else
-			update_model_info(session,mn,ov_cols = ovc,ov_rows = ovr);
+			update_model_info(session,mn,session->ov_cols = ovc,session->ov_rows = ovr);
 	}
 
 	// Make sure that the current rows/cols are still 24x80.
@@ -2390,7 +2396,7 @@ ctlr_clear(Boolean can_snap)
 	ALL_CHANGED;
 	cursor_move(0);
 	buffer_addr = 0;
-	unselect(0, ROWS*COLS);
+	// unselect(0, ROWS*COLS);
 	formatted = False;
 	default_fg = 0;
 	default_bg = 0;
@@ -2414,7 +2420,7 @@ ctlr_blanks(void)
 	ALL_CHANGED;
 	cursor_move(0);
 	buffer_addr = 0;
-	unselect(0, ROWS*COLS);
+	// unselect(0, ROWS*COLS);
 	formatted = False;
 }
 
@@ -2438,12 +2444,14 @@ ctlr_add(int baddr, unsigned char c, unsigned char cs)
 			scroll_save(maxROWS, False);
 			trace_primed = False;
 		}
+		/*
 		if (SELECTED(baddr))
 			unselect(baddr, 1);
-		ONE_CHANGED(baddr);
+		*/
 		ea_buf[baddr].cc = c;
 		ea_buf[baddr].cs = cs;
 		ea_buf[baddr].fa = 0;
+		ONE_CHANGED(baddr);
 	}
 }
 
@@ -2469,11 +2477,14 @@ ctlr_add_fa(int baddr, unsigned char fa, unsigned char cs)
 void
 ctlr_add_cs(int baddr, unsigned char cs)
 {
-	if (ea_buf[baddr].cs != cs) {
+	if (ea_buf[baddr].cs != cs)
+	{
+		/*
 		if (SELECTED(baddr))
 			unselect(baddr, 1);
-		ONE_CHANGED(baddr);
+		*/
 		ea_buf[baddr].cs = cs;
+		ONE_CHANGED(baddr);
 	}
 }
 
@@ -2483,13 +2494,16 @@ ctlr_add_cs(int baddr, unsigned char cs)
 void
 ctlr_add_gr(int baddr, unsigned char gr)
 {
-	if (ea_buf[baddr].gr != gr) {
+	if (ea_buf[baddr].gr != gr)
+	{
+		/*
 		if (SELECTED(baddr))
 			unselect(baddr, 1);
-		ONE_CHANGED(baddr);
+		*/
 		ea_buf[baddr].gr = gr;
 		if (gr & GR_BLINK)
 			blink_start();
+		ONE_CHANGED(baddr);
 	}
 }
 
@@ -2503,11 +2517,14 @@ ctlr_add_fg(int baddr, unsigned char color)
 		return;
 	if ((color & 0xf0) != 0xf0)
 		color = 0;
-	if (ea_buf[baddr].fg != color) {
+	if (ea_buf[baddr].fg != color)
+	{
+		/*
 		if (SELECTED(baddr))
 			unselect(baddr, 1);
-		ONE_CHANGED(baddr);
+		*/
 		ea_buf[baddr].fg = color;
+		ONE_CHANGED(baddr);
 	}
 }
 
@@ -2521,11 +2538,14 @@ ctlr_add_bg(int baddr, unsigned char color)
 		return;
 	if ((color & 0xf0) != 0xf0)
 		color = 0;
-	if (ea_buf[baddr].bg != color) {
+	if (ea_buf[baddr].bg != color)
+	{
+		/*
 		if (SELECTED(baddr))
 			unselect(baddr, 1);
-		ONE_CHANGED(baddr);
+		*/
 		ea_buf[baddr].bg = color;
+		ONE_CHANGED(baddr);
 	}
 }
 
@@ -2593,9 +2613,10 @@ ctlr_bcopy(int baddr_from, int baddr_to, int count, int move_ea)
 		 * the screen, unhighlight it.  Eventually there should be
 		 * logic for preserving the highlight if the *all* of the
 		 * selected text moves.
-		 */
+		 */ /*
 		if (area_is_selected(baddr_to, count))
 			unselect(baddr_to, count);
+		*/
 	}
 	/* XXX: What about move_ea? */
 }
@@ -2613,8 +2634,10 @@ ctlr_aclear(int baddr, int count, int clear_ea)
 		(void) memset((char *) &ea_buf[baddr], 0,
 				count * sizeof(struct ea));
 		REGION_CHANGED(baddr, baddr + count);
+		/*
 		if (area_is_selected(baddr, count))
 			unselect(baddr, count);
+		*/
 	}
 	/* XXX: What about clear_ea? */
 }
@@ -2632,7 +2655,7 @@ ctlr_scroll(void)
 	Boolean obscured;
 
 	/* Make sure nothing is selected. (later this can be fixed) */
-	unselect(0, ROWS*COLS);
+	// unselect(0, ROWS*COLS);
 
 	/* Synchronize pending changes prior to this. */
 	obscured = screen_obscured();
@@ -2657,12 +2680,12 @@ ctlr_scroll(void)
 
 /*
  * Note that a particular region of the screen has changed.
- */
+ */ /*
 void
 ctlr_changed(int bstart, int bend)
 {
 	REGION_CHANGED(bstart, bend);
-}
+} */
 
 #if defined(X3270_ANSI) /*[*/
 /*
@@ -2681,7 +2704,7 @@ ctlr_altbuffer(Boolean alt)
 
 		is_altbuffer = alt;
 		ALL_CHANGED;
-		unselect(0, ROWS*COLS);
+		// unselect(0, ROWS*COLS);
 
 		/*
 		 * There may be blinkers on the alternate screen; schedule one

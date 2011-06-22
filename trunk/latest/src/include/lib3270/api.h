@@ -115,6 +115,8 @@
 		{
 			unsigned short 	  sz;				/**< Struct size */
 
+			// Connection info
+			int					  secure_connection;
 			int      			  sock;				/**< Network socket */
 
 			#if defined(_WIN32) /*[*/
@@ -128,12 +130,16 @@
 
 			char				  full_model_name[FULL_MODEL_NAME_SIZE+1];
 			char				* model_name;
+			int					  model_num;
 			char           	* termtype;
 
 			char				* current_host;
 			unsigned short	  current_port;
 
-			int					  secure_connection;
+			// Terminal info
+			int					  ov_rows;
+			int					  ov_cols;
+
 
 		} H3270;
 

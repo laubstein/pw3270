@@ -316,18 +316,18 @@ LIB3270_EXPORT void get_3270_terminal_size(H3270 *h, int *rows, int *cols)
 
 void update_model_info(H3270 *session, int model, int cols, int rows)
 {
-	if(model == model_num && maxROWS == rows && maxCOLS == cols)
+	if(model == session->model_num && maxROWS == rows && maxCOLS == cols)
 		return;
 
-	maxCOLS   = cols;
-	maxROWS   = rows;
-	model_num = model;
+	maxCOLS   			= cols;
+	maxROWS  		  	= rows;
+	session->model_num	= model;
 
 	/* Update the model name. */
-	(void) sprintf(session->model_name, "327%c-%d%s",appres.m3279 ? '9' : '8',model_num,appres.extended ? "-E" : "");
+	(void) sprintf(session->model_name, "327%c-%d%s",appres.m3279 ? '9' : '8',session->model_num,appres.extended ? "-E" : "");
 
 	if(callbacks && callbacks->model_changed)
-		callbacks->model_changed(session, session->model_name,model_num,cols,rows);
+		callbacks->model_changed(session, session->model_name,session->model_num,cols,rows);
 }
 
 /* Get screen contents */
@@ -761,10 +761,7 @@ void screen_changed(int bstart, int bend)
 
 	/* If the application can manage screen changes, let it do it */
 	if(callbacks && callbacks->changed)
-	{
 		callbacks->changed(bstart,bend);
-		return;
-	}
 
 }
 
