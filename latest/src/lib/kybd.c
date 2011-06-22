@@ -722,7 +722,6 @@ ins_prep(int faddr, int baddr, int count)
 #define GE_WFLAG	0x100
 #define PASTE_WFLAG	0x200
 
-/*
 static void
 key_Character_wrapper(Widget w unused, XEvent *event unused, String *params,
     Cardinal *num_params unused)
@@ -746,7 +745,7 @@ key_Character_wrapper(Widget w unused, XEvent *event unused, String *params,
 	    ctl_see((int) ebc2asc[code]));
 	(void) key_Character(code, with_ge, pasting, NULL);
 }
-*/
+
 /*
  * Handle an ordinary displayable character key.  Lots of stuff to handle
  * insert-mode, protected fields and etc.
