@@ -129,7 +129,7 @@ static unsigned char	code_table[64] = {
 #define IsBlank(c)	((c == EBC_null) || (c == EBC_space))
 
 #define ALL_CHANGED	screen_changed(0,ROWS*COLS);
-#define REGION_CHANGED(f, l) screen_changed(f,l);
+#define REGION_CHANGED(f, l) { screen_changed(f,l); fprintf(stderr,"%s(%d): changed(%d,%d)\n",__FILE__,__LINE__,f,l);fflush(stderr); }
 #define ONE_CHANGED(n)	REGION_CHANGED(n, n+1);
 
 /*
@@ -2648,19 +2648,14 @@ ctlr_aclear(int baddr, int count, int clear_ea)
  * This could be accomplished with ctlr_bcopy() and ctlr_aclear(), but this
  * operation is common enough to warrant a separate path.
  */
-void
-ctlr_scroll(void)
+void ctlr_scroll(void)
 {
 	int qty = (ROWS - 1) * COLS;
-	Boolean obscured;
 
 	/* Make sure nothing is selected. (later this can be fixed) */
 	// unselect(0, ROWS*COLS);
 
 	/* Synchronize pending changes prior to this. */
-	obscured = screen_obscured();
-	if (!obscured && screen_has_changes)
-		screen_disp();
 
 	/* Move ea_buf. */
 	(void) memmove(&ea_buf[0], &ea_buf[COLS],
@@ -2669,12 +2664,8 @@ ctlr_scroll(void)
 	/* Clear the last line. */
 	(void) memset((char *) &ea_buf[qty], 0, COLS * sizeof(struct ea));
 
-	/* Update the screen. */
-	if (obscured) {
-		ALL_CHANGED;
-	} else {
-		screen_scroll();
-	}
+	screen_scroll();
+
 }
 #endif /*]*/
 
