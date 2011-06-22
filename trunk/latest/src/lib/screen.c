@@ -472,7 +472,7 @@ int cursor_set_addr(int baddr)
         if(callbacks && callbacks->move_cursor)
             callbacks->move_cursor(baddr/cCOLS, baddr%cCOLS);
 
-		Trace("%s: baddr=%d cc=%04x",__FUNCTION__,baddr, ea_buf[baddr].cc);
+//		Trace("%s: baddr=%d cc=%04x",__FUNCTION__,baddr, ea_buf[baddr].cc);
 
     }
 
