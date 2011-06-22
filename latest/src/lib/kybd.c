@@ -63,9 +63,9 @@
 #include "popupsc.h"
 #include "printc.h"
 #include "screenc.h"
-#if defined(X3270_DISPLAY) /*[*/
-#include "selectc.h"
-#endif /*]*/
+// #if defined(X3270_DISPLAY) /*[*/
+// #include "selectc.h"
+// #endif /*]*/
 #include "statusc.h"
 #include "tablesc.h"
 #include "telnetc.h"

@@ -46,7 +46,7 @@
 #include "popupsc.h"
 #include "printc.h"
 #include "resources.h"
-#include "selectc.h"
+// #include "selectc.h"
 #include "togglesc.h"
 #include "trace_dsc.h"
 #include "utilc.h"

@@ -66,7 +66,7 @@
 #include "menubarc.h"
 #include "popupsc.h"
 #include "screenc.h"
-#include "selectc.h"
+// #include "selectc.h"
 #include "tablesc.h"
 #include "telnetc.h"
 #include "togglesc.h"
@@ -176,6 +176,7 @@ H3270 * new_3270_session(void)
 	memset(hSession,0,sizeof(H3270));
 	hSession->sz = sizeof(H3270);
 	hSession->sock = -1;
+	hSession->model_num = -1;
 
 	strncpy(hSession->full_model_name,"IBM-",FULL_MODEL_NAME_SIZE);
 	hSession->model_name = &hSession->full_model_name[4];
