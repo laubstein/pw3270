@@ -80,9 +80,9 @@ extern char *profile_name;
 
 static const struct lib3270_screen_callbacks *callbacks = NULL;
 
-int lib3270_event_counter[COUNTER_ID_USER] = { 0, 0, 0 };
+int lib3270_event_counter[COUNTER_ID_USER] = { 0, 0 };
 
-Boolean screen_has_changes = 0;
+// Boolean screen_has_changes = 0;
 
 enum ts { TS_AUTO, TS_ON, TS_OFF };
 // enum ts ab_mode = TS_AUTO;
@@ -300,7 +300,6 @@ void screen_erase(void)
 	if(callbacks && callbacks->erase)
 	{
 		callbacks->erase();
-		screen_has_changes = 0;
 		return;
 	}
 
@@ -438,7 +437,6 @@ void screen_disp(void)
 	if(callbacks && callbacks->display)
 		callbacks->display();
 
-	screen_has_changes = 0;
 }
 
 void screen_suspend(void)
@@ -552,8 +550,7 @@ status_reset(void)
 	else
 		status_changed(STATUS_CODE_BLANK);
 
-	if(screen_has_changes)
-		screen_disp();
+	screen_disp();
 
 	if(callbacks && callbacks->reset)
 	{
@@ -756,13 +753,6 @@ int query_counter(COUNTER_ID id)
 
 void screen_changed(int bstart, int bend)
 {
-	screen_has_changes = 1;
-	lib3270_event_counter[COUNTER_ID_SCREEN_CHANGED]++;
-
-	/* If the application can manage screen changes, let it do it */
-	if(callbacks && callbacks->changed)
-		callbacks->changed(bstart,bend);
-
 }
 
 int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk)

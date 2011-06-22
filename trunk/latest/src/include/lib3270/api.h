@@ -360,7 +360,6 @@
 
 		typedef enum _COUNTER_ID
 		{
-			COUNTER_ID_SCREEN_CHANGED,
 			COUNTER_ID_CTLR_DONE,
 			COUNTER_ID_RESET,
 
@@ -369,7 +368,7 @@
 
 		LIB3270_EXPORT int query_counter(COUNTER_ID id);
 
-		#define	query_screen_change_counter() query_counter(COUNTER_ID_SCREEN_CHANGED)
+		#define	query_screen_change_counter() query_counter(COUNTER_ID_CTLR_DONE)
 
 
 		#define COLOR_ATTR_NONE			0x0000
@@ -396,7 +395,6 @@
 			int		(*addch)(int row, int col, int c, unsigned short attr);
 			void	(*charset)(char *dcs);
 			void	(*title)(char *text);
-			void	(*changed)(int bstart, int bend);
 			void	(*ring_bell)(void);
 			void	(*redraw)(void);
 			void	(*move_cursor)(int row, int col);

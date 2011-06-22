@@ -18,8 +18,8 @@
 #define display_height()	1
 #define display_widthMM()	100
 #define display_width()		1
-#define screen_obscured()	False
-#define screen_scroll()
+// #define screen_obscured()	False
+#define screen_scroll()		screen_disp()
 
 LIB3270_INTERNAL void ring_bell(void);
 LIB3270_INTERNAL void screen_132(void);

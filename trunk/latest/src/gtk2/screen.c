@@ -107,7 +107,6 @@
 	addch,					// void (*addch)(int row, int col, int c, int attr);
 	set_charset,			// void (*charset)(char *dcs);
 	settitle,				// void (*title)(char *text);
-	NULL,					// void (*changed)(int bstart, int bend);
 	gdk_beep,				// void (*ring_bell)(void);
 	redraw,					// void (*redraw)(void);
 	update_cursor_position,	// void (*move_cursor)(int row, int col);
@@ -159,12 +158,6 @@
  {
 	action_redraw(0);
  }
-
-/*
- static void changed(int bstart, int bend)
- {
- }
-*/
 
  static int SetSuspended(int state)
  {

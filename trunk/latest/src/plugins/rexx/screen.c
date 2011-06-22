@@ -466,15 +466,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 	else
 		rc = lib3270_enter();
 
-	if(!rc)
-	{
-		// Enter was sent, wait for screen changes
-		int last = query_screen_change_counter();
-		time_t tm = time(0)+1;
-
-		while(last == query_screen_change_counter() && time(0) < tm)
-			RunPendingEvents(1);
-	}
+	RunPendingEvents(1);
 
 	ReturnValue(rc);
  }
@@ -509,11 +501,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 	if(!rc)
 	{
 		// Key was sent, wait for screen changes
-		int last = query_screen_change_counter();
-		time_t tm = time(0)+1;
-
-		while(last == query_screen_change_counter() && time(0) < tm)
-			RunPendingEvents(1);
+		RunPendingEvents(1);
 	}
 
 	ReturnValue(rc);
@@ -551,9 +539,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 		return RXFUNC_BADCALL;
 	}
 
-	last = query_screen_change_counter();
-
-	while(!rc && last == query_screen_change_counter())
+	while(!rc)
 	{
 		if(!CONNECTED)
 			rc = ENOTCONN;
