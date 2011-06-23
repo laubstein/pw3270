@@ -194,7 +194,7 @@ learn_modifiers(void)
  * of "Mod2".  Note that because it is possible to map multiple keysyms to the
  * same modifier bit, the answer may be ambiguous; we return the combinations
  * iteratively.
- */
+ */ /*
 static char *
 key_symbolic_state(unsigned int state, int *iteration)
 {
@@ -212,7 +212,7 @@ key_symbolic_state(unsigned int state, int *iteration)
 	}
 
 	if (*iteration == 0) {
-		/* First time, build the table. */
+		// First time, build the table.
 		n_ix = 0;
 		for (i = 0; i < MAP_SIZE; i++) {
 			if (skeymask[i].name[0] != CN &&
@@ -226,24 +226,24 @@ key_symbolic_state(unsigned int state, int *iteration)
 		leftover = state;
 	}
 
-	/* Construct this result. */
+	// Construct this result.
 	rs[0] = '\0';
 	for (i = 0; i < n_ix;  i++) {
 		(void) strcat(rs, comma);
 		(void) strcat(rs, skeymask[ix_ix[i]].name[ix[ix_ix[i]]]);
 		comma = " ";
 	}
-#if defined(VERBOSE_EVENTS) /*[*/
+#if defined(VERBOSE_EVENTS)
 	if (leftover)
 		(void) sprintf(strchr(rs, '\0'), "%s?%d", comma, state);
-#endif /*]*/
+#endif
 
-	/*
-	 * Iterate to the next.
-	 * This involves treating each slot like an n-ary number, where n is
-	 * the number of elements in the slot, iterating until the highest-
-	 * ordered slot rolls back over to 0.
-	 */
+	//
+	// Iterate to the next.
+	// This involves treating each slot like an n-ary number, where n is
+	// the number of elements in the slot, iterating until the highest-
+	// ordered slot rolls back over to 0.
+	//
 	if (n_ix) {
 		i = n_ix - 1;
 		ix[ix_ix[i]]++;
@@ -260,16 +260,16 @@ key_symbolic_state(unsigned int state, int *iteration)
 		*iteration = 0;
 
 	return rs;
-}
+} */
 #endif /*]*/
 
-/* Return whether or not an KeyPress event state includes the Meta key. */
+/* Return whether or not an KeyPress event state includes the Meta key. */ /*
 Boolean
 event_is_meta(int state)
 {
 	int i;
 
-	/* Learn the modifier map. */
+	// Learn the modifier map. 
 	if (!know_mods) {
 		learn_modifiers();
 		know_mods = True;
@@ -283,8 +283,9 @@ event_is_meta(int state)
 	}
 	return False;
 }
+*/
 
-#if defined(VERBOSE_EVENTS) /*[*/
+#if defined(VERBOSE_EVENTS) /*[*/ /*
 static char *
 key_state(unsigned int state)
 {
@@ -325,7 +326,7 @@ key_state(unsigned int state)
 	else if (state)
 		(void) sprintf(strchr(rs, '\0'), "%s?%d", comma, state);
 	return rs;
-}
+} */
 #endif /*]*/
 #endif /*]*/
 
