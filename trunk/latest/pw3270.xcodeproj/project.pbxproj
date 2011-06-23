@@ -57,6 +57,7 @@
 		C25D56A813AAE73500BD6343 /* appres.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = appres.h; path = src/lib/appres.h; sourceTree = "<group>"; };
 		C25D56C413AAEB4600BD6343 /* actions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = actions.c; path = src/lib/actions.c; sourceTree = "<group>"; };
 		C25D56E813AAF1F400BD6343 /* print.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = print.c; path = src/lib/print.c; sourceTree = "<group>"; };
+		C25E355313B347890001C942 /* api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = api.h; path = src/include/lib3270/api.h; sourceTree = "<group>"; };
 		C2883D1B13B2BD0300A5F470 /* ft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ft.c; path = src/lib/ft.c; sourceTree = "<group>"; };
 		C2883D2413B2BDCC00A5F470 /* xio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xio.c; path = src/lib/xio.c; sourceTree = "<group>"; };
 		E710CF6D1255168F00D2D080 /* plugins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = plugins.h; path = src/include/lib3270/plugins.h; sourceTree = "<group>"; };
@@ -87,6 +88,7 @@
 		E710CF1D12550AEE00D2D080 /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				C25E355313B347890001C942 /* api.h */,
 				C25D56A813AAE73500BD6343 /* appres.h */,
 				C2512A57139A334A00B59BCA /* action_table.h */,
 				E732942E1283AB5E0040F2AC /* actions.h */,

@@ -103,10 +103,10 @@ void set_display_charset(char *dcs)
 }
 
 static void
-addch(int row, int col, int c, int attr)
+addch(int baddr, int c, int attr)
 {
 	if(callbacks && callbacks->addch)
-		callbacks->addch(row, col, c, attr);
+		callbacks->addch(baddr, c, attr);
 }
 
 /**
@@ -380,23 +380,22 @@ void screen_disp(void)
 	fa_addr = find_field_attribute(0); /* may be -1, that's okay */
 	for (row = 0; row < ROWS; row++)
 	{
-		int baddr;
+		int baddr = row*cCOLS;
 
 		for (col = 0; col < cCOLS; col++)
 		{
-			baddr = row*cCOLS+col;
 			if(ea_buf[baddr].fa)
 			{
 			    /* Field attribute. */
 				fa_addr = baddr;
 				fa = ea_buf[baddr].fa;
 				a = calc_attrs(baddr, baddr, fa);
-				addch(row,col,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
+				addch(baddr,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
 			}
 			else if (FA_IS_ZERO(fa))
 			{
 			   	/* Blank. */
-				addch(row,col,' ',attr=a);
+				addch(baddr,' ',attr=a);
 			}
 			else
 			{
@@ -417,20 +416,21 @@ void screen_disp(void)
 
 				if (ea_buf[baddr].cs == CS_LINEDRAW)
 				{
-					addch(row,col,ea_buf[baddr].cc,attr);
+					addch(baddr,ea_buf[baddr].cc,attr);
 				}
 				else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
 				{
-					addch(row,col,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
+					addch(baddr,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
 				}
 				else
 				{
 					if (toggled(MONOCASE))
-						addch(row,col,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
+						addch(baddr,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
 					else
-						addch(row,col,ebc2asc[ea_buf[baddr].cc],attr);
+						addch(baddr,ebc2asc[ea_buf[baddr].cc],attr);
 				}
 			}
+			baddr++;
 		}
 	}
 
