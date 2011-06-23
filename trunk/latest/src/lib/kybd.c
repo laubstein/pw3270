@@ -591,8 +591,6 @@ LIB3270_ACTION(break)
  */
 LIB3270_ACTION(attn)
 {
-//	action_debug(Attn_action, event, params, num_params);
-
 	if (!IN_3270)
 		return 0;
 
@@ -613,7 +611,6 @@ void
 Interrupt_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
-	action_debug(Interrupt_action, event, params, num_params);
 	if (!IN_3270)
 		return;
 
@@ -1380,7 +1377,6 @@ void
 AltCursor_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
-	action_debug(AltCursor_action, event, params, num_params);
 	reset_idle_timer();
 	do_toggle(ALT_CURSOR);
 }
@@ -1392,7 +1388,6 @@ void
 MonoCase_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
-	action_debug(MonoCase_action, event, params, num_params);
 	reset_idle_timer();
 	do_toggle(MONOCASE);
 }
@@ -1406,7 +1401,6 @@ void
 Flip_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
-	action_debug(Flip_action, event, params, num_params);
 
 //	reset_idle_timer();
 
@@ -1422,7 +1416,6 @@ Flip_action(Widget w unused, XEvent *event, String *params,
 void
 Tab_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(Tab_action, event, params, num_params);
 	action_NextField();
 }
 */
@@ -1454,14 +1447,7 @@ LIB3270_KEY_ACTION( tab )
 
 /*
  * Tab backward to previous field.
- */ /*
-void BackTab_action(Widget w unused, XEvent *event, String *params,Cardinal *num_params)
-{
-	action_debug(BackTab_action, event, params, num_params);
-	action_PreviousField();
-}
-*/
-
+ */
 LIB3270_KEY_ACTION( backtab )
 {
 	register int	baddr, nbaddr;
@@ -1594,16 +1580,6 @@ do_reset(Boolean explicit)
 
 }
 
-/*
-void
-Reset_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
-{
-	action_debug(Reset_action, event, params, num_params);
-	action_Reset();
-}
-*/
-
 LIB3270_CLEAR_SELECTION_ACTION( reset )
 {
 //	reset_idle_timer();
@@ -1616,15 +1592,6 @@ LIB3270_CLEAR_SELECTION_ACTION( reset )
 /*
  * Move to first unprotected field on screen.
  */
-
-/*
-void Home_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-	action_debug(Home_action, event, params, num_params);
-	action_FirstField();
-}
-*/
-
 LIB3270_ACTION( firstfield )
 {
 //	reset_idle_timer();
@@ -1791,16 +1758,6 @@ do_delete(void)
 	return True;
 }
 
-/*
-void
-Delete_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
-{
-	action_debug(Delete_action, event, params, num_params);
-	action_Delete();
-}
-*/
-
 LIB3270_ACTION( delete )
 {
 //	reset_idle_timer();
@@ -1834,7 +1791,6 @@ LIB3270_ACTION( delete )
  */
 LIB3270_ACTION( backspace )
 {
-//	action_debug(BackSpace_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		ENQUEUE_ACTION( lib3270_backspace );
@@ -1922,16 +1878,6 @@ do_erase(void)
 	screen_disp();
 }
 
-/*
-void
-Erase_action(Widget w unused, XEvent *event, String *params,
-    Cardinal *num_params)
-{
-	action_debug(Erase_action, event, params, num_params);
-	action_Erase();
-}
-*/
-
 LIB3270_ACTION( erase )
 {
 //	reset_idle_timer();
@@ -2003,7 +1949,6 @@ Left2_action(Widget w unused, XEvent *event, String *params,
 	register int	baddr;
 	enum dbcs_state d;
 
-	action_debug(Left2_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
@@ -2041,7 +1986,6 @@ LIB3270_ACTION( previousword )
 	unsigned char  c;
 	Boolean prot;
 
-//	action_debug(PreviousWord_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		ENQUEUE_ACTION(lib3270_previousword);
@@ -2110,7 +2054,6 @@ Right2_action(Widget w unused, XEvent *event, String *params,
 	register int	baddr;
 	enum dbcs_state d;
 
-	action_debug(Right2_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
@@ -2194,7 +2137,6 @@ LIB3270_ACTION( nextword )
 	register int	baddr;
 	unsigned char c;
 
-//	action_debug(NextWord_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		ENQUEUE_ACTION( lib3270_nextword );
@@ -2272,7 +2214,6 @@ LIB3270_CURSOR_ACTION( up )
 {
 	register int	baddr;
 
-//	action_debug(Up_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR)
@@ -2321,7 +2262,6 @@ LIB3270_CURSOR_ACTION( down )
 {
 	register int	baddr;
 
-//	action_debug(Down_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock)
 	{
@@ -2357,7 +2297,6 @@ LIB3270_CURSOR_ACTION( newline )
 	register int	baddr, faddr;
 	register unsigned char	fa;
 
-//	action_debug(Newline_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock)
 	{
@@ -2391,7 +2330,6 @@ LIB3270_CURSOR_ACTION( newline )
 void
 Dup_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(Dup_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(Dup_action, CN, CN);
@@ -2412,7 +2350,6 @@ Dup_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 void
 FieldMark_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(FieldMark_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(FieldMark_action, CN, CN);
@@ -2425,17 +2362,6 @@ FieldMark_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 	(void) key_Character(EBC_fm, False, False, NULL);
 }
 
-
-/*
- * Vanilla AID keys.
- */
-/*
-void Enter_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-	action_debug(Enter_action, event, params, num_params);
-	action_Enter();
-}
-*/
 /**
  * Send an "Enter" action.
  *
@@ -2459,15 +2385,6 @@ LIB3270_KEY_ACTION( enter )
 
 	return 0;
 }
-
-/*
-void
-SysReq_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-	action_debug(SysReq_action, event, params, num_params);
-	action_SysReq();
-}
-*/
 
 LIB3270_ACTION( sysreq )
 {
@@ -2495,14 +2412,6 @@ LIB3270_ACTION( sysreq )
 /*
  * Clear AID key
  */
-/*
-static void Clear_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-		action_debug(Clear_action, event, params, num_params);
-		action_Clear();
-}
-*/
-
 LIB3270_ACTION( clear )
 {
 //	reset_idle_timer();
@@ -2622,7 +2531,6 @@ void
 CursorSelect_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
-	action_debug(CursorSelect_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(CursorSelect_action, CN, CN);
@@ -2646,7 +2554,6 @@ void
 MouseSelect_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params)
 {
-	action_debug(MouseSelect_action, event, params, num_params);
 	if (w != *screen)
 		return;
 //	reset_idle_timer();
@@ -2660,17 +2567,6 @@ MouseSelect_action(Widget w, XEvent *event, String *params,
 }
 */
 #endif
-
-
-/*
- * Erase End Of Field Key.
-void
-EraseEOF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-	action_debug(EraseEOF_action, event, params, num_params);
-	action_EraseEOF();
-}
- */
 
 /**
  * Erase End Of Line Key.
@@ -2793,16 +2689,6 @@ LIB3270_ACTION( eraseeof )
 	return 0;
 }
 
-
-/*
- * Erase all Input Key.
-void EraseInput_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-	action_debug(EraseInput_action, event, params, num_params);
-	action_EraseInput();
-}
- */
-
 LIB3270_ACTION( eraseinput )
 {
 	register int	baddr, sbaddr;
@@ -2866,15 +2752,7 @@ LIB3270_ACTION( eraseinput )
  * but the last.
  *
  * Which is to say, does a ^W.
- */ /*
-void
-DeleteWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-	action_debug(DeleteWord_action, event, params, num_params);
-	action_DeleteWord();
-}
-*/
-
+ */ 
 LIB3270_ACTION( deleteword )
 {
 	register int baddr;
@@ -2941,15 +2819,7 @@ LIB3270_ACTION( deleteword )
  * the front of the field.
  *
  * Which is to say, does a ^U.
- */ /*
-void
-DeleteField_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-	action_debug(DeleteField_action, event, params, num_params);
-	action_DeleteField();
-}
-*/
-
+ */
 LIB3270_ACTION( deletefield )
 {
 	register int	baddr;
@@ -2997,7 +2867,6 @@ LIB3270_ACTION( deletefield )
 void
 Insert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(Insert_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(Insert_action, CN, CN);
@@ -3018,7 +2887,6 @@ Insert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 void
 ToggleInsert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(ToggleInsert_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(ToggleInsert_action, CN, CN);
@@ -3040,7 +2908,6 @@ ToggleInsert_action(Widget w unused, XEvent *event, String *params, Cardinal *nu
 void
 ToggleReverse_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(ToggleReverse_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(ToggleReverse_action, CN, CN);
@@ -3064,7 +2931,6 @@ LIB3270_ACTION( fieldend )
 	unsigned char	fa, c;
 	int	last_nonblank = -1;
 
-//	action_debug(FieldEnd_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		ENQUEUE_ACTION( lib3270_fieldend );
@@ -3115,8 +2981,6 @@ MoveCursor_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
 	register int baddr;
 	int row, col;
-
-	action_debug(MoveCursor_action, event, params, num_params);
 
 //	reset_idle_timer();
 	if (kybdlock) {
@@ -3266,7 +3130,6 @@ Key_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 	KeySym k;
 	enum keytype keytype;
 
-	action_debug(Key_action, event, params, num_params);
 //	reset_idle_timer();
 
 	for (i = 0; i < *num_params; i++) {
@@ -3300,7 +3163,6 @@ String_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 	int len = 0;
 	char *s0, *s;
 
-	action_debug(String_action, event, params, num_params);
 //	reset_idle_timer();
 
 	/* Determine the total length of the strings. */
@@ -3359,7 +3221,6 @@ HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 	char *s;
 	char *t;
 
-	action_debug(HexString_action, event, params, num_params);
 //	reset_idle_timer();
 
 	/* Determine the total length of the strings. */
@@ -3396,7 +3257,6 @@ HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 void
 CircumNot_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(CircumNot_action, event, params, num_params);
 //	reset_idle_timer();
 
 	if (IN_3270 && composing == NONE)
@@ -3993,12 +3853,13 @@ hex_input(char *s)
 #endif /*]*/
 }
 
+/*
 void
 ignore_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(ignore_action, event, params, num_params);
 //	reset_idle_timer();
 }
+*/
 
 #if defined(X3270_FT) /*[*/
 /*
@@ -4201,9 +4062,6 @@ PA_Shift_action(Widget w unused, XEvent *event unused, String *params unused,
 {
 	char	keys[32];
 
-#if defined(INTERNAL_ACTION_DEBUG)
-	action_debug(PA_Shift_action, event, params, num_params);
-#endif
 	XQueryKeymap(display, keys);
 	shift_event(state_from_keymap(keys));
 }
@@ -4287,7 +4145,6 @@ build_composites(void)
 void
 Compose_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(Compose_action, event, params, num_params);
 //	reset_idle_timer();
 
 	if (!composites && !build_composites())
@@ -4313,7 +4170,6 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 	KeySym		ks;
 	int		ll;
 
-	action_debug(Default_action, event, params, num_params);
 	switch (event->type) {
 	    case KeyPress:
 #if defined(X3270_DBCS)
@@ -4573,7 +4429,6 @@ Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_par
 void
 TemporaryKeymap_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(TemporaryKeymap_action, event, params, num_params);
 //	reset_idle_timer();
 
 	if (check_usage(TemporaryKeymap_action, *num_params, 0, 1) < 0)

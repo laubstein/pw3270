@@ -446,8 +446,6 @@ PrintText_action(Widget w unused, XEvent *event, String *params,
 	Boolean use_file = False;
 	Boolean use_string = False;
 
-	action_debug(PrintText_action, event, params, num_params);
-
 	//
 	// Pick off optional arguments:
 	// file     directs the output to a file instead of a command;
@@ -710,7 +708,6 @@ PrintWindow_action(Widget w unused, XEvent *event, String *params,
 	char *xfb = fb;
 	Boolean secure = appres.secure;
 
-	action_debug(PrintWindow_action, event, params, num_params);
 	if (*num_params > 0)
 		filter = params[0];
 	if (*num_params > 1)

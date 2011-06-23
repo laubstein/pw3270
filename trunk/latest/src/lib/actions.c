@@ -352,8 +352,8 @@ check_usage(XtActionProc action, Cardinal nargs, Cardinal nargs_min,
 
 /*
  * Display an action debug message
- */
-#if defined(X3270_TRACE) /*[*/
+ */ /*
+#if defined(X3270_TRACE)
 
 #define KSBUF	256
 void
@@ -362,7 +362,7 @@ action_debug(XtActionProc action, XEvent *event, String *params,
 {
 	Cardinal i;
 	char pbuf[1024];
-#if defined(X3270_DISPLAY) /*[*/
+#if defined(X3270_DISPLAY)
 	XKeyEvent *kevent;
 	KeySym ks;
 	XButtonEvent *bevent;
@@ -378,14 +378,14 @@ action_debug(XtActionProc action, XEvent *event, String *params,
 	int state;
 	const char *symname = "";
 	char snbuf[11];
-#endif /*]*/
+#endif
 
 	if (!toggled(EVENT_TRACE))
 		return;
 	if (event == (XEvent *)NULL) {
 		trace_event(" %s", ia_name[(int)ia_cause]);
 	}
-#if defined(X3270_DISPLAY) /*[*/
+#if defined(X3270_DISPLAY)
 	else switch (event->type) {
 	    case KeyRelease:
 		press = "Release";
@@ -393,10 +393,10 @@ action_debug(XtActionProc action, XEvent *event, String *params,
 		kevent = (XKeyEvent *)event;
 		(void) XLookupString(kevent, dummystr, KSBUF, &ks, NULL);
 		state = kevent->state;
-		/*
-		 * If the keysym is a printable ASCII character, ignore the
-		 * Shift key.
-		 */
+		//
+		// If the keysym is a printable ASCII character, ignore the
+		// Shift key.
+		//
 		if (ks != ' ' && !(ks & ~0xff) && isprint(ks))
 			state &= ~ShiftMask;
 		if (ks == NoSymbol)
@@ -414,10 +414,10 @@ action_debug(XtActionProc action, XEvent *event, String *params,
 				press,
 				symname);
 		} while (ambiguous);
-		/*
-		 * If the keysym is an alphanumeric ASCII character, show the
-		 * case-insensitive alternative, sans the colon.
-		 */
+		//
+		// If the keysym is an alphanumeric ASCII character, show the
+		// case-insensitive alternative, sans the colon.
+		//
 		if (!(ks & ~0xff) && isalpha(ks)) {
 			ambiguous = 0;
 			do {
@@ -432,13 +432,13 @@ action_debug(XtActionProc action, XEvent *event, String *params,
 			} while (ambiguous);
 			trace_event(")");
 		}
-#if defined(VERBOSE_EVENTS) /*[*/
+#if defined(VERBOSE_EVENTS)
 		trace_event("\nKey%s [state %s, keycode %d, keysym "
 			    "0x%lx \"%s\"]",
 			    press, key_state(kevent->state),
 			    kevent->keycode, ks,
 			    symname);
-#endif /*]*/
+#endif
 		break;
 	    case ButtonRelease:
 		press = "Release";
@@ -454,11 +454,11 @@ action_debug(XtActionProc action, XEvent *event, String *params,
 				bevent->button,
 				direction);
 		} while (ambiguous);
-#if defined(VERBOSE_EVENTS) /*[*/
+#if defined(VERBOSE_EVENTS)
 		trace_event("\nButton%s [state %s, button %d]",
 		    press, key_state(bevent->state),
 		    bevent->button);
-#endif /*]*/
+#endif
 		break;
 	    case MotionNotify:
 		mevent = (XMotionEvent *)event;
@@ -469,10 +469,10 @@ action_debug(XtActionProc action, XEvent *event, String *params,
 				was_ambiguous? " or": "Event",
 				key_symbolic_state(mevent->state, &ambiguous));
 		} while (ambiguous);
-#if defined(VERBOSE_EVENTS) /*[*/
+#if defined(VERBOSE_EVENTS)
 		trace_event("\nMotionNotify [state %s]",
 			    key_state(mevent->state));
-#endif /*]*/
+#endif
 		break;
 	    case EnterNotify:
 		trace_event("EnterNotify");
@@ -516,7 +516,7 @@ action_debug(XtActionProc action, XEvent *event, String *params,
 		trace_event(" via %s -> %s(", keymap_trace,
 		    action_name(action));
 	else
-#endif /*]*/
+#endif
 		trace_event(" -> Action %d(", (int) action);
 	for (i = 0; i < *num_params; i++) {
 		trace_event("%s\"%s\"",
@@ -528,7 +528,8 @@ action_debug(XtActionProc action, XEvent *event, String *params,
 	trace_rollover_check();
 }
 
-#endif /*]*/
+#endif
+*/
 
 /*
  * Wrapper for calling an action internally.
