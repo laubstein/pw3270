@@ -137,7 +137,6 @@ x3270_exit(int n)
 void
 Quit_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
-	action_debug(Quit_action, event, params, num_params);
 	if (!w || !CONNECTED) {
 		x3270_exit(0);
 	}

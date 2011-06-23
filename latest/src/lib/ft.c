@@ -462,8 +462,6 @@ Transfer_action(Widget w unused, XEvent *event, String *params,
 	String *xparams = params;
 	Cardinal xnparams = *num_params;
 
-        action_debug(Transfer_action, event, params, num_params);
-
 	ft_is_action = True;
 
 	// Make sure we're connected.
