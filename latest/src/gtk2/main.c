@@ -656,7 +656,7 @@ int main(int argc, char *argv[])
 	if(topwindow)
 	{
 		screen_resume();
-		screen_disp();
+		screen_disp(hSession);
 
 		// Start plugins after the creation of main loop
 		g_timeout_add((guint) 10, (GSourceFunc) StartPlugins, (gpointer) startup_script);

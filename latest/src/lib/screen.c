@@ -303,7 +303,7 @@ void screen_erase(void)
 	}
 
 	/* No callback, just redraw */
-	screen_disp();
+	screen_disp(&h3270);
 }
 
 LIB3270_EXPORT void get_3270_terminal_size(H3270 *h, int *rows, int *cols)
@@ -437,9 +437,9 @@ void screen_update(H3270 *session, int bstart, int bend)
 	}
 }
 
-void screen_disp(void)
+void screen_disp(H3270 *session)
 {
-	screen_update(&h3270,0,ROWS*cCOLS);
+	screen_update(session,0,ROWS*cCOLS);
 
 /*
 	int row, col;
@@ -520,7 +520,7 @@ void screen_suspend(void)
 
 void screen_resume(void)
 {
-	screen_disp();
+	screen_disp(&h3270);
 
 	if(callbacks && callbacks->set_suspended)
 		callbacks->set_suspended(0);
@@ -623,7 +623,7 @@ status_reset(void)
 	else
 		status_changed(STATUS_CODE_BLANK);
 
-	screen_disp();
+	screen_disp(&h3270);
 
 	if(callbacks && callbacks->reset)
 	{
@@ -761,7 +761,7 @@ void Redraw_action(Widget w unused, XEvent *event unused, String *params unused,
 	if(callbacks && callbacks->redraw)
 		callbacks->redraw();
 	else
-		screen_disp();
+		screen_disp(&h3270);
 }
 
 void ring_bell(void)
@@ -774,7 +774,7 @@ void
 screen_flip(void)
 {
 	flipped = !flipped;
-	screen_disp();
+	screen_disp(&h3270);
 }
 
 void
@@ -953,7 +953,7 @@ LIB3270_EXPORT int set_device_buffer(struct ea *src, int el)
 
 	memcpy(ea_buf,src,sizeof(struct ea) * el);
 
-	screen_disp();
+	screen_disp(&h3270);
 
 	return 0;
 }
@@ -1031,7 +1031,7 @@ LIB3270_ACTION( testpattern )
 
 	Trace("%s display",__FUNCTION__);
 
-	screen_disp();
+	screen_disp(&h3270);
 
 	Trace("%s ends",__FUNCTION__);
 	return 0;
