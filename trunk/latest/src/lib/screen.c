@@ -364,79 +364,78 @@ int screen_read(char *dest, int baddr, int count)
 }
 
 /* Display what's in the buffer. */
-void screen_disp(void)
+void screen_update(H3270 *session, int bstart, int bend)
 {
-	int row, col;
+	int baddr;
 	int a;
 	int attr = COLOR_GREEN;
 	unsigned char fa;
-#if defined(X3270_DBCS) /*[*/
-	enum dbcs_state d;
-#endif /*]*/
+// #if defined(X3270_DBCS)
+//	enum dbcs_state d;
+// #endif
 	int fa_addr;
 
-	fa = get_field_attribute(0);
+	fa = get_field_attribute(bstart);
 	a = color_from_fa(fa);
-	fa_addr = find_field_attribute(0); /* may be -1, that's okay */
-	for (row = 0; row < ROWS; row++)
+	fa_addr = find_field_attribute(bstart); // may be -1, that's okay
+	for(baddr = bstart; baddr < bend; baddr++)
 	{
-		int baddr = row*cCOLS;
-
-		for (col = 0; col < cCOLS; col++)
+		if(ea_buf[baddr].fa)
 		{
-			if(ea_buf[baddr].fa)
-			{
-			    /* Field attribute. */
-				fa_addr = baddr;
-				fa = ea_buf[baddr].fa;
-				a = calc_attrs(baddr, baddr, fa);
-				addch(baddr,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
+			// Field attribute.
+			fa_addr = baddr;
+			fa = ea_buf[baddr].fa;
+			a = calc_attrs(baddr, baddr, fa);
+			addch(baddr,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
+		}
+		else if (FA_IS_ZERO(fa))
+		{
+			// Blank.
+			addch(baddr,' ',attr=a);
+		}
+		else
+		{
+				// Normal text.
+			if (!(ea_buf[baddr].gr ||
+				  ea_buf[baddr].fg ||
+				  ea_buf[baddr].bg)) {
+				attr = a;
+			} else {
+				int b;
+
+				//
+				// Override some of the field
+				// attributes.
+				//
+				attr = b = calc_attrs(baddr, fa_addr, fa);
 			}
-			else if (FA_IS_ZERO(fa))
+
+			if (ea_buf[baddr].cs == CS_LINEDRAW)
 			{
-			   	/* Blank. */
-				addch(baddr,' ',attr=a);
+				addch(baddr,ea_buf[baddr].cc,attr);
+			}
+			else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
+			{
+				addch(baddr,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
 			}
 			else
 			{
-			    	/* Normal text. */
-				if (!(ea_buf[baddr].gr ||
-				      ea_buf[baddr].fg ||
-				      ea_buf[baddr].bg)) {
-					attr = a;
-				} else {
-					int b;
-
-					/*
-					 * Override some of the field
-					 * attributes.
-					 */
-					attr = b = calc_attrs(baddr, fa_addr, fa);
-				}
-
-				if (ea_buf[baddr].cs == CS_LINEDRAW)
-				{
-					addch(baddr,ea_buf[baddr].cc,attr);
-				}
-				else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
-				{
-					addch(baddr,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
-				}
+				if (toggled(MONOCASE))
+					addch(baddr,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
 				else
-				{
-					if (toggled(MONOCASE))
-						addch(baddr,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
-					else
-						addch(baddr,ebc2asc[ea_buf[baddr].cc],attr);
-				}
+					addch(baddr,ebc2asc[ea_buf[baddr].cc],attr);
 			}
-			baddr++;
 		}
 	}
 
-	if(callbacks && callbacks->display)
-		callbacks->display();
+}
 
+void screen_disp(void)
+{
+	screen_update(&h3270,0,ROWS*COLS);
+
+	if(callbacks && callbacks->display)
+		callbacks->display(&h3270);
 }
 
 void screen_suspend(void)
@@ -751,9 +750,11 @@ int query_counter(COUNTER_ID id)
 	return lib3270_event_counter[id];
 }
 
-void screen_changed(int bstart, int bend)
+/*
+void screen_changed(H3270 *session, int bstart, int bend)
 {
 }
+*/
 
 int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk)
 {
