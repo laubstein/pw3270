@@ -62,7 +62,7 @@
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
- static int  	  addch(int baddr, int c, unsigned short attr);
+ static int  	  addch(int row, int col, int c, unsigned short attr);
  static void	  set_charset(char *dcs);
 
  static void	  erase(void);
@@ -104,7 +104,7 @@
 
 	model_changed,			// void	(*model_changed)(H3270 *session, const char *name, int model, int cols, int rows);
 
-	addch,					// void (*addch)(int baddr, int c, int attr);
+	addch,					// void (*addch)(int row, int col, int c, int attr);
 	set_charset,			// void (*charset)(char *dcs);
 	settitle,				// void (*title)(char *text);
 	gdk_beep,				// void (*ring_bell)(void);
@@ -275,9 +275,10 @@
 
  }
 
- static int addch(int baddr, int c, unsigned short attr)
+ static int addch(int row, int col, int c, unsigned short attr)
  {
 
+	int		baddr = (row*screen->cols)+col;
  	ELEMENT in;
  	ELEMENT *el;
 
@@ -766,21 +767,18 @@
  {
 	if(valid_terminal_window() && screen_updates_enabled)
 	{
-		int		baddr   =  0;
 		int		row;
 		int		col;
 		cairo_t *cr	= get_terminal_cairo_context();
 
-		for(row = 0; row < screen->rows; row++)
+		for(row = 0; row < view.rows; row++)
 		{
 			int		cstart	= -1;
 			int 	bstart	= -1;
 			int 	bend	= -1;
-//#ifdef DEBUG
-//			int 	y 		= top_margin+(row * terminal_font_info.spacing);
-//#endif
+			int		baddr   =  row * screen->cols;
 
-			for(col = 0;col < screen->cols;col++)
+			for(col = 0;col < view.cols;col++)
 			{
 				if(screen->content[baddr].changed)
 				{
@@ -801,24 +799,6 @@
 					GdkRectangle r;
 					draw_region(cr,bstart,bend,color,&r);
 					gdk_window_invalidate_rect(terminal->window,&r,FALSE);
-
-//					#ifdef DEBUG
-//						if(r.x != left_margin+(cstart*fontWidth) || r.y != y || r.width != ((bend-bstart)+1)*fontWidth || r.height != terminal_font_info.spacing)
-//						{
-//							Trace("%s(%d,%d %d,%d->%d,%d row=%d (%d)) - Unexpected size returned from draw_region",
-//													__FUNCTION__,
-//													bstart,
-//													bend,
-//													bstart%screen->cols,bstart/screen->cols,
-//													bend%screen->cols,bend/screen->cols,
-//													row,(row*terminal_font_info.spacing)+top_margin);
-//							Trace("Rect: %d,%d->%d,%d",r.x,r.y,r.width,r.height);
-//							Trace("Area: %d,%d->%d,%d",left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
-//						}
-//					#endif
-
-//					gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
-
 					bstart = bend = -1;
 				}
 				baddr++;
@@ -829,17 +809,6 @@
 				GdkRectangle r;
 				draw_region(cr,bstart,bend,color,&r);
 				gdk_window_invalidate_rect(terminal->window,&r,FALSE);
-
-//				#ifdef DEBUG
-//					if(r.x != left_margin+(cstart*fontWidth) || r.y != y || r.width != ((bend-bstart)+1)*fontWidth || r.height != terminal_font_info.spacing)
-//					{
-//						Trace("%s(%d,%d) - Unexpected size returned from draw_region",__FUNCTION__,bstart,bend);
-//						Trace("Rect: %d,%d->%d,%d",r.x,r.y,r.width,r.height);
-//						Trace("Area: %d,%d->%d,%d",left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
-//					}
-//				#endif
-
-//				gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
 			}
 		}
 

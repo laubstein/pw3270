@@ -13,7 +13,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters="--program-data=.  --plugin-path=./bin/Debug/plugins" />
+				<Option parameters="--program-data=.  --model=5 --plugin-path=./bin/Debug/plugins" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>

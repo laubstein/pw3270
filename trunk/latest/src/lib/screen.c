@@ -102,11 +102,10 @@ void set_display_charset(char *dcs)
 		callbacks->charset(dcs);
 }
 
-static void
-addch(int baddr, int c, int attr)
+static void addch(int row, int col, int c, int attr)
 {
 	if(callbacks && callbacks->addch)
-		callbacks->addch(baddr, c, attr);
+		callbacks->addch(row, col, c, attr);
 }
 
 /**
@@ -366,18 +365,19 @@ int screen_read(char *dest, int baddr, int count)
 /* Display what's in the buffer. */
 void screen_update(H3270 *session, int bstart, int bend)
 {
-	int baddr;
+	int baddr, row, col;
 	int a;
 	int attr = COLOR_GREEN;
 	unsigned char fa;
-// #if defined(X3270_DBCS)
-//	enum dbcs_state d;
-// #endif
 	int fa_addr;
 
 	fa = get_field_attribute(bstart);
 	a = color_from_fa(fa);
 	fa_addr = find_field_attribute(bstart); // may be -1, that's okay
+
+	row = bstart/cCOLS;
+	col = bstart%cCOLS;
+
 	for(baddr = bstart; baddr < bend; baddr++)
 	{
 		if(ea_buf[baddr].fa)
@@ -386,21 +386,22 @@ void screen_update(H3270 *session, int bstart, int bend)
 			fa_addr = baddr;
 			fa = ea_buf[baddr].fa;
 			a = calc_attrs(baddr, baddr, fa);
-			addch(baddr,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
+			addch(row,col,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
 		}
 		else if (FA_IS_ZERO(fa))
 		{
 			// Blank.
-			addch(baddr,' ',attr=a);
+			addch(row,col,' ',attr=a);
 		}
 		else
 		{
-				// Normal text.
-			if (!(ea_buf[baddr].gr ||
-				  ea_buf[baddr].fg ||
-				  ea_buf[baddr].bg)) {
+			// Normal text.
+			if (!(ea_buf[baddr].gr || ea_buf[baddr].fg || ea_buf[baddr].bg))
+			{
 				attr = a;
-			} else {
+			}
+			else
+			{
 				int b;
 
 				//
@@ -412,27 +413,100 @@ void screen_update(H3270 *session, int bstart, int bend)
 
 			if (ea_buf[baddr].cs == CS_LINEDRAW)
 			{
-				addch(baddr,ea_buf[baddr].cc,attr);
+				addch(row,col,ea_buf[baddr].cc,attr);
 			}
 			else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
 			{
-				addch(baddr,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
+				addch(row,col,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
 			}
 			else
 			{
 				if (toggled(MONOCASE))
-					addch(baddr,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
+					addch(row,col,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
 				else
-					addch(baddr,ebc2asc[ea_buf[baddr].cc],attr);
+					addch(row,col,ebc2asc[ea_buf[baddr].cc],attr);
 			}
 		}
-	}
 
+		if(++col >= cCOLS)
+		{
+			row++;
+			col=0;
+		}
+
+	}
 }
 
 void screen_disp(void)
 {
-	screen_update(&h3270,0,ROWS*COLS);
+	screen_update(&h3270,0,maxROWS*maxCOLS);
+
+/*
+	int row, col;
+	int a;
+	int attr = COLOR_GREEN;
+	unsigned char fa;
+	int fa_addr;
+
+	fa = get_field_attribute(0);
+	a = color_from_fa(fa);
+	fa_addr = find_field_attribute(0); // may be -1, that's okay
+	for (row = 0; row < ROWS; row++)
+	{
+		for (col = 0; col < cCOLS; col++)
+		{
+			int baddr = row*cCOLS+col;
+
+			if(ea_buf[baddr].fa)
+			{
+				// Field attribute.
+				fa_addr = baddr;
+				fa = ea_buf[baddr].fa;
+				a = calc_attrs(baddr, baddr, fa);
+				addch(row,col,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
+			}
+			else if (FA_IS_ZERO(fa))
+			{
+				// Blank.
+				addch(row,col,' ',attr=a);
+			}
+			else
+			{
+				// Normal text.
+				if (!(ea_buf[baddr].gr || ea_buf[baddr].fg || ea_buf[baddr].bg))
+				{
+					attr = a;
+				}
+				else
+				{
+					int b;
+
+					//
+					// Override some of the field
+					// attributes.
+					//
+					attr = b = calc_attrs(baddr, fa_addr, fa);
+				}
+
+				if (ea_buf[baddr].cs == CS_LINEDRAW)
+				{
+					addch(row,col,ea_buf[baddr].cc,attr);
+				}
+				else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
+				{
+					addch(row,col,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
+				}
+				else
+				{
+					if (toggled(MONOCASE))
+						addch(row,col,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
+					else
+						addch(row,col,ebc2asc[ea_buf[baddr].cc],attr);
+				}
+			}
+		}
+	}
+*/
 
 	if(callbacks && callbacks->display)
 		callbacks->display(&h3270);
