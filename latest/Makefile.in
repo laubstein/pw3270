@@ -178,7 +178,7 @@ Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
 	@if [ -d "@GTKRUNTIME@" ]; then ln -s "@GTKRUNTIME@" bin/Release/gtk-runtime ;fi
 	@mkdir -p bin/Release/ui
 	@for i in $(UI_XML_FILES); do install -m 644 $$i bin/Release/ui; done
-	
+
 	@mkdir -p bin/Release/$(LOCALEDIR)/pt_BR/LC_MESSAGES
 	@msgfmt -c -v -o bin/Release/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo po/pt_BR.po
 
@@ -189,7 +189,7 @@ Debug:		$(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) \
 		$(LOGO)
 
 run: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(LOGO)
-	@bin/Debug/@PROGRAM_NAME@ --program-data="$(PWD)" --plugin-path=./bin/Debug/plugins
+	@bin/Debug/@PROGRAM_NAME@ --program-data="$(PWD)" --model=5 --plugin-path=./bin/Debug/plugins
 
 memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(LOGO)
 	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po

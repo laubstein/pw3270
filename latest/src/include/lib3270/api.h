@@ -392,7 +392,7 @@
 			void	(*Warning)(const char *fmt, va_list arg);
 			void	(*SysError)(const char *title, const char *message, const char *system);
 			void 	(*model_changed)(H3270 *session, const char *name, int model, int cols, int rows);
-			int		(*addch)(int baddr, int c, unsigned short attr);
+			int		(*addch)(int row, int col, int c, unsigned short attr);
 			void	(*charset)(char *dcs);
 			void	(*title)(char *text);
 			void	(*ring_bell)(void);
