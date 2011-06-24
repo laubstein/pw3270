@@ -86,9 +86,6 @@ struct ea      *ea_buf	= NULL;		/* 3270 device buffer */
 									/* ea_buf[-1] is the dummy default field attribute */
 
 Boolean         formatted = False;	/* set in screen_disp */
-// Boolean         screen_need_refresh = False;
-// int				first_changed = -1;
-// int				last_changed = -1;
 unsigned char	reply_mode = SF_SRM_FIELD;
 int				crm_nattr = 0;
 unsigned char	crm_attr[16];
@@ -128,9 +125,9 @@ static unsigned char	code_table[64] = {
 
 #define IsBlank(c)	((c == EBC_null) || (c == EBC_space))
 
-#define ALL_CHANGED	screen_changed(0,ROWS*COLS);
-#define REGION_CHANGED(f, l) { screen_changed(f,l); fprintf(stderr,"%s(%d): changed(%d,%d)\n",__FILE__,__LINE__,f,l);fflush(stderr); }
-#define ONE_CHANGED(n)	REGION_CHANGED(n, n+1);
+#define ALL_CHANGED	if(IN_ANSI) screen_update(&h3270,0,ROWS*COLS);
+#define REGION_CHANGED(f, l) if(IN_ANSI) screen_update(&h3270,f,l)
+#define ONE_CHANGED(n)	if(IN_ANSI) screen_update(&h3270,n,n+1);
 
 /*
 #define ALL_CHANGED	{ \

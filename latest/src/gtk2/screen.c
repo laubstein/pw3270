@@ -66,7 +66,7 @@
  static void	  set_charset(char *dcs);
 
  static void	  erase(void);
- static void	  display(void);
+ static void	  display(H3270 *session);
 
  static int	  SetSuspended(int state);
  static void	  SetScript(SCRIPT_STATE state);
@@ -119,7 +119,7 @@
 	set_oia,				// void (*set)(OIA_FLAG id, int on);
 
 	erase,					// void (*erase)(void);
-	display,				// void	(*display)(int bstart, int bend);
+	display,				// void	(*display)(H3270 *session);
 #ifdef HAVE_ALTSCREEN
 	view_changed,			// 			void 	(*set_viewsize)(H3270 *session, int rows, int cols);
 #else
@@ -762,7 +762,7 @@
 
  }
 
- static void display(void)
+ static void display(H3270 *session)
  {
 	if(valid_terminal_window() && screen_updates_enabled)
 	{

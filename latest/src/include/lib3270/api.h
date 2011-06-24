@@ -407,7 +407,7 @@
 			void	(*set)(OIA_FLAG id, int on);
 
 			void	(*erase)(void);
-			void	(*display)(void);
+			void	(*display)(H3270 *session);
 			void 	(*set_viewsize)(H3270 *session, int rows, int cols);
 
 			void	(*toggle_changed)(int ix, int value, int reason, const char *name);
