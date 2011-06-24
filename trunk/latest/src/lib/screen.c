@@ -439,7 +439,7 @@ void screen_update(H3270 *session, int bstart, int bend)
 
 void screen_disp(void)
 {
-	screen_update(&h3270,0,maxROWS*maxCOLS);
+	screen_update(&h3270,0,ROWS*cCOLS);
 
 /*
 	int row, col;
