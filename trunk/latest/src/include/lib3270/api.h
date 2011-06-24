@@ -489,7 +489,7 @@
         /* Screen calls */
 		LIB3270_EXPORT void screen_resume(void);
 		LIB3270_EXPORT void screen_suspend(void);
-		LIB3270_EXPORT void screen_disp(void);
+		LIB3270_EXPORT void screen_disp(H3270 *session);
 
 		/* Console calls */
 		LIB3270_EXPORT HCONSOLE	  console_window_new(const char *title, const char *label);

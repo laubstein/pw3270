@@ -239,7 +239,7 @@
  void set_monocase(int value, enum toggle_type reason)
  {
 	convert_charset = value ? convert_monocase : convert_regular;
-	screen_disp();
+	screen_disp(hSession);
  }
 
  static void convert_cg(ELEMENT *el, int c)

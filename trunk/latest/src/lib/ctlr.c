@@ -524,14 +524,14 @@ ctlr_erase(int alt)
 
 	if (alt) {
 		/* Going from 24x80 to maximum. */
-		screen_disp();
+		screen_disp(&h3270);
 		set_viewsize(&h3270,maxROWS,maxCOLS);
 	} else {
 		/* Going from maximum to 24x80. */
 		if (maxROWS > 24 || maxCOLS > 80) {
 			if (visible_control) {
 				ctlr_blanks();
-				screen_disp();
+				screen_disp(&h3270);
 			}
 			set_viewsize(&h3270,24,80);
 		}
@@ -2655,13 +2655,12 @@ void ctlr_scroll(void)
 	/* Synchronize pending changes prior to this. */
 
 	/* Move ea_buf. */
-	(void) memmove(&ea_buf[0], &ea_buf[COLS],
-	    qty * sizeof(struct ea));
+	(void) memmove(&ea_buf[0], &ea_buf[COLS],qty * sizeof(struct ea));
 
 	/* Clear the last line. */
 	(void) memset((char *) &ea_buf[qty], 0, COLS * sizeof(struct ea));
 
-	screen_scroll();
+	screen_disp(&h3270);
 
 }
 #endif /*]*/
@@ -2748,7 +2747,7 @@ ctlr_shrink(void)
 			    visible_control? EBC_space : EBC_null;
 	}
 	ALL_CHANGED;
-	screen_disp();
+	screen_disp(&h3270);
 }
 
 #if defined(X3270_DBCS) /*[*/

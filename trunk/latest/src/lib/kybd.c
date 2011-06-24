@@ -1781,7 +1781,7 @@ LIB3270_ACTION( delete )
 		if (!ea_buf[baddr].fa)
 			cursor_move(baddr);
 	}
-	screen_disp();
+	screen_disp(&h3270);
 	return 0;
 }
 
@@ -1813,7 +1813,7 @@ LIB3270_ACTION( backspace )
 		DEC_BA(baddr);
 		cursor_move(baddr);
 	}
-	screen_disp();
+	screen_disp(&h3270);
 	return 0;
 }
 
@@ -1875,7 +1875,7 @@ do_erase(void)
 		cursor_move(baddr);
 		(void) do_delete();
 	}
-	screen_disp();
+	screen_disp(&h3270);
 }
 
 LIB3270_ACTION( erase )
@@ -2630,7 +2630,7 @@ LIB3270_ACTION( eraseeol )
 			ea_buf[cursor_addr].cc = EBC_si;
 	}
 	(void) ctlr_dbcs_postprocess();
-	screen_disp();
+	screen_disp(&h3270);
 	return 0;
 }
 
@@ -2685,7 +2685,7 @@ LIB3270_ACTION( eraseeof )
 			ea_buf[cursor_addr].cc = EBC_si;
 	}
 	(void) ctlr_dbcs_postprocess();
-	screen_disp();
+	screen_disp(&h3270);
 	return 0;
 }
 
@@ -2740,7 +2740,7 @@ LIB3270_ACTION( eraseinput )
 		ctlr_clear(True);
 		cursor_move(0);
 	}
-	screen_disp();
+	screen_disp(&h3270);
 	return 0;
 }
 
@@ -2752,7 +2752,7 @@ LIB3270_ACTION( eraseinput )
  * but the last.
  *
  * Which is to say, does a ^W.
- */ 
+ */
 LIB3270_ACTION( deleteword )
 {
 	register int baddr;
@@ -2807,7 +2807,7 @@ LIB3270_ACTION( deleteword )
 		else
 			do_erase();
 	}
-	screen_disp();
+	screen_disp(&h3270);
 	return 0;
 }
 
@@ -2855,7 +2855,7 @@ LIB3270_ACTION( deletefield )
 		ctlr_add(baddr, EBC_null, 0);
 		INC_BA(baddr);
 	}
-	screen_disp();
+	screen_disp(&h3270);
 	return 0;
 }
 
@@ -3117,7 +3117,7 @@ void Input_String(const unsigned char *str)
 		key_ACharacter((unsigned char)((*str) & 0xff), KT_STD, IA_KEY, NULL);
 		str++;
 	}
-	screen_disp();
+	screen_disp(&h3270);
 }
 
 /*
@@ -3752,7 +3752,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 		break;
 	}
 
-	screen_disp();
+	screen_disp(&h3270);
 	return len;
 }
 
