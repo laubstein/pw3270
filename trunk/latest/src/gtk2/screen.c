@@ -327,7 +327,7 @@
 	else
 		in.status &= ~ELEMENT_STATUS_FIELD_MARKER;
 
-	if(el->changed || !memcmp(&in,el,sizeof(ELEMENT)))
+	if(!memcmp(&in,el,sizeof(ELEMENT)))
 		return 0;
 
 	memcpy(el,&in,sizeof(ELEMENT));
@@ -364,8 +364,8 @@
 
 		if(screen_updates_enabled)
 		{
-			int 	width  = screen->cols * fontWidth;
-			int 	height = screen->rows * terminal_font_info.spacing;
+			int 	width  = view.cols * fontWidth;
+			int 	height = view.rows * terminal_font_info.spacing;
 			cairo_t *cr	= get_terminal_cairo_context();
 
 			gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_BACKGROUND);

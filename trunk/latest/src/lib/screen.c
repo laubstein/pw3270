@@ -524,7 +524,6 @@ void screen_resume(void)
 
 	if(callbacks && callbacks->set_suspended)
 		callbacks->set_suspended(0);
-
 }
 
 int cursor_get_addr(void)
