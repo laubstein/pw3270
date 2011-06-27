@@ -125,6 +125,7 @@ static unsigned char	code_table[64] = {
 
 #define IsBlank(c)	((c == EBC_null) || (c == EBC_space))
 
+
 #define ALL_CHANGED	if(IN_ANSI) screen_update(&h3270,0,ROWS*COLS);
 #define REGION_CHANGED(f, l) if(IN_ANSI) screen_update(&h3270,f,l)
 #define ONE_CHANGED(n)	if(IN_ANSI) screen_update(&h3270,n,n+1);
