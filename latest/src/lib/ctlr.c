@@ -1127,7 +1127,6 @@ ctlr_erase_all_unprotected(void)
 
 	kybd_inhibit(False);
 
-	ALL_CHANGED;
 	if (formatted) {
 		/* find first field attribute */
 		baddr = 0;
@@ -1166,6 +1165,7 @@ ctlr_erase_all_unprotected(void)
 	}
 	aid = AID_NO;
 	do_reset(False);
+	ALL_CHANGED;
 }
 
 
@@ -2390,7 +2390,6 @@ ctlr_clear(Boolean can_snap)
 
 	/* Clear the screen. */
 	(void) memset((char *)ea_buf, 0, ROWS*COLS*sizeof(struct ea));
-	ALL_CHANGED;
 	cursor_move(0);
 	buffer_addr = 0;
 	// unselect(0, ROWS*COLS);
@@ -2400,6 +2399,10 @@ ctlr_clear(Boolean can_snap)
 	default_gr = 0;
 	default_ic = 0;
 	sscp_start = 0;
+
+//	ALL_CHANGED;
+	screen_erase();
+
 }
 
 /*
@@ -2414,11 +2417,11 @@ ctlr_blanks(void)
 		if (!ea_buf[baddr].fa)
 			ea_buf[baddr].cc = EBC_space;
 	}
-	ALL_CHANGED;
 	cursor_move(0);
 	buffer_addr = 0;
 	// unselect(0, ROWS*COLS);
 	formatted = False;
+	ALL_CHANGED;
 }
 
 
@@ -2431,9 +2434,10 @@ ctlr_add(int baddr, unsigned char c, unsigned char cs)
 {
 	unsigned char oc = 0;
 
-	if (ea_buf[baddr].fa ||
-	    ((oc = ea_buf[baddr].cc) != c || ea_buf[baddr].cs != cs)) {
-		if (trace_primed && !IsBlank(oc)) {
+	if(ea_buf[baddr].fa || ((oc = ea_buf[baddr].cc) != c || ea_buf[baddr].cs != cs))
+	{
+		if (trace_primed && !IsBlank(oc))
+		{
 #if defined(X3270_TRACE) /*[*/
 			if (toggled(SCREEN_TRACE))
 				trace_screen();
