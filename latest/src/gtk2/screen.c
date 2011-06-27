@@ -136,9 +136,6 @@
 
  };
 
- int					  left_margin										= 0;
- int					  top_margin										= 0;
-
  struct _screen		* screen											= NULL;
  struct _view			  view												= { 0 };
  char					* charset											= NULL;
@@ -369,11 +366,11 @@
 			cairo_t *cr	= get_terminal_cairo_context();
 
 			gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_BACKGROUND);
-			cairo_rectangle(cr, left_margin, top_margin, width, height);
+			cairo_rectangle(cr, view.left, view.top, width, height);
 			cairo_fill(cr);
 
 			cairo_destroy(cr);
-			gtk_widget_queue_draw_area(terminal,left_margin,top_margin,width,height);
+			gtk_widget_queue_draw_area(terminal,view.left, view.top,width,height);
 		}
 	}
 

@@ -365,6 +365,7 @@ int screen_read(char *dest, int baddr, int count)
 /* Display what's in the buffer. */
 void screen_update(H3270 *session, int bstart, int bend)
 {
+
 	int baddr, row, col;
 	int a;
 	int attr = COLOR_GREEN;
