@@ -177,6 +177,8 @@ H3270 * new_3270_session(void)
 	hSession->sz = sizeof(H3270);
 	hSession->sock = -1;
 	hSession->model_num = -1;
+	hSession->first_changed = -1;
+	hSession->last_changed = -1;
 
 	strncpy(hSession->full_model_name,"IBM-",FULL_MODEL_NAME_SIZE);
 	hSession->model_name = &hSession->full_model_name[4];

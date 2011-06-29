@@ -293,7 +293,7 @@ calc_attrs(int baddr, int fa_addr, int fa)
 }
 
 /* Erase screen */
-void screen_erase(void)
+void screen_erase(H3270 *session)
 {
 	/* If the application supplies a callback use it! */
 	if(callbacks && callbacks->erase)
@@ -303,7 +303,7 @@ void screen_erase(void)
 	}
 
 	/* No callback, just redraw */
-	screen_disp(&h3270);
+	screen_update(session,0,ROWS*cCOLS);
 }
 
 LIB3270_EXPORT void get_3270_terminal_size(H3270 *h, int *rows, int *cols)
@@ -379,7 +379,9 @@ void screen_update(H3270 *session, int bstart, int bend)
 	row = bstart/cCOLS;
 	col = bstart%cCOLS;
 
-	for(baddr = bstart; baddr < bend; baddr++)
+	Trace("Update@%d-%d (%d,%d): [%c]",bstart,bend,row,col,ebc2asc[ea_buf[bstart].cc]);
+
+	for(baddr = bstart; baddr <= bend; baddr++)
 	{
 		if(ea_buf[baddr].fa)
 		{
@@ -440,7 +442,11 @@ void screen_update(H3270 *session, int bstart, int bend)
 
 void screen_disp(H3270 *session)
 {
+	session->first_changed = -1;
+	session->last_changed = -1;
+
 	screen_update(session,0,ROWS*cCOLS);
+
 
 /*
 	int row, col;

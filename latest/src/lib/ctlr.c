@@ -107,6 +107,7 @@ static void	ctlr_connect(int ignored);
 static int	sscp_start;
 static void ticking_stop(void);
 static void ctlr_add_ic(int baddr, unsigned char ic);
+static void changed(H3270 *session, int bstart, int bend);
 
 /*
  * code_table is used to translate buffer addresses and attributes to the 3270
@@ -126,9 +127,9 @@ static unsigned char	code_table[64] = {
 #define IsBlank(c)	((c == EBC_null) || (c == EBC_space))
 
 
-#define ALL_CHANGED	if(IN_ANSI) screen_update(&h3270,0,ROWS*COLS);
-#define REGION_CHANGED(f, l) if(IN_ANSI) screen_update(&h3270,f,l)
-#define ONE_CHANGED(n)	if(IN_ANSI) screen_update(&h3270,n,n+1);
+#define ALL_CHANGED	if(IN_ANSI) changed(&h3270,0,ROWS*COLS);
+#define REGION_CHANGED(f, l) if(IN_ANSI) changed(&h3270,f,l)
+#define ONE_CHANGED(n)	if(IN_ANSI) changed(&h3270,n,n+1);
 
 /*
 #define ALL_CHANGED	{ \
@@ -515,7 +516,7 @@ ctlr_erase(int alt)
 	kybd_inhibit(False);
 
 	ctlr_clear(True);
-	screen_erase();
+	screen_erase(&h3270);
 
 	/* Let a script go. */
 //	sms_host_output();
@@ -2402,7 +2403,7 @@ ctlr_clear(Boolean can_snap)
 	sscp_start = 0;
 
 //	ALL_CHANGED;
-	screen_erase();
+	screen_erase(&h3270);
 
 }
 
@@ -2672,12 +2673,22 @@ void ctlr_scroll(void)
 
 /*
  * Note that a particular region of the screen has changed.
- */ /*
-void
-ctlr_changed(int bstart, int bend)
+ */
+void changed(H3270 *session, int bstart, int bend)
 {
-	REGION_CHANGED(bstart, bend);
-} */
+	if(session->first_changed < 0)
+	{
+		session->first_changed = bstart;
+		session->last_changed  = bend;
+		return;
+	}
+	if(bstart < session->first_changed)
+		session->first_changed = bstart;
+
+	if(bend > session->last_changed)
+		session->last_changed = bend;
+
+}
 
 #if defined(X3270_ANSI) /*[*/
 /*
