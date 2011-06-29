@@ -136,9 +136,11 @@
 			char				* current_host;
 			unsigned short	  current_port;
 
-			// Terminal info
+			// screen info
 			int					  ov_rows;
 			int					  ov_cols;
+			int					  first_changed;
+			int					  last_changed;
 
 
 		} H3270;

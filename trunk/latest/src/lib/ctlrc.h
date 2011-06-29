@@ -34,7 +34,7 @@ LIB3270_INTERNAL void ctlr_add_gr(int baddr, unsigned char gr);
 LIB3270_INTERNAL void ctlr_altbuffer(Boolean alt);
 LIB3270_INTERNAL Boolean ctlr_any_data(void);
 LIB3270_INTERNAL void ctlr_bcopy(int baddr_from, int baddr_to, int count, int move_ea);
-LIB3270_INTERNAL void ctlr_changed(int bstart, int bend);
+// LIB3270_INTERNAL void ctlr_changed(int bstart, int bend);
 LIB3270_INTERNAL void ctlr_clear(Boolean can_snap);
 LIB3270_INTERNAL void ctlr_erase_all_unprotected(void);
 LIB3270_INTERNAL void ctlr_init(unsigned cmask);
