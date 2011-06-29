@@ -175,7 +175,8 @@
 
 	<accelerator action='Home' key='Home' group='online' />
 	<accelerator action='Reset' key='<Shift><Ctrl>r' group='online' />
-	<accelerator action='Return' key='Return' />
+	<accelerator action='Newline' key='Return' />
+	<accelerator action='Return' key='Control_R' group='online' />
 	<accelerator action='Enter' key='KP_Enter' />
 	<accelerator action='Break' key='Escape' group='online' />
 	

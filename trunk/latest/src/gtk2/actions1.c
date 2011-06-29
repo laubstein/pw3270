@@ -339,13 +339,27 @@
 	// FIXME (perry#1#): Find a better way!
 	if( event->keyval == 0xffffff && event->hardware_keycode == 0x0013)
 		event->keyval = GDK_Pause;
+
+	// Windows sets <ctrl> in left/right control
+	else if(state & GDK_CONTROL_MASK && (event->keyval == GDK_Control_R || event->keyval == GDK_Control_L))
+		state &= ~GDK_CONTROL_MASK;
+
 #endif
 
-	Trace("Key action 0x%04x: %s %s keycode: 0x%04x",event->keyval,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "",event->hardware_keycode);
+	Trace("Key action 0x%04x: Name:%s %s%s%s keycode: 0x%04x state: 0x%04x",
+			event->keyval,
+			gdk_keyval_name(event->keyval),
+			state & GDK_SHIFT_MASK ? "Shift " : "",
+			state & GDK_CONTROL_MASK ? "Control " : "",
+			state & GDK_ALT_MASK ? "Shift " : "",
+			event->hardware_keycode,
+			state);
 
     // Check for special keyproc actions
 	for(f=0; f < G_N_ELEMENTS(keyboard_action);f++)
 	{
+//		Trace("%d keyval=%04x state=%04x",f,keyboard_action[f].keyval,keyboard_action[f].state);
+
 		if(keyboard_action[f].keyval == event->keyval && state == keyboard_action[f].state)
 		{
 #ifdef DEBUG
