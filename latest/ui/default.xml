@@ -178,6 +178,7 @@
 	<accelerator action='Return' key='Return' />
 	<accelerator action='Enter' key='KP_Enter' />
 	<accelerator action='Break' key='Escape' group='online' />
+	<accelerator action='Attn' key='<shift>Escape' group='online' />
 	
 	<accelerator action='DeleteWord' key='<Ctrl>w' group='online' />
 	<accelerator action='Delete' key='Delete' group='online' />
