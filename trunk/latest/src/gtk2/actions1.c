@@ -574,6 +574,7 @@
 		{ "Erase",				G_CALLBACK(lib3270_erase)			},
 		{ "SysREQ",				G_CALLBACK(lib3270_sysreq)			},
 		{ "Attn",				G_CALLBACK(lib3270_attn)			},
+		{ "Break",				G_CALLBACK(lib3270_break)			},
 
 		{ "FirstField",			G_CALLBACK(lib3270_firstfield)		},
 

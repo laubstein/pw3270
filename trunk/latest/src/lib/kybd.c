@@ -594,7 +594,7 @@ LIB3270_ACTION(attn)
 	if (!IN_3270)
 		return 0;
 
-//	reset_idle_timer();
+	Trace("%s",__FUNCTION__);
 
 	net_interrupt();
 

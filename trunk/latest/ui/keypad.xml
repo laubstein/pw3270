@@ -86,6 +86,11 @@
 			<button action='EraseInput' label="Erase\nInput" />
 		</row>
 		<row>
+			<button action='Attn' label="Attn" />
+			<button action='Break' label="Break" />
+		</row>
+
+		<row>
 			<button action='Enter' icon="ok" />
 		</row>
 
