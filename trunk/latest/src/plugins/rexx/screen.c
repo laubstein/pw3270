@@ -509,9 +509,9 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
-/* Rexx External Function: rx3270WaitForChanges                               */
+/* Rexx External Function: rx3270WaitForCtrlrDone                             */
 /*                                                                            */
-/* Description: Wait until the screen changes.                                */
+/* Description: Wait for next screen                                          */
 /*                                                                            */
 /* Rexx Args:	Timeout in seconds  (None to default to 60 seconds)           */
 /*                                                                            */
@@ -519,9 +519,9 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
- RexxReturnCode REXXENTRY rx3270WaitForChanges(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270WaitForCtlrDone(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	int 			last;
+ 	int 			last = query_counter(COUNTER_ID_CTLR_DONE);
  	int				rc  = 0;
  	int 			end = time(0);
 
@@ -539,7 +539,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 		return RXFUNC_BADCALL;
 	}
 
-	while(!rc)
+	while(!rc && last == query_counter(COUNTER_ID_CTLR_DONE))
 	{
 		if(!CONNECTED)
 			rc = ENOTCONN;
