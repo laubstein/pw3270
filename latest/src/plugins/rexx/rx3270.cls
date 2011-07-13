@@ -97,6 +97,10 @@ return rx3270WaitForTerminalReady(timeout)
 	use arg row, col, str
 return rx3270InputString(row,col,str)
 
+::method getStringAt
+	use arg row, col, size
+return rx3270ReadScreen(row,col,size)
+
 ::method sendEnterKey
 return rx3270SendENTERKey()
 
