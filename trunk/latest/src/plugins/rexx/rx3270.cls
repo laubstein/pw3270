@@ -69,6 +69,10 @@ return self~getConnectionState() = "CONNECTED_TN3270E"
 ::method waitForEvents
 return rx3270WaitForEvents()
 
+::method sleep
+	use arg seconds
+return rx3270Sleep(seconds)
+
 ::method getScreenContentAt
 	use arg row, col, size
 return rx3270ReadScreen(row,col,size)
