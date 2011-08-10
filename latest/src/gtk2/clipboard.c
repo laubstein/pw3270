@@ -275,7 +275,7 @@
 			*ptr = ' ';
     }
 
-	Trace("Received text:%p (%d bytes) Clipboard is %p\n",buffer,strlen(buffer),clipboard_string);
+	Trace("Received text:%p (%d bytes) Clipboard is %p\n",buffer,(int) strlen(buffer),clipboard_string);
 
 	paste_string(buffer);
 
