@@ -1514,7 +1514,7 @@ tn3270e_request(void)
 	net_rawout((unsigned char *)tt_out, tb_len);
 
 	trace_dsn("SENT %s %s DEVICE-TYPE REQUEST %.*s%s%s %s\n",
-	    cmd(SB), opt(TELOPT_TN3270E), strlen(h3270.termtype), tt_out + 5,
+	    cmd(SB), opt(TELOPT_TN3270E), (int) strlen(h3270.termtype), tt_out + 5,
 	    (try_lu != CN && *try_lu) ? " CONNECT " : "",
 	    (try_lu != CN && *try_lu) ? try_lu : "",
 	    cmd(SE));
