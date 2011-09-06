@@ -35,8 +35,8 @@
  #include "actions.h"
  #include "fonts.h"
 
- #include <globals.h>
- #include <lib3270/kybdc.h>
+// #include <globals.h>
+// #include <lib3270/kybdc.h>
  #include <lib3270/toggle.h>
  #include <lib3270/3270ds.h>
 

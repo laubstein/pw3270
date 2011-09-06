@@ -1,0 +1,111 @@
+#
+# "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
+# (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+# aplicativos mainframe. Registro no INPI sob o nome G3270.
+#
+# Copyright (C) <2008> <Banco do Brasil S.A.>
+#
+# Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+# os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+# Free Software Foundation.
+#
+# Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+# GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+# A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+# obter mais detalhes.
+#
+# Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+# programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA, 02111-1307, USA
+#
+# Contatos:
+#
+# perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+# erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+# licinio@bb.com.br		(Licínio Luis Branco)
+# kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+# macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+#
+
+#---[ Configuration values ]---------------------------------------------------
+
+MODULE_NAME=rx3270
+
+REXXCONFIG=@REXXCONFIG@
+STRIP=@STRIP@
+
+OBJDBG=@OBJDIR@/Debug/plugins/$(MODULE_NAME)
+BINDBG=@BINDIR@/Debug/plugins
+
+OBJRLS=@OBJDIR@/Release/plugins/$(MODULE_NAME)
+BINRLS=@BINDIR@/Release/plugins
+
+CC = @CC@
+LD = @LD@
+
+DBG_CFLAGS=-DDEBUG=1
+RLS_CFLAGS=-DNDEBUG=1
+
+CFLAGS=@CFLAGS@ `$(REXXCONFIG) --cflags`
+LDFLAGS=@DLL_LDFLAGS@ @LDFLAGS@ `$(REXXCONFIG) --libs`
+
+LIB3270_CFLAGS ?= `pkg-config --cflags pw3270`
+LIB3270_LIBS ?= `pkg-config --libs pw3270`
+
+GLIB_CFLAGS=@GLIB_CFLAGS@
+GLIB_LIBS=@GLIB_LIBS@
+
+GTK_CFLAGS=@GTK_CFLAGS@
+GTK_LIBS=@GTK_LIBS@
+
+#---[ Sources ]----------------------------------------------------------------
+
+COMMON_SRC = common_start.c screen.c toggle.c tools.c init.c network.c filetransfer.c
+LIBRARY_SRC = std_start.c
+PLUGIN_SRC = plg_start.c gui.c dialogs.c actions.c
+
+#---[ Rules ]------------------------------------------------------------------
+
+$(OBJDBG)/%@OBJEXT@: %.c *.h
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(GLIB_CFLAGS) $(GTK_CFLAGS) -o $@ -c $<
+
+$(OBJRLS)/%@OBJEXT@: %.c *.h
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(GLIB_CFLAGS) $(GTK_CFLAGS) -o $@ -c $<
+
+#---[ Targets ]----------------------------------------------------------------
+
+@BINDIR@/Debug/plugins/$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(COMMON_SRC) $(PLUGIN_SRC)), $(OBJDBG)/$(SRC)@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS)
+	@rm -f $(basename \$(@F)).a
+	@rm -f $(basename \$(@F)).def
+
+@BINDIR@/Release/plugins/$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(COMMON_SRC) $(PLUGIN_SRC)), $(OBJRLS)/$(SRC)@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS)
+	@rm -f $(basename \$(@F)).a
+	@rm -f $(basename \$(@F)).def
+	@$(STRIP) $@
+
+@BINDIR@/Debug/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(COMMON_SRC) $(LIBRARY_SRC)), $(OBJDBG)/$(SRC)@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS)
+	@rm -f $(basename \$(@F)).a
+	@rm -f $(basename \$(@F)).def
+
+@BINDIR@/Release/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(COMMON_SRC) $(LIBRARY_SRC)), $(OBJRLS)/$(SRC)@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS)
+	@rm -f $(basename \$(@F)).a
+	@rm -f $(basename \$(@F)).def
+	@$(STRIP) $@
+
+

@@ -40,13 +40,10 @@
 
 #include "actionsc.h"
 #include "hostc.h"
-// #include "keymapc.h"
 #include "kybdc.h"
-// #include "macrosc.h"
 #include "popupsc.h"
 #include "printc.h"
 #include "resources.h"
-// #include "selectc.h"
 #include "togglesc.h"
 #include "trace_dsc.h"
 #include "utilc.h"
@@ -269,7 +266,7 @@ event_is_meta(int state)
 {
 	int i;
 
-	// Learn the modifier map. 
+	// Learn the modifier map.
 	if (!know_mods) {
 		learn_modifiers();
 		know_mods = True;
