@@ -210,12 +210,19 @@ distclean: clean
 	@rm -f src/include/lib3270/plugins.h
 	@rm -f *.tar.gz
 	@rm -f *.src.rpm
+	@rm -f *.pc
+	@rm -f *.nsi
+	@rm -f *.spec
+	@rm -f *.desktop
 	@rm -f src/gtk2/resources.rc
 	@rm -f src/oxt/description.xml
 	@rm -f src/oxt/manifest.xml
 	@rm -f version
 	@rm -f src/plugins/rexx/Makefile
 	@rm -f src/include/lib3270/plugins.h
+	@rm -f *.log
+	@rm -f *.layout
+	@rm -f src/include/lib3270/config.h
 
 clean:
 	@rm -fr .obj
