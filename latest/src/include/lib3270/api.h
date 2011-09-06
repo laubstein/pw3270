@@ -37,7 +37,7 @@
 	extern "C" {
 #endif
 
-		#define LIB3270_H_INCLUDED "4.0"
+		#define LIB3270_H_INCLUDED "4.2"
 
 		#include <errno.h>
 
@@ -45,7 +45,12 @@
 			#include <windows.h>
 
 			#define LIB3270_EXPORT	__declspec (dllexport)
-			#define LOCAL_EXTERN	extern
+
+			#if defined (HAVE_GNUC_VISIBILITY)
+					#define LOCAL_EXTERN	__attribute__((visibility("hidden"))) extern
+			#else
+					#define LOCAL_EXTERN extern
+			#endif
 
 		#else
 			#include <stdarg.h>
@@ -53,13 +58,15 @@
 			// http://gcc.gnu.org/wiki/Visibility
 			#if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
 					#define LOCAL_EXTERN __hidden extern
-			#elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
-					#define LOCAL_EXTERN __attribute__((visibility("hidden"))) extern
+					#define LIB3270_EXPORT
+			#elif defined (HAVE_GNUC_VISIBILITY)
+					#define LOCAL_EXTERN	__attribute__((visibility("hidden"))) extern
+					#define LIB3270_EXPORT	__attribute__((visibility("default"))) extern
 			#else
 					#define LOCAL_EXTERN extern
+					#define LIB3270_EXPORT
 			#endif
 
-			#define LIB3270_EXPORT
 
 		#endif
 
@@ -257,12 +264,7 @@
 
 		LIB3270_EXPORT int RegisterFTCallbacks(const struct filetransfer_callbacks *cbk);
 
-		/* Library internals */
-		#ifdef LIB3270
-
-			extern enum ft_state ft_state;
-
-		#else
+		#ifndef LIB3270
 
 			LIB3270_EXPORT enum cstate 	QueryCstate(void);
 			LIB3270_EXPORT enum ft_state	QueryFTstate(void);
@@ -464,6 +466,9 @@
 		LIB3270_EXPORT int lib3270_paste_string(const unsigned char *str);
 		LIB3270_EXPORT void get_3270_terminal_size(H3270 *h, int *rows, int *cols);
 
+		/* Keyboard */
+		LIB3270_EXPORT int			  emulate_input(char *s, int len, int pasting);
+
 		/* Network related calls */
 		LIB3270_EXPORT int 			  Get3270Socket(void);
 
@@ -507,10 +512,25 @@
 		#include <lib3270/actions.h>
 
 		/* Host connect/disconnect and state change. */
+		typedef enum state_change
+		{
+			ST_RESOLVING,
+			ST_HALF_CONNECT,
+			ST_CONNECT,
+			ST_3270_MODE,
+			ST_LINE_MODE,
+			ST_REMODEL,
+			ST_PRINTER,
+			ST_EXITING,
+			ST_CHARSET,
+
+			N_ST				// Always the last one
+		} LIB3270_STATE_CHANGE;
+
 		LIB3270_EXPORT int host_connect(const char *n, int wait);
 		LIB3270_EXPORT int host_reconnect(int wait);
 		LIB3270_EXPORT void host_disconnect(H3270 *h, int disable);
-		LIB3270_EXPORT void register_schange(int tx, void (*func)(int));
+		LIB3270_EXPORT void register_schange(LIB3270_STATE_CHANGE tx, void (*func)(int));
 
 		/* Console/Trace window */
 		LIB3270_EXPORT HCONSOLE	  console_window_new(const char *title, const char *label);

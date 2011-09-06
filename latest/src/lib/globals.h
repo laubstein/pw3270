@@ -39,8 +39,6 @@
 	#define LIB3270_INTERNAL __hidden extern
 #elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
 	#define LIB3270_INTERNAL __attribute__((visibility("hidden"))) extern
-#elif defined( WIN32 )
-	#define LIB3270_INTERNAL
 #else
 	#define LIB3270_INTERNAL
 	#warning Exporting internal calls
@@ -244,23 +242,19 @@ LIB3270_INTERNAL int			*xtra_width;
 	LIB3270_INTERNAL unsigned char	xk_selector;
 #endif /*]*/
 
-/* Data types and complex global variables */
+/* Connection state */
+LIB3270_INTERNAL enum ft_state ft_state;
+LIB3270_INTERNAL enum cstate cstate;
 
-#ifdef LIB3270
-
-	extern enum cstate cstate;
-
-	#define PCONNECTED	((int)cstate >= (int)RESOLVING)
-	#define HALF_CONNECTED	(cstate == RESOLVING || cstate == PENDING)
-	#define CONNECTED	((int)cstate >= (int)CONNECTED_INITIAL)
-	#define IN_NEITHER	(cstate == CONNECTED_INITIAL)
-	#define IN_ANSI		(cstate == CONNECTED_ANSI || cstate == CONNECTED_NVT)
-	#define IN_3270		(cstate == CONNECTED_3270 || cstate == CONNECTED_TN3270E || cstate == CONNECTED_SSCP)
-	#define IN_SSCP		(cstate == CONNECTED_SSCP)
-	#define IN_TN3270E	(cstate == CONNECTED_TN3270E)
-	#define IN_E		(cstate >= CONNECTED_INITIAL_E)
-
-#endif
+#define PCONNECTED	((int)cstate >= (int)RESOLVING)
+#define HALF_CONNECTED	(cstate == RESOLVING || cstate == PENDING)
+#define CONNECTED	((int)cstate >= (int)CONNECTED_INITIAL)
+#define IN_NEITHER	(cstate == CONNECTED_INITIAL)
+#define IN_ANSI		(cstate == CONNECTED_ANSI || cstate == CONNECTED_NVT)
+#define IN_3270		(cstate == CONNECTED_3270 || cstate == CONNECTED_TN3270E || cstate == CONNECTED_SSCP)
+#define IN_SSCP		(cstate == CONNECTED_SSCP)
+#define IN_TN3270E	(cstate == CONNECTED_TN3270E)
+#define IN_E		(cstate >= CONNECTED_INITIAL_E)
 
 /*   keyboard modifer bitmap */
 #define ShiftKeyDown	0x01
@@ -287,7 +281,7 @@ LIB3270_INTERNAL struct trans_list *trans_list;
 /*   input key type */
 // enum keytype { KT_STD, KT_GE };
 
-/*   state changes */
+/*   state changes */ /*
 enum state_change
 {
 	ST_RESOLVING,
@@ -301,7 +295,7 @@ enum state_change
 	ST_CHARSET,
 
 	N_ST				// Always the last one
-};
+}; */
 
 /* Naming convention for private actions. */
 #define PA_PFX	"PA-"

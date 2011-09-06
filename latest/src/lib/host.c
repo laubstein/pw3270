@@ -60,11 +60,11 @@
 #define MAX_RECENT	5
 
 enum cstate	cstate = NOT_CONNECTED;
-Boolean		std_ds_host = False;
-Boolean		no_login_host = False;
-Boolean		non_tn3270e_host = False;
-Boolean		passthru_host = False;
-Boolean		ssl_host = False;
+Boolean			std_ds_host = False;
+Boolean			no_login_host = False;
+Boolean			non_tn3270e_host = False;
+Boolean			passthru_host = False;
+Boolean			ssl_host = False;
 
 //#define		LUNAME_SIZE	16
 //char		luname[LUNAME_SIZE+1];
@@ -989,7 +989,7 @@ static struct st_callback *st_last[N_ST];
 
 /* Register a function interested in a state change. */
 void
-register_schange(int tx, void (*func)(int))
+register_schange(LIB3270_STATE_CHANGE tx, void (*func)(int))
 {
 	struct st_callback *st;
 

@@ -42,7 +42,7 @@
 
 #include <glib/gstdio.h>
 
-#include "globals.h"
+// #include "globals.h"
 
 #if !defined(_WIN32)
 	#include <sys/wait.h>
@@ -90,7 +90,7 @@ static void connect_main(int status)
 	{
 		SetStatusCode(STATUS_CODE_DISCONNECTED);
 		cMode &= ~CURSOR_MODE_ENABLED;
-		ctlr_erase(True);
+		ctlr_erase(1);
 		online = FALSE;
 #ifdef 	X3270_FT
 		action_group_set_sensitive(ACTION_GROUP_FT,status);

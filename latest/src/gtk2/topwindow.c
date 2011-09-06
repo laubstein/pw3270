@@ -154,7 +154,7 @@
 	}
 	else
 	{
-		gchar *filename = g_build_filename(program_data,LOGO,NULL);
+		gchar *filename = g_build_filename(program_data,PROGRAM_LOGO,NULL);
 
 		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
 			pix = gdk_pixbuf_new_from_file(filename, NULL);

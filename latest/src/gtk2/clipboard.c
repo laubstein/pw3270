@@ -33,8 +33,8 @@
  #include "gui.h"
  #include "fonts.h"
  #include "actions.h"
- #include <globals.h>
- #include <lib3270/kybdc.h>
+// #include <globals.h>
+// #include <lib3270/kybdc.h>
  #include <lib3270/toggle.h>
  #include <string.h>
 
