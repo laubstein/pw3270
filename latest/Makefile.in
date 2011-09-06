@@ -32,12 +32,13 @@
 PACKAGE_NAME=@PACKAGE_NAME@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-bindir=@bindir@
+bindir=$(BINDIR)
 sbindir=@sbindir@
 libdir=@libdir@
 includedir=@includedir@
 datarootdir=@datarootdir@
 localedir=@localedir@
+BINDIR=@BINDIR@
 
 CC = @CC@
 LD = @LD@
@@ -75,12 +76,12 @@ PLUGINS=@PLUGINS@
 LIBRARIES=@LIBRARIES@
 
 LIB3270_CFLAGS=-I@SRCDIR@/include -DDATAROOTDIR=\"$(datarootdir)\" -DLOCALEDIR=\"$(localedir)\"
-LIB3270_LIBS=-L@BINDIR@/Release/lib -l3270
-LIB3270_DBGLIBS=-L@BINDIR@/Debug/lib -l3270 -Wl,-rpath,@BINDIR@/Debug/lib 
+LIB3270_LIBS=-L$(BINDIR)/Release/lib -l3270
+LIB3270_DBGLIBS=-L$(BINDIR)/Debug/lib -l3270 -Wl,-rpath,$(BINDIR)/Debug/lib 
 
 GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
-DBG_MAKE="LIB3270_CFLAGS=$(LIB3270_CFLAGS)" LIB3270_LIBS="$(LIB3270_DBGLIBS)" GLOBAL_DEPENDS="@BINDIR@/Debug/lib/lib3270@DLLEXT@"
-RLS_MAKE="LIB3270_CFLAGS=$(LIB3270_CFLAGS)" LIB3270_LIBS="$(LIB3270_LIBS)" GLOBAL_DEPENDS="@BINDIR@/Release/lib/lib3270@DLLEXT@"
+DBG_MAKE="LIB3270_CFLAGS=$(LIB3270_CFLAGS)" LIB3270_LIBS="$(LIB3270_DBGLIBS)" GLOBAL_DEPENDS="$(BINDIR)/Debug/lib/lib3270@DLLEXT@"
+RLS_MAKE="LIB3270_CFLAGS=$(LIB3270_CFLAGS)" LIB3270_LIBS="$(LIB3270_LIBS)" GLOBAL_DEPENDS="$(BINDIR)/Release/lib/lib3270@DLLEXT@"
 
 #---[ Sources ]----------------------------------------------------------------
 
@@ -131,27 +132,27 @@ LIB_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 
 #---[ Plugins & Libraries ]----------------------------------------------------
 
-@BINDIR@/Debug/plugins/rx3270@DLLEXT@: @BINDIR@/Debug/lib/lib3270@DLLEXT@ src/plugins/rexx/*
+$(BINDIR)/Debug/plugins/rx3270@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(DBG_MAKE) -C src/plugins/rexx $@
 
-@BINDIR@/Debug/librx3270@DLLEXT@: @BINDIR@/Debug/lib/lib3270@DLLEXT@ src/plugins/rexx/*
+$(BINDIR)/Debug/librx3270@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(DBG_MAKE) -C src/plugins/rexx $@
 
-@BINDIR@/Release/plugins/rx3270@DLLEXT@: @BINDIR@/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
+$(BINDIR)/Release/plugins/rx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
 
-@BINDIR@/Release/librx3270@DLLEXT@: @BINDIR@/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
+$(BINDIR)/Release/librx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
 
 #---[ Targets ]----------------------------------------------------------------
 
-@BINDIR@/Release/@PROGRAM_NAME@@EXEEXT@: @BINDIR@/Release/lib/lib3270@DLLEXT@ $(foreach SRC, $(basename $(GTK2_SRCS)), @OBJDIR@/Release/src/gtk2/$(SRC)@OBJEXT@)
+$(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ $(foreach SRC, $(basename $(GTK2_SRCS)), @OBJDIR@/Release/src/gtk2/$(SRC)@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(LD) -o $@ $^ $(LIB3270_LIBS) $(GNOME_LIBS) $(IGEMAC_LIBS) $(GLIB_LIBS) $(CAIRO_LIBS) $(GTK_LIBS)
 	@$(STRIP) $@
 
-@BINDIR@/Release/lib/lib3270@DLLEXT@: @OBJDIR@/Release/version@OBJEXT@ $(foreach SRC, $(basename $(LIB_SRCS)), @OBJDIR@/Release/src/lib/$(SRC)@OBJEXT@) @OBJDIR@/fallbacks@OBJEXT@
+$(BINDIR)/Release/lib/lib3270@DLLEXT@: @OBJDIR@/Release/version@OBJEXT@ $(foreach SRC, $(basename $(LIB_SRCS)), @OBJDIR@/Release/src/lib/$(SRC)@OBJEXT@) @OBJDIR@/fallbacks@OBJEXT@
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@rm -f $(basename \$(@F)).a
@@ -159,12 +160,12 @@ LIB_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 	@$(LD) $(DLL_LDFLAGS) -o $@ $^ $(SSL_LIBS)
 	@$(STRIP) $@
 
-@BINDIR@/Debug/@PROGRAM_NAME@@EXEEXT@: @BINDIR@/Debug/lib/lib3270@DLLEXT@ $(foreach SRC, $(basename $(GTK2_SRCS)), @OBJDIR@/Debug/src/gtk2/$(SRC)@OBJEXT@)
+$(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ $(foreach SRC, $(basename $(GTK2_SRCS)), @OBJDIR@/Debug/src/gtk2/$(SRC)@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(LD) -o $@ $^ $(LIB3270_DBGLIBS) $(GNOME_LIBS) $(IGEMAC_LIBS) $(GLIB_LIBS) $(CAIRO_LIBS) $(GTK_LIBS)
 
-@BINDIR@/Debug/lib/lib3270@DLLEXT@: @OBJDIR@/Debug/version@OBJEXT@ $(foreach SRC, $(basename $(LIB_SRCS)), @OBJDIR@/Debug/src/lib/$(SRC)@OBJEXT@) @OBJDIR@/fallbacks@OBJEXT@
+$(BINDIR)/Debug/lib/lib3270@DLLEXT@: @OBJDIR@/Debug/version@OBJEXT@ $(foreach SRC, $(basename $(LIB_SRCS)), @OBJDIR@/Debug/src/lib/$(SRC)@OBJEXT@) @OBJDIR@/fallbacks@OBJEXT@
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@rm -f $(basename \$(@F)).a
@@ -175,13 +176,13 @@ src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@echo $@ ...
 	@src/mkversion.sh
 
-@OBJDIR@/fallbacks@OBJEXT@: @BINDIR@/mkfb@EXEEXT@ src/lib/X3270.xad
+@OBJDIR@/fallbacks@OBJEXT@: $(BINDIR)/mkfb@EXEEXT@ src/lib/X3270.xad
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@@BINDIR@/mkfb@EXEEXT@ -c src/lib/X3270.xad @OBJDIR@/falbacks.c
+	@$(BINDIR)/mkfb@EXEEXT@ -c src/lib/X3270.xad @OBJDIR@/falbacks.c
 	@$(CC) -DLIB3270=1 $(RLS_CFLAGS) $(CFLAGS) -Isrc/lib -Isrc/include -o $@ -c @OBJDIR@/falbacks.c
 
-@BINDIR@/mkfb@EXEEXT@: src/lib/mkfb.c Makefile
+$(BINDIR)/mkfb@EXEEXT@: src/lib/mkfb.c Makefile
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(HOST_CC) -g -o $@ -D_WIN32 src/lib/mkfb.c
@@ -190,19 +191,19 @@ src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@echo $@ ...
 	@cp image/@PROGRAM_LOGO@ @PROGRAM_LOGO@
 
-Debug:	@BINDIR@/Debug/@PROGRAM_NAME@@EXEEXT@ \
+Debug:	$(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@ \
 	@PROGRAM_LOGO@ \
-	$(foreach PLUGIN, $(PLUGINS), @BINDIR@/Debug/plugins/$(PLUGIN)@DLLEXT@) \
-	$(foreach LIB, $(LIBRARIES), @BINDIR@/Debug/$(LIB)@DLLEXT@)
+	$(foreach PLUGIN, $(PLUGINS), $(BINDIR)/Debug/plugins/$(PLUGIN)@DLLEXT@) \
+	$(foreach LIB, $(LIBRARIES), $(BINDIR)/Debug/$(LIB)@DLLEXT@)
 
-Release: @BINDIR@/Release/@PROGRAM_NAME@@EXEEXT@ \
+Release: $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@ \
 		@PROGRAM_LOGO@ \
-		$(foreach PLUGIN, $(PLUGINS), @BINDIR@/Release/plugins/$(PLUGIN)@DLLEXT@) \
-		$(foreach LIB, $(LIBRARIES), @BINDIR@/Release/$(LIB)@DLLEXT@)
+		$(foreach PLUGIN, $(PLUGINS), $(BINDIR)/Release/plugins/$(PLUGIN)@DLLEXT@) \
+		$(foreach LIB, $(LIBRARIES), $(BINDIR)/Release/$(LIB)@DLLEXT@)
 
 
-run: @BINDIR@/Debug/@PROGRAM_NAME@@EXEEXT@ @PROGRAM_LOGO@
-	@@BINDIR@/Debug/@PROGRAM_NAME@@EXEEXT@ --program-data="$(PWD)" --model=5 --plugin-path=./bin/Debug/plugins
+run: Debug
+	@$(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@ --program-data="$(PWD)" --model=5 --plugin-path=$(BINDIR)/Debug/plugins
 
 distclean: clean
 	@rm -f src/version.c
@@ -215,6 +216,7 @@ distclean: clean
 	@rm -f *.spec
 	@rm -f *.desktop
 	@rm -f src/gtk2/resources.rc
+	@rm -f src/gtk2/version.c
 	@rm -f src/oxt/description.xml
 	@rm -f src/oxt/manifest.xml
 	@rm -f version
