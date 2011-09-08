@@ -305,6 +305,7 @@ PKG_CHECK_MODULES( [GLIB], [glib-2.0 gthread-2.0 gmodule-2.0], AC_DEFINE(HAVE_GL
 PKG_CHECK_MODULES( [GTK], [gtk+-2.0 >= 2.8], AC_DEFINE(HAVE_GTK) )
 PKG_CHECK_MODULES( [CAIRO], [cairo >= 1.8], AC_DEFINE(HAVE_CAIRO) )
 PKG_CHECK_MODULES( [IGEMAC], [ige-mac-integration], AC_DEFINE(HAVE_IGEMAC), AC_MSG_NOTICE([ige-mac-integration not present.]) )
+PKG_CHECK_MODULES( [UNITY], [unity], AC_DEFINE(HAVE_UNITY), AC_MSG_NOTICE([Unity is not present.]) )
 
 if test "$app_cv_gnome" == "yes"; then
 	PKG_CHECK_MODULES( [GNOME], [libgnome-2.0 libgnomeui-2.0],AC_DEFINE(HAVE_GNOME),AC_MSG_NOTICE([gnomeui not present.]) )
