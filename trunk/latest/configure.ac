@@ -379,7 +379,7 @@ AC_SUBST(OBJEXT)
 AC_SUBST(GUI_SRCS,"$app_cv_srcgui")
 AC_SUBST(LIB_SRCS,"$app_cv_srclib")
 
-AC_SUBST(OBJDIR,"$ac_pwd/.obj")
+AC_SUBST(OBJDIR,"$ac_pwd/.obj/$host")
 AC_SUBST(BINDIR,"$ac_pwd/.bin")
 AC_SUBST(SRCDIR,"$ac_pwd/src")
 
@@ -399,6 +399,8 @@ AC_OUTPUT(Makefile)
 AC_OUTPUT(version)
 AC_OUTPUT(lib3270.pc)
 AC_OUTPUT(src/include/lib3270/plugins.h)
+
+AC_OUTPUT(src/gtk2/Makefile)
 AC_OUTPUT(src/gtk2/version.c)
 
 AC_OUTPUT(src/plugins/rexx/Makefile)
