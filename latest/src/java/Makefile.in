@@ -1,0 +1,103 @@
+#
+# "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
+# (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+# aplicativos mainframe. Registro no INPI sob o nome G3270.
+#
+# Copyright (C) <2008> <Banco do Brasil S.A.>
+#
+# Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+# os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+# Free Software Foundation.
+#
+# Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+# GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+# A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+# obter mais detalhes.
+#
+# Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+# programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA, 02111-1307, USA
+#
+# Contatos:
+#
+# perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+# erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+# licinio@bb.com.br		(Licínio Luis Branco)
+# kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+# macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+#
+
+#---[ Configuration values ]---------------------------------------------------
+
+PACKAGE=@PACKAGE@
+
+JAVAC=@JAVAC@
+JAVAH=@JAVAH@
+STRIP=@STRIP@
+
+OBJDBG=@OBJDIR@/Debug/jni
+BINDBG=@BINDIR@/Debug
+
+OBJRLS=@OBJDIR@/Release/jni
+BINRLS=@BINDIR@/Release
+BINDIR=@BINDIR@
+
+JAVA_LIBJVM=@JAVA_LIBJVM@
+JDK_HOME=@JDK_HOME@
+
+CC = @CC@
+LD = @LD@
+
+DBG_CFLAGS=-DDEBUG=1
+RLS_CFLAGS=-DNDEBUG=1
+
+CFLAGS=@CFLAGS@ @JAVA_CFLAGS@
+LDFLAGS=@DLL_LDFLAGS@ @LDFLAGS@ @JAVA_LDFLAGS@
+
+LIB3270_CFLAGS ?= `pkg-config --cflags pw3270`
+LIB3270_LIBS ?= `pkg-config --libs pw3270`
+
+
+#---[ Sources ]----------------------------------------------------------------
+
+SOURCES=pw3270_jni.c
+
+#---[ Rules ]------------------------------------------------------------------
+
+$(OBJDBG)/%@OBJEXT@: %.c
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) -o $@ -c $<
+
+$(OBJRLS)/%@OBJEXT@: %.c
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) -o $@ -c $<
+
+%.class: %.java
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(JAVAC) -cp bin/java -sourcepath `dirname $^` -d `dirname $@` $^
+
+$(BINDIR)/java/$(PACKAGE)/%.class: %.java
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(JAVAC) -cp $(BINDIR)/java -sourcepath $(PWD) -d $(BINDIR)/java $^
+
+lib3270_jni.h: $(BINDIR)/java/$(PACKAGE)/terminal.class
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(JAVAH) -o $@ -classpath $(BINDIR)/java $(PACKAGE).terminal
+
+#---[ Targets ]----------------------------------------------------------------
+
+$(BINDIR)/Debug/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@)
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^
+
+$(BINDIR)/Release/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC)@OBJEXT@)
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^
+
+
+clean:
+	@rm -f lib3270_jni.h
+

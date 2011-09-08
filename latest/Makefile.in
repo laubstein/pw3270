@@ -148,6 +148,8 @@ $(BINDIR)/Release/plugins/rx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ 
 $(BINDIR)/Release/librx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
 
+$(BINDIR)/Release/libpw3270_jni@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/java/*
+	@$(MAKE) $(DBG_MAKE) -C src/java $@
 
 #---[ Targets ]----------------------------------------------------------------
 
@@ -230,6 +232,7 @@ distclean: clean
 	@rm -f *.log
 	@rm -f *.layout
 	@rm -f src/include/lib3270/config.h
+	@find ./src -name "Makefile" -exec rm -f {} \;
 
 clean:
 	@rm -fr .obj
