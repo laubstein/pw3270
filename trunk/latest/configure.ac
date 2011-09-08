@@ -400,6 +400,9 @@ AC_OUTPUT(version)
 AC_OUTPUT(lib3270.pc)
 AC_OUTPUT(src/include/lib3270/plugins.h)
 
+AC_OUTPUT(src/lib/mkversion.sh)
+AC_OUTPUT(src/lib/Makefile)
+
 AC_OUTPUT(src/gtk2/Makefile)
 AC_OUTPUT(src/gtk2/version.c)
 
