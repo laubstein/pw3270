@@ -87,6 +87,7 @@ DLL_LDFLAGS="-shared -Wl,-soname,\$(@F)"
 
 PLUGINS=""
 LIBRARIES=""
+UI_FILES="default.xml functions.xml keypad.xml"
 
 app_cv_srcgui=""
 app_cv_srclib=""
@@ -321,6 +322,7 @@ if test "$app_cv_rexx" == "yes"; then
 	AC_DEFINE(HAVE_REXX)
 	PLUGINS="$PLUGINS rx3270"
 	LIBRARIES="$LIBRARIES librx3270"
+	UI_FILES="$UI_FILES rexx.xml"
 fi
 
 if test "$app_cv_java" == "yes"; then
@@ -387,6 +389,7 @@ AC_SUBST(SRCDIR,"$ac_pwd/src")
 
 AC_SUBST(PLUGINS)
 AC_SUBST(LIBRARIES)
+AC_SUBST(UI_FILES)
 
 AC_SUBST(JDK_HOME,$JDK_HOME)
 AC_SUBST(JRE_HOME,$JRE_HOME)
