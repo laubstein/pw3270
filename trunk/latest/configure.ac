@@ -317,12 +317,13 @@ fi
 
 if test "$app_cv_rexx" == "yes"; then
 	AC_DEFINE(HAVE_REXX)
-	PLUGINS="rx3270 $PLUGINS"
+	PLUGINS="$PLUGINS rx3270"
 	LIBRARIES="$LIBRARIES librx3270"
 fi
 
 if test "$app_cv_java" == "yes"; then
 	AC_DEFINE(HAVE_JAVA)
+	PLUGINS="$PLUGINS j3270plugin"
 	LIBRARIES="$LIBRARIES libpw3270_jni"
 fi
 
@@ -401,6 +402,8 @@ AC_OUTPUT(src/include/lib3270/plugins.h)
 AC_OUTPUT(src/gtk2/version.c)
 
 AC_OUTPUT(src/plugins/rexx/Makefile)
+AC_OUTPUT(src/plugins/java/Makefile)
+
 AC_OUTPUT(src/java/Makefile)
 
 dnl Output the generated config.status script.
