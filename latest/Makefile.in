@@ -38,7 +38,9 @@ libdir=@libdir@
 includedir=@includedir@
 datarootdir=@datarootdir@
 localedir=@localedir@
+
 BINDIR=@BINDIR@
+OBJDIR=@OBJDIR@
 
 CC = @CC@
 LD = @LD@
@@ -54,28 +56,13 @@ RLS_CFLAGS=-DNDEBUG=1
 DLL_CFLAGS=@DLL_CFLAGS@
 DLL_LDFLAGS=@DLL_LDFLAGS@
 
-GLIB_CFLAGS=@GLIB_CFLAGS@
-GLIB_LIBS=@GLIB_LIBS@
-
-GTK_CFLAGS=@GTK_CFLAGS@
-GTK_LIBS=@GTK_LIBS@
-
-CAIRO_CFLAGS=@CAIRO_CFLAGS@
-CAIRO_LIBS=@CAIRO_LIBS@
-
-GNOME_CFLAGS=@GNOME_CFLAGS@
-GNOME_LIBS=@GNOME_LIBS@
-
 SSL_CFLAGS=@SSL_CFLAGS@
 SSL_LIBS=@SSL_LIBS@
-
-IGEMAC_CFLAGS=@IGEMAC_CFLAGS@
-IGEMAC_LIBS=@IGEMAC_LIBS@
 
 PLUGINS=@PLUGINS@
 LIBRARIES=@LIBRARIES@
 
-LIB3270_CFLAGS=-I@SRCDIR@/include -DDATAROOTDIR=\"$(datarootdir)\" -DLOCALEDIR=\"$(localedir)\"
+LIB3270_CFLAGS=-I@SRCDIR@/include
 LIB3270_LIBS=-L$(BINDIR)/Release/lib -l3270
 LIB3270_DBGLIBS=-L$(BINDIR)/Debug/lib -l3270 -Wl,-rpath,$(BINDIR)/Debug/lib 
 
@@ -100,37 +87,28 @@ LIB_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 
 #---[ Rules ]------------------------------------------------------------------
 
-@OBJDIR@/Debug/src/lib/%@OBJEXT@: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
+$(OBJDIR)/Debug/src/lib/%@OBJEXT@: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) -DLIB3270=1 $(DBG_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(DLL_CFLAGS) $(SSL_CFLAGS) -Isrc/include/lib3270 -o $@ -c $<
 
-@OBJDIR@/Debug/src/gtk2/%@OBJEXT@: src/gtk2/%.c src/gtk2/*.h $(GLOBAL_DEPENDS)
-	@echo $< ...
-	@mkdir -p `dirname $@`
-	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(GNOME_CFLAGS) $(IGEMAC_CFLAGS) $(GLIB_CFLAGS) $(CAIRO_CFLAGS) $(GTK_CFLAGS) -o $@ -c $<
-
-@OBJDIR@/Debug/version@OBJEXT@: src/version.c
-	@echo $< ...
-	@mkdir -p `dirname $@`
-	@$(CC) $(DBG_CFLAGS) $(CFLAGS) -o $@ -c $<
-
-@OBJDIR@/Release/src/lib/%@OBJEXT@: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
+$(OBJDIR)/Release/src/lib/%@OBJEXT@: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) -DLIB3270=1 $(RLS_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(DLL_CFLAGS) $(SSL_CFLAGS) -Isrc/include/lib3270 -o $@ -c $<
 
-@OBJDIR@/Release/src/gtk2/%@OBJEXT@: src/gtk2/%.c src/gtk2/*.h $(GLOBAL_DEPENDS)
-	@echo $< ...
-	@mkdir -p `dirname $@`
-	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(GNOME_CFLAGS) $(IGEMAC_CFLAGS) $(GLIB_CFLAGS) $(CAIRO_CFLAGS) $(GTK_CFLAGS) -o $@ -c $<
-
-@OBJDIR@/Release/version@OBJEXT@: src/version.c
+$(OBJDIR)/Release/version@OBJEXT@: src/version.c
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) $(RLS_CFLAGS) $(CFLAGS) -o $@ -c $<
 
-#---[ Plugins & Libraries ]----------------------------------------------------
+#---[ Modules ]----------------------------------------------------------------
+
+$(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/gtk2/*
+	@$(MAKE) $(DBG_MAKE) -C src/gtk2 $@
+
+$(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/gtk2/*
+	@$(MAKE) $(DBG_MAKE) -C src/gtk2 $@
 
 $(BINDIR)/Debug/plugins/rx3270@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(DBG_MAKE) -C src/plugins/rexx $@
@@ -159,13 +137,7 @@ $(BINDIR)/Release/libpw3270_jni@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ s
 
 #---[ Targets ]----------------------------------------------------------------
 
-$(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ $(foreach SRC, $(basename $(GTK2_SRCS)), @OBJDIR@/Release/src/gtk2/$(SRC)@OBJEXT@)
-	@echo $@ ...
-	@mkdir -p `dirname $@`
-	@$(LD) -o $@ $^ $(LIB3270_LIBS) $(GNOME_LIBS) $(IGEMAC_LIBS) $(GLIB_LIBS) $(CAIRO_LIBS) $(GTK_LIBS)
-	@$(STRIP) $@
-
-$(BINDIR)/Release/lib/lib3270@DLLEXT@: @OBJDIR@/Release/version@OBJEXT@ $(foreach SRC, $(basename $(LIB_SRCS)), @OBJDIR@/Release/src/lib/$(SRC)@OBJEXT@) @OBJDIR@/fallbacks@OBJEXT@
+$(BINDIR)/Release/lib/lib3270@DLLEXT@: $(OBJDIR)/Release/version@OBJEXT@ $(foreach SRC, $(basename $(LIB_SRCS)), $(OBJDIR)/Release/src/lib/$(SRC)@OBJEXT@) $(OBJDIR)/fallbacks@OBJEXT@
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@rm -f $(basename \$(@F)).a
@@ -173,12 +145,7 @@ $(BINDIR)/Release/lib/lib3270@DLLEXT@: @OBJDIR@/Release/version@OBJEXT@ $(foreac
 	@$(LD) $(DLL_LDFLAGS) -o $@ $^ $(SSL_LIBS)
 	@$(STRIP) $@
 
-$(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ $(foreach SRC, $(basename $(GTK2_SRCS)), @OBJDIR@/Debug/src/gtk2/$(SRC)@OBJEXT@)
-	@echo $@ ...
-	@mkdir -p `dirname $@`
-	@$(LD) -o $@ $^ $(LIB3270_DBGLIBS) $(GNOME_LIBS) $(IGEMAC_LIBS) $(GLIB_LIBS) $(CAIRO_LIBS) $(GTK_LIBS)
-
-$(BINDIR)/Debug/lib/lib3270@DLLEXT@: @OBJDIR@/Debug/version@OBJEXT@ $(foreach SRC, $(basename $(LIB_SRCS)), @OBJDIR@/Debug/src/lib/$(SRC)@OBJEXT@) @OBJDIR@/fallbacks@OBJEXT@
+$(BINDIR)/Debug/lib/lib3270@DLLEXT@: $(OBJDIR)/Debug/version@OBJEXT@ $(foreach SRC, $(basename $(LIB_SRCS)), $(OBJDIR)/Debug/src/lib/$(SRC)@OBJEXT@) $(OBJDIR)/fallbacks@OBJEXT@
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@rm -f $(basename \$(@F)).a
@@ -189,11 +156,16 @@ src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
 	@echo $@ ...
 	@src/mkversion.sh
 
-@OBJDIR@/fallbacks@OBJEXT@: $(BINDIR)/mkfb@EXEEXT@ src/lib/X3270.xad
+$(OBJDIR)/Debug/version@OBJEXT@: src/version.c
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(CFLAGS) -o $@ -c $<
+
+$(OBJDIR)/fallbacks@OBJEXT@: $(BINDIR)/mkfb@EXEEXT@ src/lib/X3270.xad
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(BINDIR)/mkfb@EXEEXT@ -c src/lib/X3270.xad @OBJDIR@/falbacks.c
-	@$(CC) -DLIB3270=1 $(RLS_CFLAGS) $(CFLAGS) -Isrc/lib -Isrc/include -o $@ -c @OBJDIR@/falbacks.c
+	@$(BINDIR)/mkfb@EXEEXT@ -c src/lib/X3270.xad $(OBJDIR)/falbacks.c
+	@$(CC) -DLIB3270=1 $(RLS_CFLAGS) $(CFLAGS) -Isrc/lib -Isrc/include -o $@ -c $(OBJDIR)/falbacks.c
 
 $(BINDIR)/mkfb@EXEEXT@: src/lib/mkfb.c Makefile
 	@echo $@ ...
