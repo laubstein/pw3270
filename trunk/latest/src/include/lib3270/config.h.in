@@ -53,6 +53,8 @@
 		#define HAVE_LIBGNOME
 	#endif
 
+	#undef HAVE_UNITY
+
 	#define HAVE_FONTLIST_XML
 
 	#ifndef LIBX3270DIR
