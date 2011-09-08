@@ -30,6 +30,8 @@
 #---[ Configuration values ]---------------------------------------------------
 
 PACKAGE_NAME=@PACKAGE_NAME@
+PLUGINS=@PLUGINS@
+LIBRARIES=@LIBRARIES@
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
@@ -47,8 +49,13 @@ MAKENSIS=@MAKENSIS@
 XGETTEXT=@XGETTEXT@
 MSGCAT=@MSGCAT@
 
-PLUGINS=@PLUGINS@
-LIBRARIES=@LIBRARIES@
+CC=@CC@
+LD=@LD@
+HOST_CC=@HOST_CC@
+HOST_LD=@HOST_CC@
+CFLAGS=@CFLAGS@
+DBG_CFLAGS=-DDEBUG=1
+RLS_CFLAGS=-DNDEBUG=1
 
 LIB3270_CFLAGS=-I@SRCDIR@/include
 LIB3270_LIBS=-L$(BINDIR)/Release/lib -l3270
@@ -56,6 +63,18 @@ LIB3270_DBGLIBS=-L$(BINDIR)/Debug/lib -l3270 -Wl,-rpath,$(BINDIR)/Debug/lib
 
 DBG_MAKE="LIB3270_CFLAGS=$(LIB3270_CFLAGS)" LIB3270_LIBS="$(LIB3270_DBGLIBS)" GLOBAL_DEPENDS="$(BINDIR)/Debug/lib/lib3270@DLLEXT@"
 RLS_MAKE="LIB3270_CFLAGS=$(LIB3270_CFLAGS)" LIB3270_LIBS="$(LIB3270_LIBS)" GLOBAL_DEPENDS="$(BINDIR)/Release/lib/lib3270@DLLEXT@"
+
+#---[ Rules ]------------------------------------------------------------------
+
+$(OBJDIR)/Release/%@OBJEXT@: src/%.c
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(HOST_CC) $(CFLAGS) $(RLS_CFLAGS) `pkg-config --cflags glib-2.0` -o $@ -c $<
+
+$(BINDIR)/Release/%@EXEEXT@: $(OBJDIR)/Release/%@OBJEXT@
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(HOST_LD) -o $@ $^ `pkg-config --libs glib-2.0`
 
 #---[ Main targets ]-----------------------------------------------------------
 
@@ -112,7 +131,7 @@ $(BINDIR)/Release/libpw3270_jni@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ s
 
 #---[ I18n ]-------------------------------------------------------------------
 
-$(PACKAGE_NAME).pot: $(BINDIR)/pot/lib3270.pot $(BINDIR)/pot/gtk2.pot
+$(PACKAGE_NAME).pot: $(BINDIR)/pot/lib3270.pot $(BINDIR)/pot/gtk2.pot $(BINDIR)/pot/ui.pot
 	@rm -f $@
 	@echo $@ ...
 	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
@@ -122,6 +141,16 @@ $(BINDIR)/pot/lib3270.pot: src/lib/*.c
 
 $(BINDIR)/pot/gtk2.pot: src/gtk2/*.c
 	@$(MAKE) -C src/gtk2 $@
+
+$(BINDIR)/pot/ui.pot: $(foreach XML, $(basename @UI_FILES@), $(BINDIR)/pot/ui/$(XML).pot)
+	@rm -f $@
+	@echo $@ ...
+	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+
+$(BINDIR)/pot/ui/%.pot: ui/%.xml $(BINDIR)/Release/xml2pot@EXEEXT@
+	@mkdir -p `dirname $@`
+	@echo $@ ...
+	@$(BINDIR)/Release/xml2pot@EXEEXT@ "$<" > "$@"
 
 #---[ Misc Tagets ]------------------------------------------------------------
 
