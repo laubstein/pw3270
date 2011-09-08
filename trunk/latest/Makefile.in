@@ -44,7 +44,8 @@ BINDIR=@BINDIR@
 OBJDIR=@OBJDIR@
 
 MAKENSIS=@MAKENSIS@
-STRIP=@STRIP@
+XGETTEXT=@XGETTEXT@
+MSGCAT=@MSGCAT@
 
 PLUGINS=@PLUGINS@
 LIBRARIES=@LIBRARIES@
@@ -109,6 +110,19 @@ $(BINDIR)/Release/librx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/p
 $(BINDIR)/Release/libpw3270_jni@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/java/*
 	@$(MAKE) $(DBG_MAKE) -C src/java $@
 
+#---[ I18n ]-------------------------------------------------------------------
+
+$(PACKAGE_NAME).pot: $(BINDIR)/pot/lib3270.pot $(BINDIR)/pot/gtk2.pot
+	@rm -f $@
+	@echo $@ ...
+	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+
+$(BINDIR)/pot/lib3270.pot: src/lib/*.c
+	@$(MAKE) -C src/lib $@
+
+$(BINDIR)/pot/gtk2.pot: src/gtk2/*.c
+	@$(MAKE) -C src/gtk2 $@
+
 #---[ Misc Tagets ]------------------------------------------------------------
 
 @PROGRAM_LOGO@: image/@PROGRAM_LOGO@
@@ -149,6 +163,7 @@ clean:
 	@rm -fr .obj
 	@rm -fr .bin
 	@rm -f @PROGRAM_LOGO@
+	@rm -f $(PACKAGE_NAME).pot
 
 	@$(MAKE) -C src/java clean
 	@$(MAKE) -C src/lib clean

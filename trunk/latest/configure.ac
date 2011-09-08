@@ -57,6 +57,8 @@ AC_PATH_TOOL([REXXCONFIG], [oorexx-config], [no])
 AC_PATH_TOOL([STRIP], [strip])
 AC_PATH_TOOL([MAKENSIS], [makensis], [no])
 AC_PATH_TOOL([RPMBUILD], [rpmbuild], [no])
+AC_PATH_TOOL([XGETTEXT], [xgettext], [no])
+AC_PATH_TOOL([MSGCAT], [msgcat], [no])
 
 AC_PATH_TOOL([JAVAC], [javac], [no])
 AC_PATH_TOOL([JAVAH], [javah], [no])
