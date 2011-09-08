@@ -98,7 +98,7 @@ app_cv_imgext=".svg"
 if test $host != $build; then
 	AC_CHECK_PROGS(HOST_CC, gcc cc)
 else
-	HOST_CC=$CC 
+	HOST_CC=$CC
 fi
 
 case "$host" in
@@ -280,6 +280,10 @@ fi
 if test "_$JAVA_LIBJVM" = "_" ; then
 	JAVA_LIBJVM_SO=`find $JRE_HOME/lib -name libjvm.so | head -n 1`
 	JAVA_LIBJVM=`dirname "${JAVA_LIBJVM_SO}"`
+fi
+
+if test "_$JDK_HOME" = "_" ; then
+	app_cv_java="no"
 fi
 
 case $host_cpu in
