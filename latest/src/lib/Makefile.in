@@ -30,6 +30,8 @@
 #---[ Configuration values ]---------------------------------------------------
 
 MODULE_NAME=3270
+PACKAGE=@PACKAGE@
+PACKAGE_VERSION=@PACKAGE_VERSION@
 
 BINDIR=@BINDIR@
 OBJDIR=@OBJDIR@
@@ -42,8 +44,10 @@ CC = @CC@
 LD = @LD@
 HOST_CC = @HOST_CC@
 STRIP = @STRIP@
+XGETTEXT = @XGETTEXT@
+MSGCAT = @MSGCAT@
 
-CFLAGS=@CFLAGS@
+CFLAGS=@CFLAGS@ -DLIB3270=1 -I. -I$(SRCDIR)/include -I$(SRCDIR)/include/lib3270
 DBG_CFLAGS=-DDEBUG=1
 RLS_CFLAGS=-DNDEBUG=1
 
@@ -52,10 +56,6 @@ DLL_LDFLAGS=@DLL_LDFLAGS@
 
 SSL_CFLAGS=@SSL_CFLAGS@
 SSL_LIBS=@SSL_LIBS@
-
-LIB3270_CFLAGS=-DLIB3270=1 -I$(SRCDIR)/include -I$(SRCDIR)/include/lib3270
-
-GLOBAL_DEPENDS=$(SRCDIR)/include/*.h $(SRCDIR)/include/lib3270/*.h
 
 #---[ Sources ]----------------------------------------------------------------
 
@@ -67,19 +67,28 @@ SOURCES =	version.c XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 
 #---[ Rules ]------------------------------------------------------------------
 
-$(OBJDIR)/Debug/lib/$(MODULE_NAME)/%@OBJEXT@: %.c *.h $(GLOBAL_DEPENDS)
+$(OBJDIR)/Debug/lib/$(MODULE_NAME)/%@OBJEXT@: %.c *.h $(SRCDIR)/include/*.h $(SRCDIR)/include/lib3270/*.h
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(DLL_CFLAGS) $(SSL_CFLAGS) -Isrc/include/lib3270 -o $@ -c $<
+	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(DLL_CFLAGS) $(SSL_CFLAGS) -o $@ -c $<
 
-$(OBJDIR)/Release/lib/$(MODULE_NAME)/%@OBJEXT@: %.c *.h $(GLOBAL_DEPENDS)
+$(OBJDIR)/Release/lib/$(MODULE_NAME)/%@OBJEXT@: %.c *.h $(SRCDIR)/include/*.h $(SRCDIR)/include/lib3270/*.h
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(DLL_CFLAGS) $(SSL_CFLAGS) -Isrc/include/lib3270 -o $@ -c $<
+	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(DLL_CFLAGS) $(SSL_CFLAGS)-o $@ -c $<
+
+$(BINDIR)/pot/$(MODULE_NAME)/%.pot: %.c
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(XGETTEXT)	--default-domain=$(PACKAGE) --language=C \
+			--keyword=_ --keyword=N_ --keyword=MSG_:2 --output=$@ $<
+	@touch $@
 
 #---[ Targets ]----------------------------------------------------------------
 
 all: $(BINDIR)/Release/lib/lib$(MODULE_NAME)@DLLEXT@
+
+pot: $(BINDIR)/pot/lib$(MODULE_NAME).pot
 
 $(BINDIR)/Debug/lib/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@) \
 							$(OBJDIR)/fallbacks@OBJEXT@
@@ -103,16 +112,22 @@ $(OBJDIR)/fallbacks@OBJEXT@: $(BINDIR)/mkfb@EXEEXT@ X3270.xad
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(BINDIR)/mkfb@EXEEXT@ -c X3270.xad $(OBJDIR)/falbacks.c
-	@$(CC) -DLIB3270=1 $(RLS_CFLAGS) $(CFLAGS) -I. -I$(SRCDIR)/include -I$(SRCDIR)/include/lib3270 -o $@ -c $(OBJDIR)/falbacks.c
+	@$(CC) $(RLS_CFLAGS) $(CFLAGS) -o $@ -c $(OBJDIR)/falbacks.c
 
 $(BINDIR)/mkfb@EXEEXT@: mkfb.c Makefile
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(HOST_CC) -g -o $@ -D_WIN32 mkfb.c
 
+$(BINDIR)/pot/lib$(MODULE_NAME).pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/$(MODULE_NAME)/$(SRC).pot)
+	@rm -f $@
+	@mkdir -p `dirname $@`
+	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+
 
 distclean:
 	@rm -f ./mkversion.sh
+	@rm -f $(BINDIR)/pot/$(MODULE_NAME)
 
 clean:
 	@rm -f version.c

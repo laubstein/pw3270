@@ -29,13 +29,12 @@
 
 #---[ Configuration values ]---------------------------------------------------
 
+MODULE_NAME=gtk2
 PACKAGE_NAME=@PACKAGE_NAME@
+PACKAGE=@PACKAGE@
+PACKAGE_VERSION=@PACKAGE_VERSION@
+
 prefix=@prefix@
-exec_prefix=@exec_prefix@
-bindir=$(BINDIR)
-sbindir=@sbindir@
-libdir=@libdir@
-includedir=@includedir@
 datarootdir=@datarootdir@
 localedir=@localedir@
 
@@ -45,6 +44,8 @@ OBJDIR=@OBJDIR@
 CC = @CC@
 LD = @LD@
 STRIP = @STRIP@
+XGETTEXT = @XGETTEXT@
+MSGCAT = @MSGCAT@
 
 CFLAGS=@CFLAGS@ -DLOCALEDIR=\"$(localedir)\" -DDATAROOTDIR=\"$(datarootdir)\"
 DBG_CFLAGS=-DDEBUG=1
@@ -90,8 +91,18 @@ $(OBJDIR)/Release/gtk2/%@OBJEXT@: %.c *.h
 	@mkdir -p `dirname $@`
 	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(GNOME_CFLAGS) $(IGEMAC_CFLAGS) $(GLIB_CFLAGS) $(CAIRO_CFLAGS) $(GTK_CFLAGS) -o $@ -c $<
 
+$(BINDIR)/pot/$(MODULE_NAME)/%.pot: %.c
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(XGETTEXT)	--default-domain=$(PACKAGE) --language=C \
+			--keyword=_ --keyword=N_ --keyword=MSG_:2 --output=$@ $<
+	@touch $@
 
 #---[ Targets ]----------------------------------------------------------------
+
+all: $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@
+
+pot: $(BINDIR)/pot/$(MODULE_NAME).pot
 
 $(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDIR)/Debug/gtk2/$(SRC)@OBJEXT@)
 	@echo $@ ...
@@ -104,5 +115,12 @@ $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@: $(foreach SRC, $(basename $(SOURCES)),
 	@$(LD) -o $@ $^ $(LIB3270_LIBS) $(GNOME_LIBS) $(IGEMAC_LIBS) $(GLIB_LIBS) $(CAIRO_LIBS) $(GTK_LIBS)
 	@$(STRIP) $@
 
+$(BINDIR)/pot/$(MODULE_NAME).pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/$(MODULE_NAME)/$(SRC).pot)
+	@rm -f $@
+	@mkdir -p `dirname $@`
+	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+
+distclean:
+	@rm -f $(BINDIR)/pot/$(MODULE_NAME)
 
 
