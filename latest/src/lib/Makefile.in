@@ -1,0 +1,121 @@
+#
+# "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
+# (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+# aplicativos mainframe. Registro no INPI sob o nome G3270.
+#
+# Copyright (C) <2008> <Banco do Brasil S.A.>
+#
+# Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+# os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+# Free Software Foundation.
+#
+# Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+# GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+# A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+# obter mais detalhes.
+#
+# Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+# programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA, 02111-1307, USA
+#
+# Contatos:
+#
+# perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+# erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+# licinio@bb.com.br		(Licínio Luis Branco)
+# kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+# macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+#
+
+#---[ Configuration values ]---------------------------------------------------
+
+MODULE_NAME=3270
+
+BINDIR=@BINDIR@
+OBJDIR=@OBJDIR@
+SRCDIR=@SRCDIR@
+
+OBJDBG=$(OBJDIR)/Debug/lib/$(MODULE_NAME)
+OBJRLS=$(OBJDIR)/Release/lib/$(MODULE_NAME)
+
+CC = @CC@
+LD = @LD@
+HOST_CC = @HOST_CC@
+STRIP = @STRIP@
+
+CFLAGS=@CFLAGS@
+DBG_CFLAGS=-DDEBUG=1
+RLS_CFLAGS=-DNDEBUG=1
+
+DLL_CFLAGS=@DLL_CFLAGS@
+DLL_LDFLAGS=@DLL_LDFLAGS@
+
+SSL_CFLAGS=@SSL_CFLAGS@
+SSL_LIBS=@SSL_LIBS@
+
+LIB3270_CFLAGS=-DLIB3270=1 -I$(SRCDIR)/include -I$(SRCDIR)/include/lib3270
+
+GLOBAL_DEPENDS=$(SRCDIR)/include/*.h $(SRCDIR)/include/lib3270/*.h
+
+#---[ Sources ]----------------------------------------------------------------
+
+SOURCES =	version.c XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
+		ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c kybd.c \
+		print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
+		sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
+		xio.c resolver.c log.c paste.c @LIB_SRCS@
+
+#---[ Rules ]------------------------------------------------------------------
+
+$(OBJDIR)/Debug/lib/$(MODULE_NAME)/%@OBJEXT@: %.c *.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(DLL_CFLAGS) $(SSL_CFLAGS) -Isrc/include/lib3270 -o $@ -c $<
+
+$(OBJDIR)/Release/lib/$(MODULE_NAME)/%@OBJEXT@: %.c *.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(DLL_CFLAGS) $(SSL_CFLAGS) -Isrc/include/lib3270 -o $@ -c $<
+
+#---[ Targets ]----------------------------------------------------------------
+
+all: $(BINDIR)/Release/lib/lib$(MODULE_NAME)@DLLEXT@
+
+$(BINDIR)/Debug/lib/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@) \
+							$(OBJDIR)/fallbacks@OBJEXT@
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) $(DLL_LDFLAGS) $(LDFLAGS) -o $@ $^ $(SSL_LIBS)
+
+$(BINDIR)/Release/lib/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC)@OBJEXT@) \
+							$(OBJDIR)/fallbacks@OBJEXT@
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) $(DLL_LDFLAGS) $(LDFLAGS) -o $@ $^ $(SSL_LIBS)
+	@$(STRIP) $@
+
+version.c: ./mkversion.sh
+	@echo $@ ...
+	@chmod +x ./mkversion.sh
+	@./mkversion.sh
+
+$(OBJDIR)/fallbacks@OBJEXT@: $(BINDIR)/mkfb@EXEEXT@ X3270.xad
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(BINDIR)/mkfb@EXEEXT@ -c X3270.xad $(OBJDIR)/falbacks.c
+	@$(CC) -DLIB3270=1 $(RLS_CFLAGS) $(CFLAGS) -I. -I$(SRCDIR)/include -I$(SRCDIR)/include/lib3270 -o $@ -c $(OBJDIR)/falbacks.c
+
+$(BINDIR)/mkfb@EXEEXT@: mkfb.c Makefile
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(HOST_CC) -g -o $@ -D_WIN32 mkfb.c
+
+
+distclean:
+	@rm -f ./mkversion.sh
+
+clean:
+	@rm -f version.c
+
+
+
