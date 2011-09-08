@@ -96,7 +96,7 @@ $(BINDIR)/Debug/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)), $
 
 $(BINDIR)/Release/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC)@OBJEXT@)
 	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^
-
+	@$(STRIP) $@
 
 clean:
 	@rm -f lib3270_jni.h

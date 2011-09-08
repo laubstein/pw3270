@@ -135,6 +135,9 @@ LIB_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
 $(BINDIR)/Debug/plugins/rx3270@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(DBG_MAKE) -C src/plugins/rexx $@
 
+$(BINDIR)/Debug/plugins/j3270plugin@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/java/*
+	@$(MAKE) $(DBG_MAKE) -C src/plugins/java $@
+
 $(BINDIR)/Debug/librx3270@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(DBG_MAKE) -C src/plugins/rexx $@
 
@@ -144,6 +147,9 @@ $(BINDIR)/Debug/libpw3270_jni@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/j
 
 $(BINDIR)/Release/plugins/rx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
+
+$(BINDIR)/Release/plugins/j3270plugin@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/java/*
+	@$(MAKE) $(DBG_MAKE) -C src/plugins/java $@
 
 $(BINDIR)/Release/librx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
@@ -245,5 +251,6 @@ clean:
 	@find . -name "*@DLLEXT@" -exec rm -f {} \;
 	@find . -name "*.tmp" -exec rm -f {} \;
 	@find . -name "*.a" -exec rm -f {} \;
+	@find . -name "*~" -exec rm -f {} \;
 	@find . -name "*.def" -exec rm -f {} \;
 
