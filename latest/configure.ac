@@ -54,10 +54,12 @@ AC_PROG_CXX
 AC_PROG_CC
 
 AC_PATH_TOOL([REXXCONFIG], [oorexx-config], [no])
-AC_PATH_TOOL([JAVAC], [javac], [no])
 AC_PATH_TOOL([STRIP], [strip])
 AC_PATH_TOOL([MAKENSIS], [makensis], [no])
 AC_PATH_TOOL([RPMBUILD], [rpmbuild], [no])
+
+AC_PATH_TOOL([JAVAC], [javac], [no])
+AC_PATH_TOOL([JAVAH], [javah], [no])
 
 # Check for iconv
 AM_ICONV
@@ -112,6 +114,8 @@ case "$host" in
 
 	*)
 		ICOEXT=".svg"
+		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
+		java_ldflags="-L\$(JAVA_LIBJVM) -Wl,-rpath,\$(JAVA_LIBJVM) -ljvm"
 
 esac
 #--[ Compiling options ]--------------------------------------------------------------------------------------------------------------------------------------
@@ -196,7 +200,7 @@ AC_ARG_WITH([gnome], [AS_HELP_STRING( [--without-gnome], [do not use gnome])],	[
 AC_ARG_ENABLE([macui],[AS_HELP_STRING([--disable-macui], [Disable MAC OSX compatible UI manager ])],[ app_cv_macui="$withval" ], [ app_cv_macui="yes" ])
 
 AC_ARG_ENABLE([rexx],
-	[AS_HELP_STRING([--enable-rexx], [Build rexx extension & plugin])],
+	[AS_HELP_STRING([--disable-rexx], [Build rexx extension & plugin])],
 [
 	app_cv_rexx="$withval"
 ],[
@@ -207,6 +211,20 @@ AC_ARG_ENABLE([rexx],
 		app_cv_rexx="yes"
 	fi
 ])
+
+AC_ARG_ENABLE([java],
+	[AS_HELP_STRING([--disable-java], [Build java extension & plugin])],
+[
+	app_cv_java="$withval"
+],[
+
+	if test $JAVAC = no; then
+		app_cv_java="no"
+	else
+		app_cv_java="yes"
+	fi
+])
+
 
 AC_ARG_ENABLE([pic],
 	[AS_HELP_STRING([--enable-pic], [enable support for PIC libraries (required to compile PW3270 on some systems)])],
@@ -224,6 +242,54 @@ AC_ARG_ENABLE([pic],
 AC_ARG_ENABLE([altscreen], [AS_HELP_STRING([--disable-altscreen], [Disable alternate screen support])],[ app_cv_altscreen="$enableval" ],[ app_cv_altscreen="yes" ])
 AC_ARG_ENABLE([plugins],[AS_HELP_STRING([--disable-plugins], [disable plugin support])], [ app_cv_plugins="$enableval" ],[ app_cv_plugins="yes" ])
 
+#--[ Check for java ]-----------------------------------------------------------------------------------------------------------------------------------------
+
+# Check for JRE_HOME
+if test "_$JRE_HOME" = "_" ; then
+	JRE_HOME="$JDK_HOME/jre"
+	AC_CHECK_FILE("$JDK_HOME/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
+	AC_CHECK_FILE("/usr/lib/jvm/java/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
+	AC_CHECK_FILE("/etc/alternatives/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/etc/alternatives/jre",)
+	AC_CHECK_FILE("/usr/lib/jvm/java-6-sun/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java-6-sun/jre",)
+fi
+
+# Check for libjvm
+if test "_$JAVA_LIBJVM" = "_" ; then
+
+	case "$host" in
+		*-mingw32)
+			JAVA_LIBJVM="$JRE_HOME/bin/client"
+			;;
+
+		*-apple-*)
+			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/server/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/server",)
+			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/client/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/client",)
+			;;
+
+		*)
+			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/server/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/server",)
+			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/client/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/client",)
+	esac
+
+
+fi
+
+if test "_$JAVA_LIBJVM" = "_" ; then
+	JAVA_LIBJVM_SO=`find $JRE_HOME/lib -name libjvm.so | head -n 1`
+	JAVA_LIBJVM=`dirname "${JAVA_LIBJVM_SO}"`
+fi
+
+case $host_cpu in
+     x86_64)
+	JVM_ARCH=amd64
+	;;
+     i?86)
+	JVM_ARCH=i386
+	;;
+     *)
+	JVM_ARCH=$host_cpu
+	;;
+esac
 
 #--[ Check for libs ]-----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -252,7 +318,12 @@ fi
 if test "$app_cv_rexx" == "yes"; then
 	AC_DEFINE(HAVE_REXX)
 	PLUGINS="rx3270 $PLUGINS"
-	LIBRARIES="librx3270 $LIBRARIES"
+	LIBRARIES="$LIBRARIES librx3270"
+fi
+
+if test "$app_cv_java" == "yes"; then
+	AC_DEFINE(HAVE_JAVA)
+	LIBRARIES="$LIBRARIES libpw3270_jni"
 fi
 
 if test "$app_cv_plugins" == "yes"; then
@@ -314,14 +385,23 @@ AC_SUBST(SRCDIR,"$ac_pwd/src")
 AC_SUBST(PLUGINS)
 AC_SUBST(LIBRARIES)
 
+AC_SUBST(JDK_HOME,$JDK_HOME)
+AC_SUBST(JRE_HOME,$JRE_HOME)
+AC_SUBST(JAVA_LIBJVM,$JAVA_LIBJVM)
+AC_SUBST(JVM_ARCH,$JVM_ARCH)
+AC_SUBST(JAVA_CFLAGS,$java_cflags)
+AC_SUBST(JAVA_LDFLAGS,$java_ldflags)
+
 #--[ Output files ]-------------------------------------------------------------------------------------------------------------------------------------------
 
 AC_OUTPUT(Makefile)
 AC_OUTPUT(version)
 AC_OUTPUT(lib3270.pc)
-AC_OUTPUT(src/plugins/rexx/Makefile)
 AC_OUTPUT(src/include/lib3270/plugins.h)
 AC_OUTPUT(src/gtk2/version.c)
+
+AC_OUTPUT(src/plugins/rexx/Makefile)
+AC_OUTPUT(src/java/Makefile)
 
 dnl Output the generated config.status script.
 AC_OUTPUT
