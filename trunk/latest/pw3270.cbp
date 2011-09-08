@@ -897,6 +897,7 @@
 			<Option target="pipetest" />
 			<Option target="jnidebug" />
 		</Unit>
+		<Unit filename="src/plugins/rexx/Makefile.in" />
 		<Unit filename="src/plugins/rexx/actions.c">
 			<Option compilerVar="CC" />
 		</Unit>
