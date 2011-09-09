@@ -33,6 +33,8 @@ MODULE_NAME=rx3270
 
 REXXCONFIG=@REXXCONFIG@
 STRIP=@STRIP@
+MSGCAT=@MSGCAT@
+XGETTEXT=@XGETTEXT@
 
 BINDIR=@BINDIR@
 OBJDIR=@OBJDIR@
@@ -80,6 +82,13 @@ $(OBJRLS)/%@OBJEXT@: %.c *.h
 	@mkdir -p `dirname $@`
 	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(GLIB_CFLAGS) $(GTK_CFLAGS) -o $@ -c $<
 
+$(BINDIR)/pot/$(MODULE_NAME)/%.pot: %.c
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(XGETTEXT)	--default-domain=$(PACKAGE) --language=C \
+			--keyword=_ --keyword=N_ --keyword=MSG_:2 --output=$@ $<
+	@touch $@
+
 #---[ Targets ]----------------------------------------------------------------
 
 $(BINDIR)/Debug/plugins/$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(COMMON_SRC) $(PLUGIN_SRC)), $(OBJDBG)/$(SRC)@OBJEXT@)
@@ -111,5 +120,11 @@ $(BINDIR)/Release/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(COMMON_
 	@rm -f $(basename \$(@F)).a
 	@rm -f $(basename \$(@F)).def
 	@$(STRIP) $@
+
+$(BINDIR)/pot/rexx.pot: $(foreach SRC, $(basename $(COMMON_SRC) $(PLUGIN_SRC)), $(BINDIR)/pot/$(MODULE_NAME)/$(SRC).pot)
+	@rm -f $@
+	@mkdir -p `dirname $@`
+	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+
 
 
