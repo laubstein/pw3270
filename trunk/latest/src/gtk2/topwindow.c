@@ -38,7 +38,6 @@
 /*---[ Globals ]------------------------------------------------------------------------------------------*/
 
  GtkWidget	*topwindow 		= NULL;
- GList 		*main_icon		= NULL;
  gchar		*program_logo	= NULL;
 
 #ifdef MOUSE_POINTER_CHANGE
@@ -65,6 +64,53 @@
 	gtk_im_multicontext_append_menuitems((GtkIMMulticontext *) input_method,GTK_MENU_SHELL(menu));
 	gtk_widget_show_all(menu);
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(widget),menu);
+ }
+
+ static void load_icon(void)
+ {
+	GdkPixbuf 	*pix = NULL;
+ 	gchar		*filename;
+
+	if(program_logo && !g_strcasecmp(program_logo,"none"))
+		return;
+
+	if(program_logo)
+		filename = g_strdup(program_logo);
+	else
+		filename = g_build_filename(program_data,PROGRAM_LOGO,NULL);
+
+	if(!g_file_test(filename,G_FILE_TEST_IS_REGULAR))
+	{
+		g_free(filename);
+		return;
+	}
+
+	pix = gdk_pixbuf_new_from_file(filename, NULL);
+	if(pix)
+	{
+		static const	size[] = { 16, 32, 48, 64, 128, 256 };
+		GList 			*icon = NULL;
+		int				 f;
+
+		gtk_window_set_default_icon(pix);
+		g_object_set_data_full(G_OBJECT(topwindow),"logo",pix,g_object_unref);
+
+#if defined( HAVE_IGEMAC )
+		gtk_osxapplication_set_dock_icon_pixbuf(osxapp,pix);
+#endif
+
+		for(f=0;f<G_N_ELEMENTS(size);f++)
+		{
+			pix = gdk_pixbuf_new_from_file_at_size(filename,size[f],size[f],NULL);
+			if(pix)
+				icon = g_list_append(icon, pix);
+		}
+
+		gtk_window_set_default_icon_list(icon);
+
+	}
+
+ 	g_free(filename);
  }
 
  int CreateTopWindow(void)
@@ -121,7 +167,6 @@
 	 	{ NULL,				NULL						}
 	 };
 
-	GdkPixbuf 	*pix = NULL;
 	gchar		*ptr;
 
 	init_actions();
@@ -148,6 +193,9 @@
 	g_free(ptr);
 
 	// Load program logo
+	load_icon();
+
+/*
 	if(program_logo && g_file_test(program_logo,G_FILE_TEST_IS_REGULAR))
 	{
 		pix = gdk_pixbuf_new_from_file(program_logo,NULL);
@@ -165,7 +213,7 @@
 
 	if(pix)
 	{
-		main_icon = g_list_append(main_icon, pix);
+		gtk_window_set_icon(GTK_WINDOW(topwindow),pix);
 		g_object_set_data_full(G_OBJECT(topwindow),"logo",pix,g_object_unref);
 
 #if defined( HAVE_IGEMAC )
@@ -173,12 +221,13 @@
 #endif
 
 	}
+*/
 
 	gtk_action_set_sensitive(action_by_id[ACTION_RESELECT],FALSE);
 
 	g_signal_connect(G_OBJECT(topwindow),"destroy",G_CALLBACK(action_quit),0);
 
-	gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
+//	gtk_window_set_icon_list(GTK_WINDOW(topwindow),main_icon);
 
 	gtk_window_set_default_size(GTK_WINDOW(topwindow),590,430);
 	ptr = GetString("TopWindow","Title","");
