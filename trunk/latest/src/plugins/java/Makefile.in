@@ -107,6 +107,6 @@ $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(SO
 $(BINDIR)/pot/java.pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/$(MODULE_NAME)/$(SRC).pot)
 	@rm -f $@
 	@mkdir -p `dirname $@`
-	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+	@$(MSGCAT) --sort-output $^ > $@
 
 

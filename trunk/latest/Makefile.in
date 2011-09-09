@@ -30,6 +30,7 @@
 #---[ Configuration values ]---------------------------------------------------
 
 PACKAGE_NAME=@PACKAGE_NAME@
+PACKAGE_VERSION=@PACKAGE_VERSION@
 PLUGINS=@PLUGINS@
 LIBRARIES=@LIBRARIES@
 
@@ -142,7 +143,7 @@ $(PACKAGE_NAME).po: pot/$(PACKAGE_NAME).pot
 $(PACKAGE_NAME).pot: $(foreach SRC, $(basename @LANG_MODULES@), $(BINDIR)/pot/$(SRC).pot)
 	@rm -f $@
 	@echo $@ ...
-	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+	@$(MSGCAT) --sort-output $^ | sed "s&VERSION&$(PACKAGE_VERSION)&;s&CHARSET&UTF-8&;s&PACKAGE&$(PACKAGE_NAME)&g" > $@
 
 $(BINDIR)/pot/ui.pot: $(foreach XML, $(basename @UI_FILES@), $(BINDIR)/pot/ui/$(XML).pot)
 	@rm -f $@

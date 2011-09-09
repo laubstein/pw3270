@@ -124,7 +124,7 @@ $(BINDIR)/Release/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(COMMON_
 $(BINDIR)/pot/rexx.pot: $(foreach SRC, $(basename $(COMMON_SRC) $(PLUGIN_SRC)), $(BINDIR)/pot/$(MODULE_NAME)/$(SRC).pot)
 	@rm -f $@
 	@mkdir -p `dirname $@`
-	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+	@$(MSGCAT) --sort-output $^ > $@
 
 
 
