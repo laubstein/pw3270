@@ -130,7 +130,7 @@
 	gchar			* name;
  	const gchar		* action_name	= get_xml_attribute(names,values,"action");
 	const gchar		* label			= get_xml_attribute(names,values,"label");
-	const gchar		* group_name	=  get_xml_attribute(names,values,"group");
+	const gchar		* group_name	= get_xml_attribute(names,values,"group");
 	GtkActionGroup	* group			= NULL;
 	GtkAction		* ret;
  	int				  f;
@@ -178,14 +178,9 @@
 			stock = g_strdup_printf("gtk-%s",icon);
 
 		if(label)
-		{
 			label = gettext(label);
-		}
-		else
-		{
-			if(!stock)
-				label = gettext(name);
-		}
+		else if(!stock)
+			label = gettext(name);
 
 		if(id >= 0)
 			toggle = rule[id].toggle;
