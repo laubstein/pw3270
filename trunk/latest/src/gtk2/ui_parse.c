@@ -565,7 +565,7 @@
  {
 	if(!(state->current && state->current->widget))
  	{
-	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,"%s",_( "Separator is invalid at this context (no parent)"));
+	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Separator is invalid at this context: %s"),_( "no parent" ));
 		return NULL;
  	}
 
@@ -591,7 +591,7 @@
 	}
  	else
  	{
-	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,"%s",_( "Separator is invalid at this context (unexpected parent)"));
+	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Separator is invalid at this context: %s"),_( "unexpected parent" ));
  	}
 
 	return NULL;
