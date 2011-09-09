@@ -136,7 +136,7 @@ $(BINDIR)/Release/libpw3270_jni@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ s
 
 #---[ I18n ]-------------------------------------------------------------------
 
-$(PACKAGE_NAME).po: $(PACKAGE_NAME).pot
+$(PACKAGE_NAME).po: pot/$(PACKAGE_NAME).pot
 	@$(MSGINIT) --no-translator -o $@ -i $^
 
 $(PACKAGE_NAME).pot: $(foreach SRC, $(basename @LANG_MODULES@), $(BINDIR)/pot/$(SRC).pot)
@@ -194,7 +194,7 @@ clean:
 	@rm -fr .obj
 	@rm -fr .bin
 	@rm -f @PROGRAM_LOGO@
-	@rm -f $(PACKAGE_NAME).pot
+	@rm -f pot/$(PACKAGE_NAME).pot
 	@rm -f $(PACKAGE_NAME).po
 
 	@$(MAKE) -C src/java clean
