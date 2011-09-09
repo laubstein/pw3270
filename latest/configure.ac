@@ -341,6 +341,7 @@ if test "$app_cv_java" == "yes"; then
 	AC_DEFINE(HAVE_JAVA)
 	PLUGINS="$PLUGINS j3270plugin"
 	LIBRARIES="$LIBRARIES libpw3270_jni"
+	LANG_MODULES="$LANG_MODULES java"
 fi
 
 if test "$app_cv_plugins" == "yes"; then

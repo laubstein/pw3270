@@ -34,6 +34,8 @@ MODULE_NAME=j3270plugin
 JAVAC=@JAVAC@
 JAVAH=@JAVAH@
 STRIP=@STRIP@
+MSGCAT=@MSGCAT@
+XGETTEXT=@XGETTEXT@
 
 BINDIR=@BINDIR@
 OBJDIR=@OBJDIR@
@@ -78,6 +80,12 @@ $(OBJRLS)/%@OBJEXT@: %.c
 	@mkdir -p `dirname $@`
 	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) -o $@ -c $<
 
+$(BINDIR)/pot/$(MODULE_NAME)/%.pot: %.c
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(XGETTEXT)	--default-domain=$(PACKAGE) --language=C \
+			--keyword=_ --keyword=N_ --keyword=MSG_:2 --output=$@ $<
+	@touch $@
 
 #---[ Targets ]----------------------------------------------------------------
 
@@ -95,4 +103,10 @@ $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(SO
 	@rm -f $(basename \$(@F)).a
 	@rm -f $(basename \$(@F)).def
 	@$(STRIP) $@
+
+$(BINDIR)/pot/java.pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/$(MODULE_NAME)/$(SRC).pot)
+	@rm -f $@
+	@mkdir -p `dirname $@`
+	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+
 
