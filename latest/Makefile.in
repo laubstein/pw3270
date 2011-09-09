@@ -44,20 +44,19 @@ localedir=@localedir@
 
 BINDIR=@BINDIR@
 OBJDIR=@OBJDIR@
+SRCDIR=@SRCDIR@
 
 MAKENSIS=@MAKENSIS@
 XGETTEXT=@XGETTEXT@
 MSGCAT=@MSGCAT@
+MSGINIT=@MSGINIT@
+MSGFMT=@MSGFMT@
 
-CC=@CC@
-LD=@LD@
 HOST_CC=@HOST_CC@
 HOST_LD=@HOST_CC@
 CFLAGS=@CFLAGS@
-DBG_CFLAGS=-DDEBUG=1
-RLS_CFLAGS=-DNDEBUG=1
 
-LIB3270_CFLAGS=-I@SRCDIR@/include
+LIB3270_CFLAGS=-I$(SRCDIR)/include
 LIB3270_LIBS=-L$(BINDIR)/Release/lib -l3270
 LIB3270_DBGLIBS=-L$(BINDIR)/Debug/lib -l3270 -Wl,-rpath,$(BINDIR)/Debug/lib
 
@@ -75,6 +74,12 @@ $(BINDIR)/Release/%@EXEEXT@: $(OBJDIR)/Release/%@OBJEXT@
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(HOST_LD) -o $@ $^ `pkg-config --libs glib-2.0`
+
+$(BINDIR)/pot/%.pot: src/plugins/%/*.c
+	@$(MAKE) -C $(dir $<) $@
+
+$(BINDIR)/pot/%.pot: src/%/*.c
+	@$(MAKE) -C $(dir $<) $@
 
 #---[ Main targets ]-----------------------------------------------------------
 
@@ -131,16 +136,13 @@ $(BINDIR)/Release/libpw3270_jni@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ s
 
 #---[ I18n ]-------------------------------------------------------------------
 
-$(PACKAGE_NAME).pot: $(BINDIR)/pot/lib3270.pot $(BINDIR)/pot/gtk2.pot $(BINDIR)/pot/ui.pot
+$(PACKAGE_NAME).po: $(PACKAGE_NAME).pot
+	@$(MSGINIT) --no-translator -o $@ -i $^
+
+$(PACKAGE_NAME).pot: $(foreach SRC, $(basename @LANG_MODULES@), $(BINDIR)/pot/$(SRC).pot)
 	@rm -f $@
 	@echo $@ ...
 	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
-
-$(BINDIR)/pot/lib3270.pot: src/lib/*.c
-	@$(MAKE) -C src/lib $@
-
-$(BINDIR)/pot/gtk2.pot: src/gtk2/*.c
-	@$(MAKE) -C src/gtk2 $@
 
 $(BINDIR)/pot/ui.pot: $(foreach XML, $(basename @UI_FILES@), $(BINDIR)/pot/ui/$(XML).pot)
 	@rm -f $@
@@ -193,6 +195,7 @@ clean:
 	@rm -fr .bin
 	@rm -f @PROGRAM_LOGO@
 	@rm -f $(PACKAGE_NAME).pot
+	@rm -f $(PACKAGE_NAME).po
 
 	@$(MAKE) -C src/java clean
 	@$(MAKE) -C src/lib clean

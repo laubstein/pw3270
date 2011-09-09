@@ -77,7 +77,7 @@ $(OBJDIR)/Release/lib/$(MODULE_NAME)/%@OBJEXT@: %.c *.h $(SRCDIR)/include/*.h $(
 	@mkdir -p `dirname $@`
 	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(DLL_CFLAGS) $(SSL_CFLAGS)-o $@ -c $<
 
-$(BINDIR)/pot/$(MODULE_NAME)/%.pot: %.c
+$(BINDIR)/pot/lib/%.pot: %.c
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(XGETTEXT)	--default-domain=$(PACKAGE) --language=C \
@@ -87,8 +87,6 @@ $(BINDIR)/pot/$(MODULE_NAME)/%.pot: %.c
 #---[ Targets ]----------------------------------------------------------------
 
 all: $(BINDIR)/Release/lib/lib$(MODULE_NAME)@DLLEXT@
-
-pot: $(BINDIR)/pot/lib$(MODULE_NAME).pot
 
 $(BINDIR)/Debug/lib/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@) \
 							$(OBJDIR)/fallbacks@OBJEXT@
@@ -119,11 +117,10 @@ $(BINDIR)/mkfb@EXEEXT@: mkfb.c Makefile
 	@mkdir -p `dirname $@`
 	@$(HOST_CC) -g -o $@ -D_WIN32 mkfb.c
 
-$(BINDIR)/pot/lib$(MODULE_NAME).pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/$(MODULE_NAME)/$(SRC).pot)
+$(BINDIR)/pot/lib.pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/lib/$(SRC).pot)
 	@rm -f $@
 	@mkdir -p `dirname $@`
 	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
-
 
 distclean:
 	@rm -f ./mkversion.sh

@@ -48,23 +48,28 @@ AC_CONFIG_HEADER([src/include/lib3270/config.h])
 dnl Initialise automake stuff.
 AM_INIT_AUTOMAKE
 
+dnl Check for iconv
+AM_ICONV
+
 #--[ Check for tools & Libraries ]----------------------------------------------------------------------------------------------------------------------------
 
 AC_PROG_CXX
 AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_MKDIR_P
 
 AC_PATH_TOOL([REXXCONFIG], [oorexx-config], [no])
 AC_PATH_TOOL([STRIP], [strip])
 AC_PATH_TOOL([MAKENSIS], [makensis], [no])
 AC_PATH_TOOL([RPMBUILD], [rpmbuild], [no])
+
 AC_PATH_TOOL([XGETTEXT], [xgettext], [no])
 AC_PATH_TOOL([MSGCAT], [msgcat], [no])
+AC_PATH_TOOL([MSGINIT], [msginit], [no])
+AC_PATH_TOOL([MSGFMT], [msgfmt], [no])
 
 AC_PATH_TOOL([JAVAC], [javac], [no])
 AC_PATH_TOOL([JAVAH], [javah], [no])
-
-# Check for iconv
-AM_ICONV
 
 # Headers
 AC_CHECK_HEADER(malloc.h, AC_DEFINE(HAVE_MALLOC_H,,[do we have malloc.h?]))
@@ -74,7 +79,6 @@ AC_CHECK_HEADER(malloc.h, AC_DEFINE(HAVE_MALLOC_H,,[do we have malloc.h?]))
 LD=$CC
 DLLEXT=".so"
 OBJEXT=".o"
-IMGEXT=".svg"
 DLLPREFIX="lib"
 
 OSTYPE="linux"
@@ -87,11 +91,14 @@ DLL_LDFLAGS="-shared -Wl,-soname,\$(@F)"
 
 PLUGINS=""
 LIBRARIES=""
+
 UI_FILES="default.xml functions.xml keypad.xml"
+LANG_MODULES="lib gtk2 ui"
 
 app_cv_srcgui=""
 app_cv_srclib=""
 app_cv_imgext=".svg"
+
 
 #--[ Set host based options ]---------------------------------------------------------------------------------------------------------------------------------
 
@@ -104,7 +111,6 @@ fi
 case "$host" in
 	*-mingw32)
 		DLLEXT=".dll"
-		IMGEXT=".gif"
 		ICOEXT=".ico"
 		localedir="locale"
 		app_cv_srclib="$app_cv_srclib w3misc.c winvers.c"
@@ -328,6 +334,7 @@ if test "$app_cv_rexx" == "yes"; then
 	PLUGINS="$PLUGINS rx3270"
 	LIBRARIES="$LIBRARIES librx3270"
 	UI_FILES="$UI_FILES rexx.xml"
+	LANG_MODULES="$LANG_MODULES rexx"
 fi
 
 if test "$app_cv_java" == "yes"; then
@@ -395,6 +402,7 @@ AC_SUBST(SRCDIR,"$ac_pwd/src")
 AC_SUBST(PLUGINS)
 AC_SUBST(LIBRARIES)
 AC_SUBST(UI_FILES)
+AC_SUBST(LANG_MODULES)
 
 AC_SUBST(JDK_HOME,$JDK_HOME)
 AC_SUBST(JRE_HOME,$JRE_HOME)
@@ -405,21 +413,25 @@ AC_SUBST(JAVA_LDFLAGS,$java_ldflags)
 
 #--[ Output files ]-------------------------------------------------------------------------------------------------------------------------------------------
 
-AC_OUTPUT(Makefile)
-AC_OUTPUT(version)
-AC_OUTPUT(lib3270.pc)
-AC_OUTPUT(src/include/lib3270/plugins.h)
+AC_CONFIG_FILES([
+Makefile
+version
+lib3270.pc
+src/include/lib3270/plugins.h
 
-AC_OUTPUT(src/lib/mkversion.sh)
-AC_OUTPUT(src/lib/Makefile)
+src/lib/mkversion.sh
+src/lib/Makefile
 
-AC_OUTPUT(src/gtk2/Makefile)
-AC_OUTPUT(src/gtk2/version.c)
+src/gtk2/Makefile
+src/gtk2/version.c
 
-AC_OUTPUT(src/plugins/rexx/Makefile)
-AC_OUTPUT(src/plugins/java/Makefile)
+src/plugins/rexx/Makefile
+src/plugins/java/Makefile
 
-AC_OUTPUT(src/java/Makefile)
+src/java/Makefile
+
+])
+
 
 dnl Output the generated config.status script.
 AC_OUTPUT
