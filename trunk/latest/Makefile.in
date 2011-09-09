@@ -75,10 +75,10 @@ $(BINDIR)/Release/%@EXEEXT@: $(OBJDIR)/Release/%@OBJEXT@
 	@mkdir -p `dirname $@`
 	@$(HOST_LD) -o $@ $^ `pkg-config --libs glib-2.0`
 
-$(BINDIR)/pot/%.pot: src/plugins/%/*.c
+$(BINDIR)/pot/%.pot: src/plugins/%/*
 	@$(MAKE) -C $(dir $<) $@
 
-$(BINDIR)/pot/%.pot: src/%/*.c
+$(BINDIR)/pot/%.pot: src/%/*
 	@$(MAKE) -C $(dir $<) $@
 
 #---[ Main targets ]-----------------------------------------------------------
