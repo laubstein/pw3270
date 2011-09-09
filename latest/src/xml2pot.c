@@ -154,6 +154,7 @@
 					"\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n\"\n"
 					"\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n\"\n"
 					"\"Language-Team: LANGUAGE <LL@li.org>\\n\"\n"
+					"\"Language: \\n\"\n"
 					"\"MIME-Version: 1.0\\n\"\n"
 					"\"Content-Type: text/plain; charset=CHARSET\\n\"\n"
 					"\"Content-Transfer-Encoding: 8bit\\n\"\n\n";

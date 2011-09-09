@@ -147,7 +147,7 @@ $(PACKAGE_NAME).pot: $(foreach SRC, $(basename @LANG_MODULES@), $(BINDIR)/pot/$(
 $(BINDIR)/pot/ui.pot: $(foreach XML, $(basename @UI_FILES@), $(BINDIR)/pot/ui/$(XML).pot)
 	@rm -f $@
 	@echo $@ ...
-	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+	@$(MSGCAT) --sort-output $^ > $@
 
 $(BINDIR)/pot/ui/%.pot: ui/%.xml $(BINDIR)/Release/xml2pot@EXEEXT@
 	@mkdir -p `dirname $@`
