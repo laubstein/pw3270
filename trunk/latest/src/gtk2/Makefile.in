@@ -118,7 +118,7 @@ $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@: $(foreach SRC, $(basename $(SOURCES)),
 $(BINDIR)/pot/$(MODULE_NAME).pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/$(MODULE_NAME)/$(SRC).pot)
 	@rm -f $@
 	@mkdir -p `dirname $@`
-	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+	@$(MSGCAT) --sort-output $^ > $@
 
 distclean:
 	@rm -f $(BINDIR)/pot/$(MODULE_NAME)

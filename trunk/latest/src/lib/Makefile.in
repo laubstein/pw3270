@@ -120,7 +120,7 @@ $(BINDIR)/mkfb@EXEEXT@: mkfb.c Makefile
 $(BINDIR)/pot/lib.pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/lib/$(SRC).pot)
 	@rm -f $@
 	@mkdir -p `dirname $@`
-	@$(MSGCAT) --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+	@$(MSGCAT) --sort-output $^ > $@
 
 distclean:
 	@rm -f ./mkversion.sh
