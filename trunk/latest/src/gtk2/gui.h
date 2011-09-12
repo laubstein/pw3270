@@ -51,6 +51,7 @@
 
 	#if defined( HAVE_IGEMAC )
 		#include <gtkosxapplication.h>
+		#define HAVE_DOCK 1
 	#endif
 
 	#include <lib3270/api.h>

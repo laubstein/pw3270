@@ -171,6 +171,12 @@
 
 	</popup>
 
+	<popup name='dockmenu' type='dock'>
+		<menuitem action='Connect' />
+		<menuitem action='Disconnect' />
+		<menuitem action='Quit'/>
+	</popup>
+
 	<accelerator action='Toggle' id='Insert' key='Insert' group='online' />
 
 	<accelerator action='Home' key='Home' group='online' />

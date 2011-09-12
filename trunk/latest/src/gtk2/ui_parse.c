@@ -61,6 +61,15 @@
 	static const gchar * app_menu_item[] = { "about", "preferences" };
  #endif
 
+#ifdef HAVE_DOCK
+
+	// Redefine the number of popup menus
+	#define	POPUP_MENU_DOCK		POPUP_MENU_COUNT
+	#undef 	POPUP_MENU_COUNT
+	#define	POPUP_MENU_COUNT	POPUP_MENU_DOCK+1
+
+#endif // HAVE_DOCK
+
  typedef struct _parser_state
  {
  	GtkWidget		* window;									/**< Toplevel window */
@@ -254,6 +263,12 @@
 
  }
 
+ static UI_ELEMENT * skip_block(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
+ {
+	state->ignore++;
+	return NULL;
+ }
+
  static UI_ELEMENT *create_element(size_t sz, const gchar *element_name, const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
  	UI_ELEMENT *ret = NULL;
@@ -326,7 +341,7 @@
 
 	if(type)
 	{
-		static const gchar *id_name[] = { "default", "selection" };
+		static const gchar *id_name[] = { "default", "selection", "dock" };
 		int f;
 
 		id = -1;
@@ -336,6 +351,9 @@
 			if(!g_strcasecmp(type,id_name[f]))
 				id = f;
 		}
+
+		if(id >= POPUP_MENU_COUNT)
+			return skip_block(names,values,state,error);
 
 		if(id < 0)
 		{
@@ -783,12 +801,6 @@
 
 //	Trace("%s ends",__FUNCTION__);
 	return el;
- }
-
- static UI_ELEMENT * skip_block(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
- {
-	state->ignore++;
-	return NULL;
  }
 
  static UI_ELEMENT * start_accelerator(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
@@ -1279,6 +1291,9 @@
 
 #ifdef MAC_INTEGRATION
 	Trace("%s: Top menu: %p app: %p",__FUNCTION__,state.top_menu,osxapp);
+
+	if(state.popup_menu_widget[POPUP_MENU_DOCK])
+		gtk_osxapplication_set_dock_menu(osxapp,GTK_MENU_SHELL(state.popup_menu_widget[POPUP_MENU_DOCK]));
 
 	if(state.top_menu)
 	{
