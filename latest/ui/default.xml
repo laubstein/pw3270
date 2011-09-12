@@ -139,7 +139,7 @@
 		<toolitem action='Quit' />
 	</toolbar>
 
-	<!--- popup name='selectionpopup' type='selection'>
+	<popup name='selectionpopup' type='selection'>
 		<menuitem action='Copy'/>
 		<menuitem action='Append'/>
 		<menuitem action='Unselect'/>
@@ -152,7 +152,7 @@
 
 		<separator />
 		<menuitem action='Quit'/>
-	</popup ---->
+	</popup>
 
 	<popup name='defaultpopup' type="default">
 		<menuitem action='Paste'/>

@@ -71,6 +71,7 @@
 
 	GHashTable	 	* menubar;									/**< List of active menu bars */
 	GHashTable	 	* menu;										/**< List of active menus */
+	GHashTable	 	* menuitem;									/**< List of active menu items */
 
 	GHashTable	 	* toolbar;									/**< List of active toolbars */
 	GHashTable 		* tool;										/**< List of active toolbar items */
@@ -509,25 +510,39 @@
 			name = (const gchar *) (temp = g_strdup_printf("%s:%s",name,get_xml_attribute(names,values,"id")));
 	}
 
- 	if(!(state->current && GTK_IS_MENU_ITEM(state->current->widget)))
- 	{
-	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Menuitem \"%s\" isn't inside a <menu>"), name);
+	if(!(state->current && (GTK_IS_MENU_ITEM(state->current->widget) || GTK_IS_MENU(state->current->widget))))
+	{
+	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Menuitem \"%s\" is invalid at this context"), name);
 	 	g_free(temp);
 		return NULL;
- 	}
+	}
 
  	el = (UI_ELEMENT *) g_hash_table_lookup(state->menu,name);
 
  	if(!el)
  	{
- 		// New menuitem
-		GtkWidget *menu = NULL;
-
+ 		// New menuitem action
 		if((el = create_element(sizeof(UI_ELEMENT),name,names,values,state,error)) == NULL)
 		{
 		 	g_free(temp);
 			return NULL;
 		}
+		g_hash_table_insert(state->menu,(gpointer) el->name,el);
+ 	}
+
+	g_free(temp);
+	temp = NULL;
+
+	// Check for new menu item
+	temp = g_strdup_printf("%s:%s",state->current->name,el->name);
+	el->widget = g_hash_table_lookup(state->menuitem,temp);
+	if(el->widget)
+	{
+		g_free(temp);
+	}
+	else
+	{
+		GtkWidget *menu = state->current->widget;
 
 		if(el->action)
 		{
@@ -539,22 +554,20 @@
 			el->widget = gtk_menu_item_new_with_mnemonic(gettext(label ? label : el->name));
 		}
 
-		menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(state->current->widget));
-		if(!menu)
+		if(GTK_IS_MENU_ITEM(state->current->widget))
 		{
-			menu = gtk_menu_new();
-			gtk_menu_item_set_submenu(GTK_MENU_ITEM(GTK_MENU_ITEM(state->current->widget)),menu);
+			menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(state->current->widget));
+			if(!menu)
+			{
+				menu = gtk_menu_new();
+				gtk_menu_item_set_submenu(GTK_MENU_ITEM(GTK_MENU_ITEM(state->current->widget)),menu);
+			}
 		}
 
 		gtk_menu_shell_append((GtkMenuShell *) menu, el->widget);
-		g_hash_table_insert(state->menu,(gpointer) el->name,el);
 
- 	}
-
-	g_free(temp);
-	temp = NULL;
-
-	// Check for new menu item
+		g_hash_table_insert(state->menuitem,(gpointer) temp,el->widget);
+	}
 
 
 	// Check if the menu item has a folder definition
@@ -650,6 +663,12 @@
 		gtk_widget_show(widget);
 		gtk_toolbar_insert(GTK_TOOLBAR(state->current->widget),GTK_TOOL_ITEM(widget),-1);
 	}
+	else if(GTK_IS_MENU_SHELL(state->current->widget))
+ 	{
+		GtkWidget *widget = gtk_separator_menu_item_new();
+		gtk_widget_show(widget);
+		gtk_menu_shell_append((GtkMenuShell *) state->current->widget, widget);
+ 	}
  	else
  	{
 	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Separator is invalid at this context: %s"),_( "unexpected parent" ));
@@ -1203,6 +1222,7 @@
 	state.toolbar 		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
 	state.tool	  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
 	state.menu	  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
+	state.menuitem		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) g_free, 0);
 	state.action  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) g_free, g_object_unref);
 
 	// Parse
@@ -1305,6 +1325,7 @@
 	Trace("Releasing %s","control data");
 	g_object_unref(state.accel_group);
 	g_hash_table_unref(state.menubar);
+	g_hash_table_unref(state.menuitem);
 	g_hash_table_unref(state.toolbar);
 	g_hash_table_unref(state.tool);
 	g_hash_table_unref(state.menu);
