@@ -77,9 +77,8 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
- GtkWidget	*SelectionPopup		= 0;
- GtkWidget	*DefaultPopup		= 0;
- int 		drag_type			= DRAG_TYPE_NONE;
+ GtkMenu	* popup_menu[POPUP_MENU_COUNT]	= { NULL };
+ int 		  drag_type						= DRAG_TYPE_NONE;
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -418,7 +417,7 @@
 		break;
 
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3:
-		w = (select_mode == SELECT_MODE_NONE) ? DefaultPopup : SelectionPopup;
+		w = GTK_WIDGET(popup_menu[(select_mode == SELECT_MODE_NONE) ? POPUP_MENU_DEFAULT : POPUP_MENU_SELECTION]);
 		Trace("Button 2 clicked at %ld,%ld Menu: %p",(long) event->x, (long) event->y, w);
 		if(w)
 		{

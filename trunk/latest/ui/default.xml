@@ -139,34 +139,34 @@
 		<toolitem action='Quit' />
 	</toolbar>
 
-	<popup name='selectionpopup'>
+	<!--- popup name='selectionpopup' type='selection'>
 		<menuitem action='Copy'/>
 		<menuitem action='Append'/>
 		<menuitem action='Unselect'/>
 		<menuitem action='SelectAll'/>
 
-		<separator/>
+		<separator />
 		<menuitem action='PrintScreen'/>
 		<menuitem action='PrintSelected'/>
 		<menuitem action='PrintClipboard'/>
 
-		<separator/>
+		<separator />
 		<menuitem action='Quit'/>
-	</popup>
+	</popup ---->
 
-	<popup name='defaultpopup'>
+	<popup name='defaultpopup' type="default">
 		<menuitem action='Paste'/>
 		<menuitem action='PasteNext'/>
 		<menuitem action='SelectAll'/>
 		<menuitem action='PrintScreen'/>
 		<menuitem action='PrintClipboard'/>
 
-		<separator/>
+		<separator />
 		<menuitem action='PreviousField' label='Previous field' />
 		<menuitem action='NextField' label='Next field'/>
 		<menuitem action='Return'/>
 
-		<separator/>
+		<separator />
 		<menuitem action='Quit'/>
 
 	</popup>
@@ -179,7 +179,7 @@
 	<accelerator action='Enter' key='KP_Enter' />
 	<accelerator action='Break' key='Escape' group='online' />
 	<accelerator action='Attn' key='<shift>Escape' group='online' />
-	
+
 	<accelerator action='DeleteWord' key='<Ctrl>w' group='online' />
 	<accelerator action='Delete' key='Delete' group='online' />
 	<accelerator action='Erase' key='BackSpace' group='online' />
