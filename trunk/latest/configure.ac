@@ -431,6 +431,9 @@ src/plugins/java/Makefile
 
 src/java/Makefile
 
+pw3270.nsi
+pw3270.spec
+
 ])
 
 
