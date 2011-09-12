@@ -2,7 +2,7 @@
 
 Name "@PROGRAM_NAME@"
 Caption "@PROGRAM_NAME@ - 3270 Emulator for windows/gtk"
-outfile "@PROGRAM_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@-setup.exe"
+outfile "@PROGRAM_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@-@host_cpu@-install.exe"
 XPStyle on
 
 # define the directory to install to

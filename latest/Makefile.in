@@ -31,14 +31,17 @@
 
 PACKAGE_NAME=@PACKAGE_NAME@
 PACKAGE_VERSION=@PACKAGE_VERSION@
+PACKAGE_TARNAME=@PACKAGE_TARNAME@
+
 PLUGINS=@PLUGINS@
 LIBRARIES=@LIBRARIES@
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-bindir=$(BINDIR)
+bindir=@bindir@
 sbindir=@sbindir@
 libdir=@libdir@
+docdir=@docdir@
 includedir=@includedir@
 datarootdir=@datarootdir@
 localedir=@localedir@
@@ -47,11 +50,16 @@ BINDIR=@BINDIR@
 OBJDIR=@OBJDIR@
 SRCDIR=@SRCDIR@
 
+INSTALL=@INSTALL@
+INSTALL_EXE=$(INSTALL) --mode=755
+INSTALL_DATA=$(INSTALL) --mode=644
+
 MAKENSIS=@MAKENSIS@
 XGETTEXT=@XGETTEXT@
 MSGCAT=@MSGCAT@
 MSGINIT=@MSGINIT@
 MSGFMT=@MSGFMT@
+SHELL=@SHELL@
 
 HOST_CC=@HOST_CC@
 HOST_LD=@HOST_CC@
@@ -162,6 +170,45 @@ $(BINDIR)/pot/ui/%.pot: ui/%.xml $(BINDIR)/Release/xml2pot@EXEEXT@
 	@mkdir -p `dirname $@`
 	@echo $@ ...
 	@$(BINDIR)/Release/xml2pot@EXEEXT@ "$<" > "$@"
+
+#---[ Install targets ]--------------------------------------------------------
+
+install: install-lib install-gui install-locale install-doc install-dev
+
+install-gui:	$(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@ \
+		@PROGRAM_LOGO@
+
+	@mkdir -p $(DESTDIR)/$(bindir)
+	@$(INSTALL_EXE) $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@ $(DESTDIR)/$(bindir)
+
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/plugins
+	@$(INSTALL_DATA) ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+	@$(INSTALL_DATA) @PROGRAM_LOGO@ $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)
+
+install-locale: $(foreach MO, $(LANGUAGES), $(BINDIR)/Release/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo)
+	@echo -e $(foreach MO, $(LANGUAGES), mkdir -p $(DESTDIR)/$(localedir)/$(MO)/LC_MESSAGES\\n$(INSTALL_DATA) $(BINDIR)/Release/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo $(DESTDIR)/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo \\n ) | $(SHELL)
+
+install-lib: $(BINDIR)/Release/lib/lib3270@DLLEXT@
+	mkdir -p $(DESTDIR)/$(libdir)
+	@$(INSTALL_EXE) $(BINDIR)/Release/lib/lib3270@DLLEXT@ $(DESTDIR)/$(libdir)
+
+install-dev:
+	@mkdir -p $(DESTDIR)/$(includedir)/lib3270
+	@$(INSTALL_DATA) src/include/lib3270.h $(DESTDIR)/$(includedir)
+	@$(INSTALL_DATA) src/include/lib3270/*.h $(DESTDIR)/$(includedir)/lib3270
+
+	@mkdir -p $(DESTDIR)/$(libdir)/pkgconfig
+	@$(INSTALL_DATA) lib3270.pc $(DESTDIR)/$(libdir)/pkgconfig/$(PACKAGE_NAME).pc
+
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+	@$(INSTALL_DATA) ui/debug.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+
+install-doc:
+	@mkdir -p $(DESTDIR)/$(docdir)
+	@$(INSTALL_DATA) LICENCA $(DESTDIR)/$(docdir)
+	@$(INSTALL_DATA) LICENSE $(DESTDIR)/$(docdir)
+	@$(INSTALL_DATA) AUTHORS $(DESTDIR)/$(docdir)
 
 #---[ Misc Tagets ]------------------------------------------------------------
 
