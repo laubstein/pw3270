@@ -204,6 +204,10 @@ static int program_init(void)
 	gboolean				has_log		= FALSE;
 	const gchar			*msg		= gtk_check_version(GTK_MAJOR_VERSION, GTK_MINOR_VERSION, GTK_MICRO_VERSION);
 	gchar					*ptr;
+	int						f;
+
+	for(f=0;f<POPUP_MENU_COUNT;f++)
+		popup_menu[f] = NULL;
 
 	if(msg)
 	{

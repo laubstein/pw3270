@@ -468,13 +468,13 @@
 	if(id >= N_TOGGLES)
 	{
 		id -= N_TOGGLES;
-		Trace("Connect toggle \"%s\" to gui (id=%d)",get_xml_attribute(names, values, "id"),id);
+//		Trace("Connect toggle \"%s\" to gui (id=%d)",get_xml_attribute(names, values, "id"),id);
 		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),gui_toggle_state[id]);
 		g_signal_connect(G_OBJECT(action),"toggled",G_CALLBACK(gui_toggle_action),(gpointer) id);
 	}
 	else
 	{
-		Trace("Connect toggle \"%s\" to lib3270",get_xml_attribute(names, values, "id"));
+//		Trace("Connect toggle \"%s\" to lib3270",get_xml_attribute(names, values, "id"));
 		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),Toggled(id) ? TRUE : FALSE);
 		g_signal_connect(G_OBJECT(action),"toggled",G_CALLBACK(lib3270_toggle_action),(gpointer) id);
 	}

@@ -77,6 +77,9 @@
 
 	GtkAccelGroup	* accel_group;								/**< Accelerators */
 
+	UI_ELEMENT		* popup_menu[POPUP_MENU_COUNT];				/**< Popup Menus */
+	GtkWidget		* popup_menu_widget[POPUP_MENU_COUNT];		/**< Popup Menus Widgets */
+
 #ifdef MAC_INTEGRATION
 	GtkMenuShell	* top_menu;									/**< Mac OSX top menu */
 	GtkMenuItem		* quit_menu;								/**< Quit menu widget */
@@ -307,6 +310,63 @@
 
  }
 
+ static UI_ELEMENT * start_popup(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
+ {
+ 	UI_ELEMENT		* el	= NULL;
+ 	const gchar	* name	= get_xml_attribute(names,values,"name");
+ 	const gchar	* type	= get_xml_attribute(names,values,"type");
+ 	int				  id	= POPUP_MENU_DEFAULT;
+
+	if(!name)
+	{
+	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,"%s",_( "Can't accept unnamed popup menu"));
+		return NULL;
+	}
+
+	if(type)
+	{
+		static const gchar *id_name[] = { "default", "selection" };
+		int f;
+
+		id = -1;
+
+		for(f=0;id < 0 || f > G_N_ELEMENTS(id_name);f++)
+		{
+			if(!g_strcasecmp(type,id_name[f]))
+				id = f;
+		}
+
+		if(id < 0)
+		{
+			*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Unexpected popup menu type \"%s\""),type);
+			return NULL;
+
+		}
+	}
+
+	el = state->popup_menu[id];
+
+	if(!el)
+	{
+		if((el = create_element(sizeof(UI_ELEMENT),name,names,values,state,error)) == NULL)
+			return NULL;
+
+		state->popup_menu[id] = el;
+
+		if(el->action)
+			el->widget = gtk_action_create_menu(el->action);
+		else
+			el->widget = gtk_menu_new();
+
+		if(state->popup_menu_widget[id])
+			g_object_unref(state->popup_menu_widget[id]);
+
+		state->popup_menu_widget[id] = el->widget;
+	}
+
+	return el;
+ }
+
 #ifdef MAC_INTEGRATION
  static void check_for_app_menu(const gchar *name, const gchar **names,const gchar **values, GtkWidget *widget, PARSER_STATE *state)
  {
@@ -491,6 +551,13 @@
 
  	}
 
+	g_free(temp);
+	temp = NULL;
+
+	// Check for new menu item
+
+
+	// Check if the menu item has a folder definition
 	attr = (gchar *) get_xml_attribute(names,values,"folder");
 
  	if(attr)
@@ -552,7 +619,6 @@
 		state->quit_menu = GTK_MENU_ITEM(el->widget);
 #endif // MAC_INTEGRATION
 
-	g_free(temp);
 	return el;
  }
 
@@ -808,7 +874,7 @@
 			{	"toolitem", 	start_toolitem		},
 
 			// Misc
-			{	"popup",		skip_block			},
+			{	"popup",		start_popup			},
 			{	"separator",	start_separator		},
 			{	"ui", 			start_dunno			},
 			{ 	"accelerator",	start_accelerator	},
@@ -1125,6 +1191,7 @@
 	PARSER_STATE 	  state;
 	GtkWidget		* hbox;
 	GtkWidget		* vbox;
+	int				  f;
 
 	// Initialize control data
 	memset(&state,0,sizeof(state));
@@ -1149,6 +1216,19 @@
 
 	// Menu Items
 	g_hash_table_foreach(state.menu,(GHFunc) setup_menu, (gpointer) setup_table);
+
+	// Popup menus
+	for(f=0;f<POPUP_MENU_COUNT;f++)
+	{
+		if(popup_menu[f])
+			g_object_unref(popup_menu[f]);
+		popup_menu[f] = GTK_MENU(state.popup_menu_widget[f]);
+
+		Trace("popup_menu[%d]=%p",f,popup_menu[f]);
+	}
+
+	if(!popup_menu[POPUP_MENU_SELECTION])
+		popup_menu[POPUP_MENU_SELECTION] = popup_menu[POPUP_MENU_DEFAULT];
 
 	// Menubar(s)
 	g_hash_table_foreach(state.menubar,(GHFunc) pack_menubar, vbox);
@@ -1222,25 +1302,13 @@
 	gtk_window_add_accel_group(GTK_WINDOW(state.window),state.accel_group);
 
 	// Release control data
-	Trace("Releasing %p",state.accel_group);
+	Trace("Releasing %s","control data");
 	g_object_unref(state.accel_group);
-
-	Trace("Releasing %p",state.menubar);
 	g_hash_table_unref(state.menubar);
-
-	Trace("Releasing %p",state.toolbar);
 	g_hash_table_unref(state.toolbar);
-
-	Trace("Releasing %p",state.tool);
 	g_hash_table_unref(state.tool);
-
-	Trace("Releasing %p",state.menu);
 	g_hash_table_unref(state.menu);
-
-	Trace("Releasing %p",state.action);
 	g_hash_table_unref(state.action);
-
-	Trace("Window: %p",state.window);
 
 	return state.window;
  }

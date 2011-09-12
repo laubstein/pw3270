@@ -230,8 +230,6 @@
 	LOCAL_EXTERN const char		* on_lu_command;
 
 	LOCAL_EXTERN GtkWidget			* topwindow;
-	LOCAL_EXTERN GtkWidget			* SelectionPopup;
-	LOCAL_EXTERN GtkWidget			* DefaultPopup;
 	LOCAL_EXTERN GtkWidget			* terminal;
 	LOCAL_EXTERN GdkColor			  color[TERMINAL_COLOR_COUNT+1];
 	LOCAL_EXTERN H3270				* hSession;
@@ -240,6 +238,16 @@
 	// Pixmaps
 	LOCAL_EXTERN GdkPixmap			* pixmap_cursor;	/**< Pixmap with cursor image */
 	LOCAL_EXTERN GdkPixmap			* pixmap_terminal;	/**< Pixmap with terminal contents */
+
+	enum POPUPS
+	{
+		POPUP_MENU_DEFAULT,
+		POPUP_MENU_SELECTION,
+
+		POPUP_MENU_COUNT
+	};
+
+	LOCAL_EXTERN GtkMenu			* popup_menu[POPUP_MENU_COUNT];
 
 	enum OIA_PIXMAP
 	{
