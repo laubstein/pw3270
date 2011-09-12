@@ -1249,8 +1249,8 @@
 	// Menu Items
 	g_hash_table_foreach(state.menu,(GHFunc) setup_menu, (gpointer) setup_table);
 
-	// Popup menus
-	for(f=0;f<POPUP_MENU_COUNT;f++)
+	// Standard popup menus
+	for(f=0;f <= POPUP_MENU_SELECTION;f++)
 	{
 		if(popup_menu[f])
 			g_object_unref(popup_menu[f]);
