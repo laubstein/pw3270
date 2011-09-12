@@ -40,9 +40,9 @@
  #include <gdk/gdkkeysyms.h>
  #include <errno.h>
 
- #include <globals.h>
+// #include <globals.h>
 
- #include <lib3270/kybdc.h>
+// #include <lib3270/kybdc.h>
  #include <lib3270/toggle.h>
  #include <lib3270/plugins.h>
 
