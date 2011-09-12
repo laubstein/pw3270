@@ -164,7 +164,7 @@
 		<separator />
 		<menuitem action='PreviousField' label='Previous field' />
 		<menuitem action='NextField' label='Next field'/>
-		<menuitem action='Return'/>
+		<menuitem action='Return' label='Return' />
 
 		<separator />
 		<menuitem action='Quit'/>
