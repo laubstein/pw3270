@@ -61,6 +61,8 @@ LIB3270_CFLAGS=-I$(SRCDIR)/include
 LIB3270_LIBS=-L$(BINDIR)/Release/lib -l3270
 LIB3270_DBGLIBS=-L$(BINDIR)/Debug/lib -l3270 -Wl,-rpath,$(BINDIR)/Debug/lib
 
+LANGUAGES=pt_BR
+
 DBG_MAKE="LIB3270_CFLAGS=$(LIB3270_CFLAGS)" LIB3270_LIBS="$(LIB3270_DBGLIBS)" GLOBAL_DEPENDS="$(BINDIR)/Debug/lib/lib3270@DLLEXT@"
 RLS_MAKE="LIB3270_CFLAGS=$(LIB3270_CFLAGS)" LIB3270_LIBS="$(LIB3270_LIBS)" GLOBAL_DEPENDS="$(BINDIR)/Release/lib/lib3270@DLLEXT@"
 
@@ -82,6 +84,11 @@ $(BINDIR)/pot/%.pot: src/plugins/%/*
 $(BINDIR)/pot/%.pot: src/%/*
 	@$(MAKE) -C $(dir $<) $@
 
+$(BINDIR)/Release/$(localedir)/%/LC_MESSAGES/$(PACKAGE_NAME).mo: po/%.po
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(MSGFMT) -c -v -o $@ $^
+
 #---[ Main targets ]-----------------------------------------------------------
 
 all: Release
@@ -89,7 +96,8 @@ all: Release
 Release: $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@ \
 		@PROGRAM_LOGO@ \
 		$(foreach PLUGIN, $(PLUGINS), $(BINDIR)/Release/plugins/$(PLUGIN)@DLLEXT@) \
-		$(foreach LIB, $(LIBRARIES), $(BINDIR)/Release/$(LIB)@DLLEXT@)
+		$(foreach LIB, $(LIBRARIES), $(BINDIR)/Release/$(LIB)@DLLEXT@) \
+		$(foreach MO, $(LANGUAGES), $(BINDIR)/Release/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo)
 
 
 #---[ Library ]----------------------------------------------------------------
@@ -106,7 +114,7 @@ $(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/
 	@$(MAKE) $(DBG_MAKE) -C src/gtk2 $@
 
 $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/gtk2/*
-	@$(MAKE) $(DBG_MAKE) -C src/gtk2 $@
+	@$(MAKE) $(RLS_MAKE) -C src/gtk2 $@
 
 #---[ Modules ]----------------------------------------------------------------
 
@@ -127,13 +135,13 @@ $(BINDIR)/Release/plugins/rx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ 
 	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
 
 $(BINDIR)/Release/plugins/j3270plugin@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/java/*
-	@$(MAKE) $(DBG_MAKE) -C src/plugins/java $@
+	@$(MAKE) $(RLS_MAKE) -C src/plugins/java $@
 
 $(BINDIR)/Release/librx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
 
 $(BINDIR)/Release/libpw3270_jni@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/java/*
-	@$(MAKE) $(DBG_MAKE) -C src/java $@
+	@$(MAKE) $(RLS_MAKE) -C src/java $@
 
 #---[ I18n ]-------------------------------------------------------------------
 
