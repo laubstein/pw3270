@@ -62,6 +62,7 @@ MSGCAT=@MSGCAT@
 MSGINIT=@MSGINIT@
 MSGFMT=@MSGFMT@
 SHELL=@SHELL@
+RPMBUILD=@RPMBUILD@
 
 HOST_CC=@HOST_CC@
 HOST_LD=@HOST_CC@
@@ -246,6 +247,8 @@ $(PACKAGE_NAME).desktop: Makefile $(PROGRAM_LOGO)
 	@echo "Type=Application" >> $@
 	@echo "StartupNotify=true" >> $@
 
+rpm: $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
+	@$(RPMBUILD) -ta $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
 
 $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz: clean
 	@rm -fr $(TMPDIR)/$(PACKAGE_TARNAME).tmp

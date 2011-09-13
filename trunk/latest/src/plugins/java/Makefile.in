@@ -29,7 +29,13 @@
 
 #---[ Configuration values ]---------------------------------------------------
 
+PACKAGE_NAME=@PACKAGE_NAME@
 MODULE_NAME=j3270plugin
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+bindir=@bindir@
 
 JAVAC=@JAVAC@
 JAVAH=@JAVAH@
@@ -48,6 +54,9 @@ BINRLS=$(BINDIR)/Release/plugins
 
 JDK_HOME=@JDK_HOME@
 JRE_HOME=@JRE_HOME@
+
+INSTALL=@INSTALL@
+INSTALL_EXE=$(INSTALL) --mode=755
 
 CC = @CC@
 LD = @LD@
@@ -83,7 +92,7 @@ $(OBJRLS)/%@OBJEXT@: %.c
 $(BINDIR)/pot/$(MODULE_NAME)/%.pot: %.c
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(XGETTEXT)	--default-domain=$(PACKAGE) --language=C \
+	@$(XGETTEXT)	--default-domain=$(PACKAGE_NAME) --language=C \
 			--keyword=_ --keyword=N_ --keyword=MSG_:2 --output=$@ $<
 	@touch $@
 
@@ -108,5 +117,9 @@ $(BINDIR)/pot/java.pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/$(M
 	@rm -f $@
 	@mkdir -p `dirname $@`
 	@$(MSGCAT) --sort-output $^ > $@
+
+install: $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@
+	@mkdir -p "$(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/plugins"
+	@$(INSTALL_EXE) $^ "$(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/plugins"
 
 

@@ -393,6 +393,7 @@ AC_SUBST(LIB_SRCS,"$app_cv_srclib")
 AC_SUBST(OBJDIR,"$ac_pwd/.obj/$host")
 AC_SUBST(BINDIR,"$ac_pwd/.bin")
 AC_SUBST(SRCDIR,"$ac_pwd/src")
+AC_SUBST(XMLDIR,"$ac_pwd/ui")
 
 AC_SUBST(PLUGINS)
 AC_SUBST(LIBRARIES)

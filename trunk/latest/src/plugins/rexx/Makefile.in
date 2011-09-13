@@ -29,12 +29,14 @@
 
 #---[ Configuration values ]---------------------------------------------------
 
+PACKAGE_NAME=@PACKAGE_NAME@
 MODULE_NAME=rx3270
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 bindir=@bindir@
+datarootdir=@datarootdir@
 
 REXXCONFIG=@REXXCONFIG@
 REXXC=@REXXC@
@@ -44,10 +46,13 @@ XGETTEXT=@XGETTEXT@
 
 INSTALL=@INSTALL@
 INSTALL_EXE=$(INSTALL) --mode=755
+INSTALL_DATA=$(INSTALL) --mode=644
 INSTALL_CLS=$(INSTALL) --mode=644
 
 BINDIR=@BINDIR@
 OBJDIR=@OBJDIR@
+SRCDIR=@SRCDIR@
+XMLDIR=@XMLDIR@
 
 OBJDBG=$(OBJDIR)/Debug/plugins/$(MODULE_NAME)
 BINDBG=$(BINDIR)/Debug/plugins
@@ -100,7 +105,7 @@ $(OBJRLS)/%@OBJEXT@: %.c *.h
 $(BINDIR)/pot/$(MODULE_NAME)/%.pot: %.c
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(XGETTEXT)	--default-domain=$(PACKAGE) --language=C \
+	@$(XGETTEXT)	--default-domain=$(PACKAGE_NAME) --language=C \
 			--keyword=_ --keyword=N_ --keyword=MSG_:2 --output=$@ $<
 	@touch $@
 
@@ -143,9 +148,18 @@ $(BINDIR)/pot/rexx.pot: $(foreach SRC, $(basename $(COMMON_SRC) $(PLUGIN_SRC)), 
 
 install: $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@ $(BINDIR)/Release/lib$(MODULE_NAME)@DLLEXT@ $(OBJRLS)/$(MODULE_NAME).cls
 	@mkdir -p $(DESTDIR)/$(libdir)
-	@mkdir -p $(DESTDIR)/$(bindir)
 	@$(INSTALL_EXE) $(BINDIR)/Release/lib$(MODULE_NAME)@DLLEXT@ $(DESTDIR)/$(libdir)/lib$(MODULE_NAME)@DLLEXT@
+
+	@mkdir -p "$(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/plugins"
+	@$(INSTALL_EXE) $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@ "$(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/plugins"
+
+	@mkdir -p $(DESTDIR)/$(bindir)
 	@$(INSTALL_CLS) $(OBJRLS)/$(MODULE_NAME).cls $(DESTDIR)/$(bindir)/$(MODULE_NAME).cls
 
+	@mkdir -p "$(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/ui"
+	@$(INSTALL_DATA) $(XMLDIR)/rexx.xml "$(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui"
+
 clean:
+	@rm -f $(OBJRLS)/$(MODULE_NAME).cls
+
 
