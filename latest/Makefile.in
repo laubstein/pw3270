@@ -99,6 +99,9 @@ $(BINDIR)/Release/$(localedir)/%/LC_MESSAGES/$(PACKAGE_NAME).mo: po/%.po
 	@mkdir -p `dirname $@`
 	@$(MSGFMT) -c -v -o $@ $^
 
+install-%: src/plugins/%/Makefile $(BINDIR)/Release/lib/lib3270@DLLEXT@
+	@$(MAKE) $(RLS_MAKE) DESTDIR=$(DESTDIR) -C $(dir $<) install
+
 #---[ Main targets ]-----------------------------------------------------------
 
 all: Release
@@ -220,9 +223,6 @@ install-dev:
 
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
 	@$(INSTALL_DATA) ui/debug.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
-
-install-java:
-	@$(MAKE) $(RLS_MAKE) DESTDIR=$(DESTDIR) -C src/java install
 
 install-doc:
 	@mkdir -p $(DESTDIR)/$(docdir)

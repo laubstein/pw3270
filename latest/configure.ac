@@ -59,6 +59,7 @@ AC_PROG_INSTALL
 AC_PROG_MKDIR_P
 
 AC_PATH_TOOL([REXXCONFIG], [oorexx-config], [no])
+AC_PATH_TOOL([REXXC], [rexxc], [cp])
 AC_PATH_TOOL([STRIP], [strip])
 AC_PATH_TOOL([MAKENSIS], [makensis], [no])
 AC_PATH_TOOL([RPMBUILD], [rpmbuild], [no])
@@ -322,6 +323,7 @@ if test "$app_cv_rexx" == "yes"; then
 	LIBRARIES="$LIBRARIES librx3270"
 	UI_FILES="$UI_FILES rexx.xml"
 	LANG_MODULES="$LANG_MODULES rexx"
+	INSTALL_TARGETS="$INSTALL_TARGETS rexx java"
 fi
 
 if test "$app_cv_java" == "yes"; then
