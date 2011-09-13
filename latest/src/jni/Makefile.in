@@ -118,8 +118,9 @@ $(BINDIR)/Release/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)),
 
 install: $(BINDIR)/Release/libpw3270_jni@DLLEXT@ $(BINRLS)/$(PACKAGE).jar
 	@mkdir -p $(DESTDIR)/$(JNIDIR)
-	@mkdir -p $(DESTDIR)/$(JARDIR)
 	@$(INSTALL_EXE) $(BINDIR)/Release/libpw3270_jni@DLLEXT@ $(DESTDIR)/$(JNIDIR)
+
+	@mkdir -p $(DESTDIR)/$(JARDIR)
 	@$(INSTALL_DATA) $(BINRLS)/$(PACKAGE).jar $(DESTDIR)/$(JARDIR)
 
 clean:

@@ -323,7 +323,7 @@ if test "$app_cv_rexx" == "yes"; then
 	LIBRARIES="$LIBRARIES librx3270"
 	UI_FILES="$UI_FILES rexx.xml"
 	LANG_MODULES="$LANG_MODULES rexx"
-	INSTALL_TARGETS="$INSTALL_TARGETS rexx java"
+	INSTALL_TARGETS="$INSTALL_TARGETS rexx"
 fi
 
 if test "$app_cv_java" == "yes"; then
@@ -331,7 +331,7 @@ if test "$app_cv_java" == "yes"; then
 	PLUGINS="$PLUGINS j3270plugin"
 	LIBRARIES="$LIBRARIES libpw3270_jni"
 	LANG_MODULES="$LANG_MODULES java"
-	INSTALL_TARGETS="$INSTALL_TARGETS java"
+	INSTALL_TARGETS="$INSTALL_TARGETS jni java"
 fi
 
 if test "$app_cv_plugins" == "yes"; then
@@ -416,9 +416,9 @@ src/gtk2/Makefile
 src/gtk2/version.c
 
 src/plugins/rexx/Makefile
-src/plugins/java/Makefile
 
-src/java/Makefile
+src/jni/Makefile
+src/plugins/java/Makefile
 
 pw3270.nsi
 pw3270.spec
