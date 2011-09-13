@@ -34,6 +34,17 @@ PACKAGE=@PACKAGE@
 JAVAC=@JAVAC@
 JAVAH=@JAVAH@
 STRIP=@STRIP@
+JAR=@JAR@
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+JNIDIR=@JNIDIR@
+JARDIR=@JARDIR@
+
+INSTALL=@INSTALL@
+INSTALL_EXE=$(INSTALL) --mode=755
+INSTALL_DATA=$(INSTALL) --mode=644
 
 OBJDBG=@OBJDIR@/Debug/jni
 BINDBG=@BINDIR@/Debug
@@ -42,8 +53,8 @@ OBJRLS=@OBJDIR@/Release/jni
 BINRLS=@BINDIR@/Release
 BINDIR=@BINDIR@
 
-JAVA_LIBJVM=@JAVA_LIBJVM@
 JDK_HOME=@JDK_HOME@
+JRE_HOME=@JRE_HOME@
 
 CC = @CC@
 LD = @LD@
@@ -51,8 +62,8 @@ LD = @LD@
 DBG_CFLAGS=-DDEBUG=1
 RLS_CFLAGS=-DNDEBUG=1
 
-CFLAGS=@CFLAGS@ @JAVA_CFLAGS@
-LDFLAGS=@DLL_LDFLAGS@ @LDFLAGS@ @JAVA_LDFLAGS@
+CFLAGS=@CFLAGS@ @JNI_CFLAGS@
+LDFLAGS=@DLL_LDFLAGS@ @LDFLAGS@ @JNI_LDFLAGS@
 
 LIB3270_CFLAGS ?= `pkg-config --cflags pw3270`
 LIB3270_LIBS ?= `pkg-config --libs pw3270`
@@ -68,6 +79,11 @@ $(OBJDBG)/%@OBJEXT@: %.c
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) -o $@ -c $<
+
+$(BINRLS)/$(PACKAGE).jar: $(BINDIR)/java/$(PACKAGE)/terminal.class
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@jar -cvf "$@" -C "$(BINDIR)/java" "$(PACKAGE)"
 
 $(OBJRLS)/%@OBJEXT@: %.c
 	@echo $< ...
@@ -92,11 +108,19 @@ lib3270_jni.h: $(BINDIR)/java/$(PACKAGE)/terminal.class
 #---[ Targets ]----------------------------------------------------------------
 
 $(BINDIR)/Debug/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@)
+	@mkdir -p `dirname $@`
 	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^
 
 $(BINDIR)/Release/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC)@OBJEXT@)
+	@mkdir -p `dirname $@`
 	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^
 	@$(STRIP) $@
+
+install: $(BINDIR)/Release/libpw3270_jni@DLLEXT@ $(BINRLS)/$(PACKAGE).jar
+	@mkdir -p $(DESTDIR)/$(JNIDIR)
+	@mkdir -p $(DESTDIR)/$(JARDIR)
+	@$(INSTALL_EXE) $(BINDIR)/Release/libpw3270_jni@DLLEXT@ $(DESTDIR)/$(JNIDIR)
+	@$(INSTALL_DATA) $(BINRLS)/$(PACKAGE).jar $(DESTDIR)/$(JARDIR)
 
 clean:
 	@rm -f lib3270_jni.h
