@@ -31,10 +31,20 @@
 
 MODULE_NAME=rx3270
 
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+bindir=@bindir@
+
 REXXCONFIG=@REXXCONFIG@
+REXXC=@REXXC@
 STRIP=@STRIP@
 MSGCAT=@MSGCAT@
 XGETTEXT=@XGETTEXT@
+
+INSTALL=@INSTALL@
+INSTALL_EXE=$(INSTALL) --mode=755
+INSTALL_CLS=$(INSTALL) --mode=644
 
 BINDIR=@BINDIR@
 OBJDIR=@OBJDIR@
@@ -71,6 +81,11 @@ LIBRARY_SRC = std_start.c
 PLUGIN_SRC = plg_start.c gui.c dialogs.c actions.c
 
 #---[ Rules ]------------------------------------------------------------------
+
+$(OBJRLS)/%.cls: %.cls
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@rexxc "$<" "$@"
 
 $(OBJDBG)/%@OBJEXT@: %.c *.h
 	@echo $< ...
@@ -126,5 +141,11 @@ $(BINDIR)/pot/rexx.pot: $(foreach SRC, $(basename $(COMMON_SRC) $(PLUGIN_SRC)), 
 	@mkdir -p `dirname $@`
 	@$(MSGCAT) --sort-output $^ > $@
 
+install: $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@ $(BINDIR)/Release/lib$(MODULE_NAME)@DLLEXT@ $(OBJRLS)/$(MODULE_NAME).cls
+	@mkdir -p $(DESTDIR)/$(libdir)
+	@mkdir -p $(DESTDIR)/$(bindir)
+	@$(INSTALL_EXE) $(BINDIR)/Release/lib$(MODULE_NAME)@DLLEXT@ $(DESTDIR)/$(libdir)/lib$(MODULE_NAME)@DLLEXT@
+	@$(INSTALL_CLS) $(OBJRLS)/$(MODULE_NAME).cls $(DESTDIR)/$(bindir)/$(MODULE_NAME).cls
 
+clean:
 
