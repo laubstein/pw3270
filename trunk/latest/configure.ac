@@ -94,6 +94,7 @@ LIBRARIES=""
 
 UI_FILES="default.xml functions.xml keypad.xml"
 LANG_MODULES="lib gtk2 ui"
+INSTALL_TARGETS="lib gui locale doc dev"
 
 app_cv_srcgui=""
 app_cv_srclib=""
@@ -115,6 +116,7 @@ case "$host" in
 		localedir="locale"
 		app_cv_srclib="$app_cv_srclib w3misc.c winvers.c"
 		app_cv_srcgui="$app_cv_srcgui resources.rc"
+		jni_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/win32"
 		;;
 
 	*-apple-*)
@@ -123,10 +125,11 @@ case "$host" in
 
 	*)
 		ICOEXT=".svg"
-		java_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
-		java_ldflags="-L\$(JAVA_LIBJVM) -Wl,-rpath,\$(JAVA_LIBJVM) -ljvm"
+		jni_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
+
 
 esac
+
 #--[ Compiling options ]--------------------------------------------------------------------------------------------------------------------------------------
 
 # Check for ELF symbol visibility support
@@ -221,20 +224,6 @@ AC_ARG_ENABLE([rexx],
 	fi
 ])
 
-AC_ARG_ENABLE([java],
-	[AS_HELP_STRING([--disable-java], [Build java extension & plugin])],
-[
-	app_cv_java="$withval"
-],[
-
-	if test $JAVAC = no; then
-		app_cv_java="no"
-	else
-		app_cv_java="yes"
-	fi
-])
-
-
 AC_ARG_ENABLE([pic],
 	[AS_HELP_STRING([--enable-pic], [enable support for PIC libraries (required to compile PW3270 on some systems)])],
 [
@@ -254,56 +243,53 @@ AC_ARG_ENABLE([trace],[AS_HELP_STRING([--disable-trace], [disable trace])], [ ap
 
 #--[ Check for java ]-----------------------------------------------------------------------------------------------------------------------------------------
 
-# Check for JRE_HOME
-if test "_$JRE_HOME" = "_" ; then
-	JRE_HOME="$JDK_HOME/jre"
-	AC_CHECK_FILE("$JDK_HOME/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
-	AC_CHECK_FILE("/usr/lib/jvm/java/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java/jre",)
-	AC_CHECK_FILE("/etc/alternatives/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/etc/alternatives/jre",)
-	AC_CHECK_FILE("/usr/lib/jvm/java-6-sun/jre/lib/$JVM_ARCH/client/libjvm.so",JRE_HOME="/usr/lib/jvm/java-6-sun/jre",)
+AC_ARG_ENABLE([java],
+	[AS_HELP_STRING([--disable-java], [Disable java extension & plugin])],
+[
+	app_cv_java="$withval"
+],[
+
+	AC_CHECK_PROG(app_cv_java,javac,yes,no)
+])
+
+AC_PATH_PROG(JAR,jar,no)
+if test "$JAR" = "no" ; then
+	app_cv_java="no"
 fi
 
-# Check for libjvm
-if test "_$JAVA_LIBJVM" = "_" ; then
+AC_ARG_WITH([jnidir],[AS_HELP_STRING([--with-jnidir], [jni libraries path])],[ jnidir="$withval" ],[ jnidir="\$(libdir)/java" ] )
+AC_ARG_WITH([jvmjardir],[AS_HELP_STRING([--with-jvmjardir], [JAR files installation path])],[ jardir="$withval" ],[ jardir="\$(libdir)/jvm-exports" ] )
 
-	case "$host" in
-		*-mingw32)
-			JAVA_LIBJVM="$JRE_HOME/bin/client"
-			;;
-
-		*-apple-*)
-			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/server/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/server",)
-			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/client/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/client",)
-			;;
-
-		*)
-			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/server/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/server",)
-			AC_CHECK_FILE("$JRE_HOME/lib/$JVM_ARCH/client/libjvm.so",JAVA_LIBJVM="$JRE_HOME/lib/$JVM_ARCH/client",)
-	esac
-
-
-fi
-
-if test "_$JAVA_LIBJVM" = "_" ; then
-	JAVA_LIBJVM_SO=`find $JRE_HOME/lib -name libjvm.so | head -n 1`
-	JAVA_LIBJVM=`dirname "${JAVA_LIBJVM_SO}"`
-fi
-
+# Check for JDK_HOME
 if test "_$JDK_HOME" = "_" ; then
 	app_cv_java="no"
 fi
 
+# Check for JRE_HOME
+if test "_$JRE_HOME" = "_" ; then
+	app_cv_java="no"
+fi
+
+# Set JVM arch
 case $host_cpu in
      x86_64)
-	JVM_ARCH=amd64
+	jvm_arch=amd64
 	;;
      i?86)
-	JVM_ARCH=i386
+	jvm_arch=i386
 	;;
      *)
-	JVM_ARCH=$host_cpu
+	app_cv_java="no"
 	;;
 esac
+
+AC_SUBST(JAR)
+AC_SUBST(JDK_HOME)
+AC_SUBST(JRE_HOME)
+AC_SUBST(JNIDIR,$jnidir)
+AC_SUBST(JARDIR,$jardir)
+AC_SUBST(JNI_CFLAGS,$jni_cflags)
+AC_SUBST(JNI_LDFLAGS,"-L$JRE_HOME/lib/$jvm_arch -L$JRE_HOME/lib/$jvm_arch/client -ljvm")
 
 #--[ Check for libs ]-----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -339,10 +325,11 @@ if test "$app_cv_rexx" == "yes"; then
 fi
 
 if test "$app_cv_java" == "yes"; then
-	AC_DEFINE(HAVE_JAVA)
+	AC_DEFINE(HAVE_JNI)
 	PLUGINS="$PLUGINS j3270plugin"
 	LIBRARIES="$LIBRARIES libpw3270_jni"
 	LANG_MODULES="$LANG_MODULES java"
+	INSTALL_TARGETS="$INSTALL_TARGETS java"
 fi
 
 if test "$app_cv_plugins" == "yes"; then
@@ -409,13 +396,7 @@ AC_SUBST(PLUGINS)
 AC_SUBST(LIBRARIES)
 AC_SUBST(UI_FILES)
 AC_SUBST(LANG_MODULES)
-
-AC_SUBST(JDK_HOME,$JDK_HOME)
-AC_SUBST(JRE_HOME,$JRE_HOME)
-AC_SUBST(JAVA_LIBJVM,$JAVA_LIBJVM)
-AC_SUBST(JVM_ARCH,$JVM_ARCH)
-AC_SUBST(JAVA_CFLAGS,$java_cflags)
-AC_SUBST(JAVA_LDFLAGS,$java_ldflags)
+AC_SUBST(INSTALL_TARGETS)
 
 #--[ Output files ]-------------------------------------------------------------------------------------------------------------------------------------------
 

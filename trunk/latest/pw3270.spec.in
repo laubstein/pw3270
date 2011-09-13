@@ -177,11 +177,11 @@ autoconf
 	UNO_OPTIONS=""
 %endif
 
-#%if 0%{?_java}
-#	JAVA_OPTIONS="--with-jnidir=%{_jnidir} --with-jvmjardir=%{_jvmjardir}"
-#%else
-#	JAVA_OPTIONS=""
-#%endif
+%if 0%{?_java}
+	JAVA_OPTIONS="--with-jnidir=%{_jnidir} --with-jvmjardir=%{_jvmjardir}"
+%else
+	JAVA_OPTIONS=""
+%endif
 
 %configure --disable-trace $UNO_OPTIONS $JAVA_OPTIONS
 
