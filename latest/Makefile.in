@@ -32,6 +32,7 @@
 PACKAGE_NAME=@PACKAGE_NAME@
 PACKAGE_VERSION=@PACKAGE_VERSION@
 PACKAGE_TARNAME=@PACKAGE_TARNAME@
+PROGRAM_LOGO=@PROGRAM_LOGO@
 
 PLUGINS=@PLUGINS@
 LIBRARIES=@LIBRARIES@
@@ -41,10 +42,11 @@ exec_prefix=@exec_prefix@
 bindir=@bindir@
 sbindir=@sbindir@
 libdir=@libdir@
-docdir=@docdir@
 includedir=@includedir@
 datarootdir=@datarootdir@
 localedir=@localedir@
+desktopdir=$(datarootdir)/applications
+docdir=@docdir@
 
 BINDIR=@BINDIR@
 OBJDIR=@OBJDIR@
@@ -101,8 +103,8 @@ $(BINDIR)/Release/$(localedir)/%/LC_MESSAGES/$(PACKAGE_NAME).mo: po/%.po
 
 all: Release
 
-Release: $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@ \
-		@PROGRAM_LOGO@ \
+Release: $(BINDIR)/Release/$(PACKAGE_NAME)@EXEEXT@ \
+		$(PROGRAM_LOGO) \
 		$(foreach PLUGIN, $(PLUGINS), $(BINDIR)/Release/plugins/$(PLUGIN)@DLLEXT@) \
 		$(foreach LIB, $(LIBRARIES), $(BINDIR)/Release/$(LIB)@DLLEXT@) \
 		$(foreach MO, $(LANGUAGES), $(BINDIR)/Release/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo)
@@ -118,10 +120,10 @@ $(BINDIR)/Release/lib/lib3270@DLLEXT@: src/lib/*
 
 #---[ Programs ]---------------------------------------------------------------
 
-$(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/gtk2/*
+$(BINDIR)/Debug/$(PACKAGE_NAME)@EXEEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/gtk2/*
 	@$(MAKE) $(DBG_MAKE) -C src/gtk2 $@
 
-$(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/gtk2/*
+$(BINDIR)/Release/$(PACKAGE_NAME)@EXEEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/gtk2/*
 	@$(MAKE) $(RLS_MAKE) -C src/gtk2 $@
 
 #---[ Modules ]----------------------------------------------------------------
@@ -173,21 +175,36 @@ $(BINDIR)/pot/ui/%.pot: ui/%.xml $(BINDIR)/Release/xml2pot@EXEEXT@
 
 #---[ Install targets ]--------------------------------------------------------
 
-install: install-lib install-gui install-locale install-doc install-dev
+install: install-lib install-gui install-plugins install-locale install-doc install-dev
 
-install-gui:	$(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@ \
-		@PROGRAM_LOGO@
+install-gui:	$(BINDIR)/Release/$(PACKAGE_NAME)@EXEEXT@ \
+		$(PACKAGE_NAME).desktop
 
 	@mkdir -p $(DESTDIR)/$(bindir)
-	@$(INSTALL_EXE) $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@ $(DESTDIR)/$(bindir)
+	@$(INSTALL_EXE) $(BINDIR)/Release/$(PACKAGE_NAME)@EXEEXT@ $(DESTDIR)/$(bindir)
 
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/plugins
+	@$(INSTALL_DATA) $(PROGRAM_LOGO) $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)
+	@$(INSTALL_DATA) default.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/$(PACKAGE_NAME).conf
+	@$(INSTALL_DATA) colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)
+
 	@$(INSTALL_DATA) ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
-	@$(INSTALL_DATA) @PROGRAM_LOGO@ $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)
+	@$(INSTALL_DATA) ui/functions.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+	@$(INSTALL_DATA) ui/keypad.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+	@$(INSTALL_DATA) ui/debug.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+
+	@desktop-file-install	--mode 644 \
+				--dir $(DESTDIR)/$(desktopdir) \
+				--add-category TerminalEmulator \
+				$(PACKAGE_NAME).desktop
 
 install-locale: $(foreach MO, $(LANGUAGES), $(BINDIR)/Release/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo)
 	@echo -e $(foreach MO, $(LANGUAGES), mkdir -p $(DESTDIR)/$(localedir)/$(MO)/LC_MESSAGES\\n$(INSTALL_DATA) $(BINDIR)/Release/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo $(DESTDIR)/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo \\n ) | $(SHELL)
+
+install-plugins: $(foreach PLUGIN, $(PLUGINS), $(BINDIR)/Release/plugins/$(PLUGIN)@DLLEXT@)
+	@mkdir -p $(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/plugins
+	@$(INSTALL_EXE) $^ "$(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/plugins"
 
 install-lib: $(BINDIR)/Release/lib/lib3270@DLLEXT@
 	mkdir -p $(DESTDIR)/$(libdir)
@@ -212,17 +229,74 @@ install-doc:
 
 #---[ Misc Tagets ]------------------------------------------------------------
 
-@PROGRAM_LOGO@: image/@PROGRAM_LOGO@
-	@echo $@ ...
-	@cp image/@PROGRAM_LOGO@ @PROGRAM_LOGO@
+$(PACKAGE_NAME).desktop: Makefile $(PROGRAM_LOGO)
+	@rm -f $@
+	@echo "[Desktop Entry]" > $@
+	@echo "Encoding=UTF-8" >> $@
+	@echo "GenericName=$(PACKAGE_NAME)" >> $@
+	@echo "Name=3270 Terminal" >> $@
+	@echo "Name[pt_BR]=Terminal 3270" >> $@
+	@echo "Comment=IBM 3270 Terminal emulator" >> $@
+	@echo "Exec=$(bindir)/$(PACKAGE_NAME)@EXEEXT@" >> $@
+	@echo "Icon=$(datarootdir)/$(PACKAGE_NAME)/$(PROGRAM_LOGO)" >> $@
+	@echo "Terminal=false" >> $@
+	@echo "Type=Application" >> $@
+	@echo "StartupNotify=true" >> $@
 
-Debug:	$(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@ \
-	@PROGRAM_LOGO@ \
+
+$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz: clean
+	@rm -fr $(TMPDIR)/$(PACKAGE_TARNAME).tmp
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp *.spec $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp pw3270.cbp $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp *.m4 $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp configure.ac $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp *.in $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp *.conf $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+
+	@cp AUTHORS $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp LICENSE $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp LICENCA $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@touch ChangeLog
+	@cp ChangeLog $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/image
+	@cp -r image/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/image
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/ui
+	@cp -r ui/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/ui
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/po
+	@cp -r po/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/po
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/src
+	@cp -r src/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/src
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/scripts
+	@cp -r scripts/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/scripts
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/debian
+	@cp -r debian/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/debian
+
+	@rm -f $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/debian/control
+	@rm -f $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/Makefile
+	@rm -f $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/*.layout
+	@tar --create --gzip --verbose --directory $(TMPDIR)/$(PACKAGE_TARNAME).tmp --exclude-vcs --file=$@ $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@echo $@
+
+
+$(PROGRAM_LOGO): image/$(PROGRAM_LOGO)
+	@echo $@ ...
+	@cp image/$(PROGRAM_LOGO) $(PROGRAM_LOGO)
+
+Debug:	$(BINDIR)/Debug/$(PACKAGE_NAME)@EXEEXT@ \
+	$(PROGRAM_LOGO) \
 	$(foreach PLUGIN, $(PLUGINS), $(BINDIR)/Debug/plugins/$(PLUGIN)@DLLEXT@) \
 	$(foreach LIB, $(LIBRARIES), $(BINDIR)/Debug/$(LIB)@DLLEXT@)
 
 run: Debug
-	@$(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@ --program-data="$(PWD)" --model=5 --plugin-path=$(BINDIR)/Debug/plugins
+	@$(BINDIR)/Debug/$(PACKAGE_NAME)@EXEEXT@ --program-data="$(PWD)" --model=5 --plugin-path=$(BINDIR)/Debug/plugins
 
 distclean: clean
 	@$(MAKE) -C src/lib distclean
@@ -249,7 +323,7 @@ distclean: clean
 clean:
 	@rm -fr .obj
 	@rm -fr .bin
-	@rm -f @PROGRAM_LOGO@
+	@rm -f $(PROGRAM_LOGO)
 	@rm -f $(PACKAGE_NAME).po
 
 	@$(MAKE) -C src/java clean

@@ -72,14 +72,15 @@
 	#define HAVE_PRINT_FONT_DIALOG
 
 	/* Optional parts. */
-	#define X3270_TRACE
+	#undef X3270_TRACE
+	#undef X3270_DBCS
+	#undef X3270_SCRIPT
+
 	#define X3270_TN3270E
 	#define X3270_ANSI
 	#define X3270_APL
-	#undef X3270_DBCS
 	#define X3270_FT
 	#define X3270_PRINTER
-	#undef X3270_SCRIPT
 
 	#define MOUSE_POINTER_CHANGE
 	#undef HAVE_GTK_STATUS_BAR

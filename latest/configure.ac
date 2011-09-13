@@ -250,6 +250,7 @@ AC_ARG_ENABLE([pic],
 
 AC_ARG_ENABLE([altscreen], [AS_HELP_STRING([--disable-altscreen], [Disable alternate screen support])],[ app_cv_altscreen="$enableval" ],[ app_cv_altscreen="yes" ])
 AC_ARG_ENABLE([plugins],[AS_HELP_STRING([--disable-plugins], [disable plugin support])], [ app_cv_plugins="$enableval" ],[ app_cv_plugins="yes" ])
+AC_ARG_ENABLE([trace],[AS_HELP_STRING([--disable-trace], [disable trace])], [ app_cv_trace="$enableval" ],[ app_cv_trace="yes" ])
 
 #--[ Check for java ]-----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -357,6 +358,10 @@ if test "$app_cv_macui" == "yes"; then
 	AC_DEFINE([HAVE_MACUI])
 else
 	app_cv_srcgui="$app_cv_srcgui topwindow1.c uiparser1.c actions1.c"
+fi
+
+if test "$app_cv_trace" == "yes"; then
+	AC_DEFINE([X3270_TRACE])
 fi
 
 

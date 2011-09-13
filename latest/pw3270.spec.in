@@ -177,20 +177,17 @@ autoconf
 	UNO_OPTIONS=""
 %endif
 
-%if 0%{?_java}
-	JAVA_OPTIONS="--with-jnidir=%{_jnidir} --with-jvmjardir=%{_jvmjardir}"
-%else
-	JAVA_OPTIONS=""
-%endif
+#%if 0%{?_java}
+#	JAVA_OPTIONS="--with-jnidir=%{_jnidir} --with-jvmjardir=%{_jvmjardir}"
+#%else
+#	JAVA_OPTIONS=""
+#%endif
 
 %configure --disable-trace $UNO_OPTIONS $JAVA_OPTIONS
 
 %build
 make clean
 make Release
-
-strip bin/Release/lib/lib3270.so
-strip bin/Release/@PACKAGE@
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -210,7 +207,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}/ui/default.xml
 %{_datadir}/%{name}/ui/keypad.xml
 %{_datadir}/%{name}/ui/functions.xml
-%{_datadir}/%{name}/%{name}.png
 %{_datadir}/%{name}/%{name}.svg
 %{_datadir}/%{name}/colors.conf
 
