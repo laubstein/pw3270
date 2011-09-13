@@ -103,6 +103,9 @@ $(BINDIR)/Release/$(localedir)/%/LC_MESSAGES/$(PACKAGE_NAME).mo: po/%.po
 install-%: src/plugins/%/Makefile $(BINDIR)/Release/lib/lib3270@DLLEXT@
 	@$(MAKE) $(RLS_MAKE) DESTDIR=$(DESTDIR) -C $(dir $<) install
 
+install-%: src/%/Makefile $(BINDIR)/Release/lib/lib3270@DLLEXT@
+	@$(MAKE) $(RLS_MAKE) DESTDIR=$(DESTDIR) -C $(dir $<) install
+
 #---[ Main targets ]-----------------------------------------------------------
 
 all: Release
@@ -141,9 +144,8 @@ $(BINDIR)/Debug/plugins/j3270plugin@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@
 $(BINDIR)/Debug/librx3270@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(DBG_MAKE) -C src/plugins/rexx $@
 
-$(BINDIR)/Debug/libpw3270_jni@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/java/*
-	@$(MAKE) $(DBG_MAKE) -C src/java $@
-
+$(BINDIR)/Debug/libpw3270_jni@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/jni/*
+	@$(MAKE) $(DBG_MAKE) -C src/jni $@
 
 $(BINDIR)/Release/plugins/rx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
@@ -154,8 +156,8 @@ $(BINDIR)/Release/plugins/j3270plugin@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLL
 $(BINDIR)/Release/librx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
 
-$(BINDIR)/Release/libpw3270_jni@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/java/*
-	@$(MAKE) $(RLS_MAKE) -C src/java $@
+$(BINDIR)/Release/libpw3270_jni@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/jni/*
+	@$(MAKE) $(RLS_MAKE) -C src/jni $@
 
 #---[ I18n ]-------------------------------------------------------------------
 
@@ -332,7 +334,7 @@ clean:
 	@rm -f $(PROGRAM_LOGO)
 	@rm -f $(PACKAGE_NAME).po
 
-	@$(MAKE) -C src/java clean
+	@$(MAKE) -C src/jni clean
 	@$(MAKE) -C src/lib clean
 
 	@find . -name "*@OBJEXT@" -exec rm -f {} \;
