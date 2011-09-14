@@ -23,6 +23,8 @@
 	%define ooo_sdk_home	/opt/openoffice.org/basis3.0/sdk
 %endif
 
+%define _uno 0
+
 #---[ Check for Java ]------------------------------------------------------------------------------------------------
 
 %if 0%(if [ -x @JDK_HOME@/bin/javah ]; then echo 1; else echo 0; fi)
@@ -174,7 +176,7 @@ autoconf
 %if 0%{?_uno}
 	UNO_OPTIONS="--with-office-sdk-home=%{ooo_sdk_home} --with-office-home=%{ooo_home} --with-office-ure-home=%{ooo_ure_home}"
 %else
-	UNO_OPTIONS=""
+	UNO_OPTIONS="--disable-office"
 %endif
 
 %if 0%{?_java}
