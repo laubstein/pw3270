@@ -210,12 +210,12 @@ AC_ARG_WITH([logo],[AS_HELP_STRING([--with-logo], [Change default application lo
 # Optional libraryes and packets
 AC_ARG_WITH([ssl],   [AS_HELP_STRING( [--without-ssl],	 [do not use libssl])],	[ app_cv_ssl="$withval" ],	[ app_cv_ssl="yes" ])
 AC_ARG_WITH([gnome], [AS_HELP_STRING( [--without-gnome], [do not use gnome])],	[ app_cv_gnome="$withval" ],	[ app_cv_gnome="yes" ])
-AC_ARG_ENABLE([macui],[AS_HELP_STRING([--disable-macui], [Disable MAC OSX compatible UI manager ])],[ app_cv_macui="$withval" ], [ app_cv_macui="yes" ])
+AC_ARG_ENABLE([macui],[AS_HELP_STRING([--disable-macui], [Disable MAC OSX compatible UI manager ])],[ app_cv_macui="$enableval" ], [ app_cv_macui="yes" ])
 
 AC_ARG_ENABLE([rexx],
 	[AS_HELP_STRING([--disable-rexx], [Build rexx extension & plugin])],
 [
-	app_cv_rexx="$withval"
+	app_cv_rexx="$enableval"
 ],[
 
 	if test $REXXCONFIG = no; then
@@ -228,7 +228,7 @@ AC_ARG_ENABLE([rexx],
 AC_ARG_ENABLE([pic],
 	[AS_HELP_STRING([--enable-pic], [enable support for PIC libraries (required to compile PW3270 on some systems)])],
 [
-	app_cv_pic="$withval"
+	app_cv_pic="$enableval"
 ],[
 
 	if test "$host_cpu" = "x86_64"; then
@@ -244,10 +244,13 @@ AC_ARG_ENABLE([trace],[AS_HELP_STRING([--disable-trace], [disable trace])], [ ap
 
 #--[ Check for java ]-----------------------------------------------------------------------------------------------------------------------------------------
 
+AC_ARG_VAR([JDK_HOME], [JDK home directory])
+AC_ARG_VAR([JRE_HOME], [JRE home directory])
+
 AC_ARG_ENABLE([java],
 	[AS_HELP_STRING([--disable-java], [Disable java extension & plugin])],
 [
-	app_cv_java="$withval"
+	app_cv_java="$enableval"
 ],[
 
 	AC_CHECK_PROG(app_cv_java,javac,yes,no)
@@ -291,6 +294,60 @@ AC_SUBST(JNIDIR,$jnidir)
 AC_SUBST(JARDIR,$jardir)
 AC_SUBST(JNI_CFLAGS,$jni_cflags)
 AC_SUBST(JNI_LDFLAGS,"-L$JRE_HOME/lib/$jvm_arch -L$JRE_HOME/lib/$jvm_arch/client -ljvm")
+
+#--[ Check for OpenOffice ]-----------------------------------------------------------------------------------------------------------------------------------
+#
+# OpenOffice environment vars ( from /opt/openoffice.org/basis3.1/sdk/setsdkenv_unix ):
+#
+# OO_SDK_HOME=/opt/openoffice.org/basis3.1/sdk
+# OO_SDK_URE_BIN_DIR=/opt/openoffice.org/ure/bin
+#
+AC_ARG_VAR([OO_SDK_HOME], [open-office SDK home])
+AC_ARG_VAR([OO_SDK_URE_HOME], [open-office URE home])
+
+#
+#AC_ARG_WITH([office-sdk-home],
+#	[AS_HELP_STRING([--with-office-sdk-home], [Define open-Office sdk path])],
+#[
+#	OO_SDK_HOME="$withval"
+#], )
+#
+#AC_ARG_WITH([office-sdk-ure-home],
+#	[AS_HELP_STRING([--with-office-sdk-ure-home], [Define open-Office ure path])],
+#[
+#	OO_SDK_URE_HOME="$withval"
+#] )
+#
+
+AC_ARG_ENABLE([office],[AS_HELP_STRING([--disable-office], [Disable open office extension])],[ app_cv_office="$enableval" ],[ app_cv_office="yes" ])
+
+# Check for programs
+AC_PATH_TOOL([UNOPKG], unopkg, no )
+AC_PATH_TOOL([IDLC], idlc, [\$(OO_SDK_HOME)/bin/idlc])
+AC_PATH_TOOL([CPPUMAKER], cppumaker, [\$(OO_SDK_HOME)/bin/cppumaker])
+AC_PATH_TOOL([REGMERGE], regmerge, [\$(OO_SDK_URE_BIN_DIR)/regmerge])
+AC_PATH_TOOL([REGCOMP], regcomp, [\$(OO_SDK_URE_BIN_DIR)/regcomp])
+
+AC_SUBST(OO_SDK_HOME)
+AC_SUBST(OO_SDK_URE_HOME)
+AC_SUBST(OO_SDK_URE_BIN_DIR)
+
+# Check for OO_SDK_URE_BIN_DIR
+if test "_$OO_SDK_URE_BIN_DIR" = "_" ; then
+	OO_SDK_URE_BIN_DIR=\$(OO_SDK_URE_HOME)/bin
+fi
+
+# Check for OO_SDK_HOME
+if test "_$OO_SDK_HOME" = "_" ; then
+	app_cv_office="no"
+fi
+
+# Check for OO_SDK_URE_HOME
+if test "_$OO_SDK_URE_HOME" = "_" ; then
+	app_cv_office="no"
+fi
+
+
 
 #--[ Check for libs ]-----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -419,6 +476,8 @@ src/plugins/rexx/Makefile
 
 src/jni/Makefile
 src/plugins/java/Makefile
+
+src/oxt/Makefile
 
 pw3270.nsi
 pw3270.spec
