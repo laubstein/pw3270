@@ -49,7 +49,7 @@
 
 	Trace("Reading %d bytes at %d,%d",size,row,col);
 
-	screen_size(&rows,&cols);
+	get_3270_terminal_size(this->hSession,&rows,&cols);
 
 	if(row < 0 || row > rows || col < 0 || col > cols || size < 1)
 		return OUString( RTL_CONSTASCII_USTRINGPARAM( "" ) );

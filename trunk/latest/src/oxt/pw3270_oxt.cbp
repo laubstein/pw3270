@@ -2,101 +2,47 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="pw3270_oxt" />
+		<Option title="3270 OpenOffice extension" />
 		<Option makefile_is_custom="1" />
 		<Option pch_mode="2" />
-		<Option compiler="microsoft_visual_c_with_gnumake" />
+		<Option compiler="gcc" />
 		<Build>
-			<Target title="pw3270.uno.dll">
-				<Option output=".\pw3270_oxt" prefix_auto="1" extension_auto="1" />
-				<Option object_output=".\" />
-				<Option type="3" />
-				<Option compiler="microsoft_visual_c_with_gnumake" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
+			<Target title="Debug">
+				<Option output=".bin/Debug/3270 OpenOffice extension" prefix_auto="1" extension_auto="1" />
+				<Option object_output=".obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="/W3" />
-					<Add option="/DBUILD_DLL" />
-					<Add option="/Zi" />
-					<Add option="/D_DEBUG" />
-					<Add option="/MDd" />
-					<Add option="/Ox" />
-					<Add option="/DNDEBUG" />
-					<Add option="/MD" />
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output=".bin/Release/3270 OpenOffice extension" prefix_auto="1" extension_auto="1" />
+				<Option object_output=".obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
 				</Compiler>
 				<Linker>
-					<Add option="/DEBUG" />
-					<Add option="/INCREMENTAL:NO" />
-					<Add library="user32" />
+					<Add option="-s" />
 				</Linker>
-				<ExtraCommands>
-					<Add after='mt.exe /nologo /manifest &quot;.\pw3270_oxt.dll.manifest&quot; /outputresource:&quot;.\pw3270_oxt.dll&quot;;2' />
-					<Add after='mt.exe /nologo /manifest &quot;.\pw3270_oxt.dll.manifest&quot; /outputresource:&quot;.\pw3270_oxt.dll&quot;;2' />
-				</ExtraCommands>
-			</Target>
-			<Target title="testprogram">
-				<Option platforms="Windows;" />
-				<Option output="testprogram" prefix_auto="1" extension_auto="1" />
-				<Option type="1" />
-				<Option compiler="microsoft_visual_c_with_gnumake" />
-				<Option use_console_runner="0" />
-			</Target>
-			<Target title="mkwinfiles.exe">
-				<Option output="mkwinfiles" prefix_auto="1" extension_auto="1" />
-				<Option type="1" />
-				<Option compiler="microsoft_visual_c_with_gnumake" />
-				<Option use_console_runner="0" />
 			</Target>
 		</Build>
-		<Unit filename="Makefile">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="actions.cxx">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="connection.cxx">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="description.txt">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="description.xml">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="globals.hpp">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="main.cxx">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="main.h">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="manifest.xml">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="mkmanifest.obj">
-			<Option target="pw3270.uno.dll" />
-			<Option target="testprogram" />
-		</Unit>
-		<Unit filename="mkwinfiles.cxx">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="ooo3270.hpp">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="pw3270.idl">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="screen.cxx">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="status.cxx">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
-		<Unit filename="testprogram.cxx">
-			<Option target="pw3270.uno.dll" />
-		</Unit>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Makefile.in" />
+		<Unit filename="actions.cxx" />
+		<Unit filename="connection.cxx" />
+		<Unit filename="description.xml.in" />
+		<Unit filename="globals.hpp" />
+		<Unit filename="main.cxx" />
+		<Unit filename="manifest.xml.in" />
+		<Unit filename="mkwinfiles.cxx" />
+		<Unit filename="screen.cxx" />
+		<Unit filename="status.cxx" />
+		<Unit filename="testprogram.cxx" />
 		<Extensions>
 			<code_completion />
 			<debugger />

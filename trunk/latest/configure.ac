@@ -80,6 +80,7 @@ AC_CHECK_HEADER(malloc.h, AC_DEFINE(HAVE_MALLOC_H,,[do we have malloc.h?]))
 LD=$CC
 DLLEXT=".so"
 OBJEXT=".o"
+EXEEXT=""
 DLLPREFIX="lib"
 
 OSTYPE="linux"
@@ -114,6 +115,7 @@ case "$host" in
 	*-mingw32)
 		DLLEXT=".dll"
 		ICOEXT=".ico"
+		EXEEXT=".exe"
 		localedir="locale"
 		app_cv_srclib="$app_cv_srclib w3misc.c winvers.c"
 		app_cv_srcgui="$app_cv_srcgui resources.rc"
@@ -455,6 +457,7 @@ AC_SUBST(DLL_CFLAGS)
 AC_SUBST(DLL_LDFLAGS)
 AC_SUBST(DLLEXT)
 AC_SUBST(OBJEXT)
+AC_SUBST(EXEEXT)
 AC_SUBST(GUI_SRCS,"$app_cv_srcgui")
 AC_SUBST(LIB_SRCS,"$app_cv_srclib")
 
