@@ -336,6 +336,7 @@ clean:
 
 	@$(MAKE) -C src/jni clean
 	@$(MAKE) -C src/lib clean
+	@$(MAKE) -C src/oxt clean
 
 	@find . -name "*@OBJEXT@" -exec rm -f {} \;
 	@find . -name "*@DLLEXT@" -exec rm -f {} \;

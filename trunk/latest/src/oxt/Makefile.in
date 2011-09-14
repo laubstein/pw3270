@@ -30,6 +30,7 @@
 #---[ Configuration values ]---------------------------------------------------
 
 PACKAGE=@PACKAGE@
+PROGRAM_NAME=@PROGRAM_NAME@
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
@@ -46,14 +47,85 @@ CPPUMAKER=@CPPUMAKER@
 REGMERGE=@REGMERGE@
 REGCOMP=@REGCOMP@
 
+TYPES_RDB=$(OO_SDK_URE_HOME)/share/misc/types.rdb
+CPPUENV="gcc3"
+
 INSTALL=@INSTALL@
 INSTALL_EXE=$(INSTALL) --mode=755
 INSTALL_DATA=$(INSTALL) --mode=644
 
-OBJDBG=@OBJDIR@/Debug/oxt
-BINDBG=@BINDIR@/Debug
+HOST=@HOST@
+OBJDIR=.obj/$(HOST)/oxt
+BINDIR=.bin/$(HOST)/oxt
 
-OBJRLS=@OBJDIR@/Release/oxt
-BINRLS=@BINDIR@/Release
+OBJDBG=$(OBJDIR)/Debug
+BINDBG=$(BINDIR)/Debug
+
+OBJRLS=.obj/Release
+BINRLS=.bin/Release
+
+CXX=@CXX@
+STRIP=@STRIP@
+
+DBG_CFLAGS=-DDEBUG=1
+RLS_CFLAGS=-DNDEBUG=1
+
+LIB3270_CFLAGS ?= `pkg-config --cflags pw3270`
+LIB3270_LIBS ?= `pkg-config --libs pw3270`
+
+CXXFLAGS=@CXXFLAGS@ -Wno-strict-aliasing -DCPPU_ENV=$(CPPUENV) -DLANGUAGE_BINDING_NAME=\"$(CPPUENV)\" -I$(OBJDIR)/uno/include -I$(OO_SDK_HOME)/include
+DLL_LDFLAGS=@DLL_LDFLAGS@ 
+LDFLAGS=@LDFLAGS@ $(LIB3270_LIBS) -L$(OO_SDK_HOME)/lib -L$(OO_SDK_URE_HOME)/lib -luno_cppu -luno_cppuhelpergcc3
+
+SOURCES = main.cxx connection.cxx screen.cxx actions.cxx status.cxx
+
+#---[ Rules ]------------------------------------------------------------------
+
+$(OBJDBG)/%.o: %.cxx *.hpp $(OBJDIR)/uno/include/br/com/bb/$(PACKAGE).hpp
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CXX) $(DBG_CFLAGS) $(CXXFLAGS) $(LIB3270_CFLAGS) -o $@ -c $<
+
+$(OBJDIR)/uno/%.urd: %.idl
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(IDLC) -C -I$(OO_SDK_HOME)/idl -O`dirname $@` $<
+
+$(OBJDIR)/uno/%.uno.rdb: $(OBJDIR)/uno/%.urd
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@rm -f $@
+	@$(REGMERGE) --verbose $@ / $(TYPES_RDB)
+	@$(REGMERGE) --verbose $@ /UCR $<
+	@$(REGMERGE) --verbose $@ / $<
+
+
+#---[ Targets ]----------------------------------------------------------------
+
+Release:
+
+Debug: $(BINDBG)/Debug/testprogram
+
+run: $(BINDBG)/Debug/testprogram
+	@$(BINDBG)/Debug/testprogram
+
+$(BINDBG)/$(PROGRAM_NAME).uno@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CXX) $(DLL_LDFLAGS) $(LDFLAGS) -o $@ 
+
+$(OBJDIR)/uno/include/br/com/bb/$(PACKAGE).hpp: $(OBJDIR)/uno/$(PACKAGE).uno.rdb
+	@echo $< ...
+	@rm -fr $(OBJDIR)/uno/include
+	@mkdir -p $(OBJDIR)/uno/include
+	@$(CPPUMAKER) -O$(OBJDIR)/uno/include -Gc -L -BUCR $<
+	@touch $@
+
+
+install:
+
+clean:
+	@rm -fr $(OBJDIR)
+	@rm -fr $(BINDIR)
 
 
