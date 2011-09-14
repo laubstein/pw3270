@@ -323,6 +323,10 @@ AC_ARG_ENABLE([office],[AS_HELP_STRING([--disable-office], [Disable open office 
 
 # Check for programs
 AC_PATH_TOOL([UNOPKG], unopkg, no )
+if test "$UNOPKG" = "no" ; then
+	app_cv_office="no"
+fi
+
 AC_PATH_TOOL([IDLC], idlc, [\$(OO_SDK_HOME)/bin/idlc])
 AC_PATH_TOOL([CPPUMAKER], cppumaker, [\$(OO_SDK_HOME)/bin/cppumaker])
 AC_PATH_TOOL([REGMERGE], regmerge, [\$(OO_SDK_URE_BIN_DIR)/regmerge])
@@ -334,7 +338,7 @@ AC_SUBST(OO_SDK_URE_BIN_DIR)
 
 # Check for OO_SDK_URE_BIN_DIR
 if test "_$OO_SDK_URE_BIN_DIR" = "_" ; then
-	OO_SDK_URE_BIN_DIR=\$(OO_SDK_URE_HOME)/bin
+	OO_SDK_URE_BIN_DIR="\$(OO_SDK_URE_HOME)/bin"
 fi
 
 # Check for OO_SDK_HOME
@@ -347,7 +351,14 @@ if test "_$OO_SDK_URE_HOME" = "_" ; then
 	app_cv_office="no"
 fi
 
+# Set targets
+if test "$app_cv_office" = "yes" ; then
+	AC_MSG_NOTICE([open-office sdk is present.])
+	INSTALL_TARGETS="$INSTALL_TARGETS oxt"
+else
+	AC_MSG_NOTICE([open-office sdk is NOT present.])
 
+fi
 
 #--[ Check for libs ]-----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -447,6 +458,7 @@ AC_SUBST(OBJEXT)
 AC_SUBST(GUI_SRCS,"$app_cv_srcgui")
 AC_SUBST(LIB_SRCS,"$app_cv_srclib")
 
+AC_SUBST(HOST,$host)
 AC_SUBST(OBJDIR,"$ac_pwd/.obj/$host")
 AC_SUBST(BINDIR,"$ac_pwd/.bin")
 AC_SUBST(SRCDIR,"$ac_pwd/src")

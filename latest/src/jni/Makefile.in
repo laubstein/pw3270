@@ -68,7 +68,6 @@ LDFLAGS=@DLL_LDFLAGS@ @LDFLAGS@ @JNI_LDFLAGS@
 LIB3270_CFLAGS ?= `pkg-config --cflags pw3270`
 LIB3270_LIBS ?= `pkg-config --libs pw3270`
 
-
 #---[ Sources ]----------------------------------------------------------------
 
 SOURCES=pw3270_jni.c
