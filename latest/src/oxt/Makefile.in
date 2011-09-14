@@ -61,8 +61,8 @@ BINDIR=.bin/$(HOST)/oxt
 OBJDBG=$(OBJDIR)/Debug
 BINDBG=$(BINDIR)/Debug
 
-OBJRLS=.obj/Release
-BINRLS=.bin/Release
+OBJRLS=$(OBJDIR)/Release
+BINRLS=$(BINDIR)/Release
 
 CXX=@CXX@
 STRIP=@STRIP@
@@ -75,23 +75,23 @@ LIB3270_LIBS ?= `pkg-config --libs pw3270`
 
 CXXFLAGS=@CXXFLAGS@ -Wno-strict-aliasing -DCPPU_ENV=$(CPPUENV) -DLANGUAGE_BINDING_NAME=\"$(CPPUENV)\" -I$(OBJDIR)/uno/include -I$(OO_SDK_HOME)/include
 DLL_LDFLAGS=@DLL_LDFLAGS@
-LDFLAGS=@LDFLAGS@ $(LIB3270_LIBS) -L$(OO_SDK_HOME)/lib -L$(OO_SDK_URE_HOME)/lib -Wl,-rpath-link=$(OO_SDK_URE_HOME)/lib,-rpath=$(OO_SDK_URE_HOME)/lib -luno_cppu -luno_cppuhelpergcc3
+LDFLAGS=@LDFLAGS@ -L$(OO_SDK_HOME)/lib -L$(OO_SDK_URE_HOME)/lib -Wl,-rpath-link=$(OO_SDK_URE_HOME)/lib,-rpath=$(OO_SDK_URE_HOME)/lib -luno_cppu -luno_cppuhelpergcc3
 
 SOURCES = main.cxx connection.cxx screen.cxx actions.cxx status.cxx
 
 #---[ Rules ]------------------------------------------------------------------
 
-$(OBJDBG)/%.o: %.cxx *.hpp $(OBJDIR)/uno/include/br/com/bb/$(PACKAGE).hpp
+$(OBJDBG)/%.o: %.cxx *.hpp $(OBJDIR)/uno/include/br/com/bb/$(PACKAGE).hpp Makefile
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(CXX) $(DBG_CFLAGS) $(CXXFLAGS) $(LIB3270_CFLAGS) -o $@ -c $<
+	@$(CXX) $(DBG_CFLAGS) $(CXXFLAGS) $(LIB3270_CFLAGS) -DLIBNAME=\"$(BINDBG)/$(PROGRAM_NAME).uno@DLLEXT@\" -o $@ -c $<
 
-$(OBJDIR)/uno/%.urd: %.idl
+%.urd: %.idl
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(IDLC) -C -I$(OO_SDK_HOME)/idl -O`dirname $@` $<
 
-$(OBJDIR)/uno/%.uno.rdb: $(OBJDIR)/uno/%.urd
+%.uno.rdb: %.urd $(TYPES_RDB)
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@rm -f $@
@@ -104,22 +104,26 @@ $(OBJDIR)/uno/%.uno.rdb: $(OBJDIR)/uno/%.urd
 
 Release:
 
-Debug: $(BINDBG)/testprogram@EXEEXT@
+Debug: .bin/Debug/testprogram@EXEEXT@
+
+.bin/Debug/testprogram@EXEEXT@: $(BINDBG)/testprogram@EXEEXT@
+	@mkdir -p `dirname $@`
+	@cp "$^" $@
 
 run: $(BINDBG)/testprogram@EXEEXT@
 	@$(BINDBG)/testprogram@EXEEXT@
 
-$(BINDBG)/testprogram@EXEEXT@: $(OBJDBG)/testprogram@OBJEXT@ $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@)
+$(BINDBG)/testprogram@EXEEXT@: $(BINDBG)/$(PROGRAM_NAME).uno@DLLEXT@ $(PACKAGE).uno.rdb $(OBJDBG)/testprogram@OBJEXT@
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CXX) -o $@ $^ $(LDFLAGS)
+	@$(CXX) -o $@ $(OBJDBG)/testprogram@OBJEXT@ $(LDFLAGS)
 
 $(BINDBG)/$(PROGRAM_NAME).uno@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(CXX) $(DLL_LDFLAGS) $(LDFLAGS) -o $@
+	@$(CXX) $(DLL_LDFLAGS) $(LDFLAGS) $(LIB3270_LIBS) -o $@
 
-$(OBJDIR)/uno/include/br/com/bb/$(PACKAGE).hpp: $(OBJDIR)/uno/$(PACKAGE).uno.rdb
+$(OBJDIR)/uno/include/br/com/bb/$(PACKAGE).hpp: $(PROGRAM_NAME).uno.rdb
 	@echo $< ...
 	@rm -fr $(OBJDIR)/uno/include
 	@mkdir -p $(OBJDIR)/uno/include
@@ -131,5 +135,7 @@ install:
 clean:
 	@rm -fr $(OBJDIR)
 	@rm -fr $(BINDIR)
+	@rm -f $(PROGRAM_NAME).uno.rdb
+	@rm -f $(PROGRAM_NAME).urd
 
 

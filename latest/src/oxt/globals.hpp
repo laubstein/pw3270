@@ -40,6 +40,12 @@
 	#include <unistd.h>
 #endif
 
+#ifdef DEBUG
+	#define TRACE( fmt, ... ) fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr);
+#else
+	#define TRACE( fmt, ... ) /* fmt __VA_ARGS__ */
+#endif
+
 #define IMPLNAME "br.com.bb.pw3270intf"
 #define SERVICENAME "br.com.bb.pw3270"
 
