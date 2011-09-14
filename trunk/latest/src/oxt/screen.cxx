@@ -79,7 +79,7 @@
 	char *ptr;
 	int  pos = 0;
 
-	screen_size(&rows,&cols);
+	get_3270_terminal_size(this->hSession,&rows,&cols);
 
 	Trace("Reading screen with %dx%d",rows,cols);
 
@@ -115,7 +115,7 @@
 	char 	*buffer;
 	int 	last = -1;
 
-	screen_size(&rows,&cols);
+	get_3270_terminal_size(this->hSession,&rows,&cols);
 
 	row--;
 	col--;
@@ -169,7 +169,7 @@
 	char 	*buffer;
 	bool	rc;
 
-	screen_size(&rows,&cols);
+	get_3270_terminal_size(this->hSession,&rows,&cols);
 
 	row--;
 	col--;

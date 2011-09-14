@@ -302,7 +302,7 @@ AC_SUBST(JNI_LDFLAGS,"-L$JRE_HOME/lib/$jvm_arch -L$JRE_HOME/lib/$jvm_arch/client
 # OpenOffice environment vars ( from /opt/openoffice.org/basis3.1/sdk/setsdkenv_unix ):
 #
 # OO_SDK_HOME=/opt/openoffice.org/basis3.1/sdk
-# OO_SDK_URE_BIN_DIR=/opt/openoffice.org/ure/bin
+# OO_SDK_URE_HOME=/opt/openoffice.org/ure
 #
 AC_ARG_VAR([OO_SDK_HOME], [open-office SDK home])
 AC_ARG_VAR([OO_SDK_URE_HOME], [open-office URE home])
