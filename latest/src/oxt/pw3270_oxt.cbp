@@ -40,6 +40,8 @@
 		<Unit filename="main.cxx" />
 		<Unit filename="manifest.xml.in" />
 		<Unit filename="mkwinfiles.cxx" />
+		<Unit filename="ooo3270.hpp" />
+		<Unit filename="pw3270.idl" />
 		<Unit filename="screen.cxx" />
 		<Unit filename="status.cxx" />
 		<Unit filename="testprogram.cxx" />
