@@ -41,6 +41,7 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 JNIDIR=@JNIDIR@
 JARDIR=@JARDIR@
+JVMDIR=@JVMDIR@
 
 INSTALL=@INSTALL@
 INSTALL_EXE=$(INSTALL) --mode=755

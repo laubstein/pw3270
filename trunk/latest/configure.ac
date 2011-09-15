@@ -89,7 +89,6 @@ DBG_LDFLAGS="-L.bin/Debug/lib"
 RLS_LDFLAGS="-L.bin/Release/lib -Wl,--strip-all"
 
 DLL_CFLAGS=""
-DLL_LDFLAGS="-shared -Wl,-soname,\$(@F)"
 
 PLUGINS=""
 LIBRARIES=""
@@ -117,17 +116,22 @@ case "$host" in
 		ICOEXT=".ico"
 		EXEEXT=".exe"
 		localedir="locale"
+
 		app_cv_srclib="$app_cv_srclib w3misc.c winvers.c"
 		app_cv_srcgui="$app_cv_srcgui resources.rc"
+
+		DLL_LDFLAGS="-shared -mno-cygwin -shared -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
 		jni_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/win32"
 		;;
 
 	*-apple-*)
+		DLL_LDFLAGS="-shared -Wl,-soname,\$(@F)"
 		ICOEXT=".icns"
 		;;
 
 	*)
 		ICOEXT=".svg"
+		DLL_LDFLAGS="-shared -Wl,-soname,\$(@F)"
 		jni_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
 
 
@@ -304,6 +308,8 @@ if test "_$JVMDIR" = "_" ; then
 
 fi
 
+jni_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
+
 AC_SUBST(JAR)
 AC_SUBST(JDK_HOME)
 AC_SUBST(JRE_HOME)
@@ -312,7 +318,7 @@ AC_SUBST(JVMDIR)
 AC_SUBST(JNIDIR,$jnidir)
 AC_SUBST(JARDIR,$jardir)
 AC_SUBST(JNI_CFLAGS,$jni_cflags)
-AC_SUBST(JNI_LIBS,"-L$JRE_HOME/lib/$jvm_arch -L\$(JVMDIR) -ljvm")
+AC_SUBST(JNI_LIBS,$jni_libs)
 
 #--[ Check for OpenOffice ]-----------------------------------------------------------------------------------------------------------------------------------
 #
