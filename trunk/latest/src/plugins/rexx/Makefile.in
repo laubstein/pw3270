@@ -67,11 +67,14 @@ HOST_CC = @HOST_CC@
 DBG_CFLAGS=-DDEBUG=1
 RLS_CFLAGS=-DNDEBUG=1
 
-CFLAGS=@CFLAGS@ `$(REXXCONFIG) --cflags`
-LDFLAGS=@DLL_LDFLAGS@ @LDFLAGS@ `$(REXXCONFIG) --libs`
+REXX_CFLAGS=`$(REXXCONFIG) --cflags`
+REXX_LIBS=`$(REXXCONFIG) --libs`
 
 LIB3270_CFLAGS ?= `pkg-config --cflags pw3270`
 LIB3270_LIBS ?= `pkg-config --libs pw3270`
+
+CFLAGS=@CFLAGS@ $(REXX_CFLAGS)
+LDFLAGS=@DLL_LDFLAGS@ @LDFLAGS@
 
 GLIB_CFLAGS=@GLIB_CFLAGS@
 GLIB_LIBS=@GLIB_LIBS@
@@ -114,14 +117,14 @@ $(BINDIR)/pot/$(MODULE_NAME)/%.pot: %.c
 $(BINDIR)/Debug/plugins/$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(COMMON_SRC) $(PLUGIN_SRC)), $(OBJDBG)/$(SRC)@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS)
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS) $(REXX_LIBS)
 	@rm -f $(basename \$(@F)).a
 	@rm -f $(basename \$(@F)).def
 
 $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(COMMON_SRC) $(PLUGIN_SRC)), $(OBJRLS)/$(SRC)@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS)
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS) $(REXX_LIBS)
 	@rm -f $(basename \$(@F)).a
 	@rm -f $(basename \$(@F)).def
 	@$(STRIP) $@
@@ -129,14 +132,14 @@ $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(CO
 $(BINDIR)/Debug/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(COMMON_SRC) $(LIBRARY_SRC)), $(OBJDBG)/$(SRC)@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS)
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS) $(REXX_LIBS)
 	@rm -f $(basename \$(@F)).a
 	@rm -f $(basename \$(@F)).def
 
 $(BINDIR)/Release/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(COMMON_SRC) $(LIBRARY_SRC)), $(OBJRLS)/$(SRC)@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS)
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^ $(GLIB_LIBS) $(GTK_LIBS) $(REXX_LIBS)
 	@rm -f $(basename \$(@F)).a
 	@rm -f $(basename \$(@F)).def
 	@$(STRIP) $@
