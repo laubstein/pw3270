@@ -299,10 +299,15 @@ AC_SUBST(JNI_LDFLAGS,"-L$JRE_HOME/lib/$jvm_arch -L$JRE_HOME/lib/$jvm_arch/client
 
 #--[ Check for OpenOffice ]-----------------------------------------------------------------------------------------------------------------------------------
 #
-# OpenOffice environment vars ( from /opt/openoffice.org/basis3.1/sdk/setsdkenv_unix ):
+# OpenOffice environment vars:
 #
-# OO_SDK_HOME=/opt/openoffice.org/basis3.1/sdk
-# OO_SDK_URE_HOME=/opt/openoffice.org/ure
+# OpenSUSE 11.1 ( from /opt/openoffice.org/basis3.1/sdk/setsdkenv_unix ):
+#	OO_SDK_HOME=/opt/openoffice.org/basis3.1/sdk
+#	OO_SDK_URE_HOME=/opt/openoffice.org/ure
+#
+# Ubuntu 10.10 ( from /usr/lib/libreoffice/basis3.3/sdk/setsdkenv_unix ):
+#	OO_SDK_HOME=/usr/lib/libreoffice/basis3.3/sdk
+#	OO_SDK_URE_HOME=/usr/lib/libreoffice/basis3.3/ure-link
 #
 AC_ARG_VAR([OO_SDK_HOME], [open-office SDK home])
 AC_ARG_VAR([OO_SDK_URE_HOME], [open-office URE home])
