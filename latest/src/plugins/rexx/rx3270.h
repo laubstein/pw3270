@@ -68,10 +68,16 @@
 
 		/* Rexx V3 */
 		#define REXXV3
-		#define REXXENTRY 		APIENTRY
 		#define RexxReturnCode	ULONG
 		#define PCONSTRXSTRING	RXSTRING *
 		typedef void *REXXPFN;
+
+		#if defined (HAVE_GNUC_VISIBILITY)
+			#define REXXENTRY 		__attribute__((visibility("default"))) APIENTRY
+		#else
+			#define REXXENTRY 		APIENTRY
+		#endif
+
 
 	#else
 
@@ -100,7 +106,6 @@
 	#define LIB3270_MODULE_NAME "rexx"
 	#include <lib3270/api.h>
 	#include <lib3270/plugins.h>
-//	#include <lib3270/localdefs.h>
 	#include <lib3270/statusc.h>
 	#include <lib3270/toggle.h>
 
