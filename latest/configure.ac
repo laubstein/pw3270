@@ -60,17 +60,17 @@ AC_PROG_MKDIR_P
 
 AC_PATH_TOOL([REXXCONFIG], [oorexx-config], [no])
 AC_PATH_TOOL([REXXC], [rexxc], [cp])
+
 AC_PATH_TOOL([STRIP], [strip])
-AC_PATH_TOOL([MAKENSIS], [makensis], [no])
 AC_PATH_TOOL([RPMBUILD], [rpmbuild], [no])
+
+AC_PATH_TOOL([MAKENSIS], [makensis], [no])
+AC_PATH_TOOL([WINDRES], [windres], [no])
 
 AC_PATH_TOOL([XGETTEXT], [xgettext], [no])
 AC_PATH_TOOL([MSGCAT], [msgcat], [no])
 AC_PATH_TOOL([MSGINIT], [msginit], [no])
 AC_PATH_TOOL([MSGFMT], [msgfmt], [no])
-
-AC_PATH_TOOL([JAVAC], [javac], [no])
-AC_PATH_TOOL([JAVAH], [javah], [no])
 
 # Headers
 AC_CHECK_HEADER(malloc.h, AC_DEFINE(HAVE_MALLOC_H,,[do we have malloc.h?]))
@@ -248,20 +248,9 @@ AC_ARG_ENABLE([trace],[AS_HELP_STRING([--disable-trace], [disable trace])], [ ap
 
 AC_ARG_VAR([JDK_HOME], [JDK home directory])
 AC_ARG_VAR([JRE_HOME], [JRE home directory])
+AC_ARG_VAR([JVM_DIR], [Path to jvm library])
 
-AC_ARG_ENABLE([java],
-	[AS_HELP_STRING([--disable-java], [Disable java extension & plugin])],
-[
-	app_cv_java="$enableval"
-],[
-
-	AC_CHECK_PROG(app_cv_java,javac,yes,no)
-])
-
-AC_PATH_PROG(JAR,jar,no)
-if test "$JAR" = "no" ; then
-	app_cv_java="no"
-fi
+AC_ARG_ENABLE([java],[AS_HELP_STRING([--disable-java], [Disable java extension & plugin])],[ app_cv_java="$enableval" ],[ app_cv_java="yes" ])
 
 AC_ARG_WITH([jnidir],[AS_HELP_STRING([--with-jnidir], [jni libraries path])],[ jnidir="$withval" ],[ jnidir="\$(libdir)/java" ] )
 AC_ARG_WITH([jvmjardir],[AS_HELP_STRING([--with-jvmjardir], [JAR files installation path])],[ jardir="$withval" ],[ jardir="\$(libdir)/jvm-exports" ] )
@@ -271,9 +260,16 @@ if test "_$JDK_HOME" = "_" ; then
 	app_cv_java="no"
 fi
 
-# Check for JRE_HOME
 if test "_$JRE_HOME" = "_" ; then
 	app_cv_java="no"
+fi
+
+if test "$app_cv_java" = "yes" ; then
+
+	AC_PATH_TOOL([JAVAC], [javac], [\$(JDK_HOME)/bin/javac])
+	AC_PATH_TOOL([JAVAH], [javah], [\$(JDK_HOME)/bin/javah])
+	AC_PATH_TOOL([JAR], [jar], [\$(JDK_HOME)/bin/jar])
+
 fi
 
 # Set JVM arch
@@ -285,17 +281,38 @@ case $host_cpu in
 	jvm_arch=i386
 	;;
      *)
-	app_cv_java="no"
+	jvm_arch="$host_cpu"
 	;;
 esac
+
+# Check for libjvm
+if test "_$JVMDIR" = "_" ; then
+
+	case "$host" in
+		*-mingw32)
+			JVMDIR="\$(JRE_HOME)/bin/client"
+			;;
+
+		*-apple-*)
+			JVMDIR="\$(JRE_HOME)/lib/$jvm_arch/client"
+			;;
+
+		*)
+			JVMDIR="\$(JRE_HOME)/lib/$jvm_arch/client"
+	esac
+
+
+fi
 
 AC_SUBST(JAR)
 AC_SUBST(JDK_HOME)
 AC_SUBST(JRE_HOME)
+AC_SUBST(JVMDIR)
+
 AC_SUBST(JNIDIR,$jnidir)
 AC_SUBST(JARDIR,$jardir)
 AC_SUBST(JNI_CFLAGS,$jni_cflags)
-AC_SUBST(JNI_LDFLAGS,"-L$JRE_HOME/lib/$jvm_arch -L$JRE_HOME/lib/$jvm_arch/client -ljvm")
+AC_SUBST(JNI_LIBS,"-L$JRE_HOME/lib/$jvm_arch -L\$(JVMDIR) -ljvm")
 
 #--[ Check for OpenOffice ]-----------------------------------------------------------------------------------------------------------------------------------
 #

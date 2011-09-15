@@ -46,6 +46,7 @@ LD = @LD@
 STRIP = @STRIP@
 XGETTEXT = @XGETTEXT@
 MSGCAT = @MSGCAT@
+WINDRES = @WINDRES@
 
 CFLAGS=@CFLAGS@ -DLOCALEDIR=\"$(localedir)\" -DDATAROOTDIR=\"$(datarootdir)\"
 DBG_CFLAGS=-DDEBUG=1
@@ -97,6 +98,11 @@ $(BINDIR)/pot/$(MODULE_NAME)/%.pot: %.c
 	@$(XGETTEXT)	--default-domain=$(PACKAGE) --language=C \
 			--keyword=_ --keyword=N_ --keyword=MSG_:2 --output=$@ $<
 	@touch $@
+
+$(OBJDIR)/Debug/gtk2/%@OBJEXT@: %.rc
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(WINDRES) --include-dir=. -i $< -o $@
 
 #---[ Targets ]----------------------------------------------------------------
 

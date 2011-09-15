@@ -41,7 +41,6 @@
 	#define LIB3270_INTERNAL __attribute__((visibility("hidden"))) extern
 #else
 	#define LIB3270_INTERNAL
-	#warning Exporting internal calls
 #endif
 
 #if defined(X3270_TN3270E) && !defined(X3270_ANSI) /*[*/
