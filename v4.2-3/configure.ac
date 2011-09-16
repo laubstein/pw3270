@@ -119,7 +119,7 @@ case "$host" in
 		DLLEXT=".dll"
 		PACKAGE_MANAGER="nsi"
 		PLUGINS="pipectl $PLUGINS"
-		OS_CFLAGS="-mno-cygwin -mms-bitfields -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500"
+		OS_CFLAGS="-mms-bitfields -D_WIN32 -DWC3270 -D_WIN32_WINNT=0x0500"
 		OS_DLLFLAGS="-mno-cygwin -shared -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
 		REXX_SYMBOL_HACK="-Wl,--exclude-symbols,REXXAPI_NULL_THUNK_DATA -Wl,--exclude-symbols,rexx_NULL_THUNK_DATA"
 
@@ -726,8 +726,10 @@ AC_SUBST(JAVA_CFLAGS,$java_cflags)
 AC_SUBST(JAVA_LDFLAGS,$java_ldflags)
 AC_SUBST(JVM_ARCH,$JVM_ARCH)
 
+AC_PATH_TOOL([MAKENSIS], [makensis], [no])
+AC_PATH_TOOL([WINDRES], [windres], [no])
+
 AC_SUBST(EXTENSIONS)
-AC_SUBST(WINDRES)
 AC_SUBST(libdir)
 AC_SUBST(jnidir)
 AC_SUBST(jardir)
@@ -739,32 +741,27 @@ AC_SUBST(OS_APISRCS)
 AC_SUBST(GTKRUNTIME,$pw3270_cv_gtkruntime)
 
 #dnl Configure which files to generate.
-AC_OUTPUT(Makefile)
-AC_OUTPUT(src/gtk2/version.c)
-AC_OUTPUT(src/oxt/description.xml)
-AC_OUTPUT(src/oxt/manifest.xml)
-AC_OUTPUT(src/include/lib3270/plugins.h)
-AC_OUTPUT(version)
+AC_CONFIG_FILES([
+Makefile
+src/gtk2/version.c
+src/oxt/description.xml
+src/oxt/manifest.xml
+src/include/lib3270/plugins.h
+version
 
-case "$host" in
-	*-mingw32)
-		AC_OUTPUT(pw3270.nsi)
-		AC_OUTPUT(src/gtk2/resources.rc)
-	;;
+pw3270.nsi
+src/gtk2/resources.rc
 
-	*-apple-*)
-		AC_OUTPUT(Info.plist)
-		AC_OUTPUT(pw3270.bundle)
-	;;
+Info.plist
+pw3270.bundle
 
-	*)
-		AC_OUTPUT(pw3270.spec)
-		AC_OUTPUT(debian/control-base)
-		AC_OUTPUT(debian/changelog)
-		AC_OUTPUT(lib3270.pc)
+pw3270.spec
+debian/control-base
+debian/changelog
+lib3270.pc
 
-	;;
-esac
+])
+
 
 dnl Output the generated config.status script.
 AC_OUTPUT
