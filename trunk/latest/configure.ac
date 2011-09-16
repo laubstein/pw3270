@@ -120,7 +120,7 @@ case "$host" in
 		app_cv_srclib="$app_cv_srclib w3misc.c winvers.c"
 		app_cv_srcgui="$app_cv_srcgui resources.rc"
 
-		DLL_LDFLAGS="-shared -mno-cygwin -shared -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
+		DLL_LDFLAGS="-shared -mno-cygwin -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
 		jni_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/win32"
 		;;
 
@@ -309,6 +309,7 @@ if test "_$JVMDIR" = "_" ; then
 fi
 
 jni_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
+jvm_libs="-L\$(JDK_HOME)/lib -ljvm"
 
 AC_SUBST(JAR)
 AC_SUBST(JDK_HOME)
@@ -317,8 +318,12 @@ AC_SUBST(JVMDIR)
 
 AC_SUBST(JNIDIR,$jnidir)
 AC_SUBST(JARDIR,$jardir)
+
 AC_SUBST(JNI_CFLAGS,$jni_cflags)
 AC_SUBST(JNI_LIBS,$jni_libs)
+
+AC_SUBST(JVM_CFLAGS,$jni_cflags)
+AC_SUBST(JVM_LIBS,$jvm_libs)
 
 #--[ Check for OpenOffice ]-----------------------------------------------------------------------------------------------------------------------------------
 #
