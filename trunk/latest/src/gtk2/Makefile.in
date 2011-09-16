@@ -35,6 +35,7 @@ PACKAGE=@PACKAGE@
 PACKAGE_VERSION=@PACKAGE_VERSION@
 
 prefix=@prefix@
+bindir=@bindir@
 datarootdir=@datarootdir@
 localedir=@localedir@
 
@@ -104,6 +105,12 @@ $(OBJDIR)/Debug/gtk2/%@OBJEXT@: %.rc
 	@mkdir -p `dirname $@`
 	@$(WINDRES) --include-dir=. -i $< -o $@
 
+$(OBJDIR)/Release/gtk2/%@OBJEXT@: %.rc
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(WINDRES) --include-dir=. -i $< -o $@
+
+
 #---[ Targets ]----------------------------------------------------------------
 
 all: $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@
@@ -125,6 +132,12 @@ $(BINDIR)/pot/$(MODULE_NAME).pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDI
 	@rm -f $@
 	@mkdir -p `dirname $@`
 	@$(MSGCAT) --sort-output $^ > $@
+
+install: $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@
+	@mkdir -p $(DESTDIR)/$(bindir)
+	@$(INSTALL_EXE) $(BINDIR)/Release/$(PACKAGE_NAME)@EXEEXT@ $(DESTDIR)/$(bindir)
+
+
 
 distclean:
 	@rm -f $(BINDIR)/pot/$(MODULE_NAME)
