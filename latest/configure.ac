@@ -305,11 +305,25 @@ if test "_$JVMDIR" = "_" ; then
 			JVMDIR="\$(JRE_HOME)/lib/$jvm_arch/client"
 	esac
 
-
 fi
 
-jni_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
-jvm_libs="-L\$(JDK_HOME)/lib -ljvm"
+# Java link options depends on OS
+case "$host" in
+	*-mingw32)
+		jni_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
+		jvm_libs="-L\$(JDK_HOME)/lib -Wl,-rpath,\$(JVMDIR) -ljvm"
+		;;
+
+	*-apple-*)
+		jni_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
+		jvm_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
+		;;
+
+	*)
+		jni_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
+		jvm_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
+esac
+
 
 AC_SUBST(JAR)
 AC_SUBST(JDK_HOME)

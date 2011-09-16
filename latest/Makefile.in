@@ -183,11 +183,7 @@ $(BINDIR)/pot/ui/%.pot: ui/%.xml $(BINDIR)/Release/xml2pot@EXEEXT@
 
 install: $(foreach TARGET, @INSTALL_TARGETS@, install-$(TARGET))
 
-install-gui:	$(BINDIR)/Release/$(PACKAGE_NAME)@EXEEXT@ \
-		$(PACKAGE_NAME).desktop
-
-	@mkdir -p $(DESTDIR)/$(bindir)
-	@$(INSTALL_EXE) $(BINDIR)/Release/$(PACKAGE_NAME)@EXEEXT@ $(DESTDIR)/$(bindir)
+install-gui:	$(PACKAGE_NAME).desktop
 
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
 	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/plugins
