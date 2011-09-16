@@ -86,12 +86,12 @@
 
   <!--
   <translations name="pw3270">
-    ${prefix:bin}/share/locale
+    ${prefix:bin}/locale
   </translations>
   -->
   
-  <data dest="${bundle}/Contents/Resources/share/locale/pt_BR/LC_MESSAGES/pw3270.mo">
-	${prefix:bin}/share/locale/pt_BR/LC_MESSAGES/pw3270.mo
+  <data dest="${bundle}/Contents/Resources/locale/pt_BR/LC_MESSAGES/pw3270.mo">
+	${prefix:bin}/locale/pt_BR/LC_MESSAGES/pw3270.mo
   </data>
 
   <!-- Data to copy in, usually Glade/UI files, images, sounds files
