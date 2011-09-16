@@ -95,7 +95,7 @@ LIBRARIES=""
 
 UI_FILES="default.xml functions.xml keypad.xml"
 LANG_MODULES="lib gtk2 ui"
-INSTALL_TARGETS="lib gui locale doc dev"
+INSTALL_TARGETS="lib gtk2 gui locale doc dev"
 
 app_cv_srcgui=""
 app_cv_srclib=""
