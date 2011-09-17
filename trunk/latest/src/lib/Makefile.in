@@ -37,6 +37,8 @@ BINDIR=@BINDIR@
 OBJDIR=@OBJDIR@
 SRCDIR=@SRCDIR@
 
+DEBDIR ?= debian
+
 OBJDBG=$(OBJDIR)/Debug/lib/$(MODULE_NAME)
 OBJRLS=$(OBJDIR)/Release/lib/$(MODULE_NAME)
 
@@ -101,6 +103,11 @@ $(BINDIR)/Release/lib/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(SOU
 	@$(LD) $(DLL_LDFLAGS) $(LDFLAGS) -o $@ $^ $(SSL_LIBS)
 	@$(STRIP) $@
 
+$(DEBDIR)/control-lib: control
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@cp control "$@"
+
 version.c: ./mkversion.sh
 	@echo $@ ...
 	@chmod +x ./mkversion.sh
@@ -128,6 +135,7 @@ distclean:
 
 clean:
 	@rm -f version.c
+	@rm -fr debian
 
 
 

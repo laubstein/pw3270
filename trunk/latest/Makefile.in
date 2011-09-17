@@ -109,7 +109,7 @@ install-%: src/%/Makefile $(BINDIR)/Release/lib/lib3270@DLLEXT@
 	@$(MAKE) $(RLS_MAKE) DESTDIR=$(DESTDIR) -C $(dir $<) install
 
 $(DEBDIR)/control-%: src/%/Makefile
-	@echo $(MAKE) $(RLS_MAKE) DEBDIR=$(DEBDIR) -C $(dir $<) $@
+	@$(MAKE) $(RLS_MAKE) DEBDIR=$(DEBDIR) -C $(dir $<) $@
 
 
 #---[ Main targets ]-----------------------------------------------------------
@@ -258,6 +258,7 @@ deb:	$(DEBDIR)/control
 	@$(DPKGBUILD) -rfakeroot -uc -us
 
 $(DEBDIR)/control: $(DEBDIR)/control-base $(foreach TARGET, @INSTALL_TARGETS@, $(DEBDIR)/control-$(TARGET))
+	@cat $^ > $@
 
 $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz: clean
 	@rm -fr $(TMPDIR)/$(PACKAGE_TARNAME).tmp
@@ -333,7 +334,7 @@ distclean: clean
 	@rm -f *.log
 	@rm -f *.layout
 	@rm -f src/include/lib3270/config.h
-	@rm -f $(DEBDIR)/control
+	@rm -f $(DEBDIR)/control-base
 	@find ./src -name "Makefile" -exec rm -f {} \;
 
 clean:

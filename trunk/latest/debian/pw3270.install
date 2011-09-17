@@ -9,6 +9,6 @@ usr/share/locale/pt_BR/LC_MESSAGES/pw3270.mo
 usr/share/pw3270/ui/keypad.xml
 usr/share/pw3270/ui/default.xml
 usr/share/pw3270/ui/functions.xml
-usr/share/pw3270/pw3270.png
+usr/share/pw3270/pw3270.svg
 usr/share/pw3270/colors.conf
 

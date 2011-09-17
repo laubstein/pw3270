@@ -43,6 +43,8 @@ localedir=@localedir@
 BINDIR=@BINDIR@
 OBJDIR=.obj/@HOST@
 
+DEBDIR ?= debian
+
 CC = @CC@
 LD = @LD@
 STRIP = @STRIP@
@@ -119,6 +121,11 @@ $(OBJDIR)/Release/gtk2/%@OBJEXT@: %.rc
 all: $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@
 
 pot: $(BINDIR)/pot/$(MODULE_NAME).pot
+
+$(DEBDIR)/control-gtk2: control
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@cp control "$@"
 
 $(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDIR)/Debug/gtk2/$(SRC)@OBJEXT@)
 	@echo $@ ...
