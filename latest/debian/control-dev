@@ -1,8 +1,0 @@
-Package: pw3270-dev
-Architecture: any
-Section: libdevel
-Depends: ${misc:Depends}, lib3270 (= ${binary:Version})
-Description: pw3270 development files. (Rev. 1456)
- This package contains the files needed for development of pw3270 plugins & extensions.
-
-

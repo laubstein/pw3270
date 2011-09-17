@@ -544,6 +544,10 @@ src/plugins/java/Makefile
 
 src/oxt/Makefile
 
+debian/control-base
+src/lib/control
+src/gtk2/control
+
 pw3270.nsi
 pw3270.spec
 
