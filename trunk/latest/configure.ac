@@ -62,7 +62,9 @@ AC_PATH_TOOL([REXXCONFIG], [oorexx-config], [no])
 AC_PATH_TOOL([REXXC], [rexxc], [cp])
 
 AC_PATH_TOOL([STRIP], [strip])
+
 AC_PATH_TOOL([RPMBUILD], [rpmbuild], [no])
+AC_PATH_TOOL([DPKGBUILD], [dpkg-buildpackage], [no])
 
 AC_PATH_TOOL([MAKENSIS], [makensis], [no])
 AC_PATH_TOOL([WINDRES], [windres], [no])
@@ -513,6 +515,7 @@ AC_SUBST(OBJDIR,"$ac_pwd/.obj/$host")
 AC_SUBST(BINDIR,"$ac_pwd/.bin")
 AC_SUBST(SRCDIR,"$ac_pwd/src")
 AC_SUBST(XMLDIR,"$ac_pwd/ui")
+AC_SUBST(DEBDIR,"$ac_pwd/debian")
 
 AC_SUBST(PLUGINS)
 AC_SUBST(LIBRARIES)
