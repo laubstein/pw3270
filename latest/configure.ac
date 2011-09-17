@@ -545,6 +545,8 @@ src/plugins/java/Makefile
 src/oxt/Makefile
 
 debian/control-base
+debian/changelog
+
 src/lib/control
 src/gtk2/control
 
