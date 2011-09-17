@@ -257,6 +257,18 @@ rpm: $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
 deb:	$(DEBDIR)/control
 	@$(DPKGBUILD) -rfakeroot -uc -us
 
+$(DEBDIR)/control-gui: Makefile
+	@touch $@
+
+$(DEBDIR)/control-locale: Makefile
+	@touch $@
+
+$(DEBDIR)/control-doc: Makefile
+	@touch $@
+
+$(DEBDIR)/control-dev: Makefile
+	@touch $@
+
 $(DEBDIR)/control: $(DEBDIR)/control-base $(foreach TARGET, @INSTALL_TARGETS@, $(DEBDIR)/control-$(TARGET))
 	@cat $^ > $@
 
@@ -335,6 +347,10 @@ distclean: clean
 	@rm -f *.layout
 	@rm -f src/include/lib3270/config.h
 	@rm -f $(DEBDIR)/control-base
+	@rm -f $(DEBDIR)/control-gui
+	@rm -f $(DEBDIR)/control-locale
+	@rm -f $(DEBDIR)/control-doc
+	@rm -f $(DEBDIR)/control-dev
 	@find ./src -name "Makefile" -exec rm -f {} \;
 
 clean:
