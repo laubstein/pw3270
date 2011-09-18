@@ -43,6 +43,8 @@ JNIDIR=@JNIDIR@
 JARDIR=@JARDIR@
 JVMDIR=@JVMDIR@
 
+DEBDIR ?= debian
+
 INSTALL=@INSTALL@
 INSTALL_EXE=$(INSTALL) --mode=755
 INSTALL_DATA=$(INSTALL) --mode=644
@@ -115,6 +117,11 @@ $(BINDIR)/Release/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)),
 	@mkdir -p `dirname $@`
 	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^
 	@$(STRIP) $@
+
+$(DEBDIR)/control-jni: control
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@cp control "$@"
 
 install: $(BINDIR)/Release/libpw3270_jni@DLLEXT@ $(BINRLS)/$(PACKAGE).jar
 	@mkdir -p $(DESTDIR)/$(JNIDIR)

@@ -1,0 +1,7 @@
+Package: @PACKAGE_NAME@-plugin-java
+Architecture: any
+Depends: ${misc:Depends}, @PACKAGE_NAME@ (= ${binary:Version}), lib3270-java (= ${binary:Version})
+Description: Java plugin for @PACKAGE_NAME@. (Rev. @PACKAGE_REVISION@)
+ Plugin allowing use of java classes inside @PACKAGE_NAME@'s UI.
+
+

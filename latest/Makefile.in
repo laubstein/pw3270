@@ -111,6 +111,8 @@ install-%: src/%/Makefile $(BINDIR)/Release/lib/lib3270@DLLEXT@
 $(DEBDIR)/control-%: src/%/Makefile
 	@$(MAKE) $(RLS_MAKE) DEBDIR=$(DEBDIR) -C $(dir $<) $@
 
+$(DEBDIR)/control-%: src/plugins/%/Makefile
+	@$(MAKE) $(RLS_MAKE) DEBDIR=$(DEBDIR) -C $(dir $<) $@
 
 #---[ Main targets ]-----------------------------------------------------------
 

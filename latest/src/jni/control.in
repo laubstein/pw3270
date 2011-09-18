@@ -1,0 +1,7 @@
+Package: lib3270-java
+Architecture: any
+Depends: ${misc:Depends}, lib3270 (= ${binary:Version})
+Description: Java bindings for lib3270. (Rev. @PACKAGE_REVISION@)
+ Jni library allowing 3270 access from java programs.
+
+

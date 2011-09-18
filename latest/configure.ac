@@ -261,23 +261,6 @@ AC_ARG_ENABLE([java],[AS_HELP_STRING([--disable-java], [Disable java extension &
 AC_ARG_WITH([jnidir],[AS_HELP_STRING([--with-jnidir], [jni libraries path])],[ jnidir="$withval" ],[ jnidir="\$(libdir)/java" ] )
 AC_ARG_WITH([jvmjardir],[AS_HELP_STRING([--with-jvmjardir], [JAR files installation path])],[ jardir="$withval" ],[ jardir="\$(libdir)/jvm-exports" ] )
 
-# Check for JDK_HOME
-if test "_$JDK_HOME" = "_" ; then
-	app_cv_java="no"
-fi
-
-if test "_$JRE_HOME" = "_" ; then
-	app_cv_java="no"
-fi
-
-if test "$app_cv_java" = "yes" ; then
-
-	AC_PATH_TOOL([JAVAC], [javac], [\$(JDK_HOME)/bin/javac])
-	AC_PATH_TOOL([JAVAH], [javah], [\$(JDK_HOME)/bin/javah])
-	AC_PATH_TOOL([JAR], [jar], [\$(JDK_HOME)/bin/jar])
-
-fi
-
 # Set JVM arch
 case $host_cpu in
      x86_64)
@@ -290,6 +273,28 @@ case $host_cpu in
 	jvm_arch="$host_cpu"
 	;;
 esac
+
+# Check for JDK_HOME
+if test "_$JDK_HOME" = "_" ; then
+	AC_CHECK_FILE("/usr/lib/jvm/java-6-sun/bin/javac",JDK_HOME="/usr/lib/jvm/java-6-sun",)
+fi
+
+if test "_$JDK_HOME" = "_" ; then
+	app_cv_java="no"
+fi
+
+# Check for JRE_HOME
+if test "_$JRE_HOME" = "_" ; then
+	JRE_HOME="\$(JDK_HOME)/jre"
+fi
+
+if test "$app_cv_java" = "yes" ; then
+
+	AC_PATH_TOOL([JAVAC], [javac], [\$(JDK_HOME)/bin/javac])
+	AC_PATH_TOOL([JAVAH], [javah], [\$(JDK_HOME)/bin/javah])
+	AC_PATH_TOOL([JAR], [jar], [\$(JDK_HOME)/bin/jar])
+
+fi
 
 # Check for libjvm
 if test "_$JVMDIR" = "_" ; then
@@ -304,7 +309,7 @@ if test "_$JVMDIR" = "_" ; then
 			;;
 
 		*)
-			JVMDIR="\$(JRE_HOME)/lib/$jvm_arch/client"
+			JVMDIR="\$(JRE_HOME)/lib/$jvm_arch/server"
 	esac
 
 fi
@@ -325,21 +330,6 @@ case "$host" in
 		jni_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
 		jvm_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
 esac
-
-
-AC_SUBST(JAR)
-AC_SUBST(JDK_HOME)
-AC_SUBST(JRE_HOME)
-AC_SUBST(JVMDIR)
-
-AC_SUBST(JNIDIR,$jnidir)
-AC_SUBST(JARDIR,$jardir)
-
-AC_SUBST(JNI_CFLAGS,$jni_cflags)
-AC_SUBST(JNI_LIBS,$jni_libs)
-
-AC_SUBST(JVM_CFLAGS,$jni_cflags)
-AC_SUBST(JVM_LIBS,$jvm_libs)
 
 #--[ Check for OpenOffice ]-----------------------------------------------------------------------------------------------------------------------------------
 #
@@ -434,6 +424,7 @@ fi
 # Check for pic
 if test "$app_cv_pic" == "yes"; then
 	DLL_CFLAGS="$DLL_CFLAGS -fPIC"
+	jni_cflags="$jni_cflags -fPIC"
 fi
 
 if test "$app_cv_rexx" == "yes"; then
@@ -489,6 +480,22 @@ AC_SUBST(PACKAGE_REVISION, "SVN_REV")
 AC_DEFINE(PACKAGE_RELEASE,"SVN_RELEASE")
 AC_SUBST(PACKAGE_RELEASE, "SVN_RELEASE")
 
+# Java 
+AC_SUBST(JAR)
+AC_SUBST(JDK_HOME)
+AC_SUBST(JRE_HOME)
+AC_SUBST(JVMDIR)
+
+AC_SUBST(JNIDIR,$jnidir)
+AC_SUBST(JARDIR,$jardir)
+
+AC_SUBST(JNI_CFLAGS,$jni_cflags)
+AC_SUBST(JNI_LIBS,$jni_libs)
+
+AC_SUBST(JVM_CFLAGS,$jni_cflags)
+AC_SUBST(JVM_LIBS,$jvm_libs)
+
+# C compiler
 AC_SUBST(CC)
 AC_SUBST(LD)
 
@@ -549,6 +556,8 @@ debian/changelog
 
 src/lib/control
 src/gtk2/control
+src/jni/control
+src/plugins/java/control
 
 pw3270.nsi
 pw3270.spec
