@@ -50,6 +50,8 @@ BINDIR=@BINDIR@
 OBJDIR=@OBJDIR@
 JVMDIR=@JVMDIR@
 
+DEBDIR ?= debian
+
 OBJDBG=$(OBJDIR)/Debug/plugins/$(MODULE_NAME)
 BINDBG=$(BINDIR)/Debug/plugins
 
@@ -121,6 +123,11 @@ $(BINDIR)/pot/java.pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/$(M
 	@rm -f $@
 	@mkdir -p `dirname $@`
 	@$(MSGCAT) --sort-output $^ > $@
+
+$(DEBDIR)/control-java: control
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@cp control "$@"
 
 install: $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@
 	@mkdir -p "$(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/plugins"
