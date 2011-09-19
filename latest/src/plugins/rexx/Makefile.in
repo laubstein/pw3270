@@ -54,6 +54,8 @@ OBJDIR=@OBJDIR@
 SRCDIR=@SRCDIR@
 XMLDIR=@XMLDIR@
 
+TMPDIR ?= .tmp
+
 OBJDBG=$(OBJDIR)/Debug/plugins/$(MODULE_NAME)
 BINDBG=$(BINDIR)/Debug/plugins
 
@@ -67,7 +69,7 @@ HOST_CC = @HOST_CC@
 DBG_CFLAGS=-DDEBUG=1
 RLS_CFLAGS=-DNDEBUG=1
 
-REXX_CFLAGS=`$(REXXCONFIG) --cflags`
+REXX_CFLAGS=@REXX_CFLAGS@
 REXX_LIBS=`$(REXXCONFIG) --libs`
 
 LIB3270_CFLAGS ?= `pkg-config --cflags pw3270`
@@ -162,7 +164,13 @@ install: $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@ $(BINDIR)/Release/lib$
 	@mkdir -p "$(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/ui"
 	@$(INSTALL_DATA) $(XMLDIR)/rexx.xml "$(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui"
 
+$(TMPDIR)/control-rexx: control
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@cp control "$@"
+
 clean:
 	@rm -f $(OBJRLS)/$(MODULE_NAME).cls
+	@rm -fr .tmp
 
 

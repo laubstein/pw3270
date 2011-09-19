@@ -368,6 +368,7 @@ clean:
 	@$(MAKE) -C src/lib clean
 	@$(MAKE) -C src/oxt clean
 	@$(MAKE) -C src/gtk2 clean
+	@$(MAKE) -C src/plugins/rexx clean
 
 	@find . -name "*@OBJEXT@" -exec rm -f {} \;
 	@find . -name "*@DLLEXT@" -exec rm -f {} \;

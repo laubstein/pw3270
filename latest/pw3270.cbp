@@ -870,6 +870,7 @@
 			<Option target="oooDebug" />
 		</Unit>
 		<Unit filename="src/plugins/java/Makefile.in" />
+		<Unit filename="src/plugins/java/control.in" />
 		<Unit filename="src/plugins/java/j3270plugin.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
@@ -905,6 +906,7 @@
 		<Unit filename="src/plugins/rexx/common_start.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/plugins/rexx/control.in" />
 		<Unit filename="src/plugins/rexx/dialogs.c">
 			<Option compilerVar="CC" />
 		</Unit>
