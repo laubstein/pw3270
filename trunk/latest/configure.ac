@@ -434,6 +434,15 @@ if test "$app_cv_rexx" == "yes"; then
 	UI_FILES="$UI_FILES rexx.xml"
 	LANG_MODULES="$LANG_MODULES rexx"
 	INSTALL_TARGETS="$INSTALL_TARGETS rexx"
+
+	if test "$app_cv_pic" == "yes"; then
+		REXX_CFLAGS="\`\$(REXXCONFIG) --cflags\` -fPIC"
+	else
+		REXX_CFLAGS="\`\$(REXXCONFIG) --cflags\`"
+	fi
+
+	AC_SUBST(REXX_CFLAGS)
+
 fi
 
 if test "$app_cv_java" == "yes"; then
@@ -559,7 +568,9 @@ debian/changelog
 src/lib/control
 src/gtk2/control
 src/jni/control
+
 src/plugins/java/control
+src/plugins/rexx/control
 
 pw3270.nsi
 pw3270.spec
