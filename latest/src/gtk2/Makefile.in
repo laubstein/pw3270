@@ -44,6 +44,7 @@ BINDIR=@BINDIR@
 OBJDIR=.obj/@HOST@
 
 DEBDIR ?= debian
+TMPDIR ?= .tmp
 
 CC = @CC@
 LD = @LD@
@@ -88,12 +89,12 @@ SOURCES =	main.c iocallback.c terminal.c screen.c mouse.c \
 
 #---[ Rules ]------------------------------------------------------------------
 
-$(OBJDIR)/Debug/gtk2/%@OBJEXT@: %.c *.h 
+$(OBJDIR)/Debug/gtk2/%@OBJEXT@: %.c *.h
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(GNOME_CFLAGS) $(IGEMAC_CFLAGS) $(GLIB_CFLAGS) $(CAIRO_CFLAGS) $(GTK_CFLAGS) -o $@ -c $<
 
-$(OBJDIR)/Release/gtk2/%@OBJEXT@: %.c *.h 
+$(OBJDIR)/Release/gtk2/%@OBJEXT@: %.c *.h
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) $(GNOME_CFLAGS) $(IGEMAC_CFLAGS) $(GLIB_CFLAGS) $(CAIRO_CFLAGS) $(GTK_CFLAGS) -o $@ -c $<
@@ -122,7 +123,7 @@ all: $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@
 
 pot: $(BINDIR)/pot/$(MODULE_NAME).pot
 
-$(DEBDIR)/control-gtk2: control
+$(TMPDIR)/control-gtk2: control
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@cp control "$@"
@@ -152,5 +153,6 @@ distclean:
 
 clean:
 	@rm -fr $(OBJDIR)
+	@rm -fr .tmp
 
 

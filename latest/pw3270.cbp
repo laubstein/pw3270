@@ -434,6 +434,7 @@
 		<Unit filename="src/extensions/uno/src/ooo3270.hpp" />
 		<Unit filename="src/extensions/uno/src/screen.cxx" />
 		<Unit filename="src/extensions/uno/src/test_program.cxx" />
+		<Unit filename="src/gtk2/Makefile.in" />
 		<Unit filename="src/gtk2/action_calls.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
@@ -636,10 +637,8 @@
 			<Option target="Release" />
 			<Option target="jnidebug" />
 		</Unit>
-		<Unit filename="src/lib/Makefile">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
+		<Unit filename="src/jni/Makefile.in" />
+		<Unit filename="src/lib/Makefile.in" />
 		<Unit filename="src/lib/XtGlue.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -870,6 +869,7 @@
 			<Option target="unoDebug" />
 			<Option target="oooDebug" />
 		</Unit>
+		<Unit filename="src/plugins/java/Makefile.in" />
 		<Unit filename="src/plugins/java/j3270plugin.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
