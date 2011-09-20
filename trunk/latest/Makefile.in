@@ -61,6 +61,7 @@ INSTALL_DATA=$(INSTALL) --mode=644
 MAKENSIS=@MAKENSIS@
 
 IGEBUNDLER=@IGEBUNDLER@
+PKGMAKER=@PKGMAKER@
 
 XGETTEXT=@XGETTEXT@
 MSGCAT=@MSGCAT@
@@ -140,14 +141,22 @@ $(BINDIR)/Release/lib/lib3270@DLLEXT@: src/lib/*
 #---[ Programs ]---------------------------------------------------------------
 
 $(BINDIR)/Debug/$(PACKAGE_NAME)@EXEEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/gtk2/*
+	@echo $@ ...
 	@$(MAKE) $(DBG_MAKE) -C src/gtk2 $@
 
 $(BINDIR)/Release/$(PACKAGE_NAME)@EXEEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/gtk2/*
+	@echo $@ ...
 	@$(MAKE) $(RLS_MAKE) -C src/gtk2 $@
 
 $(PACKAGE_NAME).app: $(PACKAGE_NAME).bundle Release
+	@echo $@ ...
 	@rm -fr $(PACKAGE_NAME).app
 	@$(IGEBUNDLER) $(PACKAGE_NAME).bundle
+
+$(PACKAGE_NAME).mpkg: $(PACKAGE_NAME).app Info.plist
+	@echo $@ ...
+	@$(PKGMAKER) --root $(PACKAGE_NAME).app --info Info.plist --out $@
+
 
 #---[ Modules ]----------------------------------------------------------------
 
