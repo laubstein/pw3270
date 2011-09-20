@@ -61,7 +61,8 @@ AC_PROG_MKDIR_P
 AC_PATH_TOOL([REXXCONFIG], [oorexx-config], [no])
 AC_PATH_TOOL([REXXC], [rexxc], [cp])
 
-AC_PATH_TOOL([STRIP], [strip])
+AC_PATH_TOOL([PKGMAKER],[packagemaker], [no], path="$PATH:/Developer/usr/bin")
+AC_PATH_TOOL([IGEBUNDLER],[ige-mac-bundler], [no])
 
 AC_PATH_TOOL([RPMBUILD], [rpmbuild], [no])
 AC_PATH_TOOL([DPKGBUILD], [dpkg-buildpackage], [no])
@@ -124,12 +125,17 @@ case "$host" in
 
 		DLL_LDFLAGS="-shared -mno-cygwin -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
 		jni_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/win32"
+
+		AC_PATH_TOOL([STRIP], [strip])
+
 		;;
 
 	*-apple-*)
 		DLL_LDFLAGS="-shared"
 		ICOEXT=".icns"
 		app_cv_imgext=".png"
+		AC_SUBST(STRIP,"echo")
+		localedir="share/locale"
 		;;
 
 	*)
@@ -137,6 +143,7 @@ case "$host" in
 		DLL_LDFLAGS="-shared -Wl,-soname,\$(@F)"
 		jni_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
 
+		AC_PATH_TOOL([STRIP], [strip])
 
 esac
 
@@ -574,6 +581,9 @@ src/jni/control
 
 src/plugins/java/control
 src/plugins/rexx/control
+
+pw3270.bundle
+Info.plist
 
 pw3270.nsi
 pw3270.spec
