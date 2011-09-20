@@ -54,21 +54,12 @@
 
  } UI_ELEMENT;
 
- #ifdef MAC_INTEGRATION
+ #ifdef HAVE_IGEMAC
 	/**
 	 * Name of the <menuitem> elements that will be moved for mac application menu.
 	 */
 	static const gchar * app_menu_item[] = { "about", "preferences" };
  #endif
-
-#ifdef HAVE_DOCK
-
-	// Redefine the number of popup menus
-	#define	POPUP_MENU_DOCK		POPUP_MENU_COUNT
-	#undef 	POPUP_MENU_COUNT
-	#define	POPUP_MENU_COUNT	POPUP_MENU_DOCK+1
-
-#endif // HAVE_DOCK
 
  typedef struct _parser_state
  {
@@ -87,15 +78,21 @@
 
 	GtkAccelGroup	* accel_group;								/**< Accelerators */
 
+#ifdef HAVE_DOCK
+	#define POPUP_MENU_DOCK POPUP_MENU_COUNT
+	 UI_ELEMENT		* popup_menu[POPUP_MENU_DOCK+1];			/**< Popup Menus */
+	 GtkWidget		* popup_menu_widget[POPUP_MENU_DOCK+1];		/**< Popup Menus Widgets */
+#else
 	UI_ELEMENT		* popup_menu[POPUP_MENU_COUNT];				/**< Popup Menus */
 	GtkWidget		* popup_menu_widget[POPUP_MENU_COUNT];		/**< Popup Menus Widgets */
-
-#ifdef MAC_INTEGRATION
+#endif // HAVE_DOCK
+	 
+#ifdef HAVE_IGEMAC
 	GtkMenuShell	* top_menu;									/**< Mac OSX top menu */
 	GtkMenuItem		* quit_menu;								/**< Quit menu widget */
 	GtkMenuItem		* app_menu[G_N_ELEMENTS(app_menu_item)];	/**< Standard menu item elements on the mac application menu */
 	GList			* sys_menu;									/**< Extra menu elements on the mac application menu */
-#endif // MAC_INTEGRATION
+#endif // HAVE_IGEMAC
 
 	int				  ignore;									/**< Non 0 if subtree is disabled */
 
@@ -313,13 +310,13 @@
 //		Trace("Menu created: %s widget=%p",el->name,el->widget);
  	}
 
-#ifdef MAC_INTEGRATION
+#ifdef HAVE_IGEMAC
 	{
 		const gchar *ptr = get_xml_attribute(names,values,"topmenu");
 		if(ptr && !g_strcasecmp("yes",ptr))
 			state->top_menu = GTK_MENU_SHELL(el->widget);
 	}
-#endif // MAC_INTEGRATION
+#endif // HAVE_IGEMAC
 
 
 	return el;
@@ -352,7 +349,7 @@
 				id = f;
 		}
 
-		if(id >= POPUP_MENU_COUNT)
+		if(id >= G_N_ELEMENTS(state->popup_menu))
 			return skip_block(names,values,state,error);
 
 		if(id < 0)
@@ -386,7 +383,7 @@
 	return el;
  }
 
-#ifdef MAC_INTEGRATION
+#ifdef HAVE_IGEMAC
  static void check_for_app_menu(const gchar *name, const gchar **names,const gchar **values, GtkWidget *widget, PARSER_STATE *state)
  {
 	const gchar *sysmenu = get_xml_attribute(names,values,"sysmenu");
@@ -407,7 +404,7 @@
 	state->sys_menu = g_list_prepend(state->sys_menu,GTK_MENU_ITEM(widget));
 
  }
-#endif // MAC_INTEGRATION
+#endif // HAVE_IGEMAC
 
  static UI_ELEMENT * start_menu(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
@@ -475,11 +472,11 @@
 		g_hash_table_insert(state->menu,(gpointer) el->name,el);
  	}
 
-#ifdef MAC_INTEGRATION
+#ifdef HAVE_IGEMAC
 	check_for_app_menu(el->name,names,values,el->widget,state);
 #else
 	gtk_widget_show(el->widget);
-#endif // MAC_INTEGRATION
+#endif // HAVE_IGEMAC
 
 	return el;
 
@@ -644,11 +641,11 @@
 		g_free(path);
  	}
 
-#ifdef MAC_INTEGRATION
+#ifdef HAVE_IGEMAC
 	check_for_app_menu(el->name,names,values,el->widget,state);
 	if(!g_strcasecmp(el->name,"quit"))
 		state->quit_menu = GTK_MENU_ITEM(el->widget);
-#endif // MAC_INTEGRATION
+#endif // HAVE_IGEMAC
 
 	return el;
  }
@@ -1289,12 +1286,14 @@
 	// Update action group & accelerators
 	g_hash_table_foreach(state.action,(GHFunc) finish_action_setup, &state);
 
-#ifdef MAC_INTEGRATION
+#if defined(HAVE_IGEMAC) && defined(HAVE_DOCK)
+	 if(state.popup_menu_widget[POPUP_MENU_DOCK])
+		 gtk_osxapplication_set_dock_menu(osxapp,GTK_MENU_SHELL(state.popup_menu_widget[POPUP_MENU_DOCK]));
+#endif HAVE_IGEMAC && HAVE_DOCK
+	 
+#ifdef HAVE_IGEMAC
 	Trace("%s: Top menu: %p app: %p",__FUNCTION__,state.top_menu,osxapp);
-
-	if(state.popup_menu_widget[POPUP_MENU_DOCK])
-		gtk_osxapplication_set_dock_menu(osxapp,GTK_MENU_SHELL(state.popup_menu_widget[POPUP_MENU_DOCK]));
-
+	 
 	if(state.top_menu)
 	{
 		// Set application menu
@@ -1329,7 +1328,7 @@
 			gtk_widget_hide(GTK_WIDGET(state.quit_menu));
 
 	}
-#endif // MAC_INTEGRATION
+#endif // HAVE_IGEMAC
 
 
 	// Set accelerators

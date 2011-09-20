@@ -117,6 +117,7 @@ version.c: ./mkversion.sh
 $(OBJDIR)/fallbacks@OBJEXT@: $(BINDIR)/mkfb@EXEEXT@ X3270.xad
 	@echo $@ ...
 	@mkdir -p `dirname $@`
+	@mkdir -p $(TMPDIR)
 	@$(BINDIR)/mkfb@EXEEXT@ -c X3270.xad $(OBJDIR)/falbacks.c
 	@$(CC) $(RLS_CFLAGS) $(CFLAGS) -o $@ -c $(OBJDIR)/falbacks.c
 

@@ -127,7 +127,7 @@ case "$host" in
 		;;
 
 	*-apple-*)
-		DLL_LDFLAGS="-shared -Wl,-soname,\$(@F)"
+		DLL_LDFLAGS="-shared"
 		ICOEXT=".icns"
 		;;
 
@@ -165,6 +165,7 @@ __attribute__ ((visibility ("hidden")))
      f_hidden (void)
 {
 }
+/*
 void
 __attribute__ ((visibility ("internal")))
      f_internal (void)
@@ -175,6 +176,7 @@ __attribute__ ((visibility ("protected")))
      f_protected (void)
 {
 }
+*/
 void
 __attribute__ ((visibility ("default")))
      f_default (void)
