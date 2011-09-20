@@ -86,6 +86,7 @@
 	}
 
 	pix = gdk_pixbuf_new_from_file(filename, NULL);
+	 
 	if(pix)
 	{
 		static const	size[] = { 16, 32, 48, 64, 128, 256 };
