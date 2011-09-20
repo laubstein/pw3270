@@ -354,6 +354,7 @@ distclean: clean
 	@rm -f $(DEBDIR)/control-locale
 	@rm -f $(DEBDIR)/control-doc
 	@rm -f $(DEBDIR)/control-dev
+	@rm -fr .obj
 	@find ./src -name "Makefile" -exec rm -f {} \;
 
 clean:
