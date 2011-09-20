@@ -129,6 +129,7 @@ case "$host" in
 	*-apple-*)
 		DLL_LDFLAGS="-shared"
 		ICOEXT=".icns"
+		app_cv_imgext=".png"
 		;;
 
 	*)
