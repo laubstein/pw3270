@@ -11,6 +11,8 @@
 		C23C131212CD317F003ACBD6 /* gtkrc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = gtkrc; path = mac/gtkrc; sourceTree = "<group>"; };
 		C23C133212CD5A85003ACBD6 /* launcher.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = launcher.sh; path = mac/launcher.sh; sourceTree = "<group>"; };
 		C23C138412CD6C3F003ACBD6 /* mkdmg.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = mkdmg.sh; path = mac/mkdmg.sh; sourceTree = "<group>"; };
+		C23E29551428037400B39BC5 /* Makefile.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.in; path = src/lib/Makefile.in; sourceTree = "<group>"; };
+		C23E2957142803AE00B39BC5 /* mkfb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mkfb.c; path = src/lib/mkfb.c; sourceTree = "<group>"; };
 		C2512A23139A31D200B59BCA /* action_calls.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = action_calls.c; path = src/gtk2/action_calls.c; sourceTree = "<group>"; };
 		C2512A24139A31D200B59BCA /* action_table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = action_table.h; path = src/gtk2/action_table.h; sourceTree = "<group>"; };
 		C2512A25139A31D200B59BCA /* actions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = actions.c; path = src/gtk2/actions.c; sourceTree = "<group>"; };
@@ -61,22 +63,17 @@
 		C2883D1B13B2BD0300A5F470 /* ft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ft.c; path = src/lib/ft.c; sourceTree = "<group>"; };
 		C2883D2413B2BDCC00A5F470 /* xio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xio.c; path = src/lib/xio.c; sourceTree = "<group>"; };
 		E710CF6D1255168F00D2D080 /* plugins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = plugins.h; path = src/include/lib3270/plugins.h; sourceTree = "<group>"; };
-		E710CF8D12551C0400D2D080 /* action_table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = action_table.h; path = src/gui/action_table.h; sourceTree = "<group>"; };
 		E732942E1283AB5E0040F2AC /* actions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actions.h; path = src/include/lib3270/actions.h; sourceTree = "<group>"; };
 		E75642FF124CB0C80027B68D /* configure.ac */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = configure.ac; sourceTree = "<group>"; };
 		E7564303124CB10E0027B68D /* Makefile.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.in; sourceTree = "<group>"; };
 		E773028712823836008E6088 /* Info.plist.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Info.plist.in; sourceTree = "<group>"; };
 		E773028912823A9B008E6088 /* pw3270.bundle.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = pw3270.bundle.in; sourceTree = "<group>"; };
-		E773D1DE1254BB2D00D554F7 /* uiparser1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uiparser1.h; path = src/gui/uiparser1.h; sourceTree = "<group>"; };
-		E773D1DF1254BB9E00D554F7 /* actions1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actions1.h; path = src/gui/actions1.h; sourceTree = "<group>"; };
-		E773D1E41254C09300D554F7 /* actions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actions.h; path = src/gui/actions.h; sourceTree = "<group>"; };
 		E773D21F1254D4B600D554F7 /* toggle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = toggle.h; path = src/include/lib3270/toggle.h; sourceTree = "<group>"; };
 		E773D2211254D5F900D554F7 /* toggles.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = toggles.c; path = src/lib/toggles.c; sourceTree = "<group>"; };
 		E773D2221254D75100D554F7 /* globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = globals.h; path = src/lib/globals.h; sourceTree = "<group>"; };
 		E773D2231254D79400D554F7 /* glue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = glue.c; path = src/lib/glue.c; sourceTree = "<group>"; };
 		E773D2251254DCA100D554F7 /* screen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = screen.c; path = src/lib/screen.c; sourceTree = "<group>"; };
 		E79A79BE128FBC2400E58FFF /* bootstrap.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = bootstrap.sh; sourceTree = "<group>"; };
-		E79D170A1251760C000E0EC2 /* gui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gui.h; path = src/gui/gui.h; sourceTree = "<group>"; };
 		E7DC2DDC12515B5C00B7BBCE /* config.h.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = config.h.in; path = src/include/lib3270/config.h.in; sourceTree = "<group>"; };
 		E7E883C112AF16B20011B7F0 /* charset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = charset.c; path = src/lib/charset.c; sourceTree = "<group>"; };
 		E7E883C912AF172A0011B7F0 /* ft_dft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ft_dft.c; path = src/lib/ft_dft.c; sourceTree = "<group>"; };
@@ -102,11 +99,6 @@
 		E710CF2E12550B2800D2D080 /* gtk-ui */ = {
 			isa = PBXGroup;
 			children = (
-				E710CF8D12551C0400D2D080 /* action_table.h */,
-				E773D1E41254C09300D554F7 /* actions.h */,
-				E773D1DF1254BB9E00D554F7 /* actions1.h */,
-				E773D1DE1254BB2D00D554F7 /* uiparser1.h */,
-				E79D170A1251760C000E0EC2 /* gui.h */,
 			);
 			name = "gtk-ui";
 			sourceTree = "<group>";
@@ -197,6 +189,8 @@
 		E773D2201254D5D600D554F7 /* lib3270 */ = {
 			isa = PBXGroup;
 			children = (
+				C23E2957142803AE00B39BC5 /* mkfb.c */,
+				C23E29551428037400B39BC5 /* Makefile.in */,
 				C2883D2413B2BDCC00A5F470 /* xio.c */,
 				C2883D1B13B2BD0300A5F470 /* ft.c */,
 				C2515A3013B18795004DCBE1 /* ctlr.c */,
