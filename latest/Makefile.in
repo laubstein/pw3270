@@ -59,6 +59,9 @@ INSTALL_EXE=$(INSTALL) --mode=755
 INSTALL_DATA=$(INSTALL) --mode=644
 
 MAKENSIS=@MAKENSIS@
+
+IGEBUNDLER=@IGEBUNDLER@
+
 XGETTEXT=@XGETTEXT@
 MSGCAT=@MSGCAT@
 MSGINIT=@MSGINIT@
@@ -141,6 +144,10 @@ $(BINDIR)/Debug/$(PACKAGE_NAME)@EXEEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src
 
 $(BINDIR)/Release/$(PACKAGE_NAME)@EXEEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/gtk2/*
 	@$(MAKE) $(RLS_MAKE) -C src/gtk2 $@
+
+$(PACKAGE_NAME).app: $(PACKAGE_NAME).bundle Release
+	@rm -fr $(PACKAGE_NAME).app
+	@$(IGEBUNDLER) $(PACKAGE_NAME).bundle
 
 #---[ Modules ]----------------------------------------------------------------
 
@@ -361,6 +368,8 @@ clean:
 	@rm -fr $(OBJDIR)
 	@rm -fr $(BINDIR)
 	@rm -fr $(TMPDIR)
+	
+	@rm -fr $(PACKAGE_NAME).app
 
 	@rm -f $(PROGRAM_LOGO)
 	@rm -f $(PACKAGE_NAME).po
