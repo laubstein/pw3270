@@ -356,20 +356,8 @@ esac
 AC_ARG_VAR([OO_SDK_HOME], [open-office SDK home])
 AC_ARG_VAR([OO_SDK_URE_HOME], [open-office URE home])
 
-#
-#AC_ARG_WITH([office-sdk-home],
-#	[AS_HELP_STRING([--with-office-sdk-home], [Define open-Office sdk path])],
-#[
-#	OO_SDK_HOME="$withval"
-#], )
-#
-#AC_ARG_WITH([office-sdk-ure-home],
-#	[AS_HELP_STRING([--with-office-sdk-ure-home], [Define open-Office ure path])],
-#[
-#	OO_SDK_URE_HOME="$withval"
-#] )
-#
-
+AC_ARG_WITH([office-sdk-home], [AS_HELP_STRING([--with-office-sdk-home], [Define open-Office sdk path])], [ OO_SDK_HOME="$withval" ], )
+AC_ARG_WITH([office-sdk-ure-home], [AS_HELP_STRING([--with-office-sdk-ure-home], [Define open-Office ure path])],[ OO_SDK_URE_HOME="$withval" ] )
 AC_ARG_ENABLE([office],[AS_HELP_STRING([--disable-office], [Disable open office extension])],[ app_cv_office="$enableval" ],[ app_cv_office="yes" ])
 
 # Check for programs
@@ -405,7 +393,7 @@ fi
 # Set targets
 if test "$app_cv_office" = "yes" ; then
 	AC_MSG_NOTICE([open-office sdk is present.])
-	INSTALL_TARGETS="$INSTALL_TARGETS oxt"
+#	INSTALL_TARGETS="$INSTALL_TARGETS oxt"
 else
 	AC_MSG_NOTICE([open-office sdk is NOT present.])
 
