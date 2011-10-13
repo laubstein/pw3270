@@ -273,6 +273,9 @@ $(PACKAGE_NAME).desktop: Makefile $(PROGRAM_LOGO)
 rpm: $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
 	@$(RPMBUILD) -ta $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
 
+tgz: $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
+	@echo $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz Ok!
+
 deb:	$(DEBDIR)/control
 	@$(DPKGBUILD) -rfakeroot -uc -us
 
