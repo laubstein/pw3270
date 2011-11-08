@@ -1289,7 +1289,7 @@
 #if defined(HAVE_IGEMAC) && defined(HAVE_DOCK)
 	 if(state.popup_menu_widget[POPUP_MENU_DOCK])
 		 gtk_osxapplication_set_dock_menu(osxapp,GTK_MENU_SHELL(state.popup_menu_widget[POPUP_MENU_DOCK]));
-#endif HAVE_IGEMAC && HAVE_DOCK
+#endif // HAVE_IGEMAC && HAVE_DOCK
 	 
 #ifdef HAVE_IGEMAC
 	Trace("%s: Top menu: %p app: %p",__FUNCTION__,state.top_menu,osxapp);

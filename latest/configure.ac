@@ -552,6 +552,7 @@ src/lib/Makefile
 
 src/gtk2/Makefile
 src/gtk2/version.c
+src/gtk2/resources.rc
 
 src/plugins/rexx/Makefile
 
