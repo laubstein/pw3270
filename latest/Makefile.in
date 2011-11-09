@@ -77,7 +77,7 @@ CFLAGS=@CFLAGS@
 
 LIB3270_CFLAGS=-I$(SRCDIR)/include
 LIB3270_LIBS=-L$(BINDIR)/Release/lib -l3270
-LIB3270_DBGLIBS=-L$(BINDIR)/Debug/lib -l3270 -Wl,-rpath,$(BINDIR)/Debug/lib
+LIB3270_DBGLIBS=-L$(BINDIR)/Debug/lib -l3270 -Wl,-rpath,.bin/Debug/Debug/lib
 
 LANGUAGES=pt_BR
 
@@ -380,7 +380,7 @@ clean:
 	@rm -fr $(OBJDIR)
 	@rm -fr $(BINDIR)
 	@rm -fr $(TMPDIR)
-	
+
 	@rm -fr $(PACKAGE_NAME).app
 
 	@rm -f $(PROGRAM_LOGO)

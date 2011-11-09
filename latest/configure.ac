@@ -102,6 +102,7 @@ INSTALL_TARGETS="lib gtk2 gui locale doc dev"
 
 app_cv_srcgui=""
 app_cv_srclib=""
+app_cv_socklib=""
 app_cv_imgext=".svg"
 
 
@@ -122,6 +123,7 @@ case "$host" in
 
 		app_cv_srclib="$app_cv_srclib w3misc.c winvers.c"
 		app_cv_srcgui="$app_cv_srcgui resources.rc"
+		app_cv_socklib="-lws2_32"
 
 		DLL_LDFLAGS="-shared -mno-cygwin -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
 		jni_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/win32"
@@ -523,6 +525,7 @@ AC_SUBST(OBJEXT)
 AC_SUBST(EXEEXT)
 AC_SUBST(GUI_SRCS,"$app_cv_srcgui")
 AC_SUBST(LIB_SRCS,"$app_cv_srclib")
+AC_SUBST(SOCKET_LIBS,"$app_cv_socklib")
 
 AC_SUBST(HOST,$host)
 AC_SUBST(OBJDIR,"$ac_pwd/.obj/$host")
