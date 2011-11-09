@@ -5,16 +5,16 @@ PACKAGE_RELEASE=4
 REV_FILE=./revision.m4
 REV=`date +%y%m%d%H%M`
 
-if [ -d .svn ]; then
+if test -d .svn ; then
 	SVN=`which svn 2> /dev/null`
 else
 	SVN=""
 fi
 
-if [ ! -z $SVN ]; then
+if ! test -x "$SVN" ; then
 
 	echo "Updating sources..."
-	$SVN update
+	"$SVN" update
 	if [ "$?" != "0" ]; then
 	
 		echo "$SVN update failed!"
