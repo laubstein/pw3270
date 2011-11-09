@@ -836,6 +836,7 @@
  	int i;
  	GSList 		*group	= NULL;
  	GtkWidget	*menu;
+ 	int	model = get_3270_model(hSession)-2;
 
  	if(!topmenu)
  	{
@@ -857,6 +858,9 @@
 
 		gtk_widget_show(screen_size_menu[i]);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu),screen_size_menu[i]);
+
+		if(i == model)
+			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(screen_size_menu[i]),TRUE);
 
 		g_signal_connect(G_OBJECT(screen_size_menu[i]),"toggled",G_CALLBACK(set_screen_size),(gpointer) i+2);
 
@@ -887,6 +891,7 @@
 
 	// Update menu toggle (if available)
 	model -= 2;
+
 	if(model >= 0 && model <= G_N_ELEMENTS(screen_size_text))
 	{
 		if(screen_size_menu[model] && !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(screen_size_menu[model])))
