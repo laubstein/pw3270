@@ -478,6 +478,7 @@
 		LIB3270_EXPORT void 		  popup_a_sockerr(char *fmt, ...);
 		LIB3270_EXPORT STATUS_CODE	  query_3270_terminal_status(void);
 		LIB3270_EXPORT int			  set_3270_model(H3270 *session, int model);
+		LIB3270_EXPORT int			  get_3270_model(H3270 *session);
 
 		/* Get connection info */
 		LIB3270_EXPORT const char	* get_connected_lu(H3270 *h);

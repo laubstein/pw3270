@@ -201,6 +201,17 @@ ctlr_reinit(unsigned cmask)
 }
 
 /**
+ * Get current 3270 model.
+ *
+ * @param session selected 3270 session.
+ * @return Current model number.
+ */
+int get_3270_model(H3270 *session)
+{
+	return session->model_num;
+}
+
+/**
  * Deal with the relationships between model numbers and rows/cols.
  *
  * @param model	New model (updates model name
@@ -239,64 +250,6 @@ void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr)
 	}
 
 	update_model_info(session,mn,sz[idx].cols,sz[idx].rows);
-
-/*
-//	int defmod;
-
-	switch (mn)
-	{
-	case 2:
-//		maxCOLS = 80;
-//		maxROWS = 24;
-//		model_num = 2;
-		update_model_info(session,2,80,24);
-		break;
-	case 3:
-//		maxCOLS = 80;
-//		maxROWS = 32;
-//		model_num = 3;
-		update_model_info(session,3,80,32);
-		break;
-	case 4:
-//#if defined(RESTRICT_3279)
-//		if (appres.m3279) {
-//			popup_an_error("No 3279 Model 4\nDefaulting to model 3");
-//			ctlr_set_rows_cols("3", ovc, ovr);
-//			return;
-//		}
-//#endif
-//		maxCOLS = 80;
-//		maxROWS = 43;
-//		model_num = 4;
-		update_model_info(session,4,80,43);
-		break;
-	case 5:
-//#if defined(RESTRICT_3279)
-//		if (appres.m3279) {
-//			popup_an_error("No 3279 Model 5\nDefaulting to model 3");
-//			ctlr_set_rows_cols(3, ovc, ovr);
-//			return;
-//		}
-//#endif
-//		maxCOLS = 132;
-//		maxROWS = 27;
-//		model_num = 5;
-		update_model_info(session,5,132,27);
-		break;
-
-	default:
-//#if defined(RESTRICT_3279)
-//		defmod = appres.m3279 ? 3 : 4;
-//#else
-//		defmod = 4;
-//#endif
-//		popup_an_error("Unknown model: %d\nDefaulting to %d", mn,defmod);
-//		ctlr_set_rows_cols(defmod, ovc, ovr);
-		popup_an_error("Unknown model: %d - Defaulting to %d", mn, 4);
-		mn = 4;
-		update_model_info(session,4,80,43);
-	}
-*/
 
 	// Apply oversize.
 	session->ov_cols = 0;
