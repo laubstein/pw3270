@@ -131,7 +131,7 @@ $(TMPDIR)/control-gtk2: control
 $(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDIR)/Debug/gtk2/$(SRC)@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(LD) -o $@ $^ $(LIB3270_LIBS) $(GNOME_LIBS) $(IGEMAC_LIBS) $(GLIB_LIBS) $(CAIRO_LIBS) $(GTK_LIBS)
+	@$(LD) -o $@ $^ -Wl,-rpath,.bin/Debug/lib $(LIB3270_LIBS) $(GNOME_LIBS) $(IGEMAC_LIBS) $(GLIB_LIBS) $(CAIRO_LIBS) $(GTK_LIBS)
 
 $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDIR)/Release/gtk2/$(SRC)@OBJEXT@)
 	@echo $@ ...
