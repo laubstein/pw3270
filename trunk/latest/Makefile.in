@@ -172,6 +172,9 @@ $(BINDIR)/Debug/librx3270@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugi
 $(BINDIR)/Debug/libpw3270_jni@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/jni/*
 	@$(MAKE) $(DBG_MAKE) -C src/jni $@
 
+$(BINDIR)/Debug/plugins/pipectl@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/pipectl/*
+	@$(MAKE) $(DBG_MAKE) -C src/plugins/pipectl $@
+
 $(BINDIR)/Release/plugins/rx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
 	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
 

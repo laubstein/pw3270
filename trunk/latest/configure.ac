@@ -119,6 +119,7 @@ case "$host" in
 		DLLEXT=".dll"
 		ICOEXT=".ico"
 		EXEEXT=".exe"
+		PLUGINS="$PLUGINS pipectl"
 		localedir="locale"
 
 		app_cv_srclib="$app_cv_srclib w3misc.c winvers.c"
@@ -561,6 +562,8 @@ src/plugins/rexx/Makefile
 
 src/jni/Makefile
 src/plugins/java/Makefile
+
+src/plugins/pipectl/Makefile
 
 src/oxt/Makefile
 
