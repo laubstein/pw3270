@@ -75,7 +75,7 @@ GLIB_LIBS=@GLIB_LIBS@
 
 #---[ Sources ]----------------------------------------------------------------
 
-SOURCES = commands.c init.c
+SOURCES = commands.c init.c pipesource.c
 
 #---[ Rules ]------------------------------------------------------------------
 
