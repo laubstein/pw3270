@@ -42,7 +42,7 @@
 	#include <lib3270/plugins.h>
 	#include <lib3270/api.h>
 
-	#define PIPE_BUFFER_LENGTH 512
+	#define PIPE_BUFFER_LENGTH 4096
 
 	LOCAL_EXTERN GSourceFuncs pipe_source_funcs;
 
