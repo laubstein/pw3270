@@ -74,11 +74,25 @@
  PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow)
  {
 	// Create processing thread
-	static const LPTSTR	lpszRequest	= TEXT("\\\\.\\pipe\\" PACKAGE_NAME );
+	static const LPTSTR	lpszPipename	= TEXT("\\\\.\\pipe\\" PACKAGE_NAME );
 	HANDLE					hPipe;
 
+	Trace("\n\n%s\n\n",__FUNCTION__);
 
-	hPipe = CreateNamedPipe(	lpszRequest,								// pipe name
+	hPipe = CreateNamedPipe(	lpszPipename,				// pipe name
+								PIPE_ACCESS_DUPLEX |		// read/write access
+								FILE_FLAG_OVERLAPPED,		// overlapped mode
+								PIPE_TYPE_MESSAGE |			// message-type pipe
+								PIPE_READMODE_MESSAGE |		// message-read mode
+								PIPE_WAIT,					// blocking mode
+								1,							// number of instances
+								PIPE_BUFFER_LENGTH,   		// output buffer size
+								PIPE_BUFFER_LENGTH,			// input buffer size
+								0,							// client time-out
+								NULL);						// default security attributes
+
+/*
+	hPipe = CreateNamedPipe(	lpszPipename,								// pipe name
 								PIPE_ACCESS_DUPLEX|FILE_FLAG_OVERLAPPED,	// read access
 								PIPE_TYPE_MESSAGE|PIPE_READMODE_MESSAGE,	// pipe modes
 								1,											// max. instances
@@ -86,12 +100,13 @@
 								PIPE_BUFFER_LENGTH,							// input buffer size
 								0,											// client time-out
 								NULL);										// default security attribute
+*/
 
-	Trace("%s: %p",(char *) lpszRequest, hPipe);
+	Trace("%s: %p",(char *) lpszPipename, hPipe);
 
 	if (hPipe == INVALID_HANDLE_VALUE)
 	{
-		popup_lasterror("Falha ao criar pipe %s",lpszRequest);
+		popup_lasterror("Falha ao criar pipe %s",lpszPipename);
 		return;
 	}
 

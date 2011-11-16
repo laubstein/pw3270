@@ -70,10 +70,10 @@
 
  static void run_query(HANDLE hPipe, const char *query)
  {
- 	static char buffer[4096];
+ 	static char buffer[32768];
  	DWORD cbRead = 0;
 
-	if(!TransactNamedPipe(hPipe,(LPVOID) query,strlen(query),buffer,4095,&cbRead,NULL))
+	if(!TransactNamedPipe(hPipe,(LPVOID) query,strlen(query),buffer,32768,&cbRead,NULL))
 	{
 		show_lasterror("Can't send message \"%s\"",query);
 		return;

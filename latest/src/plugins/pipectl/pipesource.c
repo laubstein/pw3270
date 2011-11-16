@@ -46,16 +46,15 @@
 
 	enum _PIPE_STATE
 	{
-		PIPE_STATE_DISCONNECTED,
-		PIPE_STATE_CONNECTING,
+		PIPE_STATE_WAITING,
 		PIPE_STATE_READ,
 		PIPE_STATE_PENDING_READ,
 
 		PIPE_STATE_UNDEFINED,
-	} PIPE_STATE		state;
+	} 					state;
 
 	OVERLAPPED			overlap;
-	unsigned char		buffer[PIPE_BUFFER_LENGTH];
+	unsigned char		buffer[PIPE_BUFFER_LENGTH+1];
  } pipe_source;
 
  #pragma
@@ -77,10 +76,11 @@
 	 * returned which were >= 0.
 	 *
 	 */
-//	Trace("%s: source=%p",__FUNCTION__,source);
-
 	if(WaitForSingleObject(((pipe_source *) source)->overlap.hEvent,0) == WAIT_OBJECT_0)
+	{
+		Trace("%s: source=%p",__FUNCTION__,source);
 		return TRUE;
+	}
 
 //	*timeout = 10;
 	return FALSE;
@@ -135,7 +135,7 @@
 	default:
 		if(source->hPipe != INVALID_HANDLE_VALUE)
 			popup_lasterror("%s",_( "Error receiving message from pipe" ) );
-		gtk_main_quit();
+//		gtk_main_quit();
 	}
 
 //	Trace("%s: No input",__FUNCTION__);
@@ -161,11 +161,11 @@
 
 	fSuccess = GetOverlappedResult(((pipe_source *) source)->hPipe,&((pipe_source *) source)->overlap,&cbRead,FALSE );
 
-//	Trace("%s: source=%p data=%p Result=%s cbRead=%d",__FUNCTION__,source,data,fSuccess ? "Success" : "Unsuccess",(int) cbRead);
+	Trace("%s: source=%p data=%p Result=%s cbRead=%d",__FUNCTION__,source,data,fSuccess ? "Success" : "Unsuccess",(int) cbRead);
 
 	switch(((pipe_source *) source)->state)
 	{
-	case PIPE_STATE_CONNECTING:
+	case PIPE_STATE_WAITING:
 		if(fSuccess)
 		{
 			Trace("Pipe connected (cbRet=%d)",(int) cbRead);
@@ -173,12 +173,12 @@
 		}
 		else
 		{
-			popup_lasterror("%s", _( "Pipe connection failed" ) ;
+			popup_lasterror("%s", _( "Pipe connection failed" ));
 		}
 		break;
 
 	case PIPE_STATE_READ:
-//		Trace("Reading pipe (cbRead=%d)",(int) cbRead);
+		Trace("Reading pipe (cbRead=%d)",(int) cbRead);
 		read_input_pipe( (pipe_source *) source);
 		break;
 
@@ -200,24 +200,24 @@
  static void IO_finalize(GSource *source)
  {
 	Trace("%s: source=%p",__FUNCTION__,source);
+
+	if( ((pipe_source *) source)->hPipe != INVALID_HANDLE_VALUE)
+	{
+		CloseHandle(((pipe_source *) source)->hPipe);
+		((pipe_source *) source)->hPipe = INVALID_HANDLE_VALUE;
+	}
+
  }
 
  static gboolean IO_closure(gpointer data)
  {
 	Trace("%s: data=%p",__FUNCTION__,data);
-
-	if( ((pipe_source *) hPipe)->hPipe != INVALID_HANDLE_VALUE)
-	{
-		CloseHandle(((pipe_source *) hPipe)->hPipe);
-		((pipe_source *) hPipe)->hPipe = INVALID_HANDLE_VALUE;
-	}
-
 	return 0;
  }
 
  void init_source_pipe(HANDLE hPipe)
  {
-	static const GSourceFuncs pipe_source_funcs =
+	static GSourceFuncs pipe_source_funcs =
 	{
 		IO_prepare,
 		IO_check,
@@ -229,8 +229,35 @@
 
 	pipe_source *source = (pipe_source *) g_source_new(&pipe_source_funcs,sizeof(pipe_source));
 
-	source->state			= PIPE_STATE_DISCONNECTED;
+	source->hPipe			= hPipe;
+	source->state			= PIPE_STATE_WAITING;
 	source->overlap.hEvent	= CreateEvent( NULL,TRUE,TRUE,NULL);
+
+	if(ConnectNamedPipe(hPipe,&source->overlap))
+	{
+		popup_lasterror("%s",_( "Error in ConnectNamedPipe" ));
+		#warning release source
+		return;
+	}
+
+	switch (GetLastError())
+	{
+	// The overlapped connection in progress.
+	case ERROR_IO_PENDING:
+		Trace("%s: ERROR_IO_PENDING",__FUNCTION__);
+		break;
+
+	// Client is already connected, so signal an event.
+	case ERROR_PIPE_CONNECTED:
+		Trace("%s: ERROR_PIPE_CONNECTED",__FUNCTION__);
+		if(SetEvent(source->overlap.hEvent))
+			break;
+
+	// If an error occurs during the connect operation...
+	default:
+		popup_lasterror("%s", _( "ConnectNamedPipe failed" ));
+		return;
+	}
 
 	g_source_attach((GSource *) source,NULL);
 
