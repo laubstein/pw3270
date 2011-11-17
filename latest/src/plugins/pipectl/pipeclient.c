@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como pipetest.c e possui - linhas de código.
+ * Este programa está nomeado como pipeclient.c e possui - linhas de código.
  *
  * Contatos:
  *
@@ -73,7 +73,7 @@
  	static char buffer[32768];
  	DWORD cbSize = 0;
 
-	printf("query(\"%s\")....\n",query);
+//	printf("query(\"%s\")....\n",query);
 
 	// http://msdn.microsoft.com/en-us/library/windows/desktop/aa365592(v=vs.85).aspx
 /*
@@ -98,11 +98,13 @@
 
 	*(buffer+((int) cbSize)) = 0;
 
-	printf("%s=\"%s\"\n",query,buffer);
+	printf("%s\n",buffer);
  }
 
  int main(int numpar, char *param[])
  {
+ 	char buffer[0x0100];
+
 	static DWORD dwMode = PIPE_READMODE_MESSAGE;
 
 	static const LPTSTR lpszPipeName	= TEXT( "\\\\.\\pipe\\pw3270" );
@@ -131,10 +133,19 @@
 	if(!SetNamedPipeHandleState(hPipe,&dwMode,NULL,NULL))
 		return show_lasterror("SetNamedPipeHandleState(%s)",lpszPipeName);
 
+/*
 	while(--numpar > 0)
 	{
 		param++;
 		run_query(hPipe, *param);
+	}
+*/
+	while(fgets(buffer,0x0FF,stdin))
+	{
+		char *ptr = strchr(buffer,'\n');
+		if(ptr)
+			*ptr = 0;
+		run_query(hPipe,buffer);
 	}
 	printf("%s\n","Disconnected....");
 	CloseHandle(hPipe);
