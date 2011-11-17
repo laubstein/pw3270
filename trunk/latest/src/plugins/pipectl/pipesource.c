@@ -61,6 +61,36 @@
 
 /*---[ GSource ]----------------------------------------------------------------------------*/
 
+static void wait_for_client(pipe_source *source)
+{
+	source->state = PIPE_STATE_WAITING;
+
+	if(ConnectNamedPipe(source->hPipe,&source->overlap))
+	{
+		popup_lasterror("%s",_( "Error in ConnectNamedPipe" ));
+		return;
+	}
+
+	switch (GetLastError())
+	{
+	// The overlapped connection in progress.
+	case ERROR_IO_PENDING:
+		Trace("%s: ERROR_IO_PENDING",__FUNCTION__);
+		break;
+
+	// Client is already connected, so signal an event.
+	case ERROR_PIPE_CONNECTED:
+		Trace("%s: ERROR_PIPE_CONNECTED",__FUNCTION__);
+		if(SetEvent(source->overlap.hEvent))
+			break;
+
+	// If an error occurs during the connect operation...
+	default:
+		popup_lasterror("%s", _( "ConnectNamedPipe failed" ));
+	}
+
+ }
+
  static gboolean IO_prepare(GSource *source, gint *timeout)
  {
 	/*
@@ -116,20 +146,28 @@
  {
 	DWORD	cbRead	= 0;
 
-	while(ReadFile(source->hPipe,source->buffer,PIPE_BUFFER_LENGTH,&cbRead,&source->overlap))
-		process_input(source,cbRead);
-
+	ReadFile(source->hPipe,source->buffer,PIPE_BUFFER_LENGTH,&cbRead,&source->overlap);
+	Trace("%s cbRead=%d",__FUNCTION__,cbRead);
 	// The read operation is still pending.
 	switch(GetLastError())
 	{
 	case ERROR_IO_PENDING:
-//		Trace("%s: PIPE_STATE_PENDING_READ",__FUNCTION__);
+		Trace("%s: PIPE_STATE_PENDING_READ",__FUNCTION__);
 		source->state = PIPE_STATE_PENDING_READ;
 		break;
 
 	case ERROR_PIPE_LISTENING:
-//		Trace("%s: ERROR_PIPE_LISTENING",__FUNCTION__);
+		Trace("%s: ERROR_PIPE_LISTENING",__FUNCTION__);
 		source->state = PIPE_STATE_READ;
+		break;
+
+	case ERROR_BROKEN_PIPE:
+		Trace("%s: ERROR_BROKEN_PIPE",__FUNCTION__);
+		wait_for_client(source);
+		break;
+
+	case ERROR_PIPE_NOT_CONNECTED:
+		Trace("%s: ERROR_PIPE_NOT_CONNECTED",__FUNCTION__);
 		break;
 
 	default:
@@ -215,6 +253,7 @@
 	return 0;
  }
 
+
  void init_source_pipe(HANDLE hPipe)
  {
 	static GSourceFuncs pipe_source_funcs =
@@ -233,32 +272,9 @@
 	source->state			= PIPE_STATE_WAITING;
 	source->overlap.hEvent	= CreateEvent( NULL,TRUE,TRUE,NULL);
 
-	if(ConnectNamedPipe(hPipe,&source->overlap))
-	{
-		popup_lasterror("%s",_( "Error in ConnectNamedPipe" ));
-		#warning release source
-		return;
-	}
-
-	switch (GetLastError())
-	{
-	// The overlapped connection in progress.
-	case ERROR_IO_PENDING:
-		Trace("%s: ERROR_IO_PENDING",__FUNCTION__);
-		break;
-
-	// Client is already connected, so signal an event.
-	case ERROR_PIPE_CONNECTED:
-		Trace("%s: ERROR_PIPE_CONNECTED",__FUNCTION__);
-		if(SetEvent(source->overlap.hEvent))
-			break;
-
-	// If an error occurs during the connect operation...
-	default:
-		popup_lasterror("%s", _( "ConnectNamedPipe failed" ));
-		return;
-	}
-
 	g_source_attach((GSource *) source,NULL);
 
+	wait_for_client(source);
+
+	return;
  }
