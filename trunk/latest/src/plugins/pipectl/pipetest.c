@@ -71,10 +71,17 @@
  static void run_query(HANDLE hPipe, const char *query)
  {
  	static char buffer[32768];
- 	DWORD cbRead = 0;
+ 	DWORD cbSize = 0;
 
 	printf("query(\"%s\")....\n",query);
 
+	// http://msdn.microsoft.com/en-us/library/windows/desktop/aa365592(v=vs.85).aspx
+	if(!WriteFile(hPipe,query,strlen(query),&cbSize,NULL))
+	{
+		show_lasterror("Can´t write %s",query);
+		return;
+	}
+/*
 	if(!TransactNamedPipe(hPipe,(LPVOID) query,strlen(query),buffer,32768,&cbRead,NULL))
 	{
 		show_lasterror("Can't send message \"%s\"",query);
@@ -90,17 +97,24 @@
 	*(buffer+((int) cbRead)) = 0;
 
 	printf("%s= %s\n",query,buffer);
-
+*/
  }
 
  int main(int numpar, char *param[])
  {
 	static DWORD dwMode = PIPE_READMODE_MESSAGE;
 
-	static const LPTSTR lpszRequest	= TEXT( "\\\\.\\pipe\\pw3270" );
+	static const LPTSTR lpszPipeName	= TEXT( "\\\\.\\pipe\\pw3270" );
 
-	printf("%s\n","Connecting....");
-	hPipe = CreateFile(	lpszRequest,   						// pipe name
+	printf("Waiting %s ....\r",lpszPipeName);
+	while(!WaitNamedPipe(lpszPipeName,10000))
+	{
+		printf("Waiting %s ....\r",lpszPipeName);
+		Sleep(1);
+	}
+
+	printf("Connecting %s ....\n",lpszPipeName);
+	hPipe = CreateFile(	lpszPipeName,   						// pipe name
 						GENERIC_WRITE|GENERIC_READ,			// Read/Write access
 						0,              					// no sharing
 						NULL,           					// default security attributes
@@ -109,11 +123,12 @@
 						NULL);          					// no template file
 
 	if(hPipe == INVALID_HANDLE_VALUE)
-		return show_lasterror("CreateFile(%s)",lpszRequest);
+		return show_lasterror("CreateFile(%s)",lpszPipeName);
 
-	printf("%s\n","Connected....");
+	printf("Connected %s ....\n",lpszPipeName);
+
 	if(!SetNamedPipeHandleState(hPipe,&dwMode,NULL,NULL))
-		return show_lasterror("SetNamedPipeHandleState(%s)",lpszRequest);
+		return show_lasterror("SetNamedPipeHandleState(%s)",lpszPipeName);
 
 	while(--numpar > 0)
 	{

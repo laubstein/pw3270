@@ -83,7 +83,7 @@
 								PIPE_ACCESS_DUPLEX |		// read/write access
 								FILE_FLAG_OVERLAPPED,		// overlapped mode
 								PIPE_TYPE_MESSAGE |			// pipe type
-								PIPE_READMODE_BYTE |		// read mode
+								PIPE_READMODE_MESSAGE |		// pipe mode
 								PIPE_WAIT,					// blocking mode
 								1,							// number of instances
 								PIPE_BUFFER_LENGTH,   		// output buffer size
