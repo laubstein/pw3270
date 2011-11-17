@@ -79,7 +79,9 @@ SOURCES = commands.c init.c pipesource.c
 
 #---[ Targets ]----------------------------------------------------------------
 
-pipetest@EXEEXT@: pipetest@OBJEXT@
+all: pipeclient@EXEEXT@ $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@
+
+pipeclient@EXEEXT@: pipeclient@OBJEXT@
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@$(LD) -o $@ $^ $(GLIB_LIBS)
@@ -87,7 +89,7 @@ pipetest@EXEEXT@: pipetest@OBJEXT@
 
 #---[ Rules ]------------------------------------------------------------------
 
-pipetest@OBJEXT@: pipetest.c *.h
+pipeclient@OBJEXT@: pipeclient.c *.h
 	@echo $< ...
 	@mkdir -p `dirname $@`
 	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(GLIB_CFLAGS) -o $@ -c $<

@@ -32,6 +32,8 @@
 
  #include <windows.h>
  #include <stdarg.h>
+ #include <lib3270/api.h>
+ #include <lib3270/macros.h>
  #include "pipectl.h"
 
 /*---[ Defines ]----------------------------------------------------------------------------*/
@@ -147,6 +149,9 @@ static void wait_for_client(pipe_source *source)
 
 	g_free(response);
 	g_free(msg);
+
+	source->state =PIPE_STATE_READ;
+
  }
 
  static void process_input(pipe_source *source, DWORD cbRead)
@@ -172,9 +177,31 @@ static void wait_for_client(pipe_source *source)
 	}
 	else
 	{
-		send_response(source,ENOENT,"%s","Not implemented");
-	}
+		const LIB3270_MACRO_LIST *call = get_3270_calls();
+		gchar *result = NULL;
 
+		errno = 0;
+
+		while(call->name && !result)
+		{
+			if(!g_ascii_strcasecmp(argv[0],call->name))
+			{
+				result = call->exec(NULL,argc,(const char **) argv);
+				if(!result)
+					result = strdup(strerror(errno));
+			}
+			call++;
+		}
+		if(result)
+		{
+			send_response(source,errno,"%s",result);
+			free(result);
+		}
+		else
+		{
+			send_response(source,ENOENT,"%s","Not implemented");
+		}
+	}
 	g_strfreev(argv);
  }
 
