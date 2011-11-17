@@ -73,6 +73,8 @@
  	static char buffer[32768];
  	DWORD cbRead = 0;
 
+	printf("query(\"%s\")....\n",query);
+
 	if(!TransactNamedPipe(hPipe,(LPVOID) query,strlen(query),buffer,32768,&cbRead,NULL))
 	{
 		show_lasterror("Can't send message \"%s\"",query);
@@ -97,32 +99,29 @@
 
 	static const LPTSTR lpszRequest	= TEXT( "\\\\.\\pipe\\pw3270" );
 
+	printf("%s\n","Connecting....");
+	hPipe = CreateFile(	lpszRequest,   						// pipe name
+						GENERIC_WRITE|GENERIC_READ,			// Read/Write access
+						0,              					// no sharing
+						NULL,           					// default security attributes
+						OPEN_EXISTING,  					// opens existing pipe
+						0,									// Attributes
+						NULL);          					// no template file
+
+	if(hPipe == INVALID_HANDLE_VALUE)
+		return show_lasterror("CreateFile(%s)",lpszRequest);
+
+	printf("%s\n","Connected....");
+	if(!SetNamedPipeHandleState(hPipe,&dwMode,NULL,NULL))
+		return show_lasterror("SetNamedPipeHandleState(%s)",lpszRequest);
+
 	while(--numpar > 0)
 	{
 		param++;
-
-		if (!WaitNamedPipe(lpszRequest, NMPWAIT_WAIT_FOREVER))
-			return show_lasterror("WaitNamedPipe(%s)",lpszRequest);
-
-		hPipe = CreateFile(	lpszRequest,   						// pipe name
-							GENERIC_WRITE|GENERIC_READ,			// Read/Write access
-							0,              					// no sharing
-							NULL,           					// default security attributes
-							OPEN_EXISTING,  					// opens existing pipe
-							0,									// Attributes
-							NULL);          					// no template file
-
-		if(hPipe == INVALID_HANDLE_VALUE)
-			return show_lasterror("CreateFile(%s)",lpszRequest);
-
-		if(!SetNamedPipeHandleState(hPipe,&dwMode,NULL,NULL))
-			return show_lasterror("SetNamedPipeHandleState(%s)",lpszRequest);
-
 		run_query(hPipe, *param);
-
-		CloseHandle(hPipe);
-
 	}
+	printf("%s\n","Disconnected....");
+	CloseHandle(hPipe);
 
 	return 0;
  }
