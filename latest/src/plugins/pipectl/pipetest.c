@@ -76,28 +76,29 @@
 	printf("query(\"%s\")....\n",query);
 
 	// http://msdn.microsoft.com/en-us/library/windows/desktop/aa365592(v=vs.85).aspx
+/*
 	if(!WriteFile(hPipe,query,strlen(query),&cbSize,NULL))
 	{
 		show_lasterror("Can´t write %s",query);
 		return;
 	}
-/*
-	if(!TransactNamedPipe(hPipe,(LPVOID) query,strlen(query),buffer,32768,&cbRead,NULL))
+*/
+
+	if(!TransactNamedPipe(hPipe,(LPVOID) query,strlen(query),buffer,32768,&cbSize,NULL))
 	{
 		show_lasterror("Can't send message \"%s\"",query);
 		return;
 	}
 
-	if(cbRead < 1)
+	if(cbSize < 1)
 	{
 		printf("Empty response to message \"%s\"\n",query);
 		return;
 	}
 
-	*(buffer+((int) cbRead)) = 0;
+	*(buffer+((int) cbSize)) = 0;
 
-	printf("%s= %s\n",query,buffer);
-*/
+	printf("%s=\"%s\"\n",query,buffer);
  }
 
  int main(int numpar, char *param[])

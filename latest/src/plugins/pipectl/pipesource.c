@@ -130,14 +130,33 @@ static void wait_for_client(pipe_source *source)
 	return FALSE;
  }
 
+ static void query_failed(pipe_source *source, gint code, const gchar *msg)
+ {
+ 	DWORD wrote;
+	gchar *response = g_strdup_printf("%04u %s",code,msg);
+	Trace("Sending error: %s",response);
+	WriteFile(source->hPipe,response,strlen(response),&wrote,NULL);
+	g_free(response);
+ }
+
  static void process_input(pipe_source *source, DWORD cbRead)
  {
- 	gchar *buffer = g_malloc0(cbRead+1);
- 	memcpy(buffer,source->buffer,cbRead);
-	Trace("Received:\n%s\n",buffer);
+ 	gint	  argv = 0;
+ 	gchar	**argc;
+ 	GError	* error = NULL;
 
+ 	source->buffer[cbRead] = 0;
+	Trace("Received:\n%s\n",source->buffer);
 
-	g_free(buffer);
+	if(!g_shell_parse_argv(source->buffer,&argv,&argc,&error))
+	{
+		// Can´t parse command-line
+		query_failed(source,error->code,error->message);
+		return;
+	}
+
+	query_failed(source,ENOENT,"Not implemented");
+
  }
 
  static void read_input_pipe(pipe_source *source)
@@ -162,6 +181,10 @@ static void wait_for_client(pipe_source *source)
 
 	case ERROR_BROKEN_PIPE:
 		Trace("%s: ERROR_BROKEN_PIPE",__FUNCTION__);
+		if(!DisconnectNamedPipe(source->hPipe))
+			popup_lasterror("%s",_( "Error in DisconnectNamedPipe" ));
+		else
+			wait_for_client(source);
 		break;
 
 	case ERROR_PIPE_NOT_CONNECTED:
