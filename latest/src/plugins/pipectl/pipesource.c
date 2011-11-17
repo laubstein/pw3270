@@ -63,19 +63,18 @@
 
 static void wait_for_client(pipe_source *source)
 {
-	source->state = PIPE_STATE_WAITING;
-
 	if(ConnectNamedPipe(source->hPipe,&source->overlap))
 	{
 		popup_lasterror("%s",_( "Error in ConnectNamedPipe" ));
 		return;
 	}
 
-	switch (GetLastError())
+	switch(GetLastError())
 	{
 	// The overlapped connection in progress.
 	case ERROR_IO_PENDING:
 		Trace("%s: ERROR_IO_PENDING",__FUNCTION__);
+		source->state = PIPE_STATE_WAITING;
 		break;
 
 	// Client is already connected, so signal an event.
@@ -112,7 +111,7 @@ static void wait_for_client(pipe_source *source)
 		return TRUE;
 	}
 
-//	*timeout = 10;
+	*timeout = 10;
 	return FALSE;
  }
 
@@ -133,12 +132,11 @@ static void wait_for_client(pipe_source *source)
 
  static void process_input(pipe_source *source, DWORD cbRead)
  {
-	gchar *buffer = g_malloc0(cbRead+1);
-	memcpy(buffer,source->buffer,cbRead);
-
+ 	gchar *buffer = g_malloc0(cbRead+1);
+ 	memcpy(buffer,source->buffer,cbRead);
 	Trace("Received:\n%s\n",buffer);
 
-//	process_pipe_input(buffer,cbRead);
+
 	g_free(buffer);
  }
 
@@ -146,8 +144,9 @@ static void wait_for_client(pipe_source *source)
  {
 	DWORD	cbRead	= 0;
 
-	ReadFile(source->hPipe,source->buffer,PIPE_BUFFER_LENGTH,&cbRead,&source->overlap);
-	Trace("%s cbRead=%d",__FUNCTION__,cbRead);
+	if(ReadFile(source->hPipe,source->buffer,PIPE_BUFFER_LENGTH,&cbRead,&source->overlap) && cbRead > 0)
+		process_input(source,cbRead);
+
 	// The read operation is still pending.
 	switch(GetLastError())
 	{
@@ -163,7 +162,6 @@ static void wait_for_client(pipe_source *source)
 
 	case ERROR_BROKEN_PIPE:
 		Trace("%s: ERROR_BROKEN_PIPE",__FUNCTION__);
-		wait_for_client(source);
 		break;
 
 	case ERROR_PIPE_NOT_CONNECTED:
