@@ -31,9 +31,8 @@
  */
 
  #include <windows.h>
+ #include <stdarg.h>
  #include "pipectl.h"
-
-
 
 /*---[ Defines ]----------------------------------------------------------------------------*/
 
@@ -130,33 +129,53 @@ static void wait_for_client(pipe_source *source)
 	return FALSE;
  }
 
- static void query_failed(pipe_source *source, gint code, const gchar *msg)
+ static void send_response(pipe_source *source, gint code, const gchar *fmt, ...)
  {
- 	DWORD wrote;
-	gchar *response = g_strdup_printf("%04u %s",code,msg);
+ 	DWORD	  wrote;
+	gchar	* response;
+	gchar	* msg;
+	va_list	  args;
+
+	va_start(args, fmt);
+	msg = g_strdup_vprintf(fmt,args);
+	va_end(args);
+
+	response = g_strdup_printf("%04u %s",code,msg);
 	Trace("Sending error: %s",response);
+
 	WriteFile(source->hPipe,response,strlen(response),&wrote,NULL);
+
 	g_free(response);
+	g_free(msg);
  }
 
  static void process_input(pipe_source *source, DWORD cbRead)
  {
- 	gint	  argv = 0;
- 	gchar	**argc;
+ 	gint	  argc = 0;
+ 	gchar	**argv;
  	GError	* error = NULL;
+ 	gchar	* cmd;
 
  	source->buffer[cbRead] = 0;
 	Trace("Received:\n%s\n",source->buffer);
 
-	if(!g_shell_parse_argv(source->buffer,&argv,&argc,&error))
+	if(!g_shell_parse_argv(source->buffer,&argc,&argv,&error))
 	{
 		// Can´t parse command-line
-		query_failed(source,error->code,error->message);
+		send_response(source,error->code,"%s",error->message);
 		return;
 	}
 
-	query_failed(source,ENOENT,"Not implemented");
+	if(!strcmp(argv[0],"versions"))
+	{
+		send_response(source,0,"%s %s %s %s %s",PACKAGE_NAME,PACKAGE_VERSION,PACKAGE_REVISION,__DATE__,__TIME__);
+	}
+	else
+	{
+		send_response(source,ENOENT,"%s","Not implemented");
+	}
 
+	g_strfreev(argv);
  }
 
  static void read_input_pipe(pipe_source *source)
