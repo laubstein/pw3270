@@ -30,6 +30,7 @@
  *
  */
 
+ #include <stdio.h>
  #include <lib3270/api.h>
  #include <lib3270/macros.h>
 
@@ -37,7 +38,10 @@
 
  static const LIB3270_MACRO_LIST macro_list[] =
  {
- 	LIB3270_MACRO_ENTRY( encoding ),
+ 	LIB3270_MACRO_ENTRY( encoding	),
+ 	LIB3270_MACRO_ENTRY( get		),
+ 	LIB3270_MACRO_ENTRY( set		),
+ 	LIB3270_MACRO_ENTRY( status		),
 
  	{NULL, NULL}
  };
@@ -47,7 +51,132 @@
  	return macro_list;
  }
 
+ static char * value_as_string(int val)
+ {
+ 	char buffer[10];
+ 	snprintf(buffer,9,"%d",val);
+ 	return strdup(buffer);
+ }
+
  LIB3270_MACRO( encoding )
  {
  	return strdup("ISO-8859-1");
+ }
+
+ LIB3270_MACRO( get )
+ {
+	int start, qtd, rows, cols, row, col;
+	char *buffer = NULL;
+
+	switch(argc)
+	{
+	case 1:	// Get entire screen
+		get_3270_terminal_size(hSession,&rows,&cols);
+		qtd = (rows*(cols+1)+1);
+		buffer = malloc(qtd+2);
+
+		Trace("Screen buffer size: %d (%dx%d)",qtd,rows,cols);
+
+		memset(buffer,0,qtd+1);
+		start = qtd = 0;
+		for(row = 0; row < rows;row++)
+		{
+			screen_read(buffer+qtd,start,cols);
+			qtd += cols;
+			start += cols;
+			buffer[qtd++] = '\n';
+		}
+		buffer[qtd] = 0;
+
+		Trace("Bytes read: %d",qtd);
+		return buffer;
+
+	case 2:	// Just size, get current cursor position
+		start	= 0;
+		qtd 	= atoi(argv[1]);
+		break;
+
+	case 3:	// Use start position
+		start	= atoi(argv[1]);
+		qtd 	= atoi(argv[2]);
+		break;
+
+	case 4:	// Get start position from row/col
+		get_3270_terminal_size(hSession,&rows,&cols);
+
+		row = atoi(argv[1])-1;
+		col = atoi(argv[2])-1;
+
+		if(row < 0 || row > rows || col < 0 || col > cols)
+		{
+			errno = EINVAL;
+			return NULL;
+		}
+
+		start 	= (row * cols) + col;
+		qtd 	= atoi(argv[3]);
+		break;
+
+	default:
+		errno = EINVAL;
+		return NULL;
+	}
+
+	if(qtd < 1)
+	{
+		errno = EINVAL;
+		return NULL;
+	}
+
+	buffer = malloc(qtd+1);
+	screen_read(buffer, start, qtd);
+
+	return buffer;
+ }
+
+ LIB3270_MACRO( set )
+ {
+ 	const char *str = NULL;
+
+	if(query_3270_terminal_status() != STATUS_CODE_BLANK)
+	{
+		errno = EBUSY;
+		return NULL;
+	}
+
+	switch(argc)
+	{
+	case 1:
+		lib3270_enter();
+		break;
+
+    case 2:
+		str = argv[1];
+		break;
+
+	case 3:
+        cursor_set_addr(atoi(argv[1]));
+		str = argv[2];
+        break;
+
+    case 4:
+        cursor_set_addr((atoi(argv[1])-1) * ctlr_get_cols() + (atoi(argv[2])-1));
+		str = argv[3];
+        break;
+
+	default:
+		errno = EINVAL;
+		return NULL;
+	}
+
+	if(str)
+		Input_String((unsigned char *) str);
+
+	return value_as_string(query_3270_terminal_status());
+ }
+
+ LIB3270_MACRO( status )
+ {
+ 	Trace("Status: %d",query_3270_terminal_status());
+	return value_as_string(query_3270_terminal_status());
  }
