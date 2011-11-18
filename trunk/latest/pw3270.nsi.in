@@ -180,7 +180,6 @@ SubSectionEnd
 Section /o "GTK+ Runtime" SecGTK
 
 	setOutPath $INSTDIR
-	file /r ".bin\Release\gtk-runtime\*.*"
 
 SectionEnd
 

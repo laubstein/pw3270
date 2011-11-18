@@ -411,6 +411,14 @@ PKG_CHECK_MODULES( [CAIRO], [cairo >= 1.8], AC_DEFINE(HAVE_CAIRO) )
 PKG_CHECK_MODULES( [IGEMAC], [ige-mac-integration], AC_DEFINE(HAVE_IGEMAC), AC_MSG_NOTICE([ige-mac-integration not present.]) )
 PKG_CHECK_MODULES( [UNITY], [unity], AC_DEFINE(HAVE_UNITY), AC_MSG_NOTICE([Unity is not present.]) )
 
+AC_ARG_WITH([gtk-runtime-path],
+	[AS_HELP_STRING([--with-gtk-runtime-path], [set base path for gtk's runtime files])],
+[
+	app_cv_gtkroot=$withval
+],[
+	app_cv_gtkroot=`$PKG_CONFIG --variable=prefix gtk+-2.0`
+])
+
 if test "$app_cv_gnome" == "yes"; then
 	PKG_CHECK_MODULES( [GNOME], [libgnome-2.0 libgnomeui-2.0],AC_DEFINE(HAVE_GNOME),AC_MSG_NOTICE([gnomeui not present.]) )
 fi
@@ -511,6 +519,7 @@ AC_SUBST(LD)
 
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
+AC_SUBST(GTK_RUNTIME,"$app_cv_gtkroot")
 AC_SUBST(CAIRO_LIBS)
 AC_SUBST(CAIRO_CFLAGS)
 AC_SUBST(GNOME_LIBS)
