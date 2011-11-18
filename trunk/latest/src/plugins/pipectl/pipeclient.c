@@ -145,7 +145,9 @@
 		char *ptr = strchr(buffer,'\n');
 		if(ptr)
 			*ptr = 0;
-		run_query(hPipe,buffer);
+
+		if(*buffer)
+			run_query(hPipe,buffer);
 	}
 	printf("%s\n","Disconnected....");
 	CloseHandle(hPipe);

@@ -489,13 +489,13 @@
 		<Unit filename="src\include\lib3270\statusc.h" />
 		<Unit filename="src\include\lib3270\toggle.h" />
 		<Unit filename="src\java\lib3270_jni.h" />
-		<Unit filename="src\java\pw3270_jni.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src\java\terminal.java">
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="src\jni\Makefile.in" />
+		<Unit filename="src\jni\pw3270_jni.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src\lib\Makefile.in" />
 		<Unit filename="src\lib\XtGlue.c">
 			<Option compilerVar="CC" />

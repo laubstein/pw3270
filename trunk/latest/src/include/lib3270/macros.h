@@ -30,8 +30,8 @@
  *
  */
 
- #define DECLARE_LIB3270_MACRO( name )  				LIB3270_EXPORT char * lib3270_macro_ ## name (H3270 *session, int argc, const char **argv);
- #define LIB3270_MACRO( name )  						LIB3270_EXPORT char * lib3270_macro_ ## name (H3270 *session, int argc, const char **argv)
+ #define DECLARE_LIB3270_MACRO( name )  				LIB3270_EXPORT char * lib3270_macro_ ## name (H3270 *hSession, int argc, const char **argv);
+ #define LIB3270_MACRO( name )  						LIB3270_EXPORT char * lib3270_macro_ ## name (H3270 *hSession, int argc, const char **argv)
 
  typedef struct _lib3270_macro_list
  {
@@ -45,4 +45,7 @@
  LIB3270_EXPORT const LIB3270_MACRO_LIST * get_3270_calls(void);
 
  DECLARE_LIB3270_MACRO( encoding )
+ DECLARE_LIB3270_MACRO( get )
+ DECLARE_LIB3270_MACRO( set )
+ DECLARE_LIB3270_MACRO( status )
 

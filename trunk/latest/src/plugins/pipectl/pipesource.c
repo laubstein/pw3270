@@ -164,9 +164,18 @@ static void wait_for_client(pipe_source *source)
  	source->buffer[cbRead] = 0;
 	Trace("Received:\n%s\n",source->buffer);
 
+	g_strstrip(source->buffer);
+
+	if(!*source->buffer)
+	{
+		send_response(source,EINVAL,"%s",_( "Unexpected blank line"));
+		return;
+	}
+
 	if(!g_shell_parse_argv(source->buffer,&argc,&argv,&error))
 	{
 		// Can´t parse command-line
+		Trace("Parse error in %s",source->buffer);
 		send_response(source,error->code,"%s",error->message);
 		return;
 	}
