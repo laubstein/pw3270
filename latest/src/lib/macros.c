@@ -40,8 +40,11 @@
  {
  	LIB3270_MACRO_ENTRY( cstate		),
  	LIB3270_MACRO_ENTRY( encoding	),
+ 	LIB3270_MACRO_ENTRY( enter		),
  	LIB3270_MACRO_ENTRY( get		),
  	LIB3270_MACRO_ENTRY( luname		),
+ 	LIB3270_MACRO_ENTRY( pa			),
+ 	LIB3270_MACRO_ENTRY( pf			),
  	LIB3270_MACRO_ENTRY( set		),
  	LIB3270_MACRO_ENTRY( status		),
 
@@ -240,4 +243,40 @@
  {
 	const char	* luname = get_connected_lu(0);
 	return strdup(luname ? luname : "none" );
+ }
+
+ LIB3270_MACRO( pf )
+ {
+ 	char ret[10];
+ 	if(argc != 2)
+	{
+		errno = EINVAL;
+		return NULL;
+	}
+	snprintf(ret,9,"%d",lib3270_pfkey(atoi(argv[1])));
+	return strdup(ret);
+ }
+
+ LIB3270_MACRO( pa )
+ {
+ 	char ret[10];
+ 	if(argc != 2)
+	{
+		errno = EINVAL;
+		return NULL;
+	}
+	snprintf(ret,9,"%d",lib3270_pakey(atoi(argv[1])));
+	return strdup(ret);
+ }
+
+ LIB3270_MACRO( enter )
+ {
+ 	char ret[10];
+ 	if(argc != 1)
+	{
+		errno = EINVAL;
+		return NULL;
+	}
+	snprintf(ret,9,"%d",lib3270_enter());
+	return strdup(ret);
  }
