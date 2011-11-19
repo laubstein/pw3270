@@ -419,6 +419,8 @@ AC_ARG_WITH([gtk-runtime-path],
 	app_cv_gtkroot=`$PKG_CONFIG --variable=prefix gtk+-2.0`
 ])
 
+app_cv_gtkvrs=`$PKG_CONFIG --variable=gtk_binary_version gtk+-2.0`
+
 if test "$app_cv_gnome" == "yes"; then
 	PKG_CHECK_MODULES( [GNOME], [libgnome-2.0 libgnomeui-2.0],AC_DEFINE(HAVE_GNOME),AC_MSG_NOTICE([gnomeui not present.]) )
 fi
@@ -520,6 +522,7 @@ AC_SUBST(LD)
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_RUNTIME,"$app_cv_gtkroot")
+AC_SUBST(GTK_RUNTIME_VERSION,"$app_cv_gtkvrs")
 AC_SUBST(CAIRO_LIBS)
 AC_SUBST(CAIRO_CFLAGS)
 AC_SUBST(GNOME_LIBS)
