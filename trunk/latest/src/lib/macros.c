@@ -38,8 +38,10 @@
 
  static const LIB3270_MACRO_LIST macro_list[] =
  {
+ 	LIB3270_MACRO_ENTRY( cstate		),
  	LIB3270_MACRO_ENTRY( encoding	),
  	LIB3270_MACRO_ENTRY( get		),
+ 	LIB3270_MACRO_ENTRY( luname		),
  	LIB3270_MACRO_ENTRY( set		),
  	LIB3270_MACRO_ENTRY( status		),
 
@@ -56,6 +58,40 @@
  	char buffer[10];
  	snprintf(buffer,9,"%d",val);
  	return strdup(buffer);
+ }
+
+ static const char * get_state(void)
+ {
+ 	#define DECLARE_XLAT_STATE(x) { x, #x }
+	static const struct _xlat_state
+	{
+		enum cstate	state;
+		const char	*ret;
+	} xlat_state[] =
+	{
+		DECLARE_XLAT_STATE( NOT_CONNECTED 		),
+		DECLARE_XLAT_STATE( RESOLVING			),
+		DECLARE_XLAT_STATE( PENDING				),
+		DECLARE_XLAT_STATE( CONNECTED_INITIAL	),
+		DECLARE_XLAT_STATE( CONNECTED_ANSI		),
+		DECLARE_XLAT_STATE( CONNECTED_3270		),
+		DECLARE_XLAT_STATE( CONNECTED_INITIAL_E	),
+		DECLARE_XLAT_STATE( CONNECTED_NVT		),
+		DECLARE_XLAT_STATE( CONNECTED_SSCP		),
+		DECLARE_XLAT_STATE( CONNECTED_TN3270E	)
+	};
+
+	int f;
+
+ 	enum cstate state = QueryCstate();
+
+	for(f=0;f < (sizeof(xlat_state)/sizeof(struct _xlat_state)); f++)
+	{
+		if(state == xlat_state[f].state)
+			return xlat_state[f].ret;
+	}
+
+	return "Unexpected";
  }
 
  LIB3270_MACRO( encoding )
@@ -172,11 +208,36 @@
 	if(str)
 		Input_String((unsigned char *) str);
 
-	return value_as_string(query_3270_terminal_status());
+	return strdup(get_state());
  }
 
  LIB3270_MACRO( status )
  {
- 	Trace("Status: %d",query_3270_terminal_status());
-	return value_as_string(query_3270_terminal_status());
+	const char	* luname	= get_connected_lu(0);
+ 	const char	* cstate	= get_state();
+ 	const char	* host		= get_current_host(0);
+ 	char		* rsp;
+ 	size_t		  sz;
+
+	if(!luname)
+		luname = "none";
+
+	if(!host)
+		host = "-";
+
+	sz = strlen(luname)+strlen(cstate)+strlen(host)+4;
+	rsp = malloc(sz+1);
+ 	snprintf(rsp,sz,"%s %s %s",cstate,luname,host);
+ 	return rsp;
+ }
+
+ LIB3270_MACRO( cstate )
+ {
+	return strdup(get_state());
+ }
+
+ LIB3270_MACRO( luname )
+ {
+	const char	* luname = get_connected_lu(0);
+	return strdup(luname ? luname : "none" );
  }
