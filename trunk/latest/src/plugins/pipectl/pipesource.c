@@ -184,6 +184,18 @@ static void wait_for_client(pipe_source *source)
 	{
 		send_response(source,0,"%s %s %s %s %s",PACKAGE_NAME,PACKAGE_VERSION,PACKAGE_REVISION,__DATE__,__TIME__);
 	}
+	else if(!strcmp(argv[0],"?"))
+	{
+		const LIB3270_MACRO_LIST *call;
+		GString *result = g_string_new(_( "Available commands:\n" ) );
+
+		for(call = get_3270_calls(); call->name; call++)
+		{
+			g_string_append_printf(result,"%s\n",call->name);
+		}
+		send_response(source,0,"%s",result->str);
+		g_string_free(result,TRUE);
+	}
 	else
 	{
 		const LIB3270_MACRO_LIST *call = get_3270_calls();
