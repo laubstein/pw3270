@@ -521,7 +521,7 @@ AC_SUBST(LD)
 
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
-AC_SUBST(GTK_RUNTIME,"$app_cv_gtkroot")
+AC_SUBST(GTK_RUNTIME_PATH,"$app_cv_gtkroot")
 AC_SUBST(GTK_RUNTIME_VERSION,"$app_cv_gtkvrs")
 AC_SUBST(CAIRO_LIBS)
 AC_SUBST(CAIRO_CFLAGS)
@@ -559,7 +559,7 @@ AC_SUBST(INSTALL_TARGETS)
 
 AC_CONFIG_FILES([
 Makefile
-version
+scripts.conf
 lib3270.pc
 src/include/lib3270/plugins.h
 
