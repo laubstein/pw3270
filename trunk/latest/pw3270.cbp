@@ -51,9 +51,13 @@
 		<Unit filename="debian\pw3270.install">
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="makegtkruntime.sh">
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="pw3270.nsi.in" />
 		<Unit filename="pw3270.spec.in" />
 		<Unit filename="rexx\sample.rex" />
+		<Unit filename="scripts.conf.in" />
 		<Unit filename="src\extensions\uno\com\sun\star\beans\Ambiguous.hpp" />
 		<Unit filename="src\extensions\uno\com\sun\star\beans\Defaulted.hpp" />
 		<Unit filename="src\extensions\uno\com\sun\star\beans\GetDirectPropertyTolerantResult.hpp" />
@@ -699,9 +703,6 @@
 			<Option target="Debug" />
 		</Unit>
 		<Unit filename="src\plugins\pipectl\Makefile.in" />
-		<Unit filename="src\plugins\pipectl\commands.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src\plugins\pipectl\init.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -1,8 +1,7 @@
 #!/bin/bash
+. scripts.conf
 
 TARGET_PATH=".bin/gtkruntime"
-SOURCE_PATH="C:/MinGW"
-GTK_VERSION="2.10.0"
 
 # Clean target folder
 rm -fr "$TARGET_PATH/*"
@@ -47,7 +46,7 @@ EOF
 
 while read FILE
 do
-	FILEPATH=$(find "$SOURCE_PATH/bin" -name "$FILE")
+	FILEPATH=$(find "$GTK_RUNTIME_PATH/bin" -name "$FILE")
 	if [ ! -z $FILEPATH ]; then
 		echo "$FILEPATH ..."
 		cp $FILEPATH "$TARGET_PATH"
@@ -79,8 +78,8 @@ mkdir -p $TARGET_PATH/share/locale/pt_BR/LC_MESSAGES
 
 while read FILE
 do
-	echo "$SOURCE_PATH/share/locale/pt_BR/LC_MESSAGES/$FILE ..."
-	cp "$SOURCE_PATH/share/locale/pt_BR/LC_MESSAGES/$FILE" "$TARGET_PATH/share/locale/pt_BR/LC_MESSAGES"
+	echo "$GTK_RUNTIME_PATH/share/locale/pt_BR/LC_MESSAGES/$FILE ..."
+	cp "$GTK_RUNTIME_PATH/share/locale/pt_BR/LC_MESSAGES/$FILE" "$TARGET_PATH/share/locale/pt_BR/LC_MESSAGES"
 	if [ "$?" != "0" ]; then
 		echo "Can´t copy $FILE"
 		exit -1
@@ -93,8 +92,8 @@ THEME_PATH="themes/MS-Windows/gtk-2.0"
 rm -fr "$TARGET_PATH/$THEME_PATH"
 mkdir -p "$TARGET_PATH/share/$THEME_PATH"
 
-echo "$SOURCE_PATH/share/$THEME_PATH/gtkrc ..."
-cp "$SOURCE_PATH/share/$THEME_PATH/gtkrc" "$TARGET_PATH/share/$THEME_PATH/gtkrc"
+echo "$GTK_RUNTIME_PATH/share/$THEME_PATH/gtkrc ..."
+cp "$GTK_RUNTIME_PATH/share/$THEME_PATH/gtkrc" "$TARGET_PATH/share/$THEME_PATH/gtkrc"
 if [ "$?" != "0" ]; then
 	echo "Can´t copy default theme"
 	exit -1
@@ -105,14 +104,14 @@ engines
 loaders
 EOF
 
-rm -fr $TARGET_PATH/lib/gtk-2.0/$GTK_VERSION/
-mkdir -p $TARGET_PATH/lib/gtk-2.0/$GTK_VERSION/
+rm -fr $TARGET_PATH/lib/gtk-2.0/$GTK_RUNTIME_VERSION/
+mkdir -p $TARGET_PATH/lib/gtk-2.0/$GTK_RUNTIME_VERSION/
 while read DIRNAME
 do
-	if [ -d "$SOURCE_PATH/lib/gtk-2.0/$GTK_VERSION/$DIRNAME" ]; then
-		echo "$SOURCE_PATH/lib/gtk-2.0/$GTK_VERSION/$DIRNAME ..."
-		mkdir -p "$TARGET_PATH/lib/gtk-2.0/$GTK_VERSION/$DIRNAME"
-		cp -r "$SOURCE_PATH/lib/gtk-2.0/$GTK_VERSION/$DIRNAME" "$TARGET_PATH/lib/gtk-2.0/$GTK_VERSION"
+	if [ -d "$GTK_RUNTIME_PATH/lib/gtk-2.0/$GTK_RUNTIME_VERSION/$DIRNAME" ]; then
+		echo "$GTK_RUNTIME_PATH/lib/gtk-2.0/$GTK_RUNTIME_VERSION/$DIRNAME ..."
+		mkdir -p "$TARGET_PATH/lib/gtk-2.0/$GTK_RUNTIME_VERSION/$DIRNAME"
+		cp -r "$GTK_RUNTIME_PATH/lib/gtk-2.0/$GTK_RUNTIME_VERSION/$DIRNAME" "$TARGET_PATH/lib/gtk-2.0/$GTK_RUNTIME_VERSION"
 		if [ "$?" != "0" ]; then
 			echo "Can´t copy $DIRNAME"
 			exit -1
