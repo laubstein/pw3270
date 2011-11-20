@@ -180,6 +180,7 @@ SubSectionEnd
 Section /o "GTK+ Runtime" SecGTK
 
 	setOutPath $INSTDIR
+	file /r ".bin\gtkruntime\*.*"
 
 SectionEnd
 
@@ -267,7 +268,7 @@ RexxOK:
 	SectionGetFlags "${SecRexxLib}" $0
 	IntOp $0 $0 | ${SF_SELECTED}
 	SectionSetFlags "${SecRexxLib}" $0
- 
+
 goto PastRexxCheck
 
 RexxNOK:
