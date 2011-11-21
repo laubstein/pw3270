@@ -56,7 +56,6 @@ do
 		fi
 	else
 		echo "Can´t find $FILE"
-		exit -1
 	fi
 done < $TEMPFILE
 rm -f $TEMPFILE
@@ -79,11 +78,15 @@ mkdir -p $TARGET_PATH/share/locale/pt_BR/LC_MESSAGES
 while read FILE
 do
 	echo "$GTK_RUNTIME_PATH/share/locale/pt_BR/LC_MESSAGES/$FILE ..."
-	cp "$GTK_RUNTIME_PATH/share/locale/pt_BR/LC_MESSAGES/$FILE" "$TARGET_PATH/share/locale/pt_BR/LC_MESSAGES"
-	if [ "$?" != "0" ]; then
-		echo "Can´t copy $FILE"
-		exit -1
+
+	if [ -e "$GTK_RUNTIME_PATH/share/locale/pt_BR/LC_MESSAGES/$FILE" ]; then
+		cp "$GTK_RUNTIME_PATH/share/locale/pt_BR/LC_MESSAGES/$FILE" "$TARGET_PATH/share/locale/pt_BR/LC_MESSAGES"
+		if [ "$?" != "0" ]; then
+			echo "Can´t copy $FILE"
+			exit -1
+		fi
 	fi
+
 done < $TEMPFILE
 rm -f $TEMPFILE
 
