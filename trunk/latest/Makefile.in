@@ -187,6 +187,9 @@ $(BINDIR)/Release/librx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/p
 $(BINDIR)/Release/libpw3270_jni@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/jni/*
 	@$(MAKE) $(RLS_MAKE) -C src/jni $@
 
+$(BINDIR)/Release/plugins/pipectl@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/pipectl/*
+	@$(MAKE) $(RLS_MAKE) -C src/plugins/pipectl $@
+
 #---[ I18n ]-------------------------------------------------------------------
 
 $(PACKAGE_NAME).po: $(BINDIR)/pot/$(PACKAGE_NAME).pot
