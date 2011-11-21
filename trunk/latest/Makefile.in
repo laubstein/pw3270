@@ -282,8 +282,13 @@ rpm: $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
 tgz: $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
 	@echo $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz Ok!
 
-deb:	$(DEBDIR)/control
+deb: $(DEBDIR)/control
 	@$(DPKGBUILD) -rfakeroot -uc -us
+
+nsi: Release
+	@chmod +x makegtkruntime.sh
+	@./makegtkruntime.sh
+	@$(MAKENSIS) $(PACKAGE_NAME).nsi
 
 $(TMPDIR)/control-gui: Makefile
 	@touch $@
