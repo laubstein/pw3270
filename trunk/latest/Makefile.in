@@ -357,7 +357,7 @@ Debug:	$(BINDIR)/Debug/$(PACKAGE_NAME)@EXEEXT@ \
 	$(foreach LIB, $(LIBRARIES), $(BINDIR)/Debug/$(LIB)@DLLEXT@)
 
 run: Debug
-	@PATH="$(PATH):.bin/Debug/lib" $(BINDIR)/Debug/$(PACKAGE_NAME).exe --program-data="$(PWD)" --model=5 --plugin-path=$(BINDIR)/Debug/plugins
+	@PATH="$(PATH):.bin/Debug/lib" $(BINDIR)/Debug/$(PACKAGE_NAME)@EXEEXT@ --program-data="$(PWD)" --model=5 --plugin-path=$(BINDIR)/Debug/plugins
 
 distclean: clean
 	@$(MAKE) -C src/lib distclean
