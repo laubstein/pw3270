@@ -110,13 +110,13 @@ lib3270_jni.h: $(BINDIR)/java/$(PACKAGE)/terminal.class
 
 #---[ Targets ]----------------------------------------------------------------
 
-$(BINDIR)/Debug/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@)
+$(BINDIR)/Debug/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@) $(BINRLS)/$(PACKAGE).jar
 	@mkdir -p `dirname $@`
-	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@)
 
-$(BINDIR)/Release/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC)@OBJEXT@)
+$(BINDIR)/Release/libpw3270_jni@DLLEXT@:  $(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC)@OBJEXT@) $(BINRLS)/$(PACKAGE).jar
 	@mkdir -p `dirname $@`
-	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $^
+	@$(LD) $(LDFLAGS) $(LIB3270_LIBS) -o $@ $(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC)@OBJEXT@)
 	@$(STRIP) $@
 
 $(TMPDIR)/control-jni: control

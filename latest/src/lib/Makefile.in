@@ -61,6 +61,7 @@ SSL_CFLAGS=@SSL_CFLAGS@
 SSL_LIBS=@SSL_LIBS@
 
 SOCKET_LIBS=@SOCKET_LIBS@
+SDK_LDFLAGS="-Wl,--warn-duplicate-exports,--output-def,$(basename $(@F)).def"
 
 #---[ Sources ]----------------------------------------------------------------
 
@@ -103,7 +104,9 @@ $(BINDIR)/Release/lib/lib$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(SOU
 							$(OBJDIR)/fallbacks@OBJEXT@
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(LD) $(DLL_LDFLAGS) $(LDFLAGS) -o $@ $^ $(SSL_LIBS) $(SOCKET_LIBS)
+	@$(LD) $(DLL_LDFLAGS) $(LDFLAGS) $(SDK_LDFLAGS) -o $@ $^ $(SSL_LIBS) $(SOCKET_LIBS)
+	@if [ -f $(basename \$(@F)).def ]; then mv -f $(basename \$(@F)).def `dirname $@` ; fi
+	@if [ -f $(basename \$(@F)).a ]; then mv -f $(basename \$(@F)).a `dirname $@` ; fi
 	@$(STRIP) $@
 
 $(TMPDIR)/control-lib: control
