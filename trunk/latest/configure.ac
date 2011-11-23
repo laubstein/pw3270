@@ -92,6 +92,7 @@ DBG_LDFLAGS="-L.bin/Debug/lib"
 RLS_LDFLAGS="-L.bin/Release/lib -Wl,--strip-all"
 
 DLL_CFLAGS=""
+EXE_LDFLAGS=""
 
 PLUGINS=""
 LIBRARIES=""
@@ -127,6 +128,7 @@ case "$host" in
 		app_cv_socklib="-lws2_32"
 
 		DLL_LDFLAGS="-shared -mno-cygwin -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
+		EXE_LDFLAGS="-mwindows"
 		jni_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/win32"
 
 		AC_PATH_TOOL([STRIP], [strip])
@@ -231,7 +233,14 @@ AC_ARG_WITH([logo],[AS_HELP_STRING([--with-logo], [Change default application lo
 # Optional libraryes and packets
 AC_ARG_WITH([ssl],   [AS_HELP_STRING( [--without-ssl],	 [do not use libssl])],	[ app_cv_ssl="$withval" ],	[ app_cv_ssl="yes" ])
 AC_ARG_WITH([gnome], [AS_HELP_STRING( [--without-gnome], [do not use gnome])],	[ app_cv_gnome="$withval" ],	[ app_cv_gnome="yes" ])
-AC_ARG_ENABLE([macui],[AS_HELP_STRING([--disable-macui], [Disable MAC OSX compatible UI manager ])],[ app_cv_macui="$enableval" ], [ app_cv_macui="yes" ])
+
+AC_ARG_ENABLE([macui],
+	[AS_HELP_STRING([--disable-macui], [Disable MAC OSX compatible UI manager ])],
+[
+	app_cv_macui="$enableval"
+],[
+	app_cv_macui="no" 
+])
 
 AC_ARG_ENABLE([rexx],
 	[AS_HELP_STRING([--disable-rexx], [Build rexx extension & plugin])],
@@ -533,6 +542,7 @@ AC_SUBST(IGEMAC_LIBS)
 AC_SUBST(IGEMAC_CFLAGS)
 AC_SUBST(DLL_CFLAGS)
 AC_SUBST(DLL_LDFLAGS)
+AC_SUBST(EXE_LDFLAGS)
 AC_SUBST(DLLEXT)
 AC_SUBST(OBJEXT)
 AC_SUBST(EXEEXT)

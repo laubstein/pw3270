@@ -59,8 +59,7 @@ CFLAGS=@CFLAGS@ -DLOCALEDIR=\"$(localedir)\" -DDATAROOTDIR=\"$(datarootdir)\"
 DBG_CFLAGS=-DDEBUG=1
 RLS_CFLAGS=-DNDEBUG=1
 
-DLL_CFLAGS=@DLL_CFLAGS@
-DLL_LDFLAGS=@DLL_LDFLAGS@
+EXE_LDFLAGS=@EXE_LDFLAGS@
 
 GLIB_CFLAGS=@GLIB_CFLAGS@
 GLIB_LIBS=@GLIB_LIBS@
@@ -136,7 +135,7 @@ $(BINDIR)/Debug/@PROGRAM_NAME@@EXEEXT@: $(foreach SRC, $(basename $(SOURCES)), $
 $(BINDIR)/Release/@PROGRAM_NAME@@EXEEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDIR)/Release/gtk2/$(SRC)@OBJEXT@)
 	@echo $@ ...
 	@mkdir -p `dirname $@`
-	@$(LD) -o $@ $^ $(LIB3270_LIBS) $(GNOME_LIBS) $(IGEMAC_LIBS) $(GLIB_LIBS) $(CAIRO_LIBS) $(GTK_LIBS)
+	@$(LD) $(EXE_LDFLAGS) -o $@ $^ $(LIB3270_LIBS) $(GNOME_LIBS) $(IGEMAC_LIBS) $(GLIB_LIBS) $(CAIRO_LIBS) $(GTK_LIBS)
 	@$(STRIP) $@
 
 $(BINDIR)/pot/$(MODULE_NAME).pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/$(MODULE_NAME)/$(SRC).pot)
