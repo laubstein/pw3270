@@ -194,10 +194,10 @@ Section /o "Software Development Kit" SecSDK
 	file "/oname=$INSTDIR\sdk\include\lib3270\api.h" "src\include\lib3270\api.h"
 	file "/oname=$INSTDIR\sdk\include\lib3270\config.h" "src\include\lib3270\config.h"
 	file "/oname=$INSTDIR\sdk\include\lib3270\plugins.h" "src\include\lib3270\plugins.h"
+	file "/oname=$INSTDIR\sdk\include\lib3270\macros.h" "src\include\lib3270\macros.h"
 
 	CreateDirectory "$INSTDIR\sdk\lib"
 	file "/oname=$INSTDIR\sdk\lib\lib3270.def" ".bin\Release\lib\lib3270.def"
-	file "/oname=$INSTDIR\sdk\lib\lib3270.a" ".bin\Release\lib\lib3270.a"
 
 SectionEnd
 
@@ -250,13 +250,13 @@ sectionEnd
 
 Function .onInit
 
-FindProcDLL::FindProc "@PROGRAM_NAME@.exe"
-IntCmp $R0 1 0 notRunning
-
-    MessageBox MB_OK|MB_ICONEXCLAMATION "@PROGRAM_NAME@ is running. Please close it first" /SD IDOK
-    Abort
-
-notRunning:
+#FindProcDLL::FindProc "@PROGRAM_NAME@.exe"
+#IntCmp $R0 1 0 notRunning
+#
+#    MessageBox MB_OK|MB_ICONEXCLAMATION "@PROGRAM_NAME@ is running. Please close it first" /SD IDOK
+#    Abort
+#
+#notRunning:
 
 IfFileExists $PROGRAMFILES\ooRexx\rexx.exe RexxOK RexxNOK
 
