@@ -30,6 +30,7 @@
  *
  */
 
+ #include <string.h>
  #include <stdio.h>
  #include <lib3270/api.h>
  #include <lib3270/macros.h>
