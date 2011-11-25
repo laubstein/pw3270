@@ -35,6 +35,7 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="Makefile.in" />
+		<Unit filename="bootstrap.sh" />
 		<Unit filename="configure.ac" />
 		<Unit filename="debian\control.in">
 			<Option target="Release" />
