@@ -29,7 +29,7 @@ if test -d ".svn" ; then
 				LCD=""
 			fi
 
-			if [ -z $LCD ]; then
+			if [ "$LCD" == "" ]; then
 				LCD=`date +%Y%m%d`
 			fi
 

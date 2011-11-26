@@ -61,7 +61,8 @@ SSL_CFLAGS=@SSL_CFLAGS@
 SSL_LIBS=@SSL_LIBS@
 
 SOCKET_LIBS=@SOCKET_LIBS@
-SDK_LDFLAGS="--output-def,$(basename $(@F)).def"
+SDK_LDFLAGS=
+#"--output-def,$(basename $(@F)).def"
 # -Wl,--warn-duplicate-exports,
 
 #---[ Sources ]----------------------------------------------------------------
