@@ -39,7 +39,9 @@
 
  static const LIB3270_MACRO_LIST macro_list[] =
  {
+ 	LIB3270_MACRO_ENTRY( connect	),
  	LIB3270_MACRO_ENTRY( cstate		),
+ 	LIB3270_MACRO_ENTRY( disconnect	),
  	LIB3270_MACRO_ENTRY( encoding	),
  	LIB3270_MACRO_ENTRY( enter		),
  	LIB3270_MACRO_ENTRY( get		),
@@ -242,7 +244,7 @@
 
  LIB3270_MACRO( luname )
  {
-	const char	* luname = get_connected_lu(0);
+	const char	* luname = get_connected_lu(hSession);
 	return strdup(luname ? luname : "none" );
  }
 
@@ -280,4 +282,37 @@
 	}
 	snprintf(ret,9,"%d",lib3270_enter());
 	return strdup(ret);
+ }
+
+ LIB3270_MACRO( connect )
+ {
+ 	int rc = EBUSY;
+ 	char ret[10];
+
+	switch(argc)
+	{
+	case 1:
+		rc = host_reconnect(0);
+		break;
+
+	case 2:
+		rc = host_connect(argv[1],0);
+		break;
+
+	case 3:
+		rc = host_connect(argv[1],atoi(argv[2]));
+		break;
+
+	default:
+		return NULL;
+	}
+
+	snprintf(ret,9,"%d",rc);
+	return strdup(ret);
+ }
+
+ LIB3270_MACRO( disconnect )
+ {
+	host_disconnect(hSession,0);
+	return strdup("0");
  }
