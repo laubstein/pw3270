@@ -65,14 +65,8 @@ Boolean			no_login_host = False;
 Boolean			non_tn3270e_host = False;
 Boolean			passthru_host = False;
 Boolean			ssl_host = False;
+Boolean			ever_3270 = False;
 
-//#define		LUNAME_SIZE	16
-//char		luname[LUNAME_SIZE+1];
-//char		*connected_lu = CN;
-//char		*connected_type = CN;
-Boolean		ever_3270 = False;
-
-// char           *current_host = CN;
 char           *full_current_host = CN;
 unsigned short  current_port;
 char	       *reconnect_host = CN;
@@ -83,9 +77,9 @@ static struct host *last_host = (struct host *)NULL;
 static Boolean auto_reconnect_inprogress = False;
 static int net_sock = -1;
 
-#if defined(X3270_DISPLAY) /*[*/
-static void save_recent(const char *);
-#endif
+// #if defined(X3270_DISPLAY)
+// static void save_recent(const char *);
+// #endif
 
 #if defined(X3270_DISPLAY) || defined(LIB3270)
 static void try_reconnect(H3270 *session);
@@ -194,12 +188,9 @@ hostfile_init(void)
 	}
 	Free(hostfile_name);
 
-#if defined(X3270_DISPLAY) /*[*/
-	/*
-	 * Read the recent-connection file, and prepend it to the hosts list.
-	 */
-	save_recent(CN);
-#endif /*]*/
+// #if defined(X3270_DISPLAY)
+// 	save_recent(CN);
+// #endif /*]*/
 }
 
 /*
@@ -531,10 +522,10 @@ static int do_connect(const char *n)
 	/* Remember this hostname, as the last hostname we connected to. */
 	Replace(reconnect_host, NewString(nb));
 
-#if defined(X3270_DISPLAY) /*[*/
-	/* Remember this hostname in the recent connection list and file. */
-	save_recent(nb);
-#endif /*]*/
+// #if defined(X3270_DISPLAY)
+// 	/* Remember this hostname in the recent connection list and file. */
+// 	save_recent(nb);
+// #endif
 
 #if defined(LOCAL_PROCESS) /*[*/
 	if ((localprocess_cmd = parse_localprocess(nb)) != CN) {
@@ -820,8 +811,8 @@ dump_array(const char *when, struct host **array, int nh)
 }
 #endif /*]*/
 
-#if defined(X3270_DISPLAY) /*[*/
-/* Save the most recent host in the recent host list. */
+/*
+#if defined(X3270_DISPLAY)
 static void
 save_recent(const char *hn)
 {
@@ -835,7 +826,7 @@ save_recent(const char *hn)
 	int i, j;
 	time_t t = time((time_t *)NULL);
 
-	/* Allocate a new entry. */
+	// Allocate a new entry.
 	if (hn != CN) {
 		h = (struct host *)Malloc(sizeof(*h));
 		h->name = NewString(hn);
@@ -847,22 +838,22 @@ save_recent(const char *hn)
 		h_array[nh++] = h;
 	}
 
-	/* Put the existing entries into the array. */
+	// Put the existing entries into the array.
 	for (h = hosts; h != (struct host *)NULL; h = h->next) {
 		if (h->entry_type != RECENT)
 			break;
 		h_array[nh++] = h;
 	}
 
-	/* Save the ibm_hosts entries for later. */
+	// Save the ibm_hosts entries for later.
 	rest = h;
 	if (rest != (struct host *)NULL)
 		rest->prev = (struct host *)NULL;
 
-	/*
-	 * Read the last-connection file, to capture the any changes made by
-	 * other instances of x3270.
-	 */
+	//
+	// Read the last-connection file, to capture the any changes made by
+	// other instances of x3270.
+	//
 	if (appres.connectfile_name != CN &&
 	    strcasecmp(appres.connectfile_name, "none")) {
 		lcf_name = do_subst(appres.connectfile_name, True, True);
@@ -876,7 +867,7 @@ save_recent(const char *hn)
 			time_t connect_time;
 			char *ptr;
 
-			/* Pick apart the entry. */
+			// Pick apart the entry.
 			sl = strlen(buf);
 			if (buf[sl - 1] == '\n')
 				buf[sl-- - 1] = '\0';
@@ -902,19 +893,19 @@ save_recent(const char *hn)
 		fclose(lcf);
 	}
 
-	/* Sort the array, in reverse order by connect time. */
-#if defined(CFDEBUG) /*[*/
+	// Sort the array, in reverse order by connect time.
+#if defined(CFDEBUG)
 	dump_array("before", h_array, nh);
-#endif /*]*/
+#endif
 	qsort(h_array, nh, sizeof(struct host *), host_compare);
-#if defined(CFDEBUG) /*[*/
+#if defined(CFDEBUG)
 	dump_array("after", h_array, nh);
-#endif /*]*/
+#endif
 
-	/*
-	 * Filter out duplicate host names, and limit the array to
-	 * MAX_RECENT entries total.
-	 */
+	//
+	// Filter out duplicate host names, and limit the array to
+	//MAX_RECENT entries total.
+	//
 	hosts = (struct host *)NULL;
 	last_host = (struct host *)NULL;
 	for (i = 0; i < nh; i++) {
@@ -930,15 +921,15 @@ save_recent(const char *hn)
 			hosts = h;
 		n_ent++;
 
-		/* Zap the duplicates. */
+		// Zap the duplicates.
 		for (j = i+1; j < nh; j++) {
 			if (h_array[j] &&
 			    (n_ent >= MAX_RECENT ||
 			     !strcmp(h_array[i]->name, h_array[j]->name))) {
-#if defined(CFDEBUG) /*[*/
+#if defined(CFDEBUG)
 				printf("%s is a dup of %s\n",
 				    h_array[j]->name, h_array[i]->name);
-#endif /*]*/
+#endif
 				Free(h_array[j]->name);
 				Free(h_array[j]->hostname);
 				Free(h_array[j]);
@@ -947,7 +938,7 @@ save_recent(const char *hn)
 		}
 	}
 
-	/* Re-attach the ibm_hosts entries to the end. */
+	// Re-attach the ibm_hosts entries to the end.
 	if (rest != (struct host *)NULL) {
 		if (last_host != (struct host *)NULL) {
 			last_host->next = rest;
@@ -957,7 +948,7 @@ save_recent(const char *hn)
 		rest->prev = last_host;
 	}
 
-	/* If there's been a change, rewrite the file. */
+	// If there's been a change, rewrite the file.
 	if (hn != CN &&
 	    appres.connectfile_name != CN &&
 	    strcasecmp(appres.connectfile_name, "none")) {
@@ -976,7 +967,8 @@ save_recent(const char *hn)
 	if (lcf_name != CN)
 		Free(lcf_name);
 }
-#endif /*]*/
+#endif
+*/
 
 /* Support for state change callbacks. */
 
