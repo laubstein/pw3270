@@ -229,6 +229,7 @@ install-gui:	$(PACKAGE_NAME).desktop
 
 	@desktop-file-install	--mode 644 \
 				--dir $(DESTDIR)/$(desktopdir) \
+				--add-category System \
 				--add-category TerminalEmulator \
 				$(PACKAGE_NAME).desktop
 
