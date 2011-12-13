@@ -76,7 +76,7 @@ static gchar		* log_filename		= NULL;
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
 /* Callback for connection state changes. */
-static void connect_main(int status)
+static void connect_main(H3270 *session, int status)
 {
 	gboolean online = (CONNECTED) ? TRUE : FALSE;
 
@@ -129,7 +129,7 @@ static void connect_main(int status)
 
 }
 
-static void connect_in3270(int status)
+static void connect_in3270(H3270 *session, int status)
 {
 #ifdef X3270_FT
 	action_group_set_sensitive(ACTION_GROUP_FT,status);
@@ -290,17 +290,17 @@ static int program_init(void)
 		g_free(ptr);
 	}
 
-	Trace("%s","Opening configuration file");
+//	Trace("%s","Opening configuration file");
 	if(Register3270IOCallbacks(&program_io_callbacks))
 		return show_lib3270_register_error(_( "Can't register as I/O manager." ));
 
-	Trace("%s","Setting screen callbacks");
+//	Trace("%s","Setting screen callbacks");
 	if(Register3270ScreenCallbacks(&program_screen_callbacks))
 		return show_lib3270_register_error(_( "Can't register as screen manager." ));
 
 
 #ifdef X3270_FT
-	Trace("%s","Starting FT feature");
+//	Trace("%s","Starting FT feature");
 	if(initft())
 		return show_lib3270_register_error(_( "Can't register as file-transfer manager." ));
 #endif
@@ -585,7 +585,7 @@ int main(int argc, char *argv[])
 	LoadPlugins();
 
 	Trace("Initializing library with %s...",argv[0]);
-	hSession = new_3270_session();
+	hSession = new_3270_session(GetString("Terminal","Model",""));
 
 	if(rc)
 	{
@@ -622,8 +622,8 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	connect_main(0);
-	connect_in3270(0);
+	connect_main(hSession,0);
+	connect_in3270(hSession,0);
 
 	register_schange(ST_CONNECT, connect_main);
 	register_schange(ST_3270_MODE, connect_in3270);

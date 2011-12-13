@@ -446,7 +446,7 @@
 
 		LIB3270_EXPORT int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
 
-		LIB3270_EXPORT H3270 * new_3270_session(void);
+		LIB3270_EXPORT H3270 * new_3270_session(const char *model);
 
 		LIB3270_EXPORT const struct lib3270_option * get_3270_option_table(int sz);
 
@@ -531,7 +531,7 @@
 		LIB3270_EXPORT int host_connect(const char *n, int wait);
 		LIB3270_EXPORT int host_reconnect(int wait);
 		LIB3270_EXPORT void host_disconnect(H3270 *h, int disable);
-		LIB3270_EXPORT void register_schange(LIB3270_STATE_CHANGE tx, void (*func)(int));
+		LIB3270_EXPORT void register_schange(LIB3270_STATE_CHANGE tx, void (*func)(H3270 *, int));
 
 		/* Console/Trace window */
 		LIB3270_EXPORT HCONSOLE	  console_window_new(const char *title, const char *label);

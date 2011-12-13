@@ -32,6 +32,7 @@
 
  #include <lib3270/config.h>
  #include <gdk/gdk.h>
+ #include <stdlib.h>
 
  #include "gui.h"
  #include "fonts.h"
@@ -755,7 +756,7 @@
 	gtk_action_group_set_sensitive(action_group[id],status);
  }
 
- static void set_ft_action_state(int state)
+ static void set_ft_action_state(H3270 *session,int state)
  {
 	gtk_action_group_set_sensitive(action_group[ACTION_GROUP_FT],state);
  }
@@ -789,7 +790,7 @@
 		action_by_id[f] = dunno;
 
 #ifdef 	X3270_FT
-	set_ft_action_state(0);
+	set_ft_action_state(hSession,0);
 	register_schange(ST_3270_MODE, set_ft_action_state);
 #else
 	gtk_action_group_set_sensitive(ft_actions,FALSE);

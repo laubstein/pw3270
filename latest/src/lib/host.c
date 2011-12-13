@@ -972,22 +972,26 @@ save_recent(const char *hn)
 
 /* Support for state change callbacks. */
 
-struct st_callback {
-	struct st_callback *next;
-	void (*func)(int);
+struct st_callback
+{
+	struct st_callback	* next;					/**< Next callback in chain */
+	H3270				* session;				/**< Session owning this callback */
+	void 				  (*func)(H3270 *,int);	/**< Callback method */
 };
 static struct st_callback *st_callbacks[N_ST];
 static struct st_callback *st_last[N_ST];
 
 /* Register a function interested in a state change. */
 void
-register_schange(LIB3270_STATE_CHANGE tx, void (*func)(int))
+register_schange(LIB3270_STATE_CHANGE tx, void (*func)(H3270 *, int))
 {
 	struct st_callback *st;
 
 	st = (struct st_callback *)Malloc(sizeof(*st));
-	st->func = func;
-	st->next = (struct st_callback *)NULL;
+
+	st->func	= func;
+	st->next	= (struct st_callback *)NULL;
+
 	if (st_last[tx] != (struct st_callback *)NULL)
 		st_last[tx]->next = st;
 	else
@@ -1001,10 +1005,9 @@ st_changed(int tx, int mode)
 {
 	struct st_callback *st;
 
-	for (st = st_callbacks[tx];
-	     st != (struct st_callback *)NULL;
-	     st = st->next) {
-		(*st->func)(mode);
+	for (st = st_callbacks[tx];st != (struct st_callback *)NULL;st = st->next)
+	{
+		(*st->func)(&h3270,mode);
 	}
 }
 

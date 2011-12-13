@@ -40,7 +40,7 @@ LIB3270_INTERNAL void ctlr_erase_all_unprotected(void);
 LIB3270_INTERNAL void ctlr_init(unsigned cmask);
 LIB3270_INTERNAL void ctlr_read_buffer(unsigned char aid_byte);
 LIB3270_INTERNAL void ctlr_read_modified(unsigned char aid_byte, Boolean all);
-LIB3270_INTERNAL void ctlr_reinit(unsigned cmask);
+LIB3270_INTERNAL void ctlr_reinit(H3270 *session, unsigned cmask);
 LIB3270_INTERNAL void ctlr_scroll(void);
 LIB3270_INTERNAL void ctlr_shrink(void);
 LIB3270_INTERNAL void ctlr_snap_buffer(void);

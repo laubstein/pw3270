@@ -72,11 +72,8 @@ extern unsigned char aid;
 
 /* Globals */
 int				ROWS, COLS;
-// int				ov_rows, ov_cols;
-
 int				maxROWS		= 0;
 int				maxCOLS		= 0;
-// int				model_num	= -1;
 
 int				cursor_addr, buffer_addr;
 Boolean         screen_alt = False;	/* alternate screen? */
@@ -102,8 +99,8 @@ static unsigned char default_bg;
 static unsigned char default_gr;
 static unsigned char default_cs;
 static unsigned char default_ic;
-static void	ctlr_half_connect(int ignored);
-static void	ctlr_connect(int ignored);
+static void	ctlr_half_connect(H3270 *session, int ignored);
+static void	ctlr_connect(H3270 *session, int ignored);
 static int	sscp_start;
 static void ticking_stop(void);
 static void ctlr_add_ic(int baddr, unsigned char ic);
@@ -130,20 +127,6 @@ static unsigned char	code_table[64] = {
 #define ALL_CHANGED	if(IN_ANSI) changed(&h3270,0,ROWS*COLS);
 #define REGION_CHANGED(f, l) if(IN_ANSI) changed(&h3270,f,l)
 #define ONE_CHANGED(n)	if(IN_ANSI) changed(&h3270,n,n+1);
-
-/*
-#define ALL_CHANGED	{ \
-	screen_changed(0,ROWS*COLS); \
-	if (IN_ANSI) { first_changed = 0; last_changed = ROWS*COLS; } }
-
-#define REGION_CHANGED(f, l)	{ \
-	screen_changed(f,l); \
-	if (IN_ANSI) { \
-	    if (first_changed == -1 || f < first_changed) first_changed = f; \
-	    if (last_changed == -1 || l > last_changed) last_changed = l; } }
-
-#define ONE_CHANGED(n)	REGION_CHANGED(n, n+1)
-*/
 
 #define DECODE_BADDR(c1, c2) \
 	((((c1) & 0xC0) == 0x00) ? \
@@ -175,8 +158,7 @@ ctlr_init(unsigned cmask unused)
 /*
  * Reinitialize the emulated 3270 hardware.
  */
-void
-ctlr_reinit(unsigned cmask)
+void ctlr_reinit(H3270 *session, unsigned cmask)
 {
 	static struct ea *real_ea_buf = NULL;
 	static struct ea *real_aea_buf = NULL;
@@ -222,7 +204,7 @@ int	set_3270_model(H3270 *session, int model)
 		return EBUSY;
 
 	ctlr_set_rows_cols(session,model,session->ov_cols,session->ov_rows);
-	ctlr_reinit(MODEL_CHANGE);
+	ctlr_reinit(session,MODEL_CHANGE);
 	return 0;
 }
 
@@ -300,7 +282,7 @@ set_formatted(void)
  * Called when a host is half connected.
  */
 static void
-ctlr_half_connect(int ignored unused)
+ctlr_half_connect(H3270 *session, int ignored unused)
 {
 	ticking_start(True);
 }
@@ -310,7 +292,7 @@ ctlr_half_connect(int ignored unused)
  * Called when a host connects, disconnects, or changes ANSI/3270 modes.
  */
 static void
-ctlr_connect(int ignored unused)
+ctlr_connect(H3270 *session, int ignored unused)
 {
 	ticking_stop();
 	status_untiming();

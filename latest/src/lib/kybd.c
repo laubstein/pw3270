@@ -405,7 +405,7 @@ kybd_inhibit(Boolean inhibit)
  * Called when a host connects or disconnects.
  */
 static void
-kybd_connect(int connected)
+kybd_connect(H3270 *session, int connected)
 {
 	if (kybdlock & KL_DEFERRED_UNLOCK)
 		RemoveTimeOut(unlock_id);
@@ -424,7 +424,7 @@ kybd_connect(int connected)
  * Called when we switch between 3270 and ANSI modes.
  */
 static void
-kybd_in3270(int in3270 unused)
+kybd_in3270(H3270 *session, int in3270 unused)
 {
 	if (kybdlock & KL_DEFERRED_UNLOCK)
 		RemoveTimeOut(unlock_id);

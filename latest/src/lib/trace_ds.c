@@ -419,7 +419,7 @@ create_tracefile_header(const char *mode)
 	wtrace("Trace %s %s", mode, ctime(&clk));
 	wtrace(" Version: %s\n", build);
 	save_yourself();
-	wtrace(" Command: %s\n", command_string);
+//	wtrace(" Command: %s\n", command_string);
 	wtrace(" Model %s", h3270.model_name);
 	wtrace(", %s display", appres.mono ? "monochrome" : "color");
 	if (appres.extended)

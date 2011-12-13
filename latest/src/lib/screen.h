@@ -20,6 +20,6 @@ LIB3270_INTERNAL Boolean screen_has_changes;
 
 LIB3270_INTERNAL void screen_update(H3270 *session, int bstart, int bend);
 
-LIB3270_INTERNAL void status_connecting(Boolean on);
-LIB3270_INTERNAL void status_resolving(Boolean on);
+LIB3270_INTERNAL void status_connecting(H3270 *session, Boolean on);
+LIB3270_INTERNAL void status_resolving(H3270 *session, Boolean on);
 

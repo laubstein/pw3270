@@ -57,7 +57,7 @@
 	if(hSession)
 		return RetValue(Retstr,EBUSY);
 
-	hSession = new_3270_session();
+	hSession = new_3270_session("");
 
 	if(!hSession)
 		return RetValue(Retstr,-1);
