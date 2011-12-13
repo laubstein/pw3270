@@ -100,7 +100,7 @@ int lib3270_jni_init(void)
 	Trace("Running %s on %s %s %s (pid: %d)",__FUNCTION__,__FILE__,__DATE__,__TIME__,getpid());
 #endif
 
-	hSession = new_3270_session();
+	hSession = new_3270_session("");
     Trace("%s ends",__FUNCTION__);
 	return 0;
 }

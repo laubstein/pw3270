@@ -821,6 +821,7 @@
 	if(gtk_check_menu_item_get_active(item))
 	{
 		Trace("Screen size set to %d",id);
+		SetInt("Terminal","Model",id);
 		set_3270_model(hSession,id);
 	}
  }

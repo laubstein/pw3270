@@ -516,14 +516,14 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 		haddr.sin.sin_port = passthru_port;
 		ha_len = sizeof(struct sockaddr_in);
 	} else if (proxy_type > 0) {
-			status_resolving(1);
+			status_resolving(&h3270,1);
 	    	if (resolve_host_and_port(proxy_host, proxy_portname,
 			    &proxy_port, &haddr.sa, &ha_len, errmsg,
 			    sizeof(errmsg)) < 0) {
 		    	popup_an_error(errmsg);
-				status_resolving(0);
+				status_resolving(&h3270,0);
 		    	return -1;
-			status_resolving(0);
+			status_resolving(&h3270,0);
 		}
 	} else {
 #if defined(LOCAL_PROCESS) /*[*/
@@ -534,14 +534,14 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 #if defined(LOCAL_PROCESS) /*[*/
 			local_process = False;
 #endif /*]*/
-			status_resolving(1);
+			status_resolving(&h3270,1);
 			if (resolve_host_and_port(host, portname,
 				    &h3270.current_port, &haddr.sa, &ha_len,
 				    errmsg, sizeof(errmsg)) < 0) {
 			    	popup_an_error(errmsg);
-					status_resolving(0);
+					status_resolving(&h3270,0);
 			    	return -1;
-			status_resolving(0);
+			status_resolving(&h3270,0);
 			}
 #if defined(LOCAL_PROCESS) /*[*/
 		}
@@ -637,7 +637,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 #endif /*]*/
 
 		/* connect */
-		status_connecting(1);
+		status_connecting(&h3270,1);
 		if (connect(h3270.sock, &haddr.sa, ha_len) == -1) {
 			if (socket_errno() == SE_EWOULDBLOCK
 #if defined(SE_EINPROGRESS) /*[*/

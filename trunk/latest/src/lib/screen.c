@@ -89,12 +89,12 @@ enum ts { TS_AUTO, TS_ON, TS_OFF };
 
 // int windows_cp = 0;
 
-static void status_connect(int ignored);
-static void status_3270_mode(int ignored);
-static void status_printer(int on);
+static void status_connect(H3270 *session, int ignored);
+static void status_3270_mode(H3270 *session, int ignored);
+static void status_printer(H3270 *session, int on);
 static int color_from_fa(unsigned char fa);
 // static Boolean ts_value(const char *s, enum ts *tsp);
-static void relabel(int ignored);
+static void relabel(H3270 *session, int ignored);
 
 void set_display_charset(char *dcs)
 {
@@ -114,7 +114,7 @@ static void addch(int row, int col, int c, int attr)
  * @return 0 if ok, non zero if not
  *
  */
-int screen_init(void)
+int screen_init(H3270 *session)
 {
 
 	/* Initialize the console. */
@@ -148,7 +148,7 @@ int screen_init(void)
 
 	/* Set up the controller. */
 	ctlr_init(-1);
-	ctlr_reinit(-1);
+	ctlr_reinit(session,-1);
 
 	/* Set the window label. */
 #if defined(WC3270) /*[*/
@@ -603,7 +603,7 @@ status_oerr(int error_type)
 
 }
 
-void status_resolving(Boolean on)
+void status_resolving(H3270 *session, Boolean on)
 {
 	if(callbacks && callbacks->cursor)
 			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
@@ -611,7 +611,7 @@ void status_resolving(Boolean on)
 	status_changed(on ? STATUS_CODE_RESOLVING : STATUS_CODE_BLANK);
 }
 
-void status_connecting(Boolean on)
+void status_connecting(H3270 *session, Boolean on)
 {
 	if(callbacks && callbacks->cursor)
 			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
@@ -699,7 +699,7 @@ void status_lu(const char *lu)
 		callbacks->lu(lu);
 }
 
-static void status_connect(int connected)
+static void status_connect(H3270 *session, int connected)
 {
 	STATUS_CODE id = STATUS_CODE_USER;
 
@@ -727,7 +727,7 @@ static void status_connect(int connected)
 
 }
 
-static void status_3270_mode(int ignored unused)
+static void status_3270_mode(H3270 *session, int ignored unused)
 {
 	Boolean oia_boxsolid = (IN_3270 && !IN_SSCP);
 	if(oia_boxsolid)
@@ -736,7 +736,7 @@ static void status_3270_mode(int ignored unused)
 
 }
 
-static void status_printer(int on)
+static void status_printer(H3270 *session, int on)
 {
 	set(OIA_FLAG_PRINTER,on);
 }
@@ -802,7 +802,7 @@ screen_title(char *text)
 }
 
 static void
-relabel(int ignored unused)
+relabel(H3270 *session, int ignored unused)
 {
 #if defined(WC3270) /*[*/
 	if (appres.title != CN)

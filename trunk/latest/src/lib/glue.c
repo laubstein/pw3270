@@ -100,20 +100,19 @@
 
  #define LAST_ARG	"--"
 
-/* Statics */
-static int parse_model_number(char *m);
+/*---[ Statics ]--------------------------------------------------------------------------------------------------------------*/
 
-/* Globals */
-H3270			h3270;
-const char		*programname;
-// char			full_model_name[FULL_MODEL_NAME_SIZE] = "IBM-";
-//char			*model_name = &full_model_name[4];
-AppRes			appres;
-int				children = 0;
-Boolean			exiting = False;
-char			*command_string = CN;
-static Boolean	sfont = False;
-Boolean			*standard_font = &sfont;
+ static int parse_model_number(const char *m);
+
+/*---[ Globals ]--------------------------------------------------------------------------------------------------------------*/
+ H3270				  h3270;
+ const char		* programname;
+ AppRes				  appres;
+ int				  children = 0;
+ Boolean			  exiting = False;
+// char				* command_string = CN;
+ static Boolean	  sfont = False;
+ Boolean			* standard_font = &sfont;
 
 #if defined(WC3270) || defined(LIB3270)/*[*/
 char			*profile_name = CN;
@@ -150,10 +149,12 @@ const char *toggle_names[N_TOGGLES] =
  * This function will create and initialize a new 3270 session, but, now
  * it just returns a static 3270 session structure.
  *
+ * @param model	Terminal model (Can be overrided by command-line options
+ *
  * @return lib3270 internal session structure.
  *
  */
-H3270 * new_3270_session(void)
+H3270 * new_3270_session(const char *model)
 {
 	static int configured = 0;
 
@@ -198,12 +199,17 @@ H3270 * new_3270_session(void)
 	/*
 	 * Sort out model and color modes, based on the model number resource.
 	 */
+	if(*appres.model)
+		model = appres.model;
 
-	Trace("Parsing model: %s",appres.model);
-	model_number = parse_model_number(appres.model);
+	if(!*model)
+		model = "2";	// No model, use the default one
+
+//	Trace("Parsing model: %s",appres.model);
+	model_number = parse_model_number(model);
 	if (model_number < 0)
 	{
-		popup_an_error("Invalid model number: %s", appres.model);
+		popup_an_error("Invalid model number: %s", model);
 		model_number = 0;
 	}
 
@@ -254,7 +260,7 @@ H3270 * new_3270_session(void)
 		(void) charset_init(CN);
 	}
 
-	if(screen_init())
+	if(screen_init(hSession))
 		return NULL;
 
 	kybd_init();
@@ -325,7 +331,7 @@ static void initialize(void)
 	appres.compose_map = "latin1";
 #endif /*]*/
 
-	appres.model = "2";
+	appres.model = "";
 	appres.hostsfile = CN;
 	appres.port = "telnet";
 
@@ -515,8 +521,7 @@ const struct lib3270_option * get_3270_option_table(int sz)
  * Parse the model number.
  * Returns -1 (error), 0 (default), or the specified number.
  */
-static int
-parse_model_number(char *m)
+static int parse_model_number(const char *m)
 {
 	int sl;
 	int n;
@@ -645,7 +650,7 @@ static struct {
 #endif /*]*/
 	{ ResLoginMacro,offset(login_macro),	XRM_STRING },
 	{ ResM3279,	offset(m3279),		XRM_BOOLEAN },
-	{ ResModel,	offset(model),		XRM_STRING },
+//	{ ResModel,	offset(model),		XRM_STRING },
 	{ ResModifiedSel, offset(modified_sel),	XRM_BOOLEAN },
 #if defined(C3270) && !defined(_WIN32) /*[*/
 	{ ResMono,	offset(mono),		XRM_BOOLEAN },
