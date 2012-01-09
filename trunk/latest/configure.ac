@@ -239,7 +239,7 @@ AC_ARG_ENABLE([macui],
 [
 	app_cv_macui="$enableval"
 ],[
-	app_cv_macui="no" 
+	app_cv_macui="no"
 ])
 
 AC_ARG_ENABLE([rexx],
@@ -438,6 +438,9 @@ fi
 if test "$app_cv_ssl" == "yes"; then
 	PKG_CHECK_MODULES( [SSL], [libssl],AC_DEFINE(HAVE_SSL),AC_MSG_NOTICE([libssl not present.]) )
 fi
+
+# Check for libm
+AC_SEARCH_LIBS(sin,m)
 
 #--[ Process options ]----------------------------------------------------------------------------------------------------------------------------------------
 
