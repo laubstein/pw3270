@@ -705,7 +705,7 @@
 
 	// For some reason the smallest size of "xos4 terminus bold" isn't drawing with the exact size;
 	// that's the reason why I'm reserving a bigger space for this element
- 	r->width = (terminal_font_info.width*8)+(terminal_font_info.width/2);
+ 	r->width = (terminal_font_info.width*9)+(terminal_font_info.width/2);
  	r->x = width - r->width;
 
 	oia_clear_rect(cr,r);
@@ -720,7 +720,7 @@
 		cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_CURSOR);
 		cairo_text_extents(cr,text,&s);
 
-		cairo_move_to(cr,width-s.width,r->y+fontAscent);
+		cairo_move_to(cr,width-(s.width+2),r->y+fontAscent);
 		cairo_show_text(cr,text);
 
 		g_free(text);
