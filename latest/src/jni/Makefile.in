@@ -96,12 +96,12 @@ $(OBJRLS)/%@OBJEXT@: %.c
 %.class: %.java
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(JAVAC) -cp bin/java -sourcepath `dirname $^` -d `dirname $@` $^
+	@$(JAVAC) -encoding utf-8 -cp bin/java -sourcepath `dirname $^` -d `dirname $@` $^
 
 $(BINDIR)/java/$(PACKAGE)/%.class: %.java
 	@echo $< ...
 	@mkdir -p `dirname $@`
-	@$(JAVAC) -cp $(BINDIR)/java -sourcepath $(PWD) -d $(BINDIR)/java $^
+	@$(JAVAC) -encoding utf-8 -cp $(BINDIR)/java -sourcepath $(PWD) -d $(BINDIR)/java $^
 
 lib3270_jni.h: $(BINDIR)/java/$(PACKAGE)/terminal.class
 	@echo $< ...

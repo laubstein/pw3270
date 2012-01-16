@@ -298,7 +298,7 @@ esac
 
 # Check for JDK_HOME
 if test "_$JDK_HOME" = "_" ; then
-	AC_CHECK_FILE("/usr/lib/jvm/java-6-sun/bin/javac",JDK_HOME="/usr/lib/jvm/java-6-sun",)
+	AC_CHECK_FILE("/usr/java/default/bin/javac",JDK_HOME="/usr/java/default",)
 fi
 
 if test "_$JDK_HOME" = "_" ; then
