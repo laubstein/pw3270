@@ -306,10 +306,10 @@ void screen_erase(H3270 *session)
 	screen_update(session,0,ROWS*cCOLS);
 }
 
-LIB3270_EXPORT void get_3270_terminal_size(H3270 *h, int *rows, int *cols)
+LIB3270_EXPORT void lib3270_get_screen_size(H3270 *h, int *r, int *c)
 {
-	*rows = ROWS;
-	*cols = cCOLS;
+	*r = ROWS;
+	*c = cCOLS;
 }
 
 void update_model_info(H3270 *session, int model, int cols, int rows)

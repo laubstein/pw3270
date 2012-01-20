@@ -34,5 +34,19 @@
 
 	#include <lib3270/api.h>
 
+	/**
+	 * Get current screen size.
+	 *
+	 * Get the size of the terminal in rows/cols; this value can differ from
+	 * the model if there's an active "altscreen" with diferent size.
+	 *
+	 * @param h	Handle of the desired session.
+	 * @param r Pointer to screen rows.
+	 * @param c Pointer to screen columns.
+	 *
+	 */
+	LIB3270_EXPORT void lib3270_get_screen_size(H3270 *h, int *r, int *c);
+
+
 #endif // LIB3270_H_INCLUDED
 

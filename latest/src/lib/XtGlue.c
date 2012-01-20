@@ -49,7 +49,7 @@
 #include <sys/types.h>
 #include <errno.h>
 
-#include <lib3270/api.h>
+#include <lib3270.h>
 
 #if defined(_WIN32) /*[*/
 
