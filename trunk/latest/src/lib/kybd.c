@@ -404,8 +404,7 @@ kybd_inhibit(Boolean inhibit)
 /*
  * Called when a host connects or disconnects.
  */
-static void
-kybd_connect(H3270 *session, int connected)
+static void kybd_connect(H3270 *session, int connected, void *dunno)
 {
 	if (kybdlock & KL_DEFERRED_UNLOCK)
 		RemoveTimeOut(unlock_id);
@@ -424,7 +423,7 @@ kybd_connect(H3270 *session, int connected)
  * Called when we switch between 3270 and ANSI modes.
  */
 static void
-kybd_in3270(H3270 *session, int in3270 unused)
+kybd_in3270(H3270 *session, int in3270 unused, void *dunno)
 {
 	if (kybdlock & KL_DEFERRED_UNLOCK)
 		RemoveTimeOut(unlock_id);
@@ -438,8 +437,7 @@ kybd_in3270(H3270 *session, int in3270 unused)
 /*
  * Called to initialize the keyboard logic.
  */
-void
-kybd_init(void)
+void kybd_init(void)
 {
 	/* Register interest in connect and disconnect events. */
 	register_schange(ST_CONNECT, kybd_connect);

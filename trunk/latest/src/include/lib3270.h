@@ -47,6 +47,30 @@
 	 */
 	LIB3270_EXPORT void lib3270_get_screen_size(H3270 *h, int *r, int *c);
 
+	/**
+	 * Start a new session (INCOMPLETE).
+	 *
+	 * Initialize session structure, opens a new session.
+	 * WARNING: Multi session ins't yet supported in lib3270, because of this
+	 * this call always return the handle of the same session.
+	 *
+	 * @param model	Terminal model.
+	 *
+	 * @return lib3270 internal session structure.
+	 *
+	 */
+	LIB3270_EXPORT H3270 * lib3270_session_new(const char *model);
+
+	/**
+	 * Register a state change callback
+	 *
+	 * @param h		Session handle.
+	 * @param tx	State ID
+	 * @param func	Callback
+	 * @param data	Data
+	 *
+	 */
+	LIB3270_EXPORT void lib3270_register_schange(H3270 *h,LIB3270_STATE_CHANGE tx, void (*func)(H3270 *, int, void *),void *data);
+
 
 #endif // LIB3270_H_INCLUDED
-

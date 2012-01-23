@@ -76,7 +76,7 @@ static gchar		* log_filename		= NULL;
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
 /* Callback for connection state changes. */
-static void connect_main(H3270 *session, int status)
+static void connect_main(H3270 *session, int status, void *dunno)
 {
 	gboolean online = (CONNECTED) ? TRUE : FALSE;
 
@@ -129,7 +129,7 @@ static void connect_main(H3270 *session, int status)
 
 }
 
-static void connect_in3270(H3270 *session, int status)
+static void connect_in3270(H3270 *session, int status, void *dunno)
 {
 #ifdef X3270_FT
 	action_group_set_sensitive(ACTION_GROUP_FT,status);
@@ -622,8 +622,8 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	connect_main(hSession,0);
-	connect_in3270(hSession,0);
+	connect_main(hSession,0,NULL);
+	connect_in3270(hSession,0,NULL);
 
 	register_schange(ST_CONNECT, connect_main);
 	register_schange(ST_3270_MODE, connect_in3270);

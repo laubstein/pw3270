@@ -143,18 +143,7 @@ const char *toggle_names[N_TOGGLES] =
 	"SmartPaste"
 };
 
-/**
- * Create a new 3270 object (INCOMPLETE).
- *
- * This function will create and initialize a new 3270 session, but, now
- * it just returns a static 3270 session structure.
- *
- * @param model	Terminal model (Can be overrided by command-line options
- *
- * @return lib3270 internal session structure.
- *
- */
-H3270 * new_3270_session(const char *model)
+H3270 * lib3270_session_new(const char *model)
 {
 	static int configured = 0;
 

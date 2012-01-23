@@ -89,12 +89,12 @@ enum ts { TS_AUTO, TS_ON, TS_OFF };
 
 // int windows_cp = 0;
 
-static void status_connect(H3270 *session, int ignored);
-static void status_3270_mode(H3270 *session, int ignored);
-static void status_printer(H3270 *session, int on);
+static void status_connect(H3270 *session, int ignored, void *dunno);
+static void status_3270_mode(H3270 *session, int ignored, void *dunno);
+static void status_printer(H3270 *session, int on, void *dunno);
 static int color_from_fa(unsigned char fa);
 // static Boolean ts_value(const char *s, enum ts *tsp);
-static void relabel(H3270 *session, int ignored);
+static void relabel(H3270 *session, int ignored, void *dunno);
 
 void set_display_charset(char *dcs)
 {
@@ -699,7 +699,7 @@ void status_lu(const char *lu)
 		callbacks->lu(lu);
 }
 
-static void status_connect(H3270 *session, int connected)
+static void status_connect(H3270 *session, int connected, void *dunno)
 {
 	STATUS_CODE id = STATUS_CODE_USER;
 
@@ -727,7 +727,7 @@ static void status_connect(H3270 *session, int connected)
 
 }
 
-static void status_3270_mode(H3270 *session, int ignored unused)
+static void status_3270_mode(H3270 *session, int ignored unused, void *dunno)
 {
 	Boolean oia_boxsolid = (IN_3270 && !IN_SSCP);
 	if(oia_boxsolid)
@@ -736,7 +736,7 @@ static void status_3270_mode(H3270 *session, int ignored unused)
 
 }
 
-static void status_printer(H3270 *session, int on)
+static void status_printer(H3270 *session, int on, void *dunno)
 {
 	set(OIA_FLAG_PRINTER,on);
 }
@@ -802,7 +802,7 @@ screen_title(char *text)
 }
 
 static void
-relabel(H3270 *session, int ignored unused)
+relabel(H3270 *session, int ignored unused, void *dunno)
 {
 #if defined(WC3270) /*[*/
 	if (appres.title != CN)

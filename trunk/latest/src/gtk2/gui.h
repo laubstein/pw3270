@@ -54,7 +54,7 @@
 		#define HAVE_DOCK 1
 	#endif
 
-	#include <lib3270/api.h>
+	#include <lib3270.h>
 	#include <lib3270/toggle.h>
 
  	#define CURSOR_MODE_3270 (CURSOR_MODE_USER+9)
@@ -244,7 +244,7 @@
 	{
 		POPUP_MENU_DEFAULT,
 		POPUP_MENU_SELECTION,
-		
+
 		POPUP_MENU_COUNT
 	};
 
