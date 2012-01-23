@@ -71,9 +71,9 @@
 extern unsigned char aid;
 
 /* Globals */
-int				ROWS, COLS;
-int				maxROWS		= 0;
-int				maxCOLS		= 0;
+// int				ROWS, COLS;
+//int				maxROWS		= 0;
+//int				maxCOLS		= 0;
 
 int				cursor_addr, buffer_addr;
 Boolean         screen_alt = False;	/* alternate screen? */
@@ -124,7 +124,7 @@ static unsigned char	code_table[64] = {
 #define IsBlank(c)	((c == EBC_null) || (c == EBC_space))
 
 
-#define ALL_CHANGED	if(IN_ANSI) changed(&h3270,0,ROWS*COLS);
+#define ALL_CHANGED	if(IN_ANSI) changed(&h3270,0,h3270.rows*h3270.cols);
 #define REGION_CHANGED(f, l) if(IN_ANSI) changed(&h3270,f,l)
 #define ONE_CHANGED(n)	if(IN_ANSI) changed(&h3270,n,n+1);
 
@@ -167,16 +167,13 @@ void ctlr_reinit(H3270 *session, unsigned cmask)
 		/* Allocate buffers */
 		if (real_ea_buf)
 			Free((char *)real_ea_buf);
-		real_ea_buf = (struct ea *)Calloc(sizeof(struct ea),
-					     (maxROWS * maxCOLS) + 1);
+		real_ea_buf = (struct ea *)Calloc(sizeof(struct ea),(session->maxROWS * session->maxCOLS) + 1);
 		ea_buf = real_ea_buf + 1;
 		if (real_aea_buf)
 			Free((char *)real_aea_buf);
-		real_aea_buf = (struct ea *)Calloc(sizeof(struct ea),
-					      (maxROWS * maxCOLS) + 1);
+		real_aea_buf = (struct ea *)Calloc(sizeof(struct ea),(session->maxROWS * session->maxCOLS) + 1);
 		aea_buf = real_aea_buf + 1;
-		Replace(zero_buf, (unsigned char *)Calloc(sizeof(struct ea),
-							  maxROWS * maxCOLS));
+		Replace(zero_buf, (unsigned char *)Calloc(sizeof(struct ea),session->maxROWS * session->maxCOLS));
 		cursor_addr = 0;
 		buffer_addr = 0;
 	}
@@ -242,17 +239,17 @@ void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr)
 			popup_an_error("Invalid %s %dx%d:\nNegative or zero",ResOversize, ovc, ovr);
 		else if (ovc * ovr >= 0x4000)
 			popup_an_error("Invalid %s %dx%d:\nToo big",ResOversize, ovc, ovr);
-		else if (ovc > 0 && ovc < maxCOLS)
-			popup_an_error("Invalid %s cols (%d):\nLess than model %d cols (%d)",ResOversize, ovc, session->model_num, maxCOLS);
-		else if (ovr > 0 && ovr < maxROWS)
-			popup_an_error("Invalid %s rows (%d):\nLess than model %d rows (%d)",ResOversize, ovr, session->model_num, maxROWS);
+		else if (ovc > 0 && ovc < session->maxCOLS)
+			popup_an_error("Invalid %s cols (%d):\nLess than model %d cols (%d)",ResOversize, ovc, session->model_num, session->maxCOLS);
+		else if (ovr > 0 && ovr < session->maxROWS)
+			popup_an_error("Invalid %s rows (%d):\nLess than model %d rows (%d)",ResOversize, ovr, session->model_num, session->maxROWS);
 		else
 			update_model_info(session,mn,session->ov_cols = ovc,session->ov_rows = ovr);
 	}
 
 	// Make sure that the current rows/cols are still 24x80.
-	COLS = 80;
-	ROWS = 24;
+	session->cols = 80;
+	session->rows = 24;
 	screen_alt = False;
 
 }
@@ -462,10 +459,10 @@ ctlr_erase(int alt)
 	if (alt) {
 		/* Going from 24x80 to maximum. */
 		screen_disp(&h3270);
-		set_viewsize(&h3270,maxROWS,maxCOLS);
+		set_viewsize(&h3270,h3270.maxROWS,h3270.maxCOLS);
 	} else {
 		/* Going from maximum to 24x80. */
-		if (maxROWS > 24 || maxCOLS > 80) {
+		if (h3270.maxROWS > 24 || h3270.maxCOLS > 80) {
 			if (visible_control) {
 				ctlr_blanks();
 				screen_disp(&h3270);
@@ -704,7 +701,7 @@ ctlr_read_modified(unsigned char aid_byte, Boolean all)
 				space3270out(3);
 				*obptr++ = ORDER_SBA;
 				ENCODE_BADDR(obptr, baddr);
-				trace_ds(" SetBufferAddress%s (Cols: %d Rows: %d)", rcba(baddr), COLS, ROWS);
+				trace_ds(" SetBufferAddress%s (Cols: %d Rows: %d)", rcba(baddr), h3270.cols, h3270.rows);
 				while (!ea_buf[baddr].fa) {
 
 					if (send_data &&
@@ -1239,7 +1236,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			END_TEXT("SetBufferAddress");
 			previous = SBA;
 			trace_ds("%s",rcba(buffer_addr));
-			if (buffer_addr >= COLS * ROWS) {
+			if (buffer_addr >= h3270.cols * h3270.rows) {
 				ABORT_WRITE("invalid SBA address");
 			}
 			current_fa = get_field_attribute(buffer_addr);
@@ -1370,7 +1367,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 				if (add_c1)
 					trace_ds("'");
 			}
-			if (baddr >= COLS * ROWS) {
+			if (baddr >= h3270.cols * h3270.rows) {
 				ABORT_WRITE("invalid RA address");
 			}
 			do {
@@ -1413,7 +1410,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			if (previous != SBA)
 				trace_ds("%s",rcba(baddr));
 			previous = ORDER;
-			if (baddr >= COLS * ROWS) {
+			if (baddr >= h3270.cols * h3270.rows) {
 				ABORT_WRITE("invalid EUA address");
 			}
 			d = ctlr_lookleft_state(buffer_addr, &why);
@@ -1705,7 +1702,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			DEC_BA(baddr);
 			while (!aborted &&
 			       ((fa_addr >= 0 && baddr != fa_addr) ||
-			        (fa_addr < 0 && baddr != ROWS*COLS - 1))) {
+			        (fa_addr < 0 && baddr != h3270.rows*h3270.cols - 1))) {
 				if (ea_buf[baddr].cc == FCORDER_SI) {
 					ABORT_WRITE("double SI");
 				}
@@ -1916,8 +1913,8 @@ ctlr_write_sscp_lu(unsigned char buf[], int buflen)
 			 * Insert NULLs to the end of the line and advance to
 			 * the beginning of the next line.
 			 */
-			s_row = buffer_addr / COLS;
-			while ((buffer_addr / COLS) == s_row) {
+			s_row = buffer_addr / h3270.cols;
+			while ((buffer_addr / h3270.cols) == s_row) {
 				ctlr_add(buffer_addr, EBC_null, default_cs);
 				ctlr_add_fg(buffer_addr, default_fg);
 				ctlr_add_bg(buffer_addr, default_bg);
@@ -2299,7 +2296,7 @@ ctlr_any_data(void)
 {
 	register int i;
 
-	for (i = 0; i < ROWS*COLS; i++) {
+	for (i = 0; i < h3270.rows*h3270.cols; i++) {
 		if (!IsBlank(ea_buf[i].cc))
 			return True;
 	}
@@ -2326,7 +2323,7 @@ ctlr_clear(Boolean can_snap)
 #endif /*]*/
 
 	/* Clear the screen. */
-	(void) memset((char *)ea_buf, 0, ROWS*COLS*sizeof(struct ea));
+	(void) memset((char *)ea_buf, 0, h3270.rows*h3270.cols*sizeof(struct ea));
 	cursor_move(0);
 	buffer_addr = 0;
 	// unselect(0, ROWS*COLS);
@@ -2350,7 +2347,7 @@ ctlr_blanks(void)
 {
 	int baddr;
 
-	for (baddr = 0; baddr < ROWS*COLS; baddr++) {
+	for (baddr = 0; baddr < h3270.rows*h3270.cols; baddr++) {
 		if (!ea_buf[baddr].fa)
 			ea_buf[baddr].cc = EBC_space;
 	}
@@ -2510,8 +2507,8 @@ ctlr_wrapping_memmove(int baddr_to, int baddr_from, int count)
 	 * It's faster to figure out if none of this is true, then do a slow
 	 * location-at-a-time version only if it happens.
 	 */
-	if (baddr_from + count <= ROWS*COLS &&
-	    baddr_to + count <= ROWS*COLS) {
+	if (baddr_from + count <= h3270.rows*h3270.cols &&
+	    baddr_to + count <= h3270.rows*h3270.cols) {
 		ctlr_bcopy(baddr_from, baddr_to, count, True);
 	} else {
 		int i, from, to;
@@ -2519,12 +2516,12 @@ ctlr_wrapping_memmove(int baddr_to, int baddr_from, int count)
 		for (i = 0; i < count; i++) {
 		    if (baddr_to > baddr_from) {
 			/* Shifting right, move left. */
-			to = (baddr_to + count - 1 - i) % ROWS*COLS;
-			from = (baddr_from + count - 1 - i) % ROWS*COLS;
+			to = (baddr_to + count - 1 - i) % h3270.rows*h3270.cols;
+			from = (baddr_from + count - 1 - i) % h3270.rows*h3270.cols;
 		    } else {
 			/* Shifting left, move right. */
-			to = (baddr_to + i) % ROWS*COLS;
-			from = (baddr_from + i) % ROWS*COLS;
+			to = (baddr_to + i) % h3270.rows*h3270.cols;
+			from = (baddr_from + i) % h3270.rows*h3270.cols;
 		    }
 		    ctlr_bcopy(from, to, 1, True);
 		}
@@ -2588,7 +2585,7 @@ ctlr_aclear(int baddr, int count, int clear_ea)
  */
 void ctlr_scroll(void)
 {
-	int qty = (ROWS - 1) * COLS;
+	int qty = (h3270.rows - 1) * h3270.cols;
 
 	/* Make sure nothing is selected. (later this can be fixed) */
 	// unselect(0, ROWS*COLS);
@@ -2596,10 +2593,10 @@ void ctlr_scroll(void)
 	/* Synchronize pending changes prior to this. */
 
 	/* Move ea_buf. */
-	(void) memmove(&ea_buf[0], &ea_buf[COLS],qty * sizeof(struct ea));
+	(void) memmove(&ea_buf[0], &ea_buf[h3270.cols],qty * sizeof(struct ea));
 
 	/* Clear the last line. */
-	(void) memset((char *) &ea_buf[qty], 0, COLS * sizeof(struct ea));
+	(void) memset((char *) &ea_buf[qty], 0, h3270.cols * sizeof(struct ea));
 
 	screen_disp(&h3270);
 
@@ -2692,7 +2689,7 @@ ctlr_shrink(void)
 {
 	int baddr;
 
-	for (baddr = 0; baddr < ROWS*COLS; baddr++) {
+	for (baddr = 0; baddr < h3270.rows*h3270.cols; baddr++) {
 		if (!ea_buf[baddr].fa)
 			ea_buf[baddr].cc =
 			    visible_control? EBC_space : EBC_null;
@@ -2811,11 +2808,11 @@ toggle_nop(struct toggle *t unused, enum toggle_type tt unused)
 
 int ctlr_get_rows(void)
 {
-    return ROWS;
+    return h3270.rows;
 }
 
 int ctlr_get_cols(void)
 {
-    return COLS;
+    return h3270.cols;
 }
 

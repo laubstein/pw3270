@@ -192,8 +192,8 @@ LIB3270_EXPORT int lib3270_paste_string(const unsigned char *str)
 		case '\n':
 			if(last != '\n')
 			{
-				baddr = (cursor_addr + COLS) % (COLS * ROWS);   /* down */
-				baddr = (baddr / COLS) * COLS;                  /* 1st col */
+				baddr = (cursor_addr + h3270.cols) % (h3270.cols * h3270.rows);   /* down */
+				baddr = (baddr / h3270.cols) * h3270.cols;                  /* 1st col */
 				faddr = find_field_attribute(baddr);
 				fa = ea_buf[faddr].fa;
 				if (faddr != baddr && !FA_IS_PROTECTED(fa))

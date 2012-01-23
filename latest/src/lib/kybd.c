@@ -635,7 +635,7 @@ static Boolean ins_prep(int faddr, int baddr, int count)
 	/* Find the end of the field. */
 	if (faddr == -1) {
 		/* Unformatted.  Use the end of the line. */
-		next_faddr = (((baddr / COLS) + 1) * COLS) % (ROWS*COLS);
+		next_faddr = (((baddr / h3270.cols) + 1) * h3270.cols) % (h3270.rows*h3270.cols);
 	} else {
 		next_faddr = faddr;
 		INC_BA(next_faddr);
@@ -696,8 +696,8 @@ static Boolean ins_prep(int faddr, int baddr, int count)
 			/* Shift right n_nulls worth. */
 			copy_len = first_null - baddr;
 			if (copy_len < 0)
-				copy_len += ROWS*COLS;
-			to = (baddr + n_nulls) % (ROWS*COLS);
+				copy_len += h3270.rows*h3270.cols;
+			to = (baddr + n_nulls) % (h3270.rows*h3270.cols);
 #if defined(_ST) /*[*/
 			printf("found %d NULLs at %d\n", n_nulls, first_null);
 			printf("copying %d from %d to %d\n", copy_len, to,
@@ -926,7 +926,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 		while (baddr_fill != faddr) {
 
 			/* Check for backward line wrap. */
-			if ((baddr_fill % COLS) == COLS - 1) {
+			if ((baddr_fill % h3270.cols) == h3270.cols - 1) {
 				Boolean aborted = True;
 				register int baddr_scan = baddr_fill;
 
@@ -939,7 +939,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 						aborted = False;
 						break;
 					}
-					if (!(baddr_scan % COLS))
+					if (!(baddr_scan % h3270.cols))
 						break;
 					DEC_BA(baddr_scan);
 				}
@@ -1606,7 +1606,7 @@ LIB3270_ACTION( firstfield )
 		cursor_move(0);
 		return 0;
 	}
-	cursor_move(next_unprotected(ROWS*COLS-1));
+	cursor_move(next_unprotected(h3270.rows*h3270.cols-1));
 
 	return 0;
 }
@@ -1726,9 +1726,9 @@ do_delete(void)
 		} while (end_baddr != baddr);
 		DEC_BA(end_baddr);
 	} else {
-		if ((baddr % COLS) == COLS - ndel)
+		if ((baddr % h3270.cols) == h3270.cols - ndel)
 			return True;
-		end_baddr = baddr + (COLS - (baddr % COLS)) - 1;
+		end_baddr = baddr + (h3270.cols - (baddr % h3270.cols)) - 1;
 	}
 
 	/* Shift the remainder of the field left. */
@@ -1738,8 +1738,8 @@ do_delete(void)
 	} else if (end_baddr != baddr) {
 		/* XXX: Need to verify this. */
 		ctlr_bcopy(baddr + ndel, baddr,
-		    ((ROWS * COLS) - 1) - (baddr + ndel) + 1, 0);
-		ctlr_bcopy(0, (ROWS * COLS) - ndel, ndel, 0);
+		    ((h3270.rows * h3270.cols) - 1) - (baddr + ndel) + 1, 0);
+		ctlr_bcopy(0, (h3270.rows * h3270.cols) - ndel, ndel, 0);
 		ctlr_bcopy(ndel, 0, end_baddr - ndel + 1, 0);
 	}
 
@@ -2231,9 +2231,9 @@ LIB3270_CURSOR_ACTION( up )
 		return 0;
 	}
 #endif /*]*/
-	baddr = cursor_addr - COLS;
+	baddr = cursor_addr - h3270.cols;
 	if (baddr < 0)
-		baddr = (cursor_addr + (ROWS * COLS)) - COLS;
+		baddr = (cursor_addr + (h3270.rows * h3270.cols)) - h3270.cols;
 	cursor_move(baddr);
 	return 0;
 }
@@ -2280,7 +2280,7 @@ LIB3270_CURSOR_ACTION( down )
 		return 0;
 	}
 #endif /*]*/
-	baddr = (cursor_addr + COLS) % (COLS * ROWS);
+	baddr = (cursor_addr + h3270.cols) % (h3270.cols * h3270.rows);
 	cursor_move(baddr);
 	return 0;
 }
@@ -2308,8 +2308,8 @@ LIB3270_CURSOR_ACTION( newline )
 		return 0;
 	}
 #endif /*]*/
-	baddr = (cursor_addr + COLS) % (COLS * ROWS);	/* down */
-	baddr = (baddr / COLS) * COLS;			/* 1st col */
+	baddr = (cursor_addr + h3270.cols) % (h3270.cols * h3270.rows);	/* down */
+	baddr = (baddr / h3270.cols) * h3270.cols;			/* 1st col */
 	faddr = find_field_attribute(baddr);
 	fa = ea_buf[faddr].fa;
 	if (faddr != baddr && !FA_IS_PROTECTED(fa))

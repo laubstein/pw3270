@@ -303,22 +303,22 @@ void screen_erase(H3270 *session)
 	}
 
 	/* No callback, just redraw */
-	screen_update(session,0,ROWS*cCOLS);
+	screen_update(session,0,session->rows * session->cols);
 }
 
 LIB3270_EXPORT void lib3270_get_screen_size(H3270 *h, int *r, int *c)
 {
-	*r = ROWS;
-	*c = cCOLS;
+	*r = h->rows;
+	*c = h->cols;
 }
 
 void update_model_info(H3270 *session, int model, int cols, int rows)
 {
-	if(model == session->model_num && maxROWS == rows && maxCOLS == cols)
+	if(model == session->model_num && session->maxROWS == rows && session->maxCOLS == cols)
 		return;
 
-	maxCOLS   			= cols;
-	maxROWS  		  	= rows;
+	session->maxCOLS   	= cols;
+	session->maxROWS   	= rows;
 	session->model_num	= model;
 
 	/* Update the model name. */
@@ -332,7 +332,7 @@ void update_model_info(H3270 *session, int model, int cols, int rows)
 int screen_read(char *dest, int baddr, int count)
 {
 	unsigned char fa	= get_field_attribute(baddr);
-	int 			max = (maxROWS * maxCOLS);
+	int 			max = (h3270.maxROWS * h3270.maxCOLS);
 
 	*dest = 0;
 
@@ -376,8 +376,8 @@ void screen_update(H3270 *session, int bstart, int bend)
 	a = color_from_fa(fa);
 	fa_addr = find_field_attribute(bstart); // may be -1, that's okay
 
-	row = bstart/cCOLS;
-	col = bstart%cCOLS;
+	row = bstart/session->cols;
+	col = bstart%session->cols;
 
 	Trace("Update@%d-%d (%d,%d): [%c]",bstart,bend,row,col,ebc2asc[ea_buf[bstart].cc]);
 
@@ -431,7 +431,7 @@ void screen_update(H3270 *session, int bstart, int bend)
 			}
 		}
 
-		if(++col >= cCOLS)
+		if(++col >= session->cols)
 		{
 			row++;
 			col=0;
@@ -445,7 +445,7 @@ void screen_disp(H3270 *session)
 	session->first_changed = -1;
 	session->last_changed = -1;
 
-	screen_update(session,0,ROWS*cCOLS);
+	screen_update(session,0,session->rows*session->cols);
 
 
 /*
@@ -547,7 +547,7 @@ int cursor_set_addr(int baddr)
         cursor_addr = baddr;
 
         if(callbacks && callbacks->move_cursor)
-            callbacks->move_cursor(baddr/cCOLS, baddr%cCOLS);
+            callbacks->move_cursor(baddr/h3270.cols, baddr%h3270.cols);
 
 //		Trace("%s: baddr=%d cc=%04x",__FUNCTION__,baddr, ea_buf[baddr].cc);
 
@@ -682,11 +682,11 @@ LIB3270_EXPORT void status_typeahead(int on)
 
 void set_viewsize(H3270 *session, int rows, int cols)
 {
-	if(rows == ROWS && COLS == cols)
+	if(rows == session->rows && session->cols == cols)
 		return;
 
-	ROWS = rows;
-	COLS = cols;
+	session->rows = rows;
+	session->cols = cols;
 
 	if(callbacks && callbacks->set_viewsize)
 		callbacks->set_viewsize(session,rows,cols);
@@ -954,7 +954,7 @@ LIB3270_EXPORT void popup_system_error(const char *title, const char *message, c
 LIB3270_EXPORT int set_device_buffer(struct ea *src, int el)
 {
 
-	if(el > (maxROWS * maxCOLS))
+	if(el > (h3270.maxROWS * h3270.maxCOLS))
 		return EINVAL;
 
 	memcpy(ea_buf,src,sizeof(struct ea) * el);
@@ -1018,7 +1018,7 @@ LIB3270_ACTION( testpattern )
 	};
 
 	int row = 0;
-	int max = (maxROWS * maxCOLS);
+	int max = (h3270.maxROWS * h3270.maxCOLS);
 	int pos = 0;
 	int f;
 
@@ -1045,11 +1045,11 @@ LIB3270_ACTION( testpattern )
 
 LIB3270_EXPORT struct ea * copy_device_buffer(int *el)
 {
-	int			sz		=  sizeof(struct ea) * (maxROWS * maxCOLS);
+	int			sz		=  sizeof(struct ea) * (h3270.maxROWS * h3270.maxCOLS);
 	struct ea	*ret	=  malloc(sz);
 	memcpy(ret,ea_buf,sz);
 	if(el)
-		*el = (maxROWS * maxCOLS);
+		*el = (h3270.maxROWS * h3270.maxCOLS);
 	return ret;
 }
 

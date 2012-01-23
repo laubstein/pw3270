@@ -199,6 +199,10 @@
 			int					  ov_cols;
 			int					  first_changed;
 			int					  last_changed;
+			int					  maxROWS;
+			int					  maxCOLS;
+			int					  rows;
+			int					  cols;
 
 			// Widget info
 			void				* widget;

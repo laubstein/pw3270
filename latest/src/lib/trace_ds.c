@@ -119,7 +119,7 @@ rcba(int baddr)
 {
 	static char buf[16];
 
-	(void) sprintf(buf, "(%d,%d)", baddr/COLS + 1, baddr%COLS + 1);
+	(void) sprintf(buf, "(%d,%d)", baddr/h3270.cols + 1, baddr%h3270.cols + 1);
 	return buf;
 }
 
@@ -791,7 +791,7 @@ do_screentrace(void)
 	register int i;
 
 	if (fprint_screen(screentracef, False, False)) {
-		for (i = 0; i < COLS; i++)
+		for (i = 0; i < h3270.cols; i++)
 			(void) fputc('=', screentracef);
 		(void) fputc('\n', screentracef);
 	}
@@ -828,7 +828,7 @@ trace_ansi_disc(void)
 	int i;
 
 	(void) fputc('\n', screentracef);
-	for (i = 0; i < COLS; i++)
+	for (i = 0; i < h3270.cols; i++)
 		(void) fputc('=', screentracef);
 	(void) fputc('\n', screentracef);
 
