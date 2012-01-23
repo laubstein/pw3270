@@ -3152,7 +3152,7 @@ Key_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 */
 /*
  * String action.
- */
+ */ /*
 void
 String_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -3162,13 +3162,13 @@ String_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 
 //	reset_idle_timer();
 
-	/* Determine the total length of the strings. */
+	// Determine the total length of the strings.
 	for (i = 0; i < *num_params; i++)
 		len += strlen(params[i]);
 	if (!len)
 		return;
 
-	/* Allocate a block of memory and copy them in. */
+	// Allocate a block of memory and copy them in.
 	s0 = s = Malloc(len + 1);
 	*s = '\0';
 	for (i = 0; i < *num_params; i++) {
@@ -3203,15 +3203,15 @@ String_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 	}
 	*s = '\0';
 
-	/* Set a pending string. */
+	// Set a pending string.
 //	ps_set(s0, False);
 }
+*/
 
 /*
  * HexString action.
- */
-void
-HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+ */ /*
+void HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	Cardinal i;
 	int len = 0;
@@ -3220,7 +3220,7 @@ HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 
 //	reset_idle_timer();
 
-	/* Determine the total length of the strings. */
+	// Determine the total length of the strings.
 	for (i = 0; i < *num_params; i++) {
 		t = params[i];
 		if (!strncmp(t, "0x", 2) || !strncmp(t, "0X", 2))
@@ -3230,7 +3230,7 @@ HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 	if (!len)
 		return;
 
-	/* Allocate a block of memory and copy them in. */
+	// Allocate a block of memory and copy them in.
 	s = Malloc(len + 1);
 	*s = '\0';
 	for (i = 0; i < *num_params; i++) {
@@ -3240,9 +3240,10 @@ HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 		(void) strcat(s, t);
 	}
 
-	/* Set a pending string. */
+	// Set a pending string.
 //	ps_set(s, True);
 }
+*/
 
 /*
  * Dual-mode action for the "asciicircum" ("^") key:
@@ -3760,19 +3761,19 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
  * characters; if in 3270 mode, they are considered EBCDIC.
  *
  * Graphic Escapes are handled as \E.
- */
+ */ /*
 void
 hex_input(char *s)
 {
 	char *t;
 	Boolean escaped;
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 	unsigned char *xbuf = (unsigned char *)NULL;
 	unsigned char *tbuf = (unsigned char *)NULL;
 	int nbytes = 0;
-#endif /*]*/
+#endif
 
-	/* Validate the string. */
+	// Validate the string.
 	if (strlen(s) % 2) {
 		popup_an_error("%s: Odd number of characters in specification",
 		    action_name(HexString_action));
@@ -3784,9 +3785,9 @@ hex_input(char *s)
 	while (*t) {
 		if (isxdigit(*t) && isxdigit(*(t + 1))) {
 			escaped = False;
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 			nbytes++;
-#endif /*]*/
+#endif
 		} else if (!strncmp(t, "\\E", 2) || !strncmp(t, "\\e", 2)) {
 			if (escaped) {
 				popup_an_error("%s: Double \\E",
@@ -3816,13 +3817,13 @@ hex_input(char *s)
 		return;
 	}
 
-#if defined(X3270_ANSI) /*[*/
-	/* Allocate a temporary buffer. */
+#if defined(X3270_ANSI)
+	// Allocate a temporary buffer.
 	if (!IN_3270 && nbytes)
 		tbuf = xbuf = (unsigned char *)Malloc(nbytes);
-#endif /*]*/
+#endif
 
-	/* Pump it in. */
+	// Pump it in.
 	t = s;
 	escaped = False;
 	while (*t) {
@@ -3832,23 +3833,24 @@ hex_input(char *s)
 			c = (FROM_HEX(*t) * 16) + FROM_HEX(*(t + 1));
 			if (IN_3270)
 				key_Character(c, escaped, True, NULL);
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 			else
 				*tbuf++ = (unsigned char)c;
-#endif /*]*/
+#endif
 			escaped = False;
 		} else if (!strncmp(t, "\\E", 2) || !strncmp(t, "\\e", 2)) {
 			escaped = True;
 		}
 		t += 2;
 	}
-#if defined(X3270_ANSI) /*[*/
+#if defined(X3270_ANSI)
 	if (!IN_3270 && nbytes) {
 		net_hexansi_out(xbuf, nbytes);
 		Free(xbuf);
 	}
-#endif /*]*/
+#endif
 }
+*/
 
 /*
 void
