@@ -1261,7 +1261,7 @@ telnet_fsm(unsigned char c)
 			trace_dsn("\n");
 			if (syncing) {
 				syncing = 0;
-				x_except_on(h3270.sock);
+				x_except_on(&h3270,h3270.sock);
 			}
 			telnet_state = TNS_DATA;
 			break;
@@ -1937,7 +1937,7 @@ void net_exception(H3270 *session)
 		trace_dsn("RCVD urgent data indication\n");
 		if (!syncing) {
 			syncing = 1;
-			x_except_off();
+			x_except_off(session);
 		}
 	}
 }

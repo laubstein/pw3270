@@ -83,8 +83,7 @@ static struct host *last_host = (struct host *)NULL;
 
 static void try_reconnect(H3270 *session);
 
-static char *
-stoken(char **s)
+static char * stoken(char **s)
 {
 	char *r;
 	char *ss = *s;
@@ -598,26 +597,18 @@ static int do_connect(H3270 *hSession, const char *n)
 
 	/* Attempt contact. */
 	ever_3270 = False;
-	hSession->net_sock = net_connect(chost, port, localprocess_cmd != CN, &resolving,
-	    &pending);
-	if (hSession->net_sock < 0 && !resolving) {
-#if defined(X3270_DISPLAY) /*[*/
-		if (appres.once) {
-			/* Exit when the error pop-up pops down. */
-			exiting = True;
-		}
-		else if ( toggled(RECONNECT) ) {
-			auto_reconnect_inprogress = True;
-			(void) AddTimeOut(RECONNECT_ERR_MS, try_reconnect);
-		}
-#endif /*]*/
+	hSession->net_sock = net_connect(chost, port, localprocess_cmd != CN, &resolving,&pending);
+
+	if (hSession->net_sock < 0 && !resolving)
+	{
 		/* Redundantly signal a disconnect. */
 		lib3270_st_changed(hSession, ST_CONNECT, False);
 		return -1;
 	}
 
 	/* Still thinking about it? */
-	if (resolving) {
+	if (resolving)
+	{
 		hSession->cstate = RESOLVING;
 		lib3270_st_changed(hSession, ST_RESOLVING, True);
 		return 0;
@@ -633,7 +624,7 @@ static int do_connect(H3270 *hSession, const char *n)
 //		login_macro(ps);
 
 	/* Prepare Xt for I/O. */
-	x_add_input(hSession->net_sock);
+	x_add_input(hSession,hSession->net_sock);
 
 	/* Set state and tell the world. */
 	if (pending)
@@ -702,7 +693,7 @@ void host_disconnect(H3270 *h, int failed)
 		h = &h3270;
 
 	if (CONNECTED || HALF_CONNECTED) {
-		x_remove_input();
+		x_remove_input(h);
 		net_disconnect();
 		h->net_sock = -1;
 

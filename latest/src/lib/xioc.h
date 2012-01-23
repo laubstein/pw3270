@@ -35,11 +35,8 @@
  *		Global declarations for xio.c.
  */
 
-// LIB3270_INTERNAL void Quit_action(Widget w, XEvent *event, String *params, Cardinal *num_params) __attribute__ ((deprecated));
-//LIB3270_INTERNAL void x3270_exit(int n) __attribute__ ((deprecated));
-
-LIB3270_INTERNAL void x_add_input(int net_sock);
-LIB3270_INTERNAL void x_except_off(void);
-LIB3270_INTERNAL void x_except_on(int net_sock);
-LIB3270_INTERNAL void x_remove_input(void);
+LIB3270_INTERNAL void x_add_input(H3270 *h,int net_sock);
+LIB3270_INTERNAL void x_except_off(H3270 *h);
+LIB3270_INTERNAL void x_except_on(H3270 *h,int net_sock);
+LIB3270_INTERNAL void x_remove_input(H3270 *h);
 
