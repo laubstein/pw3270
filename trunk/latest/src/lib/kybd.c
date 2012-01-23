@@ -623,8 +623,7 @@ Interrupt_action(Widget w unused, XEvent *event, String *params,
  * Prepare for an insert of 'count' bytes.
  * Returns True if the insert is legal, False otherwise.
  */
-static Boolean
-ins_prep(int faddr, int baddr, int count)
+static Boolean ins_prep(int faddr, int baddr, int count)
 {
 	int next_faddr;
 	int xaddr;
@@ -3120,7 +3119,7 @@ void Input_String(const unsigned char *str)
 
 /*
  * Key action.
- */
+ */ /*
 void
 Key_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -3150,7 +3149,7 @@ Key_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 			       NULL);
 	}
 }
-
+*/
 /*
  * String action.
  */
@@ -3919,7 +3918,7 @@ kybd_prime(void)
 /*
  * Translate a keysym name to a keysym, including APL and extended
  * characters.
- */
+ */ /*
 static KeySym
 MyStringToKeysym(char *s, enum keytype *keytypep)
 {
@@ -3928,7 +3927,8 @@ MyStringToKeysym(char *s, enum keytype *keytypep)
 	char *ptr;
 	unsigned char xc;
 
-#if defined(X3270_APL) /*[*/
+
+#if defined(X3270_APL)
 	if (!strncmp(s, "apl_", 4)) {
 		int is_ge;
 
@@ -3938,7 +3938,7 @@ MyStringToKeysym(char *s, enum keytype *keytypep)
 		else
 			*keytypep = KT_STD;
 	} else
-#endif /*]*/
+#endif
 	{
 		k = StringToKeysym(s);
 		*keytypep = KT_STD;
@@ -3963,7 +3963,7 @@ MyStringToKeysym(char *s, enum keytype *keytypep)
 			k &= 0xff;
 	}
 
-	/* Allow arbitrary values, e.g., 0x03 for ^C. */
+	// Allow arbitrary values, e.g., 0x03 for ^C.
 	if (k == NoSymbol &&
 	    (cc = strtoul(s, &ptr, 0)) > 0 &&
 	    cc < 0xff &&
@@ -3973,6 +3973,7 @@ MyStringToKeysym(char *s, enum keytype *keytypep)
 
 	return k;
 }
+*/
 
 /* Add a key to the extended association table. */
 void
@@ -4002,447 +4003,3 @@ clear_xks(void)
 	}
 }
 
-#if defined(X3270_DISPLAY)
-/*
-//
-//X-dependent code starts here.
-//
-
-//
-// Translate a keymap (from an XQueryKeymap or a KeymapNotify event) into
-// a bitmap of Shift, Meta or Alt keys pressed.
-//
-#define key_is_down(kc, bitmap) (kc && ((bitmap)[(kc)/8] & (1<<((kc)%8))))
-int
-state_from_keymap(char keymap[32])
-{
-	static Boolean	initted = False;
-	static KeyCode	kc_Shift_L, kc_Shift_R;
-	static KeyCode	kc_Meta_L, kc_Meta_R;
-	static KeyCode	kc_Alt_L, kc_Alt_R;
-	int	pseudo_state = 0;
-
-	if (!initted) {
-		kc_Shift_L = XKeysymToKeycode(display, XK_Shift_L);
-		kc_Shift_R = XKeysymToKeycode(display, XK_Shift_R);
-		kc_Meta_L  = XKeysymToKeycode(display, XK_Meta_L);
-		kc_Meta_R  = XKeysymToKeycode(display, XK_Meta_R);
-		kc_Alt_L   = XKeysymToKeycode(display, XK_Alt_L);
-		kc_Alt_R   = XKeysymToKeycode(display, XK_Alt_R);
-		initted = True;
-	}
-	if (key_is_down(kc_Shift_L, keymap) ||
-	    key_is_down(kc_Shift_R, keymap))
-		pseudo_state |= ShiftKeyDown;
-	if (key_is_down(kc_Meta_L, keymap) ||
-	    key_is_down(kc_Meta_R, keymap))
-		pseudo_state |= MetaKeyDown;
-	if (key_is_down(kc_Alt_L, keymap) ||
-	    key_is_down(kc_Alt_R, keymap))
-		pseudo_state |= AltKeyDown;
-	return pseudo_state;
-}
-#undef key_is_down
-
-//
-// Process shift keyboard events.  The code has to look for the raw Shift keys,
-// rather than using the handy "state" field in the event structure.  This is
-// because the event state is the state _before_ the key was pressed or
-// released.  This isn't enough information to distinguish between "left
-// shift released" and "left shift released, right shift still held down"
-// events, for example.
-//
-// This function is also called as part of Focus event processing.
-//
-void
-PA_Shift_action(Widget w unused, XEvent *event unused, String *params unused,
-    Cardinal *num_params unused)
-{
-	char	keys[32];
-
-	XQueryKeymap(display, keys);
-	shift_event(state_from_keymap(keys));
-}
-*/
-#endif
-
-#if defined(X3270_DISPLAY) || defined(C3270) /*[*/
-/*
-static Boolean
-build_composites(void)
-{
-	char *c, *c0, *c1;
-	char *ln;
-	char ksname[3][64];
-	char junk[2];
-	KeySym k[3];
-	enum keytype a[3];
-	int i;
-	struct composite *cp;
-
-	if (appres.compose_map == CN) {
-		popup_an_error("%s: No %s defined", action_name(Compose_action),
-		    ResComposeMap);
-		return False;
-	}
-	c0 = get_fresource("%s.%s", ResComposeMap, appres.compose_map);
-	if (c0 == CN) {
-		popup_an_error("%s: Cannot find %s \"%s\"",
-		    action_name(Compose_action), ResComposeMap,
-		    appres.compose_map);
-		return False;
-	}
-	c1 = c = NewString(c0);	// will be modified by strtok
-	while ((ln = strtok(c, "\n"))) {
-		Boolean okay = True;
-
-		c = NULL;
-		if (sscanf(ln, " %63[^+ \t] + %63[^= \t] =%63s%1s",
-		    ksname[0], ksname[1], ksname[2], junk) != 3) {
-			popup_an_error("%s: Invalid syntax: %s",
-			    action_name(Compose_action), ln);
-			continue;
-		}
-		for (i = 0; i < 3; i++) {
-			k[i] = MyStringToKeysym(ksname[i], &a[i]);
-			if (k[i] == NoSymbol) {
-				popup_an_error("%s: Invalid KeySym: \"%s\"",
-				    action_name(Compose_action), ksname[i]);
-				okay = False;
-				break;
-			}
-		}
-		if (!okay)
-			continue;
-		composites = (struct composite *) Realloc((char *)composites,
-		    (n_composites + 1) * sizeof(struct composite));
-		cp = composites + n_composites;
-		cp->k1.keysym = k[0];
-		cp->k1.keytype = a[0];
-		cp->k2.keysym = k[1];
-		cp->k2.keytype = a[1];
-		cp->translation.keysym = k[2];
-		cp->translation.keytype = a[2];
-		n_composites++;
-	}
-	Free(c1);
-	return True;
-}
-*/
-
-/*
- * Called by the toolkit when the "Compose" key is pressed.  "Compose" is
- * implemented by pressing and releasing three keys: "Compose" and two
- * data keys.  For example, "Compose" "s" "s" gives the German "ssharp"
- * character, and "Compose" "C", "," gives a capital "C" with a cedilla
- * (symbol Ccedilla).
- *
- * The mechanism breaks down a little when the user presses "Compose" and
- * then a non-data key.  Oh well.
- */ /*
-void
-Compose_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-//	reset_idle_timer();
-
-	if (!composites && !build_composites())
-		return;
-
-	if (composing == NONE) {
-		composing = COMPOSE;
-		status_compose(True, 0, KT_STD);
-	}
-} */
-#endif /*]*/
-
-#if defined(X3270_DISPLAY) /*[*/
-
-/*
- * Called by the toolkit for any key without special actions.
- */ /*
-void
-Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-	XKeyEvent	*kevent = (XKeyEvent *)event;
-	char		buf[32];
-	KeySym		ks;
-	int		ll;
-
-	switch (event->type) {
-	    case KeyPress:
-#if defined(X3270_DBCS)
-		if (!xim_lookup((XKeyEvent *)event))
-			return;
-#endif
-		ll = XLookupString(kevent, buf, 32, &ks, (XComposeStatus *) 0);
-		if (ll == 1) {
-			// Add Meta; XLookupString won't.
-			if (event_is_meta(kevent->state))
-				buf[0] |= 0x80;
-			// Remap certain control characters.
-			if (!IN_ANSI) switch (buf[0]) {
-			    case '\t':
-				action_internal(Tab_action, IA_DEFAULT, CN, CN);
-				break;
-			   case '\177':
-				action_internal(Delete_action, IA_DEFAULT, CN,
-				    CN);
-				break;
-			    case '\b':
-				action_internal(Erase_action, IA_DEFAULT,
-				    CN, CN);
-				break;
-			    case '\r':
-				action_Enter();
-//				action_internal(Enter_action, IA_DEFAULT, CN, CN);
-				break;
-			    case '\n':
-				action_internal(Newline_action, IA_DEFAULT, CN,
-				    CN);
-				break;
-			    default:
-				key_ACharacter((unsigned char) buf[0], KT_STD,
-				    IA_DEFAULT, NULL);
-				break;
-			} else {
-				key_ACharacter((unsigned char) buf[0], KT_STD,
-				    IA_DEFAULT, NULL);
-			}
-			return;
-		}
-
-		// Pick some other reasonable defaults.
-		switch (ks) {
-		    case XK_Up:
-			action_internal(Up_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_Down:
-			action_internal(Down_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_Left:
-			action_internal(Left_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_Right:
-			action_internal(Right_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_Insert:
-#if defined(XK_KP_Insert)
-		    case XK_KP_Insert:
-#endif
-			action_internal(Insert_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_Delete:
-			action_internal(Delete_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_Home:
-			action_internal(Home_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_Tab:
-			action_internal(Tab_action, IA_DEFAULT, CN, CN);
-			break;
-#if defined(XK_ISO_Left_Tab)
-		    case XK_ISO_Left_Tab:
-			action_internal(BackTab_action, IA_DEFAULT, CN, CN);
-			break;
-#endif
-		    case XK_Clear:
-			action_internal(Clear_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_Sys_Req:
-			action_internal(SysReq_action, IA_DEFAULT, CN, CN);
-			break;
-#if defined(XK_EuroSign)
-		    case XK_EuroSign:
-			action_internal(Key_action, IA_DEFAULT, "currency",
-				CN);
-			break;
-#endif
-
-#if defined(XK_3270_Duplicate)
-		    // Funky 3270 keysyms.
-		    case XK_3270_Duplicate:
-			action_internal(Dup_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_3270_FieldMark:
-			action_internal(FieldMark_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_3270_Right2:
-			action_internal(Right2_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_3270_Left2:
-			action_internal(Left2_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_3270_BackTab:
-			action_internal(BackTab_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_3270_EraseEOF:
-			action_internal(EraseEOF_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_3270_EraseInput:
-			action_internal(EraseInput_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_3270_Reset:
-			action_internal(Reset_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_3270_PA1:
-			action_internal(PA_action, IA_DEFAULT, "1", CN);
-			break;
-		    case XK_3270_PA2:
-			action_internal(PA_action, IA_DEFAULT, "2", CN);
-			break;
-		    case XK_3270_PA3:
-			action_internal(PA_action, IA_DEFAULT, "3", CN);
-			break;
-		    case XK_3270_Attn:
-			action_internal(Attn_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_3270_AltCursor:
-			action_internal(AltCursor_action, IA_DEFAULT, CN, CN);
-			break;
-		    case XK_3270_CursorSelect:
-			action_internal(CursorSelect_action, IA_DEFAULT, CN,
-			    CN);
-			break;
-		    case XK_3270_Enter:
-			action_Enter();
-//			action_internal(Enter_action, IA_DEFAULT, CN, CN);
-			break;
-#endif
-
-#if defined(X3270_APL)
-		    // Funky APL keysyms.
-		    case XK_downcaret:
-			action_internal(Key_action, IA_DEFAULT, "apl_downcaret",
-			    CN);
-			break;
-		    case XK_upcaret:
-			action_internal(Key_action, IA_DEFAULT, "apl_upcaret",
-			    CN);
-			break;
-		    case XK_overbar:
-			action_internal(Key_action, IA_DEFAULT, "apl_overbar",
-			    CN);
-			break;
-		    case XK_downtack:
-			action_internal(Key_action, IA_DEFAULT, "apl_downtack",
-			    CN);
-			break;
-		    case XK_upshoe:
-			action_internal(Key_action, IA_DEFAULT, "apl_upshoe",
-			    CN);
-			break;
-		    case XK_downstile:
-			action_internal(Key_action, IA_DEFAULT, "apl_downstile",
-			    CN);
-			break;
-		    case XK_underbar:
-			action_internal(Key_action, IA_DEFAULT, "apl_underbar",
-			    CN);
-			break;
-		    case XK_jot:
-			action_internal(Key_action, IA_DEFAULT, "apl_jot", CN);
-			break;
-		    case XK_quad:
-			action_internal(Key_action, IA_DEFAULT, "apl_quad", CN);
-			break;
-		    case XK_uptack:
-			action_internal(Key_action, IA_DEFAULT, "apl_uptack",
-			    CN);
-			break;
-		    case XK_circle:
-			action_internal(Key_action, IA_DEFAULT, "apl_circle",
-			    CN);
-			break;
-		    case XK_upstile:
-			action_internal(Key_action, IA_DEFAULT, "apl_upstile",
-			    CN);
-			break;
-		    case XK_downshoe:
-			action_internal(Key_action, IA_DEFAULT, "apl_downshoe",
-			    CN);
-			break;
-		    case XK_rightshoe:
-			action_internal(Key_action, IA_DEFAULT, "apl_rightshoe",
-			    CN);
-			break;
-		    case XK_leftshoe:
-			action_internal(Key_action, IA_DEFAULT, "apl_leftshoe",
-			    CN);
-			break;
-		    case XK_lefttack:
-			action_internal(Key_action, IA_DEFAULT, "apl_lefttack",
-			    CN);
-			break;
-		    case XK_righttack:
-			action_internal(Key_action, IA_DEFAULT, "apl_righttack",
-			    CN);
-			break;
-#endif
-
-		    default:
-			if (ks >= XK_F1 && ks <= XK_F24) {
-				(void) sprintf(buf, "%ld", ks - XK_F1 + 1);
-				action_internal(PF_action, IA_DEFAULT, buf, CN);
-#if defined(XK_CYRILLIC)
-			} else if (ks == XK_Cyrillic_io ||
-				   ks == XK_Cyrillic_IO ||
-				   (ks >= XK_Cyrillic_yu &&
-				    ks <= XK_Cyrillic_HARDSIGN)) {
-				// Map XK to KOI8-R.
-				(void) sprintf(buf, "%ld", ks & 0xff);
-				action_internal(Key_action, IA_DEFAULT, buf,
-						CN);
-#endif
-			} else if (xk_selector && ((ks >> 8) == xk_selector)) {
-				key_ACharacter((unsigned char)(ks & 0xff),
-						KT_STD, IA_KEY, NULL);
-			} else
-				trace_event(" %s: dropped (unknown keysym)\n",
-				    action_name(Default_action));
-			break;
-		}
-		break;
-
-	    case ButtonPress:
-	    case ButtonRelease:
-		trace_event(" %s: dropped (no action configured)\n",
-		    action_name(Default_action));
-		break;
-	    default:
-		trace_event(" %s: dropped (unknown event type)\n",
-		    action_name(Default_action));
-		break;
-	}
-}
-*/
-
-/*
- * Set or clear a temporary keymap.
- *
- *   TemporaryKeymap(x)		toggle keymap "x" (add "x" to the keymap, or if
- *				"x" was already added, remove it)
- *   TemporaryKeymap()		removes the previous keymap, if any
- *   TemporaryKeymap(None)	removes the previous keymap, if any
- */ /*
-void
-TemporaryKeymap_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
-{
-//	reset_idle_timer();
-
-	if (check_usage(TemporaryKeymap_action, *num_params, 0, 1) < 0)
-		return;
-
-	if (*num_params == 0 || !strcmp(params[0], "None")) {
-		(void) temporary_keymap(CN);
-		return;
-	}
-
-	if (temporary_keymap(params[0]) < 0) {
-		popup_an_error("%s: Can't find %s %s",
-		    action_name(TemporaryKeymap_action), ResKeymap, params[0]);
-//		cancel_if_idle_command();
-	}
-}
-*/
-
-#endif /*]*/
