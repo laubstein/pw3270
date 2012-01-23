@@ -169,7 +169,12 @@
 			int					  model_num;
 			char       	    	* termtype;
 
-			char				* current_host;
+			char				* current_host;			/**< the hostname part, stripped of qualifiers, luname and port number */
+			char           		* full_current_host;	/**< the entire string, for use in reconnecting */
+			char	       		* reconnect_host;
+			char	       		* qualified_host;
+			char	 			  auto_reconnect_inprogress;
+
 			unsigned short		  current_port;
 
 			// screen info
@@ -556,8 +561,9 @@
 
 		#include <lib3270/actions.h>
 
-		LIB3270_EXPORT int host_connect(const char *n, int wait);
-		LIB3270_EXPORT int host_reconnect(int wait);
+		#define host_connect(n,wait) lib3270_connect(NULL,n,wait)
+		#define host_reconnect(w) lib3270_reconnect(NULL,w)
+
 		LIB3270_EXPORT void host_disconnect(H3270 *h, int disable);
 
 		#define register_schange(tx,func) lib3270_register_schange(NULL,tx,func,NULL)

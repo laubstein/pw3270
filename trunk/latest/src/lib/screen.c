@@ -816,7 +816,7 @@ relabel(H3270 *session, int ignored unused, void *dunno)
 			screen_title(profile_name);
 		else
 #endif
-			screen_title(reconnect_host);
+			screen_title(session->reconnect_host);
 
 	}
 	else
