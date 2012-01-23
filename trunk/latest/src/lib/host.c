@@ -75,15 +75,13 @@ Boolean			ever_3270 = False;
 struct host *hosts = (struct host *)NULL;
 static struct host *last_host = (struct host *)NULL;
 // static Boolean auto_reconnect_inprogress = False;
-static int net_sock = -1;
+// static int net_sock = -1;
 
 // #if defined(X3270_DISPLAY)
 // static void save_recent(const char *);
 // #endif
 
-#if defined(X3270_DISPLAY) || defined(LIB3270)
 static void try_reconnect(H3270 *session);
-#endif /*]*/
 
 static char *
 stoken(char **s)
@@ -600,9 +598,9 @@ static int do_connect(H3270 *hSession, const char *n)
 
 	/* Attempt contact. */
 	ever_3270 = False;
-	net_sock = net_connect(chost, port, localprocess_cmd != CN, &resolving,
+	hSession->net_sock = net_connect(chost, port, localprocess_cmd != CN, &resolving,
 	    &pending);
-	if (net_sock < 0 && !resolving) {
+	if (hSession->net_sock < 0 && !resolving) {
 #if defined(X3270_DISPLAY) /*[*/
 		if (appres.once) {
 			/* Exit when the error pop-up pops down. */
@@ -614,14 +612,14 @@ static int do_connect(H3270 *hSession, const char *n)
 		}
 #endif /*]*/
 		/* Redundantly signal a disconnect. */
-		st_changed(ST_CONNECT, False);
+		lib3270_st_changed(hSession, ST_CONNECT, False);
 		return -1;
 	}
 
 	/* Still thinking about it? */
 	if (resolving) {
-		h3270.cstate = RESOLVING;
-		st_changed(ST_RESOLVING, True);
+		hSession->cstate = RESOLVING;
+		lib3270_st_changed(hSession, ST_RESOLVING, True);
 		return 0;
 	}
 
@@ -635,15 +633,18 @@ static int do_connect(H3270 *hSession, const char *n)
 //		login_macro(ps);
 
 	/* Prepare Xt for I/O. */
-	x_add_input(net_sock);
+	x_add_input(hSession->net_sock);
 
 	/* Set state and tell the world. */
-	if (pending) {
-		h3270.cstate = PENDING;
-		st_changed(ST_HALF_CONNECT, True);
-	} else {
-		h3270.cstate = CONNECTED_INITIAL;
-		st_changed(ST_CONNECT, True);
+	if (pending)
+	{
+		hSession->cstate = PENDING;
+		lib3270_st_changed(hSession, ST_HALF_CONNECT, True);
+	}
+	else
+	{
+		hSession->cstate = CONNECTED_INITIAL;
+		lib3270_st_changed(hSession, ST_CONNECT, True);
 #if defined(X3270_DISPLAY) /*[*/
 		if (toggled(RECONNECT) && error_popup_visible())
 			popdown_an_error();
@@ -685,9 +686,6 @@ int lib3270_connect(H3270 *h, const char *n, int wait)
 	return 0;
 }
 
-
-
-#if defined(X3270_DISPLAY) || defined(LIB3270) /*[*/
 /*
  * Called from timer to attempt an automatic reconnection.
  */
@@ -697,7 +695,6 @@ static void try_reconnect(H3270 *session)
 	session->auto_reconnect_inprogress = False;
 	lib3270_reconnect(session,0);
 }
-#endif /*]*/
 
 void host_disconnect(H3270 *h, int failed)
 {
@@ -707,26 +704,15 @@ void host_disconnect(H3270 *h, int failed)
 	if (CONNECTED || HALF_CONNECTED) {
 		x_remove_input();
 		net_disconnect();
-		net_sock = -1;
-#if defined(LIB3270)
+		h->net_sock = -1;
+
 		Trace("Disconnected (Failed: %d Reconnect: %d in_progress: %d)",failed,toggled(RECONNECT),h->auto_reconnect_inprogress);
 		if (toggled(RECONNECT) && !h->auto_reconnect_inprogress)
 		{
 			/* Schedule an automatic reconnection. */
 			h->auto_reconnect_inprogress = True;
-			(void) AddTimeOut(failed? RECONNECT_ERR_MS: RECONNECT_MS, &h3270, try_reconnect);
+			(void) AddTimeOut(failed ? RECONNECT_ERR_MS: RECONNECT_MS, h, try_reconnect);
 		}
-#endif
-
-#if defined(X3270_DISPLAY) /*[*/
-		if(toggled(RECONNECT) && !auto_reconnect_inprogress) {
-			/* Schedule an automatic reconnection. */
-			auto_reconnect_inprogress = True;
-			(void) AddTimeOut(failed? RECONNECT_ERR_MS:
-						   RECONNECT_MS,
-					  try_reconnect);
-		}
-#endif /*]*/
 
 		/*
 		 * Remember a disconnect from ANSI mode, to keep screen tracing
@@ -737,10 +723,10 @@ void host_disconnect(H3270 *h, int failed)
 			trace_ansi_disc();
 #endif /*]*/
 
-		h3270.cstate = NOT_CONNECTED;
+		h->cstate = NOT_CONNECTED;
 
 		/* Propagate the news to everyone else. */
-		st_changed(ST_CONNECT, False);
+		lib3270_st_changed(h,ST_CONNECT, False);
 	}
 }
 
