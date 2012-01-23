@@ -72,5 +72,28 @@
 	 */
 	LIB3270_EXPORT void lib3270_register_schange(H3270 *h,LIB3270_STATE_CHANGE tx, void (*func)(H3270 *, int, void *),void *data);
 
+	/**
+	 * Network connect operation, keep main loop running
+	 *
+	 * Sets 'reconnect_host', 'current_host' and 'full_current_host' as
+	 * side-effects.
+	 *
+	 * @param h		Session handle.
+	 * @param n		Host ID
+	 * @param wait	Non zero to wait for connection to be ok.
+	 *
+	 * @return 0 for success, EAGAIN if auto-reconnect is in progress, EBUSY if connected, ENOTCONN if connection has failed, -1 on unexpected failure.
+	 *
+	 */
+	LIB3270_EXPORT int lib3270_connect(H3270 *h,const char *n, int wait);
+
+	/**
+	 * Reconnect.
+	 *
+	 * @param h		Session handle.
+	 * @param wait	Non zero to wait for connection to be ok.
+	 */
+	LIB3270_EXPORT int lib3270_reconnect(H3270 *h,int wait);
+
 
 #endif // LIB3270_H_INCLUDED

@@ -238,7 +238,7 @@ printer_start(const char *lu)
 	}
 	s = cmdline;
 	while ((s = strstr(s, "%H%")) != CN) {
-		cmd_len += strlen(qualified_host) - 3;
+		cmd_len += strlen(h3270.qualified_host) - 3;
 		s += 3;
 	}
 #if !defined(_WIN32) /*[*/
@@ -273,7 +273,7 @@ printer_start(const char *lu)
 				s += 2;
 				continue;
 			} else if (!strncmp(s+1, "H%", 2)) {
-				(void) strcat(cmd_text, qualified_host);
+				(void) strcat(cmd_text, h3270.qualified_host);
 				s += 2;
 				continue;
 #if !defined(_WIN32) /*[*/
