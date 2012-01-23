@@ -59,7 +59,7 @@
 
 #define MAX_RECENT	5
 
-enum cstate	cstate = NOT_CONNECTED;
+// enum cstate	cstate = NOT_CONNECTED;
 Boolean			std_ds_host = False;
 Boolean			no_login_host = False;
 Boolean			non_tn3270e_host = False;
@@ -620,7 +620,7 @@ static int do_connect(H3270 *hSession, const char *n)
 
 	/* Still thinking about it? */
 	if (resolving) {
-		cstate = RESOLVING;
+		h3270.cstate = RESOLVING;
 		st_changed(ST_RESOLVING, True);
 		return 0;
 	}
@@ -639,10 +639,10 @@ static int do_connect(H3270 *hSession, const char *n)
 
 	/* Set state and tell the world. */
 	if (pending) {
-		cstate = PENDING;
+		h3270.cstate = PENDING;
 		st_changed(ST_HALF_CONNECT, True);
 	} else {
-		cstate = CONNECTED_INITIAL;
+		h3270.cstate = CONNECTED_INITIAL;
 		st_changed(ST_CONNECT, True);
 #if defined(X3270_DISPLAY) /*[*/
 		if (toggled(RECONNECT) && error_popup_visible())
@@ -737,7 +737,7 @@ void host_disconnect(H3270 *h, int failed)
 			trace_ansi_disc();
 #endif /*]*/
 
-		cstate = NOT_CONNECTED;
+		h3270.cstate = NOT_CONNECTED;
 
 		/* Propagate the news to everyone else. */
 		st_changed(ST_CONNECT, False);
@@ -752,7 +752,7 @@ host_in3270(enum cstate new_cstate)
 			   new_cstate == CONNECTED_SSCP ||
 			   new_cstate == CONNECTED_TN3270E);
 
-	cstate = new_cstate;
+	h3270.cstate = new_cstate;
 	ever_3270 = now3270;
 	st_changed(ST_3270_MODE, now3270);
 }
@@ -760,7 +760,7 @@ host_in3270(enum cstate new_cstate)
 void
 host_connected(void)
 {
-	cstate = CONNECTED_INITIAL;
+	h3270.cstate = CONNECTED_INITIAL;
 	st_changed(ST_CONNECT, True);
 
 #if defined(X3270_DISPLAY) /*[*/
@@ -1057,14 +1057,6 @@ LIB3270_EXPORT int lib3270_reconnect(H3270 *h,int wait)
 		h->auto_reconnect_inprogress = False;
 		return rc;
 	}
-
-	/*
-	 * If called from a script and the connection was successful (or
-	 * half-successful), pause the script until we are connected and
-	 * we have identified the host type.
-	if (!w && (CONNECTED || HALF_CONNECTED))
-		sms_connect_wait();
-	 */
 
 	return 0;
 }

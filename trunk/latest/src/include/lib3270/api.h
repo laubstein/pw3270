@@ -145,6 +145,21 @@
 		#define ST_CHARSET				LIB3270_STATE_CHARSET
 		#define LIB3270_STATE_CHANGE	LIB3270_STATE
 
+		/** connection state */
+		enum cstate
+		{
+			NOT_CONNECTED,			/**< no socket, unknown mode */
+			RESOLVING,				/**< resolving hostname */
+			PENDING,				/**< connection pending */
+			CONNECTED_INITIAL,		/**< connected, no mode yet */
+			CONNECTED_ANSI,			/**< connected in NVT ANSI mode */
+			CONNECTED_3270,			/**< connected in old-style 3270 mode */
+			CONNECTED_INITIAL_E,	/**< connected in TN3270E mode, unnegotiated */
+			CONNECTED_NVT,			/**< connected in TN3270E mode, NVT mode */
+			CONNECTED_SSCP,			/**< connected in TN3270E mode, SSCP-LU mode */
+			CONNECTED_TN3270E		/**< connected in TN3270E mode, 3270 mode */
+		};
+
 		struct lib3270_state_callback;
 
 		typedef struct _h3270
@@ -154,6 +169,7 @@
 			// Connection info
 			int					  secure_connection;
 			int      			  sock;				/**< Network socket */
+			enum cstate			  cstate;
 
 			#if defined(_WIN32) /*[*/
 			HANDLE				  sock_handle;
@@ -215,22 +231,6 @@
 			KT_STD,
 			KT_GE
 		};
-
-		/** connection state */
-		enum cstate
-		{
-			NOT_CONNECTED,			/**< no socket, unknown mode */
-			RESOLVING,				/**< resolving hostname */
-			PENDING,				/**< connection pending */
-			CONNECTED_INITIAL,		/**< connected, no mode yet */
-			CONNECTED_ANSI,			/**< connected in NVT ANSI mode */
-			CONNECTED_3270,			/**< connected in old-style 3270 mode */
-			CONNECTED_INITIAL_E,	/**< connected in TN3270E mode, unnegotiated */
-			CONNECTED_NVT,			/**< connected in TN3270E mode, NVT mode */
-			CONNECTED_SSCP,			/**< connected in TN3270E mode, SSCP-LU mode */
-			CONNECTED_TN3270E		/**< connected in TN3270E mode, 3270 mode */
-		};
-
 
 		/**  extended attributes */
 		struct ea
@@ -312,9 +312,11 @@
 
 		LIB3270_EXPORT int RegisterFTCallbacks(const struct filetransfer_callbacks *cbk);
 
+		#define QueryCstate() lib3270_get_connection_state(NULL)
+
 		#ifndef LIB3270
 
-			LIB3270_EXPORT enum cstate 	QueryCstate(void);
+
 			LIB3270_EXPORT enum ft_state	QueryFTstate(void);
 
 			#define PCONNECTED	((int) QueryCstate() >= (int)RESOLVING)

@@ -95,5 +95,16 @@
 	 */
 	LIB3270_EXPORT int lib3270_reconnect(H3270 *h,int wait);
 
+	/**
+	 * Get connection state.
+	 *
+	 * @param h		Session handle.
+	 *
+	 * @return Connection state.
+	 *
+	 */
+	LIB3270_EXPORT enum cstate lib3270_get_connection_state(H3270 *h);
+
+
 
 #endif // LIB3270_H_INCLUDED

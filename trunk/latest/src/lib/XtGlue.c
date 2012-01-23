@@ -893,9 +893,12 @@ int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk)
 
 }
 
-LIB3270_EXPORT enum cstate QueryCstate(void)
+LIB3270_EXPORT enum cstate lib3270_get_connection_state(H3270 *h)
 {
-	return cstate;
+	if(!h)
+		h = &h3270;
+
+	return h->cstate;
 }
 
 int CallAndWait(int(*callback)(void *),void *parm)
