@@ -168,8 +168,9 @@
 
 			// Connection info
 			int					  secure_connection;
-			int      			  sock;				/**< Network socket */
-			enum cstate			  cstate;
+			int      			  sock;					/**< Network socket */
+			int					  net_sock;
+			enum cstate			  cstate;				/**< Connection state */
 
 			#if defined(_WIN32) /*[*/
 			HANDLE				  sock_handle;
