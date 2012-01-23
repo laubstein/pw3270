@@ -245,15 +245,15 @@ LIB3270_INTERNAL int			*xtra_width;
 LIB3270_INTERNAL enum ft_state ft_state;
 LIB3270_INTERNAL enum cstate cstate;
 
-#define PCONNECTED	((int)cstate >= (int)RESOLVING)
-#define HALF_CONNECTED	(cstate == RESOLVING || cstate == PENDING)
-#define CONNECTED	((int)cstate >= (int)CONNECTED_INITIAL)
-#define IN_NEITHER	(cstate == CONNECTED_INITIAL)
-#define IN_ANSI		(cstate == CONNECTED_ANSI || cstate == CONNECTED_NVT)
-#define IN_3270		(cstate == CONNECTED_3270 || cstate == CONNECTED_TN3270E || cstate == CONNECTED_SSCP)
-#define IN_SSCP		(cstate == CONNECTED_SSCP)
-#define IN_TN3270E	(cstate == CONNECTED_TN3270E)
-#define IN_E		(cstate >= CONNECTED_INITIAL_E)
+#define PCONNECTED	((int)h3270.cstate >= (int)RESOLVING)
+#define HALF_CONNECTED	(h3270.cstate == RESOLVING || h3270.cstate == PENDING)
+#define CONNECTED	((int)h3270.cstate >= (int)CONNECTED_INITIAL)
+#define IN_NEITHER	(h3270.cstate == CONNECTED_INITIAL)
+#define IN_ANSI		(h3270.cstate == CONNECTED_ANSI || h3270.cstate == CONNECTED_NVT)
+#define IN_3270		(h3270.cstate == CONNECTED_3270 || h3270.cstate == CONNECTED_TN3270E || h3270.cstate == CONNECTED_SSCP)
+#define IN_SSCP		(h3270.cstate == CONNECTED_SSCP)
+#define IN_TN3270E	(h3270.cstate == CONNECTED_TN3270E)
+#define IN_E		(h3270.cstate >= CONNECTED_INITIAL_E)
 
 /*   keyboard modifer bitmap */
 #define ShiftKeyDown	0x01
