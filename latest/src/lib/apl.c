@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como apl.c e possui 219 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -66,6 +66,7 @@
  * for example, "period" becomes "dot".  These are included in the table as
  * well.
  */
+ /*
 
 static struct {
 	const char *name;
@@ -111,7 +112,7 @@ static struct {
 	{ "circlestile",	XK_ograve,		1 },
 	{ "colon",		XK_colon,		0 },
 	{ "comma",		XK_comma,		0 },
-	{ "commabar",		XK_W,			1 }, /* soliton */
+	{ "commabar",		XK_W,			1 }, // soliton
 	{ "del",		XK_bracketleft,		1 },
 	{ "delstile",		XK_udiaeresis,		1 },
 	{ "delta",		XK_bracketright,	1 },
@@ -119,9 +120,9 @@ static struct {
 	{ "deltaunderbar",	XK_Udiaeresis,		1 },
 	{ "deltilde",		XK_Ucircumflex,		1 },
 	{ "diaeresis",		XK_Ecircumflex,		1 },
-	{ "diaeresiscircle",	XK_V,			1 }, /* soliton */
+	{ "diaeresiscircle",	XK_V,			1 }, // soliton
 	{ "diaeresisdot",	XK_Odiaeresis,		1 },
-	{ "diaeresisjot",	XK_U,			1 }, /* soliton */
+	{ "diaeresisjot",	XK_U,			1 }, // soliton
 	{ "diamond",		XK_oslash,		1 },
 	{ "dieresis",		XK_Ecircumflex,		1 },
 	{ "dieresisdot",	XK_Odiaeresis,		1 },
@@ -140,7 +141,7 @@ static struct {
 	{ "epsilonunderbar",	XK_Iacute,		1 },
 	{ "equal",		XK_equal,		0 },
 	{ "equalunderbar",	XK_backslash,		1 },
-	{ "euro",		XK_X,			1 }, /* soliton */
+	{ "euro",		XK_X,			1 }, // soliton
 	{ "greater",		XK_greater,		0 },
 	{ "iota",		XK_yen,			1 },
 	{ "iotaunderbar",	XK_Egrave,		1 },
@@ -197,9 +198,9 @@ static struct {
 	{ 0, 0 }
 };
 
-/*
- * Translation from APL ksysym names to indirect APL keysyms.
- */
+//
+// Translation from APL ksysym names to indirect APL keysyms.
+//
 KeySym
 APLStringToKeysym(char *s, int *is_gep)
 {
@@ -215,5 +216,6 @@ APLStringToKeysym(char *s, int *is_gep)
 		}
 	return NoSymbol;
 }
+*/
 
 #endif /*]*/
