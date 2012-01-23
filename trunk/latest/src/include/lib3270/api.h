@@ -203,6 +203,12 @@
 			// Widget info
 			void				* widget;
 
+			// xio
+			unsigned long		  ns_read_id;
+			unsigned long		  ns_exception_id;
+			char				  reading;
+			char				  excepting;
+
 			/* State change callbacks. */
 			struct lib3270_state_callback *st_callbacks[N_ST];
 			struct lib3270_state_callback *st_last[N_ST];

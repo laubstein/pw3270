@@ -45,32 +45,31 @@
 #include "xioc.h"
 
 /* Statics. */
-static unsigned long ns_read_id;
-static unsigned long ns_exception_id;
-static Boolean reading = False;
-static Boolean excepting = False;
+// static unsigned long ns_read_id;
+// static unsigned long ns_exception_id;
+// static Boolean reading = False;
+// static Boolean excepting = False;
 
 /*
  * Called to set up input on a new network connection.
  */
-void
-x_add_input(int net_sock)
+void x_add_input(H3270 *h,int net_sock)
 {
-	ns_exception_id = AddExcept(net_sock, &h3270, net_exception);
-	excepting = True;
-	ns_read_id = AddInput(net_sock, &h3270, net_input);
-	reading = True;
+	h->ns_exception_id = AddExcept(net_sock, h, net_exception);
+	h->excepting = True;
+	h->ns_read_id = AddInput(net_sock, h, net_input);
+	h->reading = True;
 }
 
 /*
  * Called when an exception is received to disable further exceptions.
  */
-void
-x_except_off(void)
+void x_except_off(H3270 *h)
 {
-	if (excepting) {
-		RemoveInput(ns_exception_id);
-		excepting = False;
+	if(h->excepting)
+	{
+		RemoveInput(h->ns_exception_id);
+		h->excepting = False;
 	}
 }
 
@@ -79,66 +78,34 @@ x_except_off(void)
  * This includes removing and restoring reading, so the exceptions are always
  * processed first.
  */
-void
-x_except_on(int net_sock)
+void x_except_on(H3270 *h,int net_sock)
 {
-	if (excepting)
+	if(h->excepting)
 		return;
-	if (reading)
-		RemoveInput(ns_read_id);
-	ns_exception_id = AddExcept(net_sock, &h3270, net_exception);
-	excepting = True;
-	if (reading)
-		ns_read_id = AddInput(net_sock, &h3270, net_input);
+
+	if(h->reading)
+		RemoveInput(h->ns_read_id);
+
+	h->ns_exception_id = AddExcept(net_sock, h, net_exception);
+	h->excepting = True;
+
+	if(h->reading)
+		h->ns_read_id = AddInput(net_sock, h, net_input);
 }
 
 /*
  * Called to disable input on a closing network connection.
  */
-void
-x_remove_input(void)
+void x_remove_input(H3270 *h)
 {
-	if (reading) {
-		RemoveInput(ns_read_id);
-		reading = False;
+	if(h->reading)
+	{
+		RemoveInput(h->ns_read_id);
+		h->reading = False;
 	}
-	if (excepting) {
-		RemoveInput(ns_exception_id);
-		excepting = False;
-	}
-}
-
-/*
- * Application exit, with cleanup.
- */
- /*
-void
-x3270_exit(int n)
-{
-	static Boolean already_exiting = 0;
-
-	// Handle unintentional recursion.
-	if (already_exiting)
-		return;
-	already_exiting = True;
-
-	// Turn off toggle-related activity.
-	shutdown_toggles();
-
-	// Shut down the socket gracefully.
-	host_disconnect(&h3270,False);
-
-	// Tell anyone else who's interested.
-	st_changed(ST_EXITING, True);
-
-	exit(n);
-}
-
-void
-Quit_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
-{
-	if (!w || !CONNECTED) {
-		x3270_exit(0);
+	if(h->excepting)
+	{
+		RemoveInput(h->ns_exception_id);
+		h->excepting = False;
 	}
 }
-*/
