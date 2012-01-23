@@ -99,8 +99,8 @@ static unsigned char default_bg;
 static unsigned char default_gr;
 static unsigned char default_cs;
 static unsigned char default_ic;
-static void	ctlr_half_connect(H3270 *session, int ignored);
-static void	ctlr_connect(H3270 *session, int ignored);
+static void	ctlr_half_connect(H3270 *session, int ignored, void *dunno);
+static void	ctlr_connect(H3270 *session, int ignored, void *dunno);
 static int	sscp_start;
 static void ticking_stop(void);
 static void ctlr_add_ic(int baddr, unsigned char ic);
@@ -282,7 +282,7 @@ set_formatted(void)
  * Called when a host is half connected.
  */
 static void
-ctlr_half_connect(H3270 *session, int ignored unused)
+ctlr_half_connect(H3270 *session, int ignored unused, void *dunno)
 {
 	ticking_start(True);
 }
@@ -292,7 +292,7 @@ ctlr_half_connect(H3270 *session, int ignored unused)
  * Called when a host connects, disconnects, or changes ANSI/3270 modes.
  */
 static void
-ctlr_connect(H3270 *session, int ignored unused)
+ctlr_connect(H3270 *session, int ignored unused, void *dunno)
 {
 	ticking_stop();
 	status_untiming();

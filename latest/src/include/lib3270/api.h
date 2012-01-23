@@ -118,6 +118,35 @@
 		#define FULL_MODEL_NAME_SIZE	13
 
 
+		/* State change IDs. */
+		typedef enum _lib3270_state
+		{
+			LIB3270_STATE_RESOLVING,
+			LIB3270_STATE_HALF_CONNECT,
+			LIB3270_STATE_CONNECT,
+			LIB3270_STATE_3270_MODE,
+			LIB3270_STATE_LINE_MODE,
+			LIB3270_STATE_REMODEL,
+			LIB3270_STATE_PRINTER,
+			LIB3270_STATE_EXITING,
+			LIB3270_STATE_CHARSET,
+
+			N_ST				// Always the last one
+		} LIB3270_STATE;
+
+		#define ST_RESOLVING			LIB3270_STATE_RESOLVING
+		#define ST_HALF_CONNECT			LIB3270_STATE_HALF_CONNECT
+		#define ST_CONNECT				LIB3270_STATE_CONNECT
+		#define ST_3270_MODE			LIB3270_STATE_3270_MODE
+		#define ST_LINE_MODE			LIB3270_STATE_LINE_MODE
+		#define ST_REMODEL				LIB3270_STATE_REMODEL
+		#define ST_PRINTER				LIB3270_STATE_PRINTER
+		#define ST_EXITING				LIB3270_STATE_EXITING
+		#define ST_CHARSET				LIB3270_STATE_CHARSET
+		#define LIB3270_STATE_CHANGE	LIB3270_STATE
+
+		struct lib3270_state_callback;
+
 		typedef struct _h3270
 		{
 			unsigned short 	  sz;				/**< Struct size */
@@ -138,10 +167,10 @@
 			char				  full_model_name[FULL_MODEL_NAME_SIZE+1];
 			char				* model_name;
 			int					  model_num;
-			char           	* termtype;
+			char       	    	* termtype;
 
 			char				* current_host;
-			unsigned short	  current_port;
+			unsigned short		  current_port;
 
 			// screen info
 			int					  ov_rows;
@@ -149,8 +178,22 @@
 			int					  first_changed;
 			int					  last_changed;
 
+			// Widget info
+			void				* widget;
+
+			/* State change callbacks. */
+			struct lib3270_state_callback *st_callbacks[N_ST];
+			struct lib3270_state_callback *st_last[N_ST];
 
 		} H3270;
+
+		struct lib3270_state_callback
+		{
+			struct lib3270_state_callback	* next;			/**< Next callback in chain */
+			void							* data;			/**< User data */
+			void (*func)(struct _h3270 *, int, void *);		/**< Function to call */
+		};
+
 
 		/** Type of dialog boxes */
 		typedef enum _PW3270_DIALOG
@@ -446,7 +489,7 @@
 
 		LIB3270_EXPORT int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
 
-		LIB3270_EXPORT H3270 * new_3270_session(const char *model);
+		#define new_3270_session(m) lib3270_session_new(m)
 
 		LIB3270_EXPORT const struct lib3270_option * get_3270_option_table(int sz);
 
@@ -513,26 +556,12 @@
 
 		#include <lib3270/actions.h>
 
-		/* Host connect/disconnect and state change. */
-		typedef enum state_change
-		{
-			ST_RESOLVING,
-			ST_HALF_CONNECT,
-			ST_CONNECT,
-			ST_3270_MODE,
-			ST_LINE_MODE,
-			ST_REMODEL,
-			ST_PRINTER,
-			ST_EXITING,
-			ST_CHARSET,
-
-			N_ST				// Always the last one
-		} LIB3270_STATE_CHANGE;
-
 		LIB3270_EXPORT int host_connect(const char *n, int wait);
 		LIB3270_EXPORT int host_reconnect(int wait);
 		LIB3270_EXPORT void host_disconnect(H3270 *h, int disable);
-		LIB3270_EXPORT void register_schange(LIB3270_STATE_CHANGE tx, void (*func)(H3270 *, int));
+
+		#define register_schange(tx,func) lib3270_register_schange(NULL,tx,func,NULL)
+		LIB3270_EXPORT void lib3270_register_schange(H3270 *h,LIB3270_STATE tx, void (*func)(H3270 *, int, void *),void *user_data);
 
 		/* Console/Trace window */
 		LIB3270_EXPORT HCONSOLE	  console_window_new(const char *title, const char *label);

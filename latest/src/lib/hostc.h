@@ -35,7 +35,9 @@
 	extern void Disconnect_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
 */
 
-	LIB3270_INTERNAL void st_changed(int tx, int mode);
+	#define st_changed(tx,mode) lib3270_st_changed(NULL,tx,mode)
+
+	LIB3270_INTERNAL void lib3270_st_changed(H3270 *h, int tx, int mode);
 	LIB3270_INTERNAL void hostfile_init(void);
 	LIB3270_INTERNAL void host_connected(void);
 	LIB3270_INTERNAL void host_in3270(enum cstate);

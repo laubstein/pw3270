@@ -1683,7 +1683,7 @@ ansi_scroll(void)
 
 /* Callback for when we enter ANSI mode. */
 static void
-ansi_in3270(H3270 *session, int in3270)
+ansi_in3270(H3270 *session, int in3270, void *dunno)
 {
 	if (!in3270)
 		(void) ansi_reset(0, 0);

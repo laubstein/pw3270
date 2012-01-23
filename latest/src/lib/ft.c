@@ -57,8 +57,8 @@
 #include "telnetc.h"
 #include "utilc.h"
 
-static void ft_connected(H3270 *session, int ignored);
-static void ft_in3270(H3270 *session, int ignored unused);
+static void ft_connected(H3270 *session, int ignored, void *dunno);
+static void ft_in3270(H3270 *session, int ignored unused, void *dunno);
 
 /* Macros. */
 #define eos(s)	strchr((s), '\0')
@@ -372,14 +372,14 @@ ft_aborting(void)
 }
 
 /* Process a disconnect abort. */
-static void ft_connected(H3270 *session, int ignored)
+static void ft_connected(H3270 *session, int ignored, void *dunno)
 {
 	if (!CONNECTED && ft_state != FT_NONE)
 		ft_complete(MSG_("ftDisconnected","Host disconnected, transfer cancelled"));
 }
 
 /* Process an abort from no longer being in 3270 mode. */
-static void ft_in3270(H3270 *session, int ignored)
+static void ft_in3270(H3270 *session, int ignored, void *dunno)
 {
 	if (!IN_3270 && ft_state != FT_NONE)
 		ft_complete(MSG_("ftNot3270","Not in 3270 mode, transfer cancelled"));
