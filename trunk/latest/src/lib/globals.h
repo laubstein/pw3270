@@ -128,7 +128,7 @@
 #endif /*]*/
 
 /* Stop conflicting with curses' COLS, even if we don't link with it. */
-#define COLS cCOLS
+// #define COLS cCOLS
 
 
 /* types of internal actions */

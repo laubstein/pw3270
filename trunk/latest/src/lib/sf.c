@@ -734,8 +734,8 @@ do_qr_usable_area(void)
 	space3270out(19);
 	*obptr++ = 0x01;	/* 12/14-bit addressing */
 	*obptr++ = 0x00;	/* no special character features */
-	SET16(obptr, maxCOLS);	/* usable width */
-	SET16(obptr, maxROWS);	/* usable height */
+	SET16(obptr, h3270.maxCOLS);	/* usable width */
+	SET16(obptr, h3270.maxROWS);	/* usable height */
 	*obptr++ = 0x01;	/* units (mm) */
 	num = display_widthMM();
 	denom = display_width();
@@ -755,7 +755,7 @@ do_qr_usable_area(void)
 	SET16(obptr, (int)denom); /* Yr denominator */
 	*obptr++ = *char_width;	/* AW */
 	*obptr++ = *char_height;/* AH */
-	SET16(obptr, maxCOLS*maxROWS);	/* buffer, questionable */
+	SET16(obptr, h3270.maxCOLS * h3270.maxROWS);	/* buffer, questionable */
 }
 
 static void
@@ -846,7 +846,7 @@ do_qr_alpha_part(void)
 	trace_ds("> QueryReply(AlphanumericPartitions)\n");
 	space3270out(4);
 	*obptr++ = 0;		/* 1 partition */
-	SET16(obptr, maxROWS*maxCOLS);	/* buffer space */
+	SET16(obptr, h3270.maxROWS * h3270.maxCOLS);	/* buffer space */
 	*obptr++ = 0;		/* no special features */
 }
 
@@ -959,8 +959,8 @@ do_qr_imp_part(void)
 	*obptr++ = 0x00;	/* reserved */
 	SET16(obptr, 80);	/* implicit partition width */
 	SET16(obptr, 24);	/* implicit partition height */
-	SET16(obptr, maxCOLS);	/* alternate height */
-	SET16(obptr, maxROWS);	/* alternate width */
+	SET16(obptr, h3270.maxCOLS);	/* alternate height */
+	SET16(obptr, h3270.maxROWS);	/* alternate width */
 }
 
 static void

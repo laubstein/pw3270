@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como print.c e possui 748 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -73,7 +73,7 @@
 /* Statics */
 
 /*
-#if defined(X3270_DISPLAY) 
+#if defined(X3270_DISPLAY)
 static Widget print_text_shell = (Widget)NULL;
 static Widget save_text_shell = (Widget)NULL;
 static Widget print_window_shell = (Widget)NULL;
@@ -171,13 +171,13 @@ fprint_screen(FILE *f, Boolean even_if_empty, Boolean use_html)
 		fa_high = FA_IS_HIGH(fa);
 	current_high = fa_high;
 
-	for (i = 0; i < ROWS*COLS; i++) {
+	for (i = 0; i < h3270.rows*h3270.cols; i++) {
 #if defined(X3270_DBCS) /*[*/
 		char mb[16];
 		Boolean is_dbcs = False;
 #endif /*]*/
 
-		if (i && !(i % COLS)) {
+		if (i && !(i % h3270.cols)) {
 			nr++;
 			ns = 0;
 		}
@@ -522,7 +522,7 @@ PrintText_action(Widget w unused, XEvent *event, String *params,
 	if (!use_file && (filter == CN || !*filter))
 		filter = "lpr";
 
-#if defined(X3270_DISPLAY) 
+#if defined(X3270_DISPLAY)
 	if (secure ||
 		ia_cause == IA_COMMAND ||
 		ia_cause == IA_MACRO ||
@@ -532,7 +532,7 @@ PrintText_action(Widget w unused, XEvent *event, String *params,
 		FILE *f;
 		int fd = -1;
 
-		// Invoked non-interactively. 
+		// Invoked non-interactively.
 		if (use_file) {
 			if (use_string) {
 				char temp_name[15];

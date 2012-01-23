@@ -301,8 +301,8 @@ static const char *trsp_flag[2] = { "POSITIVE-RESPONSE", "NEGATIVE-RESPONSE" };
 // #define XMIT_ROWS	((appres.altscreen != CN)? 24: maxROWS)
 // #define XMIT_COLS	((appres.altscreen != CN)? 80: maxCOLS)
 // #else /*][*/
-#define XMIT_ROWS	maxROWS
-#define XMIT_COLS	maxCOLS
+#define XMIT_ROWS	h3270.maxROWS
+#define XMIT_COLS	h3270.maxCOLS
 // #endif /*]*/
 
 #if defined(HAVE_LIBSSL) /*[*/
