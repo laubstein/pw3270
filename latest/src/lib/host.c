@@ -692,7 +692,8 @@ void host_disconnect(H3270 *h, int failed)
 	if(!h)
 		h = &h3270;
 
-	if (CONNECTED || HALF_CONNECTED) {
+	if (CONNECTED || HALF_CONNECTED)
+	{
 		x_remove_input(h);
 		net_disconnect();
 		h->net_sock = -1;
