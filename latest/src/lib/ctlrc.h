@@ -31,11 +31,11 @@ LIB3270_INTERNAL void ctlr_add_cs(int baddr, unsigned char cs);
 LIB3270_INTERNAL void ctlr_add_fa(int baddr, unsigned char fa, unsigned char cs);
 LIB3270_INTERNAL void ctlr_add_fg(int baddr, unsigned char color);
 LIB3270_INTERNAL void ctlr_add_gr(int baddr, unsigned char gr);
-LIB3270_INTERNAL void ctlr_altbuffer(Boolean alt);
+LIB3270_INTERNAL void ctlr_altbuffer(H3270 *session, int alt);
 LIB3270_INTERNAL Boolean ctlr_any_data(void);
 LIB3270_INTERNAL void ctlr_bcopy(int baddr_from, int baddr_to, int count, int move_ea);
 // LIB3270_INTERNAL void ctlr_changed(int bstart, int bend);
-LIB3270_INTERNAL void ctlr_clear(Boolean can_snap);
+LIB3270_INTERNAL void ctlr_clear(H3270 *session, Boolean can_snap);
 LIB3270_INTERNAL void ctlr_erase_all_unprotected(void);
 LIB3270_INTERNAL void ctlr_init(unsigned cmask);
 LIB3270_INTERNAL void ctlr_read_buffer(unsigned char aid_byte);
@@ -59,6 +59,7 @@ LIB3270_INTERNAL void ps_process(void);
 
 LIB3270_INTERNAL void update_model_info(H3270 *session, int model, int cols, int rows);
 LIB3270_INTERNAL void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr);
+LIB3270_INTERNAL void ctlr_erase(H3270 *session, int alt);
 
 LIB3270_INTERNAL void ticking_start(H3270 *session, Boolean anyway);
 LIB3270_INTERNAL void toggle_nop(struct toggle *t, enum toggle_type tt);

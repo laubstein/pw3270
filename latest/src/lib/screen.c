@@ -99,10 +99,18 @@ void set_display_charset(char *dcs)
 		callbacks->charset(dcs);
 }
 
+/*
 static void addch(int row, int col, int c, int attr)
 {
 	if(callbacks && callbacks->addch)
 		callbacks->addch(row, col, c, attr);
+}
+*/
+
+static void addch(H3270 *session, int baddr, unsigned short c, int attr)
+{
+	if(callbacks && callbacks->addch)
+		callbacks->addch(baddr/session->cols, baddr%session->cols, c, attr);
 }
 
 /**
@@ -140,8 +148,6 @@ int screen_init(H3270 *session)
 //		(void) fprintf(stderr, "invalid %s value: '%s', assuming 'auto'\n", ResAllBold, appres.all_bold);
 //	if (ab_mode == TS_AUTO)
 //		ab_mode = appres.m3279? TS_ON: TS_OFF;
-
-	/* Pull in the user's color mappings. */
 
 	/* Set up the controller. */
 	ctlr_init(-1);
@@ -298,7 +304,7 @@ void update_model_info(H3270 *session, int model, int cols, int rows)
 /* Get screen contents */
 int screen_read(char *dest, int baddr, int count)
 {
-	unsigned char fa	= get_field_attribute(baddr);
+	unsigned char fa	= get_field_attribute(&h3270,baddr);
 	int 			max = (h3270.maxROWS * h3270.maxCOLS);
 
 	*dest = 0;
@@ -333,20 +339,15 @@ int screen_read(char *dest, int baddr, int count)
 static void screen_update(H3270 *session, int bstart, int bend)
 {
 
-	int baddr, row, col;
+	int baddr;
 	unsigned short a;
 	int attr = COLOR_GREEN;
 	unsigned char fa;
 	int fa_addr;
 
-	fa		= get_field_attribute(bstart);
+	fa		= get_field_attribute(session,bstart);
 	a  		= color_from_fa(fa);
-	fa_addr = find_field_attribute(bstart); // may be -1, that's okay
-
-	row = bstart/session->cols;
-	col = bstart%session->cols;
-
-	Trace("Update@%d-%d (%d,%d): [%c]",bstart,bend,row,col,ebc2asc[ea_buf[bstart].cc]);
+	fa_addr = find_field_attribute(session,bstart); // may be -1, that's okay
 
 	for(baddr = bstart; baddr <= bend; baddr++)
 	{
@@ -356,12 +357,12 @@ static void screen_update(H3270 *session, int bstart, int bend)
 			fa_addr = baddr;
 			fa = ea_buf[baddr].fa;
 			a = calc_attrs(baddr, baddr, fa);
-			addch(row,col,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
+			addch(session,baddr,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
 		}
 		else if (FA_IS_ZERO(fa))
 		{
 			// Blank.
-			addch(row,col,' ',attr=a);
+			addch(session,baddr,' ',attr=a);
 		}
 		else
 		{
@@ -384,25 +385,19 @@ static void screen_update(H3270 *session, int bstart, int bend)
 
 			if (ea_buf[baddr].cs == CS_LINEDRAW)
 			{
-				addch(row,col,ea_buf[baddr].cc,attr);
+				addch(session,baddr,ea_buf[baddr].cc,attr);
 			}
 			else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
 			{
-				addch(row,col,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
+				addch(session,baddr,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
 			}
 			else
 			{
 				if (toggled(MONOCASE))
-					addch(row,col,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
+					addch(session,baddr,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
 				else
-					addch(row,col,ebc2asc[ea_buf[baddr].cc],attr);
+					addch(session,baddr,ebc2asc[ea_buf[baddr].cc],attr);
 			}
-		}
-
-		if(++col >= session->cols)
-		{
-			row++;
-			col=0;
 		}
 
 	}
@@ -598,8 +593,10 @@ static void status_connect(H3270 *session, int connected, void *dunno)
 {
 	STATUS_CODE id = STATUS_CODE_USER;
 
-	if (connected) {
+	ctlr_erase(session,1);
 
+	if (connected)
+	{
 		set_status(session,OIA_FLAG_BOXSOLID,IN_3270 && !IN_SSCP);
 
 		if (kybdlock & KL_AWAITING_FIRST)
@@ -611,7 +608,9 @@ static void status_connect(H3270 *session, int connected, void *dunno)
 		set_status(session,OIA_FLAG_SECURE,session->secure_connection);
 #endif /*]*/
 
-	} else {
+	}
+	else
+	{
 		set_status(session,OIA_FLAG_BOXSOLID,False);
 		set_status(session,OIA_FLAG_SECURE,False);
 

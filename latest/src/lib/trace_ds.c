@@ -447,7 +447,7 @@ create_tracefile_header(const char *mode)
 		 * write to ensure that the display is in the right
 		 * mode.
 		 */
-		if (formatted) {
+		if (h3270.formatted) {
 			wtrace(" Screen contents:\n");
 			obptr = obuf;
 #if defined(X3270_TN3270E) /*[*/

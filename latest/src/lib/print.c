@@ -150,7 +150,7 @@ fprint_screen(FILE *f, Boolean even_if_empty, Boolean use_html)
 	int ns = 0;
 	int nr = 0;
 	Boolean any = False;
-	int fa_addr = find_field_attribute(0);
+	int fa_addr = find_field_attribute(&h3270,0);
 	unsigned char fa = ea_buf[fa_addr].fa;
 	int fa_color, current_color;
 	Bool fa_high, current_high;

@@ -766,8 +766,8 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 		return False;
 	}
 	baddr = h3270.cursor_addr;
-	faddr = find_field_attribute(baddr);
-	fa = get_field_attribute(baddr);
+	faddr = find_field_attribute(&h3270,baddr);
+	fa = get_field_attribute(&h3270,baddr);
 	if (ea_buf[baddr].fa || FA_IS_PROTECTED(fa)) {
 		operator_error(KL_OERR_PROTECTED);
 		return False;
@@ -919,7 +919,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 	INC_BA(baddr);
 
 	/* Replace leading nulls with blanks, if desired. */
-	if (formatted && toggled(BLANK_FILL)) {
+	if (h3270.formatted && toggled(BLANK_FILL)) {
 		register int	baddr_fill = baddr;
 
 		DEC_BA(baddr_fill);
@@ -1602,7 +1602,7 @@ LIB3270_ACTION( firstfield )
 		return 0;
 	}
 #endif /*]*/
-	if (!formatted) {
+	if (!h3270.formatted) {
 		cursor_move(0);
 		return 0;
 	}
@@ -1692,7 +1692,7 @@ do_delete(void)
 	baddr = h3270.cursor_addr;
 
 	/* Can't delete a field attribute. */
-	fa = get_field_attribute(baddr);
+	fa = get_field_attribute(&h3270,baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
 		return False;
@@ -1718,7 +1718,7 @@ do_delete(void)
 		ndel = 1;
 
 	/* find next fa */
-	if (formatted) {
+	if (h3270.formatted) {
 		end_baddr = baddr;
 		do {
 			INC_BA(end_baddr);
@@ -1826,7 +1826,7 @@ do_erase(void)
 	enum dbcs_state d;
 
 	baddr = h3270.cursor_addr;
-	faddr = find_field_attribute(baddr);
+	faddr = find_field_attribute(&h3270,baddr);
 	if (faddr == baddr || FA_IS_PROTECTED(ea_buf[baddr].fa)) {
 		operator_error(KL_OERR_PROTECTED);
 		return;
@@ -1994,11 +1994,11 @@ LIB3270_ACTION( previousword )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	if (!formatted)
+	if (!h3270.formatted)
 		return 0;
 
 	baddr = h3270.cursor_addr;
-	prot = FA_IS_PROTECTED(get_field_attribute(baddr));
+	prot = FA_IS_PROTECTED(get_field_attribute(&h3270,baddr));
 
 	/* Skip to before this word, if in one now. */
 	if (!prot) {
@@ -2017,7 +2017,7 @@ LIB3270_ACTION( previousword )
 		c = ea_buf[baddr].cc;
 		if (ea_buf[baddr].fa) {
 			DEC_BA(baddr);
-			prot = FA_IS_PROTECTED(get_field_attribute(baddr));
+			prot = FA_IS_PROTECTED(get_field_attribute(&h3270,baddr));
 			continue;
 		}
 		if (!prot && c != EBC_space && c != EBC_null)
@@ -2087,7 +2087,7 @@ nu_word(int baddr)
 	unsigned char c;
 	Boolean prot;
 
-	prot = FA_IS_PROTECTED(get_field_attribute(baddr));
+	prot = FA_IS_PROTECTED(get_field_attribute(&h3270,baddr));
 
 	do {
 		c = ea_buf[baddr].cc;
@@ -2145,12 +2145,12 @@ LIB3270_ACTION( nextword )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	if (!formatted)
+	if (!h3270.formatted)
 		return 0;
 
 	/* If not in an unprotected field, go to the next unprotected word. */
 	if (ea_buf[h3270.cursor_addr].fa ||
-	    FA_IS_PROTECTED(get_field_attribute(h3270.cursor_addr))) {
+	    FA_IS_PROTECTED(get_field_attribute(&h3270,h3270.cursor_addr))) {
 		baddr = nu_word(h3270.cursor_addr);
 		if (baddr != -1)
 			cursor_move(baddr);
@@ -2311,7 +2311,7 @@ LIB3270_CURSOR_ACTION( newline )
 #endif /*]*/
 	baddr = (h3270.cursor_addr + h3270.cols) % (h3270.cols * h3270.rows);	/* down */
 	baddr = (baddr / h3270.cols) * h3270.cols;			/* 1st col */
-	faddr = find_field_attribute(baddr);
+	faddr = find_field_attribute(&h3270,baddr);
 	fa = ea_buf[faddr].fa;
 	if (faddr != baddr && !FA_IS_PROTECTED(fa))
 		cursor_move(baddr);
@@ -2426,7 +2426,7 @@ LIB3270_ACTION( clear )
 	}
 #endif /*]*/
 	buffer_addr = 0;
-	ctlr_clear(True);
+	ctlr_clear(&h3270,True);
 	cursor_move(0);
 	if (CONNECTED)
 		key_AID(AID_CLEAR);
@@ -2566,14 +2566,14 @@ LIB3270_ACTION( eraseeol )
 #endif /*]*/
 
 	baddr = h3270.cursor_addr;
-	fa = get_field_attribute(baddr);
+	fa = get_field_attribute(&h3270,baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa)
 	{
 		operator_error(KL_OERR_PROTECTED);
 		return -1;
 	}
 
-	if (formatted)
+	if (h3270.formatted)
 	{
 		/* erase to next field attribute or current line */
 		do
@@ -2631,12 +2631,12 @@ LIB3270_ACTION( eraseeof )
 		return 0;
 #endif /*]*/
 	baddr = h3270.cursor_addr;
-	fa = get_field_attribute(baddr);
+	fa = get_field_attribute(&h3270,baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
 		return -1;
 	}
-	if (formatted) {	/* erase to next field attribute */
+	if (h3270.formatted) {	/* erase to next field attribute */
 		do {
 			ctlr_add(baddr, EBC_null, 0);
 			INC_BA(baddr);
@@ -2679,7 +2679,7 @@ LIB3270_ACTION( eraseinput )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	if (formatted) {
+	if (h3270.formatted) {
 		/* find first field attribute */
 		baddr = 0;
 		do {
@@ -2712,7 +2712,7 @@ LIB3270_ACTION( eraseinput )
 		if (!f)
 			cursor_move(0);
 	} else {
-		ctlr_clear(True);
+		ctlr_clear(&h3270,True);
 		cursor_move(0);
 	}
 	screen_disp(&h3270);
@@ -2745,11 +2745,11 @@ LIB3270_ACTION( deleteword )
 		return 0;
 	}
 #endif /*]*/
-	if (!formatted)
+	if (!h3270.formatted)
 		return 0;
 
 	baddr = h3270.cursor_addr;
-	fa = get_field_attribute(baddr);
+	fa = get_field_attribute(&h3270,baddr);
 
 	/* Make sure we're on a modifiable field. */
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
@@ -2812,11 +2812,11 @@ LIB3270_ACTION( deletefield )
 		return 0;
 	}
 #endif /*]*/
-	if (!formatted)
+	if (!h3270.formatted)
 		return 0;
 
 	baddr = h3270.cursor_addr;
-	fa = get_field_attribute(baddr);
+	fa = get_field_attribute(&h3270,baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
 		return -1;
@@ -2916,10 +2916,10 @@ LIB3270_ACTION( fieldend )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	if (!formatted)
+	if (!h3270.formatted)
 		return 0;
 	baddr = h3270.cursor_addr;
-	faddr = find_field_attribute(baddr);
+	faddr = find_field_attribute(&h3270,baddr);
 	fa = ea_buf[faddr].fa;
 	if (faddr == baddr || FA_IS_PROTECTED(fa))
 		return 0;
@@ -3299,7 +3299,7 @@ remargin(int lmargin)
 			b0 = baddr;
 			ever = True;
 		}
-		faddr = find_field_attribute(baddr);
+		faddr = find_field_attribute(&h3270,baddr);
 		fa = ea_buf[faddr].fa;
 		if (faddr == baddr || FA_IS_PROTECTED(fa)) {
 			baddr = next_unprotected(baddr);
@@ -3855,10 +3855,10 @@ kybd_prime(void)
 	 * No point in trying if the screen isn't formatted, the keyboard
 	 * is locked, or we aren't in 3270 mode.
 	 */
-	if (!formatted || kybdlock || !IN_3270)
+	if (!h3270.formatted || kybdlock || !IN_3270)
 		return 0;
 
-	fa = get_field_attribute(h3270.cursor_addr);
+	fa = get_field_attribute(&h3270,h3270.cursor_addr);
 	if (ea_buf[h3270.cursor_addr].fa || FA_IS_PROTECTED(fa)) {
 		/*
 		 * The cursor is not in an unprotected field.  Find the

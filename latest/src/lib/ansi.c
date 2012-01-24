@@ -605,10 +605,10 @@ ansi_reset(int ig1 unused, int ig2 unused)
 		tabs[i] = 0x01;
 	held_wrap = False;
 	if (!first) {
-		ctlr_altbuffer(True);
+		ctlr_altbuffer(&h3270,True);
 		ctlr_aclear(0, h3270.rows * h3270.cols, 1);
-		ctlr_altbuffer(False);
-		ctlr_clear(False);
+		ctlr_altbuffer(&h3270,False);
+		ctlr_clear(&h3270,False);
 		screen_80();
 	}
 	first = False;
@@ -714,7 +714,7 @@ ansi_erase_in_display(int nn, int ig2 unused)
 		ctlr_aclear(0, h3270.cursor_addr + 1, 1);
 		break;
 	    case 2:	/* all (without moving cursor) */
-		if (cursor_addr == 0 && !is_altbuffer)
+		if (cursor_addr == 0 && !h3270.is_altbuffer)
 			scroll_save(h3270.rows, True);
 		ctlr_aclear(0, h3270.rows * h3270.cols, 1);
 		break;
@@ -924,7 +924,7 @@ ansi_bell(int ig1 unused, int ig2 unused)
 static enum state
 ansi_newpage(int ig1 unused, int ig2 unused)
 {
-	ctlr_clear(False);
+	ctlr_clear(&h3270,False);
 	return DATA;
 }
 
@@ -1443,7 +1443,7 @@ dec_set(int ig1 unused, int ig2 unused)
 			rev_wraparound_mode = 1;
 			break;
 		    case 47:	/* alt buffer */
-			ctlr_altbuffer(True);
+			ctlr_altbuffer(&h3270,True);
 			break;
 		}
 	return DATA;
@@ -1475,7 +1475,7 @@ dec_reset(int ig1 unused, int ig2 unused)
 			rev_wraparound_mode = 0;
 			break;
 		    case 47:	/* alt buffer */
-			ctlr_altbuffer(False);
+			ctlr_altbuffer(&h3270,False);
 			break;
 		}
 	return DATA;
@@ -1504,7 +1504,7 @@ dec_save(int ig1 unused, int ig2 unused)
 			saved_rev_wraparound_mode = rev_wraparound_mode;
 			break;
 		    case 47:	/* alt buffer */
-			saved_altbuffer = is_altbuffer;
+			saved_altbuffer = h3270.is_altbuffer;
 			break;
 		}
 	return DATA;
@@ -1539,7 +1539,7 @@ dec_restore(int ig1 unused, int ig2 unused)
 			rev_wraparound_mode = saved_rev_wraparound_mode;
 			break;
 		    case 47:	/* alt buffer */
-			ctlr_altbuffer(saved_altbuffer);
+			ctlr_altbuffer(&h3270,saved_altbuffer);
 			break;
 		}
 	return DATA;
@@ -1664,7 +1664,7 @@ ansi_scroll(void)
 
 	/* Save the top line */
 	if (scroll_top == 1 && scroll_bottom == h3270.rows) {
-		if (!is_altbuffer)
+		if (!h3270.is_altbuffer)
 			scroll_save(1, False);
 		ctlr_scroll();
 		return;
