@@ -393,11 +393,11 @@ kybd_inhibit(Boolean inhibit)
 	if (inhibit) {
 		kybdlock_set(KL_ENTER_INHIBIT, "kybd_inhibit");
 		if (kybdlock == KL_ENTER_INHIBIT)
-			status_reset();
+			status_reset(NULL);
 	} else {
 		kybdlock_clr(KL_ENTER_INHIBIT, "kybd_inhibit");
 		if (!kybdlock)
-			status_reset();
+			status_reset(NULL);
 	}
 }
 
@@ -466,7 +466,7 @@ operator_error(int error_type)
 //		popup_an_error("Keyboard locked");
 
 	if(appres.oerr_lock) { // || sms_redirect()) {
-		status_oerr(error_type);
+		status_oerr(NULL,error_type);
 		mcursor_locked();
 		kybdlock_set((unsigned int)error_type, "operator_error");
 		(void) flush_ta();
@@ -527,15 +527,15 @@ key_AID(unsigned char aid_code)
 		buffer_addr = h3270.cursor_addr;
 	}
 	if (!IN_SSCP || aid_code != AID_CLEAR) {
-		status_twait();
+		status_twait(NULL);
 		mcursor_waiting();
 		set_toggle(INSERT,0);
 		kybdlock_set(KL_OIA_TWAIT | KL_OIA_LOCKED, "key_AID");
 	}
 	aid = aid_code;
 	ctlr_read_modified(aid, False);
-	ticking_start(False);
-	status_ctlr_done();
+	ticking_start(NULL,False);
+	status_ctlr_done(NULL);
 }
 
 LIB3270_FKEY_ACTION( pfkey )
@@ -1425,7 +1425,7 @@ LIB3270_KEY_ACTION( tab )
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
 			kybdlock_clr(KL_OERR_MASK, "Tab");
-			status_reset();
+			status_reset(&h3270);
 		} else {
 			ENQUEUE_ACTION(lib3270_tab);
 			return 0;
@@ -1455,7 +1455,7 @@ LIB3270_KEY_ACTION( backtab )
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
 			kybdlock_clr(KL_OERR_MASK, "BackTab");
-			status_reset();
+			status_reset(NULL);
 		} else {
 			ENQUEUE_ACTION(lib3270_backtab);
 			return 0;
@@ -1494,7 +1494,7 @@ LIB3270_KEY_ACTION( backtab )
 static void defer_unlock(H3270 *session)
 {
 	kybdlock_clr(KL_DEFERRED_UNLOCK, "defer_unlock");
-	status_reset();
+	status_reset(session);
 	if (CONNECTED)
 		ps_process();
 }
@@ -1566,7 +1566,7 @@ do_reset(Boolean explicit)
 	}
 
 	/* Clean up other modes. */
-	status_reset();
+	status_reset(NULL);
 	mcursor_normal();
 
 //	composing = NONE;
@@ -1643,7 +1643,7 @@ LIB3270_CURSOR_ACTION( left )
 		if (KYBDLOCK_IS_OERR)
 		{
 			kybdlock_clr(KL_OERR_MASK, "Left");
-			status_reset();
+			status_reset(NULL);
 		}
 		else
 		{
@@ -1905,7 +1905,7 @@ LIB3270_CURSOR_ACTION( right )
 		if (KYBDLOCK_IS_OERR)
 		{
 			kybdlock_clr(KL_OERR_MASK, "Right");
-			status_reset();
+			status_reset(NULL);
 		}
 		else
 		{
@@ -2216,7 +2216,7 @@ LIB3270_CURSOR_ACTION( up )
 		if (KYBDLOCK_IS_OERR)
 		{
 			kybdlock_clr(KL_OERR_MASK, "Up");
-			status_reset();
+			status_reset(NULL);
 		}
 		else
 		{
@@ -2265,7 +2265,7 @@ LIB3270_CURSOR_ACTION( down )
 		if (KYBDLOCK_IS_OERR)
 		{
 			kybdlock_clr(KL_OERR_MASK, "Down");
-			status_reset();
+			status_reset(NULL);
 		} else
 		{
 			ENQUEUE_ACTION(lib3270_cursor_down);

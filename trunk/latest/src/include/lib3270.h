@@ -131,7 +131,6 @@
 	 */
 	LIB3270_EXPORT int lib3270_set_cursor_address(H3270 *h, int baddr);
 
-
 	/**
 	 * get cursor address.
 	 *
@@ -141,6 +140,9 @@
 	 *
 	 */
 	LIB3270_EXPORT int lib3270_get_cursor_address(H3270 *h);
+
+
+	LIB3270_EXPORT STATUS_CODE lib3270_get_oia_status(H3270 *h);
 
 
 #endif // LIB3270_H_INCLUDED

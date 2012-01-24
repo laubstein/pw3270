@@ -903,7 +903,7 @@ net_disconnect(void)
 
 	/* We're not connected to an LU any more. */
 	h3270.connected_lu = CN;
-	status_lu(CN);
+	status_lu(&h3270,CN);
 
 #if !defined(_WIN32) /*[*/
 	/* We have no more interest in output buffer space. */
@@ -1175,7 +1175,7 @@ telnet_fsm(unsigned char c)
 #endif /*]*/
 			host_in3270(CONNECTED_ANSI);
 			kybdlock_clr(KL_AWAITING_FIRST, "telnet_fsm");
-			status_reset();
+			status_reset(NULL);
 			ps_process();
 		}
 		if (IN_ANSI && !IN_E) {
@@ -1437,7 +1437,7 @@ telnet_fsm(unsigned char c)
 					h3270.connected_lu = try_lu;
 				} else
 					h3270.connected_lu = CN;
-				status_lu(h3270.connected_lu);
+				status_lu(&h3270,h3270.connected_lu);
 
 				tb_len = 4 + tt_len + 2;
 				tt_out = Malloc(tb_len + 1);
@@ -1620,7 +1620,7 @@ tn3270e_negotiate(void)
 				    (char *)&sbbuf[3+tnlen+1], snlen);
 				reported_lu[snlen] = '\0';
 				h3270.connected_lu = reported_lu;
-				status_lu(h3270.connected_lu);
+				status_lu(&h3270,h3270.connected_lu);
 			}
 
 			/* Tell them what we can do. */
