@@ -74,8 +74,9 @@ extern unsigned char aid;
 // int				ROWS, COLS;
 //int				maxROWS		= 0;
 //int				maxCOLS		= 0;
+// int				cursor_addr;
 
-int				cursor_addr, buffer_addr;
+int				buffer_addr;
 Boolean         screen_alt = False;	/* alternate screen? */
 Boolean         is_altbuffer = False;
 
@@ -174,7 +175,7 @@ void ctlr_reinit(H3270 *session, unsigned cmask)
 		real_aea_buf = (struct ea *)Calloc(sizeof(struct ea),(session->maxROWS * session->maxCOLS) + 1);
 		aea_buf = real_aea_buf + 1;
 		Replace(zero_buf, (unsigned char *)Calloc(sizeof(struct ea),session->maxROWS * session->maxCOLS));
-		cursor_addr = 0;
+		session->cursor_addr = 0;
 		buffer_addr = 0;
 	}
 }
@@ -676,8 +677,8 @@ ctlr_read_modified(unsigned char aid_byte, Boolean all)
 			trace_ds("%s",see_aid(aid_byte));
 			if (short_read)
 			    goto rm_done;
-			ENCODE_BADDR(obptr, cursor_addr);
-			trace_ds("%s",rcba(cursor_addr));
+			ENCODE_BADDR(obptr, h3270.cursor_addr);
+			trace_ds("%s",rcba(h3270.cursor_addr));
 		} else {
 			space3270out(1);	/* just in case */
 		}
@@ -820,8 +821,8 @@ ctlr_read_buffer(unsigned char aid_byte)
 
 	space3270out(3);
 	*obptr++ = aid_byte;
-	ENCODE_BADDR(obptr, cursor_addr);
-	trace_ds("%s%s", see_aid(aid_byte), rcba(cursor_addr));
+	ENCODE_BADDR(obptr, h3270.cursor_addr);
+	trace_ds("%s%s", see_aid(aid_byte), rcba(h3270.cursor_addr));
 
 	baddr = 0;
 	do {
@@ -1018,7 +1019,7 @@ ctlr_snap_buffer(void)
 
 	space3270out(4);
 	*obptr++ = ORDER_SBA;
-	ENCODE_BADDR(obptr, cursor_addr);
+	ENCODE_BADDR(obptr, h3270.cursor_addr);
 	*obptr++ = ORDER_IC;
 }
 
@@ -1165,7 +1166,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 	default_cs = 0;
 	default_ic = 0;
 	trace_primed = True;
-	buffer_addr = cursor_addr;
+	buffer_addr = h3270.cursor_addr;
 	if (WCC_RESET(buf[1])) {
 		if (erase)
 			reply_mode = SF_SRM_FIELD;
@@ -2745,12 +2746,14 @@ static void keep_ticking(H3270 *session)
 	struct timeval t1;
 	long msec;
 
-	do {
+	do
+	{
 		(void) gettimeofday(&t1, (struct timezone *) 0);
 		t_want.tv_sec++;
 		msec = delta_msec(&t_want, &t1);
 	} while (msec <= 0);
-	tick_id = AddTimeOut(msec, &h3270, keep_ticking);
+
+	tick_id = AddTimeOut(msec, session, keep_ticking);
 	status_timing(&t_start, &t1);
 }
 

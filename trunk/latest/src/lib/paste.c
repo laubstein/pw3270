@@ -101,7 +101,7 @@
 
 	if(toggled(MARGINED_PASTE))
 	{
-		baddr = cursor_addr;
+		baddr = h3270.cursor_addr;
 		while(BA_TO_COL(baddr) < lmargin)
 		{
 			baddr = ROWCOL_TO_BA(BA_TO_ROW(baddr), lmargin);
@@ -132,9 +132,9 @@
 
 	if(toggled(SMART_PASTE))
 	{
-		int faddr = find_field_attribute(cursor_addr);
+		int faddr = find_field_attribute(h3270.cursor_addr);
 		if(FA_IS_PROTECTED(ea_buf[faddr].fa))
-			cursor_addr++;
+			h3270.cursor_addr++;
 		else
 			key_ACharacter(c, KT_STD, IA_PASTE, NULL);
 	}
@@ -145,43 +145,39 @@
 
 	data->qtd++;
 
- 	if(BA_TO_ROW(cursor_addr) != data->row)
+ 	if(BA_TO_ROW(h3270.cursor_addr) != data->row)
  	{
- 		Trace("Row changed from %d to %d",data->row,BA_TO_ROW(cursor_addr));
+ 		Trace("Row changed from %d to %d",data->row,BA_TO_ROW(h3270.cursor_addr));
 		if(!remargin(data->orig_col))
 			return 0;
-		data->row = BA_TO_ROW(cursor_addr);
+		data->row = BA_TO_ROW(h3270.cursor_addr);
  		return '\n';
  	}
 
  	return c;
  }
 
-/**
- * Paste string
- *
- * Returns are ignored; newlines mean "move to beginning of next line";
- * tabs and formfeeds become spaces.  Backslashes are not special
- *
- * @param s		String to input.
- *
- * @Returns 0 if ok, negative if error or number of processed characters.
- *
- */
-LIB3270_EXPORT int lib3270_paste_string(const unsigned char *str)
+LIB3270_EXPORT int lib3270_set_string(H3270 *h, const unsigned char *str)
 {
-	PASTE_DATA data = { 0, BA_TO_ROW(cursor_addr), cursor_addr, BA_TO_COL(cursor_addr) };
+	PASTE_DATA data;
 	unsigned char last = 1;
 	int baddr;
 	int faddr;
 	unsigned char fa;
+
+	CHECK_SESSION_HANDLE(h);
+
+	memset(&data,0,sizeof(data));
+ 	data.row		= BA_TO_ROW(h->cursor_addr);
+	data.orig_addr	= h->cursor_addr;
+	data.orig_col	= BA_TO_COL(h->cursor_addr);
 
 	if(kybdlock)
 		return -EINVAL;
 
 	screen_suspend();
 
-	while(*str && last && !kybdlock && cursor_addr >= data.orig_addr)
+	while(*str && last && !kybdlock && h->cursor_addr >= data.orig_addr)
 	{
 		switch(*str)
 		{
@@ -192,15 +188,15 @@ LIB3270_EXPORT int lib3270_paste_string(const unsigned char *str)
 		case '\n':
 			if(last != '\n')
 			{
-				baddr = (cursor_addr + h3270.cols) % (h3270.cols * h3270.rows);   /* down */
-				baddr = (baddr / h3270.cols) * h3270.cols;                  /* 1st col */
+				baddr = (h->cursor_addr + h->cols) % (h->cols * h->rows);   /* down */
+				baddr = (baddr / h->cols) * h->cols;               /* 1st col */
 				faddr = find_field_attribute(baddr);
 				fa = ea_buf[faddr].fa;
 				if (faddr != baddr && !FA_IS_PROTECTED(fa))
 					cursor_move(baddr);
 				else
 					cursor_move(next_unprotected(baddr));
-				data.row = BA_TO_ROW(cursor_addr);
+				data.row = BA_TO_ROW(h->cursor_addr);
 			}
 			last = ' ';
 			data.qtd++;
@@ -212,7 +208,7 @@ LIB3270_EXPORT int lib3270_paste_string(const unsigned char *str)
 		}
 		str++;
 
-		if(IN_3270 && toggled(MARGINED_PASTE) && BA_TO_COL(cursor_addr) < data.orig_col)
+		if(IN_3270 && toggled(MARGINED_PASTE) && BA_TO_COL(h->cursor_addr) < data.orig_col)
 		{
 			if(!remargin(data.orig_col))
 				last = 0;

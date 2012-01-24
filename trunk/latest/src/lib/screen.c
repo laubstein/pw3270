@@ -535,16 +535,16 @@ void screen_resume(void)
 
 int cursor_get_addr(void)
 {
-    return cursor_addr;
+    return h3270.cursor_addr;
 }
 
 int cursor_set_addr(int baddr)
 {
-    int ret = cursor_addr;
+    int ret = h3270.cursor_addr;
 
-    if(cursor_addr != baddr)
+    if(h3270.cursor_addr != baddr)
     {
-        cursor_addr = baddr;
+        h3270.cursor_addr = baddr;
 
         if(callbacks && callbacks->move_cursor)
             callbacks->move_cursor(baddr/h3270.cols, baddr%h3270.cols);

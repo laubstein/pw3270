@@ -130,6 +130,8 @@
 /* Stop conflicting with curses' COLS, even if we don't link with it. */
 // #define COLS cCOLS
 
+#define CHECK_SESSION_HANDLE(x) if(!x) x = &h3270;
+
 
 /* types of internal actions */
 enum iaction {
