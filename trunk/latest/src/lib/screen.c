@@ -631,6 +631,9 @@ static void status_connect(H3270 *session, int connected, void *dunno)
 static void status_3270_mode(H3270 *session, int ignored unused, void *dunno)
 {
 	Boolean oia_boxsolid = (IN_3270 && !IN_SSCP);
+
+	CHECK_SESSION_HANDLE(session);
+
 	if(oia_boxsolid)
 		set_status(session,OIA_FLAG_UNDERA,True);
 	set_status(session,OIA_FLAG_BOXSOLID,oia_boxsolid);
@@ -681,13 +684,15 @@ void ring_bell(void)
 		callbacks->ring_bell();
 }
 
-void
-screen_flip(void)
+/*
+void screen_flip(void)
 {
 	flipped = !flipped;
 	screen_disp(&h3270);
 }
+*/
 
+/*
 void
 screen_132(void)
 {
@@ -697,6 +702,7 @@ void
 screen_80(void)
 {
 }
+*/
 
 /* Set the window title. */
 void

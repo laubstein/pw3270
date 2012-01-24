@@ -229,6 +229,7 @@
 			int					  rows;
 			int					  cols;
 			int					  cursor_addr;
+			char				  flipped;
 
 			// Widget info
 			void				* widget;
@@ -242,6 +243,8 @@
 			/* State change callbacks. */
 			struct lib3270_state_callback *st_callbacks[N_ST];
 			struct lib3270_state_callback *st_last[N_ST];
+
+			/* Session based callbacks */
 
 		} H3270;
 

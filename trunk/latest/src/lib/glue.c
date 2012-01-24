@@ -1009,7 +1009,7 @@ int *char_height = &ch;
 
 Boolean visible_control = False;
 
-Boolean flipped = False;
+// Boolean flipped = False;
 
 /* Replacements for functions in popups.c. */
 
