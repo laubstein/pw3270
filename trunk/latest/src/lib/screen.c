@@ -99,16 +99,15 @@ void set_display_charset(char *dcs)
 		callbacks->charset(dcs);
 }
 
-/*
-static void addch(int row, int col, int c, int attr)
+static void addch(H3270 *session, int baddr, unsigned char c, unsigned short attr)
 {
-	if(callbacks && callbacks->addch)
-		callbacks->addch(row, col, c, attr);
-}
-*/
+	if(ea_buf[baddr].chr == c && ea_buf[baddr].attr == attr)
+			return;
 
-static void addch(H3270 *session, int baddr, unsigned short c, int attr)
-{
+	/* Converted char has changed, update it */
+	ea_buf[baddr].chr  = c;
+	ea_buf[baddr].attr = attr;
+
 	if(callbacks && callbacks->addch)
 		callbacks->addch(baddr/session->cols, baddr%session->cols, c, attr);
 }
@@ -179,15 +178,6 @@ static unsigned short color_from_fa(unsigned char fa)
 	// Green on black
 	return get_color_pair(0,0) | COLOR_ATTR_FIELD | ((FA_IS_HIGH(fa)) ? COLOR_ATTR_INTENSIFY : 0);
 }
-
-/*
-static int reverse_colors(int a)
-{
-	int bg = (a & 0xF0) >> 4;
-	int fg = (a & 0x0F);
-	return get_color_pair(bg,fg) | (a&0xFF00);
-}
-*/
 
 /*
  * Find the display attributes for a baddr, fa_addr and fa.
@@ -405,8 +395,8 @@ static void screen_update(H3270 *session, int bstart, int bend)
 
 void screen_disp(H3270 *session)
 {
-	session->first_changed = -1;
-	session->last_changed = -1;
+//	session->first_changed = -1;
+//	session->last_changed = -1;
 
 	screen_update(session,0,session->rows*session->cols);
 

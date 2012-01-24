@@ -57,23 +57,23 @@
 #define RECONNECT_MS		2000	/* 2 sec before reconnecting to host */
 #define RECONNECT_ERR_MS	5000	/* 5 sec before reconnecting to host */
 
-#define MAX_RECENT	5
+// #define MAX_RECENT	5
 
 // enum cstate	cstate = NOT_CONNECTED;
-Boolean			std_ds_host = False;
-Boolean			no_login_host = False;
-Boolean			non_tn3270e_host = False;
-Boolean			passthru_host = False;
-Boolean			ssl_host = False;
-Boolean			ever_3270 = False;
+// Boolean			std_ds_host = False;
+// Boolean			no_login_host = False;
+// Boolean			non_tn3270e_host = False;
+// Boolean			passthru_host = False;
+// Boolean			ssl_host = False;
+// Boolean			ever_3270 = False;
 
 // char           *full_current_host = CN;
 //unsigned short  current_port;
 //char	       *reconnect_host = CN;
 //char	       *qualified_host = CN;
 
-struct host *hosts = (struct host *)NULL;
-static struct host *last_host = (struct host *)NULL;
+// struct host *hosts = (struct host *)NULL;
+// static struct host *last_host = (struct host *)NULL;
 // static Boolean auto_reconnect_inprogress = False;
 // static int net_sock = -1;
 
@@ -105,7 +105,7 @@ static char * stoken(char **s)
 
 /*
  * Read the host file
- */
+ */ /*
 void
 hostfile_init(void)
 {
@@ -155,10 +155,10 @@ hostfile_init(void)
 			}
 			h->hostname = NewString(hostname);
 
-			/*
-			 * Quick syntax extension to allow the hosts file to
-			 * specify a port as host/port.
-			 */
+			//
+			// Quick syntax extension to allow the hosts file to
+			// specify a port as host/port.
+			//
 			if ((slash = strchr(h->hostname, '/')))
 				*slash = ':';
 
@@ -187,13 +187,14 @@ hostfile_init(void)
 
 // #if defined(X3270_DISPLAY)
 // 	save_recent(CN);
-// #endif /*]*/
+// #endif
 }
+*/
 
 /*
  * Look up a host in the list.  Turns aliases into real hostnames, and
  * finds loginstrings.
- */
+ */ /*
 static int
 hostfile_lookup(const char *name, char **hostname, char **loginstring)
 {
@@ -215,6 +216,7 @@ hostfile_lookup(const char *name, char **hostname, char **loginstring)
 	}
 	return 0;
 }
+*/
 
 #if defined(LOCAL_PROCESS) /*[*/
 /* Recognize and translate "-e" options. */
@@ -247,14 +249,14 @@ parse_localprocess(const char *s)
  * Returns NULL if there is a syntax error.
  */
 static char *
-split_host(char *s, Boolean *ansi, Boolean *std_ds, Boolean *passthru,
-	Boolean *non_e, Boolean *secure, Boolean *no_login, char *xluname,
-	char **port, Boolean *needed)
+split_host(char *s, char *ansi, char *std_ds, char *passthru,
+	char *non_e, char *secure, char *no_login, char *xluname,
+	char **port, char *needed)
 {
 	char *lbracket = CN;
 	char *at = CN;
 	char *r = NULL;
-	Boolean colon = False;
+	char colon = False;
 
 	*ansi = False;
 	*std_ds = False;
@@ -486,7 +488,7 @@ split_success:
 static int do_connect(H3270 *hSession, const char *n)
 {
 	char nb[2048];		/* name buffer */
-	char *s;		/* temporary */
+	char *s;			/* temporary */
 	const char *chost;	/* to whom we will connect */
 	char *target_name;
 	char *ps = CN;
@@ -534,26 +536,26 @@ static int do_connect(H3270 *hSession, const char *n)
 		Boolean needed;
 
 		/* Strip off and remember leading qualifiers. */
-		if ((s = split_host(nb, &ansi_host, &std_ds_host,
-		    &passthru_host, &non_tn3270e_host, &ssl_host,
-		    &no_login_host, hSession->luname, &port,
+		if ((s = split_host(nb, &ansi_host, &hSession->std_ds_host,
+		    &hSession->passthru_host, &hSession->non_tn3270e_host, &hSession->ssl_host,
+		    &hSession->no_login_host, hSession->luname, &port,
 		    &needed)) == CN)
 			return -1;
 
-		/* Look up the name in the hosts file. */
+		/* Look up the name in the hosts file. */ /*
 		if (!needed && hostfile_lookup(s, &target_name, &ps)) {
-			/*
-			 * Rescan for qualifiers.
-			 * Qualifiers, LU names, and ports are all overridden
-			 * by the hosts file.
-			 */
+			//
+			// Rescan for qualifiers.
+			// Qualifiers, LU names, and ports are all overridden
+			// by the hosts file.
+			//
 			Free(s);
 			if (!(s = split_host(target_name, &ansi_host,
 			    &std_ds_host, &passthru_host, &non_tn3270e_host,
 			    &ssl_host, &no_login_host, hSession->luname, &port,
 			    &needed)))
 				return -1;
-		}
+		} */
 		chost = s;
 
 		/* Default the port. */
@@ -588,7 +590,7 @@ static int do_connect(H3270 *hSession, const char *n)
 
 	Replace(hSession->qualified_host,
 	    xs_buffer("%s%s%s%s:%s",
-		    ssl_host? "L:": "",
+		    hSession->ssl_host? "L:": "",
 		    has_colons? "[": "",
 		    chost,
 		    has_colons? "]": "",
@@ -596,7 +598,7 @@ static int do_connect(H3270 *hSession, const char *n)
 
 
 	/* Attempt contact. */
-	ever_3270 = False;
+	hSession->ever_3270 = False;
 	hSession->net_sock = net_connect(chost, port, localprocess_cmd != CN, &resolving,&pending);
 
 	if (hSession->net_sock < 0 && !resolving)
@@ -689,8 +691,7 @@ static void try_reconnect(H3270 *session)
 
 void host_disconnect(H3270 *h, int failed)
 {
-	if(!h)
-		h = &h3270;
+    CHECK_SESSION_HANDLE(h);
 
 	if (CONNECTED || HALF_CONNECTED)
 	{
@@ -731,7 +732,7 @@ host_in3270(enum cstate new_cstate)
 			   new_cstate == CONNECTED_TN3270E);
 
 	h3270.cstate = new_cstate;
-	ever_3270 = now3270;
+	h3270.ever_3270 = now3270;
 	st_changed(ST_3270_MODE, now3270);
 }
 
@@ -747,8 +748,9 @@ host_connected(void)
 #endif /*]*/
 }
 
-#if defined(X3270_DISPLAY) /*[*/
-/* Comparison function for the qsort. */
+/*
+#if defined(X3270_DISPLAY)
+// Comparison function for the qsort.
 static int
 host_compare(const void *e1, const void *e2)
 {
@@ -762,17 +764,18 @@ host_compare(const void *e1, const void *e2)
 		r = 1;
 	else
 		r = 0;
-#if defined(CFDEBUG) /*[*/
+#if defined(CFDEBUG)
 	printf("%s %ld %d %s %ld\n",
 	    h1->name, h1->connect_time,
 	    r,
 	    h2->name, h2->connect_time);
-#endif /*]*/
+#endif
 	return r;
 }
-#endif /*]*/
+#endif
 
-#if defined(CFDEBUG) /*[*/
+
+#if defined(CFDEBUG)
 static void
 dump_array(const char *when, struct host **array, int nh)
 {
@@ -783,9 +786,9 @@ dump_array(const char *when, struct host **array, int nh)
 		printf(" %15s %ld\n", array[i]->name, array[i]->connect_time);
 	}
 }
-#endif /*]*/
+#endif
 
-/*
+
 #if defined(X3270_DISPLAY)
 static void
 save_recent(const char *hn)
@@ -1039,16 +1042,14 @@ LIB3270_EXPORT int lib3270_reconnect(H3270 *h,int wait)
 	return 0;
 }
 
-LIB3270_EXPORT const char	* get_connected_lu(H3270 *h)
+LIB3270_EXPORT const char * lib3270_get_luname(H3270 *h)
 {
-	if(h)
-		return h->connected_lu;
-	return h3270.connected_lu;
+    CHECK_SESSION_HANDLE(h);
+	return h->connected_lu;
 }
 
-LIB3270_EXPORT const char	* get_current_host(H3270 *h)
+LIB3270_EXPORT const char * lib3270_get_host(H3270 *h)
 {
-	if(h)
-		return h->current_host;
-	return h3270.current_host;
+    CHECK_SESSION_HANDLE(h);
+	return h->current_host;
 }

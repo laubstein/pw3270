@@ -108,7 +108,7 @@
 	if(Argc != 1)
 		return RXFUNC_BADCALL;
 
-	return RetValue(Retstr,find_field_attribute(atoi(Argv[0].strptr)));
+	return RetValue(Retstr,find_field_attribute(NULL,atoi(Argv[0].strptr)));
  }
 
  RexxReturnCode REXXENTRY rx3270FindFieldLength(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
@@ -116,7 +116,7 @@
 	if(Argc != 1)
 		return RXFUNC_BADCALL;
 
-	return RetValue(Retstr,find_field_length(atoi(Argv[0].strptr)));
+	return RetValue(Retstr,find_field_length(NULL,atoi(Argv[0].strptr)));
  }
 
 /*----------------------------------------------------------------------------*/

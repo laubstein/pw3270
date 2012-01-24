@@ -151,7 +151,7 @@
  {
  	int ret = 0;
 
-	if( !(*screen->content[baddr+1].ch == 'F' && FA_IS_PROTECTED(get_field_attribute(baddr))) )
+	if( !(*screen->content[baddr+1].ch == 'F' && FA_IS_PROTECTED(get_field_attribute(NULL,baddr))) )
 		return ret;
 
 	baddr++;
@@ -220,8 +220,8 @@
  {
  	if(valid_terminal_window())
  	{
-		int baddr = find_field_attribute(cursor_position);
-		int length = find_field_length(baddr);
+		int baddr = find_field_attribute(NULL,cursor_position);
+		int length = find_field_length(NULL,baddr);
 
 		SetSelection(FALSE);
 

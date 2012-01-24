@@ -62,7 +62,7 @@
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
- static int  	  addch(int row, int col, int c, unsigned short attr);
+ static int  	  addch(int row, int col, unsigned char c, unsigned short attr);
  static void	  set_charset(char *dcs);
 
  static void	  erase(void);
@@ -104,7 +104,7 @@
 
 	model_changed,			// void	(*model_changed)(H3270 *session, const char *name, int model, int cols, int rows);
 
-	addch,					// void (*addch)(int row, int col, int c, int attr);
+	addch,					// void (*addch)(int row, int col, unsigned char c, int attr);
 	set_charset,			// void (*charset)(char *dcs);
 	settitle,				// void (*title)(char *text);
 	gdk_beep,				// void (*ring_bell)(void);
@@ -272,7 +272,7 @@
 
  }
 
- static int addch(int row, int col, int c, unsigned short attr)
+ static int addch(int row, int col, unsigned char c, unsigned short attr)
  {
 
 	int		baddr = (row*screen->cols)+col;
