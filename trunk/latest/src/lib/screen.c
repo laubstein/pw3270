@@ -447,76 +447,8 @@ void screen_disp(H3270 *session)
 
 	screen_update(session,0,session->rows*session->cols);
 
-
-/*
-	int row, col;
-	int a;
-	int attr = COLOR_GREEN;
-	unsigned char fa;
-	int fa_addr;
-
-	fa = get_field_attribute(0);
-	a = color_from_fa(fa);
-	fa_addr = find_field_attribute(0); // may be -1, that's okay
-	for (row = 0; row < ROWS; row++)
-	{
-		for (col = 0; col < cCOLS; col++)
-		{
-			int baddr = row*cCOLS+col;
-
-			if(ea_buf[baddr].fa)
-			{
-				// Field attribute.
-				fa_addr = baddr;
-				fa = ea_buf[baddr].fa;
-				a = calc_attrs(baddr, baddr, fa);
-				addch(row,col,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
-			}
-			else if (FA_IS_ZERO(fa))
-			{
-				// Blank.
-				addch(row,col,' ',attr=a);
-			}
-			else
-			{
-				// Normal text.
-				if (!(ea_buf[baddr].gr || ea_buf[baddr].fg || ea_buf[baddr].bg))
-				{
-					attr = a;
-				}
-				else
-				{
-					int b;
-
-					//
-					// Override some of the field
-					// attributes.
-					//
-					attr = b = calc_attrs(baddr, fa_addr, fa);
-				}
-
-				if (ea_buf[baddr].cs == CS_LINEDRAW)
-				{
-					addch(row,col,ea_buf[baddr].cc,attr);
-				}
-				else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
-				{
-					addch(row,col,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
-				}
-				else
-				{
-					if (toggled(MONOCASE))
-						addch(row,col,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
-					else
-						addch(row,col,ebc2asc[ea_buf[baddr].cc],attr);
-				}
-			}
-		}
-	}
-*/
-
 	if(callbacks && callbacks->display)
-		callbacks->display(&h3270);
+		callbacks->display(session);
 }
 
 void screen_suspend(void)
@@ -533,25 +465,27 @@ void screen_resume(void)
 		callbacks->set_suspended(0);
 }
 
-int cursor_get_addr(void)
+LIB3270_EXPORT int lib3270_get_cursor_address(H3270 *h)
 {
-    return h3270.cursor_addr;
+    CHECK_SESSION_HANDLE(h);
+    return h->cursor_addr;
 }
 
-int cursor_set_addr(int baddr)
+LIB3270_EXPORT int lib3270_set_cursor_address(H3270 *h, int baddr)
 {
-    int ret = h3270.cursor_addr;
+    int ret;
 
-    if(h3270.cursor_addr != baddr)
-    {
-        h3270.cursor_addr = baddr;
+    CHECK_SESSION_HANDLE(h);
 
-        if(callbacks && callbacks->move_cursor)
-            callbacks->move_cursor(baddr/h3270.cols, baddr%h3270.cols);
+    ret = h->cursor_addr;
 
-//		Trace("%s: baddr=%d cc=%04x",__FUNCTION__,baddr, ea_buf[baddr].cc);
+	if(ret == baddr)
+		return ret;
 
-    }
+	h->cursor_addr = baddr;
+
+	if(callbacks && callbacks->move_cursor)
+		callbacks->move_cursor(h,baddr/h->cols, baddr%h->cols);
 
     return ret;
 }

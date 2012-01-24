@@ -174,34 +174,18 @@ RexxReturnCode REXXENTRY rx3270SetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 /*----------------------------------------------------------------------------*/
 RexxReturnCode REXXENTRY rx3270QueryScreenAttribute(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
 {
-    static const struct _attr
-    {
-        const char *name;
-        int (*call)(void);
-    } attr[] =
-    {
-        {   "SCREEN_COLS",  ctlr_get_cols   },
-        {   "SCREEN_ROWS",  ctlr_get_rows   },
-        {   "CURSOR_ADDR",  cursor_get_addr }
-    };
-
-    int f;
-    int sz;
-
-    if(Argc != 1)
-        return RXFUNC_BADCALL;
-
-    sz = strlen(Argv[0].strptr);
-
-    for(f=0;f < G_N_ELEMENTS(attr); f++)
-    {
-        if(!g_ascii_strncasecmp(Argv[0].strptr,attr[f].name,sz))
-        {
-            f = attr[f].call();
-            ReturnValue(f);
-        }
-    }
-
+	if(!g_ascii_strcasecmp(Argv[0].strptr,"SCREEN_COLS"))
+	{
+		ReturnValue(ctlr_get_cols());
+	}
+	else if(!g_ascii_strcasecmp(Argv[0].strptr,"SCREEN_ROWS"))
+	{
+		ReturnValue(ctlr_get_rows());
+	}
+	else if(!g_ascii_strcasecmp(Argv[0].strptr,"CURSOR_ADDR"))
+	{
+		ReturnValue(cursor_get_addr());
+	}
 
     ReturnValue(-1);
 }

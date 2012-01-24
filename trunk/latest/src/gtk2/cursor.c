@@ -100,7 +100,7 @@
 	rCursor.height	= terminal_font_info.height;
  }
 
- void update_cursor_position(int row, int col)
+ void update_cursor_position(H3270 *session, int row, int col)
  {
  	int addr = (row * screen->cols) + col;
 

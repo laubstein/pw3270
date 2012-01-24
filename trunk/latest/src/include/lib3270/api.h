@@ -463,7 +463,7 @@
 			void	(*title)(char *text);
 			void	(*ring_bell)(void);
 			void	(*redraw)(void);
-			void	(*move_cursor)(int row, int col);
+			void	(*move_cursor)(H3270 *session, int row, int col);
 			int		(*set_suspended)(int state);
 			void	(*set_script)(SCRIPT_STATE state);
 			void	(*reset)(int lock);
@@ -569,9 +569,9 @@
 		LIB3270_EXPORT char	* console_window_wait_for_user_entry(HCONSOLE hwnd);
 
         /* Cursor calls */
-		LIB3270_EXPORT int cursor_get_addr(void);
-        LIB3270_EXPORT int cursor_set_addr(int baddr);
-		#define cursor_move(x) cursor_set_addr(x)
+		#define cursor_get_addr(void)	lib3270_get_cursor_address(NULL)
+		#define cursor_set_addr(x)		lib3270_set_cursor_address(NULL,x)
+		#define cursor_move(x)			lib3270_set_cursor_address(NULL,x)
 
 		#include <lib3270/actions.h>
 
