@@ -1658,7 +1658,8 @@ LIB3270_CURSOR_ACTION( left )
 		return 0;
 	}
 #endif /*]*/
-	if (!flipped)
+
+	if (!h3270.flipped)
 	{
 		do_left();
 	}
@@ -1801,7 +1802,7 @@ LIB3270_ACTION( backspace )
 #endif /*]*/
 	if (reverse)
 		(void) do_delete();
-	else if (!flipped)
+	else if (!h3270.flipped)
 		do_left();
 	else {
 		register int	baddr;
@@ -1919,7 +1920,7 @@ LIB3270_CURSOR_ACTION( right )
 		return 0;
 	}
 #endif /*]*/
-	if (!flipped)
+	if (!h3270.flipped)
 	{
 		baddr = h3270.cursor_addr;
 		INC_BA(baddr);

@@ -179,7 +179,7 @@ LIB3270_INTERNAL Boolean		exiting;
 	LIB3270_INTERNAL Boolean		*font_8bit;
 #endif /*]*/
 
-LIB3270_INTERNAL Boolean	flipped;
+// LIB3270_INTERNAL Boolean	flipped;
 LIB3270_INTERNAL char		*full_current_host;
 LIB3270_INTERNAL char		*full_efontname;
 

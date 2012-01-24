@@ -20,14 +20,15 @@
 #define display_width()		1
 // #define screen_obscured()	False
 #define screen_scroll()		screen_disp()
+#define screen_132()	/* */
+#define screen_80()		/* */
+
 
 LIB3270_INTERNAL void ring_bell(void);
-LIB3270_INTERNAL void screen_132(void);
-LIB3270_INTERNAL void screen_80(void);
 LIB3270_INTERNAL void screen_erase(H3270 *session);
 LIB3270_INTERNAL void screen_changed(H3270 *session, int bstart, int bend);
 LIB3270_INTERNAL int screen_init(H3270 *session);
-LIB3270_INTERNAL void screen_flip(void);
+// LIB3270_INTERNAL void screen_flip(void);
 LIB3270_INTERNAL FILE *start_pager(void);
 LIB3270_INTERNAL Boolean screen_new_display_charsets(char *cslist, char *csname);
 LIB3270_INTERNAL void mcursor_locked();
