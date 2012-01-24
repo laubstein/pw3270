@@ -109,7 +109,7 @@
 	settitle,				// void (*title)(char *text);
 	gdk_beep,				// void (*ring_bell)(void);
 	redraw,					// void (*redraw)(void);
-	update_cursor_position,	// void (*move_cursor)(int row, int col);
+	update_cursor_position,	// void (*move_cursor)(H3270 *session, int row, int col);
 	SetSuspended,			// int	(*set_suspended)(int state);
 	SetScript,				// void	(*set_script)(SCRIPT_STATE state);
 	NULL,					// void (*reset)(int lock);

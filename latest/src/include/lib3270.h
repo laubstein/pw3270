@@ -115,10 +115,32 @@
 	 * @param h		Session handle.
 	 * @param s		String to input.
 	 *
-	 * @Returns Negative if error or number of processed characters.
+	 * @return Negative if error or number of processed characters.
 	 *
 	 */
 	LIB3270_EXPORT int lib3270_set_string(H3270 *h, const unsigned char *str);
+
+	/**
+	 * Set cursor address.
+	 *
+	 * @param h		Session handle.
+	 * @param baddr	New cursor address.
+	 *
+	 * @return last cursor address.
+	 *
+	 */
+	LIB3270_EXPORT int lib3270_set_cursor_address(H3270 *h, int baddr);
+
+
+	/**
+	 * get cursor address.
+	 *
+	 * @param h		Session handle.
+	 *
+	 * @return Cursor address.
+	 *
+	 */
+	LIB3270_EXPORT int lib3270_get_cursor_address(H3270 *h);
 
 
 #endif // LIB3270_H_INCLUDED

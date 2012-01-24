@@ -595,7 +595,7 @@ NewString(const char *s)
 */
 
 static struct {
-	/*const*/ char *name;	/* not const because of ancient X11 API */
+	const char *name;
 	KeySym keysym;
 } latin1[] = {
 	{ "space", XK_space },
@@ -824,6 +824,7 @@ StringToKeysym(char *s)
 	return NoSymbol;
 }
 
+/*
 char *
 KeysymToString(KeySym k)
 {
@@ -835,6 +836,7 @@ KeysymToString(KeySym k)
 	}
 	return (char *)NULL;
 }
+*/
 
 /* Timeouts. */
 
@@ -895,9 +897,7 @@ int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk)
 
 LIB3270_EXPORT enum cstate lib3270_get_connection_state(H3270 *h)
 {
-	if(!h)
-		h = &h3270;
-
+	CHECK_SESSION_HANDLE(h);
 	return h->cstate;
 }
 
