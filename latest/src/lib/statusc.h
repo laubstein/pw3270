@@ -16,23 +16,28 @@
 #include <lib3270/api.h>
 
 LIB3270_INTERNAL void 		status_compose(int on, unsigned char c, enum keytype keytype);
-LIB3270_INTERNAL void 		status_ctlr_done(void);
+LIB3270_INTERNAL void 		status_ctlr_done(H3270 *session);
 
-LIB3270_INTERNAL void 		status_timing(struct timeval *t0, struct timeval *t1);
-LIB3270_INTERNAL void 		status_untiming(void);
+LIB3270_INTERNAL void 		status_timing(H3270 *session, struct timeval *t0, struct timeval *t1);
+LIB3270_INTERNAL void 		status_untiming(H3270 *session);
 
-LIB3270_INTERNAL void 		status_lu(const char *);
-LIB3270_INTERNAL void 		status_oerr(int error_type);
-LIB3270_INTERNAL void 		status_reset(void);
-LIB3270_INTERNAL void 		status_reverse_mode(int on);
-LIB3270_INTERNAL void 		status_twait(void);
-LIB3270_INTERNAL void 		status_typeahead(int on);
+LIB3270_INTERNAL void 		status_lu(H3270 *session, const char *);
+LIB3270_INTERNAL void 		status_oerr(H3270 *session, int error_type);
+LIB3270_INTERNAL void 		status_reset(H3270 *session);
+LIB3270_INTERNAL void 		status_twait(H3270 *session);
 
-LIB3270_INTERNAL void 		status_changed(STATUS_CODE id);
 
-#define status_kybdlock() status_changed(STATUS_CODE_KYBDLOCK)
-#define status_syswait() status_changed(STATUS_CODE_SYSWAIT)
-#define status_minus() status_changed(STATUS_CODE_MINUS)
+
+
+LIB3270_INTERNAL void 		status_changed(H3270 *session, STATUS_CODE id);
+
+LIB3270_INTERNAL void 		set_status(H3270 *session, OIA_FLAG id, Boolean on);
+
+
+#define status_typeahead(on)	set_status(NULL,OIA_FLAG_TYPEAHEAD,on)
+#define status_kybdlock()		status_changed(NULL,STATUS_CODE_KYBDLOCK)
+#define status_syswait()		status_changed(NULL,STATUS_CODE_SYSWAIT)
+#define status_minus()			status_changed(NULL,STATUS_CODE_MINUS)
 
 
 extern int lib3270_event_counter[COUNTER_ID_USER];

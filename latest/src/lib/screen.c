@@ -79,22 +79,18 @@ extern char *profile_name;
 #endif
 
 static const struct lib3270_screen_callbacks *callbacks = NULL;
+static SCRIPT_STATE script_state = SCRIPT_STATE_NONE;
+
 
 int lib3270_event_counter[COUNTER_ID_USER] = { 0, 0 };
 
-// Boolean screen_has_changes = 0;
-
 enum ts { TS_AUTO, TS_ON, TS_OFF };
-// enum ts ab_mode = TS_AUTO;
-
-// int windows_cp = 0;
 
 static void screen_update(H3270 *session, int bstart, int bend);
 static void status_connect(H3270 *session, int ignored, void *dunno);
 static void status_3270_mode(H3270 *session, int ignored, void *dunno);
 static void status_printer(H3270 *session, int on, void *dunno);
 static int color_from_fa(unsigned char fa);
-// static Boolean ts_value(const char *s, enum ts *tsp);
 static void relabel(H3270 *session, int ignored, void *dunno);
 
 void set_display_charset(char *dcs)
@@ -470,30 +466,26 @@ LIB3270_EXPORT int lib3270_set_cursor_address(H3270 *h, int baddr)
 
 /* Status line stuff. */
 
-static void set(OIA_FLAG id, Boolean on)
+void set_status(H3270 *session, OIA_FLAG id, Boolean on)
 {
+	CHECK_SESSION_HANDLE(session);
+
 	if(callbacks && callbacks->set)
 		callbacks->set(id,on);
 }
 
-void status_ctlr_done(void)
+void status_ctlr_done(H3270 *session)
 {
+	CHECK_SESSION_HANDLE(session);
 	lib3270_event_counter[COUNTER_ID_CTLR_DONE]++;
-	set(OIA_FLAG_UNDERA,True);
+	set_status(session,OIA_FLAG_UNDERA,True);
 }
 
-/*
-void
-status_minus(void)
-{
-	status_changed(STATUS_CODE_MINUS);
-}
-*/
-
-void
-status_oerr(int error_type)
+void status_oerr(H3270 *session, int error_type)
 {
 	STATUS_CODE sts = STATUS_CODE_USER;
+
+	CHECK_SESSION_HANDLE(session);
 
 	switch (error_type)
 	{
@@ -511,7 +503,7 @@ status_oerr(int error_type)
 		return;
 	}
 
-	status_changed(sts);
+	status_changed(session,sts);
 
 }
 
@@ -520,7 +512,7 @@ void status_resolving(H3270 *session, Boolean on)
 	if(callbacks && callbacks->cursor)
 			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
 
-	status_changed(on ? STATUS_CODE_RESOLVING : STATUS_CODE_BLANK);
+	status_changed(session, on ? STATUS_CODE_RESOLVING : STATUS_CODE_BLANK);
 }
 
 void status_connecting(H3270 *session, Boolean on)
@@ -528,20 +520,21 @@ void status_connecting(H3270 *session, Boolean on)
 	if(callbacks && callbacks->cursor)
 			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
 
-	status_changed(on ? STATUS_CODE_CONNECTING : STATUS_CODE_BLANK);
+	status_changed(session, on ? STATUS_CODE_CONNECTING : STATUS_CODE_BLANK);
 }
 
-void
-status_reset(void)
+void status_reset(H3270 *session)
 {
-	if (kybdlock & KL_ENTER_INHIBIT)
-		status_changed(STATUS_CODE_INHIBIT);
-	else if (kybdlock & KL_DEFERRED_UNLOCK)
-		status_changed(STATUS_CODE_X);
-	else
-		status_changed(STATUS_CODE_BLANK);
+	CHECK_SESSION_HANDLE(session);
 
-	screen_disp(&h3270);
+	if (kybdlock & KL_ENTER_INHIBIT)
+		status_changed(session,STATUS_CODE_INHIBIT);
+	else if (kybdlock & KL_DEFERRED_UNLOCK)
+		status_changed(session,STATUS_CODE_X);
+	else
+		status_changed(session,STATUS_CODE_BLANK);
+
+	screen_disp(session);
 
 	if(callbacks && callbacks->reset)
 	{
@@ -551,12 +544,7 @@ status_reset(void)
 
 }
 
-void status_reverse_mode(int on)
-{
-	set(OIA_FLAG_REVERSE,on);
-}
-
-static STATUS_CODE current_status_code = -1;
+// static STATUS_CODE current_status_code = -1;
 
 /**
  * Query the updated terminal status.
@@ -565,35 +553,36 @@ static STATUS_CODE current_status_code = -1;
  *
  * @see STATUS_CODE
  */
-LIB3270_EXPORT STATUS_CODE query_3270_terminal_status(void)
+LIB3270_EXPORT STATUS_CODE lib3270_get_oia_status(H3270 *session)
 {
-	return current_status_code;
+	CHECK_SESSION_HANDLE(session);
+	return session->oia_status;
 }
 
-void status_changed(STATUS_CODE id)
+void status_changed(H3270 *session, STATUS_CODE id)
 {
-	if(id == current_status_code)
+	CHECK_SESSION_HANDLE(session);
+
+	if(id == session->oia_status)
 		return;
 
-	current_status_code = id;
+	session->oia_status = id;
 
 	if(callbacks && callbacks->status)
 		callbacks->status(id);
 }
 
-void status_twait(void)
+void status_twait(H3270 *session)
 {
-	set(OIA_FLAG_UNDERA,False);
-	status_changed(STATUS_CODE_TWAIT);
-}
-
-void status_typeahead(int on)
-{
-	set(OIA_FLAG_TYPEAHEAD,on);
+	CHECK_SESSION_HANDLE(session);
+	set_status(session,OIA_FLAG_UNDERA,False);
+	status_changed(session,STATUS_CODE_TWAIT);
 }
 
 void set_viewsize(H3270 *session, int rows, int cols)
 {
+	CHECK_SESSION_HANDLE(session);
+
 	if(rows == session->rows && session->cols == cols)
 		return;
 
@@ -605,7 +594,7 @@ void set_viewsize(H3270 *session, int rows, int cols)
 
 }
 
-void status_lu(const char *lu)
+void status_lu(H3270 *session, const char *lu)
 {
 	if(callbacks && callbacks->lu)
 		callbacks->lu(lu);
@@ -617,7 +606,7 @@ static void status_connect(H3270 *session, int connected, void *dunno)
 
 	if (connected) {
 
-		set(OIA_FLAG_BOXSOLID,IN_3270 && !IN_SSCP);
+		set_status(session,OIA_FLAG_BOXSOLID,IN_3270 && !IN_SSCP);
 
 		if (kybdlock & KL_AWAITING_FIRST)
 			id = STATUS_CODE_AWAITING_FIRST;
@@ -625,17 +614,17 @@ static void status_connect(H3270 *session, int connected, void *dunno)
 			id = STATUS_CODE_CONNECTED;
 
 #if defined(HAVE_LIBSSL) /*[*/
-		set(OIA_FLAG_SECURE,session->secure_connection);
+		set_status(session,OIA_FLAG_SECURE,session->secure_connection);
 #endif /*]*/
 
 	} else {
-		set(OIA_FLAG_BOXSOLID,False);
-		set(OIA_FLAG_SECURE,False);
+		set_status(session,OIA_FLAG_BOXSOLID,False);
+		set_status(session,OIA_FLAG_SECURE,False);
 
 		id = STATUS_CODE_DISCONNECTED;
 	}
 
-	status_changed(id);
+	status_changed(session,id);
 
 }
 
@@ -643,17 +632,15 @@ static void status_3270_mode(H3270 *session, int ignored unused, void *dunno)
 {
 	Boolean oia_boxsolid = (IN_3270 && !IN_SSCP);
 	if(oia_boxsolid)
-		set(OIA_FLAG_UNDERA,True);
-	set(OIA_FLAG_BOXSOLID,oia_boxsolid);
+		set_status(session,OIA_FLAG_UNDERA,True);
+	set_status(session,OIA_FLAG_BOXSOLID,oia_boxsolid);
 
 }
 
 static void status_printer(H3270 *session, int on, void *dunno)
 {
-	set(OIA_FLAG_PRINTER,on);
+	set_status(session,OIA_FLAG_PRINTER,on);
 }
-
-static SCRIPT_STATE script_state = SCRIPT_STATE_NONE;
 
 LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state)
 {
@@ -662,14 +649,18 @@ LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state)
 	return script_state = state;
 }
 
-void status_timing(struct timeval *t0, struct timeval *t1)
+void status_timing(H3270 *session, struct timeval *t0, struct timeval *t1)
 {
+	CHECK_SESSION_HANDLE(session);
+
 	if(callbacks && callbacks->show_timer)
 		callbacks->show_timer(t1->tv_sec - t0->tv_sec);
 }
 
-void status_untiming(void)
+void status_untiming(H3270 *session)
 {
+	CHECK_SESSION_HANDLE(session);
+
 	if(callbacks && callbacks->show_timer)
 		callbacks->show_timer(-1);
 }

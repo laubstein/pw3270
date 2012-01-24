@@ -160,6 +160,29 @@
 			CONNECTED_TN3270E		/**< connected in TN3270E mode, 3270 mode */
 		};
 
+		typedef enum _STATUS_CODE
+		{
+			STATUS_CODE_BLANK,
+			STATUS_CODE_SYSWAIT,
+			STATUS_CODE_TWAIT,
+			STATUS_CODE_CONNECTED,
+			STATUS_CODE_DISCONNECTED,
+			STATUS_CODE_AWAITING_FIRST,
+			STATUS_CODE_MINUS,
+			STATUS_CODE_PROTECTED,
+			STATUS_CODE_NUMERIC,
+			STATUS_CODE_OVERFLOW,
+			STATUS_CODE_INHIBIT,
+			STATUS_CODE_KYBDLOCK,
+
+			STATUS_CODE_X,
+			STATUS_CODE_RESOLVING,
+			STATUS_CODE_CONNECTING,
+
+			STATUS_CODE_USER
+
+		} STATUS_CODE;
+
 		struct lib3270_state_callback;
 
 		typedef struct _h3270
@@ -191,6 +214,8 @@
 			char	       		* reconnect_host;
 			char	       		* qualified_host;
 			char	 			  auto_reconnect_inprogress;
+
+			STATUS_CODE			  oia_status;
 
 			unsigned short		  current_port;
 
@@ -379,29 +404,6 @@
 			CURSOR_MODE_USER
 		} CURSOR_MODE;
 
-		typedef enum _STATUS_CODE
-		{
-			STATUS_CODE_BLANK,
-			STATUS_CODE_SYSWAIT,
-			STATUS_CODE_TWAIT,
-			STATUS_CODE_CONNECTED,
-			STATUS_CODE_DISCONNECTED,
-			STATUS_CODE_AWAITING_FIRST,
-			STATUS_CODE_MINUS,
-			STATUS_CODE_PROTECTED,
-			STATUS_CODE_NUMERIC,
-			STATUS_CODE_OVERFLOW,
-			STATUS_CODE_INHIBIT,
-			STATUS_CODE_KYBDLOCK,
-
-			STATUS_CODE_X,
-			STATUS_CODE_RESOLVING,
-			STATUS_CODE_CONNECTING,
-
-			STATUS_CODE_USER
-
-		} STATUS_CODE;
-
 		typedef enum _SCRIPT_STATE
 		{
 			SCRIPT_STATE_NONE,
@@ -539,7 +541,9 @@
 		LIB3270_EXPORT void 		  popup_an_error(const char *fmt, ...);
 		LIB3270_EXPORT void 		  popup_system_error(const char *title, const char *message, const char *system);
 		LIB3270_EXPORT void 		  popup_a_sockerr(char *fmt, ...);
-		LIB3270_EXPORT STATUS_CODE	  query_3270_terminal_status(void);
+
+		#define query_3270_terminal_status(void) lib3270_get_oia_status(NULL)
+
 		LIB3270_EXPORT int			  set_3270_model(H3270 *session, int model);
 		LIB3270_EXPORT int			  get_3270_model(H3270 *session);
 

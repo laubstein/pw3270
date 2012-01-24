@@ -103,7 +103,7 @@ static unsigned char default_ic;
 static void	ctlr_half_connect(H3270 *session, int ignored, void *dunno);
 static void	ctlr_connect(H3270 *session, int ignored, void *dunno);
 static int	sscp_start;
-static void ticking_stop(void);
+static void ticking_stop(H3270 *session);
 static void ctlr_add_ic(int baddr, unsigned char ic);
 static void changed(H3270 *session, int bstart, int bend);
 
@@ -279,10 +279,9 @@ set_formatted(void)
 /*
  * Called when a host is half connected.
  */
-static void
-ctlr_half_connect(H3270 *session, int ignored unused, void *dunno)
+static void ctlr_half_connect(H3270 *session, int ignored unused, void *dunno)
 {
-	ticking_start(True);
+	ticking_start(session,True);
 }
 
 
@@ -292,8 +291,8 @@ ctlr_half_connect(H3270 *session, int ignored unused, void *dunno)
 static void
 ctlr_connect(H3270 *session, int ignored unused, void *dunno)
 {
-	ticking_stop();
-	status_untiming();
+	ticking_stop(session);
+	status_untiming(session);
 
 	if (ever_3270)
 		ea_buf[-1].fa = FA_PRINTABLE | FA_MODIFY;
@@ -301,7 +300,7 @@ ctlr_connect(H3270 *session, int ignored unused, void *dunno)
 		ea_buf[-1].fa = FA_PRINTABLE | FA_PROTECT;
 	if (!IN_3270 || (IN_SSCP && (kybdlock & KL_OIA_TWAIT))) {
 		kybdlock_clr(KL_OIA_TWAIT, "ctlr_connect");
-		status_reset();
+		status_reset(session);
 	}
 
 	default_fg = 0x00;
@@ -1180,7 +1179,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 	}
 	wcc_keyboard_restore = WCC_KEYBOARD_RESTORE(buf[1]);
 	if (wcc_keyboard_restore)
-		ticking_stop();
+		ticking_stop(NULL);
 	if (wcc_keyboard_restore) {
 		trace_ds("%srestore", paren);
 		paren = ",";
@@ -2754,29 +2753,32 @@ static void keep_ticking(H3270 *session)
 	} while (msec <= 0);
 
 	tick_id = AddTimeOut(msec, session, keep_ticking);
-	status_timing(&t_start, &t1);
+	status_timing(session,&t_start, &t1);
 }
 
-void
-ticking_start(Boolean anyway)
+void ticking_start(H3270 *session, Boolean anyway)
 {
+	CHECK_SESSION_HANDLE(session);
+
 	(void) gettimeofday(&t_start, (struct timezone *) 0);
+
 	mticking = True;
 
 	if (!toggled(SHOW_TIMING) && !anyway)
 		return;
-	status_untiming();
+	status_untiming(session);
 	if (ticking)
 		RemoveTimeOut(tick_id);
 	ticking = True;
-	tick_id = AddTimeOut(1000, &h3270, keep_ticking);
+	tick_id = AddTimeOut(1000, session, keep_ticking);
 	t_want = t_start;
 }
 
-static void
-ticking_stop(void)
+static void ticking_stop(H3270 *session)
 {
 	struct timeval t1;
+
+	CHECK_SESSION_HANDLE(session);
 
 	(void) gettimeofday(&t1, (struct timezone *) 0);
 	if (mticking) {
@@ -2790,14 +2792,14 @@ ticking_stop(void)
 		return;
 	RemoveTimeOut(tick_id);
 	ticking = False;
-	status_timing(&t_start, &t1);
+	status_timing(session,&t_start, &t1);
 }
 
 void
 toggle_showTiming(struct toggle *t unused, enum toggle_type tt unused)
 {
 	if (!toggled(SHOW_TIMING))
-		status_untiming();
+		status_untiming(NULL);
 }
 
 

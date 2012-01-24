@@ -170,6 +170,7 @@ H3270 * lib3270_session_new(const char *model)
 	hSession->first_changed = -1;
 	hSession->last_changed = -1;
 	hSession->cstate = NOT_CONNECTED;
+	hSession->oia_status = -1;
 
 	strncpy(hSession->full_model_name,"IBM-",FULL_MODEL_NAME_SIZE);
 	hSession->model_name = &hSession->full_model_name[4];
