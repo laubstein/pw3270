@@ -42,6 +42,9 @@ AC_INIT([pw3270], [4.2], [perry.werneck@gmail.com])
 dnl Place auxilliary scripts here.
 AC_CONFIG_AUX_DIR([scripts])
 
+dnl Compute the canonical host-system type 
+AC_CANONICAL_HOST
+
 dnl Put macro definitions here (though they aren't used).
 AC_CONFIG_HEADER([src/include/lib3270/config.h])
 
@@ -172,24 +175,12 @@ rm -f conftest.$ac_objext conftest.err m4_ifval([$1], [conftest.$ac_ext])[]dnl
 ])# GLIB_CHECK_COMPILE_WARNINGS
 
 AC_MSG_CHECKING(for GNUC visibility attribute)
-GLIB_CHECK_COMPILE_WARNINGS([
+GLIB_CHECK_COMPILE_WARNINGS([AC_LANG_SOURCE([
 void
 __attribute__ ((visibility ("hidden")))
      f_hidden (void)
 {
 }
-/*
-void
-__attribute__ ((visibility ("internal")))
-     f_internal (void)
-{
-}
-void
-__attribute__ ((visibility ("protected")))
-     f_protected (void)
-{
-}
-*/
 void
 __attribute__ ((visibility ("default")))
      f_default (void)
@@ -203,7 +194,7 @@ int main (int argc, char **argv)
         f_default();
         return 0;
 }
-],g_have_gnuc_visibility=yes,g_have_gnuc_visibility=no)
+])],g_have_gnuc_visibility=yes,g_have_gnuc_visibility=no)
 AC_MSG_RESULT($g_have_gnuc_visibility)
 if test x$g_have_gnuc_visibility = xyes; then
   AC_DEFINE(HAVE_GNUC_VISIBILITY, 1, [supports GCC visibility attributes])
