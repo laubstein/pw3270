@@ -89,6 +89,7 @@ enum ts { TS_AUTO, TS_ON, TS_OFF };
 
 // int windows_cp = 0;
 
+static void screen_update(H3270 *session, int bstart, int bend);
 static void status_connect(H3270 *session, int ignored, void *dunno);
 static void status_3270_mode(H3270 *session, int ignored, void *dunno);
 static void status_printer(H3270 *session, int on, void *dunno);
@@ -363,7 +364,7 @@ int screen_read(char *dest, int baddr, int count)
 }
 
 /* Display what's in the buffer. */
-void screen_update(H3270 *session, int bstart, int bend)
+static void screen_update(H3270 *session, int bstart, int bend)
 {
 
 	int baddr, row, col;
