@@ -489,7 +489,6 @@
 		<Unit filename="src/include/lib3270/config.h.in" />
 		<Unit filename="src/include/lib3270/macros.h" />
 		<Unit filename="src/include/lib3270/plugins.h.in" />
-		<Unit filename="src/include/lib3270/statusc.h" />
 		<Unit filename="src/include/lib3270/toggle.h" />
 		<Unit filename="src/java/lib3270_jni.h" />
 		<Unit filename="src/java/terminal.java">
@@ -618,6 +617,7 @@
 		</Unit>
 		<Unit filename="src/lib/sfc.h" />
 		<Unit filename="src/lib/shlobj_missing.h" />
+		<Unit filename="src/lib/statusc.h" />
 		<Unit filename="src/lib/tables.c">
 			<Option compilerVar="CC" />
 		</Unit>

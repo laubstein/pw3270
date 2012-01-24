@@ -168,29 +168,6 @@ int screen_init(H3270 *session)
 	return 0;
 }
 
-/*
- * Parse a tri-state resource value.
- * Returns True for success, False for failure.
- */ /*
-static Boolean
-ts_value(const char *s, enum ts *tsp)
-{
-	*tsp = TS_AUTO;
-
-	if (s != CN && s[0]) {
-		int sl = strlen(s);
-
-		if (!strncasecmp(s, "true", sl))
-			*tsp = TS_ON;
-		else if (!strncasecmp(s, "false", sl))
-			*tsp = TS_OFF;
-		else if (strncasecmp(s, "auto", sl))
-			return False;
-	}
-	return True;
-}
-*/
-
 /* Map a field attribute to its default colors. */
 static int
 color_from_fa(unsigned char fa)
@@ -574,7 +551,7 @@ status_reset(void)
 
 }
 
-LIB3270_EXPORT void status_reverse_mode(int on)
+void status_reverse_mode(int on)
 {
 	set(OIA_FLAG_REVERSE,on);
 }
@@ -593,7 +570,7 @@ LIB3270_EXPORT STATUS_CODE query_3270_terminal_status(void)
 	return current_status_code;
 }
 
-LIB3270_EXPORT void status_changed(STATUS_CODE id)
+void status_changed(STATUS_CODE id)
 {
 	if(id == current_status_code)
 		return;
@@ -604,13 +581,13 @@ LIB3270_EXPORT void status_changed(STATUS_CODE id)
 		callbacks->status(id);
 }
 
-LIB3270_EXPORT void status_twait(void)
+void status_twait(void)
 {
 	set(OIA_FLAG_UNDERA,False);
 	status_changed(STATUS_CODE_TWAIT);
 }
 
-LIB3270_EXPORT void status_typeahead(int on)
+void status_typeahead(int on)
 {
 	set(OIA_FLAG_TYPEAHEAD,on);
 }
@@ -648,7 +625,7 @@ static void status_connect(H3270 *session, int connected, void *dunno)
 			id = STATUS_CODE_CONNECTED;
 
 #if defined(HAVE_LIBSSL) /*[*/
-		set(OIA_FLAG_SECURE,h3270.secure_connection);
+		set(OIA_FLAG_SECURE,session->secure_connection);
 #endif /*]*/
 
 	} else {
@@ -697,6 +674,7 @@ void status_untiming(void)
 		callbacks->show_timer(-1);
 }
 
+/*
 void Redraw_action(Widget w unused, XEvent *event unused, String *params unused, Cardinal *num_params unused)
 {
 	if(callbacks && callbacks->redraw)
@@ -704,6 +682,7 @@ void Redraw_action(Widget w unused, XEvent *event unused, String *params unused,
 	else
 		screen_disp(&h3270);
 }
+*/
 
 void ring_bell(void)
 {
