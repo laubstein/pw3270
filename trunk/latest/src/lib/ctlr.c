@@ -77,13 +77,13 @@ extern unsigned char aid;
 // int				cursor_addr;
 
 int				buffer_addr;
-Boolean         screen_alt = False;	/* alternate screen? */
-Boolean         is_altbuffer = False;
+// Boolean         screen_alt = False;	/* alternate screen? */
+// Boolean         is_altbuffer = False;
 
 struct ea      *ea_buf	= NULL;		/* 3270 device buffer */
 									/* ea_buf[-1] is the dummy default field attribute */
 
-Boolean         formatted = False;	/* set in screen_disp */
+// Boolean         formatted = False;	/* set in screen_disp */
 unsigned char	reply_mode = SF_SRM_FIELD;
 int				crm_nattr = 0;
 unsigned char	crm_attr[16];
@@ -92,7 +92,7 @@ Boolean			dbcs = False;
 /* Statics */
 static struct ea *aea_buf;	/* alternate 3270 extended attribute buffer */
 static unsigned char *zero_buf;	/* empty buffer, for area clears */
-static void set_formatted(void);
+static void set_formatted(H3270 *session);
 static void ctlr_blanks(void);
 static Boolean  trace_primed = False;
 static unsigned char default_fg;
@@ -251,7 +251,7 @@ void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr)
 	// Make sure that the current rows/cols are still 24x80.
 	session->cols = 80;
 	session->rows = 24;
-	screen_alt = False;
+	session->screen_alt = False;
 
 }
 
@@ -260,16 +260,19 @@ void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr)
  * Set the formatted screen flag.  A formatted screen is a screen that
  * has at least one field somewhere on it.
  */
-static void
-set_formatted(void)
+static void set_formatted(H3270 *session)
 {
-	register int	baddr;
+	register int baddr;
 
-	formatted = False;
+	CHECK_SESSION_HANDLE(session);
+
+	session->formatted = False;
 	baddr = 0;
-	do {
-		if (ea_buf[baddr].fa) {
-			formatted = True;
+	do
+	{
+		if (ea_buf[baddr].fa)
+		{
+			session->formatted = True;
 			break;
 		}
 		INC_BA(baddr);
@@ -288,8 +291,7 @@ static void ctlr_half_connect(H3270 *session, int ignored unused, void *dunno)
 /*
  * Called when a host connects, disconnects, or changes ANSI/3270 modes.
  */
-static void
-ctlr_connect(H3270 *session, int ignored unused, void *dunno)
+static void ctlr_connect(H3270 *session, int ignored unused, void *dunno)
 {
 	ticking_stop(session);
 	status_untiming(session);
@@ -318,12 +320,13 @@ ctlr_connect(H3270 *session, int ignored unused, void *dunno)
  * Find the buffer address of the field attribute for a given buffer address.
  * Returns -1 if the screen isn't formatted.
  */
-int
-find_field_attribute(int baddr)
+int find_field_attribute(H3270 *h, int baddr)
 {
 	int sbaddr;
 
-	if (!formatted)
+	CHECK_SESSION_HANDLE(h);
+
+	if (!h->formatted)
 		return -1;
 
 	sbaddr = baddr;
@@ -338,11 +341,15 @@ find_field_attribute(int baddr)
 /*
  * Get Field width
  */
-int find_field_length(int baddr)
+int find_field_length(H3270 *h, int baddr)
 {
 	int saddr;
-	int addr = find_field_attribute(baddr);
+	int addr;
 	int width = 0;
+
+	CHECK_SESSION_HANDLE(h);
+
+	addr = find_field_attribute(h,baddr);
 
 	if(addr < 0)
 		return -1;
@@ -364,10 +371,10 @@ int find_field_length(int baddr)
  * Find the field attribute for the given buffer address.  Return its address
  * rather than its value.
  */
-unsigned char
-get_field_attribute(int baddr)
+unsigned char get_field_attribute(H3270 *h, int baddr)
 {
-	return ea_buf[find_field_attribute(baddr)].fa;
+	CHECK_SESSION_HANDLE(h);
+	return ea_buf[find_field_attribute(h,baddr)].fa;
 }
 
 /*
@@ -382,7 +389,7 @@ get_bounded_field_attribute(register int baddr, register int bound,
 {
 	int	sbaddr;
 
-	if (!formatted) {
+	if (!h3270.formatted) {
 		*fa_out = ea_buf[-1].fa;
 		return True;
 	}
@@ -442,36 +449,39 @@ next_unprotected(int baddr0)
  * Perform an erase command, which may include changing the (virtual) screen
  * size.
  */
-void
-ctlr_erase(int alt)
+void ctlr_erase(H3270 *session, int alt)
 {
+	CHECK_SESSION_HANDLE(session);
+
 	kybd_inhibit(False);
 
-	ctlr_clear(True);
-	screen_erase(&h3270);
+	ctlr_clear(session,True);
+	screen_erase(session);
 
-	/* Let a script go. */
-//	sms_host_output();
-
-	if (alt == screen_alt)
+	if(alt == session->screen_alt)
 		return;
 
-	if (alt) {
+	if (alt)
+	{
 		/* Going from 24x80 to maximum. */
-		screen_disp(&h3270);
-		set_viewsize(&h3270,h3270.maxROWS,h3270.maxCOLS);
-	} else {
+		screen_disp(session);
+		set_viewsize(session,session->maxROWS,session->maxCOLS);
+	}
+	else
+	{
 		/* Going from maximum to 24x80. */
-		if (h3270.maxROWS > 24 || h3270.maxCOLS > 80) {
-			if (visible_control) {
+		if (session->maxROWS > 24 || session->maxCOLS > 80)
+		{
+			if (visible_control)
+			{
 				ctlr_blanks();
-				screen_disp(&h3270);
+				screen_disp(session);
 			}
-			set_viewsize(&h3270,24,80);
+			set_viewsize(session,24,80);
 		}
 	}
 
-	screen_alt = alt;
+	session->screen_alt = alt;
 }
 
 
@@ -500,7 +510,7 @@ process_ds(unsigned char *buf, int buflen)
 	case CMD_EWA:	/* erase/write alternate */
 	case SNA_CMD_EWA:
 		trace_ds("EraseWriteAlternate");
-		ctlr_erase(True);
+		ctlr_erase(NULL,True);
 		if ((rv = ctlr_write(buf, buflen, True)) < 0)
 			return rv;
 		return PDS_OKAY_NO_OUTPUT;
@@ -508,7 +518,7 @@ process_ds(unsigned char *buf, int buflen)
 	case CMD_EW:	/* erase/write */
 	case SNA_CMD_EW:
 		trace_ds("EraseWrite");
-		ctlr_erase(False);
+		ctlr_erase(NULL,False);
 		if ((rv = ctlr_write(buf, buflen, True)) < 0)
 			return rv;
 		return PDS_OKAY_NO_OUTPUT;
@@ -685,7 +695,7 @@ ctlr_read_modified(unsigned char aid_byte, Boolean all)
 	}
 
 	baddr = 0;
-	if (formatted) {
+	if (h3270.formatted) {
 		/* find first field attribute */
 		do {
 			if (ea_buf[baddr].fa)
@@ -934,7 +944,7 @@ ctlr_snap_buffer(void)
 	unsigned char   av;
 
 	space3270out(2);
-	*obptr++ = screen_alt ? CMD_EWA : CMD_EW;
+	*obptr++ = h3270.screen_alt ? CMD_EWA : CMD_EW;
 	*obptr++ = code_table[0];
 
 	do {
@@ -1061,7 +1071,7 @@ ctlr_erase_all_unprotected(void)
 
 	kybd_inhibit(False);
 
-	if (formatted) {
+	if (h3270.formatted) {
 		/* find first field attribute */
 		baddr = 0;
 		do {
@@ -1095,7 +1105,7 @@ ctlr_erase_all_unprotected(void)
 		if (!f)
 			cursor_move(0);
 	} else {
-		ctlr_clear(True);
+		ctlr_clear(&h3270,True);
 	}
 	aid = AID_NO;
 	do_reset(False);
@@ -1151,7 +1161,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			ctlr_add_gr(buffer_addr, 0); \
 			ctlr_add_ic(buffer_addr, 0); \
 			trace_ds("%s",see_attr(fa)); \
-			formatted = True; \
+			h3270.formatted = True; \
 		}
 
 	kybd_inhibit(False);
@@ -1203,7 +1213,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 
 	last_cmd = True;
 	last_zpt = False;
-	current_fa = get_field_attribute(buffer_addr);
+	current_fa = get_field_attribute(&h3270,buffer_addr);
 
 #define ABORT_WRITEx { \
 	rv = PDS_BAD_ADDR; \
@@ -1239,7 +1249,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			if (buffer_addr >= h3270.cols * h3270.rows) {
 				ABORT_WRITE("invalid SBA address");
 			}
-			current_fa = get_field_attribute(buffer_addr);
+			current_fa = get_field_attribute(&h3270,buffer_addr);
 			last_cmd = True;
 			last_zpt = False;
 			break;
@@ -1399,7 +1409,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 					INC_BA(buffer_addr);
 				}
 			} while (buffer_addr != baddr);
-			current_fa = get_field_attribute(buffer_addr);
+			current_fa = get_field_attribute(&h3270,buffer_addr);
 			last_cmd = True;
 			last_zpt = False;
 			break;
@@ -1430,7 +1440,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 				}
 				INC_BA(buffer_addr);
 			} while (buffer_addr != baddr);
-			current_fa = get_field_attribute(buffer_addr);
+			current_fa = get_field_attribute(&h3270,buffer_addr);
 			last_cmd = True;
 			last_zpt = False;
 			break;
@@ -1450,7 +1460,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			ctlr_add_gr(buffer_addr, default_gr);
 			ctlr_add_ic(buffer_addr, default_ic);
 			INC_BA(buffer_addr);
-			current_fa = get_field_attribute(buffer_addr);
+			current_fa = get_field_attribute(&h3270,buffer_addr);
 			last_cmd = False;
 			last_zpt = False;
 			break;
@@ -1697,7 +1707,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			if (d != DBCS_NONE && why == DBCS_FIELD) {
 				ABORT_WRITE("SI in DBCS field");
 			}
-			fa_addr = find_field_attribute(buffer_addr);
+			fa_addr = find_field_attribute(&h3270,buffer_addr);
 			baddr = buffer_addr;
 			DEC_BA(baddr);
 			while (!aborted &&
@@ -1849,7 +1859,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			break;
 		}
 	}
-	set_formatted();
+	set_formatted(&h3270);
 	END_TEXT0;
 	trace_ds("\n");
 	if (wcc_keyboard_restore) {
@@ -2278,8 +2288,8 @@ ps_process(void)
 #if defined(X3270_FT) /*[*/
 	/* Process file transfers. */
 	if (ft_state != FT_NONE &&      /* transfer in progress */
-	    formatted &&                /* screen is formatted */
-	    !screen_alt &&              /* 24x80 screen */
+	    h3270.formatted &&          /* screen is formatted */
+	    !h3270.screen_alt &&        /* 24x80 screen */
 	    !kybdlock &&                /* keyboard not locked */
 	    /* magic field */
 	    ea_buf[1919].fa && FA_IS_SKIP(ea_buf[1919].fa)) {
@@ -2308,7 +2318,7 @@ ctlr_any_data(void)
  * and buffer addresses and extended attributes.
  */
 void
-ctlr_clear(Boolean can_snap)
+ctlr_clear(H3270 *session, Boolean can_snap)
 {
 	/* Snap any data that is about to be lost into the trace file. */
 	if (ctlr_any_data()) {
@@ -2316,18 +2326,18 @@ ctlr_clear(Boolean can_snap)
 		if (can_snap && !trace_skipping && toggled(SCREEN_TRACE))
 			trace_screen();
 #endif /*]*/
-		scroll_save(maxROWS, ever_3270 ? False : True);
+		scroll_save(session->maxROWS, ever_3270 ? False : True);
 	}
 #if defined(X3270_TRACE) /*[*/
 	trace_skipping = False;
 #endif /*]*/
 
 	/* Clear the screen. */
-	(void) memset((char *)ea_buf, 0, h3270.rows*h3270.cols*sizeof(struct ea));
+	(void) memset((char *)ea_buf, 0, session->rows*session->cols*sizeof(struct ea));
 	cursor_move(0);
 	buffer_addr = 0;
 	// unselect(0, ROWS*COLS);
-	formatted = False;
+	session->formatted = False;
 	default_fg = 0;
 	default_bg = 0;
 	default_gr = 0;
@@ -2335,7 +2345,7 @@ ctlr_clear(Boolean can_snap)
 	sscp_start = 0;
 
 //	ALL_CHANGED;
-	screen_erase(&h3270);
+	screen_erase(session);
 
 }
 
@@ -2354,7 +2364,7 @@ ctlr_blanks(void)
 	cursor_move(0);
 	buffer_addr = 0;
 	// unselect(0, ROWS*COLS);
-	formatted = False;
+	h3270.formatted = False;
 	ALL_CHANGED;
 }
 
@@ -2376,7 +2386,7 @@ ctlr_add(int baddr, unsigned char c, unsigned char cs)
 			if (toggled(SCREEN_TRACE))
 				trace_screen();
 #endif /*]*/
-			scroll_save(maxROWS, False);
+			scroll_save(session->maxROWS, False);
 			trace_primed = False;
 		}
 		/*
@@ -2622,22 +2632,23 @@ void changed(H3270 *session, int bstart, int bend)
 
 }
 
-#if defined(X3270_ANSI) /*[*/
 /*
  * Swap the regular and alternate screen buffers
  */
-void
-ctlr_altbuffer(Boolean alt)
+void ctlr_altbuffer(H3270 *session, int alt)
 {
 	struct ea *etmp;
 
-	if (alt != is_altbuffer) {
+    CHECK_SESSION_HANDLE(session);
+
+	if (alt != session->is_altbuffer)
+	{
 
 		etmp = ea_buf;
 		ea_buf = aea_buf;
 		aea_buf = etmp;
 
-		is_altbuffer = alt;
+		session->is_altbuffer = alt;
 		ALL_CHANGED;
 		// unselect(0, ROWS*COLS);
 
@@ -2648,7 +2659,6 @@ ctlr_altbuffer(Boolean alt)
 		blink_start();
 	}
 }
-#endif /*]*/
 
 
 /*
@@ -2659,7 +2669,7 @@ mdt_set(int baddr)
 {
 	int faddr;
 
-	faddr = find_field_attribute(baddr);
+	faddr = find_field_attribute(&h3270,baddr);
 	if (faddr >= 0 && !(ea_buf[faddr].fa & FA_MODIFY)) {
 		ea_buf[faddr].fa |= FA_MODIFY;
 		if (appres.modified_sel)
@@ -2672,7 +2682,7 @@ mdt_clear(int baddr)
 {
 	int faddr;
 
-	faddr = find_field_attribute(baddr);
+	faddr = find_field_attribute(&h3270,baddr);
 	if (faddr >= 0 && (ea_buf[faddr].fa & FA_MODIFY)) {
 		ea_buf[faddr].fa &= ~FA_MODIFY;
 		if (appres.modified_sel)

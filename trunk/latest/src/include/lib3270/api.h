@@ -230,6 +230,10 @@
 			int					  cols;
 			int					  cursor_addr;
 			char				  flipped;
+			int					  screen_alt;			/**< alternate screen? */
+			int					  is_altbuffer;
+
+			int					  formatted;			/**< set in screen_disp */
 
 			// Widget info
 			void				* widget;
@@ -522,9 +526,9 @@
 		LIB3270_EXPORT void show_3270_popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, ...);
 
 		/* Set/Get screen contents */
-		LIB3270_EXPORT int find_field_attribute(int baddr);
-		LIB3270_EXPORT int find_field_length(int baddr);
-		LIB3270_EXPORT unsigned char get_field_attribute(int baddr);
+		LIB3270_EXPORT int find_field_attribute(H3270 *session, int baddr);
+		LIB3270_EXPORT int find_field_length(H3270 *session, int baddr);
+		LIB3270_EXPORT unsigned char get_field_attribute(H3270 *session, int baddr);
 		LIB3270_EXPORT int screen_read(char *dest, int baddr, int count);
 		LIB3270_EXPORT void Input_String(const unsigned char *str);
 		LIB3270_EXPORT void screen_size(int *rows, int *cols);
@@ -561,9 +565,8 @@
 		LIB3270_EXPORT void RunPendingEvents(int wait);
 		LIB3270_EXPORT int Wait(int seconds);
 
-		LIB3270_EXPORT void ctlr_erase(int alt);
-        LIB3270_EXPORT int ctlr_get_cols(void);
-        LIB3270_EXPORT int ctlr_get_rows(void);
+        LIB3270_EXPORT int ctlr_get_cols(void) __attribute__ ((deprecated));
+        LIB3270_EXPORT int ctlr_get_rows(void) __attribute__ ((deprecated));
 
         /* Screen calls */
 		LIB3270_EXPORT void screen_resume(void);

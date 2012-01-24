@@ -203,10 +203,10 @@ LIB3270_INTERNAL char		*hostname;
 	LIB3270_INTERNAL Boolean	local_process;
 #endif /*]*/
 
-LIB3270_INTERNAL int			maxCOLS;
-LIB3270_INTERNAL int			maxROWS;
-LIB3270_INTERNAL char			*model_name;
-LIB3270_INTERNAL int			model_num;
+// LIB3270_INTERNAL int			maxCOLS;
+// LIB3270_INTERNAL int			maxROWS;
+// LIB3270_INTERNAL char			*model_name;
+// LIB3270_INTERNAL int			model_num;
 LIB3270_INTERNAL Boolean		no_login_host;
 LIB3270_INTERNAL Boolean		non_tn3270e_host;
 LIB3270_INTERNAL int			ov_cols, ov_rows;

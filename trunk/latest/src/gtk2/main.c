@@ -90,7 +90,7 @@ static void connect_main(H3270 *session, int status, void *dunno)
 	{
 		SetStatusCode(STATUS_CODE_DISCONNECTED);
 		cMode &= ~CURSOR_MODE_ENABLED;
-		ctlr_erase(1);
+//		ctlr_erase(1);
 		online = FALSE;
 #ifdef 	X3270_FT
 		action_group_set_sensitive(ACTION_GROUP_FT,status);

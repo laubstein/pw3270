@@ -65,7 +65,7 @@
 #include <lib3270/api.h>
 
 /* Externals: ctlr.c */
-extern Boolean  screen_alt;
+// extern Boolean  screen_alt;
 extern unsigned char reply_mode;
 extern int      crm_nattr;
 extern unsigned char crm_attr[];
@@ -380,11 +380,11 @@ sf_erase_reset(unsigned char buf[], int buflen)
 	switch (buf[3]) {
 	    case SF_ER_DEFAULT:
 		trace_ds(" Default\n");
-		ctlr_erase(False);
+		ctlr_erase(NULL,False);
 		break;
 	    case SF_ER_ALT:
 		trace_ds(" Alternate\n");
-		ctlr_erase(True);
+		ctlr_erase(NULL,True);
 		break;
 	    default:
 		trace_ds(" unknown type 0x%02x\n", buf[3]);
@@ -509,13 +509,13 @@ sf_create_partition(unsigned char buf[], int buflen)
 		GET16(h, &buf[6]);
 		trace_ds(",h=%d", h);
 	} else
-		h = maxROWS;
+		h = h3270.maxROWS;
 
 	if (buflen > 9) {
 		GET16(w, &buf[8]);
 		trace_ds(",w=%d", w);
 	} else
-		w = maxCOLS;
+		w = h3270.maxCOLS;
 
 	if (buflen > 11) {
 		GET16(rv, &buf[10]);
@@ -533,13 +533,13 @@ sf_create_partition(unsigned char buf[], int buflen)
 		GET16(hv, &buf[14]);
 		trace_ds(",hv=%d", hv);
 	} else
-		hv = (h > maxROWS)? maxROWS: h;
+		hv = (h > h3270.maxROWS)? h3270.maxROWS: h;
 
 	if (buflen > 17) {
 		GET16(wv, &buf[16]);
 		trace_ds(",wv=%d", wv);
 	} else
-		wv = (w > maxCOLS)? maxCOLS: w;
+		wv = (w > h3270.maxCOLS)? h3270.maxCOLS: w;
 
 	if (buflen > 19) {
 		GET16(rw, &buf[18]);
@@ -605,7 +605,7 @@ sf_outbound_ds(unsigned char buf[], int buflen)
 		break;
 	    case SNA_CMD_EW:
 		trace_ds(" EraseWrite");
-		ctlr_erase(screen_alt);
+		ctlr_erase(&h3270,h3270.screen_alt);
 		if (buflen > 5) {
 			if ((rv = ctlr_write(&buf[4], buflen-4, True)) < 0)
 				return rv;
@@ -614,7 +614,7 @@ sf_outbound_ds(unsigned char buf[], int buflen)
 		break;
 	    case SNA_CMD_EWA:
 		trace_ds(" EraseWriteAlternate");
-		ctlr_erase(screen_alt);
+		ctlr_erase(&h3270,h3270.screen_alt);
 		if (buflen > 5) {
 			if ((rv = ctlr_write(&buf[4], buflen-4, True)) < 0)
 				return rv;
