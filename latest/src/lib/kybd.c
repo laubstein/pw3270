@@ -511,7 +511,7 @@ key_AID(unsigned char aid_code)
 	plugin_aid(aid_code);
 #endif /*]*/
 
-	Trace("IN_SSCP: %d cursor_addr: %d",IN_SSCP,cursor_addr);
+	Trace("IN_SSCP: %d cursor_addr: %d",IN_SSCP,h3270.cursor_addr);
 
 	if (IN_SSCP) {
 		if (kybdlock & KL_OIA_MINUS)
@@ -524,7 +524,7 @@ key_AID(unsigned char aid_code)
 	}
 	if (IN_SSCP && aid_code == AID_ENTER) {
 		/* Act as if the host had written our input. */
-		buffer_addr = cursor_addr;
+		buffer_addr = h3270.cursor_addr;
 	}
 	if (!IN_SSCP || aid_code != AID_CLEAR) {
 		status_twait();
@@ -765,7 +765,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 		enq_ta(key_Character_wrapper, codename, CN);
 		return False;
 	}
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	faddr = find_field_attribute(baddr);
 	fa = get_field_attribute(baddr);
 	if (ea_buf[baddr].fa || FA_IS_PROTECTED(fa)) {
@@ -953,7 +953,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 		}
 	}
 
-	mdt_set(cursor_addr);
+	mdt_set(h3270.cursor_addr);
 
 	/*
 	 * Implement auto-skip, and don't land on attribute bytes.
@@ -1437,7 +1437,7 @@ LIB3270_KEY_ACTION( tab )
 		return 0;
 	}
 #endif /*]*/
-	cursor_move(next_unprotected(cursor_addr));
+	cursor_move(next_unprotected(h3270.cursor_addr));
 	return 0;
 }
 
@@ -1463,7 +1463,7 @@ LIB3270_KEY_ACTION( backtab )
 	}
 	if (!IN_3270)
 		return 0;
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	DEC_BA(baddr);
 	if (ea_buf[baddr].fa)	/* at bof */
 		DEC_BA(baddr);
@@ -1621,7 +1621,7 @@ do_left(void)
 	register int	baddr;
 	enum dbcs_state d;
 
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	DEC_BA(baddr);
 	d = ctlr_dbcs_state(baddr);
 	if (IS_LEFT(d))
@@ -1666,7 +1666,7 @@ LIB3270_CURSOR_ACTION( left )
 	{
 		register int	baddr;
 
-		baddr = cursor_addr;
+		baddr = h3270.cursor_addr;
 		INC_BA(baddr);
 		/* XXX: DBCS? */
 		cursor_move(baddr);
@@ -1688,7 +1688,7 @@ do_delete(void)
 	int ndel;
 	register int i;
 
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 
 	/* Can't delete a field attribute. */
 	fa = get_field_attribute(baddr);
@@ -1748,7 +1748,7 @@ do_delete(void)
 		ctlr_add(end_baddr - i, EBC_null, 0);
 
 	/* Set the MDT for this field. */
-	mdt_set(cursor_addr);
+	mdt_set(h3270.cursor_addr);
 
 	/* Patch up the DBCS state for display. */
 	(void) ctlr_dbcs_postprocess();
@@ -1806,7 +1806,7 @@ LIB3270_ACTION( backspace )
 	else {
 		register int	baddr;
 
-		baddr = cursor_addr;
+		baddr = h3270.cursor_addr;
 		DEC_BA(baddr);
 		cursor_move(baddr);
 	}
@@ -1824,7 +1824,7 @@ do_erase(void)
 	int	baddr, faddr;
 	enum dbcs_state d;
 
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	faddr = find_field_attribute(baddr);
 	if (faddr == baddr || FA_IS_PROTECTED(ea_buf[baddr].fa)) {
 		operator_error(KL_OERR_PROTECTED);
@@ -1837,8 +1837,8 @@ do_erase(void)
 	/*
 	 * If we are now on an SI, move left again.
 	 */
-	if (ea_buf[cursor_addr].cc == EBC_si) {
-		baddr = cursor_addr;
+	if (ea_buf[h3270.cursor_addr].cc == EBC_si) {
+		baddr = h3270.cursor_addr;
 		DEC_BA(baddr);
 		cursor_move(baddr);
 	}
@@ -1866,9 +1866,9 @@ do_erase(void)
 	 * If we've just erased the last character of a DBCS subfield, erase
 	 * the SO/SI pair as well.
 	 */
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	DEC_BA(baddr);
-	if (ea_buf[baddr].cc == EBC_so && ea_buf[cursor_addr].cc == EBC_si) {
+	if (ea_buf[baddr].cc == EBC_so && ea_buf[h3270.cursor_addr].cc == EBC_si) {
 		cursor_move(baddr);
 		(void) do_delete();
 	}
@@ -1921,7 +1921,7 @@ LIB3270_CURSOR_ACTION( right )
 #endif /*]*/
 	if (!flipped)
 	{
-		baddr = cursor_addr;
+		baddr = h3270.cursor_addr;
 		INC_BA(baddr);
 		d = ctlr_dbcs_state(baddr);
 		if (IS_RIGHT(d))
@@ -1996,7 +1996,7 @@ LIB3270_ACTION( previousword )
 	if (!formatted)
 		return 0;
 
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	prot = FA_IS_PROTECTED(get_field_attribute(baddr));
 
 	/* Skip to before this word, if in one now. */
@@ -2004,7 +2004,7 @@ LIB3270_ACTION( previousword )
 		c = ea_buf[baddr].cc;
 		while (!ea_buf[baddr].fa && c != EBC_space && c != EBC_null) {
 			DEC_BA(baddr);
-			if (baddr == cursor_addr)
+			if (baddr == h3270.cursor_addr)
 				return 0;
 			c = ea_buf[baddr].cc;
 		}
@@ -2148,25 +2148,25 @@ LIB3270_ACTION( nextword )
 		return 0;
 
 	/* If not in an unprotected field, go to the next unprotected word. */
-	if (ea_buf[cursor_addr].fa ||
-	    FA_IS_PROTECTED(get_field_attribute(cursor_addr))) {
-		baddr = nu_word(cursor_addr);
+	if (ea_buf[h3270.cursor_addr].fa ||
+	    FA_IS_PROTECTED(get_field_attribute(h3270.cursor_addr))) {
+		baddr = nu_word(h3270.cursor_addr);
 		if (baddr != -1)
 			cursor_move(baddr);
 		return 0;
 	}
 
 	/* If there's another word in this field, go to it. */
-	baddr = nt_word(cursor_addr);
+	baddr = nt_word(h3270.cursor_addr);
 	if (baddr != -1) {
 		cursor_move(baddr);
 		return 0;
 	}
 
 	/* If in a word, go to just after its end. */
-	c = ea_buf[cursor_addr].cc;
+	c = ea_buf[h3270.cursor_addr].cc;
 	if (c != EBC_space && c != EBC_null) {
-		baddr = cursor_addr;
+		baddr = h3270.cursor_addr;
 		do {
 			c = ea_buf[baddr].cc;
 			if (c == EBC_space || c == EBC_null) {
@@ -2179,11 +2179,11 @@ LIB3270_ACTION( nextword )
 				return 0;
 			}
 			INC_BA(baddr);
-		} while (baddr != cursor_addr);
+		} while (baddr != h3270.cursor_addr);
 	}
 	/* Otherwise, go to the next unprotected word. */
 	else {
-		baddr = nu_word(cursor_addr);
+		baddr = nu_word(h3270.cursor_addr);
 		if (baddr != -1)
 			cursor_move(baddr);
 	}
@@ -2231,9 +2231,9 @@ LIB3270_CURSOR_ACTION( up )
 		return 0;
 	}
 #endif /*]*/
-	baddr = cursor_addr - h3270.cols;
+	baddr = h3270.cursor_addr - h3270.cols;
 	if (baddr < 0)
-		baddr = (cursor_addr + (h3270.rows * h3270.cols)) - h3270.cols;
+		baddr = (h3270.cursor_addr + (h3270.rows * h3270.cols)) - h3270.cols;
 	cursor_move(baddr);
 	return 0;
 }
@@ -2280,7 +2280,7 @@ LIB3270_CURSOR_ACTION( down )
 		return 0;
 	}
 #endif /*]*/
-	baddr = (cursor_addr + h3270.cols) % (h3270.cols * h3270.rows);
+	baddr = (h3270.cursor_addr + h3270.cols) % (h3270.cols * h3270.rows);
 	cursor_move(baddr);
 	return 0;
 }
@@ -2308,7 +2308,7 @@ LIB3270_CURSOR_ACTION( newline )
 		return 0;
 	}
 #endif /*]*/
-	baddr = (cursor_addr + h3270.cols) % (h3270.cols * h3270.rows);	/* down */
+	baddr = (h3270.cursor_addr + h3270.cols) % (h3270.cols * h3270.rows);	/* down */
 	baddr = (baddr / h3270.cols) * h3270.cols;			/* 1st col */
 	faddr = find_field_attribute(baddr);
 	fa = ea_buf[faddr].fa;
@@ -2337,7 +2337,7 @@ Dup_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 		return;
 #endif /*]*/
 	if (key_Character(EBC_dup, False, False, NULL))
-		cursor_move(next_unprotected(cursor_addr));
+		cursor_move(next_unprotected(h3270.cursor_addr));
 }
 
 
@@ -2542,29 +2542,6 @@ CursorSelect_action(Widget w unused, XEvent *event, String *params,
 }
 */
 
-#if defined(X3270_DISPLAY)
-/*
- * Cursor Select mouse action (light pen simulator).
- */
-/*
-void
-MouseSelect_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params)
-{
-	if (w != *screen)
-		return;
-//	reset_idle_timer();
-	if (kybdlock)
-		return;
-#if defined(X3270_ANSI)
-	if (IN_ANSI)
-		return;
-#endif
-	lightpen_select(mouse_baddr(w, event));
-}
-*/
-#endif
-
 /**
  * Erase End Of Line Key.
  *
@@ -2587,7 +2564,7 @@ LIB3270_ACTION( eraseeol )
 		return 0;
 #endif /*]*/
 
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	fa = get_field_attribute(baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa)
 	{
@@ -2604,7 +2581,7 @@ LIB3270_ACTION( eraseeol )
 			INC_BA(baddr);
 		} while (!ea_buf[baddr].fa && BA_TO_COL(baddr) > 0);
 
-		mdt_set(cursor_addr);
+		mdt_set(h3270.cursor_addr);
 	}
 	else
 	{
@@ -2652,7 +2629,7 @@ LIB3270_ACTION( eraseeof )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	fa = get_field_attribute(baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
@@ -2663,7 +2640,7 @@ LIB3270_ACTION( eraseeof )
 			ctlr_add(baddr, EBC_null, 0);
 			INC_BA(baddr);
 		} while (!ea_buf[baddr].fa);
-		mdt_set(cursor_addr);
+		mdt_set(h3270.cursor_addr);
 	} else {	/* erase to end of screen */
 		do {
 			ctlr_add(baddr, EBC_null, 0);
@@ -2770,7 +2747,7 @@ LIB3270_ACTION( deleteword )
 	if (!formatted)
 		return 0;
 
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	fa = get_field_attribute(baddr);
 
 	/* Make sure we're on a modifiable field. */
@@ -2781,7 +2758,7 @@ LIB3270_ACTION( deleteword )
 
 	/* Backspace over any spaces to the left of the cursor. */
 	for (;;) {
-		baddr = cursor_addr;
+		baddr = h3270.cursor_addr;
 		DEC_BA(baddr);
 		if (ea_buf[baddr].fa)
 			return 0;
@@ -2794,7 +2771,7 @@ LIB3270_ACTION( deleteword )
 
 	/* Backspace until the character to the left of the cursor is blank. */
 	for (;;) {
-		baddr = cursor_addr;
+		baddr = h3270.cursor_addr;
 		DEC_BA(baddr);
 		if (ea_buf[baddr].fa)
 			return 0;
@@ -2837,7 +2814,7 @@ LIB3270_ACTION( deletefield )
 	if (!formatted)
 		return 0;
 
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	fa = get_field_attribute(baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
@@ -2846,7 +2823,7 @@ LIB3270_ACTION( deletefield )
 	while (!ea_buf[baddr].fa)
 		DEC_BA(baddr);
 	INC_BA(baddr);
-	mdt_set(cursor_addr);
+	mdt_set(h3270.cursor_addr);
 	cursor_move(baddr);
 	while (!ea_buf[baddr].fa) {
 		ctlr_add(baddr, EBC_null, 0);
@@ -2940,7 +2917,7 @@ LIB3270_ACTION( fieldend )
 #endif /*]*/
 	if (!formatted)
 		return 0;
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	faddr = find_field_attribute(baddr);
 	fa = ea_buf[faddr].fa;
 	if (faddr == baddr || FA_IS_PROTECTED(fa))
@@ -3314,7 +3291,7 @@ remargin(int lmargin)
 	int faddr;
 	unsigned char fa;
 
-	baddr = cursor_addr;
+	baddr = h3270.cursor_addr;
 	while (BA_TO_COL(baddr) < lmargin) {
 		baddr = ROWCOL_TO_BA(BA_TO_ROW(baddr), lmargin);
 		if (!ever) {
@@ -3361,8 +3338,8 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 	int literal = 0;
 	int nc = 0;
 	enum iaction ia = pasting ? IA_PASTE : IA_STRING;
-	int orig_addr = cursor_addr;
-	int orig_col = BA_TO_COL(cursor_addr);
+	int orig_addr = h3270.cursor_addr;
+	int orig_col = BA_TO_COL(h3270.cursor_addr);
 	Boolean skipped = False;
 #if defined(X3270_DBCS) /*[*/
 	unsigned char ebc[2];
@@ -3414,12 +3391,12 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 		if (pasting && IN_3270) {
 
 			/* Check for cursor wrap to top of screen. */
-			if (cursor_addr < orig_addr)
+			if (h3270.cursor_addr < orig_addr)
 				return len-1;		/* wrapped */
 
 			/* Jump cursor over left margin. */
 			if (toggled(MARGINED_PASTE) &&
-			    BA_TO_COL(cursor_addr) < orig_col) {
+			    BA_TO_COL(h3270.cursor_addr) < orig_col) {
 				if (!remargin(orig_col))
 					return len-1;
 				skipped = True;
@@ -3718,7 +3695,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 	switch (state) {
 	    case BASE:
 		if (toggled(MARGINED_PASTE) &&
-		    BA_TO_COL(cursor_addr) < orig_col) {
+		    BA_TO_COL(h3270.cursor_addr) < orig_col) {
 			(void) remargin(orig_col);
 		}
 		break;
@@ -3727,7 +3704,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 		key_ACharacter((unsigned char) literal, KT_STD, ia, &skipped);
 		state = BASE;
 		if (toggled(MARGINED_PASTE) &&
-		    BA_TO_COL(cursor_addr) < orig_col) {
+		    BA_TO_COL(h3270.cursor_addr) < orig_col) {
 			(void) remargin(orig_col);
 		}
 		break;
@@ -3880,13 +3857,13 @@ kybd_prime(void)
 	if (!formatted || kybdlock || !IN_3270)
 		return 0;
 
-	fa = get_field_attribute(cursor_addr);
-	if (ea_buf[cursor_addr].fa || FA_IS_PROTECTED(fa)) {
+	fa = get_field_attribute(h3270.cursor_addr);
+	if (ea_buf[h3270.cursor_addr].fa || FA_IS_PROTECTED(fa)) {
 		/*
 		 * The cursor is not in an unprotected field.  Find the
 		 * next one.
 		 */
-		baddr = next_unprotected(cursor_addr);
+		baddr = next_unprotected(h3270.cursor_addr);
 
 		/* If there isn't any, give up. */
 		if (!baddr)
@@ -3895,7 +3872,7 @@ kybd_prime(void)
 		/* Move the cursor there. */
 	} else {
 		/* Already in an unprotected field.  Find its start. */
-		baddr = cursor_addr;
+		baddr = h3270.cursor_addr;
 		while (!ea_buf[baddr].fa) {
 			DEC_BA(baddr);
 		}

@@ -203,6 +203,7 @@
 			int					  maxCOLS;
 			int					  rows;
 			int					  cols;
+			int					  cursor_addr;
 
 			// Widget info
 			void				* widget;
@@ -524,8 +525,8 @@
 		LIB3270_EXPORT void Input_String(const unsigned char *str);
 		LIB3270_EXPORT void screen_size(int *rows, int *cols);
 		LIB3270_EXPORT int query_secure_connection(H3270 *h);
-		LIB3270_EXPORT int lib3270_paste_string(const unsigned char *str);
 
+		#define lib3270_paste_string(str) lib3270_set_string(NULL,str)
 		#define get_3270_terminal_size(h,r,c) lib3270_get_screen_size(h,r,c)
 
 		/* Keyboard */

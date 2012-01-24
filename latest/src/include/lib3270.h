@@ -106,5 +106,19 @@
 	LIB3270_EXPORT enum cstate lib3270_get_connection_state(H3270 *h);
 
 
+	/**
+	 * Set string at current cursor position.
+	 *
+	 * Returns are ignored; newlines mean "move to beginning of next line";
+	 * tabs and formfeeds become spaces.  Backslashes are not special
+	 *
+	 * @param h		Session handle.
+	 * @param s		String to input.
+	 *
+	 * @Returns Negative if error or number of processed characters.
+	 *
+	 */
+	LIB3270_EXPORT int lib3270_set_string(H3270 *h, const unsigned char *str);
+
 
 #endif // LIB3270_H_INCLUDED
