@@ -296,7 +296,7 @@ static void ctlr_connect(H3270 *session, int ignored unused, void *dunno)
 	ticking_stop(session);
 	status_untiming(session);
 
-	if (ever_3270)
+	if (session->ever_3270)
 		ea_buf[-1].fa = FA_PRINTABLE | FA_MODIFY;
 	else
 		ea_buf[-1].fa = FA_PRINTABLE | FA_PROTECT;
@@ -2618,6 +2618,7 @@ void ctlr_scroll(void)
  */
 void changed(H3270 *session, int bstart, int bend)
 {
+	/*
 	if(session->first_changed < 0)
 	{
 		session->first_changed = bstart;
@@ -2629,7 +2630,7 @@ void changed(H3270 *session, int bstart, int bend)
 
 	if(bend > session->last_changed)
 		session->last_changed = bend;
-
+	*/
 }
 
 /*

@@ -167,8 +167,8 @@ H3270 * lib3270_session_new(const char *model)
 	hSession->sz = sizeof(H3270);
 	hSession->sock = -1;
 	hSession->model_num = -1;
-	hSession->first_changed = -1;
-	hSession->last_changed = -1;
+//	hSession->first_changed = -1;
+//	hSession->last_changed = -1;
 	hSession->cstate = NOT_CONNECTED;
 	hSession->oia_status = -1;
 
@@ -255,8 +255,8 @@ H3270 * lib3270_session_new(const char *model)
 		return NULL;
 
 	kybd_init();
-	hostfile_init();
-	hostfile_init();
+//	hostfile_init();
+//	hostfile_init();
 	ansi_init();
 
 #if defined(X3270_FT)

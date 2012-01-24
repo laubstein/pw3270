@@ -222,8 +222,8 @@
 			// screen info
 			int					  ov_rows;
 			int					  ov_cols;
-			int					  first_changed;
-			int					  last_changed;
+//			int					  first_changed;
+//			int					  last_changed;
 			int					  maxROWS;
 			int					  maxCOLS;
 			int					  rows;
@@ -234,6 +234,14 @@
 			int					  is_altbuffer;
 
 			int					  formatted;			/**< set in screen_disp */
+
+			// host.c
+			char 				  std_ds_host;
+			char 				  no_login_host;
+			char 				  non_tn3270e_host;
+			char 				  passthru_host;
+			char 				  ssl_host;
+			char 				  ever_3270;
 
 			// Widget info
 			void				* widget;
@@ -279,14 +287,19 @@
 		/**  extended attributes */
 		struct ea
 		{
-			unsigned char cc;	/**< EBCDIC or ASCII character code */
-			unsigned char fa;	/**< field attribute, it nonzero */
-			unsigned char fg;	/**< foreground color (0x00 or 0xf<n>) */
-			unsigned char bg;	/**< background color (0x00 or 0xf<n>) */
-			unsigned char gr;	/**< ANSI graphics rendition bits */
-			unsigned char cs;	/**< character set (GE flag, or 0..2) */
-			unsigned char ic;	/**< input control (DBCS) */
-			unsigned char db;	/**< DBCS state */
+			unsigned char cc;		/**< EBCDIC or ASCII character code */
+			unsigned char fa;		/**< field attribute, it nonzero */
+			unsigned char fg;		/**< foreground color (0x00 or 0xf<n>) */
+			unsigned char bg;		/**< background color (0x00 or 0xf<n>) */
+			unsigned char gr;		/**< ANSI graphics rendition bits */
+			unsigned char cs;		/**< character set (GE flag, or 0..2) */
+			unsigned char ic;		/**< input control (DBCS) */
+			unsigned char db;		/**< DBCS state */
+
+			/* Updated by addch() */
+			unsigned char  chr;		/**< ASCII character code */
+			unsigned short attr;	/**< Converted character attribute (color & etc) */
+
 		};
 		#define GR_BLINK		0x01
 		#define GR_REVERSE		0x02
@@ -466,7 +479,7 @@
 			void	(*Warning)(const char *fmt, va_list arg);
 			void	(*SysError)(const char *title, const char *message, const char *system);
 			void 	(*model_changed)(H3270 *session, const char *name, int model, int cols, int rows);
-			int		(*addch)(int row, int col, int c, unsigned short attr);
+			int		(*addch)(int row, int col, unsigned char c, unsigned short attr);
 			void	(*charset)(char *dcs);
 			void	(*title)(char *text);
 			void	(*ring_bell)(void);
@@ -554,8 +567,8 @@
 		LIB3270_EXPORT int			  get_3270_model(H3270 *session);
 
 		/* Get connection info */
-		LIB3270_EXPORT const char	* get_connected_lu(H3270 *h);
-		LIB3270_EXPORT const char	* get_current_host(H3270 *h);
+		#define get_connected_lu(h) lib3270_get_luname(h)
+		#define get_current_host(h) lib3270_get_host(h)
 
 		LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state);
 

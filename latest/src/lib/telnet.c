@@ -464,7 +464,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 	Replace(h3270.hostname, NewString(host));
 
 	/* get the passthru host and port number */
-	if (passthru_host) {
+	if (h3270.passthru_host) {
 		const char *hn;
 
 		hn = getenv("INTERNET_HOST");
@@ -509,7 +509,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 
 	/* fill in the socket address of the given host */
 	(void) memset((char *) &haddr, 0, sizeof(haddr));
-	if (passthru_host) {
+	if (h3270.passthru_host) {
 		haddr.sin.sin_family = AF_INET;
 		(void) memmove(&haddr.sin.sin_addr, passthru_haddr,
 			       passthru_len);
@@ -632,7 +632,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 		/* init ssl */
 #if defined(HAVE_LIBSSL) /*[*/
 		last_ssl_error = 0;
-		if (ssl_host)
+		if (h3270.ssl_host)
 			ssl_init();
 #endif /*]*/
 
@@ -663,7 +663,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 #endif /*]*/
 
 	/* set up temporary termtype */
-	if (appres.termname == CN && std_ds_host) {
+	if (appres.termname == CN && h3270.std_ds_host) {
 		(void) sprintf(ttype_tmpval, "IBM-327%c-%d",
 		    appres.m3279 ? '9' : '8', h3270.model_num);
 		h3270.termtype = ttype_tmpval;
@@ -768,11 +768,11 @@ net_connected(void)
 		}
 	}
 
-	trace_dsn("Connected to %s, port %u%s.\n", h3270.hostname, h3270.current_port,ssl_host? " via SSL": "");
+	trace_dsn("Connected to %s, port %u%s.\n", h3270.hostname, h3270.current_port,h3270.ssl_host? " via SSL": "");
 
 #if defined(HAVE_LIBSSL) /*[*/
 	/* Set up SSL. */
-	if (ssl_host && !h3270.secure_connection) {
+	if (h3270.ssl_host && !h3270.secure_connection) {
 		if (SSL_set_fd(ssl_con, h3270.sock) != 1) {
 			trace_dsn("Can't set fd!\n");
 		}
@@ -827,7 +827,7 @@ net_connected(void)
 	check_linemode(True);
 
 	/* write out the passthru hostname and port nubmer */
-	if (passthru_host) {
+	if (h3270.passthru_host) {
 		char *buf;
 
 		buf = Malloc(strlen(h3270.hostname) + 32);
@@ -1287,7 +1287,7 @@ telnet_fsm(unsigned char c)
 #if defined(X3270_TN3270E) /*[*/
 		    case TELOPT_TN3270E:
 #endif /*]*/
-			if (c != TELOPT_TN3270E || !non_tn3270e_host) {
+			if (c != TELOPT_TN3270E || !h3270.non_tn3270e_host) {
 				if (!hisopts[c]) {
 					hisopts[c] = 1;
 					do_opt[2] = c;
@@ -1348,7 +1348,7 @@ telnet_fsm(unsigned char c)
 #if defined(HAVE_LIBSSL) /*[*/
 		    case TELOPT_STARTTLS:
 #endif /*]*/
-			if (c == TELOPT_TN3270E && non_tn3270e_host)
+			if (c == TELOPT_TN3270E && h3270.non_tn3270e_host)
 				goto wont;
 			if (c == TELOPT_TM && !appres.bsd_tm)
 				goto wont;
@@ -3203,7 +3203,7 @@ ssl_init(void)
 		ssl_ctx = SSL_CTX_new(SSLv23_method());
 		if (ssl_ctx == NULL) {
 			popup_an_error("SSL_CTX_new failed");
-			ssl_host = False;
+			h3270.ssl_host = False;
 			return;
 		}
 		SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL);
@@ -3212,7 +3212,7 @@ ssl_init(void)
 	ssl_con = SSL_new(ssl_ctx);
 	if (ssl_con == NULL) {
 		popup_an_error("SSL_new failed");
-		ssl_host = False;
+		h3270.ssl_host = False;
 	}
 	SSL_set_verify(ssl_con, 0/*xxx*/, NULL);
 
