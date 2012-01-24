@@ -547,6 +547,8 @@
 		LIB3270_EXPORT const char	* get_connected_lu(H3270 *h);
 		LIB3270_EXPORT const char	* get_current_host(H3270 *h);
 
+		LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state);
+
 		LIB3270_EXPORT int Toggled(int ix);
 
 		LIB3270_EXPORT int CallAndWait(int(*callback)(void *), void *parm);
