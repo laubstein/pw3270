@@ -90,7 +90,7 @@ static void screen_update(H3270 *session, int bstart, int bend);
 static void status_connect(H3270 *session, int ignored, void *dunno);
 static void status_3270_mode(H3270 *session, int ignored, void *dunno);
 static void status_printer(H3270 *session, int on, void *dunno);
-static int color_from_fa(unsigned char fa);
+static unsigned short color_from_fa(unsigned char fa);
 static void relabel(H3270 *session, int ignored, void *dunno);
 
 void set_display_charset(char *dcs)
@@ -165,8 +165,7 @@ int screen_init(H3270 *session)
 }
 
 /* Map a field attribute to its default colors. */
-static int
-color_from_fa(unsigned char fa)
+static unsigned short color_from_fa(unsigned char fa)
 {
 	if (appres.m3279)
 		return get_color_pair(DEFCOLOR_MAP(fa),0) | COLOR_ATTR_FIELD;
@@ -175,20 +174,22 @@ color_from_fa(unsigned char fa)
 	return get_color_pair(0,0) | COLOR_ATTR_FIELD | ((FA_IS_HIGH(fa)) ? COLOR_ATTR_INTENSIFY : 0);
 }
 
+/*
 static int reverse_colors(int a)
 {
 	int bg = (a & 0xF0) >> 4;
 	int fg = (a & 0x0F);
 	return get_color_pair(bg,fg) | (a&0xFF00);
 }
+*/
 
 /*
  * Find the display attributes for a baddr, fa_addr and fa.
  */
-static int
-calc_attrs(int baddr, int fa_addr, int fa)
+static unsigned short calc_attrs(int baddr, int fa_addr, int fa)
 {
-    	int fg = 0, bg = 0, gr, a;
+	unsigned short fg=0, bg=0, a;
+	int gr;
 
 	/* Compute the color. */
 
@@ -197,11 +198,12 @@ calc_attrs(int baddr, int fa_addr, int fa)
 		(!ea_buf[baddr].fg &&
 		 !ea_buf[fa_addr].fg &&
 		 !ea_buf[baddr].bg &&
-		 !ea_buf[fa_addr].bg)) {
-
-	    	a = color_from_fa(fa);
-
-	} else {
+		 !ea_buf[fa_addr].bg))
+	{
+		a = color_from_fa(fa);
+	}
+	else
+	{
 
 		/* The current location or the fa specifies the fg or bg. */
 		if (ea_buf[baddr].fg)
@@ -239,29 +241,20 @@ calc_attrs(int baddr, int fa_addr, int fa)
 	if(!(gr & GR_REVERSE) && !bg)
 	{
 		if(gr & GR_BLINK)
-			a |= COLOR_ATTR_BLINK;
+			a |= LIB3270_ATTR_BLINK;
 
 		if(gr & GR_UNDERLINE)
-			a |= COLOR_ATTR_UNDERLINE;
+			a |= LIB3270_ATTR_UNDERLINE;
 	}
 
-
-/*
-	if (appres.highlight_underline &&
-		appres.m3279 &&
-		(gr & (GR_BLINK | GR_UNDERLINE)) &&
-		!(gr & GR_REVERSE) &&
-		!bg) {
-
-	    	a |= BACKGROUND_INTENSITY;
-	}
-*/
+	if(appres.m3279 && (gr & (GR_BLINK | GR_UNDERLINE)) && !(gr & GR_REVERSE) && !bg)
+    	a |= LIB3270_ATTR_BACKGROUND_INTENSITY;
 
 	if(!appres.m3279 &&	((gr & GR_INTENSIFY) || FA_IS_HIGH(fa)))
-		a |= COLOR_ATTR_INTENSIFY;
+		a |= LIB3270_ATTR_INTENSIFY;
 
 	if (gr & GR_REVERSE)
-		a = reverse_colors(a);
+		a = get_color_pair(((a & 0xF0) >> 4),(a & 0x0F)) | (a&0xFF00); // a = reverse_colors(a);
 
 	return a;
 }
@@ -341,13 +334,13 @@ static void screen_update(H3270 *session, int bstart, int bend)
 {
 
 	int baddr, row, col;
-	int a;
+	unsigned short a;
 	int attr = COLOR_GREEN;
 	unsigned char fa;
 	int fa_addr;
 
-	fa = get_field_attribute(bstart);
-	a = color_from_fa(fa);
+	fa		= get_field_attribute(bstart);
+	a  		= color_from_fa(fa);
 	fa_addr = find_field_attribute(bstart); // may be -1, that's okay
 
 	row = bstart/session->cols;
@@ -379,13 +372,14 @@ static void screen_update(H3270 *session, int bstart, int bend)
 			}
 			else
 			{
-				int b;
-
+//				unsigned short b;
 				//
 				// Override some of the field
 				// attributes.
 				//
-				attr = b = calc_attrs(baddr, fa_addr, fa);
+//				attr = b = calc_attrs(baddr, fa_addr, fa);
+
+				attr = calc_attrs(baddr, fa_addr, fa);
 			}
 
 			if (ea_buf[baddr].cs == CS_LINEDRAW)
