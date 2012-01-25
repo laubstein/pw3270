@@ -37,7 +37,7 @@ LIB3270_INTERNAL void ctlr_bcopy(int baddr_from, int baddr_to, int count, int mo
 // LIB3270_INTERNAL void ctlr_changed(int bstart, int bend);
 LIB3270_INTERNAL void ctlr_clear(H3270 *session, Boolean can_snap);
 LIB3270_INTERNAL void ctlr_erase_all_unprotected(void);
-LIB3270_INTERNAL void ctlr_init(unsigned cmask);
+LIB3270_INTERNAL void ctlr_init(H3270 *session, unsigned cmask);
 LIB3270_INTERNAL void ctlr_read_buffer(unsigned char aid_byte);
 LIB3270_INTERNAL void ctlr_read_modified(unsigned char aid_byte, Boolean all);
 LIB3270_INTERNAL void ctlr_reinit(H3270 *session, unsigned cmask);

@@ -143,25 +143,16 @@ const char *toggle_names[N_TOGGLES] =
 	"SmartPaste"
 };
 
-H3270 * lib3270_session_new(const char *model)
+void lib3270_session_free(H3270 *h)
 {
-	static int configured = 0;
 
-	H3270		*hSession = &h3270;
-	int 		ovc, ovr;
-	int 		model_number;
-	char		junk;
+}
 
-	Trace("%s - configured=%d",__FUNCTION__,configured);
-
-	if(configured)
-	{
-		// TODO (perry#5#): Allocate a new structure.
-		errno = EBUSY;
-		return hSession;
-	}
-
-	configured = 1;
+void lib3270_session_init(H3270 *hSession, const char *model)
+{
+	int 	ovc, ovr;
+	char	junk;
+	int		model_number;
 
 	memset(hSession,0,sizeof(H3270));
 	hSession->sz = sizeof(H3270);
@@ -174,18 +165,6 @@ H3270 * lib3270_session_new(const char *model)
 
 	strncpy(hSession->full_model_name,"IBM-",FULL_MODEL_NAME_SIZE);
 	hSession->model_name = &hSession->full_model_name[4];
-
-#if defined(_WIN32)
-
-	(void) get_version_info();
-
-	Trace("%s (init_calls: %d)",__FUNCTION__,init_calls);
-
-#else
-
-	Trace("%s (init_calls: %d)",__FUNCTION__,init_calls);
-
-#endif
 
 	/*
 	 * Sort out model and color modes, based on the model number resource.
@@ -243,6 +222,29 @@ H3270 * lib3270_session_new(const char *model)
 	if (appres.apl_mode)
 		appres.charset = Apl;
 
+}
+
+H3270 * lib3270_session_new(const char *model)
+{
+	static int configured = 0;
+
+	H3270		*hSession = &h3270;
+
+	Trace("%s - configured=%d",__FUNCTION__,configured);
+
+	if(configured)
+	{
+		// TODO (perry#5#): Allocate a new structure.
+		errno = EBUSY;
+		return hSession;
+	}
+
+	configured = 1;
+
+	lib3270_session_init(hSession, model);
+
+	if(screen_init(hSession))
+		return NULL;
 
 	Trace("Charset: %s",appres.charset);
 	if (charset_init(appres.charset) != CS_OKAY)
@@ -250,9 +252,6 @@ H3270 * lib3270_session_new(const char *model)
 		Warning( _( "Cannot find charset \"%s\", using defaults" ), appres.charset);
 		(void) charset_init(CN);
 	}
-
-	if(screen_init(hSession))
-		return NULL;
 
 	kybd_init();
 //	hostfile_init();
@@ -286,6 +285,12 @@ static void initialize(void)
 #endif
 
 	initialize_toggles();
+
+#if defined(_WIN32)
+	(void) get_version_info();
+#endif
+
+	Trace("%s (init_calls: %d)",__FUNCTION__,init_calls);
 
 	/* Set the defaults. */
 	appres.mono = False;

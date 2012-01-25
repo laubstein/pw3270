@@ -99,6 +99,14 @@
 	LIB3270_EXPORT H3270 * lib3270_session_new(const char *model);
 
 	/**
+	 * Destroy session, release memory
+	 *
+	 * @param h		Session handle.
+	 *
+	 */
+	LIB3270_EXPORT void lib3270_session_free(H3270 *h);
+
+	/**
 	 * Register a state change callback
 	 *
 	 * @param h		Session handle.
