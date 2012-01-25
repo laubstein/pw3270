@@ -146,7 +146,7 @@ libtest: testprogram@EXEEXT@
 
 chklib: testprogram@EXEEXT@
 ifeq ($(VALGRIND),no)
-		@$(BINDBG)/testprogram@EXEEXT@
+		@./testprogram@EXEEXT@
 else
 		@G_DEBUG=gc-friendly G_SLICE=always-malloc \$(VALGRIND) --leak-check=full ./testprogram@EXEEXT@
 endif
