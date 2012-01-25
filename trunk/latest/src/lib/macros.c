@@ -66,7 +66,7 @@
  	return strdup(buffer);
  }
 
- static const char * get_state(void)
+ static const char * get_state(H3270 *h)
  {
  	#define DECLARE_XLAT_STATE(x) { x, #x }
 	static const struct _xlat_state
@@ -89,7 +89,7 @@
 
 	int f;
 
- 	enum cstate state = QueryCstate();
+ 	enum cstate state = lib3270_get_connection_state(h);
 
 	for(f=0;f < (sizeof(xlat_state)/sizeof(struct _xlat_state)); f++)
 	{
@@ -214,14 +214,14 @@
 	if(str)
 		Input_String((unsigned char *) str);
 
-	return strdup(get_state());
+	return strdup(get_state(hSession));
  }
 
  LIB3270_MACRO( status )
  {
-	const char	* luname	= get_connected_lu(0);
- 	const char	* cstate	= get_state();
- 	const char	* host		= get_current_host(0);
+	const char	* luname	= (const char *) get_connected_lu(hSession);
+ 	const char	* cstate	= get_state(hSession);
+ 	const char	* host		= (const char *) get_current_host(hSession);
  	char		* rsp;
  	size_t		  sz;
 
@@ -239,12 +239,12 @@
 
  LIB3270_MACRO( cstate )
  {
-	return strdup(get_state());
+	return strdup(get_state(hSession));
  }
 
  LIB3270_MACRO( luname )
  {
-	const char	* luname = get_connected_lu(hSession);
+	const char	* luname = (const char *) get_connected_lu(hSession);
 	return strdup(luname ? luname : "none" );
  }
 

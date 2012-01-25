@@ -132,13 +132,13 @@ int screen_init(H3270 *session)
 	}
 
 	/* Set up callbacks for state changes. */
-	register_schange(ST_CONNECT, status_connect);
-	register_schange(ST_3270_MODE, status_3270_mode);
-	register_schange(ST_PRINTER, status_printer);
+	lib3270_register_schange(session,ST_CONNECT, status_connect,0);
+	lib3270_register_schange(session,ST_3270_MODE, status_3270_mode,0);
+	lib3270_register_schange(session,ST_PRINTER, status_printer,0);
 
-	register_schange(ST_HALF_CONNECT, relabel);
-	register_schange(ST_CONNECT, relabel);
-	register_schange(ST_3270_MODE, relabel);
+	lib3270_register_schange(session,ST_HALF_CONNECT, relabel,0);
+	lib3270_register_schange(session,ST_CONNECT, relabel,0);
+	lib3270_register_schange(session,ST_3270_MODE, relabel,0);
 
 	/* See about all-bold behavior. */
 //	if (appres.all_bold_on)
@@ -149,7 +149,7 @@ int screen_init(H3270 *session)
 //		ab_mode = appres.m3279? TS_ON: TS_OFF;
 
 	/* Set up the controller. */
-	ctlr_init(-1);
+	ctlr_init(session,-1);
 	ctlr_reinit(session,-1);
 
 	/* Set the window label. */

@@ -148,13 +148,12 @@ static unsigned char	code_table[64] = {
 /*
  * Initialize the emulated 3270 hardware.
  */
-void
-ctlr_init(unsigned cmask unused)
+void ctlr_init(H3270 *session, unsigned cmask unused)
 {
 	/* Register callback routines. */
-	register_schange(ST_HALF_CONNECT, ctlr_half_connect);
-	register_schange(ST_CONNECT, ctlr_connect);
-	register_schange(ST_3270_MODE, ctlr_connect);
+	lib3270_register_schange(session,ST_HALF_CONNECT, ctlr_half_connect, 0);
+	lib3270_register_schange(session,ST_CONNECT, ctlr_connect, 0);
+	lib3270_register_schange(session,ST_3270_MODE, ctlr_connect, 0);
 }
 /*
  * Reinitialize the emulated 3270 hardware.
