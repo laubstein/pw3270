@@ -57,6 +57,7 @@ TMPDIR=@TMPDIR@
 INSTALL=@INSTALL@
 INSTALL_EXE=$(INSTALL) --mode=755
 INSTALL_DATA=$(INSTALL) --mode=644
+VALGRIND=/usr/bin/valgrind
 
 MAKENSIS=@MAKENSIS@
 
@@ -137,6 +138,19 @@ $(BINDIR)/Debug/lib/lib3270@DLLEXT@: src/lib/*
 
 $(BINDIR)/Release/lib/lib3270@DLLEXT@: src/lib/*
 	@$(MAKE) $(RLS_MAKE) -C src/lib $@
+
+testprogram@EXEEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/lib/testprogram.c
+	@$(CC) $(LIB3270_CFLAGS) -DDEBUG=1 -g -o $@ src/lib/testprogram.c  -Wl,-rpath,.bin/Debug/lib $(LIB3270_DBGLIBS)
+
+libtest: testprogram@EXEEXT@
+
+chklib: testprogram@EXEEXT@
+ifeq ($(VALGRIND),no)
+		@$(BINDBG)/testprogram@EXEEXT@
+else
+		@G_DEBUG=gc-friendly G_SLICE=always-malloc \$(VALGRIND) --leak-check=full ./testprogram@EXEEXT@
+endif
+
 
 #---[ Programs ]---------------------------------------------------------------
 
