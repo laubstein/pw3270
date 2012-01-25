@@ -110,6 +110,9 @@ static void addch(H3270 *session, int baddr, unsigned char c, unsigned short att
 
 	if(callbacks && callbacks->addch)
 		callbacks->addch(baddr/session->cols, baddr%session->cols, c, attr);
+
+	if(session->update)
+		session->update(session,baddr,c,attr);
 }
 
 /**
@@ -570,6 +573,9 @@ void set_viewsize(H3270 *session, int rows, int cols)
 
 	if(callbacks && callbacks->set_viewsize)
 		callbacks->set_viewsize(session,rows,cols);
+
+	if(session->configure)
+		session->configure(session,rows,cols);
 
 }
 
