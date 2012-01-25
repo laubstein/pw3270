@@ -185,7 +185,9 @@
 
 		struct lib3270_state_callback;
 
-		typedef struct _h3270
+		typedef struct _h3270 H3270;
+
+		struct _h3270
 		{
 			unsigned short 	  sz;				/**< Struct size */
 
@@ -257,14 +259,16 @@
 			struct lib3270_state_callback *st_last[N_ST];
 
 			/* Session based callbacks */
+			void (*configure)(H3270 *session, int rows, int cols);
+			void (*update)(H3270 *session, int baddr, unsigned char c, unsigned short attr);
 
-		} H3270;
+		};
 
 		struct lib3270_state_callback
 		{
 			struct lib3270_state_callback	* next;			/**< Next callback in chain */
 			void							* data;			/**< User data */
-			void (*func)(struct _h3270 *, int, void *);		/**< Function to call */
+			void (*func)(H3270 *, int, void *);		/**< Function to call */
 		};
 
 
