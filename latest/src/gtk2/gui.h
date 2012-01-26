@@ -344,7 +344,7 @@
 	LOCAL_EXTERN void		  unselect(void);
 	LOCAL_EXTERN void		  reselect(void);
 
-	LOCAL_EXTERN void		  update_cursor_position(H3270 *session, int row, int col);
+	LOCAL_EXTERN void		  update_cursor_position(H3270 *session, unsigned short row, unsigned short col);
 	LOCAL_EXTERN void		  update_cursor_info(void);
 	LOCAL_EXTERN void		  queue_draw_cursor(void);
 	LOCAL_EXTERN void		  update_cursor_pixmap(void);
