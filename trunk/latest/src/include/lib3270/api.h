@@ -272,7 +272,7 @@
 			struct lib3270_state_callback *st_last[N_ST];
 
 			/* Session based callbacks */
-			void (*configure)(H3270 *session, int rows, int cols);
+			void (*configure)(H3270 *session, unsigned short rows, unsigned short cols);
 			void (*update)(H3270 *session, int baddr, unsigned char c, unsigned short attr);
 			void (*update_cursor)(H3270 *session, unsigned short row, unsigned short col);
 			void (*set_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
@@ -503,6 +503,7 @@
 			void	(*erase)(void);
 			void	(*display)(H3270 *session);
 			void 	(*set_viewsize)(H3270 *session, unsigned short rows, unsigned short cols);
+
 
 			void	(*toggle_changed)(int ix, int value, int reason, const char *name);
 			void	(*show_timer)(long seconds);
