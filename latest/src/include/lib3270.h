@@ -186,6 +186,17 @@
 	 */
 	LIB3270_EXPORT int lib3270_get_cursor_address(H3270 *h);
 
+	/**
+	 * Get buffer contents.
+	 *
+	 * @param h		Session handle.
+	 * @param first	First element to get.
+	 * @param last	Last element to get.
+	 * @param chr	Pointer to buffer which will receive the read chars.
+	 * @param attr	Pointer to buffer which will receive the chars attributes.
+	 *
+	 */
+	LIB3270_EXPORT int lib3270_get_contents(H3270 *h, int first, int last, unsigned char *chr, unsigned short *attr);
 
 	LIB3270_EXPORT STATUS_CODE	  lib3270_get_oia_status(H3270 *h);
 	LIB3270_EXPORT const char	* lib3270_get_luname(H3270 *h);

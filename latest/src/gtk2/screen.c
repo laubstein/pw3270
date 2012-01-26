@@ -71,7 +71,7 @@
  static int	  SetSuspended(int state);
  static void	  SetScript(SCRIPT_STATE state);
  static void	  set_cursor(CURSOR_MODE mode);
- static void	  set_oia(OIA_FLAG id, unsigned char on);
+ static void	  set_oia(H3270 *session, OIA_FLAG id, unsigned char on);
  static void	  set_lu(const char *lu);
 // static void	  changed(int bstart, int bend);
  static void	  error(const char *fmt, va_list arg);
@@ -121,9 +121,9 @@
 	erase,					// void (*erase)(void);
 	display,				// void	(*display)(H3270 *session);
 #ifdef HAVE_ALTSCREEN
-	view_changed,			// 			void 	(*set_viewsize)(H3270 *session, int rows, int cols);
+	view_changed,			// 			void 	(*set_viewsize)(H3270 *session, unsigned short rows, unsigned short cols);
 #else
-	NULL,					// void (*set_viewsize)(int rows, int cols);
+	NULL,					// void (*set_viewsize)(unsigned short rows, unsigned short cols);
 #endif
 
 	update_toggle,			// void (*toggle_changed)(int ix, int value, int reason, const char *name);
@@ -454,7 +454,7 @@
 		g_free(luname);
  }
 
- static void set_oia(OIA_FLAG id, unsigned char on)
+ static void set_oia(H3270 *session, OIA_FLAG id, unsigned char on)
  {
  	if(id > OIA_FLAG_USER)
 		return;

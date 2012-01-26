@@ -241,8 +241,8 @@
 //			int					  last_changed;
 			int					  maxROWS;
 			int					  maxCOLS;
-			int					  rows;
-			int					  cols;
+			unsigned short		  rows;
+			unsigned short		  cols;
 			int					  cursor_addr;
 			char				  flipped;
 			int					  screen_alt;			/**< alternate screen? */
@@ -502,7 +502,7 @@
 
 			void	(*erase)(void);
 			void	(*display)(H3270 *session);
-			void 	(*set_viewsize)(H3270 *session, int rows, int cols);
+			void 	(*set_viewsize)(H3270 *session, unsigned short rows, unsigned short cols);
 
 			void	(*toggle_changed)(int ix, int value, int reason, const char *name);
 			void	(*show_timer)(long seconds);
