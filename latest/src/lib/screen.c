@@ -320,7 +320,7 @@ LIB3270_EXPORT int lib3270_get_contents(H3270 *h, int first, int last, unsigned 
 
 	for(baddr = first; baddr < last;baddr++)
 	{
-		*(chr++)  = ea_buf[baddr].chr;
+		*(chr++)  = ea_buf[baddr].chr ? ea_buf[baddr].chr : ' ';
 		*(attr++) = ea_buf[baddr].attr;
 	}
 

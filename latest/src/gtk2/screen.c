@@ -86,7 +86,7 @@
  static void	  model_changed(H3270 *session, const char *name, int model, int cols, int rows);
 
 #ifdef HAVE_ALTSCREEN
- static void view_changed(H3270 *session, int rows, int cols);
+ static void view_changed(H3270 *session, unsigned short rows, unsigned short cols);
 #endif
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
@@ -906,7 +906,7 @@
  }
 
 #ifdef HAVE_ALTSCREEN
- static void view_changed(H3270 *session, int rows, int cols)
+ static void view_changed(H3270 *session, unsigned short rows, unsigned short cols)
  {
 	if(!screen || rows > screen->rows || cols > screen->cols )
 		return;
