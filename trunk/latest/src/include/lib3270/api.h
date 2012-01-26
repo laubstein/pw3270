@@ -183,6 +183,19 @@
 
 		} STATUS_CODE;
 
+		typedef enum _OIA_FLAG
+		{
+			OIA_FLAG_BOXSOLID,
+			OIA_FLAG_UNDERA,
+			OIA_FLAG_SECURE,
+			OIA_FLAG_TYPEAHEAD,
+			OIA_FLAG_PRINTER,
+			OIA_FLAG_REVERSE,
+
+			OIA_FLAG_USER
+		} OIA_FLAG;
+
+
 		struct lib3270_state_callback;
 
 		typedef struct _h3270 H3270;
@@ -261,6 +274,8 @@
 			/* Session based callbacks */
 			void (*configure)(H3270 *session, int rows, int cols);
 			void (*update)(H3270 *session, int baddr, unsigned char c, unsigned short attr);
+			void (*update_cursor)(H3270 *session, unsigned short row, unsigned short col);
+			void (*set_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
 
 		};
 
@@ -438,18 +453,6 @@
 
 		} SCRIPT_STATE;
 
-		typedef enum _OIA_FLAG
-		{
-			OIA_FLAG_BOXSOLID,
-			OIA_FLAG_UNDERA,
-			OIA_FLAG_SECURE,
-			OIA_FLAG_TYPEAHEAD,
-			OIA_FLAG_PRINTER,
-			OIA_FLAG_REVERSE,
-
-			OIA_FLAG_USER
-		} OIA_FLAG;
-
 		typedef enum _COUNTER_ID
 		{
 			COUNTER_ID_CTLR_DONE,
@@ -488,14 +491,14 @@
 			void	(*title)(char *text);
 			void	(*ring_bell)(void);
 			void	(*redraw)(void);
-			void	(*move_cursor)(H3270 *session, int row, int col);
+			void	(*move_cursor)(H3270 *session, unsigned short row, unsigned short col);
 			int		(*set_suspended)(int state);
 			void	(*set_script)(SCRIPT_STATE state);
 			void	(*reset)(int lock);
 			void	(*status)(STATUS_CODE id);
 			void	(*cursor)(CURSOR_MODE mode);
 			void	(*lu)(const char *lu);
-			void	(*set)(OIA_FLAG id, int on);
+			void	(*set_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
 
 			void	(*erase)(void);
 			void	(*display)(H3270 *session);

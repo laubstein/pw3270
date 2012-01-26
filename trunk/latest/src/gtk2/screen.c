@@ -71,7 +71,7 @@
  static int	  SetSuspended(int state);
  static void	  SetScript(SCRIPT_STATE state);
  static void	  set_cursor(CURSOR_MODE mode);
- static void	  set_oia(OIA_FLAG id, int on);
+ static void	  set_oia(OIA_FLAG id, unsigned char on);
  static void	  set_lu(const char *lu);
 // static void	  changed(int bstart, int bend);
  static void	  error(const char *fmt, va_list arg);
@@ -109,14 +109,14 @@
 	settitle,				// void (*title)(char *text);
 	gdk_beep,				// void (*ring_bell)(void);
 	redraw,					// void (*redraw)(void);
-	update_cursor_position,	// void (*move_cursor)(H3270 *session, int row, int col);
+	update_cursor_position,	// void (*move_cursor)(H3270 *session, unsigned short row, unsigned short col);
 	SetSuspended,			// int	(*set_suspended)(int state);
 	SetScript,				// void	(*set_script)(SCRIPT_STATE state);
 	NULL,					// void (*reset)(int lock);
 	SetStatusCode,			// void (*status)(STATUS_CODE id);
 	set_cursor,				// void (*cursor)(CURSOR_MODE mode);
 	set_lu,					// void (*lu)(const char *lu);
-	set_oia,				// void (*set)(OIA_FLAG id, int on);
+	set_oia,				// void (*set)(OIA_FLAG id, unsigned char on);
 
 	erase,					// void (*erase)(void);
 	display,				// void	(*display)(H3270 *session);
@@ -454,7 +454,7 @@
 		g_free(luname);
  }
 
- static void set_oia(OIA_FLAG id, int on)
+ static void set_oia(OIA_FLAG id, unsigned char on)
  {
  	if(id > OIA_FLAG_USER)
 		return;

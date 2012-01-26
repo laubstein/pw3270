@@ -123,15 +123,23 @@ static void addch(H3270 *session, int baddr, unsigned char c, unsigned short att
  */
 int screen_init(H3270 *session)
 {
+	CHECK_SESSION_HANDLE(session);
 
 	/* Initialize the console. */
-	if(callbacks && callbacks->init)
+	if(callbacks)
 	{
 		if(callbacks->init())
 		{
 			popup_an_error("Can't initialize terminal.");
 			return -1;
 		}
+
+		/* Init default callbacks */
+		if(callbacks->move_cursor)
+			session->update_cursor = callbacks->move_cursor;
+
+		if(callbacks->set_oia)
+			session->set_oia = callbacks->set_oia;
 	}
 
 	/* Set up callbacks for state changes. */
@@ -440,8 +448,13 @@ LIB3270_EXPORT int lib3270_set_cursor_address(H3270 *h, int baddr)
 
 	h->cursor_addr = baddr;
 
+	if(h->update_cursor)
+		h->update_cursor(h,(unsigned short) (baddr/h->cols),(unsigned short) (baddr%h->cols));
+
+/*
 	if(callbacks && callbacks->move_cursor)
-		callbacks->move_cursor(h,baddr/h->cols, baddr%h->cols);
+		callbacks->move_cursor(h,row,col);
+*/
 
     return ret;
 }
@@ -452,8 +465,8 @@ void set_status(H3270 *session, OIA_FLAG id, Boolean on)
 {
 	CHECK_SESSION_HANDLE(session);
 
-	if(callbacks && callbacks->set)
-		callbacks->set(id,on);
+	if(session->set_oia)
+		session->set_oia(session,id,on);
 }
 
 void status_ctlr_done(H3270 *session)
