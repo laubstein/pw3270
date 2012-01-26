@@ -140,6 +140,10 @@ int screen_init(H3270 *session)
 
 		if(callbacks->set_oia)
 			session->set_oia = callbacks->set_oia;
+
+		if(callbacks->set_viewsize)
+			session->configure = callbacks->set_viewsize;
+
 	}
 
 	/* Set up callbacks for state changes. */
@@ -302,6 +306,27 @@ void update_model_info(H3270 *session, int model, int cols, int rows)
 		callbacks->model_changed(session, session->model_name,session->model_num,cols,rows);
 }
 
+LIB3270_EXPORT int lib3270_get_contents(H3270 *h, int first, int last, unsigned char *chr, unsigned short *attr)
+{
+	int baddr;
+	int len;
+
+    CHECK_SESSION_HANDLE(h);
+
+	len = h->rows * h->cols;
+
+	if(first > len || last > len || first < 0 || last < 0)
+		return EFAULT;
+
+	for(baddr = first; baddr < last;baddr++)
+	{
+		*(chr++)  = ea_buf[baddr].chr;
+		*(attr++) = ea_buf[baddr].attr;
+	}
+
+	return 0;
+}
+
 /* Get screen contents */
 int screen_read(char *dest, int baddr, int count)
 {
@@ -451,11 +476,6 @@ LIB3270_EXPORT int lib3270_set_cursor_address(H3270 *h, int baddr)
 	if(h->update_cursor)
 		h->update_cursor(h,(unsigned short) (baddr/h->cols),(unsigned short) (baddr%h->cols));
 
-/*
-	if(callbacks && callbacks->move_cursor)
-		callbacks->move_cursor(h,row,col);
-*/
-
     return ret;
 }
 
@@ -584,11 +604,8 @@ void set_viewsize(H3270 *session, int rows, int cols)
 	session->rows = rows;
 	session->cols = cols;
 
-	if(callbacks && callbacks->set_viewsize)
-		callbacks->set_viewsize(session,rows,cols);
-
 	if(session->configure)
-		session->configure(session,rows,cols);
+		session->configure(session,session->rows,session->cols);
 
 }
 
