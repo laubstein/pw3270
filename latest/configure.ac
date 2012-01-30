@@ -431,7 +431,7 @@ if test "$app_cv_ssl" == "yes"; then
 fi
 
 # Check for libm
-AC_SEARCH_LIBS(sin,m)
+AC_SEARCH_LIBS( [sin], [m], AC_DEFINE(HAVE_LIBM), AC_MSG_NOTICE([libm not present.]))
 
 #--[ Process options ]----------------------------------------------------------------------------------------------------------------------------------------
 

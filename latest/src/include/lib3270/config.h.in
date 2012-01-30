@@ -42,6 +42,7 @@
 
 	#undef HAVE_ICONV
 	#undef HAVE_PLUGINS
+	#undef HAVE_LIBM
 
 	#undef HAVE_SSL
 	#ifdef HAVE_SSL
