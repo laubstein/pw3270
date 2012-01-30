@@ -202,6 +202,4 @@
 	LIB3270_EXPORT const char	* lib3270_get_luname(H3270 *h);
 	LIB3270_EXPORT const char	* lib3270_get_host(H3270 *h);
 
-
-
 #endif // LIB3270_H_INCLUDED
