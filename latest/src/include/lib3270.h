@@ -252,11 +252,23 @@
 	 */
 	LIB3270_EXPORT unsigned char lib3270_get_toogle(H3270 *h, LIB3270_TOGGLE ix);
 
+	/**
+	 * Check if the active connection is secure.
+	 *
+	 * @param h		Session handle.
+	 *
+	 * @return Non 0 if the connection is SSL secured, 0 if not.
+	 */
+	LIB3270_EXPORT int lib3270_get_ssl_state(H3270 *h);
+
+
+
 	LIB3270_EXPORT STATUS_CODE	  lib3270_get_oia_status(H3270 *h);
 	LIB3270_EXPORT const char	* lib3270_get_luname(H3270 *h);
 	LIB3270_EXPORT const char	* lib3270_get_host(H3270 *h);
 
 	#define lib3270_has_printer_session(h) 	(h->oia_flag[LIB3270_FLAG_PRINTER] != 0)
 	#define lib3270_has_active_script(h)	(h->oia_flag[LIB3270_FLAG_SCRIPT] != 0)
+	#define lib3270_get_typeahead(h)		(h->oia_flag[LIB3270_FLAG_TYPEAHEAD] != 0)
 
 #endif // LIB3270_H_INCLUDED
