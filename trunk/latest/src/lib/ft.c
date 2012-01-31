@@ -31,7 +31,7 @@
  */
 
 #include <lib3270/config.h>
-#include <lib3270/api.h>
+#include <lib3270.h>
 #include "globals.h"
 
 #if defined(X3270_FT)

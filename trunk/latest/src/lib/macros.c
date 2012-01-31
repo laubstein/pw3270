@@ -32,7 +32,7 @@
 
  #include <string.h>
  #include <stdio.h>
- #include <lib3270/api.h>
+ #include <lib3270.h>
  #include <lib3270/macros.h>
 
  #define LIB3270_MACRO_ENTRY( name )  { #name, lib3270_macro_ ## name }
