@@ -95,7 +95,22 @@
 		LIB3270_TOGGLE_SMART_PASTE,
 
 		LIB3270_TOGGLE_COUNT
+
 	} LIB3270_TOGGLE;
+
+	typedef enum _lib3270_flag
+	{
+		LIB3270_FLAG_BOXSOLID,
+		LIB3270_FLAG_UNDERA,
+		LIB3270_FLAG_SECURE,
+		LIB3270_FLAG_TYPEAHEAD,
+		LIB3270_FLAG_PRINTER,
+		LIB3270_FLAG_REVERSE,
+		LIB3270_FLAG_SCRIPT,
+
+		LIB3270_FLAG_COUNT
+
+	} LIB3270_FLAG;
 
 	#include <lib3270/api.h>
 
@@ -241,6 +256,7 @@
 	LIB3270_EXPORT const char	* lib3270_get_luname(H3270 *h);
 	LIB3270_EXPORT const char	* lib3270_get_host(H3270 *h);
 
-
+	#define lib3270_has_printer_session(h) 	(h->oia_flag[LIB3270_FLAG_PRINTER] != 0)
+	#define lib3270_has_active_script(h)	(h->oia_flag[LIB3270_FLAG_SCRIPT] != 0)
 
 #endif // LIB3270_H_INCLUDED

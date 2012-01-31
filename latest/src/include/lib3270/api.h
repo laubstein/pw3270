@@ -183,18 +183,14 @@
 
 		} STATUS_CODE;
 
-		typedef enum _OIA_FLAG
-		{
-			OIA_FLAG_BOXSOLID,
-			OIA_FLAG_UNDERA,
-			OIA_FLAG_SECURE,
-			OIA_FLAG_TYPEAHEAD,
-			OIA_FLAG_PRINTER,
-			OIA_FLAG_REVERSE,
-
-			OIA_FLAG_USER
-		} OIA_FLAG;
-
+		#define OIA_FLAG_BOXSOLID	LIB3270_FLAG_BOXSOLID
+		#define OIA_FLAG_UNDERA		LIB3270_FLAG_UNDERA
+		#define OIA_FLAG_SECURE		LIB3270_FLAG_SECURE
+		#define OIA_FLAG_TYPEAHEAD	LIB3270_FLAG_TYPEAHEAD
+		#define OIA_FLAG_PRINTER	LIB3270_FLAG_PRINTER
+		#define OIA_FLAG_REVERSE	LIB3270_FLAG_REVERSE
+		#define OIA_FLAG_USER		LIB3270_FLAG_COUNT
+		#define OIA_FLAG			LIB3270_FLAG
 
 		struct lib3270_state_callback;
 
@@ -231,6 +227,8 @@
 			char	 			  auto_reconnect_inprogress;
 
 			STATUS_CODE			  oia_status;
+
+			unsigned char 		  oia_flag[LIB3270_FLAG_COUNT];
 
 			unsigned short		  current_port;
 

@@ -481,12 +481,18 @@ LIB3270_EXPORT int lib3270_set_cursor_address(H3270 *h, int baddr)
 
 /* Status line stuff. */
 
-void set_status(H3270 *session, OIA_FLAG id, Boolean on)
+void set_status(H3270 *session, LIB3270_FLAG id, Boolean on)
 {
 	CHECK_SESSION_HANDLE(session);
 
-	if(session->set_oia)
-		session->set_oia(session,id,on);
+	if(id < LIB3270_FLAG_COUNT)
+	{
+		session->oia_flag[id] = (on != 0);
+
+		if(session->set_oia)
+			session->set_oia(session,id,on);
+	}
+
 }
 
 void status_ctlr_done(H3270 *session)
