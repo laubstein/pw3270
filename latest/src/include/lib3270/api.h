@@ -31,13 +31,13 @@
  */
 
 
-#ifndef LIB3270_H_INCLUDED
+#ifndef LIB3270_API_INCLUDED
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-		#define LIB3270_H_INCLUDED "4.2"
+		#define LIB3270_API_INCLUDED "4.2"
 
 		#include <errno.h>
 
@@ -580,7 +580,7 @@
 
 		LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state);
 
-		LIB3270_EXPORT int Toggled(int ix);
+		#define Toggled(ix) lib3270_get_toogle(NULL,ix)
 
 		LIB3270_EXPORT int CallAndWait(int(*callback)(void *), void *parm);
 		LIB3270_EXPORT void RunPendingEvents(int wait);
@@ -625,4 +625,4 @@
 	}
 #endif
 
-#endif // LIB3270_H_INCLUDED
+#endif // LIB3270_API_INCLUDED
