@@ -32,6 +32,8 @@
 
 #ifndef LIB3270_H_INCLUDED
 
+	#define LIB3270_H_INCLUDED 1
+
 	/**
 	 * Character attributes
 	 */
@@ -68,6 +70,32 @@
 
 	} LIB3270_ATTR;
 
+	typedef enum _lib3270_toggle
+	{
+		LIB3270_TOGGLE_MONOCASE,
+		LIB3270_TOGGLE_ALT_CURSOR,
+		LIB3270_TOGGLE_CURSOR_BLINK,
+		LIB3270_TOGGLE_SHOW_TIMING,
+		LIB3270_TOGGLE_CURSOR_POS,
+		LIB3270_TOGGLE_DS_TRACE,
+		LIB3270_TOGGLE_SCROLL_BAR,
+		LIB3270_TOGGLE_LINE_WRAP,
+		LIB3270_TOGGLE_BLANK_FILL,
+		LIB3270_TOGGLE_SCREEN_TRACE,
+		LIB3270_TOGGLE_EVENT_TRACE,
+		LIB3270_TOGGLE_MARGINED_PASTE,
+		LIB3270_TOGGLE_RECTANGLE_SELECT,
+		LIB3270_TOGGLE_CROSSHAIR,
+		LIB3270_TOGGLE_VISIBLE_CONTROL,
+		LIB3270_TOGGLE_AID_WAIT,
+		LIB3270_TOGGLE_FULL_SCREEN,
+		LIB3270_TOGGLE_RECONNECT,
+		LIB3270_TOGGLE_INSERT,
+		LIB3270_TOGGLE_KEYPAD,
+		LIB3270_TOGGLE_SMART_PASTE,
+
+		LIB3270_TOGGLE_COUNT
+	} LIB3270_TOGGLE;
 
 	#include <lib3270/api.h>
 
@@ -198,8 +226,21 @@
 	 */
 	LIB3270_EXPORT int lib3270_get_contents(H3270 *h, int first, int last, unsigned char *chr, unsigned short *attr);
 
+	/**
+	 * get toggle state.
+	 *
+	 * @param h		Session handle.
+	 * @param ix	Toggle id.
+	 *
+	 * @return 0 if the toggle is disabled, non zero if enabled.
+	 *
+	 */
+	LIB3270_EXPORT unsigned char lib3270_get_toogle(H3270 *h, LIB3270_TOGGLE ix);
+
 	LIB3270_EXPORT STATUS_CODE	  lib3270_get_oia_status(H3270 *h);
 	LIB3270_EXPORT const char	* lib3270_get_luname(H3270 *h);
 	LIB3270_EXPORT const char	* lib3270_get_host(H3270 *h);
+
+
 
 #endif // LIB3270_H_INCLUDED

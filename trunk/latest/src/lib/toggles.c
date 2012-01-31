@@ -94,6 +94,8 @@ LIB3270_EXPORT void register_3270_toggle_monitor(LIB3270_TOGGLE_ID ix, void (*ca
 
 LIB3270_EXPORT unsigned char lib3270_get_toogle(H3270 *session, LIB3270_TOGGLE ix)
 {
+	CHECK_SESSION_HANDLE(session);
+
 	if(ix < 0 || ix >= N_TOGGLES)
 		return 0;
 	return (unsigned char) appres.toggle[ix].value != 0;
