@@ -551,8 +551,8 @@
 		LIB3270_EXPORT int screen_read(char *dest, int baddr, int count);
 		LIB3270_EXPORT void Input_String(const unsigned char *str);
 		LIB3270_EXPORT void screen_size(int *rows, int *cols);
-		LIB3270_EXPORT int query_secure_connection(H3270 *h);
 
+		#define query_secure_connection(h) lib3270_get_ssl_state(h)
 		#define lib3270_paste_string(str) lib3270_set_string(NULL,str)
 		#define get_3270_terminal_size(h,r,c) lib3270_get_screen_size(h,r,c)
 

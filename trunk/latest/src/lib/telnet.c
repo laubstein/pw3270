@@ -3414,12 +3414,12 @@ net_proxy_port(void)
 	    	return NULL;
 }
 
-int query_secure_connection(H3270 *h)
+LIB3270_EXPORT int lib3270_get_ssl_state(H3270 *h)
 {
+	CHECK_SESSION_HANDLE(h);
+
 #if defined(HAVE_LIBSSL)
-		if(h)
-			return h->secure_connection;
-		return h3270.secure_connection;
+		return (h->secure_connection != 0);
 #else
 		return 0;
 #endif
