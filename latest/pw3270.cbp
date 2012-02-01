@@ -719,6 +719,11 @@
 			<Option target="libtest" />
 		</Unit>
 		<Unit filename="src\plugins\pipectl\Makefile.in" />
+		<Unit filename="src\plugins\pipectl\commands.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="src\plugins\pipectl\init.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -40,7 +40,7 @@
 	#include <glib/gi18n.h>
 
 	#include <lib3270/plugins.h>
-	#include <lib3270/api.h>
+	#include <lib3270.h>
 
 	#define PIPE_BUFFER_LENGTH 4096
 
