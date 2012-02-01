@@ -32,7 +32,7 @@
 
  #include <windows.h>
  #include <stdarg.h>
- #include <lib3270/api.h>
+ #include <lib3270.h>
  #include <lib3270/macros.h>
  #include "pipectl.h"
 
