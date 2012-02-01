@@ -429,7 +429,8 @@
 
 		};
 
-		LIB3270_EXPORT int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk);
+		#define Register3270IOCallbacks(x) lib3270_register_io_handlers(x)
+
 
 		/* Screen processing */
 		typedef enum _CURSOR_MODE
