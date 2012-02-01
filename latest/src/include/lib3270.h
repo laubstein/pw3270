@@ -261,6 +261,15 @@
 	 */
 	LIB3270_EXPORT int lib3270_get_ssl_state(H3270 *h);
 
+	/**
+	 * Register application I/O Handlers.
+	 *
+	 * @param cbk	Structure with the application I/O handles to set.
+	 *
+	 * @return 0 if ok, error code if not.
+	 *
+	 */
+	int LIB3270_EXPORT lib3270_register_io_handlers(const struct lib3270_io_callbacks *cbk);
 
 
 	LIB3270_EXPORT STATUS_CODE	  lib3270_get_oia_status(H3270 *h);

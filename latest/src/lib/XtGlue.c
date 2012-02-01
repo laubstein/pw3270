@@ -882,7 +882,9 @@ void RemoveInput(unsigned long id)
 		callbacks->RemoveInput(id);
 }
 
-int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk)
+#define Register3270IOCallbacks(x) lib3270_register_io_handlers(x)
+
+int LIB3270_EXPORT lib3270_register_io_handlers(const struct lib3270_io_callbacks *cbk)
 {
 	if(!cbk)
 		return EINVAL;
