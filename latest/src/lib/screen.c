@@ -318,7 +318,7 @@ LIB3270_EXPORT int lib3270_get_contents(H3270 *h, int first, int last, unsigned 
 	if(first > len || last > len || first < 0 || last < 0)
 		return EFAULT;
 
-	for(baddr = first; baddr < last;baddr++)
+	for(baddr = first; baddr <= last;baddr++)
 	{
 		*(chr++)  = ea_buf[baddr].chr ? ea_buf[baddr].chr : ' ';
 		*(attr++) = ea_buf[baddr].attr;
