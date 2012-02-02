@@ -280,4 +280,14 @@
 	#define lib3270_has_active_script(h)	(h->oia_flag[LIB3270_FLAG_SCRIPT] != 0)
 	#define lib3270_get_typeahead(h)		(h->oia_flag[LIB3270_FLAG_TYPEAHEAD] != 0)
 
+	LIB3270_EXPORT int lib3270_pconnected(H3270 *h);
+	LIB3270_EXPORT int lib3270_half_connected(H3270 *h);
+	LIB3270_EXPORT int lib3270_connected(H3270 *h);
+	LIB3270_EXPORT int lib3270_in_neither(H3270 *h);
+	LIB3270_EXPORT int lib3270_in_ansi(H3270 *h);
+	LIB3270_EXPORT int lib3270_in_3270(H3270 *h);
+	LIB3270_EXPORT int lib3270_in_sscp(H3270 *h);
+	LIB3270_EXPORT int lib3270_in_tn3270e(H3270 *h);
+	LIB3270_EXPORT int lib3270_in_e(H3270 *h);
+
 #endif // LIB3270_H_INCLUDED

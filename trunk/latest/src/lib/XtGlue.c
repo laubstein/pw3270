@@ -903,6 +903,60 @@ LIB3270_EXPORT enum cstate lib3270_get_connection_state(H3270 *h)
 	return h->cstate;
 }
 
+LIB3270_EXPORT int lib3270_pconnected(H3270 *h)
+{
+	CHECK_SESSION_HANDLE(h);
+	return (((int) h->cstate) >= (int)RESOLVING);
+}
+
+LIB3270_EXPORT int lib3270_half_connected(H3270 *h)
+{
+	CHECK_SESSION_HANDLE(h);
+	return (h->cstate == RESOLVING || h->cstate == PENDING);
+}
+
+LIB3270_EXPORT int lib3270_connected(H3270 *h)
+{
+	CHECK_SESSION_HANDLE(h);
+	return ((int) h->cstate >= (int)CONNECTED_INITIAL);
+}
+
+LIB3270_EXPORT int lib3270_in_neither(H3270 *h)
+{
+	CHECK_SESSION_HANDLE(h);
+	return (h->cstate == CONNECTED_INITIAL);
+}
+
+LIB3270_EXPORT int lib3270_in_ansi(H3270 *h)
+{
+	CHECK_SESSION_HANDLE(h);
+	return (h->cstate == CONNECTED_ANSI || h->cstate == CONNECTED_NVT);
+}
+
+LIB3270_EXPORT int lib3270_in_3270(H3270 *h)
+{
+	CHECK_SESSION_HANDLE(h);
+	return (h->cstate == CONNECTED_3270 || h->cstate == CONNECTED_TN3270E || h->cstate == CONNECTED_SSCP);
+}
+
+LIB3270_EXPORT int lib3270_in_sscp(H3270 *h)
+{
+	CHECK_SESSION_HANDLE(h);
+	return (h->cstate == CONNECTED_SSCP);
+}
+
+LIB3270_EXPORT int lib3270_in_tn3270e(H3270 *h)
+{
+	CHECK_SESSION_HANDLE(h);
+	return (h->cstate == CONNECTED_TN3270E);
+}
+
+LIB3270_EXPORT int lib3270_in_e(H3270 *h)
+{
+	CHECK_SESSION_HANDLE(h);
+	return (h->cstate >= CONNECTED_INITIAL_E);
+}
+
 int CallAndWait(int(*callback)(void *),void *parm)
 {
 	if(callbacks->CallAndWait)
