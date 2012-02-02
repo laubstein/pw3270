@@ -245,8 +245,9 @@ LIB3270_INTERNAL int			*xtra_width;
 
 /* Connection state */
 LIB3270_INTERNAL enum ft_state ft_state;
-LIB3270_INTERNAL enum cstate cstate;
 
+/*
+LIB3270_INTERNAL enum cstate cstate;
 #define PCONNECTED	((int)h3270.cstate >= (int)RESOLVING)
 #define HALF_CONNECTED	(h3270.cstate == RESOLVING || h3270.cstate == PENDING)
 #define CONNECTED	((int)h3270.cstate >= (int)CONNECTED_INITIAL)
@@ -256,6 +257,7 @@ LIB3270_INTERNAL enum cstate cstate;
 #define IN_SSCP		(h3270.cstate == CONNECTED_SSCP)
 #define IN_TN3270E	(h3270.cstate == CONNECTED_TN3270E)
 #define IN_E		(h3270.cstate >= CONNECTED_INITIAL_E)
+*/
 
 /*   keyboard modifer bitmap */
 #define ShiftKeyDown	0x01

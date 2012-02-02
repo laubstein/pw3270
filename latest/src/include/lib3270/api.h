@@ -386,22 +386,33 @@
 
 		LIB3270_EXPORT int RegisterFTCallbacks(const struct filetransfer_callbacks *cbk);
 
-		#define QueryCstate() lib3270_get_connection_state(NULL)
+//		#define QueryCstate() lib3270_get_connection_state(NULL)
+
+		#define PCONNECTED		lib3270_pconnected(NULL)
+		#define HALF_CONNECTED	lib3270_half_connected(NULL)
+		#define CONNECTED		lib3270_connected(NULL)
+
+		#define IN_NEITHER		lib3270_in_neither(NULL)
+		#define IN_ANSI			lib3270_in_ansi(NULL)
+		#define IN_3270			lib3270_in_3270(NULL)
+		#define IN_SSCP			lib3270_in_sscp(NULL)
+		#define IN_TN3270E		lib3270_in_tn3270e(NULL)
+		#define IN_E			lib3270_in_e(NULL)
 
 		#ifndef LIB3270
 
 
 			LIB3270_EXPORT enum ft_state	QueryFTstate(void);
 
-			#define PCONNECTED	((int) QueryCstate() >= (int)RESOLVING)
-			#define HALF_CONNECTED	(QueryCstate() == RESOLVING || QueryCstate() == PENDING)
-			#define CONNECTED	((int) QueryCstate() >= (int)CONNECTED_INITIAL)
-			#define IN_NEITHER	(QueryCstate() == CONNECTED_INITIAL)
-			#define IN_ANSI		(QueryCstate() == CONNECTED_ANSI || QueryCstate() == CONNECTED_NVT)
-			#define IN_3270		(QueryCstate() == CONNECTED_3270 || QueryCstate() == CONNECTED_TN3270E || QueryCstate() == CONNECTED_SSCP)
-			#define IN_SSCP		(QueryCstate() == CONNECTED_SSCP)
-			#define IN_TN3270E	(QueryCstate() == CONNECTED_TN3270E)
-			#define IN_E		(QueryCstate() >= CONNECTED_INITIAL_E)
+//			#define PCONNECTED	((int) QueryCstate() >= (int)RESOLVING)
+//			#define HALF_CONNECTED	(QueryCstate() == RESOLVING || QueryCstate() == PENDING)
+//			#define CONNECTED	((int) QueryCstate() >= (int)CONNECTED_INITIAL)
+//			#define IN_NEITHER	(QueryCstate() == CONNECTED_INITIAL)
+//			#define IN_ANSI		(QueryCstate() == CONNECTED_ANSI || QueryCstate() == CONNECTED_NVT)
+//			#define IN_3270		(QueryCstate() == CONNECTED_3270 || QueryCstate() == CONNECTED_TN3270E || QueryCstate() == CONNECTED_SSCP)
+//			#define IN_SSCP		(QueryCstate() == CONNECTED_SSCP)
+//			#define IN_TN3270E	(QueryCstate() == CONNECTED_TN3270E)
+//			#define IN_E		(QueryCstate() >= CONNECTED_INITIAL_E)
 
 		#endif
 
