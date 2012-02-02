@@ -973,6 +973,7 @@ LIB3270_ACTION( testpattern )
 			pos = 0;
 		}
 		ea_buf[f].fg = fg;
+		ea_buf[f].bg = (fg == COLOR_BLACK) ? COLOR_WHITE : COLOR_BLACK;
 		ea_buf[f].cs = pat[row].cs;
 		ea_buf[f].cc = pat[row].cc[pos++];
 	}
