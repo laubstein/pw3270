@@ -957,6 +957,7 @@ LIB3270_ACTION( testpattern )
 	int max = (h3270.maxROWS * h3270.maxCOLS);
 	int pos = 0;
 	int f;
+	int fg = COLOR_BLUE;
 
 	Trace("%s begins",__FUNCTION__);
 	for(f=0;f<max;f++)
@@ -964,9 +965,14 @@ LIB3270_ACTION( testpattern )
 		if(!pat[row].cc[pos])
 		{
 			if(++row >= (sizeof(pat)/sizeof(struct _pat)) )
+			{
 				row = 0;
+				if(++fg > COLOR_WHITE)
+					fg = COLOR_BLUE;
+			}
 			pos = 0;
 		}
+		ea_buf[f].fg = fg;
 		ea_buf[f].cs = pat[row].cs;
 		ea_buf[f].cc = pat[row].cc[pos++];
 	}
