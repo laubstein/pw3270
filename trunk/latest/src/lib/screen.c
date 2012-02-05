@@ -128,12 +128,6 @@ int screen_init(H3270 *session)
 	/* Initialize the console. */
 	if(callbacks)
 	{
-		if(callbacks->init())
-		{
-			popup_an_error("Can't initialize terminal.");
-			return -1;
-		}
-
 		/* Init default callbacks */
 		if(callbacks->move_cursor)
 			session->update_cursor = callbacks->move_cursor;
@@ -144,6 +138,11 @@ int screen_init(H3270 *session)
 		if(callbacks->set_viewsize)
 			session->configure = callbacks->set_viewsize;
 
+		if(callbacks->init())
+		{
+			popup_an_error("Can't initialize terminal.");
+			return -1;
+		}
 	}
 
 	/* Set up callbacks for state changes. */
@@ -693,41 +692,11 @@ void status_untiming(H3270 *session)
 		callbacks->show_timer(-1);
 }
 
-/*
-void Redraw_action(Widget w unused, XEvent *event unused, String *params unused, Cardinal *num_params unused)
-{
-	if(callbacks && callbacks->redraw)
-		callbacks->redraw();
-	else
-		screen_disp(&h3270);
-}
-*/
-
 void ring_bell(void)
 {
 	if(callbacks && callbacks->ring_bell)
 		callbacks->ring_bell();
 }
-
-/*
-void screen_flip(void)
-{
-	flipped = !flipped;
-	screen_disp(&h3270);
-}
-*/
-
-/*
-void
-screen_132(void)
-{
-}
-
-void
-screen_80(void)
-{
-}
-*/
 
 /* Set the window title. */
 void
@@ -765,12 +734,6 @@ int query_counter(COUNTER_ID id)
 {
 	return lib3270_event_counter[id];
 }
-
-/*
-void screen_changed(H3270 *session, int bstart, int bend)
-{
-}
-*/
 
 int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk)
 {
@@ -830,7 +793,6 @@ LIB3270_EXPORT void update_toggle_actions(void)
 			callbacks->toggle_changed(f,appres.toggle[f].value,TT_UPDATE,toggle_names[f]);
 	}
 }
-
 #endif
 
 void Warning(const char *fmt, ...)
