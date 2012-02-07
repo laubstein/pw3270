@@ -2770,39 +2770,53 @@ void ticking_start(H3270 *session, Boolean anyway)
 {
 	CHECK_SESSION_HANDLE(session);
 
-	(void) gettimeofday(&t_start, (struct timezone *) 0);
+	if(session->set_timer)
+	{
+		if(toggled(SHOW_TIMING) || anyway)
+			session->set_timer(session,-1);
+	}
+	else
+	{
+		(void) gettimeofday(&t_start, (struct timezone *) 0);
 
-	mticking = True;
+		mticking = True;
 
-	if (!toggled(SHOW_TIMING) && !anyway)
-		return;
-	status_untiming(session);
-	if (ticking)
-		RemoveTimeOut(tick_id);
-	ticking = True;
-	tick_id = AddTimeOut(1000, session, keep_ticking);
-	t_want = t_start;
+		if (!toggled(SHOW_TIMING) && !anyway)
+			return;
+		status_untiming(session);
+		if (ticking)
+			RemoveTimeOut(tick_id);
+		ticking = True;
+		tick_id = AddTimeOut(1000, session, keep_ticking);
+		t_want = t_start;
+	}
+
 }
 
 static void ticking_stop(H3270 *session)
 {
-	struct timeval t1;
-
 	CHECK_SESSION_HANDLE(session);
 
-	(void) gettimeofday(&t1, (struct timezone *) 0);
-	if (mticking) {
-//		sms_accumulate_time(&t_start, &t1);
-		mticking = False;
-	} else {
-		return;
+	if(session->set_timer)
+	{
+		session->set_timer(session,0);
 	}
+	else
+	{
+		struct timeval t1;
 
-	if (!ticking)
-		return;
-	RemoveTimeOut(tick_id);
-	ticking = False;
-	status_timing(session,&t_start, &t1);
+		(void) gettimeofday(&t1, (struct timezone *) 0);
+		if (mticking)
+			mticking = False;
+		else
+			return;
+
+		if (!ticking)
+			return;
+		RemoveTimeOut(tick_id);
+		ticking = False;
+		status_timing(session,&t_start, &t1);
+	}
 }
 
 void
