@@ -256,7 +256,6 @@
 			char 				  ssl_host;
 			char 				  ever_3270;
 
-
 			// Widget info
 			void				* widget;
 

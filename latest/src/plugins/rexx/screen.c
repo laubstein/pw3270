@@ -65,7 +65,7 @@
 
 	Trace("Status: %d",query_3270_terminal_status());
 
- 	if(query_3270_terminal_status() != STATUS_CODE_BLANK)
+ 	if(query_3270_terminal_status() != LIB3270_STATUS_BLANK)
 		return RetValue(Retstr,EINVAL);
 
 	switch(Argc)
@@ -100,7 +100,7 @@
 
 	Trace("Status: %d",query_3270_terminal_status());
 
-	return RetValue(Retstr,query_3270_terminal_status() == STATUS_CODE_BLANK ? 0 : EINVAL);
+	return RetValue(Retstr,query_3270_terminal_status() == LIB3270_STATUS_BLANK ? 0 : EINVAL);
  }
 
  RexxReturnCode REXXENTRY rx3270FindFieldAttribute(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
@@ -307,7 +307,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 		{
 			rc = ECANCELED;
 		}
-		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
+		else if(query_3270_terminal_status() == LIB3270_STATUS_BLANK)
 		{
 			screen_read(buffer,start,sz);
 			*(buffer+sz) = 0;
@@ -445,7 +445,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 
 	if(!PCONNECTED)
 		rc = ENOTCONN;
-	else if(query_3270_terminal_status() != STATUS_CODE_BLANK)
+	else if(query_3270_terminal_status() != LIB3270_STATUS_BLANK)
 		rc = EINVAL;
 	else
 		rc = lib3270_enter();
@@ -477,7 +477,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 
 	if(!PCONNECTED)
 		rc = ENOTCONN;
-	else if(query_3270_terminal_status() != STATUS_CODE_BLANK)
+	else if(query_3270_terminal_status() != LIB3270_STATUS_BLANK)
 		rc = EINVAL;
 	else
 		rc = lib3270_pfkey(atoi(Argv[0].strptr));
@@ -649,7 +649,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 		{
 			rc = ECANCELED;
 		}
-		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
+		else if(query_3270_terminal_status() == LIB3270_STATUS_BLANK)
 		{
 			screen_read(buffer,pos,sz);
 			*(buffer+(sz+1)) = 0;
@@ -685,7 +685,7 @@ RexxReturnCode REXXENTRY rx3270IsTerminalReady(PSZ Name, LONG Argc, RXSTRING Arg
     if(Argc)
 		return RXFUNC_BADCALL;
 
-	if(!CONNECTED || query_3270_terminal_status() != STATUS_CODE_BLANK)
+	if(!CONNECTED || query_3270_terminal_status() != LIB3270_STATUS_BLANK)
 	{
 		ReturnValue(0);
 	}
@@ -735,7 +735,7 @@ RexxReturnCode REXXENTRY rx3270IsTerminalReady(PSZ Name, LONG Argc, RXSTRING Arg
             rc = ENOTCONN;
 		else if(IsHalted())
 			rc = ECANCELED;
-		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
+		else if(query_3270_terminal_status() == LIB3270_STATUS_BLANK)
 			rc = 0;
 	}
 
