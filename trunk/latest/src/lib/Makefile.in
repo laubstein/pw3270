@@ -68,10 +68,12 @@ SDK_LDFLAGS=
 #---[ Sources ]----------------------------------------------------------------
 
 SOURCES =	version.c XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
-		ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c kybd.c \
+		ft.c ft_cut.c ft_dft.c glue.c host.c kybd.c \
 		print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
 		sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
 		xio.c resolver.c log.c paste.c macros.c @LIB_SRCS@
+
+# icmd.c
 
 #---[ Rules ]------------------------------------------------------------------
 
