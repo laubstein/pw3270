@@ -505,19 +505,19 @@
 	charset = g_strdup(dcs);
  }
 
- void SetStatusCode(STATUS_CODE id)
+ void SetStatusCode(H3270 *session, LIB3270_STATUS id)
  {
  	if(id == terminal_message_id)
 		return;
 
 	terminal_message_id = id;
 
-	if(id == STATUS_CODE_BLANK)
+	if(id == LIB3270_STATUS_BLANK)
 	{
 		set_cursor(CURSOR_MODE_NORMAL);
 		update_cursor_pixmap();
 	}
-	else if(id >= STATUS_CODE_USER)
+	else if(id >= LIB3270_STATUS_USER)
 	{
 		Log("Unexpected status code %d",(int) id);
 		return;

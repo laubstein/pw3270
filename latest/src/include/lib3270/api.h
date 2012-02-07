@@ -160,28 +160,28 @@
 			CONNECTED_TN3270E		/**< connected in TN3270E mode, 3270 mode */
 		};
 
-		typedef enum _STATUS_CODE
+		typedef enum _LIB3270_STATUS
 		{
-			STATUS_CODE_BLANK,
-			STATUS_CODE_SYSWAIT,
-			STATUS_CODE_TWAIT,
-			STATUS_CODE_CONNECTED,
-			STATUS_CODE_DISCONNECTED,
-			STATUS_CODE_AWAITING_FIRST,
-			STATUS_CODE_MINUS,
-			STATUS_CODE_PROTECTED,
-			STATUS_CODE_NUMERIC,
-			STATUS_CODE_OVERFLOW,
-			STATUS_CODE_INHIBIT,
-			STATUS_CODE_KYBDLOCK,
+			LIB3270_STATUS_BLANK,
+			LIB3270_STATUS_SYSWAIT,
+			LIB3270_STATUS_TWAIT,
+			LIB3270_STATUS_CONNECTED,
+			LIB3270_STATUS_DISCONNECTED,
+			LIB3270_STATUS_AWAITING_FIRST,
+			LIB3270_STATUS_MINUS,
+			LIB3270_STATUS_PROTECTED,
+			LIB3270_STATUS_NUMERIC,
+			LIB3270_STATUS_OVERFLOW,
+			LIB3270_STATUS_INHIBIT,
+			LIB3270_STATUS_KYBDLOCK,
 
-			STATUS_CODE_X,
-			STATUS_CODE_RESOLVING,
-			STATUS_CODE_CONNECTING,
+			LIB3270_STATUS_X,
+			LIB3270_STATUS_RESOLVING,
+			LIB3270_STATUS_CONNECTING,
 
-			STATUS_CODE_USER
+			LIB3270_STATUS_USER
 
-		} STATUS_CODE;
+		} LIB3270_STATUS;
 
 		#define OIA_FLAG_BOXSOLID	LIB3270_FLAG_BOXSOLID
 		#define OIA_FLAG_UNDERA		LIB3270_FLAG_UNDERA
@@ -226,7 +226,7 @@
 			char	       		* qualified_host;
 			char	 			  auto_reconnect_inprogress;
 
-			STATUS_CODE			  oia_status;
+			LIB3270_STATUS		  oia_status;
 
 			unsigned char 		  oia_flag[LIB3270_FLAG_COUNT];
 
@@ -256,6 +256,7 @@
 			char 				  ssl_host;
 			char 				  ever_3270;
 
+
 			// Widget info
 			void				* widget;
 
@@ -274,6 +275,8 @@
 			void (*update)(H3270 *session, int baddr, unsigned char c, unsigned short attr);
 			void (*update_cursor)(H3270 *session, unsigned short row, unsigned short col);
 			void (*set_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
+			void (*update_luname)(H3270 *session, const char *name);
+			void (*update_status)(H3270 *session, LIB3270_STATUS id);
 
 		};
 
@@ -505,7 +508,7 @@
 			int		(*set_suspended)(int state);
 			void	(*set_script)(SCRIPT_STATE state);
 			void	(*reset)(int lock);
-			void	(*status)(STATUS_CODE id);
+			void	(*status)(H3270 *session, LIB3270_STATUS id);
 			void	(*cursor)(CURSOR_MODE mode);
 			void	(*lu)(const char *lu);
 			void	(*set_oia)(H3270 *session, OIA_FLAG id, unsigned char on);

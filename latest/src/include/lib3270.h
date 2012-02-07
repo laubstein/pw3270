@@ -272,13 +272,15 @@
 	int LIB3270_EXPORT lib3270_register_io_handlers(const struct lib3270_io_callbacks *cbk);
 
 
-	LIB3270_EXPORT STATUS_CODE	  lib3270_get_oia_status(H3270 *h);
-	LIB3270_EXPORT const char	* lib3270_get_luname(H3270 *h);
-	LIB3270_EXPORT const char	* lib3270_get_host(H3270 *h);
+	LIB3270_EXPORT LIB3270_STATUS	  lib3270_get_oia_status(H3270 *h);
+	LIB3270_EXPORT const char		* lib3270_get_luname(H3270 *h);
+	LIB3270_EXPORT const char		* lib3270_get_host(H3270 *h);
 
 	#define lib3270_has_printer_session(h) 	(h->oia_flag[LIB3270_FLAG_PRINTER] != 0)
 	#define lib3270_has_active_script(h)	(h->oia_flag[LIB3270_FLAG_SCRIPT] != 0)
 	#define lib3270_get_typeahead(h)		(h->oia_flag[LIB3270_FLAG_TYPEAHEAD] != 0)
+	#define lib3270_get_undera(h)			(h->oia_flag[LIB3270_FLAG_UNDERA] != 0)
+	#define lib3270_get_oia_box_solid(h)	(h->oia_flag[LIB3270_FLAG_BOXSOLID] != 0)
 
 	LIB3270_EXPORT int lib3270_pconnected(H3270 *h);
 	LIB3270_EXPORT int lib3270_half_connected(H3270 *h);
