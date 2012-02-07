@@ -957,10 +957,10 @@ LIB3270_EXPORT int lib3270_in_e(H3270 *h)
 	return (h->cstate >= CONNECTED_INITIAL_E);
 }
 
-int CallAndWait(int(*callback)(void *),void *parm)
+int CallAndWait(int(*callback)(void *), H3270 *session, void *parm)
 {
 	if(callbacks->CallAndWait)
-		return callbacks->CallAndWait(callback,parm);
+		return callbacks->CallAndWait(callback,session,parm);
 	else
 		return callback(parm);
 }
