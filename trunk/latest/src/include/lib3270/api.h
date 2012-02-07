@@ -435,7 +435,7 @@
 				unsigned long (*AddOutput)(int source, H3270 *session, void (*fn)(H3270 *session));
 			#endif /*]*/
 
-			int 			(*CallAndWait)(int(*callback)(void *), H3270 *session, void *parm);
+			int 			(*callthread)(int(*callback)(H3270 *, void *), H3270 *session, void *parm);
 
 			int				(*Wait)(int seconds);
 			int 			(*RunPendingEvents)(int wait);
@@ -593,8 +593,8 @@
 		LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state);
 
 		#define Toggled(ix) lib3270_get_toogle(NULL,ix)
+		#define CallAndWait(c,h,p) lib3270_call_thread(c,h,p)
 
-		LIB3270_EXPORT int CallAndWait(int(*callback)(void *), H3270 *session, void *parm);
 		LIB3270_EXPORT void RunPendingEvents(int wait);
 		LIB3270_EXPORT int Wait(int seconds);
 

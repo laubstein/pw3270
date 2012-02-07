@@ -51,7 +51,7 @@
 #include "oia.h"
 
 #ifdef G_THREADS_ENABLED
-	static int static_CallAndWait(int(*callback)(void *), H3270 *session, void *parm);
+	static int static_CallAndWait(int(*callback)(H3270 *session, void *), H3270 *session, void *parm);
 #endif
 
 static unsigned long	static_AddInput(int source, H3270 *session, void (*fn)(H3270 *session));
@@ -288,8 +288,9 @@ static gboolean IO_closure(gpointer data)
 struct bgParameter
 {
 	gboolean	running;
+	H3270 		*session;
 	int			rc;
-	int(*callback)(void *);
+	int(*callback)(H3270 *session, void *);
 	void		*parm;
 
 };
@@ -297,15 +298,15 @@ struct bgParameter
 gpointer BgCall(struct bgParameter *p)
 {
 	Trace("%s starts",__FUNCTION__);
-	p->rc = p->callback(p->parm);
+	p->rc = p->callback(p->session,p->parm);
 	p->running = FALSE;
 	Trace("%s ends",__FUNCTION__);
 	return 0;
 }
 
-static int static_CallAndWait(int(*callback)(void *), H3270 *session, void *parm)
+static int static_CallAndWait(int(*callback)(H3270 *session, void *), H3270 *session, void *parm)
 {
-	struct bgParameter p = { TRUE, -1, callback, parm };
+	struct bgParameter p = { TRUE, session, -1, callback, parm };
 	GThread	*thread;
 
 	Trace("Starting auxiliary thread for callback %p",callback);
