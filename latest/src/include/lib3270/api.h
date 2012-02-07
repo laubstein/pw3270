@@ -509,7 +509,7 @@
 			void	(*reset)(int lock);
 			void	(*status)(H3270 *session, LIB3270_STATUS id);
 			void	(*cursor)(CURSOR_MODE mode);
-			void	(*lu)(const char *lu);
+			void	(*lu)(H3270 *session, const char *lu);
 			void	(*set_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
 
 			void	(*erase)(void);
