@@ -435,7 +435,7 @@
 				unsigned long (*AddOutput)(int source, H3270 *session, void (*fn)(H3270 *session));
 			#endif /*]*/
 
-			int 			(*CallAndWait)(int(*callback)(void *), void *parm);
+			int 			(*CallAndWait)(int(*callback)(void *), H3270 *session, void *parm);
 
 			int				(*Wait)(int seconds);
 			int 			(*RunPendingEvents)(int wait);
@@ -594,7 +594,7 @@
 
 		#define Toggled(ix) lib3270_get_toogle(NULL,ix)
 
-		LIB3270_EXPORT int CallAndWait(int(*callback)(void *), void *parm);
+		LIB3270_EXPORT int CallAndWait(int(*callback)(void *), H3270 *session, void *parm);
 		LIB3270_EXPORT void RunPendingEvents(int wait);
 		LIB3270_EXPORT int Wait(int seconds);
 

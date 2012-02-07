@@ -51,7 +51,7 @@
 #include "oia.h"
 
 #ifdef G_THREADS_ENABLED
-	static int static_CallAndWait(int(*callback)(void *), void *parm);
+	static int static_CallAndWait(int(*callback)(void *), H3270 *session, void *parm);
 #endif
 
 static unsigned long	static_AddInput(int source, H3270 *session, void (*fn)(H3270 *session));
@@ -303,7 +303,7 @@ gpointer BgCall(struct bgParameter *p)
 	return 0;
 }
 
-static int static_CallAndWait(int(*callback)(void *), void *parm)
+static int static_CallAndWait(int(*callback)(void *), H3270 *session, void *parm)
 {
 	struct bgParameter p = { TRUE, -1, callback, parm };
 	GThread	*thread;

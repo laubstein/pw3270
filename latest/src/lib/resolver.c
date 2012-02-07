@@ -183,7 +183,7 @@ int resolve_host_and_port(const char *host, char *portname, unsigned short *ppor
 
 	Trace("Calling resolver for %s", p.host);
 
-	rc = CallAndWait((int (*)(void *)) cresolve_host_and_port,&p);
+	rc = CallAndWait((int (*)(void *)) cresolve_host_and_port,&h3270,&p);
 
 	Trace("Calling resolver for %s exits with %d", p.host, rc);
 
