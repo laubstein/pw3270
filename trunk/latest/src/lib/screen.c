@@ -380,7 +380,9 @@ static void screen_update(H3270 *session, int bstart, int bend)
 	a  		= color_from_fa(fa);
 	fa_addr = find_field_attribute(session,bstart); // may be -1, that's okay
 
-	for(baddr = bstart; baddr <= bend; baddr++)
+	Trace("%s ea_buf=%p",__FUNCTION__,ea_buf);
+
+	for(baddr = bstart; baddr < bend; baddr++)
 	{
 		if(ea_buf[baddr].fa)
 		{

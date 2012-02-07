@@ -72,7 +72,7 @@
  static void	  SetScript(SCRIPT_STATE state);
  static void	  set_cursor(CURSOR_MODE mode);
  static void	  set_oia(H3270 *session, OIA_FLAG id, unsigned char on);
- static void	  set_lu(const char *lu);
+ static void	  set_lu(H3270 *session, const char *lu);
 // static void	  changed(int bstart, int bend);
  static void	  error(const char *fmt, va_list arg);
  static void 	  warning(const char *fmt, va_list arg);
@@ -383,7 +383,7 @@
 
  static GPid on_lu_pid = 0;
 
- static void set_lu(const char *lu)
+ static void set_lu(H3270 *session, const char *lu)
  {
  	gchar *luname = NULL;
 
