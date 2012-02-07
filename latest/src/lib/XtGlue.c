@@ -957,12 +957,14 @@ LIB3270_EXPORT int lib3270_in_e(H3270 *h)
 	return (h->cstate >= CONNECTED_INITIAL_E);
 }
 
-int CallAndWait(int(*callback)(void *), H3270 *session, void *parm)
+LIB3270_EXPORT int lib3270_call_thread(int(*callback)(H3270 *h, void *), H3270 *h, void *parm)
 {
-	if(callbacks->CallAndWait)
-		return callbacks->CallAndWait(callback,session,parm);
+	CHECK_SESSION_HANDLE(h);
+
+	if(callbacks->callthread)
+		return callbacks->callthread(callback,h,parm);
 	else
-		return callback(parm);
+		return callback(h,parm);
 }
 
 void RunPendingEvents(int wait)

@@ -292,4 +292,18 @@
 	LIB3270_EXPORT int lib3270_in_tn3270e(H3270 *h);
 	LIB3270_EXPORT int lib3270_in_e(H3270 *h);
 
+	/**
+	 * Call non gui function.
+	 *
+	 * Call informed function in a separate thread, keep gui main loop running until
+	 * the function returns.
+	 *
+	 * @param callback	Function to call.
+	 * @param h			Related session (for timer indicator)
+	 * @param parm		Parameter to be passed to the function.
+	 *
+	 */
+	LIB3270_EXPORT int lib3270_call_thread(int(*callback)(H3270 *h, void *), H3270 *h, void *parm);
+
+
 #endif // LIB3270_H_INCLUDED
