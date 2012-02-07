@@ -274,6 +274,7 @@
 			void (*update)(H3270 *session, int baddr, unsigned char c, unsigned short attr);
 			void (*update_cursor)(H3270 *session, unsigned short row, unsigned short col);
 			void (*set_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
+			void (*set_timer)(H3270 *session, unsigned char on);
 			void (*update_luname)(H3270 *session, const char *name);
 			void (*update_status)(H3270 *session, LIB3270_STATUS id);
 
