@@ -333,7 +333,7 @@
 	void 		ReloadPixmaps(void);
 	void 		Reselect(void);
 	void 		set_rectangle_select(int value, enum toggle_type reason);
-	void 		SetStatusCode(STATUS_CODE id);
+	void 		SetStatusCode(H3270 *session, LIB3270_STATUS id);
 	void 		SetTerminalFont(const gchar *fontname);
 
 	void		init_gui_toggles(void);

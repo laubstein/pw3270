@@ -371,7 +371,7 @@
 
  static gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
  {
-	if(query_3270_terminal_status() != STATUS_CODE_BLANK || event->direction < 0 || event->direction > G_N_ELEMENTS(action_scroll))
+	if(query_3270_terminal_status() != LIB3270_STATUS_BLANK || event->direction < 0 || event->direction > G_N_ELEMENTS(action_scroll))
 		return 0;
 
 	Trace("Scroll: %d Action: %p",event->direction,action_scroll[event->direction]);

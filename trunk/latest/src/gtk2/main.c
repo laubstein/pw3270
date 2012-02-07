@@ -88,7 +88,7 @@ static void connect_main(H3270 *session, int status, void *dunno)
 	}
 	else
 	{
-		SetStatusCode(STATUS_CODE_DISCONNECTED);
+		SetStatusCode(session,LIB3270_STATUS_DISCONNECTED);
 		cMode &= ~CURSOR_MODE_ENABLED;
 //		ctlr_erase(1);
 		online = FALSE;

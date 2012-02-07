@@ -111,10 +111,12 @@ int             ns_rsent;
 unsigned char  *obuf;		/* 3270 output buffer */
 unsigned char  *obptr = (unsigned char *) NULL;
 int             linemode = 1;
-#if defined(LOCAL_PROCESS) /*[*/
+/*
+#if defined(LOCAL_PROCESS)
 Boolean		local_process = False;
-#endif /*]*/
+#endif
 // char           *termtype;
+*/
 
 /* Externals */
 extern struct timeval ds_ts;
@@ -194,7 +196,7 @@ static void check_in3270(void);
 static void store3270in(unsigned char c);
 static void check_linemode(Boolean init);
 static int non_blocking(Boolean on);
-static void net_connected(void);
+static void net_connected(H3270 *session);
 #if defined(X3270_TN3270E) /*[*/
 static int tn3270e_negotiate(void);
 #endif /*]*/
@@ -526,14 +528,16 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 			status_resolving(&h3270,0);
 		}
 	} else {
-#if defined(LOCAL_PROCESS) /*[*/
+/*
+#if defined(LOCAL_PROCESS)
 		if (ls) {
 			local_process = True;
 		} else {
-#endif /*]*/
-#if defined(LOCAL_PROCESS) /*[*/
+#endif
+#if defined(LOCAL_PROCESS)
 			local_process = False;
-#endif /*]*/
+#endif
+*/
 			status_resolving(&h3270,1);
 			if (resolve_host_and_port(host, portname,
 				    &h3270.current_port, &haddr.sa, &ha_len,
@@ -543,13 +547,15 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 			    	return -1;
 			status_resolving(&h3270,0);
 			}
-#if defined(LOCAL_PROCESS) /*[*/
+/*
+#if defined(LOCAL_PROCESS)
 		}
-#endif /*]*/
-
+#endif
+*/
 	}
 
-#if defined(LOCAL_PROCESS) /*[*/
+/*
+#if defined(LOCAL_PROCESS)
 	if (local_process) {
 		int amaster;
 		struct winsize w;
@@ -560,10 +566,10 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 		w.ws_ypixel = 0;
 
 		switch (forkpty(&amaster, NULL, NULL, &w)) {
-		    case -1:	/* failed */
+		    case -1:	// failed
 			popup_an_errno(errno, "forkpty");
 			close_fail;
-		    case 0:	/* child */
+		    case 0:	// child
 			putenv("TERM=xterm");
 			if (strchr(host, ' ') != CN) {
 				(void) execlp("/bin/sh", "sh", "-c", host,
@@ -580,17 +586,18 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 			#warning Notify User
 			_exit(1);
 			break;
-		    default:	/* parent */
+		    default:	// parent
 			sock = amaster;
-#if !defined(_WIN32) /*[*/
+#if !defined(_WIN32)
 			(void) fcntl(sock, F_SETFD, 1);
-#endif /*]*/
+#endif
 			net_connected();
 			host_in3270(CONNECTED_ANSI);
 			break;
 		}
 	} else {
-#endif /*]*/
+#endif
+*/
 		/* create the socket */
 		if ((h3270.sock = socket(haddr.sa.sa_family, SOCK_STREAM, 0)) == -1) {
 			popup_a_sockerr( N_( "socket" ) );
@@ -656,11 +663,13 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 		} else {
 			if (non_blocking(False) < 0)
 				close_fail;
-			net_connected();
+			net_connected(&h3270);
 		}
-#if defined(LOCAL_PROCESS) /*[*/
+/*
+#if defined(LOCAL_PROCESS)
 	}
-#endif /*]*/
+#endif
+*/
 
 	/* set up temporary termtype */
 	if (appres.termname == CN && h3270.std_ds_host) {
@@ -752,41 +761,41 @@ setup_lus(void)
 	try_lu = *curr_lu;
 }
 
-static void
-net_connected(void)
+static void net_connected(H3270 *session)
 {
-	if (proxy_type > 0) {
-
+	if (proxy_type > 0)
+	{
 		/* Negotiate with the proxy. */
-	    	trace_dsn("Connected to proxy server %s, port %u.\n",
-			proxy_host, proxy_port);
+		trace_dsn("Connected to proxy server %s, port %u.\n",proxy_host, proxy_port);
 
-	    	if (proxy_negotiate(proxy_type, h3270.sock, h3270.hostname,
-			    h3270.current_port) < 0) {
-		    	host_disconnect(&h3270,True);
+		if (proxy_negotiate(proxy_type, session->sock, session->hostname,session->current_port) < 0)
+		{
+			host_disconnect(session,True);
 			return;
 		}
 	}
 
-	trace_dsn("Connected to %s, port %u%s.\n", h3270.hostname, h3270.current_port,h3270.ssl_host? " via SSL": "");
+	trace_dsn("Connected to %s, port %u%s.\n", session->hostname, session->current_port,session->ssl_host? " via SSL": "");
 
 #if defined(HAVE_LIBSSL) /*[*/
 	/* Set up SSL. */
-	if (h3270.ssl_host && !h3270.secure_connection) {
-		if (SSL_set_fd(ssl_con, h3270.sock) != 1) {
+	if(session->ssl_host && !session->secure_connection)
+	{
+		if (SSL_set_fd(ssl_con, session->sock) != 1)
+		{
 			trace_dsn("Can't set fd!\n");
 		}
-		if (SSL_connect(ssl_con) != 1) {
+		if (SSL_connect(ssl_con) != 1)
+		{
 			/*
 			 * No need to trace the error, it was already
 			 * displayed.
 			 */
-			host_disconnect(&h3270,True);
+			host_disconnect(session,True);
 			return;
 		}
-		h3270.secure_connection = True;
-		trace_dsn("TLS/SSL tunneled connection complete.  "
-			  "Connection is now secure.\n");
+		session->secure_connection = True;
+		trace_dsn("TLS/SSL tunneled connection complete. Connection is now secure.\n");
 
 		/* Tell everyone else again. */
 		host_connected();
@@ -827,12 +836,13 @@ net_connected(void)
 	check_linemode(True);
 
 	/* write out the passthru hostname and port nubmer */
-	if (h3270.passthru_host) {
+	if (session->passthru_host)
+	{
 		char *buf;
 
-		buf = Malloc(strlen(h3270.hostname) + 32);
-		(void) sprintf(buf, "%s %d\r\n", h3270.hostname, h3270.current_port);
-		(void) send(h3270.sock, buf, strlen(buf), 0);
+		buf = Malloc(strlen(session->hostname) + 32);
+		(void) sprintf(buf, "%s %d\r\n", session->hostname, session->current_port);
+		(void) send(session->sock, buf, strlen(buf), 0);
 		Free(buf);
 	}
 }
@@ -853,7 +863,7 @@ connection_complete(void)
 	}
 #endif /*]*/
 	host_connected();
-	net_connected();
+	net_connected(&h3270);
 }
 
 #if !defined(_WIN32) /*[*/
@@ -940,7 +950,7 @@ void net_input(H3270 *session)
 #if defined(_WIN32) /*[*/
 		if (HALF_CONNECTED) {
 
-			if (connect(h3270.sock, &haddr.sa, sizeof(haddr)) < 0) {
+			if (connect(session->sock, &haddr.sa, sizeof(haddr)) < 0) {
 				int err = GetLastError();
 
 				switch (err) {
@@ -966,20 +976,21 @@ void net_input(H3270 *session)
 #endif /*]*/
 
 #if defined(_WIN32) /*[*/
-		(void) ResetEvent(h3270.sock_handle);
+		(void) ResetEvent(session->sock_handle);
 #endif /*]*/
 
-#if defined(HAVE_LIBSSL) /*[*/
+#if defined(HAVE_LIBSSL)
 		if (ssl_con != NULL)
 			nr = SSL_read(ssl_con, (char *) netrbuf, BUFSZ);
 		else
-#else /*][*/
-#endif /*]*/
-#if defined(LOCAL_PROCESS) /*[*/
+#endif // HAVE_LIBSSL
+/*
+#if defined(LOCAL_PROCESS)
 		if (local_process)
 		    	nr = read(sock, (char *) netrbuf, BUFSZ);
 		else
-#endif /*]*/
+#endif
+*/
 			nr = recv(session->sock, (char *) netrbuf, BUFSZ, 0);
 		if (nr < 0) {
 			if (socket_errno() == SE_EWOULDBLOCK) {
@@ -999,7 +1010,7 @@ void net_input(H3270 *session)
 				    err_buf);
 
 				popup_an_error("SSL_read:\n%s", err_buf);
-				host_disconnect(&h3270,True);
+				host_disconnect(session,True);
 				return;
 			}
 #endif /*]*/
@@ -1007,25 +1018,27 @@ void net_input(H3270 *session)
 				connection_complete();
 				return;
 			}
-#if defined(LOCAL_PROCESS) /*[*/
+/*
+#if defined(LOCAL_PROCESS) /
 			if (errno == EIO && local_process) {
 				trace_dsn("RCVD local process disconnect\n");
-				host_disconnect(False);
+				host_disconnect(session,False);
 				return;
 			}
-#endif /*]*/
+#endif
+*/
 			trace_dsn("RCVD socket error %d\n", errno);
 			if (HALF_CONNECTED) {
 				popup_a_sockerr( N_( "%s:%d" ),h3270.hostname, h3270.current_port);
 			} else if (socket_errno() != SE_ECONNRESET) {
 				popup_a_sockerr( N_( "Socket read error" ) );
 			}
-			host_disconnect(&h3270,True);
+			host_disconnect(session,True);
 			return;
 		} else if (nr == 0) {
 			/* Host disconnected. */
 			trace_dsn("RCVD disconnect\n");
-			host_disconnect(&h3270,False);
+			host_disconnect(session,False);
 			return;
 		}
 
@@ -1035,11 +1048,11 @@ void net_input(H3270 *session)
 		{
 			if (non_blocking(False) < 0)
 			{
-				host_disconnect(&h3270,True);
+				host_disconnect(session,True);
 				return;
 			}
 			host_connected();
-			net_connected();
+			net_connected(session);
 		}
 
 #if defined(X3270_TRACE) /*[*/
@@ -1067,9 +1080,11 @@ void net_input(H3270 *session)
 					host_disconnect(&h3270,True);
 					return;
 				}
-#if defined(LOCAL_PROCESS) /*[*/
+/*
+#if defined(LOCAL_PROCESS)
 			}
-#endif /*]*/
+#endif
+*/
 		}
 
 #if defined(X3270_ANSI) /*[*/

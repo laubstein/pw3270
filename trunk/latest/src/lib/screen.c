@@ -138,6 +138,12 @@ int screen_init(H3270 *session)
 		if(callbacks->set_viewsize)
 			session->configure = callbacks->set_viewsize;
 
+		if(callbacks->lu)
+			session->update_luname = callbacks->lu;
+
+		if(callbacks->status)
+			session->update_status = callbacks->status;
+
 		if(callbacks->init())
 		{
 			popup_an_error("Can't initialize terminal.");
@@ -503,20 +509,20 @@ void status_ctlr_done(H3270 *session)
 
 void status_oerr(H3270 *session, int error_type)
 {
-	STATUS_CODE sts = STATUS_CODE_USER;
+	LIB3270_STATUS sts = LIB3270_STATUS_USER;
 
 	CHECK_SESSION_HANDLE(session);
 
 	switch (error_type)
 	{
 	case KL_OERR_PROTECTED:
-		sts = STATUS_CODE_PROTECTED;
+		sts = LIB3270_STATUS_PROTECTED;
 		break;
 	case KL_OERR_NUMERIC:
-		sts = STATUS_CODE_NUMERIC;
+		sts = LIB3270_STATUS_NUMERIC;
 		break;
 	case KL_OERR_OVERFLOW:
-		sts = STATUS_CODE_OVERFLOW;
+		sts = LIB3270_STATUS_OVERFLOW;
 		break;
 
 	default:
@@ -532,7 +538,7 @@ void status_resolving(H3270 *session, Boolean on)
 	if(callbacks && callbacks->cursor)
 			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
 
-	status_changed(session, on ? STATUS_CODE_RESOLVING : STATUS_CODE_BLANK);
+	status_changed(session, on ? LIB3270_STATUS_RESOLVING : LIB3270_STATUS_BLANK);
 }
 
 void status_connecting(H3270 *session, Boolean on)
@@ -540,7 +546,7 @@ void status_connecting(H3270 *session, Boolean on)
 	if(callbacks && callbacks->cursor)
 			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
 
-	status_changed(session, on ? STATUS_CODE_CONNECTING : STATUS_CODE_BLANK);
+	status_changed(session, on ? LIB3270_STATUS_CONNECTING : LIB3270_STATUS_BLANK);
 }
 
 void status_reset(H3270 *session)
@@ -548,11 +554,11 @@ void status_reset(H3270 *session)
 	CHECK_SESSION_HANDLE(session);
 
 	if (kybdlock & KL_ENTER_INHIBIT)
-		status_changed(session,STATUS_CODE_INHIBIT);
+		status_changed(session,LIB3270_STATUS_INHIBIT);
 	else if (kybdlock & KL_DEFERRED_UNLOCK)
-		status_changed(session,STATUS_CODE_X);
+		status_changed(session,LIB3270_STATUS_X);
 	else
-		status_changed(session,STATUS_CODE_BLANK);
+		status_changed(session,LIB3270_STATUS_BLANK);
 
 	screen_disp(session);
 
@@ -564,22 +570,20 @@ void status_reset(H3270 *session)
 
 }
 
-// static STATUS_CODE current_status_code = -1;
-
 /**
  * Query the updated terminal status.
  *
  * @return status-code.
  *
- * @see STATUS_CODE
+ * @see LIB3270_STATUS
  */
-LIB3270_EXPORT STATUS_CODE lib3270_get_oia_status(H3270 *session)
+LIB3270_EXPORT LIB3270_STATUS lib3270_get_oia_status(H3270 *session)
 {
 	CHECK_SESSION_HANDLE(session);
 	return session->oia_status;
 }
 
-void status_changed(H3270 *session, STATUS_CODE id)
+void status_changed(H3270 *session, LIB3270_STATUS id)
 {
 	CHECK_SESSION_HANDLE(session);
 
@@ -588,15 +592,15 @@ void status_changed(H3270 *session, STATUS_CODE id)
 
 	session->oia_status = id;
 
-	if(callbacks && callbacks->status)
-		callbacks->status(id);
+	if(session->update_status)
+		session->update_status(session,id);
 }
 
 void status_twait(H3270 *session)
 {
 	CHECK_SESSION_HANDLE(session);
 	set_status(session,OIA_FLAG_UNDERA,False);
-	status_changed(session,STATUS_CODE_TWAIT);
+	status_changed(session,LIB3270_STATUS_TWAIT);
 }
 
 void set_viewsize(H3270 *session, int rows, int cols)
@@ -616,13 +620,16 @@ void set_viewsize(H3270 *session, int rows, int cols)
 
 void status_lu(H3270 *session, const char *lu)
 {
-	if(callbacks && callbacks->lu)
-		callbacks->lu(lu);
+	CHECK_SESSION_HANDLE(session);
+
+	if(session->update_luname)
+		session->update_luname(session,lu);
+
 }
 
 static void status_connect(H3270 *session, int connected, void *dunno)
 {
-	STATUS_CODE id = STATUS_CODE_USER;
+	LIB3270_STATUS id = LIB3270_STATUS_USER;
 
 	ctlr_erase(session,1);
 
@@ -631,9 +638,9 @@ static void status_connect(H3270 *session, int connected, void *dunno)
 		set_status(session,OIA_FLAG_BOXSOLID,IN_3270 && !IN_SSCP);
 
 		if (kybdlock & KL_AWAITING_FIRST)
-			id = STATUS_CODE_AWAITING_FIRST;
+			id = LIB3270_STATUS_AWAITING_FIRST;
 		else
-			id = STATUS_CODE_CONNECTED;
+			id = LIB3270_STATUS_CONNECTED;
 
 #if defined(HAVE_LIBSSL) /*[*/
 		set_status(session,OIA_FLAG_SECURE,session->secure_connection);
@@ -645,7 +652,7 @@ static void status_connect(H3270 *session, int connected, void *dunno)
 		set_status(session,OIA_FLAG_BOXSOLID,False);
 		set_status(session,OIA_FLAG_SECURE,False);
 
-		id = STATUS_CODE_DISCONNECTED;
+		id = LIB3270_STATUS_DISCONNECTED;
 	}
 
 	status_changed(session,id);

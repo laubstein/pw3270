@@ -180,7 +180,7 @@
  {
  	const char *str = NULL;
 
-	if(query_3270_terminal_status() != STATUS_CODE_BLANK)
+	if(query_3270_terminal_status() != LIB3270_STATUS_BLANK)
 	{
 		errno = EBUSY;
 		return NULL;
