@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como ctlr.c e possui 2827 linhas de código.
+ * Este programa está nomeado como ctlr.c e possui - linhas de código.
  *
  * Contatos:
  *
@@ -2773,7 +2773,7 @@ void ticking_start(H3270 *session, Boolean anyway)
 	if(session->set_timer)
 	{
 		if(toggled(SHOW_TIMING) || anyway)
-			session->set_timer(session,-1);
+			session->set_timer(session,1);
 	}
 	else
 	{
@@ -2783,6 +2783,7 @@ void ticking_start(H3270 *session, Boolean anyway)
 
 		if (!toggled(SHOW_TIMING) && !anyway)
 			return;
+
 		status_untiming(session);
 		if (ticking)
 			RemoveTimeOut(tick_id);
@@ -2823,7 +2824,7 @@ void
 toggle_showTiming(struct toggle *t unused, enum toggle_type tt unused)
 {
 	if (!toggled(SHOW_TIMING))
-		status_untiming(NULL);
+		status_untiming(&h3270);
 }
 
 

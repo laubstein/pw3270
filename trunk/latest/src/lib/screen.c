@@ -699,6 +699,9 @@ void status_untiming(H3270 *session)
 
 	if(callbacks && callbacks->show_timer)
 		callbacks->show_timer(-1);
+
+	if(session->set_timer)
+		session->set_timer(session,0);
 }
 
 void ring_bell(void)
