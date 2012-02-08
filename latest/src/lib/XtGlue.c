@@ -959,12 +959,21 @@ LIB3270_EXPORT int lib3270_in_e(H3270 *h)
 
 LIB3270_EXPORT int lib3270_call_thread(int(*callback)(H3270 *h, void *), H3270 *h, void *parm)
 {
+	int rc;
 	CHECK_SESSION_HANDLE(h);
 
+	if(h->set_timer)
+		h->set_timer(h,1);
+
 	if(callbacks->callthread)
-		return callbacks->callthread(callback,h,parm);
+		rc = callbacks->callthread(callback,h,parm);
 	else
-		return callback(h,parm);
+		rc = callback(h,parm);
+
+	if(h->set_timer)
+		h->set_timer(h,0);
+
+	return rc;
 }
 
 void RunPendingEvents(int wait)
