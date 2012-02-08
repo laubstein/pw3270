@@ -133,7 +133,7 @@ int screen_init(H3270 *session)
 			session->update_cursor = callbacks->move_cursor;
 
 		if(callbacks->set_oia)
-			session->set_oia = callbacks->set_oia;
+			session->update_oia = callbacks->set_oia;
 
 		if(callbacks->set_viewsize)
 			session->configure = callbacks->set_viewsize;
@@ -496,8 +496,8 @@ void set_status(H3270 *session, LIB3270_FLAG id, Boolean on)
 	{
 		session->oia_flag[id] = (on != 0);
 
-		if(session->set_oia)
-			session->set_oia(session,id,on);
+		if(session->update_oia)
+			session->update_oia(session,id,session->oia_flag[id]);
 	}
 
 }
