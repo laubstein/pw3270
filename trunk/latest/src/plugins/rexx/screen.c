@@ -71,7 +71,7 @@
 	switch(Argc)
 	{
 	case 0:
-		lib3270_enter();
+		lib3270_enter(NULL);
 		break;
 
     case 1:
@@ -448,7 +448,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 	else if(query_3270_terminal_status() != LIB3270_STATUS_BLANK)
 		rc = EINVAL;
 	else
-		rc = lib3270_enter();
+		rc = lib3270_enter(NULL);
 
 	RunPendingEvents(1);
 
@@ -480,7 +480,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 	else if(query_3270_terminal_status() != LIB3270_STATUS_BLANK)
 		rc = EINVAL;
 	else
-		rc = lib3270_pfkey(atoi(Argv[0].strptr));
+		rc = lib3270_pfkey(NULL,atoi(Argv[0].strptr));
 
 	if(!rc)
 	{

@@ -428,7 +428,7 @@ cut_data_request(void)
 	ft_update_length();
 	expanded_length += count;
 
-	lib3270_enter();
+	lib3270_enter(&h3270);
 }
 
 /*
@@ -513,7 +513,7 @@ cut_data(void)
 static void cut_ack(void)
 {
 	trace_ds("> FT ACK\n");
-	lib3270_enter();
+	lib3270_enter(&h3270);
 }
 
 /*
@@ -532,7 +532,7 @@ cut_abort(const char *s, unsigned short reason)
 	ctlr_add(RO_REASON_CODE+1, LOW8(reason), 0);
 	trace_ds("> FT CONTROL_CODE ABORT\n");
 
-	lib3270_pfkey(2);
+	lib3270_pfkey(&h3270,2);
 
 	/* Update the in-progress pop-up. */
 	ft_aborting();
