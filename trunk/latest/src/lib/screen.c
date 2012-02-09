@@ -112,7 +112,7 @@ static void addch(H3270 *session, int baddr, unsigned char c, unsigned short att
 		callbacks->addch(baddr/session->cols, baddr%session->cols, c, attr);
 
 	if(session->update)
-		session->update(session,baddr,c,attr);
+		session->update(session,baddr,c,attr,baddr == session->cursor_addr);
 }
 
 /**
