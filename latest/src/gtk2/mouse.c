@@ -197,7 +197,7 @@
 		if(length < 4 )
 		{
 			int function = CheckForFunction(start,length-1);
-			if(!lib3270_pfkey(function))
+			if(!lib3270_pfkey(hSession,function))
 				return;
 		}
 		start++;
@@ -232,7 +232,7 @@
 		if(length < 3)
 		{
 			int function = CheckForFunction(baddr,length);
-			if(!lib3270_pfkey(function))
+			if(!lib3270_pfkey(hSession,function))
 				return;
 		}
 

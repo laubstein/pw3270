@@ -300,7 +300,7 @@
 
 	if(!TOGGLED_KEEP_SELECTED)
 		unselect();
- 	lib3270_pfkey((int) id);
+ 	lib3270_pfkey(NULL,(int) id);
  }
 
  static void action_pakey(GtkAction *action, gpointer id)
@@ -309,7 +309,7 @@
 
 	if(!TOGGLED_KEEP_SELECTED)
 		unselect();
- 	lib3270_pakey((int) id);
+ 	lib3270_pakey(NULL,(int) id);
  }
 
  gboolean check_key_action(GtkWidget *widget, GdkEventKey *event)

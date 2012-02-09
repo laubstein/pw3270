@@ -234,7 +234,7 @@
  {
  	unselect();
  	if(PCONNECTED)
-		lib3270_enter();
+		lib3270_enter(hSession);
 	else
 		action_connect(action);
  }
@@ -480,7 +480,7 @@
  {
  	Trace("%s - KPAlternative is %s",__FUNCTION__,TOGGLED_KP_ALTERNATIVE ? "Enabled" : "Disabled");
  	if(TOGGLED_KP_ALTERNATIVE)
-		lib3270_tab();
+		lib3270_tab(hSession);
 	else
 		ParseInput("+");
 
@@ -490,7 +490,7 @@
  {
  	Trace("%s - KPAlternative is %s",__FUNCTION__,TOGGLED_KP_ALTERNATIVE ? "Enabled" : "Disabled");
  	if(TOGGLED_KP_ALTERNATIVE)
-		lib3270_backtab();
+		lib3270_backtab(hSession);
 	else
 		ParseInput("-");
  }

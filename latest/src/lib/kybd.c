@@ -3251,7 +3251,7 @@ do_pa(unsigned n)
 		return;
 	}
 
-	lib3270_pakey(n);
+	lib3270_pakey(&h3270,n);
 
 }
 
@@ -3263,7 +3263,7 @@ static void do_pf(unsigned n)
 		return;
 	}
 
-	lib3270_pfkey(n);
+	lib3270_pfkey(&h3270,n);
 }
 
 /*
@@ -3410,7 +3410,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 		    case BASE:
 			switch (c) {
 			    case '\b':
-			    lib3270_cursor_left();
+			    lib3270_cursor_left(&h3270);
 				skipped = False;
 				break;
 			    case '\f':
@@ -3418,7 +3418,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 					key_ACharacter((unsigned char) ' ',
 					    KT_STD, ia, &skipped);
 				} else {
-					lib3270_clear();
+					lib3270_clear(&h3270);
 					skipped = False;
 					if (IN_3270)
 						return len-1;
@@ -3427,11 +3427,11 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 			    case '\n':
 				if (pasting) {
 					if (!skipped)
-						lib3270_cursor_newline();
+						lib3270_cursor_newline(&h3270);
 //						action_internal(Newline_action,ia, CN, CN);
 					skipped = False;
 				} else {
-					lib3270_enter();
+					lib3270_enter(&h3270);
 					skipped = False;
 					if (IN_3270)
 						return len-1;
@@ -3440,7 +3440,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 			    case '\r':	/* ignored */
 				break;
 			    case '\t':
-			    lib3270_tab();
+			    lib3270_tab(&h3270);
 				skipped = False;
 				break;
 			    case '\\':	/* backslashes are NOT special when
@@ -3506,13 +3506,13 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				state = BASE;
 				break;
 			    case 'b':
-				lib3270_cursor_left();
+				lib3270_cursor_left(&h3270);
 //				action_internal(Left_action, ia, CN, CN);
 				skipped = False;
 				state = BASE;
 				break;
 			    case 'f':
-			    lib3270_clear();
+			    lib3270_clear(&h3270);
 				skipped = False;
 				state = BASE;
 				if (IN_3270)
@@ -3520,7 +3520,7 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				else
 					break;
 			    case 'n':
-				lib3270_enter();
+				lib3270_enter(&h3270);
  				skipped = False;
 				state = BASE;
 				if (IN_3270)
@@ -3532,19 +3532,19 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 				break;
 
 			    case 'r':
-					lib3270_cursor_newline();
+					lib3270_cursor_newline(&h3270);
 //					action_internal(Newline_action, ia, CN, CN);
 					skipped = False;
 					state = BASE;
 					break;
 
 			    case 't':
-			    lib3270_tab();
+			    lib3270_tab(&h3270);
 				skipped = False;
 				state = BASE;
 				break;
 			    case 'T':
-			    lib3270_tab();
+			    lib3270_tab(&h3270);
 				skipped = False;
 				state = BASE;
 				break;
