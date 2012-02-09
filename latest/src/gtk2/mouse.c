@@ -924,7 +924,7 @@
 	SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  }
 
- static void doSelect(int (*call)(void))
+ static void doSelect(H3270 *hSession, int (*call)(H3270 *hSession))
  {
  	int row;
  	int col;
@@ -937,7 +937,7 @@
  		startCol = endCol = (cursor_position % screen->cols);
  	}
 
- 	call();
+ 	call(hSession);
 
  	row = cursor_position / screen->cols;
  	col = cursor_position % screen->cols;
@@ -950,22 +950,22 @@
 
  PW3270_ACTION( selectleft )
  {
- 	doSelect(lib3270_cursor_left);
+ 	doSelect(hSession,lib3270_cursor_left);
  }
 
  PW3270_ACTION( selectright )
  {
- 	doSelect(lib3270_cursor_right);
+ 	doSelect(hSession,lib3270_cursor_right);
  }
 
  PW3270_ACTION( selectup )
  {
- 	doSelect(lib3270_cursor_up);
+ 	doSelect(hSession,lib3270_cursor_up);
  }
 
  PW3270_ACTION( selectdown )
  {
- 	doSelect(lib3270_cursor_down);
+ 	doSelect(hSession,lib3270_cursor_down);
  }
 
  static void MoveSelection(int row, int col)

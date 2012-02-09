@@ -369,7 +369,6 @@ int screen_read(char *dest, int baddr, int count)
 /* Display what's in the buffer. */
 static void screen_update(H3270 *session, int bstart, int bend)
 {
-
 	int baddr;
 	unsigned short a;
 	int attr = COLOR_GREEN;
@@ -434,6 +433,10 @@ static void screen_update(H3270 *session, int bstart, int bend)
 		}
 
 	}
+
+	if(session->changed)
+		session->changed(session,bstart,bend);
+
 }
 
 void screen_disp(H3270 *session)
