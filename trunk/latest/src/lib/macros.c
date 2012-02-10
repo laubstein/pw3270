@@ -71,8 +71,8 @@
  	#define DECLARE_XLAT_STATE(x) { x, #x }
 	static const struct _xlat_state
 	{
-		enum cstate	state;
-		const char	*ret;
+		LIB3270_CSTATE	  state;
+		const char		* ret;
 	} xlat_state[] =
 	{
 		DECLARE_XLAT_STATE( NOT_CONNECTED 		),
@@ -89,7 +89,7 @@
 
 	int f;
 
- 	enum cstate state = lib3270_get_connection_state(h);
+ 	LIB3270_CSTATE state = lib3270_get_connection_state(h);
 
 	for(f=0;f < (sizeof(xlat_state)/sizeof(struct _xlat_state)); f++)
 	{

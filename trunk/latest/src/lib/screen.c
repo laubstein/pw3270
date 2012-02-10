@@ -144,6 +144,9 @@ int screen_init(H3270 *session)
 		if(callbacks->status)
 			session->update_status = callbacks->status;
 
+		if(callbacks->erase)
+			session->erase = callbacks->erase;
+
 		if(callbacks->init())
 		{
 			popup_an_error("Can't initialize terminal.");
@@ -278,15 +281,11 @@ static unsigned short calc_attrs(int baddr, int fa_addr, int fa)
 /* Erase screen */
 void screen_erase(H3270 *session)
 {
-	/* If the application supplies a callback use it! */
-	if(callbacks && callbacks->erase)
-	{
-		callbacks->erase();
-		return;
-	}
-
-	/* No callback, just redraw */
-	screen_update(session,0,session->rows * session->cols);
+	/* If the application supplies a callback use it!, if not just redraw with blanks */
+	if(session->erase)
+		session->erase(session);
+	else
+		screen_update(session,0,session->rows * session->cols);
 }
 
 LIB3270_EXPORT void lib3270_get_screen_size(H3270 *h, int *r, int *c)

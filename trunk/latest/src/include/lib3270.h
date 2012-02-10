@@ -112,6 +112,23 @@
 
 	} LIB3270_FLAG;
 
+	/**
+	 * connection state
+	 */
+	typedef enum lib3270_cstate
+	{
+		LIB3270_NOT_CONNECTED,			/**< no socket, disconnected */
+		LIB3270_RESOLVING,				/**< resolving hostname */
+		LIB3270_PENDING,				/**< connection pending */
+		LIB3270_CONNECTED_INITIAL,		/**< connected, no mode yet */
+		LIB3270_CONNECTED_ANSI,			/**< connected in NVT ANSI mode */
+		LIB3270_CONNECTED_3270,			/**< connected in old-style 3270 mode */
+		LIB3270_CONNECTED_INITIAL_E,	/**< connected in TN3270E mode, unnegotiated */
+		LIB3270_CONNECTED_NVT,			/**< connected in TN3270E mode, NVT mode */
+		LIB3270_CONNECTED_SSCP,			/**< connected in TN3270E mode, SSCP-LU mode */
+		LIB3270_CONNECTED_TN3270E		/**< connected in TN3270E mode, 3270 mode */
+	} LIB3270_CSTATE;
+
 	#include <lib3270/api.h>
 
 	/**
@@ -191,8 +208,7 @@
 	 * @return Connection state.
 	 *
 	 */
-	LIB3270_EXPORT enum cstate lib3270_get_connection_state(H3270 *h);
-
+	LIB3270_EXPORT LIB3270_CSTATE lib3270_get_connection_state(H3270 *h);
 
 	/**
 	 * Set string at current cursor position.
@@ -273,7 +289,17 @@
 
 
 	LIB3270_EXPORT LIB3270_STATUS	  lib3270_get_oia_status(H3270 *h);
+
+	/**
+	 * Get connected LU name
+	 *
+	 * @param h	Session handle.
+	 *
+	 * @return conected LU name or NULL if not connected.
+	 *
+	 */
 	LIB3270_EXPORT const char		* lib3270_get_luname(H3270 *h);
+
 	LIB3270_EXPORT const char		* lib3270_get_host(H3270 *h);
 
 	#define lib3270_has_printer_session(h) 	(h->oia_flag[LIB3270_FLAG_PRINTER] != 0)

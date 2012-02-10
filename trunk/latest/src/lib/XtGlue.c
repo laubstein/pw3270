@@ -897,7 +897,7 @@ int LIB3270_EXPORT lib3270_register_io_handlers(const struct lib3270_io_callback
 
 }
 
-LIB3270_EXPORT enum cstate lib3270_get_connection_state(H3270 *h)
+LIB3270_EXPORT LIB3270_CSTATE lib3270_get_connection_state(H3270 *h)
 {
 	CHECK_SESSION_HANDLE(h);
 	return h->cstate;
