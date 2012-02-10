@@ -798,7 +798,7 @@ static void net_connected(H3270 *session)
 		trace_dsn("TLS/SSL tunneled connection complete. Connection is now secure.\n");
 
 		/* Tell everyone else again. */
-		host_connected();
+		host_connected(session);
 	}
 #endif /*]*/
 
@@ -862,7 +862,7 @@ connection_complete(void)
 		return;
 	}
 #endif /*]*/
-	host_connected();
+	host_connected(&h3270);
 	net_connected(&h3270);
 }
 
@@ -1051,7 +1051,7 @@ void net_input(H3270 *session)
 				host_disconnect(session,True);
 				return;
 			}
-			host_connected();
+			host_connected(session);
 			net_connected(session);
 		}
 
@@ -1188,7 +1188,7 @@ telnet_fsm(unsigned char c)
 			if (linemode)
 				cooked_init();
 #endif /*]*/
-			host_in3270(CONNECTED_ANSI);
+			host_in3270(&h3270,CONNECTED_ANSI);
 			kybdlock_clr(KL_AWAITING_FIRST, "telnet_fsm");
 			status_reset(NULL);
 			ps_process();
@@ -2391,7 +2391,7 @@ do_lnext(char c)
 static void
 check_in3270(void)
 {
-	enum cstate new_cstate = NOT_CONNECTED;
+	LIB3270_CSTATE new_cstate = NOT_CONNECTED;
 #if defined(X3270_TRACE) /*[*/
 	static const char *state_name[] = {
 		"unconnected",
@@ -2480,7 +2480,7 @@ check_in3270(void)
 		}
 #endif /*]*/
 		trace_dsn("Now operating in %s mode.\n",state_name[new_cstate]);
-		host_in3270(new_cstate);
+		host_in3270(&h3270,new_cstate);
 	}
 }
 
@@ -3386,7 +3386,7 @@ continue_tls(unsigned char *sbbuf, int len)
 	trace_dsn("TLS/SSL negotiated connection complete. Connection is now secure.\n");
 
 	/* Tell the world that we are (still) connected, now in secure mode. */
-	host_connected();
+	host_connected(&h3270);
 }
 
 #endif /*]*/

@@ -146,19 +146,17 @@
 		#define LIB3270_STATE_CHANGE	LIB3270_STATE
 
 		/** connection state */
-		enum cstate
-		{
-			NOT_CONNECTED,			/**< no socket, unknown mode */
-			RESOLVING,				/**< resolving hostname */
-			PENDING,				/**< connection pending */
-			CONNECTED_INITIAL,		/**< connected, no mode yet */
-			CONNECTED_ANSI,			/**< connected in NVT ANSI mode */
-			CONNECTED_3270,			/**< connected in old-style 3270 mode */
-			CONNECTED_INITIAL_E,	/**< connected in TN3270E mode, unnegotiated */
-			CONNECTED_NVT,			/**< connected in TN3270E mode, NVT mode */
-			CONNECTED_SSCP,			/**< connected in TN3270E mode, SSCP-LU mode */
-			CONNECTED_TN3270E		/**< connected in TN3270E mode, 3270 mode */
-		};
+		#define cstate LIB3270_CSTATE
+		#define NOT_CONNECTED	LIB3270_NOT_CONNECTED
+		#define RESOLVING	LIB3270_RESOLVING
+		#define PENDING	LIB3270_PENDING
+		#define CONNECTED_INITIAL	LIB3270_CONNECTED_INITIAL
+		#define CONNECTED_ANSI	LIB3270_CONNECTED_ANSI
+		#define CONNECTED_3270	LIB3270_CONNECTED_3270
+		#define CONNECTED_INITIAL_E	LIB3270_CONNECTED_INITIAL_E
+		#define CONNECTED_NVT	LIB3270_CONNECTED_NVT
+		#define CONNECTED_SSCP	LIB3270_CONNECTED_SSCP
+		#define CONNECTED_TN3270E	LIB3270_CONNECTED_TN3270E
 
 		typedef enum _LIB3270_STATUS
 		{
@@ -204,7 +202,7 @@
 			int					  secure_connection;
 			int      			  sock;					/**< Network socket */
 			int					  net_sock;
-			enum cstate			  cstate;				/**< Connection state */
+			LIB3270_CSTATE		  cstate;				/**< Connection state */
 
 			#if defined(_WIN32) /*[*/
 			HANDLE				  sock_handle;
@@ -278,6 +276,7 @@
 			void (*set_timer)(H3270 *session, unsigned char on);
 			void (*update_luname)(H3270 *session, const char *name);
 			void (*update_status)(H3270 *session, LIB3270_STATUS id);
+			void (*erase)(H3270 *session);
 
 		};
 
@@ -514,7 +513,7 @@
 			void	(*lu)(H3270 *session, const char *lu);
 			void	(*set_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
 
-			void	(*erase)(void);
+			void	(*erase)(H3270 *session);
 			void	(*display)(H3270 *session);
 			void 	(*set_viewsize)(H3270 *session, unsigned short rows, unsigned short cols);
 

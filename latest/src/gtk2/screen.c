@@ -65,7 +65,7 @@
  static int  	  addch(int row, int col, unsigned char c, unsigned short attr);
  static void	  set_charset(char *dcs);
 
- static void	  erase(void);
+ static void	  erase(H3270 *session);
  static void	  display(H3270 *session);
 
  static int	  SetSuspended(int state);
@@ -118,7 +118,7 @@
 	set_lu,					// void (*lu)(const char *lu);
 	set_oia,				// void (*set)(OIA_FLAG id, unsigned char on);
 
-	erase,					// void (*erase)(void);
+	erase,					// void (*erase)(H3270 *session);
 	display,				// void	(*display)(H3270 *session);
 #ifdef HAVE_ALTSCREEN
 	view_changed,			// 			void 	(*set_viewsize)(H3270 *session, unsigned short rows, unsigned short cols);
@@ -337,7 +337,7 @@
   * Erase screen.
   *
   */
- static void erase(void)
+ static void erase(H3270 *session)
  {
  	int f;
 

@@ -724,251 +724,36 @@ void host_disconnect(H3270 *h, int failed)
 }
 
 /* The host has entered 3270 or ANSI mode, or switched between them. */
-void
-host_in3270(enum cstate new_cstate)
+void host_in3270(H3270 *session, LIB3270_CSTATE new_cstate)
 {
 	Boolean now3270 = (new_cstate == CONNECTED_3270 ||
 			   new_cstate == CONNECTED_SSCP ||
 			   new_cstate == CONNECTED_TN3270E);
 
-	h3270.cstate = new_cstate;
-	h3270.ever_3270 = now3270;
-	st_changed(ST_3270_MODE, now3270);
+	session->cstate = new_cstate;
+	session->ever_3270 = now3270;
+	lib3270_st_changed(session, ST_3270_MODE, now3270);
 }
 
-void
-host_connected(void)
+void host_connected(H3270 *session)
 {
-	h3270.cstate = CONNECTED_INITIAL;
-	st_changed(ST_CONNECT, True);
+	session->cstate = CONNECTED_INITIAL;
+	lib3270_st_changed(session, ST_CONNECT, True);
 
-#if defined(X3270_DISPLAY) /*[*/
+/*
+#if defined(X3270_DISPLAY)
 	if (toggled(RECONNECT) && error_popup_visible())
 		popdown_an_error();
-#endif /*]*/
-}
-
-/*
-#if defined(X3270_DISPLAY)
-// Comparison function for the qsort.
-static int
-host_compare(const void *e1, const void *e2)
-{
-	const struct host *h1 = *(const struct host **)e1;
-	const struct host *h2 = *(const struct host **)e2;
-	int r;
-
-	if (h1->connect_time > h2->connect_time)
-		r = -1;
-	else if (h1->connect_time < h2->connect_time)
-		r = 1;
-	else
-		r = 0;
-#if defined(CFDEBUG)
-	printf("%s %ld %d %s %ld\n",
-	    h1->name, h1->connect_time,
-	    r,
-	    h2->name, h2->connect_time);
-#endif
-	return r;
-}
-#endif
-
-
-#if defined(CFDEBUG)
-static void
-dump_array(const char *when, struct host **array, int nh)
-{
-	int i;
-
-	printf("%s\n", when);
-	for (i = 0; i < nh; i++) {
-		printf(" %15s %ld\n", array[i]->name, array[i]->connect_time);
-	}
-}
-#endif
-
-
-#if defined(X3270_DISPLAY)
-static void
-save_recent(const char *hn)
-{
-	char *lcf_name = CN;
-	FILE *lcf = (FILE *)NULL;
-	struct host *h;
-	struct host *rest = (struct host *)NULL;
-	int n_ent = 0;
-	struct host *h_array[(MAX_RECENT * 2) + 1];
-	int nh = 0;
-	int i, j;
-	time_t t = time((time_t *)NULL);
-
-	// Allocate a new entry.
-	if (hn != CN) {
-		h = (struct host *)Malloc(sizeof(*h));
-		h->name = NewString(hn);
-		h->parents = NULL;
-		h->hostname = NewString(hn);
-		h->entry_type = RECENT;
-		h->loginstring = CN;
-		h->connect_time = t;
-		h_array[nh++] = h;
-	}
-
-	// Put the existing entries into the array.
-	for (h = hosts; h != (struct host *)NULL; h = h->next) {
-		if (h->entry_type != RECENT)
-			break;
-		h_array[nh++] = h;
-	}
-
-	// Save the ibm_hosts entries for later.
-	rest = h;
-	if (rest != (struct host *)NULL)
-		rest->prev = (struct host *)NULL;
-
-	//
-	// Read the last-connection file, to capture the any changes made by
-	// other instances of x3270.
-	//
-	if (appres.connectfile_name != CN &&
-	    strcasecmp(appres.connectfile_name, "none")) {
-		lcf_name = do_subst(appres.connectfile_name, True, True);
-		lcf = fopen(lcf_name, "r");
-	}
-	if (lcf != (FILE *)NULL) {
-		char buf[1024];
-
-		while (fgets(buf, sizeof(buf), lcf) != CN) {
-			int sl;
-			time_t connect_time;
-			char *ptr;
-
-			// Pick apart the entry.
-			sl = strlen(buf);
-			if (buf[sl - 1] == '\n')
-				buf[sl-- - 1] = '\0';
-			if (!sl ||
-			    buf[0] == '#' ||
-			    (connect_time = strtoul(buf, &ptr, 10)) == 0L ||
-			    ptr == buf ||
-			    *ptr != ' ' ||
-			    !*(ptr + 1))
-				continue;
-
-			h = (struct host *)Malloc(sizeof(*h));
-			h->name = NewString(ptr + 1);
-			h->parents = NULL;
-			h->hostname = NewString(ptr + 1);
-			h->entry_type = RECENT;
-			h->loginstring = CN;
-			h->connect_time = connect_time;
-			h_array[nh++] = h;
-			if (nh > (MAX_RECENT * 2) + 1)
-				break;
-		}
-		fclose(lcf);
-	}
-
-	// Sort the array, in reverse order by connect time.
-#if defined(CFDEBUG)
-	dump_array("before", h_array, nh);
-#endif
-	qsort(h_array, nh, sizeof(struct host *), host_compare);
-#if defined(CFDEBUG)
-	dump_array("after", h_array, nh);
-#endif
-
-	//
-	// Filter out duplicate host names, and limit the array to
-	//MAX_RECENT entries total.
-	//
-	hosts = (struct host *)NULL;
-	last_host = (struct host *)NULL;
-	for (i = 0; i < nh; i++) {
-		h = h_array[i];
-		if (h == (struct host *)NULL)
-			continue;
-		h->next = (struct host *)NULL;
-		if (last_host != (struct host *)NULL)
-			last_host->next = h;
-		h->prev = last_host;
-		last_host = h;
-		if (hosts == (struct host *)NULL)
-			hosts = h;
-		n_ent++;
-
-		// Zap the duplicates.
-		for (j = i+1; j < nh; j++) {
-			if (h_array[j] &&
-			    (n_ent >= MAX_RECENT ||
-			     !strcmp(h_array[i]->name, h_array[j]->name))) {
-#if defined(CFDEBUG)
-				printf("%s is a dup of %s\n",
-				    h_array[j]->name, h_array[i]->name);
-#endif
-				Free(h_array[j]->name);
-				Free(h_array[j]->hostname);
-				Free(h_array[j]);
-				h_array[j] = (struct host *)NULL;
-			}
-		}
-	}
-
-	// Re-attach the ibm_hosts entries to the end.
-	if (rest != (struct host *)NULL) {
-		if (last_host != (struct host *)NULL) {
-			last_host->next = rest;
-		} else {
-			hosts = rest;
-		}
-		rest->prev = last_host;
-	}
-
-	// If there's been a change, rewrite the file.
-	if (hn != CN &&
-	    appres.connectfile_name != CN &&
-	    strcasecmp(appres.connectfile_name, "none")) {
-		lcf = fopen(lcf_name, "w");
-		if (lcf != (FILE *)NULL) {
-			fprintf(lcf, "# Created %s# by %s\n", ctime(&t), build);
-			for (h = hosts; h != (struct host *)NULL; h = h->next) {
-				if (h->entry_type != RECENT)
-					break;
-				(void) fprintf(lcf, "%lu %s\n", h->connect_time,
-				    h->name);
-			}
-			fclose(lcf);
-		}
-	}
-	if (lcf_name != CN)
-		Free(lcf_name);
-}
 #endif
 */
-
-/* Support for state change callbacks. */
-
-/*
-struct st_callback
-{
-	struct st_callback	* next;
-	H3270				* session;
-	void				* data;
-	void (*func)(H3270 *, int, void *);
-};
-
-static struct st_callback *st_callbacks[N_ST];
-static struct st_callback *st_last[N_ST];
-*/
+}
 
 /* Register a function interested in a state change. */
 LIB3270_EXPORT void lib3270_register_schange(H3270 *h,LIB3270_STATE_CHANGE tx, void (*func)(H3270 *, int, void *),void *data)
 {
 	struct lib3270_state_callback *st;
 
-	if(!h)
-		h = &h3270;
+    CHECK_SESSION_HANDLE(h);
 
 	st = (struct lib3270_state_callback *)Malloc(sizeof(*st));
 
@@ -1006,8 +791,7 @@ void lib3270_st_changed(H3270 *h, int tx, int mode)
 {
 	struct lib3270_state_callback *st;
 
-	if(!h)
-		h = &h3270;
+    CHECK_SESSION_HANDLE(h);
 
 	for (st = h->st_callbacks[tx];st != (struct lib3270_state_callback *)NULL;st = st->next)
 	{
@@ -1019,8 +803,7 @@ LIB3270_EXPORT int lib3270_reconnect(H3270 *h,int wait)
 {
 	int rc;
 
-	if(!h)
-		h = &h3270;
+    CHECK_SESSION_HANDLE(h);
 
 	if (CONNECTED || HALF_CONNECTED)
 		return EBUSY;

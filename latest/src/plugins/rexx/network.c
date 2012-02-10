@@ -91,8 +91,8 @@
 
  	static const struct _xlat_state
  	{
- 		enum cstate	state;
- 		const gchar	*ret;
+ 		LIB3270_CSTATE	  state;
+ 		const gchar		* ret;
  	} xlat_state[] =
  	{
 			DECLARE_XLAT_STATE( NOT_CONNECTED 		),
@@ -108,7 +108,7 @@
  	};
 
  	int				f;
- 	enum cstate 	state;
+ 	LIB3270_CSTATE	state;
 
 	if(Argc != 0)
 		return RXFUNC_BADCALL;
