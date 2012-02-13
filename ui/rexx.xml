@@ -1,0 +1,11 @@
+<ui>
+	<menubar name='MainMenubar'>
+		<menu action='FileMenu' />
+		<menu action='EditMenu' />
+		<menu action='ScriptsMenu'>
+			<menuitem action='RunExternalRexx'/>
+			<menuitem action='RexxScripts' />
+		</menu>
+	</menubar>
+</ui>
+
