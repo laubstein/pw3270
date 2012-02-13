@@ -1,8 +1,0 @@
-Package: lib3270-openoffice.org
-Architecture: any
-Section: libs
-Depends: ${misc:Depends}, lib3270 (= ${binary:Version})
-Description: Uno/OpenOffice library allowing 3270 access from StarBasic. (Rev. @PACKAGE_REVISION@)
- This package contains the openoffice.org extenstion file to allow 3270 access from StarBasic.
-
-
