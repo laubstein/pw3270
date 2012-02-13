@@ -3081,7 +3081,7 @@ xim_lookup(XKeyEvent *event)
 
 /*
  * Key action by string
- */
+ */ /*
 void Input_String(const unsigned char *str)
 {
 //	reset_idle_timer();
@@ -3093,7 +3093,7 @@ void Input_String(const unsigned char *str)
 		str++;
 	}
 	screen_disp(&h3270);
-}
+} */
 
 /*
  * Key action.
@@ -3312,36 +3312,16 @@ remargin(int lmargin)
 	return True;
 }
 
-/**
- * Pretend that a sequence of keys was entered at the keyboard.
- *
- * "Pasting" means that the sequence came from the X clipboard.  Returns are
- * ignored; newlines mean "move to beginning of next line"; tabs and formfeeds
- * become spaces.  Backslashes are not special, but ASCII ESC characters are
- * used to signify 3270 Graphic Escapes.
- *
- * "Not pasting" means that the sequence is a login string specified in the
- * hosts file, or a parameter to the String action.  Returns are "move to
- * beginning of next line"; newlines mean "Enter AID" and the termination of
- * processing the string.  Backslashes are processed as in C.
- *
- * @param s		String to input.
- * @param len		Size of the string (or -1 to null terminated strings)
- * @param pasting	pasting flag (See comments).
- *
- * @Returns the number of unprocessed characters.
- */
-LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
+LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int pasting)
 {
-	enum {
-	    BASE, BACKSLASH, BACKX, BACKP, BACKPA, BACKPF, OCTAL, HEX, XGE
-	} state = BASE;
+	enum { BASE, BACKSLASH, BACKX, BACKP, BACKPA, BACKPF, OCTAL, HEX, XGE } state = BASE;
 	int literal = 0;
 	int nc = 0;
 	enum iaction ia = pasting ? IA_PASTE : IA_STRING;
-	int orig_addr = h3270.cursor_addr;
-	int orig_col = BA_TO_COL(h3270.cursor_addr);
+	int orig_addr;
+	int orig_col;
 	Boolean skipped = False;
+
 #if defined(X3270_DBCS) /*[*/
 	unsigned char ebc[2];
 	unsigned char cx;
@@ -3353,6 +3333,11 @@ LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 	char c;
 	char *ws;
 #endif /*]*/
+
+	CHECK_SESSION_HANDLE(session);
+
+	orig_addr = session->cursor_addr;
+	orig_col  = BA_TO_COL(session->cursor_addr);
 
 	if(len < 0)
 		len = strlen(s);

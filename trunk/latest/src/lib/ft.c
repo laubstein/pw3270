@@ -262,7 +262,7 @@ static const struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to m
 
 	Trace("Command: \"%s\"",buffer);
 
-	(void) emulate_input(buffer, strlen(buffer), False);
+	(void) lib3270_emulate_input(NULL, buffer, strlen(buffer), False);
 
 	// Get this thing started.
 	set_ft_state(FT_AWAIT_ACK);

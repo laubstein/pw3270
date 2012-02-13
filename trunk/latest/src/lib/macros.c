@@ -212,7 +212,7 @@
 	}
 
 	if(str)
-		Input_String((unsigned char *) str);
+		lib3270_set_string(NULL, (const unsigned char *) str);
 
 	return strdup(get_state(hSession));
  }
