@@ -1,0 +1,13 @@
+Package: lib3270-rexx
+Architecture: any
+Depends: ${misc:Depends}, lib3270 (= ${binary:Version}), oorexx (>= 4.0.1)
+Description: 3270 support for rexx scripts. (Rev. @PACKAGE_REVISION@)
+ This package contains the rexx layer for acessing 3270 hosts.
+
+Package: pw3270-plugin-rexx
+Architecture: any
+Depends: ${misc:Depends}, pw3270 (= ${binary:Version}), lib3270-rexx (= ${binary:Version})
+Description: Rexx plugin for pw3270. (Rev. @PACKAGE_REVISION@)
+ This package contains the plugin to allow rexx scripting inside pw3270.
+
+
