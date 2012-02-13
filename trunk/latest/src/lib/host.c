@@ -689,6 +689,11 @@ static void try_reconnect(H3270 *session)
 	lib3270_reconnect(session,0);
 }
 
+LIB3270_EXPORT void lib3270_disconnect(H3270 *h)
+{
+	host_disconnect(h,0);
+}
+
 void host_disconnect(H3270 *h, int failed)
 {
     CHECK_SESSION_HANDLE(h);
@@ -767,24 +772,6 @@ LIB3270_EXPORT void lib3270_register_schange(H3270 *h,LIB3270_STATE_CHANGE tx, v
 	h->st_last[tx] = st;
 
 }
-
-/*
-void register_schange(LIB3270_STATE_CHANGE tx, void (*func)(H3270 *, int))
-{
-	struct st_callback *st;
-
-	st = (struct st_callback *)Malloc(sizeof(*st));
-
-	st->func	= func;
-	st->next	= (struct st_callback *)NULL;
-
-	if (st_last[tx] != (struct st_callback *)NULL)
-		st_last[tx]->next = st;
-	else
-		st_callbacks[tx] = st;
-	st_last[tx] = st;
-}
-*/
 
 /* Signal a state change. */
 void lib3270_st_changed(H3270 *h, int tx, int mode)

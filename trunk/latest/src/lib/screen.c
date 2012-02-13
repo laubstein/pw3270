@@ -187,7 +187,7 @@ int screen_init(H3270 *session)
 #endif
 
 	/* Finish screen initialization. */
-	screen_suspend();
+	screen_suspend(session);
 
 	return 0;
 }
@@ -449,15 +449,15 @@ void screen_disp(H3270 *session)
 		callbacks->display(session);
 }
 
-void screen_suspend(void)
+void screen_suspend(H3270 *session)
 {
 	if(callbacks && callbacks->set_suspended)
 		callbacks->set_suspended(1);
 }
 
-void screen_resume(void)
+void screen_resume(H3270 *session)
 {
-	screen_disp(&h3270);
+	screen_disp(session);
 
 	if(callbacks && callbacks->set_suspended)
 		callbacks->set_suspended(0);
@@ -822,23 +822,39 @@ void Warning(const char *fmt, ...)
 
 }
 
-void mcursor_locked()
+void mcursor_set(H3270 *session,CURSOR_MODE m)
 {
+	CHECK_SESSION_HANDLE(session);
+
+	if(callbacks && callbacks->cursor)
+		callbacks->cursor(m);
+}
+
+/*
+void mcursor_locked(H3270 *session)
+{
+	CHECK_SESSION_HANDLE(session);
+
 	if(callbacks && callbacks->cursor)
 		callbacks->cursor(CURSOR_MODE_LOCKED);
 }
 
-extern void mcursor_normal()
+extern void mcursor_normal(H3270 *session)
 {
+	CHECK_SESSION_HANDLE(session);
+
 	if(callbacks && callbacks->cursor)
 		callbacks->cursor(CURSOR_MODE_NORMAL);
 }
 
-extern void mcursor_waiting()
+extern void mcursor_waiting(H3270 *session)
 {
+	CHECK_SESSION_HANDLE(session);
+
 	if(callbacks && callbacks->cursor)
 		callbacks->cursor(CURSOR_MODE_WAITING);
 }
+*/
 
 /* Pop up an error dialog. */
 extern void popup_an_error(const char *fmt, ...)

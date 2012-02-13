@@ -323,7 +323,7 @@
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
 	unselect();
-	host_disconnect(hSession,0);
+	lib3270_disconnect(hSession);
  }
 
  static int SaveText(const char *title, gchar *text)

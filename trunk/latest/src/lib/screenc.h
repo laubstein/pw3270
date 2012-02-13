@@ -31,9 +31,18 @@ LIB3270_INTERNAL int screen_init(H3270 *session);
 // LIB3270_INTERNAL void screen_flip(void);
 LIB3270_INTERNAL FILE *start_pager(void);
 LIB3270_INTERNAL Boolean screen_new_display_charsets(char *cslist, char *csname);
-LIB3270_INTERNAL void mcursor_locked();
-LIB3270_INTERNAL void mcursor_normal();
-LIB3270_INTERNAL void mcursor_waiting();
+
+LIB3270_INTERNAL void mcursor_set(H3270 *session,CURSOR_MODE m);
+
+#define mcursor_locked(x) mcursor_set(x,CURSOR_MODE_LOCKED)
+#define mcursor_normal(x) mcursor_set(x,CURSOR_MODE_NORMAL)
+#define mcursor_waiting(x) mcursor_set(x,CURSOR_MODE_WAITING)
+
+
+//LIB3270_INTERNAL void mcursor_locked(H3270 *session);
+//LIB3270_INTERNAL void mcursor_normal(H3270 *session);
+//LIB3270_INTERNAL void mcursor_waiting(H3270 *session);
+
 LIB3270_INTERNAL void notify_toggle_changed(int ix, int value, int reason);
 LIB3270_INTERNAL void set_viewsize(H3270 *session, int rows, int cols);
 

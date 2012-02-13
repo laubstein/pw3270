@@ -147,7 +147,7 @@
 		return RetValue(Retstr,ENOTCONN);
 	}
 
-	host_disconnect(hSession,0);
+	lib3270_disconnect(hSession);
 	return RetValue(Retstr,0);
  }
 

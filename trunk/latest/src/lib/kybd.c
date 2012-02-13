@@ -467,7 +467,7 @@ operator_error(int error_type)
 
 	if(appres.oerr_lock) { // || sms_redirect()) {
 		status_oerr(NULL,error_type);
-		mcursor_locked();
+		mcursor_locked(&h3270);
 		kybdlock_set((unsigned int)error_type, "operator_error");
 		(void) flush_ta();
 	} else {
@@ -528,7 +528,7 @@ key_AID(unsigned char aid_code)
 	}
 	if (!IN_SSCP || aid_code != AID_CLEAR) {
 		status_twait(NULL);
-		mcursor_waiting();
+		mcursor_waiting(&h3270);
 		set_toggle(INSERT,0);
 		kybdlock_set(KL_OIA_TWAIT | KL_OIA_LOCKED, "key_AID");
 	}
@@ -1567,7 +1567,7 @@ do_reset(Boolean explicit)
 
 	/* Clean up other modes. */
 	status_reset(NULL);
-	mcursor_normal();
+	mcursor_normal(&h3270);
 
 //	composing = NONE;
 //	status_compose(False, 0, KT_STD);
