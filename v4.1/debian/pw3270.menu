@@ -1,2 +1,0 @@
-?package(pw3270):needs="X11" section="Apps/Net"\
-  title="pw3270" command="usr/bin/pw3270"
