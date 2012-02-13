@@ -277,6 +277,7 @@
 			void (*update_luname)(H3270 *session, const char *name);
 			void (*update_status)(H3270 *session, LIB3270_STATUS id);
 			void (*erase)(H3270 *session);
+			void (*cursor)(H3270 *session, LIB3270_CURSOR id);
 
 		};
 
@@ -447,14 +448,10 @@
 
 
 		/* Screen processing */
-		typedef enum _CURSOR_MODE
-		{
-			CURSOR_MODE_NORMAL,
-			CURSOR_MODE_WAITING,
-			CURSOR_MODE_LOCKED,
 
-			CURSOR_MODE_USER
-		} CURSOR_MODE;
+		#define CURSOR_MODE_NORMAL		LIB3270_CURSOR_NORMAL
+		#define CURSOR_MODE_WAITING		LIB3270_CURSOR_WAITING
+		#define CURSOR_MODE_LOCKED		LIB3270_CURSOR_LOCKED
 
 		typedef enum _SCRIPT_STATE
 		{
@@ -509,7 +506,7 @@
 			void	(*set_script)(SCRIPT_STATE state);
 			void	(*reset)(int lock);
 			void	(*status)(H3270 *session, LIB3270_STATUS id);
-			void	(*cursor)(CURSOR_MODE mode);
+			void	(*cursor)(H3270 *session, LIB3270_CURSOR mode);
 			void	(*lu)(H3270 *session, const char *lu);
 			void	(*set_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
 

@@ -57,7 +57,7 @@
 	#include <lib3270.h>
 	#include <lib3270/toggle.h>
 
- 	#define CURSOR_MODE_3270 (CURSOR_MODE_USER+9)
+ 	#define CURSOR_MODE_3270 (LIB3270_CURSOR_USER+9)
 
 	enum _drag_type
 	{
@@ -75,7 +75,7 @@
 	};
 
 	LOCAL_EXTERN int 			drag_type;
-	LOCAL_EXTERN CURSOR_MODE	cursor_mode;
+	LOCAL_EXTERN LIB3270_CURSOR	cursor_mode;
 
 	#define MAX_CHR_LENGTH 4
 	typedef struct _element

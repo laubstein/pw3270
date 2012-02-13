@@ -147,6 +147,9 @@ int screen_init(H3270 *session)
 		if(callbacks->erase)
 			session->erase = callbacks->erase;
 
+		if(callbacks->cursor)
+			session->cursor = callbacks->cursor;
+
 		if(callbacks->init())
 		{
 			popup_an_error("Can't initialize terminal.");
@@ -539,16 +542,16 @@ void status_oerr(H3270 *session, int error_type)
 
 void status_resolving(H3270 *session, Boolean on)
 {
-	if(callbacks && callbacks->cursor)
-			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
+	if(session->cursor)
+			session->cursor(session, on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
 
 	status_changed(session, on ? LIB3270_STATUS_RESOLVING : LIB3270_STATUS_BLANK);
 }
 
 void status_connecting(H3270 *session, Boolean on)
 {
-	if(callbacks && callbacks->cursor)
-			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
+	if(session->cursor)
+			session->cursor(session,on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
 
 	status_changed(session, on ? LIB3270_STATUS_CONNECTING : LIB3270_STATUS_BLANK);
 }
@@ -822,12 +825,12 @@ void Warning(const char *fmt, ...)
 
 }
 
-void mcursor_set(H3270 *session,CURSOR_MODE m)
+void mcursor_set(H3270 *session,LIB3270_CURSOR m)
 {
 	CHECK_SESSION_HANDLE(session);
 
-	if(callbacks && callbacks->cursor)
-		callbacks->cursor(m);
+	if(session->cursor)
+		session->cursor(session,m);
 }
 
 /*

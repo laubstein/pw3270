@@ -112,6 +112,24 @@
 
 	} LIB3270_FLAG;
 
+
+	/**
+	 * Cursor modes.
+	 *
+	 * Cursor modes set by library; an application can us it
+	 * as a hint to change the mouse cursor based on connection status.
+	 *
+	 */
+	typedef enum _LIB3270_CURSOR
+	{
+		LIB3270_CURSOR_NORMAL,		/**< Ready for user actions */
+		LIB3270_CURSOR_WAITING,		/**< Waiting for host */
+		LIB3270_CURSOR_LOCKED,		/**< Locked, can't receive user actions */
+
+		LIB3270_CURSOR_USER
+	} LIB3270_CURSOR;
+
+
 	/**
 	 * connection state
 	 */
