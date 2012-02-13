@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="pw3270" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/g3270" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/g3270" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="`pkg-config gtk+-2.0 --cflags`" />
+			<Add option="-Wall" />
+		</Compiler>
+		<Linker>
+			<Add option="`pkg-config gtk+-2.0 --libs`" />
+		</Linker>
+		<Unit filename="Makefile.in" />
+		<Unit filename="aclocal.m4" />
+		<Unit filename="build.sh" />
+		<Unit filename="configure.ac" />
+		<Unit filename="license.txt" />
+		<Unit filename="menu.conf" />
+		<Unit filename="pw3270.spec" />
+		<Unit filename="src/actions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/clipboard.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/colors.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/config.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/draw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/extension.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/extension.h" />
+		<Unit filename="src/g3270.h" />
+		<Unit filename="src/gsource.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/3270ds.h" />
+		<Unit filename="src/lib/Makefile.in" />
+		<Unit filename="src/lib/X11/keysym.h" />
+		<Unit filename="src/lib/XtGlue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/actions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/actionsc.h" />
+		<Unit filename="src/lib/ansi.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ansic.h" />
+		<Unit filename="src/lib/apl.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/aplc.h" />
+		<Unit filename="src/lib/appres.h" />
+		<Unit filename="src/lib/arpa_telnet.h" />
+		<Unit filename="src/lib/c3270.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/cg.h" />
+		<Unit filename="src/lib/charset.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/charsetc.h" />
+		<Unit filename="src/lib/child.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/childc.h" />
+		<Unit filename="src/lib/conf.h" />
+		<Unit filename="src/lib/configure.in" />
+		<Unit filename="src/lib/ctlr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ctlr.h" />
+		<Unit filename="src/lib/ctlrc.h" />
+		<Unit filename="src/lib/dialogc.h" />
+		<Unit filename="src/lib/ft.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ft_cut.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ft_cut_ds.h" />
+		<Unit filename="src/lib/ft_cutc.h" />
+		<Unit filename="src/lib/ft_dft.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/ft_dft_ds.h" />
+		<Unit filename="src/lib/ft_dftc.h" />
+		<Unit filename="src/lib/ftc.h" />
+		<Unit filename="src/lib/globals.h" />
+		<Unit filename="src/lib/glue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/gluec.h" />
+		<Unit filename="src/lib/help.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/host.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/hostc.h" />
+		<Unit filename="src/lib/idle.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/idlec.h" />
+		<Unit filename="src/lib/keymap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/keymapc.h" />
+		<Unit filename="src/lib/keypadc.h" />
+		<Unit filename="src/lib/kybd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/kybdc.h" />
+		<Unit filename="src/lib/lib3270.h" />
+		<Unit filename="src/lib/localdefs.h" />
+		<Unit filename="src/lib/macros.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/macrosc.h" />
+		<Unit filename="src/lib/menubarc.h" />
+		<Unit filename="src/lib/mkfb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/objects.h" />
+		<Unit filename="src/lib/popupsc.h" />
+		<Unit filename="src/lib/print.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/printc.h" />
+		<Unit filename="src/lib/printer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/printerc.h" />
+		<Unit filename="src/lib/resources.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/resources.h" />
+		<Unit filename="src/lib/rpq.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/savec.h" />
+		<Unit filename="src/lib/screen.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/screen.h" />
+		<Unit filename="src/lib/screenc.h" />
+		<Unit filename="src/lib/scrollc.h" />
+		<Unit filename="src/lib/see.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/seec.h" />
+		<Unit filename="src/lib/selectc.h" />
+		<Unit filename="src/lib/sf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/sfc.h" />
+		<Unit filename="src/lib/statusc.h" />
+		<Unit filename="src/lib/tables.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/tablesc.h" />
+		<Unit filename="src/lib/telnet.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/telnetc.h" />
+		<Unit filename="src/lib/tn3270e.h" />
+		<Unit filename="src/lib/toggles.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/togglesc.h" />
+		<Unit filename="src/lib/trace_ds.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/trace_dsc.h" />
+		<Unit filename="src/lib/util.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/utilc.h" />
+		<Unit filename="src/lib/wide.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/widec.h" />
+		<Unit filename="src/lib/x3270if.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/xio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lib/xioc.h" />
+		<Unit filename="src/lib/xl.h" />
+		<Unit filename="src/log.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/log.h" />
+		<Unit filename="src/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/mouse.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/print.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/screen_callbacks.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sources.mak" />
+		<Unit filename="src/terminal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/terminal.h" />
+		<Unit filename="src/toolbar.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/trace.h" />
+		<Unit filename="sysconfig" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
