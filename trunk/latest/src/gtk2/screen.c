@@ -70,7 +70,7 @@
 
  static int	  SetSuspended(int state);
  static void	  SetScript(SCRIPT_STATE state);
- static void	  set_cursor(CURSOR_MODE mode);
+ static void	  set_cursor(H3270 *session, LIB3270_CURSOR mode);
  static void	  set_oia(H3270 *session, OIA_FLAG id, unsigned char on);
  static void	  set_lu(H3270 *session, const char *lu);
 // static void	  changed(int bstart, int bend);
@@ -140,6 +140,7 @@
  struct _view			  view												= { 0 };
  char					* charset											= NULL;
  char					* window_title										= PROGRAM_NAME;
+ LIB3270_CURSOR 	  cursor_mode = -1;
 
  gboolean				  screen_updates_enabled							= FALSE;
 
@@ -514,7 +515,7 @@
 
 	if(id == LIB3270_STATUS_BLANK)
 	{
-		set_cursor(CURSOR_MODE_NORMAL);
+		set_cursor(session,CURSOR_MODE_NORMAL);
 		update_cursor_pixmap();
 	}
 	else if(id >= LIB3270_STATUS_USER)
@@ -527,12 +528,10 @@
 
  }
 
-
- CURSOR_MODE cursor_mode = -1;
-
- static void set_cursor(CURSOR_MODE mode)
+ static void set_cursor(H3270 *session, LIB3270_CURSOR mode)
  {
- 	if(mode == cursor_mode || mode > CURSOR_MODE_USER || !terminal || !terminal->window)
+
+ 	if(mode == cursor_mode || mode > LIB3270_CURSOR_USER || !terminal || !terminal->window)
 		return;
 
 	cursor_mode = mode;

@@ -527,15 +527,15 @@ key_AID(unsigned char aid_code)
 		buffer_addr = h3270.cursor_addr;
 	}
 	if (!IN_SSCP || aid_code != AID_CLEAR) {
-		status_twait(NULL);
+		status_twait(&h3270);
 		mcursor_waiting(&h3270);
 		set_toggle(INSERT,0);
 		kybdlock_set(KL_OIA_TWAIT | KL_OIA_LOCKED, "key_AID");
 	}
 	aid = aid_code;
 	ctlr_read_modified(aid, False);
-	ticking_start(NULL,False);
-	status_ctlr_done(NULL);
+	ticking_start(&h3270,False);
+	status_ctlr_done(&h3270);
 }
 
 LIB3270_FKEY_ACTION( pfkey )

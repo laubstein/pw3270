@@ -32,7 +32,7 @@ LIB3270_INTERNAL int screen_init(H3270 *session);
 LIB3270_INTERNAL FILE *start_pager(void);
 LIB3270_INTERNAL Boolean screen_new_display_charsets(char *cslist, char *csname);
 
-LIB3270_INTERNAL void mcursor_set(H3270 *session,CURSOR_MODE m);
+LIB3270_INTERNAL void mcursor_set(H3270 *session,LIB3270_CURSOR m);
 
 #define mcursor_locked(x) mcursor_set(x,CURSOR_MODE_LOCKED)
 #define mcursor_normal(x) mcursor_set(x,CURSOR_MODE_NORMAL)

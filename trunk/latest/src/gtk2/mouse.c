@@ -721,7 +721,7 @@
  		Trace("Type: %d",type);
 
  		if(type >= 0)
-			gdk_window_set_cursor(terminal->window,wCursor[CURSOR_MODE_USER+type]);
+			gdk_window_set_cursor(terminal->window,wCursor[LIB3270_CURSOR_USER+type]);
  		else
 			gdk_window_set_cursor(terminal->window,wCursor[cursor_mode]);
  	}
