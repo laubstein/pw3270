@@ -242,6 +242,27 @@
 	LIB3270_EXPORT LIB3270_CSTATE lib3270_get_connection_state(H3270 *h);
 
 	/**
+	 * Pretend that a sequence of keys was entered at the keyboard.
+	 *
+	 * "Pasting" means that the sequence came from the clipboard.  Returns are
+	 * ignored; newlines mean "move to beginning of next line"; tabs and formfeeds
+	 * become spaces.  Backslashes are not special, but ASCII ESC characters are
+	 * used to signify 3270 Graphic Escapes.
+	 *
+	 * "Not pasting" means that the sequence is a login string specified in the
+	 * hosts file, or a parameter to the String action.  Returns are "move to
+	 * beginning of next line"; newlines mean "Enter AID" and the termination of
+	 * processing the string.  Backslashes are processed as in C.
+	 *
+	 * @param s			String to input.
+	 * @param len		Size of the string (or -1 to null terminated strings)
+	 * @param pasting	pasting flag (See comments).
+	 *
+	 * @return The number of unprocessed characters.
+	 */
+	LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int pasting);
+
+	/**
 	 * Set string at current cursor position.
 	 *
 	 * Returns are ignored; newlines mean "move to beginning of next line";
