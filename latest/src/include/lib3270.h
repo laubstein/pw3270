@@ -131,6 +131,10 @@
 
 	#include <lib3270/api.h>
 
+#ifdef __cplusplus
+	extern "C" {
+#endif
+
 	/**
 	 * Get current screen size.
 	 *
@@ -191,6 +195,15 @@
 	 *
 	 */
 	LIB3270_EXPORT int lib3270_connect(H3270 *h,const char *n, int wait);
+
+
+	/**
+	 * Disconnect from host.
+	 *
+	 * @param h		Session handle.
+	 *
+	 */
+	LIB3270_EXPORT void lib3270_disconnect(H3270 *h);
 
 	/**
 	 * Reconnect.
@@ -331,5 +344,8 @@
 	 */
 	LIB3270_EXPORT int lib3270_call_thread(int(*callback)(H3270 *h, void *), H3270 *h, void *parm);
 
+#ifdef __cplusplus
+	}
+#endif
 
 #endif // LIB3270_H_INCLUDED

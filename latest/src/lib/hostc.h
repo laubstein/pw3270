@@ -36,5 +36,5 @@
 	LIB3270_INTERNAL void hostfile_init(void);
 	LIB3270_INTERNAL void host_connected(H3270 *session);
 	LIB3270_INTERNAL void host_in3270(H3270 *session, LIB3270_CSTATE);
-
+	LIB3270_INTERNAL void host_disconnect(H3270 *h, int disable);
 

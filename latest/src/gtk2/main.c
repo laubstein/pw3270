@@ -647,7 +647,7 @@ int main(int argc, char *argv[])
 		gtk_main_iteration();
 
 	/* Connect to the host. */
-	screen_suspend();
+	screen_suspend(hSession);
 
 	if(cl_hostname != CN)
 		SetString("Network","Hostname",cl_hostname);
@@ -659,7 +659,7 @@ int main(int argc, char *argv[])
 
 	if(topwindow)
 	{
-		screen_resume();
+		screen_resume(hSession);
 		screen_disp(hSession);
 
 		// Start plugins after the creation of main loop

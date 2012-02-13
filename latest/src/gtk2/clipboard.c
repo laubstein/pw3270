@@ -113,7 +113,7 @@
 	action_group_set_sensitive(ACTION_GROUP_CLIPBOARD,clipboard_string != NULL);
 	gtk_action_set_sensitive(action_by_id[ACTION_PASTENEXT],clipboard_string != NULL);
 
-	screen_resume();
+	screen_resume(hSession);
 
 	Trace("%s - ends (clipboard_string=%p)",__FUNCTION__,clipboard_string);
 

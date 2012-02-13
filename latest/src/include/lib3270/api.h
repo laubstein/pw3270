@@ -603,8 +603,8 @@
         LIB3270_EXPORT int ctlr_get_rows(void) __attribute__ ((deprecated));
 
         /* Screen calls */
-		LIB3270_EXPORT void screen_resume(void);
-		LIB3270_EXPORT void screen_suspend(void);
+		LIB3270_EXPORT void screen_resume(H3270 *session);
+		LIB3270_EXPORT void screen_suspend(H3270 *session);
 		LIB3270_EXPORT void screen_disp(H3270 *session);
 
 		/* Console calls */
@@ -622,8 +622,6 @@
 
 		#define host_connect(n,wait) lib3270_connect(NULL,n,wait)
 		#define host_reconnect(w) lib3270_reconnect(NULL,w)
-
-		LIB3270_EXPORT void host_disconnect(H3270 *h, int disable);
 
 		#define register_schange(tx,func) lib3270_register_schange(NULL,tx,func,NULL)
 		LIB3270_EXPORT void lib3270_register_schange(H3270 *h,LIB3270_STATE tx, void (*func)(H3270 *, int, void *),void *user_data);
