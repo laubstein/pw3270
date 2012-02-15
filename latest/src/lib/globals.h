@@ -349,6 +349,4 @@ enum state_change
 
 /* Library internal calls */
 
-LIB3270_INTERNAL void							  initialize_toggles(void);
-LIB3270_INTERNAL void							  shutdown_toggles(void);
 

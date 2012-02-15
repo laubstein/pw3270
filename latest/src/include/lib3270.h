@@ -378,7 +378,7 @@
 	 * @return 0 if the toggle is disabled, non zero if enabled.
 	 *
 	 */
-	LIB3270_EXPORT unsigned char lib3270_get_toogle(H3270 *h, LIB3270_TOGGLE ix);
+	LIB3270_EXPORT unsigned char lib3270_get_toggle(H3270 *h, LIB3270_TOGGLE ix);
 
 	/**
 	 * Check if the active connection is secure.
