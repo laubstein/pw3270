@@ -584,7 +584,7 @@ void status_reset(H3270 *session)
  *
  * @see LIB3270_STATUS
  */
-LIB3270_EXPORT LIB3270_STATUS lib3270_get_oia_status(H3270 *session)
+LIB3270_EXPORT LIB3270_STATUS lib3270_get_program_message(H3270 *session)
 {
 	CHECK_SESSION_HANDLE(session);
 	return session->oia_status;
