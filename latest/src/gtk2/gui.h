@@ -332,7 +332,7 @@
 	void 		InvalidatePixmaps(GdkDrawable *drawable, GdkGC *gc);
 	void 		ReloadPixmaps(void);
 	void 		Reselect(void);
-	void 		set_rectangle_select(int value, enum toggle_type reason);
+	void 		set_rectangle_select(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason);
 	void 		SetStatusCode(H3270 *session, LIB3270_STATUS id);
 	void 		SetTerminalFont(const gchar *fontname);
 
@@ -409,7 +409,7 @@
 
 	LOCAL_EXTERN int		  get_selected_rectangle(GdkRectangle *rect);
 
-	void	set_monocase(int value, enum toggle_type reason);
+	void	set_monocase(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason);
 
 	// Plugins
 	LOCAL_EXTERN GModule	* get_plugin_by_name(const gchar *plugin_name);

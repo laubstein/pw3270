@@ -62,8 +62,8 @@ LIB3270_INTERNAL void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ov
 LIB3270_INTERNAL void ctlr_erase(H3270 *session, int alt);
 
 LIB3270_INTERNAL void ticking_start(H3270 *session, Boolean anyway);
-LIB3270_INTERNAL void toggle_nop(struct toggle *t, enum toggle_type tt);
-LIB3270_INTERNAL void toggle_showTiming(struct toggle *t, enum toggle_type tt);
+LIB3270_INTERNAL void toggle_nop(struct toggle *t, LIB3270_TOGGLE_TYPE tt);
+LIB3270_INTERNAL void toggle_showTiming(struct toggle *t, LIB3270_TOGGLE_TYPE tt);
 
 enum dbcs_state {
 	DBCS_NONE = 0,		/* position is not DBCS */

@@ -56,40 +56,32 @@
 
 
 
-#if defined(LIB3270)
-
-static void no_callback(int value, enum toggle_type reason)
+static void no_callback(H3270 *h, int value, LIB3270_TOGGLE_TYPE reason)
 {
 }
 
-/**
- * Register a callback method to be called when toggle changes.
- *
- * Register a callback function to be called when the toggle changes; NOTE: the callback will be called
- * during the register to make sure the toogle state in the client is ok.
- *
- * @param ix		Toggle id.
- * @param callback	Function to call when toggle changes.
- *
- */
-LIB3270_EXPORT void register_3270_toggle_monitor(LIB3270_TOGGLE_ID ix, void (*callback)(int value, enum toggle_type reason))
+LIB3270_EXPORT int lib3270_register_tchange(H3270 *h, LIB3270_TOGGLE_ID ix, void (*func)(H3270 *, int, LIB3270_TOGGLE_TYPE))
 {
 	struct toggle *t;
 
-	if(ix < 0 || ix >= N_TOGGLES)
-		return;
+	CHECK_SESSION_HANDLE(h);
+
+	if(ix < 0 || ix >= LIB3270_TOGGLE_COUNT)
+		return EINVAL;
 
 	t = &appres.toggle[ix];
 
-	if(callback)
+	if(func)
 	{
-		t->callback = callback;
-		t->callback(t->value, (int) TT_INITIAL);
+		t->callback = func;
+		t->callback(h, t->value, (int) TT_INITIAL);
 	}
 	else
 	{
 		t->callback = no_callback;
 	}
+
+	return 0;
 }
 
 LIB3270_EXPORT unsigned char lib3270_get_toogle(H3270 *session, LIB3270_TOGGLE ix)
@@ -100,12 +92,11 @@ LIB3270_EXPORT unsigned char lib3270_get_toogle(H3270 *session, LIB3270_TOGGLE i
 		return 0;
 	return (unsigned char) appres.toggle[ix].value != 0;
 }
-#endif
+
 /*
  * Generic toggle stuff
  */
-static void
-do_toggle_reason(LIB3270_TOGGLE_ID ix, enum toggle_type reason)
+static void do_toggle_reason(H3270 *session, LIB3270_TOGGLE_ID ix, LIB3270_TOGGLE_TYPE reason)
 {
 	struct toggle *t = &appres.toggle[ix];
 
@@ -116,14 +107,12 @@ do_toggle_reason(LIB3270_TOGGLE_ID ix, enum toggle_type reason)
 	toggle_toggle(t);
 	t->upcall(t, reason);
 
-#if defined(X3270_MENUS) /*[*/
-	menubar_retoggle(t);
-#endif /*]*/
+//#if defined(X3270_MENUS) /*[*/
+//	menubar_retoggle(t);
+//#endif /*]*/
 
-#if defined(LIB3270)
-	t->callback(t->value, (int) reason);
+	t->callback(session,t->value, (int) reason);
 	notify_toggle_changed(ix, t->value, reason);
-#endif
 
 }
 
@@ -142,7 +131,7 @@ LIB3270_EXPORT int set_toggle(LIB3270_TOGGLE_ID ix, int value)
 
 	struct toggle	*t;
 
-	if(ix < 0 || ix >= N_TOGGLES)
+	if(ix < 0 || ix >= LIB3270_TOGGLE_COUNT)
 		return 0;
 
 	t = &appres.toggle[ix];
@@ -150,17 +139,20 @@ LIB3270_EXPORT int set_toggle(LIB3270_TOGGLE_ID ix, int value)
 	if(t->value == v)
 		return 0;
 
-	do_toggle_reason(ix, TT_INTERACTIVE);
+	do_toggle_reason(&h3270, ix, TT_INTERACTIVE);
 
 	return -1;
 }
 
-LIB3270_EXPORT int do_3270_toggle(LIB3270_TOGGLE_ID ix)
+LIB3270_EXPORT int lib3270_toggle(H3270 *session, LIB3270_TOGGLE_ID ix)
 {
-	if(ix < 0 || ix >= N_TOGGLES)
+	CHECK_SESSION_HANDLE(session);
+
+	if(ix < 0 || ix >= LIB3270_TOGGLE_COUNT)
 		return EINVAL;
 
-	do_toggle_reason(ix, TT_INTERACTIVE);
+	do_toggle_reason(session, ix, TT_INTERACTIVE);
+
 	return 0;
 }
 

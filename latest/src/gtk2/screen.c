@@ -166,7 +166,7 @@
 
 	screen_updates_enabled = enabled;
 
- 	Trace("%s(%d): screen updates are %s",__FUNCTION__,state,screen_updates_enabled ? "enabled" : "disabled");
+// 	Trace("%s(%d): screen updates are %s",__FUNCTION__,state,screen_updates_enabled ? "enabled" : "disabled");
 
 	if(screen_updates_enabled)
  	{
@@ -235,7 +235,7 @@
  	return g_convert(in, -1, "UTF-8", CHARSET, NULL, sz, NULL);
  }
 
- void set_monocase(int value, enum toggle_type reason)
+ void set_monocase(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
  {
 	convert_charset = value ? convert_monocase : convert_regular;
 	screen_disp(hSession);

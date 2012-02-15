@@ -67,12 +67,12 @@
 struct toggle {
 	char	value;		/* toggle value */
 	char	changed;	/* has the value changed since init */
-	Widget	w[2];		/* the menu item widgets */
-	const char *label[2];	/* labels */
-	void (*upcall)(struct toggle *, enum toggle_type); /* change value */
+//	Widget	w[2];		/* the menu item widgets */
+//	const char *label[2];	/* labels */
+	void (*upcall)(struct toggle *, LIB3270_TOGGLE_TYPE); /* change value */
 
 #if defined(LIB3270)
-	void (*callback)(int, enum toggle_type);
+	void (*callback)(H3270 *, int, LIB3270_TOGGLE_TYPE);
 #endif
 
 };

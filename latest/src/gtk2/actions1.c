@@ -151,10 +151,10 @@
 	return rc;
  }
 
- static void clear_and_call(GtkAction *action, int (*call)(void))
+ static void clear_and_call(GtkAction *action, int (*call)(H3270 *))
  {
  	unselect();
- 	call();
+ 	call(NULL);
  }
 
  LOCAL_EXTERN void gui_toogle_set_visible(enum GUI_TOGGLE id, gboolean visible)

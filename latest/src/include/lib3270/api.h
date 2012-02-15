@@ -131,7 +131,7 @@
 			LIB3270_STATE_EXITING,
 			LIB3270_STATE_CHARSET,
 
-			N_ST				// Always the last one
+			LIB3270_STATE_USER				// Always the last one
 		} LIB3270_STATE;
 
 		#define ST_RESOLVING			LIB3270_STATE_RESOLVING
@@ -143,6 +143,7 @@
 		#define ST_PRINTER				LIB3270_STATE_PRINTER
 		#define ST_EXITING				LIB3270_STATE_EXITING
 		#define ST_CHARSET				LIB3270_STATE_CHARSET
+		#define N_ST					LIB3270_STATE_USER
 		#define LIB3270_STATE_CHANGE	LIB3270_STATE
 
 		/** connection state */

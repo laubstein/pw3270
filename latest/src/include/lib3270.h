@@ -98,6 +98,24 @@
 
 	} LIB3270_TOGGLE;
 
+
+	/**
+	 * Toggle types.
+	 *
+	 */
+	typedef enum _LIB3270_TOGGLE_TYPE
+	{
+		LIB3270_TOGGLE_TYPE_INITIAL,
+		LIB3270_TOGGLE_TYPE_INTERACTIVE,
+		LIB3270_TOGGLE_TYPE_ACTION,
+		LIB3270_TOGGLE_TYPE_FINAL,
+		LIB3270_TOGGLE_TYPE_UPDATE,
+
+		LIB3270_TOGGLE_TYPE_USER
+
+	} LIB3270_TOGGLE_TYPE;
+
+
 	/**
 	 * OIA Status indicators.
 	 *
@@ -213,7 +231,7 @@
 	LIB3270_EXPORT H3270 * lib3270_session_new(const char *model);
 
 	/**
-	 * Destroy session, release memory
+	 * Destroy session, release memory.
 	 *
 	 * @param h		Session handle.
 	 *
@@ -221,7 +239,7 @@
 	LIB3270_EXPORT void lib3270_session_free(H3270 *h);
 
 	/**
-	 * Register a state change callback
+	 * Register a state change callback.
 	 *
 	 * @param h		Session handle.
 	 * @param tx	State ID
@@ -230,6 +248,17 @@
 	 *
 	 */
 	LIB3270_EXPORT void lib3270_register_schange(H3270 *h,LIB3270_STATE_CHANGE tx, void (*func)(H3270 *, int, void *),void *data);
+
+	/**
+	 * Register a toggle change callback.
+	 *
+	 * @param h		Session handle.
+	 * @param ix	Toggle id
+	 * @param func	Function to call when toggle changes.
+	 *
+	 * @return 0 if ok, EINVAL if the toggle id is invalid.
+	 */
+	LIB3270_EXPORT int lib3270_register_tchange(H3270 *h, LIB3270_TOGGLE ix, void (*func)(H3270 *h, int, LIB3270_TOGGLE_TYPE reason));
 
 	/**
 	 * Network connect operation, keep main loop running
