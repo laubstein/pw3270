@@ -1,0 +1,15 @@
+Package: lib3270
+Architecture: any
+Section: libs
+Depends: ${misc:Depends}, binutils (>= 2.14.90.0.7)
+Description: @PACKAGE_NAME@ shared libraries. (Rev. @PACKAGE_REVISION@)
+ This package contains the @PACKAGE_NAME@ shared library for the core application.
+
+Package: @PACKAGE_NAME@-dev
+Architecture: any
+Section: libdevel
+Depends: ${misc:Depends}, lib3270 (= ${binary:Version})
+Description: @PACKAGE_NAME@ development files. (Rev. @PACKAGE_REVISION@)
+ This package contains the files needed for development of @PACKAGE_NAME@ plugins & extensions.
+
+

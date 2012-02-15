@@ -1,0 +1,140 @@
+#
+# "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
+# (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+# aplicativos mainframe. Registro no INPI sob o nome G3270.
+#
+# Copyright (C) <2008> <Banco do Brasil S.A.>
+#
+# Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+# os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+# Free Software Foundation.
+#
+# Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+# GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+# A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+# obter mais detalhes.
+#
+# Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+# programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA, 02111-1307, USA
+#
+# Contatos:
+#
+# perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+# erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+# licinio@bb.com.br		(Licínio Luis Branco)
+# kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+# macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+#
+
+#---[ Configuration values ]---------------------------------------------------
+
+PACKAGE_NAME=@PACKAGE_NAME@
+MODULE_NAME=j3270plugin
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+bindir=@bindir@
+
+JAVAC=@JAVAC@
+JAVAH=@JAVAH@
+STRIP=@STRIP@
+MSGCAT=@MSGCAT@
+XGETTEXT=@XGETTEXT@
+
+JDK_HOME=@JDK_HOME@
+JRE_HOME=@JRE_HOME@
+
+BINDIR=@BINDIR@
+OBJDIR=@OBJDIR@
+JVMDIR=@JVMDIR@
+
+DEBDIR ?= debian
+TMPDIR ?= .tmp
+
+OBJDBG=$(OBJDIR)/Debug/plugins/$(MODULE_NAME)
+BINDBG=$(BINDIR)/Debug/plugins
+
+OBJRLS=$(OBJDIR)/Release/plugins/$(MODULE_NAME)
+BINRLS=$(BINDIR)/Release/plugins
+
+INSTALL=@INSTALL@
+INSTALL_EXE=$(INSTALL) --mode=755
+
+CC = @CC@
+LD = @LD@
+
+DBG_CFLAGS=-DDEBUG=1
+RLS_CFLAGS=-DNDEBUG=1
+
+GTK_CFLAGS=@GTK_CFLAGS@
+GTK_LIBS=@GTK_LIBS@
+
+JVM_CFLAGS=@JVM_CFLAGS@
+JVM_LIBS=@JVM_LIBS@
+
+CFLAGS=@CFLAGS@ $(JVM_CFLAGS) $(GTK_CFLAGS)
+LDFLAGS=@DLL_LDFLAGS@ @LDFLAGS@
+
+LIB3270_CFLAGS ?= `pkg-config --cflags pw3270`
+LIB3270_LIBS ?= `pkg-config --libs pw3270`
+
+#---[ Sources ]----------------------------------------------------------------
+
+SOURCES=j3270plugin.c
+
+#---[ Rules ]------------------------------------------------------------------
+
+$(OBJDBG)/%@OBJEXT@: %.c
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) -o $@ -c $<
+
+$(OBJRLS)/%@OBJEXT@: %.c
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(RLS_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) -o $@ -c $<
+
+$(BINDIR)/pot/$(MODULE_NAME)/%.pot: %.c
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(XGETTEXT)	--default-domain=$(PACKAGE_NAME) --language=C \
+			--keyword=_ --keyword=N_ --keyword=MSG_:2 --output=$@ $<
+	@touch $@
+
+#---[ Targets ]----------------------------------------------------------------
+
+$(BINDIR)/Debug/plugins/$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC)@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) $(LDFLAGS) -o $@ $^ $(JVM_LIBS) $(LIB3270_LIBS) $(GLIB_LIBS) $(GTK_LIBS)
+	@rm -f $(basename \$(@F)).a
+	@rm -f $(basename \$(@F)).def
+
+$(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@: $(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC)@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) $(LDFLAGS) -o $@ $^ $(JVM_LIBS) $(LIB3270_LIBS) $(GLIB_LIBS) $(GTK_LIBS)
+	@rm -f $(basename \$(@F)).a
+	@rm -f $(basename \$(@F)).def
+	@$(STRIP) $@
+
+$(BINDIR)/pot/java.pot: $(foreach SRC, $(basename $(SOURCES)), $(BINDIR)/pot/$(MODULE_NAME)/$(SRC).pot)
+	@rm -f $@
+	@mkdir -p `dirname $@`
+	@$(MSGCAT) --sort-output $^ > $@
+
+$(TMPDIR)/control-java: control
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@cp control "$@"
+
+install: $(BINDIR)/Release/plugins/$(MODULE_NAME)@DLLEXT@
+	@mkdir -p "$(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/plugins"
+	@$(INSTALL_EXE) $^ "$(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/plugins"
+
+clean:
+	@rm -fr .tmp
+
+
