@@ -33,8 +33,11 @@ if test -d ".svn" ; then
 				LCD=`date +%Y%m%d`
 			fi
 
+			URL=`svn info | grep "URL: " | sed -s "s@URL: @@g"`
+
 			echo "m4_define([SVN_REV], $REV)" > $REV_FILE
 			echo "m4_define([SVN_DATE], $LCD)" >> $REV_FILE
+			echo "m4_define([SVN_URL], $URL)" >> $REV_FILE
 			echo "m4_define([SVN_RELEASE], $PACKAGE_RELEASE)" >> $REV_FILE
 
 		fi

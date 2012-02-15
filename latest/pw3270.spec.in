@@ -82,7 +82,8 @@ BuildRequires:  autoconf automake gcc-c++ sed pkgconfig gtk2-devel libgnome-deve
 IBM 3270 terminal emulator gtk. It can be used to communicate with
 any IBM host that supports 3270-style connections over TELNET.
 
-Revision: @PACKAGE_REVISION@
+SVN Revision:		@PACKAGE_REVISION@
+SVN sources from:	@PACKAGE_SOURCE@
 
 %package lib
 Provides:	%{name}-lib
@@ -94,7 +95,8 @@ BuildRequires:  autoconf openssl-devel sed pkgconfig
 %description lib
 tn3270 protocol library for %{name}
 
-Revision: @PACKAGE_REVISION@
+SVN Revision:		@PACKAGE_REVISION@
+SVN sources from:	@PACKAGE_SOURCE@
 
 %package devel
 Provides:	%{name}-devel
@@ -105,7 +107,8 @@ Requires:	%{name}-lib = @PACKAGE_VERSION@
 %description devel
 devel for tn3270 protocol library for %{name}
 
-Revision: @PACKAGE_REVISION@
+SVN Revision:		@PACKAGE_REVISION@
+SVN sources from:	@PACKAGE_SOURCE@
 
 %if 0%{?_rexx}
 %package rexx
@@ -117,7 +120,8 @@ BuildRequires:	ooRexx >= 3.2.0
 %description rexx
 Rexx bindings for 3270 access using lib3270 (non-gui)
 
-Revision: @PACKAGE_REVISION@
+SVN Revision:		@PACKAGE_REVISION@
+SVN sources from:	@PACKAGE_SOURCE@
 
 %package plugin-rexx
 Summary:	Rexx plugin for  %{name}
@@ -128,7 +132,8 @@ BuildRequires:	ooRexx >= 3.2.0
 %description plugin-rexx
 Plugin to add Rexx scripting suport in %{name}
 
-Revision: @PACKAGE_REVISION@
+SVN Revision:		@PACKAGE_REVISION@
+SVN sources from:	@PACKAGE_SOURCE@
 %endif
 
 %if 0%{?_uno}
@@ -142,7 +147,8 @@ BuildRequires:	autoconf sed pkgconfig zip
 %description OpenOffice
 Uno/OpenOffice library allowing 3270 access from StarBasic
 
-Revision: @PACKAGE_REVISION@
+SVN Revision:		@PACKAGE_REVISION@
+SVN sources from:	@PACKAGE_SOURCE@
 %endif
 
 %if 0%{?_java}
@@ -154,7 +160,8 @@ Requires:	%{name}-lib = @PACKAGE_VERSION@
 %description java
 Jni library allowing 3270 access from java programs (non-GUI)
 
-Revision: @PACKAGE_REVISION@
+SVN Revision:		@PACKAGE_REVISION@
+SVN sources from:	@PACKAGE_SOURCE@
 
 %package plugin-java
 Group:		Development/Libraries
@@ -164,7 +171,8 @@ Requires:	%{name}-java = @PACKAGE_VERSION@
 %description plugin-java
 Plugin allowing use of java classes inside %{name}'s UI
 
-Revision: @PACKAGE_REVISION@
+SVN Revision:		@PACKAGE_REVISION@
+SVN sources from:	@PACKAGE_SOURCE@
 %endif
 
 %prep
