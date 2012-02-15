@@ -57,8 +57,8 @@
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
- static void set_showcursor(int value, enum toggle_type reason);
- static void set_blink(int value, enum toggle_type reason);
+ static void set_showcursor(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason);
+ static void set_blink(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason);
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -303,7 +303,7 @@
 	return FALSE;
  }
 
- static void set_crosshair(int value, enum toggle_type reason)
+ static void set_crosshair(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
  {
 	queue_draw_cursor();
  	if(value)
@@ -330,7 +330,7 @@
  }
 
 
- static void set_blink(int value, enum toggle_type reason)
+ static void set_blink(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
  {
 	if(value)
 	{
@@ -356,7 +356,7 @@
 	queue_draw_cursor();
  }
 
- static void set_insert(int value, enum toggle_type reason)
+ static void set_insert(H3270 *h, int value, LIB3270_TOGGLE_TYPE reason)
  {
 	gtk_widget_queue_draw_area(terminal,rCursor.x,rCursor.y,rCursor.width,rCursor.height);
 	update_oia_element(OIA_ELEMENT_INSERT_INDICATOR);
@@ -438,7 +438,7 @@
  *
  * @param value	Valor modificado (Diferente de zero apresenta o cursor)
  */
- static void set_showcursor(int value, enum toggle_type reason)
+ static void set_showcursor(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
  {
 	update_oia_element(OIA_ELEMENT_CURSOR_POSITION);
  }

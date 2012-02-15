@@ -144,7 +144,7 @@ static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, cons
 	Trace("%s %s", log_domain, message);
 }
 
-static void set_fullscreen(int value, enum toggle_type reason)
+static void set_fullscreen(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
 {
  	Trace("Fullscren mode toggled (value: %d",value);
 

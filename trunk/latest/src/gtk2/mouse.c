@@ -679,7 +679,7 @@
 
  }
 
- void set_rectangle_select(int value, enum toggle_type reason)
+ void set_rectangle_select(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
  {
  	if(select_mode != SELECT_MODE_RECTANGLE && select_mode != SELECT_MODE_TEXT)
 		return;

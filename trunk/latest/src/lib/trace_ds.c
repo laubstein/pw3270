@@ -645,7 +645,7 @@ no_tracefile_callback(Widget w, XtPointer client_data,
 
 /* Open the trace file. */
 static void
-tracefile_on(int reason, enum toggle_type tt)
+tracefile_on(int reason, LIB3270_TOGGLE_TYPE tt)
 {
 	char *tracefile_buf = NULL;
 	char *tracefile;
@@ -745,7 +745,7 @@ static void tracefile_off(void)
 	stop_tracing();
 }
 
-void toggle_dsTrace(struct toggle *t unused, enum toggle_type tt)
+void toggle_dsTrace(struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
 {
 	/* If turning on trace and no trace file, open one. */
 
@@ -762,7 +762,7 @@ void toggle_dsTrace(struct toggle *t unused, enum toggle_type tt)
 }
 
 void
-toggle_eventTrace(struct toggle *t unused, enum toggle_type tt)
+toggle_eventTrace(struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
 {
 	/* If turning on event debug, and no trace file, open one. */
 
@@ -905,7 +905,7 @@ onescreen_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 #endif /*]*/
 
 void
-toggle_screenTrace(struct toggle *t unused, enum toggle_type tt)
+toggle_screenTrace(struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
 {
 	char *tracefile_buf = NULL;
 	char *tracefile;

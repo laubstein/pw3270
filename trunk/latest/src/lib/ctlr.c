@@ -2821,7 +2821,7 @@ static void ticking_stop(H3270 *session)
 }
 
 void
-toggle_showTiming(struct toggle *t unused, enum toggle_type tt unused)
+toggle_showTiming(struct toggle *t unused, LIB3270_TOGGLE_TYPE tt unused)
 {
 	if (!toggled(SHOW_TIMING))
 		status_untiming(&h3270);
@@ -2832,7 +2832,7 @@ toggle_showTiming(struct toggle *t unused, enum toggle_type tt unused)
  * No-op toggle.
  */
 void
-toggle_nop(struct toggle *t unused, enum toggle_type tt unused)
+toggle_nop(struct toggle *t unused, LIB3270_TOGGLE_TYPE tt unused)
 {
 }
 

@@ -36,7 +36,11 @@
 
 	#include <lib3270.h>
 
-	enum toggle_type { TT_INITIAL, TT_INTERACTIVE, TT_ACTION, TT_FINAL, TT_UPDATE };
+	#define TT_INITIAL			LIB3270_TOGGLE_TYPE_INITIAL
+	#define TT_INTERACTIVE		LIB3270_TOGGLE_TYPE_INTERACTIVE
+	#define TT_ACTION			LIB3270_TOGGLE_TYPE_ACTION
+	#define TT_FINAL 			LIB3270_TOGGLE_TYPE_FINAL
+	#define TT_UPDATE			LIB3270_TOGGLE_TYPE_UPDATE
 
 	#define MONOCASE			LIB3270_TOGGLE_MONOCASE
 	#define ALT_CURSOR			LIB3270_TOGGLE_ALT_CURSOR
@@ -64,8 +68,11 @@
 	#define LIB3270_TOGGLE_ID LIB3270_TOGGLE
 
 
-	LIB3270_EXPORT void					  register_3270_toggle_monitor(LIB3270_TOGGLE_ID ix, void (*callback)(int value, enum toggle_type reason));
-	LIB3270_EXPORT int					  do_3270_toggle(LIB3270_TOGGLE_ID ix);
+	#define register_3270_toggle_monitor(ix,callback) lib3270_register_tchange(NULL,ix,callback)
+	// LIB3270_EXPORT void					  register_3270_toggle_monitor(LIB3270_TOGGLE_ID ix, void (*callback)(int value, LIB3270_TOGGLE_TYPE reason));
+
+	LIB3270_EXPORT int					  lib3270_toggle(H3270 *session, LIB3270_TOGGLE_ID ix);
+
 	LIB3270_EXPORT int					  set_3270_toggle(LIB3270_TOGGLE_ID ix, int value);
 
 	LIB3270_EXPORT const char			* get_3270_toggle_name(LIB3270_TOGGLE_ID ix);
@@ -75,7 +82,8 @@
 
 	// Compatibility macros
 	#define register_tchange(ix,callback) register_3270_toggle_monitor(ix,callback)
-	#define do_toggle(ix) do_3270_toggle(ix)
+	#define do_toggle(ix) lib3270_toggle(NULL,ix)
+
 	#define get_toggle_name(ix) get_3270_toggle_name(ix)
 	#define set_toggle(ix,value) set_3270_toggle(ix,value)
 	#define get_toggle_by_name(name) get_3270_toggle_by_name(name)
