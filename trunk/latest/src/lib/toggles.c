@@ -84,7 +84,7 @@ LIB3270_EXPORT int lib3270_register_tchange(H3270 *h, LIB3270_TOGGLE_ID ix, void
 	return 0;
 }
 
-LIB3270_EXPORT unsigned char lib3270_get_toogle(H3270 *session, LIB3270_TOGGLE ix)
+LIB3270_EXPORT unsigned char lib3270_get_toggle(H3270 *session, LIB3270_TOGGLE ix)
 {
 	CHECK_SESSION_HANDLE(session);
 
@@ -159,59 +159,43 @@ LIB3270_EXPORT int lib3270_toggle(H3270 *session, LIB3270_TOGGLE_ID ix)
 /*
  * Called from system initialization code to handle initial toggle settings.
  */
-void
-initialize_toggles(void)
+void initialize_toggles(H3270 *session, struct toggle *toggle)
 {
 	int f;
 
-#if defined(LIB3270)
 	for(f=0;f<N_TOGGLES;f++)
 	{
-		appres.toggle[f].callback = no_callback;
-		appres.toggle[f].upcall = toggle_nop;
+		toggle[f].callback	= no_callback;
+		toggle[f].upcall	= toggle_nop;
 	}
+
+#if defined(X3270_TRACE)
+	toggle[DS_TRACE].upcall			= toggle_dsTrace;
+	toggle[SCREEN_TRACE].upcall		= toggle_screenTrace;
+	toggle[EVENT_TRACE].upcall		= toggle_eventTrace;
 #endif
 
-//#if defined(X3270_DISPLAY) || defined(C3270) /*[*/
-// 	appres.toggle[MONOCASE].upcall =         toggle_monocase;
-//#endif /*]*/
+#if defined(X3270_ANSI)
+	toggle[LINE_WRAP].upcall		= toggle_lineWrap;
+#endif
 
-#if defined(X3270_DISPLAY) /*[*/
-	appres.toggle[ALT_CURSOR].upcall =       toggle_altCursor;
-	appres.toggle[CURSOR_BLINK].upcall =     toggle_cursorBlink;
-	appres.toggle[SHOW_TIMING].upcall =      toggle_showTiming;
-	appres.toggle[CURSOR_POS].upcall =       toggle_cursorPos;
-	appres.toggle[SCROLL_BAR].upcall =       toggle_scrollBar;
-	appres.toggle[CROSSHAIR].upcall =        toggle_crosshair;
-	appres.toggle[VISIBLE_CONTROL].upcall =  toggle_visible_control;
-#endif /*]*/
-#if defined(X3270_TRACE) /*[*/
-	appres.toggle[DS_TRACE].upcall =         toggle_dsTrace;
-	appres.toggle[SCREEN_TRACE].upcall =     toggle_screenTrace;
-	appres.toggle[EVENT_TRACE].upcall =      toggle_eventTrace;
-#endif /*]*/
-#if defined(X3270_ANSI) /*[*/
-	appres.toggle[LINE_WRAP].upcall =        toggle_lineWrap;
-#endif /*]*/
+#if defined(X3270_TRACE)
+	if(toggle[DS_TRACE].value)
+		toggle[DS_TRACE].upcall(&toggle[DS_TRACE],TT_INITIAL);
 
-#if defined(X3270_TRACE) /*[*/
-	if (toggled(DS_TRACE))
-		appres.toggle[DS_TRACE].upcall(&appres.toggle[DS_TRACE],
-		    TT_INITIAL);
-	if (toggled(EVENT_TRACE))
-		appres.toggle[EVENT_TRACE].upcall(&appres.toggle[EVENT_TRACE],
-		    TT_INITIAL);
-	if (toggled(SCREEN_TRACE))
-		appres.toggle[SCREEN_TRACE].upcall(&appres.toggle[SCREEN_TRACE],
-		    TT_INITIAL);
-#endif /*]*/
+	if(toggle[EVENT_TRACE].value)
+		toggle[EVENT_TRACE].upcall(&toggle[EVENT_TRACE],TT_INITIAL);
+
+	if(toggle[SCREEN_TRACE].value)
+		toggle[SCREEN_TRACE].upcall(&toggle[SCREEN_TRACE],TT_INITIAL);
+#endif
 
 #if defined(DEFAULT_TOGGLE_CURSOR_POS)
-	appres.toggle[CURSOR_POS].value = True;
+	toggle[CURSOR_POS].value = True;
 #endif /*]*/
 
 #if defined(DEFAULT_TOGGLE_RECTANGLE_SELECT)
-	appres.toggle[RECTANGLE_SELECT].value = True;
+	toggle[RECTANGLE_SELECT].value = True;
 #endif
 
 }
@@ -219,26 +203,29 @@ initialize_toggles(void)
 /*
  * Called from system exit code to handle toggles.
  */
-void
-shutdown_toggles(void)
+void shutdown_toggles(H3270 *session, struct toggle *toggle)
 {
-#if defined(X3270_TRACE) /*[*/
-	/* Clean up the data stream trace monitor window. */
-	if (toggled(DS_TRACE)) {
-		appres.toggle[DS_TRACE].value = False;
-		toggle_dsTrace(&appres.toggle[DS_TRACE], TT_FINAL);
-	}
-	if (toggled(EVENT_TRACE)) {
-		appres.toggle[EVENT_TRACE].value = False;
-		toggle_dsTrace(&appres.toggle[EVENT_TRACE], TT_FINAL);
+#if defined(X3270_TRACE)
+	// Clean up the data stream trace monitor window.
+	if(toggle[DS_TRACE].value)
+	{
+		toggle[DS_TRACE].value = False;
+		toggle_dsTrace(&toggle[DS_TRACE], TT_FINAL);
 	}
 
-	/* Clean up the screen trace file. */
-	if (toggled(SCREEN_TRACE)) {
-		appres.toggle[SCREEN_TRACE].value = False;
-		toggle_screenTrace(&appres.toggle[SCREEN_TRACE], TT_FINAL);
+	if(toggle[EVENT_TRACE].value)
+	{
+		toggle[EVENT_TRACE].value = False;
+		toggle_dsTrace(&toggle[EVENT_TRACE], TT_FINAL);
 	}
-#endif /*]*/
+
+	// Clean up the screen trace file.
+	if (toggle[SCREEN_TRACE].value)
+	{
+		toggle[SCREEN_TRACE].value = False;
+		toggle_screenTrace(&toggle[SCREEN_TRACE], TT_FINAL);
+	}
+#endif
 }
 
 LIB3270_EXPORT const char * get_3270_toggle_name(LIB3270_TOGGLE_ID ix)

@@ -145,7 +145,7 @@ const char *toggle_names[N_TOGGLES] =
 
 void lib3270_session_free(H3270 *h)
 {
-
+	shutdown_toggles(h,appres.toggle);
 }
 
 void lib3270_session_init(H3270 *hSession, const char *model)
@@ -284,7 +284,7 @@ static void initialize(void)
 	Trace("Initializing library (calls: %d)",init_calls);
 #endif
 
-	initialize_toggles();
+	initialize_toggles(&h3270,appres.toggle);
 
 #if defined(_WIN32)
 	(void) get_version_info();

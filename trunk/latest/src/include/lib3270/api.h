@@ -586,7 +586,7 @@
 
 		LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state);
 
-		#define Toggled(ix) lib3270_get_toogle(NULL,ix)
+		#define Toggled(ix) lib3270_get_toggle(NULL,ix)
 		#define CallAndWait(c,h,p) lib3270_call_thread(c,h,p)
 
 		LIB3270_EXPORT void RunPendingEvents(int wait);

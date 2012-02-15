@@ -20,47 +20,7 @@
  *		tcl3270.
  */
 
-#if defined(LIB3270)
-	#include <lib3270/toggle.h>
-#else
-	#define MONOCASE	0
-	#define ALT_CURSOR	1
-	#define CURSOR_BLINK	2
-	#define SHOW_TIMING	3
-	#define CURSOR_POS	4
-
-	#if defined(X3270_TRACE) /*[*/
-	#define DS_TRACE	5
-	#endif /*]*/
-
-	#define SCROLL_BAR	6
-
-	#if defined(X3270_ANSI) /*[*/
-	#define LINE_WRAP	7
-	#endif /*]*/
-
-	#define BLANK_FILL	8
-
-	#if defined(X3270_TRACE) /*[*/
-	#define SCREEN_TRACE	9
-	#define EVENT_TRACE	10
-	#endif /*]*/
-
-	#define MARGINED_PASTE	11
-	#define RECTANGLE_SELECT 12
-
-	#if defined(X3270_DISPLAY) /*[*/
-	#define CROSSHAIR	13
-	#define VISIBLE_CONTROL	14
-	#endif /*]*/
-
-	#if defined(X3270_SCRIPT) || defined(TCL3270) /*[*/
-	#define AID_WAIT	15
-	#endif /*]*/
-
-	#define N_TOGGLES	16
-
-#endif
+#include <lib3270/toggle.h>
 
 /* Toggles */
 
@@ -149,7 +109,8 @@ typedef struct {
 	char	*compose_map;
 	char	*printer_lu;
 #endif /*]*/
-#if defined(X3270_DISPLAY) /*[*/
+/*
+#if defined(X3270_DISPLAY)
 	char	*efontname;
 	char	*fixed_size;
 	char	*debug_font;
@@ -168,11 +129,12 @@ typedef struct {
 	char	*char_class;
 	int		modified_sel_color;
 	int		visual_select_color;
-#if defined(X3270_DBCS) /*[*/
+#if defined(X3270_DBCS)
 	char	*input_method;
 	char	*preedit_type;
-#endif /*]*/
-#endif /*]*/
+#endif
+#endif
+*/
 #if defined(X3270_DBCS) /*[*/
 	char	*local_encoding;
 #endif /*]*/
@@ -220,14 +182,14 @@ typedef struct {
 
 	/* Toggles */
 	struct toggle toggle[N_TOGGLES];
-
-#if defined(X3270_DISPLAY) /*[*/
-	/* Simple widget resources */
+/*
+#if defined(X3270_DISPLAY)
+	// Simple widget resources
 	Cursor	normal_mcursor;
 	Cursor	wait_mcursor;
 	Cursor	locked_mcursor;
-#endif /*]*/
-
+#endif
+*/
 #if defined(X3270_ANSI) /*[*/
 	/* Line-mode TTY parameters */
 	char	icrnl;
