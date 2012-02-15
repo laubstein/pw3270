@@ -98,11 +98,15 @@
 
 	} LIB3270_TOGGLE;
 
+	/**
+	 * OIA Status indicators.
+	 *
+	 */
 	typedef enum _lib3270_flag
 	{
-		LIB3270_FLAG_BOXSOLID,
-		LIB3270_FLAG_UNDERA,
-		LIB3270_FLAG_SECURE,
+		LIB3270_FLAG_BOXSOLID,	/**< System available */
+		LIB3270_FLAG_UNDERA,	/**< Control Unit STATUS */
+		LIB3270_FLAG_SECURE,	/**< Security status */
 		LIB3270_FLAG_TYPEAHEAD,
 		LIB3270_FLAG_PRINTER,
 		LIB3270_FLAG_REVERSE,
@@ -111,6 +115,34 @@
 		LIB3270_FLAG_COUNT
 
 	} LIB3270_FLAG;
+
+
+	/**
+	 * 3270 program messages.
+	 *
+	 */
+	typedef enum _LIB3270_MESSAGE
+	{
+		LIB3270_MESSAGE_NONE,				/**< No message */
+		LIB3270_MESSAGE_SYSWAIT,
+		LIB3270_MESSAGE_TWAIT,
+		LIB3270_MESSAGE_CONNECTED,
+		LIB3270_MESSAGE_DISCONNECTED,		/**< Disconnected from host */
+		LIB3270_MESSAGE_AWAITING_FIRST,
+		LIB3270_MESSAGE_MINUS,
+		LIB3270_MESSAGE_PROTECTED,
+		LIB3270_MESSAGE_NUMERIC,
+		LIB3270_MESSAGE_OVERFLOW,
+		LIB3270_MESSAGE_INHIBIT,
+		LIB3270_MESSAGE_KYBDLOCK,
+
+		LIB3270_MESSAGE_X,
+		LIB3270_MESSAGE_RESOLVING,			/**< Resolving hostname (running DNS query) */
+		LIB3270_MESSAGE_CONNECTING,			/**< Connecting to host */
+
+		LIB3270_MESSAGE_USER
+
+	} LIB3270_MESSAGE;
 
 
 	/**
@@ -213,7 +245,6 @@
 	 *
 	 */
 	LIB3270_EXPORT int lib3270_connect(H3270 *h,const char *n, int wait);
-
 
 	/**
 	 * Disconnect from host.
@@ -340,7 +371,17 @@
 	int LIB3270_EXPORT lib3270_register_io_handlers(const struct lib3270_io_callbacks *cbk);
 
 
-	LIB3270_EXPORT LIB3270_STATUS	  lib3270_get_oia_status(H3270 *h);
+	/**
+	 * Get program message.
+	 *
+	 * @see LIB3270_MESSAGE
+	 *
+	 * @param h	Session handle.
+	 *
+	 * @return Latest program message.
+	 *
+	 */
+	LIB3270_EXPORT LIB3270_MESSAGE	  lib3270_get_program_message(H3270 *h);
 
 	/**
 	 * Get connected LU name
