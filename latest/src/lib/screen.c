@@ -793,11 +793,10 @@ void Error(const char *fmt, ...)
 
 }
 
-#if defined(LIB3270)
-void notify_toggle_changed(int ix, int value, int reason)
+void notify_toggle_changed(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason)
 {
 	if(callbacks && callbacks->toggle_changed)
-		callbacks->toggle_changed(ix,value,reason,toggle_names[ix]);
+		callbacks->toggle_changed(session,ix,value,reason,toggle_names[ix]);
 }
 
 LIB3270_EXPORT void update_toggle_actions(void)
@@ -807,10 +806,9 @@ LIB3270_EXPORT void update_toggle_actions(void)
 	if(callbacks && callbacks->toggle_changed)
 	{
 		for(f=0;f< N_TOGGLES;f++)
-			callbacks->toggle_changed(f,appres.toggle[f].value,TT_UPDATE,toggle_names[f]);
+			callbacks->toggle_changed(&h3270,f,appres.toggle[f].value,TT_UPDATE,toggle_names[f]);
 	}
 }
-#endif
 
 void Warning(const char *fmt, ...)
 {

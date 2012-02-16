@@ -269,6 +269,7 @@
 			void (*changed)(H3270 *session, int bstart, int bend);
 			void (*update_cursor)(H3270 *session, unsigned short row, unsigned short col);
 			void (*update_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
+
 			void (*set_timer)(H3270 *session, unsigned char on);
 			void (*update_luname)(H3270 *session, const char *name);
 			void (*update_status)(H3270 *session, LIB3270_STATUS id);
@@ -511,7 +512,7 @@
 			void 	(*set_viewsize)(H3270 *session, unsigned short rows, unsigned short cols);
 
 
-			void	(*toggle_changed)(int ix, int value, int reason, const char *name);
+			void	(*toggle_changed)(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason, const char *name);
 			void	(*show_timer)(long seconds);
 
 			// Console/Trace window

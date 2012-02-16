@@ -26,20 +26,17 @@
 
 struct toggle {
 	char	value;		/* toggle value */
-	char	changed;	/* has the value changed since init */
+//	char	changed;	/* has the value changed since init */
 //	Widget	w[2];		/* the menu item widgets */
 //	const char *label[2];	/* labels */
-	void (*upcall)(struct toggle *, LIB3270_TOGGLE_TYPE); /* change value */
-
-#if defined(LIB3270)
+	void (*upcall)(H3270 *, struct toggle *, LIB3270_TOGGLE_TYPE); /* change value */
 	void (*callback)(H3270 *, int, LIB3270_TOGGLE_TYPE);
-#endif
 
 };
 
 #define toggled(ix)		(appres.toggle[ix].value)
 #define toggle_toggle(t) \
-	{ (t)->value = !(t)->value; (t)->changed = True; }
+	{ (t)->value = !(t)->value; }
 
 /* Application resources */
 

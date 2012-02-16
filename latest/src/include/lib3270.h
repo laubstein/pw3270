@@ -148,7 +148,7 @@
 		LIB3270_MESSAGE_DISCONNECTED,		/**< Disconnected from host */
 		LIB3270_MESSAGE_AWAITING_FIRST,
 		LIB3270_MESSAGE_MINUS,
-		LIB3270_MESSAGE_PROTECTED c
+		LIB3270_MESSAGE_PROTECTED,
 		LIB3270_MESSAGE_NUMERIC,
 		LIB3270_MESSAGE_OVERFLOW,
 		LIB3270_MESSAGE_INHIBIT,
@@ -379,6 +379,18 @@
 	 *
 	 */
 	LIB3270_EXPORT unsigned char lib3270_get_toggle(H3270 *h, LIB3270_TOGGLE ix);
+
+	/**
+	 * Set toggle state.
+	 *
+	 * @param h		Session handle.
+	 * @param ix	Toggle id.
+	 * @param value	New toggle state (non zero for true).
+	 *
+	 * @return 0 if the toggle wasn't changed, non zero if it was changed.
+	 *
+	 */
+	LIB3270_EXPORT int lib3270_set_toggle(H3270 *h, LIB3270_TOGGLE ix, int value);
 
 	/**
 	 * Check if the active connection is secure.
