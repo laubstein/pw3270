@@ -148,7 +148,7 @@
 		LIB3270_MESSAGE_DISCONNECTED,		/**< Disconnected from host */
 		LIB3270_MESSAGE_AWAITING_FIRST,
 		LIB3270_MESSAGE_MINUS,
-		LIB3270_MESSAGE_PROTECTED,
+		LIB3270_MESSAGE_PROTECTED c
 		LIB3270_MESSAGE_NUMERIC,
 		LIB3270_MESSAGE_OVERFLOW,
 		LIB3270_MESSAGE_INHIBIT,
@@ -316,7 +316,7 @@
 	 *
 	 * @param s			String to input.
 	 * @param len		Size of the string (or -1 to null terminated strings)
-	 * @param pasting	pasting flag (See comments).
+	 * @param pasting	Non zero for pasting (See comments).
 	 *
 	 * @return The number of unprocessed characters.
 	 */
@@ -413,7 +413,10 @@
 	LIB3270_EXPORT LIB3270_MESSAGE	  lib3270_get_program_message(H3270 *h);
 
 	/**
-	 * Get connected LU name
+	 * Get connected LU name.
+	 *
+	 * Get the name of the connected LU; the value is internal to lib3270 and
+	 * should not be changed ou freed.
 	 *
 	 * @param h	Session handle.
 	 *
