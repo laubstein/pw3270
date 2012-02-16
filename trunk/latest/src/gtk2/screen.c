@@ -78,7 +78,7 @@
  static void 	  warning(const char *fmt, va_list arg);
  static void	  syserror(const char *title, const char *message, const char *system);
  static int	  init(void);
- static void 	  update_toggle(int ix, int value, int reason, const char *name);
+ static void 	  update_toggle(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason, const char *name);
  static void 	  redraw(void);
  static gchar	* convert_monocase(int c, gsize *sz);
  static gchar	* convert_regular(int c, gsize *sz);
@@ -126,7 +126,7 @@
 	NULL,					// void (*set_viewsize)(unsigned short rows, unsigned short cols);
 #endif
 
-	update_toggle,			// void (*toggle_changed)(int ix, int value, int reason, const char *name);
+	update_toggle,			// void (*toggle_changed)(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason, const char *name);
 	oia_set_timer,			// void	(*show_timer)(long seconds);
 
 	gui_console_window_new,						// HCONSOLE	(*console_new)(const char *title, const char *label);
@@ -734,7 +734,7 @@
 	return 0;
  }
 
- void update_toggle(int ix, int value, int reason, const char *name)
+ void update_toggle(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason, const char *name)
  {
 	update_3270_toggle_action(ix, value);
  }

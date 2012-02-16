@@ -145,7 +145,25 @@ const char *toggle_names[N_TOGGLES] =
 
 void lib3270_session_free(H3270 *h)
 {
+	int f;
+
+	// Terminate session
+	if(lib3270_connected(h))
+		lib3270_disconnect(h);
+
 	shutdown_toggles(h,appres.toggle);
+
+	// Release state change callbacks
+	for(f=0;f<N_ST;f++)
+	{
+		while(h->st_callbacks[f])
+		{
+			struct lib3270_state_callback *next = h->st_callbacks[f]->next;
+			Free(h->st_callbacks[f]);
+			h->st_callbacks[f] = next;
+		}
+	}
+
 }
 
 void lib3270_session_init(H3270 *hSession, const char *model)

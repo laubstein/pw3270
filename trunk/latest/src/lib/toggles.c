@@ -96,7 +96,7 @@ LIB3270_EXPORT unsigned char lib3270_get_toggle(H3270 *session, LIB3270_TOGGLE i
 /*
  * Generic toggle stuff
  */
-static void do_toggle_reason(H3270 *session, LIB3270_TOGGLE_ID ix, LIB3270_TOGGLE_TYPE reason)
+static void do_toggle_reason(H3270 *session, LIB3270_TOGGLE ix, LIB3270_TOGGLE_TYPE reason)
 {
 	struct toggle *t = &appres.toggle[ix];
 
@@ -105,31 +105,21 @@ static void do_toggle_reason(H3270 *session, LIB3270_TOGGLE_ID ix, LIB3270_TOGGL
 	 * menu label(s).
 	 */
 	toggle_toggle(t);
-	t->upcall(t, reason);
-
-//#if defined(X3270_MENUS) /*[*/
-//	menubar_retoggle(t);
-//#endif /*]*/
+	t->upcall(session, t, reason);
 
 	t->callback(session,t->value, (int) reason);
-	notify_toggle_changed(ix, t->value, reason);
+
+	notify_toggle_changed(session, ix, t->value, reason);
 
 }
 
-/**
- * Set 3270 toggle state.
- *
- * @param ix	Toggle to set.
- * @param value	New toggle state (non zero for true).
- *
- * @return 0 if the toggle wasn't changed, non zero if it was changed.
- *
- */
-LIB3270_EXPORT int set_toggle(LIB3270_TOGGLE_ID ix, int value)
+LIB3270_EXPORT int lib3270_set_toggle(H3270 *session, LIB3270_TOGGLE ix, int value)
 {
 	Boolean v = ((Boolean) (value != 0)); // Convert int in Boolean
 
 	struct toggle	*t;
+
+	CHECK_SESSION_HANDLE(session);
 
 	if(ix < 0 || ix >= LIB3270_TOGGLE_COUNT)
 		return 0;
@@ -139,7 +129,7 @@ LIB3270_EXPORT int set_toggle(LIB3270_TOGGLE_ID ix, int value)
 	if(t->value == v)
 		return 0;
 
-	do_toggle_reason(&h3270, ix, TT_INTERACTIVE);
+	do_toggle_reason(session, ix, TT_INTERACTIVE);
 
 	return -1;
 }
@@ -181,13 +171,13 @@ void initialize_toggles(H3270 *session, struct toggle *toggle)
 
 #if defined(X3270_TRACE)
 	if(toggle[DS_TRACE].value)
-		toggle[DS_TRACE].upcall(&toggle[DS_TRACE],TT_INITIAL);
+		toggle[DS_TRACE].upcall(session, &toggle[DS_TRACE],TT_INITIAL);
 
 	if(toggle[EVENT_TRACE].value)
-		toggle[EVENT_TRACE].upcall(&toggle[EVENT_TRACE],TT_INITIAL);
+		toggle[EVENT_TRACE].upcall(session, &toggle[EVENT_TRACE],TT_INITIAL);
 
 	if(toggle[SCREEN_TRACE].value)
-		toggle[SCREEN_TRACE].upcall(&toggle[SCREEN_TRACE],TT_INITIAL);
+		toggle[SCREEN_TRACE].upcall(session, &toggle[SCREEN_TRACE],TT_INITIAL);
 #endif
 
 #if defined(DEFAULT_TOGGLE_CURSOR_POS)
@@ -210,20 +200,20 @@ void shutdown_toggles(H3270 *session, struct toggle *toggle)
 	if(toggle[DS_TRACE].value)
 	{
 		toggle[DS_TRACE].value = False;
-		toggle_dsTrace(&toggle[DS_TRACE], TT_FINAL);
+		toggle_dsTrace(session, &toggle[DS_TRACE], TT_FINAL);
 	}
 
 	if(toggle[EVENT_TRACE].value)
 	{
 		toggle[EVENT_TRACE].value = False;
-		toggle_dsTrace(&toggle[EVENT_TRACE], TT_FINAL);
+		toggle_dsTrace(session, &toggle[EVENT_TRACE], TT_FINAL);
 	}
 
 	// Clean up the screen trace file.
 	if (toggle[SCREEN_TRACE].value)
 	{
 		toggle[SCREEN_TRACE].value = False;
-		toggle_screenTrace(&toggle[SCREEN_TRACE], TT_FINAL);
+		toggle_screenTrace(session, &toggle[SCREEN_TRACE], TT_FINAL);
 	}
 #endif
 }

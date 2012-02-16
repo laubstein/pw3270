@@ -2820,19 +2820,20 @@ static void ticking_stop(H3270 *session)
 	}
 }
 
-void
-toggle_showTiming(struct toggle *t unused, LIB3270_TOGGLE_TYPE tt unused)
+/*
+void toggle_showTiming(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE tt unused)
 {
 	if (!toggled(SHOW_TIMING))
 		status_untiming(&h3270);
 }
+*/
 
 
 /*
  * No-op toggle.
  */
 void
-toggle_nop(struct toggle *t unused, LIB3270_TOGGLE_TYPE tt unused)
+toggle_nop(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE tt unused)
 {
 }
 

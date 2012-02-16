@@ -22,9 +22,9 @@
 LIB3270_INTERNAL Boolean trace_skipping;
 
 const char *rcba(int baddr);
-void toggle_dsTrace(struct toggle *t, LIB3270_TOGGLE_TYPE tt);
-void toggle_eventTrace(struct toggle *t, LIB3270_TOGGLE_TYPE tt);
-void toggle_screenTrace(struct toggle *t, LIB3270_TOGGLE_TYPE tt);
+void toggle_dsTrace(H3270 *h, struct toggle *t, LIB3270_TOGGLE_TYPE tt);
+void toggle_eventTrace(H3270 *h, struct toggle *t, LIB3270_TOGGLE_TYPE tt);
+void toggle_screenTrace(H3270 *h, struct toggle *t, LIB3270_TOGGLE_TYPE tt);
 void trace_ansi_disc(void);
 void trace_char(char c);
 void trace_ds(const char *fmt, ...) printflike(1, 2);

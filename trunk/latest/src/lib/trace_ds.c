@@ -622,7 +622,7 @@ static void tracefile_callback(Widget w, XtPointer client_data, XtPointer call_d
 
 	/* We're really tracing, turn the flag on. */
 	appres.toggle[trace_reason].value = True;
-	appres.toggle[trace_reason].changed = True;
+//	appres.toggle[trace_reason].changed = True;
 	menubar_retoggle(&appres.toggle[trace_reason]);
 
 	/* Display current status. */
@@ -745,7 +745,7 @@ static void tracefile_off(void)
 	stop_tracing();
 }
 
-void toggle_dsTrace(struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
+void toggle_dsTrace(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
 {
 	/* If turning on trace and no trace file, open one. */
 
@@ -761,8 +761,7 @@ void toggle_dsTrace(struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
 		(void) gettimeofday(&ds_ts, (struct timezone *)NULL);
 }
 
-void
-toggle_eventTrace(struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
+void toggle_eventTrace(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
 {
 	/* If turning on event debug, and no trace file, open one. */
 
@@ -857,13 +856,14 @@ screentrace_cb(char *tfn)
 
 	/* We're really tracing, turn the flag on. */
 	appres.toggle[SCREEN_TRACE].value = True;
-	appres.toggle[SCREEN_TRACE].changed = True;
+//	appres.toggle[SCREEN_TRACE].changed = True;
 	menubar_retoggle(&appres.toggle[SCREEN_TRACE]);
 	return True;
 }
 
-#if defined(X3270_DISPLAY) /*[*/
-/* Callback for "OK" button on screentrace popup */
+/*
+#if defined(X3270_DISPLAY)
+// Callback for "OK" button on screentrace popup
 static void
 screentrace_callback(Widget w unused, XtPointer client_data,
     XtPointer call_data unused)
@@ -872,7 +872,7 @@ screentrace_callback(Widget w unused, XtPointer client_data,
 		XtPopdown(screentrace_shell);
 }
 
-/* Callback for second "OK" button on screentrace popup */
+// Callback for second "OK" button on screentrace popup
 static void
 onescreen_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 {
@@ -892,20 +892,19 @@ onescreen_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 	(void) fcntl(fileno(screentracef), F_SETFD, 1);
 	XtFree(tfn);
 
-	/* Save the current image, once. */
+	// Save the current image, once.
 	do_screentrace();
 
-	/* Close the file, we're done. */
+	// Close the file, we're done.
 	(void) fclose(screentracef);
 	screentracef = (FILE *)NULL;
 
 	if (w)
 		XtPopdown(screentrace_shell);
 }
-#endif /*]*/
+#endif */
 
-void
-toggle_screenTrace(struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
+void toggle_screenTrace(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
 {
 	char *tracefile_buf = NULL;
 	char *tracefile;
