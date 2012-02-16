@@ -150,6 +150,9 @@ int screen_init(H3270 *session)
 		if(callbacks->cursor)
 			session->cursor = callbacks->cursor;
 
+		if(callbacks->toggle_changed)
+			session->update_toggle = callbacks->toggle_changed;
+
 		if(callbacks->init())
 		{
 			popup_an_error("Can't initialize terminal.");
@@ -793,11 +796,13 @@ void Error(const char *fmt, ...)
 
 }
 
+/*
 void notify_toggle_changed(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason)
 {
 	if(callbacks && callbacks->toggle_changed)
 		callbacks->toggle_changed(session,ix,value,reason,toggle_names[ix]);
 }
+*/
 
 LIB3270_EXPORT void update_toggle_actions(void)
 {

@@ -17,30 +17,33 @@
  *		Global declarations for menubar.c.
  */
 
-#if defined(X3270_MENUS) /*[*/
+#warning menubarc.h is deprecated
 
-LIB3270_INTERNAL void HandleMenu_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params);
-#if defined(X3270_SCRIPT) /*[*/
-LIB3270_INTERNAL void menubar_as_set(Boolean sensitive);
-#else /*][*/
-#define menubar_as_set(n)
-#endif /*]*/
-LIB3270_INTERNAL void menubar_init(Widget container, Dimension overall_width,
-    Dimension current_width);
-LIB3270_INTERNAL void menubar_keypad_changed(void);
-LIB3270_INTERNAL Dimension menubar_qheight(Dimension container_width);
-LIB3270_INTERNAL void menubar_resize(Dimension width);
-LIB3270_INTERNAL void menubar_retoggle(struct toggle *t);
+/*
+#if defined(X3270_MENUS)
 
-#else /*][*/
+// LIB3270_INTERNAL void HandleMenu_action(Widget w, XEvent *event, String *params,Cardinal *num_params);
+// #if defined(X3270_SCRIPT)
+// LIB3270_INTERNAL void menubar_as_set(Boolean sensitive);
+// #else
+// #define menubar_as_set(n)
+// #endif
 
-#define menubar_as_set(n)
-#define menubar_init(a, b, c)
-#define menubar_keypad_changed()
-#define menubar_qheight(n)	0
-#define menubar_resize(n)
-#define menubar_retoggle(t)
-#define HandleMenu_action ignore_action
+// LIB3270_INTERNAL void menubar_init(Widget container, Dimension overall_width,Dimension current_width);
+// LIB3270_INTERNAL void menubar_keypad_changed(void);
+// LIB3270_INTERNAL Dimension menubar_qheight(Dimension container_width);
+// LIB3270_INTERNAL void menubar_resize(Dimension width);
+// LIB3270_INTERNAL void menubar_retoggle(struct toggle *t);
 
-#endif /*]*/
+#else
+
+// #define menubar_as_set(n)
+// #define menubar_init(a, b, c)
+// #define menubar_keypad_changed()
+// #define menubar_qheight(n)	0
+// #define menubar_resize(n)
+// #define menubar_retoggle(t)
+// #define HandleMenu_action ignore_action
+
+#endif
+*/

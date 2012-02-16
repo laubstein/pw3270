@@ -44,7 +44,7 @@
 #include "ansic.h"
 #include "actionsc.h"
 #include "ctlrc.h"
-#include "menubarc.h"
+// #include "menubarc.h"
 #include "popupsc.h"
 #include "screenc.h"
 #include "trace_dsc.h"
@@ -106,10 +106,12 @@ static void do_toggle_reason(H3270 *session, LIB3270_TOGGLE ix, LIB3270_TOGGLE_T
 	 */
 	toggle_toggle(t);
 	t->upcall(session, t, reason);
-
 	t->callback(session,t->value, (int) reason);
 
-	notify_toggle_changed(session, ix, t->value, reason);
+	if(session->update_toggle)
+		session->update_toggle(session,ix,t->value,reason,toggle_names[ix]);
+
+//	notify_toggle_changed(session, ix, t->value, reason);
 
 }
 
