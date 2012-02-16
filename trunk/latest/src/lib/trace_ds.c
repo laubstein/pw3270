@@ -61,7 +61,7 @@
 #include "charsetc.h"
 #include "childc.h"
 #include "ctlrc.h"
-#include "menubarc.h"
+// #include "menubarc.h"
 #include "popupsc.h"
 #include "printc.h"
 #include "savec.h"
@@ -270,8 +270,7 @@ wtrace(const char *fmt, ...)
 	}
 }
 
-static void
-stop_tracing(void)
+static void stop_tracing(void)
 {
 	if (tracef != NULL && tracef != stdout)
 		(void) fclose(tracef);
@@ -280,14 +279,20 @@ stop_tracing(void)
 		(void) fclose(tracef_pipe);
 		tracef_pipe = NULL;
 	}
+
+	lib3270_set_toggle(&h3270,DS_TRACE,0);
+	lib3270_set_toggle(&h3270,EVENT_TRACE,0);
+
+/*
 	if (toggled(DS_TRACE)) {
 		toggle_toggle(&appres.toggle[DS_TRACE]);
-		menubar_retoggle(&appres.toggle[DS_TRACE]);
+//		menubar_retoggle(&appres.toggle[DS_TRACE]);
 	}
 	if (toggled(EVENT_TRACE)) {
 		toggle_toggle(&appres.toggle[EVENT_TRACE]);
-		menubar_retoggle(&appres.toggle[EVENT_TRACE]);
+//		menubar_retoggle(&appres.toggle[EVENT_TRACE]);
 	}
+*/
 }
 
 /* Check for a trace file rollover event. */
@@ -623,7 +628,7 @@ static void tracefile_callback(Widget w, XtPointer client_data, XtPointer call_d
 	/* We're really tracing, turn the flag on. */
 	appres.toggle[trace_reason].value = True;
 //	appres.toggle[trace_reason].changed = True;
-	menubar_retoggle(&appres.toggle[trace_reason]);
+//	menubar_retoggle(&appres.toggle[trace_reason]);
 
 	/* Display current status. */
 	buf = create_tracefile_header("started");
@@ -857,7 +862,7 @@ screentrace_cb(char *tfn)
 	/* We're really tracing, turn the flag on. */
 	appres.toggle[SCREEN_TRACE].value = True;
 //	appres.toggle[SCREEN_TRACE].changed = True;
-	menubar_retoggle(&appres.toggle[SCREEN_TRACE]);
+//	menubar_retoggle(&appres.toggle[SCREEN_TRACE]);
 	return True;
 }
 

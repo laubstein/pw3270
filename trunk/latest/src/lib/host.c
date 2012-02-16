@@ -45,7 +45,7 @@
 #include "actionsc.h"
 #include "hostc.h"
 // #include "macrosc.h"
-#include "menubarc.h"
+// #include "menubarc.h"
 #include "popupsc.h"
 #include "telnetc.h"
 #include "trace_dsc.h"
