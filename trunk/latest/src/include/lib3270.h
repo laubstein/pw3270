@@ -393,6 +393,16 @@
 	LIB3270_EXPORT int lib3270_set_toggle(H3270 *h, LIB3270_TOGGLE ix, int value);
 
 	/**
+	 * Revert toggle status.
+	 *
+	 * @param h		Session handle.
+	 * @param ix	Toggle id.
+	 *
+	 * @return 0 if the toggle was changed, errno code if not.
+	 */
+	LIB3270_EXPORT int lib3270_toggle(H3270 *h, LIB3270_TOGGLE ix);
+
+	/**
 	 * Check if the active connection is secure.
 	 *
 	 * @param h		Session handle.

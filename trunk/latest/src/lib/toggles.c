@@ -136,7 +136,7 @@ LIB3270_EXPORT int lib3270_set_toggle(H3270 *session, LIB3270_TOGGLE ix, int val
 	return -1;
 }
 
-LIB3270_EXPORT int lib3270_toggle(H3270 *session, LIB3270_TOGGLE_ID ix)
+LIB3270_EXPORT int lib3270_toggle(H3270 *session, LIB3270_TOGGLE ix)
 {
 	CHECK_SESSION_HANDLE(session);
 
