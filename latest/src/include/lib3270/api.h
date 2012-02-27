@@ -268,7 +268,7 @@
 			void (*update)(H3270 *session, int baddr, unsigned char c, unsigned short attr, unsigned char cursor);
 			void (*changed)(H3270 *session, int bstart, int bend);
 
-			void (*update_cursor)(H3270 *session, unsigned short row, unsigned short col);
+			void (*update_cursor)(H3270 *session, unsigned short row, unsigned short col, unsigned char c, unsigned short attr);
 			void (*update_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
 			void (*update_toggle)(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason, const char *name);
 			void (*update_luname)(H3270 *session, const char *name);
@@ -500,7 +500,7 @@
 			void	(*title)(char *text);
 			void	(*ring_bell)(void);
 			void	(*redraw)(void);
-			void	(*move_cursor)(H3270 *session, unsigned short row, unsigned short col);
+			void	(*move_cursor)(H3270 *session, unsigned short row, unsigned short col, unsigned char c, unsigned short attr);
 			int		(*set_suspended)(int state);
 			void	(*set_script)(SCRIPT_STATE state);
 			void	(*reset)(int lock);

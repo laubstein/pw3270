@@ -489,7 +489,7 @@ LIB3270_EXPORT int lib3270_set_cursor_address(H3270 *h, int baddr)
 	h->cursor_addr = baddr;
 
 	if(h->update_cursor)
-		h->update_cursor(h,(unsigned short) (baddr/h->cols),(unsigned short) (baddr%h->cols));
+		h->update_cursor(h,(unsigned short) (baddr/h->cols),(unsigned short) (baddr%h->cols),ea_buf[baddr].chr,ea_buf[baddr].attr);
 
     return ret;
 }
