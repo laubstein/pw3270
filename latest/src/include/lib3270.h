@@ -403,6 +403,16 @@
 	LIB3270_EXPORT LIB3270_TOGGLE lib3270_get_toggle_id(const char *name);
 
 	/**
+	 * Get the toggle name as string.
+	 *
+	 * @param id	Toggle id
+	 *
+	 * @return Constant string with the toggle name or "" if invalid.
+	 *
+	 */
+	LIB3270_EXPORT const char * lib3270_get_toggle_name(LIB3270_TOGGLE ix);
+
+	/**
 	 * Revert toggle status.
 	 *
 	 * @param h		Session handle.
