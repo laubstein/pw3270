@@ -381,6 +381,16 @@
 	LIB3270_EXPORT unsigned char lib3270_get_toggle(H3270 *h, LIB3270_TOGGLE ix);
 
 	/**
+	 * Translate a string toggle name to the corresponding value.
+	 *
+	 * @param name	Toggle name.
+	 *
+	 * @return Toggle ID or -1 if it's invalid.
+	 *
+	 */
+	LIB3270_EXPORT LIB3270_TOGGLE lib3270_get_toggle_id(const char *name);
+
+	/**
 	 * Set toggle state.
 	 *
 	 * @param h		Session handle.

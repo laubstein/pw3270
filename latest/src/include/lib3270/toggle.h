@@ -76,7 +76,9 @@
 	LIB3270_EXPORT int					  set_3270_toggle(LIB3270_TOGGLE_ID ix, int value);
 
 	LIB3270_EXPORT const char			* get_3270_toggle_name(LIB3270_TOGGLE_ID ix);
-	LIB3270_EXPORT LIB3270_TOGGLE_ID	  get_3270_toggle_by_name(const char *name);
+//	LIB3270_EXPORT LIB3270_TOGGLE_ID	  get_3270_toggle_by_name(const char *name);
+	#define get_3270_toggle_by_name(x)	  lib3270_get_toggle_id(x)
+
 
 	LIB3270_EXPORT void					  update_toggle_actions(void);
 
@@ -86,6 +88,6 @@
 
 	#define get_toggle_name(ix) get_3270_toggle_name(ix)
 	#define set_toggle(ix,value) lib3270_set_toggle(NULL,ix,value)
-	#define get_toggle_by_name(name) get_3270_toggle_by_name(name)
+	#define get_toggle_by_name(name) lib3270_get_toggle_id(name)
 
 #endif /* TOGGLE3270_H_INCLUDED */

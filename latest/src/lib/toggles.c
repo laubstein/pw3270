@@ -227,7 +227,7 @@ LIB3270_EXPORT const char * get_3270_toggle_name(LIB3270_TOGGLE_ID ix)
 	return "";
 }
 
-LIB3270_EXPORT LIB3270_TOGGLE_ID get_3270_toggle_by_name(const char *name)
+LIB3270_EXPORT LIB3270_TOGGLE lib3270_get_toggle_id(const char *name)
 {
 	int f;
 
