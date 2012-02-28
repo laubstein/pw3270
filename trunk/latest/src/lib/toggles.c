@@ -220,7 +220,7 @@ void shutdown_toggles(H3270 *session, struct toggle *toggle)
 #endif
 }
 
-LIB3270_EXPORT const char * get_3270_toggle_name(LIB3270_TOGGLE_ID ix)
+LIB3270_EXPORT const char * lib3270_get_toggle_name(LIB3270_TOGGLE_ID ix)
 {
 	if(ix < N_TOGGLES)
 		return toggle_names[ix];
