@@ -123,9 +123,9 @@ version.c: ./mkversion.sh
 	@chmod +x ./mkversion.sh
 	@./mkversion.sh
 
-fallbacks.c: $(BINDIR)/mkfb.exe X3270.xad
+fallbacks.c: $(BINDIR)/mkfb@EXEEXT@ X3270.xad
 	@mkdir -p $(TMPDIR)
-	@$(BINDIR)/mkfb.exe -c X3270.xad falbacks.c
+	@$(BINDIR)/mkfb@EXEEXT@ -c X3270.xad falbacks.c
 
 $(OBJDIR)/fallbacks@OBJEXT@: fallbacks.c
 	@echo $@ ...

@@ -714,7 +714,7 @@ ansi_erase_in_display(int nn, int ig2 unused)
 		ctlr_aclear(0, h3270.cursor_addr + 1, 1);
 		break;
 	    case 2:	/* all (without moving cursor) */
-		if (cursor_addr == 0 && !h3270.is_altbuffer)
+		if (h3270.cursor_addr == 0 && !h3270.is_altbuffer)
 			scroll_save(h3270.rows, True);
 		ctlr_aclear(0, h3270.rows * h3270.cols, 1);
 		break;

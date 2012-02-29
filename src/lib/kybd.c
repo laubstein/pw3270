@@ -1771,13 +1771,13 @@ LIB3270_ACTION( delete )
 	if (!do_delete())
 		return 0;
 	if (reverse) {
-		int baddr = cursor_addr;
+		int baddr = hSession->cursor_addr;
 
 		DEC_BA(baddr);
 		if (!ea_buf[baddr].fa)
 			cursor_move(baddr);
 	}
-	screen_disp(&h3270);
+	screen_disp(hSession);
 	return 0;
 }
 
@@ -1848,9 +1848,9 @@ do_erase(void)
 	 * This ensures that if this is the end of a DBCS subfield, we will
 	 * land on the SI, instead of on the character following.
 	 */
-	d = ctlr_dbcs_state(cursor_addr);
+	d = ctlr_dbcs_state(h3270.cursor_addr);
 	if (IS_RIGHT(d)) {
-		baddr = cursor_addr;
+		baddr = h3270.cursor_addr;
 		DEC_BA(baddr);
 		cursor_move(baddr);
 	}
@@ -2596,11 +2596,11 @@ LIB3270_ACTION( eraseeol )
 	d = ctlr_lookleft_state(cursor_addr, &why);
 	if (IS_DBCS(d) && why == DBCS_SUBFIELD) {
 		if (d == DBCS_RIGHT) {
-			baddr = cursor_addr;
+			baddr = h3270.cursor_addr;
 			DEC_BA(baddr);
 			ea_buf[baddr].cc = EBC_si;
 		} else
-			ea_buf[cursor_addr].cc = EBC_si;
+			ea_buf[h3270.cursor_addr].cc = EBC_si;
 	}
 	(void) ctlr_dbcs_postprocess();
 	screen_disp(&h3270);
@@ -2628,18 +2628,18 @@ LIB3270_ACTION( eraseeof )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	baddr = h3270.cursor_addr;
-	fa = get_field_attribute(&h3270,baddr);
+	baddr = hSession->cursor_addr;
+	fa = get_field_attribute(hSession,baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
 		return -1;
 	}
-	if (h3270.formatted) {	/* erase to next field attribute */
+	if (hSession->formatted) {	/* erase to next field attribute */
 		do {
 			ctlr_add(baddr, EBC_null, 0);
 			INC_BA(baddr);
 		} while (!ea_buf[baddr].fa);
-		mdt_set(h3270.cursor_addr);
+		mdt_set(hSession->cursor_addr);
 	} else {	/* erase to end of screen */
 		do {
 			ctlr_add(baddr, EBC_null, 0);
@@ -2651,14 +2651,14 @@ LIB3270_ACTION( eraseeof )
 	d = ctlr_lookleft_state(cursor_addr, &why);
 	if (IS_DBCS(d) && why == DBCS_SUBFIELD) {
 		if (d == DBCS_RIGHT) {
-			baddr = cursor_addr;
+			baddr = hSession->cursor_addr;
 			DEC_BA(baddr);
 			ea_buf[baddr].cc = EBC_si;
 		} else
-			ea_buf[cursor_addr].cc = EBC_si;
+			ea_buf[hSession->cursor_addr].cc = EBC_si;
 	}
 	(void) ctlr_dbcs_postprocess();
-	screen_disp(&h3270);
+	screen_disp(hSession);
 	return 0;
 }
 
@@ -2677,7 +2677,7 @@ LIB3270_ACTION( eraseinput )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	if (h3270.formatted) {
+	if (hSession->formatted) {
 		/* find first field attribute */
 		baddr = 0;
 		do {
@@ -2710,10 +2710,10 @@ LIB3270_ACTION( eraseinput )
 		if (!f)
 			cursor_move(0);
 	} else {
-		ctlr_clear(&h3270,True);
+		ctlr_clear(hSession,True);
 		cursor_move(0);
 	}
-	screen_disp(&h3270);
+	screen_disp(hSession);
 	return 0;
 }
 
@@ -2743,11 +2743,11 @@ LIB3270_ACTION( deleteword )
 		return 0;
 	}
 #endif /*]*/
-	if (!h3270.formatted)
+	if (!hSession->formatted)
 		return 0;
 
-	baddr = h3270.cursor_addr;
-	fa = get_field_attribute(&h3270,baddr);
+	baddr = hSession->cursor_addr;
+	fa = get_field_attribute(hSession,baddr);
 
 	/* Make sure we're on a modifiable field. */
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
@@ -2757,7 +2757,7 @@ LIB3270_ACTION( deleteword )
 
 	/* Backspace over any spaces to the left of the cursor. */
 	for (;;) {
-		baddr = h3270.cursor_addr;
+		baddr = hSession->cursor_addr;
 		DEC_BA(baddr);
 		if (ea_buf[baddr].fa)
 			return 0;
@@ -2770,7 +2770,7 @@ LIB3270_ACTION( deleteword )
 
 	/* Backspace until the character to the left of the cursor is blank. */
 	for (;;) {
-		baddr = h3270.cursor_addr;
+		baddr = hSession->cursor_addr;
 		DEC_BA(baddr);
 		if (ea_buf[baddr].fa)
 			return 0;
@@ -2780,7 +2780,7 @@ LIB3270_ACTION( deleteword )
 		else
 			do_erase();
 	}
-	screen_disp(&h3270);
+	screen_disp(hSession);
 	return 0;
 }
 
@@ -2810,11 +2810,11 @@ LIB3270_ACTION( deletefield )
 		return 0;
 	}
 #endif /*]*/
-	if (!h3270.formatted)
+	if (!hSession->formatted)
 		return 0;
 
-	baddr = h3270.cursor_addr;
-	fa = get_field_attribute(&h3270,baddr);
+	baddr = hSession->cursor_addr;
+	fa = get_field_attribute(hSession,baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
 		return -1;
@@ -2822,13 +2822,13 @@ LIB3270_ACTION( deletefield )
 	while (!ea_buf[baddr].fa)
 		DEC_BA(baddr);
 	INC_BA(baddr);
-	mdt_set(h3270.cursor_addr);
+	mdt_set(hSession->cursor_addr);
 	cursor_move(baddr);
 	while (!ea_buf[baddr].fa) {
 		ctlr_add(baddr, EBC_null, 0);
 		INC_BA(baddr);
 	}
-	screen_disp(&h3270);
+	screen_disp(hSession);
 	return 0;
 }
 
@@ -2914,10 +2914,10 @@ LIB3270_ACTION( fieldend )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	if (!h3270.formatted)
+	if (!hSession->formatted)
 		return 0;
-	baddr = h3270.cursor_addr;
-	faddr = find_field_attribute(&h3270,baddr);
+	baddr = hSession->cursor_addr;
+	faddr = find_field_attribute(hSession,baddr);
 	fa = ea_buf[faddr].fa;
 	if (faddr == baddr || FA_IS_PROTECTED(fa))
 		return 0;
@@ -3375,12 +3375,12 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 		if (pasting && IN_3270) {
 
 			/* Check for cursor wrap to top of screen. */
-			if (h3270.cursor_addr < orig_addr)
+			if (session->cursor_addr < orig_addr)
 				return len-1;		/* wrapped */
 
 			/* Jump cursor over left margin. */
 			if (toggled(MARGINED_PASTE) &&
-			    BA_TO_COL(h3270.cursor_addr) < orig_col) {
+			    BA_TO_COL(session->cursor_addr) < orig_col) {
 				if (!remargin(orig_col))
 					return len-1;
 				skipped = True;
@@ -3393,7 +3393,7 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 		    case BASE:
 			switch (c) {
 			    case '\b':
-			    lib3270_cursor_left(&h3270);
+			    lib3270_cursor_left(session);
 				skipped = False;
 				break;
 			    case '\f':
@@ -3401,7 +3401,7 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 					key_ACharacter((unsigned char) ' ',
 					    KT_STD, ia, &skipped);
 				} else {
-					lib3270_clear(&h3270);
+					lib3270_clear(session);
 					skipped = False;
 					if (IN_3270)
 						return len-1;
@@ -3410,11 +3410,11 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 			    case '\n':
 				if (pasting) {
 					if (!skipped)
-						lib3270_cursor_newline(&h3270);
+						lib3270_cursor_newline(session);
 //						action_internal(Newline_action,ia, CN, CN);
 					skipped = False;
 				} else {
-					lib3270_enter(&h3270);
+					lib3270_enter(session);
 					skipped = False;
 					if (IN_3270)
 						return len-1;
@@ -3423,7 +3423,7 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 			    case '\r':	/* ignored */
 				break;
 			    case '\t':
-			    lib3270_tab(&h3270);
+			    lib3270_tab(session);
 				skipped = False;
 				break;
 			    case '\\':	/* backslashes are NOT special when
@@ -3489,13 +3489,13 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 				state = BASE;
 				break;
 			    case 'b':
-				lib3270_cursor_left(&h3270);
+				lib3270_cursor_left(session);
 //				action_internal(Left_action, ia, CN, CN);
 				skipped = False;
 				state = BASE;
 				break;
 			    case 'f':
-			    lib3270_clear(&h3270);
+			    lib3270_clear(session);
 				skipped = False;
 				state = BASE;
 				if (IN_3270)
@@ -3503,7 +3503,7 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 				else
 					break;
 			    case 'n':
-				lib3270_enter(&h3270);
+				lib3270_enter(session);
  				skipped = False;
 				state = BASE;
 				if (IN_3270)
@@ -3515,25 +3515,24 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 				break;
 
 			    case 'r':
-					lib3270_cursor_newline(&h3270);
+					lib3270_cursor_newline(session);
 //					action_internal(Newline_action, ia, CN, CN);
 					skipped = False;
 					state = BASE;
 					break;
 
 			    case 't':
-			    lib3270_tab(&h3270);
+			    lib3270_tab(session);
 				skipped = False;
 				state = BASE;
 				break;
 			    case 'T':
-			    lib3270_tab(&h3270);
+			    lib3270_tab(session);
 				skipped = False;
 				state = BASE;
 				break;
 			    case 'v':
-				popup_an_error("%s: Vertical tab not supported",
-				    action_name(String_action));
+				popup_an_error("%s: Vertical tab not supported",action_name(String_action));
 //				cancel_if_idle_command();
 				state = BASE;
 				break;
@@ -3541,8 +3540,7 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 				state = BACKX;
 				break;
 			    case '\\':
-				key_ACharacter((unsigned char) c, KT_STD, ia,
-						&skipped);
+				key_ACharacter((unsigned char) c, KT_STD, ia,&skipped);
 				state = BASE;
 				break;
 			    case '0':
@@ -3679,7 +3677,7 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 	switch (state) {
 	    case BASE:
 		if (toggled(MARGINED_PASTE) &&
-		    BA_TO_COL(h3270.cursor_addr) < orig_col) {
+		    BA_TO_COL(session->cursor_addr) < orig_col) {
 			(void) remargin(orig_col);
 		}
 		break;
@@ -3688,7 +3686,7 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 		key_ACharacter((unsigned char) literal, KT_STD, ia, &skipped);
 		state = BASE;
 		if (toggled(MARGINED_PASTE) &&
-		    BA_TO_COL(h3270.cursor_addr) < orig_col) {
+		    BA_TO_COL(session->cursor_addr) < orig_col) {
 			(void) remargin(orig_col);
 		}
 		break;
@@ -3711,7 +3709,7 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 		break;
 	}
 
-	screen_disp(&h3270);
+	screen_disp(session);
 	return len;
 }
 
