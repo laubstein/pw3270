@@ -123,7 +123,11 @@ version.c: ./mkversion.sh
 	@chmod +x ./mkversion.sh
 	@./mkversion.sh
 
-$(OBJDIR)/fallbacks@OBJEXT@: $(BINDIR)/mkfb@EXEEXT@ X3270.xad
+fallbacks.c: $(BINDIR)/mkfb.exe X3270.xad
+	@mkdir -p $(TMPDIR)
+	@$(BINDIR)/mkfb.exe -c X3270.xad falbacks.c
+
+$(OBJDIR)/fallbacks@OBJEXT@: fallbacks.c
 	@echo $@ ...
 	@mkdir -p `dirname $@`
 	@mkdir -p $(TMPDIR)
@@ -146,6 +150,7 @@ distclean:
 
 clean:
 	@rm -f version.c
+	@rm -f fallbacks.c
 	@rm -fr debian
 	@rm -fr .tmp
 

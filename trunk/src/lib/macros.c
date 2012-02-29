@@ -59,12 +59,14 @@
  	return macro_list;
  }
 
+/*
  static char * value_as_string(int val)
  {
  	char buffer[10];
  	snprintf(buffer,9,"%d",val);
  	return strdup(buffer);
  }
+*/
 
  static const char * get_state(H3270 *h)
  {
@@ -313,6 +315,6 @@
 
  LIB3270_MACRO( disconnect )
  {
-	host_disconnect(hSession,0);
+	lib3270_disconnect(hSession);
 	return strdup("0");
  }

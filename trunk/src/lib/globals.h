@@ -348,5 +348,6 @@ enum state_change
 #endif /*]*/
 
 /* Library internal calls */
+void key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,Boolean *skipped);
 
 
