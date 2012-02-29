@@ -1,27 +1,27 @@
-/* 
+/*
  * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270. Registro no INPI sob o nome G3270.
- * 
+ *
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- * 
+ *
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- * 
+ *
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- * 
+ *
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- * 
+ *
  * Este programa está nomeado como w3misc.c e possui 110 linhas de código.
- * 
- * Contatos: 
- * 
+ *
+ * Contatos:
+ *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -36,11 +36,12 @@
  *		Miscellaneous Win32 functions.
  */
 
+/*
 #include "globals.h"
 
-#if !defined(_WIN32) /*[*/
+#if !defined(_WIN32)
 #error This module is only for Win32.
-#endif /*]*/
+#endif
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -49,9 +50,8 @@
 
 #include "w3miscc.h"
 
-/* Convert a network address to a string. */
-const char *
-inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
+// Convert a network address to a string.
+const char * inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
 {
     	union {
 	    	struct sockaddr sa;
@@ -65,11 +65,11 @@ inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
 
 	switch (af) {
 	case AF_INET:
-	    	sa.sin = *(struct sockaddr_in *)src;	/* struct copy */
+	    	sa.sin = *(struct sockaddr_in *)src;	// struct copy
 		ssz = sizeof(struct sockaddr_in);
 		break;
 	case AF_INET6:
-	    	sa.sin6 = *(struct sockaddr_in6 *)src;	/* struct copy */
+	    	sa.sin6 = *(struct sockaddr_in6 *)src;	// struct copy
 		ssz = sizeof(struct sockaddr_in6);
 		break;
 	default:
@@ -89,9 +89,8 @@ inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
 	return dst;
 }
 
-/* Decode a Win32 error number. */
-const char *
-win32_strerror(int e)
+// Decode a Win32 error number.
+const char * win32_strerror(int e)
 {
 	static char buffer[4096];
 
@@ -102,9 +101,11 @@ win32_strerror(int e)
 	    buffer,
 	    sizeof(buffer),
 	    NULL) == 0) {
-	    
+
 	    sprintf(buffer, "Windows error %d", e);
 	}
 
 	return buffer;
 }
+
+*/

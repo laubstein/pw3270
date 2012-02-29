@@ -36,9 +36,23 @@
  */
 
 #include "globals.h"
-#if !defined(_WIN32) /*[*/
-#include <pwd.h>
-#endif /*]*/
+
+#if defined(_WIN32)
+
+	#include <windows.h>
+	#include "winversc.h"
+
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
+	#include <stdio.h>
+	#include <errno.h>
+
+	#include "w3miscc.h"
+
+#else
+	#include <pwd.h>
+#endif // _WIN32
+
 #include <stdarg.h>
 #include "resources.h"
 
@@ -46,6 +60,99 @@
 #include <lib3270/api.h>
 
 #define my_isspace(c)	isspace((unsigned char)c)
+
+
+#if defined(_WIN32)
+
+int is_nt = 1;
+int has_ipv6 = 1;
+
+int get_version_info(void)
+{
+	OSVERSIONINFO info;
+
+	// Figure out what version of Windows this is.
+	memset(&info, '\0', sizeof(info));
+	info.dwOSVersionInfoSize = sizeof(info);
+	if(GetVersionEx(&info) == 0)
+	{
+		WriteLog("lib3270","%s","Can't get Windows version");
+		return -1;
+	}
+
+	// Yes, people still run Win98.
+	if (info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+		is_nt = 0;
+
+	// Win2K and earlier is IPv4-only.  WinXP and later can have IPv6.
+	if (!is_nt || info.dwMajorVersion < 5 || (info.dwMajorVersion == 5 && info.dwMinorVersion < 1))
+	{
+		has_ipv6 = 0;
+	}
+
+	return 0;
+}
+
+// Convert a network address to a string.
+const char * inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
+{
+    	union {
+	    	struct sockaddr sa;
+		struct sockaddr_in sin;
+		struct sockaddr_in6 sin6;
+	} sa;
+	DWORD ssz;
+	DWORD sz = cnt;
+
+	memset(&sa, '\0', sizeof(sa));
+
+	switch (af) {
+	case AF_INET:
+	    	sa.sin = *(struct sockaddr_in *)src;	// struct copy
+		ssz = sizeof(struct sockaddr_in);
+		break;
+	case AF_INET6:
+	    	sa.sin6 = *(struct sockaddr_in6 *)src;	// struct copy
+		ssz = sizeof(struct sockaddr_in6);
+		break;
+	default:
+	    	if (cnt > 0)
+			dst[0] = '\0';
+		return NULL;
+	}
+
+	sa.sa.sa_family = af;
+
+	if (WSAAddressToString(&sa.sa, ssz, NULL, dst, &sz) != 0) {
+	    	if (cnt > 0)
+			dst[0] = '\0';
+		return NULL;
+	}
+
+	return dst;
+}
+
+// Decode a Win32 error number.
+const char * win32_strerror(int e)
+{
+	static char buffer[4096];
+
+	if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,
+	    NULL,
+	    e,
+	    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+	    buffer,
+	    sizeof(buffer),
+	    NULL) == 0) {
+
+	    sprintf(buffer, "Windows error %d", e);
+	}
+
+	return buffer;
+}
+
+
+#endif // _WIN32
 
 /*
  * Cheesy internal version of sprintf that allocates its own memory.

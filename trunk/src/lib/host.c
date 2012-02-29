@@ -579,8 +579,8 @@ static int do_connect(H3270 *hSession, const char *n)
 	Replace(hSession->current_host, CN);
 
 	if (localprocess_cmd != CN) {
-		if (full_current_host[strlen(OptLocalProcess)] != '\0')
-			hSession->current_host = NewString(full_current_host + strlen(OptLocalProcess) + 1);
+		if (hSession->full_current_host[strlen(OptLocalProcess)] != '\0')
+			hSession->current_host = NewString(hSession->full_current_host + strlen(OptLocalProcess) + 1);
 		else
 			hSession->current_host = NewString("default shell");
 	} else {
