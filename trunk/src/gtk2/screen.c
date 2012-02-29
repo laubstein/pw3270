@@ -514,6 +514,7 @@
 
 	terminal_message_id = id;
 
+/*
 	if(id == LIB3270_STATUS_BLANK)
 	{
 		set_cursor(session,CURSOR_MODE_NORMAL);
@@ -524,6 +525,7 @@
 		Log("Unexpected status code %d",(int) id);
 		return;
 	}
+*/
 
 	update_oia_element(OIA_ELEMENT_MESSAGE_AREA);
 
