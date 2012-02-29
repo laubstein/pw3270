@@ -186,9 +186,10 @@ void lib3270_session_init(H3270 *hSession, const char *model)
 
 	/*
 	 * Sort out model and color modes, based on the model number resource.
-	 */
-	if(*appres.model)
+	 */ /*
+	if(appres.model && *appres.model)
 		model = appres.model;
+	*/
 
 	if(!*model)
 		model = "2";	// No model, use the default one
@@ -1056,6 +1057,13 @@ popup_an_errno(int errn, const char *fmt, ...)
 
 	Error(vmsgbuf);
 }
+
+#ifdef DEBUG
+extern void lib3270_initialize(void)
+{
+	initialize();
+}
+#endif
 
 void
 action_output(const char *fmt, ...)

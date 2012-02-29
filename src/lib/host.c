@@ -83,6 +83,7 @@
 
 static void try_reconnect(H3270 *session);
 
+/*
 static char * stoken(char **s)
 {
 	char *r;
@@ -101,7 +102,7 @@ static char * stoken(char **s)
 	*s = ss;
 	return r;
 }
-
+*/
 
 /*
  * Read the host file
@@ -490,7 +491,7 @@ static int do_connect(H3270 *hSession, const char *n)
 	char nb[2048];		/* name buffer */
 	char *s;			/* temporary */
 	const char *chost;	/* to whom we will connect */
-	char *target_name;
+//	char *target_name;
 	char *ps = CN;
 	char *port = CN;
 	Boolean resolving;

@@ -103,7 +103,7 @@ static Boolean key_Character(int code, Boolean with_ge, Boolean pasting,
 static Boolean flush_ta(void);
 static void key_AID(unsigned char aid_code);
 static void kybdlock_set(unsigned int bits, const char *cause);
-static KeySym MyStringToKeysym(char *s, enum keytype *keytypep);
+// static KeySym MyStringToKeysym(char *s, enum keytype *keytypep);
 
 #if defined(X3270_DBCS) /*[*/
 Boolean key_WCharacter(unsigned char code[], Boolean *skipped);
@@ -1289,9 +1289,7 @@ retry:
 /*
  * Handle an ordinary character key, given an ASCII code.
  */
-void
-key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,
-	       Boolean *skipped)
+void key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,Boolean *skipped)
 {
 //	register int i;
 	struct akeysym ak;
