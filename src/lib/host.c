@@ -57,30 +57,6 @@
 #define RECONNECT_MS		2000	/* 2 sec before reconnecting to host */
 #define RECONNECT_ERR_MS	5000	/* 5 sec before reconnecting to host */
 
-// #define MAX_RECENT	5
-
-// enum cstate	cstate = NOT_CONNECTED;
-// Boolean			std_ds_host = False;
-// Boolean			no_login_host = False;
-// Boolean			non_tn3270e_host = False;
-// Boolean			passthru_host = False;
-// Boolean			ssl_host = False;
-// Boolean			ever_3270 = False;
-
-// char           *full_current_host = CN;
-//unsigned short  current_port;
-//char	       *reconnect_host = CN;
-//char	       *qualified_host = CN;
-
-// struct host *hosts = (struct host *)NULL;
-// static struct host *last_host = (struct host *)NULL;
-// static Boolean auto_reconnect_inprogress = False;
-// static int net_sock = -1;
-
-// #if defined(X3270_DISPLAY)
-// static void save_recent(const char *);
-// #endif
-
 static void try_reconnect(H3270 *session);
 
 /*
@@ -605,7 +581,7 @@ static int do_connect(H3270 *hSession, const char *n)
 	if (hSession->net_sock < 0 && !resolving)
 	{
 		/* Redundantly signal a disconnect. */
-		lib3270_st_changed(hSession, ST_CONNECT, False);
+		host_disconnected(hSession);
 		return -1;
 	}
 
@@ -637,12 +613,7 @@ static int do_connect(H3270 *hSession, const char *n)
 	}
 	else
 	{
-		hSession->cstate = CONNECTED_INITIAL;
-		lib3270_st_changed(hSession, ST_CONNECT, True);
-#if defined(X3270_DISPLAY) /*[*/
-		if (toggled(RECONNECT) && error_popup_visible())
-			popdown_an_error();
-#endif /*]*/
+		host_connected(hSession);
 	}
 
 	return 0;
@@ -722,10 +693,7 @@ void host_disconnect(H3270 *h, int failed)
 			trace_ansi_disc();
 #endif /*]*/
 
-		h->cstate = NOT_CONNECTED;
-
-		/* Propagate the news to everyone else. */
-		lib3270_st_changed(h,ST_CONNECT, False);
+		host_disconnected(h);
 	}
 }
 
@@ -745,13 +713,18 @@ void host_connected(H3270 *session)
 {
 	session->cstate = CONNECTED_INITIAL;
 	lib3270_st_changed(session, ST_CONNECT, True);
+	if(session->update_connect)
+		session->update_connect(session,1);
+}
 
-/*
-#if defined(X3270_DISPLAY)
-	if (toggled(RECONNECT) && error_popup_visible())
-		popdown_an_error();
-#endif
-*/
+void host_disconnected(H3270 *session)
+{
+	session->cstate = NOT_CONNECTED;
+	set_status(session,OIA_FLAG_UNDERA,False);
+	lib3270_st_changed(session,ST_CONNECT, False);
+	status_changed(session,LIB3270_MESSAGE_DISCONNECTED);
+	if(session->update_connect)
+		session->update_connect(session,0);
 }
 
 /* Register a function interested in a state change. */
