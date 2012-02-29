@@ -564,11 +564,19 @@ void status_reset(H3270 *session)
 	CHECK_SESSION_HANDLE(session);
 
 	if (kybdlock & KL_ENTER_INHIBIT)
+	{
 		status_changed(session,LIB3270_STATUS_INHIBIT);
+	}
 	else if (kybdlock & KL_DEFERRED_UNLOCK)
+	{
 		status_changed(session,LIB3270_STATUS_X);
+	}
 	else
+	{
+		if(session->cursor)
+			session->cursor(session,CURSOR_MODE_NORMAL);
 		status_changed(session,LIB3270_STATUS_BLANK);
+	}
 
 	screen_disp(session);
 
