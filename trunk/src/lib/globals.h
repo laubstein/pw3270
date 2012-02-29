@@ -351,4 +351,3 @@ enum state_change
 void key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,Boolean *skipped);
 void lib3270_initialize(void);
 
-

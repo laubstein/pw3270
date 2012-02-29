@@ -273,6 +273,7 @@
 			void (*update_toggle)(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason, const char *name);
 			void (*update_luname)(H3270 *session, const char *name);
 			void (*update_status)(H3270 *session, LIB3270_STATUS id);
+			void (*update_connect)(H3270 *session, unsigned char connected);
 
 			void (*set_timer)(H3270 *session, unsigned char on);
 			void (*erase)(H3270 *session);
