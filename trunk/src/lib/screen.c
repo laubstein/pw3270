@@ -153,6 +153,9 @@ int screen_init(H3270 *session)
 		if(callbacks->toggle_changed)
 			session->update_toggle = callbacks->toggle_changed;
 
+		if(callbacks->model_changed)
+			session->update_model = callbacks->model_changed;
+
 		if(callbacks->init())
 		{
 			popup_an_error("Can't initialize terminal.");
@@ -312,8 +315,13 @@ void update_model_info(H3270 *session, int model, int cols, int rows)
 	/* Update the model name. */
 	(void) sprintf(session->model_name, "327%c-%d%s",appres.m3279 ? '9' : '8',session->model_num,appres.extended ? "-E" : "");
 
-	if(callbacks && callbacks->model_changed)
-		callbacks->model_changed(session, session->model_name,session->model_num,cols,rows);
+	if(session->configure)
+		session->configure(session,rows,cols);
+
+	if(session->update_model)
+		session->update_model(session, session->model_name,session->model_num,rows,cols);
+	else if(callbacks && callbacks->model_changed)
+		callbacks->model_changed(session, session->model_name,session->model_num,rows,cols);
 }
 
 LIB3270_EXPORT int lib3270_get_contents(H3270 *h, int first, int last, unsigned char *chr, unsigned short *attr)
