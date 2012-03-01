@@ -248,10 +248,14 @@ void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr)
 			update_model_info(session,mn,session->ov_cols = ovc,session->ov_rows = ovr);
 	}
 
+	set_viewsize(session,sz[idx].rows,sz[idx].cols);
+
+	/*
 	// Make sure that the current rows/cols are still 24x80.
 	session->cols = 80;
 	session->rows = 24;
 	session->screen_alt = False;
+	*/
 
 }
 
