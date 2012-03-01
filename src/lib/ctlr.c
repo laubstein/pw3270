@@ -200,14 +200,9 @@ int	lib3270_set_model(H3270 *session, int model)
 	if(CONNECTED)
 		return EBUSY;
 
-	if(session->model_num != model)
-	{
-		ctlr_set_rows_cols(session,model,session->ov_cols,session->ov_rows);
-		ctlr_reinit(session,MODEL_CHANGE);
+	ctlr_set_rows_cols(session,model,session->ov_cols,session->ov_rows);
+	ctlr_reinit(session,MODEL_CHANGE);
 
-		if(session->update_model)
-			session->update_model(session,model);
-	}
 	return 0;
 }
 

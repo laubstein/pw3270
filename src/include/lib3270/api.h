@@ -274,7 +274,7 @@
 			void (*update_luname)(H3270 *session, const char *name);
 			void (*update_status)(H3270 *session, LIB3270_STATUS id);
 			void (*update_connect)(H3270 *session, unsigned char connected);
-			void (*update_model)(H3270 *session, int model);
+			void (*update_model)(H3270 *session, const char *name, int model, int rows, int cols);
 
 			void (*set_timer)(H3270 *session, unsigned char on);
 			void (*erase)(H3270 *session);
@@ -496,7 +496,7 @@
 			void	(*Error)(const char *fmt, va_list arg);
 			void	(*Warning)(const char *fmt, va_list arg);
 			void	(*SysError)(const char *title, const char *message, const char *system);
-			void 	(*model_changed)(H3270 *session, const char *name, int model, int cols, int rows);
+			void 	(*model_changed)(H3270 *session, const char *name, int model, int rows, int cols);
 			int		(*addch)(int row, int col, unsigned char c, unsigned short attr);
 			void	(*charset)(char *dcs);
 			void	(*title)(char *text);

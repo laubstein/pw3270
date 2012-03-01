@@ -83,7 +83,7 @@
  static gchar	* convert_monocase(int c, gsize *sz);
  static gchar	* convert_regular(int c, gsize *sz);
  static int	  popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, va_list arg);
- static void	  model_changed(H3270 *session, const char *name, int model, int cols, int rows);
+ static void	  model_changed(H3270 *session, const char *name, int model, int rows, int cols);
 
 #ifdef HAVE_ALTSCREEN
  static void view_changed(H3270 *session, unsigned short rows, unsigned short cols);
@@ -102,7 +102,7 @@
 	warning,				// void (*Warning)(const char *fmt, va_list arg);
 	syserror,				// void	(*SysError)(const char *title, const char *message, const char *system);
 
-	model_changed,			// void	(*model_changed)(H3270 *session, const char *name, int model, int cols, int rows);
+	model_changed,			// void	(*model_changed)(H3270 *session, const char *name, int model, int rows, int cols);
 
 	addch,					// void (*addch)(int row, int col, unsigned char c, int attr);
 	set_charset,			// void (*charset)(char *dcs);
@@ -874,7 +874,7 @@
 
  }
 
- static void model_changed(H3270 *session, const char *name, int model, int cols, int rows)
+ static void model_changed(H3270 *session, const char *name, int model, int rows, int cols)
  {
 	int length = rows*cols;
 
