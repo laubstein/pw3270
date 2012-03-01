@@ -185,7 +185,7 @@ void ctlr_reinit(H3270 *session, unsigned cmask)
  * @param session selected 3270 session.
  * @return Current model number.
  */
-int get_3270_model(H3270 *session)
+int lib3270_get_model(H3270 *session)
 {
 	return session->model_num;
 }
@@ -195,7 +195,7 @@ int get_3270_model(H3270 *session)
  *
  * @param model	New model (updates model name
  */
-int	set_3270_model(H3270 *session, int model)
+int	lib3270_set_model(H3270 *session, int model)
 {
 	if(CONNECTED)
 		return EBUSY;

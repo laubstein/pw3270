@@ -581,8 +581,11 @@
 
 		#define query_3270_terminal_status(void) lib3270_get_program_message(NULL)
 
-		LIB3270_EXPORT int			  set_3270_model(H3270 *session, int model);
-		LIB3270_EXPORT int			  get_3270_model(H3270 *session);
+		#define set_3270_model(h,m)	lib3270_set_model(h,m)
+		#define get_3270_model(h) lib3270_get_model(h)
+
+		LIB3270_EXPORT int			  lib3270_set_model(H3270 *session, int model);
+		LIB3270_EXPORT int			  lib3270_get_model(H3270 *session);
 
 		/* Get connection info */
 		#define get_connected_lu(h) lib3270_get_luname(h)
