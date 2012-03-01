@@ -315,9 +315,6 @@ void update_model_info(H3270 *session, int model, int cols, int rows)
 	/* Update the model name. */
 	(void) sprintf(session->model_name, "327%c-%d%s",appres.m3279 ? '9' : '8',session->model_num,appres.extended ? "-E" : "");
 
-	if(session->configure)
-		session->configure(session,rows,cols);
-
 	if(session->update_model)
 		session->update_model(session, session->model_name,session->model_num,rows,cols);
 	else if(callbacks && callbacks->model_changed)
