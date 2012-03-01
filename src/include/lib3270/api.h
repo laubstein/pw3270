@@ -274,6 +274,7 @@
 			void (*update_luname)(H3270 *session, const char *name);
 			void (*update_status)(H3270 *session, LIB3270_STATUS id);
 			void (*update_connect)(H3270 *session, unsigned char connected);
+			void (*update_model)(H3270 *session, int model);
 
 			void (*set_timer)(H3270 *session, unsigned char on);
 			void (*erase)(H3270 *session);

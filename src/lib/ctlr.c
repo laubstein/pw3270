@@ -193,15 +193,21 @@ int lib3270_get_model(H3270 *session)
 /**
  * Deal with the relationships between model numbers and rows/cols.
  *
- * @param model	New model (updates model name
+ * @param model	New model (updates model name)
  */
 int	lib3270_set_model(H3270 *session, int model)
 {
 	if(CONNECTED)
 		return EBUSY;
 
-	ctlr_set_rows_cols(session,model,session->ov_cols,session->ov_rows);
-	ctlr_reinit(session,MODEL_CHANGE);
+	if(session->model_num != model)
+	{
+		ctlr_set_rows_cols(session,model,session->ov_cols,session->ov_rows);
+		ctlr_reinit(session,MODEL_CHANGE);
+
+		if(session->update_model)
+			session->update_model(session,model);
+	}
 	return 0;
 }
 
