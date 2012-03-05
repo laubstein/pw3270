@@ -22,20 +22,13 @@
 #
 # perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
 # erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
-# licinio@bb.com.br		(Licínio Luis Branco)
-# kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
-# macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+# licinio@bb.com.br			(Licínio Luis Branco)
+# kraucer@bb.com.br			(Kraucer Fernandes Mazuco)
 #
 
-#---[ Configuration values ]---------------------------------------------------
-
 PACKAGE_NAME=@PACKAGE_NAME@
-PACKAGE_VERSION=@PACKAGE_VERSION@
-PACKAGE_TARNAME=@PACKAGE_TARNAME@
 
-EXEEXT=@EXEEXT@
-
-#---[ Paths ]------------------------------------------------------------------
+#---[ Paths & Tools ]----------------------------------------------------------
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
@@ -48,32 +41,42 @@ localedir=@localedir@
 docdir=@docdir@
 sysconfdir=@sysconfdir@
 
-OBJDIR=.obj
-BINDIR=.bin
-
-#---[ Tools ]------------------------------------------------------------------
-
 VALGRIND=@VALGRIND@
+
+#---[ Sources ]----------------------------------------------------------------
+
+include sources.mak
+
+#---[ Targets ]----------------------------------------------------------------
+
+SOURCES=testprogram.c ../common/config.c $(foreach SRC, $(UI_PARSER_SRC), $(SRC))
+
+DEPENDS=*.h ../common/*.h Makefile
+
+CFLAGS=@CFLAGS@ @GTK_CFLAGS@ -DAPPDATA=\"$(datarootdir)/$(PACKAGE_NAME)\" -I../../include
+LIBS=@LIBS@ @GTK_LIBS@
+
+include ../../include/rules.mak
 
 #---[ Debug targets ]----------------------------------------------------------
 
 Debug: $(BINDIR)/Debug/$(PACKAGE_TARNAME)$(EXEEXT)
 
-$(BINDIR)/Debug/$(PACKAGE_TARNAME)$(EXEEXT): src/gtk/* src/include/lib3270/* src/include/*
-	@$(MAKE) ROOTDIR="../.." -C src/gtk ../../$(BINDIR)/Debug/$(PACKAGE_TARNAME)$(EXEEXT)
+$(BINDIR)/Debug/testprogram$(EXEEXT):	$(foreach SRC, $(basename $(SOURCES)), $(OBJDIR)/Debug/$(SRC)$(OBJEXT))
 
+	@echo $@ ...
+	@$(MKDIR) `dirname $@`
+	@$(LD) -Wl,--rpath,.bin/Debug -o $@ $^ $(LIBS)
 
-#---[ Targets ]----------------------------------------------------------------
+run: $(BINDIR)/Debug/testprogram$(EXEEXT)
+	@cd "$(ROOTDIR)" ; .bin/Debug/testprogram$(EXEEXT)
 
-run:
-	@$(MAKE) ROOTDIR="../.." -C src/gtk run
+memchk: $(BINDIR)/Debug/testprogram$(EXEEXT)
+ifeq ($(VALGRIND),no)
+	@cd "$(ROOTDIR)" ; .bin/Debug/testprogram$(EXEEXT)
+else
+	@cd "$(ROOTDIR)" ; G_DEBUG=gc-friendly G_SLICE=always-malloc \$(VALGRIND) --leak-check=full --suppressions=../valgrind.suppression --gen-suppressions=all $(BINDIR)/Debug/testprogram$(EXEEXT)
+endif
 
-clean:
-	@rm -fr $(OBJDIR)
-	@rm -fr $(BINDIR)
-	@make -C src/gtk clean
+clean: clean-common
 
-distclean: clean
-	@rm -f src/gtk/Makefile
-	@rm -f config.status
-	@rm -f *.log

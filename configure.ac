@@ -37,12 +37,12 @@ m4_include([revision.m4])
 
 dnl Initialise automake with the package name, version and
 dnl bug-reporting address.
-AC_INIT([pw3270], [4.2], [perry.werneck@gmail.com])
+AC_INIT([pw3270], [5.0], [perry.werneck@gmail.com])
 
 dnl Place auxilliary scripts here.
 AC_CONFIG_AUX_DIR([scripts])
 
-dnl Compute the canonical host-system type 
+dnl Compute the canonical host-system type
 AC_CANONICAL_HOST
 
 dnl Put macro definitions here (though they aren't used).
@@ -51,113 +51,41 @@ AC_CONFIG_HEADER([src/include/lib3270/config.h])
 dnl Initialise automake stuff.
 AM_INIT_AUTOMAKE
 
-dnl Check for iconv
-AM_ICONV
-
 #--[ Check for tools & Libraries ]----------------------------------------------------------------------------------------------------------------------------
 
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MKDIR_P
+AC_PROG_LN_S
 
-AC_PATH_TOOL([REXXCONFIG], [oorexx-config], [no])
+AC_PATH_TOOL([STRIP], [strip])
+AC_SUBST(STRIP)
+
 AC_PATH_TOOL([REXXC], [rexxc], [cp])
+AC_SUBST(REXXC)
 
-AC_PATH_TOOL([PKGMAKER],[packagemaker], [no], path="$PATH:/Developer/usr/bin")
-AC_PATH_TOOL([IGEBUNDLER],[ige-mac-bundler], [no])
+AC_PATH_TOOL([VALGRIND], [valgrind], [no])
+AC_PATH_TOOL([REXXCONFIG], [oorexx-config], [no])
 
-AC_PATH_TOOL([RPMBUILD], [rpmbuild], [no])
-AC_PATH_TOOL([DPKGBUILD], [dpkg-buildpackage], [no])
+#--[ OS ]-----------------------------------------------------------------------------------------------------------------------------------------------------
+DLL_LIBS="-shared -Wl,-soname,\$(@F)"
 
-AC_PATH_TOOL([MAKENSIS], [makensis], [no])
-AC_PATH_TOOL([WINDRES], [windres], [no])
-
-AC_PATH_TOOL([XGETTEXT], [xgettext], [no])
-AC_PATH_TOOL([MSGCAT], [msgcat], [no])
-AC_PATH_TOOL([MSGINIT], [msginit], [no])
-AC_PATH_TOOL([MSGFMT], [msgfmt], [no])
-
-# Headers
-AC_CHECK_HEADER(malloc.h, AC_DEFINE(HAVE_MALLOC_H,,[do we have malloc.h?]))
-
-#--[ Set default options ]------------------------------------------------------------------------------------------------------------------------------------
-
-LD=$CC
 DLLEXT=".so"
 OBJEXT=".o"
 EXEEXT=""
 DLLPREFIX="lib"
 
-OSTYPE="linux"
+
+AC_SUBST(EXEEXT)
+
+#--[ Debug/Release ]------------------------------------------------------------------------------------------------------------------------------------------
 
 DBG_LDFLAGS="-L.bin/Debug/lib"
 RLS_LDFLAGS="-L.bin/Release/lib -Wl,--strip-all"
 
-DLL_CFLAGS=""
-EXE_LDFLAGS=""
+#--[ Check for ELF symbol visibility support ]----------------------------------------------------------------------------------------------------------------
 
-PLUGINS=""
-LIBRARIES=""
-
-UI_FILES="default.xml functions.xml keypad.xml"
-LANG_MODULES="lib gtk2 ui"
-INSTALL_TARGETS="lib gtk2 gui locale doc dev"
-
-app_cv_srcgui=""
-app_cv_srclib=""
-app_cv_socklib=""
-app_cv_imgext=".svg"
-
-
-#--[ Set host based options ]---------------------------------------------------------------------------------------------------------------------------------
-
-if test $host != $build; then
-	AC_CHECK_PROGS(HOST_CC, gcc cc)
-else
-	HOST_CC=$CC
-fi
-
-case "$host" in
-	*-mingw32)
-		DLLEXT=".dll"
-		ICOEXT=".ico"
-		EXEEXT=".exe"
-		PLUGINS="$PLUGINS pipectl"
-		localedir="locale"
-
-		app_cv_srclib="$app_cv_srclib w3misc.c winvers.c"
-		app_cv_srcgui="$app_cv_srcgui resources.rc"
-		app_cv_socklib="-lws2_32"
-
-		DLL_LDFLAGS="-shared -mno-cygwin -Wl,--add-stdcall-alias,--enable-auto-import,-soname,\$(@F)"
-		EXE_LDFLAGS="-mwindows"
-		jni_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/win32"
-
-		AC_PATH_TOOL([STRIP], [strip])
-
-		;;
-
-	*-apple-*)
-		DLL_LDFLAGS="-shared"
-		ICOEXT=".icns"
-		app_cv_imgext=".png"
-		AC_SUBST(STRIP,"echo")
-		localedir="share/locale"
-		;;
-
-	*)
-		ICOEXT=".svg"
-		DLL_LDFLAGS="-shared -Wl,-soname,\$(@F)"
-		jni_cflags="-I\$(JDK_HOME)/include/ -I\$(JDK_HOME)/include/linux"
-
-		AC_PATH_TOOL([STRIP], [strip])
-
-esac
-
-#--[ Compiling options ]--------------------------------------------------------------------------------------------------------------------------------------
-
-# Check for ELF symbol visibility support
 # Try to compile PROGRAM, check for warnings
 m4_define([GLIB_CHECK_COMPILE_WARNINGS],
 [m4_ifvaln([$1], [AC_LANG_CONFTEST([$1])])dnl
@@ -190,8 +118,6 @@ int main (int argc, char **argv)
 {
         f_hidden();
         f_internal();
-        f_protected();
-        f_default();
         return 0;
 }
 ])],g_have_gnuc_visibility=yes,g_have_gnuc_visibility=no)
@@ -215,394 +141,39 @@ if test $app_cv_fvisibility_ok = yes; then
   CFLAGS="$CFLAGS -fvisibility=hidden"
 fi
 
-#--[ Command-line arguments & options ]-----------------------------------------------------------------------------------------------------------------------
+#--[ Headers ]------------------------------------------------------------------------------------------------------------------------------------------------
 
-# Branding
-AC_ARG_WITH([program-name], [AS_HELP_STRING([--with-program-name], [Program name])], [ app_cv_progname="$withval" ],[ app_cv_progname="$PACKAGE_NAME" ])
-AC_ARG_WITH([logo],[AS_HELP_STRING([--with-logo], [Change default application logo])], [ app_cv_logo=$app_cv_progname$app_cv_imgext ],[ app_cv_logo=$app_cv_progname$app_cv_imgext ])
+AC_CHECK_HEADER(malloc.h, AC_DEFINE(HAVE_MALLOC_H,,[do we have malloc.h?]))
 
-# Optional libraryes and packets
-AC_ARG_WITH([ssl],   [AS_HELP_STRING( [--without-ssl],	 [do not use libssl])],	[ app_cv_ssl="$withval" ],	[ app_cv_ssl="yes" ])
-AC_ARG_WITH([gnome], [AS_HELP_STRING( [--without-gnome], [do not use gnome])],	[ app_cv_gnome="$withval" ],	[ app_cv_gnome="yes" ])
-
-AC_ARG_ENABLE([macui],
-	[AS_HELP_STRING([--disable-macui], [Disable MAC OSX compatible UI manager ])],
-[
-	app_cv_macui="$enableval"
-],[
-	app_cv_macui="no"
-])
-
-AC_ARG_ENABLE([rexx],
-	[AS_HELP_STRING([--disable-rexx], [Build rexx extension & plugin])],
-[
-	app_cv_rexx="$enableval"
-],[
-
-	if test $REXXCONFIG = no; then
-		app_cv_rexx="no"
-	else
-		app_cv_rexx="yes"
-	fi
-])
-
-AC_ARG_ENABLE([pic],
-	[AS_HELP_STRING([--enable-pic], [enable support for PIC libraries (required to compile PW3270 on some systems)])],
-[
-	app_cv_pic="$enableval"
-],[
-
-	if test "$host_cpu" = "x86_64"; then
-		app_cv_pic="yes"
-	else
-		app_cv_pic="no"
-	fi
-])
-
-AC_ARG_ENABLE([altscreen], [AS_HELP_STRING([--disable-altscreen], [Disable alternate screen support])],[ app_cv_altscreen="$enableval" ],[ app_cv_altscreen="yes" ])
-AC_ARG_ENABLE([plugins],[AS_HELP_STRING([--disable-plugins], [disable plugin support])], [ app_cv_plugins="$enableval" ],[ app_cv_plugins="yes" ])
-AC_ARG_ENABLE([trace],[AS_HELP_STRING([--disable-trace], [disable trace])], [ app_cv_trace="$enableval" ],[ app_cv_trace="yes" ])
-
-#--[ Check for java ]-----------------------------------------------------------------------------------------------------------------------------------------
-
-AC_ARG_VAR([JDK_HOME], [JDK home directory])
-AC_ARG_VAR([JRE_HOME], [JRE home directory])
-AC_ARG_VAR([JVM_DIR], [Path to jvm library])
-
-AC_ARG_ENABLE([java],[AS_HELP_STRING([--disable-java], [Disable java extension & plugin])],[ app_cv_java="$enableval" ],[ app_cv_java="yes" ])
-
-AC_ARG_WITH([jnidir],[AS_HELP_STRING([--with-jnidir], [jni libraries path])],[ jnidir="$withval" ],[ jnidir="\$(libdir)/java" ] )
-AC_ARG_WITH([jvmjardir],[AS_HELP_STRING([--with-jvmjardir], [JAR files installation path])],[ jardir="$withval" ],[ jardir="\$(libdir)/jvm-exports" ] )
-
-# Set JVM arch
-case $host_cpu in
-     x86_64)
-	jvm_arch=amd64
-	;;
-     i?86)
-	jvm_arch=i386
-	;;
-     *)
-	jvm_arch="$host_cpu"
-	;;
-esac
-
-# Check for JDK_HOME
-if test "_$JDK_HOME" = "_" ; then
-	AC_CHECK_FILE("/usr/java/default/bin/javac",JDK_HOME="/usr/java/default",)
-fi
-
-if test "_$JDK_HOME" = "_" ; then
-	app_cv_java="no"
-fi
-
-# Check for JRE_HOME
-if test "_$JRE_HOME" = "_" ; then
-	JRE_HOME="\$(JDK_HOME)/jre"
-fi
-
-if test "$app_cv_java" = "yes" ; then
-
-	AC_PATH_TOOL([JAVAC], [javac], [\$(JDK_HOME)/bin/javac])
-	AC_PATH_TOOL([JAVAH], [javah], [\$(JDK_HOME)/bin/javah])
-	AC_PATH_TOOL([JAR], [jar], [\$(JDK_HOME)/bin/jar])
-
-fi
-
-# Check for libjvm
-if test "_$JVMDIR" = "_" ; then
-
-	case "$host" in
-		*-mingw32)
-			JVMDIR="\$(JRE_HOME)/bin/client"
-			;;
-
-		*-apple-*)
-			JVMDIR="\$(JRE_HOME)/lib/$jvm_arch/client"
-			;;
-
-		*)
-			JVMDIR="\$(JRE_HOME)/lib/$jvm_arch/server"
-	esac
-
-fi
-
-# Java link options depends on OS
-case "$host" in
-	*-mingw32)
-		jni_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
-		jvm_libs="-L\$(JDK_HOME)/lib -Wl,-rpath,\$(JVMDIR) -ljvm"
-		;;
-
-	*-apple-*)
-		jni_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
-		jvm_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
-		;;
-
-	*)
-		jni_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
-		jvm_libs="-L\$(JRE_HOME)/lib/$jvm_arch -L\$(JVMDIR) -Wl,-rpath,\$(JVMDIR) -ljvm"
-esac
-
-#--[ Check for OpenOffice ]-----------------------------------------------------------------------------------------------------------------------------------
-#
-# OpenOffice environment vars:
-#
-# OpenSUSE 11.1 ( from /opt/openoffice.org/basis3.1/sdk/setsdkenv_unix ):
-#	OO_SDK_HOME=/opt/openoffice.org/basis3.1/sdk
-#	OO_SDK_URE_HOME=/opt/openoffice.org/ure
-#
-# Ubuntu 10.10 ( from /usr/lib/libreoffice/basis3.3/sdk/setsdkenv_unix ):
-#	OO_SDK_HOME=/usr/lib/libreoffice/basis3.3/sdk
-#	OO_SDK_URE_HOME=/usr/lib/libreoffice/basis3.3/ure-link
-#
-AC_ARG_VAR([OO_SDK_HOME], [open-office SDK home])
-AC_ARG_VAR([OO_SDK_URE_HOME], [open-office URE home])
-
-AC_ARG_WITH([office-sdk-home], [AS_HELP_STRING([--with-office-sdk-home], [Define open-Office sdk path])], [ OO_SDK_HOME="$withval" ], )
-AC_ARG_WITH([office-sdk-ure-home], [AS_HELP_STRING([--with-office-sdk-ure-home], [Define open-Office ure path])],[ OO_SDK_URE_HOME="$withval" ] )
-AC_ARG_ENABLE([office],[AS_HELP_STRING([--disable-office], [Disable open office extension])],[ app_cv_office="$enableval" ],[ app_cv_office="yes" ])
-
-# Check for programs
-AC_PATH_TOOL([UNOPKG], unopkg, no )
-if test "$UNOPKG" = "no" ; then
-	app_cv_office="no"
-fi
-
-AC_PATH_TOOL([IDLC], idlc, [\$(OO_SDK_HOME)/bin/idlc])
-AC_PATH_TOOL([CPPUMAKER], cppumaker, [\$(OO_SDK_HOME)/bin/cppumaker])
-AC_PATH_TOOL([REGMERGE], regmerge, [\$(OO_SDK_URE_BIN_DIR)/regmerge])
-AC_PATH_TOOL([REGCOMP], regcomp, [\$(OO_SDK_URE_BIN_DIR)/regcomp])
-
-AC_SUBST(OO_SDK_HOME)
-AC_SUBST(OO_SDK_URE_HOME)
-AC_SUBST(OO_SDK_URE_BIN_DIR)
-
-# Check for OO_SDK_URE_BIN_DIR
-if test "_$OO_SDK_URE_BIN_DIR" = "_" ; then
-	OO_SDK_URE_BIN_DIR="\$(OO_SDK_URE_HOME)/bin"
-fi
-
-# Check for OO_SDK_HOME
-if test "_$OO_SDK_HOME" = "_" ; then
-	app_cv_office="no"
-fi
-
-# Check for OO_SDK_URE_HOME
-if test "_$OO_SDK_URE_HOME" = "_" ; then
-	app_cv_office="no"
-fi
-
-# Set targets
-if test "$app_cv_office" = "yes" ; then
-	AC_MSG_NOTICE([open-office sdk is present.])
-#	INSTALL_TARGETS="$INSTALL_TARGETS oxt"
-else
-	AC_MSG_NOTICE([open-office sdk is NOT present.])
-
-fi
-
-#--[ Check for libs ]-----------------------------------------------------------------------------------------------------------------------------------------
+#--[ GTK 2/3 check ]------------------------------------------------------------------------------------------------------------------------------------------
 
 PKG_CHECK_EXISTS
-PKG_CHECK_MODULES( [GLIB], [glib-2.0 gthread-2.0 gmodule-2.0], AC_DEFINE(HAVE_GLIB) )
-PKG_CHECK_MODULES( [GTK], [gtk+-2.0 >= 2.8], AC_DEFINE(HAVE_GTK) )
-PKG_CHECK_MODULES( [CAIRO], [cairo >= 1.8], AC_DEFINE(HAVE_CAIRO) )
-PKG_CHECK_MODULES( [IGEMAC], [ige-mac-integration], AC_DEFINE(HAVE_IGEMAC), AC_MSG_NOTICE([ige-mac-integration not present.]) )
-PKG_CHECK_MODULES( [UNITY], [unity], AC_DEFINE(HAVE_UNITY), AC_MSG_NOTICE([Unity is not present.]) )
 
-AC_ARG_WITH([gtk-runtime-path],
-	[AS_HELP_STRING([--with-gtk-runtime-path], [set base path for gtk's runtime files])],
-[
-	app_cv_gtkroot=$withval
-],[
-	app_cv_gtkroot=`$PKG_CONFIG --variable=prefix gtk+-2.0`
-])
-
-app_cv_gtkvrs=`$PKG_CONFIG --variable=gtk_binary_version gtk+-2.0`
-
-if test "$app_cv_gnome" == "yes"; then
-	PKG_CHECK_MODULES( [GNOME], [libgnome-2.0 libgnomeui-2.0],AC_DEFINE(HAVE_GNOME),AC_MSG_NOTICE([gnomeui not present.]) )
-fi
-
-# Check for libssl
-if test "$app_cv_ssl" == "yes"; then
-	PKG_CHECK_MODULES( [SSL], [libssl],AC_DEFINE(HAVE_SSL),AC_MSG_NOTICE([libssl not present.]) )
-fi
-
-# Check for libm
-AC_SEARCH_LIBS( [sin], [m], AC_DEFINE(HAVE_LIBM), AC_MSG_NOTICE([libm not present.]))
-
-#--[ Process options ]----------------------------------------------------------------------------------------------------------------------------------------
-
-# Check for pic
-if test "$app_cv_pic" == "yes"; then
-	DLL_CFLAGS="$DLL_CFLAGS -fPIC"
-	jni_cflags="$jni_cflags -fPIC"
-fi
-
-if test "$app_cv_rexx" == "yes"; then
-	AC_DEFINE(HAVE_REXX)
-	PLUGINS="$PLUGINS rx3270"
-	LIBRARIES="$LIBRARIES librx3270"
-	UI_FILES="$UI_FILES rexx.xml"
-	LANG_MODULES="$LANG_MODULES rexx"
-	INSTALL_TARGETS="$INSTALL_TARGETS rexx"
-
-	if test "$app_cv_pic" == "yes"; then
-		REXX_CFLAGS="\`\$(REXXCONFIG) --cflags\` -fPIC"
-	else
-		REXX_CFLAGS="\`\$(REXXCONFIG) --cflags\`"
-	fi
-
-	AC_SUBST(REXX_CFLAGS)
-
-fi
-
-if test "$app_cv_java" == "yes"; then
-	AC_DEFINE(HAVE_JNI)
-	PLUGINS="$PLUGINS j3270plugin"
-	LIBRARIES="$LIBRARIES libpw3270_jni"
-	LANG_MODULES="$LANG_MODULES java"
-	INSTALL_TARGETS="$INSTALL_TARGETS jni java"
-fi
-
-if test "$app_cv_plugins" == "yes"; then
-	AC_DEFINE([HAVE_PLUGINS])
-fi
-
-if test "$app_cv_altscreen" == "yes"; then
-	AC_DEFINE([HAVE_ALTSCREEN])
-fi
-
-if test "$app_cv_macui" == "yes"; then
-	app_cv_srcgui="$app_cv_srcgui actions.c toggle.c ui_parse.c topwindow.c"
-	AC_DEFINE([HAVE_MACUI])
-else
-	app_cv_srcgui="$app_cv_srcgui topwindow1.c uiparser1.c actions1.c"
-fi
-
-if test "$app_cv_trace" == "yes"; then
-	AC_DEFINE([X3270_TRACE])
-fi
-
-
-#--[ Substs & Defines ]---------------------------------------------------------------------------------------------------------------------------------------
-
-# Branding
-AC_DEFINE_UNQUOTED(PROGRAM_NAME,"$app_cv_progname")
-AC_SUBST(PROGRAM_NAME,"$app_cv_progname")
-
-AC_DEFINE_UNQUOTED(PROGRAM_LOGO,"$app_cv_logo")
-AC_SUBST(PROGRAM_LOGO,"$app_cv_logo")
-
-# Define revisions
-AC_DEFINE(PACKAGE_REVISION,"SVN_REV")
-AC_SUBST(PACKAGE_REVISION, "SVN_REV")
-
-AC_DEFINE(PACKAGE_RELEASE,"SVN_RELEASE")
-AC_SUBST(PACKAGE_RELEASE, "SVN_RELEASE")
-
-AC_SUBST(PACKAGE_SOURCE,"SVN_URL")
-
-# Java
-AC_SUBST(JAR)
-AC_SUBST(JDK_HOME)
-AC_SUBST(JRE_HOME)
-AC_SUBST(JVMDIR)
-
-AC_SUBST(JNIDIR,$jnidir)
-AC_SUBST(JARDIR,$jardir)
-
-AC_SUBST(JNI_CFLAGS,$jni_cflags)
-AC_SUBST(JNI_LIBS,$jni_libs)
-
-AC_SUBST(JVM_CFLAGS,$jni_cflags)
-AC_SUBST(JVM_LIBS,$jvm_libs)
-
-# C compiler
-AC_SUBST(CC)
-AC_SUBST(LD)
+PKG_CHECK_MODULES( [GTK], [gtk+-3.0], [ ], [ PKG_CHECK_MODULES( [GTK], [gtk+-2.0 >= 2.8]) ], [ ] )
 
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
-AC_SUBST(GTK_RUNTIME_PATH,"$app_cv_gtkroot")
-AC_SUBST(GTK_RUNTIME_VERSION,"$app_cv_gtkvrs")
-AC_SUBST(CAIRO_LIBS)
-AC_SUBST(CAIRO_CFLAGS)
-AC_SUBST(GNOME_LIBS)
-AC_SUBST(GNOME_CFLAGS)
+
+#--[ SSL ]----------------------------------------------------------------------------------------------------------------------------------------------------
+
+PKG_CHECK_MODULES( [SSL], [libssl], AC_DEFINE(HAVE_SSL), AC_MSG_NOTICE([libssl not present.]) )
+
 AC_SUBST(SSL_LIBS)
 AC_SUBST(SSL_CFLAGS)
-AC_SUBST(IGEMAC_LIBS)
-AC_SUBST(IGEMAC_CFLAGS)
-AC_SUBST(DLL_CFLAGS)
-AC_SUBST(DLL_LDFLAGS)
-AC_SUBST(EXE_LDFLAGS)
-AC_SUBST(DLLEXT)
-AC_SUBST(OBJEXT)
-AC_SUBST(EXEEXT)
-AC_SUBST(GUI_SRCS,"$app_cv_srcgui")
-AC_SUBST(LIB_SRCS,"$app_cv_srclib")
-AC_SUBST(SOCKET_LIBS,"$app_cv_socklib")
 
-AC_SUBST(HOST,$host)
-AC_SUBST(OBJDIR,"$ac_pwd/.obj/$host")
-AC_SUBST(BINDIR,"$ac_pwd/.bin")
-AC_SUBST(TMPDIR,"$ac_pwd/.tmp")
-
-AC_SUBST(SRCDIR,"$ac_pwd/src")
-AC_SUBST(XMLDIR,"$ac_pwd/ui")
-AC_SUBST(DEBDIR,"$ac_pwd/debian")
-
-AC_SUBST(PLUGINS)
-AC_SUBST(LIBRARIES)
-AC_SUBST(UI_FILES)
-AC_SUBST(LANG_MODULES)
-AC_SUBST(INSTALL_TARGETS)
+#--[ Libraries ]----------------------------------------------------------------------------------------------------------------------------------------------
+AC_SEARCH_LIBS( [sin], [m], AC_DEFINE(HAVE_LIBM), AC_MSG_NOTICE([libm not present.]))
 
 #--[ Output files ]-------------------------------------------------------------------------------------------------------------------------------------------
 
 AC_CONFIG_FILES([
-Makefile
-scripts.conf
-lib3270.pc
-src/include/lib3270/plugins.h
 
-src/lib/mkversion.sh
-src/lib/Makefile
-
-src/gtk2/Makefile
-src/gtk2/version.c
-src/gtk2/resources.rc
-
-src/plugins/rexx/Makefile
-
-src/jni/Makefile
-src/plugins/java/Makefile
-
-src/plugins/pipectl/Makefile
-
-src/oxt/Makefile
-
-debian/control-base
-debian/changelog
-
-src/lib/control
-src/gtk2/control
-src/jni/control
-
-src/plugins/java/control
-src/plugins/rexx/control
-
-pw3270.bundle
-Info.plist
-
-pw3270.nsi
-pw3270.spec
+	Makefile
+	src/include/rules.mak
+	src/gtk/Makefile
+	src/gtk/uiparser/Makefile
 
 ])
-
 
 dnl Output the generated config.status script.
 AC_OUTPUT

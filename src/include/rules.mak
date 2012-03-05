@@ -29,51 +29,49 @@
 
 #---[ Configuration values ]---------------------------------------------------
 
-PACKAGE_NAME=@PACKAGE_NAME@
-PACKAGE_VERSION=@PACKAGE_VERSION@
-PACKAGE_TARNAME=@PACKAGE_TARNAME@
+PACKAGE_NAME=pw3270
+PACKAGE_VERSION=5.0
+PACKAGE_TARNAME=pw3270
+EXEEXT=
 
-EXEEXT=@EXEEXT@
+LIB3270_CFLAGS ?= `pkg-config --cflags lib3270`
+LIB3270_LIBS ?= `pkg-config --libs lib3270`
 
-#---[ Paths ]------------------------------------------------------------------
-
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-bindir=@bindir@
-sbindir=@sbindir@
-libdir=@libdir@
-includedir=@includedir@
-datarootdir=@datarootdir@
-localedir=@localedir@
-docdir=@docdir@
-sysconfdir=@sysconfdir@
-
-OBJDIR=.obj
-BINDIR=.bin
+DEBUG_CFLAGS=-DDEBUG=1 -g
+DEPENDS ?= *.h
 
 #---[ Tools ]------------------------------------------------------------------
 
-VALGRIND=@VALGRIND@
+MKDIR=/bin/mkdir -p
+CC=gcc
+LD=gcc
 
-#---[ Debug targets ]----------------------------------------------------------
+#---[       ]------------------------------------------------------------------
 
-Debug: $(BINDIR)/Debug/$(PACKAGE_TARNAME)$(EXEEXT)
+OBJEXT=.o
 
-$(BINDIR)/Debug/$(PACKAGE_TARNAME)$(EXEEXT): src/gtk/* src/include/lib3270/* src/include/*
-	@$(MAKE) ROOTDIR="../.." -C src/gtk ../../$(BINDIR)/Debug/$(PACKAGE_TARNAME)$(EXEEXT)
+#---[ Paths ]------------------------------------------------------------------
+
+ROOTDIR ?= "."
+OBJDIR  ?= $(ROOTDIR)/.obj
+BINDIR  ?= $(ROOTDIR)/.bin
+
+#---[ Rules ]------------------------------------------------------------------
+
+$(OBJDIR)/Debug/%.o: %.c $(DEPENDS)
+	@echo $< ...
+	@$(MKDIR) `dirname $@`
+	@$(CC) $(DEBUG_CFLAGS) $(CFLAGS) $(LIB3270_CFLAGS) -o $@ -c $<
 
 
 #---[ Targets ]----------------------------------------------------------------
 
-run:
-	@$(MAKE) ROOTDIR="../.." -C src/gtk run
-
-clean:
+clean-common:
 	@rm -fr $(OBJDIR)
 	@rm -fr $(BINDIR)
-	@make -C src/gtk clean
-
-distclean: clean
-	@rm -f src/gtk/Makefile
-	@rm -f config.status
 	@rm -f *.log
+	@find . -name "*~" -exec rm -f {} \;
+
+
+
+

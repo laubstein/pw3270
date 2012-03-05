@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270.
  *
@@ -18,45 +18,39 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como @@FILENAME@@ e possui @@LINES@@ linhas de código.
+ * Este programa está nomeado como accelerator.c e possui - linhas de código.
  *
  * Contatos:
  *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
- * erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+ * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
  * kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
- * macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
  *
  */
 
-#ifndef LIB3270_CONFIG_INCLUDED
+ #include "../globals.h"
+ #include "private.h"
 
-	#define LIB3270_CONFIG_INCLUDED 1
+/*--[ Implement ]------------------------------------------------------------------------------------*/
 
-	#undef PACKAGE_NAME
-	#undef PACKAGE_VERSION
-	#undef PACKAGE_REVISION
+ GObject * ui_create_accelerator(GtkAction *action,struct parser *info,const gchar **names, const gchar **values, GError **error)
+ {
+ 	if(info->element)
+	{
+		*error = g_error_new(ERROR_DOMAIN,EINVAL,"%s", _( "<accelerator> should be on toplevel"));
+		return NULL;
+	}
 
-	#undef HAVE_GNUC_VISIBILITY
-	#undef HAVE_LIBM
+ 	if(!action)
+	{
+		*error = g_error_new(ERROR_DOMAIN,EINVAL,"%s", _( "<accelerator> should have an action attribute"));
+		return NULL;
+	}
 
-	#undef HAVE_LIBSSL
+	return NULL;
+ }
 
-	/* Optional parts. */
-	#undef X3270_TRACE
-	#undef X3270_DBCS
-	#undef X3270_SCRIPT
-
-	#define X3270_TN3270E
-	#define X3270_ANSI
-	#define X3270_APL
-	#define X3270_FT
-	#define X3270_PRINTER
-
-	#undef HAVE_ALTSCREEN
-	#undef HAVE_IGEMAC
-	#undef HAVE_MACUI
-	#undef HAVE_MALLOC_H
-
-#endif /* LIB3270_CONFIG_INCLUDED */
+ void ui_end_accelerator(GObject *widget,struct parser *info,GError **error)
+ {
+ }

@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270.
  *
@@ -18,45 +18,25 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como @@FILENAME@@ e possui @@LINES@@ linhas de código.
+ * Este programa está nomeado como parser.h e possui - linhas de código.
  *
  * Contatos:
  *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
- * erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+ * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
  * kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
- * macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
  *
  */
 
-#ifndef LIB3270_CONFIG_INCLUDED
+ typedef struct _setup_item
+ {
+	const gchar * name;
+	void		  (*setup)(GtkWidget *widget, GtkWidget *obj);
+ } SETUP_ITEM;
 
-	#define LIB3270_CONFIG_INCLUDED 1
-
-	#undef PACKAGE_NAME
-	#undef PACKAGE_VERSION
-	#undef PACKAGE_REVISION
-
-	#undef HAVE_GNUC_VISIBILITY
-	#undef HAVE_LIBM
-
-	#undef HAVE_LIBSSL
-
-	/* Optional parts. */
-	#undef X3270_TRACE
-	#undef X3270_DBCS
-	#undef X3270_SCRIPT
-
-	#define X3270_TN3270E
-	#define X3270_ANSI
-	#define X3270_APL
-	#define X3270_FT
-	#define X3270_PRINTER
-
-	#undef HAVE_ALTSCREEN
-	#undef HAVE_IGEMAC
-	#undef HAVE_MACUI
-	#undef HAVE_MALLOC_H
-
-#endif /* LIB3270_CONFIG_INCLUDED */
+ GtkWidget 		* ui_parse_xml_folder(const gchar *path, const gchar ** groupname, GtkWidget *widget, const SETUP_ITEM *itn);
+ void			  ui_connect_action(GtkAction *action, GtkWidget *widget, const gchar *name, const gchar *id);
+ void			  ui_connect_toggle(GtkAction *action, GtkWidget *widget, const gchar *name, const gchar *id);
+ void			  ui_connect_pfkey(GtkAction *action, GtkWidget *widget, const gchar *name, const gchar *id);
+ void			  ui_connect_pakey(GtkAction *action, GtkWidget *widget, const gchar *name, const gchar *id);

@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270.
  *
@@ -18,45 +18,33 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como @@FILENAME@@ e possui @@LINES@@ linhas de código.
+ * Este programa está nomeado como globals.c e possui - linhas de código.
  *
  * Contatos:
  *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
- * erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
- * licinio@bb.com.br		(Licínio Luis Branco)
- * kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
- * macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+ * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  *
  */
 
-#ifndef LIB3270_CONFIG_INCLUDED
+ #include <pw3270.h>
+ #include <lib3270/config.h>
+ #include <gtk/gtk.h>
 
-	#define LIB3270_CONFIG_INCLUDED 1
+ #define ENABLE_NLS
+ #define GETTEXT_PACKAGE PACKAGE_NAME
 
-	#undef PACKAGE_NAME
-	#undef PACKAGE_VERSION
-	#undef PACKAGE_REVISION
+ #include <libintl.h>
+ #include <glib/gi18n.h>
 
-	#undef HAVE_GNUC_VISIBILITY
-	#undef HAVE_LIBM
+ #include "v3270/v3270.h"
 
-	#undef HAVE_LIBSSL
+ // Configuration
+ #include "common/common.h"
 
-	/* Optional parts. */
-	#undef X3270_TRACE
-	#undef X3270_DBCS
-	#undef X3270_SCRIPT
+ GtkWidget	* create_main_window(void);
+ void		  setup_font_list(GtkWidget *widget, GtkWidget *obj);
 
-	#define X3270_TN3270E
-	#define X3270_ANSI
-	#define X3270_APL
-	#define X3270_FT
-	#define X3270_PRINTER
 
-	#undef HAVE_ALTSCREEN
-	#undef HAVE_IGEMAC
-	#undef HAVE_MACUI
-	#undef HAVE_MALLOC_H
 
-#endif /* LIB3270_CONFIG_INCLUDED */
+

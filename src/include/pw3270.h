@@ -1,5 +1,5 @@
 /*
- * "Software G3270, desenvolvido com base nos códigos fontes do WC3270  e  X3270
+ * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270.
  *
@@ -18,45 +18,72 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como @@FILENAME@@ e possui @@LINES@@ linhas de código.
+ * Este programa está nomeado como widget.h e possui - linhas de código.
  *
  * Contatos:
  *
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
- * erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+ * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
  * kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
  * macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
  *
  */
 
-#ifndef LIB3270_CONFIG_INCLUDED
+ #ifndef PW3270_H_INCLUDED
 
-	#define LIB3270_CONFIG_INCLUDED 1
 
-	#undef PACKAGE_NAME
-	#undef PACKAGE_VERSION
-	#undef PACKAGE_REVISION
+	#define PW3270_H_INCLUDED 1
 
-	#undef HAVE_GNUC_VISIBILITY
-	#undef HAVE_LIBM
+	#ifdef _WIN32
+		#include <windows.h>
+	#endif
 
-	#undef HAVE_LIBSSL
+	#include <gtk/gtk.h>
 
-	/* Optional parts. */
-	#undef X3270_TRACE
-	#undef X3270_DBCS
-	#undef X3270_SCRIPT
+	// Trace
+	#include <stdio.h>
 
-	#define X3270_TN3270E
-	#define X3270_ANSI
-	#define X3270_APL
-	#define X3270_FT
-	#define X3270_PRINTER
+	#if defined( DEBUG )
+		#define trace(x, ...)          fprintf(stderr,"%s(%d):\t" x "\n",__FILE__,__LINE__, __VA_ARGS__); fflush(stderr);
+	#else
+		#define trace(x, ...) /* */
+	#endif
 
-	#undef HAVE_ALTSCREEN
-	#undef HAVE_IGEMAC
-	#undef HAVE_MACUI
-	#undef HAVE_MALLOC_H
+	// Error management
+	#include <errno.h>
 
-#endif /* LIB3270_CONFIG_INCLUDED */
+	#ifndef ETIMEDOUT
+		#define ETIMEDOUT -1238
+	#endif
+
+	#ifndef ECANCELED
+		#ifdef EINTR
+			#define ECANCELED EINTR
+		#else
+			#define ECANCELED -1125
+		#endif
+	#endif
+
+	#ifndef ENOTCONN
+		#define ENOTCONN -1107
+	#endif
+
+	// Windows
+	#ifdef _WIN32
+
+		#ifndef WINVER
+			#define WINVER 0x0501
+		#endif
+
+		#ifndef _WIN32_WINNT
+			#define _WIN32_WINNT WINVER
+		#endif
+
+	#endif
+
+
+
+
+
+#endif // PW3270_H_INCLUDED
