@@ -71,7 +71,8 @@
     { "KeepSelected", 	    FALSE	},
     { "Underline",		    TRUE	},
     { "AutoConnect",    	TRUE	},
-    { "KPAlternative",		FALSE	}
+    { "KPAlternative",		FALSE	},
+    { "Beep",				TRUE	},
  };
 
  gboolean gui_toggle_state[GUI_TOGGLE_COUNT] = { 0 };

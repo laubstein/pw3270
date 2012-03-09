@@ -91,6 +91,14 @@
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
 
+ static void ring_bell(void)
+ {
+	if(TOGGLED_BEEP)
+	{
+		gdk_beep();
+	}
+ }
+
  const struct lib3270_screen_callbacks program_screen_callbacks =
  {
 	sizeof(struct lib3270_screen_callbacks),
@@ -107,7 +115,7 @@
 	addch,					// void (*addch)(int row, int col, unsigned char c, int attr);
 	set_charset,			// void (*charset)(char *dcs);
 	settitle,				// void (*title)(char *text);
-	gdk_beep,				// void (*ring_bell)(void);
+	ring_bell,				// void (*ring_bell)(void);
 	redraw,					// void (*redraw)(void);
 	update_cursor_position,	// void (*move_cursor)(H3270 *session, unsigned short row, unsigned short col, unsigned char c, unsigned short attr);
 	SetSuspended,			// int	(*set_suspended)(int state);

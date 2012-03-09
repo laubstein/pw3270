@@ -386,8 +386,6 @@
  {
  	int idx = ((int) id) + N_TOGGLES;
 
-	Trace("*************** %p %p %p ",toggle_action[idx].reset, toggle_action[idx].set, toggle_action[idx].toggle);
-
 	if(toggle_action[idx].reset)
 		gtk_action_set_visible(toggle_action[idx].reset,visible && gui_toggle_state[id]);
 

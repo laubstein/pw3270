@@ -100,7 +100,16 @@ $(BINDIR)/Release/%@EXEEXT@: $(OBJDIR)/Release/%@OBJEXT@
 $(BINDIR)/pot/%.pot: src/plugins/%/*
 	@$(MAKE) -C $(dir $<) $@
 
-$(BINDIR)/pot/%.pot: src/%/*
+$(BINDIR)/pot/lib.pot: src/lib/*.c
+	@$(MAKE) -C $(dir $<) $@
+
+$(BINDIR)/pot/gtk2.pot: src/gtk2/*.c
+	@$(MAKE) -C $(dir $<) $@
+
+$(BINDIR)/pot/rexx.pot: src/plugins/rexx/*.c
+	@$(MAKE) -C $(dir $<) $@
+
+$(BINDIR)/pot/java.pot: src/plugins/java/*.c
 	@$(MAKE) -C $(dir $<) $@
 
 $(BINDIR)/Release/$(localedir)/%/LC_MESSAGES/$(PACKAGE_NAME).mo: po/%.po
