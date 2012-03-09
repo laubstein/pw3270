@@ -117,7 +117,6 @@
 		#define LUNAME_SIZE				16
 		#define FULL_MODEL_NAME_SIZE	13
 
-
 		/* State change IDs. */
 		typedef enum _lib3270_state
 		{
@@ -189,7 +188,6 @@
 		struct lib3270_state_callback;
 
 		typedef struct _h3270 H3270;
-
 		struct _h3270
 		{
 			unsigned short 	  sz;				/**< Struct size */

@@ -107,6 +107,7 @@
 				<menuitem action='Toggle' id='Underline' label='Show Underline'  />
 				<menuitem action='Toggle' id='KeepSelected' label='Keep selected' />
 				<menuitem action='Toggle' id='SmartPaste' label='Smart paste' />
+				<menuitem action='Toggle' id='Beep' label='Alert sound' />
 				<menuitem action='Toggle' id='KPAlternative' label='Use +/- for field navigation' />
 			</menu>
 

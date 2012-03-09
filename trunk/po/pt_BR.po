@@ -103,6 +103,10 @@ msgstr "Copiar anexando"
 msgid "Add/Remove CR at end of line"
 msgstr "Inserir/Remover CR no final da linha"
 
+#: ui/default.xml:110
+msgid "Alert sound"
+msgstr "Aviso sonoro"
+
 #: filetransfer.c:393
 msgid "Append"
 msgstr "Adicionar"
