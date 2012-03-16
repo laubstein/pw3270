@@ -30,24 +30,24 @@
  *
  */
 
-	#define DECLARE_LIB3270_ACTION( name )  				LIB3270_EXPORT int lib3270_ ## name (H3270 *hSession);
-	#define LIB3270_ACTION( name )  						LIB3270_EXPORT int lib3270_ ## name (H3270 *hSession)
+	#define DECLARE_LIB3270_ACTION( name )  				LIB3270_EXPORT int lib3270_ ## name (void);
+	#define LIB3270_ACTION( name )  						LIB3270_EXPORT int lib3270_ ## name (void)
 
 	// Clear actions - When called the selected area is cleared
-	#define DECLARE_LIB3270_CLEAR_SELECTION_ACTION( name )  LIB3270_EXPORT int lib3270_ ## name (H3270 *hSession);
-	#define LIB3270_CLEAR_SELECTION_ACTION( name )			LIB3270_EXPORT int lib3270_ ## name (H3270 *hSession)
+	#define DECLARE_LIB3270_CLEAR_SELECTION_ACTION( name )  LIB3270_EXPORT int lib3270_ ## name (void);
+	#define LIB3270_CLEAR_SELECTION_ACTION( name )			LIB3270_EXPORT int lib3270_ ## name (void)
 
 	// Single key actions
-	#define DECLARE_LIB3270_KEY_ACTION( name )				LIB3270_EXPORT int lib3270_ ## name (H3270 *hSession);
-	#define LIB3270_KEY_ACTION( name )						LIB3270_EXPORT int lib3270_ ## name (H3270 *hSession)
+	#define DECLARE_LIB3270_KEY_ACTION( name )				LIB3270_EXPORT int lib3270_ ## name (void);
+	#define LIB3270_KEY_ACTION( name )						LIB3270_EXPORT int lib3270_ ## name (void)
 
 	// Cursor actions
-	#define DECLARE_LIB3270_CURSOR_ACTION( name )			LIB3270_EXPORT int lib3270_cursor_ ## name (H3270 *hSession);
-	#define LIB3270_CURSOR_ACTION( name )					LIB3270_EXPORT int lib3270_cursor_ ## name (H3270 *hSession)
+	#define DECLARE_LIB3270_CURSOR_ACTION( name )			LIB3270_EXPORT int lib3270_cursor_ ## name (void);
+	#define LIB3270_CURSOR_ACTION( name )					LIB3270_EXPORT int lib3270_cursor_ ## name (void)
 
 	// PF & PA key actions
-	#define DECLARE_LIB3270_FKEY_ACTION( name )				LIB3270_EXPORT int lib3270_ ## name (H3270 *hSession, int key);
-	#define LIB3270_FKEY_ACTION( name )						LIB3270_EXPORT int lib3270_ ## name (H3270 *hSession, int key)
+	#define DECLARE_LIB3270_FKEY_ACTION( name )				LIB3270_EXPORT int lib3270_ ## name (int key);
+	#define LIB3270_FKEY_ACTION( name )						LIB3270_EXPORT int lib3270_ ## name (int key)
 
 
 	// Load action table entries

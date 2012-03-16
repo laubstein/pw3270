@@ -191,7 +191,7 @@
 	switch(argc)
 	{
 	case 1:
-		lib3270_enter(hSession);
+		lib3270_enter();
 		break;
 
     case 2:
@@ -258,7 +258,7 @@
 		errno = EINVAL;
 		return NULL;
 	}
-	snprintf(ret,9,"%d",lib3270_pfkey(hSession,atoi(argv[1])));
+	snprintf(ret,9,"%d",lib3270_pfkey(atoi(argv[1])));
 	return strdup(ret);
  }
 
@@ -270,7 +270,7 @@
 		errno = EINVAL;
 		return NULL;
 	}
-	snprintf(ret,9,"%d",lib3270_pakey(hSession,atoi(argv[1])));
+	snprintf(ret,9,"%d",lib3270_pakey(atoi(argv[1])));
 	return strdup(ret);
  }
 
@@ -282,7 +282,7 @@
 		errno = EINVAL;
 		return NULL;
 	}
-	snprintf(ret,9,"%d",lib3270_enter(hSession));
+	snprintf(ret,9,"%d",lib3270_enter());
 	return strdup(ret);
  }
 
