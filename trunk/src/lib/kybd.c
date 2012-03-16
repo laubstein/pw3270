@@ -2323,12 +2323,12 @@ LIB3270_CURSOR_ACTION( newline )
 /*
  * DUP key
  */
-void
-Dup_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+LIB3270_KEY_ACTION( dup )
 {
 //	reset_idle_timer();
-	if (kybdlock) {
-		enq_ta(Dup_action, CN, CN);
+	if (kybdlock)
+	{
+		ENQUEUE_ACTION(lib3270_dup);
 		return;
 	}
 #if defined(X3270_ANSI) /*[*/
