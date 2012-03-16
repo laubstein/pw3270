@@ -101,9 +101,6 @@ void set_display_charset(char *dcs)
 
 static void addch(H3270 *session, int baddr, unsigned char c, unsigned short attr)
 {
-	if(ea_buf[baddr].chr == c && ea_buf[baddr].attr == attr)
-			return;
-
 	/* Converted char has changed, update it */
 	ea_buf[baddr].chr  = c;
 	ea_buf[baddr].attr = attr;
