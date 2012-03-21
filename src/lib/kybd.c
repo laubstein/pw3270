@@ -3079,7 +3079,7 @@ xim_lookup(XKeyEvent *event)
 
 /*
  * Key action by string
- */ /*
+ */
 void Input_String(const unsigned char *str)
 {
 //	reset_idle_timer();
@@ -3091,7 +3091,7 @@ void Input_String(const unsigned char *str)
 		str++;
 	}
 	screen_disp(&h3270);
-} */
+}
 
 /*
  * Key action.

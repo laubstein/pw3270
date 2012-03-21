@@ -115,7 +115,7 @@
 
 	RunPendingEvents(0);
 
-	state = QueryCstate();
+	state = lib3270_get_connection_state(NULL);
 
 	for(f=0;f < G_N_ELEMENTS(xlat_state); f++)
 	{
