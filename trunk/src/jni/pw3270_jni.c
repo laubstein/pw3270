@@ -129,7 +129,7 @@ JNIEXPORT jint JNICALL Java_pw3270_terminal_Connect(JNIEnv *env, jobject obj, js
 	int rc;
 	const char *hostinfo = (*env)->GetStringUTFChars(env, j_hostinfo, 0);
 
-	if(QueryCstate() != NOT_CONNECTED)
+	if(lib3270_get_connection_state(NULL) != NOT_CONNECTED)
 		return EINVAL;
 
 	rc = host_connect(hostinfo,1);
@@ -157,17 +157,17 @@ JNIEXPORT jint JNICALL Java_pw3270_terminal_Connect(JNIEnv *env, jobject obj, js
 
 JNIEXPORT jint JNICALL Java_pw3270_terminal_Disconnect(JNIEnv *env, jobject obj)
 {
-	if(QueryCstate() <= NOT_CONNECTED)
+	if(lib3270_get_connection_state(NULL) <= NOT_CONNECTED)
 		return EINVAL;
 
-	host_disconnect(hSession,0);
+	lib3270_disconnect(hSession);
 
 	return 0;
 }
 
 JNIEXPORT jint JNICALL Java_pw3270_terminal_getConnectionState(JNIEnv *env, jobject obj)
 {
-	return (jint) QueryCstate();
+	return (jint) lib3270_get_connection_state(NULL);
 }
 
 JNIEXPORT jboolean JNICALL Java_pw3270_terminal_isConnected(JNIEnv *env, jobject obj)
