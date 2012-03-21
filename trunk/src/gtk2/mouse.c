@@ -924,7 +924,7 @@
 	SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  }
 
- static void doSelect(H3270 *hSession, int (*call)(H3270 *hSession))
+ static void doSelect(H3270 *hSession, int (*call)(void))
  {
  	int row;
  	int col;
@@ -937,7 +937,7 @@
  		startCol = endCol = (cursor_position % screen->cols);
  	}
 
- 	call(hSession);
+ 	call();
 
  	row = cursor_position / screen->cols;
  	col = cursor_position % screen->cols;

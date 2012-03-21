@@ -152,10 +152,10 @@
 	return rc;
  }
 
- static void clear_and_call(GtkAction *action, int (*call)(H3270 *))
+ static void clear_and_call(GtkAction *action, int (*call)(void))
  {
  	unselect();
- 	call(NULL);
+ 	call();
  }
 
  LOCAL_EXTERN void gui_toogle_set_visible(enum GUI_TOGGLE id, gboolean visible)
@@ -577,6 +577,7 @@
 		{ "SysREQ",				G_CALLBACK(lib3270_sysreq)			},
 		{ "Attn",				G_CALLBACK(lib3270_attn)			},
 		{ "Break",				G_CALLBACK(lib3270_break)			},
+		{ "Dup",				G_CALLBACK(lib3270_dup)				},
 
 		{ "FirstField",			G_CALLBACK(lib3270_firstfield)		},
 
