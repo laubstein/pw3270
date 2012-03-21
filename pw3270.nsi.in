@@ -196,12 +196,7 @@ Section /o "Software Development Kit" SecSDK
 	file "/oname=$INSTDIR\sdk\include\lib3270\plugins.h" "src\include\lib3270\plugins.h"
 	file "/oname=$INSTDIR\sdk\include\lib3270\macros.h" "src\include\lib3270\macros.h"
 
-	CreateDirectory "$INSTDIR\sdk\lib"
-	file "/oname=$INSTDIR\sdk\lib\lib3270.def" ".bin\Release\lib\lib3270.def"
-
 SectionEnd
-
-
 
 # create a section to define what the uninstaller does.
 # the section will always be named "Uninstall"
