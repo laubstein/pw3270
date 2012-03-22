@@ -2336,7 +2336,10 @@ LIB3270_KEY_ACTION( dup )
 		return;
 #endif /*]*/
 	if (key_Character(EBC_dup, False, False, NULL))
+	{
+		screen_disp(&h3270);
 		cursor_move(next_unprotected(h3270.cursor_addr));
+	}
 }
 
 
