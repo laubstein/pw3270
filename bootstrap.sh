@@ -5,57 +5,52 @@ PACKAGE_RELEASE=5
 REV_FILE=./revision.m4
 REV=`date +%y%m%d%H%M`
 
-if test -d ".svn" ; then
+SVN=`which svn 2> /dev/null`
 
-	SVN=`which svn 2> /dev/null`
+if test -x "$SVN" ; then
 
-	if test -x "$SVN" ; then
+	echo "Updating sources..."
+	"$SVN" update
+	if [ "$?" != "0" ]; then
 
-		echo "Updating sources..."
-		"$SVN" update
-		if [ "$?" != "0" ]; then
+		echo "$SVN update failed!"
 
-			echo "$SVN update failed!"
+	else
 
+		LANG="EN_US"
+
+		if $SVN --xml info >/dev/null 2>&1; then
+			REV=`$SVN --xml info | tr -d '\r\n' | sed -e 's/.*<commit.*revision="\([0-9]*\)".*<\/commit>.*/\1/'`
+			LCD=`$SVN --xml info | tr -d '\r\n' | sed -e 's/.*<commit.*<date>\([0-9\-]*\)\T\([0-9\:]*\)\..*<\/date>.*<\/commit>.*/\1 \2/'`
+		elif $SVN --version --quiet >/dev/null 2>&1; then
+			REV=`$SVN info | grep "^Revision:" | cut -d" " -f2`
+			LCD=`$SVN info | grep "^Last Changed Date:" | cut -d" " -f4,5`
 		else
-
-			if $SVN --xml info >/dev/null 2>&1; then
-				REV=`$SVN --xml info | tr -d '\r\n' | sed -e 's/.*<commit.*revision="\([0-9]*\)".*<\/commit>.*/\1/'`
-				LCD=`$SVN --xml info | tr -d '\r\n' | sed -e 's/.*<commit.*<date>\([0-9\-]*\)\T\([0-9\:]*\)\..*<\/date>.*<\/commit>.*/\1 \2/'`
-			elif $SVN --version --quiet >/dev/null 2>&1; then
-				REV=`$SVN info | grep "^Revision:" | cut -d" " -f2`
-				LCD=`$SVN info | grep "^Last Changed Date:" | cut -d" " -f4,5`
-			else
-				LCD=""
-			fi
-
-			if [ "$LCD" == "" ]; then
-				LCD=`date +%Y%m%d`
-			fi
-
-			URL=`svn info | grep "URL: " | sed -s "s@URL: @@g"`
-
-			echo "m4_define([SVN_REV], $REV)" > $REV_FILE
-			echo "m4_define([SVN_DATE], $LCD)" >> $REV_FILE
-			echo "m4_define([SVN_URL], $URL)" >> $REV_FILE
-			echo "m4_define([SVN_RELEASE], $PACKAGE_RELEASE)" >> $REV_FILE
-
+			LCD=""
 		fi
 
-		SVN2CL=`which svn2cl.sh 2> /dev/null`
-		if [ ! -z $SVN2CL ]; then
-			echo "Creating changelog ..."
-			$SVN2CL
+		if [ "$LCD" == "" ]; then
+			LCD=`date +%Y%m%d`
 		fi
+
+		URL=`svn info | grep "URL: " | sed -s "s@URL: @@g"`
+
+		echo "m4_define([SVN_REV], $REV)" > $REV_FILE
+		echo "m4_define([SVN_DATE], $LCD)" >> $REV_FILE
+		echo "m4_define([SVN_URL], $URL)" >> $REV_FILE
+		echo "m4_define([SVN_RELEASE], $PACKAGE_RELEASE)" >> $REV_FILE
+
 	fi
 
-elif [ ! -e $REV_FILE ]; then
-	echo "Can´t find subversion and no revision.m4 supplied; aborting"
-	exit -1
+	SVN2CL=`which svn2cl.sh 2> /dev/null`
+	if [ ! -z $SVN2CL ]; then
+		echo "Creating changelog ..."
+		$SVN2CL
+	fi
 fi
 
 if [ ! -f $REV_FILE ]; then
-	echo "Can't create $REV_FILE Is svn installed?"
+	echo "Can't create $REV_FILE is svn available?"
 	exit -1
 fi
 
