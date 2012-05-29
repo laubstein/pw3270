@@ -27,8 +27,12 @@
 
 #---[ Check for Java ]------------------------------------------------------------------------------------------------
 
+%define java_prereqs
+%define _java 0
+
 %if 0%(if [ -x @JDK_HOME@/bin/javah ]; then echo 1; else echo 0; fi)
 	%define _java	1
+	%define java_prereqs jpackage-utils
 %endif
 
 #---[ Check for distro ]----------------------------------------------------------------------------------------------
@@ -76,7 +80,7 @@ Source:         %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Requires:       openssl shared-mime-info libgnome libgnomeui %{name}-lib = @PACKAGE_VERSION@
 Distribution:    %_distro
-BuildRequires:  autoconf automake gcc-c++ sed pkgconfig gtk2-devel libgnome-devel gettext-devel
+BuildRequires:  autoconf automake gcc-c++ sed pkgconfig gtk2-devel libgnome-devel gettext-devel %{java_prereqs}
 
 %description
 IBM 3270 terminal emulator gtk. It can be used to communicate with
