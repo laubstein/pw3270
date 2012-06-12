@@ -1,0 +1,798 @@
+#
+# "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
+# (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+# aplicativos mainframe. Registro no INPI sob o nome G3270.
+#
+# Copyright (C) <2008> <Banco do Brasil S.A.>
+#
+# Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+# os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+# Free Software Foundation.
+#
+# Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+# GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+# A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+# obter mais detalhes.
+#
+# Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+# programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA, 02111-1307, USA
+#
+# Contatos:
+#
+# perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+# erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+# licinio@bb.com.br		(Licínio Luis Branco)
+# kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+# macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+#
+
+prefix ?= @prefix@
+exec_prefix ?= @exec_prefix@
+bindir ?= @bindir@
+LIBDIR ?= @libdir@
+PACKAGE ?= @PACKAGE@
+PACKAGE_TARNAME ?= @PACKAGE_TARNAME@
+PACKAGE_VERSION ?= @PACKAGE_VERSION@
+PACKAGE_MANAGER ?= @PACKAGE_MANAGER@
+DEFAULT_CONFIG ?= @DEFAULT_CONFIG@
+PACKAGE_LOGO ?= @PACKAGE_LOGO@
+PACKAGE_ICON ?= @PACKAGE_ICON@
+
+datarootdir ?= @datarootdir@
+docdir ?= @docdir@
+LOGO = $(notdir $(PACKAGE_LOGO))
+ICON = $(notdir $(PACKAGE_ICON))
+
+LOCALEDIR ?= @localedir@
+
+PLUGINS ?= @PLUGINS@
+PLUGINS_UI ?= @PLUGINS_UI@
+EXTENSIONS ?= @EXTENSIONS@
+DLLEXT ?= @DLLEXT@
+
+TARGETS = @PROGRAM_NAME@@EXEEXT@ @TARGETS@
+UI_XML_FILES ?= @UI_XML_FILES@
+
+TMPDIR ?= /tmp
+
+# Lib dirs
+DBG_LIBDIR=bin/Debug/lib
+RLS_LIBDIR=bin/Release/lib
+
+# Set command paths and mkfb (which has to run locally)
+MKFB = bin/mkfb
+
+# Set compilers
+HOST_CC = @HOST_CC@
+NATIVECC = @HOST_CC@
+
+CC = @CC@
+LD = @LD@
+
+CXX=@CXX@
+CXXFLAGS=@CXXFLAGS@
+
+WINDRES = @WINDRES@
+
+####################################################################################################
+# Java Stuff
+####################################################################################################
+JRE_HOME = @JRE_HOME@
+JDK_HOME = @JDK_HOME@
+JAVA_LIBJVM = @JAVA_LIBJVM@
+
+JAVAC = @JAVAC@
+JAVAH = @JAVAH@
+
+JNIDIR ?= @jnidir@
+JARDIR ?= @jardir@
+
+JAVA_CFLAGS ?= @JAVA_CFLAGS@ -DJNIDIR=\"$(JNIDIR)\" -DJARDIR=\"$(JARDIR)\"
+JAVA_LDFLAGS ?= @JAVA_LDFLAGS@
+
+####################################################################################################
+# OpenOffice.org stuff
+####################################################################################################
+OO_SDK_HOME ?= @OO_SDK_HOME@
+OO_URE_HOME ?= @OO_URE_HOME@
+OO_HOME ?= @OO_HOME@
+IDLC ?= @IDLC@
+CPPUMAKER ?= @CPPUMAKER@
+REGMERGE ?= @REGMERGE@
+REGCOMP ?= @REGCOMP@
+TYPES_RDB ?= @TYPES_RDB@
+CPPUENV ?= @CPPUENV@
+
+OO_LDFLAGS ?= -L$(OO_HOME)/ure/lib -L$(OO_SDK_HOME)/lib -L$(OO_URE_HOME)/lib -Wl,-rpath-link=$(OO_URE_HOME)/lib -luno_cppu -luno_cppuhelpergcc3
+OO_CXXFLAGS ?= -Wno-strict-aliasing -DCPPU_ENV=$(CPPUENV) -DLANGUAGE_BINDING_NAME=\"$(CPPUENV)\" -Iuno/include -I$(OO_SDK_HOME)/include
+
+####################################################################################################
+# GUI Options
+####################################################################################################
+GUI = @GUI@
+GUI_CFLAGS = @GTK_CFLAGS@ @CAIRO_CFLAGS@ @IGEMAC_CFLAGS@ @LIBGNOME_CFLAGS@ -DLOGO=\"$(LOGO)\" -DICON=\"$(ICON)\"
+GUI_LIBS = @GTK_LIBS@ @CAIRO_LIBS@ @IGEMAC_LIBS@ @LIBGNOME_LIBS@
+
+####################################################################################################
+# Set compile/link parameters
+####################################################################################################
+
+# Common parameters
+DBG_CFLAGS=-DDEBUG=1 -ggdb
+CFLAGS = @CFLAGS@ @OS_CFLAGS@ -g -Wall -DLIBDIR=\"$(LIBDIR)\" -DDATAROOTDIR=\"$(datarootdir)\" -DLOCALEDIR=\"$(LOCALEDIR)\" -Isrc/include
+
+
+# Application parameters
+APP_CFLAGS=@APP_CFLAGS@
+APP_LDFLAGS=@OS_LFLAGS@
+
+# Library parameters
+DLL_CFLAGS ?= @DLL_CFLAGS@
+API_CFLAGS ?= @LIBSSL_CFLAGS@ @API_CFLAGS@
+API_LDFLAGS ?= @LIBSSL_LIBS@ @OS_LFLAGS@
+
+# Rexx parameters
+REXX_CFLAGS ?= @REXX_CFLAGS@
+REXX_LDFLAGS = @REXX_LIBS@ @GTK_LIBS@ @OS_DLLFLAGS@ @LIBICONV@ @REXX_SYMBOL_HACK@
+
+####################################################################################################
+# Sources
+####################################################################################################
+
+APP_SRCS =	main.c iocallback.c terminal.c screen.c mouse.c \
+			clipboard.c print.c config.c colors.c plugin.c filetransfer.c fonts.c \
+			version.c draw.c tracewindow.c commands.c script.c oia.c \
+			cursor.c @OS_APPSRCS@ action_calls.c @UI_SRCS@
+
+API_SRCS = 	XtGlue.c actions.c ansi.c apl.c charset.c ctlr.c \
+			ft.c ft_cut.c ft_dft.c glue.c host.c icmd.c kybd.c \
+			print.c printer.c proxy.c resources.c rpq.c screen.c see.c \
+			sf.c tables.c telnet.c toggles.c trace_ds.c utf8.c util.c \
+			xio.c resolver.c log.c paste.c @OS_APISRCS@
+# keymap.c idle.c macros.c
+
+REXX_COMMON_SRC =	common_start.c screen.c toggle.c tools.c init.c network.c filetransfer.c
+REXX_STD_SRC =	std_start.c
+REXX_PLG_SRC =	plg_start.c gui.c dialogs.c actions.c
+
+PIPECTL_SRC =	init.c commands.c
+
+JNI_SRC =	pw3270_jni.c
+
+JPLUGIN_SRC = j3270plugin.c
+
+OOO_SRCS = 	main.cxx connection.cxx screen.cxx actions.cxx status.cxx
+
+####################################################################################################
+# Targets
+####################################################################################################
+
+Release:	$(foreach BIN, $(TARGETS), bin/Release/$(BIN)) \
+			$(LOGO) \
+			$(foreach BIN, $(PLUGINS), bin/Release/plugins/$(BIN)$(DLLEXT)) \
+			$(foreach BIN, $(EXTENSIONS), bin/Release/$(BIN)$(DLLEXT))
+	@install -m 644 $(LOGO) bin/Release/$(LOGO)
+
+	@rm -f bin/Release/gtk-runtime
+	@if [ -d "@GTKRUNTIME@" ]; then ln -s "@GTKRUNTIME@" bin/Release/gtk-runtime ;fi
+	@mkdir -p bin/Release/ui
+	@for i in $(UI_XML_FILES); do install -m 644 $$i bin/Release/ui; done
+	
+	@mkdir -p bin/Release/$(LOCALEDIR)/pt_BR/LC_MESSAGES
+	@msgfmt -c -v -o bin/Release/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo po/pt_BR.po
+
+	@echo @PACKAGE@ Ok!
+
+Debug:		$(foreach BIN, $(TARGETS), bin/Debug/$(BIN)) \
+		$(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) \
+		$(LOGO)
+
+run: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(LOGO)
+	@bin/Debug/@PROGRAM_NAME@ --program-data="$(PWD)" --plugin-path=./bin/Debug/plugins
+
+memcheck: bin/Debug/@PROGRAM_NAME@@EXEEXT@ $(foreach BIN, $(PLUGINS), bin/Debug/plugins/$(BIN)$(DLLEXT)) $(LOGO)
+	@msgfmt -c -v -o $(LOCALEDIR)/pt_BR/LC_MESSAGES/@PROGRAM_NAME@.mo po/pt_BR.po
+	@cd bin/Debug ; LD_LIBRARY_PATH=. valgrind --leak-check=full ./@PROGRAM_NAME@ --program-data="../../"
+
+####################################################################################################
+# Install packages & Bundles
+####################################################################################################
+
+install-package: $(PACKAGE_MANAGER)
+
+rpm: @PACKAGE@-@PACKAGE_VERSION@.tar.gz
+	@rpmbuild -ta @PACKAGE@-@PACKAGE_VERSION@.tar.gz
+
+nsi: Release
+	@wine "$(HOME)/.wine/drive_c/Arquivos de programas/NSIS/makensis.exe" "$(PACKAGE).nsi"
+
+deb: debian/control
+	@dpkg-buildpackage -rfakeroot -uc -us
+
+bin/$(PACKAGE).app: Release
+	@rm -fr bin/$(PACKAGE).app
+	@ige-mac-bundler $(PACKAGE).bundle
+
+####################################################################################################
+# Rules
+####################################################################################################
+
+GLOBAL_DEPENDS=src/include/*.h src/include/lib3270/*.h Makefile
+
+####################################################################################################
+# Debug Rules
+####################################################################################################
+
+obj/Debug/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(DLL_CFLAGS) $(API_CFLAGS) -o $@ -c $<
+
+obj/Debug/src/@GUI@/%.o: src/@GUI@/%.c src/@GUI@/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(CFLAGS) $(APP_CFLAGS) $(GUI_CFLAGS) -o $@ -c $<
+
+obj/Debug/src/@GUI@/resources.o: src/@GUI@/resources.rc @PROGRAM_NAME@.ico Makefile
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(WINDRES) --include-dir=. -i $< -o $@
+
+obj/Debug/version.o: src/version.c
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(CFLAGS) -Isrc/lib -o $@ -c $<
+
+####################################################################################################
+# Release Rules
+####################################################################################################
+
+obj/Release/src/lib/%.o: src/lib/%.c src/lib/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DLL_CFLAGS) $(API_CFLAGS) $(CFLAGS) -o $@ -c $<
+
+obj/Release/src/@GUI@/%.o: src/@GUI@/%.c src/@GUI@/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(CFLAGS) $(APP_CFLAGS) $(GUI_CFLAGS) -o $@ -c $<
+
+obj/Release/src/@GUI@/resources.o: src/@GUI@/resources.rc @PROGRAM_NAME@.ico Makefile
+	@echo $< ...
+	@$(WINDRES) --include-dir=src/gui -i $< -o $@
+
+obj/Release/version.o: src/version.c
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(CFLAGS) -Isrc/lib -o $@ -c $<
+
+####################################################################################################
+# Release Targets
+####################################################################################################
+
+bin/Release/@PROGRAM_NAME@@EXEEXT@: bin/Release/lib/lib3270$(DLLEXT) $(foreach SRC, $(basename $(APP_SRCS)), obj/Release/src/@GUI@/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) @LD_RLSFLAGS@ -o $@ $^ $(APP_LDFLAGS) -Wl,-rpath,$(LIBDIR) $(GUI_LIBS)
+
+bin/Release/lib/lib3270$(DLLEXT): obj/Release/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Release/src/lib/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@rm -f $(basename \$(@F)).a
+	@rm -f $(basename \$(@F)).def
+	@$(LD) @OS_DLLFLAGS@ @LD_APIFLAGS@ @LD_RLSFLAGS@ -o $@ $^ $(API_LDFLAGS)
+	@if [ -f $(basename \$(@F)).def ]; then mv -f $(basename \$(@F)).def `dirname $@` ; fi
+	@if [ -f $(basename \$(@F)).a ]; then mv -f $(basename \$(@F)).a `dirname $@` ; fi
+
+####################################################################################################
+# Debug Targets
+####################################################################################################
+
+bin/Debug/@PROGRAM_NAME@@EXEEXT@: bin/Debug/lib/lib3270$(DLLEXT) $(foreach SRC, $(basename $(APP_SRCS)), obj/Debug/src/@GUI@/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) -o $@ $^ -L$(DBG_LIBDIR) -l3270 -Wl,-rpath,bin/Debug/lib $(APP_LDFLAGS) $(GUI_LIBS)
+
+bin/Debug/lib/lib3270$(DLLEXT): obj/Debug/version.o obj/Release/src/lib/fallbacks.o $(foreach SRC, $(basename $(API_SRCS)), obj/Debug/src/lib/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@rm -f $(basename \$(@F)).a
+	@rm -f $(basename \$(@F)).def
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ $(API_LDFLAGS)
+
+####################################################################################################
+# gettext Rules
+####################################################################################################
+
+pot/%.pot: src/%.c Makefile
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@xgettext	--default-domain=$(PACKAGE) --language=C \
+			--keyword=_ --keyword=N_ --keyword=MSG_:2 --output=$@ $<
+	@touch $@
+
+pot/%.pot: src/%.rc Makefile
+	@echo $@ ...
+	@touch $@
+
+pot/%.pot: %.xml bin/xml2pot
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@bin/xml2pot "$<" > "$@"
+
+####################################################################################################
+# Misc Rules
+####################################################################################################
+
+%.class: %.java
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(JAVAC) -cp bin/java -sourcepath `dirname $^` -d `dirname $@` $^
+
+bin/java/@PACKAGE@/%.class: src/java/%.java
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(JAVAC) -cp bin/java -sourcepath src/java -d bin/java $^
+
+####################################################################################################
+# OpenOffice.org extension
+####################################################################################################
+
+oooDebug: bin/Debug/unotest
+
+@PROGRAM_NAME@.oxt: bin/Release/@PROGRAM_NAME@.uno@DLLEXT@ uno/@PROGRAM_NAME@.uno.rdb src/oxt/description.xml src/oxt/manifest.xml src/oxt/description.txt
+	@echo $@ ...
+	@rm -fr uno/oxt.tmp
+	@mkdir -p uno/oxt.tmp/META-INF
+	@cp src/oxt/manifest.xml uno/oxt.tmp/META-INF
+	@cp src/oxt/description.xml uno/oxt.tmp
+	@cp src/oxt/description.txt uno/oxt.tmp
+	@cp image/pw3270.png uno/oxt.tmp/@PROGRAM_NAME@.png
+	@cp bin/Release/@PROGRAM_NAME@.uno@DLLEXT@ uno/oxt.tmp
+	@cp uno/@PROGRAM_NAME@.uno.rdb uno/oxt.tmp
+	@cd uno/oxt.tmp ; zip -m -r ../../@PROGRAM_NAME@.oxt .
+	@echo $@ Ok.
+
+obj/Debug/src/oxt/%.o: src/oxt/%.cxx src/oxt/*.hpp $(GLOBAL_DEPENDS) uno/include/br/com/bb/$(PACKAGE).hpp
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CXX) $(DBG_CFLAGS) $(CFLAGS) $(DLL_CFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -Iuno/include -o $@ -c $<
+
+obj/Release/src/oxt/%.o: src/oxt/%.cxx src/oxt/*.hpp $(GLOBAL_DEPENDS) uno/include/br/com/bb/$(PACKAGE).hpp
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CXX) $(CFLAGS) $(DLL_CFLAGS) $(OO_CXXFLAGS) $(LIB3270_CFLAGS) -Iuno/include -o $@ -c $<
+
+bin/Debug/unotest: bin/Debug/@PROGRAM_NAME@.uno@DLLEXT@ obj/Debug/src/oxt/testprogram.@OBJEXT@
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CXX) -o $@ obj/Debug/src/oxt/testprogram.@OBJEXT@ -L$(DBG_LIBDIR) -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
+
+bin/Release/@PROGRAM_NAME@.uno@DLLEXT@: $(RLS_LIBDIR)/lib3270$(DLLEXT) $(foreach SRC, $(basename $(OOO_SRCS)), obj/Release/src/oxt/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CXX) @OS_DLLFLAGS@ -o $@ $(foreach SRC, $(basename $(OOO_SRCS)), obj/Release/src/oxt/$(SRC).@OBJEXT@) -L$(RLS_LIBDIR) -Wl,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
+
+bin/Debug/@PROGRAM_NAME@.uno@DLLEXT@: $(DBG_LIBDIR)/lib3270$(DLLEXT) $(foreach SRC, $(basename $(OOO_SRCS)), obj/Debug/src/oxt/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CXX) @OS_DLLFLAGS@ -o $@ $(foreach SRC, $(basename $(OOO_SRCS)), obj/Debug/src/oxt/$(SRC).@OBJEXT@) -L$(DBG_LIBDIR) -Wl,-rpath=bin/Debug,-rpath=$(OO_URE_HOME)/lib -l3270 $(OO_LDFLAGS)
+
+uno/%.urd: src/oxt/%.idl
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(IDLC) -C -I$(OO_SDK_HOME)/idl -O`dirname $@` $<
+
+%.uno.rdb : %.urd
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@rm -f $@
+	@$(REGMERGE) --verbose $@ / $(TYPES_RDB)
+	@$(REGMERGE) --verbose $@ /UCR $<
+	@$(REGMERGE) --verbose $@ / $<
+
+uno/include/br/com/bb/$(PACKAGE).hpp: uno/$(PACKAGE).uno.rdb
+	@echo $< ...
+	@rm -fr ./uno/include
+	@mkdir ./uno/include
+	@$(CPPUMAKER) -O./uno/include -Gc -L -BUCR $<
+	@touch $@
+
+####################################################################################################
+# Pipectl plugin
+####################################################################################################
+
+# Debug
+obj/Debug/src/plugins/pipectl/%.o: src/plugins/pipectl/%.c src/plugins/pipectl/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(CFLAGS) $(DBG_CFLAGS) $(GUI_CFLAGS) $(DLL_CFLAGS) $(REXX_CFLAGS) -o $@ -c $<
+
+bin/Debug/plugins/pipectl$(DLLEXT): 	$(DBG_LIBDIR)/lib3270$(DLLEXT) \
+					$(foreach SRC, $(PIPECTL_SRC), obj/Debug/src/plugins/pipectl/$(basename $(SRC)).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(GUI_LIBS)
+
+# Release
+obj/Release/src/plugins/pipectl/%.o: src/plugins/pipectl/%.c src/plugins/pipectl/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(CFLAGS) $(GUI_CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
+
+bin/Release/plugins/pipectl$(DLLEXT): 	$(RLS_LIBDIR)/lib3270$(DLLEXT) \
+					$(foreach SRC, $(PIPECTL_SRC), obj/Release/src/plugins/pipectl/$(basename $(SRC)).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@rm -f $(basename \$(@F)).a
+	@rm -f $(basename \$(@F)).def
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(GUI_LIBS)
+
+pipetest: bin/Debug/pipetest@EXEEXT@
+	@echo $@ Ok
+
+bin/Debug/pipetest@EXEEXT@: obj/Debug/src/plugins/pipectl/pipetest.o
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) -o $@ $^ -L$(DBG_LIBDIR) -Wl,-rpath,bin/Debug $(APP_LDFLAGS) $(GUI_LIBS)
+
+
+####################################################################################################
+# Rexx plugin/extension
+####################################################################################################
+
+# Debug
+DBGRexx: bin/Debug/librx3270$(DLLEXT)
+
+rextest:  bin/Debug/librx3270$(DLLEXT)
+	@LD_LIBRARY_PATH=bin/Debug rexx rexxtest.rex
+
+obj/Debug/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(CFLAGS) $(DBG_CFLAGS) $(GUI_CFLAGS) $(REXX_CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
+
+bin/Debug/plugins/rx3270$(DLLEXT): 	bin/Debug/lib/lib3270$(DLLEXT) \
+					$(foreach SRC, $(REXX_PLG_SRC) $(REXX_COMMON_SRC), obj/Debug/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS) $(GUI_LIBS)
+
+bin/Debug/librx3270$(DLLEXT): 		bin/Debug/lib/lib3270$(DLLEXT) \
+					$(foreach SRC, $(REXX_STD_SRC) $(REXX_COMMON_SRC), obj/Debug/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS) $(GUI_LIBS)
+
+#Release
+obj/Release/src/plugins/rexx/%.o: src/plugins/rexx/%.c src/plugins/rexx/*.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(CFLAGS) $(GUI_CFLAGS) $(REXX_CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
+
+bin/Release/plugins/rx3270$(DLLEXT): 	bin/Release/lib/lib3270$(DLLEXT) \
+					$(foreach SRC, $(REXX_PLG_SRC) $(REXX_COMMON_SRC), obj/Release/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS) $(GUI_LIBS)
+
+bin/Release/librx3270$(DLLEXT): 		bin/Release/lib/lib3270$(DLLEXT) \
+					$(foreach SRC, $(REXX_STD_SRC) $(REXX_COMMON_SRC), obj/Release/src/plugins/rexx/$(basename $(SRC)).@OBJEXT@)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) @OS_DLLFLAGS@ -o $@ $^ $(REXX_LDFLAGS)
+
+####################################################################################################
+# Java
+####################################################################################################
+
+# Misc
+src/java/lib3270_jni.h: bin/java/@PACKAGE@/terminal.class
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(JAVAH) -o $@ -classpath bin/java @PACKAGE@.terminal
+
+# Debug
+obj/Debug/src/java/%.o: src/java/%.c src/java/lib3270_jni.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(JAVA_CFLAGS) $(CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
+
+obj/Debug/src/plugins/java/%.o: src/plugins/java/%.c $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(DBG_CFLAGS) $(JAVA_CFLAGS) $(APP_CFLAGS) $(GUI_CFLAGS) $(CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
+
+bin/Debug/$(PACKAGE).jar: bin/java/@PACKAGE@/terminal.class
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@jar -cvf "$@" -C "bin/java" "@PACKAGE@"
+
+bin/Debug/plugins/j3270plugin$(DLLEXT): 	bin/Debug/lib/lib3270$(DLLEXT) \
+				$(foreach SRC, $(JPLUGIN_SRC), obj/Debug/src/plugins/java/$(basename $(SRC)).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -L$(DBG_LIBDIR) -l3270 $(JAVA_LDFLAGS) @GTK_LIBS@
+
+bin/Debug/lib$(PACKAGE)_jni$(DLLEXT): bin/Debug/lib/lib3270$(DLLEXT) $(foreach SRC, $(basename $(JNI_SRC)), obj/Debug/src/java/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -L$(DBG_LIBDIR) -l3270 -Wl,-rpath,bin/Debug
+
+jnidebug: bin/Debug/lib$(PACKAGE)_jni$(DLLEXT) bin/Release/$(PACKAGE).jar
+
+
+# Release
+obj/Release/src/java/%.o: src/java/%.c src/java/lib3270_jni.h $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(JAVA_CFLAGS) $(CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
+
+obj/Release/src/plugins/java/%.o: src/plugins/java/%.c $(GLOBAL_DEPENDS)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(JAVA_CFLAGS) $(GUI_CFLAGS) $(CFLAGS) $(DLL_CFLAGS) -o $@ -c $<
+
+bin/Release/$(PACKAGE).jar: bin/java/@PACKAGE@/terminal.class
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@jar -cvf "$@" -C "bin/java" "@PACKAGE@"
+
+bin/Release/plugins/j3270plugin$(DLLEXT): 	$(RLS_LIBDIR)/lib3270$(DLLEXT) \
+				$(foreach SRC, $(JPLUGIN_SRC), obj/Release/src/plugins/java/$(basename $(SRC)).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -L$(RLS_LIBDIR) -l3270 $(JAVA_LDFLAGS) @GTK_LIBS@
+
+
+bin/Release/lib$(PACKAGE)_jni$(DLLEXT): $(RLS_LIBDIR)/lib3270$(DLLEXT) $(foreach SRC, $(basename $(JNI_SRC)), obj/Release/src/java/$(SRC).@OBJEXT@)
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(LD) @OS_DLLFLAGS@ -o $@ $^ -L$(RLS_LIBDIR) -l3270 -Wl,-rpath,$(LIBDIR)
+
+java: bin/Release/$(PACKAGE).jar bin/Release/lib$(PACKAGE)_jni$(DLLEXT) bin/Release/plugins/j3270plugin$(DLLEXT)
+	@echo "Java modules ok Ok!"
+
+####################################################################################################
+# Misc Targets
+####################################################################################################
+
+src/lib/fallbacks.c: $(MKFB) src/lib/X3270.xad Makefile
+	@$(RM) $@
+	@mkdir -p `dirname $@`
+	@$(MKFB) -c src/lib/X3270.xad $@
+
+$(MKFB): src/lib/mkfb.c Makefile
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(HOST_CC) -g -o $@ -D_WIN32 src/lib/mkfb.c
+
+bin/xml2pot: src/xml2pot.c
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(CC) $(GUI_CFLAGS) $(GUI_LIBS) -o $@ $<
+
+$(LOGO): $(PACKAGE_LOGO)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@cp $< $@
+
+$(ICON): $(PACKAGE_ICON)
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@cp $< $@
+
+$(PACKAGE).desktop: Makefile $(ICON)
+	@rm -f $@
+	@echo "[Desktop Entry]" > $@
+	@echo "Encoding=UTF-8" >> $@
+	@echo "GenericName=$(PACKAGE)" >> $@
+	@echo "Name=3270 Terminal" >> $@
+	@echo "Name[pt_BR]=Terminal 3270" >> $@
+	@echo "Comment=IBM 3270 Terminal emulator" >> $@
+	@echo "Exec=$(bindir)/$(PACKAGE)" >> $@
+	@echo "Icon=$(datarootdir)/$(PACKAGE)/$(ICON)" >> $@
+	@echo "Terminal=false" >> $@
+	@echo "Type=Application" >> $@
+	@echo "StartupNotify=true" >> $@
+
+src/version.c:	src/lib/*.c src/mkversion.sh Makefile $(GLOBAL_DEPENDS)
+	@src/mkversion.sh
+
+pot/$(PACKAGE).pot:	$(foreach SRC, $(basename $(APP_SRCS)), pot/@GUI@/$(SRC).pot) \
+			$(foreach SRC, $(basename $(API_SRCS)), pot/lib/$(SRC).pot) \
+			$(foreach SRC, $(basename $(REXX_COMMON_SRC)), pot/plugins/rexx/$(SRC).pot) \
+			$(foreach SRC, $(basename $(REXX_STD_SRC)), pot/plugins/rexx/$(SRC).pot) \
+			$(foreach SRC, $(basename $(REXX_PLG_SRC)), pot/plugins/rexx/$(SRC).pot) \
+			$(foreach SRC, $(basename $(UI_XML_FILES)), pot/$(SRC).pot) \
+			$(foreach SRC, $(basename $(PLUGINS_UI)), pot/ui/$(SRC).pot)
+
+	@rm -f $@
+	@msgcat --sort-output $^ | sed "s&PACKAGE VERSION&$(PACKAGE) $(PACKAGE_VERSION)&;s&CHARSET&UTF-8&" > $@
+
+$(PACKAGE).po: pot/$(PACKAGE).pot
+	@msginit --no-translator -o $@ -i $^
+
+tgz: $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
+
+####################################################################################################
+# Install targets
+####################################################################################################
+
+debian/control: debian/control-base $(foreach PKT, @INSTALL_PACKETS@, debian/control-$(PKT))
+	@cat debian/control-base $(foreach PKT, @INSTALL_PACKETS@, debian/control-$(PKT)) > $@
+
+install: install-common install-gui @INSTALL_TARGETS@ install-doc
+
+install-plugin-java: bin/Release/libpw3270_jni.so bin/Release/pw3270.jar
+	@mkdir -p $(DESTDIR)/$(JNIDIR)
+	@mkdir -p $(DESTDIR)/$(JARDIR)
+	@install -m 644 bin/Release/libpw3270_jni.so $(DESTDIR)/$(JNIDIR)
+	@install -m 644 bin/Release/pw3270.jar $(DESTDIR)/$(JARDIR)
+
+install-plugin-rexx: bin/Release/librx3270.so
+	@mkdir -p $(DESTDIR)/$(bindir)
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+	@mkdir -p $(DESTDIR)/$(LIBDIR)
+	@rexxc src/plugins/rexx/rx3270.cls $(DESTDIR)/$(bindir)/rx3270.cls
+	@install -m 644 ui/rexx.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui/rexx.xml
+	@install -m 644 bin/Release/librx3270.so $(DESTDIR)/$(LIBDIR)/librx3270.so
+
+install-oxt: @PROGRAM_NAME@.oxt
+	@mkdir -p $(DESTDIR)/$(OO_HOME)/share/extension/install/
+	@install -m 644 @PROGRAM_NAME@.oxt $(DESTDIR)/$(OO_HOME)/share/extension/install/@PROGRAM_NAME@.oxt
+
+install-dev: lib3270.pc
+	@mkdir -p $(DESTDIR)/@includedir@/lib3270
+	@mkdir -p $(DESTDIR)/$(LIBDIR)/pkgconfig
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+	@install --mode=644 src/include/lib3270.h $(DESTDIR)/@includedir@
+	@install --mode=644 src/include/lib3270/*.h $(DESTDIR)/@includedir@/lib3270
+	@install --mode=644 lib3270.pc $(DESTDIR)/$(LIBDIR)/pkgconfig/$(PACKAGE).pc
+	@install --mode=644 ui/debug.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+
+install-doc:
+	@mkdir -p $(DESTDIR)/$(docdir)
+	@install --mode=644 LICENCA $(DESTDIR)/$(docdir)
+	@install --mode=644 LICENSE $(DESTDIR)/$(docdir)
+	@install --mode=644 AUTHORS $(DESTDIR)/$(docdir)
+
+install-gui: bin/Release/@PROGRAM_NAME@@EXEEXT@ $(ICON) $(LOGO)
+	@mkdir -p $(DESTDIR)/$(bindir)
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+	@mkdir -p $(DESTDIR)/$(LOCALEDIR)
+	@mkdir -p $(DESTDIR)/$(datarootdir)/applications/
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+
+	@install --mode=755 bin/Release/@PROGRAM_NAME@@EXEEXT@ $(DESTDIR)/$(bindir)
+	@install --mode=644 $(LOGO) $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 $(ICON) $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE)
+	@install --mode=644 $(DEFAULT_CONFIG) $(DESTDIR)/$(datarootdir)/$(PACKAGE)/@PROGRAM_NAME@.conf
+
+	@install --mode=644 ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+	@install --mode=644 ui/keypad.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+	@install --mode=644 ui/functions.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+
+	@desktop-file-install	--mode 644 \
+				--dir $(DESTDIR)/$(datarootdir)/applications \
+				--add-category TerminalEmulator \
+				$(PACKAGE).desktop
+
+	@mkdir -p $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES
+	@install --mode=644 bin/Release/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo $(DESTDIR)/$(LOCALEDIR)/pt_BR/LC_MESSAGES/pw3270.mo
+
+install-common: Release po/pt_BR.po $(PACKAGE).desktop
+
+	@mkdir -p $(DESTDIR)/$(bindir)
+	@mkdir -p $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui
+
+	@for i in $(PLUGINS); do install --mode=755 bin/Release/plugins/$$i$(DLLEXT) $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/plugins; done
+	@for i in $(PLUGINS_UI); do install --mode=644 ui/$$i $(DESTDIR)/$(datarootdir)/$(PACKAGE)/ui; done
+
+	@install --mode=755 bin/Release/lib/lib3270$(DLLEXT) $(DESTDIR)/$(LIBDIR)
+
+
+$(PACKAGE)-$(PACKAGE_VERSION).tar.gz: clean
+
+	@rm -fr $(TMPDIR)/$(PACKAGE).tmp
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp *.spec $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp pw3270.cbp $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp *.m4 $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp configure.ac $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp *.in $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp *.conf $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+
+	@cp AUTHORS $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp LICENSE $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@cp LICENCA $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+	@touch ChangeLog
+	@cp ChangeLog $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
+	@cp -r image/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/image
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/ui
+	@cp -r ui/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/ui
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/po
+	@cp -r po/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/po
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/src
+	@cp -r src/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/src
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/scripts
+	@cp -r scripts/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/scripts
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/debian
+	@cp -r debian/* $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/debian
+
+	@rm -f $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/debian/control
+	@rm -f $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/Makefile
+	@rm -f $(TMPDIR)/$(PACKAGE).tmp/$(PACKAGE)-$(PACKAGE_VERSION)/*.layout
+	@tar --create --gzip --verbose --directory $(TMPDIR)/$(PACKAGE).tmp --exclude-vcs --file=$@ $(PACKAGE)-$(PACKAGE_VERSION)
+	@echo $@
+
+distclean: clean
+	@rm -f src/version.c
+	@rm -f src/java/lib3270_jni.h
+	@rm -f src/include/lib3270/plugins.h
+	@rm -f src/include/lib3270/stamp-h1
+	@rm -f src/include/lib3270/config.h
+	@rm -f src/@GUI@/version.c
+	@rm -f src/@GUI@/resources.rc
+	@rm -f src/lib/fallbacks.c
+	@rm -f src/oxt/description.xml
+	@rm -f src/oxt/pw3270.uno.exp
+	@rm -f src/oxt/manifest.xml
+	@rm -f src/oxt/pw3270.uno.lib
+	@rm -f lib3270.pc
+	@rm -f pw3270.layout
+	@rm -f *.nsi
+
+clean:
+	@rm -fr obj
+	@rm -fr uno
+	@rm -fr bin
+	@rm -fr pot
+	@rm -fr src/oxt/br
+	@rm -fr src/oxt/com
+	@rm -f	src/lib/fallbacks.c
+	@rm -f	src/lib/version.o
+	@rm -f	$(MKFB)
+	@rm -f	src/version.c
+	@rm -f	sources.lst
+	@rm -f	$(PACKAGE)-$(PACKAGE_VERSION).tar.gz
+	@rm -f $(PACKAGE).pot
+	@rm -f $(PACKAGE).po
+	@rm -fr autom4te.cache
+	@rm -f config.status
+	@rm -f *.lnk
+	@rm -fr locale
+	@rm -f $(ICO)
+	@rm -f $(LOGO)
+	@rm -f @PROGRAM_NAME@.oxt
+	@rm -f src/java/lib3270_jni.h
+	@rm -f src/oxt/pw3270.uno.rdb
+
+	@if [ -e src/plugins/rexx/Makefile ]; then make -C src/plugins/rexx clean; fi
+	@if [ -e src/extensions/uno/Makefile ]; then make -C src/extensions/uno clean; fi
+
+	@find . -name "*.obj" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.map" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.class" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.def" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.lnk" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.a" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.save" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*~" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.bak" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.exe" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.log" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.dll" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "leak.out" -exec mv -f {} $(TMPDIR) \;
+	@find . -name "*.tmp" -exec mv -f {} $(TMPDIR) \;
