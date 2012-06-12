@@ -55,6 +55,8 @@ AM_INIT_AUTOMAKE
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+AC_PATH_TOOL([MAKENSIS], [makensis], [no])
+AC_PATH_TOOL([WINDRES], [windres], [no])
 
 # Check for iconv
 AM_ICONV

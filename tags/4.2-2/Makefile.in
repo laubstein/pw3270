@@ -260,7 +260,7 @@ obj/Release/src/@GUI@/%.o: src/@GUI@/%.c src/@GUI@/*.h $(GLOBAL_DEPENDS)
 
 obj/Release/src/@GUI@/resources.o: src/@GUI@/resources.rc @PROGRAM_NAME@.ico Makefile
 	@echo $< ...
-	@$(WINDRES) --include-dir=src/gui -i $< -o $@
+	@$(WINDRES) --include-dir=src/gtk2 -i $< -o $@
 
 obj/Release/version.o: src/version.c
 	@echo $< ...
