@@ -79,19 +79,22 @@ extern char *profile_name;
 #endif
 
 static const struct lib3270_screen_callbacks *callbacks = NULL;
-static SCRIPT_STATE script_state = SCRIPT_STATE_NONE;
 
+int lib3270_event_counter[COUNTER_ID_USER] = { 0, 0, 0 };
 
-int lib3270_event_counter[COUNTER_ID_USER] = { 0, 0 };
+Boolean screen_has_changes = 0;
 
 enum ts { TS_AUTO, TS_ON, TS_OFF };
+enum ts ab_mode = TS_AUTO;
 
-static void screen_update(H3270 *session, int bstart, int bend);
-static void status_connect(H3270 *session, int ignored, void *dunno);
-static void status_3270_mode(H3270 *session, int ignored, void *dunno);
-static void status_printer(H3270 *session, int on, void *dunno);
-static unsigned short color_from_fa(unsigned char fa);
-static void relabel(H3270 *session, int ignored, void *dunno);
+// int windows_cp = 0;
+
+static void status_connect(int ignored);
+static void status_3270_mode(int ignored);
+static void status_printer(int on);
+static int color_from_fa(unsigned char fa);
+static Boolean ts_value(const char *s, enum ts *tsp);
+static void relabel(int ignored);
 
 void set_display_charset(char *dcs)
 {
@@ -99,17 +102,11 @@ void set_display_charset(char *dcs)
 		callbacks->charset(dcs);
 }
 
-static void addch(H3270 *session, int baddr, unsigned char c, unsigned short attr)
+static void
+addch(int row, int col, int c, int attr)
 {
-	/* Converted char has changed, update it */
-	ea_buf[baddr].chr  = c;
-	ea_buf[baddr].attr = attr;
-
 	if(callbacks && callbacks->addch)
-		callbacks->addch(baddr/session->cols, baddr%session->cols, c, attr);
-
-	if(session->update)
-		session->update(session,baddr,c,attr,baddr == session->cursor_addr);
+		callbacks->addch(row, col, c, attr);
 }
 
 /**
@@ -118,41 +115,19 @@ static void addch(H3270 *session, int baddr, unsigned char c, unsigned short att
  * @return 0 if ok, non zero if not
  *
  */
-int screen_init(H3270 *session)
+int screen_init(void)
 {
-	CHECK_SESSION_HANDLE(session);
+
+	/* Disallow altscreen/defscreen. */
+	if ((appres.altscreen != CN) || (appres.defscreen != CN))
+	{
+		popup_an_error("altscreen/defscreen not supported");
+		return -1;
+	}
 
 	/* Initialize the console. */
-	if(callbacks)
+	if(callbacks && callbacks->init)
 	{
-		/* Init default callbacks */
-		if(callbacks->move_cursor)
-			session->update_cursor = callbacks->move_cursor;
-
-		if(callbacks->set_oia)
-			session->update_oia = callbacks->set_oia;
-
-		if(callbacks->set_viewsize)
-			session->configure = callbacks->set_viewsize;
-
-		if(callbacks->lu)
-			session->update_luname = callbacks->lu;
-
-		if(callbacks->status)
-			session->update_status = callbacks->status;
-
-		if(callbacks->erase)
-			session->erase = callbacks->erase;
-
-		if(callbacks->cursor)
-			session->cursor = callbacks->cursor;
-
-		if(callbacks->toggle_changed)
-			session->update_toggle = callbacks->toggle_changed;
-
-		if(callbacks->model_changed)
-			session->update_model = callbacks->model_changed;
-
 		if(callbacks->init())
 		{
 			popup_an_error("Can't initialize terminal.");
@@ -160,26 +135,32 @@ int screen_init(H3270 *session)
 		}
 	}
 
-	/* Set up callbacks for state changes. */
-	lib3270_register_schange(session,ST_CONNECT, status_connect,0);
-	lib3270_register_schange(session,ST_3270_MODE, status_3270_mode,0);
-	lib3270_register_schange(session,ST_PRINTER, status_printer,0);
+//	if(callbacks && callbacks->setsize)
+//		callbacks->setsize(maxROWS,maxCOLS);
 
-	lib3270_register_schange(session,ST_HALF_CONNECT, relabel,0);
-	lib3270_register_schange(session,ST_CONNECT, relabel,0);
-	lib3270_register_schange(session,ST_3270_MODE, relabel,0);
+	/* Set up callbacks for state changes. */
+	register_schange(ST_CONNECT, status_connect);
+	register_schange(ST_3270_MODE, status_3270_mode);
+	register_schange(ST_PRINTER, status_printer);
+
+	register_schange(ST_HALF_CONNECT, relabel);
+	register_schange(ST_CONNECT, relabel);
+	register_schange(ST_3270_MODE, relabel);
 
 	/* See about all-bold behavior. */
-//	if (appres.all_bold_on)
-//		ab_mode = TS_ON;
-//	else if (!ts_value(appres.all_bold, &ab_mode))
-//		(void) fprintf(stderr, "invalid %s value: '%s', assuming 'auto'\n", ResAllBold, appres.all_bold);
-//	if (ab_mode == TS_AUTO)
-//		ab_mode = appres.m3279? TS_ON: TS_OFF;
+	if (appres.all_bold_on)
+		ab_mode = TS_ON;
+	else if (!ts_value(appres.all_bold, &ab_mode))
+		(void) fprintf(stderr, "invalid %s value: '%s', "
+		    "assuming 'auto'\n", ResAllBold, appres.all_bold);
+	if (ab_mode == TS_AUTO)
+		ab_mode = appres.m3279? TS_ON: TS_OFF;
+
+	/* Pull in the user's color mappings. */
 
 	/* Set up the controller. */
-	ctlr_init(session,-1);
-	ctlr_reinit(session,-1);
+	ctlr_init(-1);
+	ctlr_reinit(-1);
 
 	/* Set the window label. */
 #if defined(WC3270) /*[*/
@@ -193,28 +174,59 @@ int screen_init(H3270 *session)
 #endif
 
 	/* Finish screen initialization. */
-	screen_suspend(session);
+	screen_suspend();
 
 	return 0;
 }
 
+/*
+ * Parse a tri-state resource value.
+ * Returns True for success, False for failure.
+ */
+static Boolean
+ts_value(const char *s, enum ts *tsp)
+{
+	*tsp = TS_AUTO;
+
+	if (s != CN && s[0]) {
+		int sl = strlen(s);
+
+		if (!strncasecmp(s, "true", sl))
+			*tsp = TS_ON;
+		else if (!strncasecmp(s, "false", sl))
+			*tsp = TS_OFF;
+		else if (strncasecmp(s, "auto", sl))
+			return False;
+	}
+	return True;
+}
+
+
 /* Map a field attribute to its default colors. */
-static unsigned short color_from_fa(unsigned char fa)
+static int
+color_from_fa(unsigned char fa)
 {
 	if (appres.m3279)
 		return get_color_pair(DEFCOLOR_MAP(fa),0) | COLOR_ATTR_FIELD;
 
 	// Green on black
-	return get_color_pair(0,0) | COLOR_ATTR_FIELD | ((FA_IS_HIGH(fa)) ? COLOR_ATTR_INTENSIFY : 0);
+	return get_color_pair(0,0) | COLOR_ATTR_FIELD | (((ab_mode == TS_ON) || FA_IS_HIGH(fa)) ? COLOR_ATTR_INTENSIFY : 0);
+}
+
+static int reverse_colors(int a)
+{
+	int bg = (a & 0xF0) >> 4;
+	int fg = (a & 0x0F);
+	return get_color_pair(bg,fg) | (a&0xFF00);
 }
 
 /*
  * Find the display attributes for a baddr, fa_addr and fa.
  */
-static unsigned short calc_attrs(int baddr, int fa_addr, int fa)
+static int
+calc_attrs(int baddr, int fa_addr, int fa)
 {
-	unsigned short fg=0, bg=0, a;
-	int gr;
+    	int fg = 0, bg = 0, gr, a;
 
 	/* Compute the color. */
 
@@ -223,12 +235,11 @@ static unsigned short calc_attrs(int baddr, int fa_addr, int fa)
 		(!ea_buf[baddr].fg &&
 		 !ea_buf[fa_addr].fg &&
 		 !ea_buf[baddr].bg &&
-		 !ea_buf[fa_addr].bg))
-	{
-		a = color_from_fa(fa);
-	}
-	else
-	{
+		 !ea_buf[fa_addr].bg)) {
+
+	    	a = color_from_fa(fa);
+
+	} else {
 
 		/* The current location or the fa specifies the fg or bg. */
 		if (ea_buf[baddr].fg)
@@ -266,84 +277,75 @@ static unsigned short calc_attrs(int baddr, int fa_addr, int fa)
 	if(!(gr & GR_REVERSE) && !bg)
 	{
 		if(gr & GR_BLINK)
-			a |= LIB3270_ATTR_BLINK;
+			a |= COLOR_ATTR_BLINK;
 
 		if(gr & GR_UNDERLINE)
-			a |= LIB3270_ATTR_UNDERLINE;
+			a |= COLOR_ATTR_UNDERLINE;
 	}
 
-	if(appres.m3279 && (gr & (GR_BLINK | GR_UNDERLINE)) && !(gr & GR_REVERSE) && !bg)
-    	a |= LIB3270_ATTR_BACKGROUND_INTENSITY;
 
-	if(!appres.m3279 &&	((gr & GR_INTENSIFY) || FA_IS_HIGH(fa)))
-		a |= LIB3270_ATTR_INTENSIFY;
+/*
+	if (appres.highlight_underline &&
+		appres.m3279 &&
+		(gr & (GR_BLINK | GR_UNDERLINE)) &&
+		!(gr & GR_REVERSE) &&
+		!bg) {
+
+	    	a |= BACKGROUND_INTENSITY;
+	}
+*/
+
+	if(!appres.m3279 &&	((gr & GR_INTENSIFY) || (ab_mode == TS_ON) || FA_IS_HIGH(fa)))
+		a |= COLOR_ATTR_INTENSIFY;
 
 	if (gr & GR_REVERSE)
-		a = get_color_pair(((a & 0xF0) >> 4),(a & 0x0F)) | (a&0xFF00); // a = reverse_colors(a);
+		a = reverse_colors(a);
 
 	return a;
 }
 
 /* Erase screen */
-void screen_erase(H3270 *session)
+void screen_erase(void)
 {
-	/* If the application supplies a callback use it!, if not just redraw with blanks */
-	if(session->erase)
-		session->erase(session);
-	else
-		screen_update(session,0,session->rows * session->cols);
+	/* If the application supplies a callback use it! */
+	if(callbacks && callbacks->erase)
+	{
+		callbacks->erase();
+		screen_has_changes = 0;
+		return;
+	}
+
+	/* No callback, just redraw */
+	screen_disp();
 }
 
-LIB3270_EXPORT void lib3270_get_screen_size(H3270 *h, int *r, int *c)
+LIB3270_EXPORT void get_3270_terminal_size(H3270 *h, int *rows, int *cols)
 {
-	*r = h->rows;
-	*c = h->cols;
+	*rows = ROWS;
+	*cols = cCOLS;
 }
 
 void update_model_info(H3270 *session, int model, int cols, int rows)
 {
-	if(model == session->model_num && session->maxROWS == rows && session->maxCOLS == cols)
+	if(model == model_num && maxROWS == rows && maxCOLS == cols)
 		return;
 
-	session->maxCOLS   	= cols;
-	session->maxROWS   	= rows;
-	session->model_num	= model;
+	maxCOLS   = cols;
+	maxROWS   = rows;
+	model_num = model;
 
 	/* Update the model name. */
-	(void) sprintf(session->model_name, "327%c-%d%s",appres.m3279 ? '9' : '8',session->model_num,appres.extended ? "-E" : "");
+	(void) sprintf(session->model_name, "327%c-%d%s",appres.m3279 ? '9' : '8',model_num,appres.extended ? "-E" : "");
 
-	if(session->update_model)
-		session->update_model(session, session->model_name,session->model_num,rows,cols);
-	else if(callbacks && callbacks->model_changed)
-		callbacks->model_changed(session, session->model_name,session->model_num,rows,cols);
-}
-
-LIB3270_EXPORT int lib3270_get_contents(H3270 *h, int first, int last, unsigned char *chr, unsigned short *attr)
-{
-	int baddr;
-	int len;
-
-    CHECK_SESSION_HANDLE(h);
-
-	len = h->rows * h->cols;
-
-	if(first > len || last > len || first < 0 || last < 0)
-		return EFAULT;
-
-	for(baddr = first; baddr <= last;baddr++)
-	{
-		*(chr++)  = ea_buf[baddr].chr ? ea_buf[baddr].chr : ' ';
-		*(attr++) = ea_buf[baddr].attr;
-	}
-
-	return 0;
+	if(callbacks && callbacks->model_changed)
+		callbacks->model_changed(session, session->model_name,model_num,cols,rows);
 }
 
 /* Get screen contents */
 int screen_read(char *dest, int baddr, int count)
 {
-	unsigned char fa	= get_field_attribute(&h3270,baddr);
-	int 			max = (h3270.maxROWS * h3270.maxCOLS);
+	unsigned char fa	= get_field_attribute(baddr);
+	int 			max = (maxROWS * maxCOLS);
 
 	*dest = 0;
 
@@ -374,213 +376,195 @@ int screen_read(char *dest, int baddr, int count)
 }
 
 /* Display what's in the buffer. */
-static void screen_update(H3270 *session, int bstart, int bend)
+void screen_disp(void)
 {
-	int baddr;
-	unsigned short a;
+	int row, col;
+	int a;
 	int attr = COLOR_GREEN;
 	unsigned char fa;
+#if defined(X3270_DBCS) /*[*/
+	enum dbcs_state d;
+#endif /*]*/
 	int fa_addr;
 
-	fa		= get_field_attribute(session,bstart);
-	a  		= color_from_fa(fa);
-	fa_addr = find_field_attribute(session,bstart); // may be -1, that's okay
-
-	Trace("%s ea_buf=%p",__FUNCTION__,ea_buf);
-
-	for(baddr = bstart; baddr < bend; baddr++)
+	fa = get_field_attribute(0);
+	a = color_from_fa(fa);
+	fa_addr = find_field_attribute(0); /* may be -1, that's okay */
+	for (row = 0; row < ROWS; row++)
 	{
-		if(ea_buf[baddr].fa)
+		int baddr;
+
+		for (col = 0; col < cCOLS; col++)
 		{
-			// Field attribute.
-			fa_addr = baddr;
-			fa = ea_buf[baddr].fa;
-			a = calc_attrs(baddr, baddr, fa);
-			addch(session,baddr,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
-		}
-		else if (FA_IS_ZERO(fa))
-		{
-			// Blank.
-			addch(session,baddr,' ',attr=a);
-		}
-		else
-		{
-			// Normal text.
-			if (!(ea_buf[baddr].gr || ea_buf[baddr].fg || ea_buf[baddr].bg))
+			baddr = row*cCOLS+col;
+			if(ea_buf[baddr].fa)
 			{
-				attr = a;
+			    /* Field attribute. */
+				fa_addr = baddr;
+				fa = ea_buf[baddr].fa;
+				a = calc_attrs(baddr, baddr, fa);
+				addch(row,col,' ',(attr = COLOR_GREEN)|CHAR_ATTR_MARKER);
+			}
+			else if (FA_IS_ZERO(fa))
+			{
+			   	/* Blank. */
+				addch(row,col,' ',attr=a);
 			}
 			else
 			{
-//				unsigned short b;
-				//
-				// Override some of the field
-				// attributes.
-				//
-//				attr = b = calc_attrs(baddr, fa_addr, fa);
+			    	/* Normal text. */
+				if (!(ea_buf[baddr].gr ||
+				      ea_buf[baddr].fg ||
+				      ea_buf[baddr].bg)) {
+					attr = a;
+				} else {
+					int b;
 
-				attr = calc_attrs(baddr, fa_addr, fa);
-			}
+					/*
+					 * Override some of the field
+					 * attributes.
+					 */
+					attr = b = calc_attrs(baddr, fa_addr, fa);
+				}
 
-			if (ea_buf[baddr].cs == CS_LINEDRAW)
-			{
-				addch(session,baddr,ea_buf[baddr].cc,attr);
-			}
-			else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
-			{
-				addch(session,baddr,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
-			}
-			else
-			{
-				if (toggled(MONOCASE))
-					addch(session,baddr,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
+				if (ea_buf[baddr].cs == CS_LINEDRAW)
+				{
+					addch(row,col,ea_buf[baddr].cc,attr);
+				}
+				else if (ea_buf[baddr].cs == CS_APL || (ea_buf[baddr].cs & CS_GE))
+				{
+					addch(row,col,ea_buf[baddr].cc,attr|CHAR_ATTR_CG);
+				}
 				else
-					addch(session,baddr,ebc2asc[ea_buf[baddr].cc],attr);
+				{
+					if (toggled(MONOCASE))
+						addch(row,col,asc2uc[ebc2asc[ea_buf[baddr].cc]],attr);
+					else
+						addch(row,col,ebc2asc[ea_buf[baddr].cc],attr);
+				}
 			}
 		}
-
 	}
 
-	if(session->changed)
-		session->changed(session,bstart,bend);
-
-}
-
-void screen_disp(H3270 *session)
-{
-//	session->first_changed = -1;
-//	session->last_changed = -1;
-
-	screen_update(session,0,session->rows*session->cols);
-
 	if(callbacks && callbacks->display)
-		callbacks->display(session);
+		callbacks->display();
+
+	screen_has_changes = 0;
 }
 
-void screen_suspend(H3270 *session)
+void screen_suspend(void)
 {
 	if(callbacks && callbacks->set_suspended)
 		callbacks->set_suspended(1);
 }
 
-void screen_resume(H3270 *session)
+void screen_resume(void)
 {
-	screen_disp(session);
+	screen_disp();
 
 	if(callbacks && callbacks->set_suspended)
 		callbacks->set_suspended(0);
+
 }
 
-LIB3270_EXPORT int lib3270_get_cursor_address(H3270 *h)
+int cursor_get_addr(void)
 {
-    CHECK_SESSION_HANDLE(h);
-    return h->cursor_addr;
+    return cursor_addr;
 }
 
-LIB3270_EXPORT int lib3270_set_cursor_address(H3270 *h, int baddr)
+int cursor_set_addr(int baddr)
 {
-    int ret;
+    int ret = cursor_addr;
 
-    CHECK_SESSION_HANDLE(h);
+    if(cursor_addr != baddr)
+    {
+        cursor_addr = baddr;
 
-    ret = h->cursor_addr;
+        if(callbacks && callbacks->move_cursor)
+            callbacks->move_cursor(baddr/cCOLS, baddr%cCOLS);
 
-	if(ret == baddr)
-		return ret;
+		Trace("%s: baddr=%d cc=%04x",__FUNCTION__,baddr, ea_buf[baddr].cc);
 
-	h->cursor_addr = baddr;
-
-	if(h->update_cursor)
-		h->update_cursor(h,(unsigned short) (baddr/h->cols),(unsigned short) (baddr%h->cols),ea_buf[baddr].chr,ea_buf[baddr].attr);
+    }
 
     return ret;
 }
 
 /* Status line stuff. */
 
-void set_status(H3270 *session, LIB3270_FLAG id, Boolean on)
+static void set(OIA_FLAG id, Boolean on)
 {
-	CHECK_SESSION_HANDLE(session);
-
-	if(id < LIB3270_FLAG_COUNT)
-	{
-		session->oia_flag[id] = (on != 0);
-
-		if(session->update_oia)
-			session->update_oia(session,id,session->oia_flag[id]);
-	}
-
+	if(callbacks && callbacks->set)
+		callbacks->set(id,on);
 }
 
-void status_ctlr_done(H3270 *session)
+void status_ctlr_done(void)
 {
-	CHECK_SESSION_HANDLE(session);
 	lib3270_event_counter[COUNTER_ID_CTLR_DONE]++;
-	set_status(session,OIA_FLAG_UNDERA,True);
+	set(OIA_FLAG_UNDERA,True);
 }
 
-void status_oerr(H3270 *session, int error_type)
+/*
+void
+status_minus(void)
 {
-	LIB3270_STATUS sts = LIB3270_STATUS_USER;
+	status_changed(STATUS_CODE_MINUS);
+}
+*/
 
-	CHECK_SESSION_HANDLE(session);
+void
+status_oerr(int error_type)
+{
+	STATUS_CODE sts = STATUS_CODE_USER;
 
 	switch (error_type)
 	{
 	case KL_OERR_PROTECTED:
-		sts = LIB3270_STATUS_PROTECTED;
+		sts = STATUS_CODE_PROTECTED;
 		break;
 	case KL_OERR_NUMERIC:
-		sts = LIB3270_STATUS_NUMERIC;
+		sts = STATUS_CODE_NUMERIC;
 		break;
 	case KL_OERR_OVERFLOW:
-		sts = LIB3270_STATUS_OVERFLOW;
+		sts = STATUS_CODE_OVERFLOW;
 		break;
 
 	default:
 		return;
 	}
 
-	status_changed(session,sts);
+	status_changed(sts);
 
 }
 
-void status_resolving(H3270 *session, Boolean on)
+void status_resolving(Boolean on)
 {
-	if(session->cursor)
-			session->cursor(session, on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
+	if(callbacks && callbacks->cursor)
+			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
 
-	status_changed(session, on ? LIB3270_STATUS_RESOLVING : LIB3270_STATUS_BLANK);
+	status_changed(on ? STATUS_CODE_RESOLVING : STATUS_CODE_BLANK);
 }
 
-void status_connecting(H3270 *session, Boolean on)
+void status_connecting(Boolean on)
 {
-	if(session->cursor)
-			session->cursor(session,on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
+	if(callbacks && callbacks->cursor)
+			callbacks->cursor(on ? CURSOR_MODE_LOCKED : CURSOR_MODE_NORMAL);
 
-	status_changed(session, on ? LIB3270_STATUS_CONNECTING : LIB3270_STATUS_BLANK);
+	status_changed(on ? STATUS_CODE_CONNECTING : STATUS_CODE_BLANK);
 }
 
-void status_reset(H3270 *session)
+void
+status_reset(void)
 {
-	CHECK_SESSION_HANDLE(session);
-
 	if (kybdlock & KL_ENTER_INHIBIT)
-	{
-		status_changed(session,LIB3270_STATUS_INHIBIT);
-	}
+		status_changed(STATUS_CODE_INHIBIT);
 	else if (kybdlock & KL_DEFERRED_UNLOCK)
-	{
-		status_changed(session,LIB3270_STATUS_X);
-	}
+		status_changed(STATUS_CODE_X);
 	else
-	{
-		if(session->cursor)
-			session->cursor(session,CURSOR_MODE_NORMAL);
-		status_changed(session,LIB3270_STATUS_BLANK);
-	}
+		status_changed(STATUS_CODE_BLANK);
 
-	screen_disp(session);
+	if(screen_has_changes)
+		screen_disp();
 
 	if(callbacks && callbacks->reset)
 	{
@@ -590,111 +574,114 @@ void status_reset(H3270 *session)
 
 }
 
+LIB3270_EXPORT void status_reverse_mode(int on)
+{
+	set(OIA_FLAG_REVERSE,on);
+}
+
+static STATUS_CODE current_status_code = -1;
+
 /**
  * Query the updated terminal status.
  *
  * @return status-code.
  *
- * @see LIB3270_STATUS
+ * @see STATUS_CODE
  */
-LIB3270_EXPORT LIB3270_STATUS lib3270_get_program_message(H3270 *session)
+LIB3270_EXPORT STATUS_CODE query_3270_terminal_status(void)
 {
-	CHECK_SESSION_HANDLE(session);
-	return session->oia_status;
+	return current_status_code;
 }
 
-void status_changed(H3270 *session, LIB3270_STATUS id)
+LIB3270_EXPORT void status_changed(STATUS_CODE id)
 {
-	CHECK_SESSION_HANDLE(session);
-
-	if(id == session->oia_status)
+	if(id == current_status_code)
 		return;
 
-	session->oia_status = id;
+	current_status_code = id;
 
-	if(session->update_status)
-		session->update_status(session,id);
+	if(callbacks && callbacks->status)
+		callbacks->status(id);
 }
 
-void status_twait(H3270 *session)
+/*
+void
+status_syswait(void)
 {
-	CHECK_SESSION_HANDLE(session);
-	set_status(session,OIA_FLAG_UNDERA,False);
-	status_changed(session,LIB3270_STATUS_TWAIT);
+	status_changed(STATUS_CODE_SYSWAIT);
+}
+*/
+
+LIB3270_EXPORT void status_twait(void)
+{
+	set(OIA_FLAG_UNDERA,False);
+	status_changed(STATUS_CODE_TWAIT);
 }
 
-void set_viewsize(H3270 *session, int rows, int cols)
+LIB3270_EXPORT void status_typeahead(int on)
 {
-	CHECK_SESSION_HANDLE(session);
-
-	if(rows == session->rows && session->cols == cols)
-		return;
-
-	session->rows = rows;
-	session->cols = cols;
-
-	if(session->configure)
-		session->configure(session,session->rows,session->cols);
-
+	set(OIA_FLAG_TYPEAHEAD,on);
 }
 
-void status_lu(H3270 *session, const char *lu)
+/*
+LIB3270_EXPORT void status_compose(int on, unsigned char c, enum keytype keytype)
 {
-	CHECK_SESSION_HANDLE(session);
+	if(callbacks && callbacks->compose)
+		callbacks->compose(on,c,keytype);
+}
+*/
 
-	if(session->update_luname)
-		session->update_luname(session,lu);
-
+void
+status_lu(const char *lu)
+{
+	if(callbacks && callbacks->lu)
+		callbacks->lu(lu);
 }
 
-static void status_connect(H3270 *session, int connected, void *dunno)
+static void
+status_connect(int connected)
 {
-	LIB3270_STATUS id = LIB3270_STATUS_USER;
+	STATUS_CODE id = STATUS_CODE_USER;
 
-	ctlr_erase(session,1);
+	if (connected) {
 
-	if (connected)
-	{
-		set_status(session,OIA_FLAG_BOXSOLID,IN_3270 && !IN_SSCP);
+		set(OIA_FLAG_BOXSOLID,IN_3270 && !IN_SSCP);
 
 		if (kybdlock & KL_AWAITING_FIRST)
-			id = LIB3270_STATUS_AWAITING_FIRST;
+			id = STATUS_CODE_AWAITING_FIRST;
 		else
-			id = LIB3270_STATUS_CONNECTED;
+			id = STATUS_CODE_CONNECTED;
 
 #if defined(HAVE_LIBSSL) /*[*/
-		set_status(session,OIA_FLAG_SECURE,session->secure_connection);
+		set(OIA_FLAG_SECURE,h3270.secure_connection);
 #endif /*]*/
 
-	}
-	else
-	{
-		set_status(session,OIA_FLAG_BOXSOLID,False);
-		set_status(session,OIA_FLAG_SECURE,False);
+	} else {
+		set(OIA_FLAG_BOXSOLID,False);
+		set(OIA_FLAG_SECURE,False);
 
-		id = LIB3270_STATUS_DISCONNECTED;
+		id = STATUS_CODE_DISCONNECTED;
 	}
 
-	status_changed(session,id);
+	status_changed(id);
 
 }
 
-static void status_3270_mode(H3270 *session, int ignored unused, void *dunno)
+static void status_3270_mode(int ignored unused)
 {
 	Boolean oia_boxsolid = (IN_3270 && !IN_SSCP);
-
-	CHECK_SESSION_HANDLE(session);
-
 	if(oia_boxsolid)
-		set_status(session,OIA_FLAG_UNDERA,True);
-	set_status(session,OIA_FLAG_BOXSOLID,oia_boxsolid);
+		set(OIA_FLAG_UNDERA,True);
+	set(OIA_FLAG_BOXSOLID,oia_boxsolid);
 
 }
 
-static void status_printer(H3270 *session, int on, void *dunno)
+static void status_printer(int on)
 {
-	set_status(session,OIA_FLAG_PRINTER,on);
+	set(OIA_FLAG_PRINTER,on);
 }
+
+static SCRIPT_STATE script_state = SCRIPT_STATE_NONE;
 
 LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state)
 {
@@ -703,29 +690,47 @@ LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state)
 	return script_state = state;
 }
 
-void status_timing(H3270 *session, struct timeval *t0, struct timeval *t1)
+void status_timing(struct timeval *t0, struct timeval *t1)
 {
-	CHECK_SESSION_HANDLE(session);
-
 	if(callbacks && callbacks->show_timer)
 		callbacks->show_timer(t1->tv_sec - t0->tv_sec);
 }
 
-void status_untiming(H3270 *session)
+void status_untiming(void)
 {
-	CHECK_SESSION_HANDLE(session);
-
 	if(callbacks && callbacks->show_timer)
 		callbacks->show_timer(-1);
+}
 
-	if(session->set_timer)
-		session->set_timer(session,0);
+void Redraw_action(Widget w unused, XEvent *event unused, String *params unused, Cardinal *num_params unused)
+{
+	if(callbacks && callbacks->redraw)
+		callbacks->redraw();
+	else
+		screen_disp();
 }
 
 void ring_bell(void)
 {
 	if(callbacks && callbacks->ring_bell)
 		callbacks->ring_bell();
+}
+
+void
+screen_flip(void)
+{
+	flipped = !flipped;
+	screen_disp();
+}
+
+void
+screen_132(void)
+{
+}
+
+void
+screen_80(void)
+{
 }
 
 /* Set the window title. */
@@ -737,7 +742,7 @@ screen_title(char *text)
 }
 
 static void
-relabel(H3270 *session, int ignored unused, void *dunno)
+relabel(int ignored unused)
 {
 #if defined(WC3270) /*[*/
 	if (appres.title != CN)
@@ -751,7 +756,7 @@ relabel(H3270 *session, int ignored unused, void *dunno)
 			screen_title(profile_name);
 		else
 #endif
-			screen_title(session->reconnect_host);
+			screen_title(reconnect_host);
 
 	}
 	else
@@ -763,6 +768,20 @@ relabel(H3270 *session, int ignored unused, void *dunno)
 int query_counter(COUNTER_ID id)
 {
 	return lib3270_event_counter[id];
+}
+
+void screen_changed(int bstart, int bend)
+{
+	screen_has_changes = 1;
+	lib3270_event_counter[COUNTER_ID_SCREEN_CHANGED]++;
+
+	/* If the application can manage screen changes, let it do it */
+	if(callbacks && callbacks->changed)
+	{
+		callbacks->changed(bstart,bend);
+		return;
+	}
+
 }
 
 int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk)
@@ -806,13 +825,12 @@ void Error(const char *fmt, ...)
 
 }
 
-/*
-void notify_toggle_changed(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason)
+#if defined(LIB3270)
+void notify_toggle_changed(int ix, int value, int reason)
 {
 	if(callbacks && callbacks->toggle_changed)
-		callbacks->toggle_changed(session,ix,value,reason,toggle_names[ix]);
+		callbacks->toggle_changed(ix,value,reason,toggle_names[ix]);
 }
-*/
 
 LIB3270_EXPORT void update_toggle_actions(void)
 {
@@ -821,9 +839,11 @@ LIB3270_EXPORT void update_toggle_actions(void)
 	if(callbacks && callbacks->toggle_changed)
 	{
 		for(f=0;f< N_TOGGLES;f++)
-			callbacks->toggle_changed(&h3270,f,appres.toggle[f].value,TT_UPDATE,toggle_names[f]);
+			callbacks->toggle_changed(f,appres.toggle[f].value,TT_UPDATE,toggle_names[f]);
 	}
 }
+
+#endif
 
 void Warning(const char *fmt, ...)
 {
@@ -838,39 +858,23 @@ void Warning(const char *fmt, ...)
 
 }
 
-void mcursor_set(H3270 *session,LIB3270_CURSOR m)
+void mcursor_locked()
 {
-	CHECK_SESSION_HANDLE(session);
-
-	if(session->cursor)
-		session->cursor(session,m);
-}
-
-/*
-void mcursor_locked(H3270 *session)
-{
-	CHECK_SESSION_HANDLE(session);
-
 	if(callbacks && callbacks->cursor)
 		callbacks->cursor(CURSOR_MODE_LOCKED);
 }
 
-extern void mcursor_normal(H3270 *session)
+extern void mcursor_normal()
 {
-	CHECK_SESSION_HANDLE(session);
-
 	if(callbacks && callbacks->cursor)
 		callbacks->cursor(CURSOR_MODE_NORMAL);
 }
 
-extern void mcursor_waiting(H3270 *session)
+extern void mcursor_waiting()
 {
-	CHECK_SESSION_HANDLE(session);
-
 	if(callbacks && callbacks->cursor)
 		callbacks->cursor(CURSOR_MODE_WAITING);
 }
-*/
 
 /* Pop up an error dialog. */
 extern void popup_an_error(const char *fmt, ...)
@@ -898,12 +902,12 @@ LIB3270_EXPORT void popup_system_error(const char *title, const char *message, c
 LIB3270_EXPORT int set_device_buffer(struct ea *src, int el)
 {
 
-	if(el > (h3270.maxROWS * h3270.maxCOLS))
+	if(el > (maxROWS * maxCOLS))
 		return EINVAL;
 
 	memcpy(ea_buf,src,sizeof(struct ea) * el);
 
-	screen_disp(&h3270);
+	screen_disp();
 
 	return 0;
 }
@@ -962,10 +966,9 @@ LIB3270_ACTION( testpattern )
 	};
 
 	int row = 0;
-	int max = (h3270.maxROWS * h3270.maxCOLS);
+	int max = (maxROWS * maxCOLS);
 	int pos = 0;
 	int f;
-	int fg = COLOR_BLUE;
 
 	Trace("%s begins",__FUNCTION__);
 	for(f=0;f<max;f++)
@@ -973,22 +976,16 @@ LIB3270_ACTION( testpattern )
 		if(!pat[row].cc[pos])
 		{
 			if(++row >= (sizeof(pat)/sizeof(struct _pat)) )
-			{
 				row = 0;
-				if(++fg > COLOR_WHITE)
-					fg = COLOR_BLUE;
-			}
 			pos = 0;
 		}
-		ea_buf[f].fg = fg;
-		ea_buf[f].bg = (fg == COLOR_BLACK) ? COLOR_WHITE : COLOR_BLACK;
 		ea_buf[f].cs = pat[row].cs;
 		ea_buf[f].cc = pat[row].cc[pos++];
 	}
 
 	Trace("%s display",__FUNCTION__);
 
-	screen_disp(&h3270);
+	screen_disp();
 
 	Trace("%s ends",__FUNCTION__);
 	return 0;
@@ -996,11 +993,11 @@ LIB3270_ACTION( testpattern )
 
 LIB3270_EXPORT struct ea * copy_device_buffer(int *el)
 {
-	int			sz		=  sizeof(struct ea) * (h3270.maxROWS * h3270.maxCOLS);
+	int			sz		=  sizeof(struct ea) * (maxROWS * maxCOLS);
 	struct ea	*ret	=  malloc(sz);
 	memcpy(ret,ea_buf,sz);
 	if(el)
-		*el = (h3270.maxROWS * h3270.maxCOLS);
+		*el = (maxROWS * maxCOLS);
 	return ret;
 }
 

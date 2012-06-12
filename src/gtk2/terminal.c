@@ -57,8 +57,8 @@
 
 /*---[ Prototipes ]---------------------------------------------------------------------------------------------*/
 
- static void set_showcursor(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason);
- static void set_blink(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason);
+ static void set_showcursor(int value, enum toggle_type reason);
+ static void set_blink(int value, enum toggle_type reason);
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
@@ -143,7 +143,7 @@
 			gdk_drawable_get_size(window,&width,&height);
 
 			gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_CROSS_HAIR);
-			cairo_rectangle(cr, rCursor.x, 0, 1, view.top+2+(terminal_font_info.spacing*view.rows));
+			cairo_rectangle(cr, rCursor.x, 0, 1, top_margin+2+(terminal_font_info.spacing*terminal_rows));
 			cairo_rectangle(cr, 0, rCursor.y+fontAscent, width,1);
 			cairo_fill(cr);
 		}
@@ -219,7 +219,7 @@
 
 	update_font_info(cr, fontname, &terminal_font_info);
 
-	gtk_widget_set_size_request(terminal, screen->cols*terminal_font_info.width, ((screen->rows+2)*terminal_font_info.height));
+	gtk_widget_set_size_request(terminal, terminal_cols*terminal_font_info.width, ((terminal_rows+2)*terminal_font_info.height));
 
 	g_free(fontname);
 	cairo_destroy(cr);
@@ -303,7 +303,7 @@
 	return FALSE;
  }
 
- static void set_crosshair(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
+ static void set_crosshair(int value, enum toggle_type reason)
  {
 	queue_draw_cursor();
  	if(value)
@@ -330,7 +330,7 @@
  }
 
 
- static void set_blink(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
+ static void set_blink(int value, enum toggle_type reason)
  {
 	if(value)
 	{
@@ -356,7 +356,7 @@
 	queue_draw_cursor();
  }
 
- static void set_insert(H3270 *h, int value, LIB3270_TOGGLE_TYPE reason)
+ static void set_insert(int value, enum toggle_type reason)
  {
 	gtk_widget_queue_draw_area(terminal,rCursor.x,rCursor.y,rCursor.width,rCursor.height);
 	update_oia_element(OIA_ELEMENT_INSERT_INDICATOR);
@@ -371,7 +371,7 @@
 
  static gboolean mouse_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
  {
-	if(query_3270_terminal_status() != LIB3270_STATUS_BLANK || event->direction < 0 || event->direction > G_N_ELEMENTS(action_scroll))
+	if(query_3270_terminal_status() != STATUS_CODE_BLANK || event->direction < 0 || event->direction > G_N_ELEMENTS(action_scroll))
 		return 0;
 
 	Trace("Scroll: %d Action: %p",event->direction,action_scroll[event->direction]);
@@ -438,7 +438,7 @@
  *
  * @param value	Valor modificado (Diferente de zero apresenta o cursor)
  */
- static void set_showcursor(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
+ static void set_showcursor(int value, enum toggle_type reason)
  {
 	update_oia_element(OIA_ELEMENT_CURSOR_POSITION);
  }

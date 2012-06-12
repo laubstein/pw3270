@@ -44,7 +44,7 @@
 #include "ansic.h"
 #include "actionsc.h"
 #include "ctlrc.h"
-// #include "menubarc.h"
+#include "menubarc.h"
 #include "popupsc.h"
 #include "screenc.h"
 #include "trace_dsc.h"
@@ -56,47 +56,54 @@
 
 
 
-static void no_callback(H3270 *h, int value, LIB3270_TOGGLE_TYPE reason)
+#if defined(LIB3270)
+
+static void no_callback(int value, enum toggle_type reason)
 {
 }
 
-LIB3270_EXPORT int lib3270_register_tchange(H3270 *h, LIB3270_TOGGLE_ID ix, void (*func)(H3270 *, int, LIB3270_TOGGLE_TYPE))
+/**
+ * Register a callback method to be called when toggle changes.
+ *
+ * Register a callback function to be called when the toggle changes; NOTE: the callback will be called
+ * during the register to make sure the toogle state in the client is ok.
+ *
+ * @param ix		Toggle id.
+ * @param callback	Function to call when toggle changes.
+ *
+ */
+LIB3270_EXPORT void register_3270_toggle_monitor(LIB3270_TOGGLE_ID ix, void (*callback)(int value, enum toggle_type reason))
 {
 	struct toggle *t;
 
-	CHECK_SESSION_HANDLE(h);
-
-	if(ix < 0 || ix >= LIB3270_TOGGLE_COUNT)
-		return EINVAL;
+	if(ix < 0 || ix >= N_TOGGLES)
+		return;
 
 	t = &appres.toggle[ix];
 
-	if(func)
+	if(callback)
 	{
-		t->callback = func;
-		t->callback(h, t->value, (int) TT_INITIAL);
+		t->callback = callback;
+		t->callback(t->value, (int) TT_INITIAL);
 	}
 	else
 	{
 		t->callback = no_callback;
 	}
-
-	return 0;
 }
 
-LIB3270_EXPORT unsigned char lib3270_get_toggle(H3270 *session, LIB3270_TOGGLE ix)
+int Toggled(int ix)
 {
-	CHECK_SESSION_HANDLE(session);
-
 	if(ix < 0 || ix >= N_TOGGLES)
 		return 0;
-	return (unsigned char) appres.toggle[ix].value != 0;
+	return (int) appres.toggle[ix].value;
 }
-
+#endif
 /*
  * Generic toggle stuff
  */
-static void do_toggle_reason(H3270 *session, LIB3270_TOGGLE ix, LIB3270_TOGGLE_TYPE reason)
+static void
+do_toggle_reason(LIB3270_TOGGLE_ID ix, enum toggle_type reason)
 {
 	struct toggle *t = &appres.toggle[ix];
 
@@ -105,25 +112,35 @@ static void do_toggle_reason(H3270 *session, LIB3270_TOGGLE ix, LIB3270_TOGGLE_T
 	 * menu label(s).
 	 */
 	toggle_toggle(t);
-	t->upcall(session, t, reason);
-	t->callback(session,t->value, (int) reason);
+	t->upcall(t, reason);
 
-	if(session->update_toggle)
-		session->update_toggle(session,ix,t->value,reason,toggle_names[ix]);
+#if defined(X3270_MENUS) /*[*/
+	menubar_retoggle(t);
+#endif /*]*/
 
-//	notify_toggle_changed(session, ix, t->value, reason);
+#if defined(LIB3270)
+	t->callback(t->value, (int) reason);
+	notify_toggle_changed(ix, t->value, reason);
+#endif
 
 }
 
-LIB3270_EXPORT int lib3270_set_toggle(H3270 *session, LIB3270_TOGGLE ix, int value)
+/**
+ * Set 3270 toggle state.
+ *
+ * @param ix	Toggle to set.
+ * @param value	New toggle state (non zero for true).
+ *
+ * @return 0 if the toggle wasn't changed, non zero if it was changed.
+ *
+ */
+LIB3270_EXPORT int set_toggle(LIB3270_TOGGLE_ID ix, int value)
 {
 	Boolean v = ((Boolean) (value != 0)); // Convert int in Boolean
 
 	struct toggle	*t;
 
-	CHECK_SESSION_HANDLE(session);
-
-	if(ix < 0 || ix >= LIB3270_TOGGLE_COUNT)
+	if(ix < 0 || ix >= N_TOGGLES)
 		return 0;
 
 	t = &appres.toggle[ix];
@@ -131,63 +148,76 @@ LIB3270_EXPORT int lib3270_set_toggle(H3270 *session, LIB3270_TOGGLE ix, int val
 	if(t->value == v)
 		return 0;
 
-	do_toggle_reason(session, ix, TT_INTERACTIVE);
+	do_toggle_reason(ix, TT_INTERACTIVE);
 
 	return -1;
 }
 
-LIB3270_EXPORT int lib3270_toggle(H3270 *session, LIB3270_TOGGLE ix)
+LIB3270_EXPORT int do_3270_toggle(LIB3270_TOGGLE_ID ix)
 {
-	CHECK_SESSION_HANDLE(session);
-
-	if(ix < 0 || ix >= LIB3270_TOGGLE_COUNT)
+	if(ix < 0 || ix >= N_TOGGLES)
 		return EINVAL;
 
-	do_toggle_reason(session, ix, TT_INTERACTIVE);
-
+	do_toggle_reason(ix, TT_INTERACTIVE);
 	return 0;
 }
 
 /*
  * Called from system initialization code to handle initial toggle settings.
  */
-void initialize_toggles(H3270 *session, struct toggle *toggle)
+void
+initialize_toggles(void)
 {
 	int f;
 
+#if defined(LIB3270)
 	for(f=0;f<N_TOGGLES;f++)
 	{
-		toggle[f].callback	= no_callback;
-		toggle[f].upcall	= toggle_nop;
+		appres.toggle[f].callback = no_callback;
+		appres.toggle[f].upcall = toggle_nop;
 	}
-
-#if defined(X3270_TRACE)
-	toggle[DS_TRACE].upcall			= toggle_dsTrace;
-	toggle[SCREEN_TRACE].upcall		= toggle_screenTrace;
-	toggle[EVENT_TRACE].upcall		= toggle_eventTrace;
 #endif
 
-#if defined(X3270_ANSI)
-	toggle[LINE_WRAP].upcall		= toggle_lineWrap;
-#endif
+//#if defined(X3270_DISPLAY) || defined(C3270) /*[*/
+// 	appres.toggle[MONOCASE].upcall =         toggle_monocase;
+//#endif /*]*/
 
-#if defined(X3270_TRACE)
-	if(toggle[DS_TRACE].value)
-		toggle[DS_TRACE].upcall(session, &toggle[DS_TRACE],TT_INITIAL);
+#if defined(X3270_DISPLAY) /*[*/
+	appres.toggle[ALT_CURSOR].upcall =       toggle_altCursor;
+	appres.toggle[CURSOR_BLINK].upcall =     toggle_cursorBlink;
+	appres.toggle[SHOW_TIMING].upcall =      toggle_showTiming;
+	appres.toggle[CURSOR_POS].upcall =       toggle_cursorPos;
+	appres.toggle[SCROLL_BAR].upcall =       toggle_scrollBar;
+	appres.toggle[CROSSHAIR].upcall =        toggle_crosshair;
+	appres.toggle[VISIBLE_CONTROL].upcall =  toggle_visible_control;
+#endif /*]*/
+#if defined(X3270_TRACE) /*[*/
+	appres.toggle[DS_TRACE].upcall =         toggle_dsTrace;
+	appres.toggle[SCREEN_TRACE].upcall =     toggle_screenTrace;
+	appres.toggle[EVENT_TRACE].upcall =      toggle_eventTrace;
+#endif /*]*/
+#if defined(X3270_ANSI) /*[*/
+	appres.toggle[LINE_WRAP].upcall =        toggle_lineWrap;
+#endif /*]*/
 
-	if(toggle[EVENT_TRACE].value)
-		toggle[EVENT_TRACE].upcall(session, &toggle[EVENT_TRACE],TT_INITIAL);
-
-	if(toggle[SCREEN_TRACE].value)
-		toggle[SCREEN_TRACE].upcall(session, &toggle[SCREEN_TRACE],TT_INITIAL);
-#endif
+#if defined(X3270_TRACE) /*[*/
+	if (toggled(DS_TRACE))
+		appres.toggle[DS_TRACE].upcall(&appres.toggle[DS_TRACE],
+		    TT_INITIAL);
+	if (toggled(EVENT_TRACE))
+		appres.toggle[EVENT_TRACE].upcall(&appres.toggle[EVENT_TRACE],
+		    TT_INITIAL);
+	if (toggled(SCREEN_TRACE))
+		appres.toggle[SCREEN_TRACE].upcall(&appres.toggle[SCREEN_TRACE],
+		    TT_INITIAL);
+#endif /*]*/
 
 #if defined(DEFAULT_TOGGLE_CURSOR_POS)
-	toggle[CURSOR_POS].value = True;
+	appres.toggle[CURSOR_POS].value = True;
 #endif /*]*/
 
 #if defined(DEFAULT_TOGGLE_RECTANGLE_SELECT)
-	toggle[RECTANGLE_SELECT].value = True;
+	appres.toggle[RECTANGLE_SELECT].value = True;
 #endif
 
 }
@@ -195,39 +225,36 @@ void initialize_toggles(H3270 *session, struct toggle *toggle)
 /*
  * Called from system exit code to handle toggles.
  */
-void shutdown_toggles(H3270 *session, struct toggle *toggle)
+void
+shutdown_toggles(void)
 {
-#if defined(X3270_TRACE)
-	// Clean up the data stream trace monitor window.
-	if(toggle[DS_TRACE].value)
-	{
-		toggle[DS_TRACE].value = False;
-		toggle_dsTrace(session, &toggle[DS_TRACE], TT_FINAL);
+#if defined(X3270_TRACE) /*[*/
+	/* Clean up the data stream trace monitor window. */
+	if (toggled(DS_TRACE)) {
+		appres.toggle[DS_TRACE].value = False;
+		toggle_dsTrace(&appres.toggle[DS_TRACE], TT_FINAL);
+	}
+	if (toggled(EVENT_TRACE)) {
+		appres.toggle[EVENT_TRACE].value = False;
+		toggle_dsTrace(&appres.toggle[EVENT_TRACE], TT_FINAL);
 	}
 
-	if(toggle[EVENT_TRACE].value)
-	{
-		toggle[EVENT_TRACE].value = False;
-		toggle_dsTrace(session, &toggle[EVENT_TRACE], TT_FINAL);
+	/* Clean up the screen trace file. */
+	if (toggled(SCREEN_TRACE)) {
+		appres.toggle[SCREEN_TRACE].value = False;
+		toggle_screenTrace(&appres.toggle[SCREEN_TRACE], TT_FINAL);
 	}
-
-	// Clean up the screen trace file.
-	if (toggle[SCREEN_TRACE].value)
-	{
-		toggle[SCREEN_TRACE].value = False;
-		toggle_screenTrace(session, &toggle[SCREEN_TRACE], TT_FINAL);
-	}
-#endif
+#endif /*]*/
 }
 
-LIB3270_EXPORT const char * lib3270_get_toggle_name(LIB3270_TOGGLE_ID ix)
+LIB3270_EXPORT const char * get_3270_toggle_name(LIB3270_TOGGLE_ID ix)
 {
 	if(ix < N_TOGGLES)
 		return toggle_names[ix];
 	return "";
 }
 
-LIB3270_EXPORT LIB3270_TOGGLE lib3270_get_toggle_id(const char *name)
+LIB3270_EXPORT LIB3270_TOGGLE_ID get_3270_toggle_by_name(const char *name)
 {
 	int f;
 

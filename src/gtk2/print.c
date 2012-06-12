@@ -34,7 +34,7 @@
  #include "actions.h"
 
  #include <lib3270/config.h>
-// #include <globals.h>
+ #include <globals.h>
  #include <errno.h>
 
 
@@ -168,9 +168,8 @@
 
 	if(!conf)
 		return;
-
-#if GTK_CHECK_VERSION(2,12,0)
 	Trace("Settings: %p Conf: %p page_setup: %p",settings,conf,setup);
+#if GTK_CHECK_VERSION(2,12,0)
 	gtk_print_settings_to_key_file(settings,conf,NULL);
 	gtk_page_setup_to_key_file(setup,conf,NULL);
 #else

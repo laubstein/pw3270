@@ -22,7 +22,7 @@
 #define KYBDC_H_INCLUDED
 
 /* keyboard lock states */
-LIB3270_INTERNAL unsigned int kybdlock;
+extern unsigned int kybdlock;
 #define KL_OERR_MASK		0x000f
 #define  KL_OERR_PROTECTED	1
 #define  KL_OERR_NUMERIC	2
@@ -37,9 +37,9 @@ LIB3270_INTERNAL unsigned int kybdlock;
 #define KL_SCROLLED		0x0400
 #define KL_OIA_MINUS		0x0800
 
-// void key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause, Boolean *skipped);
+void key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause, Boolean *skipped);
 
-/* actions */ /*
+/* actions */
 extern void AltCursor_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 extern void Attn_action(Widget w, XEvent *event, String *params,
@@ -49,11 +49,11 @@ extern void BackSpace_action(Widget w, XEvent *event, String *params,
 extern void BackTab_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 extern void CircumNot_action(Widget w, XEvent *event, String *params,
-    Cardinal *num_params); */
+    Cardinal *num_params);
 /*
 extern void Clear_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
-*/ /*
+*/
 extern void Compose_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 extern void CursorSelect_action(Widget w, XEvent *event, String *params,
@@ -139,8 +139,6 @@ extern void ToggleReverse_action(Widget w, XEvent *event, String *params,
     Cardinal *num_params);
 extern void Up_action(Widget w, XEvent *event, String *params,    Cardinal *num_params);
 
-*/
-
 /* other functions */
 extern void add_xk(KeySym key, KeySym assoc);
 extern void clear_xks(void);
@@ -153,5 +151,7 @@ extern int kybd_prime(void);
 extern void kybd_scroll_lock(Boolean lock);
 extern Boolean run_ta(void);
 extern int state_from_keymap(char keymap[32]);
+
+LIB3270_EXPORT int emulate_input(char *s, int len, int pasting);
 
 #endif /* KYBDC_H_INCLUDED */

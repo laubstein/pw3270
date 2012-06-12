@@ -31,13 +31,13 @@
  */
 
 
-#ifndef LIB3270_API_INCLUDED
+#ifndef LIB3270_H_INCLUDED
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-		#define LIB3270_API_INCLUDED "4.2"
+		#define LIB3270_H_INCLUDED "4.0"
 
 		#include <errno.h>
 
@@ -45,12 +45,7 @@
 			#include <windows.h>
 
 			#define LIB3270_EXPORT	__declspec (dllexport)
-
-			#if defined (HAVE_GNUC_VISIBILITY)
-					#define LOCAL_EXTERN	__attribute__((visibility("hidden"))) extern
-			#else
-					#define LOCAL_EXTERN extern
-			#endif
+			#define LOCAL_EXTERN	extern
 
 		#else
 			#include <stdarg.h>
@@ -58,15 +53,13 @@
 			// http://gcc.gnu.org/wiki/Visibility
 			#if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
 					#define LOCAL_EXTERN __hidden extern
-					#define LIB3270_EXPORT
-			#elif defined (HAVE_GNUC_VISIBILITY)
-					#define LOCAL_EXTERN	__attribute__((visibility("hidden"))) extern
-					#define LIB3270_EXPORT	__attribute__((visibility("default"))) extern
+			#elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
+					#define LOCAL_EXTERN __attribute__((visibility("hidden"))) extern
 			#else
 					#define LOCAL_EXTERN extern
-					#define LIB3270_EXPORT
 			#endif
 
+			#define LIB3270_EXPORT
 
 		#endif
 
@@ -117,86 +110,12 @@
 		#define LUNAME_SIZE				16
 		#define FULL_MODEL_NAME_SIZE	13
 
-		/* State change IDs. */
-		typedef enum _lib3270_state
-		{
-			LIB3270_STATE_RESOLVING,
-			LIB3270_STATE_HALF_CONNECT,
-			LIB3270_STATE_CONNECT,
-			LIB3270_STATE_3270_MODE,
-			LIB3270_STATE_LINE_MODE,
-			LIB3270_STATE_REMODEL,
-			LIB3270_STATE_PRINTER,
-			LIB3270_STATE_EXITING,
-			LIB3270_STATE_CHARSET,
 
-			LIB3270_STATE_USER				// Always the last one
-		} LIB3270_STATE;
-
-		#define ST_RESOLVING			LIB3270_STATE_RESOLVING
-		#define ST_HALF_CONNECT			LIB3270_STATE_HALF_CONNECT
-		#define ST_CONNECT				LIB3270_STATE_CONNECT
-		#define ST_3270_MODE			LIB3270_STATE_3270_MODE
-		#define ST_LINE_MODE			LIB3270_STATE_LINE_MODE
-		#define ST_REMODEL				LIB3270_STATE_REMODEL
-		#define ST_PRINTER				LIB3270_STATE_PRINTER
-		#define ST_EXITING				LIB3270_STATE_EXITING
-		#define ST_CHARSET				LIB3270_STATE_CHARSET
-		#define N_ST					LIB3270_STATE_USER
-		#define LIB3270_STATE_CHANGE	LIB3270_STATE
-
-		/** connection state */
-		#define cstate LIB3270_CSTATE
-		#define NOT_CONNECTED	LIB3270_NOT_CONNECTED
-		#define RESOLVING	LIB3270_RESOLVING
-		#define PENDING	LIB3270_PENDING
-		#define CONNECTED_INITIAL	LIB3270_CONNECTED_INITIAL
-		#define CONNECTED_ANSI	LIB3270_CONNECTED_ANSI
-		#define CONNECTED_3270	LIB3270_CONNECTED_3270
-		#define CONNECTED_INITIAL_E	LIB3270_CONNECTED_INITIAL_E
-		#define CONNECTED_NVT	LIB3270_CONNECTED_NVT
-		#define CONNECTED_SSCP	LIB3270_CONNECTED_SSCP
-		#define CONNECTED_TN3270E	LIB3270_CONNECTED_TN3270E
-
-		#define LIB3270_STATUS					LIB3270_MESSAGE
-		#define LIB3270_STATUS_BLANK			LIB3270_MESSAGE_NONE
-		#define LIB3270_STATUS_SYSWAIT			LIB3270_MESSAGE_SYSWAIT
-		#define LIB3270_STATUS_TWAIT			LIB3270_MESSAGE_TWAIT
-		#define LIB3270_STATUS_CONNECTED		LIB3270_MESSAGE_CONNECTED
-		#define LIB3270_STATUS_DISCONNECTED		LIB3270_MESSAGE_DISCONNECTED
-		#define LIB3270_STATUS_AWAITING_FIRST	LIB3270_MESSAGE_AWAITING_FIRST
-		#define LIB3270_STATUS_MINUS			LIB3270_MESSAGE_MINUS
-		#define LIB3270_STATUS_PROTECTED		LIB3270_MESSAGE_PROTECTED
-		#define LIB3270_STATUS_NUMERIC			LIB3270_MESSAGE_NUMERIC
-		#define LIB3270_STATUS_OVERFLOW			LIB3270_MESSAGE_OVERFLOW
-		#define LIB3270_STATUS_INHIBIT			LIB3270_MESSAGE_INHIBIT
-		#define LIB3270_STATUS_KYBDLOCK			LIB3270_MESSAGE_KYBDLOCK
-		#define LIB3270_STATUS_X				LIB3270_MESSAGE_X
-		#define LIB3270_STATUS_RESOLVING		LIB3270_MESSAGE_RESOLVING
-		#define LIB3270_STATUS_CONNECTING		LIB3270_MESSAGE_CONNECTING
-		#define LIB3270_STATUS_USER				LIB3270_MESSAGE_USER
-
-		#define OIA_FLAG_BOXSOLID	LIB3270_FLAG_BOXSOLID
-		#define OIA_FLAG_UNDERA		LIB3270_FLAG_UNDERA
-		#define OIA_FLAG_SECURE		LIB3270_FLAG_SECURE
-		#define OIA_FLAG_TYPEAHEAD	LIB3270_FLAG_TYPEAHEAD
-		#define OIA_FLAG_PRINTER	LIB3270_FLAG_PRINTER
-		#define OIA_FLAG_REVERSE	LIB3270_FLAG_REVERSE
-		#define OIA_FLAG_USER		LIB3270_FLAG_COUNT
-		#define OIA_FLAG			LIB3270_FLAG
-
-		struct lib3270_state_callback;
-
-		typedef struct _h3270 H3270;
-		struct _h3270
+		typedef struct _h3270
 		{
 			unsigned short 	  sz;				/**< Struct size */
 
-			// Connection info
-			int					  secure_connection;
-			int      			  sock;					/**< Network socket */
-			int					  net_sock;
-			LIB3270_CSTATE		  cstate;				/**< Connection state */
+			int      			  sock;				/**< Network socket */
 
 			#if defined(_WIN32) /*[*/
 			HANDLE				  sock_handle;
@@ -209,84 +128,14 @@
 
 			char				  full_model_name[FULL_MODEL_NAME_SIZE+1];
 			char				* model_name;
-			int					  model_num;
-			char       	    	* termtype;
+			char           	* termtype;
 
-			char				* current_host;			/**< the hostname part, stripped of qualifiers, luname and port number */
-			char           		* full_current_host;	/**< the entire string, for use in reconnecting */
-			char	       		* reconnect_host;
-			char	       		* qualified_host;
-			char	 			  auto_reconnect_inprogress;
+			char				* current_host;
+			unsigned short	  current_port;
 
-			LIB3270_MESSAGE		  oia_status;
+			int					  secure_connection;
 
-			unsigned char 		  oia_flag[LIB3270_FLAG_COUNT];
-
-			unsigned short		  current_port;
-
-			// screen info
-			int					  ov_rows;
-			int					  ov_cols;
-//			int					  first_changed;
-//			int					  last_changed;
-			int					  maxROWS;
-			int					  maxCOLS;
-			unsigned short		  rows;
-			unsigned short		  cols;
-			int					  cursor_addr;
-			char				  flipped;
-			int					  screen_alt;			/**< alternate screen? */
-			int					  is_altbuffer;
-
-			int					  formatted;			/**< set in screen_disp */
-
-			// host.c
-			char 				  std_ds_host;
-			char 				  no_login_host;
-			char 				  non_tn3270e_host;
-			char 				  passthru_host;
-			char 				  ssl_host;
-			char 				  ever_3270;
-
-			// Widget info
-			void				* widget;
-
-			// xio
-			unsigned long		  ns_read_id;
-			unsigned long		  ns_exception_id;
-			char				  reading;
-			char				  excepting;
-
-			/* State change callbacks. */
-			struct lib3270_state_callback *st_callbacks[N_ST];
-			struct lib3270_state_callback *st_last[N_ST];
-
-			/* Session based callbacks */
-			void (*configure)(H3270 *session, unsigned short rows, unsigned short cols);
-			void (*update)(H3270 *session, int baddr, unsigned char c, unsigned short attr, unsigned char cursor);
-			void (*changed)(H3270 *session, int bstart, int bend);
-
-			void (*update_cursor)(H3270 *session, unsigned short row, unsigned short col, unsigned char c, unsigned short attr);
-			void (*update_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
-			void (*update_toggle)(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason, const char *name);
-			void (*update_luname)(H3270 *session, const char *name);
-			void (*update_status)(H3270 *session, LIB3270_STATUS id);
-			void (*update_connect)(H3270 *session, unsigned char connected);
-			void (*update_model)(H3270 *session, const char *name, int model, int rows, int cols);
-
-			void (*set_timer)(H3270 *session, unsigned char on);
-			void (*erase)(H3270 *session);
-			void (*cursor)(H3270 *session, LIB3270_CURSOR id);
-
-		};
-
-		struct lib3270_state_callback
-		{
-			struct lib3270_state_callback	* next;			/**< Next callback in chain */
-			void							* data;			/**< User data */
-			void (*func)(H3270 *, int, void *);		/**< Function to call */
-		};
-
+		} H3270;
 
 		/** Type of dialog boxes */
 		typedef enum _PW3270_DIALOG
@@ -304,22 +153,33 @@
 			KT_GE
 		};
 
+		/** connection state */
+		enum cstate
+		{
+			NOT_CONNECTED,			/**< no socket, unknown mode */
+			RESOLVING,				/**< resolving hostname */
+			PENDING,				/**< connection pending */
+			CONNECTED_INITIAL,		/**< connected, no mode yet */
+			CONNECTED_ANSI,			/**< connected in NVT ANSI mode */
+			CONNECTED_3270,			/**< connected in old-style 3270 mode */
+			CONNECTED_INITIAL_E,	/**< connected in TN3270E mode, unnegotiated */
+			CONNECTED_NVT,			/**< connected in TN3270E mode, NVT mode */
+			CONNECTED_SSCP,			/**< connected in TN3270E mode, SSCP-LU mode */
+			CONNECTED_TN3270E		/**< connected in TN3270E mode, 3270 mode */
+		};
+
+
 		/**  extended attributes */
 		struct ea
 		{
-			unsigned char cc;		/**< EBCDIC or ASCII character code */
-			unsigned char fa;		/**< field attribute, it nonzero */
-			unsigned char fg;		/**< foreground color (0x00 or 0xf<n>) */
-			unsigned char bg;		/**< background color (0x00 or 0xf<n>) */
-			unsigned char gr;		/**< ANSI graphics rendition bits */
-			unsigned char cs;		/**< character set (GE flag, or 0..2) */
-			unsigned char ic;		/**< input control (DBCS) */
-			unsigned char db;		/**< DBCS state */
-
-			/* Updated by addch() */
-			unsigned char  chr;		/**< ASCII character code */
-			unsigned short attr;	/**< Converted character attribute (color & etc) */
-
+			unsigned char cc;	/**< EBCDIC or ASCII character code */
+			unsigned char fa;	/**< field attribute, it nonzero */
+			unsigned char fg;	/**< foreground color (0x00 or 0xf<n>) */
+			unsigned char bg;	/**< background color (0x00 or 0xf<n>) */
+			unsigned char gr;	/**< ANSI graphics rendition bits */
+			unsigned char cs;	/**< character set (GE flag, or 0..2) */
+			unsigned char ic;	/**< input control (DBCS) */
+			unsigned char db;	/**< DBCS state */
 		};
 		#define GR_BLINK		0x01
 		#define GR_REVERSE		0x02
@@ -389,33 +249,25 @@
 
 		LIB3270_EXPORT int RegisterFTCallbacks(const struct filetransfer_callbacks *cbk);
 
-//		#define QueryCstate() lib3270_get_connection_state(NULL)
+		/* Library internals */
+		#ifdef LIB3270
 
-		#define PCONNECTED		lib3270_pconnected(NULL)
-		#define HALF_CONNECTED	lib3270_half_connected(NULL)
-		#define CONNECTED		lib3270_connected(NULL)
+			extern enum ft_state ft_state;
 
-		#define IN_NEITHER		lib3270_in_neither(NULL)
-		#define IN_ANSI			lib3270_in_ansi(NULL)
-		#define IN_3270			lib3270_in_3270(NULL)
-		#define IN_SSCP			lib3270_in_sscp(NULL)
-		#define IN_TN3270E		lib3270_in_tn3270e(NULL)
-		#define IN_E			lib3270_in_e(NULL)
+		#else
 
-		#ifndef LIB3270
-
-
+			LIB3270_EXPORT enum cstate 	QueryCstate(void);
 			LIB3270_EXPORT enum ft_state	QueryFTstate(void);
 
-//			#define PCONNECTED	((int) QueryCstate() >= (int)RESOLVING)
-//			#define HALF_CONNECTED	(QueryCstate() == RESOLVING || QueryCstate() == PENDING)
-//			#define CONNECTED	((int) QueryCstate() >= (int)CONNECTED_INITIAL)
-//			#define IN_NEITHER	(QueryCstate() == CONNECTED_INITIAL)
-//			#define IN_ANSI		(QueryCstate() == CONNECTED_ANSI || QueryCstate() == CONNECTED_NVT)
-//			#define IN_3270		(QueryCstate() == CONNECTED_3270 || QueryCstate() == CONNECTED_TN3270E || QueryCstate() == CONNECTED_SSCP)
-//			#define IN_SSCP		(QueryCstate() == CONNECTED_SSCP)
-//			#define IN_TN3270E	(QueryCstate() == CONNECTED_TN3270E)
-//			#define IN_E		(QueryCstate() >= CONNECTED_INITIAL_E)
+			#define PCONNECTED	((int) QueryCstate() >= (int)RESOLVING)
+			#define HALF_CONNECTED	(QueryCstate() == RESOLVING || QueryCstate() == PENDING)
+			#define CONNECTED	((int) QueryCstate() >= (int)CONNECTED_INITIAL)
+			#define IN_NEITHER	(QueryCstate() == CONNECTED_INITIAL)
+			#define IN_ANSI		(QueryCstate() == CONNECTED_ANSI || QueryCstate() == CONNECTED_NVT)
+			#define IN_3270		(QueryCstate() == CONNECTED_3270 || QueryCstate() == CONNECTED_TN3270E || QueryCstate() == CONNECTED_SSCP)
+			#define IN_SSCP		(QueryCstate() == CONNECTED_SSCP)
+			#define IN_TN3270E	(QueryCstate() == CONNECTED_TN3270E)
+			#define IN_E		(QueryCstate() >= CONNECTED_INITIAL_E)
 
 		#endif
 
@@ -436,21 +288,47 @@
 				unsigned long (*AddOutput)(int source, H3270 *session, void (*fn)(H3270 *session));
 			#endif /*]*/
 
-			int 			(*callthread)(int(*callback)(H3270 *, void *), H3270 *session, void *parm);
+			int 			(*CallAndWait)(int(*callback)(void *), void *parm);
 
 			int				(*Wait)(int seconds);
 			int 			(*RunPendingEvents)(int wait);
 
 		};
 
-		#define Register3270IOCallbacks(x) lib3270_register_io_handlers(x)
-
+		LIB3270_EXPORT int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk);
 
 		/* Screen processing */
+		typedef enum _CURSOR_MODE
+		{
+			CURSOR_MODE_NORMAL,
+			CURSOR_MODE_WAITING,
+			CURSOR_MODE_LOCKED,
 
-		#define CURSOR_MODE_NORMAL		LIB3270_CURSOR_NORMAL
-		#define CURSOR_MODE_WAITING		LIB3270_CURSOR_WAITING
-		#define CURSOR_MODE_LOCKED		LIB3270_CURSOR_LOCKED
+			CURSOR_MODE_USER
+		} CURSOR_MODE;
+
+		typedef enum _STATUS_CODE
+		{
+			STATUS_CODE_BLANK,
+			STATUS_CODE_SYSWAIT,
+			STATUS_CODE_TWAIT,
+			STATUS_CODE_CONNECTED,
+			STATUS_CODE_DISCONNECTED,
+			STATUS_CODE_AWAITING_FIRST,
+			STATUS_CODE_MINUS,
+			STATUS_CODE_PROTECTED,
+			STATUS_CODE_NUMERIC,
+			STATUS_CODE_OVERFLOW,
+			STATUS_CODE_INHIBIT,
+			STATUS_CODE_KYBDLOCK,
+
+			STATUS_CODE_X,
+			STATUS_CODE_RESOLVING,
+			STATUS_CODE_CONNECTING,
+
+			STATUS_CODE_USER
+
+		} STATUS_CODE;
 
 		typedef enum _SCRIPT_STATE
 		{
@@ -462,8 +340,21 @@
 
 		} SCRIPT_STATE;
 
+		typedef enum _OIA_FLAG
+		{
+			OIA_FLAG_BOXSOLID,
+			OIA_FLAG_UNDERA,
+			OIA_FLAG_SECURE,
+			OIA_FLAG_TYPEAHEAD,
+			OIA_FLAG_PRINTER,
+			OIA_FLAG_REVERSE,
+
+			OIA_FLAG_USER
+		} OIA_FLAG;
+
 		typedef enum _COUNTER_ID
 		{
+			COUNTER_ID_SCREEN_CHANGED,
 			COUNTER_ID_CTLR_DONE,
 			COUNTER_ID_RESET,
 
@@ -472,16 +363,17 @@
 
 		LIB3270_EXPORT int query_counter(COUNTER_ID id);
 
-		#define	query_screen_change_counter() query_counter(COUNTER_ID_CTLR_DONE)
+		#define	query_screen_change_counter() query_counter(COUNTER_ID_SCREEN_CHANGED)
+
 
 		#define COLOR_ATTR_NONE			0x0000
-		#define COLOR_ATTR_FIELD		LIB3270_ATTR_FIELD
-		#define COLOR_ATTR_BLINK		LIB3270_ATTR_BLINK
-		#define COLOR_ATTR_UNDERLINE	LIB3270_ATTR_UNDERLINE
-		#define COLOR_ATTR_INTENSIFY	LIB3270_ATTR_INTENSIFY
+		#define COLOR_ATTR_FIELD		0x0100
+		#define COLOR_ATTR_BLINK		0x0200
+		#define COLOR_ATTR_UNDERLINE	0x0400
+		#define COLOR_ATTR_INTENSIFY	0x0800
 
-		#define CHAR_ATTR_CG			LIB3270_ATTR_CG
-		#define CHAR_ATTR_MARKER		LIB3270_ATTR_MARKER
+		#define CHAR_ATTR_CG			0x1000
+		#define CHAR_ATTR_MARKER		0x2000
 
 		#define CHAR_ATTR_UNCONVERTED	CHAR_ATTR_CG
 
@@ -494,27 +386,26 @@
 			void	(*Error)(const char *fmt, va_list arg);
 			void	(*Warning)(const char *fmt, va_list arg);
 			void	(*SysError)(const char *title, const char *message, const char *system);
-			void 	(*model_changed)(H3270 *session, const char *name, int model, int rows, int cols);
-			int		(*addch)(int row, int col, unsigned char c, unsigned short attr);
+			void 	(*model_changed)(H3270 *session, const char *name, int model, int cols, int rows);
+			int		(*addch)(int row, int col, int c, unsigned short attr);
 			void	(*charset)(char *dcs);
 			void	(*title)(char *text);
+			void	(*changed)(int bstart, int bend);
 			void	(*ring_bell)(void);
 			void	(*redraw)(void);
-			void	(*move_cursor)(H3270 *session, unsigned short row, unsigned short col, unsigned char c, unsigned short attr);
+			void	(*move_cursor)(int row, int col);
 			int		(*set_suspended)(int state);
 			void	(*set_script)(SCRIPT_STATE state);
 			void	(*reset)(int lock);
-			void	(*status)(H3270 *session, LIB3270_STATUS id);
-			void	(*cursor)(H3270 *session, LIB3270_CURSOR mode);
-			void	(*lu)(H3270 *session, const char *lu);
-			void	(*set_oia)(H3270 *session, OIA_FLAG id, unsigned char on);
+			void	(*status)(STATUS_CODE id);
+			void	(*cursor)(CURSOR_MODE mode);
+			void	(*lu)(const char *lu);
+			void	(*set)(OIA_FLAG id, int on);
 
-			void	(*erase)(H3270 *session);
-			void	(*display)(H3270 *session);
-			void 	(*set_viewsize)(H3270 *session, unsigned short rows, unsigned short cols);
+			void	(*erase)(void);
+			void	(*display)(void);
 
-
-			void	(*toggle_changed)(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason, const char *name);
+			void	(*toggle_changed)(int ix, int value, int reason, const char *name);
 			void	(*show_timer)(long seconds);
 
 			// Console/Trace window
@@ -546,7 +437,7 @@
 
 		LIB3270_EXPORT int Register3270ScreenCallbacks(const struct lib3270_screen_callbacks *cbk);
 
-		#define new_3270_session(m) lib3270_session_new(m)
+		LIB3270_EXPORT H3270 * new_3270_session(void);
 
 		LIB3270_EXPORT const struct lib3270_option * get_3270_option_table(int sz);
 
@@ -556,19 +447,15 @@
 		LIB3270_EXPORT void show_3270_popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, ...);
 
 		/* Set/Get screen contents */
-		LIB3270_EXPORT int find_field_attribute(H3270 *session, int baddr);
-		LIB3270_EXPORT int find_field_length(H3270 *session, int baddr);
-		LIB3270_EXPORT unsigned char get_field_attribute(H3270 *session, int baddr);
+		LIB3270_EXPORT int find_field_attribute(int baddr);
+		LIB3270_EXPORT int find_field_length(int baddr);
+		LIB3270_EXPORT unsigned char get_field_attribute(int baddr);
 		LIB3270_EXPORT int screen_read(char *dest, int baddr, int count);
 		LIB3270_EXPORT void Input_String(const unsigned char *str);
 		LIB3270_EXPORT void screen_size(int *rows, int *cols);
-
-		#define query_secure_connection(h) lib3270_get_ssl_state(h)
-		#define lib3270_paste_string(str) lib3270_set_string(NULL,str)
-		#define get_3270_terminal_size(h,r,c) lib3270_get_screen_size(h,r,c)
-
-		/* Keyboard */
-		LIB3270_EXPORT int			  emulate_input(char *s, int len, int pasting);
+		LIB3270_EXPORT int query_secure_connection(H3270 *h);
+		LIB3270_EXPORT int lib3270_paste_string(const unsigned char *str);
+		LIB3270_EXPORT void get_3270_terminal_size(H3270 *h, int *rows, int *cols);
 
 		/* Network related calls */
 		LIB3270_EXPORT int 			  Get3270Socket(void);
@@ -577,34 +464,27 @@
 		LIB3270_EXPORT void 		  popup_an_error(const char *fmt, ...);
 		LIB3270_EXPORT void 		  popup_system_error(const char *title, const char *message, const char *system);
 		LIB3270_EXPORT void 		  popup_a_sockerr(char *fmt, ...);
-
-		#define query_3270_terminal_status(void) lib3270_get_program_message(NULL)
-
-		#define set_3270_model(h,m)	lib3270_set_model(h,m)
-		#define get_3270_model(h) lib3270_get_model(h)
-
-		LIB3270_EXPORT int			  lib3270_set_model(H3270 *session, int model);
-		LIB3270_EXPORT int			  lib3270_get_model(H3270 *session);
+		LIB3270_EXPORT STATUS_CODE	  query_3270_terminal_status(void);
+		LIB3270_EXPORT int			  set_3270_model(H3270 *session, int model);
 
 		/* Get connection info */
-		#define get_connected_lu(h) lib3270_get_luname(h)
-		#define get_current_host(h) lib3270_get_host(h)
+		LIB3270_EXPORT const char	* get_connected_lu(H3270 *h);
+		LIB3270_EXPORT const char	* get_current_host(H3270 *h);
 
-		LIB3270_EXPORT SCRIPT_STATE status_script(SCRIPT_STATE state);
+		LIB3270_EXPORT int Toggled(int ix);
 
-		#define Toggled(ix) lib3270_get_toggle(NULL,ix)
-		#define CallAndWait(c,h,p) lib3270_call_thread(c,h,p)
-
+		LIB3270_EXPORT int CallAndWait(int(*callback)(void *), void *parm);
 		LIB3270_EXPORT void RunPendingEvents(int wait);
 		LIB3270_EXPORT int Wait(int seconds);
 
-        LIB3270_EXPORT int ctlr_get_cols(void) __attribute__ ((deprecated));
-        LIB3270_EXPORT int ctlr_get_rows(void) __attribute__ ((deprecated));
+		LIB3270_EXPORT void ctlr_erase(int alt);
+        LIB3270_EXPORT int ctlr_get_cols(void);
+        LIB3270_EXPORT int ctlr_get_rows(void);
 
         /* Screen calls */
-		LIB3270_EXPORT void screen_resume(H3270 *session);
-		LIB3270_EXPORT void screen_suspend(H3270 *session);
-		LIB3270_EXPORT void screen_disp(H3270 *session);
+		LIB3270_EXPORT void screen_resume(void);
+		LIB3270_EXPORT void screen_suspend(void);
+		LIB3270_EXPORT void screen_disp(void);
 
 		/* Console calls */
 		LIB3270_EXPORT HCONSOLE	  console_window_new(const char *title, const char *label);
@@ -613,17 +493,17 @@
 		LIB3270_EXPORT char	* console_window_wait_for_user_entry(HCONSOLE hwnd);
 
         /* Cursor calls */
-		#define cursor_get_addr(void)	lib3270_get_cursor_address(NULL)
-		#define cursor_set_addr(x)		lib3270_set_cursor_address(NULL,x)
-		#define cursor_move(x)			lib3270_set_cursor_address(NULL,x)
+		LIB3270_EXPORT int cursor_get_addr(void);
+        LIB3270_EXPORT int cursor_set_addr(int baddr);
+		#define cursor_move(x) cursor_set_addr(x)
 
 		#include <lib3270/actions.h>
 
-		#define host_connect(n,wait) lib3270_connect(NULL,n,wait)
-		#define host_reconnect(w) lib3270_reconnect(NULL,w)
-
-		#define register_schange(tx,func) lib3270_register_schange(NULL,tx,func,NULL)
-		LIB3270_EXPORT void lib3270_register_schange(H3270 *h,LIB3270_STATE tx, void (*func)(H3270 *, int, void *),void *user_data);
+		/* Host connect/disconnect and state change. */
+		LIB3270_EXPORT int host_connect(const char *n, int wait);
+		LIB3270_EXPORT int host_reconnect(int wait);
+		LIB3270_EXPORT void host_disconnect(H3270 *h, int disable);
+		LIB3270_EXPORT void register_schange(int tx, void (*func)(int));
 
 		/* Console/Trace window */
 		LIB3270_EXPORT HCONSOLE	  console_window_new(const char *title, const char *label);
@@ -635,4 +515,4 @@
 	}
 #endif
 
-#endif // LIB3270_API_INCLUDED
+#endif // LIB3270_H_INCLUDED

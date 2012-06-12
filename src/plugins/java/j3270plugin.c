@@ -46,7 +46,7 @@
  #include <libintl.h>
  #include <glib/gi18n.h>
 
- #include <lib3270.h>
+ #include <lib3270/api.h>
  #include <lib3270/plugins.h>
 
  // References:

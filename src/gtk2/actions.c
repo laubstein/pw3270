@@ -143,8 +143,6 @@
 
 	{ GDK_Print,			GDK_CONTROL_MASK,	NULL,	G_CALLBACK(action_printscreen)		},
 	{ GDK_Print,			GDK_SHIFT_MASK,		NULL,	G_CALLBACK(lib3270_sysreq)			},
-	{ GDK_Control_R,		0,					NULL,	NULL								},
-	{ GDK_Control_L,		0,					NULL,	NULL								},
 
 #ifdef WIN32
 	{ GDK_Pause,			0,					NULL,	0									},
@@ -386,6 +384,8 @@
  {
  	int idx = ((int) id) + N_TOGGLES;
 
+	Trace("*************** %p %p %p ",toggle_action[idx].reset, toggle_action[idx].set, toggle_action[idx].toggle);
+
 	if(toggle_action[idx].reset)
 		gtk_action_set_visible(toggle_action[idx].reset,visible && gui_toggle_state[id]);
 
@@ -466,13 +466,13 @@
 	if(id >= N_TOGGLES)
 	{
 		id -= N_TOGGLES;
-//		Trace("Connect toggle \"%s\" to gui (id=%d)",get_xml_attribute(names, values, "id"),id);
+		Trace("Connect toggle \"%s\" to gui (id=%d)",get_xml_attribute(names, values, "id"),id);
 		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),gui_toggle_state[id]);
 		g_signal_connect(G_OBJECT(action),"toggled",G_CALLBACK(gui_toggle_action),(gpointer) id);
 	}
 	else
 	{
-//		Trace("Connect toggle \"%s\" to lib3270",get_xml_attribute(names, values, "id"));
+		Trace("Connect toggle \"%s\" to lib3270",get_xml_attribute(names, values, "id"));
 		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),Toggled(id) ? TRUE : FALSE);
 		g_signal_connect(G_OBJECT(action),"toggled",G_CALLBACK(lib3270_toggle_action),(gpointer) id);
 	}
@@ -678,10 +678,6 @@
 	// FIXME (perry#1#): Find a better way!
 	if( event->keyval == 0xffffff && event->hardware_keycode == 0x0013)
 		event->keyval = GDK_Pause;
-
-	// Windows sets <ctrl> in left/right control
-	else if(state & GDK_CONTROL_MASK && (event->keyval == GDK_Control_R || event->keyval == GDK_Control_L))
-		state &= ~GDK_CONTROL_MASK;
 #endif
 
 	Trace("Key action 0x%04x: %s %s keycode: 0x%04x",event->keyval,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "",event->hardware_keycode);

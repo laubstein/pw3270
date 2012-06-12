@@ -32,15 +32,22 @@
 
  #include "pipectl.h"
 
+ #define PIPE_BUFFER_LENGTH 512
+
 /*---[ Globals ]----------------------------------------------------------------------------------*/
 
  EXPORT_PW3270_PLUGIN_INFORMATION("Pipe controller");
 
 /*---[ Statics ]----------------------------------------------------------------------------------*/
 
+ static HANDLE 	  hPipe			= INVALID_HANDLE_VALUE;
+ static GThread 	* hThread		= NULL;
+ static gboolean	  enabled		= TRUE;
+ static OVERLAPPED	  overlap_data;
+
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
- void popup_lasterror(const gchar *fmt, ...)
+ static void popup_lasterror(const gchar *fmt, ...)
  {
  	char 		buffer[4096];
 	va_list		arg_ptr;
@@ -71,28 +78,135 @@
 	LocalFree(lpMsgBuf);
  }
 
+ static void wait_for_client(void)
+ {
+	memset(&overlap_data,0,sizeof(overlap_data));
+
+	if(ConnectNamedPipe(hPipe, &overlap_data))
+	{
+		popup_lasterror("%s", _( "Can't connect pipe" ) );
+		enabled = FALSE;
+	}
+	else
+	{
+		switch (GetLastError())
+		{
+		// The overlapped connection in progress.
+		case ERROR_IO_PENDING:
+			Trace("Connection pending in pipe %p",hPipe);
+			break;
+
+		// Client is already connected, so signal an event.
+		case ERROR_PIPE_CONNECTED:
+			Trace("Client connected in pipe %p",hPipe);
+			break;
+
+		// If an error occurs during the connect operation...
+		default:
+			popup_lasterror("%s", _( "ConnectNamedPipe failed" ) );
+			enabled = FALSE;
+		}
+
+	}
+ }
+
+ static gpointer pipe_processor_thread(gpointer dunno)
+ {
+ 	static enum _state
+ 	{
+ 		PIPE_STATE_CONNECTING,
+ 		PIPE_STATE_WRITING,
+ 		PIPE_STATE_READING
+ 	} state = PIPE_STATE_CONNECTING;
+
+	char buffer[4096];
+
+ 	Trace("%s starts",__FUNCTION__);
+	wait_for_client();
+
+	while(enabled)
+	{
+		if(WaitForSingleObject(hPipe,100) == WAIT_OBJECT_0)
+		{
+			DWORD cbRet, cbRead;
+
+			if(GetOverlappedResult(hPipe,&overlap_data,&cbRet,FALSE))
+			{
+				// Data received
+				switch(state)
+				{
+				case PIPE_STATE_CONNECTING:
+					Trace("Connection received on pipe %p",hPipe);
+					state = PIPE_STATE_READING;
+					break;
+
+				case PIPE_STATE_READING:
+					if(ReadFile(hPipe,buffer, 4095, &cbRead,&overlap_data))
+					{
+						gchar *response;
+						*(buffer+cbRead) = 0;
+						response = run_commands(buffer);
+						if(response)
+						{
+							WriteFile(hPipe,response,strlen(response),&cbRead,&overlap_data);
+							g_free(response);
+						}
+						else
+						{
+							static const char *msg = "error";
+							WriteFile(hPipe,msg,strlen(msg),&cbRead,&overlap_data);
+						}
+						state = PIPE_STATE_WRITING;
+					}
+					break;
+
+				case PIPE_STATE_WRITING:
+					DisconnectNamedPipe(hPipe);
+					wait_for_client();
+					state = PIPE_STATE_CONNECTING;
+					break;
+
+				default:
+					Trace("Invalid state %d on %p",(int) state,hPipe);
+					DisconnectNamedPipe(hPipe);
+					wait_for_client();
+					state = PIPE_STATE_CONNECTING;
+				}
+			}
+			else
+			{
+				ULONG rc = GetLastError();
+
+				Trace("GetOverlappedResult: %d (%s)",(int) rc, rc == ERROR_BROKEN_PIPE ? "Broken pipe" : "Unexpected");
+
+				if(rc == ERROR_BROKEN_PIPE)
+				{
+					Trace("Pipe %p disconnected",hPipe);
+					DisconnectNamedPipe(hPipe);
+					wait_for_client();
+					state = PIPE_STATE_CONNECTING;
+				}
+				else
+				{
+					enabled = FALSE;
+				}
+			}
+		}
+	}
+
+
+ 	hThread = NULL;
+ 	Trace("%s finished",__FUNCTION__);
+
+ 	return 0;
+ }
+
  PW3270_PLUGIN_ENTRY void pw3270_plugin_start(GtkWidget *topwindow)
  {
 	// Create processing thread
-	static const LPTSTR	lpszPipename	= TEXT("\\\\.\\pipe\\" PACKAGE_NAME );
-	HANDLE					hPipe;
+	static const LPTSTR lpszRequest	= TEXT("\\\\.\\pipe\\" PACKAGE_NAME );
 
-	Trace("\n\n%s\n\n",__FUNCTION__);
-
-	hPipe = CreateNamedPipe(	lpszPipename,				// pipe name
-								PIPE_ACCESS_DUPLEX |		// read/write access
-								FILE_FLAG_OVERLAPPED,		// overlapped mode
-								PIPE_TYPE_MESSAGE |			// pipe type
-								PIPE_READMODE_MESSAGE |		// pipe mode
-								PIPE_WAIT,					// blocking mode
-								1,							// number of instances
-								PIPE_BUFFER_LENGTH,   		// output buffer size
-								PIPE_BUFFER_LENGTH,			// input buffer size
-								0,							// client time-out
-								NULL);						// default security attributes
-
-/*
-	hPipe = CreateNamedPipe(	lpszPipename,								// pipe name
+	hPipe = CreateNamedPipe(	lpszRequest,								// pipe name
 								PIPE_ACCESS_DUPLEX|FILE_FLAG_OVERLAPPED,	// read access
 								PIPE_TYPE_MESSAGE|PIPE_READMODE_MESSAGE,	// pipe modes
 								1,											// max. instances
@@ -100,22 +214,30 @@
 								PIPE_BUFFER_LENGTH,							// input buffer size
 								0,											// client time-out
 								NULL);										// default security attribute
-*/
 
-	Trace("%s: %p",(char *) lpszPipename, hPipe);
+	Trace("%s: %p",(char *) lpszRequest, hPipe);
 
 	if (hPipe == INVALID_HANDLE_VALUE)
 	{
-		popup_lasterror("Falha ao criar pipe %s",lpszPipename);
+		popup_lasterror("Falha ao criar pipe %s",lpszRequest);
 		return;
 	}
 
-	init_source_pipe(hPipe);
-
+	hThread = g_thread_create(pipe_processor_thread,0,TRUE,0);
  }
 
  PW3270_PLUGIN_ENTRY void pw3270_plugin_stop(GtkWidget *topwindow)
  {
+	enabled = FALSE;
 
+	if(hThread)
+		g_thread_join(hThread);
+
+	if(	hPipe != INVALID_HANDLE_VALUE)
+	{
+		Trace("Pipe %p closed",hPipe);
+		CloseHandle(hPipe);
+		hPipe = INVALID_HANDLE_VALUE;
+	}
  }
 

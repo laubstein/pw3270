@@ -20,7 +20,7 @@ set -e
 
 cd `dirname $0`
 
-version="@PACKAGE_VERSION@"
+. ./version.txt
 builddate=`date`
 sccsdate=`date +%Y/%m/%d`
 user=${LOGNAME-$USER}
@@ -32,9 +32,9 @@ user=${LOGNAME-$USER}
 rpq_timestamp=`date +%Y%m%d%H%M%S`
 
 cat <<EOF >version.c
-char *build = "@PACKAGE@ v$version $builddate $user";
+char *build = "${2-x3270} v$version $builddate $user";
 char *app_defaults_version = "$adversion";
-char *sccsid = "@(#)@PACKAGE@ v$version $sccsdate $user";
+char *sccsid = "@(#)${2-x3270} v$version $sccsdate $user";
 
 const char *build_rpq_timestamp = "$rpq_timestamp";
 const char *build_rpq_version = "$version";

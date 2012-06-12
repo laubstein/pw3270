@@ -2,16 +2,16 @@
 
 Name "@PROGRAM_NAME@"
 Caption "@PROGRAM_NAME@ - 3270 Emulator for windows/gtk"
-outfile "@PROGRAM_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@-@host_cpu@-install.exe"
+outfile "@PROGRAM_NAME@-@PACKAGE_VERSION@-@PACKAGE_RELEASE@-setup.exe"
 XPStyle on
 
 # define the directory to install to
 installDir $PROGRAMFILES\@PROGRAM_NAME@
 
 #define the installer icon
-!define MUI_ICON "src\gtk2\@PROGRAM_NAME@.ico"
-!define MUI_UNICON "src\gtk2\@PROGRAM_NAME@.ico"
-icon "src\gtk2\@PROGRAM_NAME@.ico"
+!define MUI_ICON "@PROGRAM_NAME@.ico"
+!define MUI_UNICON "@PROGRAM_NAME@.ico"
+icon "@PROGRAM_NAME@.ico"
 
 # Get installation folder from registry if available
 InstallDirRegKey HKCU "Software\@PROGRAM_NAME@" ""
@@ -58,13 +58,13 @@ SubSection "@PROGRAM_NAME@" SecMain
 		createShortCut "$DESKTOP\@PROGRAM_NAME@.lnk" "$INSTDIR\@PROGRAM_NAME@.exe"
 
 		# Binary files
-		file "/oname=$INSTDIR\@PROGRAM_NAME@.exe"	".bin\Release\@PROGRAM_NAME@.exe"
-		file "/oname=$INSTDIR\@PROGRAM_NAME@.ico"	"src\gtk2\@PROGRAM_NAME@.ico"
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.exe"	"bin\Release\@PROGRAM_NAME@.exe"
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.ico"	"@PROGRAM_NAME@.ico"
 
 		# Configuration files
-		file "/oname=$INSTDIR\@PROGRAM_NAME@.gif"	"image\@PROGRAM_NAME@.gif"
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.gif"	"bin\Release\@PROGRAM_NAME@.gif"
 		file "/oname=$INSTDIR\colors.conf"		"colors.conf"
-		file "/oname=$INSTDIR\@PROGRAM_NAME@.conf"	"default.conf"
+		file "/oname=$INSTDIR\@PROGRAM_NAME@.conf"	"@DEFAULT_CONFIG@"
 
 		# Documentation files
 		file "/oname=$INSTDIR\ChangeLog"		"ChangeLog"
@@ -74,11 +74,11 @@ SubSection "@PROGRAM_NAME@" SecMain
 		# UI definition files
 		CreateDirectory "$INSTDIR\ui"
 
-		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.xml" 	"ui\default.xml"
+		file "/oname=$INSTDIR\ui\@PROGRAM_NAME@.xml" bin\Release\ui\default.xml
 
 		# Locale files
 		CreateDirectory "$INSTDIR\@localedir@\pt_BR\LC_MESSAGES"
-		file "/oname=$INSTDIR\@localedir@\pt_BR\LC_MESSAGES\@PACKAGE@.mo" ".bin\Release\locale\pt_BR\LC_MESSAGES\@PACKAGE@.mo"
+		file "/oname=$INSTDIR\@localedir@\pt_BR\LC_MESSAGES\@PACKAGE@.mo" "bin\Release\locale\pt_BR\LC_MESSAGES\@PACKAGE@.mo"
 
 		# define uninstaller name
 		writeUninstaller $INSTDIR\uninstall.exe
@@ -104,7 +104,7 @@ SubSection "@PROGRAM_NAME@" SecMain
 		WriteRegStr HKCU "Software\@PROGRAM_NAME@" "" $INSTDIR
 
 		# Main library
-		file "/oname=$SYSDIR\lib3270.dll" ".bin\Release\lib\lib3270.dll"
+		file "/oname=$SYSDIR\lib3270.dll" bin\Release\lib\lib3270.dll
 
 	sectionEnd
 
@@ -117,15 +117,17 @@ SubSection "@PROGRAM_NAME@" SecMain
 			file src\plugins\rexx\rx3270.cls
 
 			CreateDirectory "$INSTDIR\plugins"
-			file "/oname=$INSTDIR\plugins\rx3270.dll" ".bin\Release\plugins\rx3270.dll"
+			file "/oname=$INSTDIR\plugins\rx3270.dll" bin\Release\plugins\rx3270.dll
 			file "/oname=$INSTDIR\ui\rexx.xml" ui\rexx.xml
 
 		sectionEnd
 
 		Section /o "Pipe control" PipePlugin
 			setOutPath $INSTDIR
+
 			CreateDirectory "$INSTDIR\plugins"
-			file "/oname=$INSTDIR\plugins\pipectl.dll" ".bin\Release\plugins\pipectl.dll"
+			file "/oname=$INSTDIR\plugins\pipectl.dll" bin\Release\plugins\pipectl.dll
+
 		sectionEnd
 
 	SubSectionEnd
@@ -135,14 +137,14 @@ SubSection "@PROGRAM_NAME@" SecMain
 		Section /o "JNI module" jni
 			setOutPath $INSTDIR
 			CreateDirectory "$INSTDIR\java"
-			file "/oname=$INSTDIR\java\pw3270.jar" ".bin\Release\pw3270.jar"
-			file "/oname=$INSTDIR\java\libpw3270_jni.dll" ".bin\Release\libpw3270_jni.dll"
+			file "/oname=$INSTDIR\java\pw3270.jar" bin\Release\pw3270.jar
+			file "/oname=$INSTDIR\java\libpw3270_jni.dll" bin\Release\libpw3270_jni.dll
 		SectionEnd
 
 		Section /o "Java plugin" jplugin
 			setOutPath $INSTDIR
 			CreateDirectory "$INSTDIR\plugins"
-			file "/oname=$INSTDIR\plugins\j3270plugin.dll" ".bin\Release\plugins\j3270plugin.dll"
+			file "/oname=$INSTDIR\plugins\j3270plugin.dll" bin\Release\plugins\j3270plugin.dll
 		SectionEnd
 
 	SubSectionEnd
@@ -151,24 +153,24 @@ SubSection "@PROGRAM_NAME@" SecMain
 	SubSection "Extras" SecExtra
 
 		Section "Right keypad" RKeypad
-			file "/oname=$INSTDIR\ui\keypad.xml" "ui\keypad.xml"
+			file "/oname=$INSTDIR\ui\keypad.xml" "bin\Release\ui\keypad.xml"
 		SectionEnd
 
 		Section /o "Function bar" FBar
-			file "/oname=$INSTDIR\ui\functions.xml" "ui\functions.xml"
+			file "/oname=$INSTDIR\ui\functions.xml" "bin\Release\ui\functions.xml"
 		SectionEnd
 
 		Section /o "Debug & Trace menus" SecDBGMenu
 
-			file "/oname=$INSTDIR\ui\debug.xml" "ui\debug.xml"
+			file "/oname=$INSTDIR\ui\debug.xml" "bin\Release\ui\debug.xml"
 
 		SectionEnd
 
 		Section /o "Rexx extension library" SecRexxLib
 
 			setOutPath $PROGRAMFILES\ooRexx
-			file ".bin\Release\librx3270.dll"
-			file "src\plugins\rexx\rx3270.cls"
+			file bin\Release\librx3270.dll
+			file src\plugins\rexx\rx3270.cls
 
 		SectionEnd
 
@@ -180,7 +182,7 @@ SubSectionEnd
 Section /o "GTK+ Runtime" SecGTK
 
 	setOutPath $INSTDIR
-	file /r ".bin\gtkruntime\*.*"
+	file /r "bin\Release\gtk-runtime\*.*"
 
 SectionEnd
 
@@ -194,9 +196,14 @@ Section /o "Software Development Kit" SecSDK
 	file "/oname=$INSTDIR\sdk\include\lib3270\api.h" "src\include\lib3270\api.h"
 	file "/oname=$INSTDIR\sdk\include\lib3270\config.h" "src\include\lib3270\config.h"
 	file "/oname=$INSTDIR\sdk\include\lib3270\plugins.h" "src\include\lib3270\plugins.h"
-	file "/oname=$INSTDIR\sdk\include\lib3270\macros.h" "src\include\lib3270\macros.h"
+
+	CreateDirectory "$INSTDIR\sdk\lib"
+	file "/oname=$INSTDIR\sdk\lib\lib3270.def" "bin\Release\lib\lib3270.def"
+	file "/oname=$INSTDIR\sdk\lib\lib3270.a" "bin\Release\lib\lib3270.a"
 
 SectionEnd
+
+
 
 # create a section to define what the uninstaller does.
 # the section will always be named "Uninstall"
@@ -245,13 +252,13 @@ sectionEnd
 
 Function .onInit
 
-#FindProcDLL::FindProc "@PROGRAM_NAME@.exe"
-#IntCmp $R0 1 0 notRunning
-#
-#    MessageBox MB_OK|MB_ICONEXCLAMATION "@PROGRAM_NAME@ is running. Please close it first" /SD IDOK
-#    Abort
-#
-#notRunning:
+FindProcDLL::FindProc "@PROGRAM_NAME@.exe"
+IntCmp $R0 1 0 notRunning
+
+    MessageBox MB_OK|MB_ICONEXCLAMATION "@PROGRAM_NAME@ is running. Please close it first" /SD IDOK
+    Abort
+
+notRunning:
 
 IfFileExists $PROGRAMFILES\ooRexx\rexx.exe RexxOK RexxNOK
 
@@ -263,7 +270,7 @@ RexxOK:
 	SectionGetFlags "${SecRexxLib}" $0
 	IntOp $0 $0 | ${SF_SELECTED}
 	SectionSetFlags "${SecRexxLib}" $0
-
+ 
 goto PastRexxCheck
 
 RexxNOK:

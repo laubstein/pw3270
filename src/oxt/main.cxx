@@ -38,6 +38,9 @@
 #include <stdio.h>
 
 
+#define TRACE( fmt, ... ) /* fmt __VA_ARGS__ */
+// #define TRACE( fmt, ... ) fprintf(stderr, "%s(%d) " fmt "\n", __FILE__, __LINE__, __VA_ARGS__ ); fflush(stderr);
+
 #include "ooo3270.hpp"
 
 // #include <comphelper/componentmodule.hxx>

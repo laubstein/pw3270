@@ -32,7 +32,6 @@
 
  #include <lib3270/config.h>
  #include <gdk/gdk.h>
- #include <stdlib.h>
 
  #include "gui.h"
  #include "fonts.h"
@@ -41,9 +40,9 @@
  #include <gdk/gdkkeysyms.h>
  #include <errno.h>
 
-// #include <globals.h>
+ #include <globals.h>
 
-// #include <lib3270/kybdc.h>
+ #include <lib3270/kybdc.h>
  #include <lib3270/toggle.h>
  #include <lib3270/plugins.h>
 
@@ -57,7 +56,6 @@
  static void action_Down(GtkWidget *w, gpointer user_data);
  static void action_Left(GtkWidget *w, gpointer user_data);
  static void action_Right(GtkWidget *w, gpointer user_data);
- static void action_Newline(GtkWidget *w, gpointer user_data);
 
  static void action_pfkey(GtkAction *action,gpointer id);
  static void action_pakey(GtkAction *action,gpointer id);
@@ -71,8 +69,7 @@
     { "KeepSelected", 	    FALSE	},
     { "Underline",		    TRUE	},
     { "AutoConnect",    	TRUE	},
-    { "KPAlternative",		FALSE	},
-    { "Beep",				TRUE	},
+    { "KPAlternative",		FALSE	}
  };
 
  gboolean gui_toggle_state[GUI_TOGGLE_COUNT] = { 0 };
@@ -111,11 +108,9 @@
 
 	{ GDK_Print,			GDK_CONTROL_MASK,	NULL,	G_CALLBACK(action_printscreen)		},
 	{ GDK_Print,			GDK_SHIFT_MASK,		NULL,	G_CALLBACK(lib3270_sysreq)			},
-	{ GDK_Control_R,		0,					NULL,	NULL								},
-	{ GDK_Control_L,		0,					NULL,	NULL								},
 
 #ifdef WIN32
-	{ GDK_Pause,			0,					NULL,	NULL								},
+	{ GDK_Pause,			0,					NULL,	0									},
 #endif
  };
 
@@ -203,11 +198,6 @@
  void action_Right(GtkWidget *w, gpointer user_data)
  {
  	clear_and_call(0,lib3270_cursor_right);
- }
-
- void action_Newline(GtkWidget *w, gpointer user_data)
- {
- 	clear_and_call(0,lib3270_cursor_newline);
  }
 
  static void toggle_action(GtkToggleAction *action, gpointer id)
@@ -341,27 +331,13 @@
 	// FIXME (perry#1#): Find a better way!
 	if( event->keyval == 0xffffff && event->hardware_keycode == 0x0013)
 		event->keyval = GDK_Pause;
-
-	// Windows sets <ctrl> in left/right control
-	else if(state & GDK_CONTROL_MASK && (event->keyval == GDK_Control_R || event->keyval == GDK_Control_L))
-		state &= ~GDK_CONTROL_MASK;
-
 #endif
 
-	Trace("Key action 0x%04x: Name:%s %s%s%s keycode: 0x%04x state: 0x%04x",
-			event->keyval,
-			gdk_keyval_name(event->keyval),
-			state & GDK_SHIFT_MASK ? "Shift " : "",
-			state & GDK_CONTROL_MASK ? "Control " : "",
-			state & GDK_ALT_MASK ? "Shift " : "",
-			event->hardware_keycode,
-			state);
+	Trace("Key action 0x%04x: %s %s keycode: 0x%04x",event->keyval,gdk_keyval_name(event->keyval),state & GDK_SHIFT_MASK ? "Shift " : "",event->hardware_keycode);
 
     // Check for special keyproc actions
 	for(f=0; f < G_N_ELEMENTS(keyboard_action);f++)
 	{
-//		Trace("%d keyval=%04x state=%04x",f,keyboard_action[f].keyval,keyboard_action[f].state);
-
 		if(keyboard_action[f].keyval == event->keyval && state == keyboard_action[f].state)
 		{
 #ifdef DEBUG
@@ -502,7 +478,6 @@
 		{ 	"CursorLeft",		G_CALLBACK(action_Left)				},
 		{ 	"CursorUp",			G_CALLBACK(action_Up)				},
 		{ 	"CursorDown",		G_CALLBACK(action_Down)				},
-		{ 	"Newline",			G_CALLBACK(action_Newline)			},
 
 		{	"NextField",		G_CALLBACK(lib3270_tab)				},
 		{	"PreviousField",	G_CALLBACK(lib3270_backtab)			},
@@ -575,9 +550,6 @@
 		{ "Delete",				G_CALLBACK(lib3270_delete)			},
 		{ "Erase",				G_CALLBACK(lib3270_erase)			},
 		{ "SysREQ",				G_CALLBACK(lib3270_sysreq)			},
-		{ "Attn",				G_CALLBACK(lib3270_attn)			},
-		{ "Break",				G_CALLBACK(lib3270_break)			},
-		{ "Dup",				G_CALLBACK(lib3270_dup)				},
 
 		{ "FirstField",			G_CALLBACK(lib3270_firstfield)		},
 
@@ -758,7 +730,7 @@
 	gtk_action_group_set_sensitive(action_group[id],status);
  }
 
- static void set_ft_action_state(H3270 *session,int state,void *dunno)
+ static void set_ft_action_state(int state)
  {
 	gtk_action_group_set_sensitive(action_group[ACTION_GROUP_FT],state);
  }
@@ -792,7 +764,7 @@
 		action_by_id[f] = dunno;
 
 #ifdef 	X3270_FT
-	set_ft_action_state(hSession,0,NULL);
+	set_ft_action_state(0);
 	register_schange(ST_3270_MODE, set_ft_action_state);
 #else
 	gtk_action_group_set_sensitive(ft_actions,FALSE);

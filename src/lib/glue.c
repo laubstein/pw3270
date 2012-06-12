@@ -63,10 +63,10 @@
 // #include "keymapc.h"
 #include "kybdc.h"
 //#include "macrosc.h"
-// #include "menubarc.h"
+#include "menubarc.h"
 #include "popupsc.h"
 #include "screenc.h"
-// #include "selectc.h"
+#include "selectc.h"
 #include "tablesc.h"
 #include "telnetc.h"
 #include "togglesc.h"
@@ -100,19 +100,20 @@
 
  #define LAST_ARG	"--"
 
-/*---[ Statics ]--------------------------------------------------------------------------------------------------------------*/
+/* Statics */
+static int parse_model_number(char *m);
 
- static int parse_model_number(const char *m);
-
-/*---[ Globals ]--------------------------------------------------------------------------------------------------------------*/
- H3270				  h3270;
- const char		* programname;
- AppRes				  appres;
- int				  children = 0;
- Boolean			  exiting = False;
-// char				* command_string = CN;
- static Boolean	  sfont = False;
- Boolean			* standard_font = &sfont;
+/* Globals */
+H3270			h3270;
+const char		*programname;
+// char			full_model_name[FULL_MODEL_NAME_SIZE] = "IBM-";
+//char			*model_name = &full_model_name[4];
+AppRes			appres;
+int				children = 0;
+Boolean			exiting = False;
+char			*command_string = CN;
+static Boolean	sfont = False;
+Boolean			*standard_font = &sfont;
 
 #if defined(WC3270) || defined(LIB3270)/*[*/
 char			*profile_name = CN;
@@ -143,62 +144,63 @@ const char *toggle_names[N_TOGGLES] =
 	"SmartPaste"
 };
 
-void lib3270_session_free(H3270 *h)
+/**
+ * Create a new 3270 object (INCOMPLETE).
+ *
+ * This function will create and initialize a new 3270 session, but, now
+ * it just returns a static 3270 session structure.
+ *
+ * @return lib3270 internal session structure.
+ *
+ */
+H3270 * new_3270_session(void)
 {
-	int f;
+	static int configured = 0;
 
-	// Terminate session
-	if(lib3270_connected(h))
-		lib3270_disconnect(h);
+	H3270		*hSession = &h3270;
+	int 		ovc, ovr;
+	int 		model_number;
+	char		junk;
 
-	shutdown_toggles(h,appres.toggle);
+	Trace("%s - configured=%d",__FUNCTION__,configured);
 
-	// Release state change callbacks
-	for(f=0;f<N_ST;f++)
+	if(configured)
 	{
-		while(h->st_callbacks[f])
-		{
-			struct lib3270_state_callback *next = h->st_callbacks[f]->next;
-			Free(h->st_callbacks[f]);
-			h->st_callbacks[f] = next;
-		}
+		// TODO (perry#5#): Allocate a new structure.
+		errno = EBUSY;
+		return hSession;
 	}
 
-}
-
-void lib3270_session_init(H3270 *hSession, const char *model)
-{
-	int 	ovc, ovr;
-	char	junk;
-	int		model_number;
+	configured = 1;
 
 	memset(hSession,0,sizeof(H3270));
 	hSession->sz = sizeof(H3270);
 	hSession->sock = -1;
-	hSession->model_num = -1;
-//	hSession->first_changed = -1;
-//	hSession->last_changed = -1;
-	hSession->cstate = NOT_CONNECTED;
-	hSession->oia_status = -1;
 
 	strncpy(hSession->full_model_name,"IBM-",FULL_MODEL_NAME_SIZE);
 	hSession->model_name = &hSession->full_model_name[4];
 
+#if defined(_WIN32)
+
+	(void) get_version_info();
+
+	Trace("%s (init_calls: %d)",__FUNCTION__,init_calls);
+
+#else
+
+	Trace("%s (init_calls: %d)",__FUNCTION__,init_calls);
+
+#endif
+
 	/*
 	 * Sort out model and color modes, based on the model number resource.
-	 */ /*
-	if(appres.model && *appres.model)
-		model = appres.model;
-	*/
+	 */
 
-	if(!*model)
-		model = "2";	// No model, use the default one
-
-//	Trace("Parsing model: %s",appres.model);
-	model_number = parse_model_number(model);
+	Trace("Parsing model: %s",appres.model);
+	model_number = parse_model_number(appres.model);
 	if (model_number < 0)
 	{
-		popup_an_error("Invalid model number: %s", model);
+		popup_an_error("Invalid model number: %s", appres.model);
 		model_number = 0;
 	}
 
@@ -211,9 +213,10 @@ void lib3270_session_init(H3270 *hSession, const char *model)
 #endif
 	}
 
+#if defined(C3270) && !defined(_WIN32)
 	if(appres.mono)
 		appres.m3279 = False;
-
+#endif
 	if(!appres.extended)
 		appres.oversize = CN;
 
@@ -241,29 +244,6 @@ void lib3270_session_init(H3270 *hSession, const char *model)
 	if (appres.apl_mode)
 		appres.charset = Apl;
 
-}
-
-H3270 * lib3270_session_new(const char *model)
-{
-	static int configured = 0;
-
-	H3270		*hSession = &h3270;
-
-	Trace("%s - configured=%d",__FUNCTION__,configured);
-
-	if(configured)
-	{
-		// TODO (perry#5#): Allocate a new structure.
-		errno = EBUSY;
-		return hSession;
-	}
-
-	configured = 1;
-
-	lib3270_session_init(hSession, model);
-
-	if(screen_init(hSession))
-		return NULL;
 
 	Trace("Charset: %s",appres.charset);
 	if (charset_init(appres.charset) != CS_OKAY)
@@ -272,9 +252,12 @@ H3270 * lib3270_session_new(const char *model)
 		(void) charset_init(CN);
 	}
 
+	if(screen_init())
+		return NULL;
+
 	kybd_init();
-//	hostfile_init();
-//	hostfile_init();
+	hostfile_init();
+	hostfile_init();
 	ansi_init();
 
 #if defined(X3270_FT)
@@ -303,16 +286,12 @@ static void initialize(void)
 	Trace("Initializing library (calls: %d)",init_calls);
 #endif
 
-	initialize_toggles(&h3270,appres.toggle);
-
-#if defined(_WIN32)
-	(void) get_version_info();
-#endif
-
-	Trace("%s (init_calls: %d)",__FUNCTION__,init_calls);
+	initialize_toggles();
 
 	/* Set the defaults. */
+#if defined(C3270) && !defined(_WIN32) /*[*/
 	appres.mono = False;
+#endif /*]*/
 	appres.extended = True;
 
 #if defined(C3270) /*[*/
@@ -325,13 +304,13 @@ static void initialize(void)
 	appres.apl_mode = False;
 
 #if defined(C3270) || defined(TCL3270) /*[*/
-//	appres.scripted = False;
+	appres.scripted = False;
 #else /*][*/
 	appres.scripted = True;
 #endif /*]*/
 
 	appres.numeric_lock = False;
-//	appres.secure = False;
+	appres.secure = False;
 
 #if defined(C3270) /*[*/
 	appres.oerr_lock = True;
@@ -346,7 +325,7 @@ static void initialize(void)
 	appres.compose_map = "latin1";
 #endif /*]*/
 
-	appres.model = "";
+	appres.model = "2";
 	appres.hostsfile = CN;
 	appres.port = "telnet";
 
@@ -379,8 +358,8 @@ static void initialize(void)
 
 #if defined(C3270) /*[*/
 	appres.meta_escape = "auto";
-//	appres.curses_keypad = True;
-//	appres.cbreak_mode = False;
+	appres.curses_keypad = True;
+	appres.cbreak_mode = False;
 #endif /*]*/
 
 #if defined(X3270_ANSI) /*[*/
@@ -461,38 +440,41 @@ int lib3270_unloaded(void)
 static const struct lib3270_option options[] =
 {
 	// TODO (perry#5#): Add option descriptions.
-//#if defined(C3270) /*[*/
-//    { OptAllBold,  OPT_BOOLEAN, True,  ResAllBold,   offset(all_bold_on), NULL },
-//    { OptAltScreen,OPT_STRING,  False, ResAltScreen, offset(altscreen), NULL },
-//#endif /*]*/
+#if defined(C3270) /*[*/
+    { OptAllBold,  OPT_BOOLEAN, True,  ResAllBold,   offset(all_bold_on), NULL },
+#endif /*]*/
+#if defined(C3270) /*[*/
+    { OptAltScreen,OPT_STRING,  False, ResAltScreen, offset(altscreen), NULL },
+#endif /*]*/
     { OptAplMode,  OPT_BOOLEAN, True,  ResAplMode,   offset(apl_mode), NULL },
 #if defined(C3270) /*[*/
-//    { OptCbreak,   OPT_BOOLEAN, True,  ResCbreak,    offset(cbreak_mode), NULL },
+    { OptCbreak,   OPT_BOOLEAN, True,  ResCbreak,    offset(cbreak_mode), NULL },
 #endif /*]*/
 #if defined(HAVE_LIBSSL) /*[*/
     { OptCertFile, OPT_STRING,  False, ResCertFile,  offset(cert_file), NULL },
 #endif /*]*/
     { OptCharset,  OPT_STRING,  False, ResCharset,   offset(charset), NULL },
     { OptClear,    OPT_SKIP2,   False, NULL,         NULL, NULL },
-//    { OptDefScreen,OPT_STRING,  False, ResDefScreen, offset(defscreen), NULL },
+#if defined(C3270) /*[*/
+    { OptDefScreen,OPT_STRING,  False, ResDefScreen, offset(defscreen), NULL },
+#endif /*]*/
 #if defined(X3270_TRACE) /*[*/
     { OptDsTrace,  OPT_BOOLEAN, True,  ResDsTrace,   toggle_offset(DS_TRACE), NULL },
 #endif /*]*/
     { OptHostsFile,OPT_STRING,  False, ResHostsFile, offset(hostsfile), NULL },
-//#if defined(C3270)
-//    { OptKeymap,   OPT_STRING,  False, ResKeymap,    offset(key_map), N_( "Specifies a keymap name and optional modifiers." ) },
-// #endif
-
-// #if defined(X3270_DBCS) /*[*/
-//    { OptLocalEncoding,OPT_STRING,False,ResLocalEncoding,offset(local_encoding), NULL },
-//#endif /*]*/
-    { OptModel,    OPT_STRING,  False, ResKeymap,    offset(model), N_( "Set terminal model (screen size)" ) },
-#if !defined(_WIN32) /*[*/
-    { OptMono,     OPT_BOOLEAN, True,  ResMono,      offset(mono), N_( "Forces monochrome display" ) },
+#if defined(C3270) /*[*/
+    { OptKeymap,   OPT_STRING,  False, ResKeymap,    offset(key_map), N_( "Specifies a keymap name and optional modifiers." ) },
 #endif /*]*/
-//    { OptOnce,     OPT_BOOLEAN, True,  ResOnce,      offset(once), NULL },
-    { OptOversize, OPT_STRING,  False, ResOversize,  offset(oversize), N_( "Sets the screen dimensions to be larger than the default for the chosen model (COLSxROWS)." ) },
-    { OptPort,     OPT_STRING,  False, ResPort,      offset(port), N_( "The name of the default TCP port to connect" ) },
+#if defined(X3270_DBCS) /*[*/
+    { OptLocalEncoding,OPT_STRING,False,ResLocalEncoding,offset(local_encoding), NULL },
+#endif /*]*/
+    { OptModel,    OPT_STRING,  False, ResKeymap,    offset(model), N_( "Set terminal model (screen size)" ) },
+#if defined(C3270) && !defined(_WIN32) /*[*/
+    { OptMono,     OPT_BOOLEAN, True,  ResMono,      offset(mono), NULL },
+#endif /*]*/
+    { OptOnce,     OPT_BOOLEAN, True,  ResOnce,      offset(once), NULL },
+    { OptOversize, OPT_STRING,  False, ResOversize,  offset(oversize), NULL },
+    { OptPort,     OPT_STRING,  False, ResPort,      offset(port), NULL },
 #if defined(C3270) && !defined(LIB3270) /*[*/
     { OptPrinterLu,OPT_STRING,  False, ResPrinterLu, offset(printer_lu), NULL },
 #endif /*]*/
@@ -500,9 +482,9 @@ static const struct lib3270_option options[] =
 #if defined(S3270) /*[*/
     { OptScripted, OPT_NOP,     False, ResScripted,  NULL, NULL },
 #endif /*]*/
-//#if defined(C3270) /*[*/
-//    { OptSecure,   OPT_BOOLEAN, True,  ResSecure,    offset(secure), NULL },
-//#endif /*]*/
+#if defined(C3270) /*[*/
+    { OptSecure,   OPT_BOOLEAN, True,  ResSecure,    offset(secure), NULL },
+#endif /*]*/
     { OptSet,      OPT_SKIP2,   False, NULL,         NULL, NULL },
 #if defined(X3270_SCRIPT) /*[*/
     { OptSocket,   OPT_BOOLEAN, True,  ResSocket,    offset(socket), NULL },
@@ -536,7 +518,8 @@ const struct lib3270_option * get_3270_option_table(int sz)
  * Parse the model number.
  * Returns -1 (error), 0 (default), or the specified number.
  */
-static int parse_model_number(const char *m)
+static int
+parse_model_number(char *m)
 {
 	int sl;
 	int n;
@@ -613,8 +596,10 @@ static struct {
 	void *address;
 	enum resource_type { XRM_STRING, XRM_BOOLEAN, XRM_INT } type;
 } resources[] = {
+#if defined(C3270) /*[*/
 	{ ResAllBold,	offset(all_bold),	XRM_STRING },
-//	{ ResAltScreen,	offset(altscreen),	XRM_STRING },
+	{ ResAltScreen,	offset(altscreen),	XRM_STRING },
+#endif /*]*/
 	{ ResBsdTm,	offset(bsd_tm),		XRM_BOOLEAN },
 #if defined(HAVE_LIBSSL) /*[*/
 	{ ResCertFile,	offset(cert_file),	XRM_STRING },
@@ -622,7 +607,9 @@ static struct {
 	{ ResCharset,	offset(charset),	XRM_STRING },
 	{ ResColor8,	offset(color8),		XRM_BOOLEAN },
 	{ ResConfDir,	offset(conf_dir),	XRM_STRING },
-//	{ ResDefScreen,	offset(defscreen),	XRM_STRING },
+#if defined(C3270) /*[*/
+	{ ResDefScreen,	offset(defscreen),	XRM_STRING },
+#endif /*]*/
 #if defined(X3270_ANSI) /*[*/
 	{ ResEof,	offset(eof),		XRM_STRING },
 	{ ResErase,	offset(erase),		XRM_STRING },
@@ -654,10 +641,10 @@ static struct {
 	{ ResIdleTimeout,offset(idle_timeout),	XRM_STRING },
 #endif /*]*/
 #if defined(C3270) /*[*/
-//	{ ResKeymap,	offset(key_map),	XRM_STRING },
+	{ ResKeymap,	offset(key_map),	XRM_STRING },
 	{ ResMetaEscape,offset(meta_escape),	XRM_STRING },
-//	{ ResCursesKeypad,offset(curses_keypad),XRM_BOOLEAN },
-//	{ ResCbreak,	offset(cbreak_mode),	XRM_BOOLEAN },
+	{ ResCursesKeypad,offset(curses_keypad),XRM_BOOLEAN },
+	{ ResCbreak,	offset(cbreak_mode),	XRM_BOOLEAN },
 #endif /*]*/
 #if defined(X3270_ANSI) /*[*/
 	{ ResKill,	offset(kill),		XRM_STRING },
@@ -665,7 +652,7 @@ static struct {
 #endif /*]*/
 	{ ResLoginMacro,offset(login_macro),	XRM_STRING },
 	{ ResM3279,	offset(m3279),		XRM_BOOLEAN },
-//	{ ResModel,	offset(model),		XRM_STRING },
+	{ ResModel,	offset(model),		XRM_STRING },
 	{ ResModifiedSel, offset(modified_sel),	XRM_BOOLEAN },
 #if defined(C3270) && !defined(_WIN32) /*[*/
 	{ ResMono,	offset(mono),		XRM_BOOLEAN },
@@ -683,7 +670,7 @@ static struct {
 	{ ResQuit,	offset(quit),		XRM_STRING },
 	{ ResRprnt,	offset(rprnt),		XRM_STRING },
 #endif /*]*/
-//	{ ResSecure,	offset(secure),		XRM_BOOLEAN },
+	{ ResSecure,	offset(secure),		XRM_BOOLEAN },
 	{ ResTermName,	offset(termname),	XRM_STRING },
 #if defined(WC3270) /*[*/
 	{ ResTitle,	offset(title),		XRM_STRING },
@@ -1033,7 +1020,7 @@ int *char_height = &ch;
 
 Boolean visible_control = False;
 
-// Boolean flipped = False;
+Boolean flipped = False;
 
 /* Replacements for functions in popups.c. */
 
@@ -1057,13 +1044,6 @@ popup_an_errno(int errn, const char *fmt, ...)
 
 	Error(vmsgbuf);
 }
-
-#ifdef DEBUG
-extern void lib3270_initialize(void)
-{
-	initialize();
-}
-#endif
 
 void
 action_output(const char *fmt, ...)

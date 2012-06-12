@@ -44,7 +44,8 @@
 
 #include "actionsc.h"
 #include "hostc.h"
-#include "statusc.h"
+// #include "macrosc.h"
+#include "menubarc.h"
 #include "popupsc.h"
 #include "telnetc.h"
 #include "trace_dsc.h"
@@ -56,10 +57,42 @@
 #define RECONNECT_MS		2000	/* 2 sec before reconnecting to host */
 #define RECONNECT_ERR_MS	5000	/* 5 sec before reconnecting to host */
 
-static void try_reconnect(H3270 *session);
+#define MAX_RECENT	5
 
-/*
-static char * stoken(char **s)
+enum cstate	cstate = NOT_CONNECTED;
+Boolean		std_ds_host = False;
+Boolean		no_login_host = False;
+Boolean		non_tn3270e_host = False;
+Boolean		passthru_host = False;
+Boolean		ssl_host = False;
+
+//#define		LUNAME_SIZE	16
+//char		luname[LUNAME_SIZE+1];
+//char		*connected_lu = CN;
+//char		*connected_type = CN;
+Boolean		ever_3270 = False;
+
+// char           *current_host = CN;
+char           *full_current_host = CN;
+unsigned short  current_port;
+char	       *reconnect_host = CN;
+char	       *qualified_host = CN;
+
+struct host *hosts = (struct host *)NULL;
+static struct host *last_host = (struct host *)NULL;
+static Boolean auto_reconnect_inprogress = False;
+static int net_sock = -1;
+
+#if defined(X3270_DISPLAY) /*[*/
+static void save_recent(const char *);
+#endif
+
+#if defined(X3270_DISPLAY) || defined(LIB3270)
+static void try_reconnect(H3270 *session);
+#endif /*]*/
+
+static char *
+stoken(char **s)
 {
 	char *r;
 	char *ss = *s;
@@ -77,11 +110,11 @@ static char * stoken(char **s)
 	*s = ss;
 	return r;
 }
-*/
+
 
 /*
  * Read the host file
- */ /*
+ */
 void
 hostfile_init(void)
 {
@@ -131,10 +164,10 @@ hostfile_init(void)
 			}
 			h->hostname = NewString(hostname);
 
-			//
-			// Quick syntax extension to allow the hosts file to
-			// specify a port as host/port.
-			//
+			/*
+			 * Quick syntax extension to allow the hosts file to
+			 * specify a port as host/port.
+			 */
 			if ((slash = strchr(h->hostname, '/')))
 				*slash = ':';
 
@@ -161,16 +194,18 @@ hostfile_init(void)
 	}
 	Free(hostfile_name);
 
-// #if defined(X3270_DISPLAY)
-// 	save_recent(CN);
-// #endif
+#if defined(X3270_DISPLAY) /*[*/
+	/*
+	 * Read the recent-connection file, and prepend it to the hosts list.
+	 */
+	save_recent(CN);
+#endif /*]*/
 }
-*/
 
 /*
  * Look up a host in the list.  Turns aliases into real hostnames, and
  * finds loginstrings.
- */ /*
+ */
 static int
 hostfile_lookup(const char *name, char **hostname, char **loginstring)
 {
@@ -192,7 +227,6 @@ hostfile_lookup(const char *name, char **hostname, char **loginstring)
 	}
 	return 0;
 }
-*/
 
 #if defined(LOCAL_PROCESS) /*[*/
 /* Recognize and translate "-e" options. */
@@ -225,14 +259,14 @@ parse_localprocess(const char *s)
  * Returns NULL if there is a syntax error.
  */
 static char *
-split_host(char *s, char *ansi, char *std_ds, char *passthru,
-	char *non_e, char *secure, char *no_login, char *xluname,
-	char **port, char *needed)
+split_host(char *s, Boolean *ansi, Boolean *std_ds, Boolean *passthru,
+	Boolean *non_e, Boolean *secure, Boolean *no_login, char *xluname,
+	char **port, Boolean *needed)
 {
 	char *lbracket = CN;
 	char *at = CN;
 	char *r = NULL;
-	char colon = False;
+	Boolean colon = False;
 
 	*ansi = False;
 	*std_ds = False;
@@ -461,12 +495,12 @@ split_success:
 	return r;
 }
 
-static int do_connect(H3270 *hSession, const char *n)
+static int do_connect(const char *n)
 {
 	char nb[2048];		/* name buffer */
-	char *s;			/* temporary */
+	char *s;		/* temporary */
 	const char *chost;	/* to whom we will connect */
-//	char *target_name;
+	char *target_name;
 	char *ps = CN;
 	char *port = CN;
 	Boolean resolving;
@@ -475,7 +509,7 @@ static int do_connect(H3270 *hSession, const char *n)
 	const char *localprocess_cmd = NULL;
 	Boolean has_colons = False;
 
-	if (CONNECTED || hSession->auto_reconnect_inprogress)
+	if (CONNECTED || auto_reconnect_inprogress)
 		return 0;
 
 	/* Skip leading blanks. */
@@ -495,12 +529,12 @@ static int do_connect(H3270 *hSession, const char *n)
 		*s-- = '\0';
 
 	/* Remember this hostname, as the last hostname we connected to. */
-	Replace(hSession->reconnect_host, NewString(nb));
+	Replace(reconnect_host, NewString(nb));
 
-// #if defined(X3270_DISPLAY)
-// 	/* Remember this hostname in the recent connection list and file. */
-// 	save_recent(nb);
-// #endif
+#if defined(X3270_DISPLAY) /*[*/
+	/* Remember this hostname in the recent connection list and file. */
+	save_recent(nb);
+#endif /*]*/
 
 #if defined(LOCAL_PROCESS) /*[*/
 	if ((localprocess_cmd = parse_localprocess(nb)) != CN) {
@@ -512,26 +546,26 @@ static int do_connect(H3270 *hSession, const char *n)
 		Boolean needed;
 
 		/* Strip off and remember leading qualifiers. */
-		if ((s = split_host(nb, &ansi_host, &hSession->std_ds_host,
-		    &hSession->passthru_host, &hSession->non_tn3270e_host, &hSession->ssl_host,
-		    &hSession->no_login_host, hSession->luname, &port,
+		if ((s = split_host(nb, &ansi_host, &std_ds_host,
+		    &passthru_host, &non_tn3270e_host, &ssl_host,
+		    &no_login_host, h3270.luname, &port,
 		    &needed)) == CN)
 			return -1;
 
-		/* Look up the name in the hosts file. */ /*
+		/* Look up the name in the hosts file. */
 		if (!needed && hostfile_lookup(s, &target_name, &ps)) {
-			//
-			// Rescan for qualifiers.
-			// Qualifiers, LU names, and ports are all overridden
-			// by the hosts file.
-			//
+			/*
+			 * Rescan for qualifiers.
+			 * Qualifiers, LU names, and ports are all overridden
+			 * by the hosts file.
+			 */
 			Free(s);
 			if (!(s = split_host(target_name, &ansi_host,
 			    &std_ds_host, &passthru_host, &non_tn3270e_host,
-			    &ssl_host, &no_login_host, hSession->luname, &port,
+			    &ssl_host, &no_login_host, h3270.luname, &port,
 			    &needed)))
 				return -1;
-		} */
+		}
 		chost = s;
 
 		/* Default the port. */
@@ -546,49 +580,52 @@ static int do_connect(H3270 *hSession, const char *n)
 	 *   and port number
 	 *  full_current_host is the entire string, for use in reconnecting
 	 */
-	if (n != hSession->full_current_host)
-	{
-		Replace(hSession->full_current_host, NewString(n));
+	if (n != full_current_host) {
+		Replace(full_current_host, NewString(n));
 	}
-
-	Replace(hSession->current_host, CN);
-
+	Replace(h3270.current_host, CN);
 	if (localprocess_cmd != CN) {
-		if (hSession->full_current_host[strlen(OptLocalProcess)] != '\0')
-			hSession->current_host = NewString(hSession->full_current_host + strlen(OptLocalProcess) + 1);
+		if (full_current_host[strlen(OptLocalProcess)] != '\0')
+			h3270.current_host = NewString(full_current_host + strlen(OptLocalProcess) + 1);
 		else
-			hSession->current_host = NewString("default shell");
+			h3270.current_host = NewString("default shell");
 	} else {
-		hSession->current_host = s;
+		h3270.current_host = s;
 	}
 
 	has_colons = (strchr(chost, ':') != NULL);
-
-	Replace(hSession->qualified_host,
+	Replace(qualified_host,
 	    xs_buffer("%s%s%s%s:%s",
-		    hSession->ssl_host? "L:": "",
+		    ssl_host? "L:": "",
 		    has_colons? "[": "",
 		    chost,
 		    has_colons? "]": "",
 		    port));
 
-
 	/* Attempt contact. */
-	hSession->ever_3270 = False;
-	hSession->net_sock = net_connect(chost, port, localprocess_cmd != CN, &resolving,&pending);
-
-	if (hSession->net_sock < 0 && !resolving)
-	{
+	ever_3270 = False;
+	net_sock = net_connect(chost, port, localprocess_cmd != CN, &resolving,
+	    &pending);
+	if (net_sock < 0 && !resolving) {
+#if defined(X3270_DISPLAY) /*[*/
+		if (appres.once) {
+			/* Exit when the error pop-up pops down. */
+			exiting = True;
+		}
+		else if ( toggled(RECONNECT) ) {
+			auto_reconnect_inprogress = True;
+			(void) AddTimeOut(RECONNECT_ERR_MS, try_reconnect);
+		}
+#endif /*]*/
 		/* Redundantly signal a disconnect. */
-		host_disconnected(hSession);
+		st_changed(ST_CONNECT, False);
 		return -1;
 	}
 
 	/* Still thinking about it? */
-	if (resolving)
-	{
-		hSession->cstate = RESOLVING;
-		lib3270_st_changed(hSession, ST_RESOLVING, True);
+	if (resolving) {
+		cstate = RESOLVING;
+		st_changed(ST_RESOLVING, True);
 		return 0;
 	}
 
@@ -602,36 +639,47 @@ static int do_connect(H3270 *hSession, const char *n)
 //		login_macro(ps);
 
 	/* Prepare Xt for I/O. */
-	x_add_input(hSession,hSession->net_sock);
+	x_add_input(net_sock);
 
 	/* Set state and tell the world. */
-	if (pending)
-	{
-		hSession->cstate = PENDING;
-		lib3270_st_changed(hSession, ST_HALF_CONNECT, True);
-	}
-	else
-	{
-		host_connected(hSession);
+	if (pending) {
+		cstate = PENDING;
+		st_changed(ST_HALF_CONNECT, True);
+	} else {
+		cstate = CONNECTED_INITIAL;
+		st_changed(ST_CONNECT, True);
+#if defined(X3270_DISPLAY) /*[*/
+		if (toggled(RECONNECT) && error_popup_visible())
+			popdown_an_error();
+#endif /*]*/
 	}
 
 	return 0;
 }
 
-int lib3270_connect(H3270 *h, const char *n, int wait)
+/**
+ * Network connect operation, keep main loop running
+ *
+ * Sets 'reconnect_host', 'current_host' and 'full_current_host' as
+ * side-effects.
+ *
+ * @param	n		Host ID
+ * @param	wait	Non zero to wait for connection to be ok.
+ *
+ * @return 0 for success, EAGAIN if auto-reconnect is in progress, EBUSY if connected, ENOTCONN if connection has failed, -1 on unexpected failure.
+ *
+ */
+int host_connect(const char *n, int wait)
 {
-	if(!h)
-		h = &h3270;
-
 	RunPendingEvents(0);
 
-	if(h->auto_reconnect_inprogress)
+	if(auto_reconnect_inprogress)
 		return EAGAIN;
 
 	if(PCONNECTED)
 		return EBUSY;
 
-	if(do_connect(h,n))
+	if(do_connect(n))
 		return -1;
 
 	if(wait)
@@ -650,38 +698,48 @@ int lib3270_connect(H3270 *h, const char *n, int wait)
 	return 0;
 }
 
+
+
+#if defined(X3270_DISPLAY) || defined(LIB3270) /*[*/
 /*
  * Called from timer to attempt an automatic reconnection.
  */
 static void try_reconnect(H3270 *session)
 {
-	WriteLog("3270","Starting auto-reconnect (Host: %s)",session->reconnect_host ? session->reconnect_host : "-");
-	session->auto_reconnect_inprogress = False;
-	lib3270_reconnect(session,0);
+	WriteLog("3270","Starting auto-reconnect (Host: %s)",reconnect_host ? reconnect_host : "-");
+	auto_reconnect_inprogress = False;
+	host_reconnect(0);
 }
-
-LIB3270_EXPORT void lib3270_disconnect(H3270 *h)
-{
-	host_disconnect(h,0);
-}
+#endif /*]*/
 
 void host_disconnect(H3270 *h, int failed)
 {
-    CHECK_SESSION_HANDLE(h);
+	if(!h)
+		h = &h3270;
 
-	if (CONNECTED || HALF_CONNECTED)
-	{
-		x_remove_input(h);
+	if (CONNECTED || HALF_CONNECTED) {
+		x_remove_input();
 		net_disconnect();
-		h->net_sock = -1;
-
-		Trace("Disconnected (Failed: %d Reconnect: %d in_progress: %d)",failed,toggled(RECONNECT),h->auto_reconnect_inprogress);
-		if (toggled(RECONNECT) && !h->auto_reconnect_inprogress)
+		net_sock = -1;
+#if defined(LIB3270)
+		Trace("Disconnected (Failed: %d Reconnect: %d in_progress: %d)",failed,toggled(RECONNECT),auto_reconnect_inprogress);
+		if (toggled(RECONNECT) && !auto_reconnect_inprogress)
 		{
 			/* Schedule an automatic reconnection. */
-			h->auto_reconnect_inprogress = True;
-			(void) AddTimeOut(failed ? RECONNECT_ERR_MS: RECONNECT_MS, h, try_reconnect);
+			auto_reconnect_inprogress = True;
+			(void) AddTimeOut(failed? RECONNECT_ERR_MS: RECONNECT_MS, &h3270, try_reconnect);
 		}
+#endif
+
+#if defined(X3270_DISPLAY) /*[*/
+		if(toggled(RECONNECT) && !auto_reconnect_inprogress) {
+			/* Schedule an automatic reconnection. */
+			auto_reconnect_inprogress = True;
+			(void) AddTimeOut(failed? RECONNECT_ERR_MS:
+						   RECONNECT_MS,
+					  try_reconnect);
+		}
+#endif /*]*/
 
 		/*
 		 * Remember a disconnect from ANSI mode, to keep screen tracing
@@ -692,107 +750,317 @@ void host_disconnect(H3270 *h, int failed)
 			trace_ansi_disc();
 #endif /*]*/
 
-		host_disconnected(h);
+		cstate = NOT_CONNECTED;
+
+		/* Propagate the news to everyone else. */
+		st_changed(ST_CONNECT, False);
 	}
 }
 
 /* The host has entered 3270 or ANSI mode, or switched between them. */
-void host_in3270(H3270 *session, LIB3270_CSTATE new_cstate)
+void
+host_in3270(enum cstate new_cstate)
 {
 	Boolean now3270 = (new_cstate == CONNECTED_3270 ||
 			   new_cstate == CONNECTED_SSCP ||
 			   new_cstate == CONNECTED_TN3270E);
 
-	session->cstate = new_cstate;
-	session->ever_3270 = now3270;
-	lib3270_st_changed(session, ST_3270_MODE, now3270);
+	cstate = new_cstate;
+	ever_3270 = now3270;
+	st_changed(ST_3270_MODE, now3270);
 }
 
-void host_connected(H3270 *session)
+void
+host_connected(void)
 {
-	session->cstate = CONNECTED_INITIAL;
-	lib3270_st_changed(session, ST_CONNECT, True);
-	if(session->update_connect)
-		session->update_connect(session,1);
+	cstate = CONNECTED_INITIAL;
+	st_changed(ST_CONNECT, True);
+
+#if defined(X3270_DISPLAY) /*[*/
+	if (toggled(RECONNECT) && error_popup_visible())
+		popdown_an_error();
+#endif /*]*/
 }
 
-void host_disconnected(H3270 *session)
+#if defined(X3270_DISPLAY) /*[*/
+/* Comparison function for the qsort. */
+static int
+host_compare(const void *e1, const void *e2)
 {
-	session->cstate = NOT_CONNECTED;
-	set_status(session,OIA_FLAG_UNDERA,False);
-	lib3270_st_changed(session,ST_CONNECT, False);
-	status_changed(session,LIB3270_MESSAGE_DISCONNECTED);
-	if(session->update_connect)
-		session->update_connect(session,0);
+	const struct host *h1 = *(const struct host **)e1;
+	const struct host *h2 = *(const struct host **)e2;
+	int r;
+
+	if (h1->connect_time > h2->connect_time)
+		r = -1;
+	else if (h1->connect_time < h2->connect_time)
+		r = 1;
+	else
+		r = 0;
+#if defined(CFDEBUG) /*[*/
+	printf("%s %ld %d %s %ld\n",
+	    h1->name, h1->connect_time,
+	    r,
+	    h2->name, h2->connect_time);
+#endif /*]*/
+	return r;
 }
+#endif /*]*/
+
+#if defined(CFDEBUG) /*[*/
+static void
+dump_array(const char *when, struct host **array, int nh)
+{
+	int i;
+
+	printf("%s\n", when);
+	for (i = 0; i < nh; i++) {
+		printf(" %15s %ld\n", array[i]->name, array[i]->connect_time);
+	}
+}
+#endif /*]*/
+
+#if defined(X3270_DISPLAY) /*[*/
+/* Save the most recent host in the recent host list. */
+static void
+save_recent(const char *hn)
+{
+	char *lcf_name = CN;
+	FILE *lcf = (FILE *)NULL;
+	struct host *h;
+	struct host *rest = (struct host *)NULL;
+	int n_ent = 0;
+	struct host *h_array[(MAX_RECENT * 2) + 1];
+	int nh = 0;
+	int i, j;
+	time_t t = time((time_t *)NULL);
+
+	/* Allocate a new entry. */
+	if (hn != CN) {
+		h = (struct host *)Malloc(sizeof(*h));
+		h->name = NewString(hn);
+		h->parents = NULL;
+		h->hostname = NewString(hn);
+		h->entry_type = RECENT;
+		h->loginstring = CN;
+		h->connect_time = t;
+		h_array[nh++] = h;
+	}
+
+	/* Put the existing entries into the array. */
+	for (h = hosts; h != (struct host *)NULL; h = h->next) {
+		if (h->entry_type != RECENT)
+			break;
+		h_array[nh++] = h;
+	}
+
+	/* Save the ibm_hosts entries for later. */
+	rest = h;
+	if (rest != (struct host *)NULL)
+		rest->prev = (struct host *)NULL;
+
+	/*
+	 * Read the last-connection file, to capture the any changes made by
+	 * other instances of x3270.
+	 */
+	if (appres.connectfile_name != CN &&
+	    strcasecmp(appres.connectfile_name, "none")) {
+		lcf_name = do_subst(appres.connectfile_name, True, True);
+		lcf = fopen(lcf_name, "r");
+	}
+	if (lcf != (FILE *)NULL) {
+		char buf[1024];
+
+		while (fgets(buf, sizeof(buf), lcf) != CN) {
+			int sl;
+			time_t connect_time;
+			char *ptr;
+
+			/* Pick apart the entry. */
+			sl = strlen(buf);
+			if (buf[sl - 1] == '\n')
+				buf[sl-- - 1] = '\0';
+			if (!sl ||
+			    buf[0] == '#' ||
+			    (connect_time = strtoul(buf, &ptr, 10)) == 0L ||
+			    ptr == buf ||
+			    *ptr != ' ' ||
+			    !*(ptr + 1))
+				continue;
+
+			h = (struct host *)Malloc(sizeof(*h));
+			h->name = NewString(ptr + 1);
+			h->parents = NULL;
+			h->hostname = NewString(ptr + 1);
+			h->entry_type = RECENT;
+			h->loginstring = CN;
+			h->connect_time = connect_time;
+			h_array[nh++] = h;
+			if (nh > (MAX_RECENT * 2) + 1)
+				break;
+		}
+		fclose(lcf);
+	}
+
+	/* Sort the array, in reverse order by connect time. */
+#if defined(CFDEBUG) /*[*/
+	dump_array("before", h_array, nh);
+#endif /*]*/
+	qsort(h_array, nh, sizeof(struct host *), host_compare);
+#if defined(CFDEBUG) /*[*/
+	dump_array("after", h_array, nh);
+#endif /*]*/
+
+	/*
+	 * Filter out duplicate host names, and limit the array to
+	 * MAX_RECENT entries total.
+	 */
+	hosts = (struct host *)NULL;
+	last_host = (struct host *)NULL;
+	for (i = 0; i < nh; i++) {
+		h = h_array[i];
+		if (h == (struct host *)NULL)
+			continue;
+		h->next = (struct host *)NULL;
+		if (last_host != (struct host *)NULL)
+			last_host->next = h;
+		h->prev = last_host;
+		last_host = h;
+		if (hosts == (struct host *)NULL)
+			hosts = h;
+		n_ent++;
+
+		/* Zap the duplicates. */
+		for (j = i+1; j < nh; j++) {
+			if (h_array[j] &&
+			    (n_ent >= MAX_RECENT ||
+			     !strcmp(h_array[i]->name, h_array[j]->name))) {
+#if defined(CFDEBUG) /*[*/
+				printf("%s is a dup of %s\n",
+				    h_array[j]->name, h_array[i]->name);
+#endif /*]*/
+				Free(h_array[j]->name);
+				Free(h_array[j]->hostname);
+				Free(h_array[j]);
+				h_array[j] = (struct host *)NULL;
+			}
+		}
+	}
+
+	/* Re-attach the ibm_hosts entries to the end. */
+	if (rest != (struct host *)NULL) {
+		if (last_host != (struct host *)NULL) {
+			last_host->next = rest;
+		} else {
+			hosts = rest;
+		}
+		rest->prev = last_host;
+	}
+
+	/* If there's been a change, rewrite the file. */
+	if (hn != CN &&
+	    appres.connectfile_name != CN &&
+	    strcasecmp(appres.connectfile_name, "none")) {
+		lcf = fopen(lcf_name, "w");
+		if (lcf != (FILE *)NULL) {
+			fprintf(lcf, "# Created %s# by %s\n", ctime(&t), build);
+			for (h = hosts; h != (struct host *)NULL; h = h->next) {
+				if (h->entry_type != RECENT)
+					break;
+				(void) fprintf(lcf, "%lu %s\n", h->connect_time,
+				    h->name);
+			}
+			fclose(lcf);
+		}
+	}
+	if (lcf_name != CN)
+		Free(lcf_name);
+}
+#endif /*]*/
+
+/* Support for state change callbacks. */
+
+struct st_callback {
+	struct st_callback *next;
+	void (*func)(int);
+};
+static struct st_callback *st_callbacks[N_ST];
+static struct st_callback *st_last[N_ST];
 
 /* Register a function interested in a state change. */
-LIB3270_EXPORT void lib3270_register_schange(H3270 *h,LIB3270_STATE_CHANGE tx, void (*func)(H3270 *, int, void *),void *data)
+void
+register_schange(int tx, void (*func)(int))
 {
-	struct lib3270_state_callback *st;
+	struct st_callback *st;
 
-    CHECK_SESSION_HANDLE(h);
-
-	st = (struct lib3270_state_callback *)Malloc(sizeof(*st));
-
-	st->func	= func;
-	st->next	= (struct lib3270_state_callback *)NULL;
-
-	if (h->st_last[tx] != (struct lib3270_state_callback *)NULL)
-		h->st_last[tx]->next = st;
+	st = (struct st_callback *)Malloc(sizeof(*st));
+	st->func = func;
+	st->next = (struct st_callback *)NULL;
+	if (st_last[tx] != (struct st_callback *)NULL)
+		st_last[tx]->next = st;
 	else
-		h->st_callbacks[tx] = st;
-	h->st_last[tx] = st;
-
+		st_callbacks[tx] = st;
+	st_last[tx] = st;
 }
 
 /* Signal a state change. */
-void lib3270_st_changed(H3270 *h, int tx, int mode)
+void
+st_changed(int tx, int mode)
 {
-	struct lib3270_state_callback *st;
+	struct st_callback *st;
 
-    CHECK_SESSION_HANDLE(h);
-
-	for (st = h->st_callbacks[tx];st != (struct lib3270_state_callback *)NULL;st = st->next)
-	{
-		(*st->func)(h,mode,st->data);
+	for (st = st_callbacks[tx];
+	     st != (struct st_callback *)NULL;
+	     st = st->next) {
+		(*st->func)(mode);
 	}
 }
 
-LIB3270_EXPORT int lib3270_reconnect(H3270 *h,int wait)
+#if defined(X3270_MENUS) || defined(LIB3270) /*[*/
+
+LIB3270_EXPORT int host_reconnect(int wait)
 {
 	int rc;
-
-    CHECK_SESSION_HANDLE(h);
 
 	if (CONNECTED || HALF_CONNECTED)
 		return EBUSY;
 
-	if (h->current_host == CN)
+	if (h3270.current_host == CN)
 		return ENOENT;
 
-	if (h->auto_reconnect_inprogress)
+	if (auto_reconnect_inprogress)
 		return EBUSY;
 
-	rc = lib3270_connect(h,h->reconnect_host,wait);
+	rc = host_connect(reconnect_host,wait);
 
 	if(rc)
 	{
-		h->auto_reconnect_inprogress = False;
+		auto_reconnect_inprogress = False;
 		return rc;
 	}
 
+	/*
+	 * If called from a script and the connection was successful (or
+	 * half-successful), pause the script until we are connected and
+	 * we have identified the host type.
+	if (!w && (CONNECTED || HALF_CONNECTED))
+		sms_connect_wait();
+	 */
+
 	return 0;
 }
+#endif /*]*/
 
-LIB3270_EXPORT const char * lib3270_get_luname(H3270 *h)
+LIB3270_EXPORT const char	* get_connected_lu(H3270 *h)
 {
-    CHECK_SESSION_HANDLE(h);
-	return h->connected_lu;
+	if(h)
+		return h->connected_lu;
+	return h3270.connected_lu;
 }
 
-LIB3270_EXPORT const char * lib3270_get_host(H3270 *h)
+LIB3270_EXPORT const char	* get_current_host(H3270 *h)
 {
-    CHECK_SESSION_HANDLE(h);
-	return h->current_host;
+	if(h)
+		return h->current_host;
+	return h3270.current_host;
 }

@@ -40,21 +40,11 @@
 
 	#undef HAVE_GNUC_VISIBILITY
 
+	#undef HAVE_LIBSSL
 	#undef HAVE_ICONV
 	#undef HAVE_PLUGINS
-	#undef HAVE_LIBM
-
-	#undef HAVE_SSL
-	#ifdef HAVE_SSL
-		#define HAVE_LIBSSL
-	#endif
-
-	#undef HAVE_GNOME
-	#ifdef HAVE_GNOME
-		#define HAVE_LIBGNOME
-	#endif
-
-	#undef HAVE_UNITY
+	#undef HAVE_LIBGNOME
+	#undef HAVE_REXX
 
 	#define HAVE_FONTLIST_XML
 
@@ -70,23 +60,20 @@
 		#define PROGRAM_DATA "."
 	#endif
 
-	#define HAVE_PRINT_FONT_DIALOG
+	#undef HAVE_PRINT_FONT_DIALOG
 
 	/* Optional parts. */
 	#undef X3270_TRACE
+	#undef X3270_TN3270E
+	#undef X3270_ANSI
+	#undef X3270_APL
 	#undef X3270_DBCS
+	#undef X3270_FT
+	#undef X3270_PRINTER
 	#undef X3270_SCRIPT
 
-	#define X3270_TN3270E
-	#define X3270_ANSI
-	#define X3270_APL
-	#define X3270_FT
-	#define X3270_PRINTER
-
-	#define MOUSE_POINTER_CHANGE
+	#undef MOUSE_POINTER_CHANGE
 	#undef HAVE_GTK_STATUS_BAR
-
-	#undef HAVE_ALTSCREEN
 	#undef HAVE_IGEMAC
 	#undef HAVE_MACUI
 	#undef HAVE_MALLOC_H
@@ -95,9 +82,8 @@
 	#define DEFAULT_TOGGLE_RECTANGLE_SELECT
 	#define DEFAULT_TOGGLE_CURSOR_POS
 
-	/* Brandings */
+	/* Program name */
 	#undef PROGRAM_NAME
-	#undef PROGRAM_LOGO
 
 	/* OpenOffice.org stuff */
 	/* #undef SERVICENAME */

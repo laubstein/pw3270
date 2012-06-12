@@ -1,27 +1,27 @@
-/*
+/* 
  * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270. Registro no INPI sob o nome G3270.
- *
+ * 
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- *
+ * 
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- *
+ * 
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- *
+ * 
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- *
+ * 
  * Este programa está nomeado como proxy.c e possui 991 linhas de código.
- *
- * Contatos:
- *
+ * 
+ * Contatos: 
+ * 
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -328,8 +328,8 @@ proxy_passthru(int fd, char *host, unsigned short port)
 	(void) sprintf(buf, "%s %u\r\n", host, port);
 
 #if defined(X3270_TRACE) /*[*/
-    trace_dsn("Passthru Proxy: xmit '%.*s'", (int) (strlen(buf) - 2), buf);
-	trace_netdata('>', (unsigned char *)buf, (int) strlen(buf));
+	trace_dsn("Passthru Proxy: xmit '%.*s'", strlen(buf) - 2, buf);
+	trace_netdata('>', (unsigned char *)buf, strlen(buf));
 #endif /*]*/
 
 	if (send(fd, buf, strlen(buf), 0) < 0) {
@@ -363,8 +363,8 @@ proxy_http(int fd, char *host, unsigned short port)
 		port);
 
 #if defined(X3270_TRACE) /*[*/
-	trace_dsn("HTTP Proxy: xmit '%.*s'\n", (int) (strlen(buf) - 2), buf);
-	trace_netdata('>', (unsigned char *)buf, (int) strlen(buf));
+	trace_dsn("HTTP Proxy: xmit '%.*s'\n", strlen(buf) - 2, buf);
+	trace_netdata('>', (unsigned char *)buf, strlen(buf));
 #endif /*]*/
 
 	if (send(fd, buf, strlen(buf), 0) < 0) {
@@ -380,8 +380,8 @@ proxy_http(int fd, char *host, unsigned short port)
 		port);
 
 #if defined(X3270_TRACE) /*[*/
-	trace_dsn("HTTP Proxy: xmit '%.*s'\n", (int) (strlen(buf) - 2), buf);
-	trace_netdata('>', (unsigned char *)buf, (int) strlen(buf));
+	trace_dsn("HTTP Proxy: xmit '%.*s'\n", strlen(buf) - 2, buf);
+	trace_netdata('>', (unsigned char *)buf, strlen(buf));
 #endif /*]*/
 
 	if (send(fd, buf, strlen(buf), 0) < 0) {
@@ -479,8 +479,8 @@ proxy_telnet(int fd, char *host, unsigned short port)
 	(void) sprintf(buf, "connect %s %u\r\n", host, port);
 
 #if defined(X3270_TRACE) /*[*/
-	trace_dsn("TELNET Proxy: xmit '%.*s'", (int) (strlen(buf) - 2), buf);
-	trace_netdata('>', (unsigned char *)buf, (int) strlen(buf));
+	trace_dsn("TELNET Proxy: xmit '%.*s'", strlen(buf) - 2, buf);
+	trace_netdata('>', (unsigned char *)buf, strlen(buf));
 #endif /*]*/
 
 	if (send(fd, buf, strlen(buf), 0) < 0) {
@@ -688,10 +688,10 @@ proxy_socks5(int fd, char *host, unsigned short port, int force_d)
 		int rv;
 
 		/* Resolve the hostname. */
-		status_resolving(&h3270,1);
+		status_resolving(1);
 		rv = resolve_host_and_port(host, CN, &rport, &ha.sa, &ha_len,
 			errmsg, sizeof(errmsg));
-		status_resolving(&h3270,0);
+		status_resolving(0);
 		if (rv == -2)
 		    	use_name = 1;
 		else if (rv < 0) {
@@ -707,7 +707,7 @@ proxy_socks5(int fd, char *host, unsigned short port, int force_d)
 	trace_dsn("SOCKS5 Proxy: xmit version 5 nmethods 1 (no auth)\n");
 	trace_netdata('>', rbuf, 3);
 #endif /*]*/
-	if (send(fd, (const char *) rbuf, 3, 0) < 0) {
+	if (send(fd, rbuf, 3, 0) < 0) {
 		popup_a_sockerr("SOCKS5 Proxy: send error");
 		return -1;
 	}
@@ -734,7 +734,7 @@ proxy_socks5(int fd, char *host, unsigned short port, int force_d)
 			return -1;
 		}
 
-	    	nr = recv(fd, (char *) &rbuf[nread], 1, 0);
+	    	nr = recv(fd, &rbuf[nread], 1, 0);
 		if (nr < 0) {
 			popup_a_sockerr("SOCKS5 Proxy: receive error");
 #if defined(X3270_TRACE) /*[*/
@@ -839,7 +839,7 @@ proxy_socks5(int fd, char *host, unsigned short port, int force_d)
 			return -1;
 		}
 
-	    	nr = recv(fd, (char *) &r, 1, 0);
+	    	nr = recv(fd, &r, 1, 0);
 		if (nr < 0) {
 			popup_a_sockerr("SOCKS5 Proxy: receive error");
 #if defined(X3270_TRACE) /*[*/

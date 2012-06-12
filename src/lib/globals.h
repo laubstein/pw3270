@@ -31,16 +31,19 @@
  */
 
 /* Autoconf settings. */
-#include <lib3270/config.h>		/* autoconf settings */
-#include <lib3270.h>			/* lib3270 API calls and defs */
+#include <lib3270/config.h>			/* autoconf settings */
+#include <lib3270/api.h>			/* lib3270 API calls and defs */
 
 /* From glibconfig.h */
 #if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
 	#define LIB3270_INTERNAL __hidden extern
 #elif defined (__GNUC__) && defined (HAVE_GNUC_VISIBILITY)
 	#define LIB3270_INTERNAL __attribute__((visibility("hidden"))) extern
+#elif defined( WIN32 )
+	#define LIB3270_INTERNAL
 #else
 	#define LIB3270_INTERNAL
+	#warning Exporting internal calls
 #endif
 
 #if defined(X3270_TN3270E) && !defined(X3270_ANSI) /*[*/
@@ -128,9 +131,7 @@
 #endif /*]*/
 
 /* Stop conflicting with curses' COLS, even if we don't link with it. */
-// #define COLS cCOLS
-
-#define CHECK_SESSION_HANDLE(x) if(!x) x = &h3270;
+#define COLS cCOLS
 
 
 /* types of internal actions */
@@ -179,7 +180,7 @@ LIB3270_INTERNAL Boolean		exiting;
 	LIB3270_INTERNAL Boolean		*font_8bit;
 #endif /*]*/
 
-// LIB3270_INTERNAL Boolean	flipped;
+LIB3270_INTERNAL Boolean	flipped;
 LIB3270_INTERNAL char		*full_current_host;
 LIB3270_INTERNAL char		*full_efontname;
 
@@ -203,14 +204,14 @@ LIB3270_INTERNAL char		*hostname;
 	LIB3270_INTERNAL Boolean	local_process;
 #endif /*]*/
 
-// LIB3270_INTERNAL int			maxCOLS;
-// LIB3270_INTERNAL int			maxROWS;
-// LIB3270_INTERNAL char			*model_name;
-// LIB3270_INTERNAL int			model_num;
+LIB3270_INTERNAL int			maxCOLS;
+LIB3270_INTERNAL int			maxROWS;
+LIB3270_INTERNAL char			*model_name;
+LIB3270_INTERNAL int			model_num;
 LIB3270_INTERNAL Boolean		no_login_host;
 LIB3270_INTERNAL Boolean		non_tn3270e_host;
-// LIB3270_INTERNAL int			ov_cols, ov_rows;
- LIB3270_INTERNAL Boolean		passthru_host;
+LIB3270_INTERNAL int			ov_cols, ov_rows;
+LIB3270_INTERNAL Boolean		passthru_host;
 LIB3270_INTERNAL const char	*programname;
 LIB3270_INTERNAL char			*qualified_host;
 LIB3270_INTERNAL char			*reconnect_host;
@@ -243,21 +244,23 @@ LIB3270_INTERNAL int			*xtra_width;
 	LIB3270_INTERNAL unsigned char	xk_selector;
 #endif /*]*/
 
-/* Connection state */
-LIB3270_INTERNAL enum ft_state ft_state;
+/* Data types and complex global variables */
 
-/*
-LIB3270_INTERNAL enum cstate cstate;
-#define PCONNECTED	((int)h3270.cstate >= (int)RESOLVING)
-#define HALF_CONNECTED	(h3270.cstate == RESOLVING || h3270.cstate == PENDING)
-#define CONNECTED	((int)h3270.cstate >= (int)CONNECTED_INITIAL)
-#define IN_NEITHER	(h3270.cstate == CONNECTED_INITIAL)
-#define IN_ANSI		(h3270.cstate == CONNECTED_ANSI || h3270.cstate == CONNECTED_NVT)
-#define IN_3270		(h3270.cstate == CONNECTED_3270 || h3270.cstate == CONNECTED_TN3270E || h3270.cstate == CONNECTED_SSCP)
-#define IN_SSCP		(h3270.cstate == CONNECTED_SSCP)
-#define IN_TN3270E	(h3270.cstate == CONNECTED_TN3270E)
-#define IN_E		(h3270.cstate >= CONNECTED_INITIAL_E)
-*/
+#ifdef LIB3270
+
+	extern enum cstate cstate;
+
+	#define PCONNECTED	((int)cstate >= (int)RESOLVING)
+	#define HALF_CONNECTED	(cstate == RESOLVING || cstate == PENDING)
+	#define CONNECTED	((int)cstate >= (int)CONNECTED_INITIAL)
+	#define IN_NEITHER	(cstate == CONNECTED_INITIAL)
+	#define IN_ANSI		(cstate == CONNECTED_ANSI || cstate == CONNECTED_NVT)
+	#define IN_3270		(cstate == CONNECTED_3270 || cstate == CONNECTED_TN3270E || cstate == CONNECTED_SSCP)
+	#define IN_SSCP		(cstate == CONNECTED_SSCP)
+	#define IN_TN3270E	(cstate == CONNECTED_TN3270E)
+	#define IN_E		(cstate >= CONNECTED_INITIAL_E)
+
+#endif
 
 /*   keyboard modifer bitmap */
 #define ShiftKeyDown	0x01
@@ -284,7 +287,7 @@ LIB3270_INTERNAL struct trans_list *trans_list;
 /*   input key type */
 // enum keytype { KT_STD, KT_GE };
 
-/*   state changes */ /*
+/*   state changes */
 enum state_change
 {
 	ST_RESOLVING,
@@ -298,7 +301,7 @@ enum state_change
 	ST_CHARSET,
 
 	N_ST				// Always the last one
-}; */
+};
 
 /* Naming convention for private actions. */
 #define PA_PFX	"PA-"
@@ -348,6 +351,7 @@ enum state_change
 #endif /*]*/
 
 /* Library internal calls */
-void key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,Boolean *skipped);
-void lib3270_initialize(void);
+
+LIB3270_INTERNAL void							  initialize_toggles(void);
+LIB3270_INTERNAL void							  shutdown_toggles(void);
 

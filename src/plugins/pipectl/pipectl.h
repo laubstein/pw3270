@@ -40,15 +40,8 @@
 	#include <glib/gi18n.h>
 
 	#include <lib3270/plugins.h>
-	#include <lib3270.h>
+	#include <lib3270/api.h>
 
-	#define PIPE_BUFFER_LENGTH 4096
-
-	LOCAL_EXTERN GSourceFuncs pipe_source_funcs;
-
-//	LOCAL_EXTERN gchar * run_commands(const gchar *scr);
-
-	LOCAL_EXTERN void popup_lasterror(const gchar *fmt, ...);
-	LOCAL_EXTERN void init_source_pipe(HANDLE hPipe);
+	gchar *run_commands(const gchar *scr);
 
 #endif // PIPECTL_H_INCLUDED

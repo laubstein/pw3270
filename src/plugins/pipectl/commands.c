@@ -38,8 +38,6 @@
 
 /*---[ Implement ]--------------------------------------------------------------------------------*/
 
-/*
-
  static const gchar * get_state(void)
  {
 	static const struct _xlat_state
@@ -93,11 +91,9 @@
  	const char *luname = get_connected_lu(0);
 	g_string_append_printf(rsp,"%s",luname ? luname : "None");
  }
-*/
 
 /*---[ Command Interpreter ]----------------------------------------------------------------------*/
 
-/*
  #define COMMAND_ENTRY(x) { #x, x }
 
  static const struct _entry
@@ -158,5 +154,3 @@
 	return g_string_free(rsp,FALSE);
 
  }
-
-*/

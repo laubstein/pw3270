@@ -66,7 +66,7 @@
 
 #define CHECK_FOR_TERMINAL_STATUS	if(!PCONNECTED) \
 										return ENOTCONN; \
-									else if(query_3270_terminal_status() != LIB3270_STATUS_BLANK) \
+									else if(query_3270_terminal_status() != STATUS_CODE_BLANK) \
 										return EBUSY;
 
 
@@ -100,7 +100,7 @@ int lib3270_jni_init(void)
 	Trace("Running %s on %s %s %s (pid: %d)",__FUNCTION__,__FILE__,__DATE__,__TIME__,getpid());
 #endif
 
-	hSession = new_3270_session("");
+	hSession = new_3270_session();
     Trace("%s ends",__FUNCTION__);
 	return 0;
 }
@@ -129,7 +129,7 @@ JNIEXPORT jint JNICALL Java_pw3270_terminal_Connect(JNIEnv *env, jobject obj, js
 	int rc;
 	const char *hostinfo = (*env)->GetStringUTFChars(env, j_hostinfo, 0);
 
-	if(lib3270_get_connection_state(NULL) != NOT_CONNECTED)
+	if(QueryCstate() != NOT_CONNECTED)
 		return EINVAL;
 
 	rc = host_connect(hostinfo,1);
@@ -145,7 +145,7 @@ JNIEXPORT jint JNICALL Java_pw3270_terminal_Connect(JNIEnv *env, jobject obj, js
 
 		while(time(0) < tm)
 		{
-			if( (CONNECTED) && query_3270_terminal_status() == LIB3270_STATUS_BLANK)
+			if( (CONNECTED) && query_3270_terminal_status() == STATUS_CODE_BLANK)
 				return 0;
 
 			RunPendingEvents(1);
@@ -157,17 +157,17 @@ JNIEXPORT jint JNICALL Java_pw3270_terminal_Connect(JNIEnv *env, jobject obj, js
 
 JNIEXPORT jint JNICALL Java_pw3270_terminal_Disconnect(JNIEnv *env, jobject obj)
 {
-	if(lib3270_get_connection_state(NULL) <= NOT_CONNECTED)
+	if(QueryCstate() <= NOT_CONNECTED)
 		return EINVAL;
 
-	lib3270_disconnect(hSession);
+	host_disconnect(hSession,0);
 
 	return 0;
 }
 
 JNIEXPORT jint JNICALL Java_pw3270_terminal_getConnectionState(JNIEnv *env, jobject obj)
 {
-	return (jint) lib3270_get_connection_state(NULL);
+	return (jint) QueryCstate();
 }
 
 JNIEXPORT jboolean JNICALL Java_pw3270_terminal_isConnected(JNIEnv *env, jobject obj)
@@ -177,7 +177,7 @@ JNIEXPORT jboolean JNICALL Java_pw3270_terminal_isConnected(JNIEnv *env, jobject
 
 JNIEXPORT jboolean JNICALL Java_pw3270_terminal_isTerminalReady(JNIEnv *env, jobject obj)
 {
-	if(!CONNECTED || query_3270_terminal_status() != LIB3270_STATUS_BLANK)
+	if(!CONNECTED || query_3270_terminal_status() != STATUS_CODE_BLANK)
 		return JNI_FALSE;
 	return JNI_TRUE;
 }
@@ -312,7 +312,7 @@ JNIEXPORT jint JNICALL Java_pw3270_terminal_waitForTerminalReady(JNIEnv *env, jo
 		{
 			return ENOTCONN;
 		}
-		else if(query_3270_terminal_status() == LIB3270_STATUS_BLANK)
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 		{
 			return 0;
 		}
@@ -349,7 +349,7 @@ JNIEXPORT jint JNICALL Java_pw3270_terminal_waitForStringAt(JNIEnv *env, jobject
 			// Disconnected, ret
 			rc = ENOTCONN;
 		}
-		else if(query_3270_terminal_status() == LIB3270_STATUS_BLANK)
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 		{
 			// Screen contents are ok. Check.
 			if(last != query_screen_change_counter())

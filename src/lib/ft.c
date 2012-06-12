@@ -31,7 +31,7 @@
  */
 
 #include <lib3270/config.h>
-#include <lib3270.h>
+#include <lib3270/api.h>
 #include "globals.h"
 
 #if defined(X3270_FT)
@@ -57,8 +57,8 @@
 #include "telnetc.h"
 #include "utilc.h"
 
-static void ft_connected(H3270 *session, int ignored, void *dunno);
-static void ft_in3270(H3270 *session, int ignored unused, void *dunno);
+static void ft_connected(int ignored);
+static void ft_in3270(int ignored unused);
 
 /* Macros. */
 #define eos(s)	strchr((s), '\0')
@@ -262,7 +262,7 @@ static const struct filetransfer_callbacks	*callbacks = NULL;		// Callbacks to m
 
 	Trace("Command: \"%s\"",buffer);
 
-	(void) lib3270_emulate_input(NULL, buffer, strlen(buffer), False);
+	(void) emulate_input(buffer, strlen(buffer), False);
 
 	// Get this thing started.
 	set_ft_state(FT_AWAIT_ACK);
@@ -372,17 +372,380 @@ ft_aborting(void)
 }
 
 /* Process a disconnect abort. */
-static void ft_connected(H3270 *session, int ignored, void *dunno)
+static void ft_connected(int ignored)
 {
 	if (!CONNECTED && ft_state != FT_NONE)
 		ft_complete(MSG_("ftDisconnected","Host disconnected, transfer cancelled"));
 }
 
 /* Process an abort from no longer being in 3270 mode. */
-static void ft_in3270(H3270 *session, int ignored, void *dunno)
+static void ft_in3270(int ignored)
 {
 	if (!IN_3270 && ft_state != FT_NONE)
 		ft_complete(MSG_("ftNot3270","Not in 3270 mode, transfer cancelled"));
 }
+
+/*
+ * Script/macro action for file transfer.
+ *  Transfer(option=value[,...])
+ *  Options are:
+ *   Direction=send|receive	default receive
+ *   HostFile=name		required
+ *   LocalFile=name			required
+ *   Host=[tso|vm]		default tso
+ *   Mode=[ascii|binary]	default ascii
+ *   Cr=[add|remove|keep]	default add/remove
+ *   Exist=[keep|replace|append]	default keep
+ *   Recfm=[default|fixed|variable|undefined] default default
+ *   Lrecl=n			no default
+ *   Blksize=n			no default
+ *   Allocation=[default|tracks|cylinders|avblock] default default
+ *   PrimarySpace=n		no default
+ *   SecondarySpace=n		no default
+ *
+static struct {
+	const char *name;
+	char *value;
+	const char *keyword[4];
+} tp[] = {
+	{ "Direction",		CN, { "receive", "send" } },
+	{ "HostFile" },
+	{ "LocalFile" },
+	{ "Host",		CN, { "tso", "vm" } },
+	{ "Mode",		CN, { "ascii", "binary" } },
+	{ "Cr",			CN, { "auto", "remove",	"add", "keep" } },
+	{ "Exist",		CN, { "keep", "replace", "append" } },
+	{ "Recfm",		CN, { "default", "fixed", "variable",
+				      "undefined" } },
+	{ "Lrecl" },
+	{ "Blksize" },
+	{ "Allocation",		CN, { "default", "tracks", "cylinders",
+				      "avblock" } },
+	{ "PrimarySpace" },
+	{ "SecondarySpace" },
+	{ "BufferSize" },
+	{ CN }
+};
+enum ft_parm_name {
+	PARM_DIRECTION,
+	PARM_HOST_FILE,
+	PARM_LOCAL_FILE,
+	PARM_HOST,
+	PARM_MODE,
+	PARM_CR,
+	PARM_EXIST,
+	PARM_RECFM,
+	PARM_LRECL,
+	PARM_BLKSIZE,
+	PARM_ALLOCATION,
+	PARM_PRIMARY_SPACE,
+	PARM_SECONDARY_SPACE,
+	PARM_BUFFER_SIZE,
+	N_PARMS
+};
+
+void
+Transfer_action(Widget w unused, XEvent *event, String *params,
+    Cardinal *num_params)
+{
+	int i, k;
+	Cardinal j;
+	long l;
+	char *ptr;
+	char *ft_command = CN;
+
+	char opts[80];
+	char *op = opts + 1;
+	char *cmd;
+	unsigned flen;
+
+	String *xparams = params;
+	Cardinal xnparams = *num_params;
+
+        action_debug(Transfer_action, event, params, num_params);
+
+	ft_is_action = True;
+
+	// Make sure we're connected.
+	if (!IN_3270) {
+		popup_an_error("Not connected");
+		return;
+	}
+
+//#if defined(C3270) || defined(WC3270)
+//	// Check for interactive mode.
+//	if (xnparams == 0 && escaped) {
+//	    	if (interactive_transfer(&xparams, &xnparams) < 0) {
+//		    	return;
+//		}
+//	}
+//#endif
+
+	// Set everything to the default.
+	for (i = 0; i < N_PARMS; i++) {
+		Free(tp[i].value);
+		if (tp[i].keyword[0] != CN)
+			tp[i].value =
+				NewString(tp[i].keyword[0]);
+		else
+			tp[i].value = CN;
+	}
+
+	// See what they specified.
+	for (j = 0; j < xnparams; j++) {
+		for (i = 0; i < N_PARMS; i++) {
+			char *eq;
+			int kwlen;
+
+			eq = strchr(xparams[j], '=');
+			if (eq == CN || eq == xparams[j] || !*(eq + 1)) {
+				popup_an_error("Invalid option syntax: '%s'",
+					xparams[j]);
+				return;
+			}
+			kwlen = eq - xparams[j];
+			if (!strncasecmp(xparams[j], tp[i].name, kwlen)
+					&& !tp[i].name[kwlen]) {
+				if (tp[i].keyword[0]) {
+					for (k = 0;
+					     tp[i].keyword[k] != CN && k < 4;
+					     k++) {
+						if (!strcasecmp(eq + 1,
+							tp[i].keyword[k])) {
+							break;
+						}
+					}
+					if (k >= 4 ||
+					    tp[i].keyword[k] == CN) {
+						popup_an_error("Invalid option "
+							"value: '%s'", eq + 1);
+						return;
+					}
+				} else switch (i) {
+				    case PARM_LRECL:
+				    case PARM_BLKSIZE:
+				    case PARM_PRIMARY_SPACE:
+				    case PARM_SECONDARY_SPACE:
+				    case PARM_BUFFER_SIZE:
+					l = strtol(eq + 1, &ptr, 10);
+					if (ptr == eq + 1 || *ptr) {
+						popup_an_error("Invalid option "
+							"value: '%s'", eq + 1);
+						return;
+					}
+					break;
+				    default:
+					break;
+				}
+				tp[i].value = NewString(eq + 1);
+				break;
+			}
+		}
+		if (i >= N_PARMS) {
+			popup_an_error("Unknown option: %s", xparams[j]);
+			return;
+		}
+	}
+
+	// Check for required values.
+	if (tp[PARM_HOST_FILE].value == CN) {
+		popup_an_error("Missing 'HostFile' option");
+		return;
+	}
+	if (tp[PARM_LOCAL_FILE].value == CN) {
+		popup_an_error("Missing 'LocalFile' option");
+		return;
+	}
+
+	//
+	// Start the transfer.  Much of this is duplicated from ft_start()
+	// and should be made common.
+	//
+	if (tp[PARM_BUFFER_SIZE].value != CN)
+		dft_buffersize = atoi(tp[PARM_BUFFER_SIZE].value);
+	else
+		dft_buffersize = 0;
+	set_dft_buffersize();
+
+	receive_flag = !strcasecmp(tp[PARM_DIRECTION].value, "receive");
+	append_flag = !strcasecmp(tp[PARM_EXIST].value, "append");
+	allow_overwrite = !strcasecmp(tp[PARM_EXIST].value, "replace");
+	ascii_flag = !strcasecmp(tp[PARM_MODE].value, "ascii");
+	if (!strcasecmp(tp[PARM_CR].value, "auto")) {
+		cr_flag = ascii_flag;
+	} else {
+		cr_flag = !strcasecmp(tp[PARM_CR].value, "remove") ||
+			  !strcasecmp(tp[PARM_CR].value, "add");
+	}
+	vm_flag = !strcasecmp(tp[PARM_HOST].value, "vm");
+	recfm = DEFAULT_RECFM;
+	for (k = 0; tp[PARM_RECFM].keyword[k] != CN && k < 4; k++) {
+		if (!strcasecmp(tp[PARM_RECFM].value,
+			    tp[PARM_RECFM].keyword[k]))  {
+			recfm = (enum recfm)k;
+			break;
+		}
+	}
+	units = DEFAULT_UNITS;
+	for (k = 0; tp[PARM_ALLOCATION].keyword[k] != CN && k < 4; k++) {
+		if (!strcasecmp(tp[PARM_ALLOCATION].value,
+			    tp[PARM_ALLOCATION].keyword[k]))  {
+			units = (enum units)k;
+			break;
+		}
+	}
+
+	ft_host_filename = tp[PARM_HOST_FILE].value;
+	ft_local_filename = tp[PARM_LOCAL_FILE].value;
+
+	// See if the local file can be overwritten.
+	if (receive_flag && !append_flag && !allow_overwrite) {
+		ft_local_file = fopen(ft_local_filename, "r");
+		if (ft_local_file != (FILE *)NULL) {
+			(void) fclose(ft_local_file);
+			popup_an_error("File exists");
+			return;
+		}
+	}
+
+	// Open the local file.
+	ft_local_file = fopen(ft_local_filename,
+	    receive_flag ?
+		(append_flag ? "a" : "w" ) :
+		"r");
+	if (ft_local_file == (FILE *)NULL) {
+		popup_an_errno(errno, "Open(%s)", ft_local_filename);
+		return;
+	}
+
+	// Build the ind$file command
+	op[0] = '\0';
+	if (ascii_flag)
+		strcat(op, " ascii");
+	if (cr_flag)
+		strcat(op, " crlf");
+	if (append_flag && !receive_flag)
+		strcat(op, " append");
+	if (!receive_flag) {
+		if (!vm_flag) {
+			if (recfm != DEFAULT_RECFM) {
+				// RECFM Entered, process
+				strcat(op, " recfm(");
+				switch (recfm) {
+				    case FIXED:
+					strcat(op, "f");
+					break;
+				    case VARIABLE:
+					strcat(op, "v");
+					break;
+				    case UNDEFINED:
+					strcat(op, "u");
+					break;
+				    default:
+					break;
+				};
+				strcat(op, ")");
+				if (tp[PARM_LRECL].value != CN)
+					sprintf(eos(op), " lrecl(%s)",
+					    tp[PARM_LRECL].value);
+				if (tp[PARM_BLKSIZE].value != CN)
+					sprintf(eos(op), " blksize(%s)",
+					    tp[PARM_BLKSIZE].value);
+			}
+			if (units != DEFAULT_UNITS) {
+				// Space Entered, processs it
+				switch (units) {
+				    case TRACKS:
+					strcat(op, " tracks");
+					break;
+				    case CYLINDERS:
+					strcat(op, " cylinders");
+					break;
+				    case AVBLOCK:
+					strcat(op, " avblock");
+					break;
+				    default:
+					break;
+				};
+				if (tp[PARM_PRIMARY_SPACE].value != CN) {
+					sprintf(eos(op), " space(%s",
+					    tp[PARM_PRIMARY_SPACE].value);
+					if (tp[PARM_SECONDARY_SPACE].value)
+						sprintf(eos(op), ",%s",
+						    tp[PARM_SECONDARY_SPACE].value);
+					strcat(op, ")");
+				}
+			}
+		} else {
+			if (recfm != DEFAULT_RECFM) {
+				strcat(op, " recfm ");
+				switch (recfm) {
+				    case FIXED:
+					strcat(op, "f");
+					break;
+				    case VARIABLE:
+					strcat(op, "v");
+					break;
+				    default:
+					break;
+				};
+
+				if (tp[PARM_LRECL].value)
+					sprintf(eos(op), " lrecl %s",
+					    tp[PARM_LRECL].value);
+			}
+		}
+	}
+
+	// Insert the '(' for VM options.
+	if (strlen(op) > 0 && vm_flag) {
+		opts[0] = ' ';
+		opts[1] = '(';
+		op = opts;
+	}
+
+	//
+	// Unless the user specified a particular file transfer command,
+	// translate 'ind$file' so that it will have the proper EBCDIC value,
+	// regardless of the local character set.
+	//
+	if (appres.ft_command != CN) {
+		ft_command = appres.ft_command;
+	} else {
+		char *s = "ind$file";
+		char *t;
+		unsigned char c;
+
+		ft_command = Malloc(strlen(s) + 1);
+		t = ft_command;
+
+		while ((c = *s++)) {
+			*t++ = ebc2asc[asc2ebc0[c & 0xff]];
+		}
+		*t = '\0';
+	}
+
+	// Build the whole command.
+	cmd = xs_buffer("%s %s %s%s\\n",
+	    ft_command,
+	    receive_flag ? "get" : "put", ft_host_filename, op);
+	if (appres.ft_command == CN)
+		Free(ft_command);
+
+	// Erase the line and enter the command.
+	flen = kybd_prime();
+	if (!flen || flen < strlen(cmd) - 1) {
+		Free(cmd);
+		popup_an_error(get_message("ftUnable"));
+		return;
+	}
+	(void) emulate_input(cmd, strlen(cmd), False);
+	Free(cmd);
+
+	// Get this thing started.
+	set_ft_state(FT_AWAIT_ACK);
+	ft_is_cut = False;
+}
+*/
 
 #endif

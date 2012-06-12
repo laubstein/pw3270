@@ -36,7 +36,7 @@
 
  const gchar *program_name			= "@PROGRAM_NAME@";
  const gchar *program_version		= "@PACKAGE_VERSION@";
- const gchar *program_fullversion	= "@PACKAGE_VERSION@.@PACKAGE_RELEASE@-@PACKAGE_REVISION@";
+ const gchar *program_fullversion	= "@PACKAGE_VERSION@ (Rev. " PACKAGE_REVISION ")";
  const gchar *program_release		= "@PACKAGE_RELEASE@";
 
 

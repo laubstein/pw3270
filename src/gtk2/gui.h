@@ -51,13 +51,12 @@
 
 	#if defined( HAVE_IGEMAC )
 		#include <gtkosxapplication.h>
-		#define HAVE_DOCK 1
 	#endif
 
-	#include <lib3270.h>
+	#include <lib3270/api.h>
 	#include <lib3270/toggle.h>
 
- 	#define CURSOR_MODE_3270 (LIB3270_CURSOR_USER+9)
+ 	#define CURSOR_MODE_3270 (CURSOR_MODE_USER+9)
 
 	enum _drag_type
 	{
@@ -75,7 +74,7 @@
 	};
 
 	LOCAL_EXTERN int 			drag_type;
-	LOCAL_EXTERN LIB3270_CURSOR	cursor_mode;
+	LOCAL_EXTERN CURSOR_MODE	cursor_mode;
 
 	#define MAX_CHR_LENGTH 4
 	typedef struct _element
@@ -104,21 +103,7 @@
 
 	} ELEMENT;
 
-	LOCAL_EXTERN struct _screen
-	{
-		int		length;			/**< Screen buffer length (row * cols) */
-		int		rows;			/**< Screen rows */
-		int		cols;			/**< Screen cols */
-		ELEMENT content[1];		/**< Screen contents */
-	} *screen;
-
-	LOCAL_EXTERN struct _view
-	{
-		int	 rows;			/**< View rows */
-		int	 cols;			/**< View cols */
-		int	 left;			/**< Left margin */
-		int	 top;			/**< Top margin */
-	} view;
+	LOCAL_EXTERN ELEMENT *screen;
 
     enum GUI_TOGGLE
     {
@@ -126,8 +111,7 @@
         GUI_TOGGLE_KEEP_SELECTED,
         GUI_TOGGLE_UNDERLINE,
         GUI_TOGGLE_CONNECT_ON_STARTUP,
-        GUI_TOGGLE_KP_ALTERNATIVE,		/**< Keypad +/- move to next/previous field */
-        GUI_TOGGLE_BEEP,
+        GUI_TOGGKE_KP_ALTERNATIVE,		/**< Keypad +/- move to next/previous field */
 
         GUI_TOGGLE_COUNT
     };
@@ -137,8 +121,7 @@
     #define TOGGLED_SMART_PASTE		    gui_toggle_state[GUI_TOGGLE_SMART_PASTE]
     #define TOGGLED_UNDERLINE		    gui_toggle_state[GUI_TOGGLE_UNDERLINE]
     #define TOGGLED_CONNECT_ON_STARTUP  gui_toggle_state[GUI_TOGGLE_CONNECT_ON_STARTUP]
-    #define TOGGLED_KP_ALTERNATIVE		gui_toggle_state[GUI_TOGGLE_KP_ALTERNATIVE]
-    #define TOGGLED_BEEP				gui_toggle_state[GUI_TOGGLE_BEEP]
+    #define TOGGLED_KP_ALTERNATIVE		gui_toggle_state[GUI_TOGGKE_KP_ALTERNATIVE]
 
     LOCAL_EXTERN gboolean		  gui_toggle_state[GUI_TOGGLE_COUNT];
 	LOCAL_EXTERN const gchar	* gui_toggle_name[GUI_TOGGLE_COUNT+1];
@@ -233,24 +216,17 @@
 	LOCAL_EXTERN const char		* on_lu_command;
 
 	LOCAL_EXTERN GtkWidget			* topwindow;
+	LOCAL_EXTERN GtkWidget			* SelectionPopup;
+	LOCAL_EXTERN GtkWidget			* DefaultPopup;
 	LOCAL_EXTERN GtkWidget			* terminal;
 	LOCAL_EXTERN GdkColor			  color[TERMINAL_COLOR_COUNT+1];
 	LOCAL_EXTERN H3270				* hSession;
 	LOCAL_EXTERN GtkIMContext		* input_method;
+	LOCAL_EXTERN gint				  terminal_buffer_length;
 
 	// Pixmaps
 	LOCAL_EXTERN GdkPixmap			* pixmap_cursor;	/**< Pixmap with cursor image */
 	LOCAL_EXTERN GdkPixmap			* pixmap_terminal;	/**< Pixmap with terminal contents */
-
-	enum POPUPS
-	{
-		POPUP_MENU_DEFAULT,
-		POPUP_MENU_SELECTION,
-
-		POPUP_MENU_COUNT
-	};
-
-	LOCAL_EXTERN GtkMenu			* popup_menu[POPUP_MENU_COUNT];
 
 	enum OIA_PIXMAP
 	{
@@ -270,6 +246,12 @@
 #endif
 
 	LOCAL_EXTERN gint					  cMode;
+
+	LOCAL_EXTERN int 					  terminal_rows;
+	LOCAL_EXTERN int				 	  terminal_cols;
+
+	LOCAL_EXTERN int					  left_margin;
+	LOCAL_EXTERN int					  top_margin;
 
 	LOCAL_EXTERN gint					  cursor_position;
 	LOCAL_EXTERN GdkRectangle			  rCursor;
@@ -334,8 +316,8 @@
 	void 		InvalidatePixmaps(GdkDrawable *drawable, GdkGC *gc);
 	void 		ReloadPixmaps(void);
 	void 		Reselect(void);
-	void 		set_rectangle_select(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason);
-	void 		SetStatusCode(H3270 *session, LIB3270_STATUS id);
+	void 		set_rectangle_select(int value, enum toggle_type reason);
+	void 		SetStatusCode(STATUS_CODE id);
 	void 		SetTerminalFont(const gchar *fontname);
 
 	void		init_gui_toggles(void);
@@ -346,7 +328,7 @@
 	LOCAL_EXTERN void		  unselect(void);
 	LOCAL_EXTERN void		  reselect(void);
 
-	LOCAL_EXTERN void		  update_cursor_position(H3270 *session, unsigned short row, unsigned short col, unsigned char c, unsigned short attr);
+	LOCAL_EXTERN void		  update_cursor_position(int row, int col);
 	LOCAL_EXTERN void		  update_cursor_info(void);
 	LOCAL_EXTERN void		  queue_draw_cursor(void);
 	LOCAL_EXTERN void		  update_cursor_pixmap(void);
@@ -411,7 +393,7 @@
 
 	LOCAL_EXTERN int		  get_selected_rectangle(GdkRectangle *rect);
 
-	void	set_monocase(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason);
+	void	set_monocase(int value, enum toggle_type reason);
 
 	// Plugins
 	LOCAL_EXTERN GModule	* get_plugin_by_name(const gchar *plugin_name);

@@ -35,10 +35,10 @@
  #include <glib.h>
 
  #include <lib3270/config.h>
-// #include <globals.h>
+ #include <globals.h>
 
  #include "gui.h"
-// #include <lib3270/kybdc.h>
+ #include <lib3270/kybdc.h>
 
  #include <lib3270/plugins.h>
 

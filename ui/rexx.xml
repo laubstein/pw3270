@@ -36,7 +36,7 @@
 		<menu name='View' />
 		<menu name='ScriptsMenu' label='Scripts' >
 			<menuitem action='rx3270.select' label='External Rexx script'/>
-			<menuitem name='rx3270.scripts' label='Rexx scripts' folder='rexx' />
+			<menuitem name='RexxScripts' label='Rexx scripts' folder='rexx' />
 		</menu>
 	</menubar>
 </ui>

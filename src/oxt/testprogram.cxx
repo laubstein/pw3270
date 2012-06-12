@@ -69,8 +69,11 @@ int SAL_CALL main(int argc, char **argv)
 
 	if (xImplReg.is())
 	{
-        const char *libname = LIBNAME;
-
+#if defined( WIN32 )
+        const char *libname = "pw3270.uno.dll";
+#else
+        const char *libname = "bin/Debug/pw3270.uno.so";
+#endif
         TRACE("Loading %s",libname);
 
 		xImplReg->registerImplementation(

@@ -1,27 +1,27 @@
-/*
+/* 
  * "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
  * (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
  * aplicativos mainframe. Registro no INPI sob o nome G3270.
- *
+ * 
  * Copyright (C) <2008> <Banco do Brasil S.A.>
- *
+ * 
  * Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
  * os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
  * Free Software Foundation.
- *
+ * 
  * Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
  * GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
  * A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
  * obter mais detalhes.
- *
+ * 
  * Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
- *
+ * 
  * Este programa está nomeado como print.c e possui 748 linhas de código.
- *
- * Contatos:
- *
+ * 
+ * Contatos: 
+ * 
  * perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
  * erico.mendonca@gmail.com	(Erico Mascarenhas Mendonça)
  * licinio@bb.com.br		(Licínio Luis Branco)
@@ -72,14 +72,13 @@
 
 /* Statics */
 
-/*
-#if defined(X3270_DISPLAY)
+#if defined(X3270_DISPLAY) /*[*/
 static Widget print_text_shell = (Widget)NULL;
 static Widget save_text_shell = (Widget)NULL;
 static Widget print_window_shell = (Widget)NULL;
 static char *print_window_command = CN;
-#endif
-*/
+#endif /*]*/
+
 
 /* Print Text popup */
 
@@ -150,7 +149,7 @@ fprint_screen(FILE *f, Boolean even_if_empty, Boolean use_html)
 	int ns = 0;
 	int nr = 0;
 	Boolean any = False;
-	int fa_addr = find_field_attribute(&h3270,0);
+	int fa_addr = find_field_attribute(0);
 	unsigned char fa = ea_buf[fa_addr].fa;
 	int fa_color, current_color;
 	Bool fa_high, current_high;
@@ -171,13 +170,13 @@ fprint_screen(FILE *f, Boolean even_if_empty, Boolean use_html)
 		fa_high = FA_IS_HIGH(fa);
 	current_high = fa_high;
 
-	for (i = 0; i < h3270.rows*h3270.cols; i++) {
+	for (i = 0; i < ROWS*COLS; i++) {
 #if defined(X3270_DBCS) /*[*/
 		char mb[16];
 		Boolean is_dbcs = False;
 #endif /*]*/
 
-		if (i && !(i % h3270.cols)) {
+		if (i && !(i % COLS)) {
 			nr++;
 			ns = 0;
 		}
@@ -302,12 +301,12 @@ fprint_screen(FILE *f, Boolean even_if_empty, Boolean use_html)
 	return True;
 }
 
-/* Termination code for print text process. */ /*
+/* Termination code for print text process. */
 static void
 print_text_done(FILE *f, Boolean do_popdown
-#if defined(X3270_DISPLAY)
+#if defined(X3270_DISPLAY) /*[*/
 					    unused
-#endif
+#endif /*]*/
 						  )
 {
 	int status;
@@ -317,20 +316,18 @@ print_text_done(FILE *f, Boolean do_popdown
 		popup_an_error("Print program exited with status %d.",
 		    (status & 0xff00) > 8);
 	} else {
-#if defined(X3270_DISPLAY)
+#if defined(X3270_DISPLAY) /*[*/
 		if (do_popdown)
 			XtPopdown(print_text_shell);
 		if (appres.do_confirms)
 			popup_an_info("Screen image printed.");
-#endif
+#endif /*]*/
 	}
 
 }
-*/
 
-#if defined(X3270_DISPLAY)
-
-/* Callback for "OK" button on the print text popup. */ /*
+#if defined(X3270_DISPLAY) /*[*/
+/* Callback for "OK" button on the print text popup. */
 static void
 print_text_callback(Widget w unused, XtPointer client_data,
     XtPointer call_data unused)
@@ -350,8 +347,8 @@ print_text_callback(Widget w unused, XtPointer client_data,
 	(void) fprint_screen(f, True, False);
 	print_text_done(f, True);
 }
-*/
-/* Callback for "Plain Text" button on save text popup. *//*
+
+/* Callback for "Plain Text" button on save text popup. */
 static void
 save_text_plain_callback(Widget w unused, XtPointer client_data,
     XtPointer call_data unused)
@@ -374,8 +371,8 @@ save_text_plain_callback(Widget w unused, XtPointer client_data,
 	if (appres.do_confirms)
 		popup_an_info("Screen image saved.");
 }
-*/
-/* Callback for "HTML" button on save text popup. */ /*
+
+/* Callback for "HTML" button on save text popup. */
 static void
 save_text_html_callback(Widget w unused, XtPointer client_data,
     XtPointer call_data unused)
@@ -398,8 +395,8 @@ save_text_html_callback(Widget w unused, XtPointer client_data,
 	if (appres.do_confirms)
 		popup_an_info("Screen image saved.");
 }
-*/
-/* Pop up the Print Text dialog, given a filter. */ /*
+
+/* Pop up the Print Text dialog, given a filter. */
 static void
 popup_print_text(char *filter)
 {
@@ -413,8 +410,8 @@ popup_print_text(char *filter)
 	}
 	popup_popup(print_text_shell, XtGrabExclusive);
 }
-*/
-/* Pop up the Save Text dialog. */ /*
+
+/* Pop up the Save Text dialog. */
 static void
 popup_save_text(char *filename)
 {
@@ -430,11 +427,9 @@ popup_save_text(char *filename)
 		    NULL);
 	popup_popup(save_text_shell, XtGrabExclusive);
 }
-*/
+#endif /*]*/
 
-#endif
-
-/* Print or save the contents of the screen as text. */ /*
+/* Print or save the contents of the screen as text. */
 void
 PrintText_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -446,19 +441,21 @@ PrintText_action(Widget w unused, XEvent *event, String *params,
 	Boolean use_file = False;
 	Boolean use_string = False;
 
-	//
-	// Pick off optional arguments:
-	// file     directs the output to a file instead of a command;
-	//			must be the last keyword
-	// html     generates HTML output instead of ASCII text (and implies
-	//			'file')
-	// secure   disables the pop-up dialog, if this action is invoked from
-	//			a keymap
-	// command  directs the output to a command (this is the default, but
-	//			allows the command to be one of the other keywords);
-	//			must be the last keyword
-	// string   returns the data as a string, allowed only from scripts
-	//
+	action_debug(PrintText_action, event, params, num_params);
+
+	/*
+	 * Pick off optional arguments:
+	 *  file     directs the output to a file instead of a command;
+	 *  	      must be the last keyword
+	 *  html     generates HTML output instead of ASCII text (and implies
+	 *            'file')
+	 *  secure   disables the pop-up dialog, if this action is invoked from
+	 *            a keymap
+	 *  command  directs the output to a command (this is the default, but
+	 *            allows the command to be one of the other keywords);
+	 *  	      must be the last keyword
+	 *  string   returns the data as a string, allowed only from scripts
+	 */
 	for (i = 0; i < *num_params; i++) {
 		if (!strcasecmp(params[i], "file")) {
 			use_file = True;
@@ -492,7 +489,7 @@ PrintText_action(Widget w unused, XEvent *event, String *params,
 	}
 	switch (*num_params - i) {
 	case 0:
-		// Use the default.
+		/* Use the default. */
 		if (!use_file)
 			filter = get_resource(ResPrintTextCommand);
 		break;
@@ -511,41 +508,41 @@ PrintText_action(Widget w unused, XEvent *event, String *params,
 	}
 
 	if (filter != CN && filter[0] == '@') {
-		//
-		// Starting the PrintTextCommand resource value with '@'
-		// suppresses the pop-up dialog, as does setting the 'secure'
-		// resource.
-		//
+		/*
+		 * Starting the PrintTextCommand resource value with '@'
+		 * suppresses the pop-up dialog, as does setting the 'secure'
+		 * resource.
+		 */
 		secure = True;
 		filter++;
 	}
 	if (!use_file && (filter == CN || !*filter))
 		filter = "lpr";
 
-#if defined(X3270_DISPLAY)
+#if defined(X3270_DISPLAY) /*[*/
 	if (secure ||
 		ia_cause == IA_COMMAND ||
 		ia_cause == IA_MACRO ||
 		ia_cause == IA_SCRIPT)
-#endif
+#endif /*]*/
 	{
 		FILE *f;
 		int fd = -1;
 
-		// Invoked non-interactively.
+		/* Invoked non-interactively. */
 		if (use_file) {
 			if (use_string) {
 				char temp_name[15];
 
-#if defined(_WIN32)
+#if defined(_WIN32) /*[*/
 				strcpy(temp_name, "x3hXXXXXX");
 				mktemp(temp_name);
 				fd = _open(temp_name, _O_RDWR,
 					_S_IREAD | _S_IWRITE);
-#else
+#else /*][*/
 				strcpy(temp_name, "/tmp/x3hXXXXXX");
 				fd = mkstemp(temp_name);
-#endif
+#endif /*]*/
 				if (fd < 0) {
 					popup_an_errno(errno, "mkstemp");
 					return;
@@ -586,22 +583,21 @@ PrintText_action(Widget w unused, XEvent *event, String *params,
 		return;
 	}
 
-#if defined(X3270_DISPLAY)
-	// Invoked interactively -- pop up the confirmation dialog.
+#if defined(X3270_DISPLAY) /*[*/
+	/* Invoked interactively -- pop up the confirmation dialog. */
 	if (use_file) {
 		popup_save_text(filter);
 	} else {
 		popup_print_text(filter);
 	}
-#endif
+#endif /*]*/
 }
-*/
 
 #if defined(X3270_DISPLAY) /*[*/
 #if defined(X3270_MENUS) /*[*/
 
 
-/* Callback for Print Text menu option. */ /*
+/* Callback for Print Text menu option. */
 void
 print_text_option(Widget w, XtPointer client_data unused,
     XtPointer call_data unused)
@@ -610,7 +606,7 @@ print_text_option(Widget w, XtPointer client_data unused,
 	Boolean secure = appres.secure;
 	Boolean use_html = False;
 
-	// Decode the filter.
+	/* Decode the filter. */
 	if (filter != CN && *filter == '@') {
 		secure = True;
 		filter++;
@@ -621,7 +617,7 @@ print_text_option(Widget w, XtPointer client_data unused,
 	if (secure) {
 		FILE *f;
 
-		// Print the screen without confirming.
+		/* Print the screen without confirming. */
 		if (!(f = popen(filter, "w"))) {
 			popup_an_errno(errno, "popen(%s)", filter);
 			return;
@@ -629,21 +625,20 @@ print_text_option(Widget w, XtPointer client_data unused,
 		(void) fprint_screen(f, True, use_html);
 		print_text_done(f, False);
 	} else {
-		// Pop up a dialog to confirm or modify their choice.
+		/* Pop up a dialog to confirm or modify their choice. */
 		popup_print_text(filter);
 	}
 }
-*/
 
-/* Callback for Save Text menu option. */ /*
+/* Callback for Save Text menu option. */
 void
 save_text_option(Widget w, XtPointer client_data unused,
     XtPointer call_data unused)
 {
-	// Pop up a dialog to confirm or modify their choice.
+	/* Pop up a dialog to confirm or modify their choice. */
 	popup_save_text(CN);
-} */
-#endif
+}
+#endif /*]*/
 
 
 /* Print Window popup */
@@ -665,7 +660,7 @@ save_text_option(Widget w, XtPointer client_data unused,
  * that.
  */
 
-/* Termination procedure for window print. */ /*
+/* Termination procedure for window print. */
 static void
 print_window_done(int status)
 {
@@ -675,8 +670,8 @@ print_window_done(int status)
 	else if (appres.do_confirms)
 		popup_an_info("Bitmap printed.");
 }
-*/
-/* Timeout callback for window print. */ /*
+
+/* Timeout callback for window print. */
 static void
 snap_it(XtPointer closure unused, XtIntervalId *id unused)
 {
@@ -686,8 +681,8 @@ snap_it(XtPointer closure unused, XtIntervalId *id unused)
 	print_window_done(system(print_window_command));
 	print_window_command = CN;
 }
-*/
-/* Callback for "OK" button on print window popup. */ /*
+
+/* Callback for "OK" button on print window popup. */
 static void
 print_window_callback(Widget w unused, XtPointer client_data,
     XtPointer call_data unused)
@@ -696,9 +691,9 @@ print_window_callback(Widget w unused, XtPointer client_data,
 	XtPopdown(print_window_shell);
 	if (print_window_command)
 		(void) XtAppAddTimeOut(appcontext, 1000, snap_it, 0);
-} */
+}
 
-/* Print the contents of the screen as a bitmap. */ /*
+/* Print the contents of the screen as a bitmap. */
 void
 PrintWindow_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
@@ -708,6 +703,7 @@ PrintWindow_action(Widget w unused, XEvent *event, String *params,
 	char *xfb = fb;
 	Boolean secure = appres.secure;
 
+	action_debug(PrintWindow_action, event, params, num_params);
 	if (*num_params > 0)
 		filter = params[0];
 	if (*num_params > 1)
@@ -736,10 +732,9 @@ PrintWindow_action(Widget w unused, XEvent *event, String *params,
 	    NULL);
 	popup_popup(print_window_shell, XtGrabExclusive);
 }
-*/
 
 #if defined(X3270_MENUS) /*[*/
-/* Callback for menu Print Window option. */ /*
+/* Callback for menu Print Window option. */
 void
 print_window_option(Widget w, XtPointer client_data unused,
     XtPointer call_data unused)
@@ -747,7 +742,7 @@ print_window_option(Widget w, XtPointer client_data unused,
 	Cardinal zero = 0;
 
 	PrintWindow_action(w, (XEvent *)NULL, (String *)NULL, &zero);
-} */
+}
 #endif /*]*/
 
 #endif /*]*/

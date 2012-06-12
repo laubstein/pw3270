@@ -33,8 +33,8 @@
  #include "gui.h"
  #include "fonts.h"
  #include "actions.h"
-// #include <globals.h>
-// #include <lib3270/kybdc.h>
+ #include <globals.h>
+ #include <lib3270/kybdc.h>
  #include <lib3270/toggle.h>
  #include <string.h>
 
@@ -113,7 +113,7 @@
 	action_group_set_sensitive(ACTION_GROUP_CLIPBOARD,clipboard_string != NULL);
 	gtk_action_set_sensitive(action_by_id[ACTION_PASTENEXT],clipboard_string != NULL);
 
-	screen_resume(hSession);
+	screen_resume();
 
 	Trace("%s - ends (clipboard_string=%p)",__FUNCTION__,clipboard_string);
 
@@ -275,7 +275,7 @@
 			*ptr = ' ';
     }
 
-	Trace("Received text:%p (%d bytes) Clipboard is %p\n",buffer,(int) strlen(buffer),clipboard_string);
+	Trace("Received text:%p (%d bytes) Clipboard is %p\n",buffer,strlen(buffer),clipboard_string);
 
 	paste_string(buffer);
 
@@ -528,7 +528,7 @@
  	cols = g_malloc0(rect.width * sizeof(gboolean));
  	for(row=0;row < rect.height;row++)
  	{
-		el = screen->content +(((row+rect.y) * screen->cols)+rect.x);
+		el = screen+(((row+rect.y) * terminal_cols)+rect.x);
 		for(col = 0;col < rect.width;col++)
 		{
 			if(*el->ch && !g_ascii_isspace(*el->ch))
@@ -547,7 +547,7 @@
 		if(buffer->len > 0)
 			g_string_append_c(buffer,'\n');
 
-		el = screen->content+(((row+rect.y) * screen->cols)+rect.x);
+		el = screen+(((row+rect.y) * terminal_cols)+rect.x);
 		col = 0;
 		while(col < rect.width)
 		{
@@ -619,7 +619,7 @@
 	cr = gdk_cairo_create(pix);
 	cairo_set_scaled_font(cr,terminal_font_info.font);
 
-	baddr = rect.y * screen->cols;
+	baddr = rect.y * terminal_cols;
 	baseline = terminal_font_info.ascent;
 	y = 0;
 
@@ -635,7 +635,7 @@
 			x += terminal_font_info.width;
 		}
 
-		baddr += screen->cols;
+		baddr += terminal_cols;
 		y += terminal_font_info.spacing;
 		baseline += terminal_font_info.spacing;
 	}

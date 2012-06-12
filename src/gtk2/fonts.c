@@ -70,7 +70,7 @@
 
  	for(f=0;font_list[f].size;f++)
  	{
-		if( ((font_list[f].height*(view.rows+1))+2) < height && (font_list[f].width*view.cols) < width )
+		if( ((font_list[f].height*(terminal_rows+1))+2) < height && (font_list[f].width*terminal_cols) < width )
 			size = f;
  	}
 
@@ -103,7 +103,7 @@
 
 	// Adjust line spacing
 
-	terminal_font_info.spacing = height / (view.rows+2);
+	terminal_font_info.spacing = height / (terminal_rows+2);
 
 //	Trace("Spacing: %d  height: %d",terminal_font_info.spacing, terminal_font_info.height);
 
@@ -111,13 +111,13 @@
 		terminal_font_info.spacing = terminal_font_info.height;
 
 	// Center image
-	view.left = (width >> 1) - ((view.cols * terminal_font_info.width) >> 1);
-	if(view.left < 0)
-		view.left = 0;
+	left_margin = (width >> 1) - ((terminal_cols * terminal_font_info.width) >> 1);
+	if(left_margin < 0)
+		left_margin = 0;
 
-	view.top = (height >> 1) - (((view.rows+1) * terminal_font_info.spacing) >> 1);
-	if(view.top < 0)
-		view.top = 0;
+	top_margin = (height >> 1) - (((terminal_rows+1) * terminal_font_info.spacing) >> 1);
+	if(top_margin < 0)
+		top_margin = 0;
 
 	return TRUE;
  }
@@ -213,7 +213,7 @@
 //	info->size		= font_list->size;
 	info->matrix	= &font_list->matrix;
 
- 	Trace("Minimum terminal size is %dx%d",screen->cols*font_list->width, (screen->rows+1)*font_list->height);
+ 	Trace("Minimum terminal size is %dx%d",terminal_cols*font_list->width, (terminal_rows+1)*font_list->height);
 
  }
 

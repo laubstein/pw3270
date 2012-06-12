@@ -19,7 +19,6 @@
 
 #include <lib3270/api.h>
 
-/*
 	struct host {
 		char *name;
 		char **parents;
@@ -30,14 +29,15 @@
 		struct host *prev, *next;
 	};
 	extern struct host *hosts;
+
+/*
+	extern void Connect_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
+	extern void Disconnect_action(Widget w, XEvent *event, String *params, Cardinal *num_params);
 */
 
-	#define st_changed(tx,mode) lib3270_st_changed(NULL,tx,mode)
+	LIB3270_INTERNAL void st_changed(int tx, int mode);
+	LIB3270_INTERNAL void hostfile_init(void);
+	LIB3270_INTERNAL void host_connected(void);
+	LIB3270_INTERNAL void host_in3270(enum cstate);
 
-	LIB3270_INTERNAL void lib3270_st_changed(H3270 *h, int tx, int mode);
-//	LIB3270_INTERNAL void hostfile_init(void);
-	LIB3270_INTERNAL void host_connected(H3270 *session);
-	LIB3270_INTERNAL void host_disconnected(H3270 *session);
-	LIB3270_INTERNAL void host_in3270(H3270 *session, LIB3270_CSTATE);
-	LIB3270_INTERNAL void host_disconnect(H3270 *h, int disable);
 

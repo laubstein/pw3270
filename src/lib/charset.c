@@ -211,18 +211,13 @@ charset_init(char *csname)
 		charset_defaults();
 		set_cgcsgids(CN);
 		set_charset_name(CN);
+#if defined(_WIN32) || defined(LIB3270)/*[*/
 		set_display_charset("iso8859-1");
-
-/*
-#if defined(_WIN32) || defined(LIB3270)
-		set_display_charset("iso8859-1");
-#elif defined(X3270_DISPLAY) || (defined(C3270) && !defined(_WIN32))
+#elif defined(X3270_DISPLAY) || (defined(C3270) && !defined(_WIN32)) /*[*/
 		(void) screen_new_display_charsets(default_display_charset,"us");
-#else
+#else /*][*/
 		utf8_set_display_charsets(default_display_charset, "us");
-#endif
-*/
-
+#endif /*]*/
 		return CS_OKAY;
 	}
 

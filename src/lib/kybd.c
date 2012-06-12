@@ -63,9 +63,9 @@
 #include "popupsc.h"
 #include "printc.h"
 #include "screenc.h"
-// #if defined(X3270_DISPLAY) /*[*/
-// #include "selectc.h"
-// #endif /*]*/
+#if defined(X3270_DISPLAY) /*[*/
+#include "selectc.h"
+#endif /*]*/
 #include "statusc.h"
 #include "tablesc.h"
 #include "telnetc.h"
@@ -103,7 +103,7 @@ static Boolean key_Character(int code, Boolean with_ge, Boolean pasting,
 static Boolean flush_ta(void);
 static void key_AID(unsigned char aid_code);
 static void kybdlock_set(unsigned int bits, const char *cause);
-// static KeySym MyStringToKeysym(char *s, enum keytype *keytypep);
+static KeySym MyStringToKeysym(char *s, enum keytype *keytypep);
 
 #if defined(X3270_DBCS) /*[*/
 Boolean key_WCharacter(unsigned char code[], Boolean *skipped);
@@ -393,18 +393,19 @@ kybd_inhibit(Boolean inhibit)
 	if (inhibit) {
 		kybdlock_set(KL_ENTER_INHIBIT, "kybd_inhibit");
 		if (kybdlock == KL_ENTER_INHIBIT)
-			status_reset(NULL);
+			status_reset();
 	} else {
 		kybdlock_clr(KL_ENTER_INHIBIT, "kybd_inhibit");
 		if (!kybdlock)
-			status_reset(NULL);
+			status_reset();
 	}
 }
 
 /*
  * Called when a host connects or disconnects.
  */
-static void kybd_connect(H3270 *session, int connected, void *dunno)
+static void
+kybd_connect(int connected)
 {
 	if (kybdlock & KL_DEFERRED_UNLOCK)
 		RemoveTimeOut(unlock_id);
@@ -423,7 +424,7 @@ static void kybd_connect(H3270 *session, int connected, void *dunno)
  * Called when we switch between 3270 and ANSI modes.
  */
 static void
-kybd_in3270(H3270 *session, int in3270 unused, void *dunno)
+kybd_in3270(int in3270 unused)
 {
 	if (kybdlock & KL_DEFERRED_UNLOCK)
 		RemoveTimeOut(unlock_id);
@@ -437,7 +438,8 @@ kybd_in3270(H3270 *session, int in3270 unused, void *dunno)
 /*
  * Called to initialize the keyboard logic.
  */
-void kybd_init(void)
+void
+kybd_init(void)
 {
 	/* Register interest in connect and disconnect events. */
 	register_schange(ST_CONNECT, kybd_connect);
@@ -466,8 +468,8 @@ operator_error(int error_type)
 //		popup_an_error("Keyboard locked");
 
 	if(appres.oerr_lock) { // || sms_redirect()) {
-		status_oerr(NULL,error_type);
-		mcursor_locked(&h3270);
+		status_oerr(error_type);
+		mcursor_locked();
 		kybdlock_set((unsigned int)error_type, "operator_error");
 		(void) flush_ta();
 	} else {
@@ -511,7 +513,7 @@ key_AID(unsigned char aid_code)
 	plugin_aid(aid_code);
 #endif /*]*/
 
-	Trace("IN_SSCP: %d cursor_addr: %d",IN_SSCP,h3270.cursor_addr);
+	Trace("IN_SSCP: %d cursor_addr: %d",IN_SSCP,cursor_addr);
 
 	if (IN_SSCP) {
 		if (kybdlock & KL_OIA_MINUS)
@@ -524,18 +526,18 @@ key_AID(unsigned char aid_code)
 	}
 	if (IN_SSCP && aid_code == AID_ENTER) {
 		/* Act as if the host had written our input. */
-		buffer_addr = h3270.cursor_addr;
+		buffer_addr = cursor_addr;
 	}
 	if (!IN_SSCP || aid_code != AID_CLEAR) {
-		status_twait(&h3270);
-		mcursor_waiting(&h3270);
+		status_twait();
+		mcursor_waiting();
 		set_toggle(INSERT,0);
 		kybdlock_set(KL_OIA_TWAIT | KL_OIA_LOCKED, "key_AID");
 	}
 	aid = aid_code;
 	ctlr_read_modified(aid, False);
-	ticking_start(&h3270,False);
-	status_ctlr_done(&h3270);
+	ticking_start(False);
+	status_ctlr_done();
 }
 
 LIB3270_FKEY_ACTION( pfkey )
@@ -571,44 +573,15 @@ LIB3270_FKEY_ACTION( pakey )
 	return 0;
 }
 
-LIB3270_ACTION(break)
-{
-
-	if (!IN_3270)
-		return 0;
-
-	Trace("%s",__FUNCTION__);
-
-	net_break();
-
-	return 0;
-}
 
 /*
  * ATTN key, per RFC 2355.  Sends IP, regardless.
  */
-LIB3270_ACTION(attn)
-{
-	if (!IN_3270)
-		return 0;
-
-	Trace("%s",__FUNCTION__);
-
-	net_interrupt();
-
-	return 0;
-}
-
-/*
- * IAC IP, which works for 5250 System Request and interrupts the program
- * on an AS/400, even when the keyboard is locked.
- *
- * This is now the same as the Attn action.
- */ /*
 void
-Interrupt_action(Widget w unused, XEvent *event, String *params,
+Attn_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
+	action_debug(Attn_action, event, params, num_params);
 	if (!IN_3270)
 		return;
 
@@ -617,13 +590,33 @@ Interrupt_action(Widget w unused, XEvent *event, String *params,
 	net_interrupt();
 }
 
-*/
+/*
+ * IAC IP, which works for 5250 System Request and interrupts the program
+ * on an AS/400, even when the keyboard is locked.
+ *
+ * This is now the same as the Attn action.
+ */
+void
+Interrupt_action(Widget w unused, XEvent *event, String *params,
+    Cardinal *num_params)
+{
+	action_debug(Interrupt_action, event, params, num_params);
+	if (!IN_3270)
+		return;
+
+//	reset_idle_timer();
+
+	net_interrupt();
+}
+
+
 
 /*
  * Prepare for an insert of 'count' bytes.
  * Returns True if the insert is legal, False otherwise.
  */
-static Boolean ins_prep(int faddr, int baddr, int count)
+static Boolean
+ins_prep(int faddr, int baddr, int count)
 {
 	int next_faddr;
 	int xaddr;
@@ -635,7 +628,7 @@ static Boolean ins_prep(int faddr, int baddr, int count)
 	/* Find the end of the field. */
 	if (faddr == -1) {
 		/* Unformatted.  Use the end of the line. */
-		next_faddr = (((baddr / h3270.cols) + 1) * h3270.cols) % (h3270.rows*h3270.cols);
+		next_faddr = (((baddr / COLS) + 1) * COLS) % (ROWS*COLS);
 	} else {
 		next_faddr = faddr;
 		INC_BA(next_faddr);
@@ -696,8 +689,8 @@ static Boolean ins_prep(int faddr, int baddr, int count)
 			/* Shift right n_nulls worth. */
 			copy_len = first_null - baddr;
 			if (copy_len < 0)
-				copy_len += h3270.rows*h3270.cols;
-			to = (baddr + n_nulls) % (h3270.rows*h3270.cols);
+				copy_len += ROWS*COLS;
+			to = (baddr + n_nulls) % (ROWS*COLS);
 #if defined(_ST) /*[*/
 			printf("found %d NULLs at %d\n", n_nulls, first_null);
 			printf("copying %d from %d to %d\n", copy_len, to,
@@ -765,9 +758,9 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 		enq_ta(key_Character_wrapper, codename, CN);
 		return False;
 	}
-	baddr = h3270.cursor_addr;
-	faddr = find_field_attribute(&h3270,baddr);
-	fa = get_field_attribute(&h3270,baddr);
+	baddr = cursor_addr;
+	faddr = find_field_attribute(baddr);
+	fa = get_field_attribute(baddr);
 	if (ea_buf[baddr].fa || FA_IS_PROTECTED(fa)) {
 		operator_error(KL_OERR_PROTECTED);
 		return False;
@@ -919,14 +912,14 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 	INC_BA(baddr);
 
 	/* Replace leading nulls with blanks, if desired. */
-	if (h3270.formatted && toggled(BLANK_FILL)) {
+	if (formatted && toggled(BLANK_FILL)) {
 		register int	baddr_fill = baddr;
 
 		DEC_BA(baddr_fill);
 		while (baddr_fill != faddr) {
 
 			/* Check for backward line wrap. */
-			if ((baddr_fill % h3270.cols) == h3270.cols - 1) {
+			if ((baddr_fill % COLS) == COLS - 1) {
 				Boolean aborted = True;
 				register int baddr_scan = baddr_fill;
 
@@ -939,7 +932,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 						aborted = False;
 						break;
 					}
-					if (!(baddr_scan % h3270.cols))
+					if (!(baddr_scan % COLS))
 						break;
 					DEC_BA(baddr_scan);
 				}
@@ -953,7 +946,7 @@ key_Character(int code, Boolean with_ge, Boolean pasting, Boolean *skipped)
 		}
 	}
 
-	mdt_set(h3270.cursor_addr);
+	mdt_set(cursor_addr);
 
 	/*
 	 * Implement auto-skip, and don't land on attribute bytes.
@@ -1289,7 +1282,9 @@ retry:
 /*
  * Handle an ordinary character key, given an ASCII code.
  */
-void key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,Boolean *skipped)
+void
+key_ACharacter(unsigned char c, enum keytype keytype, enum iaction cause,
+	       Boolean *skipped)
 {
 //	register int i;
 	struct akeysym ak;
@@ -1372,6 +1367,7 @@ void
 AltCursor_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
+	action_debug(AltCursor_action, event, params, num_params);
 	reset_idle_timer();
 	do_toggle(ALT_CURSOR);
 }
@@ -1383,6 +1379,7 @@ void
 MonoCase_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
+	action_debug(MonoCase_action, event, params, num_params);
 	reset_idle_timer();
 	do_toggle(MONOCASE);
 }
@@ -1396,6 +1393,7 @@ void
 Flip_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
+	action_debug(Flip_action, event, params, num_params);
 
 //	reset_idle_timer();
 
@@ -1411,6 +1409,7 @@ Flip_action(Widget w unused, XEvent *event, String *params,
 void
 Tab_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_debug(Tab_action, event, params, num_params);
 	action_NextField();
 }
 */
@@ -1423,7 +1422,7 @@ LIB3270_KEY_ACTION( tab )
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
 			kybdlock_clr(KL_OERR_MASK, "Tab");
-			status_reset(&h3270);
+			status_reset();
 		} else {
 			ENQUEUE_ACTION(lib3270_tab);
 			return 0;
@@ -1435,14 +1434,21 @@ LIB3270_KEY_ACTION( tab )
 		return 0;
 	}
 #endif /*]*/
-	cursor_move(next_unprotected(h3270.cursor_addr));
+	cursor_move(next_unprotected(cursor_addr));
 	return 0;
 }
 
 
 /*
  * Tab backward to previous field.
- */
+ */ /*
+void BackTab_action(Widget w unused, XEvent *event, String *params,Cardinal *num_params)
+{
+	action_debug(BackTab_action, event, params, num_params);
+	action_PreviousField();
+}
+*/
+
 LIB3270_KEY_ACTION( backtab )
 {
 	register int	baddr, nbaddr;
@@ -1453,7 +1459,7 @@ LIB3270_KEY_ACTION( backtab )
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
 			kybdlock_clr(KL_OERR_MASK, "BackTab");
-			status_reset(NULL);
+			status_reset();
 		} else {
 			ENQUEUE_ACTION(lib3270_backtab);
 			return 0;
@@ -1461,7 +1467,7 @@ LIB3270_KEY_ACTION( backtab )
 	}
 	if (!IN_3270)
 		return 0;
-	baddr = h3270.cursor_addr;
+	baddr = cursor_addr;
 	DEC_BA(baddr);
 	if (ea_buf[baddr].fa)	/* at bof */
 		DEC_BA(baddr);
@@ -1492,7 +1498,7 @@ LIB3270_KEY_ACTION( backtab )
 static void defer_unlock(H3270 *session)
 {
 	kybdlock_clr(KL_DEFERRED_UNLOCK, "defer_unlock");
-	status_reset(session);
+	status_reset();
 	if (CONNECTED)
 		ps_process();
 }
@@ -1564,8 +1570,8 @@ do_reset(Boolean explicit)
 	}
 
 	/* Clean up other modes. */
-	status_reset(NULL);
-	mcursor_normal(&h3270);
+	status_reset();
+	mcursor_normal();
 
 //	composing = NONE;
 //	status_compose(False, 0, KT_STD);
@@ -1574,6 +1580,16 @@ do_reset(Boolean explicit)
 	Trace("Reset counter updated to %d",lib3270_event_counter[COUNTER_ID_RESET]);
 
 }
+
+/*
+void
+Reset_action(Widget w unused, XEvent *event, String *params,
+    Cardinal *num_params)
+{
+	action_debug(Reset_action, event, params, num_params);
+	action_Reset();
+}
+*/
 
 LIB3270_CLEAR_SELECTION_ACTION( reset )
 {
@@ -1587,6 +1603,15 @@ LIB3270_CLEAR_SELECTION_ACTION( reset )
 /*
  * Move to first unprotected field on screen.
  */
+
+/*
+void Home_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_debug(Home_action, event, params, num_params);
+	action_FirstField();
+}
+*/
+
 LIB3270_ACTION( firstfield )
 {
 //	reset_idle_timer();
@@ -1600,11 +1625,11 @@ LIB3270_ACTION( firstfield )
 		return 0;
 	}
 #endif /*]*/
-	if (!h3270.formatted) {
+	if (!formatted) {
 		cursor_move(0);
 		return 0;
 	}
-	cursor_move(next_unprotected(h3270.rows*h3270.cols-1));
+	cursor_move(next_unprotected(ROWS*COLS-1));
 
 	return 0;
 }
@@ -1619,7 +1644,7 @@ do_left(void)
 	register int	baddr;
 	enum dbcs_state d;
 
-	baddr = h3270.cursor_addr;
+	baddr = cursor_addr;
 	DEC_BA(baddr);
 	d = ctlr_dbcs_state(baddr);
 	if (IS_LEFT(d))
@@ -1641,7 +1666,7 @@ LIB3270_CURSOR_ACTION( left )
 		if (KYBDLOCK_IS_OERR)
 		{
 			kybdlock_clr(KL_OERR_MASK, "Left");
-			status_reset(NULL);
+			status_reset();
 		}
 		else
 		{
@@ -1656,8 +1681,7 @@ LIB3270_CURSOR_ACTION( left )
 		return 0;
 	}
 #endif /*]*/
-
-	if (!h3270.flipped)
+	if (!flipped)
 	{
 		do_left();
 	}
@@ -1665,7 +1689,7 @@ LIB3270_CURSOR_ACTION( left )
 	{
 		register int	baddr;
 
-		baddr = h3270.cursor_addr;
+		baddr = cursor_addr;
 		INC_BA(baddr);
 		/* XXX: DBCS? */
 		cursor_move(baddr);
@@ -1687,10 +1711,10 @@ do_delete(void)
 	int ndel;
 	register int i;
 
-	baddr = h3270.cursor_addr;
+	baddr = cursor_addr;
 
 	/* Can't delete a field attribute. */
-	fa = get_field_attribute(&h3270,baddr);
+	fa = get_field_attribute(baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
 		return False;
@@ -1716,7 +1740,7 @@ do_delete(void)
 		ndel = 1;
 
 	/* find next fa */
-	if (h3270.formatted) {
+	if (formatted) {
 		end_baddr = baddr;
 		do {
 			INC_BA(end_baddr);
@@ -1725,9 +1749,9 @@ do_delete(void)
 		} while (end_baddr != baddr);
 		DEC_BA(end_baddr);
 	} else {
-		if ((baddr % h3270.cols) == h3270.cols - ndel)
+		if ((baddr % COLS) == COLS - ndel)
 			return True;
-		end_baddr = baddr + (h3270.cols - (baddr % h3270.cols)) - 1;
+		end_baddr = baddr + (COLS - (baddr % COLS)) - 1;
 	}
 
 	/* Shift the remainder of the field left. */
@@ -1737,8 +1761,8 @@ do_delete(void)
 	} else if (end_baddr != baddr) {
 		/* XXX: Need to verify this. */
 		ctlr_bcopy(baddr + ndel, baddr,
-		    ((h3270.rows * h3270.cols) - 1) - (baddr + ndel) + 1, 0);
-		ctlr_bcopy(0, (h3270.rows * h3270.cols) - ndel, ndel, 0);
+		    ((ROWS * COLS) - 1) - (baddr + ndel) + 1, 0);
+		ctlr_bcopy(0, (ROWS * COLS) - ndel, ndel, 0);
 		ctlr_bcopy(ndel, 0, end_baddr - ndel + 1, 0);
 	}
 
@@ -1747,12 +1771,22 @@ do_delete(void)
 		ctlr_add(end_baddr - i, EBC_null, 0);
 
 	/* Set the MDT for this field. */
-	mdt_set(h3270.cursor_addr);
+	mdt_set(cursor_addr);
 
 	/* Patch up the DBCS state for display. */
 	(void) ctlr_dbcs_postprocess();
 	return True;
 }
+
+/*
+void
+Delete_action(Widget w unused, XEvent *event, String *params,
+    Cardinal *num_params)
+{
+	action_debug(Delete_action, event, params, num_params);
+	action_Delete();
+}
+*/
 
 LIB3270_ACTION( delete )
 {
@@ -1771,13 +1805,13 @@ LIB3270_ACTION( delete )
 	if (!do_delete())
 		return 0;
 	if (reverse) {
-		int baddr = h3270.cursor_addr;
+		int baddr = cursor_addr;
 
 		DEC_BA(baddr);
 		if (!ea_buf[baddr].fa)
 			cursor_move(baddr);
 	}
-	screen_disp(&h3270);
+	screen_disp();
 	return 0;
 }
 
@@ -1787,6 +1821,7 @@ LIB3270_ACTION( delete )
  */
 LIB3270_ACTION( backspace )
 {
+//	action_debug(BackSpace_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		ENQUEUE_ACTION( lib3270_backspace );
@@ -1800,16 +1835,16 @@ LIB3270_ACTION( backspace )
 #endif /*]*/
 	if (reverse)
 		(void) do_delete();
-	else if (!h3270.flipped)
+	else if (!flipped)
 		do_left();
 	else {
 		register int	baddr;
 
-		baddr = h3270.cursor_addr;
+		baddr = cursor_addr;
 		DEC_BA(baddr);
 		cursor_move(baddr);
 	}
-	screen_disp(&h3270);
+	screen_disp();
 	return 0;
 }
 
@@ -1823,8 +1858,8 @@ do_erase(void)
 	int	baddr, faddr;
 	enum dbcs_state d;
 
-	baddr = h3270.cursor_addr;
-	faddr = find_field_attribute(&h3270,baddr);
+	baddr = cursor_addr;
+	faddr = find_field_attribute(baddr);
 	if (faddr == baddr || FA_IS_PROTECTED(ea_buf[baddr].fa)) {
 		operator_error(KL_OERR_PROTECTED);
 		return;
@@ -1836,8 +1871,8 @@ do_erase(void)
 	/*
 	 * If we are now on an SI, move left again.
 	 */
-	if (ea_buf[h3270.cursor_addr].cc == EBC_si) {
-		baddr = h3270.cursor_addr;
+	if (ea_buf[cursor_addr].cc == EBC_si) {
+		baddr = cursor_addr;
 		DEC_BA(baddr);
 		cursor_move(baddr);
 	}
@@ -1848,9 +1883,9 @@ do_erase(void)
 	 * This ensures that if this is the end of a DBCS subfield, we will
 	 * land on the SI, instead of on the character following.
 	 */
-	d = ctlr_dbcs_state(h3270.cursor_addr);
+	d = ctlr_dbcs_state(cursor_addr);
 	if (IS_RIGHT(d)) {
-		baddr = h3270.cursor_addr;
+		baddr = cursor_addr;
 		DEC_BA(baddr);
 		cursor_move(baddr);
 	}
@@ -1865,14 +1900,24 @@ do_erase(void)
 	 * If we've just erased the last character of a DBCS subfield, erase
 	 * the SO/SI pair as well.
 	 */
-	baddr = h3270.cursor_addr;
+	baddr = cursor_addr;
 	DEC_BA(baddr);
-	if (ea_buf[baddr].cc == EBC_so && ea_buf[h3270.cursor_addr].cc == EBC_si) {
+	if (ea_buf[baddr].cc == EBC_so && ea_buf[cursor_addr].cc == EBC_si) {
 		cursor_move(baddr);
 		(void) do_delete();
 	}
-	screen_disp(&h3270);
+	screen_disp();
 }
+
+/*
+void
+Erase_action(Widget w unused, XEvent *event, String *params,
+    Cardinal *num_params)
+{
+	action_debug(Erase_action, event, params, num_params);
+	action_Erase();
+}
+*/
 
 LIB3270_ACTION( erase )
 {
@@ -1904,7 +1949,7 @@ LIB3270_CURSOR_ACTION( right )
 		if (KYBDLOCK_IS_OERR)
 		{
 			kybdlock_clr(KL_OERR_MASK, "Right");
-			status_reset(NULL);
+			status_reset();
 		}
 		else
 		{
@@ -1918,9 +1963,9 @@ LIB3270_CURSOR_ACTION( right )
 		return 0;
 	}
 #endif /*]*/
-	if (!h3270.flipped)
+	if (!flipped)
 	{
-		baddr = h3270.cursor_addr;
+		baddr = cursor_addr;
 		INC_BA(baddr);
 		d = ctlr_dbcs_state(baddr);
 		if (IS_RIGHT(d))
@@ -1945,6 +1990,7 @@ Left2_action(Widget w unused, XEvent *event, String *params,
 	register int	baddr;
 	enum dbcs_state d;
 
+	action_debug(Left2_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
@@ -1982,6 +2028,7 @@ LIB3270_ACTION( previousword )
 	unsigned char  c;
 	Boolean prot;
 
+//	action_debug(PreviousWord_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		ENQUEUE_ACTION(lib3270_previousword);
@@ -1992,18 +2039,18 @@ LIB3270_ACTION( previousword )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	if (!h3270.formatted)
+	if (!formatted)
 		return 0;
 
-	baddr = h3270.cursor_addr;
-	prot = FA_IS_PROTECTED(get_field_attribute(&h3270,baddr));
+	baddr = cursor_addr;
+	prot = FA_IS_PROTECTED(get_field_attribute(baddr));
 
 	/* Skip to before this word, if in one now. */
 	if (!prot) {
 		c = ea_buf[baddr].cc;
 		while (!ea_buf[baddr].fa && c != EBC_space && c != EBC_null) {
 			DEC_BA(baddr);
-			if (baddr == h3270.cursor_addr)
+			if (baddr == cursor_addr)
 				return 0;
 			c = ea_buf[baddr].cc;
 		}
@@ -2015,7 +2062,7 @@ LIB3270_ACTION( previousword )
 		c = ea_buf[baddr].cc;
 		if (ea_buf[baddr].fa) {
 			DEC_BA(baddr);
-			prot = FA_IS_PROTECTED(get_field_attribute(&h3270,baddr));
+			prot = FA_IS_PROTECTED(get_field_attribute(baddr));
 			continue;
 		}
 		if (!prot && c != EBC_space && c != EBC_null)
@@ -2050,6 +2097,7 @@ Right2_action(Widget w unused, XEvent *event, String *params,
 	register int	baddr;
 	enum dbcs_state d;
 
+	action_debug(Right2_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR) {
@@ -2085,7 +2133,7 @@ nu_word(int baddr)
 	unsigned char c;
 	Boolean prot;
 
-	prot = FA_IS_PROTECTED(get_field_attribute(&h3270,baddr));
+	prot = FA_IS_PROTECTED(get_field_attribute(baddr));
 
 	do {
 		c = ea_buf[baddr].cc;
@@ -2133,6 +2181,7 @@ LIB3270_ACTION( nextword )
 	register int	baddr;
 	unsigned char c;
 
+//	action_debug(NextWord_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		ENQUEUE_ACTION( lib3270_nextword );
@@ -2143,29 +2192,29 @@ LIB3270_ACTION( nextword )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	if (!h3270.formatted)
+	if (!formatted)
 		return 0;
 
 	/* If not in an unprotected field, go to the next unprotected word. */
-	if (ea_buf[h3270.cursor_addr].fa ||
-	    FA_IS_PROTECTED(get_field_attribute(&h3270,h3270.cursor_addr))) {
-		baddr = nu_word(h3270.cursor_addr);
+	if (ea_buf[cursor_addr].fa ||
+	    FA_IS_PROTECTED(get_field_attribute(cursor_addr))) {
+		baddr = nu_word(cursor_addr);
 		if (baddr != -1)
 			cursor_move(baddr);
 		return 0;
 	}
 
 	/* If there's another word in this field, go to it. */
-	baddr = nt_word(h3270.cursor_addr);
+	baddr = nt_word(cursor_addr);
 	if (baddr != -1) {
 		cursor_move(baddr);
 		return 0;
 	}
 
 	/* If in a word, go to just after its end. */
-	c = ea_buf[h3270.cursor_addr].cc;
+	c = ea_buf[cursor_addr].cc;
 	if (c != EBC_space && c != EBC_null) {
-		baddr = h3270.cursor_addr;
+		baddr = cursor_addr;
 		do {
 			c = ea_buf[baddr].cc;
 			if (c == EBC_space || c == EBC_null) {
@@ -2178,11 +2227,11 @@ LIB3270_ACTION( nextword )
 				return 0;
 			}
 			INC_BA(baddr);
-		} while (baddr != h3270.cursor_addr);
+		} while (baddr != cursor_addr);
 	}
 	/* Otherwise, go to the next unprotected word. */
 	else {
-		baddr = nu_word(h3270.cursor_addr);
+		baddr = nu_word(cursor_addr);
 		if (baddr != -1)
 			cursor_move(baddr);
 	}
@@ -2210,12 +2259,13 @@ LIB3270_CURSOR_ACTION( up )
 {
 	register int	baddr;
 
+//	action_debug(Up_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		if (KYBDLOCK_IS_OERR)
 		{
 			kybdlock_clr(KL_OERR_MASK, "Up");
-			status_reset(NULL);
+			status_reset();
 		}
 		else
 		{
@@ -2230,9 +2280,9 @@ LIB3270_CURSOR_ACTION( up )
 		return 0;
 	}
 #endif /*]*/
-	baddr = h3270.cursor_addr - h3270.cols;
+	baddr = cursor_addr - COLS;
 	if (baddr < 0)
-		baddr = (h3270.cursor_addr + (h3270.rows * h3270.cols)) - h3270.cols;
+		baddr = (cursor_addr + (ROWS * COLS)) - COLS;
 	cursor_move(baddr);
 	return 0;
 }
@@ -2258,13 +2308,14 @@ LIB3270_CURSOR_ACTION( down )
 {
 	register int	baddr;
 
+//	action_debug(Down_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock)
 	{
 		if (KYBDLOCK_IS_OERR)
 		{
 			kybdlock_clr(KL_OERR_MASK, "Down");
-			status_reset(NULL);
+			status_reset();
 		} else
 		{
 			ENQUEUE_ACTION(lib3270_cursor_down);
@@ -2279,56 +2330,54 @@ LIB3270_CURSOR_ACTION( down )
 		return 0;
 	}
 #endif /*]*/
-	baddr = (h3270.cursor_addr + h3270.cols) % (h3270.cols * h3270.rows);
+	baddr = (cursor_addr + COLS) % (COLS * ROWS);
 	cursor_move(baddr);
 	return 0;
 }
 
 
-/**
+/*
  * Cursor to first field on next line or any lines after that.
  */
-LIB3270_CURSOR_ACTION( newline )
+void
+Newline_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	register int	baddr, faddr;
 	register unsigned char	fa;
 
+	action_debug(Newline_action, event, params, num_params);
 //	reset_idle_timer();
-	if (kybdlock)
-	{
-		ENQUEUE_ACTION(lib3270_cursor_newline);
-//		enq_ta(Newline_action, CN, CN);
-		return 0;
+	if (kybdlock) {
+		enq_ta(Newline_action, CN, CN);
+		return;
 	}
 #if defined(X3270_ANSI) /*[*/
-	if (IN_ANSI)
-	{
+	if (IN_ANSI) {
 		net_sendc('\n');
-		return 0;
+		return;
 	}
 #endif /*]*/
-	baddr = (h3270.cursor_addr + h3270.cols) % (h3270.cols * h3270.rows);	/* down */
-	baddr = (baddr / h3270.cols) * h3270.cols;			/* 1st col */
-	faddr = find_field_attribute(&h3270,baddr);
+	baddr = (cursor_addr + COLS) % (COLS * ROWS);	/* down */
+	baddr = (baddr / COLS) * COLS;			/* 1st col */
+	faddr = find_field_attribute(baddr);
 	fa = ea_buf[faddr].fa;
 	if (faddr != baddr && !FA_IS_PROTECTED(fa))
 		cursor_move(baddr);
 	else
 		cursor_move(next_unprotected(baddr));
-
-	return 0;
 }
 
 
 /*
  * DUP key
  */
-LIB3270_KEY_ACTION( dup )
+void
+Dup_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_debug(Dup_action, event, params, num_params);
 //	reset_idle_timer();
-	if (kybdlock)
-	{
-		ENQUEUE_ACTION(lib3270_dup);
+	if (kybdlock) {
+		enq_ta(Dup_action, CN, CN);
 		return;
 	}
 #if defined(X3270_ANSI) /*[*/
@@ -2336,10 +2385,7 @@ LIB3270_KEY_ACTION( dup )
 		return;
 #endif /*]*/
 	if (key_Character(EBC_dup, False, False, NULL))
-	{
-		screen_disp(&h3270);
-		cursor_move(next_unprotected(h3270.cursor_addr));
-	}
+		cursor_move(next_unprotected(cursor_addr));
 }
 
 
@@ -2349,6 +2395,7 @@ LIB3270_KEY_ACTION( dup )
 void
 FieldMark_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_debug(FieldMark_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(FieldMark_action, CN, CN);
@@ -2361,6 +2408,17 @@ FieldMark_action(Widget w unused, XEvent *event, String *params, Cardinal *num_p
 	(void) key_Character(EBC_fm, False, False, NULL);
 }
 
+
+/*
+ * Vanilla AID keys.
+ */
+/*
+void Enter_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_debug(Enter_action, event, params, num_params);
+	action_Enter();
+}
+*/
 /**
  * Send an "Enter" action.
  *
@@ -2384,6 +2442,15 @@ LIB3270_KEY_ACTION( enter )
 
 	return 0;
 }
+
+/*
+void
+SysReq_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_debug(SysReq_action, event, params, num_params);
+	action_SysReq();
+}
+*/
 
 LIB3270_ACTION( sysreq )
 {
@@ -2411,6 +2478,14 @@ LIB3270_ACTION( sysreq )
 /*
  * Clear AID key
  */
+/*
+static void Clear_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+		action_debug(Clear_action, event, params, num_params);
+		action_Clear();
+}
+*/
+
 LIB3270_ACTION( clear )
 {
 //	reset_idle_timer();
@@ -2427,7 +2502,7 @@ LIB3270_ACTION( clear )
 	}
 #endif /*]*/
 	buffer_addr = 0;
-	ctlr_clear(&h3270,True);
+	ctlr_clear(True);
 	cursor_move(0);
 	if (CONNECTED)
 		key_AID(AID_CLEAR);
@@ -2530,6 +2605,7 @@ void
 CursorSelect_action(Widget w unused, XEvent *event, String *params,
     Cardinal *num_params)
 {
+	action_debug(CursorSelect_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(CursorSelect_action, CN, CN);
@@ -2543,6 +2619,41 @@ CursorSelect_action(Widget w unused, XEvent *event, String *params,
 	lightpen_select(cursor_addr);
 }
 */
+
+#if defined(X3270_DISPLAY)
+/*
+ * Cursor Select mouse action (light pen simulator).
+ */
+/*
+void
+MouseSelect_action(Widget w, XEvent *event, String *params,
+    Cardinal *num_params)
+{
+	action_debug(MouseSelect_action, event, params, num_params);
+	if (w != *screen)
+		return;
+//	reset_idle_timer();
+	if (kybdlock)
+		return;
+#if defined(X3270_ANSI)
+	if (IN_ANSI)
+		return;
+#endif
+	lightpen_select(mouse_baddr(w, event));
+}
+*/
+#endif
+
+
+/*
+ * Erase End Of Field Key.
+void
+EraseEOF_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_debug(EraseEOF_action, event, params, num_params);
+	action_EraseEOF();
+}
+ */
 
 /**
  * Erase End Of Line Key.
@@ -2566,15 +2677,15 @@ LIB3270_ACTION( eraseeol )
 		return 0;
 #endif /*]*/
 
-	baddr = h3270.cursor_addr;
-	fa = get_field_attribute(&h3270,baddr);
+	baddr = cursor_addr;
+	fa = get_field_attribute(baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa)
 	{
 		operator_error(KL_OERR_PROTECTED);
 		return -1;
 	}
 
-	if (h3270.formatted)
+	if (formatted)
 	{
 		/* erase to next field attribute or current line */
 		do
@@ -2583,7 +2694,7 @@ LIB3270_ACTION( eraseeol )
 			INC_BA(baddr);
 		} while (!ea_buf[baddr].fa && BA_TO_COL(baddr) > 0);
 
-		mdt_set(h3270.cursor_addr);
+		mdt_set(cursor_addr);
 	}
 	else
 	{
@@ -2599,14 +2710,14 @@ LIB3270_ACTION( eraseeol )
 	d = ctlr_lookleft_state(cursor_addr, &why);
 	if (IS_DBCS(d) && why == DBCS_SUBFIELD) {
 		if (d == DBCS_RIGHT) {
-			baddr = h3270.cursor_addr;
+			baddr = cursor_addr;
 			DEC_BA(baddr);
 			ea_buf[baddr].cc = EBC_si;
 		} else
-			ea_buf[h3270.cursor_addr].cc = EBC_si;
+			ea_buf[cursor_addr].cc = EBC_si;
 	}
 	(void) ctlr_dbcs_postprocess();
-	screen_disp(&h3270);
+	screen_disp();
 	return 0;
 }
 
@@ -2631,18 +2742,18 @@ LIB3270_ACTION( eraseeof )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	baddr = h3270.cursor_addr;
-	fa = get_field_attribute(&h3270,baddr);
+	baddr = cursor_addr;
+	fa = get_field_attribute(baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
 		return -1;
 	}
-	if (h3270.formatted) {	/* erase to next field attribute */
+	if (formatted) {	/* erase to next field attribute */
 		do {
 			ctlr_add(baddr, EBC_null, 0);
 			INC_BA(baddr);
 		} while (!ea_buf[baddr].fa);
-		mdt_set(h3270.cursor_addr);
+		mdt_set(cursor_addr);
 	} else {	/* erase to end of screen */
 		do {
 			ctlr_add(baddr, EBC_null, 0);
@@ -2654,16 +2765,26 @@ LIB3270_ACTION( eraseeof )
 	d = ctlr_lookleft_state(cursor_addr, &why);
 	if (IS_DBCS(d) && why == DBCS_SUBFIELD) {
 		if (d == DBCS_RIGHT) {
-			baddr = h3270.cursor_addr;
+			baddr = cursor_addr;
 			DEC_BA(baddr);
 			ea_buf[baddr].cc = EBC_si;
 		} else
-			ea_buf[h3270.cursor_addr].cc = EBC_si;
+			ea_buf[cursor_addr].cc = EBC_si;
 	}
 	(void) ctlr_dbcs_postprocess();
-	screen_disp(&h3270);
+	screen_disp();
 	return 0;
 }
+
+
+/*
+ * Erase all Input Key.
+void EraseInput_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_debug(EraseInput_action, event, params, num_params);
+	action_EraseInput();
+}
+ */
 
 LIB3270_ACTION( eraseinput )
 {
@@ -2680,7 +2801,7 @@ LIB3270_ACTION( eraseinput )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	if (h3270.formatted) {
+	if (formatted) {
 		/* find first field attribute */
 		baddr = 0;
 		do {
@@ -2713,10 +2834,10 @@ LIB3270_ACTION( eraseinput )
 		if (!f)
 			cursor_move(0);
 	} else {
-		ctlr_clear(&h3270,True);
+		ctlr_clear(True);
 		cursor_move(0);
 	}
-	screen_disp(&h3270);
+	screen_disp();
 	return 0;
 }
 
@@ -2728,7 +2849,15 @@ LIB3270_ACTION( eraseinput )
  * but the last.
  *
  * Which is to say, does a ^W.
- */
+ */ /*
+void
+DeleteWord_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_debug(DeleteWord_action, event, params, num_params);
+	action_DeleteWord();
+}
+*/
+
 LIB3270_ACTION( deleteword )
 {
 	register int baddr;
@@ -2746,11 +2875,11 @@ LIB3270_ACTION( deleteword )
 		return 0;
 	}
 #endif /*]*/
-	if (!h3270.formatted)
+	if (!formatted)
 		return 0;
 
-	baddr = h3270.cursor_addr;
-	fa = get_field_attribute(&h3270,baddr);
+	baddr = cursor_addr;
+	fa = get_field_attribute(baddr);
 
 	/* Make sure we're on a modifiable field. */
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
@@ -2760,7 +2889,7 @@ LIB3270_ACTION( deleteword )
 
 	/* Backspace over any spaces to the left of the cursor. */
 	for (;;) {
-		baddr = h3270.cursor_addr;
+		baddr = cursor_addr;
 		DEC_BA(baddr);
 		if (ea_buf[baddr].fa)
 			return 0;
@@ -2773,7 +2902,7 @@ LIB3270_ACTION( deleteword )
 
 	/* Backspace until the character to the left of the cursor is blank. */
 	for (;;) {
-		baddr = h3270.cursor_addr;
+		baddr = cursor_addr;
 		DEC_BA(baddr);
 		if (ea_buf[baddr].fa)
 			return 0;
@@ -2783,7 +2912,7 @@ LIB3270_ACTION( deleteword )
 		else
 			do_erase();
 	}
-	screen_disp(&h3270);
+	screen_disp();
 	return 0;
 }
 
@@ -2795,7 +2924,15 @@ LIB3270_ACTION( deleteword )
  * the front of the field.
  *
  * Which is to say, does a ^U.
- */
+ */ /*
+void
+DeleteField_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_debug(DeleteField_action, event, params, num_params);
+	action_DeleteField();
+}
+*/
+
 LIB3270_ACTION( deletefield )
 {
 	register int	baddr;
@@ -2813,11 +2950,11 @@ LIB3270_ACTION( deletefield )
 		return 0;
 	}
 #endif /*]*/
-	if (!h3270.formatted)
+	if (!formatted)
 		return 0;
 
-	baddr = h3270.cursor_addr;
-	fa = get_field_attribute(&h3270,baddr);
+	baddr = cursor_addr;
+	fa = get_field_attribute(baddr);
 	if (FA_IS_PROTECTED(fa) || ea_buf[baddr].fa) {
 		operator_error(KL_OERR_PROTECTED);
 		return -1;
@@ -2825,13 +2962,13 @@ LIB3270_ACTION( deletefield )
 	while (!ea_buf[baddr].fa)
 		DEC_BA(baddr);
 	INC_BA(baddr);
-	mdt_set(h3270.cursor_addr);
+	mdt_set(cursor_addr);
 	cursor_move(baddr);
 	while (!ea_buf[baddr].fa) {
 		ctlr_add(baddr, EBC_null, 0);
 		INC_BA(baddr);
 	}
-	screen_disp(&h3270);
+	screen_disp();
 	return 0;
 }
 
@@ -2843,6 +2980,7 @@ LIB3270_ACTION( deletefield )
 void
 Insert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_debug(Insert_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(Insert_action, CN, CN);
@@ -2863,6 +3001,7 @@ Insert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 void
 ToggleInsert_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_debug(ToggleInsert_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(ToggleInsert_action, CN, CN);
@@ -2884,6 +3023,7 @@ ToggleInsert_action(Widget w unused, XEvent *event, String *params, Cardinal *nu
 void
 ToggleReverse_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_debug(ToggleReverse_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		enq_ta(ToggleReverse_action, CN, CN);
@@ -2907,6 +3047,7 @@ LIB3270_ACTION( fieldend )
 	unsigned char	fa, c;
 	int	last_nonblank = -1;
 
+//	action_debug(FieldEnd_action, event, params, num_params);
 //	reset_idle_timer();
 	if (kybdlock) {
 		ENQUEUE_ACTION( lib3270_fieldend );
@@ -2917,10 +3058,10 @@ LIB3270_ACTION( fieldend )
 	if (IN_ANSI)
 		return 0;
 #endif /*]*/
-	if (!h3270.formatted)
+	if (!formatted)
 		return 0;
-	baddr = h3270.cursor_addr;
-	faddr = find_field_attribute(&h3270,baddr);
+	baddr = cursor_addr;
+	faddr = find_field_attribute(baddr);
 	fa = ea_buf[faddr].fa;
 	if (faddr == baddr || FA_IS_PROTECTED(fa))
 		return 0;
@@ -2951,12 +3092,14 @@ LIB3270_ACTION( fieldend )
 /*
  * MoveCursor action.  Depending on arguments, this is either a move to the
  * mouse cursor position, or to an absolute location.
- */ /*
+ */
 void
 MoveCursor_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
 	register int baddr;
 	int row, col;
+
+	action_debug(MoveCursor_action, event, params, num_params);
 
 //	reset_idle_timer();
 	if (kybdlock) {
@@ -2966,14 +3109,14 @@ MoveCursor_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 	}
 
 	switch (*num_params) {
-#if defined(X3270_DISPLAY
-	    case 0:		// mouse click, presumably
+#if defined(X3270_DISPLAY) /*[*/
+	    case 0:		/* mouse click, presumably */
 		if (w != *screen)
 			return;
 		cursor_move(mouse_baddr(w, event));
 		break;
-#endif
-	    case 2:		// probably a macro call
+#endif /*]*/
+	    case 2:		/* probably a macro call */
 		row = atoi(params[0]);
 		col = atoi(params[1]);
 		if (!IN_3270) {
@@ -2987,7 +3130,7 @@ MoveCursor_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 		baddr = ((row * COLS) + col) % (ROWS * COLS);
 		cursor_move(baddr);
 		break;
-	    default:		// couln't say
+	    default:		/* couln't say */
 		popup_an_error("%s requires 0 or 2 arguments",
 		    action_name(MoveCursor_action));
 //		cancel_if_idle_command();
@@ -2995,12 +3138,12 @@ MoveCursor_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 	}
 }
 
-*/
+
 #if defined(X3270_DBCS) && defined(X3270_DISPLAY) /*[*/
 /*
  * Run a KeyPress through XIM.
  * Returns True if there is further processing to do, False otherwise.
- */ /*
+ */
 static Boolean
 xim_lookup(XKeyEvent *event)
 {
@@ -3077,8 +3220,7 @@ xim_lookup(XKeyEvent *event)
 	}
 	return rv;
 }
-*/
-#endif
+#endif /*]*/
 
 /*
  * Key action by string
@@ -3093,12 +3235,12 @@ void Input_String(const unsigned char *str)
 		key_ACharacter((unsigned char)((*str) & 0xff), KT_STD, IA_KEY, NULL);
 		str++;
 	}
-	screen_disp(&h3270);
+	screen_disp();
 }
 
 /*
  * Key action.
- */ /*
+ */
 void
 Key_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -3106,6 +3248,7 @@ Key_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 	KeySym k;
 	enum keytype keytype;
 
+	action_debug(Key_action, event, params, num_params);
 //	reset_idle_timer();
 
 	for (i = 0; i < *num_params; i++) {
@@ -3128,10 +3271,10 @@ Key_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 			       NULL);
 	}
 }
-*/
+
 /*
  * String action.
- */ /*
+ */
 void
 String_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
@@ -3139,15 +3282,16 @@ String_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 	int len = 0;
 	char *s0, *s;
 
+	action_debug(String_action, event, params, num_params);
 //	reset_idle_timer();
 
-	// Determine the total length of the strings.
+	/* Determine the total length of the strings. */
 	for (i = 0; i < *num_params; i++)
 		len += strlen(params[i]);
 	if (!len)
 		return;
 
-	// Allocate a block of memory and copy them in.
+	/* Allocate a block of memory and copy them in. */
 	s0 = s = Malloc(len + 1);
 	*s = '\0';
 	for (i = 0; i < *num_params; i++) {
@@ -3182,24 +3326,25 @@ String_action(Widget w unused, XEvent *event, String *params, Cardinal *num_para
 	}
 	*s = '\0';
 
-	// Set a pending string.
+	/* Set a pending string. */
 //	ps_set(s0, False);
 }
-*/
 
 /*
  * HexString action.
- */ /*
-void HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+ */
+void
+HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
 	Cardinal i;
 	int len = 0;
 	char *s;
 	char *t;
 
+	action_debug(HexString_action, event, params, num_params);
 //	reset_idle_timer();
 
-	// Determine the total length of the strings.
+	/* Determine the total length of the strings. */
 	for (i = 0; i < *num_params; i++) {
 		t = params[i];
 		if (!strncmp(t, "0x", 2) || !strncmp(t, "0X", 2))
@@ -3209,7 +3354,7 @@ void HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *
 	if (!len)
 		return;
 
-	// Allocate a block of memory and copy them in.
+	/* Allocate a block of memory and copy them in. */
 	s = Malloc(len + 1);
 	*s = '\0';
 	for (i = 0; i < *num_params; i++) {
@@ -3219,10 +3364,9 @@ void HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *
 		(void) strcat(s, t);
 	}
 
-	// Set a pending string.
+	/* Set a pending string. */
 //	ps_set(s, True);
 }
-*/
 
 /*
  * Dual-mode action for the "asciicircum" ("^") key:
@@ -3234,6 +3378,7 @@ void HexString_action(Widget w unused, XEvent *event, String *params, Cardinal *
 void
 CircumNot_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_debug(CircumNot_action, event, params, num_params);
 //	reset_idle_timer();
 
 	if (IN_3270 && composing == NONE)
@@ -3293,14 +3438,14 @@ remargin(int lmargin)
 	int faddr;
 	unsigned char fa;
 
-	baddr = h3270.cursor_addr;
+	baddr = cursor_addr;
 	while (BA_TO_COL(baddr) < lmargin) {
 		baddr = ROWCOL_TO_BA(BA_TO_ROW(baddr), lmargin);
 		if (!ever) {
 			b0 = baddr;
 			ever = True;
 		}
-		faddr = find_field_attribute(&h3270,baddr);
+		faddr = find_field_attribute(baddr);
 		fa = ea_buf[faddr].fa;
 		if (faddr == baddr || FA_IS_PROTECTED(fa)) {
 			baddr = next_unprotected(baddr);
@@ -3313,16 +3458,36 @@ remargin(int lmargin)
 	return True;
 }
 
-LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int pasting)
+/**
+ * Pretend that a sequence of keys was entered at the keyboard.
+ *
+ * "Pasting" means that the sequence came from the X clipboard.  Returns are
+ * ignored; newlines mean "move to beginning of next line"; tabs and formfeeds
+ * become spaces.  Backslashes are not special, but ASCII ESC characters are
+ * used to signify 3270 Graphic Escapes.
+ *
+ * "Not pasting" means that the sequence is a login string specified in the
+ * hosts file, or a parameter to the String action.  Returns are "move to
+ * beginning of next line"; newlines mean "Enter AID" and the termination of
+ * processing the string.  Backslashes are processed as in C.
+ *
+ * @param s		String to input.
+ * @param len		Size of the string (or -1 to null terminated strings)
+ * @param pasting	pasting flag (See comments).
+ *
+ * @Returns the number of unprocessed characters.
+ */
+LIB3270_EXPORT int emulate_input(char *s, int len, int pasting)
 {
-	enum { BASE, BACKSLASH, BACKX, BACKP, BACKPA, BACKPF, OCTAL, HEX, XGE } state = BASE;
+	enum {
+	    BASE, BACKSLASH, BACKX, BACKP, BACKPA, BACKPF, OCTAL, HEX, XGE
+	} state = BASE;
 	int literal = 0;
 	int nc = 0;
 	enum iaction ia = pasting ? IA_PASTE : IA_STRING;
-	int orig_addr;
-	int orig_col;
+	int orig_addr = cursor_addr;
+	int orig_col = BA_TO_COL(cursor_addr);
 	Boolean skipped = False;
-
 #if defined(X3270_DBCS) /*[*/
 	unsigned char ebc[2];
 	unsigned char cx;
@@ -3334,11 +3499,6 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 	char c;
 	char *ws;
 #endif /*]*/
-
-	CHECK_SESSION_HANDLE(session);
-
-	orig_addr = session->cursor_addr;
-	orig_col  = BA_TO_COL(session->cursor_addr);
 
 	if(len < 0)
 		len = strlen(s);
@@ -3378,12 +3538,12 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 		if (pasting && IN_3270) {
 
 			/* Check for cursor wrap to top of screen. */
-			if (session->cursor_addr < orig_addr)
+			if (cursor_addr < orig_addr)
 				return len-1;		/* wrapped */
 
 			/* Jump cursor over left margin. */
 			if (toggled(MARGINED_PASTE) &&
-			    BA_TO_COL(session->cursor_addr) < orig_col) {
+			    BA_TO_COL(cursor_addr) < orig_col) {
 				if (!remargin(orig_col))
 					return len-1;
 				skipped = True;
@@ -3413,8 +3573,8 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 			    case '\n':
 				if (pasting) {
 					if (!skipped)
-						lib3270_cursor_newline();
-//						action_internal(Newline_action,ia, CN, CN);
+						action_internal(Newline_action,
+								ia, CN, CN);
 					skipped = False;
 				} else {
 					lib3270_enter();
@@ -3516,14 +3676,11 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 			    case 'p':
 				state = BACKP;
 				break;
-
 			    case 'r':
-					lib3270_cursor_newline();
-//					action_internal(Newline_action, ia, CN, CN);
-					skipped = False;
-					state = BASE;
-					break;
-
+				action_internal(Newline_action, ia, CN, CN);
+				skipped = False;
+				state = BASE;
+				break;
 			    case 't':
 			    lib3270_tab();
 				skipped = False;
@@ -3535,7 +3692,8 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 				state = BASE;
 				break;
 			    case 'v':
-				popup_an_error("%s: Vertical tab not supported",action_name(String_action));
+				popup_an_error("%s: Vertical tab not supported",
+				    action_name(String_action));
 //				cancel_if_idle_command();
 				state = BASE;
 				break;
@@ -3543,7 +3701,8 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 				state = BACKX;
 				break;
 			    case '\\':
-				key_ACharacter((unsigned char) c, KT_STD, ia,&skipped);
+				key_ACharacter((unsigned char) c, KT_STD, ia,
+						&skipped);
 				state = BASE;
 				break;
 			    case '0':
@@ -3680,7 +3839,7 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 	switch (state) {
 	    case BASE:
 		if (toggled(MARGINED_PASTE) &&
-		    BA_TO_COL(session->cursor_addr) < orig_col) {
+		    BA_TO_COL(cursor_addr) < orig_col) {
 			(void) remargin(orig_col);
 		}
 		break;
@@ -3689,7 +3848,7 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 		key_ACharacter((unsigned char) literal, KT_STD, ia, &skipped);
 		state = BASE;
 		if (toggled(MARGINED_PASTE) &&
-		    BA_TO_COL(session->cursor_addr) < orig_col) {
+		    BA_TO_COL(cursor_addr) < orig_col) {
 			(void) remargin(orig_col);
 		}
 		break;
@@ -3712,7 +3871,7 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
 		break;
 	}
 
-	screen_disp(session);
+	screen_disp();
 	return len;
 }
 
@@ -3723,19 +3882,19 @@ LIB3270_EXPORT int lib3270_emulate_input(H3270 *session, char *s, int len, int p
  * characters; if in 3270 mode, they are considered EBCDIC.
  *
  * Graphic Escapes are handled as \E.
- */ /*
+ */
 void
 hex_input(char *s)
 {
 	char *t;
 	Boolean escaped;
-#if defined(X3270_ANSI)
+#if defined(X3270_ANSI) /*[*/
 	unsigned char *xbuf = (unsigned char *)NULL;
 	unsigned char *tbuf = (unsigned char *)NULL;
 	int nbytes = 0;
-#endif
+#endif /*]*/
 
-	// Validate the string.
+	/* Validate the string. */
 	if (strlen(s) % 2) {
 		popup_an_error("%s: Odd number of characters in specification",
 		    action_name(HexString_action));
@@ -3747,9 +3906,9 @@ hex_input(char *s)
 	while (*t) {
 		if (isxdigit(*t) && isxdigit(*(t + 1))) {
 			escaped = False;
-#if defined(X3270_ANSI)
+#if defined(X3270_ANSI) /*[*/
 			nbytes++;
-#endif
+#endif /*]*/
 		} else if (!strncmp(t, "\\E", 2) || !strncmp(t, "\\e", 2)) {
 			if (escaped) {
 				popup_an_error("%s: Double \\E",
@@ -3779,13 +3938,13 @@ hex_input(char *s)
 		return;
 	}
 
-#if defined(X3270_ANSI)
-	// Allocate a temporary buffer.
+#if defined(X3270_ANSI) /*[*/
+	/* Allocate a temporary buffer. */
 	if (!IN_3270 && nbytes)
 		tbuf = xbuf = (unsigned char *)Malloc(nbytes);
-#endif
+#endif /*]*/
 
-	// Pump it in.
+	/* Pump it in. */
 	t = s;
 	escaped = False;
 	while (*t) {
@@ -3795,32 +3954,30 @@ hex_input(char *s)
 			c = (FROM_HEX(*t) * 16) + FROM_HEX(*(t + 1));
 			if (IN_3270)
 				key_Character(c, escaped, True, NULL);
-#if defined(X3270_ANSI)
+#if defined(X3270_ANSI) /*[*/
 			else
 				*tbuf++ = (unsigned char)c;
-#endif
+#endif /*]*/
 			escaped = False;
 		} else if (!strncmp(t, "\\E", 2) || !strncmp(t, "\\e", 2)) {
 			escaped = True;
 		}
 		t += 2;
 	}
-#if defined(X3270_ANSI)
+#if defined(X3270_ANSI) /*[*/
 	if (!IN_3270 && nbytes) {
 		net_hexansi_out(xbuf, nbytes);
 		Free(xbuf);
 	}
-#endif
+#endif /*]*/
 }
-*/
 
-/*
 void
 ignore_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
 {
+	action_debug(ignore_action, event, params, num_params);
 //	reset_idle_timer();
 }
-*/
 
 #if defined(X3270_FT) /*[*/
 /*
@@ -3839,16 +3996,16 @@ kybd_prime(void)
 	 * No point in trying if the screen isn't formatted, the keyboard
 	 * is locked, or we aren't in 3270 mode.
 	 */
-	if (!h3270.formatted || kybdlock || !IN_3270)
+	if (!formatted || kybdlock || !IN_3270)
 		return 0;
 
-	fa = get_field_attribute(&h3270,h3270.cursor_addr);
-	if (ea_buf[h3270.cursor_addr].fa || FA_IS_PROTECTED(fa)) {
+	fa = get_field_attribute(cursor_addr);
+	if (ea_buf[cursor_addr].fa || FA_IS_PROTECTED(fa)) {
 		/*
 		 * The cursor is not in an unprotected field.  Find the
 		 * next one.
 		 */
-		baddr = next_unprotected(h3270.cursor_addr);
+		baddr = next_unprotected(cursor_addr);
 
 		/* If there isn't any, give up. */
 		if (!baddr)
@@ -3857,7 +4014,7 @@ kybd_prime(void)
 		/* Move the cursor there. */
 	} else {
 		/* Already in an unprotected field.  Find its start. */
-		baddr = h3270.cursor_addr;
+		baddr = cursor_addr;
 		while (!ea_buf[baddr].fa) {
 			DEC_BA(baddr);
 		}
@@ -3882,7 +4039,7 @@ kybd_prime(void)
 /*
  * Translate a keysym name to a keysym, including APL and extended
  * characters.
- */ /*
+ */
 static KeySym
 MyStringToKeysym(char *s, enum keytype *keytypep)
 {
@@ -3891,8 +4048,7 @@ MyStringToKeysym(char *s, enum keytype *keytypep)
 	char *ptr;
 	unsigned char xc;
 
-
-#if defined(X3270_APL)
+#if defined(X3270_APL) /*[*/
 	if (!strncmp(s, "apl_", 4)) {
 		int is_ge;
 
@@ -3902,7 +4058,7 @@ MyStringToKeysym(char *s, enum keytype *keytypep)
 		else
 			*keytypep = KT_STD;
 	} else
-#endif
+#endif /*]*/
 	{
 		k = StringToKeysym(s);
 		*keytypep = KT_STD;
@@ -3927,7 +4083,7 @@ MyStringToKeysym(char *s, enum keytype *keytypep)
 			k &= 0xff;
 	}
 
-	// Allow arbitrary values, e.g., 0x03 for ^C.
+	/* Allow arbitrary values, e.g., 0x03 for ^C. */
 	if (k == NoSymbol &&
 	    (cc = strtoul(s, &ptr, 0)) > 0 &&
 	    cc < 0xff &&
@@ -3937,7 +4093,6 @@ MyStringToKeysym(char *s, enum keytype *keytypep)
 
 	return k;
 }
-*/
 
 /* Add a key to the extended association table. */
 void
@@ -3967,3 +4122,453 @@ clear_xks(void)
 	}
 }
 
+#if defined(X3270_DISPLAY)
+/*
+//
+//X-dependent code starts here.
+//
+
+//
+// Translate a keymap (from an XQueryKeymap or a KeymapNotify event) into
+// a bitmap of Shift, Meta or Alt keys pressed.
+//
+#define key_is_down(kc, bitmap) (kc && ((bitmap)[(kc)/8] & (1<<((kc)%8))))
+int
+state_from_keymap(char keymap[32])
+{
+	static Boolean	initted = False;
+	static KeyCode	kc_Shift_L, kc_Shift_R;
+	static KeyCode	kc_Meta_L, kc_Meta_R;
+	static KeyCode	kc_Alt_L, kc_Alt_R;
+	int	pseudo_state = 0;
+
+	if (!initted) {
+		kc_Shift_L = XKeysymToKeycode(display, XK_Shift_L);
+		kc_Shift_R = XKeysymToKeycode(display, XK_Shift_R);
+		kc_Meta_L  = XKeysymToKeycode(display, XK_Meta_L);
+		kc_Meta_R  = XKeysymToKeycode(display, XK_Meta_R);
+		kc_Alt_L   = XKeysymToKeycode(display, XK_Alt_L);
+		kc_Alt_R   = XKeysymToKeycode(display, XK_Alt_R);
+		initted = True;
+	}
+	if (key_is_down(kc_Shift_L, keymap) ||
+	    key_is_down(kc_Shift_R, keymap))
+		pseudo_state |= ShiftKeyDown;
+	if (key_is_down(kc_Meta_L, keymap) ||
+	    key_is_down(kc_Meta_R, keymap))
+		pseudo_state |= MetaKeyDown;
+	if (key_is_down(kc_Alt_L, keymap) ||
+	    key_is_down(kc_Alt_R, keymap))
+		pseudo_state |= AltKeyDown;
+	return pseudo_state;
+}
+#undef key_is_down
+
+//
+// Process shift keyboard events.  The code has to look for the raw Shift keys,
+// rather than using the handy "state" field in the event structure.  This is
+// because the event state is the state _before_ the key was pressed or
+// released.  This isn't enough information to distinguish between "left
+// shift released" and "left shift released, right shift still held down"
+// events, for example.
+//
+// This function is also called as part of Focus event processing.
+//
+void
+PA_Shift_action(Widget w unused, XEvent *event unused, String *params unused,
+    Cardinal *num_params unused)
+{
+	char	keys[32];
+
+#if defined(INTERNAL_ACTION_DEBUG)
+	action_debug(PA_Shift_action, event, params, num_params);
+#endif
+	XQueryKeymap(display, keys);
+	shift_event(state_from_keymap(keys));
+}
+*/
+#endif
+
+#if defined(X3270_DISPLAY) || defined(C3270) /*[*/
+/*
+static Boolean
+build_composites(void)
+{
+	char *c, *c0, *c1;
+	char *ln;
+	char ksname[3][64];
+	char junk[2];
+	KeySym k[3];
+	enum keytype a[3];
+	int i;
+	struct composite *cp;
+
+	if (appres.compose_map == CN) {
+		popup_an_error("%s: No %s defined", action_name(Compose_action),
+		    ResComposeMap);
+		return False;
+	}
+	c0 = get_fresource("%s.%s", ResComposeMap, appres.compose_map);
+	if (c0 == CN) {
+		popup_an_error("%s: Cannot find %s \"%s\"",
+		    action_name(Compose_action), ResComposeMap,
+		    appres.compose_map);
+		return False;
+	}
+	c1 = c = NewString(c0);	// will be modified by strtok
+	while ((ln = strtok(c, "\n"))) {
+		Boolean okay = True;
+
+		c = NULL;
+		if (sscanf(ln, " %63[^+ \t] + %63[^= \t] =%63s%1s",
+		    ksname[0], ksname[1], ksname[2], junk) != 3) {
+			popup_an_error("%s: Invalid syntax: %s",
+			    action_name(Compose_action), ln);
+			continue;
+		}
+		for (i = 0; i < 3; i++) {
+			k[i] = MyStringToKeysym(ksname[i], &a[i]);
+			if (k[i] == NoSymbol) {
+				popup_an_error("%s: Invalid KeySym: \"%s\"",
+				    action_name(Compose_action), ksname[i]);
+				okay = False;
+				break;
+			}
+		}
+		if (!okay)
+			continue;
+		composites = (struct composite *) Realloc((char *)composites,
+		    (n_composites + 1) * sizeof(struct composite));
+		cp = composites + n_composites;
+		cp->k1.keysym = k[0];
+		cp->k1.keytype = a[0];
+		cp->k2.keysym = k[1];
+		cp->k2.keytype = a[1];
+		cp->translation.keysym = k[2];
+		cp->translation.keytype = a[2];
+		n_composites++;
+	}
+	Free(c1);
+	return True;
+}
+*/
+
+/*
+ * Called by the toolkit when the "Compose" key is pressed.  "Compose" is
+ * implemented by pressing and releasing three keys: "Compose" and two
+ * data keys.  For example, "Compose" "s" "s" gives the German "ssharp"
+ * character, and "Compose" "C", "," gives a capital "C" with a cedilla
+ * (symbol Ccedilla).
+ *
+ * The mechanism breaks down a little when the user presses "Compose" and
+ * then a non-data key.  Oh well.
+ */ /*
+void
+Compose_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_debug(Compose_action, event, params, num_params);
+//	reset_idle_timer();
+
+	if (!composites && !build_composites())
+		return;
+
+	if (composing == NONE) {
+		composing = COMPOSE;
+		status_compose(True, 0, KT_STD);
+	}
+} */
+#endif /*]*/
+
+#if defined(X3270_DISPLAY) /*[*/
+
+/*
+ * Called by the toolkit for any key without special actions.
+ */ /*
+void
+Default_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	XKeyEvent	*kevent = (XKeyEvent *)event;
+	char		buf[32];
+	KeySym		ks;
+	int		ll;
+
+	action_debug(Default_action, event, params, num_params);
+	switch (event->type) {
+	    case KeyPress:
+#if defined(X3270_DBCS)
+		if (!xim_lookup((XKeyEvent *)event))
+			return;
+#endif
+		ll = XLookupString(kevent, buf, 32, &ks, (XComposeStatus *) 0);
+		if (ll == 1) {
+			// Add Meta; XLookupString won't.
+			if (event_is_meta(kevent->state))
+				buf[0] |= 0x80;
+			// Remap certain control characters.
+			if (!IN_ANSI) switch (buf[0]) {
+			    case '\t':
+				action_internal(Tab_action, IA_DEFAULT, CN, CN);
+				break;
+			   case '\177':
+				action_internal(Delete_action, IA_DEFAULT, CN,
+				    CN);
+				break;
+			    case '\b':
+				action_internal(Erase_action, IA_DEFAULT,
+				    CN, CN);
+				break;
+			    case '\r':
+				action_Enter();
+//				action_internal(Enter_action, IA_DEFAULT, CN, CN);
+				break;
+			    case '\n':
+				action_internal(Newline_action, IA_DEFAULT, CN,
+				    CN);
+				break;
+			    default:
+				key_ACharacter((unsigned char) buf[0], KT_STD,
+				    IA_DEFAULT, NULL);
+				break;
+			} else {
+				key_ACharacter((unsigned char) buf[0], KT_STD,
+				    IA_DEFAULT, NULL);
+			}
+			return;
+		}
+
+		// Pick some other reasonable defaults.
+		switch (ks) {
+		    case XK_Up:
+			action_internal(Up_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_Down:
+			action_internal(Down_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_Left:
+			action_internal(Left_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_Right:
+			action_internal(Right_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_Insert:
+#if defined(XK_KP_Insert)
+		    case XK_KP_Insert:
+#endif
+			action_internal(Insert_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_Delete:
+			action_internal(Delete_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_Home:
+			action_internal(Home_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_Tab:
+			action_internal(Tab_action, IA_DEFAULT, CN, CN);
+			break;
+#if defined(XK_ISO_Left_Tab)
+		    case XK_ISO_Left_Tab:
+			action_internal(BackTab_action, IA_DEFAULT, CN, CN);
+			break;
+#endif
+		    case XK_Clear:
+			action_internal(Clear_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_Sys_Req:
+			action_internal(SysReq_action, IA_DEFAULT, CN, CN);
+			break;
+#if defined(XK_EuroSign)
+		    case XK_EuroSign:
+			action_internal(Key_action, IA_DEFAULT, "currency",
+				CN);
+			break;
+#endif
+
+#if defined(XK_3270_Duplicate)
+		    // Funky 3270 keysyms.
+		    case XK_3270_Duplicate:
+			action_internal(Dup_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_3270_FieldMark:
+			action_internal(FieldMark_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_3270_Right2:
+			action_internal(Right2_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_3270_Left2:
+			action_internal(Left2_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_3270_BackTab:
+			action_internal(BackTab_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_3270_EraseEOF:
+			action_internal(EraseEOF_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_3270_EraseInput:
+			action_internal(EraseInput_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_3270_Reset:
+			action_internal(Reset_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_3270_PA1:
+			action_internal(PA_action, IA_DEFAULT, "1", CN);
+			break;
+		    case XK_3270_PA2:
+			action_internal(PA_action, IA_DEFAULT, "2", CN);
+			break;
+		    case XK_3270_PA3:
+			action_internal(PA_action, IA_DEFAULT, "3", CN);
+			break;
+		    case XK_3270_Attn:
+			action_internal(Attn_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_3270_AltCursor:
+			action_internal(AltCursor_action, IA_DEFAULT, CN, CN);
+			break;
+		    case XK_3270_CursorSelect:
+			action_internal(CursorSelect_action, IA_DEFAULT, CN,
+			    CN);
+			break;
+		    case XK_3270_Enter:
+			action_Enter();
+//			action_internal(Enter_action, IA_DEFAULT, CN, CN);
+			break;
+#endif
+
+#if defined(X3270_APL)
+		    // Funky APL keysyms.
+		    case XK_downcaret:
+			action_internal(Key_action, IA_DEFAULT, "apl_downcaret",
+			    CN);
+			break;
+		    case XK_upcaret:
+			action_internal(Key_action, IA_DEFAULT, "apl_upcaret",
+			    CN);
+			break;
+		    case XK_overbar:
+			action_internal(Key_action, IA_DEFAULT, "apl_overbar",
+			    CN);
+			break;
+		    case XK_downtack:
+			action_internal(Key_action, IA_DEFAULT, "apl_downtack",
+			    CN);
+			break;
+		    case XK_upshoe:
+			action_internal(Key_action, IA_DEFAULT, "apl_upshoe",
+			    CN);
+			break;
+		    case XK_downstile:
+			action_internal(Key_action, IA_DEFAULT, "apl_downstile",
+			    CN);
+			break;
+		    case XK_underbar:
+			action_internal(Key_action, IA_DEFAULT, "apl_underbar",
+			    CN);
+			break;
+		    case XK_jot:
+			action_internal(Key_action, IA_DEFAULT, "apl_jot", CN);
+			break;
+		    case XK_quad:
+			action_internal(Key_action, IA_DEFAULT, "apl_quad", CN);
+			break;
+		    case XK_uptack:
+			action_internal(Key_action, IA_DEFAULT, "apl_uptack",
+			    CN);
+			break;
+		    case XK_circle:
+			action_internal(Key_action, IA_DEFAULT, "apl_circle",
+			    CN);
+			break;
+		    case XK_upstile:
+			action_internal(Key_action, IA_DEFAULT, "apl_upstile",
+			    CN);
+			break;
+		    case XK_downshoe:
+			action_internal(Key_action, IA_DEFAULT, "apl_downshoe",
+			    CN);
+			break;
+		    case XK_rightshoe:
+			action_internal(Key_action, IA_DEFAULT, "apl_rightshoe",
+			    CN);
+			break;
+		    case XK_leftshoe:
+			action_internal(Key_action, IA_DEFAULT, "apl_leftshoe",
+			    CN);
+			break;
+		    case XK_lefttack:
+			action_internal(Key_action, IA_DEFAULT, "apl_lefttack",
+			    CN);
+			break;
+		    case XK_righttack:
+			action_internal(Key_action, IA_DEFAULT, "apl_righttack",
+			    CN);
+			break;
+#endif
+
+		    default:
+			if (ks >= XK_F1 && ks <= XK_F24) {
+				(void) sprintf(buf, "%ld", ks - XK_F1 + 1);
+				action_internal(PF_action, IA_DEFAULT, buf, CN);
+#if defined(XK_CYRILLIC)
+			} else if (ks == XK_Cyrillic_io ||
+				   ks == XK_Cyrillic_IO ||
+				   (ks >= XK_Cyrillic_yu &&
+				    ks <= XK_Cyrillic_HARDSIGN)) {
+				// Map XK to KOI8-R.
+				(void) sprintf(buf, "%ld", ks & 0xff);
+				action_internal(Key_action, IA_DEFAULT, buf,
+						CN);
+#endif
+			} else if (xk_selector && ((ks >> 8) == xk_selector)) {
+				key_ACharacter((unsigned char)(ks & 0xff),
+						KT_STD, IA_KEY, NULL);
+			} else
+				trace_event(" %s: dropped (unknown keysym)\n",
+				    action_name(Default_action));
+			break;
+		}
+		break;
+
+	    case ButtonPress:
+	    case ButtonRelease:
+		trace_event(" %s: dropped (no action configured)\n",
+		    action_name(Default_action));
+		break;
+	    default:
+		trace_event(" %s: dropped (unknown event type)\n",
+		    action_name(Default_action));
+		break;
+	}
+}
+*/
+
+/*
+ * Set or clear a temporary keymap.
+ *
+ *   TemporaryKeymap(x)		toggle keymap "x" (add "x" to the keymap, or if
+ *				"x" was already added, remove it)
+ *   TemporaryKeymap()		removes the previous keymap, if any
+ *   TemporaryKeymap(None)	removes the previous keymap, if any
+ */ /*
+void
+TemporaryKeymap_action(Widget w unused, XEvent *event, String *params, Cardinal *num_params)
+{
+	action_debug(TemporaryKeymap_action, event, params, num_params);
+//	reset_idle_timer();
+
+	if (check_usage(TemporaryKeymap_action, *num_params, 0, 1) < 0)
+		return;
+
+	if (*num_params == 0 || !strcmp(params[0], "None")) {
+		(void) temporary_keymap(CN);
+		return;
+	}
+
+	if (temporary_keymap(params[0]) < 0) {
+		popup_an_error("%s: Can't find %s %s",
+		    action_name(TemporaryKeymap_action), ResKeymap, params[0]);
+//		cancel_if_idle_command();
+	}
+}
+*/
+
+#endif /*]*/

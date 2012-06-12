@@ -135,11 +135,11 @@
 #define QR_IMP_PART	0xa6	/* implicit partition */
 #define QR_NULL		0xff	/* null */
 
-#define BA_TO_ROW(ba)		((ba) / h3270.cols)
-#define BA_TO_COL(ba)		((ba) % h3270.cols)
-#define ROWCOL_TO_BA(r,c)	(((r) * h3270.cols) + c)
-#define INC_BA(ba)		{ (ba) = ((ba) + 1) % (h3270.cols * h3270.rows); }
-#define DEC_BA(ba)		{ (ba) = (ba) ? (ba - 1) : ((h3270.cols*h3270.rows) - 1); }
+#define BA_TO_ROW(ba)		((ba) / COLS)
+#define BA_TO_COL(ba)		((ba) % COLS)
+#define ROWCOL_TO_BA(r,c)	(((r) * COLS) + c)
+#define INC_BA(ba)		{ (ba) = ((ba) + 1) % (COLS * ROWS); }
+#define DEC_BA(ba)		{ (ba) = (ba) ? (ba - 1) : ((COLS*ROWS) - 1); }
 
 /* Field attributes. */
 #define FA_PRINTABLE	0xc0	/* these make the character "printable" */
@@ -313,17 +313,17 @@
 #define EBC_dup		0x1c
 #define EBC_fm		0x1e
 #define EBC_space	0x40
-#define EBC_nobreakspace 0x41
-#define EBC_period	0x4b
-#define EBC_ampersand	0x50
+#define EBC_nobreakspace 0x41   
+#define EBC_period	0x4b    
+#define EBC_ampersand	0x50    
 #define EBC_underscore	0x6d
-#define EBC_greater	0x6e
-#define EBC_question	0x6f
+#define EBC_greater	0x6e    
+#define EBC_question	0x6f    
 #define EBC_Yacute	0xad
 #define EBC_diaeresis	0xbd
 #define EBC_minus	0xca
-#define EBC_0		0xf0
-#define EBC_9		0xf9
+#define EBC_0		0xf0    
+#define EBC_9		0xf9    
 #define EBC_eo		0xff
 
 /* BIND definitions. */

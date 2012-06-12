@@ -65,7 +65,7 @@
 
 	Trace("Status: %d",query_3270_terminal_status());
 
- 	if(query_3270_terminal_status() != LIB3270_STATUS_BLANK)
+ 	if(query_3270_terminal_status() != STATUS_CODE_BLANK)
 		return RetValue(Retstr,EINVAL);
 
 	switch(Argc)
@@ -100,7 +100,7 @@
 
 	Trace("Status: %d",query_3270_terminal_status());
 
-	return RetValue(Retstr,query_3270_terminal_status() == LIB3270_STATUS_BLANK ? 0 : EINVAL);
+	return RetValue(Retstr,query_3270_terminal_status() == STATUS_CODE_BLANK ? 0 : EINVAL);
  }
 
  RexxReturnCode REXXENTRY rx3270FindFieldAttribute(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
@@ -108,7 +108,7 @@
 	if(Argc != 1)
 		return RXFUNC_BADCALL;
 
-	return RetValue(Retstr,find_field_attribute(NULL,atoi(Argv[0].strptr)));
+	return RetValue(Retstr,find_field_attribute(atoi(Argv[0].strptr)));
  }
 
  RexxReturnCode REXXENTRY rx3270FindFieldLength(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
@@ -116,7 +116,7 @@
 	if(Argc != 1)
 		return RXFUNC_BADCALL;
 
-	return RetValue(Retstr,find_field_length(NULL,atoi(Argv[0].strptr)));
+	return RetValue(Retstr,find_field_length(atoi(Argv[0].strptr)));
  }
 
 /*----------------------------------------------------------------------------*/
@@ -174,18 +174,34 @@ RexxReturnCode REXXENTRY rx3270SetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 /*----------------------------------------------------------------------------*/
 RexxReturnCode REXXENTRY rx3270QueryScreenAttribute(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
 {
-	if(!g_ascii_strcasecmp(Argv[0].strptr,"SCREEN_COLS"))
-	{
-		ReturnValue(ctlr_get_cols());
-	}
-	else if(!g_ascii_strcasecmp(Argv[0].strptr,"SCREEN_ROWS"))
-	{
-		ReturnValue(ctlr_get_rows());
-	}
-	else if(!g_ascii_strcasecmp(Argv[0].strptr,"CURSOR_ADDR"))
-	{
-		ReturnValue(cursor_get_addr());
-	}
+    static const struct _attr
+    {
+        const char *name;
+        int (*call)(void);
+    } attr[] =
+    {
+        {   "SCREEN_COLS",  ctlr_get_cols   },
+        {   "SCREEN_ROWS",  ctlr_get_rows   },
+        {   "CURSOR_ADDR",  cursor_get_addr }
+    };
+
+    int f;
+    int sz;
+
+    if(Argc != 1)
+        return RXFUNC_BADCALL;
+
+    sz = strlen(Argv[0].strptr);
+
+    for(f=0;f < G_N_ELEMENTS(attr); f++)
+    {
+        if(!g_ascii_strncasecmp(Argv[0].strptr,attr[f].name,sz))
+        {
+            f = attr[f].call();
+            ReturnValue(f);
+        }
+    }
+
 
     ReturnValue(-1);
 }
@@ -307,7 +323,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 		{
 			rc = ECANCELED;
 		}
-		else if(query_3270_terminal_status() == LIB3270_STATUS_BLANK)
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 		{
 			screen_read(buffer,start,sz);
 			*(buffer+sz) = 0;
@@ -445,12 +461,20 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 
 	if(!PCONNECTED)
 		rc = ENOTCONN;
-	else if(query_3270_terminal_status() != LIB3270_STATUS_BLANK)
+	else if(query_3270_terminal_status() != STATUS_CODE_BLANK)
 		rc = EINVAL;
 	else
 		rc = lib3270_enter();
 
-	RunPendingEvents(1);
+	if(!rc)
+	{
+		// Enter was sent, wait for screen changes
+		int last = query_screen_change_counter();
+		time_t tm = time(0)+1;
+
+		while(last == query_screen_change_counter() && time(0) < tm)
+			RunPendingEvents(1);
+	}
 
 	ReturnValue(rc);
  }
@@ -477,7 +501,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 
 	if(!PCONNECTED)
 		rc = ENOTCONN;
-	else if(query_3270_terminal_status() != LIB3270_STATUS_BLANK)
+	else if(query_3270_terminal_status() != STATUS_CODE_BLANK)
 		rc = EINVAL;
 	else
 		rc = lib3270_pfkey(atoi(Argv[0].strptr));
@@ -485,7 +509,11 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 	if(!rc)
 	{
 		// Key was sent, wait for screen changes
-		RunPendingEvents(1);
+		int last = query_screen_change_counter();
+		time_t tm = time(0)+1;
+
+		while(last == query_screen_change_counter() && time(0) < tm)
+			RunPendingEvents(1);
 	}
 
 	ReturnValue(rc);
@@ -493,9 +521,9 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
-/* Rexx External Function: rx3270WaitForCtrlrDone                             */
+/* Rexx External Function: rx3270WaitForChanges                               */
 /*                                                                            */
-/* Description: Wait for next screen                                          */
+/* Description: Wait until the screen changes.                                */
 /*                                                                            */
 /* Rexx Args:	Timeout in seconds  (None to default to 60 seconds)           */
 /*                                                                            */
@@ -503,9 +531,9 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
- RexxReturnCode REXXENTRY rx3270WaitForCtlrDone(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
+ RexxReturnCode REXXENTRY rx3270WaitForChanges(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr)
  {
- 	int 			last = query_counter(COUNTER_ID_CTLR_DONE);
+ 	int 			last;
  	int				rc  = 0;
  	int 			end = time(0);
 
@@ -523,7 +551,9 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 		return RXFUNC_BADCALL;
 	}
 
-	while(!rc && last == query_counter(COUNTER_ID_CTLR_DONE))
+	last = query_screen_change_counter();
+
+	while(!rc && last == query_screen_change_counter())
 	{
 		if(!CONNECTED)
 			rc = ENOTCONN;
@@ -649,7 +679,7 @@ RexxReturnCode REXXENTRY rx3270GetCursorPosition(PSZ Name, LONG Argc, RXSTRING A
 		{
 			rc = ECANCELED;
 		}
-		else if(query_3270_terminal_status() == LIB3270_STATUS_BLANK)
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 		{
 			screen_read(buffer,pos,sz);
 			*(buffer+(sz+1)) = 0;
@@ -685,7 +715,7 @@ RexxReturnCode REXXENTRY rx3270IsTerminalReady(PSZ Name, LONG Argc, RXSTRING Arg
     if(Argc)
 		return RXFUNC_BADCALL;
 
-	if(!CONNECTED || query_3270_terminal_status() != LIB3270_STATUS_BLANK)
+	if(!CONNECTED || query_3270_terminal_status() != STATUS_CODE_BLANK)
 	{
 		ReturnValue(0);
 	}
@@ -735,7 +765,7 @@ RexxReturnCode REXXENTRY rx3270IsTerminalReady(PSZ Name, LONG Argc, RXSTRING Arg
             rc = ENOTCONN;
 		else if(IsHalted())
 			rc = ECANCELED;
-		else if(query_3270_terminal_status() == LIB3270_STATUS_BLANK)
+		else if(query_3270_terminal_status() == STATUS_CODE_BLANK)
 			rc = 0;
 	}
 

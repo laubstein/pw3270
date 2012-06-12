@@ -49,7 +49,7 @@
 #include <sys/types.h>
 #include <errno.h>
 
-#include <lib3270.h>
+#include <lib3270/api.h>
 
 #if defined(_WIN32) /*[*/
 
@@ -595,7 +595,7 @@ NewString(const char *s)
 */
 
 static struct {
-	const char *name;
+	/*const*/ char *name;	/* not const because of ancient X11 API */
 	KeySym keysym;
 } latin1[] = {
 	{ "space", XK_space },
@@ -824,7 +824,6 @@ StringToKeysym(char *s)
 	return NoSymbol;
 }
 
-/*
 char *
 KeysymToString(KeySym k)
 {
@@ -836,7 +835,6 @@ KeysymToString(KeySym k)
 	}
 	return (char *)NULL;
 }
-*/
 
 /* Timeouts. */
 
@@ -882,9 +880,7 @@ void RemoveInput(unsigned long id)
 		callbacks->RemoveInput(id);
 }
 
-#define Register3270IOCallbacks(x) lib3270_register_io_handlers(x)
-
-int LIB3270_EXPORT lib3270_register_io_handlers(const struct lib3270_io_callbacks *cbk)
+int Register3270IOCallbacks(const struct lib3270_io_callbacks *cbk)
 {
 	if(!cbk)
 		return EINVAL;
@@ -897,83 +893,17 @@ int LIB3270_EXPORT lib3270_register_io_handlers(const struct lib3270_io_callback
 
 }
 
-LIB3270_EXPORT LIB3270_CSTATE lib3270_get_connection_state(H3270 *h)
+LIB3270_EXPORT enum cstate QueryCstate(void)
 {
-	CHECK_SESSION_HANDLE(h);
-	return h->cstate;
+	return cstate;
 }
 
-LIB3270_EXPORT int lib3270_pconnected(H3270 *h)
+int CallAndWait(int(*callback)(void *),void *parm)
 {
-	CHECK_SESSION_HANDLE(h);
-	return (((int) h->cstate) >= (int)RESOLVING);
-}
-
-LIB3270_EXPORT int lib3270_half_connected(H3270 *h)
-{
-	CHECK_SESSION_HANDLE(h);
-	return (h->cstate == RESOLVING || h->cstate == PENDING);
-}
-
-LIB3270_EXPORT int lib3270_connected(H3270 *h)
-{
-	CHECK_SESSION_HANDLE(h);
-	return ((int) h->cstate >= (int)CONNECTED_INITIAL);
-}
-
-LIB3270_EXPORT int lib3270_in_neither(H3270 *h)
-{
-	CHECK_SESSION_HANDLE(h);
-	return (h->cstate == CONNECTED_INITIAL);
-}
-
-LIB3270_EXPORT int lib3270_in_ansi(H3270 *h)
-{
-	CHECK_SESSION_HANDLE(h);
-	return (h->cstate == CONNECTED_ANSI || h->cstate == CONNECTED_NVT);
-}
-
-LIB3270_EXPORT int lib3270_in_3270(H3270 *h)
-{
-	CHECK_SESSION_HANDLE(h);
-	return (h->cstate == CONNECTED_3270 || h->cstate == CONNECTED_TN3270E || h->cstate == CONNECTED_SSCP);
-}
-
-LIB3270_EXPORT int lib3270_in_sscp(H3270 *h)
-{
-	CHECK_SESSION_HANDLE(h);
-	return (h->cstate == CONNECTED_SSCP);
-}
-
-LIB3270_EXPORT int lib3270_in_tn3270e(H3270 *h)
-{
-	CHECK_SESSION_HANDLE(h);
-	return (h->cstate == CONNECTED_TN3270E);
-}
-
-LIB3270_EXPORT int lib3270_in_e(H3270 *h)
-{
-	CHECK_SESSION_HANDLE(h);
-	return (h->cstate >= CONNECTED_INITIAL_E);
-}
-
-LIB3270_EXPORT int lib3270_call_thread(int(*callback)(H3270 *h, void *), H3270 *h, void *parm)
-{
-	int rc;
-	CHECK_SESSION_HANDLE(h);
-
-	if(h->set_timer)
-		h->set_timer(h,1);
-
-	if(callbacks->callthread)
-		rc = callbacks->callthread(callback,h,parm);
+	if(callbacks->CallAndWait)
+		return callbacks->CallAndWait(callback,parm);
 	else
-		rc = callback(h,parm);
-
-	if(h->set_timer)
-		h->set_timer(h,0);
-
-	return rc;
+		return callback(parm);
 }
 
 void RunPendingEvents(int wait)

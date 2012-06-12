@@ -91,18 +91,18 @@
 
  void update_cursor_info(void)
  {
- 	int row = cursor_position / screen->cols;
- 	int col = cursor_position % screen->cols;
+ 	int row = cursor_position / terminal_cols;
+ 	int col = cursor_position % terminal_cols;
 
-	rCursor.x 		= view.left + (col * terminal_font_info.width);
-	rCursor.y 		= view.top + (row * terminal_font_info.spacing);
+	rCursor.x 		= left_margin + (col * terminal_font_info.width);
+	rCursor.y 		= top_margin + (row * terminal_font_info.spacing);
 	rCursor.width 	= fontWidth;
 	rCursor.height	= terminal_font_info.height;
  }
 
- void update_cursor_position(H3270 *session, unsigned short row, unsigned short col, unsigned char c, unsigned short attr)
+ void update_cursor_position(int row, int col)
  {
- 	int addr = (row * screen->cols) + col;
+ 	int addr = (row * terminal_cols) + col;
 
 	if(addr == cursor_position)
 		return;

@@ -33,11 +33,9 @@ extern void action_debug(XtActionProc action, XEvent *event, String *params,
 extern void action_init(void);
 extern void action_internal(XtActionProc action, enum iaction cause,
     const char *parm1, const char *parm2);
-
-#define action_name(x)  #x
-// extern const char *action_name(XtActionProc action);
-// extern int check_usage(XtActionProc action, Cardinal nargs, Cardinal nargs_min, Cardinal nargs_max);
-
+extern const char *action_name(XtActionProc action);
+extern int check_usage(XtActionProc action, Cardinal nargs, Cardinal nargs_min,
+    Cardinal nargs_max);
 extern Boolean event_is_meta(int state);
 
 

@@ -83,7 +83,7 @@
 	LOCAL_EXTERN gboolean		  oia_caps_state;
 #endif // HAVE_CAPS_STATE
 
-	LOCAL_EXTERN LIB3270_STATUS	  terminal_message_id;
+	LOCAL_EXTERN STATUS_CODE	  terminal_message_id;
 
 	LOCAL_EXTERN SCRIPT_STATE 	  oia_script_state;
 	LOCAL_EXTERN gboolean		  oia_script_blink;

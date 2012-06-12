@@ -54,7 +54,7 @@
 
  } UI_ELEMENT;
 
- #ifdef HAVE_IGEMAC
+ #ifdef MAC_INTEGRATION
 	/**
 	 * Name of the <menuitem> elements that will be moved for mac application menu.
 	 */
@@ -71,28 +71,18 @@
 
 	GHashTable	 	* menubar;									/**< List of active menu bars */
 	GHashTable	 	* menu;										/**< List of active menus */
-	GHashTable	 	* menuitem;									/**< List of active menu items */
 
 	GHashTable	 	* toolbar;									/**< List of active toolbars */
 	GHashTable 		* tool;										/**< List of active toolbar items */
 
 	GtkAccelGroup	* accel_group;								/**< Accelerators */
 
-#ifdef HAVE_DOCK
-	#define POPUP_MENU_DOCK POPUP_MENU_COUNT
-	 UI_ELEMENT		* popup_menu[POPUP_MENU_DOCK+1];			/**< Popup Menus */
-	 GtkWidget		* popup_menu_widget[POPUP_MENU_DOCK+1];		/**< Popup Menus Widgets */
-#else
-	UI_ELEMENT		* popup_menu[POPUP_MENU_COUNT];				/**< Popup Menus */
-	GtkWidget		* popup_menu_widget[POPUP_MENU_COUNT];		/**< Popup Menus Widgets */
-#endif // HAVE_DOCK
-	 
-#ifdef HAVE_IGEMAC
+#ifdef MAC_INTEGRATION
 	GtkMenuShell	* top_menu;									/**< Mac OSX top menu */
 	GtkMenuItem		* quit_menu;								/**< Quit menu widget */
 	GtkMenuItem		* app_menu[G_N_ELEMENTS(app_menu_item)];	/**< Standard menu item elements on the mac application menu */
 	GList			* sys_menu;									/**< Extra menu elements on the mac application menu */
-#endif // HAVE_IGEMAC
+#endif // MAC_INTEGRATION
 
 	int				  ignore;									/**< Non 0 if subtree is disabled */
 
@@ -140,7 +130,7 @@
 	gchar			* name;
  	const gchar		* action_name	= get_xml_attribute(names,values,"action");
 	const gchar		* label			= get_xml_attribute(names,values,"label");
-	const gchar		* group_name	= get_xml_attribute(names,values,"group");
+	const gchar		* group_name	=  get_xml_attribute(names,values,"group");
 	GtkActionGroup	* group			= NULL;
 	GtkAction		* ret;
  	int				  f;
@@ -188,9 +178,14 @@
 			stock = g_strdup_printf("gtk-%s",icon);
 
 		if(label)
+		{
 			label = gettext(label);
-		else if(!stock)
-			label = gettext(name);
+		}
+		else
+		{
+			if(!stock)
+				label = gettext(name);
+		}
 
 		if(id >= 0)
 			toggle = rule[id].toggle;
@@ -260,12 +255,6 @@
 
  }
 
- static UI_ELEMENT * skip_block(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
- {
-	state->ignore++;
-	return NULL;
- }
-
  static UI_ELEMENT *create_element(size_t sz, const gchar *element_name, const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
  	UI_ELEMENT *ret = NULL;
@@ -310,80 +299,20 @@
 //		Trace("Menu created: %s widget=%p",el->name,el->widget);
  	}
 
-#ifdef HAVE_IGEMAC
+#ifdef MAC_INTEGRATION
 	{
 		const gchar *ptr = get_xml_attribute(names,values,"topmenu");
 		if(ptr && !g_strcasecmp("yes",ptr))
 			state->top_menu = GTK_MENU_SHELL(el->widget);
 	}
-#endif // HAVE_IGEMAC
+#endif // MAC_INTEGRATION
 
 
 	return el;
 
  }
 
- static UI_ELEMENT * start_popup(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
- {
- 	UI_ELEMENT		* el	= NULL;
- 	const gchar	* name	= get_xml_attribute(names,values,"name");
- 	const gchar	* type	= get_xml_attribute(names,values,"type");
- 	int				  id	= POPUP_MENU_DEFAULT;
-
-	if(!name)
-	{
-	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,"%s",_( "Can't accept unnamed popup menu"));
-		return NULL;
-	}
-
-	if(type)
-	{
-		static const gchar *id_name[] = { "default", "selection", "dock" };
-		int f;
-
-		id = -1;
-
-		for(f=0;id < 0 || f > G_N_ELEMENTS(id_name);f++)
-		{
-			if(!g_strcasecmp(type,id_name[f]))
-				id = f;
-		}
-
-		if(id >= G_N_ELEMENTS(state->popup_menu))
-			return skip_block(names,values,state,error);
-
-		if(id < 0)
-		{
-			*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Unexpected popup menu type \"%s\""),type);
-			return NULL;
-
-		}
-	}
-
-	el = state->popup_menu[id];
-
-	if(!el)
-	{
-		if((el = create_element(sizeof(UI_ELEMENT),name,names,values,state,error)) == NULL)
-			return NULL;
-
-		state->popup_menu[id] = el;
-
-		if(el->action)
-			el->widget = gtk_action_create_menu(el->action);
-		else
-			el->widget = gtk_menu_new();
-
-		if(state->popup_menu_widget[id])
-			g_object_unref(state->popup_menu_widget[id]);
-
-		state->popup_menu_widget[id] = el->widget;
-	}
-
-	return el;
- }
-
-#ifdef HAVE_IGEMAC
+#ifdef MAC_INTEGRATION
  static void check_for_app_menu(const gchar *name, const gchar **names,const gchar **values, GtkWidget *widget, PARSER_STATE *state)
  {
 	const gchar *sysmenu = get_xml_attribute(names,values,"sysmenu");
@@ -404,7 +333,7 @@
 	state->sys_menu = g_list_prepend(state->sys_menu,GTK_MENU_ITEM(widget));
 
  }
-#endif // HAVE_IGEMAC
+#endif // MAC_INTEGRATION
 
  static UI_ELEMENT * start_menu(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
@@ -472,11 +401,11 @@
 		g_hash_table_insert(state->menu,(gpointer) el->name,el);
  	}
 
-#ifdef HAVE_IGEMAC
+#ifdef MAC_INTEGRATION
 	check_for_app_menu(el->name,names,values,el->widget,state);
 #else
 	gtk_widget_show(el->widget);
-#endif // HAVE_IGEMAC
+#endif // MAC_INTEGRATION
 
 	return el;
 
@@ -525,39 +454,25 @@
 			name = (const gchar *) (temp = g_strdup_printf("%s:%s",name,get_xml_attribute(names,values,"id")));
 	}
 
-	if(!(state->current && (GTK_IS_MENU_ITEM(state->current->widget) || GTK_IS_MENU(state->current->widget))))
-	{
-	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Menuitem \"%s\" is invalid at this context"), name);
+ 	if(!(state->current && GTK_IS_MENU_ITEM(state->current->widget)))
+ 	{
+	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Menuitem \"%s\" isn't inside a <menu>"), name);
 	 	g_free(temp);
 		return NULL;
-	}
+ 	}
 
  	el = (UI_ELEMENT *) g_hash_table_lookup(state->menu,name);
 
  	if(!el)
  	{
- 		// New menuitem action
+ 		// New menuitem
+		GtkWidget *menu = NULL;
+
 		if((el = create_element(sizeof(UI_ELEMENT),name,names,values,state,error)) == NULL)
 		{
 		 	g_free(temp);
 			return NULL;
 		}
-		g_hash_table_insert(state->menu,(gpointer) el->name,el);
- 	}
-
-	g_free(temp);
-	temp = NULL;
-
-	// Check for new menu item
-	temp = g_strdup_printf("%s:%s",state->current->name,el->name);
-	el->widget = g_hash_table_lookup(state->menuitem,temp);
-	if(el->widget)
-	{
-		g_free(temp);
-	}
-	else
-	{
-		GtkWidget *menu = state->current->widget;
 
 		if(el->action)
 		{
@@ -569,23 +484,18 @@
 			el->widget = gtk_menu_item_new_with_mnemonic(gettext(label ? label : el->name));
 		}
 
-		if(GTK_IS_MENU_ITEM(state->current->widget))
+		menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(state->current->widget));
+		if(!menu)
 		{
-			menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(state->current->widget));
-			if(!menu)
-			{
-				menu = gtk_menu_new();
-				gtk_menu_item_set_submenu(GTK_MENU_ITEM(GTK_MENU_ITEM(state->current->widget)),menu);
-			}
+			menu = gtk_menu_new();
+			gtk_menu_item_set_submenu(GTK_MENU_ITEM(GTK_MENU_ITEM(state->current->widget)),menu);
 		}
 
 		gtk_menu_shell_append((GtkMenuShell *) menu, el->widget);
+		g_hash_table_insert(state->menu,(gpointer) el->name,el);
 
-		g_hash_table_insert(state->menuitem,(gpointer) temp,el->widget);
-	}
+ 	}
 
-
-	// Check if the menu item has a folder definition
 	attr = (gchar *) get_xml_attribute(names,values,"folder");
 
  	if(attr)
@@ -641,12 +551,13 @@
 		g_free(path);
  	}
 
-#ifdef HAVE_IGEMAC
+#ifdef MAC_INTEGRATION
 	check_for_app_menu(el->name,names,values,el->widget,state);
 	if(!g_strcasecmp(el->name,"quit"))
 		state->quit_menu = GTK_MENU_ITEM(el->widget);
-#endif // HAVE_IGEMAC
+#endif // MAC_INTEGRATION
 
+	g_free(temp);
 	return el;
  }
 
@@ -654,7 +565,7 @@
  {
 	if(!(state->current && state->current->widget))
  	{
-	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Separator is invalid at this context: %s"),_( "no parent" ));
+	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,"%s",_( "Separator is invalid at this context (no parent)"));
 		return NULL;
  	}
 
@@ -678,15 +589,9 @@
 		gtk_widget_show(widget);
 		gtk_toolbar_insert(GTK_TOOLBAR(state->current->widget),GTK_TOOL_ITEM(widget),-1);
 	}
-	else if(GTK_IS_MENU_SHELL(state->current->widget))
- 	{
-		GtkWidget *widget = gtk_separator_menu_item_new();
-		gtk_widget_show(widget);
-		gtk_menu_shell_append((GtkMenuShell *) state->current->widget, widget);
- 	}
  	else
  	{
-	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,_( "Separator is invalid at this context: %s"),_( "unexpected parent" ));
+	 	*error = g_error_new(ERROR_DOMAIN,EINVAL,"%s",_( "Separator is invalid at this context (unexpected parent)"));
  	}
 
 	return NULL;
@@ -800,6 +705,12 @@
 	return el;
  }
 
+ static UI_ELEMENT * skip_block(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
+ {
+	state->ignore++;
+	return NULL;
+ }
+
  static UI_ELEMENT * start_accelerator(const gchar **names,const gchar **values, PARSER_STATE *state, GError **error)
  {
  	const gchar	*name = get_xml_attribute(names,values,"name");
@@ -902,7 +813,7 @@
 			{	"toolitem", 	start_toolitem		},
 
 			// Misc
-			{	"popup",		start_popup			},
+			{	"popup",		skip_block			},
 			{	"separator",	start_separator		},
 			{	"ui", 			start_dunno			},
 			{ 	"accelerator",	start_accelerator	},
@@ -1219,7 +1130,6 @@
 	PARSER_STATE 	  state;
 	GtkWidget		* hbox;
 	GtkWidget		* vbox;
-	int				  f;
 
 	// Initialize control data
 	memset(&state,0,sizeof(state));
@@ -1231,7 +1141,6 @@
 	state.toolbar 		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
 	state.tool	  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
 	state.menu	  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) 0, g_free);
-	state.menuitem		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) g_free, 0);
 	state.action  		= g_hash_table_new_full(g_str_hash, g_str_equal, (GDestroyNotify) g_free, g_object_unref);
 
 	// Parse
@@ -1245,19 +1154,6 @@
 
 	// Menu Items
 	g_hash_table_foreach(state.menu,(GHFunc) setup_menu, (gpointer) setup_table);
-
-	// Standard popup menus
-	for(f=0;f <= POPUP_MENU_SELECTION;f++)
-	{
-		if(popup_menu[f])
-			g_object_unref(popup_menu[f]);
-		popup_menu[f] = GTK_MENU(state.popup_menu_widget[f]);
-
-		Trace("popup_menu[%d]=%p",f,popup_menu[f]);
-	}
-
-	if(!popup_menu[POPUP_MENU_SELECTION])
-		popup_menu[POPUP_MENU_SELECTION] = popup_menu[POPUP_MENU_DEFAULT];
 
 	// Menubar(s)
 	g_hash_table_foreach(state.menubar,(GHFunc) pack_menubar, vbox);
@@ -1286,14 +1182,9 @@
 	// Update action group & accelerators
 	g_hash_table_foreach(state.action,(GHFunc) finish_action_setup, &state);
 
-#if defined(HAVE_IGEMAC) && defined(HAVE_DOCK)
-	 if(state.popup_menu_widget[POPUP_MENU_DOCK])
-		 gtk_osxapplication_set_dock_menu(osxapp,GTK_MENU_SHELL(state.popup_menu_widget[POPUP_MENU_DOCK]));
-#endif // HAVE_IGEMAC && HAVE_DOCK
-	 
-#ifdef HAVE_IGEMAC
+#ifdef MAC_INTEGRATION
 	Trace("%s: Top menu: %p app: %p",__FUNCTION__,state.top_menu,osxapp);
-	 
+
 	if(state.top_menu)
 	{
 		// Set application menu
@@ -1328,7 +1219,7 @@
 			gtk_widget_hide(GTK_WIDGET(state.quit_menu));
 
 	}
-#endif // HAVE_IGEMAC
+#endif // MAC_INTEGRATION
 
 
 	// Set accelerators
@@ -1336,14 +1227,25 @@
 	gtk_window_add_accel_group(GTK_WINDOW(state.window),state.accel_group);
 
 	// Release control data
-	Trace("Releasing %s","control data");
+	Trace("Releasing %p",state.accel_group);
 	g_object_unref(state.accel_group);
+
+	Trace("Releasing %p",state.menubar);
 	g_hash_table_unref(state.menubar);
-	g_hash_table_unref(state.menuitem);
+
+	Trace("Releasing %p",state.toolbar);
 	g_hash_table_unref(state.toolbar);
+
+	Trace("Releasing %p",state.tool);
 	g_hash_table_unref(state.tool);
+
+	Trace("Releasing %p",state.menu);
 	g_hash_table_unref(state.menu);
+
+	Trace("Releasing %p",state.action);
 	g_hash_table_unref(state.action);
+
+	Trace("Window: %p",state.window);
 
 	return state.window;
  }

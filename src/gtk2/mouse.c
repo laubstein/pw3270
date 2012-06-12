@@ -35,8 +35,8 @@
  #include "actions.h"
  #include "fonts.h"
 
-// #include <globals.h>
-// #include <lib3270/kybdc.h>
+ #include <globals.h>
+ #include <lib3270/kybdc.h>
  #include <lib3270/toggle.h>
  #include <lib3270/3270ds.h>
 
@@ -77,8 +77,9 @@
 
 /*---[ Globals ]--------------------------------------------------------------*/
 
- GtkMenu	* popup_menu[POPUP_MENU_COUNT]	= { NULL };
- int 		  drag_type						= DRAG_TYPE_NONE;
+ GtkWidget	*SelectionPopup		= 0;
+ GtkWidget	*DefaultPopup		= 0;
+ int 		drag_type			= DRAG_TYPE_NONE;
 
 /*---[ Implement ]------------------------------------------------------------*/
 
@@ -151,7 +152,7 @@
  {
  	int ret = 0;
 
-	if( !(*screen->content[baddr+1].ch == 'F' && FA_IS_PROTECTED(get_field_attribute(NULL,baddr))) )
+	if( !(*screen[baddr+1].ch == 'F' && FA_IS_PROTECTED(get_field_attribute(baddr))) )
 		return ret;
 
 	baddr++;
@@ -159,10 +160,10 @@
 	{
 		baddr++;
 
-		if(*screen->content[baddr].ch > '9' || *screen->content[baddr].ch < '0')
+		if(*screen[baddr].ch > '9' || *screen[baddr].ch < '0')
 			return 0;
 
-		ret = (ret*10)+(*screen->content[baddr].ch - '0');
+		ret = (ret*10)+(*screen[baddr].ch - '0');
 	}
 
 	Trace("%s: %d",__FUNCTION__,ret);
@@ -176,9 +177,9 @@
 		int start = cursor_position;
 		int end = start;
 		int length;
-		int sz = screen->rows * screen->cols;
+		int sz = terminal_rows * terminal_cols;
 
-		if(g_ascii_isspace(*screen->content[start].ch))
+		if(g_ascii_isspace(*screen[start].ch))
 		{
 			action_selectfield(0);
 			return;
@@ -186,10 +187,10 @@
 
 		SetSelection(FALSE);
 
-		while(start > 0 && !g_ascii_isspace(*screen->content[start].ch))
+		while(start > 0 && !g_ascii_isspace(*screen[start].ch))
 			start--;
 
-		while(end < sz && !g_ascii_isspace(*screen->content[end].ch))
+		while(end < sz && !g_ascii_isspace(*screen[end].ch))
 			end++;
 
 		length = end-start;
@@ -203,13 +204,13 @@
 		start++;
 		end--;
 
-		startRow = start / screen->cols;
-		startCol = start % screen->cols;
+		startRow = start / terminal_cols;
+		startCol = start % terminal_cols;
 
 		UpdateSelectedRegion(start,end);
 
-		endRow = end / screen->cols;
-		endCol = end % screen->cols;
+		endRow = end / terminal_cols;
+		endCol = end % terminal_cols;
 
 		SetSelectionMode(SELECT_MODE_WORD);
  	}
@@ -220,13 +221,13 @@
  {
  	if(valid_terminal_window())
  	{
-		int baddr = find_field_attribute(NULL,cursor_position);
-		int length = find_field_length(NULL,baddr);
+		int baddr = find_field_attribute(cursor_position);
+		int length = find_field_length(baddr);
 
 		SetSelection(FALSE);
 
-//		Trace("%s: %d %d",__FUNCTION__,length,((screen->rows * screen->cols) - baddr));
-//		if(length < 0 || length > ((screen->rows * screen->cols) - baddr))
+//		Trace("%s: %d %d",__FUNCTION__,length,((terminal_rows * terminal_cols) - baddr));
+//		if(length < 0 || length > ((terminal_rows * terminal_cols) - baddr))
 //			return;
 
 		if(length < 3)
@@ -236,14 +237,14 @@
 				return;
 		}
 
-		startRow = (baddr+1) / screen->cols;
-		startCol = (baddr+1) % screen->cols;
+		startRow = (baddr+1) / terminal_cols;
+		startCol = (baddr+1) % terminal_cols;
 
 		UpdateSelectedRegion(baddr+1,baddr+length);
 
 		baddr += length;
-		endRow = baddr / screen->cols;
-		endCol = baddr % screen->cols;
+		endRow = baddr / terminal_cols;
+		endCol = baddr % terminal_cols;
 
 		SetSelectionMode(SELECT_MODE_FIELD);
  	}
@@ -259,18 +260,18 @@
 	if(!screen)
 		return;
 
-	for(pos = 0; pos < (screen->rows * screen->cols);pos++)
+	for(pos = 0; pos < (terminal_rows * terminal_cols);pos++)
 	{
-		status = screen->content[pos].status & ELEMENT_STATUS_FIELD_MASK;
+		status = screen[pos].status & ELEMENT_STATUS_FIELD_MASK;
 		if(selected)
 			status |= ELEMENT_STATUS_SELECTED;
 
-		if(screen->content[pos].status != status)
+		if(screen[pos].status != status)
 		{
 			if(start < 0)
 				start = pos;
 			end = pos;
-			screen->content[pos].status = status;
+			screen[pos].status = status;
 		}
 	}
 
@@ -278,22 +279,22 @@
 	{
 		// Set selection borders
 		int first = 0;
-		int last  = (screen->rows-1)*screen->cols;
-		for(pos = 0;pos < screen->cols;pos++)
+		int last  = (terminal_rows-1)*terminal_cols;
+		for(pos = 0;pos < terminal_cols;pos++)
 		{
-			screen->content[first++].status |= SELECTION_BOX_TOP;
-			screen->content[last++].status |= SELECTION_BOX_BOTTOM;
+			screen[first++].status |= SELECTION_BOX_TOP;
+			screen[last++].status |= SELECTION_BOX_BOTTOM;
 		}
 
 		first = 0;
-		last = screen->cols-1;
+		last = terminal_cols-1;
 
-		for(pos = 0;pos < screen->rows;pos++)
+		for(pos = 0;pos < terminal_rows;pos++)
 		{
-			screen->content[first].status |= SELECTION_BOX_LEFT;
-			screen->content[last].status |= SELECTION_BOX_RIGHT;
-			first += screen->cols;
-			last += screen->cols;
+			screen[first].status |= SELECTION_BOX_LEFT;
+			screen[last].status |= SELECTION_BOX_RIGHT;
+			first += terminal_cols;
+			last += terminal_cols;
 		}
 	}
 
@@ -303,7 +304,7 @@
 		cairo_t *cr = get_terminal_cairo_context();
 		draw_region(cr,start,end,color,&r);
 		cairo_destroy(cr);
-		gtk_widget_queue_draw_area(terminal,view.left,view.top,view.cols*fontWidth,view.rows*terminal_font_info.spacing);
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*terminal_font_info.spacing);
 	}
  }
 
@@ -311,37 +312,35 @@
  {
  	int rc = 0;
 
- 	if(x < view.left)
+ 	if(x < left_margin)
  	{
  		*col = 0;
  		rc = -1;
  	}
-	else if(x > (view.left+(view.cols * fontWidth)))
+	else if(x > (left_margin+(terminal_cols * fontWidth)))
 	{
-		*col = view.cols-1;
+		*col = terminal_cols-1;
 		rc = -1;
 	}
 	else
 	{
-		*col = ((((unsigned long) x) - view.left)/fontWidth);
+		*col = ((((unsigned long) x) - left_margin)/fontWidth);
 	}
 
-	if(y < view.top)
+	if(y < top_margin)
 	{
 		*row = 0;
 		rc = -1;
 	}
-	else if(y > (view.top+(view.rows * terminal_font_info.spacing)))
+	else if(y > (top_margin+(terminal_rows * terminal_font_info.spacing)))
 	{
-		*row = view.rows-1;
+		*row = terminal_rows-1;
 		rc = -1;
 	}
 	else
 	{
-		*row = ((((unsigned long) y) - view.top)/terminal_font_info.spacing);
+		*row = ((((unsigned long) y) - top_margin)/terminal_font_info.spacing);
 	}
-
-//	Trace("%s x=%ld y=%ld r=%d c=%d",__FUNCTION__,x,y,*row,*col);
 
 	return rc;
  }
@@ -373,7 +372,7 @@
 				{
 					unselect();
 				}
-				else if(screen->content[(r*screen->cols)+c].status & ELEMENT_STATUS_SELECTED)
+				else if(screen[(r*terminal_cols)+c].status & ELEMENT_STATUS_SELECTED)
 				{
 					SetSelectionMode(SELECT_MODE_FIELD);
 				}
@@ -417,7 +416,7 @@
 		break;
 
 	case ((GDK_BUTTON_PRESS & 0x0F) << 4) | 3:
-		w = GTK_WIDGET(popup_menu[(select_mode == SELECT_MODE_NONE) ? POPUP_MENU_DEFAULT : POPUP_MENU_SELECTION]);
+		w = (select_mode == SELECT_MODE_NONE) ? DefaultPopup : SelectionPopup;
 		Trace("Button 2 clicked at %ld,%ld Menu: %p",(long) event->x, (long) event->y, w);
 		if(w)
 		{
@@ -463,8 +462,8 @@
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 1: // Single click on button 1
 		Trace("Single click (button: %d)",event->button);
 		unselect();
-		if(row >= 0 && row <= view.rows && col >= 0 && col <= view.cols)
-			cursor_move((row*view.cols)+col);
+		if(row >= 0 && row <= terminal_rows && col >= 0 && col <= terminal_cols)
+			cursor_move((row*terminal_cols)+col);
 		break;
 
 	case ((SELECT_MODE_NONE & 0x0F) << 4) | 2: // Single click on button 2
@@ -550,16 +549,16 @@
 		right = endCol;
 	}
 
-	for(row = 0; row < screen->rows;row++)
+	for(row = 0; row < terminal_rows;row++)
 	{
 		int scol	= -1;
 		int ecol	= -1;
 		int saddr	= -1;
 		int eaddr	= -1;
 
-		for(col = 0; col < screen->cols;col++)
+		for(col = 0; col < terminal_cols;col++)
 		{
-			unsigned char status = screen->content[pos].status & ELEMENT_STATUS_FIELD_MASK;
+			unsigned char status = screen[pos].status & ELEMENT_STATUS_FIELD_MASK;
 
 			if(col >= left && col <= right && row >= top && row <= bottom)
 			{
@@ -579,9 +578,9 @@
 
 			}
 
-			if(screen->content[pos].status != status)
+			if(screen[pos].status != status)
 			{
-				screen->content[pos].status = status;
+				screen[pos].status = status;
 
 				if(saddr < 0)
 				{
@@ -604,16 +603,16 @@
 		}
 	}
 
-	cursor_move((bottom*view.cols)+right);
+	cursor_move((bottom*terminal_cols)+right);
 
 	if(valid_terminal_window())
-		gtk_widget_queue_draw_area(terminal,view.left,view.top,view.cols*fontWidth,view.rows*terminal_font_info.spacing);
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*terminal_font_info.spacing);
 
  }
 
  static void UpdateSelectedText(void)
  {
- 	UpdateSelectedRegion((startRow * screen->cols)+startCol,(endRow * screen->cols)+endCol);
+ 	UpdateSelectedRegion((startRow * terminal_cols)+startCol,(endRow * terminal_cols)+endCol);
  }
 
  static void UpdateSelectedRegion(int bstart, int bend)
@@ -628,35 +627,35 @@
 		bend = temp;
  	}
 
-	for(row = 0; row < screen->rows;row++)
+	for(row = 0; row < terminal_rows;row++)
 	{
 		int saddr = -1;
 		int eaddr = -1;
 
-		for(col = 0; col < screen->cols;col++)
+		for(col = 0; col < terminal_cols;col++)
 		{
-			unsigned char status = screen->content[pos].status & ELEMENT_STATUS_FIELD_MASK;
+			unsigned char status = screen[pos].status & ELEMENT_STATUS_FIELD_MASK;
 
 			if (pos >= bstart && pos <= bend)
 			{
 				status |= ELEMENT_STATUS_SELECTED;
 
-				if(!(row && (screen->content[pos-screen->cols].status) & ELEMENT_STATUS_SELECTED))
+				if(!(row && (screen[pos-terminal_cols].status) & ELEMENT_STATUS_SELECTED))
 					status |= SELECTION_BOX_TOP;
 
-				if(!(pos && col && (screen->content[pos-1].status) & ELEMENT_STATUS_SELECTED))
+				if(!(pos && col && (screen[pos-1].status) & ELEMENT_STATUS_SELECTED))
 					status |= SELECTION_BOX_LEFT;
 
-				if(pos+1 > bend || col == (screen->cols-1))
+				if(pos+1 > bend || col == (terminal_cols-1))
 					status |= SELECTION_BOX_RIGHT;
 
-				if((pos+screen->cols) > bend)
+				if((pos+terminal_cols) > bend)
 					status |= SELECTION_BOX_BOTTOM;
 			}
 
-			if(screen->content[pos].status != status)
+			if(screen[pos].status != status)
 			{
-				screen->content[pos].status = status;
+				screen[pos].status = status;
 				if(saddr < 0)
 					saddr = pos;
 				eaddr = pos;
@@ -675,11 +674,11 @@
 	}
 
 	if(valid_terminal_window())
-		gtk_widget_queue_draw_area(terminal,view.left,view.top,view.cols*fontWidth,view.rows*terminal_font_info.spacing);
+		gtk_widget_queue_draw_area(terminal,left_margin,top_margin,terminal_cols*fontWidth,terminal_rows*terminal_font_info.spacing);
 
  }
 
- void set_rectangle_select(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
+ void set_rectangle_select(int value, enum toggle_type reason)
  {
  	if(select_mode != SELECT_MODE_RECTANGLE && select_mode != SELECT_MODE_TEXT)
 		return;
@@ -721,7 +720,7 @@
  		Trace("Type: %d",type);
 
  		if(type >= 0)
-			gdk_window_set_cursor(terminal->window,wCursor[LIB3270_CURSOR_USER+type]);
+			gdk_window_set_cursor(terminal->window,wCursor[CURSOR_MODE_USER+type]);
  		else
 			gdk_window_set_cursor(terminal->window,wCursor[cursor_mode]);
  	}
@@ -880,9 +879,9 @@
 			if(startRow < 0)
 				startRow = 0;
 			endRow = startRow + r;
-			if(endRow >= (view.rows-1))
+			if(endRow >= (terminal_rows-1))
 			{
-				endRow = (view.rows-1);
+				endRow = (terminal_rows-1);
 				startRow = endRow - r;
 			}
 
@@ -892,9 +891,9 @@
 				startCol = 0;
 			endCol = startCol + c;
 
-			if(endCol >= (view.cols-1))
+			if(endCol >= (terminal_cols-1))
 			{
-				endCol = (view.cols-1);
+				endCol = (terminal_cols-1);
 				startCol = endCol - c;
 			}
 
@@ -924,7 +923,7 @@
 	SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
  }
 
- static void doSelect(H3270 *hSession, int (*call)(void))
+ static void doSelect(int (*call)(void))
  {
  	int row;
  	int col;
@@ -933,14 +932,14 @@
  	{
  		SetSelectionMode(Toggled(RECTANGLE_SELECT) ? SELECT_MODE_RECTANGLE : SELECT_MODE_TEXT);
 
- 		startRow = endRow = (cursor_position / screen->cols);
- 		startCol = endCol = (cursor_position % screen->cols);
+ 		startRow = endRow = (cursor_position / terminal_cols);
+ 		startCol = endCol = (cursor_position % terminal_cols);
  	}
 
  	call();
 
- 	row = cursor_position / screen->cols;
- 	col = cursor_position % screen->cols;
+ 	row = cursor_position / terminal_cols;
+ 	col = cursor_position % terminal_cols;
 
 	endRow = row;
 	endCol = col;
@@ -950,22 +949,22 @@
 
  PW3270_ACTION( selectleft )
  {
- 	doSelect(hSession,lib3270_cursor_left);
+ 	doSelect(lib3270_cursor_left);
  }
 
  PW3270_ACTION( selectright )
  {
- 	doSelect(hSession,lib3270_cursor_right);
+ 	doSelect(lib3270_cursor_right);
  }
 
  PW3270_ACTION( selectup )
  {
- 	doSelect(hSession,lib3270_cursor_up);
+ 	doSelect(lib3270_cursor_up);
  }
 
  PW3270_ACTION( selectdown )
  {
- 	doSelect(hSession,lib3270_cursor_down);
+ 	doSelect(lib3270_cursor_down);
  }
 
  static void MoveSelection(int row, int col)
@@ -990,7 +989,7 @@
 
  PW3270_ACTION( selectiondown )
  {
- 	int maxrow = screen->rows-1;
+ 	int maxrow = terminal_rows-1;
 
 	if(startRow < maxrow && endRow < maxrow)
 		MoveSelection(1,0);
@@ -1004,7 +1003,7 @@
 
  PW3270_ACTION( selectionright )
  {
- 	int maxcol = screen->cols-1;
+ 	int maxcol = terminal_cols-1;
 
 	if(startCol < maxcol && endCol < maxcol)
 		MoveSelection(0,1);

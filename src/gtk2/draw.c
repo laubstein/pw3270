@@ -140,15 +140,15 @@
 		short	fg;
 		short 	bg;
 
-		if(screen->content[addr].status & ELEMENT_STATUS_SELECTED)
+		if(screen[addr].status & ELEMENT_STATUS_SELECTED)
 		{
 			fg = TERMINAL_COLOR_SELECTED_FG;
 			bg = TERMINAL_COLOR_SELECTED_BG;
 		}
 		else
 		{
-			fg = (screen->content[addr].fg & 0xFF);
-			bg = (screen->content[addr].bg & 0xFF);
+			fg = (screen[addr].fg & 0xFF);
+			bg = (screen[addr].bg & 0xFF);
 		}
 
 		cairo_set_3270_color(cr,bg);
@@ -158,7 +158,7 @@
 		cairo_set_3270_color(cr,fg);
 	}
 
-	if(TOGGLED_UNDERLINE && (screen->content[addr].fg & COLOR_ATTR_UNDERLINE))
+	if(TOGGLED_UNDERLINE && (screen[addr].fg & COLOR_ATTR_UNDERLINE))
 	{
 		// Draw underline
 		int sl = (fontDescent/3);
@@ -168,41 +168,41 @@
 		cairo_fill(cr);
 	}
 
-	if(screen->content[addr].cg)
+	if(screen[addr].cg)
 	{
 		// Graphics char
-		draw_cg(cr, screen->content[addr].cg, x, y,font->width, font->height);
+		draw_cg(cr, screen[addr].cg, x, y,font->width, font->height);
 	}
-	else if(*screen->content[addr].ch != ' ' && *screen->content[addr].ch)
+	else if(*screen[addr].ch != ' ' && *screen[addr].ch)
 	{
 		// Text char
 		cairo_move_to(cr,x,baseline);
-		cairo_show_text(cr,screen->content[addr].ch);
+		cairo_show_text(cr,screen[addr].ch);
 	}
 
-	if(screen->content[addr].status & ELEMENT_STATUS_SELECTED)
+	if(screen[addr].status & ELEMENT_STATUS_SELECTED)
 	{
 		cairo_set_3270_color(cr,TERMINAL_COLOR_SELECTED_BORDER);
 
-		if(screen->content[addr].status & SELECTION_BOX_TOP)
+		if(screen[addr].status & SELECTION_BOX_TOP)
 		{
 			cairo_rectangle(cr, x, y, font->width, 1);
 			cairo_fill(cr);
 		}
 
-		if(screen->content[addr].status & SELECTION_BOX_BOTTOM)
+		if(screen[addr].status & SELECTION_BOX_BOTTOM)
 		{
 			cairo_rectangle(cr, x, y+(font->spacing-1), font->width, 1);
 			cairo_fill(cr);
 		}
 
-		if(screen->content[addr].status & SELECTION_BOX_LEFT)
+		if(screen[addr].status & SELECTION_BOX_LEFT)
 		{
 			cairo_rectangle(cr, x, y, 1, font->spacing);
 			cairo_fill(cr);
 		}
 
-		if(screen->content[addr].status & SELECTION_BOX_RIGHT)
+		if(screen[addr].status & SELECTION_BOX_RIGHT)
 		{
 			cairo_rectangle(cr, x+(font->width-1), y, 1, font->spacing);
 			cairo_fill(cr);
@@ -214,9 +214,9 @@
  void draw_region(cairo_t *cr, int bstart, int bend, GdkColor *clr, GdkRectangle *r)
  {
  	int addr;
- 	int col	= (bstart % screen->cols);
- 	int x	= view.left + (col * fontWidth);
- 	int y	= view.top  + ((bstart / screen->cols) * terminal_font_info.spacing);
+ 	int col	= (bstart % terminal_cols);
+ 	int x	= left_margin + (col * fontWidth);
+ 	int y	= top_margin  + ((bstart / terminal_cols) * terminal_font_info.spacing);
  	int baseline = y + terminal_font_info.ascent;
 
 	memset(r,0,sizeof(GdkRectangle));
@@ -226,10 +226,10 @@
 	for(addr = bstart; addr <= bend; addr++)
 	{
 		draw_element(cr,&terminal_font_info,x,y,baseline,addr,clr);
-		if(++col >= screen->cols)
+		if(++col >= terminal_cols)
 		{
 			col  = 0;
-			x    = view.left;
+			x    = left_margin;
 			y   += terminal_font_info.spacing;
 			baseline += terminal_font_info.spacing;
 		}
@@ -277,7 +277,7 @@
 	cairo_rectangle(cr, 0, 0, width, height);
 	cairo_fill(cr);
 
-	draw_region(cr,0,(screen->cols * screen->rows)-1,color,&r);
+	draw_region(cr,0,(terminal_cols * terminal_rows)-1,color,&r);
 	draw_oia(cr,get_terminal_cached_gc());
 
 	cairo_destroy(cr);
@@ -304,7 +304,7 @@
 
 		update_font_info(cr, fontname, &terminal_font_info);
 
-		gtk_widget_set_size_request(terminal, screen->cols*terminal_font_info.width, ((screen->rows+2)*terminal_font_info.spacing));
+		gtk_widget_set_size_request(terminal, terminal_cols*terminal_font_info.width, ((terminal_rows+2)*terminal_font_info.spacing));
 
 		g_free(fontname);
 		cairo_destroy(cr);

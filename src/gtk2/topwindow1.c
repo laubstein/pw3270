@@ -38,8 +38,8 @@
  #include <gdk/gdkkeysyms.h>
  #include <lib3270/config.h>
 
-// #include <globals.h>
-// #include <lib3270/kybdc.h>
+ #include <globals.h>
+ #include <lib3270/kybdc.h>
  #include <lib3270/toggle.h>
  #include <lib3270/plugins.h>
 
@@ -140,7 +140,7 @@
 	if(program_logo && g_file_test(program_logo,G_FILE_TEST_IS_REGULAR))
 		return gdk_pixbuf_new_from_file(program_logo,NULL);
 
-	filename = g_build_filename(program_data,PROGRAM_LOGO,NULL);
+	filename = g_build_filename(program_data,LOGO,NULL);
 
 	if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
 		pix = gdk_pixbuf_new_from_file(filename, NULL);
@@ -267,19 +267,26 @@
 	manager = load_application_ui(topwindow, GTK_BOX(toolbar), GTK_BOX(vbox), GTK_BOX(hbox));
 	if(manager)
 	{
-		static const gchar *popup_name[] = { "defaultpopup", "selectionpopup" };
+		static const struct _popup
+		{
+			const char 	*name;
+			GtkWidget		**widget;
+		} popup[] =
+		{
+			{ "defaultpopup",	&DefaultPopup	},
+			{ "selectionpopup",	&SelectionPopup	}
+		};
 
 		int f;
 
-		for(f=0;f < G_N_ELEMENTS(popup_name);f++)
+		for(f=0;f < G_N_ELEMENTS(popup);f++)
 		{
-			popup_menu[f] = widget_from_action_name(popup_name[f]);
-			if(popup_menu[f])
-				g_object_ref(popup_menu[f]);
+			*popup[f].widget = widget_from_action_name(popup[f].name);
+			if(*popup[f].widget)
+			{
+				g_object_ref(*popup[f].widget);
+			}
 		}
-
-		if(!popup_menu[POPUP_MENU_SELECTION])
-			popup_menu[POPUP_MENU_SELECTION] = popup_menu[POPUP_MENU_DEFAULT];
 
 		LoadMenus();
 		LoadInputMethods();

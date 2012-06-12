@@ -107,7 +107,6 @@
 				<menuitem action='Toggle' id='Underline' label='Show Underline'  />
 				<menuitem action='Toggle' id='KeepSelected' label='Keep selected' />
 				<menuitem action='Toggle' id='SmartPaste' label='Smart paste' />
-				<menuitem action='Toggle' id='Beep' label='Alert sound' />
 				<menuitem action='Toggle' id='KPAlternative' label='Use +/- for field navigation' />
 			</menu>
 
@@ -140,34 +139,34 @@
 		<toolitem action='Quit' />
 	</toolbar>
 
-	<popup name='selectionpopup' type='selection'>
+	<popup name='selectionpopup'>
 		<menuitem action='Copy'/>
 		<menuitem action='Append'/>
 		<menuitem action='Unselect'/>
 		<menuitem action='SelectAll'/>
 
-		<separator />
+		<separator/>
 		<menuitem action='PrintScreen'/>
 		<menuitem action='PrintSelected'/>
 		<menuitem action='PrintClipboard'/>
 
-		<separator />
+		<separator/>
 		<menuitem action='Quit'/>
 	</popup>
 
-	<popup name='defaultpopup' type="default">
+	<popup name='defaultpopup'>
 		<menuitem action='Paste'/>
 		<menuitem action='PasteNext'/>
 		<menuitem action='SelectAll'/>
 		<menuitem action='PrintScreen'/>
 		<menuitem action='PrintClipboard'/>
 
-		<separator />
+		<separator/>
 		<menuitem action='PreviousField' label='Previous field' />
 		<menuitem action='NextField' label='Next field'/>
-		<menuitem action='Return' label='Return' />
+		<menuitem action='Return'/>
 
-		<separator />
+		<separator/>
 		<menuitem action='Quit'/>
 
 	</popup>
@@ -178,9 +177,7 @@
 	<accelerator action='Reset' key='<Shift><Ctrl>r' group='online' />
 	<accelerator action='Return' key='Return' />
 	<accelerator action='Enter' key='KP_Enter' />
-	<accelerator action='Break' key='Escape' group='online' />
-	<accelerator action='Attn' key='<shift>Escape' group='online' />
-
+	<accelerator action='Escape' key='Escape' group='online' />
 	<accelerator action='DeleteWord' key='<Ctrl>w' group='online' />
 	<accelerator action='Delete' key='Delete' group='online' />
 	<accelerator action='Erase' key='BackSpace' group='online' />
@@ -206,8 +203,6 @@
 
 	<accelerator action='PreviousField' key='ISO_Left_Tab' group='online' />
 	<accelerator action='NextField' key='Tab' group='online' />
-
-	<accelerator action='dup' key='<Shift>KP_Multiply' group='online' />
 
 	<!--- Mouse actions --->
 	<scroll direction='up' action='pfkey' id='7' />

@@ -20,66 +20,111 @@
  *		tcl3270.
  */
 
-#include <lib3270/toggle.h>
+#if defined(LIB3270)
+	#include <lib3270/toggle.h>
+#else
+	#define MONOCASE	0
+	#define ALT_CURSOR	1
+	#define CURSOR_BLINK	2
+	#define SHOW_TIMING	3
+	#define CURSOR_POS	4
+
+	#if defined(X3270_TRACE) /*[*/
+	#define DS_TRACE	5
+	#endif /*]*/
+
+	#define SCROLL_BAR	6
+
+	#if defined(X3270_ANSI) /*[*/
+	#define LINE_WRAP	7
+	#endif /*]*/
+
+	#define BLANK_FILL	8
+
+	#if defined(X3270_TRACE) /*[*/
+	#define SCREEN_TRACE	9
+	#define EVENT_TRACE	10
+	#endif /*]*/
+
+	#define MARGINED_PASTE	11
+	#define RECTANGLE_SELECT 12
+
+	#if defined(X3270_DISPLAY) /*[*/
+	#define CROSSHAIR	13
+	#define VISIBLE_CONTROL	14
+	#endif /*]*/
+
+	#if defined(X3270_SCRIPT) || defined(TCL3270) /*[*/
+	#define AID_WAIT	15
+	#endif /*]*/
+
+	#define N_TOGGLES	16
+
+#endif
 
 /* Toggles */
 
 struct toggle {
 	char	value;		/* toggle value */
-//	char	changed;	/* has the value changed since init */
-//	Widget	w[2];		/* the menu item widgets */
-//	const char *label[2];	/* labels */
-	void (*upcall)(H3270 *, struct toggle *, LIB3270_TOGGLE_TYPE); /* change value */
-	void (*callback)(H3270 *, int, LIB3270_TOGGLE_TYPE);
+	char	changed;	/* has the value changed since init */
+	Widget	w[2];		/* the menu item widgets */
+	const char *label[2];	/* labels */
+	void (*upcall)(struct toggle *, enum toggle_type); /* change value */
+
+#if defined(LIB3270)
+	void (*callback)(int, enum toggle_type);
+#endif
 
 };
 
 #define toggled(ix)		(appres.toggle[ix].value)
 #define toggle_toggle(t) \
-	{ (t)->value = !(t)->value; }
+	{ (t)->value = !(t)->value; (t)->changed = True; }
 
 /* Application resources */
 
 typedef struct {
 	/* Basic colors */
-// #if defined(X3270_DISPLAY) /*[*/
-//	Pixel	foreground;
-//	Pixel	background;
-// #endif /*]*/
+#if defined(X3270_DISPLAY) /*[*/
+	Pixel	foreground;
+	Pixel	background;
+#endif /*]*/
 
 	/* Options (not toggles) */
+#if defined(X3270_DISPLAY) || (defined(C3270) && !defined(_WIN32)) /*[*/
 	char mono;
+#endif /*]*/
 	char extended;
 	char m3279;
 	char modified_sel;
-//	char once;
-//#if defined(X3270_DISPLAY) /*[*/
-//	char visual_bell;
-//	char menubar;
-//	char active_icon;
-//	char label_icon;
-//	char invert_kpshift;
-//	char use_cursor_color;
-//	char allow_resize;
-//	char no_other;
-//	char do_confirms;
-// #if !defined(G3270)
-//	char reconnect;
-// #endif
-//	char visual_select;
-//	char suppress_host;
-//	char suppress_font_menu;
-//# if defined(X3270_KEYPAD) /*[*/
-//	char keypad_on;
-//# endif /*]*/
-//#endif /*]*/
-//#if defined(C3270) /*[*/
-//	char all_bold_on;
-//	char curses_keypad;
-//	char cbreak_mode;
-//#endif /*]*/
+	char once;
+#if defined(X3270_DISPLAY) /*[*/
+	char visual_bell;
+	char menubar;
+	char active_icon;
+	char label_icon;
+	char invert_kpshift;
+	char use_cursor_color;
+	char allow_resize;
+	char no_other;
+	char do_confirms;
+#if !defined(G3270)
+	char reconnect;
+#endif
+	char visual_select;
+	char suppress_host;
+	char suppress_font_menu;
+# if defined(X3270_KEYPAD) /*[*/
+	char keypad_on;
+# endif /*]*/
+#endif /*]*/
+#if defined(C3270) /*[*/
+	char all_bold_on;
+	char curses_keypad;
+	char cbreak_mode;
+#endif /*]*/
 	char apl_mode;
-//	char scripted;
+	char scripted;
 	char numeric_lock;
 	char secure;
 	char oerr_lock;
@@ -102,12 +147,11 @@ typedef struct {
 	char	*keypad;
 #endif /*]*/
 #if defined(X3270_DISPLAY) || defined(C3270) /*[*/
-//	char	*key_map;
+	char	*key_map;
 	char	*compose_map;
 	char	*printer_lu;
 #endif /*]*/
-/*
-#if defined(X3270_DISPLAY)
+#if defined(X3270_DISPLAY) /*[*/
 	char	*efontname;
 	char	*fixed_size;
 	char	*debug_font;
@@ -126,20 +170,19 @@ typedef struct {
 	char	*char_class;
 	int		modified_sel_color;
 	int		visual_select_color;
-#if defined(X3270_DBCS)
+#if defined(X3270_DBCS) /*[*/
 	char	*input_method;
 	char	*preedit_type;
-#endif
-#endif
-*/
+#endif /*]*/
+#endif /*]*/
 #if defined(X3270_DBCS) /*[*/
 	char	*local_encoding;
 #endif /*]*/
 #if defined(C3270) /*[*/
 	char	*meta_escape;
 	char	*all_bold;
-//	char	*altscreen;
-//	char	*defscreen;
+	char	*altscreen;
+	char	*defscreen;
 #endif /*]*/
 	char	*conf_dir;
 	char	*model;
@@ -179,14 +222,14 @@ typedef struct {
 
 	/* Toggles */
 	struct toggle toggle[N_TOGGLES];
-/*
-#if defined(X3270_DISPLAY)
-	// Simple widget resources
+
+#if defined(X3270_DISPLAY) /*[*/
+	/* Simple widget resources */
 	Cursor	normal_mcursor;
 	Cursor	wait_mcursor;
 	Cursor	locked_mcursor;
-#endif
-*/
+#endif /*]*/
+
 #if defined(X3270_ANSI) /*[*/
 	/* Line-mode TTY parameters */
 	char	icrnl;

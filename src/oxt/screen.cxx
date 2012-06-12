@@ -49,7 +49,7 @@
 
 	Trace("Reading %d bytes at %d,%d",size,row,col);
 
-	get_3270_terminal_size(this->hSession,&rows,&cols);
+	screen_size(&rows,&cols);
 
 	if(row < 0 || row > rows || col < 0 || col > cols || size < 1)
 		return OUString( RTL_CONSTASCII_USTRINGPARAM( "" ) );
@@ -79,7 +79,7 @@
 	char *ptr;
 	int  pos = 0;
 
-	get_3270_terminal_size(this->hSession,&rows,&cols);
+	screen_size(&rows,&cols);
 
 	Trace("Reading screen with %dx%d",rows,cols);
 
@@ -115,7 +115,7 @@
 	char 	*buffer;
 	int 	last = -1;
 
-	get_3270_terminal_size(this->hSession,&rows,&cols);
+	screen_size(&rows,&cols);
 
 	row--;
 	col--;
@@ -169,7 +169,7 @@
 	char 	*buffer;
 	bool	rc;
 
-	get_3270_terminal_size(this->hSession,&rows,&cols);
+	screen_size(&rows,&cols);
 
 	row--;
 	col--;

@@ -61,7 +61,7 @@
 #include "charsetc.h"
 #include "childc.h"
 #include "ctlrc.h"
-// #include "menubarc.h"
+#include "menubarc.h"
 #include "popupsc.h"
 #include "printc.h"
 #include "savec.h"
@@ -119,7 +119,7 @@ rcba(int baddr)
 {
 	static char buf[16];
 
-	(void) sprintf(buf, "(%d,%d)", baddr/h3270.cols + 1, baddr%h3270.cols + 1);
+	(void) sprintf(buf, "(%d,%d)", baddr/COLS + 1, baddr%COLS + 1);
 	return buf;
 }
 
@@ -270,7 +270,8 @@ wtrace(const char *fmt, ...)
 	}
 }
 
-static void stop_tracing(void)
+static void
+stop_tracing(void)
 {
 	if (tracef != NULL && tracef != stdout)
 		(void) fclose(tracef);
@@ -279,20 +280,14 @@ static void stop_tracing(void)
 		(void) fclose(tracef_pipe);
 		tracef_pipe = NULL;
 	}
-
-	lib3270_set_toggle(&h3270,DS_TRACE,0);
-	lib3270_set_toggle(&h3270,EVENT_TRACE,0);
-
-/*
 	if (toggled(DS_TRACE)) {
 		toggle_toggle(&appres.toggle[DS_TRACE]);
-//		menubar_retoggle(&appres.toggle[DS_TRACE]);
+		menubar_retoggle(&appres.toggle[DS_TRACE]);
 	}
 	if (toggled(EVENT_TRACE)) {
 		toggle_toggle(&appres.toggle[EVENT_TRACE]);
-//		menubar_retoggle(&appres.toggle[EVENT_TRACE]);
+		menubar_retoggle(&appres.toggle[EVENT_TRACE]);
 	}
-*/
 }
 
 /* Check for a trace file rollover event. */
@@ -424,9 +419,11 @@ create_tracefile_header(const char *mode)
 	wtrace("Trace %s %s", mode, ctime(&clk));
 	wtrace(" Version: %s\n", build);
 	save_yourself();
-//	wtrace(" Command: %s\n", command_string);
+	wtrace(" Command: %s\n", command_string);
 	wtrace(" Model %s", h3270.model_name);
+#if defined(X3270_DISPLAY) || (defined(C3270) && !defined(_WIN32)) /*[*/
 	wtrace(", %s display", appres.mono ? "monochrome" : "color");
+#endif /*]*/
 	if (appres.extended)
 		wtrace(", extended data stream");
 	wtrace(", %s emulation", appres.m3279 ? "color" : "monochrome");
@@ -452,7 +449,7 @@ create_tracefile_header(const char *mode)
 		 * write to ensure that the display is in the right
 		 * mode.
 		 */
-		if (h3270.formatted) {
+		if (formatted) {
 			wtrace(" Screen contents:\n");
 			obptr = obuf;
 #if defined(X3270_TN3270E) /*[*/
@@ -627,8 +624,8 @@ static void tracefile_callback(Widget w, XtPointer client_data, XtPointer call_d
 
 	/* We're really tracing, turn the flag on. */
 	appres.toggle[trace_reason].value = True;
-//	appres.toggle[trace_reason].changed = True;
-//	menubar_retoggle(&appres.toggle[trace_reason]);
+	appres.toggle[trace_reason].changed = True;
+	menubar_retoggle(&appres.toggle[trace_reason]);
 
 	/* Display current status. */
 	buf = create_tracefile_header("started");
@@ -650,7 +647,7 @@ no_tracefile_callback(Widget w, XtPointer client_data,
 
 /* Open the trace file. */
 static void
-tracefile_on(int reason, LIB3270_TOGGLE_TYPE tt)
+tracefile_on(int reason, enum toggle_type tt)
 {
 	char *tracefile_buf = NULL;
 	char *tracefile;
@@ -750,7 +747,7 @@ static void tracefile_off(void)
 	stop_tracing();
 }
 
-void toggle_dsTrace(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
+void toggle_dsTrace(struct toggle *t unused, enum toggle_type tt)
 {
 	/* If turning on trace and no trace file, open one. */
 
@@ -766,7 +763,8 @@ void toggle_dsTrace(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE
 		(void) gettimeofday(&ds_ts, (struct timezone *)NULL);
 }
 
-void toggle_eventTrace(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
+void
+toggle_eventTrace(struct toggle *t unused, enum toggle_type tt)
 {
 	/* If turning on event debug, and no trace file, open one. */
 
@@ -795,7 +793,7 @@ do_screentrace(void)
 	register int i;
 
 	if (fprint_screen(screentracef, False, False)) {
-		for (i = 0; i < h3270.cols; i++)
+		for (i = 0; i < COLS; i++)
 			(void) fputc('=', screentracef);
 		(void) fputc('\n', screentracef);
 	}
@@ -832,7 +830,7 @@ trace_ansi_disc(void)
 	int i;
 
 	(void) fputc('\n', screentracef);
-	for (i = 0; i < h3270.cols; i++)
+	for (i = 0; i < COLS; i++)
 		(void) fputc('=', screentracef);
 	(void) fputc('\n', screentracef);
 
@@ -861,14 +859,13 @@ screentrace_cb(char *tfn)
 
 	/* We're really tracing, turn the flag on. */
 	appres.toggle[SCREEN_TRACE].value = True;
-//	appres.toggle[SCREEN_TRACE].changed = True;
-//	menubar_retoggle(&appres.toggle[SCREEN_TRACE]);
+	appres.toggle[SCREEN_TRACE].changed = True;
+	menubar_retoggle(&appres.toggle[SCREEN_TRACE]);
 	return True;
 }
 
-/*
-#if defined(X3270_DISPLAY)
-// Callback for "OK" button on screentrace popup
+#if defined(X3270_DISPLAY) /*[*/
+/* Callback for "OK" button on screentrace popup */
 static void
 screentrace_callback(Widget w unused, XtPointer client_data,
     XtPointer call_data unused)
@@ -877,7 +874,7 @@ screentrace_callback(Widget w unused, XtPointer client_data,
 		XtPopdown(screentrace_shell);
 }
 
-// Callback for second "OK" button on screentrace popup
+/* Callback for second "OK" button on screentrace popup */
 static void
 onescreen_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 {
@@ -897,19 +894,20 @@ onescreen_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 	(void) fcntl(fileno(screentracef), F_SETFD, 1);
 	XtFree(tfn);
 
-	// Save the current image, once.
+	/* Save the current image, once. */
 	do_screentrace();
 
-	// Close the file, we're done.
+	/* Close the file, we're done. */
 	(void) fclose(screentracef);
 	screentracef = (FILE *)NULL;
 
 	if (w)
 		XtPopdown(screentrace_shell);
 }
-#endif */
+#endif /*]*/
 
-void toggle_screenTrace(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE tt)
+void
+toggle_screenTrace(struct toggle *t unused, enum toggle_type tt)
 {
 	char *tracefile_buf = NULL;
 	char *tracefile;

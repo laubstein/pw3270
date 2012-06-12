@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como pipeclient.c e possui - linhas de código.
+ * Este programa está nomeado como pipetest.c e possui - linhas de código.
  *
  * Contatos:
  *
@@ -70,87 +70,59 @@
 
  static void run_query(HANDLE hPipe, const char *query)
  {
- 	static char buffer[32768];
- 	DWORD cbSize = 0;
+ 	static char buffer[4096];
+ 	DWORD cbRead = 0;
 
-//	printf("query(\"%s\")....\n",query);
-
-	// http://msdn.microsoft.com/en-us/library/windows/desktop/aa365592(v=vs.85).aspx
-/*
-	if(!WriteFile(hPipe,query,strlen(query),&cbSize,NULL))
-	{
-		show_lasterror("Can´t write %s",query);
-		return;
-	}
-*/
-
-	if(!TransactNamedPipe(hPipe,(LPVOID) query,strlen(query),buffer,32768,&cbSize,NULL))
+	if(!TransactNamedPipe(hPipe,(LPVOID) query,strlen(query),buffer,4095,&cbRead,NULL))
 	{
 		show_lasterror("Can't send message \"%s\"",query);
 		return;
 	}
 
-	if(cbSize < 1)
+	if(cbRead < 1)
 	{
 		printf("Empty response to message \"%s\"\n",query);
 		return;
 	}
 
-	*(buffer+((int) cbSize)) = 0;
+	*(buffer+((int) cbRead)) = 0;
 
-	printf("%s\n",buffer);
+	printf("%s= %s\n",query,buffer);
+
  }
 
  int main(int numpar, char *param[])
  {
- 	char buffer[0x0100];
-
 	static DWORD dwMode = PIPE_READMODE_MESSAGE;
 
-	static const LPTSTR lpszPipeName	= TEXT( "\\\\.\\pipe\\pw3270" );
+	static const LPTSTR lpszRequest	= TEXT( "\\\\.\\pipe\\pw3270" );
 
-	printf("Waiting %s ....\r",lpszPipeName);
-	while(!WaitNamedPipe(lpszPipeName,10000))
-	{
-		printf("Waiting %s ....\r",lpszPipeName);
-		Sleep(1);
-	}
-
-	printf("Connecting %s ....\n",lpszPipeName);
-	hPipe = CreateFile(	lpszPipeName,   						// pipe name
-						GENERIC_WRITE|GENERIC_READ,			// Read/Write access
-						0,              					// no sharing
-						NULL,           					// default security attributes
-						OPEN_EXISTING,  					// opens existing pipe
-						0,									// Attributes
-						NULL);          					// no template file
-
-	if(hPipe == INVALID_HANDLE_VALUE)
-		return show_lasterror("CreateFile(%s)",lpszPipeName);
-
-	printf("Connected %s ....\n",lpszPipeName);
-
-	if(!SetNamedPipeHandleState(hPipe,&dwMode,NULL,NULL))
-		return show_lasterror("SetNamedPipeHandleState(%s)",lpszPipeName);
-
-/*
 	while(--numpar > 0)
 	{
 		param++;
-		run_query(hPipe, *param);
-	}
-*/
-	while(fgets(buffer,0x0FF,stdin))
-	{
-		char *ptr = strchr(buffer,'\n');
-		if(ptr)
-			*ptr = 0;
 
-		if(*buffer)
-			run_query(hPipe,buffer);
+		if (!WaitNamedPipe(lpszRequest, NMPWAIT_WAIT_FOREVER))
+			return show_lasterror("WaitNamedPipe(%s)",lpszRequest);
+
+		hPipe = CreateFile(	lpszRequest,   						// pipe name
+							GENERIC_WRITE|GENERIC_READ,			// Read/Write access
+							0,              					// no sharing
+							NULL,           					// default security attributes
+							OPEN_EXISTING,  					// opens existing pipe
+							0,									// Attributes
+							NULL);          					// no template file
+
+		if(hPipe == INVALID_HANDLE_VALUE)
+			return show_lasterror("CreateFile(%s)",lpszRequest);
+
+		if(!SetNamedPipeHandleState(hPipe,&dwMode,NULL,NULL))
+			return show_lasterror("SetNamedPipeHandleState(%s)",lpszRequest);
+
+		run_query(hPipe, *param);
+
+		CloseHandle(hPipe);
+
 	}
-	printf("%s\n","Disconnected....");
-	CloseHandle(hPipe);
 
 	return 0;
  }

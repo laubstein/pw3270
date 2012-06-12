@@ -65,7 +65,7 @@
 #include <lib3270/api.h>
 
 /* Externals: ctlr.c */
-// extern Boolean  screen_alt;
+extern Boolean  screen_alt;
 extern unsigned char reply_mode;
 extern int      crm_nattr;
 extern unsigned char crm_attr[];
@@ -380,11 +380,11 @@ sf_erase_reset(unsigned char buf[], int buflen)
 	switch (buf[3]) {
 	    case SF_ER_DEFAULT:
 		trace_ds(" Default\n");
-		ctlr_erase(NULL,False);
+		ctlr_erase(False);
 		break;
 	    case SF_ER_ALT:
 		trace_ds(" Alternate\n");
-		ctlr_erase(NULL,True);
+		ctlr_erase(True);
 		break;
 	    default:
 		trace_ds(" unknown type 0x%02x\n", buf[3]);
@@ -509,13 +509,13 @@ sf_create_partition(unsigned char buf[], int buflen)
 		GET16(h, &buf[6]);
 		trace_ds(",h=%d", h);
 	} else
-		h = h3270.maxROWS;
+		h = maxROWS;
 
 	if (buflen > 9) {
 		GET16(w, &buf[8]);
 		trace_ds(",w=%d", w);
 	} else
-		w = h3270.maxCOLS;
+		w = maxCOLS;
 
 	if (buflen > 11) {
 		GET16(rv, &buf[10]);
@@ -533,13 +533,13 @@ sf_create_partition(unsigned char buf[], int buflen)
 		GET16(hv, &buf[14]);
 		trace_ds(",hv=%d", hv);
 	} else
-		hv = (h > h3270.maxROWS)? h3270.maxROWS: h;
+		hv = (h > maxROWS)? maxROWS: h;
 
 	if (buflen > 17) {
 		GET16(wv, &buf[16]);
 		trace_ds(",wv=%d", wv);
 	} else
-		wv = (w > h3270.maxCOLS)? h3270.maxCOLS: w;
+		wv = (w > maxCOLS)? maxCOLS: w;
 
 	if (buflen > 19) {
 		GET16(rw, &buf[18]);
@@ -605,7 +605,7 @@ sf_outbound_ds(unsigned char buf[], int buflen)
 		break;
 	    case SNA_CMD_EW:
 		trace_ds(" EraseWrite");
-		ctlr_erase(&h3270,h3270.screen_alt);
+		ctlr_erase(screen_alt);
 		if (buflen > 5) {
 			if ((rv = ctlr_write(&buf[4], buflen-4, True)) < 0)
 				return rv;
@@ -614,7 +614,7 @@ sf_outbound_ds(unsigned char buf[], int buflen)
 		break;
 	    case SNA_CMD_EWA:
 		trace_ds(" EraseWriteAlternate");
-		ctlr_erase(&h3270,h3270.screen_alt);
+		ctlr_erase(screen_alt);
 		if (buflen > 5) {
 			if ((rv = ctlr_write(&buf[4], buflen-4, True)) < 0)
 				return rv;
@@ -734,8 +734,8 @@ do_qr_usable_area(void)
 	space3270out(19);
 	*obptr++ = 0x01;	/* 12/14-bit addressing */
 	*obptr++ = 0x00;	/* no special character features */
-	SET16(obptr, h3270.maxCOLS);	/* usable width */
-	SET16(obptr, h3270.maxROWS);	/* usable height */
+	SET16(obptr, maxCOLS);	/* usable width */
+	SET16(obptr, maxROWS);	/* usable height */
 	*obptr++ = 0x01;	/* units (mm) */
 	num = display_widthMM();
 	denom = display_width();
@@ -755,7 +755,7 @@ do_qr_usable_area(void)
 	SET16(obptr, (int)denom); /* Yr denominator */
 	*obptr++ = *char_width;	/* AW */
 	*obptr++ = *char_height;/* AH */
-	SET16(obptr, h3270.maxCOLS * h3270.maxROWS);	/* buffer, questionable */
+	SET16(obptr, maxCOLS*maxROWS);	/* buffer, questionable */
 }
 
 static void
@@ -846,7 +846,7 @@ do_qr_alpha_part(void)
 	trace_ds("> QueryReply(AlphanumericPartitions)\n");
 	space3270out(4);
 	*obptr++ = 0;		/* 1 partition */
-	SET16(obptr, h3270.maxROWS * h3270.maxCOLS);	/* buffer space */
+	SET16(obptr, maxROWS*maxCOLS);	/* buffer space */
 	*obptr++ = 0;		/* no special features */
 }
 
@@ -959,8 +959,8 @@ do_qr_imp_part(void)
 	*obptr++ = 0x00;	/* reserved */
 	SET16(obptr, 80);	/* implicit partition width */
 	SET16(obptr, 24);	/* implicit partition height */
-	SET16(obptr, h3270.maxCOLS);	/* alternate height */
-	SET16(obptr, h3270.maxROWS);	/* alternate width */
+	SET16(obptr, maxCOLS);	/* alternate height */
+	SET16(obptr, maxROWS);	/* alternate width */
 }
 
 static void

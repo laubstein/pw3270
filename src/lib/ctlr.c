@@ -18,7 +18,7 @@
  * programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA, 02111-1307, USA
  *
- * Este programa está nomeado como ctlr.c e possui - linhas de código.
+ * Este programa está nomeado como ctlr.c e possui 2827 linhas de código.
  *
  * Contatos:
  *
@@ -57,7 +57,7 @@
 #include "screenc.h"
 #include "scrollc.h"
 #include "seec.h"
-// #include "selectc.h"
+#include "selectc.h"
 #include "sfc.h"
 #include "statusc.h"
 #include "tablesc.h"
@@ -71,19 +71,24 @@
 extern unsigned char aid;
 
 /* Globals */
-// int				ROWS, COLS;
-//int				maxROWS		= 0;
-//int				maxCOLS		= 0;
-// int				cursor_addr;
+int				ROWS, COLS;
+int				ov_rows, ov_cols;
 
-int				buffer_addr;
-// Boolean         screen_alt = False;	/* alternate screen? */
-// Boolean         is_altbuffer = False;
+int				maxROWS		= 0;
+int				maxCOLS		= 0;
+int				model_num	= -1;
+
+int				cursor_addr, buffer_addr;
+Boolean         screen_alt = False;	/* alternate screen? */
+Boolean         is_altbuffer = False;
 
 struct ea      *ea_buf	= NULL;		/* 3270 device buffer */
 									/* ea_buf[-1] is the dummy default field attribute */
 
-// Boolean         formatted = False;	/* set in screen_disp */
+Boolean         formatted = False;	/* set in screen_disp */
+Boolean         screen_need_refresh = False;
+int				first_changed = -1;
+int				last_changed = -1;
 unsigned char	reply_mode = SF_SRM_FIELD;
 int				crm_nattr = 0;
 unsigned char	crm_attr[16];
@@ -92,7 +97,7 @@ Boolean			dbcs = False;
 /* Statics */
 static struct ea *aea_buf;	/* alternate 3270 extended attribute buffer */
 static unsigned char *zero_buf;	/* empty buffer, for area clears */
-static void set_formatted(H3270 *session);
+static void set_formatted(void);
 static void ctlr_blanks(void);
 static Boolean  trace_primed = False;
 static unsigned char default_fg;
@@ -100,12 +105,11 @@ static unsigned char default_bg;
 static unsigned char default_gr;
 static unsigned char default_cs;
 static unsigned char default_ic;
-static void	ctlr_half_connect(H3270 *session, int ignored, void *dunno);
-static void	ctlr_connect(H3270 *session, int ignored, void *dunno);
+static void	ctlr_half_connect(int ignored);
+static void	ctlr_connect(int ignored);
 static int	sscp_start;
-static void ticking_stop(H3270 *session);
+static void ticking_stop(void);
 static void ctlr_add_ic(int baddr, unsigned char ic);
-static void changed(H3270 *session, int bstart, int bend);
 
 /*
  * code_table is used to translate buffer addresses and attributes to the 3270
@@ -124,10 +128,17 @@ static unsigned char	code_table[64] = {
 
 #define IsBlank(c)	((c == EBC_null) || (c == EBC_space))
 
+#define ALL_CHANGED	{ \
+	screen_changed(0,ROWS*COLS); \
+	if (IN_ANSI) { first_changed = 0; last_changed = ROWS*COLS; } }
 
-#define ALL_CHANGED	if(IN_ANSI) changed(&h3270,0,h3270.rows*h3270.cols);
-#define REGION_CHANGED(f, l) if(IN_ANSI) changed(&h3270,f,l)
-#define ONE_CHANGED(n)	if(IN_ANSI) changed(&h3270,n,n+1);
+#define REGION_CHANGED(f, l)	{ \
+	screen_changed(f,l); \
+	if (IN_ANSI) { \
+	    if (first_changed == -1 || f < first_changed) first_changed = f; \
+	    if (last_changed == -1 || l > last_changed) last_changed = l; } }
+
+#define ONE_CHANGED(n)	REGION_CHANGED(n, n+1)
 
 #define DECODE_BADDR(c1, c2) \
 	((((c1) & 0xC0) == 0x00) ? \
@@ -148,17 +159,19 @@ static unsigned char	code_table[64] = {
 /*
  * Initialize the emulated 3270 hardware.
  */
-void ctlr_init(H3270 *session, unsigned cmask unused)
+void
+ctlr_init(unsigned cmask unused)
 {
 	/* Register callback routines. */
-	lib3270_register_schange(session,ST_HALF_CONNECT, ctlr_half_connect, 0);
-	lib3270_register_schange(session,ST_CONNECT, ctlr_connect, 0);
-	lib3270_register_schange(session,ST_3270_MODE, ctlr_connect, 0);
+	register_schange(ST_HALF_CONNECT, ctlr_half_connect);
+	register_schange(ST_CONNECT, ctlr_connect);
+	register_schange(ST_3270_MODE, ctlr_connect);
 }
 /*
  * Reinitialize the emulated 3270 hardware.
  */
-void ctlr_reinit(H3270 *session, unsigned cmask)
+void
+ctlr_reinit(unsigned cmask)
 {
 	static struct ea *real_ea_buf = NULL;
 	static struct ea *real_aea_buf = NULL;
@@ -167,42 +180,33 @@ void ctlr_reinit(H3270 *session, unsigned cmask)
 		/* Allocate buffers */
 		if (real_ea_buf)
 			Free((char *)real_ea_buf);
-		real_ea_buf = (struct ea *)Calloc(sizeof(struct ea),(session->maxROWS * session->maxCOLS) + 1);
+		real_ea_buf = (struct ea *)Calloc(sizeof(struct ea),
+					     (maxROWS * maxCOLS) + 1);
 		ea_buf = real_ea_buf + 1;
 		if (real_aea_buf)
 			Free((char *)real_aea_buf);
-		real_aea_buf = (struct ea *)Calloc(sizeof(struct ea),(session->maxROWS * session->maxCOLS) + 1);
+		real_aea_buf = (struct ea *)Calloc(sizeof(struct ea),
+					      (maxROWS * maxCOLS) + 1);
 		aea_buf = real_aea_buf + 1;
-		Replace(zero_buf, (unsigned char *)Calloc(sizeof(struct ea),session->maxROWS * session->maxCOLS));
-		session->cursor_addr = 0;
+		Replace(zero_buf, (unsigned char *)Calloc(sizeof(struct ea),
+							  maxROWS * maxCOLS));
+		cursor_addr = 0;
 		buffer_addr = 0;
 	}
 }
 
 /**
- * Get current 3270 model.
- *
- * @param session selected 3270 session.
- * @return Current model number.
- */
-int lib3270_get_model(H3270 *session)
-{
-	return session->model_num;
-}
-
-/**
  * Deal with the relationships between model numbers and rows/cols.
  *
- * @param model	New model (updates model name)
+ * @param model	New model (updates model name
  */
-int	lib3270_set_model(H3270 *session, int model)
+int	set_3270_model(H3270 *session, int model)
 {
 	if(CONNECTED)
 		return EBUSY;
 
-	ctlr_set_rows_cols(session,model,session->ov_cols,session->ov_rows);
-	ctlr_reinit(session,MODEL_CHANGE);
-
+	ctlr_set_rows_cols(session,model,ov_cols,ov_rows);
+	ctlr_reinit(MODEL_CHANGE);
 	return 0;
 }
 
@@ -231,31 +235,85 @@ void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr)
 
 	update_model_info(session,mn,sz[idx].cols,sz[idx].rows);
 
+/*
+//	int defmod;
+
+	switch (mn)
+	{
+	case 2:
+//		maxCOLS = 80;
+//		maxROWS = 24;
+//		model_num = 2;
+		update_model_info(session,2,80,24);
+		break;
+	case 3:
+//		maxCOLS = 80;
+//		maxROWS = 32;
+//		model_num = 3;
+		update_model_info(session,3,80,32);
+		break;
+	case 4:
+//#if defined(RESTRICT_3279)
+//		if (appres.m3279) {
+//			popup_an_error("No 3279 Model 4\nDefaulting to model 3");
+//			ctlr_set_rows_cols("3", ovc, ovr);
+//			return;
+//		}
+//#endif
+//		maxCOLS = 80;
+//		maxROWS = 43;
+//		model_num = 4;
+		update_model_info(session,4,80,43);
+		break;
+	case 5:
+//#if defined(RESTRICT_3279)
+//		if (appres.m3279) {
+//			popup_an_error("No 3279 Model 5\nDefaulting to model 3");
+//			ctlr_set_rows_cols(3, ovc, ovr);
+//			return;
+//		}
+//#endif
+//		maxCOLS = 132;
+//		maxROWS = 27;
+//		model_num = 5;
+		update_model_info(session,5,132,27);
+		break;
+
+	default:
+//#if defined(RESTRICT_3279)
+//		defmod = appres.m3279 ? 3 : 4;
+//#else
+//		defmod = 4;
+//#endif
+//		popup_an_error("Unknown model: %d\nDefaulting to %d", mn,defmod);
+//		ctlr_set_rows_cols(defmod, ovc, ovr);
+		popup_an_error("Unknown model: %d - Defaulting to %d", mn, 4);
+		mn = 4;
+		update_model_info(session,4,80,43);
+	}
+*/
+
 	// Apply oversize.
-	session->ov_cols = 0;
-	session->ov_rows = 0;
+	ov_cols = 0;
+	ov_rows = 0;
 	if (ovc != 0 || ovr != 0)
 	{
 		if (ovc <= 0 || ovr <= 0)
 			popup_an_error("Invalid %s %dx%d:\nNegative or zero",ResOversize, ovc, ovr);
 		else if (ovc * ovr >= 0x4000)
 			popup_an_error("Invalid %s %dx%d:\nToo big",ResOversize, ovc, ovr);
-		else if (ovc > 0 && ovc < session->maxCOLS)
-			popup_an_error("Invalid %s cols (%d):\nLess than model %d cols (%d)",ResOversize, ovc, session->model_num, session->maxCOLS);
-		else if (ovr > 0 && ovr < session->maxROWS)
-			popup_an_error("Invalid %s rows (%d):\nLess than model %d rows (%d)",ResOversize, ovr, session->model_num, session->maxROWS);
+		else if (ovc > 0 && ovc < maxCOLS)
+			popup_an_error("Invalid %s cols (%d):\nLess than model %d cols (%d)",ResOversize, ovc, model_num, maxCOLS);
+		else if (ovr > 0 && ovr < maxROWS)
+			popup_an_error("Invalid %s rows (%d):\nLess than model %d rows (%d)",ResOversize, ovr, model_num, maxROWS);
 		else
-			update_model_info(session,mn,session->ov_cols = ovc,session->ov_rows = ovr);
+			update_model_info(session,mn,ov_cols = ovc,ov_rows = ovr);
 	}
 
-	set_viewsize(session,sz[idx].rows,sz[idx].cols);
-
-	/*
 	// Make sure that the current rows/cols are still 24x80.
-	session->cols = 80;
-	session->rows = 24;
-	session->screen_alt = False;
-	*/
+	COLS = 80;
+	ROWS = 24;
+	screen_alt = False;
 
 }
 
@@ -264,19 +322,16 @@ void ctlr_set_rows_cols(H3270 *session, int mn, int ovc, int ovr)
  * Set the formatted screen flag.  A formatted screen is a screen that
  * has at least one field somewhere on it.
  */
-static void set_formatted(H3270 *session)
+static void
+set_formatted(void)
 {
-	register int baddr;
+	register int	baddr;
 
-	CHECK_SESSION_HANDLE(session);
-
-	session->formatted = False;
+	formatted = False;
 	baddr = 0;
-	do
-	{
-		if (ea_buf[baddr].fa)
-		{
-			session->formatted = True;
+	do {
+		if (ea_buf[baddr].fa) {
+			formatted = True;
 			break;
 		}
 		INC_BA(baddr);
@@ -286,27 +341,29 @@ static void set_formatted(H3270 *session)
 /*
  * Called when a host is half connected.
  */
-static void ctlr_half_connect(H3270 *session, int ignored unused, void *dunno)
+static void
+ctlr_half_connect(int ignored unused)
 {
-	ticking_start(session,True);
+	ticking_start(True);
 }
 
 
 /*
  * Called when a host connects, disconnects, or changes ANSI/3270 modes.
  */
-static void ctlr_connect(H3270 *session, int ignored unused, void *dunno)
+static void
+ctlr_connect(int ignored unused)
 {
-	ticking_stop(session);
-	status_untiming(session);
+	ticking_stop();
+	status_untiming();
 
-	if (session->ever_3270)
+	if (ever_3270)
 		ea_buf[-1].fa = FA_PRINTABLE | FA_MODIFY;
 	else
 		ea_buf[-1].fa = FA_PRINTABLE | FA_PROTECT;
 	if (!IN_3270 || (IN_SSCP && (kybdlock & KL_OIA_TWAIT))) {
 		kybdlock_clr(KL_OIA_TWAIT, "ctlr_connect");
-		status_reset(session);
+		status_reset();
 	}
 
 	default_fg = 0x00;
@@ -324,13 +381,12 @@ static void ctlr_connect(H3270 *session, int ignored unused, void *dunno)
  * Find the buffer address of the field attribute for a given buffer address.
  * Returns -1 if the screen isn't formatted.
  */
-int find_field_attribute(H3270 *h, int baddr)
+int
+find_field_attribute(int baddr)
 {
 	int sbaddr;
 
-	CHECK_SESSION_HANDLE(h);
-
-	if (!h->formatted)
+	if (!formatted)
 		return -1;
 
 	sbaddr = baddr;
@@ -345,15 +401,11 @@ int find_field_attribute(H3270 *h, int baddr)
 /*
  * Get Field width
  */
-int find_field_length(H3270 *h, int baddr)
+int find_field_length(int baddr)
 {
 	int saddr;
-	int addr;
+	int addr = find_field_attribute(baddr);
 	int width = 0;
-
-	CHECK_SESSION_HANDLE(h);
-
-	addr = find_field_attribute(h,baddr);
 
 	if(addr < 0)
 		return -1;
@@ -375,10 +427,10 @@ int find_field_length(H3270 *h, int baddr)
  * Find the field attribute for the given buffer address.  Return its address
  * rather than its value.
  */
-unsigned char get_field_attribute(H3270 *h, int baddr)
+unsigned char
+get_field_attribute(int baddr)
 {
-	CHECK_SESSION_HANDLE(h);
-	return ea_buf[find_field_attribute(h,baddr)].fa;
+	return ea_buf[find_field_attribute(baddr)].fa;
 }
 
 /*
@@ -393,7 +445,7 @@ get_bounded_field_attribute(register int baddr, register int bound,
 {
 	int	sbaddr;
 
-	if (!h3270.formatted) {
+	if (!formatted) {
 		*fa_out = ea_buf[-1].fa;
 		return True;
 	}
@@ -453,39 +505,38 @@ next_unprotected(int baddr0)
  * Perform an erase command, which may include changing the (virtual) screen
  * size.
  */
-void ctlr_erase(H3270 *session, int alt)
+void
+ctlr_erase(int alt)
 {
-	CHECK_SESSION_HANDLE(session);
-
 	kybd_inhibit(False);
 
-	ctlr_clear(session,True);
-	screen_erase(session);
+	ctlr_clear(True);
+	screen_erase();
 
-	if(alt == session->screen_alt)
+	/* Let a script go. */
+//	sms_host_output();
+
+	if (alt == screen_alt)
 		return;
 
-	if (alt)
-	{
+	if (alt) {
 		/* Going from 24x80 to maximum. */
-		screen_disp(session);
-		set_viewsize(session,session->maxROWS,session->maxCOLS);
-	}
-	else
-	{
+		screen_disp();
+		ROWS = maxROWS;
+		COLS = maxCOLS;
+	} else {
 		/* Going from maximum to 24x80. */
-		if (session->maxROWS > 24 || session->maxCOLS > 80)
-		{
-			if (visible_control)
-			{
+		if (maxROWS > 24 || maxCOLS > 80) {
+			if (visible_control) {
 				ctlr_blanks();
-				screen_disp(session);
+				screen_disp();
 			}
-			set_viewsize(session,24,80);
+			ROWS = 24;
+			COLS = 80;
 		}
 	}
 
-	session->screen_alt = alt;
+	screen_alt = alt;
 }
 
 
@@ -514,7 +565,7 @@ process_ds(unsigned char *buf, int buflen)
 	case CMD_EWA:	/* erase/write alternate */
 	case SNA_CMD_EWA:
 		trace_ds("EraseWriteAlternate");
-		ctlr_erase(NULL,True);
+		ctlr_erase(True);
 		if ((rv = ctlr_write(buf, buflen, True)) < 0)
 			return rv;
 		return PDS_OKAY_NO_OUTPUT;
@@ -522,7 +573,7 @@ process_ds(unsigned char *buf, int buflen)
 	case CMD_EW:	/* erase/write */
 	case SNA_CMD_EW:
 		trace_ds("EraseWrite");
-		ctlr_erase(NULL,False);
+		ctlr_erase(False);
 		if ((rv = ctlr_write(buf, buflen, True)) < 0)
 			return rv;
 		return PDS_OKAY_NO_OUTPUT;
@@ -690,8 +741,8 @@ ctlr_read_modified(unsigned char aid_byte, Boolean all)
 			trace_ds("%s",see_aid(aid_byte));
 			if (short_read)
 			    goto rm_done;
-			ENCODE_BADDR(obptr, h3270.cursor_addr);
-			trace_ds("%s",rcba(h3270.cursor_addr));
+			ENCODE_BADDR(obptr, cursor_addr);
+			trace_ds("%s",rcba(cursor_addr));
 		} else {
 			space3270out(1);	/* just in case */
 		}
@@ -699,7 +750,7 @@ ctlr_read_modified(unsigned char aid_byte, Boolean all)
 	}
 
 	baddr = 0;
-	if (h3270.formatted) {
+	if (formatted) {
 		/* find first field attribute */
 		do {
 			if (ea_buf[baddr].fa)
@@ -715,7 +766,7 @@ ctlr_read_modified(unsigned char aid_byte, Boolean all)
 				space3270out(3);
 				*obptr++ = ORDER_SBA;
 				ENCODE_BADDR(obptr, baddr);
-				trace_ds(" SetBufferAddress%s (Cols: %d Rows: %d)", rcba(baddr), h3270.cols, h3270.rows);
+				trace_ds(" SetBufferAddress%s (Cols: %d Rows: %d)", rcba(baddr), COLS, ROWS);
 				while (!ea_buf[baddr].fa) {
 
 					if (send_data &&
@@ -834,8 +885,8 @@ ctlr_read_buffer(unsigned char aid_byte)
 
 	space3270out(3);
 	*obptr++ = aid_byte;
-	ENCODE_BADDR(obptr, h3270.cursor_addr);
-	trace_ds("%s%s", see_aid(aid_byte), rcba(h3270.cursor_addr));
+	ENCODE_BADDR(obptr, cursor_addr);
+	trace_ds("%s%s", see_aid(aid_byte), rcba(cursor_addr));
 
 	baddr = 0;
 	do {
@@ -948,7 +999,7 @@ ctlr_snap_buffer(void)
 	unsigned char   av;
 
 	space3270out(2);
-	*obptr++ = h3270.screen_alt ? CMD_EWA : CMD_EW;
+	*obptr++ = screen_alt ? CMD_EWA : CMD_EW;
 	*obptr++ = code_table[0];
 
 	do {
@@ -1032,7 +1083,7 @@ ctlr_snap_buffer(void)
 
 	space3270out(4);
 	*obptr++ = ORDER_SBA;
-	ENCODE_BADDR(obptr, h3270.cursor_addr);
+	ENCODE_BADDR(obptr, cursor_addr);
 	*obptr++ = ORDER_IC;
 }
 
@@ -1075,7 +1126,8 @@ ctlr_erase_all_unprotected(void)
 
 	kybd_inhibit(False);
 
-	if (h3270.formatted) {
+	ALL_CHANGED;
+	if (formatted) {
 		/* find first field attribute */
 		baddr = 0;
 		do {
@@ -1109,11 +1161,10 @@ ctlr_erase_all_unprotected(void)
 		if (!f)
 			cursor_move(0);
 	} else {
-		ctlr_clear(&h3270,True);
+		ctlr_clear(True);
 	}
 	aid = AID_NO;
 	do_reset(False);
-	ALL_CHANGED;
 }
 
 
@@ -1165,7 +1216,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			ctlr_add_gr(buffer_addr, 0); \
 			ctlr_add_ic(buffer_addr, 0); \
 			trace_ds("%s",see_attr(fa)); \
-			h3270.formatted = True; \
+			formatted = True; \
 		}
 
 	kybd_inhibit(False);
@@ -1179,7 +1230,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 	default_cs = 0;
 	default_ic = 0;
 	trace_primed = True;
-	buffer_addr = h3270.cursor_addr;
+	buffer_addr = cursor_addr;
 	if (WCC_RESET(buf[1])) {
 		if (erase)
 			reply_mode = SF_SRM_FIELD;
@@ -1193,7 +1244,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 	}
 	wcc_keyboard_restore = WCC_KEYBOARD_RESTORE(buf[1]);
 	if (wcc_keyboard_restore)
-		ticking_stop(NULL);
+		ticking_stop();
 	if (wcc_keyboard_restore) {
 		trace_ds("%srestore", paren);
 		paren = ",";
@@ -1217,7 +1268,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 
 	last_cmd = True;
 	last_zpt = False;
-	current_fa = get_field_attribute(&h3270,buffer_addr);
+	current_fa = get_field_attribute(buffer_addr);
 
 #define ABORT_WRITEx { \
 	rv = PDS_BAD_ADDR; \
@@ -1250,10 +1301,10 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			END_TEXT("SetBufferAddress");
 			previous = SBA;
 			trace_ds("%s",rcba(buffer_addr));
-			if (buffer_addr >= h3270.cols * h3270.rows) {
+			if (buffer_addr >= COLS * ROWS) {
 				ABORT_WRITE("invalid SBA address");
 			}
-			current_fa = get_field_attribute(&h3270,buffer_addr);
+			current_fa = get_field_attribute(buffer_addr);
 			last_cmd = True;
 			last_zpt = False;
 			break;
@@ -1381,7 +1432,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 				if (add_c1)
 					trace_ds("'");
 			}
-			if (baddr >= h3270.cols * h3270.rows) {
+			if (baddr >= COLS * ROWS) {
 				ABORT_WRITE("invalid RA address");
 			}
 			do {
@@ -1413,7 +1464,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 					INC_BA(buffer_addr);
 				}
 			} while (buffer_addr != baddr);
-			current_fa = get_field_attribute(&h3270,buffer_addr);
+			current_fa = get_field_attribute(buffer_addr);
 			last_cmd = True;
 			last_zpt = False;
 			break;
@@ -1424,7 +1475,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			if (previous != SBA)
 				trace_ds("%s",rcba(baddr));
 			previous = ORDER;
-			if (baddr >= h3270.cols * h3270.rows) {
+			if (baddr >= COLS * ROWS) {
 				ABORT_WRITE("invalid EUA address");
 			}
 			d = ctlr_lookleft_state(buffer_addr, &why);
@@ -1444,7 +1495,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 				}
 				INC_BA(buffer_addr);
 			} while (buffer_addr != baddr);
-			current_fa = get_field_attribute(&h3270,buffer_addr);
+			current_fa = get_field_attribute(buffer_addr);
 			last_cmd = True;
 			last_zpt = False;
 			break;
@@ -1464,7 +1515,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			ctlr_add_gr(buffer_addr, default_gr);
 			ctlr_add_ic(buffer_addr, default_ic);
 			INC_BA(buffer_addr);
-			current_fa = get_field_attribute(&h3270,buffer_addr);
+			current_fa = get_field_attribute(buffer_addr);
 			last_cmd = False;
 			last_zpt = False;
 			break;
@@ -1711,12 +1762,12 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			if (d != DBCS_NONE && why == DBCS_FIELD) {
 				ABORT_WRITE("SI in DBCS field");
 			}
-			fa_addr = find_field_attribute(&h3270,buffer_addr);
+			fa_addr = find_field_attribute(buffer_addr);
 			baddr = buffer_addr;
 			DEC_BA(baddr);
 			while (!aborted &&
 			       ((fa_addr >= 0 && baddr != fa_addr) ||
-			        (fa_addr < 0 && baddr != h3270.rows*h3270.cols - 1))) {
+			        (fa_addr < 0 && baddr != ROWS*COLS - 1))) {
 				if (ea_buf[baddr].cc == FCORDER_SI) {
 					ABORT_WRITE("double SI");
 				}
@@ -1863,7 +1914,7 @@ ctlr_write(unsigned char buf[], int buflen, Boolean erase)
 			break;
 		}
 	}
-	set_formatted(&h3270);
+	set_formatted();
 	END_TEXT0;
 	trace_ds("\n");
 	if (wcc_keyboard_restore) {
@@ -1927,8 +1978,8 @@ ctlr_write_sscp_lu(unsigned char buf[], int buflen)
 			 * Insert NULLs to the end of the line and advance to
 			 * the beginning of the next line.
 			 */
-			s_row = buffer_addr / h3270.cols;
-			while ((buffer_addr / h3270.cols) == s_row) {
+			s_row = buffer_addr / COLS;
+			while ((buffer_addr / COLS) == s_row) {
 				ctlr_add(buffer_addr, EBC_null, default_cs);
 				ctlr_add_fg(buffer_addr, default_fg);
 				ctlr_add_bg(buffer_addr, default_bg);
@@ -2292,8 +2343,8 @@ ps_process(void)
 #if defined(X3270_FT) /*[*/
 	/* Process file transfers. */
 	if (ft_state != FT_NONE &&      /* transfer in progress */
-	    h3270.formatted &&          /* screen is formatted */
-	    !h3270.screen_alt &&        /* 24x80 screen */
+	    formatted &&                /* screen is formatted */
+	    !screen_alt &&              /* 24x80 screen */
 	    !kybdlock &&                /* keyboard not locked */
 	    /* magic field */
 	    ea_buf[1919].fa && FA_IS_SKIP(ea_buf[1919].fa)) {
@@ -2310,7 +2361,7 @@ ctlr_any_data(void)
 {
 	register int i;
 
-	for (i = 0; i < h3270.rows*h3270.cols; i++) {
+	for (i = 0; i < ROWS*COLS; i++) {
 		if (!IsBlank(ea_buf[i].cc))
 			return True;
 	}
@@ -2322,7 +2373,7 @@ ctlr_any_data(void)
  * and buffer addresses and extended attributes.
  */
 void
-ctlr_clear(H3270 *session, Boolean can_snap)
+ctlr_clear(Boolean can_snap)
 {
 	/* Snap any data that is about to be lost into the trace file. */
 	if (ctlr_any_data()) {
@@ -2330,27 +2381,24 @@ ctlr_clear(H3270 *session, Boolean can_snap)
 		if (can_snap && !trace_skipping && toggled(SCREEN_TRACE))
 			trace_screen();
 #endif /*]*/
-		scroll_save(session->maxROWS, ever_3270 ? False : True);
+		scroll_save(maxROWS, ever_3270 ? False : True);
 	}
 #if defined(X3270_TRACE) /*[*/
 	trace_skipping = False;
 #endif /*]*/
 
 	/* Clear the screen. */
-	(void) memset((char *)ea_buf, 0, session->rows*session->cols*sizeof(struct ea));
+	(void) memset((char *)ea_buf, 0, ROWS*COLS*sizeof(struct ea));
+	ALL_CHANGED;
 	cursor_move(0);
 	buffer_addr = 0;
-	// unselect(0, ROWS*COLS);
-	session->formatted = False;
+	unselect(0, ROWS*COLS);
+	formatted = False;
 	default_fg = 0;
 	default_bg = 0;
 	default_gr = 0;
 	default_ic = 0;
 	sscp_start = 0;
-
-//	ALL_CHANGED;
-	screen_erase(session);
-
 }
 
 /*
@@ -2361,15 +2409,15 @@ ctlr_blanks(void)
 {
 	int baddr;
 
-	for (baddr = 0; baddr < h3270.rows*h3270.cols; baddr++) {
+	for (baddr = 0; baddr < ROWS*COLS; baddr++) {
 		if (!ea_buf[baddr].fa)
 			ea_buf[baddr].cc = EBC_space;
 	}
+	ALL_CHANGED;
 	cursor_move(0);
 	buffer_addr = 0;
-	// unselect(0, ROWS*COLS);
-	h3270.formatted = False;
-	ALL_CHANGED;
+	unselect(0, ROWS*COLS);
+	formatted = False;
 }
 
 
@@ -2382,25 +2430,22 @@ ctlr_add(int baddr, unsigned char c, unsigned char cs)
 {
 	unsigned char oc = 0;
 
-	if(ea_buf[baddr].fa || ((oc = ea_buf[baddr].cc) != c || ea_buf[baddr].cs != cs))
-	{
-		if (trace_primed && !IsBlank(oc))
-		{
+	if (ea_buf[baddr].fa ||
+	    ((oc = ea_buf[baddr].cc) != c || ea_buf[baddr].cs != cs)) {
+		if (trace_primed && !IsBlank(oc)) {
 #if defined(X3270_TRACE) /*[*/
 			if (toggled(SCREEN_TRACE))
 				trace_screen();
 #endif /*]*/
-			scroll_save(session->maxROWS, False);
+			scroll_save(maxROWS, False);
 			trace_primed = False;
 		}
-		/*
 		if (SELECTED(baddr))
 			unselect(baddr, 1);
-		*/
+		ONE_CHANGED(baddr);
 		ea_buf[baddr].cc = c;
 		ea_buf[baddr].cs = cs;
 		ea_buf[baddr].fa = 0;
-		ONE_CHANGED(baddr);
 	}
 }
 
@@ -2426,14 +2471,11 @@ ctlr_add_fa(int baddr, unsigned char fa, unsigned char cs)
 void
 ctlr_add_cs(int baddr, unsigned char cs)
 {
-	if (ea_buf[baddr].cs != cs)
-	{
-		/*
+	if (ea_buf[baddr].cs != cs) {
 		if (SELECTED(baddr))
 			unselect(baddr, 1);
-		*/
-		ea_buf[baddr].cs = cs;
 		ONE_CHANGED(baddr);
+		ea_buf[baddr].cs = cs;
 	}
 }
 
@@ -2443,16 +2485,13 @@ ctlr_add_cs(int baddr, unsigned char cs)
 void
 ctlr_add_gr(int baddr, unsigned char gr)
 {
-	if (ea_buf[baddr].gr != gr)
-	{
-		/*
+	if (ea_buf[baddr].gr != gr) {
 		if (SELECTED(baddr))
 			unselect(baddr, 1);
-		*/
+		ONE_CHANGED(baddr);
 		ea_buf[baddr].gr = gr;
 		if (gr & GR_BLINK)
 			blink_start();
-		ONE_CHANGED(baddr);
 	}
 }
 
@@ -2466,14 +2505,11 @@ ctlr_add_fg(int baddr, unsigned char color)
 		return;
 	if ((color & 0xf0) != 0xf0)
 		color = 0;
-	if (ea_buf[baddr].fg != color)
-	{
-		/*
+	if (ea_buf[baddr].fg != color) {
 		if (SELECTED(baddr))
 			unselect(baddr, 1);
-		*/
-		ea_buf[baddr].fg = color;
 		ONE_CHANGED(baddr);
+		ea_buf[baddr].fg = color;
 	}
 }
 
@@ -2487,14 +2523,11 @@ ctlr_add_bg(int baddr, unsigned char color)
 		return;
 	if ((color & 0xf0) != 0xf0)
 		color = 0;
-	if (ea_buf[baddr].bg != color)
-	{
-		/*
+	if (ea_buf[baddr].bg != color) {
 		if (SELECTED(baddr))
 			unselect(baddr, 1);
-		*/
-		ea_buf[baddr].bg = color;
 		ONE_CHANGED(baddr);
+		ea_buf[baddr].bg = color;
 	}
 }
 
@@ -2521,8 +2554,8 @@ ctlr_wrapping_memmove(int baddr_to, int baddr_from, int count)
 	 * It's faster to figure out if none of this is true, then do a slow
 	 * location-at-a-time version only if it happens.
 	 */
-	if (baddr_from + count <= h3270.rows*h3270.cols &&
-	    baddr_to + count <= h3270.rows*h3270.cols) {
+	if (baddr_from + count <= ROWS*COLS &&
+	    baddr_to + count <= ROWS*COLS) {
 		ctlr_bcopy(baddr_from, baddr_to, count, True);
 	} else {
 		int i, from, to;
@@ -2530,12 +2563,12 @@ ctlr_wrapping_memmove(int baddr_to, int baddr_from, int count)
 		for (i = 0; i < count; i++) {
 		    if (baddr_to > baddr_from) {
 			/* Shifting right, move left. */
-			to = (baddr_to + count - 1 - i) % h3270.rows*h3270.cols;
-			from = (baddr_from + count - 1 - i) % h3270.rows*h3270.cols;
+			to = (baddr_to + count - 1 - i) % ROWS*COLS;
+			from = (baddr_from + count - 1 - i) % ROWS*COLS;
 		    } else {
 			/* Shifting left, move right. */
-			to = (baddr_to + i) % h3270.rows*h3270.cols;
-			from = (baddr_from + i) % h3270.rows*h3270.cols;
+			to = (baddr_to + i) % ROWS*COLS;
+			from = (baddr_from + i) % ROWS*COLS;
 		    }
 		    ctlr_bcopy(from, to, 1, True);
 		}
@@ -2562,10 +2595,9 @@ ctlr_bcopy(int baddr_from, int baddr_to, int count, int move_ea)
 		 * the screen, unhighlight it.  Eventually there should be
 		 * logic for preserving the highlight if the *all* of the
 		 * selected text moves.
-		 */ /*
+		 */
 		if (area_is_selected(baddr_to, count))
 			unselect(baddr_to, count);
-		*/
 	}
 	/* XXX: What about move_ea? */
 }
@@ -2583,10 +2615,8 @@ ctlr_aclear(int baddr, int count, int clear_ea)
 		(void) memset((char *) &ea_buf[baddr], 0,
 				count * sizeof(struct ea));
 		REGION_CHANGED(baddr, baddr + count);
-		/*
 		if (area_is_selected(baddr, count))
 			unselect(baddr, count);
-		*/
 	}
 	/* XXX: What about clear_ea? */
 }
@@ -2597,65 +2627,63 @@ ctlr_aclear(int baddr, int count, int clear_ea)
  * This could be accomplished with ctlr_bcopy() and ctlr_aclear(), but this
  * operation is common enough to warrant a separate path.
  */
-void ctlr_scroll(void)
+void
+ctlr_scroll(void)
 {
-	int qty = (h3270.rows - 1) * h3270.cols;
+	int qty = (ROWS - 1) * COLS;
+	Boolean obscured;
 
 	/* Make sure nothing is selected. (later this can be fixed) */
-	// unselect(0, ROWS*COLS);
+	unselect(0, ROWS*COLS);
 
 	/* Synchronize pending changes prior to this. */
+	obscured = screen_obscured();
+	if (!obscured && screen_has_changes)
+		screen_disp();
 
 	/* Move ea_buf. */
-	(void) memmove(&ea_buf[0], &ea_buf[h3270.cols],qty * sizeof(struct ea));
+	(void) memmove(&ea_buf[0], &ea_buf[COLS],
+	    qty * sizeof(struct ea));
 
 	/* Clear the last line. */
-	(void) memset((char *) &ea_buf[qty], 0, h3270.cols * sizeof(struct ea));
+	(void) memset((char *) &ea_buf[qty], 0, COLS * sizeof(struct ea));
 
-	screen_disp(&h3270);
-
+	/* Update the screen. */
+	if (obscured) {
+		ALL_CHANGED;
+	} else {
+		screen_scroll();
+	}
 }
 #endif /*]*/
 
 /*
  * Note that a particular region of the screen has changed.
  */
-void changed(H3270 *session, int bstart, int bend)
+void
+ctlr_changed(int bstart, int bend)
 {
-	/*
-	if(session->first_changed < 0)
-	{
-		session->first_changed = bstart;
-		session->last_changed  = bend;
-		return;
-	}
-	if(bstart < session->first_changed)
-		session->first_changed = bstart;
-
-	if(bend > session->last_changed)
-		session->last_changed = bend;
-	*/
+	REGION_CHANGED(bstart, bend);
 }
 
+#if defined(X3270_ANSI) /*[*/
 /*
  * Swap the regular and alternate screen buffers
  */
-void ctlr_altbuffer(H3270 *session, int alt)
+void
+ctlr_altbuffer(Boolean alt)
 {
 	struct ea *etmp;
 
-    CHECK_SESSION_HANDLE(session);
-
-	if (alt != session->is_altbuffer)
-	{
+	if (alt != is_altbuffer) {
 
 		etmp = ea_buf;
 		ea_buf = aea_buf;
 		aea_buf = etmp;
 
-		session->is_altbuffer = alt;
+		is_altbuffer = alt;
 		ALL_CHANGED;
-		// unselect(0, ROWS*COLS);
+		unselect(0, ROWS*COLS);
 
 		/*
 		 * There may be blinkers on the alternate screen; schedule one
@@ -2664,6 +2692,7 @@ void ctlr_altbuffer(H3270 *session, int alt)
 		blink_start();
 	}
 }
+#endif /*]*/
 
 
 /*
@@ -2674,7 +2703,7 @@ mdt_set(int baddr)
 {
 	int faddr;
 
-	faddr = find_field_attribute(&h3270,baddr);
+	faddr = find_field_attribute(baddr);
 	if (faddr >= 0 && !(ea_buf[faddr].fa & FA_MODIFY)) {
 		ea_buf[faddr].fa |= FA_MODIFY;
 		if (appres.modified_sel)
@@ -2687,7 +2716,7 @@ mdt_clear(int baddr)
 {
 	int faddr;
 
-	faddr = find_field_attribute(&h3270,baddr);
+	faddr = find_field_attribute(baddr);
 	if (faddr >= 0 && (ea_buf[faddr].fa & FA_MODIFY)) {
 		ea_buf[faddr].fa &= ~FA_MODIFY;
 		if (appres.modified_sel)
@@ -2704,13 +2733,13 @@ ctlr_shrink(void)
 {
 	int baddr;
 
-	for (baddr = 0; baddr < h3270.rows*h3270.cols; baddr++) {
+	for (baddr = 0; baddr < ROWS*COLS; baddr++) {
 		if (!ea_buf[baddr].fa)
 			ea_buf[baddr].cc =
 			    visible_control? EBC_space : EBC_null;
 	}
 	ALL_CHANGED;
-	screen_disp(&h3270);
+	screen_disp();
 }
 
 #if defined(X3270_DBCS) /*[*/
@@ -2760,95 +2789,74 @@ static void keep_ticking(H3270 *session)
 	struct timeval t1;
 	long msec;
 
-	do
-	{
+	do {
 		(void) gettimeofday(&t1, (struct timezone *) 0);
 		t_want.tv_sec++;
 		msec = delta_msec(&t_want, &t1);
 	} while (msec <= 0);
-
-	tick_id = AddTimeOut(msec, session, keep_ticking);
-	status_timing(session,&t_start, &t1);
+	tick_id = AddTimeOut(msec, &h3270, keep_ticking);
+	status_timing(&t_start, &t1);
 }
 
-void ticking_start(H3270 *session, Boolean anyway)
+void
+ticking_start(Boolean anyway)
 {
-	CHECK_SESSION_HANDLE(session);
+	(void) gettimeofday(&t_start, (struct timezone *) 0);
+	mticking = True;
 
-	if(session->set_timer)
-	{
-		if(toggled(SHOW_TIMING) || anyway)
-			session->set_timer(session,1);
-	}
-	else
-	{
-		(void) gettimeofday(&t_start, (struct timezone *) 0);
-
-		mticking = True;
-
-		if (!toggled(SHOW_TIMING) && !anyway)
-			return;
-
-		status_untiming(session);
-		if (ticking)
-			RemoveTimeOut(tick_id);
-		ticking = True;
-		tick_id = AddTimeOut(1000, session, keep_ticking);
-		t_want = t_start;
-	}
-
-}
-
-static void ticking_stop(H3270 *session)
-{
-	CHECK_SESSION_HANDLE(session);
-
-	if(session->set_timer)
-	{
-		session->set_timer(session,0);
-	}
-	else
-	{
-		struct timeval t1;
-
-		(void) gettimeofday(&t1, (struct timezone *) 0);
-		if (mticking)
-			mticking = False;
-		else
-			return;
-
-		if (!ticking)
-			return;
+	if (!toggled(SHOW_TIMING) && !anyway)
+		return;
+	status_untiming();
+	if (ticking)
 		RemoveTimeOut(tick_id);
-		ticking = False;
-		status_timing(session,&t_start, &t1);
-	}
+	ticking = True;
+	tick_id = AddTimeOut(1000, &h3270, keep_ticking);
+	t_want = t_start;
 }
 
-/*
-void toggle_showTiming(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE tt unused)
+static void
+ticking_stop(void)
+{
+	struct timeval t1;
+
+	(void) gettimeofday(&t1, (struct timezone *) 0);
+	if (mticking) {
+//		sms_accumulate_time(&t_start, &t1);
+		mticking = False;
+	} else {
+		return;
+	}
+
+	if (!ticking)
+		return;
+	RemoveTimeOut(tick_id);
+	ticking = False;
+	status_timing(&t_start, &t1);
+}
+
+void
+toggle_showTiming(struct toggle *t unused, enum toggle_type tt unused)
 {
 	if (!toggled(SHOW_TIMING))
-		status_untiming(&h3270);
+		status_untiming();
 }
-*/
 
 
 /*
  * No-op toggle.
  */
 void
-toggle_nop(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE tt unused)
+toggle_nop(struct toggle *t unused, enum toggle_type tt unused)
 {
 }
 
 int ctlr_get_rows(void)
 {
-    return h3270.rows;
+    return ROWS;
 }
 
 int ctlr_get_cols(void)
 {
-    return h3270.cols;
+    return COLS;
 }
 

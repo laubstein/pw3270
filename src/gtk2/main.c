@@ -42,7 +42,7 @@
 
 #include <glib/gstdio.h>
 
-// #include "globals.h"
+#include "globals.h"
 
 #if !defined(_WIN32)
 	#include <sys/wait.h>
@@ -76,7 +76,7 @@ static gchar		* log_filename		= NULL;
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
 /* Callback for connection state changes. */
-static void connect_main(H3270 *session, int status, void *dunno)
+static void connect_main(int status)
 {
 	gboolean online = (CONNECTED) ? TRUE : FALSE;
 
@@ -88,9 +88,9 @@ static void connect_main(H3270 *session, int status, void *dunno)
 	}
 	else
 	{
-		SetStatusCode(session,LIB3270_STATUS_DISCONNECTED);
+		SetStatusCode(STATUS_CODE_DISCONNECTED);
 		cMode &= ~CURSOR_MODE_ENABLED;
-//		ctlr_erase(1);
+		ctlr_erase(True);
 		online = FALSE;
 #ifdef 	X3270_FT
 		action_group_set_sensitive(ACTION_GROUP_FT,status);
@@ -129,7 +129,7 @@ static void connect_main(H3270 *session, int status, void *dunno)
 
 }
 
-static void connect_in3270(H3270 *session, int status, void *dunno)
+static void connect_in3270(int status)
 {
 #ifdef X3270_FT
 	action_group_set_sensitive(ACTION_GROUP_FT,status);
@@ -144,7 +144,7 @@ static void log_callback(const gchar *log_domain, GLogLevelFlags log_level, cons
 	Trace("%s %s", log_domain, message);
 }
 
-static void set_fullscreen(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
+static void set_fullscreen(int value, enum toggle_type reason)
 {
  	Trace("Fullscren mode toggled (value: %d",value);
 
@@ -204,10 +204,6 @@ static int program_init(void)
 	gboolean				has_log		= FALSE;
 	const gchar			*msg		= gtk_check_version(GTK_MAJOR_VERSION, GTK_MINOR_VERSION, GTK_MICRO_VERSION);
 	gchar					*ptr;
-	int						f;
-
-	for(f=0;f<POPUP_MENU_COUNT;f++)
-		popup_menu[f] = NULL;
 
 	if(msg)
 	{
@@ -290,17 +286,17 @@ static int program_init(void)
 		g_free(ptr);
 	}
 
-//	Trace("%s","Opening configuration file");
+	Trace("%s","Opening configuration file");
 	if(Register3270IOCallbacks(&program_io_callbacks))
 		return show_lib3270_register_error(_( "Can't register as I/O manager." ));
 
-//	Trace("%s","Setting screen callbacks");
+	Trace("%s","Setting screen callbacks");
 	if(Register3270ScreenCallbacks(&program_screen_callbacks))
 		return show_lib3270_register_error(_( "Can't register as screen manager." ));
 
 
 #ifdef X3270_FT
-//	Trace("%s","Starting FT feature");
+	Trace("%s","Starting FT feature");
 	if(initft())
 		return show_lib3270_register_error(_( "Can't register as file-transfer manager." ));
 #endif
@@ -413,7 +409,7 @@ static void load_options(GOptionContext *context)
 		switch(opt[f].type)
 		{
 		case OPT_BOOLEAN:		// FIXME (perry#1#): How can I set a boolean option?
-			entry->arg = G_OPTION_ARG_NONE;
+			entry->long_name = NULL;
 			break;
 
 		case OPT_STRING:
@@ -585,7 +581,7 @@ int main(int argc, char *argv[])
 	LoadPlugins();
 
 	Trace("Initializing library with %s...",argv[0]);
-	hSession = new_3270_session(GetString("Terminal","Model",""));
+	hSession = new_3270_session();
 
 	if(rc)
 	{
@@ -622,8 +618,8 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	connect_main(hSession,0,NULL);
-	connect_in3270(hSession,0,NULL);
+	connect_main(0);
+	connect_in3270(0);
 
 	register_schange(ST_CONNECT, connect_main);
 	register_schange(ST_3270_MODE, connect_in3270);
@@ -647,7 +643,7 @@ int main(int argc, char *argv[])
 		gtk_main_iteration();
 
 	/* Connect to the host. */
-	screen_suspend(hSession);
+	screen_suspend();
 
 	if(cl_hostname != CN)
 		SetString("Network","Hostname",cl_hostname);
@@ -659,8 +655,8 @@ int main(int argc, char *argv[])
 
 	if(topwindow)
 	{
-		screen_resume(hSession);
-		screen_disp(hSession);
+		screen_resume();
+		screen_disp();
 
 		// Start plugins after the creation of main loop
 		g_timeout_add((guint) 10, (GSourceFunc) StartPlugins, (gpointer) startup_script);

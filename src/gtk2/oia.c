@@ -92,7 +92,7 @@
 
  static void oia_message_area(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
-// static void dunno(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
+ static void dunno(cairo_t *cr, GdkGC *gc, GdkRectangle *r);
 
  static void oia_clear_rect(cairo_t *cr, GdkRectangle *r);
  static void oia_show_text(cairo_t *cr, GdkRectangle *r, const gchar *text, enum TERMINAL_COLOR c);
@@ -103,10 +103,10 @@
  static GdkPixmap * pixmap_oia[OIA_PIXMAP_COUNT] = { NULL, NULL};
 #endif // ENABLE_BM_PIXMAPS
 
- #define OIAROW	(view.top+4+(terminal_font_info.spacing*view.rows))
+ #define OIAROW	(top_margin+4+(terminal_font_info.spacing*terminal_rows))
 
  gboolean		  oia_flag[OIA_FLAG_USER];
- LIB3270_STATUS	  terminal_message_id = (LIB3270_STATUS) -1;
+ STATUS_CODE	  terminal_message_id = (STATUS_CODE) -1;
 
  SCRIPT_STATE	  oia_script_state = SCRIPT_STATE_NONE;
 
@@ -153,11 +153,9 @@
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
 
-/*
  static void dunno(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
  }
-*/
 
  void update_oia(void)
  {
@@ -167,7 +165,7 @@
 		GdkGC *gc = get_terminal_cached_gc();
 		draw_oia(cr,gc);
 		cairo_destroy(cr);
-		gtk_widget_queue_draw_area(terminal,OIAROW,view.left,view.cols*fontWidth,terminal_font_info.spacing+2);
+		gtk_widget_queue_draw_area(terminal,OIAROW,left_margin,terminal_cols*fontWidth,terminal_font_info.spacing+2);
 	}
  }
 
@@ -175,13 +173,13 @@
  {
  	int	f;
  	int row   = OIAROW;
- 	int width = (view.cols * terminal_font_info.width);
+ 	int width = (terminal_cols * terminal_font_info.width);
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
-	cairo_rectangle(cr, view.left, row, width, terminal_font_info.height);
+	cairo_rectangle(cr, left_margin, row, width, terminal_font_info.height);
 	cairo_fill(cr);
 
-	width += view.left;
+	width += left_margin;
 	for(f=0;f<OIA_ELEMENT_COUNT;f++)
 	{
 		GdkRectangle rect;
@@ -195,7 +193,7 @@
 
 	// http://cairographics.org/FAQ/#sharp_lines
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_SEPARATOR);
-	cairo_rectangle(cr, view.left, row-2, (view.cols * fontWidth), 1);
+	cairo_rectangle(cr, left_margin, row-2, (terminal_cols * fontWidth), 1);
 	cairo_fill(cr);
 
  }
@@ -210,7 +208,7 @@
 		memset(&rect,0,sizeof(rect));
 		rect.y = OIAROW;
 		rect.height = terminal_font_info.height;
-		rect.width = view.left + (view.cols * fontWidth);
+		rect.width = left_margin + (terminal_cols * fontWidth);
 
 		oia_call[el].update(cr,get_terminal_cached_gc(),&rect);
 
@@ -529,9 +527,9 @@
 */
 
 #ifdef ENABLE_BM_PIXMAPS
-
+	 
 	// Pixmap version
-
+	 
 	#include "locked.bm"
 	#include "unlocked.bm"
 
@@ -562,16 +560,16 @@
 	gdk_cairo_set_source_pixmap(cr, pixmap_oia[idx], r->x, r->y);
 	gdk_cairo_rectangle(cr,r);
 	cairo_fill(cr);
-
+	 
 #else
-
+	 
 	// Non Pixmap version
 
 	r->x = (r->width - (46*terminal_font_info.width))+1;
 	r->y++;
 	r->width = (terminal_font_info.width*2)-1;
 	r->height--;
-
+	 
 	oia_clear_icon(cr,r);
 
 	if(query_secure_connection(hSession))
@@ -580,9 +578,9 @@
 		cairo_arc(cr,r->x+(r->width/2),r->y+(r->height/2),r->width/(2.5),0,2*M_PI);
 		cairo_fill(cr);
 	}
-
+	 
 #endif // ENABLE_BM_PIXMAPS
-
+	 
  }
 
  static void oia_draw_insert_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
@@ -628,7 +626,7 @@
  static void oia_four_in_a_square(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	//  0          "4" in a square
-	r->x = view.left;
+	r->x = left_margin;
 	r->width = terminal_font_info.width+2;
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
@@ -644,7 +642,7 @@
  static void oia_undera_indicator(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	//  1          "A" underlined
-	r->x = (view.left+terminal_font_info.width+4);
+	r->x = (left_margin+terminal_font_info.width+4);
 	r->width = terminal_font_info.width;
 
 	oia_clear_rect(cr,r);
@@ -663,7 +661,7 @@
  static void oia_connection_status(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
  {
 	// 2          solid box if connected, "?" in a box if not
-	r->x = (view.left+(terminal_font_info.width*2)+6);
+	r->x = (left_margin+(terminal_font_info.width*2)+6);
 	r->width = terminal_font_info.width+2;
 
 	cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_BACKGROUND);
@@ -705,7 +703,7 @@
 
 	// For some reason the smallest size of "xos4 terminus bold" isn't drawing with the exact size;
 	// that's the reason why I'm reserving a bigger space for this element
- 	r->width = (terminal_font_info.width*9)+(terminal_font_info.width/2);
+ 	r->width = (terminal_font_info.width*8)+(terminal_font_info.width/2);
  	r->x = width - r->width;
 
 	oia_clear_rect(cr,r);
@@ -715,12 +713,12 @@
 		gchar *text;
 		cairo_text_extents_t s;
 
-		text = g_strdup_printf("%03d/%03d",(cursor_position/screen->cols)+1,(cursor_position%screen->cols)+1);
+		text = g_strdup_printf("%03d/%03d",(cursor_position/terminal_cols)+1,(cursor_position%terminal_cols)+1);
 
 		cairo_set_3270_color(cr,TERMINAL_COLOR_OIA_CURSOR);
 		cairo_text_extents(cr,text,&s);
 
-		cairo_move_to(cr,width-(s.width+2),r->y+fontAscent);
+		cairo_move_to(cr,width-s.width,r->y+fontAscent);
 		cairo_show_text(cr,text);
 
 		g_free(text);
@@ -811,65 +809,65 @@
 	#endif
 		int				  color;
 		const gchar	* string;
-	} message[LIB3270_STATUS_USER] =
+	} message[STATUS_CODE_USER] =
  	{
-		OIA_MESSAGE(	LIB3270_STATUS_BLANK,
+		OIA_MESSAGE(	STATUS_CODE_BLANK,
 						TERMINAL_COLOR_OIA_STATUS_OK,
 						"" ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_SYSWAIT,
+		OIA_MESSAGE(	STATUS_CODE_SYSWAIT,
 						TERMINAL_COLOR_OIA_STATUS_OK,
 						N_( "X System" ) ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_TWAIT,
+		OIA_MESSAGE(	STATUS_CODE_TWAIT,
 						TERMINAL_COLOR_OIA_STATUS_OK,
 						N_( "X Wait" ) ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_CONNECTED,
+		OIA_MESSAGE(	STATUS_CODE_CONNECTED,
 						TERMINAL_COLOR_OIA_STATUS_OK,
 						NULL ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_DISCONNECTED,
+		OIA_MESSAGE(	STATUS_CODE_DISCONNECTED,
 						TERMINAL_COLOR_OIA_STATUS_INVALID,
 						N_( "X Not Connected" ) ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_AWAITING_FIRST,
+		OIA_MESSAGE(	STATUS_CODE_AWAITING_FIRST,
 						TERMINAL_COLOR_OIA_STATUS_OK,
 						N_( "X" ) ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_MINUS,
+		OIA_MESSAGE(	STATUS_CODE_MINUS,
 						TERMINAL_COLOR_OIA_STATUS_OK,
 						N_( "X -f" ) ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_PROTECTED,
+		OIA_MESSAGE(	STATUS_CODE_PROTECTED,
 						TERMINAL_COLOR_OIA_STATUS_INVALID,
 						N_( "X Protected" ) ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_NUMERIC,
+		OIA_MESSAGE(	STATUS_CODE_NUMERIC,
 						TERMINAL_COLOR_OIA_STATUS_INVALID,
 						N_( "X Numeric" ) ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_OVERFLOW,
+		OIA_MESSAGE(	STATUS_CODE_OVERFLOW,
 						TERMINAL_COLOR_OIA_STATUS_INVALID,
 						N_( "X Overflow" ) ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_INHIBIT,
+		OIA_MESSAGE(	STATUS_CODE_INHIBIT,
 						TERMINAL_COLOR_OIA_STATUS_INVALID,
 						N_( "X Inhibit" ) ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_KYBDLOCK,
+		OIA_MESSAGE(	STATUS_CODE_KYBDLOCK,
 						TERMINAL_COLOR_OIA_STATUS_INVALID,
 						NULL ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_X,
+		OIA_MESSAGE(	STATUS_CODE_X,
 						TERMINAL_COLOR_OIA_STATUS_INVALID,
 						N_( "X" ) ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_RESOLVING,
+		OIA_MESSAGE(	STATUS_CODE_RESOLVING,
 						TERMINAL_COLOR_OIA_STATUS_WARNING,
 						N_( "X Resolving" ) ),
 
-		OIA_MESSAGE(	LIB3270_STATUS_CONNECTING,
+		OIA_MESSAGE(	STATUS_CODE_CONNECTING,
 						TERMINAL_COLOR_OIA_STATUS_WARNING,
 						N_( "X Connecting" ) ),
 
@@ -885,7 +883,7 @@
 
 	msg = message[current_message_id].string;
 
-	r->x = view.left + (terminal_font_info.width * 5);
+	r->x = left_margin + (terminal_font_info.width * 5);
 	r->width = (r->width - (terminal_font_info.width * 47)) - r->x;
 
 	if(r->width < 0)
@@ -967,5 +965,5 @@
 			pixmap_oia[f] = NULL;
 		}
 	}
-#endif // ENABLE_BM_PIXMAPS
+#endif // ENABLE_BM_PIXMAPS 
  }

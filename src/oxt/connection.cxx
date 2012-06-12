@@ -33,7 +33,7 @@
 #include "ooo3270.hpp"
 #include <osl/thread.hxx>
 #include <errno.h>
-#include <lib3270.h>
+#include <lib3270/api.h>
 #include <string.h>
 #include <time.h>
 #include <malloc.h>
@@ -132,7 +132,7 @@ sal_Int16 SAL_CALL pw3270::uno_impl::Disconnect() throw (RuntimeException)
 
 	yeld();
 
-	lib3270_disconnect(this->hSession);
+	host_disconnect(this->hSession,0);
 
 	yeld();
 

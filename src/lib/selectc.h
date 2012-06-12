@@ -14,9 +14,5 @@
 
 /* Non-display version of selectc.h */
 
-// #define unselect(baddr, len)
-// #define area_is_selected(baddr, len)	False
-
-#error delete.me - Selection isnt used on library version
-
-
+#define unselect(baddr, len)
+#define area_is_selected(baddr, len)	False

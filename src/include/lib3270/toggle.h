@@ -34,61 +34,51 @@
 
 	#define TOGGLE3270_H_INCLUDED 1
 
-	#include <lib3270.h>
+	#include <lib3270/api.h>
 
-	#define TT_INITIAL			LIB3270_TOGGLE_TYPE_INITIAL
-	#define TT_INTERACTIVE		LIB3270_TOGGLE_TYPE_INTERACTIVE
-	#define TT_ACTION			LIB3270_TOGGLE_TYPE_ACTION
-	#define TT_FINAL 			LIB3270_TOGGLE_TYPE_FINAL
-	#define TT_UPDATE			LIB3270_TOGGLE_TYPE_UPDATE
+	enum toggle_type { TT_INITIAL, TT_INTERACTIVE, TT_ACTION, TT_FINAL, TT_UPDATE };
 
-	#define MONOCASE			LIB3270_TOGGLE_MONOCASE
-	#define ALT_CURSOR			LIB3270_TOGGLE_ALT_CURSOR
-	#define CURSOR_BLINK		LIB3270_TOGGLE_CURSOR_BLINK
-	#define SHOW_TIMING			LIB3270_TOGGLE_SHOW_TIMING
-	#define CURSOR_POS			LIB3270_TOGGLE_CURSOR_POS
-	#define DS_TRACE			LIB3270_TOGGLE_DS_TRACE
-	#define SCROLL_BAR			LIB3270_TOGGLE_SCROLL_BAR
-	#define LINE_WRAP			LIB3270_TOGGLE_LINE_WRAP
-	#define BLANK_FILL			LIB3270_TOGGLE_BLANK_FILL
-	#define SCREEN_TRACE		LIB3270_TOGGLE_SCREEN_TRACE
-	#define EVENT_TRACE			LIB3270_TOGGLE_EVENT_TRACE
-	#define MARGINED_PASTE		LIB3270_TOGGLE_MARGINED_PASTE
-	#define RECTANGLE_SELECT	LIB3270_TOGGLE_RECTANGLE_SELECT
-	#define CROSSHAIR			LIB3270_TOGGLE_CROSSHAIR
-	#define VISIBLE_CONTROL		LIB3270_TOGGLE_VISIBLE_CONTROL
-	#define AID_WAIT			LIB3270_TOGGLE_AID_WAIT
-	#define FULL_SCREEN			LIB3270_TOGGLE_FULL_SCREEN
-	#define RECONNECT			LIB3270_TOGGLE_RECONNECT
-	#define INSERT				LIB3270_TOGGLE_INSERT
-	#define KEYPAD				LIB3270_TOGGLE_KEYPAD
-	#define SMART_PASTE			LIB3270_TOGGLE_SMART_PASTE
-	#define N_TOGGLES			LIB3270_TOGGLE_COUNT
+	typedef enum _lib3270_toggle_id
+	{
+		MONOCASE,
+		ALT_CURSOR,
+		CURSOR_BLINK,
+		SHOW_TIMING,
+		CURSOR_POS,
+		DS_TRACE,
+		SCROLL_BAR,
+		LINE_WRAP,
+		BLANK_FILL,
+		SCREEN_TRACE,
+		EVENT_TRACE,
+		MARGINED_PASTE,
+		RECTANGLE_SELECT,
+		CROSSHAIR,
+		VISIBLE_CONTROL,
+		AID_WAIT,
+		FULL_SCREEN,
+		RECONNECT,
+		INSERT,
+		KEYPAD,
+		SMART_PASTE,
 
-	#define LIB3270_TOGGLE_ID LIB3270_TOGGLE
+		N_TOGGLES
+	} LIB3270_TOGGLE_ID;
 
-
-	#define register_3270_toggle_monitor(ix,callback) lib3270_register_tchange(NULL,ix,callback)
-
-	// LIB3270_EXPORT void					  register_3270_toggle_monitor(LIB3270_TOGGLE_ID ix, void (*callback)(int value, LIB3270_TOGGLE_TYPE reason));
-//	LIB3270_EXPORT int					  lib3270_toggle(H3270 *session, LIB3270_TOGGLE_ID ix);
-
+	LIB3270_EXPORT void					  register_3270_toggle_monitor(LIB3270_TOGGLE_ID ix, void (*callback)(int value, enum toggle_type reason));
+	LIB3270_EXPORT int					  do_3270_toggle(LIB3270_TOGGLE_ID ix);
 	LIB3270_EXPORT int					  set_3270_toggle(LIB3270_TOGGLE_ID ix, int value);
 
-//	LIB3270_EXPORT const char			* get_3270_toggle_name(LIB3270_TOGGLE_ID ix);
-//	LIB3270_EXPORT LIB3270_TOGGLE_ID	  get_3270_toggle_by_name(const char *name);
-	#define get_3270_toggle_by_name(x)	  lib3270_get_toggle_id(x)
-
+	LIB3270_EXPORT const char			* get_3270_toggle_name(LIB3270_TOGGLE_ID ix);
+	LIB3270_EXPORT LIB3270_TOGGLE_ID	  get_3270_toggle_by_name(const char *name);
 
 	LIB3270_EXPORT void					  update_toggle_actions(void);
 
 	// Compatibility macros
 	#define register_tchange(ix,callback) register_3270_toggle_monitor(ix,callback)
-	#define do_toggle(ix) lib3270_toggle(NULL,ix)
-
-	#define get_3270_toggle_name(ix)	lib3270_get_toggle_name(ix)
-	#define get_toggle_name(ix)			lib3270_get_toggle_name(ix)
-	#define set_toggle(ix,value)		lib3270_set_toggle(NULL,ix,value)
-	#define get_toggle_by_name(name)	lib3270_get_toggle_id(name)
+	#define do_toggle(ix) do_3270_toggle(ix)
+	#define get_toggle_name(ix) get_3270_toggle_name(ix)
+	#define set_toggle(ix,value) set_3270_toggle(ix,value)
+	#define get_toggle_by_name(name) get_3270_toggle_by_name(name)
 
 #endif /* TOGGLE3270_H_INCLUDED */

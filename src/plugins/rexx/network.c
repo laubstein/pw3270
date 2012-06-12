@@ -91,8 +91,8 @@
 
  	static const struct _xlat_state
  	{
- 		LIB3270_CSTATE	  state;
- 		const gchar		* ret;
+ 		enum cstate	state;
+ 		const gchar	*ret;
  	} xlat_state[] =
  	{
 			DECLARE_XLAT_STATE( NOT_CONNECTED 		),
@@ -108,14 +108,14 @@
  	};
 
  	int				f;
- 	LIB3270_CSTATE	state;
+ 	enum cstate 	state;
 
 	if(Argc != 0)
 		return RXFUNC_BADCALL;
 
 	RunPendingEvents(0);
 
-	state = lib3270_get_connection_state(NULL);
+	state = QueryCstate();
 
 	for(f=0;f < G_N_ELEMENTS(xlat_state); f++)
 	{
@@ -147,7 +147,7 @@
 		return RetValue(Retstr,ENOTCONN);
 	}
 
-	lib3270_disconnect(hSession);
+	host_disconnect(hSession,0);
 	return RetValue(Retstr,0);
  }
 

@@ -59,7 +59,7 @@
 #include "charsetc.h"
 #include "ctlrc.h"
 #include "hostc.h"
-// #include "menubarc.h"
+#include "menubarc.h"
 #include "popupsc.h"
 #include "printerc.h"
 #include "printc.h"
@@ -101,8 +101,8 @@ static void	printer_otimeout(H3270 *session);
 static void	printer_etimeout(H3270 *session);
 static void	printer_dump(struct pr3o *p, Boolean is_err, Boolean is_dead);
 #endif /*]*/
-static void	printer_host_connect(H3270 *session, int connected unused, void *dunno);
-static void	printer_exiting(H3270 *session, int b unused, void *dunno);
+static void	printer_host_connect(int connected unused);
+static void	printer_exiting(int b unused);
 
 /* Globals */
 
@@ -238,7 +238,7 @@ printer_start(const char *lu)
 	}
 	s = cmdline;
 	while ((s = strstr(s, "%H%")) != CN) {
-		cmd_len += strlen(h3270.qualified_host) - 3;
+		cmd_len += strlen(qualified_host) - 3;
 		s += 3;
 	}
 #if !defined(_WIN32) /*[*/
@@ -273,7 +273,7 @@ printer_start(const char *lu)
 				s += 2;
 				continue;
 			} else if (!strncmp(s+1, "H%", 2)) {
-				(void) strcat(cmd_text, h3270.qualified_host);
+				(void) strcat(cmd_text, qualified_host);
 				s += 2;
 				continue;
 #if !defined(_WIN32) /*[*/
@@ -657,7 +657,7 @@ printer_stop(void)
 
 /* The emulator is exiting.  Make sure the printer session is cleaned up. */
 static void
-printer_exiting(H3270 *session, int b unused, void *dunno)
+printer_exiting(int b unused)
 {
 	printer_stop();
 }
@@ -684,7 +684,7 @@ lu_callback(Widget w, XtPointer client_data, XtPointer call_data unused)
 
 /* Host connect/disconnect/3270-mode event. */
 static void
-printer_host_connect(H3270 *session, int connected unused, void *dunno)
+printer_host_connect(int connected unused)
 {
 	if (IN_3270) {
 		char *printer_lu = appres.printer_lu;

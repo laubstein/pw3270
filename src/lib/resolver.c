@@ -84,7 +84,7 @@ struct parms
  * Returns 0 for success, -1 for fatal error (name resolution impossible),
  *  -2 for simple error (cannot resolve the name).
  */
-static int cresolve_host_and_port(H3270 *h, struct parms *p)
+static int cresolve_host_and_port(struct parms *p)
 {
 #ifdef AF_INET6
 
@@ -183,7 +183,7 @@ int resolve_host_and_port(const char *host, char *portname, unsigned short *ppor
 
 	Trace("Calling resolver for %s", p.host);
 
-	rc = CallAndWait((int (*)(H3270 *, void *)) cresolve_host_and_port,&h3270,&p);
+	rc = CallAndWait((int (*)(void *)) cresolve_host_and_port,&p);
 
 	Trace("Calling resolver for %s exits with %d", p.host, rc);
 

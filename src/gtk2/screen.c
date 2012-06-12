@@ -62,42 +62,30 @@
 
 /*---[ Prototipes ]----------------------------------------------------------------------------------------*/
 
- static int  	  addch(int row, int col, unsigned char c, unsigned short attr);
+ static int  	  addch(int row, int col, int c, unsigned short attr);
  static void	  set_charset(char *dcs);
 
- static void	  erase(H3270 *session);
- static void	  display(H3270 *session);
+ static void	  erase(void);
+ static void	  display(void);
 
  static int	  SetSuspended(int state);
  static void	  SetScript(SCRIPT_STATE state);
- static void	  set_cursor(H3270 *session, LIB3270_CURSOR mode);
- static void	  set_oia(H3270 *session, OIA_FLAG id, unsigned char on);
- static void	  set_lu(H3270 *session, const char *lu);
-// static void	  changed(int bstart, int bend);
+ static void	  set_cursor(CURSOR_MODE mode);
+ static void	  set_oia(OIA_FLAG id, int on);
+ static void	  set_lu(const char *lu);
+ static void	  changed(int bstart, int bend);
  static void	  error(const char *fmt, va_list arg);
  static void 	  warning(const char *fmt, va_list arg);
  static void	  syserror(const char *title, const char *message, const char *system);
  static int	  init(void);
- static void 	  update_toggle(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason, const char *name);
+ static void 	  update_toggle(int ix, int value, int reason, const char *name);
  static void 	  redraw(void);
  static gchar	* convert_monocase(int c, gsize *sz);
  static gchar	* convert_regular(int c, gsize *sz);
  static int	  popup_dialog(H3270 *session, PW3270_DIALOG type, const char *title, const char *msg, const char *fmt, va_list arg);
- static void	  model_changed(H3270 *session, const char *name, int model, int rows, int cols);
-
-#ifdef HAVE_ALTSCREEN
- static void view_changed(H3270 *session, unsigned short rows, unsigned short cols);
-#endif
+ static void	  model_changed(H3270 *session, const char *name, int model, int cols, int rows);
 
 /*---[ Globals ]-------------------------------------------------------------------------------------------*/
-
- static void ring_bell(void)
- {
-	if(TOGGLED_BEEP)
-	{
-		gdk_beep();
-	}
- }
 
  const struct lib3270_screen_callbacks program_screen_callbacks =
  {
@@ -110,31 +98,26 @@
 	warning,				// void (*Warning)(const char *fmt, va_list arg);
 	syserror,				// void	(*SysError)(const char *title, const char *message, const char *system);
 
-	model_changed,			// void	(*model_changed)(H3270 *session, const char *name, int model, int rows, int cols);
+	model_changed,			// void	(*model_changed)(H3270 *session, const char *name, int model, int cols, int rows);
 
-	addch,					// void (*addch)(int row, int col, unsigned char c, int attr);
+	addch,					// void (*addch)(int row, int col, int c, int attr);
 	set_charset,			// void (*charset)(char *dcs);
 	settitle,				// void (*title)(char *text);
-	ring_bell,				// void (*ring_bell)(void);
+	changed,				// void (*changed)(int bstart, int bend);
+	gdk_beep,				// void (*ring_bell)(void);
 	redraw,					// void (*redraw)(void);
-	update_cursor_position,	// void (*move_cursor)(H3270 *session, unsigned short row, unsigned short col, unsigned char c, unsigned short attr);
+	update_cursor_position,	// void (*move_cursor)(int row, int col);
 	SetSuspended,			// int	(*set_suspended)(int state);
 	SetScript,				// void	(*set_script)(SCRIPT_STATE state);
 	NULL,					// void (*reset)(int lock);
 	SetStatusCode,			// void (*status)(STATUS_CODE id);
 	set_cursor,				// void (*cursor)(CURSOR_MODE mode);
 	set_lu,					// void (*lu)(const char *lu);
-	set_oia,				// void (*set)(OIA_FLAG id, unsigned char on);
+	set_oia,				// void (*set)(OIA_FLAG id, int on);
 
-	erase,					// void (*erase)(H3270 *session);
-	display,				// void	(*display)(H3270 *session);
-#ifdef HAVE_ALTSCREEN
-	view_changed,			// 			void 	(*set_viewsize)(H3270 *session, unsigned short rows, unsigned short cols);
-#else
-	NULL,					// void (*set_viewsize)(unsigned short rows, unsigned short cols);
-#endif
-
-	update_toggle,			// void (*toggle_changed)(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason, const char *name);
+	erase,					// void (*erase)(void);
+	display,				// void	(*display)(int bstart, int bend);
+	update_toggle,			// void (*toggle_changed)(int ix, int value, int reason, const char *name);
 	oia_set_timer,			// void	(*show_timer)(long seconds);
 
 	gui_console_window_new,						// HCONSOLE	(*console_new)(const char *title, const char *label);
@@ -144,13 +127,17 @@
 
  };
 
- struct _screen		* screen											= NULL;
- struct _view			  view												= { 0 };
+ int 					  terminal_rows										= 0;
+ int 					  terminal_cols										= 0;
+ int					  left_margin										= 0;
+ int					  top_margin										= 0;
+
+ ELEMENT				* screen											= NULL;
  char					* charset											= NULL;
  char					* window_title										= PROGRAM_NAME;
- LIB3270_CURSOR 	  cursor_mode = -1;
 
  gboolean				  screen_updates_enabled							= FALSE;
+ int					  terminal_buffer_length							= 0;
 
  static const gchar	* screen_size_text[]								= { "80x24", "80x32", "80x43", "132x27" };
  static GtkWidget		* screen_size_menu[G_N_ELEMENTS(screen_size_text)]	= { 0 };
@@ -165,6 +152,10 @@
 	action_redraw(0);
  }
 
+ static void changed(int bstart, int bend)
+ {
+ }
+
  static int SetSuspended(int state)
  {
  	gboolean enabled = (state == 0);
@@ -174,7 +165,7 @@
 
 	screen_updates_enabled = enabled;
 
-// 	Trace("%s(%d): screen updates are %s",__FUNCTION__,state,screen_updates_enabled ? "enabled" : "disabled");
+ 	Trace("%s(%d): screen updates are %s",__FUNCTION__,state,screen_updates_enabled ? "enabled" : "disabled");
 
 	if(screen_updates_enabled)
  	{
@@ -215,8 +206,7 @@
     }
 
     // NOTE (perry#1#): Is it the best way?
-//    Input_String((const unsigned char *) input);
-	lib3270_set_string(hSession, (const unsigned char *) input);
+    Input_String((const unsigned char *) input);
 
     g_free(input);
  }
@@ -243,10 +233,10 @@
  	return g_convert(in, -1, "UTF-8", CHARSET, NULL, sz, NULL);
  }
 
- void set_monocase(H3270 *session, int value, LIB3270_TOGGLE_TYPE reason)
+ void set_monocase(int value, enum toggle_type reason)
  {
 	convert_charset = value ? convert_monocase : convert_regular;
-	screen_disp(hSession);
+	screen_disp();
  }
 
  static void convert_cg(ELEMENT *el, int c)
@@ -282,14 +272,17 @@
 
  }
 
- static int addch(int row, int col, unsigned char c, unsigned short attr)
+ static int addch(int row, int col, int c, unsigned short attr)
  {
 
-	int		baddr = (row*screen->cols)+col;
  	ELEMENT in;
  	ELEMENT *el;
+ 	int		baddr = (row*terminal_cols)+col;
 
- 	if(!screen || baddr > screen->length)
+ 	if(!screen || col >= terminal_cols || row >= terminal_rows)
+		return EINVAL;
+
+	if(baddr > terminal_buffer_length)
 		return EFAULT;
 
 	memset(&in,0,sizeof(in));
@@ -325,7 +318,7 @@
 		in.fg |= COLOR_ATTR_UNDERLINE;
 
 	// Get element entry in the buffer, update ONLY if changed
- 	el = screen->content + baddr;
+ 	el = screen + baddr;
 
 	in.status = el->status;
 
@@ -334,7 +327,7 @@
 	else
 		in.status &= ~ELEMENT_STATUS_FIELD_MARKER;
 
-	if(!memcmp(&in,el,sizeof(ELEMENT)))
+	if(el->changed || !memcmp(&in,el,sizeof(ELEMENT)))
 		return 0;
 
 	memcpy(el,&in,sizeof(ELEMENT));
@@ -347,7 +340,7 @@
   * Erase screen.
   *
   */
- static void erase(H3270 *session)
+ static void erase(void)
  {
  	int f;
 
@@ -357,12 +350,12 @@
 	{
 		unsigned char status;
 
-		for(f=0;f<screen->length;f++)
+		for(f=0;f<terminal_buffer_length;f++)
 		{
-			status = screen->content[f].status & ~ELEMENT_STATUS_FIELD_MARKER;
-			memset(screen->content+f,0,sizeof(ELEMENT));
-			screen->content[f].ch[0]	= ' ';
-			screen->content[f].status	= status;
+			status				= screen[f].status & ~ELEMENT_STATUS_FIELD_MARKER;
+			memset(screen+f,0,sizeof(ELEMENT));
+			screen[f].ch[0]		= ' ';
+			screen[f].status	= status;
 		}
 	}
 
@@ -371,16 +364,16 @@
 
 		if(screen_updates_enabled)
 		{
-			int 	width  = view.cols * fontWidth;
-			int 	height = view.rows * terminal_font_info.spacing;
+			int 	width  = terminal_cols * fontWidth;
+			int 	height = terminal_rows * terminal_font_info.spacing;
 			cairo_t *cr	= get_terminal_cairo_context();
 
 			gdk_cairo_set_source_color(cr,color+TERMINAL_COLOR_BACKGROUND);
-			cairo_rectangle(cr, view.left, view.top, width, height);
+			cairo_rectangle(cr, left_margin, top_margin, width, height);
 			cairo_fill(cr);
 
 			cairo_destroy(cr);
-			gtk_widget_queue_draw_area(terminal,view.left, view.top,width,height);
+			gtk_widget_queue_draw_area(terminal,left_margin,top_margin,width,height);
 		}
 	}
 
@@ -393,7 +386,7 @@
 
  static GPid on_lu_pid = 0;
 
- static void set_lu(H3270 *session, const char *lu)
+ static void set_lu(const char *lu)
  {
  	gchar *luname = NULL;
 
@@ -464,7 +457,7 @@
 		g_free(luname);
  }
 
- static void set_oia(H3270 *session, OIA_FLAG id, unsigned char on)
+ static void set_oia(OIA_FLAG id, int on)
  {
  	if(id > OIA_FLAG_USER)
 		return;
@@ -515,34 +508,34 @@
 	charset = g_strdup(dcs);
  }
 
- void SetStatusCode(H3270 *session, LIB3270_STATUS id)
+ void SetStatusCode(STATUS_CODE id)
  {
  	if(id == terminal_message_id)
 		return;
 
 	terminal_message_id = id;
 
-/*
-	if(id == LIB3270_STATUS_BLANK)
+	if(id == STATUS_CODE_BLANK)
 	{
-		set_cursor(session,CURSOR_MODE_NORMAL);
+		set_cursor(CURSOR_MODE_NORMAL);
 		update_cursor_pixmap();
 	}
-	else if(id >= LIB3270_STATUS_USER)
+	else if(id >= STATUS_CODE_USER)
 	{
 		Log("Unexpected status code %d",(int) id);
 		return;
 	}
-*/
 
 	update_oia_element(OIA_ELEMENT_MESSAGE_AREA);
 
  }
 
- static void set_cursor(H3270 *session, LIB3270_CURSOR mode)
- {
 
- 	if(mode == cursor_mode || mode > LIB3270_CURSOR_USER || !terminal || !terminal->window)
+ CURSOR_MODE cursor_mode = -1;
+
+ static void set_cursor(CURSOR_MODE mode)
+ {
+ 	if(mode == cursor_mode || mode > CURSOR_MODE_USER || !terminal || !terminal->window)
 		return;
 
 	cursor_mode = mode;
@@ -556,33 +549,26 @@
 
  gchar * GetScreenContents(gboolean all)
  {
- 	gsize	max;
- 	GString	*str;
+ 	gsize	max = terminal_rows*terminal_cols*MAX_CHR_LENGTH;
+ 	GString	*str = g_string_sized_new(max);
  	int		row,col;
  	int		pos	= 0;
 
- 	if(!screen)
-		return NULL;
-
-	max = screen->rows*screen->cols*MAX_CHR_LENGTH;
-
- 	str = g_string_sized_new(max);
-
-	for(row = 0; row < screen->rows;row++)
+	for(row = 0; row < terminal_rows;row++)
 	{
 		gchar		line[max];
 
 		*line = 0;
-		for(col = 0; col < screen->cols;col++)
+		for(col = 0; col < terminal_cols;col++)
 		{
-			if(all || (screen->content[pos].status & ELEMENT_STATUS_SELECTED))
+			if(all || (screen[pos].status & ELEMENT_STATUS_SELECTED))
 			{
 				if(!*line)
 				{
 					if(*str->str)
 						g_string_append_c(str,'\n');
 				}
-				g_strlcat(line,*screen->content[pos].ch ? screen->content[pos].ch : " ",max);
+				g_strlcat(line,*screen[pos].ch ? screen[pos].ch : " ",max);
 			}
 			pos++;
 		}
@@ -744,7 +730,7 @@
 	return 0;
  }
 
- void update_toggle(H3270 *session, LIB3270_TOGGLE ix, unsigned char value, LIB3270_TOGGLE_TYPE reason, const char *name)
+ void update_toggle(int ix, int value, int reason, const char *name)
  {
 	update_3270_toggle_action(ix, value);
  }
@@ -770,24 +756,27 @@
 
  }
 
- static void display(H3270 *session)
+ static void display(void)
  {
 	if(valid_terminal_window() && screen_updates_enabled)
 	{
+		int		baddr   =  0;
 		int		row;
 		int		col;
 		cairo_t *cr	= get_terminal_cairo_context();
 
-		for(row = 0; row < view.rows; row++)
+		for(row = 0; row < terminal_rows; row++)
 		{
 			int		cstart	= -1;
 			int 	bstart	= -1;
 			int 	bend	= -1;
-			int		baddr   =  row * screen->cols;
+//#ifdef DEBUG
+//			int 	y 		= top_margin+(row * terminal_font_info.spacing);
+//#endif
 
-			for(col = 0;col < view.cols;col++)
+			for(col = 0;col < terminal_cols;col++)
 			{
-				if(screen->content[baddr].changed)
+				if(screen[baddr].changed)
 				{
 					if(bstart < 0)
 					{
@@ -795,7 +784,7 @@
 						cstart = col;
 					}
 					bend = baddr;
-					screen->content[baddr].changed = FALSE;
+					screen[baddr].changed = FALSE;
 
 					if(baddr == cursor_position)
 						update_cursor_pixmap();
@@ -806,6 +795,24 @@
 					GdkRectangle r;
 					draw_region(cr,bstart,bend,color,&r);
 					gdk_window_invalidate_rect(terminal->window,&r,FALSE);
+
+//					#ifdef DEBUG
+//						if(r.x != left_margin+(cstart*fontWidth) || r.y != y || r.width != ((bend-bstart)+1)*fontWidth || r.height != terminal_font_info.spacing)
+//						{
+//							Trace("%s(%d,%d %d,%d->%d,%d row=%d (%d)) - Unexpected size returned from draw_region",
+//													__FUNCTION__,
+//													bstart,
+//													bend,
+//													bstart%terminal_cols,bstart/terminal_cols,
+//													bend%terminal_cols,bend/terminal_cols,
+//													row,(row*terminal_font_info.spacing)+top_margin);
+//							Trace("Rect: %d,%d->%d,%d",r.x,r.y,r.width,r.height);
+//							Trace("Area: %d,%d->%d,%d",left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
+//						}
+//					#endif
+
+//					gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
+
 					bstart = bend = -1;
 				}
 				baddr++;
@@ -816,6 +823,17 @@
 				GdkRectangle r;
 				draw_region(cr,bstart,bend,color,&r);
 				gdk_window_invalidate_rect(terminal->window,&r,FALSE);
+
+//				#ifdef DEBUG
+//					if(r.x != left_margin+(cstart*fontWidth) || r.y != y || r.width != ((bend-bstart)+1)*fontWidth || r.height != terminal_font_info.spacing)
+//					{
+//						Trace("%s(%d,%d) - Unexpected size returned from draw_region",__FUNCTION__,bstart,bend);
+//						Trace("Rect: %d,%d->%d,%d",r.x,r.y,r.width,r.height);
+//						Trace("Area: %d,%d->%d,%d",left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
+//					}
+//				#endif
+
+//				gtk_widget_queue_draw_area(terminal,left_margin+(cstart*fontWidth),y,((bend-bstart)+1)*fontWidth,terminal_font_info.spacing);
 			}
 		}
 
@@ -831,7 +849,6 @@
 	if(gtk_check_menu_item_get_active(item))
 	{
 		Trace("Screen size set to %d",id);
-		SetInt("Terminal","Model",id);
 		set_3270_model(hSession,id);
 	}
  }
@@ -847,7 +864,6 @@
  	int i;
  	GSList 		*group	= NULL;
  	GtkWidget	*menu;
- 	int	model = get_3270_model(hSession)-2;
 
  	if(!topmenu)
  	{
@@ -870,9 +886,6 @@
 		gtk_widget_show(screen_size_menu[i]);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu),screen_size_menu[i]);
 
-		if(i == model)
-			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(screen_size_menu[i]),TRUE);
-
 		g_signal_connect(G_OBJECT(screen_size_menu[i]),"toggled",G_CALLBACK(set_screen_size),(gpointer) i+2);
 
     }
@@ -882,27 +895,27 @@
 
  }
 
- static void model_changed(H3270 *session, const char *name, int model, int rows, int cols)
+ static void model_changed(H3270 *session, const char *name, int model, int cols, int rows)
  {
-	int length = rows*cols;
 
  	// Check for screen buffer change
- 	if(screen)
+ 	if(rows != terminal_rows || cols != terminal_cols)
+ 	{
 		g_free(screen);
+		screen = NULL;
 
-	screen = g_malloc0(sizeof(struct _screen) + (sizeof(ELEMENT)*length));
-	screen->length	= length;
-	screen->rows	= rows;
-	screen->cols	= cols;
+		if(rows && cols)
+		{
+			terminal_buffer_length = rows*cols;
+			screen = g_new0(ELEMENT,terminal_buffer_length);
+			terminal_rows = rows;
+			terminal_cols = cols;
 
-	memset(&view,0,sizeof(view));
-
-	view.rows = screen->rows = rows;
-	view.cols = screen->cols = cols;
+		}
+ 	}
 
 	// Update menu toggle (if available)
 	model -= 2;
-
 	if(model >= 0 && model <= G_N_ELEMENTS(screen_size_text))
 	{
 		if(screen_size_menu[model] && !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(screen_size_menu[model])))
@@ -914,20 +927,3 @@
 		action_redraw(0);
 
  }
-
-#ifdef HAVE_ALTSCREEN
- static void view_changed(H3270 *session, unsigned short rows, unsigned short cols)
- {
-	if(!screen || rows > screen->rows || cols > screen->cols )
-		return;
-
-	Trace("View changed from %d x %d to %d x %d",view.rows,view.cols,rows,cols);
-
-	view.rows = rows;
-	view.cols = cols;
-
-	// Redraw
-	if(terminal && terminal->window)
-		action_redraw(0);
- }
-#endif

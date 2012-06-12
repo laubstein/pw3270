@@ -111,12 +111,10 @@ int             ns_rsent;
 unsigned char  *obuf;		/* 3270 output buffer */
 unsigned char  *obptr = (unsigned char *) NULL;
 int             linemode = 1;
-/*
-#if defined(LOCAL_PROCESS)
+#if defined(LOCAL_PROCESS) /*[*/
 Boolean		local_process = False;
-#endif
+#endif /*]*/
 // char           *termtype;
-*/
 
 /* Externals */
 extern struct timeval ds_ts;
@@ -125,7 +123,7 @@ extern struct timeval ds_ts;
 // static int      		sock 			= -1;	/* active socket */
 
 #if defined(HAVE_LIBSSL) /*[*/
-static unsigned long last_ssl_error	= !0;
+static unsigned long last_ssl_error	= 0;
 #endif
 
 //#if defined(_WIN32) /*[*/
@@ -196,7 +194,7 @@ static void check_in3270(void);
 static void store3270in(unsigned char c);
 static void check_linemode(Boolean init);
 static int non_blocking(Boolean on);
-static void net_connected(H3270 *session);
+static void net_connected(void);
 #if defined(X3270_TN3270E) /*[*/
 static int tn3270e_negotiate(void);
 #endif /*]*/
@@ -299,13 +297,13 @@ static const char *trsp_flag[2] = { "POSITIVE-RESPONSE", "NEGATIVE-RESPONSE" };
 #endif /*]*/
 #endif /*]*/
 
-// #if defined(C3270) && defined(C3270_80_132) /*[*/
-// #define XMIT_ROWS	((appres.altscreen != CN)? 24: maxROWS)
-// #define XMIT_COLS	((appres.altscreen != CN)? 80: maxCOLS)
-// #else /*][*/
-#define XMIT_ROWS	h3270.maxROWS
-#define XMIT_COLS	h3270.maxCOLS
-// #endif /*]*/
+#if defined(C3270) && defined(C3270_80_132) /*[*/
+#define XMIT_ROWS	((appres.altscreen != CN)? 24: maxROWS)
+#define XMIT_COLS	((appres.altscreen != CN)? 80: maxCOLS)
+#else /*][*/
+#define XMIT_ROWS	maxROWS
+#define XMIT_COLS	maxCOLS
+#endif /*]*/
 
 #if defined(HAVE_LIBSSL) /*[*/
 static SSL_CTX *ssl_ctx;
@@ -317,7 +315,7 @@ static void ssl_init(void);
 #else /*][*/
 #define INFO_CONST
 #endif /*]*/
-static void ssl_info_callback(INFO_CONST SSL *s, int where, int ret);
+static void client_info_callback(INFO_CONST SSL *s, int where, int ret);
 static void continue_tls(unsigned char *sbbuf, int len);
 #endif /*]*/
 
@@ -418,11 +416,6 @@ LIB3270_EXPORT void popup_a_sockerr(char *fmt, ...)
 }
 #endif
 
-static int bgconnect(H3270 *h, void *dunno)
-{
-	return connect(h3270.sock, &haddr.sa, ha_len);
-}
-
 /*
  * net_connect
  *	Establish a telnet socket to the given host passed as an argument.
@@ -471,7 +464,7 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 	Replace(h3270.hostname, NewString(host));
 
 	/* get the passthru host and port number */
-	if (h3270.passthru_host) {
+	if (passthru_host) {
 		const char *hn;
 
 		hn = getenv("INTERNET_HOST");
@@ -516,34 +509,88 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 
 	/* fill in the socket address of the given host */
 	(void) memset((char *) &haddr, 0, sizeof(haddr));
-	if (h3270.passthru_host) {
+	if (passthru_host) {
 		haddr.sin.sin_family = AF_INET;
 		(void) memmove(&haddr.sin.sin_addr, passthru_haddr,
 			       passthru_len);
 		haddr.sin.sin_port = passthru_port;
 		ha_len = sizeof(struct sockaddr_in);
 	} else if (proxy_type > 0) {
-			status_resolving(&h3270,1);
+			status_resolving(1);
 	    	if (resolve_host_and_port(proxy_host, proxy_portname,
 			    &proxy_port, &haddr.sa, &ha_len, errmsg,
 			    sizeof(errmsg)) < 0) {
 		    	popup_an_error(errmsg);
-				status_resolving(&h3270,0);
+				status_resolving(0);
 		    	return -1;
-			status_resolving(&h3270,0);
+			status_resolving(0);
 		}
 	} else {
-			status_resolving(&h3270,1);
+#if defined(LOCAL_PROCESS) /*[*/
+		if (ls) {
+			local_process = True;
+		} else {
+#endif /*]*/
+#if defined(LOCAL_PROCESS) /*[*/
+			local_process = False;
+#endif /*]*/
+			status_resolving(1);
 			if (resolve_host_and_port(host, portname,
 				    &h3270.current_port, &haddr.sa, &ha_len,
 				    errmsg, sizeof(errmsg)) < 0) {
 			    	popup_an_error(errmsg);
-					status_resolving(&h3270,0);
+					status_resolving(0);
 			    	return -1;
-			status_resolving(&h3270,0);
+			status_resolving(0);
 			}
+#if defined(LOCAL_PROCESS) /*[*/
+		}
+#endif /*]*/
+
 	}
 
+#if defined(LOCAL_PROCESS) /*[*/
+	if (local_process) {
+		int amaster;
+		struct winsize w;
+
+		w.ws_row = XMIT_ROWS;
+		w.ws_col = XMIT_COLS;
+		w.ws_xpixel = 0;
+		w.ws_ypixel = 0;
+
+		switch (forkpty(&amaster, NULL, NULL, &w)) {
+		    case -1:	/* failed */
+			popup_an_errno(errno, "forkpty");
+			close_fail;
+		    case 0:	/* child */
+			putenv("TERM=xterm");
+			if (strchr(host, ' ') != CN) {
+				(void) execlp("/bin/sh", "sh", "-c", host,
+				    NULL);
+			} else {
+				char *arg1;
+
+				arg1 = strrchr(host, '/');
+				(void) execlp(host,
+					(arg1 == CN) ? host : arg1 + 1,
+					NULL);
+			}
+			perror(host);
+			#warning Notify User
+			_exit(1);
+			break;
+		    default:	/* parent */
+			sock = amaster;
+#if !defined(_WIN32) /*[*/
+			(void) fcntl(sock, F_SETFD, 1);
+#endif /*]*/
+			net_connected();
+			host_in3270(CONNECTED_ANSI);
+			break;
+		}
+	} else {
+#endif /*]*/
 		/* create the socket */
 		if ((h3270.sock = socket(haddr.sa.sa_family, SOCK_STREAM, 0)) == -1) {
 			popup_a_sockerr( N_( "socket" ) );
@@ -570,59 +617,38 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 #endif /*]*/
 
 		/* set the socket to be non-delaying */
-/*
-#if defined(_WIN32)
+#if defined(_WIN32) /*[*/
 		if (non_blocking(False) < 0)
-#else
+#else /*][*/
 		if (non_blocking(True) < 0)
-#endif
-			close_fail;
-*/
-
-		if (non_blocking(False) < 0)
+#endif /*]*/
 			close_fail;
 
-#if !defined(_WIN32)
+#if !defined(_WIN32) /*[*/
 		/* don't share the socket with our children */
 		(void) fcntl(h3270.sock, F_SETFD, 1);
-#endif
+#endif /*]*/
 
 		/* init ssl */
 #if defined(HAVE_LIBSSL) /*[*/
 		last_ssl_error = 0;
-		if (h3270.ssl_host)
+		if (ssl_host)
 			ssl_init();
 #endif /*]*/
 
 		/* connect */
-		status_connecting(&h3270,1);
-
-		if(CallAndWait((int (*)(H3270 *, void *)) bgconnect,&h3270,NULL) == -1)
-		{
-			Trace("Connect failed: %s (rc=%d)",strerror(socket_errno()),socket_errno());
-			popup_a_sockerr( N_( "Can't connect to %s:%d" ),h3270.hostname, h3270.current_port);
-			close_fail;
-		}
-		else
-		{
-			net_connected(&h3270);
-		}
-
-/*
+		status_connecting(1);
 		if (connect(h3270.sock, &haddr.sa, ha_len) == -1) {
-
-			Trace("Connect failed: %s (rc=%d)",strerror(socket_errno()),socket_errno());
-
 			if (socket_errno() == SE_EWOULDBLOCK
-#if defined(SE_EINPROGRESS)
+#if defined(SE_EINPROGRESS) /*[*/
 			    || socket_errno() == SE_EINPROGRESS
-#endif
+#endif /*]*/
 						   ) {
 				trace_dsn("Connection pending.\n");
 				*pending = True;
-#if !defined(_WIN32)
+#if !defined(_WIN32) /*[*/
 				output_id = AddOutput(h3270.sock, &h3270, output_possible);
-#endif
+#endif /*]*/
 			} else {
 				popup_a_sockerr( N_( "Can't connect to %s:%d" ),h3270.hostname, h3270.current_port);
 				close_fail;
@@ -630,14 +656,16 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 		} else {
 			if (non_blocking(False) < 0)
 				close_fail;
-			net_connected(&h3270);
+			net_connected();
 		}
-*/
+#if defined(LOCAL_PROCESS) /*[*/
+	}
+#endif /*]*/
 
 	/* set up temporary termtype */
-	if (appres.termname == CN && h3270.std_ds_host) {
+	if (appres.termname == CN && std_ds_host) {
 		(void) sprintf(ttype_tmpval, "IBM-327%c-%d",
-		    appres.m3279 ? '9' : '8', h3270.model_num);
+		    appres.m3279 ? '9' : '8', model_num);
 		h3270.termtype = ttype_tmpval;
 	}
 
@@ -724,44 +752,44 @@ setup_lus(void)
 	try_lu = *curr_lu;
 }
 
-static void net_connected(H3270 *session)
+static void
+net_connected(void)
 {
-	if (proxy_type > 0)
-	{
-		/* Negotiate with the proxy. */
-		trace_dsn("Connected to proxy server %s, port %u.\n",proxy_host, proxy_port);
+	if (proxy_type > 0) {
 
-		if (proxy_negotiate(proxy_type, session->sock, session->hostname,session->current_port) < 0)
-		{
-			host_disconnect(session,True);
+		/* Negotiate with the proxy. */
+	    	trace_dsn("Connected to proxy server %s, port %u.\n",
+			proxy_host, proxy_port);
+
+	    	if (proxy_negotiate(proxy_type, h3270.sock, h3270.hostname,
+			    h3270.current_port) < 0) {
+		    	host_disconnect(&h3270,True);
 			return;
 		}
 	}
 
-	trace_dsn("Connected to %s, port %u%s.\n", session->hostname, session->current_port,session->ssl_host? " via SSL": "");
+	trace_dsn("Connected to %s, port %u%s.\n", h3270.hostname, h3270.current_port,ssl_host? " via SSL": "");
 
 #if defined(HAVE_LIBSSL) /*[*/
 	/* Set up SSL. */
-	if(session->ssl_host && !session->secure_connection)
-	{
-		if (SSL_set_fd(ssl_con, session->sock) != 1)
-		{
+	if (ssl_host && !h3270.secure_connection) {
+		if (SSL_set_fd(ssl_con, h3270.sock) != 1) {
 			trace_dsn("Can't set fd!\n");
 		}
-		if (SSL_connect(ssl_con) != 1)
-		{
+		if (SSL_connect(ssl_con) != 1) {
 			/*
 			 * No need to trace the error, it was already
 			 * displayed.
 			 */
-			host_disconnect(session,True);
+			host_disconnect(&h3270,True);
 			return;
 		}
-		session->secure_connection = True;
-		trace_dsn("TLS/SSL tunneled connection complete. Connection is now secure.\n");
+		h3270.secure_connection = True;
+		trace_dsn("TLS/SSL tunneled connection complete.  "
+			  "Connection is now secure.\n");
 
 		/* Tell everyone else again. */
-		host_connected(session);
+		host_connected();
 	}
 #endif /*]*/
 
@@ -799,13 +827,12 @@ static void net_connected(H3270 *session)
 	check_linemode(True);
 
 	/* write out the passthru hostname and port nubmer */
-	if (session->passthru_host)
-	{
+	if (passthru_host) {
 		char *buf;
 
-		buf = Malloc(strlen(session->hostname) + 32);
-		(void) sprintf(buf, "%s %d\r\n", session->hostname, session->current_port);
-		(void) send(session->sock, buf, strlen(buf), 0);
+		buf = Malloc(strlen(h3270.hostname) + 32);
+		(void) sprintf(buf, "%s %d\r\n", h3270.hostname, h3270.current_port);
+		(void) send(h3270.sock, buf, strlen(buf), 0);
 		Free(buf);
 	}
 }
@@ -825,8 +852,8 @@ connection_complete(void)
 		return;
 	}
 #endif /*]*/
-	host_connected(&h3270);
-	net_connected(&h3270);
+	host_connected();
+	net_connected();
 }
 
 #if !defined(_WIN32) /*[*/
@@ -876,7 +903,7 @@ net_disconnect(void)
 
 	/* We're not connected to an LU any more. */
 	h3270.connected_lu = CN;
-	status_lu(&h3270,CN);
+	status_lu(CN);
 
 #if !defined(_WIN32) /*[*/
 	/* We have no more interest in output buffer space. */
@@ -913,7 +940,7 @@ void net_input(H3270 *session)
 #if defined(_WIN32) /*[*/
 		if (HALF_CONNECTED) {
 
-			if (connect(session->sock, &haddr.sa, sizeof(haddr)) < 0) {
+			if (connect(h3270.sock, &haddr.sa, sizeof(haddr)) < 0) {
 				int err = GetLastError();
 
 				switch (err) {
@@ -939,21 +966,20 @@ void net_input(H3270 *session)
 #endif /*]*/
 
 #if defined(_WIN32) /*[*/
-		(void) ResetEvent(session->sock_handle);
+		(void) ResetEvent(h3270.sock_handle);
 #endif /*]*/
 
-#if defined(HAVE_LIBSSL)
+#if defined(HAVE_LIBSSL) /*[*/
 		if (ssl_con != NULL)
 			nr = SSL_read(ssl_con, (char *) netrbuf, BUFSZ);
 		else
-#endif // HAVE_LIBSSL
-/*
-#if defined(LOCAL_PROCESS)
+#else /*][*/
+#endif /*]*/
+#if defined(LOCAL_PROCESS) /*[*/
 		if (local_process)
 		    	nr = read(sock, (char *) netrbuf, BUFSZ);
 		else
-#endif
-*/
+#endif /*]*/
 			nr = recv(session->sock, (char *) netrbuf, BUFSZ, 0);
 		if (nr < 0) {
 			if (socket_errno() == SE_EWOULDBLOCK) {
@@ -973,7 +999,7 @@ void net_input(H3270 *session)
 				    err_buf);
 
 				popup_an_error("SSL_read:\n%s", err_buf);
-				host_disconnect(session,True);
+				host_disconnect(&h3270,True);
 				return;
 			}
 #endif /*]*/
@@ -981,27 +1007,25 @@ void net_input(H3270 *session)
 				connection_complete();
 				return;
 			}
-/*
-#if defined(LOCAL_PROCESS) /
+#if defined(LOCAL_PROCESS) /*[*/
 			if (errno == EIO && local_process) {
 				trace_dsn("RCVD local process disconnect\n");
-				host_disconnect(session,False);
+				host_disconnect(False);
 				return;
 			}
-#endif
-*/
+#endif /*]*/
 			trace_dsn("RCVD socket error %d\n", errno);
 			if (HALF_CONNECTED) {
 				popup_a_sockerr( N_( "%s:%d" ),h3270.hostname, h3270.current_port);
 			} else if (socket_errno() != SE_ECONNRESET) {
 				popup_a_sockerr( N_( "Socket read error" ) );
 			}
-			host_disconnect(session,True);
+			host_disconnect(&h3270,True);
 			return;
 		} else if (nr == 0) {
 			/* Host disconnected. */
 			trace_dsn("RCVD disconnect\n");
-			host_disconnect(session,False);
+			host_disconnect(&h3270,False);
 			return;
 		}
 
@@ -1011,11 +1035,11 @@ void net_input(H3270 *session)
 		{
 			if (non_blocking(False) < 0)
 			{
-				host_disconnect(session,True);
+				host_disconnect(&h3270,True);
 				return;
 			}
-			host_connected(session);
-			net_connected(session);
+			host_connected();
+			net_connected();
 		}
 
 #if defined(X3270_TRACE) /*[*/
@@ -1043,11 +1067,9 @@ void net_input(H3270 *session)
 					host_disconnect(&h3270,True);
 					return;
 				}
-/*
-#if defined(LOCAL_PROCESS)
+#if defined(LOCAL_PROCESS) /*[*/
 			}
-#endif
-*/
+#endif /*]*/
 		}
 
 #if defined(X3270_ANSI) /*[*/
@@ -1108,7 +1130,8 @@ send_naws(void)
 	(void) sprintf(naws_msg + naws_len, "%c%c", IAC, SE);
 	naws_len += 2;
 	net_rawout((unsigned char *)naws_msg, naws_len);
-	trace_dsn("SENT %s NAWS %d %d %s\n", cmd(SB), XMIT_COLS, XMIT_ROWS, cmd(SE));
+	trace_dsn("SENT %s NAWS %d %d %s\n", cmd(SB), XMIT_COLS,
+	    XMIT_ROWS, cmd(SE));
 }
 
 
@@ -1151,9 +1174,9 @@ telnet_fsm(unsigned char c)
 			if (linemode)
 				cooked_init();
 #endif /*]*/
-			host_in3270(&h3270,CONNECTED_ANSI);
+			host_in3270(CONNECTED_ANSI);
 			kybdlock_clr(KL_AWAITING_FIRST, "telnet_fsm");
-			status_reset(NULL);
+			status_reset();
 			ps_process();
 		}
 		if (IN_ANSI && !IN_E) {
@@ -1239,7 +1262,7 @@ telnet_fsm(unsigned char c)
 			trace_dsn("\n");
 			if (syncing) {
 				syncing = 0;
-				x_except_on(&h3270,h3270.sock);
+				x_except_on(h3270.sock);
 			}
 			telnet_state = TNS_DATA;
 			break;
@@ -1265,7 +1288,7 @@ telnet_fsm(unsigned char c)
 #if defined(X3270_TN3270E) /*[*/
 		    case TELOPT_TN3270E:
 #endif /*]*/
-			if (c != TELOPT_TN3270E || !h3270.non_tn3270e_host) {
+			if (c != TELOPT_TN3270E || !non_tn3270e_host) {
 				if (!hisopts[c]) {
 					hisopts[c] = 1;
 					do_opt[2] = c;
@@ -1326,7 +1349,7 @@ telnet_fsm(unsigned char c)
 #if defined(HAVE_LIBSSL) /*[*/
 		    case TELOPT_STARTTLS:
 #endif /*]*/
-			if (c == TELOPT_TN3270E && h3270.non_tn3270e_host)
+			if (c == TELOPT_TN3270E && non_tn3270e_host)
 				goto wont;
 			if (c == TELOPT_TM && !appres.bsd_tm)
 				goto wont;
@@ -1415,7 +1438,7 @@ telnet_fsm(unsigned char c)
 					h3270.connected_lu = try_lu;
 				} else
 					h3270.connected_lu = CN;
-				status_lu(&h3270,h3270.connected_lu);
+				status_lu(h3270.connected_lu);
 
 				tb_len = 4 + tt_len + 2;
 				tt_out = Malloc(tb_len + 1);
@@ -1492,7 +1515,7 @@ tn3270e_request(void)
 	net_rawout((unsigned char *)tt_out, tb_len);
 
 	trace_dsn("SENT %s %s DEVICE-TYPE REQUEST %.*s%s%s %s\n",
-	    cmd(SB), opt(TELOPT_TN3270E), (int) strlen(h3270.termtype), tt_out + 5,
+	    cmd(SB), opt(TELOPT_TN3270E), strlen(h3270.termtype), tt_out + 5,
 	    (try_lu != CN && *try_lu) ? " CONNECT " : "",
 	    (try_lu != CN && *try_lu) ? try_lu : "",
 	    cmd(SE));
@@ -1598,7 +1621,7 @@ tn3270e_negotiate(void)
 				    (char *)&sbbuf[3+tnlen+1], snlen);
 				reported_lu[snlen] = '\0';
 				h3270.connected_lu = reported_lu;
-				status_lu(&h3270,h3270.connected_lu);
+				status_lu(h3270.connected_lu);
 			}
 
 			/* Tell them what we can do. */
@@ -1906,8 +1929,6 @@ process_eor(void)
  */
 void net_exception(H3270 *session)
 {
-	CHECK_SESSION_HANDLE(session);
-
 #if defined(LOCAL_PROCESS) /*[*/
 	if (local_process) {
 		trace_dsn("RCVD exception\n");
@@ -1917,7 +1938,7 @@ void net_exception(H3270 *session)
 		trace_dsn("RCVD urgent data indication\n");
 		if (!syncing) {
 			syncing = 1;
-			x_except_off(session);
+			x_except_off();
 		}
 	}
 }
@@ -2356,7 +2377,7 @@ do_lnext(char c)
 static void
 check_in3270(void)
 {
-	LIB3270_CSTATE new_cstate = NOT_CONNECTED;
+	enum cstate new_cstate = NOT_CONNECTED;
 #if defined(X3270_TRACE) /*[*/
 	static const char *state_name[] = {
 		"unconnected",
@@ -2398,14 +2419,14 @@ check_in3270(void)
 	           hisopts[TELOPT_BINARY] &&
 	           hisopts[TELOPT_EOR]) {
 		new_cstate = CONNECTED_3270;
-	} else if (h3270.cstate == CONNECTED_INITIAL) {
+	} else if (cstate == CONNECTED_INITIAL) {
 		/* Nothing has happened, yet. */
 		return;
 	} else {
 		new_cstate = CONNECTED_ANSI;
 	}
 
-	if (new_cstate != h3270.cstate) {
+	if (new_cstate != cstate) {
 #if defined(X3270_TN3270E) /*[*/
 		int was_in_e = IN_E;
 #endif /*]*/
@@ -2445,7 +2466,7 @@ check_in3270(void)
 		}
 #endif /*]*/
 		trace_dsn("Now operating in %s mode.\n",state_name[new_cstate]);
-		host_in3270(&h3270,new_cstate);
+		host_in3270(new_cstate);
 	}
 }
 
@@ -3183,7 +3204,7 @@ ssl_init(void)
 		ssl_ctx = SSL_CTX_new(SSLv23_method());
 		if (ssl_ctx == NULL) {
 			popup_an_error("SSL_CTX_new failed");
-			h3270.ssl_host = False;
+			ssl_host = False;
 			return;
 		}
 		SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL);
@@ -3192,11 +3213,11 @@ ssl_init(void)
 	ssl_con = SSL_new(ssl_ctx);
 	if (ssl_con == NULL) {
 		popup_an_error("SSL_new failed");
-		h3270.ssl_host = False;
+		ssl_host = False;
 	}
 	SSL_set_verify(ssl_con, 0/*xxx*/, NULL);
 
-	SSL_CTX_set_info_callback(ssl_ctx, ssl_info_callback);
+	SSL_CTX_set_info_callback(ssl_ctx, client_info_callback);
 
 	/* XXX: May need to get key file and password. */
 	if (appres.cert_file)
@@ -3219,7 +3240,7 @@ ssl_init(void)
 }
 
 /* Callback for tracing protocol negotiation. */
-static void ssl_info_callback(INFO_CONST SSL *s, int where, int ret)
+static void client_info_callback(INFO_CONST SSL *s, int where, int ret)
 {
 	if (where == SSL_CB_CONNECT_LOOP)
 	{
@@ -3266,7 +3287,6 @@ static void ssl_info_callback(INFO_CONST SSL *s, int where, int ret)
 				err_buf[0] = '\0';
 			}
 
-			Trace("SSL Connect error in %s\nState: %s\nAlert: %s\n",err_buf,SSL_state_string_long(s),SSL_alert_type_string_long(ret));
 			trace_dsn("SSL Connect error in %s\nState: %s\nAlert: %s\n",err_buf,SSL_state_string_long(s),SSL_alert_type_string_long(ret));
 
 			if(showing)
@@ -3352,7 +3372,7 @@ continue_tls(unsigned char *sbbuf, int len)
 	trace_dsn("TLS/SSL negotiated connection complete. Connection is now secure.\n");
 
 	/* Tell the world that we are (still) connected, now in secure mode. */
-	host_connected(&h3270);
+	host_connected();
 }
 
 #endif /*]*/
@@ -3395,12 +3415,12 @@ net_proxy_port(void)
 	    	return NULL;
 }
 
-LIB3270_EXPORT int lib3270_get_ssl_state(H3270 *h)
+int query_secure_connection(H3270 *h)
 {
-	CHECK_SESSION_HANDLE(h);
-
 #if defined(HAVE_LIBSSL)
-		return (h->secure_connection != 0);
+		if(h)
+			return h->secure_connection;
+		return h3270.secure_connection;
 #else
 		return 0;
 #endif

@@ -68,16 +68,10 @@
 
 		/* Rexx V3 */
 		#define REXXV3
+		#define REXXENTRY 		APIENTRY
 		#define RexxReturnCode	ULONG
 		#define PCONSTRXSTRING	RXSTRING *
 		typedef void *REXXPFN;
-
-		#if defined (HAVE_GNUC_VISIBILITY)
-			#define REXXENTRY 		__attribute__((visibility("default"))) APIENTRY
-		#else
-			#define REXXENTRY 		APIENTRY
-		#endif
-
 
 	#else
 
@@ -104,9 +98,10 @@
 
 	/* include the lib3270 stuff */
 	#define LIB3270_MODULE_NAME "rexx"
-	#include <lib3270.h>
+	#include <lib3270/api.h>
 	#include <lib3270/plugins.h>
-//	#include <lib3270/statusc.h>
+//	#include <lib3270/localdefs.h>
+	#include <lib3270/statusc.h>
 	#include <lib3270/toggle.h>
 
 	#define CONFIG_GROUP "Rexx"
@@ -156,7 +151,7 @@
 	RexxReturnCode REXXENTRY rx3270QueryCState(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	RexxReturnCode REXXENTRY rx3270WaitForEvents(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	RexxReturnCode REXXENTRY rx3270Sleep(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
-	RexxReturnCode REXXENTRY rx3270WaitForCtlrDone(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
+	RexxReturnCode REXXENTRY rx3270WaitForChanges(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	RexxReturnCode REXXENTRY rx3270Quit(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	RexxReturnCode REXXENTRY rx3270SetVisible(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);
 	RexxReturnCode REXXENTRY rx3270Sleep(PSZ Name, LONG Argc, RXSTRING Argv[],PSZ Queuename, PRXSTRING Retstr);

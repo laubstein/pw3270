@@ -499,7 +499,7 @@ dec_save_cursor(int ig1 unused, int ig2 unused)
 {
 	int i;
 
-	saved_cursor = h3270.cursor_addr;
+	saved_cursor = cursor_addr;
 	saved_cset = cset;
 	for (i = 0; i < 4; i++)
 		saved_csd[i] = csd[i];
@@ -530,9 +530,9 @@ ansi_newline(int ig1 unused, int ig2 unused)
 {
 	int nc;
 
-	cursor_move(h3270.cursor_addr - (h3270.cursor_addr % h3270.cols));
-	nc = h3270.cursor_addr + h3270.cols;
-	if (nc < scroll_bottom * h3270.cols)
+	cursor_move(cursor_addr - (cursor_addr % COLS));
+	nc = cursor_addr + COLS;
+	if (nc < scroll_bottom * COLS)
 		cursor_move(nc);
 	else
 		ansi_scroll();
@@ -547,11 +547,11 @@ ansi_cursor_up(int nn, int ig2 unused)
 
 	if (nn < 1)
 		nn = 1;
-	rr = h3270.cursor_addr / h3270.cols;
+	rr = cursor_addr / COLS;
 	if (rr - nn < 0)
-		cursor_move(h3270.cursor_addr % h3270.cols);
+		cursor_move(cursor_addr % COLS);
 	else
-		cursor_move(h3270.cursor_addr - (nn * h3270.cols));
+		cursor_move(cursor_addr - (nn * COLS));
 	held_wrap = False;
 	return DATA;
 }
@@ -599,16 +599,16 @@ ansi_reset(int ig1 unused, int ig2 unused)
 	allow_wide_mode = 0;
 	saved_altbuffer = False;
 	scroll_top = 1;
-	scroll_bottom = h3270.rows;
-	Replace(tabs, (unsigned char *)Malloc((h3270.cols+7)/8));
-	for (i = 0; i < (h3270.cols+7)/8; i++)
+	scroll_bottom = ROWS;
+	Replace(tabs, (unsigned char *)Malloc((COLS+7)/8));
+	for (i = 0; i < (COLS+7)/8; i++)
 		tabs[i] = 0x01;
 	held_wrap = False;
 	if (!first) {
-		ctlr_altbuffer(&h3270,True);
-		ctlr_aclear(0, h3270.rows * h3270.cols, 1);
-		ctlr_altbuffer(&h3270,False);
-		ctlr_clear(&h3270,False);
+		ctlr_altbuffer(True);
+		ctlr_aclear(0, ROWS * COLS, 1);
+		ctlr_altbuffer(False);
+		ctlr_clear(False);
 		screen_80();
 	}
 	first = False;
@@ -619,8 +619,8 @@ ansi_reset(int ig1 unused, int ig2 unused)
 static enum state
 ansi_insert_chars(int nn, int ig2 unused)
 {
-	int cc = h3270.cursor_addr % h3270.cols;	/* current col */
-	int mc = h3270.cols - cc;		/* max chars that can be inserted */
+	int cc = cursor_addr % COLS;	/* current col */
+	int mc = COLS - cc;		/* max chars that can be inserted */
 	int ns;				/* chars that are shifting */
 
 	if (nn < 1)
@@ -631,10 +631,10 @@ ansi_insert_chars(int nn, int ig2 unused)
 	/* Move the surviving chars right */
 	ns = mc - nn;
 	if (ns)
-		ctlr_bcopy(h3270.cursor_addr, h3270.cursor_addr + nn, ns, 1);
+		ctlr_bcopy(cursor_addr, cursor_addr + nn, ns, 1);
 
 	/* Clear the middle of the line */
-	ctlr_aclear(h3270.cursor_addr, nn, 1);
+	ctlr_aclear(cursor_addr, nn, 1);
 	return DATA;
 }
 
@@ -645,11 +645,11 @@ ansi_cursor_down(int nn, int ig2 unused)
 
 	if (nn < 1)
 		nn = 1;
-	rr = h3270.cursor_addr / h3270.cols;
-	if (rr + nn >= h3270.cols)
-		cursor_move((h3270.cols-1)*h3270.cols + (h3270.cursor_addr%h3270.cols));
+	rr = cursor_addr / COLS;
+	if (rr + nn >= ROWS)
+		cursor_move((ROWS-1)*COLS + (cursor_addr%COLS));
 	else
-		cursor_move(h3270.cursor_addr + (nn * h3270.cols));
+		cursor_move(cursor_addr + (nn * COLS));
 	held_wrap = False;
 	return DATA;
 }
@@ -661,12 +661,12 @@ ansi_cursor_right(int nn, int ig2 unused)
 
 	if (nn < 1)
 		nn = 1;
-	cc = h3270.cursor_addr % h3270.cols;
-	if (cc == h3270.cols-1)
+	cc = cursor_addr % COLS;
+	if (cc == COLS-1)
 		return DATA;
-	if (cc + nn >= h3270.cols)
-		nn = h3270.cols - 1 - cc;
-	cursor_move(h3270.cursor_addr + nn);
+	if (cc + nn >= COLS)
+		nn = COLS - 1 - cc;
+	cursor_move(cursor_addr + nn);
 	held_wrap = False;
 	return DATA;
 }
@@ -682,12 +682,12 @@ ansi_cursor_left(int nn, int ig2 unused)
 	}
 	if (nn < 1)
 		nn = 1;
-	cc = h3270.cursor_addr % h3270.cols;
+	cc = cursor_addr % COLS;
 	if (!cc)
 		return DATA;
 	if (nn > cc)
 		nn = cc;
-	cursor_move(h3270.cursor_addr - nn);
+	cursor_move(cursor_addr - nn);
 	return DATA;
 }
 
@@ -695,10 +695,10 @@ static enum state
 ansi_cursor_motion(int n1, int n2)
 {
 	if (n1 < 1) n1 = 1;
-	if (n1 > h3270.rows) n1 = h3270.rows;
+	if (n1 > ROWS) n1 = ROWS;
 	if (n2 < 1) n2 = 1;
-	if (n2 > h3270.cols) n2 = h3270.cols;
-	cursor_move((n1 - 1) * h3270.cols + (n2 - 1));
+	if (n2 > COLS) n2 = COLS;
+	cursor_move((n1 - 1) * COLS + (n2 - 1));
 	held_wrap = False;
 	return DATA;
 }
@@ -708,15 +708,15 @@ ansi_erase_in_display(int nn, int ig2 unused)
 {
 	switch (nn) {
 	    case 0:	/* below */
-		ctlr_aclear(h3270.cursor_addr, (h3270.rows * h3270.cols) - h3270.cursor_addr, 1);
+		ctlr_aclear(cursor_addr, (ROWS * COLS) - cursor_addr, 1);
 		break;
 	    case 1:	/* above */
-		ctlr_aclear(0, h3270.cursor_addr + 1, 1);
+		ctlr_aclear(0, cursor_addr + 1, 1);
 		break;
 	    case 2:	/* all (without moving cursor) */
-		if (h3270.cursor_addr == 0 && !h3270.is_altbuffer)
-			scroll_save(h3270.rows, True);
-		ctlr_aclear(0, h3270.rows * h3270.cols, 1);
+		if (cursor_addr == 0 && !is_altbuffer)
+			scroll_save(ROWS, True);
+		ctlr_aclear(0, ROWS * COLS, 1);
 		break;
 	}
 	return DATA;
@@ -725,17 +725,17 @@ ansi_erase_in_display(int nn, int ig2 unused)
 static enum state
 ansi_erase_in_line(int nn, int ig2 unused)
 {
-	int nc = h3270.cursor_addr % h3270.cols;
+	int nc = cursor_addr % COLS;
 
 	switch (nn) {
 	    case 0:	/* to right */
-		ctlr_aclear(h3270.cursor_addr, h3270.cols - nc, 1);
+		ctlr_aclear(cursor_addr, COLS - nc, 1);
 		break;
 	    case 1:	/* to left */
-		ctlr_aclear(h3270.cursor_addr - nc, nc+1, 1);
+		ctlr_aclear(cursor_addr - nc, nc+1, 1);
 		break;
 	    case 2:	/* all */
-		ctlr_aclear(h3270.cursor_addr - nc, h3270.cols, 1);
+		ctlr_aclear(cursor_addr - nc, COLS, 1);
 		break;
 	}
 	return DATA;
@@ -744,7 +744,7 @@ ansi_erase_in_line(int nn, int ig2 unused)
 static enum state
 ansi_insert_lines(int nn, int ig2 unused)
 {
-	int rr = h3270.cursor_addr / h3270.cols;	/* current row */
+	int rr = cursor_addr / COLS;	/* current row */
 	int mr = scroll_bottom - rr;	/* rows left at and below this one */
 	int ns;				/* rows that are shifting */
 
@@ -760,17 +760,17 @@ ansi_insert_lines(int nn, int ig2 unused)
 	/* Move the victims down */
 	ns = mr - nn;
 	if (ns)
-		ctlr_bcopy(rr * h3270.cols, (rr + nn) * h3270.cols, ns * h3270.cols, 1);
+		ctlr_bcopy(rr * COLS, (rr + nn) * COLS, ns * COLS, 1);
 
 	/* Clear the middle of the screen */
-	ctlr_aclear(rr * h3270.cols, nn * h3270.cols, 1);
+	ctlr_aclear(rr * COLS, nn * COLS, 1);
 	return DATA;
 }
 
 static enum state
 ansi_delete_lines(int nn, int ig2 unused)
 {
-	int rr = h3270.cursor_addr / h3270.cols;	/* current row */
+	int rr = cursor_addr / COLS;	/* current row */
 	int mr = scroll_bottom - rr;	/* max rows that can be deleted */
 	int ns;				/* rows that are shifting */
 
@@ -786,18 +786,18 @@ ansi_delete_lines(int nn, int ig2 unused)
 	/* Move the surviving rows up */
 	ns = mr - nn;
 	if (ns)
-		ctlr_bcopy((rr + nn) * h3270.cols, rr * h3270.cols, ns * h3270.cols, 1);
+		ctlr_bcopy((rr + nn) * COLS, rr * COLS, ns * COLS, 1);
 
 	/* Clear the rest of the screen */
-	ctlr_aclear((rr + ns) * h3270.cols, nn * h3270.cols, 1);
+	ctlr_aclear((rr + ns) * COLS, nn * COLS, 1);
 	return DATA;
 }
 
 static enum state
 ansi_delete_chars(int nn, int ig2 unused)
 {
-	int cc = h3270.cursor_addr % h3270.cols;	/* current col */
-	int mc = h3270.cols - cc;		/* max chars that can be deleted */
+	int cc = cursor_addr % COLS;	/* current col */
+	int mc = COLS - cc;		/* max chars that can be deleted */
 	int ns;				/* chars that are shifting */
 
 	if (nn < 1)
@@ -808,10 +808,10 @@ ansi_delete_chars(int nn, int ig2 unused)
 	/* Move the surviving chars left */
 	ns = mc - nn;
 	if (ns)
-		ctlr_bcopy(h3270.cursor_addr + nn, h3270.cursor_addr, ns, 1);
+		ctlr_bcopy(cursor_addr + nn, cursor_addr, ns, 1);
 
 	/* Clear the end of the line */
-	ctlr_aclear(h3270.cursor_addr + ns, nn, 1);
+	ctlr_aclear(cursor_addr + ns, nn, 1);
 	return DATA;
 }
 
@@ -924,7 +924,7 @@ ansi_bell(int ig1 unused, int ig2 unused)
 static enum state
 ansi_newpage(int ig1 unused, int ig2 unused)
 {
-	ctlr_clear(&h3270,False);
+	ctlr_clear(False);
 	return DATA;
 }
 
@@ -936,11 +936,11 @@ ansi_backspace(int ig1 unused, int ig2 unused)
 		return DATA;
 	}
 	if (rev_wraparound_mode) {
-		if (h3270.cursor_addr > (scroll_top - 1) * h3270.cols)
-			cursor_move(h3270.cursor_addr - 1);
+		if (cursor_addr > (scroll_top - 1) * COLS)
+			cursor_move(cursor_addr - 1);
 	} else {
-		if (h3270.cursor_addr % h3270.cols)
-			cursor_move(h3270.cursor_addr - 1);
+		if (cursor_addr % COLS)
+			cursor_move(cursor_addr - 1);
 	}
 	return DATA;
 }
@@ -948,8 +948,8 @@ ansi_backspace(int ig1 unused, int ig2 unused)
 static enum state
 ansi_cr(int ig1 unused, int ig2 unused)
 {
-	if (h3270.cursor_addr % h3270.cols)
-		cursor_move(h3270.cursor_addr - (h3270.cursor_addr % h3270.cols));
+	if (cursor_addr % COLS)
+		cursor_move(cursor_addr - (cursor_addr % COLS));
 	if (auto_newline_mode)
 		(void) ansi_lf(0, 0);
 	held_wrap = False;
@@ -959,18 +959,18 @@ ansi_cr(int ig1 unused, int ig2 unused)
 static enum state
 ansi_lf(int ig1 unused, int ig2 unused)
 {
-	int nc = h3270.cursor_addr + h3270.cols;
+	int nc = cursor_addr + COLS;
 
 	held_wrap = False;
 
 	/* If we're below the scrolling region, don't scroll. */
-	if ((h3270.cursor_addr / h3270.cols) >= scroll_bottom) {
-		if (nc < h3270.rows * h3270.cols)
+	if ((cursor_addr / COLS) >= scroll_bottom) {
+		if (nc < ROWS * COLS)
 			cursor_move(nc);
 		return DATA;
 	}
 
-	if (nc < scroll_bottom * h3270.cols)
+	if (nc < scroll_bottom * COLS)
 		cursor_move(nc);
 	else
 		ansi_scroll();
@@ -980,16 +980,16 @@ ansi_lf(int ig1 unused, int ig2 unused)
 static enum state
 ansi_htab(int ig1 unused, int ig2 unused)
 {
-	int col = h3270.cursor_addr % h3270.cols;
+	int col = cursor_addr % COLS;
 	int i;
 
 	held_wrap = False;
-	if (col == h3270.cols-1)
+	if (col == COLS-1)
 		return DATA;
-	for (i = col+1; i < h3270.cols-1; i++)
+	for (i = col+1; i < COLS-1; i++)
 		if (tabs[i/8] & 1<<(i%8))
 			break;
-	cursor_move(h3270.cursor_addr - col + i);
+	cursor_move(cursor_addr - col + i);
 	return DATA;
 }
 
@@ -1006,15 +1006,15 @@ ansi_nop(int ig1 unused, int ig2 unused)
 }
 
 #define PWRAP { \
-    nc = h3270.cursor_addr + 1; \
-    if (nc < scroll_bottom * h3270.cols) \
+    nc = cursor_addr + 1; \
+    if (nc < scroll_bottom * COLS) \
 	    cursor_move(nc); \
     else { \
-	    if (h3270.cursor_addr / h3270.cols >= scroll_bottom) \
-		    cursor_move(h3270.cursor_addr / h3270.cols * h3270.cols); \
+	    if (cursor_addr / COLS >= scroll_bottom) \
+		    cursor_move(cursor_addr / COLS * COLS); \
 	    else { \
 		    ansi_scroll(); \
-		    cursor_move(nc - h3270.cols); \
+		    cursor_move(nc - COLS); \
 	    } \
     } \
 }
@@ -1070,16 +1070,16 @@ ansi_printing(int ig1 unused, int ig2 unused)
 	switch (csd[(once_cset != -1) ? once_cset : cset]) {
 	    case CSD_LD:	/* line drawing "0" */
 		if (ansi_ch >= 0x5f && ansi_ch <= 0x7e)
-			ctlr_add(h3270.cursor_addr, (unsigned char)(ansi_ch - 0x5f),
+			ctlr_add(cursor_addr, (unsigned char)(ansi_ch - 0x5f),
 			    CS_LINEDRAW);
 		else
-			ctlr_add(h3270.cursor_addr, asc2ebc[ansi_ch], CS_BASE);
+			ctlr_add(cursor_addr, asc2ebc[ansi_ch], CS_BASE);
 		break;
 	    case CSD_UK:	/* UK "A" */
 		if (ansi_ch == '#')
-			ctlr_add(h3270.cursor_addr, 0x1e, CS_LINEDRAW);
+			ctlr_add(cursor_addr, 0x1e, CS_LINEDRAW);
 		else
-			ctlr_add(h3270.cursor_addr, asc2ebc[ansi_ch], CS_BASE);
+			ctlr_add(cursor_addr, asc2ebc[ansi_ch], CS_BASE);
 		break;
 	    case CSD_US:	/* US "B" */
 		ebc_ch = asc2ebc[ansi_ch];
@@ -1157,7 +1157,7 @@ ansi_printing(int ig1 unused, int ig2 unused)
 			ea_buf[cursor_addr].db = DBCS_NONE;
 		}
 #endif /*]*/
-		ctlr_add(h3270.cursor_addr, ebc_ch, default_cs);
+		ctlr_add(cursor_addr, ebc_ch, default_cs);
 #if defined(X3270_DBCS) /*[*/
 		if (default_cs == CS_DBCS)
 			(void) ctlr_dbcs_postprocess();
@@ -1165,9 +1165,9 @@ ansi_printing(int ig1 unused, int ig2 unused)
 		break;
 	}
 	once_cset = -1;
-	ctlr_add_gr(h3270.cursor_addr, gr);
-	ctlr_add_fg(h3270.cursor_addr, fg);
-	ctlr_add_bg(h3270.cursor_addr, bg);
+	ctlr_add_gr(cursor_addr, gr);
+	ctlr_add_fg(cursor_addr, fg);
+	ctlr_add_bg(cursor_addr, bg);
 	if (wraparound_mode) {
 		/*
 		 * There is a fascinating behavior of xterm which we will
@@ -1182,14 +1182,14 @@ ansi_printing(int ig1 unused, int ig2 unused)
 		 * In my opinion, very strange, but among other things, 'vi'
 		 * depends on it!
 		 */
-		if (!((h3270.cursor_addr + 1) % h3270.cols)) {
+		if (!((cursor_addr + 1) % COLS)) {
 			held_wrap = True;
 		} else {
 			PWRAP;
 		}
 	} else {
-		if ((h3270.cursor_addr % h3270.cols) != (h3270.cols - 1))
-			cursor_move(h3270.cursor_addr + 1);
+		if ((cursor_addr % COLS) != (COLS - 1))
+			cursor_move(cursor_addr + 1);
 	}
 	return DATA;
 }
@@ -1259,7 +1259,7 @@ ansi_digit(int ig1 unused, int ig2 unused)
 static enum state
 ansi_reverse_index(int ig1 unused, int ig2 unused)
 {
-	int rr = h3270.cursor_addr / h3270.cols;	/* current row */
+	int rr = cursor_addr / COLS;	/* current row */
 	int np = (scroll_top - 1) - rr;	/* number of rows in the scrolling
 					   region, above this line */
 	int ns;				/* number of rows to scroll */
@@ -1345,7 +1345,7 @@ ansi_status_report(int nn, int ig2 unused)
 		break;
 	    case 6:
 		(void) sprintf(cpr, "\033[%d;%dR",
-		    (h3270.cursor_addr/h3270.cols) + 1, (h3270.cursor_addr%h3270.cols) + 1);
+		    (cursor_addr/COLS) + 1, (cursor_addr%COLS) + 1);
 		net_sends(cpr);
 		break;
 	}
@@ -1443,7 +1443,7 @@ dec_set(int ig1 unused, int ig2 unused)
 			rev_wraparound_mode = 1;
 			break;
 		    case 47:	/* alt buffer */
-			ctlr_altbuffer(&h3270,True);
+			ctlr_altbuffer(True);
 			break;
 		}
 	return DATA;
@@ -1475,7 +1475,7 @@ dec_reset(int ig1 unused, int ig2 unused)
 			rev_wraparound_mode = 0;
 			break;
 		    case 47:	/* alt buffer */
-			ctlr_altbuffer(&h3270,False);
+			ctlr_altbuffer(False);
 			break;
 		}
 	return DATA;
@@ -1504,7 +1504,7 @@ dec_save(int ig1 unused, int ig2 unused)
 			saved_rev_wraparound_mode = rev_wraparound_mode;
 			break;
 		    case 47:	/* alt buffer */
-			saved_altbuffer = h3270.is_altbuffer;
+			saved_altbuffer = is_altbuffer;
 			break;
 		}
 	return DATA;
@@ -1539,7 +1539,7 @@ dec_restore(int ig1 unused, int ig2 unused)
 			rev_wraparound_mode = saved_rev_wraparound_mode;
 			break;
 		    case 47:	/* alt buffer */
-			ctlr_altbuffer(&h3270,saved_altbuffer);
+			ctlr_altbuffer(saved_altbuffer);
 			break;
 		}
 	return DATA;
@@ -1550,15 +1550,15 @@ dec_scrolling_region(int top, int bottom)
 {
 	if (top < 1)
 		top = 1;
-	if (bottom > h3270.rows)
-		bottom = h3270.rows;
-	if (top <= bottom && (top > 1 || bottom < h3270.rows)) {
+	if (bottom > ROWS)
+		bottom = ROWS;
+	if (top <= bottom && (top > 1 || bottom < ROWS)) {
 		scroll_top = top;
 		scroll_bottom = bottom;
 		cursor_move(0);
 	} else {
 		scroll_top = 1;
-		scroll_bottom = h3270.rows;
+		scroll_bottom = ROWS;
 	}
 	return DATA;
 }
@@ -1630,7 +1630,7 @@ xterm_text_do(int ig1 unused, int ig2 unused)
 static enum state
 ansi_htab_set(int ig1 unused, int ig2 unused)
 {
-	register int col = h3270.cursor_addr % h3270.cols;
+	register int col = cursor_addr % COLS;
 
 	tabs[col/8] |= 1<<(col%8);
 	return DATA;
@@ -1643,11 +1643,11 @@ ansi_htab_clear(int nn, int ig2 unused)
 
 	switch (nn) {
 	    case 0:
-		col = h3270.cursor_addr % h3270.cols;
+		col = cursor_addr % COLS;
 		tabs[col/8] &= ~(1<<(col%8));
 		break;
 	    case 3:
-		for (i = 0; i < (h3270.cols+7)/8; i++)
+		for (i = 0; i < (COLS+7)/8; i++)
 			tabs[i] = 0;
 		break;
 	}
@@ -1663,8 +1663,8 @@ ansi_scroll(void)
 	held_wrap = False;
 
 	/* Save the top line */
-	if (scroll_top == 1 && scroll_bottom == h3270.rows) {
-		if (!h3270.is_altbuffer)
+	if (scroll_top == 1 && scroll_bottom == ROWS) {
+		if (!is_altbuffer)
 			scroll_save(1, False);
 		ctlr_scroll();
 		return;
@@ -1672,18 +1672,18 @@ ansi_scroll(void)
 
 	/* Scroll all but the last line up */
 	if (scroll_bottom > scroll_top)
-		ctlr_bcopy(scroll_top * h3270.cols,
-		    (scroll_top - 1) * h3270.cols,
-		    (scroll_bottom - scroll_top) * h3270.cols,
+		ctlr_bcopy(scroll_top * COLS,
+		    (scroll_top - 1) * COLS,
+		    (scroll_bottom - scroll_top) * COLS,
 		    1);
 
 	/* Clear the last line */
-	ctlr_aclear((scroll_bottom - 1) * h3270.cols, h3270.cols, 1);
+	ctlr_aclear((scroll_bottom - 1) * COLS, COLS, 1);
 }
 
 /* Callback for when we enter ANSI mode. */
 static void
-ansi_in3270(H3270 *session, int in3270, void *dunno)
+ansi_in3270(int in3270)
 {
 	if (!in3270)
 		(void) ansi_reset(0, 0);
@@ -1825,7 +1825,8 @@ ansi_send_pa(int nn)
 	net_sends(fn_buf);
 }
 
-void toggle_lineWrap(H3270 *session, struct toggle *t unused, LIB3270_TOGGLE_TYPE type unused)
+void
+toggle_lineWrap(struct toggle *t unused, enum toggle_type type unused)
 {
 	if (toggled(LINE_WRAP))
 		wraparound_mode = 1;

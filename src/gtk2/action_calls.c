@@ -266,14 +266,14 @@
 
 	/* Load image logo */
 	if(program_logo && g_file_test(program_logo,G_FILE_TEST_IS_REGULAR))
-		 logo = gdk_pixbuf_new_from_file_at_size(program_logo,64,64,NULL);
+		 logo = gdk_pixbuf_new_from_file(program_logo,NULL);
 
 	if(!logo)
 	{
-		filename = g_build_filename(program_data,PROGRAM_LOGO,NULL);
+		filename = g_build_filename(program_data,LOGO,NULL);
 
 		if(g_file_test(filename,G_FILE_TEST_IS_REGULAR))
-			logo = gdk_pixbuf_new_from_file_at_size(filename,64,64,NULL);
+			logo = gdk_pixbuf_new_from_file(filename, NULL);
 
 		g_free(filename);
 	}
@@ -323,7 +323,7 @@
 	action_group_set_sensitive(ACTION_GROUP_ONLINE,FALSE);
 	action_group_set_sensitive(ACTION_GROUP_OFFLINE,FALSE);
 	unselect();
-	lib3270_disconnect(hSession);
+	host_disconnect(hSession,0);
  }
 
  static int SaveText(const char *title, gchar *text)

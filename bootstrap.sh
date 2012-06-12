@@ -1,23 +1,25 @@
 #!/bin/bash
 
 PACKAGE_VERSION=4.2
-PACKAGE_RELEASE=5
+PACKAGE_RELEASE=2
 REV_FILE=./revision.m4
 REV=`date +%y%m%d%H%M`
 
-SVN=`which svn 2> /dev/null`
+if [ -d .svn ]; then
+	SVN=`which svn 2> /dev/null`
+else
+	SVN=""
+fi
 
-if test -x "$SVN" ; then
+if [ ! -z $SVN ]; then
 
 	echo "Updating sources..."
-	"$SVN" update
+	$SVN update
 	if [ "$?" != "0" ]; then
-
+	
 		echo "$SVN update failed!"
 
 	else
-
-		LANG="EN_US"
 
 		if $SVN --xml info >/dev/null 2>&1; then
 			REV=`$SVN --xml info | tr -d '\r\n' | sed -e 's/.*<commit.*revision="\([0-9]*\)".*<\/commit>.*/\1/'`
@@ -29,15 +31,8 @@ if test -x "$SVN" ; then
 			LCD=""
 		fi
 
-		if [ "$LCD" == "" ]; then
-			LCD=`date +%Y%m%d`
-		fi
-
-		URL=`svn info | grep "URL: " | sed -s "s@URL: @@g"`
-
 		echo "m4_define([SVN_REV], $REV)" > $REV_FILE
 		echo "m4_define([SVN_DATE], $LCD)" >> $REV_FILE
-		echo "m4_define([SVN_URL], $URL)" >> $REV_FILE
 		echo "m4_define([SVN_RELEASE], $PACKAGE_RELEASE)" >> $REV_FILE
 
 	fi
@@ -47,15 +42,11 @@ if test -x "$SVN" ; then
 		echo "Creating changelog ..."
 		$SVN2CL
 	fi
-fi
 
-if [ ! -f $REV_FILE ]; then
-	echo "Can't create $REV_FILE is svn available?"
-	exit -1
 fi
 
 case $MACHTYPE in
-
+	
 *-apple-*)
 
 	if [ -z $JHBUILD_PREFIX ]; then
@@ -64,7 +55,7 @@ case $MACHTYPE in
 	fi
 
 	;;
-
+	
 *)
 	SVN_SCRIPT="s/@PACKAGE_VERSION@/$PACKAGE_VERSION/g;s/@PACKAGE_RELEASE@/$PACKAGE_RELEASE/g;s/@PACKAGE_REVISION@/$REV/g;s/@DATE_CHANGED@/`date --rfc-2822`/g"
 
@@ -76,7 +67,7 @@ case $MACHTYPE in
 		sed "$SVN_SCRIPT" "debian/changelog.in" > "debian/changelog"
 	fi
 	;;
-
+		
 esac
 
 aclocal
@@ -86,6 +77,11 @@ fi
 
 autoconf
 if [ "$?" != "0" ]; then
+	exit -1
+fi
+
+if [ ! -f $REV_FILE ]; then
+	echo "Can't create $REV_FILE Is svn installed?"
 	exit -1
 fi
 

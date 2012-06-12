@@ -1,12 +1,13 @@
-/usr/include/lib3270/statusc.h
-/usr/include/lib3270/config.h
-/usr/include/lib3270/3270ds.h
-/usr/include/lib3270/api.h
-/usr/include/lib3270/actions.h
-/usr/include/lib3270/action_table.h
-/usr/include/lib3270/plugins.h
-/usr/include/lib3270/toggle.h
-/usr/include/lib3270.h
-/usr/lib/pkgconfig/pw3270.pc
-/usr/share/pw3270/ui/debug.xml
+usr/include/lib3270/statusc.h
+usr/include/lib3270/config.h
+usr/include/lib3270/kybdc.h
+usr/include/lib3270/3270ds.h
+usr/include/lib3270/api.h
+usr/include/lib3270/actions.h
+usr/include/lib3270/action_table.h
+usr/include/lib3270/plugins.h
+usr/include/lib3270/toggle.h
+usr/include/lib3270.h
+usr/lib/pkgconfig/pw3270.pc
+usr/share/pw3270/ui/debug.xml
 
