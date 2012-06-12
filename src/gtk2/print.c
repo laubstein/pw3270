@@ -120,12 +120,15 @@
 #else
 	if(GTK_WIDGET_REALIZED(font_dialog))
 #endif
-		font = gtk_font_selection_get_font_name(GTK_FONT_SELECTION(font_dialog));
+
+	font = gtk_font_selection_get_font_name(GTK_FONT_SELECTION(font_dialog));
 
 	Trace("Selected font: \"%s\"",font);
 
 	if(font)
 		g_object_set_data_full(G_OBJECT(prt),"3270FontName",font,g_free);
+
+
  }
 
 
@@ -133,9 +136,18 @@
  {
  	gchar *fontname = g_object_get_data(G_OBJECT(prt),"3270FontName");
 
- 	Trace("Loading font \"%s\"",fontname);
-
 	gtk_font_selection_set_font_name(GTK_FONT_SELECTION(widget),fontname);
+
+ 	Trace("Font: \"%s\" size: %d",fontname,gtk_font_selection_get_size(GTK_FONT_SELECTION(widget)));
+
+ 	if(!gtk_font_selection_get_size(GTK_FONT_SELECTION(widget)))
+	{
+		// Font size is 0, set it to 10
+		gchar *ptr = g_strdup_printf("%s 10",fontname);
+		gtk_font_selection_set_font_name(GTK_FONT_SELECTION(widget),ptr);
+		g_free(ptr);
+	}
+
  }
 
  static GObject * create_custom_widget(GtkPrintOperation *prt, gpointer user_data)
@@ -176,7 +188,7 @@
 	gtk_print_settings_foreach(settings,(GtkPrintSettingsFunc) SavePrintSetting,conf);
 #endif
 
-	g_key_file_set_string(conf,"Print","Font",g_object_get_data(G_OBJECT(prt),"3270FontName"));
+	g_key_file_set_string(conf,"Print","fontname",g_object_get_data(G_OBJECT(prt),"3270FontName"));
 
  }
 
@@ -200,9 +212,9 @@
 	g_object_set_data_full(G_OBJECT(prt),"3270Text",g_strsplit(g_strchomp(text),"\n",-1),(void (*)(gpointer)) g_strfreev);
 
 	// Set print
-	font = GetString("Print","Font","");
+	font = GetString("Print","fontname","");
 	if(!*font)
-		font = GetString("Terminal","Font","Courier");
+		font = GetString("Terminal","Font","Courier new 10");
 
 	g_object_set_data_full(G_OBJECT(prt),"3270FontName",g_strdup(font),g_free);
 
