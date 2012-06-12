@@ -136,6 +136,15 @@
  	Trace("Loading font \"%s\"",fontname);
 
 	gtk_font_selection_set_font_name(GTK_FONT_SELECTION(widget),fontname);
+
+ 	if(!gtk_font_selection_get_size(GTK_FONT_SELECTION(widget)))
+	{
+		// Font size is 0, set it to 10
+		gchar *ptr = g_strdup_printf("%s 10",fontname);
+		gtk_font_selection_set_font_name(GTK_FONT_SELECTION(widget),ptr);
+		g_free(ptr);
+	}
+
  }
 
  static GObject * create_custom_widget(GtkPrintOperation *prt, gpointer user_data)
