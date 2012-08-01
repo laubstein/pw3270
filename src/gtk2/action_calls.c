@@ -54,10 +54,11 @@
  	char			*ptr;
  	gboolean		again		= TRUE;
 	char 			buffer[1024];
- 	GtkTable		*table		= GTK_TABLE(gtk_table_new(2,4,FALSE));
+ 	GtkTable		*table		= GTK_TABLE(gtk_table_new(2,6,FALSE));
  	GtkEntry		*host		= GTK_ENTRY(gtk_entry_new());
  	GtkEntry		*port		= GTK_ENTRY(gtk_entry_new());
- 	GtkToggleButton	*checkbox	= GTK_TOGGLE_BUTTON(gtk_check_button_new_with_label( _( "Secure connection" ) ));
+ 	GtkToggleButton	*secure		= GTK_TOGGLE_BUTTON(gtk_check_button_new_with_label( _( "Secure connection" ) ));
+ 	GtkToggleButton	*as400		= GTK_TOGGLE_BUTTON(gtk_check_button_new_with_label( _( "Host is AS400" ) ));
  	GtkWidget 		*dialog 	= gtk_dialog_new_with_buttons(	_( "Select hostname" ),
 																GTK_WINDOW(topwindow),
 																GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -73,12 +74,13 @@
 	gtk_entry_set_width_chars(port,7);
 
 	gtk_table_attach(table,gtk_label_new( _( "Hostname:" ) ), 0,1,0,1,0,0,5,0);
-	gtk_table_attach(table,GTK_WIDGET(host), 1,2,0,1,GTK_EXPAND|GTK_FILL,0,0,0);
+	gtk_table_attach(table,GTK_WIDGET(host), 1,4,0,1,GTK_EXPAND|GTK_FILL,0,0,0);
 
-	gtk_table_attach(table,gtk_label_new( _( "Port:" ) ), 2,3,0,1,0,0,5,0);
-	gtk_table_attach(table,GTK_WIDGET(port), 3,4,0,1,GTK_FILL,0,0,0);
+	gtk_table_attach(table,gtk_label_new( _( "Port:" ) ), 4,5,0,1,0,0,5,0);
+	gtk_table_attach(table,GTK_WIDGET(port), 5,6,0,1,GTK_EXPAND|GTK_FILL,0,0,0);
 
-	gtk_table_attach(table,GTK_WIDGET(checkbox), 1,2,1,2,GTK_EXPAND|GTK_FILL,0,0,0);
+	gtk_table_attach(table,GTK_WIDGET(secure), 1,2,1,2,GTK_FILL,0,0,0);
+	gtk_table_attach(table,GTK_WIDGET(as400), 2,3,1,2,GTK_EXPAND|GTK_FILL,0,20,0);
 
 	gtk_container_set_border_width(GTK_CONTAINER(table),5);
 
@@ -89,15 +91,22 @@
 #ifdef HAVE_LIBSSL
 	if(!strncmp(hostname,"L:",2))
 	{
-		gtk_toggle_button_set_active(checkbox,TRUE);
+		gtk_toggle_button_set_active(secure,TRUE);
 		hostname += 2;
 	}
 #else
-	gtk_toggle_button_set_active(checkbox,FALSE);
-	gtk_widget_set_sensitive(GTK_WIDGET(checkbox),FALSE);
+	gtk_toggle_button_set_active(secure,FALSE);
+	gtk_widget_set_sensitive(GTK_WIDGET(secure),FALSE);
 	if(!strncmp(hostname,"L:",2))
 		hostname += 2;
 #endif
+
+	ptr = strchr(hostname,',');
+	if(ptr)
+	{
+		*(ptr++) = 0;
+		gtk_toggle_button_set_active(as400,strcmp(ptr,"as400") == 0);
+	}
 
 	ptr = strchr(hostname,':');
 	if(ptr)
@@ -123,7 +132,7 @@
 
 			gtk_widget_set_sensitive(dialog,FALSE);
 
-			if(gtk_toggle_button_get_active(checkbox))
+			if(gtk_toggle_button_get_active(secure))
 				strcpy(buffer,"L:");
 			else
 				*buffer = 0;
@@ -131,6 +140,9 @@
 			strncat(buffer,gtk_entry_get_text(host),1023);
 			strncat(buffer,":",1023);
 			strncat(buffer,gtk_entry_get_text(port),1023);
+
+			if(gtk_toggle_button_get_active(as400))
+				strncat(buffer,",as400",1023);
 
 			if(!host_connect(buffer,1))
 			{

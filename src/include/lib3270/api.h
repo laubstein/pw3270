@@ -197,6 +197,7 @@
 			int      			  sock;					/**< Network socket */
 			int					  net_sock;
 			LIB3270_CSTATE		  cstate;				/**< Connection state */
+			int					  as400;				/**< Host is AS400 */
 
 			#if defined(_WIN32) /*[*/
 			HANDLE				  sock_handle;
