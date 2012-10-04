@@ -6,11 +6,7 @@ PACKAGE_RELEASE=3
 REV=`date +%y%m%d%H%M`
 REV_FILE=./revision.m4
 
-if [ -d .svn ]; then
-	SVN=`which svn 2> /dev/null`
-else
-	SVN=""
-fi
+SVN=`which svn 2> /dev/null`
 
 if [ ! -z $SVN ]; then
 
