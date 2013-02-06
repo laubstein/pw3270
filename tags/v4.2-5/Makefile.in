@@ -1,0 +1,436 @@
+#
+# "Software pw3270, desenvolvido com base nos códigos fontes do WC3270  e X3270
+# (Paul Mattes Paul.Mattes@usa.net), de emulação de terminal 3270 para acesso a
+# aplicativos mainframe. Registro no INPI sob o nome G3270.
+#
+# Copyright (C) <2008> <Banco do Brasil S.A.>
+#
+# Este programa é software livre. Você pode redistribuí-lo e/ou modificá-lo sob
+# os termos da GPL v.2 - Licença Pública Geral  GNU,  conforme  publicado  pela
+# Free Software Foundation.
+#
+# Este programa é distribuído na expectativa de  ser  útil,  mas  SEM  QUALQUER
+# GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou  de  ADEQUAÇÃO
+# A QUALQUER PROPÓSITO EM PARTICULAR. Consulte a Licença Pública Geral GNU para
+# obter mais detalhes.
+#
+# Você deve ter recebido uma cópia da Licença Pública Geral GNU junto com este
+# programa;  se  não, escreva para a Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA, 02111-1307, USA
+#
+# Contatos:
+#
+# perry.werneck@gmail.com	(Alexandre Perry de Souza Werneck)
+# erico.mendonca@gmail.com	(Erico Mascarenhas de Mendonça)
+# licinio@bb.com.br		(Licínio Luis Branco)
+# kraucer@bb.com.br		(Kraucer Fernandes Mazuco)
+# macmiranda@bb.com.br		(Marco Aurélio Caldas Miranda)
+#
+
+#---[ Configuration values ]---------------------------------------------------
+
+PACKAGE_NAME=@PACKAGE_NAME@
+PACKAGE_VERSION=@PACKAGE_VERSION@
+PACKAGE_TARNAME=@PACKAGE_TARNAME@
+PROGRAM_LOGO=@PROGRAM_LOGO@
+
+PLUGINS=@PLUGINS@
+LIBRARIES=@LIBRARIES@
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+sbindir=@sbindir@
+libdir=@libdir@
+includedir=@includedir@
+datarootdir=@datarootdir@
+localedir=@localedir@
+desktopdir=$(datarootdir)/applications
+docdir=@docdir@
+
+BINDIR=@BINDIR@
+OBJDIR=@OBJDIR@
+SRCDIR=@SRCDIR@
+DEBDIR=@DEBDIR@
+TMPDIR=@TMPDIR@
+
+INSTALL=@INSTALL@
+INSTALL_EXE=$(INSTALL) --mode=755
+INSTALL_DATA=$(INSTALL) --mode=644
+VALGRIND=/usr/bin/valgrind
+
+MAKENSIS=@MAKENSIS@
+
+IGEBUNDLER=@IGEBUNDLER@
+PKGMAKER=@PKGMAKER@
+
+XGETTEXT=@XGETTEXT@
+MSGCAT=@MSGCAT@
+MSGINIT=@MSGINIT@
+MSGFMT=@MSGFMT@
+SHELL=@SHELL@
+RPMBUILD=@RPMBUILD@
+DPKGBUILD=@DPKGBUILD@
+
+HOST_CC=@HOST_CC@
+HOST_LD=@HOST_CC@
+CFLAGS=@CFLAGS@
+
+LIB3270_CFLAGS=-I$(SRCDIR)/include
+LIB3270_LIBS=-L$(BINDIR)/Release/lib -l3270
+LIB3270_DBGLIBS=-L$(BINDIR)/Debug/lib -l3270 -Wl,-rpath,.bin/Debug/Debug/lib
+
+LANGUAGES=pt_BR
+
+DBG_MAKE="LIB3270_CFLAGS=$(LIB3270_CFLAGS)" LIB3270_LIBS="$(LIB3270_DBGLIBS)" GLOBAL_DEPENDS="$(BINDIR)/Debug/lib/lib3270@DLLEXT@"
+RLS_MAKE="LIB3270_CFLAGS=$(LIB3270_CFLAGS)" LIB3270_LIBS="$(LIB3270_LIBS)" GLOBAL_DEPENDS="$(BINDIR)/Release/lib/lib3270@DLLEXT@"
+
+#---[ Rules ]------------------------------------------------------------------
+
+$(OBJDIR)/Release/%@OBJEXT@: src/%.c
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(HOST_CC) $(CFLAGS) $(RLS_CFLAGS) `pkg-config --cflags glib-2.0` -o $@ -c $<
+
+$(BINDIR)/Release/%@EXEEXT@: $(OBJDIR)/Release/%@OBJEXT@
+	@echo $@ ...
+	@mkdir -p `dirname $@`
+	@$(HOST_LD) -o $@ $^ `pkg-config --libs glib-2.0`
+
+$(BINDIR)/pot/%.pot: src/plugins/%/*
+	@$(MAKE) -C $(dir $<) $@
+
+$(BINDIR)/pot/lib.pot: src/lib/*.c
+	@$(MAKE) -C $(dir $<) $@
+
+$(BINDIR)/pot/gtk2.pot: src/gtk2/*.c
+	@$(MAKE) -C $(dir $<) $@
+
+$(BINDIR)/pot/rexx.pot: src/plugins/rexx/*.c
+	@$(MAKE) -C $(dir $<) $@
+
+$(BINDIR)/pot/java.pot: src/plugins/java/*.c
+	@$(MAKE) -C $(dir $<) $@
+
+$(BINDIR)/Release/$(localedir)/%/LC_MESSAGES/$(PACKAGE_NAME).mo: po/%.po
+	@echo $< ...
+	@mkdir -p `dirname $@`
+	@$(MSGFMT) -c -v -o $@ $^
+
+install-%: src/plugins/%/Makefile $(BINDIR)/Release/lib/lib3270@DLLEXT@
+	@$(MAKE) $(RLS_MAKE) DESTDIR=$(DESTDIR) -C $(dir $<) install
+
+install-%: src/%/Makefile $(BINDIR)/Release/lib/lib3270@DLLEXT@
+	@$(MAKE) $(RLS_MAKE) DESTDIR=$(DESTDIR) -C $(dir $<) install
+
+$(TMPDIR)/control-%: src/%/Makefile
+	@$(MAKE) TMPDIR=$(TMPDIR) DEBDIR=$(DEBDIR) -C $(dir $<) $@
+
+$(TMPDIR)/control-%: src/plugins/%/Makefile
+	@$(MAKE) TMPDIR=$(TMPDIR) DEBDIR=$(DEBDIR) -C $(dir $<) $@
+
+#---[ Main targets ]-----------------------------------------------------------
+
+all: Release
+
+Release: $(BINDIR)/Release/$(PACKAGE_NAME)@EXEEXT@ \
+		$(PROGRAM_LOGO) \
+		$(foreach PLUGIN, $(PLUGINS), $(BINDIR)/Release/plugins/$(PLUGIN)@DLLEXT@) \
+		$(foreach LIB, $(LIBRARIES), $(BINDIR)/Release/$(LIB)@DLLEXT@) \
+		$(foreach MO, $(LANGUAGES), $(BINDIR)/Release/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo)
+
+
+#---[ Library ]----------------------------------------------------------------
+
+$(BINDIR)/Debug/lib/lib3270@DLLEXT@: src/lib/*
+	@$(MAKE) $(DBG_MAKE) -C src/lib $@
+
+$(BINDIR)/Release/lib/lib3270@DLLEXT@: src/lib/*
+	@$(MAKE) $(RLS_MAKE) -C src/lib $@
+
+testprogram@EXEEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/lib/testprogram.c
+	@$(CC) $(LIB3270_CFLAGS) -DDEBUG=1 -g -o $@ src/lib/testprogram.c  -Wl,-rpath,.bin/Debug/lib $(LIB3270_DBGLIBS)
+
+libtest: testprogram@EXEEXT@
+
+chklib: testprogram@EXEEXT@
+ifeq ($(VALGRIND),no)
+		@./testprogram@EXEEXT@
+else
+		@G_DEBUG=gc-friendly G_SLICE=always-malloc \$(VALGRIND) --leak-check=full ./testprogram@EXEEXT@
+endif
+
+
+#---[ Programs ]---------------------------------------------------------------
+
+$(BINDIR)/Debug/$(PACKAGE_NAME)@EXEEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/gtk2/*
+	@echo $@ ...
+	@$(MAKE) $(DBG_MAKE) -C src/gtk2 $@
+
+$(BINDIR)/Release/$(PACKAGE_NAME)@EXEEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/gtk2/*
+	@echo $@ ...
+	@$(MAKE) $(RLS_MAKE) -C src/gtk2 $@
+
+$(PACKAGE_NAME).app: $(PACKAGE_NAME).bundle Release
+	@echo $@ ...
+	@rm -fr $(PACKAGE_NAME).app
+	@$(IGEBUNDLER) $(PACKAGE_NAME).bundle
+
+$(PACKAGE_NAME).mpkg: $(PACKAGE_NAME).app Info.plist
+	@echo $@ ...
+	@$(PKGMAKER) --root $(PACKAGE_NAME).app --info Info.plist --out $@
+
+
+#---[ Modules ]----------------------------------------------------------------
+
+$(BINDIR)/Debug/plugins/rx3270@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/rexx/*
+	@$(MAKE) $(DBG_MAKE) -C src/plugins/rexx $@
+
+$(BINDIR)/Debug/plugins/j3270plugin@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/java/*
+	@$(MAKE) $(DBG_MAKE) -C src/plugins/java $@
+
+$(BINDIR)/Debug/librx3270@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/rexx/*
+	@$(MAKE) $(DBG_MAKE) -C src/plugins/rexx $@
+
+$(BINDIR)/Debug/libpw3270_jni@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/jni/*
+	@$(MAKE) $(DBG_MAKE) -C src/jni $@
+
+$(BINDIR)/Debug/plugins/pipectl@DLLEXT@: $(BINDIR)/Debug/lib/lib3270@DLLEXT@ src/plugins/pipectl/*
+	@$(MAKE) $(DBG_MAKE) -C src/plugins/pipectl $@
+
+$(BINDIR)/Release/plugins/rx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
+	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
+
+$(BINDIR)/Release/plugins/j3270plugin@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/java/*
+	@$(MAKE) $(RLS_MAKE) -C src/plugins/java $@
+
+$(BINDIR)/Release/librx3270@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/rexx/*
+	@$(MAKE) $(RLS_MAKE) -C src/plugins/rexx $@
+
+$(BINDIR)/Release/libpw3270_jni@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/jni/*
+	@$(MAKE) $(RLS_MAKE) -C src/jni $@
+
+$(BINDIR)/Release/plugins/pipectl@DLLEXT@: $(BINDIR)/Release/lib/lib3270@DLLEXT@ src/plugins/pipectl/*
+	@$(MAKE) $(RLS_MAKE) -C src/plugins/pipectl $@
+
+#---[ I18n ]-------------------------------------------------------------------
+
+$(PACKAGE_NAME).po: $(BINDIR)/pot/$(PACKAGE_NAME).pot
+	@$(MSGINIT) --no-translator -o $@ -i $^
+
+$(BINDIR)/pot/$(PACKAGE_NAME).pot: $(foreach SRC, $(basename @LANG_MODULES@), $(BINDIR)/pot/$(SRC).pot)
+	@rm -f $@
+	@echo $@ ...
+	@$(MSGCAT) --sort-output $^ | sed "s&VERSION&$(PACKAGE_VERSION)&;s&CHARSET&UTF-8&;s&PACKAGE&$(PACKAGE_NAME)&g" > $@
+
+$(BINDIR)/pot/ui.pot: $(foreach XML, $(basename @UI_FILES@), $(BINDIR)/pot/ui/$(XML).pot)
+	@rm -f $@
+	@echo $@ ...
+	@$(MSGCAT) --sort-output $^ > $@
+
+$(BINDIR)/pot/ui/%.pot: ui/%.xml $(BINDIR)/Release/xml2pot@EXEEXT@
+	@mkdir -p `dirname $@`
+	@echo $@ ...
+	@$(BINDIR)/Release/xml2pot@EXEEXT@ "$<" > "$@"
+
+#---[ Install targets ]--------------------------------------------------------
+
+install: $(foreach TARGET, @INSTALL_TARGETS@, install-$(TARGET))
+
+install-gui:	$(PACKAGE_NAME).desktop
+
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/plugins
+	@$(INSTALL_DATA) $(PROGRAM_LOGO) $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)
+	@$(INSTALL_DATA) default.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/$(PACKAGE_NAME).conf
+	@$(INSTALL_DATA) colors.conf $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)
+
+	@$(INSTALL_DATA) ui/default.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+	@$(INSTALL_DATA) ui/functions.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+	@$(INSTALL_DATA) ui/keypad.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+	@$(INSTALL_DATA) ui/debug.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+
+	@desktop-file-install	--mode 644 \
+				--dir $(DESTDIR)/$(desktopdir) \
+				--add-category System \
+				--add-category TerminalEmulator \
+				$(PACKAGE_NAME).desktop
+
+install-locale: $(foreach MO, $(LANGUAGES), $(BINDIR)/Release/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo)
+	@echo -e $(foreach MO, $(LANGUAGES), mkdir -p $(DESTDIR)/$(localedir)/$(MO)/LC_MESSAGES\\n$(INSTALL_DATA) $(BINDIR)/Release/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo $(DESTDIR)/$(localedir)/$(MO)/LC_MESSAGES/$(PACKAGE_NAME).mo \\n ) | $(SHELL)
+
+install-plugins: $(foreach PLUGIN, $(PLUGINS), $(BINDIR)/Release/plugins/$(PLUGIN)@DLLEXT@)
+	@mkdir -p $(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/plugins
+	@$(INSTALL_EXE) $^ "$(DESTDIR)/$(libdir)/$(PACKAGE_NAME)/plugins"
+
+install-lib: $(BINDIR)/Release/lib/lib3270@DLLEXT@
+	mkdir -p $(DESTDIR)/$(libdir)
+	@$(INSTALL_EXE) $(BINDIR)/Release/lib/lib3270@DLLEXT@ $(DESTDIR)/$(libdir)
+
+install-dev:
+	@mkdir -p $(DESTDIR)/$(includedir)/lib3270
+	@$(INSTALL_DATA) src/include/lib3270.h $(DESTDIR)/$(includedir)
+	@$(INSTALL_DATA) src/include/lib3270/*.h $(DESTDIR)/$(includedir)/lib3270
+
+	@mkdir -p $(DESTDIR)/$(libdir)/pkgconfig
+	@$(INSTALL_DATA) lib3270.pc $(DESTDIR)/$(libdir)/pkgconfig/$(PACKAGE_NAME).pc
+
+	@mkdir -p $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+	@$(INSTALL_DATA) ui/debug.xml $(DESTDIR)/$(datarootdir)/$(PACKAGE_NAME)/ui
+
+install-doc:
+	@mkdir -p $(DESTDIR)/$(docdir)
+	@$(INSTALL_DATA) LICENCA $(DESTDIR)/$(docdir)
+	@$(INSTALL_DATA) LICENSE $(DESTDIR)/$(docdir)
+	@$(INSTALL_DATA) AUTHORS $(DESTDIR)/$(docdir)
+
+#---[ Misc Tagets ]------------------------------------------------------------
+
+$(PACKAGE_NAME).desktop: Makefile $(PROGRAM_LOGO)
+	@rm -f $@
+	@echo "[Desktop Entry]" > $@
+	@echo "Encoding=UTF-8" >> $@
+	@echo "GenericName=$(PACKAGE_NAME)" >> $@
+	@echo "Name=3270 Terminal" >> $@
+	@echo "Name[pt_BR]=Terminal 3270" >> $@
+	@echo "Comment=IBM 3270 Terminal emulator" >> $@
+	@echo "Exec=$(bindir)/$(PACKAGE_NAME)@EXEEXT@" >> $@
+	@echo "Icon=$(datarootdir)/$(PACKAGE_NAME)/$(PROGRAM_LOGO)" >> $@
+	@echo "Terminal=false" >> $@
+	@echo "Type=Application" >> $@
+	@echo "StartupNotify=true" >> $@
+
+rpm: $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
+	@$(RPMBUILD) -ta $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
+
+tgz: $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
+	@echo $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz Ok!
+
+deb: $(DEBDIR)/control
+	@$(DPKGBUILD) -rfakeroot -uc -us
+
+nsi: Release
+	@chmod +x makegtkruntime.sh
+	@./makegtkruntime.sh
+	@$(MAKENSIS) $(PACKAGE_NAME).nsi
+
+$(TMPDIR)/control-gui: Makefile
+	@touch $@
+
+$(TMPDIR)/control-locale: Makefile
+	@touch $@
+
+$(TMPDIR)/control-doc: Makefile
+	@touch $@
+
+$(TMPDIR)/control-dev: Makefile
+	@touch $@
+
+$(DEBDIR)/control: $(DEBDIR)/control-base $(foreach TARGET, @INSTALL_TARGETS@, $(TMPDIR)/control-$(TARGET))
+	@cat $^ > $@
+
+$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz: clean
+	@rm -fr $(TMPDIR)/$(PACKAGE_TARNAME).tmp
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp *.spec $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp pw3270.cbp $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp *.m4 $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp configure.ac $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp *.in $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp *.conf $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+
+	@cp AUTHORS $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp LICENSE $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@cp LICENCA $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@touch ChangeLog
+	@cp ChangeLog $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/image
+	@cp -r image/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/image
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/ui
+	@cp -r ui/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/ui
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/po
+	@cp -r po/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/po
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/src
+	@cp -r src/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/src
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/scripts
+	@cp -r scripts/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/scripts
+
+	@mkdir -p $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/debian
+	@cp -r debian/* $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/debian
+
+	@rm -f $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/debian/control
+	@rm -f $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/Makefile
+	@rm -f $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/*.layout
+	@tar --create --gzip --verbose --directory $(TMPDIR)/$(PACKAGE_TARNAME).tmp --exclude-vcs --file=$@ $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@echo $@
+
+
+$(PROGRAM_LOGO): image/$(PROGRAM_LOGO)
+	@echo $@ ...
+	@cp image/$(PROGRAM_LOGO) $(PROGRAM_LOGO)
+
+Debug:	$(BINDIR)/Debug/$(PACKAGE_NAME)@EXEEXT@ \
+	$(PROGRAM_LOGO) \
+	$(foreach PLUGIN, $(PLUGINS), $(BINDIR)/Debug/plugins/$(PLUGIN)@DLLEXT@) \
+	$(foreach LIB, $(LIBRARIES), $(BINDIR)/Debug/$(LIB)@DLLEXT@)
+
+run: Debug
+	@PATH="$(PATH):.bin/Debug/lib" $(BINDIR)/Debug/$(PACKAGE_NAME)@EXEEXT@ --program-data="$(PWD)" --plugin-path=$(BINDIR)/Debug/plugins
+
+distclean: clean
+	@$(MAKE) -C src/lib distclean
+	@rm -f src/gtk2/version.c
+	@rm -f src/include/lib3270/plugins.h
+	@rm -f *.tar.gz
+	@rm -f *.src.rpm
+	@rm -f *.pc
+	@rm -f *.nsi
+	@rm -f *.spec
+	@rm -f *.desktop
+	@rm -f src/gtk2/resources.rc
+	@rm -f src/gtk2/version.c
+	@rm -f src/oxt/description.xml
+	@rm -f src/oxt/manifest.xml
+	@rm -f version
+	@rm -f src/plugins/rexx/Makefile
+	@rm -f src/include/lib3270/plugins.h
+	@rm -f *.log
+	@rm -f *.layout
+	@rm -f src/include/lib3270/config.h
+	@rm -f $(DEBDIR)/control-base
+	@rm -f $(DEBDIR)/control-gui
+	@rm -f $(DEBDIR)/control-locale
+	@rm -f $(DEBDIR)/control-doc
+	@rm -f $(DEBDIR)/control-dev
+	@rm -fr .obj
+	@find ./src -name "Makefile" -exec rm -f {} \;
+
+clean:
+	@rm -fr $(OBJDIR)
+	@rm -fr $(BINDIR)
+	@rm -fr $(TMPDIR)
+
+	@rm -fr $(PACKAGE_NAME).app
+
+	@rm -f $(PROGRAM_LOGO)
+	@rm -f $(PACKAGE_NAME).po
+
+	@$(MAKE) -C src/jni clean
+	@$(MAKE) -C src/lib clean
+	@$(MAKE) -C src/oxt clean
+	@$(MAKE) -C src/gtk2 clean
+	@$(MAKE) -C src/plugins/rexx clean
+
+	@find . -name "*@OBJEXT@" -exec rm -f {} \;
+	@find . -name "*@DLLEXT@" -exec rm -f {} \;
+	@find . -name "*.tmp" -exec rm -f {} \;
+	@find . -name "*.a" -exec rm -f {} \;
+	@find . -name "*~" -exec rm -f {} \;
+	@find . -name "*.def" -exec rm -f {} \;
+
