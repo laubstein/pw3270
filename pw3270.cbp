@@ -13,7 +13,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters="--program-data=. --plugin-path=./.bin/Debug/plugins " />
+				<Option parameters="--program-data=.  --model=5 --plugin-path=./bin/Debug/plugins" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -47,10 +47,6 @@
 		</Compiler>
 		<Unit filename="Makefile.in" />
 		<Unit filename="bootstrap.sh" />
-		<Unit filename="colors.conf">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
 		<Unit filename="configure.ac" />
 		<Unit filename="debian/control-base.in" />
 		<Unit filename="debian/lib3270.install">

@@ -125,7 +125,7 @@ extern struct timeval ds_ts;
 // static int      		sock 			= -1;	/* active socket */
 
 #if defined(HAVE_LIBSSL) /*[*/
-static unsigned long last_ssl_error	= !0;
+static unsigned long last_ssl_error	= 0;
 #endif
 
 //#if defined(_WIN32) /*[*/
@@ -317,7 +317,7 @@ static void ssl_init(void);
 #else /*][*/
 #define INFO_CONST
 #endif /*]*/
-static void ssl_info_callback(INFO_CONST SSL *s, int where, int ret);
+static void client_info_callback(INFO_CONST SSL *s, int where, int ret);
 static void continue_tls(unsigned char *sbbuf, int len);
 #endif /*]*/
 
@@ -417,11 +417,6 @@ LIB3270_EXPORT void popup_a_sockerr(char *fmt, ...)
 
 }
 #endif
-
-static int bgconnect(H3270 *h, void *dunno)
-{
-	return connect(h3270.sock, &haddr.sa, ha_len);
-}
 
 /*
  * net_connect
@@ -533,6 +528,16 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 			status_resolving(&h3270,0);
 		}
 	} else {
+/*
+#if defined(LOCAL_PROCESS)
+		if (ls) {
+			local_process = True;
+		} else {
+#endif
+#if defined(LOCAL_PROCESS)
+			local_process = False;
+#endif
+*/
 			status_resolving(&h3270,1);
 			if (resolve_host_and_port(host, portname,
 				    &h3270.current_port, &haddr.sa, &ha_len,
@@ -542,8 +547,57 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 			    	return -1;
 			status_resolving(&h3270,0);
 			}
+/*
+#if defined(LOCAL_PROCESS)
+		}
+#endif
+*/
 	}
 
+/*
+#if defined(LOCAL_PROCESS)
+	if (local_process) {
+		int amaster;
+		struct winsize w;
+
+		w.ws_row = XMIT_ROWS;
+		w.ws_col = XMIT_COLS;
+		w.ws_xpixel = 0;
+		w.ws_ypixel = 0;
+
+		switch (forkpty(&amaster, NULL, NULL, &w)) {
+		    case -1:	// failed
+			popup_an_errno(errno, "forkpty");
+			close_fail;
+		    case 0:	// child
+			putenv("TERM=xterm");
+			if (strchr(host, ' ') != CN) {
+				(void) execlp("/bin/sh", "sh", "-c", host,
+				    NULL);
+			} else {
+				char *arg1;
+
+				arg1 = strrchr(host, '/');
+				(void) execlp(host,
+					(arg1 == CN) ? host : arg1 + 1,
+					NULL);
+			}
+			perror(host);
+			#warning Notify User
+			_exit(1);
+			break;
+		    default:	// parent
+			sock = amaster;
+#if !defined(_WIN32)
+			(void) fcntl(sock, F_SETFD, 1);
+#endif
+			net_connected();
+			host_in3270(CONNECTED_ANSI);
+			break;
+		}
+	} else {
+#endif
+*/
 		/* create the socket */
 		if ((h3270.sock = socket(haddr.sa.sa_family, SOCK_STREAM, 0)) == -1) {
 			popup_a_sockerr( N_( "socket" ) );
@@ -570,22 +624,17 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 #endif /*]*/
 
 		/* set the socket to be non-delaying */
-/*
-#if defined(_WIN32)
+#if defined(_WIN32) /*[*/
 		if (non_blocking(False) < 0)
-#else
+#else /*][*/
 		if (non_blocking(True) < 0)
-#endif
-			close_fail;
-*/
-
-		if (non_blocking(False) < 0)
+#endif /*]*/
 			close_fail;
 
-#if !defined(_WIN32)
+#if !defined(_WIN32) /*[*/
 		/* don't share the socket with our children */
 		(void) fcntl(h3270.sock, F_SETFD, 1);
-#endif
+#endif /*]*/
 
 		/* init ssl */
 #if defined(HAVE_LIBSSL) /*[*/
@@ -596,33 +645,17 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 
 		/* connect */
 		status_connecting(&h3270,1);
-
-		if(CallAndWait((int (*)(H3270 *, void *)) bgconnect,&h3270,NULL) == -1)
-		{
-			Trace("Connect failed: %s (rc=%d)",strerror(socket_errno()),socket_errno());
-			popup_a_sockerr( N_( "Can't connect to %s:%d" ),h3270.hostname, h3270.current_port);
-			close_fail;
-		}
-		else
-		{
-			net_connected(&h3270);
-		}
-
-/*
 		if (connect(h3270.sock, &haddr.sa, ha_len) == -1) {
-
-			Trace("Connect failed: %s (rc=%d)",strerror(socket_errno()),socket_errno());
-
 			if (socket_errno() == SE_EWOULDBLOCK
-#if defined(SE_EINPROGRESS)
+#if defined(SE_EINPROGRESS) /*[*/
 			    || socket_errno() == SE_EINPROGRESS
-#endif
+#endif /*]*/
 						   ) {
 				trace_dsn("Connection pending.\n");
 				*pending = True;
-#if !defined(_WIN32)
+#if !defined(_WIN32) /*[*/
 				output_id = AddOutput(h3270.sock, &h3270, output_possible);
-#endif
+#endif /*]*/
 			} else {
 				popup_a_sockerr( N_( "Can't connect to %s:%d" ),h3270.hostname, h3270.current_port);
 				close_fail;
@@ -632,6 +665,10 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 				close_fail;
 			net_connected(&h3270);
 		}
+/*
+#if defined(LOCAL_PROCESS)
+	}
+#endif
 */
 
 	/* set up temporary termtype */
@@ -1906,8 +1943,6 @@ process_eor(void)
  */
 void net_exception(H3270 *session)
 {
-	CHECK_SESSION_HANDLE(session);
-
 #if defined(LOCAL_PROCESS) /*[*/
 	if (local_process) {
 		trace_dsn("RCVD exception\n");
@@ -3196,7 +3231,7 @@ ssl_init(void)
 	}
 	SSL_set_verify(ssl_con, 0/*xxx*/, NULL);
 
-	SSL_CTX_set_info_callback(ssl_ctx, ssl_info_callback);
+	SSL_CTX_set_info_callback(ssl_ctx, client_info_callback);
 
 	/* XXX: May need to get key file and password. */
 	if (appres.cert_file)
@@ -3219,7 +3254,7 @@ ssl_init(void)
 }
 
 /* Callback for tracing protocol negotiation. */
-static void ssl_info_callback(INFO_CONST SSL *s, int where, int ret)
+static void client_info_callback(INFO_CONST SSL *s, int where, int ret)
 {
 	if (where == SSL_CB_CONNECT_LOOP)
 	{
@@ -3266,7 +3301,6 @@ static void ssl_info_callback(INFO_CONST SSL *s, int where, int ret)
 				err_buf[0] = '\0';
 			}
 
-			Trace("SSL Connect error in %s\nState: %s\nAlert: %s\n",err_buf,SSL_state_string_long(s),SSL_alert_type_string_long(ret));
 			trace_dsn("SSL Connect error in %s\nState: %s\nAlert: %s\n",err_buf,SSL_state_string_long(s),SSL_alert_type_string_long(ret));
 
 			if(showing)

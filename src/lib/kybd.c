@@ -546,19 +546,10 @@ LIB3270_FKEY_ACTION( pfkey )
 
 	if (kybdlock & KL_OIA_MINUS)
 		return -1;
-
-	if (kybdlock)
-	{
-		if(h3270.as400)
-			enq_key(pa_xlate,0);
+	else if (kybdlock)
 		enq_key(pf_xlate,key-1);
-	}
 	else
-	{
-		if(h3270.as400)
-			key_AID(pa_xlate[0]);
 		key_AID(pf_xlate[key-1]);
-	}
 
 	return 0;
 }

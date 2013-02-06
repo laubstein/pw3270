@@ -510,7 +510,7 @@
     return RetValue(Retstr,0);
  }
 
- LIB3270_EXPORT void pw3270_call_rexx_script(GtkWidget *action, GtkWidget *program_window)
+ void pw3270_call_rexx_script(GtkWidget *action, GtkWidget *program_window)
  {
 	LONG      			return_code;                 	// interpreter return code
 #ifdef CONSTRXSTRING

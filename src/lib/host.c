@@ -620,9 +620,6 @@ static int do_connect(H3270 *hSession, const char *n)
 
 int lib3270_connect(H3270 *h, const char *n, int wait)
 {
-	char * hostname;
-	char * options;
-
 	if(!h)
 		h = &h3270;
 
@@ -634,20 +631,8 @@ int lib3270_connect(H3270 *h, const char *n, int wait)
 	if(PCONNECTED)
 		return EBUSY;
 
-	hostname = strdup(n);
-
-	options = strchr(hostname,',');
-	if(options)
-	{
-		*(options++) = 0;
-		h->as400 = strcasecmp(options,"as400") == 0 ? 1 : 0;
-	}
-
-	if(do_connect(h,hostname))
-	{
-		free(hostname);
+	if(do_connect(h,n))
 		return -1;
-	}
 
 	if(wait)
 	{
@@ -662,7 +647,6 @@ int lib3270_connect(H3270 *h, const char *n, int wait)
 		}
 	}
 
-	free(hostname);
 	return 0;
 }
 

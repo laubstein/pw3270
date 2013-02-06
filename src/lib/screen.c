@@ -296,7 +296,6 @@ void screen_erase(H3270 *session)
 
 LIB3270_EXPORT void lib3270_get_screen_size(H3270 *h, int *r, int *c)
 {
-	CHECK_SESSION_HANDLE(h);
 	*r = h->rows;
 	*c = h->cols;
 }
