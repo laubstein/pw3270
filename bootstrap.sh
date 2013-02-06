@@ -5,7 +5,7 @@ PACKAGE_RELEASE=5
 REV_FILE=./revision.m4
 REV=`date +%y%m%d%H%M`
 
-if test -d ".svn" ; then
+#if test -d ".svn" ; then
 
 	SVN=`which svn 2> /dev/null`
 
@@ -49,10 +49,10 @@ if test -d ".svn" ; then
 		fi
 	fi
 
-elif [ ! -e $REV_FILE ]; then
-	echo "Can´t find subversion and no revision.m4 supplied; aborting"
-	exit -1
-fi
+#elif [ ! -e $REV_FILE ]; then
+#	echo "Can´t find subversion and no revision.m4 supplied; aborting"
+#	exit -1
+#fi
 
 if [ ! -f $REV_FILE ]; then
 	echo "Can't create $REV_FILE Is svn installed?"
