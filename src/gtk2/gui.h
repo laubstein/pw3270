@@ -256,6 +256,7 @@
 	{
 		OIA_PIXMAP_LOCKED,		// 0 = Locked
 		OIA_PIXMAP_UNLOCKED,	// 1 = Unlocked
+		OIA_PIXMAP_WARNING,		// 2 = Warning
 
 		OIA_PIXMAP_COUNT
 	};

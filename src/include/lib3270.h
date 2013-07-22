@@ -431,6 +431,8 @@
 	 */
 	LIB3270_EXPORT int lib3270_get_ssl_state(H3270 *h);
 
+	LIB3270_EXPORT int lib3270_get_ssl_cert_state(H3270 *h);
+
 	/**
 	 * Register application I/O Handlers.
 	 *
