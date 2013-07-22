@@ -367,7 +367,7 @@ $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz: clean
 	@rm -f $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/debian/control
 	@rm -f $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/Makefile
 	@rm -f $(TMPDIR)/$(PACKAGE_TARNAME).tmp/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/*.layout
-	@tar --create --gzip --verbose --owner=root --group=root --directory $(TMPDIR)/$(PACKAGE_TARNAME).tmp --exclude-vcs --file=$@ $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+	@tar --format=ustar --create --gzip --verbose --owner=root --group=root --directory $(TMPDIR)/$(PACKAGE_TARNAME).tmp --exclude-vcs --file=$@ $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
 	@echo $@
 
 
