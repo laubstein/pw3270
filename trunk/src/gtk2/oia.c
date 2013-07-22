@@ -100,7 +100,7 @@
 /*---[ Statics ]------------------------------------------------------------------------------------------------*/
 
 #ifdef ENABLE_BM_PIXMAPS
- static GdkPixmap * pixmap_oia[OIA_PIXMAP_COUNT] = { NULL, NULL};
+ static GdkPixmap * pixmap_oia[OIA_PIXMAP_COUNT] = { NULL, NULL, NULL};
 #endif // ENABLE_BM_PIXMAPS
 
  #define OIAROW	(view.top+4+(terminal_font_info.spacing*view.rows))
@@ -152,12 +152,6 @@
 
 
 /*---[ Implement ]----------------------------------------------------------------------------------------------*/
-
-/*
- static void dunno(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
- {
- }
-*/
 
  void update_oia(void)
  {
@@ -481,6 +475,7 @@
     return ret;
 
  }
+
 #endif //  ENABLE_BM_PIXMAPS
 
  static void oia_draw_ssl_state(cairo_t *cr, GdkGC *gc, GdkRectangle *r)
@@ -534,6 +529,7 @@
 
 	#include "locked.bm"
 	#include "unlocked.bm"
+	#include "warning.bm"
 
 	static const struct _imagedata
 	{
@@ -544,10 +540,13 @@
 	{
 		{ locked_bits,		locked_width,	locked_height	},
 		{ unlocked_bits,	unlocked_width,	unlocked_height	},
+		{ warning_bits,		warning_width,	warning_height	},
 
 	};
 
 	int idx = query_secure_connection(hSession) ? OIA_PIXMAP_LOCKED : OIA_PIXMAP_UNLOCKED;
+	int color = TERMINAL_COLOR_OIA_SSL_STATE;
+
 
 	r->x = (r->width - (46*terminal_font_info.width))+1;
 	r->y++;
@@ -556,8 +555,14 @@
 
 	oia_clear_icon(cr,r);
 
+	if(!query_ssl_cert_check_status(hSession))
+	{
+		idx = OIA_PIXMAP_WARNING;
+		color = TERMINAL_COLOR_OIA_STATUS_WARNING;
+	}
+
 	if(!pixmap_oia[idx])
-		pixmap_oia[idx] = oia_create_scaled_pixmap(r,gc,imagedata[idx].data,imagedata[idx].width,imagedata[idx].height,TERMINAL_COLOR_OIA_SSL_STATE);
+		pixmap_oia[idx] = oia_create_scaled_pixmap(r,gc,imagedata[idx].data,imagedata[idx].width,imagedata[idx].height,color);
 
 	gdk_cairo_set_source_pixmap(cr, pixmap_oia[idx], r->x, r->y);
 	gdk_cairo_rectangle(cr,r);
@@ -959,7 +964,7 @@
 #ifdef ENABLE_BM_PIXMAPS
 	 int f;
 
-	for(f=0;f<OIA_PIXMAP_COUNT;f++)
+	for(f=0;f<G_N_ELEMENTS(pixmap_oia);f++)
 	{
 		if(pixmap_oia[f])
 		{

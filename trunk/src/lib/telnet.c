@@ -570,15 +570,6 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 #endif /*]*/
 
 		/* set the socket to be non-delaying */
-/*
-#if defined(_WIN32)
-		if (non_blocking(False) < 0)
-#else
-		if (non_blocking(True) < 0)
-#endif
-			close_fail;
-*/
-
 		if (non_blocking(False) < 0)
 			close_fail;
 
@@ -608,31 +599,6 @@ int net_connect(const char *host, char *portname, Boolean ls, Boolean *resolving
 			net_connected(&h3270);
 		}
 
-/*
-		if (connect(h3270.sock, &haddr.sa, ha_len) == -1) {
-
-			Trace("Connect failed: %s (rc=%d)",strerror(socket_errno()),socket_errno());
-
-			if (socket_errno() == SE_EWOULDBLOCK
-#if defined(SE_EINPROGRESS)
-			    || socket_errno() == SE_EINPROGRESS
-#endif
-						   ) {
-				trace_dsn("Connection pending.\n");
-				*pending = True;
-#if !defined(_WIN32)
-				output_id = AddOutput(h3270.sock, &h3270, output_possible);
-#endif
-			} else {
-				popup_a_sockerr( N_( "Can't connect to %s:%d" ),h3270.hostname, h3270.current_port);
-				close_fail;
-			}
-		} else {
-			if (non_blocking(False) < 0)
-				close_fail;
-			net_connected(&h3270);
-		}
-*/
 
 	/* set up temporary termtype */
 	if (appres.termname == CN && h3270.std_ds_host) {
@@ -758,7 +724,18 @@ static void net_connected(H3270 *session)
 			return;
 		}
 		session->secure_connection = True;
-		trace_dsn("TLS/SSL tunneled connection complete. Connection is now secure.\n");
+
+		if(SSL_get_verify_result(ssl_con))
+		{
+			trace_dsn("TLS/SSL tunneled connection complete. X509 certificate verification failed.\n");
+			session->valid_certificate	= False;
+		}
+		else
+		{
+			trace_dsn("TLS/SSL tunneled connection complete. Connection is now secure.\n");
+			session->valid_certificate	= True;
+
+		}
 
 		/* Tell everyone else again. */
 		host_connected(session);
@@ -863,6 +840,7 @@ net_disconnect(void)
 		ssl_con = NULL;
 	}
 	h3270.secure_connection = False;
+	h3270.valid_certificate	= False;
 #endif /*]*/
 	if (CONNECTED)
 		(void) shutdown(h3270.sock, 2);
@@ -3401,6 +3379,17 @@ LIB3270_EXPORT int lib3270_get_ssl_state(H3270 *h)
 
 #if defined(HAVE_LIBSSL)
 		return (h->secure_connection != 0);
+#else
+		return 0;
+#endif
+}
+
+LIB3270_EXPORT int lib3270_get_ssl_cert_state(H3270 *h)
+{
+	CHECK_SESSION_HANDLE(h);
+
+#if defined(HAVE_LIBSSL)
+		return (h->valid_certificate != 0);
 #else
 		return 0;
 #endif

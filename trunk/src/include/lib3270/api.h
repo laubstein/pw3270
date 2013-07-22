@@ -194,6 +194,7 @@
 
 			// Connection info
 			int					  secure_connection;
+			int					  valid_certificate;
 			int      			  sock;					/**< Network socket */
 			int					  net_sock;
 			LIB3270_CSTATE		  cstate;				/**< Connection state */
@@ -565,6 +566,7 @@
 		LIB3270_EXPORT void screen_size(int *rows, int *cols);
 
 		#define query_secure_connection(h) lib3270_get_ssl_state(h)
+		#define query_ssl_cert_check_status(h) lib3270_get_ssl_cert_state(h)
 		#define lib3270_paste_string(str) lib3270_set_string(NULL,str)
 		#define get_3270_terminal_size(h,r,c) lib3270_get_screen_size(h,r,c)
 
