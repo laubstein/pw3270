@@ -215,8 +215,8 @@
     }
 
     // NOTE (perry#1#): Is it the best way?
-//    Input_String((const unsigned char *) input);
-	lib3270_set_string(hSession, (const unsigned char *) input);
+    Input_String((const unsigned char *) input);
+	// lib3270_set_string(hSession, (const unsigned char *) input);
 
     g_free(input);
  }
